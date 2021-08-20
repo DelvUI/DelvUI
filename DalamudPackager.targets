@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+    <Target Name="PackagePlugin" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+        <DalamudPackager
+                ProjectDir="$(ProjectDir)"
+                OutputPath="$(OutputPath)"
+                AssemblyName="$(AssemblyName)"
+                MakeZip="true"
+                Include="
+                DelvUIPlugin.dll;
+                Media/Textures/bars.psd;
+                Media/Textures/HealthBar.png;
+                Media/Textures/HealthBarBG.png;
+                Media/Textures/PrimaryBar.png;
+                Media/Textures/PrimaryBarBG.png;
+                Media/Textures/SecondaryBar.png;
+                Media/Textures/SecondaryBarDim.png;
+                Media/Textures/SecondaryBarBG.png
+                Media/Textures/TargetBar.png;
+                Media/Textures/TargetBarBG.png"/>
+    </Target>
+</Project>
