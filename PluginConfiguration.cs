@@ -1,5 +1,4 @@
-﻿using System.Numerics;
-using Dalamud.Configuration;
+﻿using Dalamud.Configuration;
 using Dalamud.Plugin;
 using ImGuiNET;
 using ImGuiScene;
@@ -22,6 +21,7 @@ namespace DelvUIPlugin {
         [JsonIgnore] public TextureWrap SecondaryBarDimImage = null;
         [JsonIgnore] public TextureWrap TargetBarImage = null;
         [JsonIgnore] public TextureWrap TargetBarBackgroundImage = null;
+        [JsonIgnore] public TextureWrap BarBorder = null;
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
 
         public void Init(DalamudPluginInterface pluginInterface) {

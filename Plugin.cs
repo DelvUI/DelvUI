@@ -1,5 +1,4 @@
 ﻿using System;
-using System.ComponentModel;
 using System.IO;
 using System.Reflection;
 using Dalamud.Game.Command;
@@ -30,9 +29,7 @@ namespace DelvUIPlugin {
             _pluginConfiguration = pluginInterface.GetPluginConfig() as PluginConfiguration ?? new PluginConfiguration();
 
             _pluginConfiguration.Init(_pluginInterface);
-
-            // Pull this out of Initialize and instantiate hud class based on current job
-            _hudWindowWindow = new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration);
+            
             _configurationWindow = new ConfigurationWindow(this, _pluginConfiguration);
 
             LoadTextures();
@@ -73,6 +70,7 @@ namespace DelvUIPlugin {
             _pluginConfiguration.SecondaryBarDimImage = LoadTexture("SecondaryBarDim.png");
             _pluginConfiguration.TargetBarImage = LoadTexture("TargetBar.png");
             _pluginConfiguration.TargetBarBackgroundImage = LoadTexture("TargetBarBG.png");
+            _pluginConfiguration.BarBorder = LoadTexture("BarBorder.png");
         }
         
         // ReSharper disable once MemberCanBePrivate.Global
@@ -104,12 +102,28 @@ namespace DelvUIPlugin {
             
             if (_fontBuilt) ImGui.PushFont(_pluginConfiguration.BigNoodleTooFont);
 
+            if (_hudWindowWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
+                SwapJobs();
+            }
+
             _configurationWindow.Draw();
-            _hudWindowWindow.Draw();
+            _hudWindowWindow?.Draw();
             
             if (_fontBuilt) ImGui.PopFont();
         }
 
+        private void SwapJobs() {
+            switch (_pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
+                case 24:
+                    _hudWindowWindow = new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration);
+                    break;
+                
+                case 32:
+                    _hudWindowWindow = new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration);
+                    break;
+            }
+        }
+        
         private void OpenConfigUi(object sender, EventArgs e) {
             _configurationWindow.IsVisible = !_configurationWindow.IsVisible;
         }
@@ -120,7 +134,10 @@ namespace DelvUIPlugin {
             }
 
             _configurationWindow.IsVisible = false;
-            _hudWindowWindow.IsVisible = false;
+
+            if (_hudWindowWindow != null) {
+                _hudWindowWindow.IsVisible = false;
+            }
 
             DisposeTextures();
 
@@ -141,6 +158,7 @@ namespace DelvUIPlugin {
             _pluginConfiguration.SecondaryBarDimImage?.Dispose();
             _pluginConfiguration.TargetBarImage?.Dispose();
             _pluginConfiguration.TargetBarBackgroundImage?.Dispose();
+            _pluginConfiguration.BarBorder?.Dispose();
         }
         
         public void Dispose() {
