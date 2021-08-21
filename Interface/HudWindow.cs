@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Actors.Types;
@@ -99,6 +100,43 @@ namespace DelvUIPlugin.Interface {
             var nameSize = ImGui.CalcTextSize(name);
             ImGui.SetCursorPos(new Vector2(cursorPos.X + BarWidth - nameSize.X - indent, cursorPos.Y + BarHeight - 26));
             ImGui.TextColored(Vector4.One, name);
+
+            DrawTargetOfTargetBar(target.TargetActorID);
+        }
+        
+        protected virtual void DrawTargetOfTargetBar(int targetActorId) {
+            Actor target = null;
+            
+            for (var i = 0; i < 200; i += 2) {
+                if (PluginInterface.ClientState.Actors[i]?.ActorId == targetActorId) {
+                    target = PluginInterface.ClientState.Actors[i];
+                }
+            }
+            
+            if (!(target is Chara actor)) {
+                return;
+            }
+
+            var scale = (float) actor.CurrentHp / actor.MaxHp;
+
+            const int barWidth = 120;
+            const int barHeight = 20;
+            var cursorPos = new Vector2(CenterX + XOffset + BarWidth + 2, CenterY + YOffset);
+            var barSize = new Vector2(barWidth, barHeight);
+            ImGui.SetCursorPos(cursorPos);
+            ImGui.Image(ImageHealthBackground, barSize, Vector2.One, Vector2.Zero);
+
+            ImGui.SetCursorPos(cursorPos);
+            ImGui.Image(ImageHealth, new Vector2(barWidth * scale, barHeight), new Vector2(scale, 1f), Vector2.Zero);
+            
+            ImGui.SetCursorPos(cursorPos);
+            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+            
+            const int indent = 5;
+            ImGui.SetWindowFontScale(0.66f);
+            ImGui.SetCursorPos(new Vector2(cursorPos.X + indent, cursorPos.Y + 2));
+            ImGui.TextColored(Vector4.One, $"{actor.Name.Abbreviate().Truncate(16)}");
+            ImGui.SetWindowFontScale(1.0f);
         }
         
         public void Draw() {
