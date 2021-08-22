@@ -34,44 +34,37 @@ namespace DelvUIPlugin.Interface {
             const int chunkSize = 3000;
 
             // Chunk 1
-            var currentResource = Math.Min(actor.CurrentMp, chunkSize); 
-            var scale = (float) currentResource / chunkSize;
+            var mana = Math.Min(actor.CurrentMp, chunkSize); 
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(PluginConfiguration.PrimaryBarBackgroundImage.ImGuiHandle, barSize, Vector2.One, Vector2.Zero);
-
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(PluginConfiguration.PrimaryBarImage.ImGuiHandle, new Vector2(barWidth * scale, BarHeight), new Vector2(scale, 1f), Vector2.Zero);
-            
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+            var drawList = ImGui.GetWindowDrawList();
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + new Vector2(barSize.X * mana / chunkSize, barSize.Y), 
+                0xFFE6CD00, 0xFFD8Df3C, 0xFFD8Df3C, 0xFFE6CD00
+            );
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             
             // Chunk 2
-            currentResource = Math.Max(Math.Min(actor.CurrentMp, chunkSize * 2) - chunkSize, 0); 
-            scale = (float) currentResource / chunkSize;
+            mana = Math.Max(Math.Min(actor.CurrentMp, chunkSize * 2) - chunkSize, 0); 
             cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(PluginConfiguration.PrimaryBarBackgroundImage.ImGuiHandle, barSize, Vector2.One, Vector2.Zero);
-            
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(PluginConfiguration.PrimaryBarImage.ImGuiHandle, new Vector2(barWidth * scale, BarHeight), new Vector2(scale, 1f), Vector2.Zero);
-            
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + new Vector2(barSize.X * mana / chunkSize, barSize.Y), 
+                0xFFE6CD00, 0xFFD8Df3C, 0xFFD8Df3C, 0xFFE6CD00
+            );
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             
             // Chunk 3
-            currentResource = Math.Max(Math.Min(actor.CurrentMp, chunkSize * 3) - chunkSize * 2, 0); 
-            scale = (float) currentResource / chunkSize;
+            mana = Math.Max(Math.Min(actor.CurrentMp, chunkSize * 3) - chunkSize * 2, 0); 
             cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image( PluginConfiguration.PrimaryBarBackgroundImage.ImGuiHandle, barSize, Vector2.One, Vector2.Zero);
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(PluginConfiguration.PrimaryBarImage.ImGuiHandle, new Vector2(barWidth * scale, BarHeight), new Vector2(scale, 1f), Vector2.Zero);
-            
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + new Vector2(barSize.X * mana / chunkSize, barSize.Y), 
+                0xFFE6CD00, 0xFFD8Df3C, 0xFFD8Df3C, 0xFFE6CD00
+            );
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
         
         private void DrawSecondaryResourceBar() {
@@ -87,41 +80,49 @@ namespace DelvUIPlugin.Interface {
             var barSize = new Vector2(barWidth, BarHeight);
             
             // Chunk 1
-            int blood = gauge.Blood;
-            var currentResource = Math.Min(blood, chunkSize); 
-            var scale = (float) currentResource / chunkSize;
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(PluginConfiguration.SecondaryBarBackgroundImage.ImGuiHandle, barSize, Vector2.One, Vector2.Zero);
+            var blood = Math.Min((int)gauge.Blood, chunkSize); 
+            var scale = (float) blood / chunkSize;
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(
-                scale >= 1.0f ? PluginConfiguration.SecondaryBarImage.ImGuiHandle : PluginConfiguration.SecondaryBarDimImage.ImGuiHandle,
-                new Vector2(barWidth * scale, BarHeight),
-                new Vector2(scale, 1f),
-                Vector2.Zero
-            );
+            var drawList = ImGui.GetWindowDrawList();
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+
+            if (scale >= 1.0f) {
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight), 
+                    0xFFC40B95, 0xFFFE00BF, 0xFFFE00BF, 0xFFC40B95
+                );
+            }
+            else {
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight), 
+                    0xFF90827C, 0xFF8E8D8F, 0xFF8E8D8F, 0xFF90827C
+                );
+            }
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+
             
             // Chunk 2
-            currentResource = Math.Max(Math.Min(blood, chunkSize * 2) - chunkSize, 0); 
-            scale = (float) currentResource / chunkSize;
+            blood = Math.Max(Math.Min((int)gauge.Blood, chunkSize * 2) - chunkSize, 0); 
+            scale = (float) blood / chunkSize;
             cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(PluginConfiguration.SecondaryBarBackgroundImage.ImGuiHandle, barSize, Vector2.One, Vector2.Zero);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+
+            if (scale >= 1.0f) {
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight), 
+                    0xFF3D009B, 0xFF4D25DD, 0xFF4D25DD, 0xFF3D009B
+                );
+            }
+            else {
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight), 
+                    0xFF90827C, 0xFF8E8D8F, 0xFF8E8D8F, 0xFF90827C
+                );
+            }
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(
-                scale >= 1.0f ? PluginConfiguration.SecondaryBarImage.ImGuiHandle : PluginConfiguration.SecondaryBarDimImage.ImGuiHandle,
-                new Vector2(barWidth * scale, BarHeight),
-                new Vector2(scale, 1f),
-                Vector2.Zero
-            );
-            
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
     }
 }

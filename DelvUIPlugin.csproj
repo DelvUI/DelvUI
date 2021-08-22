@@ -74,39 +74,6 @@
         <Compile Include="Properties\AssemblyInfo.cs" />
     </ItemGroup>
     <ItemGroup>
-      <Content Include="Media\Textures\BarBorder.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Media\Textures\bars.psd">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Media\Textures\HealthBar.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Media\Textures\HealthBarBG.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Media\Textures\PrimaryBar.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Media\Textures\PrimaryBarBG.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Media\Textures\SecondaryBar.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Media\Textures\SecondaryBarBG.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Media\Textures\SecondaryBarDim.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Media\Textures\TargetBar.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <Content Include="Media\Textures\TargetBarBG.png">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
       <Content Include="DelvUIPlugin.json" />
         <Content Include="Media\Fonts\big-noodle-too.ttf">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -114,6 +81,9 @@
     </ItemGroup>
     <ItemGroup>
       <PackageReference Include="DalamudPackager" Version="1.2.1" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="Media\Textures" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

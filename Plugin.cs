@@ -4,7 +4,6 @@ using System.Reflection;
 using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using ImGuiNET;
-using ImGuiScene;
 using DelvUIPlugin.Interface;
 
 namespace DelvUIPlugin {
@@ -32,8 +31,6 @@ namespace DelvUIPlugin {
             
             _configurationWindow = new ConfigurationWindow(this, _pluginConfiguration);
 
-            LoadTextures();
-
             _pluginInterface.CommandManager.AddHandler("/pdelvui", new CommandInfo(PluginCommand) {HelpMessage = "Opens configuration window", ShowInHelp = true});
 
             _pluginInterface.UiBuilder.OnBuildUi += BuildUi;
@@ -58,36 +55,6 @@ namespace DelvUIPlugin {
                 PluginLog.Log($"Font doesn't exist. {fontFile}");
                 _fontLoadFailed = true;
             }
-        }
-
-        private void LoadTextures() {
-            _pluginConfiguration.HealthBarImage = LoadTexture("HealthBar.png");
-            _pluginConfiguration.HealthBarBackgroundImage = LoadTexture("HealthBarBG.png");
-            _pluginConfiguration.PrimaryBarImage = LoadTexture("PrimaryBar.png");
-            _pluginConfiguration.PrimaryBarBackgroundImage = LoadTexture("PrimaryBarBG.png");
-            _pluginConfiguration.SecondaryBarImage = LoadTexture("SecondaryBar.png");
-            _pluginConfiguration.SecondaryBarBackgroundImage = LoadTexture("SecondaryBarBG.png");
-            _pluginConfiguration.SecondaryBarDimImage = LoadTexture("SecondaryBarDim.png");
-            _pluginConfiguration.TargetBarImage = LoadTexture("TargetBar.png");
-            _pluginConfiguration.TargetBarBackgroundImage = LoadTexture("TargetBarBG.png");
-            _pluginConfiguration.BarBorder = LoadTexture("BarBorder.png");
-        }
-        
-        // ReSharper disable once MemberCanBePrivate.Global
-        public TextureWrap LoadTexture(string fileName) {
-            var filePath = Path.Combine($@"{Path.GetDirectoryName(AssemblyLocation)}\Media\Textures", $@"{fileName}");
-
-            if (!File.Exists(filePath)) {
-                PluginLog.Error($"{filePath} was not found.");
-                return null;
-            }
-
-            var texture = _pluginInterface.UiBuilder.LoadImage(filePath);
-            if (texture == null) {
-                PluginLog.Error($"Failed to load {filePath}.");
-            }
-
-            return texture;
         }
 
         private void PluginCommand(string command, string arguments) {
@@ -139,8 +106,6 @@ namespace DelvUIPlugin {
                 _hudWindowWindow.IsVisible = false;
             }
 
-            DisposeTextures();
-
             _pluginInterface.CommandManager.RemoveHandler("/pdelvui");
             _pluginInterface.UiBuilder.OnBuildUi -= BuildUi;
             _pluginInterface.UiBuilder.OnBuildFonts -= BuildFont;
@@ -148,19 +113,6 @@ namespace DelvUIPlugin {
             _pluginInterface.UiBuilder.RebuildFonts();
         }
 
-        private void DisposeTextures() {
-            _pluginConfiguration.HealthBarImage?.Dispose();
-            _pluginConfiguration.HealthBarBackgroundImage?.Dispose();
-            _pluginConfiguration.PrimaryBarImage?.Dispose();
-            _pluginConfiguration.PrimaryBarBackgroundImage?.Dispose();
-            _pluginConfiguration.SecondaryBarImage?.Dispose();
-            _pluginConfiguration.SecondaryBarBackgroundImage?.Dispose();
-            _pluginConfiguration.SecondaryBarDimImage?.Dispose();
-            _pluginConfiguration.TargetBarImage?.Dispose();
-            _pluginConfiguration.TargetBarBackgroundImage?.Dispose();
-            _pluginConfiguration.BarBorder?.Dispose();
-        }
-        
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);

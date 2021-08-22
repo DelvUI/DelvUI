@@ -34,23 +34,25 @@ namespace DelvUIPlugin.Interface {
             var yPos = CenterY + YOffset + BarHeight + yPadding;
             
             const float lilyCooldown = 30000f;
-            var imagePrimary = PluginConfiguration.PrimaryBarImage.ImGuiHandle;
-            var imageSecondary = PluginConfiguration.SecondaryBarImage.ImGuiHandle;
-            var imageSecondaryDim = PluginConfiguration.SecondaryBarDimImage.ImGuiHandle;
-            var imageSecondaryBackground = PluginConfiguration.SecondaryBarBackgroundImage.ImGuiHandle;
 
             var cursorPos = new Vector2(xPos, yPos);
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(imageSecondaryBackground, barSize, Vector2.One, Vector2.Zero);
-            
+            var drawList = ImGui.GetWindowDrawList();
+
             var scale = gauge.NumLilies == 0 ? gauge.LilyTimer / lilyCooldown : 1;
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(
-                gauge.NumLilies >= 1 ? imagePrimary : imageSecondaryDim, 
-                new Vector2(barWidth * scale, BarHeight), 
-                new Vector2(scale, 1f), 
-                Vector2.Zero
-            );
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+
+            if (gauge.NumLilies >= 1) {
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight), 
+                    0xFFD8D8D8, 0xFFFEFEFE, 0xFFFEFEFE, 0xFFD8D8D8
+                );
+            }
+            else {
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight),
+                    0xFF90827C, 0xFF8E8D8F, 0xFF8E8D8F, 0xFF90827C
+                );
+            }
             
             if (scale < 1) {
                 var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
@@ -58,23 +60,27 @@ namespace DelvUIPlugin.Interface {
                 DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y));
             }
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
             cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(imageSecondaryBackground, barSize, Vector2.One, Vector2.Zero);
-
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            
             if (gauge.NumLilies > 0) {
                 scale = gauge.NumLilies == 1 ? gauge.LilyTimer / lilyCooldown : 1;
-                ImGui.SetCursorPos(cursorPos);
-                ImGui.Image(
-                    gauge.NumLilies >= 2 ? imagePrimary : imageSecondaryDim,
-                    new Vector2(barWidth * scale, BarHeight),
-                    new Vector2(scale, 1f),
-                    Vector2.Zero
-                );
-
+                
+                if (gauge.NumLilies >= 2) {
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight), 
+                        0xFFD8D8D8, 0xFFFEFEFE, 0xFFFEFEFE, 0xFFD8D8D8
+                    );
+                }
+                else {
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight),
+                        0xFF90827C, 0xFF8E8D8F, 0xFF8E8D8F, 0xFF90827C
+                    );
+                }
+            
                 if (scale < 1) {
                     var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
                     var size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
@@ -82,22 +88,26 @@ namespace DelvUIPlugin.Interface {
                 }
             }
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
-
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            
             cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(imageSecondaryBackground, barSize, Vector2.One, Vector2.Zero);
-
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            
             if (gauge.NumLilies > 1) {
                 scale = gauge.NumLilies == 2 ? gauge.LilyTimer / lilyCooldown : 1;
-                ImGui.SetCursorPos(cursorPos);
-                ImGui.Image(
-                    gauge.NumLilies == 3 ? imagePrimary : imageSecondaryDim,
-                    new Vector2(barWidth * scale, BarHeight),
-                    new Vector2(scale, 1f),
-                    Vector2.Zero
-                );
+                
+                if (gauge.NumLilies == 3) {
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight), 
+                        0xFFD8D8D8, 0xFFFEFEFE, 0xFFFEFEFE, 0xFFD8D8D8
+                    );
+                }
+                else {
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight),
+                        0xFF90827C, 0xFF8E8D8F, 0xFF8E8D8F, 0xFF90827C
+                    );
+                }
                 
                 if (scale < 1) {
                     var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
@@ -106,30 +116,35 @@ namespace DelvUIPlugin.Interface {
                 }
             }
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
-
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            
             // Blood Lilies
             cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(gauge.NumBloodLily > 0 ? imageSecondary : imageSecondaryBackground, barSize, Vector2.One, Vector2.Zero);
+            scale = gauge.NumBloodLily > 0 ? 1 : 0;
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + new Vector2(barSize.X * scale, barSize.Y), 
+                0xFF3D009B, 0xFF4D25DD, 0xFF4D25DD, 0xFF3D009B
+            );
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
-
             cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(gauge.NumBloodLily > 1 ? imageSecondary : imageSecondaryBackground, barSize, Vector2.One, Vector2.Zero);
+            scale = gauge.NumBloodLily > 1 ? 1 : 0;
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + new Vector2(barSize.X * scale, barSize.Y), 
+                0xFF3D009B, 0xFF4D25DD, 0xFF4D25DD, 0xFF3D009B
+            );
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
-
             cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(gauge.NumBloodLily > 2 ? imageSecondary : imageSecondaryBackground, barSize, Vector2.One, Vector2.Zero);
-            
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+            scale = gauge.NumBloodLily > 2 ? 1 : 0;
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + new Vector2(barSize.X * scale, barSize.Y), 
+                0xFF3D009B, 0xFF4D25DD, 0xFF4D25DD, 0xFF3D009B
+            );
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
     }
 }

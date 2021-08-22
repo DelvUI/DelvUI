@@ -34,41 +34,47 @@ namespace DelvUIPlugin.Interface {
             var barSize = new Vector2(barWidth, BarHeight);
             
             // Chunk 1
-            int esprit = gauge.Esprit;
-            var currentResource = Math.Min(esprit, chunkSize); 
-            var scale = (float) currentResource / chunkSize;
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(PluginConfiguration.SecondaryBarBackgroundImage.ImGuiHandle, barSize, Vector2.One, Vector2.Zero);
+            var esprit = Math.Min((int)gauge.Esprit, chunkSize); 
+            var scale = (float) esprit / chunkSize;
+            var drawList = ImGui.GetWindowDrawList();
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(
-                scale >= 1.0f ? PluginConfiguration.SecondaryBarImage.ImGuiHandle : PluginConfiguration.SecondaryBarDimImage.ImGuiHandle,
-                new Vector2(barWidth * scale, BarHeight),
-                new Vector2(scale, 1f),
-                Vector2.Zero
-            );
+            if (scale >= 1.0f) {
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight), 
+                    0xFF3DD8FE, 0xFF3BF3FF, 0xFF3BF3FF, 0xFF3DD8FE
+                );
+            }
+            else {
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight), 
+                    0xFF90827C, 0xFF8E8D8F, 0xFF8E8D8F, 0xFF90827C
+                );
+            }
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             
             // Chunk 2
-            currentResource = Math.Max(Math.Min(esprit, chunkSize * 2) - chunkSize, 0); 
-            scale = (float) currentResource / chunkSize;
+            esprit = Math.Max(Math.Min((int)gauge.Esprit, chunkSize * 2) - chunkSize, 0); 
+            scale = (float) esprit / chunkSize;
             cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(PluginConfiguration.SecondaryBarBackgroundImage.ImGuiHandle, barSize, Vector2.One, Vector2.Zero);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(
-                scale >= 1.0f ? PluginConfiguration.SecondaryBarImage.ImGuiHandle : PluginConfiguration.SecondaryBarDimImage.ImGuiHandle,
-                new Vector2(barWidth * scale, BarHeight),
-                new Vector2(scale, 1f),
-                Vector2.Zero
-            );
+            if (scale >= 1.0f) {
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight), 
+                    0xFF3DD8FE, 0xFF3BF3FF, 0xFF3BF3FF, 0xFF3DD8FE
+                );
+            }
+            else {
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight), 
+                    0xFF90827C, 0xFF8E8D8F, 0xFF8E8D8F, 0xFF90827C
+                );
+            }
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
         
         private void DrawSecondaryResourceBar() {
@@ -82,19 +88,24 @@ namespace DelvUIPlugin.Interface {
             var barSize = new Vector2(barWidth, BarHeight);
             var xPos = CenterX - XOffset;
             var yPos = CenterY + YOffset + BarHeight + yPadding;
-            
-            var imagePrimary = PluginConfiguration.PrimaryBarImage.ImGuiHandle;
-            var imageSecondaryBg = PluginConfiguration.SecondaryBarBackgroundImage.ImGuiHandle;
-
             var cursorPos = new Vector2(xPos - xPadding - barWidth, yPos);
+            
+            var drawList = ImGui.GetWindowDrawList();
             
             for (var i = 1; i < 5; i++) {
                 cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
-                ImGui.SetCursorPos(cursorPos);
-                ImGui.Image(gauge.NumFeathers >= i ? imagePrimary : imageSecondaryBg, barSize, Vector2.One, Vector2.Zero);
-
-                ImGui.SetCursorPos(cursorPos);
-                ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+                
+                if (gauge.NumFeathers >= i) {
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + barSize, 
+                        0xFF4FD29B, 0xFF49F6AE, 0xFF49F6AE, 0xFF4FD29B
+                    );
+                }
+                else {
+                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+                }
+                
+                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             }
         }
     }

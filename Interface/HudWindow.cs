@@ -22,14 +22,9 @@ namespace DelvUIPlugin.Interface {
         protected float CenterY => ImGui.GetMainViewport().Size.Y / 2f;
         protected int XOffset => 238;
         protected int YOffset => 490;
-        protected int BarHeight => PluginConfiguration.BarBorder.Height;
-        protected int BarWidth => PluginConfiguration.BarBorder.Width;
+        protected int BarHeight => 36;
+        protected int BarWidth => 300;
         protected Vector2 BarSize => _barsize;
-        protected IntPtr ImageBorder => PluginConfiguration.BarBorder.ImGuiHandle;
-        protected IntPtr ImageHealth => PluginConfiguration.HealthBarImage.ImGuiHandle;
-        protected IntPtr ImageHealthBackground => PluginConfiguration.HealthBarBackgroundImage.ImGuiHandle;
-        protected IntPtr ImageTargetBar => PluginConfiguration.TargetBarImage.ImGuiHandle;
-        protected IntPtr ImageTargetBarBackground => PluginConfiguration.TargetBarBackgroundImage.ImGuiHandle;
         
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {
             PluginInterface = pluginInterface;
@@ -54,13 +49,13 @@ namespace DelvUIPlugin.Interface {
             ImGui.SetCursorPos(cursorPos);
             
             if (ImGui.BeginChild("health_bar", BarSize)) {
-                ImGui.Image(ImageHealthBackground, BarSize, Vector2.One, Vector2.Zero);
-
-                ImGui.SetCursorPos(Vector2.Zero);
-                ImGui.Image(ImageHealth, new Vector2(BarWidth * scale, BarHeight), new Vector2(scale, 1f), Vector2.Zero);
-
-                ImGui.SetCursorPos(Vector2.Zero);
-                ImGui.Image(ImageBorder, BarSize, Vector2.One, Vector2.Zero);
+                var drawList = ImGui.GetWindowDrawList();
+                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0xFF17055D);
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(BarWidth * scale, BarHeight), 
+                    0xFF3D009B, 0xFF4D25DD, 0xFF4D25DD, 0xFF3D009B
+                );
+                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
 
                 if (ImGui.IsItemClicked()) {
                     PluginInterface.ClientState.Targets.SetCurrentTarget(actor);
@@ -76,14 +71,13 @@ namespace DelvUIPlugin.Interface {
             var barSize = new Vector2(357, 26);
             var cursorPos = new Vector2(CenterX - 178, CenterY + 496);
             
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(PluginConfiguration.PrimaryBarBackgroundImage.ImGuiHandle, barSize, Vector2.One, Vector2.Zero);
-
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(PluginConfiguration.PrimaryBarImage.ImGuiHandle, new Vector2(357 * scale, 26), new Vector2(scale, 1f), Vector2.Zero);
-            
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+            var drawList = ImGui.GetWindowDrawList();
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + new Vector2(barSize.X * scale, barSize.Y), 
+                0xFFE6CD00, 0xFFD8Df3C, 0xFFD8Df3C, 0xFFE6CD00
+            );
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
         
         protected virtual void DrawTargetBar() {
@@ -94,17 +88,13 @@ namespace DelvUIPlugin.Interface {
             }
 
             var scale = (float) actor.CurrentHp / actor.MaxHp;
-                
             var cursorPos = new Vector2(CenterX + XOffset, CenterY + YOffset);
-            
             ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageTargetBarBackground, BarSize, Vector2.One, Vector2.Zero);
-
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageTargetBar, new Vector2(BarWidth * scale, BarHeight), new Vector2(scale, 1f), Vector2.Zero);
-            
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, BarSize, Vector2.One, Vector2.Zero);
+ 
+            var drawList = ImGui.GetWindowDrawList();
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0xFF13374E);
+            drawList.AddRectFilledMultiColor(cursorPos, cursorPos + new Vector2(BarWidth * scale, BarHeight), 0xFF4091D6, 0xFF45C7E6, 0xFF45C7E6, 0xFF4091D6);
+            drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
             
             var percentage = $"{(int) (scale * 100)}";
             var percentageSize = ImGui.CalcTextSize(percentage);
@@ -132,26 +122,27 @@ namespace DelvUIPlugin.Interface {
                 return;
             }
 
-            var scale = (float) actor.CurrentHp / actor.MaxHp;
-
             const int barWidth = 120;
             const int barHeight = 20;
-            var cursorPos = new Vector2(CenterX + XOffset + BarWidth + 2, CenterY + YOffset);
             var barSize = new Vector2(barWidth, barHeight);
 
             var name = $"{actor.Name.Abbreviate().Truncate(12)}";
             var textSize = ImGui.CalcTextSize(name);
+
+            var cursorPos = new Vector2(CenterX + XOffset + BarWidth + 2, CenterY + YOffset);
             DrawOutlinedText(name, new Vector2(cursorPos.X + barWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
-                
-            ImGui.SetCursorPos(cursorPos);
+            ImGui.SetCursorPos(cursorPos);    
+            
             if (ImGui.BeginChild("target_bar", barSize)) {
-                ImGui.Image(ImageHealthBackground, barSize, Vector2.One, Vector2.Zero);
-
-                ImGui.SetCursorPos(Vector2.Zero);
-                ImGui.Image(ImageHealth, new Vector2(barWidth * scale, barHeight), new Vector2(scale, 1f), Vector2.Zero);
-
-                ImGui.SetCursorPos(Vector2.Zero);
-                ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+                var drawList = ImGui.GetWindowDrawList();
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0xFF17055D);
+                
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2((float)barWidth * actor.CurrentHp / actor.MaxHp, barHeight), 
+                    0xFF3D009B, 0xFF4D25DD, 0xFF4D25DD, 0xFF3D009B
+                );
+                
+                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
                 
                 if (ImGui.IsItemClicked()) {
                     PluginInterface.ClientState.Targets.SetCurrentTarget(target);
