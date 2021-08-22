@@ -52,6 +52,12 @@ namespace DelvUIPlugin.Interface {
                 Vector2.Zero
             );
             
+            if (scale < 1) {
+                var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
+                var size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
+                DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y));
+            }
+            
             ImGui.SetCursorPos(cursorPos);
             ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
 
@@ -68,6 +74,12 @@ namespace DelvUIPlugin.Interface {
                     new Vector2(scale, 1f),
                     Vector2.Zero
                 );
+
+                if (scale < 1) {
+                    var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
+                    var size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
+                    DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y));
+                }
             }
             
             ImGui.SetCursorPos(cursorPos);
@@ -86,6 +98,12 @@ namespace DelvUIPlugin.Interface {
                     new Vector2(scale, 1f),
                     Vector2.Zero
                 );
+                
+                if (scale < 1) {
+                    var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
+                    var size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
+                    DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y));
+                }
             }
             
             ImGui.SetCursorPos(cursorPos);

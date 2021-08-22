@@ -16,6 +16,8 @@ namespace DelvUIPlugin.Interface {
 
         public abstract uint JobId { get; }
 
+        protected Vector4 ColorBlack => new Vector4(0f, 0f, 0f, 1f);
+        
         protected float CenterX => ImGui.GetMainViewport().Size.X / 2f;
         protected float CenterY => ImGui.GetMainViewport().Size.Y / 2f;
         protected int XOffset => 238;
@@ -38,29 +40,34 @@ namespace DelvUIPlugin.Interface {
         protected virtual void DrawHealthBar() {
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentHp / actor.MaxHp;
-            
+
             var cursorPos = new Vector2(CenterX - BarWidth - XOffset, CenterY + YOffset);
 
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageHealthBackground, BarSize, Vector2.One, Vector2.Zero);
-
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageHealth, new Vector2(BarWidth * scale, BarHeight), new Vector2(scale, 1f), Vector2.Zero);
-            
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, BarSize, Vector2.One, Vector2.Zero);
-            
-            const int indent = 5;
-            ImGui.SetCursorPos(new Vector2(cursorPos.X + indent, cursorPos.Y + BarHeight - 26));
-            ImGui.TextColored(Vector4.One, $"{actor.Name.Abbreviate().Truncate(16)}");
+            DrawOutlinedText($"{actor.Name.Abbreviate().Truncate(16)}", new Vector2(cursorPos.X + 5, cursorPos.Y -22));
             
             var hp = $"{actor.MaxHp.KiloFormat(),6} | ";
             var hpSize = ImGui.CalcTextSize(hp);
             var percentageSize = ImGui.CalcTextSize("100");
-            ImGui.SetCursorPos(new Vector2(cursorPos.X + BarWidth - hpSize.X - percentageSize.X - indent, cursorPos.Y + BarHeight - 26));
-            ImGui.TextColored(Vector4.One, hp);
-            ImGui.SetCursorPos(new Vector2(cursorPos.X + BarWidth - percentageSize.X - indent, cursorPos.Y + BarHeight - 26));
-            ImGui.TextColored(Vector4.One, $"{(int)(scale * 100),3}");
+            DrawOutlinedText(hp, new Vector2(cursorPos.X + BarWidth - hpSize.X - percentageSize.X - 5, cursorPos.Y -22));
+            DrawOutlinedText($"{(int)(scale * 100),3}", new Vector2(cursorPos.X + BarWidth - percentageSize.X - 5, cursorPos.Y -22));
+            
+            ImGui.SetCursorPos(cursorPos);
+            
+            if (ImGui.BeginChild("health_bar", BarSize)) {
+                ImGui.Image(ImageHealthBackground, BarSize, Vector2.One, Vector2.Zero);
+
+                ImGui.SetCursorPos(Vector2.Zero);
+                ImGui.Image(ImageHealth, new Vector2(BarWidth * scale, BarHeight), new Vector2(scale, 1f), Vector2.Zero);
+
+                ImGui.SetCursorPos(Vector2.Zero);
+                ImGui.Image(ImageBorder, BarSize, Vector2.One, Vector2.Zero);
+
+                if (ImGui.IsItemClicked()) {
+                    PluginInterface.ClientState.Targets.SetCurrentTarget(actor);
+                }
+                
+                ImGui.EndChild();
+            }
         }
 
         protected virtual void DrawPrimaryResourceBar() {
@@ -99,20 +106,15 @@ namespace DelvUIPlugin.Interface {
             ImGui.SetCursorPos(cursorPos);
             ImGui.Image(ImageBorder, BarSize, Vector2.One, Vector2.Zero);
             
-            var indent = 5;
             var percentage = $"{(int) (scale * 100)}";
             var percentageSize = ImGui.CalcTextSize(percentage);
             var maxPercentageSize = ImGui.CalcTextSize("100");
-            ImGui.SetCursorPos(new Vector2(cursorPos.X + indent + maxPercentageSize.X - percentageSize.X, cursorPos.Y + BarHeight - 26));
-            ImGui.TextColored(Vector4.One, percentage);
+            DrawOutlinedText(percentage, new Vector2(cursorPos.X + 5 + maxPercentageSize.X - percentageSize.X, cursorPos.Y - 22));
+            DrawOutlinedText($" | {actor.MaxHp.KiloFormat(),-6}", new Vector2(cursorPos.X + 5 + maxPercentageSize.X, cursorPos.Y - 22));
             
-            ImGui.SetCursorPos(new Vector2(cursorPos.X + indent + maxPercentageSize.X, cursorPos.Y + BarHeight - 26));
-            ImGui.TextColored(Vector4.One, $" | {actor.MaxHp.KiloFormat(),-6}");
-
             var name = $"{actor.Name.Abbreviate().Truncate(16)}";
             var nameSize = ImGui.CalcTextSize(name);
-            ImGui.SetCursorPos(new Vector2(cursorPos.X + BarWidth - nameSize.X - indent, cursorPos.Y + BarHeight - 26));
-            ImGui.TextColored(Vector4.One, name);
+            DrawOutlinedText(name, new Vector2(cursorPos.X + BarWidth - nameSize.X - 5, cursorPos.Y - 22));
 
             DrawTargetOfTargetBar(target.TargetActorID);
         }
@@ -136,29 +138,60 @@ namespace DelvUIPlugin.Interface {
             const int barHeight = 20;
             var cursorPos = new Vector2(CenterX + XOffset + BarWidth + 2, CenterY + YOffset);
             var barSize = new Vector2(barWidth, barHeight);
-            ImGui.SetCursorPos(cursorPos);
 
+            var name = $"{actor.Name.Abbreviate().Truncate(12)}";
+            var textSize = ImGui.CalcTextSize(name);
+            DrawOutlinedText(name, new Vector2(cursorPos.X + barWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
+                
+            ImGui.SetCursorPos(cursorPos);
             if (ImGui.BeginChild("target_bar", barSize)) {
                 ImGui.Image(ImageHealthBackground, barSize, Vector2.One, Vector2.Zero);
 
-                ImGui.SetCursorPos(new Vector2(0, 0));
+                ImGui.SetCursorPos(Vector2.Zero);
                 ImGui.Image(ImageHealth, new Vector2(barWidth * scale, barHeight), new Vector2(scale, 1f), Vector2.Zero);
 
-                ImGui.SetCursorPos(new Vector2(0, 0));
+                ImGui.SetCursorPos(Vector2.Zero);
                 ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
-
-                const int indent = 5;
-                ImGui.SetWindowFontScale(0.66f);
-                ImGui.SetCursorPos(new Vector2(indent, 2));
-                ImGui.TextColored(Vector4.One, $"{actor.Name.Abbreviate().Truncate(16)}");
-                ImGui.SetWindowFontScale(1.0f);
-             
+                
                 if (ImGui.IsItemClicked()) {
                     PluginInterface.ClientState.Targets.SetCurrentTarget(target);
                 }
-
+                
                 ImGui.EndChild();
             }
+        }
+
+        protected void DrawOutlinedText(string text, Vector2 pos) {
+            DrawOutlinedText(text, pos, Vector4.One, new Vector4(0f, 0f, 0f, 1f));
+        }
+        
+        protected void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor) {
+            ImGui.SetCursorPos(new Vector2(pos.X - 1, pos.Y + 1));
+            ImGui.TextColored(outlineColor, text);
+                
+            ImGui.SetCursorPos(new Vector2(pos.X, pos.Y+1));
+            ImGui.TextColored(outlineColor, text);
+                
+            ImGui.SetCursorPos(new Vector2(pos.X+1, pos.Y+1));
+            ImGui.TextColored(outlineColor, text);
+                
+            ImGui.SetCursorPos(new Vector2(pos.X-1, pos.Y));
+            ImGui.TextColored(outlineColor, text);
+
+            ImGui.SetCursorPos(new Vector2(pos.X+1, pos.Y));
+            ImGui.TextColored(outlineColor, text);
+                
+            ImGui.SetCursorPos(new Vector2(pos.X-1, pos.Y-1));
+            ImGui.TextColored(outlineColor, text);
+                
+            ImGui.SetCursorPos(new Vector2(pos.X, pos.Y-1));
+            ImGui.TextColored(outlineColor, text);
+                
+            ImGui.SetCursorPos(new Vector2(pos.X+1, pos.Y-1));
+            ImGui.TextColored(outlineColor, text);
+                
+            ImGui.SetCursorPos(new Vector2(pos.X, pos.Y));
+            ImGui.TextColored(color, text);
         }
         
         public void Draw() {
