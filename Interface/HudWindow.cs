@@ -137,19 +137,28 @@ namespace DelvUIPlugin.Interface {
             var cursorPos = new Vector2(CenterX + XOffset + BarWidth + 2, CenterY + YOffset);
             var barSize = new Vector2(barWidth, barHeight);
             ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageHealthBackground, barSize, Vector2.One, Vector2.Zero);
 
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageHealth, new Vector2(barWidth * scale, barHeight), new Vector2(scale, 1f), Vector2.Zero);
-            
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
-            
-            const int indent = 5;
-            ImGui.SetWindowFontScale(0.66f);
-            ImGui.SetCursorPos(new Vector2(cursorPos.X + indent, cursorPos.Y + 2));
-            ImGui.TextColored(Vector4.One, $"{actor.Name.Abbreviate().Truncate(16)}");
-            ImGui.SetWindowFontScale(1.0f);
+            if (ImGui.BeginChild("target_bar", barSize)) {
+                ImGui.Image(ImageHealthBackground, barSize, Vector2.One, Vector2.Zero);
+
+                ImGui.SetCursorPos(new Vector2(0, 0));
+                ImGui.Image(ImageHealth, new Vector2(barWidth * scale, barHeight), new Vector2(scale, 1f), Vector2.Zero);
+
+                ImGui.SetCursorPos(new Vector2(0, 0));
+                ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+
+                const int indent = 5;
+                ImGui.SetWindowFontScale(0.66f);
+                ImGui.SetCursorPos(new Vector2(indent, 2));
+                ImGui.TextColored(Vector4.One, $"{actor.Name.Abbreviate().Truncate(16)}");
+                ImGui.SetWindowFontScale(1.0f);
+             
+                if (ImGui.IsItemClicked()) {
+                    PluginInterface.ClientState.Targets.SetCurrentTarget(target);
+                }
+
+                ImGui.EndChild();
+            }
         }
         
         public void Draw() {
@@ -170,7 +179,7 @@ namespace DelvUIPlugin.Interface {
             if (!begin) {
                 return;
             }
-            
+
             Draw(true);
             
             ImGui.End();
