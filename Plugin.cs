@@ -95,6 +95,8 @@ namespace DelvUIPlugin {
         }
 
         private void BuildUi() {
+            _pluginInterface.UiBuilder.OverrideGameCursor = false;
+            
             if (!_fontBuilt && !_fontLoadFailed) {
                 _pluginInterface.UiBuilder.RebuildFonts();
                 return;
