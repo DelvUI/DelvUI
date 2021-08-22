@@ -63,6 +63,7 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="Interface\DancerHudWindow.cs" />
         <Compile Include="Interface\DarkKnightHudWindow.cs" />
         <Compile Include="Interface\WhiteMageHudWindow.cs" />
         <Compile Include="PluginConfiguration.cs" />

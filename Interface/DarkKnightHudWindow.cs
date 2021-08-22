@@ -22,7 +22,7 @@ namespace DelvUIPlugin.Interface {
             DrawTargetBar();
         }
 
-        private void DrawPrimaryResourceBar() {
+        protected override void DrawPrimaryResourceBar() {
             var actor = PluginInterface.ClientState.LocalPlayer;
 
             const int xPadding = 6;

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
@@ -22,22 +21,6 @@ namespace DelvUIPlugin.Interface {
             DrawTargetBar();
         }
 
-        private void DrawPrimaryResourceBar() {
-            var actor = PluginInterface.ClientState.LocalPlayer;
-            var scale = (float) actor.CurrentMp / actor.MaxMp;
-            var barSize = new Vector2(BarWidth, BarHeight);
-            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset);
-            
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(PluginConfiguration.PrimaryBarBackgroundImage.ImGuiHandle, barSize, Vector2.One, Vector2.Zero);
-
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(PluginConfiguration.PrimaryBarImage.ImGuiHandle, new Vector2(BarWidth * scale, BarHeight), new Vector2(scale, 1f), Vector2.Zero);
-            
-            ImGui.SetCursorPos(cursorPos);
-            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
-        }
-        
         private void DrawSecondaryResourceBar() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<WHMGauge>();
 

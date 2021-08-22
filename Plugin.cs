@@ -113,15 +113,13 @@ namespace DelvUIPlugin {
         }
 
         private void SwapJobs() {
-            switch (_pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
-                case 24:
-                    _hudWindowWindow = new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration);
-                    break;
-                
-                case 32:
-                    _hudWindowWindow = new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration);
-                    break;
-            }
+            _hudWindowWindow = _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id switch
+            {
+                24 => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
+                32 => new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration),
+                38 => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
+                _ => _hudWindowWindow
+            };
         }
         
         private void OpenConfigUi(object sender, EventArgs e) {

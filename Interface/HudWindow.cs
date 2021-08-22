@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Actors.Types;
@@ -23,9 +22,7 @@ namespace DelvUIPlugin.Interface {
         protected int YOffset => 490;
         protected int BarHeight => PluginConfiguration.BarBorder.Height;
         protected int BarWidth => PluginConfiguration.BarBorder.Width;
-
         protected Vector2 BarSize => _barsize;
-
         protected IntPtr ImageBorder => PluginConfiguration.BarBorder.ImGuiHandle;
         protected IntPtr ImageHealth => PluginConfiguration.HealthBarImage.ImGuiHandle;
         protected IntPtr ImageHealthBackground => PluginConfiguration.HealthBarBackgroundImage.ImGuiHandle;
@@ -66,6 +63,22 @@ namespace DelvUIPlugin.Interface {
             ImGui.TextColored(Vector4.One, $"{(int)(scale * 100),3}");
         }
 
+        protected virtual void DrawPrimaryResourceBar() {
+            var actor = PluginInterface.ClientState.LocalPlayer;
+            var scale = (float) actor.CurrentMp / actor.MaxMp;
+            var barSize = new Vector2(357, 26);
+            var cursorPos = new Vector2(CenterX - 178, CenterY + 496);
+            
+            ImGui.SetCursorPos(cursorPos);
+            ImGui.Image(PluginConfiguration.PrimaryBarBackgroundImage.ImGuiHandle, barSize, Vector2.One, Vector2.Zero);
+
+            ImGui.SetCursorPos(cursorPos);
+            ImGui.Image(PluginConfiguration.PrimaryBarImage.ImGuiHandle, new Vector2(357 * scale, 26), new Vector2(scale, 1f), Vector2.Zero);
+            
+            ImGui.SetCursorPos(cursorPos);
+            ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
+        }
+        
         protected virtual void DrawTargetBar() {
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
