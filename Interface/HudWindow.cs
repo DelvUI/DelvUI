@@ -128,7 +128,7 @@ namespace DelvUIPlugin.Interface {
             
             if (!(target is Chara actor)) {
                 return;
-            }q
+            }
 
             const int barWidth = 120;
             const int barHeight = 20;
