@@ -13,12 +13,12 @@ namespace DelvUIPlugin {
 
         private DalamudPluginInterface _pluginInterface;
         private PluginConfiguration _pluginConfiguration;
-        private HudWindow _hudWindowWindow;
+        private HudWindow _hudWindow;
         private ConfigurationWindow _configurationWindow;
 
         private bool _fontBuilt;
         private bool _fontLoadFailed;
-
+        
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         // ReSharper disable once MemberCanBePrivate.Global
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
@@ -26,12 +26,14 @@ namespace DelvUIPlugin {
         public void Initialize(DalamudPluginInterface pluginInterface) {
             _pluginInterface = pluginInterface;
             _pluginConfiguration = pluginInterface.GetPluginConfig() as PluginConfiguration ?? new PluginConfiguration();
-
             _pluginConfiguration.Init(_pluginInterface);
-            
-            _configurationWindow = new ConfigurationWindow(this, _pluginConfiguration);
+            _configurationWindow = new ConfigurationWindow(this, _pluginInterface, _pluginConfiguration);
 
-            _pluginInterface.CommandManager.AddHandler("/pdelvui", new CommandInfo(PluginCommand) {HelpMessage = "Opens configuration window", ShowInHelp = true});
+            _pluginInterface.CommandManager.AddHandler("/pdelvui", new CommandInfo(PluginCommand)
+            {
+                HelpMessage = "Opens the DelvUI configuration window.", 
+                ShowInHelp = true
+            });
 
             _pluginInterface.UiBuilder.OnBuildUi += BuildUi;
             _pluginInterface.UiBuilder.OnBuildFonts += BuildFont;
@@ -71,23 +73,25 @@ namespace DelvUIPlugin {
             
             if (_fontBuilt) ImGui.PushFont(_pluginConfiguration.BigNoodleTooFont);
 
-            if (_hudWindowWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
+            if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
                 SwapJobs();
             }
 
             _configurationWindow.Draw();
-            _hudWindowWindow?.Draw();
-            
-            if (_fontBuilt) ImGui.PopFont();
+            _hudWindow?.Draw();
+
+            if (_fontBuilt) {
+                ImGui.PopFont();
+            }
         }
 
         private void SwapJobs() {
-            _hudWindowWindow = _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id switch
+            _hudWindow = _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id switch
             {
-                24 => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
-                32 => new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration),
-                38 => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
-                _ => _hudWindowWindow
+                Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.DRK => new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.DNC => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
+                _ => _hudWindow
             };
         }
         
@@ -102,8 +106,8 @@ namespace DelvUIPlugin {
 
             _configurationWindow.IsVisible = false;
 
-            if (_hudWindowWindow != null) {
-                _hudWindowWindow.IsVisible = false;
+            if (_hudWindow != null) {
+                _hudWindow.IsVisible = false;
             }
 
             _pluginInterface.CommandManager.RemoveHandler("/pdelvui");

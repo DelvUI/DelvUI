@@ -1,7 +1,38 @@
 ﻿using System;
+using System.Numerics;
 
 namespace DelvUIPlugin {
     public static class Extensions {
+        public static string Abbreviate(this string str) {
+            var splits = str.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+            
+            for (var i = 0; i < splits.Length - 1; i++) {
+                splits[i] = splits[i][0].ToString();
+            }
+    
+            return string.Join(". ", splits).ToUpper();
+        }
+
+        public static Vector4 AdjustColor(this Vector4 vec, float correctionFactor) {
+            var red = vec.X;
+            var green = vec.Y;
+            var blue = vec.Z;
+
+            if (correctionFactor < 0) {
+                correctionFactor = 1 + correctionFactor;
+                red *= correctionFactor;
+                green *= correctionFactor;
+                blue *= correctionFactor;
+            }
+            else {
+                red = (1 - red) * correctionFactor + red;
+                green = (1 - green) * correctionFactor + green;
+                blue = (1 - blue) * correctionFactor + blue;
+            }
+
+            return new Vector4(red, green, blue, vec.W);
+        }
+        
         public static string KiloFormat(this int num)
         {
             if (num >= 100000000)
@@ -18,16 +49,6 @@ namespace DelvUIPlugin {
 
             return num.ToString("#,0");
         } 
-        
-        public static string Abbreviate(this string str) {
-            var splits = str.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-            
-            for (var i = 0; i < splits.Length - 1; i++) {
-                splits[i] = splits[i][0].ToString();
-            }
-    
-            return string.Join(". ", splits).ToUpper();
-        }
         
         public static string Truncate(this string value, int maxLength)
         {

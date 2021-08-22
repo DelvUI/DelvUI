@@ -1,13 +1,16 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using System.Numerics;
-using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
+using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
 using Dalamud.Interface;
 using Dalamud.Plugin;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 
 namespace DelvUIPlugin.Interface {
+    
     public abstract class HudWindow {
         public bool IsVisible = true;
         protected readonly DalamudPluginInterface PluginInterface;
@@ -49,11 +52,12 @@ namespace DelvUIPlugin.Interface {
             ImGui.SetCursorPos(cursorPos);
             
             if (ImGui.BeginChild("health_bar", BarSize)) {
+                var colors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
                 var drawList = ImGui.GetWindowDrawList();
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0xFF17055D);
+                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(BarWidth * scale, BarHeight), 
-                    0xFF3D009B, 0xFF4D25DD, 0xFF4D25DD, 0xFF3D009B
+                    colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
                 );
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
 
@@ -91,9 +95,13 @@ namespace DelvUIPlugin.Interface {
             var cursorPos = new Vector2(CenterX + XOffset, CenterY + YOffset);
             ImGui.SetCursorPos(cursorPos);
  
+            var colors = DetermineTargetPlateColors(actor);
             var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0xFF13374E);
-            drawList.AddRectFilledMultiColor(cursorPos, cursorPos + new Vector2(BarWidth * scale, BarHeight), 0xFF4091D6, 0xFF45C7E6, 0xFF45C7E6, 0xFF4091D6);
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + new Vector2(BarWidth * scale, BarHeight), 
+                colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+            );
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
             
             var percentage = $"{(int) (scale * 100)}";
@@ -120,7 +128,7 @@ namespace DelvUIPlugin.Interface {
             
             if (!(target is Chara actor)) {
                 return;
-            }
+            }q
 
             const int barWidth = 120;
             const int barHeight = 20;
@@ -133,13 +141,14 @@ namespace DelvUIPlugin.Interface {
             DrawOutlinedText(name, new Vector2(cursorPos.X + barWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
             ImGui.SetCursorPos(cursorPos);    
             
+            var colors = DetermineTargetPlateColors(actor);
             if (ImGui.BeginChild("target_bar", barSize)) {
                 var drawList = ImGui.GetWindowDrawList();
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0xFF17055D);
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["background"]);
                 
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2((float)barWidth * actor.CurrentHp / actor.MaxHp, barHeight), 
-                    0xFF3D009B, 0xFF4D25DD, 0xFF4D25DD, 0xFF3D009B
+                    colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
                 );
                 
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
@@ -150,6 +159,32 @@ namespace DelvUIPlugin.Interface {
                 
                 ImGui.EndChild();
             }
+        }
+
+        protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor) {
+            var colors = PluginConfiguration.NPCColorMap["neutral"];
+            
+            // Still need to figure out the "orange" state; aggroed but not yet attacked.
+            switch (actor.ObjectKind) {
+                case ObjectKind.Player:
+                    colors = PluginConfiguration.JobColorMap[actor.ClassJob.Id];
+                    break;
+
+                case ObjectKind.BattleNpc when (actor.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat:
+                    colors = PluginConfiguration.NPCColorMap["hostile"];
+                    break;
+
+                case ObjectKind.BattleNpc:
+                {
+                    if (!IsHostileMemory((BattleNpc)actor)) {
+                        colors = PluginConfiguration.NPCColorMap["friendly"];
+                    }
+
+                    break;
+                }
+            }
+
+            return colors;
         }
 
         protected void DrawOutlinedText(string text, Vector2 pos) {
@@ -220,15 +255,18 @@ namespace DelvUIPlugin.Interface {
                 return false;
             }
 
-            if (PluginConfiguration.HideCombat && PluginInterface.ClientState.Condition[ConditionFlag.InCombat]) {
-                return false;
-            }
-
             var parameterWidget = (AtkUnitBase*) PluginInterface.Framework.Gui.GetUiObjectByName("_ParameterWidget", 1);
             var fadeMiddleWidget = (AtkUnitBase*) PluginInterface.Framework.Gui.GetUiObjectByName("FadeMiddle", 1);
             
             // Display HUD only if parameter widget is visible and we're not in a fade event
             return PluginInterface.ClientState.LocalPlayer == null || parameterWidget == null || fadeMiddleWidget == null || !parameterWidget->IsVisible || fadeMiddleWidget->IsVisible;
+        }
+        
+        unsafe bool IsHostileMemory(BattleNpc npc)
+        {
+            return (npc.BattleNpcKind == BattleNpcSubKind.Enemy || (int)npc.BattleNpcKind == 1) 
+                   && *(byte*)(npc.Address + 0x1980) != 0 
+                   && *(byte*)(npc.Address + 0x193C) != 1;
         }
     }
 }
