@@ -84,14 +84,14 @@ namespace DelvUIPlugin.Interface {
             var yPos = CenterY + YOffset + BarHeight + yPadding;
             
             var imagePrimary = PluginConfiguration.PrimaryBarImage.ImGuiHandle;
-            var imageSecondaryDim = PluginConfiguration.SecondaryBarDimImage.ImGuiHandle;
+            var imageSecondaryBg = PluginConfiguration.SecondaryBarBackgroundImage.ImGuiHandle;
 
             var cursorPos = new Vector2(xPos - xPadding - barWidth, yPos);
             
             for (var i = 1; i < 5; i++) {
                 cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
                 ImGui.SetCursorPos(cursorPos);
-                ImGui.Image(gauge.NumFeathers >= i ? imagePrimary : imageSecondaryDim, barSize, Vector2.One, Vector2.Zero);
+                ImGui.Image(gauge.NumFeathers >= i ? imagePrimary : imageSecondaryBg, barSize, Vector2.One, Vector2.Zero);
 
                 ImGui.SetCursorPos(cursorPos);
                 ImGui.Image(ImageBorder, barSize, Vector2.One, Vector2.Zero);
