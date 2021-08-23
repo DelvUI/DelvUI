@@ -1,0 +1,27 @@
+name: Help wanted
+description: For when you are having issues setting up DelvUI
+title: "[Help wanted]: "
+labels: [help wanted]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What's the issue?
+      description: Also tell us, what are you trying to do / achieve?
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  # - type: textarea
+  #   id: config
+  #   attributes:
+  #     label: Settings Export
+  #     description: Please export your settings by going into Settings -> Import / Export -> Export Settings. Just paste the code in here and it will be automatically formatted into code, so no need for backticks.
+  #     render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: FFXIV Update
+      description: Whenever Final Fantasy has an update, XIVLauncher needs an update so please don't open issues during that window.
+      options:
+        - label: I have confirmed that I have the latest version of XIVLauncher and DelvUI.
+          required: true

@@ -1,0 +1,12 @@
+name: Suggestion
+description: For when you want to suggest new features for DelvUI
+title: "[Suggestion]: "
+labels: [suggestion]
+body:
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: What's your suggestion?
+      description: Please try to be detailed explaining what you want.
+    validations:
+      required: true

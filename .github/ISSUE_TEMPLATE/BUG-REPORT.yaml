@@ -1,0 +1,51 @@
+name: Bug
+description: For when you have found a bug
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What are you trying to do?
+      description: What are you trying to do?
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behaviors
+    attributes:
+      label: What is the expected behavior?
+      description: What do you think should happen?
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  - type: textarea
+    id: actually-happened
+    attributes:
+      label: What actually happened?
+      description: Please try to be as descriptive as possible.
+      placeholder: Tell us what you see!
+    validations:
+      required: true
+  - type: textarea
+    id: suggested-solution
+    attributes:
+      label: Suggested solution
+      description: If you have any idea how we could solve it let me know.
+      placeholder: Tell us what you see!
+    validations:
+      required: false
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: If you have any errors in the log please put them here
+      render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: FFXIV Update
+      description: Whenever Final Fantasy has an update, XIVLauncher needs an update so please don't open issues during that window.
+      options:
+        - label: I have confirmed that I have the latest version of XIVLauncher and DelvUI.
+          required: true
