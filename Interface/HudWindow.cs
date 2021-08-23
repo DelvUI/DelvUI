@@ -23,10 +23,10 @@ namespace DelvUIPlugin.Interface {
         
         protected float CenterX => ImGui.GetMainViewport().Size.X / 2f;
         protected float CenterY => ImGui.GetMainViewport().Size.Y / 2f;
-        protected int XOffset => 238;
-        protected int YOffset => 490;
-        protected int BarHeight => 36;
-        protected int BarWidth => 300;
+        protected int XOffset => 190;
+        protected int YOffset => 460;
+        protected int BarHeight => 50;
+        protected int BarWidth => 270;
         protected Vector2 BarSize => _barsize;
         
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {

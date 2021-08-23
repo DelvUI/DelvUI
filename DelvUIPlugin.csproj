@@ -42,16 +42,10 @@
           <HintPath>..\FFXIVClientStructs\bin\Debug\FFXIVClientStructs.dll</HintPath>
         </Reference>
         <Reference Include="ImGui.NET, Version=1.72.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\..\Assemblies\ImGui.NET.dll</HintPath>
+          <HintPath>C:\Users\jdsmi\AppData\Roaming\XIVLauncher\addon\Hooks\dev\ImGui.NET.dll</HintPath>
         </Reference>
         <Reference Include="ImGuiScene, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\..\Assemblies\ImGuiScene.dll</HintPath>
-        </Reference>
-        <Reference Include="Lumina, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\..\Assemblies\Lumina.dll</HintPath>
-        </Reference>
-        <Reference Include="Lumina.Excel, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\..\Assemblies\Lumina.Excel.dll</HintPath>
+          <HintPath>C:\Users\jdsmi\AppData\Roaming\XIVLauncher\addon\Hooks\dev\ImGuiScene.dll</HintPath>
         </Reference>
         <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
           <HintPath>C:\Users\jdsmi\AppData\Roaming\XIVLauncher\addon\Hooks\5.2.6.1\Newtonsoft.Json.dll</HintPath>

@@ -8,10 +8,10 @@ namespace DelvUIPlugin.Interface {
     public class DarkKnightHudWindow : HudWindow {
         public override uint JobId => 32;
 
-        private new int BarHeight => 26;
-        private new int BarWidth => 357;
-        private new int XOffset => 178;
-        private new int YOffset => 496;
+        private new int BarHeight => 13;
+        private new int BarWidth => 320;
+        private new int XOffset => 160;
+        private new int YOffset => 466;
         
         public DarkKnightHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
@@ -25,11 +25,11 @@ namespace DelvUIPlugin.Interface {
         protected override void DrawPrimaryResourceBar() {
             var actor = PluginInterface.ClientState.LocalPlayer;
 
-            const int xPadding = 6;
+            const int xPadding = 2;
             var barWidth = (BarWidth - xPadding * 2)  / 3.0f;
             var barSize = new Vector2(barWidth, BarHeight);
             var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset;
+            var yPos = CenterY + YOffset - 33;
             var cursorPos = new Vector2(xPos, yPos);
             const int chunkSize = 3000;
 
@@ -70,11 +70,10 @@ namespace DelvUIPlugin.Interface {
         private void DrawSecondaryResourceBar() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DRKGauge>();
             
-            const int xPadding = 5;
-            const int yPadding = 3;
+            const int xPadding = 2;
             var barWidth = (BarWidth - xPadding) / 2;
             var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset + BarHeight + yPadding;
+            var yPos = CenterY + YOffset + BarHeight - 33;
             var cursorPos = new Vector2(xPos, yPos);
             const int chunkSize = 50;
             var barSize = new Vector2(barWidth, BarHeight);
