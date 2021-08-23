@@ -5,11 +5,12 @@ using System.Globalization;
 using System.Numerics;
 using System.Text;
 using FFXIVClientStructs.FFXIV.Client.System.String;
+using Dalamud.Game.Text.SeStringHandling;
 
 namespace DelvUI {
     public static class Extensions {
-        public static string Abbreviate(this string str) {
-            var splits = str.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
+        public static string Abbreviate(this SeString str) {
+            var splits = str.TextValue.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
             
             for (var i = 0; i < splits.Length - 1; i++) {
                 splits[i] = splits[i][0].ToString();
@@ -55,7 +56,7 @@ namespace DelvUI {
             }
         }
         
-        public static string KiloFormat(this int num)
+        public static string KiloFormat(this uint num)
         {
             if (num >= 100000000)
                 return (num / 1000000).ToString("#,0M", CultureInfo.InvariantCulture);

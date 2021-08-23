@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup Label="Target">
         <PlatformTarget>AnyCPU</PlatformTarget>
-        <TargetFramework>net48</TargetFramework>
+        <TargetFramework>net5.0-windows</TargetFramework>
         <LangVersion>preview</LangVersion>
         <Platforms>AnyCPU</Platforms>
         <Configurations>Debug;Release</Configurations>
@@ -14,7 +14,9 @@
 
     <!-- Build Configuration -->
     <PropertyGroup>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <OutputType>Library</OutputType>
+        <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
         <DebugSymbols>true</DebugSymbols>
         <DebugType>full</DebugType>
@@ -27,11 +29,15 @@
     <!-- Release Configuration -->
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
         <Deterministic>true</Deterministic>
+        <PlatformTarget>x64</PlatformTarget>
+    </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <PlatformTarget>x64</PlatformTarget>
     </PropertyGroup>
 
     <!-- Dalamud Configuration -->
     <PropertyGroup>
-        <DalamudVersion>5.2.7.0</DalamudVersion>
+        <DalamudVersion>dev</DalamudVersion>
         <DalamudLocal>../dalamud/</DalamudLocal>
         <DalamudXIVLauncher>$(APPDATA)\XIVLauncher\addon\Hooks\$(DalamudVersion)</DalamudXIVLauncher>
     </PropertyGroup>
@@ -47,7 +53,6 @@
 
     <!-- Included Content -->
     <ItemGroup>
-        <Content Include="Helpers\TEXTTAGS.md" />
         <Content Include="Media\**">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
@@ -59,6 +64,10 @@
     </ItemGroup>
 
     <!-- Library References -->
+    <ItemGroup>
+        <None Include="..\.editorconfig" Link=".editorconfig" />
+    </ItemGroup>
+    
     <ItemGroup>
         <Reference Include="Dalamud">
             <Private>false</Private>
@@ -93,7 +102,7 @@
             <InputAssemblies Include="&quot;$(TargetPath)&quot;" />
             <InputAssemblies Include="&quot;$(TargetDir)FFXIVClientStructs.dll&quot;" Exclude="$(TargetPath)" />
             <InputAssemblies Include="&quot;$(TargetDir)FFXIVClientStructs.Common.dll&quot;" Exclude="$(TargetPath)" />
-            <InputAssemblies Include="&quot;$(TargetDir)Serilog.dll&quot;" Exclude="$(TargetPath)" />
+            <InputAssemblies Include="&quot;$(TargetDir)Scriban.dll&quot;" Exclude="$(TargetPath)" />
         </ItemGroup>
         <Exec Command="$(PkgILRepack)\tools\ILRepack.exe /lib:$(DalamudLocal) /lib:$(DalamudXIVLauncher) /out:&quot;$(TargetDir)..\$(Configuration).ILMerge\$(TargetFileName)&quot; @(InputAssemblies, ' ')" />
     </Target>

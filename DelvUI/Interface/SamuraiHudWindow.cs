@@ -1,10 +1,18 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using Dalamud.Interface;
+using System.Diagnostics;
 using System.Globalization;
 using System.Numerics;
-using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+using Dalamud.Data;
+using Dalamud.Game;
+using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.JobGauge;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.Gui;
 using Dalamud.Plugin;
 using ImGuiNET;
 using DelvUI.Config;
@@ -43,7 +51,7 @@ namespace DelvUI.Interface
         private int SamSenBarWidth => PluginConfiguration.SamSenBarWidth;
         private int SamSenBarX => PluginConfiguration.SamSenBarX;
         private int SamSenBarY => PluginConfiguration.SamSenBarY;
-		
+
         private int SamTimeJinpuXOffset => PluginConfiguration.SamTimeJinpuXOffset;
         private int SamTimeJinpuYOffset => PluginConfiguration.SamTimeJinpuYOffset;
 
@@ -75,39 +83,66 @@ namespace DelvUI.Interface
         private Dictionary<string, uint> SamKenkiColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 7];
         private Dictionary<string, uint> SamEmptyColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 8]; 
         private Dictionary<string, uint> SamExpiryColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 9];
-
-
-
-
-        public SamuraiHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
+        
+        public SamuraiHudWindow(
+            ClientState clientState,
+            DalamudPluginInterface pluginInterface,
+            DataManager dataManager,
+            Framework framework,
+            GameGui gameGui,
+            JobGauges jobGauges,
+            ObjectTable objectTable, 
+            PluginConfiguration pluginConfiguration,
+            SigScanner sigScanner,
+            TargetManager targetManager,
+            UiBuilder uiBuilder
+        ) : base(
+            clientState,
+            pluginInterface,
+            dataManager,
+            framework,
+            gameGui,
+            jobGauges,
+            objectTable,
+            pluginConfiguration,
+            sigScanner,
+            targetManager,
+            uiBuilder
+        ) { }
 
         protected override void Draw(bool _)
         {
             if (GaugeEnabled) {
                 DrawKenkiBar();
             }
+
             if (SenEnabled) {
                 DrawSenResourceBar();
             }
+            
             if (MeditationEnabled) {
                 DrawMeditationResourceBar();
             }
+            
             if (HiganbanaEnabled) {
                 DrawHiganbanaBar();
             }
+
             if (BuffsEnabled) {
                 DrawActiveBuffs();
             }
         }
+
         protected override void DrawPrimaryResourceBar() {
         }
+        
         private void DrawKenkiBar()
         {
             if (!GaugeEnabled) {
                 return;
             }
 
-            var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
+            var gauge = JobGauges.Get<SAMGauge>();
 
 
             var xPos = CenterX + BaseXOffset - SamKenkiBarX;
@@ -134,15 +169,16 @@ namespace DelvUI.Interface
 
         private void DrawHiganbanaBar()
         {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            var actor = TargetManager.SoftTarget ?? TargetManager.Target;
 
-            if (target is not Chara) {
+            if (actor is not BattleChara target) {
                 return;
             }
 
-            var actorId = PluginInterface.ClientState.LocalPlayer.ActorId;
-            var higanbana = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1228 && o.OwnerId == actorId || o.EffectId == 1319 && o.OwnerId == actorId);
-            var higanbanaDuration = higanbana.Duration;
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            var actorId = ClientState.LocalPlayer.ObjectId;
+            var higanbana = target.StatusList.FirstOrDefault(o => o.StatusId == 1228 && o.SourceID == actorId || o.StatusId == 1319 && o.SourceID == actorId);
+            var higanbanaDuration = higanbana?.RemainingTime ?? 0f;
 
             var higanbanaColor = higanbanaDuration > 5 ? SamHiganbanaColor["base"] : SamExpiryColor["base"];
 
@@ -167,14 +203,18 @@ namespace DelvUI.Interface
 
         private void DrawActiveBuffs()
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
+            var actor = ClientState.LocalPlayer;
+
+            if (actor is not BattleChara target) {
+                return;
+            }
 
             var buffsBarWidth = (SamBuffsBarWidth / 2) - 1;
-            var shifu = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1299);
-            var jinpu = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1298);
+            var shifu = target.StatusList.FirstOrDefault(o => o.StatusId == 1299);
+            var jinpu = target.StatusList.FirstOrDefault(o => o.StatusId == 1298);
 
-            var shifuDuration = shifu.Duration;
-            var jinpuDuration = jinpu.Duration;
+            var shifuDuration = shifu?.RemainingTime ?? 0f;
+            var jinpuDuration = jinpu?.RemainingTime ?? 0f;
 
             var xOffset = CenterX + BaseXOffset - SamBuffsBarX;
             var cursorPos = new Vector2(CenterX + BaseXOffset - SamBuffsBarX, CenterY + BaseYOffset + SamBuffsBarY);
@@ -193,8 +233,7 @@ namespace DelvUI.Interface
                     SamShifuColor["gradientLeft"], SamShifuColor["gradientRight"], SamShifuColor["gradientRight"], SamShifuColor["gradientLeft"]
                 );
 
-            if (!PluginConfiguration.ShowBuffTime)
-            {
+            if (!PluginConfiguration.ShowBuffTime) {
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
                 cursorPos = new Vector2(cursorPos.X + buffsBarWidth + BuffsPadding, cursorPos.Y);
@@ -209,8 +248,7 @@ namespace DelvUI.Interface
                 );
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             }
-            else
-            {
+            else {
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
                 if (BuffText) {
                     DrawOutlinedText(Math.Round(shifuDuration).ToString(CultureInfo.InvariantCulture), new Vector2(cursorPos.X + buffsBarWidth / 2f - shifuTextSize.X / 2f, cursorPos.Y + (barSize.Y / 2) - 12));
@@ -229,6 +267,7 @@ namespace DelvUI.Interface
                     jinpuDuration > 0 ? SamJinpuColor["gradientLeft"] : 0x00202E3
                 );
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+
                 if (BuffText) {
                     DrawOutlinedText(Math.Round(jinpuDuration).ToString(CultureInfo.InvariantCulture), new Vector2(cursorPos.X + buffsBarWidth / 2f - jinpuTextSize.X / 2f, cursorPos.Y + (barSize.Y / 2) - 12));
                 }
@@ -236,7 +275,7 @@ namespace DelvUI.Interface
         }
 
         private void DrawSenResourceBar() {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
+            var gauge = JobGauges.Get<SAMGauge>();
             
             var senBarWidth = (SamSenBarWidth - SenPadding * 2) / 3f;
             var senBarSize = new Vector2(senBarWidth, SamSenBarHeight);
@@ -248,24 +287,24 @@ namespace DelvUI.Interface
 
             // Ka Bar
             cursorPos = new Vector2(cursorPos.X + SenPadding + senBarWidth, cursorPos.Y);
-            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasSetsu() ? SamSetsuColor["base"] : SamEmptyColor["background"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasSetsu ? SamSetsuColor["base"] : SamEmptyColor["background"]);
             drawList.AddRect(cursorPos, cursorPos + senBarSize, 0xFF000000);
 
             // Getsu Bar
             cursorPos = new Vector2(cursorPos.X + SenPadding + senBarWidth, cursorPos.Y);
-            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasGetsu() ? SamGetsuColor["base"] : SamEmptyColor["background"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasGetsu ? SamGetsuColor["base"] : SamEmptyColor["background"]);
             drawList.AddRect(cursorPos, cursorPos + senBarSize, 0xFF000000);
 
             // Setsu Bar
             cursorPos = new Vector2(cursorPos.X + SenPadding + senBarWidth, cursorPos.Y);
-            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasKa() ? SamKaColor["base"] : SamEmptyColor["background"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasKa ? SamKaColor["base"] : SamEmptyColor["background"]);
             drawList.AddRect(cursorPos, cursorPos + senBarSize, 0xFF000000);
         }
 
 
         private void DrawMeditationResourceBar()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
+            var gauge = JobGauges.Get<SAMGauge>();
 
             var meditationBarWidth = (SamMeditationBarWidth - MeditationPadding * 2) / 3f;
             var meditationBarSize = new Vector2(meditationBarWidth, SamMeditationBarHeight);

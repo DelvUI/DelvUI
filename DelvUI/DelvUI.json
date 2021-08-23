@@ -2,5 +2,6 @@
   "Name": "DelvUI",
   "Author": "jdsmith2816",
   "Description": "Provides an ElvUI style HUD for FFXIV",
-  "RepoUrl": "https://github.com/jdsmith2816/delvui"
+  "RepoUrl": "https://github.com/jdsmith2816/delvui",
+  "DalamudApiLevel": 4
 }

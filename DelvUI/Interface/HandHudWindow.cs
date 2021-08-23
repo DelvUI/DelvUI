@@ -2,6 +2,13 @@
 using ImGuiNET;
 using System.Diagnostics;
 using System.Numerics;
+using Dalamud.Data;
+using Dalamud.Game;
+using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.JobGauge;
+using Dalamud.Game.ClientState.Objects;
+using Dalamud.Game.Gui;
+using Dalamud.Interface;
 using DelvUI.Config;
 
 namespace DelvUI.Interface
@@ -9,22 +16,44 @@ namespace DelvUI.Interface
     public class HandHudWindow : HudWindow
     {
 
-        public HandHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) :
-            base(pluginInterface, pluginConfiguration)
-        {
-            JobId = pluginInterface.ClientState.LocalPlayer.ClassJob.Id;
+        public HandHudWindow(
+            ClientState clientState,
+            DalamudPluginInterface pluginInterface,
+            DataManager dataManager,
+            Framework framework,
+            GameGui gameGui,
+            JobGauges jobGauges,
+            ObjectTable objectTable, 
+            PluginConfiguration pluginConfiguration,
+            SigScanner sigScanner,
+            TargetManager targetManager,
+            UiBuilder uiBuilder
+        ) : base(
+            clientState,
+            pluginInterface,
+            dataManager,
+            framework,
+            gameGui,
+            jobGauges,
+            objectTable,
+            pluginConfiguration,
+            sigScanner,
+            targetManager,
+            uiBuilder
+        ) {
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            JobId = ClientState.LocalPlayer.ClassJob.Id;
         }
+        
         public override uint JobId { get; }
 
-
-        protected override void Draw(bool _)
-        {
+        protected override void Draw(bool _) {
         }
 
         protected override void DrawPrimaryResourceBar() {
-            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            var actor = ClientState.LocalPlayer;
             var barSize = new Vector2(PrimaryResourceBarWidth, PrimaryResourceBarHeight);
-            var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentCp / actor.MaxCp;
             var cursorPos = new Vector2(CenterX - PrimaryResourceBarXOffset + 33, CenterY + PrimaryResourceBarYOffset - 16);
 
@@ -36,8 +65,7 @@ namespace DelvUI.Interface
             );
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-            if (ShowPrimaryResourceBarThresholdMarker)
-            {
+            if (ShowPrimaryResourceBarThresholdMarker) {
                 // threshold
                 var position = new Vector2(cursorPos.X + (PrimaryResourceBarThresholdValue / 10000f) * barSize.X - 3, cursorPos.Y);
                 var size = new Vector2(2, barSize.Y);
@@ -47,11 +75,9 @@ namespace DelvUI.Interface
             if (!ShowPrimaryResourceBarValue) return;
 
             // text
-            var currentCp = PluginInterface.ClientState.LocalPlayer.CurrentCp;
+            var currentCp = ClientState.LocalPlayer.CurrentCp;
             var text = $"{currentCp,0}";
             DrawOutlinedText(text, new Vector2(cursorPos.X + 2 + PrimaryResourceBarTextXOffset, cursorPos.Y - 3 + PrimaryResourceBarTextYOffset));
         }
-
-
     }
 }

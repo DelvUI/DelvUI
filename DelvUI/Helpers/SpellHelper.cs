@@ -1,5 +1,4 @@
 ﻿using System;
-using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace DelvUI.Helpers

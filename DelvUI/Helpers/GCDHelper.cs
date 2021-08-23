@@ -1,13 +1,13 @@
 ﻿using System.Collections.Generic;
-using Dalamud.Game.ClientState.Actors.Types;
-using FFXIVClientStructs.FFXIV.Client.Game;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Config;
+using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace DelvUI.Helpers
 {
-    class GCDHelper
+    internal static class GCDHelper
     {
-        private static Dictionary<uint, uint> jobActionIDs = new Dictionary<uint, uint>
+        private static readonly Dictionary<uint, uint> JobActionIDs = new Dictionary<uint, uint>
         {
             [Jobs.GNB] = 16137,     // Keen Edge
             [Jobs.WAR] = 31,        // Heavy Swing
@@ -29,10 +29,9 @@ namespace DelvUI.Helpers
             [Jobs.BLU] = 11385      // Water Cannon
         };
 
-        public unsafe static bool GetGCDInfo(PlayerCharacter player, out float timeElapsed, out float timeTotal, ActionType actionType = ActionType.Spell)
+        public static unsafe bool GetGCDInfo(PlayerCharacter player, out float timeElapsed, out float timeTotal, ActionType actionType = ActionType.Spell)
         {
-            if (player is null || !jobActionIDs.TryGetValue(player.ClassJob.Id, out var actionId))
-            {
+            if (player is null || !JobActionIDs.TryGetValue(player.ClassJob.Id, out var actionId)) {
                 timeElapsed = 0;
                 timeTotal = 0;
                 return false;

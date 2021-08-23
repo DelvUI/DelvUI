@@ -2,7 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Dalamud.Game.ClientState.Actors.Types;
+using System.Numerics;
+using Dalamud.Data;
+using Dalamud.Game;
+using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.JobGauge;
+using Dalamud.Game.ClientState.Objects;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.Gui;
+using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
@@ -45,7 +53,32 @@ namespace DelvUI.Interface
         private Dictionary<string, uint> SmnMiasmaColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 3];
         private Dictionary<string, uint> SmnBioColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 4];
         private Dictionary<string, uint> SmnExpiryColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 5];
-        public SummonerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
+
+        public SummonerHudWindow(
+            ClientState clientState,
+            DalamudPluginInterface pluginInterface,
+            DataManager dataManager,
+            Framework framework,
+            GameGui gameGui,
+            JobGauges jobGauges,
+            ObjectTable objectTable, 
+            PluginConfiguration pluginConfiguration,
+            SigScanner sigScanner,
+            TargetManager targetManager,
+            UiBuilder uiBuilder
+        ) : base(
+            clientState,
+            pluginInterface,
+            dataManager,
+            framework,
+            gameGui,
+            jobGauges,
+            objectTable,
+            pluginConfiguration,
+            sigScanner,
+            targetManager,
+            uiBuilder
+        ) { }
 
         protected override void Draw(bool _)
         {
@@ -54,23 +87,24 @@ namespace DelvUI.Interface
             DrawAetherBar();
         }
 
-        protected override void DrawPrimaryResourceBar()
-        {
+        protected override void DrawPrimaryResourceBar() {
         }
+
         private void DrawActiveDots()
         {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            var actor = TargetManager.SoftTarget ?? TargetManager.Target;
             if (!ShowBioBar && !ShowMiasmaBar) return;
-            if (target is not Chara) return;
+            if (actor is not BattleChara target) return;
             var xPos = CenterX - XOffset + MiasmaBarXOffset;
             var yPos = CenterY + YOffset + MiasmaBarYOffset;
             var barDrawList = new List<Bar>();
 
             if (ShowMiasmaBar)
             {
-                var miasma = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1215 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
-                                                                      o.EffectId == 180 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
-                var miasmaDuration = Math.Abs(miasma.Duration);
+                Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+                var miasma = target.StatusList.FirstOrDefault(o => o.StatusId == 1215 && o.SourceID == ClientState.LocalPlayer.ObjectId ||
+                                                                      o.StatusId == 180 && o.SourceID == ClientState.LocalPlayer.ObjectId);
+                var miasmaDuration = Math.Abs(miasma?.RemainingTime ?? 0f);
                 var miasmaColor = miasmaDuration > 5 ? SmnMiasmaColor : SmnExpiryColor;
                 var builder = BarBuilder.Create(xPos, yPos, MiasmaBarHeight, MiasmaBarWidth );
                 var miasmaBar = builder.AddInnerBar(miasmaDuration, 30f, miasmaColor)
@@ -81,10 +115,11 @@ namespace DelvUI.Interface
 
             if (ShowBioBar)
             {
-                var bio = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1214 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
-                                                                   o.EffectId == 179 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
-                                                                   o.EffectId == 189 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
-                var bioDuration = Math.Abs(bio.Duration);
+                Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+                var bio = target.StatusList.FirstOrDefault(o => o.StatusId == 1214 && o.SourceID == ClientState.LocalPlayer.ObjectId ||
+                                                                   o.StatusId == 179 && o.SourceID == ClientState.LocalPlayer.ObjectId ||
+                                                                   o.StatusId == 189 && o.SourceID == ClientState.LocalPlayer.ObjectId);
+                var bioDuration = Math.Abs(bio?.RemainingTime ?? 0f);
                 var bioColor = bioDuration > 5 ? SmnBioColor : SmnExpiryColor;
                 xPos = CenterX - XOffset + BioBarXOffset;
                 yPos = CenterY + YOffset + BioBarYOffset;
@@ -106,30 +141,30 @@ namespace DelvUI.Interface
         }
         private void DrawRuinBar()
         {
-            // Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            var ruinBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1212);
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            var ruinBuff = ClientState.LocalPlayer.StatusList.FirstOrDefault(o => o.StatusId == 1212);
             var xPos = CenterX - XOffset + RuinBarXOffset;
             var yPos = CenterY + YOffset + RuinBarYOffset;
             if (!ShowRuinBar) return;
             var bar = BarBuilder.Create(xPos, yPos, RuinBarHeight, RuinBarWidth)
                 .SetChunks(4)
                 .SetChunkPadding(RuinBarPadding)
-                .AddInnerBar(ruinBuff.StackCount, 4, SmnRuinColor).SetBackgroundColor(SmnEmptyColor["background"])
+                .AddInnerBar(ruinBuff?.StackCount ?? 0, 4, SmnRuinColor).SetBackgroundColor(SmnEmptyColor["background"])
                 .Build();
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
         private void DrawAetherBar()
         {
-            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            var aetherFlowBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            var aetherFlowBuff = ClientState.LocalPlayer.StatusList.FirstOrDefault(o => o.StatusId == 304);
             var xPos = CenterX - XOffset + AetherBarXOffset;
             var yPos = CenterY + YOffset + AetherBarYOffset;
             if (!ShowAetherBar) return;
             var bar = BarBuilder.Create(xPos, yPos, AetherBarHeight, AetherBarWidth)
                 .SetChunks(2)
                 .SetChunkPadding(AetherBarPadding)
-                .AddInnerBar(aetherFlowBuff.StackCount, 2, SmnAetherColor).SetBackgroundColor(SmnEmptyColor["background"])
+                .AddInnerBar(aetherFlowBuff?.StackCount ?? 0, 2, SmnAetherColor).SetBackgroundColor(SmnEmptyColor["background"])
                 .Build();
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);

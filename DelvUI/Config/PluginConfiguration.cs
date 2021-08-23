@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using Dalamud.Configuration;
+using Dalamud.Logging;
 using Dalamud.Plugin;
 using DelvUI.Interface;
 using DelvUI.Interface.StatusEffects;

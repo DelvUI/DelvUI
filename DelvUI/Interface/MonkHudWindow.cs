@@ -1,7 +1,16 @@
 using System;
-using System.Linq;
 using System.Collections.Generic;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+using System.Diagnostics;
+using System.Linq;
+using Dalamud.Interface;
+using Dalamud.Data;
+using Dalamud.Game;
+using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.JobGauge;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.Gui;
 using Dalamud.Plugin;
 using ImGuiNET;
 using DelvUI.Interface.Bars;
@@ -24,103 +33,139 @@ namespace DelvUI.Interface
         private bool ChakraEnabled => PluginConfiguration.ChakraEnabled;
         private bool LeadenFistEnabled => PluginConfiguration.LeadenFistEnabled;
         private bool TwinSnakesEnabled => PluginConfiguration.TwinSnakesEnabled;
-        private bool EnabRiddleOfEarthEnabled => PluginConfiguration.RiddleOfEarthEnabled;
+        private bool RiddleOfEarthEnabled => PluginConfiguration.RiddleOfEarthEnabled;
         private bool PerfectBalanceEnabled => PluginConfiguration.PerfectBalanceEnabled;
         private bool TrueNorthEnabled => PluginConfiguration.TrueNorthEnabled;
         private bool FormsEnabled => PluginConfiguration.FormsEnabled;
-        protected int DemolishHeight => PluginConfiguration.MNKDemolishHeight;
-        protected int DemolishWidth => PluginConfiguration.MNKDemolishWidth;
-        protected int DemolishXOffset => PluginConfiguration.MNKDemolishXOffset;
-        protected int DemolishYOffset => PluginConfiguration.MNKDemolishYOffset;
-        protected int ChakraHeight => PluginConfiguration.MNKChakraHeight;
-        protected int ChakraWidth => PluginConfiguration.MNKChakraWidth;
-        protected int ChakraXOffset => PluginConfiguration.MNKChakraXOffset;
-        protected int ChakraYOffset => PluginConfiguration.MNKChakraYOffset;
-        protected int LeadenFistHeight => PluginConfiguration.MNKLeadenFistHeight;
-        protected int LeadenFistWidth => PluginConfiguration.MNKLeadenFistWidth;
-        protected int LeadenFistXOffset => PluginConfiguration.MNKLeadenFistXOffset;
-        protected int LeadenFistYOffset => PluginConfiguration.MNKLeadenFistYOffset;
-        protected int TwinSnakesHeight => PluginConfiguration.MNKTwinSnakesHeight;
-        protected int TwinSnakesWidth => PluginConfiguration.MNKTwinSnakesWidth;
-        protected int TwinSnakesXOffset => PluginConfiguration.MNKTwinSnakesXOffset;
-        protected int TwinSnakesYOffset => PluginConfiguration.MNKTwinSnakesYOffset;
-        protected int RiddleOfEarthHeight => PluginConfiguration.MNKRiddleOfEarthHeight;
-        protected int RiddleOfEarthWidth => PluginConfiguration.MNKRiddleOfEarthWidth;
-        protected int RiddleOfEarthXOffset => PluginConfiguration.MNKRiddleOfEarthXOffset;
-        protected int RiddleOfEarthYOffset => PluginConfiguration.MNKRiddleOfEarthYOffset;
-        protected int PerfectBalanceHeight => PluginConfiguration.MNKPerfectBalanceHeight;
-        protected int PerfectBalanceWidth => PluginConfiguration.MNKPerfectBalanceWidth;
-        protected int PerfectBalanceXOffset => PluginConfiguration.MNKPerfectBalanceXOffset;
-        protected int PerfectBalanceYOffset => PluginConfiguration.MNKPerfectBalanceYOffset;
-        protected int TrueNorthHeight => PluginConfiguration.MNKTrueNorthHeight;
-        protected int TrueNorthWidth => PluginConfiguration.MNKTrueNorthWidth;
-        protected int TrueNorthXOffset => PluginConfiguration.MNKTrueNorthXOffset;
-        protected int TrueNorthYOffset => PluginConfiguration.MNKTrueNorthYOffset;
-        protected int FormsHeight => PluginConfiguration.MNKFormsHeight;
-        protected int FormsWidth => PluginConfiguration.MNKFormsWidth;
-        protected int FormsXOffset => PluginConfiguration.MNKFormsXOffset;
-        protected int FormsYOffset => PluginConfiguration.MNKFormsYOffset;
+        private int DemolishHeight => PluginConfiguration.MNKDemolishHeight;
+        private int DemolishWidth => PluginConfiguration.MNKDemolishWidth;
+        private int DemolishXOffset => PluginConfiguration.MNKDemolishXOffset;
+        private int DemolishYOffset => PluginConfiguration.MNKDemolishYOffset;
+        private int ChakraHeight => PluginConfiguration.MNKChakraHeight;
+        private int ChakraWidth => PluginConfiguration.MNKChakraWidth;
+        private int ChakraXOffset => PluginConfiguration.MNKChakraXOffset;
+        private int ChakraYOffset => PluginConfiguration.MNKChakraYOffset;
+        private int LeadenFistHeight => PluginConfiguration.MNKLeadenFistHeight;
+        private int LeadenFistWidth => PluginConfiguration.MNKLeadenFistWidth;
+        private int LeadenFistXOffset => PluginConfiguration.MNKLeadenFistXOffset;
+        private int LeadenFistYOffset => PluginConfiguration.MNKLeadenFistYOffset;
+        private int TwinSnakesHeight => PluginConfiguration.MNKTwinSnakesHeight;
+        private int TwinSnakesWidth => PluginConfiguration.MNKTwinSnakesWidth;
+        private int TwinSnakesXOffset => PluginConfiguration.MNKTwinSnakesXOffset;
+        private int TwinSnakesYOffset => PluginConfiguration.MNKTwinSnakesYOffset;
+        private int RiddleOfEarthHeight => PluginConfiguration.MNKRiddleOfEarthHeight;
+        private int RiddleOfEarthWidth => PluginConfiguration.MNKRiddleOfEarthWidth;
+        private int RiddleOfEarthXOffset => PluginConfiguration.MNKRiddleOfEarthXOffset;
+        private int RiddleOfEarthYOffset => PluginConfiguration.MNKRiddleOfEarthYOffset;
+        private int PerfectBalanceHeight => PluginConfiguration.MNKPerfectBalanceHeight;
+        private int PerfectBalanceWidth => PluginConfiguration.MNKPerfectBalanceWidth;
+        private int PerfectBalanceXOffset => PluginConfiguration.MNKPerfectBalanceXOffset;
+        private int PerfectBalanceYOffset => PluginConfiguration.MNKPerfectBalanceYOffset;
+        private int TrueNorthHeight => PluginConfiguration.MNKTrueNorthHeight;
+        private int TrueNorthWidth => PluginConfiguration.MNKTrueNorthWidth;
+        private int TrueNorthXOffset => PluginConfiguration.MNKTrueNorthXOffset;
+        private int TrueNorthYOffset => PluginConfiguration.MNKTrueNorthYOffset;
+        private int FormsHeight => PluginConfiguration.MNKFormsHeight;
+        private int FormsWidth => PluginConfiguration.MNKFormsWidth;
+        private int FormsXOffset => PluginConfiguration.MNKFormsXOffset;
+        private int FormsYOffset => PluginConfiguration.MNKFormsYOffset;
 
-        protected Dictionary<string, uint> DemolishColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000];
-        protected Dictionary<string, uint> ChakraColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 1];
-        protected Dictionary<string, uint> LeadenFistColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 2];
-        protected Dictionary<string, uint> TwinSnakesColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 3];
-        protected Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 4];
-        protected Dictionary<string, uint> RiddleOfEarthColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 5];
-        protected Dictionary<string, uint> PerfectBalanceColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 6];
-        protected Dictionary<string, uint> TrueNorthColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 7];
-        protected Dictionary<string, uint> FormsColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 8];
+        private Dictionary<string, uint> DemolishColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000];
+        private Dictionary<string, uint> ChakraColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 1];
+        private Dictionary<string, uint> LeadenFistColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 2];
+        private Dictionary<string, uint> TwinSnakesColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 3];
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 4];
+        private Dictionary<string, uint> RiddleOfEarthColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 5];
+        private Dictionary<string, uint> PerfectBalanceColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 6];
+        private Dictionary<string, uint> TrueNorthColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 7];
+        private Dictionary<string, uint> FormsColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 8];
 
         #endregion
 
-        public MonkHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
+        public MonkHudWindow(
+            ClientState clientState,
+            DalamudPluginInterface pluginInterface,
+            DataManager dataManager,
+            Framework framework,
+            GameGui gameGui,
+            JobGauges jobGauges,
+            ObjectTable objectTable, 
+            PluginConfiguration pluginConfiguration,
+            SigScanner sigScanner,
+            TargetManager targetManager,
+            UiBuilder uiBuilder
+        ) : base(
+            clientState,
+            pluginInterface,
+            dataManager,
+            framework,
+            gameGui,
+            jobGauges,
+            objectTable,
+            pluginConfiguration,
+            sigScanner,
+            targetManager,
+            uiBuilder
+        ) { }
 
-        protected override void Draw(bool _)
-        {
-            if (FormsEnabled)
+        protected override void Draw(bool _) {
+            if (FormsEnabled) {
                 DrawFormsBar();
-            if (EnabRiddleOfEarthEnabled)
+            }
+
+            if (RiddleOfEarthEnabled) {
                 DrawRiddleOfEarthBar();
-            if (PerfectBalanceEnabled)
+            }
+
+            if (PerfectBalanceEnabled) {
                 DrawPerfectBalanceBar();
-            if (TrueNorthEnabled)
+            }
+
+            if (TrueNorthEnabled) {
                 DrawTrueNorthBar();
-            if (ChakraEnabled)
+            }
+
+            if (ChakraEnabled) {
                 DrawChakraGauge();
-            if (LeadenFistEnabled)
+            }
+
+            if (LeadenFistEnabled) {
                 DrawLeadenFistBar();
-            if (TwinSnakesEnabled)
+            }
+
+            if (TwinSnakesEnabled) {
                 DrawTwinSnakesBar();
-            if (DemolishEnabled)
+            }
+
+            if (DemolishEnabled) {
                 DrawDemolishBar();
+            }
         }
 
-        protected override void DrawPrimaryResourceBar()
-        {
+        protected override void DrawPrimaryResourceBar() {
         }
 
         private void DrawFormsBar()
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
-            var opoOpoForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 107);
-            var raptorForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 108);
-            var coeurlForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 109);
-            var formlessFist = target.StatusEffects.FirstOrDefault(o => o.EffectId == 2513);
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            var target = ClientState.LocalPlayer;
+            var opoOpoForm = target.StatusList.FirstOrDefault(o => o.StatusId == 107);
+            var raptorForm = target.StatusList.FirstOrDefault(o => o.StatusId == 108);
+            var coeurlForm = target.StatusList.FirstOrDefault(o => o.StatusId == 109);
+            var formlessFist = target.StatusList.FirstOrDefault(o => o.StatusId == 2513);
 
-            var opoOpoFormDuration = opoOpoForm.Duration;
-            var raptorFormDuration = raptorForm.Duration;
-            var coeurlFormDuration = coeurlForm.Duration;
-            var formlessFistDuration = formlessFist.Duration;
+            var opoOpoFormDuration = opoOpoForm?.RemainingTime ?? 0f;
+            var raptorFormDuration = raptorForm?.RemainingTime ?? 0f;
+            var coeurlFormDuration = coeurlForm?.RemainingTime ?? 0f;
 
             var xPos = CenterX - XOffset + FormsXOffset + 33;
             var yPos = CenterY + YOffset - FormsYOffset - 87;
 
             var builder = BarBuilder.Create(xPos, yPos, FormsHeight, FormsWidth);
-            float maximum = 15f;
+            const float maximum = 15f;
 
-            if (opoOpoFormDuration > 0)
-            {
-                Bar bar = builder.AddInnerBar(Math.Abs(opoOpoFormDuration), maximum, FormsColor)
+            if (opoOpoFormDuration > 0) {
+                var bar = builder.AddInnerBar(Math.Abs(opoOpoFormDuration), maximum, FormsColor)
                     .SetTextMode(BarTextMode.EachChunk)
                     .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Opo-Opo Form")
                     .SetBackgroundColor(EmptyColor["background"])
@@ -129,9 +174,9 @@ namespace DelvUI.Interface
                 var drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
-            if (raptorFormDuration > 0)
-            {
-                Bar bar = builder.AddInnerBar(Math.Abs(raptorFormDuration), maximum, FormsColor)
+            
+            if (raptorFormDuration > 0) {
+                var bar = builder.AddInnerBar(Math.Abs(raptorFormDuration), maximum, FormsColor)
                     .SetTextMode(BarTextMode.EachChunk)
                     .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Raptor Form")
                     .SetBackgroundColor(EmptyColor["background"])
@@ -140,9 +185,9 @@ namespace DelvUI.Interface
                 var drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
-            if (coeurlFormDuration > 0)
-            {
-                Bar bar = builder.AddInnerBar(Math.Abs(coeurlFormDuration), maximum, FormsColor)
+            
+            if (coeurlFormDuration > 0) {
+                var bar = builder.AddInnerBar(Math.Abs(coeurlFormDuration), maximum, FormsColor)
                     .SetTextMode(BarTextMode.EachChunk)
                     .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Coeurl Form")
                     .SetBackgroundColor(EmptyColor["background"])
@@ -151,9 +196,9 @@ namespace DelvUI.Interface
                 var drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
-            if (formlessFist.Duration > 0)
-            {
-                Bar bar = builder.AddInnerBar(Math.Abs(formlessFist.Duration), maximum, FormsColor)
+            
+            if (formlessFist?.RemainingTime > 0) {
+                var bar = builder.AddInnerBar(Math.Abs(formlessFist.RemainingTime), maximum, FormsColor)
                     .SetTextMode(BarTextMode.EachChunk)
                     .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Formless Fist")
                     .SetBackgroundColor(EmptyColor["background"])
@@ -162,9 +207,8 @@ namespace DelvUI.Interface
                 var drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
-            else
-            {
-                Bar bar = builder.AddInnerBar(0, maximum, FormsColor)
+            else {
+                var bar = builder.AddInnerBar(0, maximum, FormsColor)
                     .SetBackgroundColor(EmptyColor["background"])
                     .Build();
 
@@ -175,19 +219,19 @@ namespace DelvUI.Interface
 
         private void DrawTrueNorthBar()
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
-            var trueNorth = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1250);
-            var trueNorthDuration = trueNorth.Duration;
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            var target = ClientState.LocalPlayer;
+            var trueNorth = target.StatusList.FirstOrDefault(o => o.StatusId == 1250);
+            var trueNorthDuration = trueNorth?.RemainingTime ?? 0f;
 
             var xPos = CenterX - XOffset + TrueNorthXOffset + 172;
             var yPos = CenterY + YOffset - TrueNorthYOffset - 65;
 
             var builder = BarBuilder.Create(xPos, yPos, TrueNorthHeight, TrueNorthWidth);
-            float maximum = 10f;
+            const float maximum = 10f;
 
-            if (trueNorthDuration > 0)
-            {
-                Bar bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, TrueNorthColor)
+            if (trueNorthDuration > 0) {
+                var bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, TrueNorthColor)
                     .SetTextMode(BarTextMode.EachChunk)
                     .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                     .SetBackgroundColor(EmptyColor["background"])
@@ -196,9 +240,8 @@ namespace DelvUI.Interface
                 var drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
-            else
-            {
-                Bar bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, TrueNorthColor)
+            else {
+                var bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, TrueNorthColor)
                     .SetBackgroundColor(EmptyColor["background"])
                     .Build();
 
@@ -209,19 +252,19 @@ namespace DelvUI.Interface
 
         private void DrawPerfectBalanceBar()
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
-            var perfectBalance = target.StatusEffects.FirstOrDefault(o => o.EffectId == 110);
-            var perfectBalanceDuration = perfectBalance.StackCount;
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            var target = ClientState.LocalPlayer;
+            var perfectBalance = target.StatusList.FirstOrDefault(o => o.StatusId == 110);
+            var perfectBalanceDuration = perfectBalance?.StackCount ?? 0;
 
             var xPos = CenterX - XOffset + PerfectBalanceXOffset + 150;
             var yPos = CenterY + YOffset - PerfectBalanceYOffset - 65;
 
             var builder = BarBuilder.Create(xPos, yPos, PerfectBalanceHeight, PerfectBalanceWidth);
-            float maximum = 6f;
+            const float maximum = 6f;
 
-            if (perfectBalanceDuration > 0)
-            {
-                Bar bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, PerfectBalanceColor)
+            if (perfectBalanceDuration > 0) {
+                var bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, PerfectBalanceColor)
                     .SetVertical(true)
                     .SetFlipDrainDirection(PerfectBalanceBarFlipped)
                     .SetTextMode(BarTextMode.EachChunk)
@@ -232,9 +275,8 @@ namespace DelvUI.Interface
                 var drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
-            else
-            {
-                Bar bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, PerfectBalanceColor)
+            else {
+                var bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, PerfectBalanceColor)
                     .SetBackgroundColor(EmptyColor["background"])
                     .Build();
 
@@ -243,21 +285,20 @@ namespace DelvUI.Interface
             }
         }
 
-        private void DrawRiddleOfEarthBar()
-        {
-            var target = PluginInterface.ClientState.LocalPlayer;
-            var RiddleOfearth = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1179);
-            var RiddleOfearthDuration = RiddleOfearth.StackCount;
+        private void DrawRiddleOfEarthBar() {
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            var target = ClientState.LocalPlayer;
+            var riddleOfEarth = target.StatusList.FirstOrDefault(o => o.StatusId == 1179);
+            var riddleOfEarthDuration = riddleOfEarth?.StackCount ?? 0;
 
             var xPos = CenterX - XOffset + RiddleOfEarthXOffset + 33;
             var yPos = CenterY + YOffset - RiddleOfEarthYOffset - 65;
 
             var builder = BarBuilder.Create(xPos, yPos, RiddleOfEarthHeight, RiddleOfEarthWidth);
-            float maximum = 3f;
+            const float maximum = 3f;
 
-            if (RiddleOfearthDuration > 0)
-            {
-                Bar bar = builder.AddInnerBar(Math.Abs(RiddleOfearthDuration), maximum, RiddleOfEarthColor)
+            if (riddleOfEarthDuration > 0) {
+                var bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, RiddleOfEarthColor)
                     .SetTextMode(BarTextMode.EachChunk)
                     .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                     .SetBackgroundColor(EmptyColor["background"])
@@ -267,9 +308,8 @@ namespace DelvUI.Interface
                 var drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
-            else
-            {
-                Bar bar = builder.AddInnerBar(Math.Abs(RiddleOfearthDuration), maximum, RiddleOfEarthColor)
+            else {
+                var bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, RiddleOfEarthColor)
                     .SetBackgroundColor(EmptyColor["background"])
                     .SetFlipDrainDirection(RiddleOfEarthBarFlipped == false)
                     .Build();
@@ -279,9 +319,8 @@ namespace DelvUI.Interface
             }
         }
 
-        private void DrawChakraGauge()
-        {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<MNKGauge>();
+        private void DrawChakraGauge() {
+            var gauge = JobGauges.Get<MNKGauge>();
 
             var xPos = CenterX - XOffset + ChakraXOffset + 33;
             var yPos = CenterY + YOffset - ChakraYOffset - 43;
@@ -289,7 +328,7 @@ namespace DelvUI.Interface
             var bar = BarBuilder.Create(xPos, yPos, ChakraHeight, ChakraWidth)
                 .SetChunks(5)
                 .SetChunkPadding(2)
-                .AddInnerBar(gauge.NumChakra, 5, ChakraColor, EmptyColor)
+                .AddInnerBar(gauge.Chakra, 5, ChakraColor, EmptyColor)
                 .SetBackgroundColor(EmptyColor["background"])
                 .Build();
 
@@ -297,19 +336,19 @@ namespace DelvUI.Interface
             bar.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawTwinSnakesBar()
-        {
-            var target = PluginInterface.ClientState.LocalPlayer;
-            var twinSnakes = target.StatusEffects.FirstOrDefault(o => o.EffectId == 101);
-            var twinSnakesDuration = twinSnakes.Duration;
+        private void DrawTwinSnakesBar() {
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            var target = ClientState.LocalPlayer;
+            var twinSnakes = target.StatusList.FirstOrDefault(o => o.StatusId == 101);
+            var twinSnakesDuration = twinSnakes?.RemainingTime ?? 0f;
 
             var xPos = CenterX - XOffset + TwinSnakesXOffset + 33;
             var yPos = CenterY + YOffset - TwinSnakesYOffset - 21;
 
             var builder = BarBuilder.Create(xPos, yPos, TwinSnakesHeight, TwinSnakesWidth);
-            float maximum = 15f;
+            const float maximum = 15f;
 
-            Bar bar = builder.AddInnerBar(Math.Abs(twinSnakesDuration), maximum, TwinSnakesColor)
+            var bar = builder.AddInnerBar(Math.Abs(twinSnakesDuration), maximum, TwinSnakesColor)
                 .SetTextMode(BarTextMode.EachChunk)
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                 .SetBackgroundColor(EmptyColor["background"])
@@ -320,21 +359,20 @@ namespace DelvUI.Interface
             bar.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawLeadenFistBar()
-        {
-            var target = PluginInterface.ClientState.LocalPlayer;
-            var leadenFist = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1861);
-            var leadenFistDuration = leadenFist.Duration;
+        private void DrawLeadenFistBar() {
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            var target = ClientState.LocalPlayer;
+            var leadenFist = target.StatusList.FirstOrDefault(o => o.StatusId == 1861);
+            var leadenFistDuration = leadenFist?.RemainingTime ?? 0f;
 
             var xPos = CenterX - XOffset + LeadenFistXOffset + 146;
             var yPos = CenterY + YOffset - LeadenFistYOffset - 21;
 
             var builder = BarBuilder.Create(xPos, yPos, LeadenFistHeight, LeadenFistWidth);
-            float maximum = 30f;
+            const float maximum = 30f;
 
-            if (leadenFistDuration > 0)
-            {
-                Bar bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, LeadenFistColor)
+            if (leadenFistDuration > 0) {
+                var bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, LeadenFistColor)
                     .SetVertical(true)
                     .SetTextMode(BarTextMode.EachChunk)
                     .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
@@ -344,9 +382,8 @@ namespace DelvUI.Interface
                 var drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
-            else
-            {
-                Bar bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, LeadenFistColor)
+            else {
+                var bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, LeadenFistColor)
                     .SetBackgroundColor(EmptyColor["background"])
                     .Build();
 
@@ -357,17 +394,21 @@ namespace DelvUI.Interface
 
         private void DrawDemolishBar()
         {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget ?? PluginInterface.ClientState.LocalPlayer;
-            var Demolish = target.StatusEffects.FirstOrDefault(o => o.EffectId == 246 || o.EffectId == 1309);
-            var DemolishDuration = Demolish.Duration;
+            var actor = TargetManager.SoftTarget ?? TargetManager.Target ?? ClientState.LocalPlayer;
+
+            var demolishDuration = 0f;
+            if (actor is BattleChara target) {
+                var demolish = target.StatusList.FirstOrDefault(o => o.StatusId is 246 or 1309);
+                demolishDuration = demolish?.RemainingTime ?? 0f;
+            }
 
             var xPos = CenterX - XOffset + DemolishXOffset + 176;
             var yPos = CenterY + YOffset - DemolishYOffset - 21;
 
             var builder = BarBuilder.Create(xPos, yPos, DemolishHeight, DemolishWidth);
-            float maximum = 18f;
+            const float maximum = 18f;
 
-            Bar bar = builder.AddInnerBar(Math.Abs(DemolishDuration), maximum, DemolishColor)
+            var bar = builder.AddInnerBar(Math.Abs(demolishDuration), maximum, DemolishColor)
                 .SetTextMode(BarTextMode.EachChunk)
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                 .SetBackgroundColor(EmptyColor["background"])

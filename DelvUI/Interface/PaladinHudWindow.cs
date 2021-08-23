@@ -3,8 +3,15 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+using Dalamud.Data;
+using Dalamud.Game;
+using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.JobGauge;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.Gui;
+using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
@@ -102,7 +109,31 @@ namespace DelvUI.Interface
 
         private Dictionary<string, uint> OathNotFullColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 7];
 
-        public PaladinHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) {}
+        public PaladinHudWindow(
+            ClientState clientState,
+            DalamudPluginInterface pluginInterface,
+            DataManager dataManager,
+            Framework framework,
+            GameGui gameGui,
+            JobGauges jobGauges,
+            ObjectTable objectTable, 
+            PluginConfiguration pluginConfiguration,
+            SigScanner sigScanner,
+            TargetManager targetManager,
+            UiBuilder uiBuilder
+        ) : base(
+            clientState,
+            pluginInterface,
+            dataManager,
+            framework,
+            gameGui,
+            jobGauges,
+            objectTable,
+            pluginConfiguration,
+            sigScanner,
+            targetManager,
+            uiBuilder
+        ) { }
 
         protected override void Draw(bool _)
         {
@@ -124,8 +155,8 @@ namespace DelvUI.Interface
 
         private void DrawManaBar()
         {
-            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            var actor = PluginInterface.ClientState.LocalPlayer;
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            var actor = ClientState.LocalPlayer;
 
             var posX = CenterX + BaseXOffset - ManaXOffset;
             var posY = CenterY + BaseYOffset + ManaYOffset;
@@ -156,7 +187,7 @@ namespace DelvUI.Interface
 
         private void DrawOathGauge()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<PLDGauge>();
+            var gauge = JobGauges.Get<PLDGauge>();
 
             var xPos = CenterX + BaseXOffset - OathGaugeXOffset;
             var yPos = CenterY + BaseYOffset + OathGaugeYOffset;
@@ -165,10 +196,9 @@ namespace DelvUI.Interface
                 .SetChunks(2)
                 .SetChunkPadding(OathGaugeBarPadding)
                 .SetBackgroundColor(EmptyColor["background"])
-                .AddInnerBar(gauge.GaugeAmount, 100, OathGaugeColor, OathNotFullColor);
+                .AddInnerBar(gauge.OathGauge, 100, OathGaugeColor, OathNotFullColor);
 
-            if (OathGaugeText)
-            {
+            if (OathGaugeText) {
                 builder.SetTextMode(BarTextMode.EachChunk)
                     .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
@@ -179,19 +209,19 @@ namespace DelvUI.Interface
 
         private void DrawBuffBar()
         {
-            var fightOrFlightBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 76);
-            var requiescatBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1368);
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            var fightOrFlightBuff = ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 76);
+            var requiescatBuff = ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 1368);
 
             var xPos = CenterX + BaseXOffset - BuffBarXOffset;
             var yPos = CenterY + BaseYOffset + BuffBarYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, BuffBarHeight, BuffBarWidth)                
                 .SetBackgroundColor(EmptyColor["background"]);
-            
 
             if (fightOrFlightBuff.Any())
             {
-                var fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().Duration);
+                var fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().RemainingTime);
                 builder.AddInnerBar(fightOrFlightDuration, 25, FightOrFlightColor);
                 if (BuffBarText)
                     builder.SetTextMode(BarTextMode.EachChunk)
@@ -200,7 +230,7 @@ namespace DelvUI.Interface
 
             if (requiescatBuff.Any())
             {
-                var requiescatDuration = Math.Abs(requiescatBuff.First().Duration);
+                var requiescatDuration = Math.Abs(requiescatBuff.First().RemainingTime);
                 builder.AddInnerBar(requiescatDuration, 12, RequiescatColor);
                 if (BuffBarText)
                     builder.SetTextMode(BarTextMode.EachChunk)
@@ -213,7 +243,8 @@ namespace DelvUI.Interface
 
         private void DrawAtonementBar()
         {
-            var atonementBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1902);
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            var atonementBuff = ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 1902);
             var stackCount = atonementBuff.Any() ? atonementBuff.First().StackCount : 0;
 
             var xPos = CenterX + BaseXOffset - AtonementBarXOffset;
@@ -231,14 +262,14 @@ namespace DelvUI.Interface
 
         private void DrawDoTBar()
         {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            var actor = TargetManager.SoftTarget ?? TargetManager.Target;
 
-            if (target is not Chara)
+            if (actor is not BattleChara target)
                 return;
 
-            var goringBlade = target.StatusEffects.FirstOrDefault(o =>
-                o.EffectId == 725 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
-            var duration = Math.Abs(goringBlade.Duration);
+            Debug.Assert(ClientState.LocalPlayer != null, "ClientState.LocalPlayer != null");
+            var goringBlade = target.StatusList.FirstOrDefault(o => o.StatusId == 725 && o.SourceID == ClientState.LocalPlayer.ObjectId);
+            var duration = Math.Abs(goringBlade?.RemainingTime ?? 0f);
             
             var xPos = CenterX + BaseXOffset - DoTBarXOffset;
             var yPos = CenterY + BaseYOffset + DoTBarYOffset;

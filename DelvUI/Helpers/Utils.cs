@@ -1,11 +1,10 @@
 ﻿using System;
-using Dalamud.Game.ClientState.Actors;
-using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
+using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Helpers
 {
-    class Utils
+    internal static class Utils
     {
         public static unsafe bool IsHostileMemory(BattleNpc npc)
         {
@@ -16,7 +15,7 @@ namespace DelvUI.Helpers
                    && *(byte*)(npc.Address + 0x193C) != 1;
         }
 
-        public static unsafe float ActorShieldValue(Actor actor)
+        public static unsafe float ActorShieldValue(GameObject actor)
         {
             if (actor == null) return 0f;
 

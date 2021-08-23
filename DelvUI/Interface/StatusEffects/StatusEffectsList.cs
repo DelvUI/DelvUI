@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Dalamud.Game.ClientState.Structs;
+using Dalamud.Data;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Helpers;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
-using Lumina.Excel.GeneratedSheets;
-using Dalamud.Plugin;
+using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
 using ImGuiNET;
 
 namespace DelvUI.Interface.StatusEffects
 {
     public struct StatusEffectData
     {
-        public StatusEffect statusEffect;
-        public Status data;
+        public Status status;
+        public LuminaStatus data;
 
-        public StatusEffectData(StatusEffect statusEffect, Status data)
+        public StatusEffectData(Status status, LuminaStatus data)
         {
-            this.statusEffect = statusEffect;
+            this.status = status;
             this.data = data;
         }
     }
@@ -32,20 +32,19 @@ namespace DelvUI.Interface.StatusEffects
 
     public class StatusEffectsList
     {
-        private DalamudPluginInterface _pluginInterface;
         private GrowthDirections _lastGrowthDirections;
         private GrowthDirections _lastValidGrowthDirections = GrowthDirections.LEFT | GrowthDirections.DOWN;
 
         private uint rowCount = 0;
         private uint colCount = 0;
 
-        public Actor Actor = null;
+        public BattleChara Actor = null;
+        private readonly DataManager _dataManager;
         public StatusEffectsListConfig Config;
         public Vector2 Center = Vector2.Zero;
 
-        public StatusEffectsList(DalamudPluginInterface pluginInterface, StatusEffectsListConfig config)
-        {
-            _pluginInterface = pluginInterface;
+        public StatusEffectsList(DataManager dataManager, StatusEffectsListConfig config) {
+            _dataManager = dataManager;
             Config = config;
         }
 
@@ -105,18 +104,18 @@ namespace DelvUI.Interface.StatusEffects
             var list = new List<StatusEffectData>();
             if (Actor == null) return list;
 
-            var effectCount = Actor.StatusEffects.Length;
+            var effectCount = Actor.StatusList.Length;
             if (effectCount == 0) return list;
 
-            var sheet = _pluginInterface.Data.GetExcelSheet<Status>();
+            var sheet = _dataManager.GetExcelSheet<LuminaStatus>();
             if (sheet == null) return list;
 
             for (int i = 0; i < effectCount; i++)
             {
-                var status = Actor.StatusEffects[i];
-                if (status.EffectId <= 0) continue;
+                var status = Actor.StatusList[i];
+                if (status == null || status.StatusId <= 0) continue;
 
-                var row = sheet.GetRow((uint)status.EffectId);
+                var row = sheet.GetRow(status.StatusId);
                 if (row == null) continue;
 
                 if (!Config.ShowBuffs && row.Category == 1) continue;

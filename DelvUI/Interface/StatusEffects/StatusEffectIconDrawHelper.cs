@@ -27,16 +27,16 @@ namespace DelvUI.Interface.StatusEffects
             // duration
             if (config.ShowDurationText && !statusEffectData.data.IsPermanent && !statusEffectData.data.IsFcBuff)
             {
-                var duration = Math.Round(Math.Abs(statusEffectData.statusEffect.Duration));
+                var duration = Math.Round(Math.Abs(statusEffectData.status.RemainingTime));
                 var text = Utils.DurationToString(duration);
                 var textSize = ImGui.CalcTextSize(text);
                 DrawHelper.DrawOutlinedText(text, position + new Vector2(config.Size.X / 2f - textSize.X / 2f, config.Size.Y / 2f - textSize.Y / 2f));
             }
 
             // stacks
-            if (config.ShowStacksText && statusEffectData.data.MaxStacks > 0 && statusEffectData.statusEffect.StackCount > 0 && !statusEffectData.data.IsFcBuff)
+            if (config.ShowStacksText && statusEffectData.data.MaxStacks > 0 && statusEffectData.status.StackCount > 0 && !statusEffectData.data.IsFcBuff)
             {
-                var text = $"{statusEffectData.statusEffect.StackCount}";
+                var text = $"{statusEffectData.status.StackCount}";
                 var textSize = ImGui.CalcTextSize(text);
                 DrawHelper.DrawOutlinedText(text, position + new Vector2(config.Size.X * 0.9f - textSize.X / 2f, config.Size.X * 0.2f - textSize.Y / 2f), Vector4.UnitW, Vector4.One);
             }
