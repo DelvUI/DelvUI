@@ -19,8 +19,6 @@ namespace DelvUIPlugin.Interface {
 
         public abstract uint JobId { get; }
 
-        protected Vector4 ColorBlack => new Vector4(0f, 0f, 0f, 1f);
-        
         protected float CenterX => ImGui.GetMainViewport().Size.X / 2f;
         protected float CenterY => ImGui.GetMainViewport().Size.Y / 2f;
         protected int XOffset => 160;
@@ -72,8 +70,8 @@ namespace DelvUIPlugin.Interface {
         protected virtual void DrawPrimaryResourceBar() {
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentMp / actor.MaxMp;
-            var barSize = new Vector2(357, 26);
-            var cursorPos = new Vector2(CenterX - 178, CenterY + 496);
+            var barSize = new Vector2(254, 13);
+            var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 27);
             
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);

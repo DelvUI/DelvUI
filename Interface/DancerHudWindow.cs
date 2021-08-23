@@ -8,10 +8,10 @@ namespace DelvUIPlugin.Interface {
     public class DancerHudWindow : HudWindow {
         public override uint JobId => 38;
         
-        private new static int BarHeight => 26;
-        private new static int BarWidth => 357;
-        private new static int XOffset => 178;
-        private new static int YOffset => 496;
+        private new static int BarHeight => 13;
+        private new static int BarWidth => 254;
+        private new static int XOffset => 127;
+        private new static int YOffset => 466;
         
         public DancerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
@@ -28,7 +28,7 @@ namespace DelvUIPlugin.Interface {
             const int xPadding = 5;
             var barWidth = (BarWidth - xPadding) / 2;
             var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset;
+            var yPos = CenterY + YOffset - 33;
             var cursorPos = new Vector2(xPos, yPos);
             const int chunkSize = 50;
             var barSize = new Vector2(barWidth, BarHeight);
@@ -80,14 +80,13 @@ namespace DelvUIPlugin.Interface {
         private void DrawSecondaryResourceBar() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
 
-            const int xPadding = 3;
-            const int yPadding = 3;
+            const int xPadding = 4;
             const int numChunks = 4;
             
             var barWidth = (BarWidth - xPadding * (numChunks - 1)) / numChunks;
             var barSize = new Vector2(barWidth, BarHeight);
             var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset + BarHeight + yPadding;
+            var yPos = CenterY + YOffset + BarHeight - 33;
             var cursorPos = new Vector2(xPos - xPadding - barWidth, yPos);
             
             var drawList = ImGui.GetWindowDrawList();
