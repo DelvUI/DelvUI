@@ -9,8 +9,8 @@ namespace DelvUIPlugin.Interface {
         public override uint JobId => 32;
 
         private new int BarHeight => 13;
-        private new int BarWidth => 320;
-        private new int XOffset => 160;
+        private new int BarWidth => 254;
+        private new int XOffset => 127;
         private new int YOffset => 466;
         
         public DarkKnightHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
