@@ -36,7 +36,7 @@
     </PropertyGroup>
     <ItemGroup>
         <Reference Include="Dalamud, Version=5.2.7.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>C:\Users\jdsmi\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
+          <HintPath>C:\Users\aba\AppData\Roaming\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
         </Reference>
         <Reference Include="FFXIVClientStructs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
           <HintPath>..\FFXIVClientStructs\bin\Debug\FFXIVClientStructs.dll</HintPath>
@@ -54,7 +54,7 @@
           <HintPath>..\..\Assemblies\Lumina.Excel.dll</HintPath>
         </Reference>
         <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
-          <HintPath>C:\Users\jdsmi\AppData\Roaming\XIVLauncher\addon\Hooks\5.2.6.1\Newtonsoft.Json.dll</HintPath>
+          <HintPath>C:\Users\aba\AppData\Roaming\XIVLauncher\addon\Hooks\5.2.7.0\Newtonsoft.Json.dll</HintPath>
         </Reference>
         <Reference Include="System" />
         <Reference Include="System.Core" />
@@ -63,7 +63,8 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-        <Compile Include="Interface\DancerHudWindow.cs" />
+		<Compile Include="Interface\SamuraiHudWindow.cs" />
+		<Compile Include="Interface\DancerHudWindow.cs" />
         <Compile Include="Interface\DarkKnightHudWindow.cs" />
         <Compile Include="Interface\WhiteMageHudWindow.cs" />
         <Compile Include="PluginConfiguration.cs" />
