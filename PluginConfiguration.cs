@@ -11,32 +11,32 @@ namespace DelvUIPlugin {
 
         public bool HideHud = false;
 
-        public Vector4 JobColorPLD = new Vector4(21f,28f,100f,255f);
-        public Vector4 JobColorWAR = new Vector4(153f,23f,23f,255f);
-        public Vector4 JobColorDRK = new Vector4(136f,14f,79f,255f);
-        public Vector4 JobColorGNB = new Vector4(78f,52f,46f,255f);
+        public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,1f);
+        public Vector4 JobColorWAR = new Vector4(153f/255f,23f/255f,23f/255f,1f);
+        public Vector4 JobColorDRK = new Vector4(136f/255f,14f/255f,79f/255f,1f);
+        public Vector4 JobColorGNB = new Vector4(78f/255f,52f/255f,46f/255f,1f);
         
-        public Vector4 JobColorWHM = new Vector4(150f,150f,150f,255f);
-        public Vector4 JobColorSCH = new Vector4(121f,134f,203f,255f);
-        public Vector4 JobColorAST = new Vector4(121f,85f,72f,255f);
+        public Vector4 JobColorWHM = new Vector4(150f/255f,150f/255f,150f/255f,1f);
+        public Vector4 JobColorSCH = new Vector4(121f/255f,134f/255f,203f/255f,1f);
+        public Vector4 JobColorAST = new Vector4(121f/255f,85f/255f,72f/255f,1f);
         
-        public Vector4 JobColorMNK = new Vector4(78f,52f,46f,255f);
-        public Vector4 JobColorDRG = new Vector4(63f,81f,181f,255f);
-        public Vector4 JobColorNIN = new Vector4(211f,47f,47f,255f);
-        public Vector4 JobColorSAM = new Vector4(255f,202f,40f,255f);
+        public Vector4 JobColorMNK = new Vector4(78f/255f,52f/255f,46f/255f,1f);
+        public Vector4 JobColorDRG = new Vector4(63f/255f,81f/255f,181f/255f,1f);
+        public Vector4 JobColorNIN = new Vector4(211f/255f,47f/255f,47f/255f,1f);
+        public Vector4 JobColorSAM = new Vector4(255f/255f,202f/255f,40f/255f,1f);
         
-        public Vector4 JobColorBRD = new Vector4(158f,157f,36f,255f);
-        public Vector4 JobColorMCH = new Vector4(0f,151f,167f,255f);
-        public Vector4 JobColorDNC = new Vector4(244f,143f,177f,255f);
+        public Vector4 JobColorBRD = new Vector4(158f/255f,157f,36f,1f);
+        public Vector4 JobColorMCH = new Vector4(0f/255f,151f,167f,1f);
+        public Vector4 JobColorDNC = new Vector4(244f/255f,143f,177f,1f);
 
-        public Vector4 JobColorBLM = new Vector4(126f,87f,194f,255f);
-        public Vector4 JobColorSMN = new Vector4(46f,125f,50f,255f);
-        public Vector4 JobColorRDM = new Vector4(233f,30f,99f,255f);
-        public Vector4 JobColorBLU = new Vector4(0f,185f,247f,255f);
+        public Vector4 JobColorBLM = new Vector4(126f/255f,87f/255f,194f/255f,1f);
+        public Vector4 JobColorSMN = new Vector4(46f/255f,125f/255f,50f/255f,1f);
+        public Vector4 JobColorRDM = new Vector4(233f/255f,30f/255f,99f/255f,1f);
+        public Vector4 JobColorBLU = new Vector4(0f/255f,185f/255f,247f/255f,1f);
 
-        public Vector4 NPCColorHostile = new Vector4(205f, 25f, 25f, 255f);
-        public Vector4 NPCColorNeutral = new Vector4(214f, 145f, 64f, 255f);
-        public Vector4 NPCColorFriendly = new Vector4(0f, 145f, 6f, 255f);
+        public Vector4 NPCColorHostile = new Vector4(205f/255f, 25f/255f, 25f/255f, 1f);
+        public Vector4 NPCColorNeutral = new Vector4(214f/255f, 145f/255f, 64f/255f, 1f);
+        public Vector4 NPCColorFriendly = new Vector4(0f/255f, 145f/255f, 6f/255f, 1f);
         
         [JsonIgnore] private DalamudPluginInterface _pluginInterface;
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;

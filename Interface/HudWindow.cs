@@ -89,7 +89,7 @@ namespace DelvUIPlugin.Interface {
                 return;
             }
 
-            var scale = (float) actor.MaxHp < 0 ? actor.CurrentHp / actor.MaxHp : 0;
+            var scale = (float) (actor.MaxHp > 0.00 ? actor.CurrentHp / actor.MaxHp : 0.00);
             var cursorPos = new Vector2(CenterX + XOffset, CenterY + YOffset);
             ImGui.SetCursorPos(cursorPos);
  
@@ -101,8 +101,8 @@ namespace DelvUIPlugin.Interface {
                 colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
             );
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-            
-            var percentage = (string)(scale * 100).ToString();
+
+            var percentage = $"{(int) (scale * 100),3}";
             var percentageSize = ImGui.CalcTextSize(percentage);
             var maxPercentageSize = ImGui.CalcTextSize("100");
             DrawOutlinedText(percentage, new Vector2(cursorPos.X + 5 + maxPercentageSize.X - percentageSize.X, cursorPos.Y - 22));
