@@ -30,7 +30,7 @@ namespace DelvUIPlugin.Interface {
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentMp / actor.MaxMp;
             var barSize = new Vector2(BarWidth, BarHeight);
-            var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset);
+            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset);
             
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
@@ -59,7 +59,7 @@ namespace DelvUIPlugin.Interface {
         private void DrawWhiteManaBar() {
             var gauge = (float)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().WhiteGauge;
             var barSize = new Vector2(BarWidth, BarHeight);
-            var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 22);
+            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 22);
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
             drawList.AddRectFilledMultiColor(
@@ -77,7 +77,7 @@ namespace DelvUIPlugin.Interface {
         private void DrawBlackManaBar() {
             var gauge = (float) PluginInterface.ClientState.JobGauges.Get<RDMGauge>().BlackGauge;
             var barSize = new Vector2(BarWidth, BarHeight);
-            var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 44);
+            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 44);
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
             drawList.AddRectFilledMultiColor(
@@ -93,7 +93,7 @@ namespace DelvUIPlugin.Interface {
         
         private void DrawAccelBar() {
             var barSize = new Vector2(BarWidth/3-1, BarHeight/2);
-            var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 55);
+            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 55);
             var drawList = ImGui.GetWindowDrawList();
             var accelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1238);
             drawList.AddRectFilled(cursorPos, cursorPos + new Vector2(barSize.X , barSize.Y), 0x88000000);
@@ -154,7 +154,7 @@ namespace DelvUIPlugin.Interface {
         
         private void DrawDualCastBar() {
             var barSize = new Vector2(BarWidth, BarHeight);
-            var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 22);
+            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 22);
             var drawList = ImGui.GetWindowDrawList();
             var dualCastBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1249);
 
@@ -179,7 +179,7 @@ namespace DelvUIPlugin.Interface {
             var blackGauge = (float)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().BlackGauge;
             var gaugeDiff = whiteGauge - blackGauge;
             var barSize = new Vector2(BarWidth, BarHeight);
-            var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 22);
+            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 22);
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(new Vector2(cursorPos.X + barSize.X+2,cursorPos.Y + barSize.Y-53), 
                 new Vector2(cursorPos.X + barSize.X+10,cursorPos.Y + barSize.Y*2+2), 0x88000000);
