@@ -69,7 +69,7 @@ namespace DelvUIPlugin.Interface {
             
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             drawList.AddRect(cursorPos, cursorPos + new Vector2(barSize.X*0.8f, barSize.Y), 0xFF000000);
-            DrawOutlinedText(gauge.ToString(), new Vector2(cursorPos.X+barSize.X * gauge/100-(gauge==100?30:gauge>10?20:0), cursorPos.Y+-2));
+            DrawOutlinedText(gauge.ToString(), new Vector2(cursorPos.X+barSize.X * gauge/100-(gauge==100?30:gauge>5?20:0), cursorPos.Y+-2));
 
 
         }        
@@ -87,7 +87,7 @@ namespace DelvUIPlugin.Interface {
             
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             drawList.AddRect(cursorPos, new Vector2(cursorPos.X + barSize.X*0.8f, cursorPos.Y + barSize.Y), 0xFF000000);
-            DrawOutlinedText(gauge.ToString(), new Vector2(cursorPos.X+barSize.X * gauge/100-(gauge==100?30:gauge>10?20:0), cursorPos.Y+-2));
+            DrawOutlinedText(gauge.ToString(), new Vector2(cursorPos.X+barSize.X * gauge/100-(gauge==100?30:gauge>5?20:0), cursorPos.Y+-2));
 
         }  
         
