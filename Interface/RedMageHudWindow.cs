@@ -121,6 +121,7 @@ namespace DelvUIPlugin.Interface {
                         cursorPos, cursorPos + new Vector2(barSize.X , barSize.Y), 
                         0xFF2000FC, 0xFF2000FC, 0xFF2000FC, 0xFF2000FC
                     );
+                    drawList.AddRect(cursorPos, cursorPos + new Vector2(barSize.X , barSize.Y), 0xFF000000);
                     cursorPos = new Vector2(cursorPos.X + barSize.X + 2, cursorPos.Y);
                     drawList.AddRectFilledMultiColor(
                         cursorPos, cursorPos + new Vector2(barSize.X , barSize.Y), 
