@@ -59,7 +59,7 @@ namespace DelvUIPlugin.Interface {
         private void DrawWhiteManaBar() {
             var gauge = (float)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().WhiteGauge;
             var barSize = new Vector2(BarWidth, BarHeight);
-            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 22);
+            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 44);
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
             drawList.AddRectFilledMultiColor(
@@ -77,7 +77,7 @@ namespace DelvUIPlugin.Interface {
         private void DrawBlackManaBar() {
             var gauge = (float) PluginInterface.ClientState.JobGauges.Get<RDMGauge>().BlackGauge;
             var barSize = new Vector2(BarWidth, BarHeight);
-            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 44);
+            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 22);
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
             drawList.AddRectFilledMultiColor(
