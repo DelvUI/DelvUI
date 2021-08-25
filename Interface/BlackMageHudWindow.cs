@@ -131,9 +131,8 @@ namespace DelvUIPlugin.Interface
                 DrawPolyglotStack(cursorPos, barSize, 1);
 
                 // 2nd stack
-                bool is2ndCharged = gauge.NumPolyglotStacks == 2;
                 cursorPos.X = CenterX + 1;
-                DrawPolyglotStack(cursorPos, barSize, is2ndCharged ? 1 : scale);
+                DrawPolyglotStack(cursorPos, barSize, scale);
             }
         }
 
