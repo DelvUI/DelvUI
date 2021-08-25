@@ -90,6 +90,7 @@ namespace DelvUIPlugin {
             {
                 Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.DRK => new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.GNB => new GunbreakerHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.DNC => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
