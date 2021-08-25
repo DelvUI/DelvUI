@@ -8,10 +8,10 @@ namespace DelvUIPlugin.Interface {
     public class DancerHudWindow : HudWindow {
         public override uint JobId => 38;
         
-        private new static int BarHeight => 26;
-        private new static int BarWidth => 357;
-        private new static int XOffset => 178;
-        private new static int YOffset => 496;
+        private new static int BarHeight => 13;
+        private new static int BarWidth => 254;
+        private new static int XOffset => 127;
+        private new static int YOffset => 466;
         
         public DancerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
@@ -25,10 +25,10 @@ namespace DelvUIPlugin.Interface {
         protected override void DrawPrimaryResourceBar() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
             
-            const int xPadding = 5;
+            const int xPadding = 2;
             var barWidth = (BarWidth - xPadding) / 2;
             var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset;
+            var yPos = CenterY + YOffset - 46;
             var cursorPos = new Vector2(xPos, yPos);
             const int chunkSize = 50;
             var barSize = new Vector2(barWidth, BarHeight);
@@ -80,32 +80,27 @@ namespace DelvUIPlugin.Interface {
         private void DrawSecondaryResourceBar() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
 
-            const int xPadding = 3;
-            const int yPadding = 3;
-            const int numChunks = 4;
-            
-            var barWidth = (BarWidth - xPadding * (numChunks - 1)) / numChunks;
+            const int xPadding = 2;
+            var barWidth = (BarWidth - xPadding * 3) / 4;
             var barSize = new Vector2(barWidth, BarHeight);
             var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset + BarHeight + yPadding;
-            var cursorPos = new Vector2(xPos - xPadding - barWidth, yPos);
-            
+            var yPos = CenterY + YOffset - 30;
+            var cursorPos = new Vector2(xPos, yPos);
+
             var drawList = ImGui.GetWindowDrawList();
-            
-            for (var i = 1; i < 5; i++) {
-                cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
-                
-                if (gauge.NumFeathers >= i) {
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + barSize, 
-                        0xFF4FD29B, 0xFF49F6AE, 0xFF49F6AE, 0xFF4FD29B
-                    );
+            for (var i = 0; i <= 4 - 1; i++)
+            {
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+                if (gauge.NumFeathers > i)
+                {
+                    drawList.AddRectFilled(cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y), 0xFF4FD29B);
                 }
-                else {
-                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+                else
+                {
+
                 }
-                
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+                cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
             }
         }
     }

@@ -1,4 +1,7 @@
-.idea
-Debug
-obj
-.vs/*
+.idea/
+.vs/
+bin/
+Debug/
+obj/
+DelvUI.sln.DotSettings.user
+Folder.DotSettings.user
