@@ -8,8 +8,8 @@ namespace DelvUIPlugin.Interface {
     public class GunbreakerHudWindow : HudWindow {
         public override uint JobId => 37;
 
-        private new int BarHeight => 13;
-        private new int BarWidth => 254;
+        private int BarHeight => 13;
+        private int BarWidth => 254;
         private new int XOffset => 127;
         private new int YOffset => 466;
         
@@ -19,6 +19,7 @@ namespace DelvUIPlugin.Interface {
             DrawHealthBar();
             DrawPowderGauge();
             DrawTargetBar();
+            DrawFocusBar();
         }
 
         private void DrawPowderGauge() {
