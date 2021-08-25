@@ -96,6 +96,7 @@ namespace DelvUIPlugin {
                 Jobs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.RDM => new RedMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SMN => new SummonerHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.SCH => new ScholarHudWindow(_pluginInterface, _pluginConfiguration),
                 _ => _hudWindow
             };
         }
