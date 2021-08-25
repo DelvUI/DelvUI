@@ -25,6 +25,7 @@ namespace DelvUIPlugin.Interface
             DrawFairyBar();
             DrawAetherBar();
             DrawTargetBar();
+            DrawFocusBar();
         }
 
         protected override void DrawPrimaryResourceBar()
