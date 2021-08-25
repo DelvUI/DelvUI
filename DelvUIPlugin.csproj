@@ -57,7 +57,7 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-		    <Compile Include="Interface\SamuraiHudWindow.cs" />
+		<Compile Include="Interface\SamuraiHudWindow.cs" />
         <Compile Include="Interface\BardHudWindow.cs" />
         <Compile Include="Interface\DancerHudWindow.cs" />
         <Compile Include="Interface\DarkKnightHudWindow.cs" />
@@ -65,6 +65,7 @@
         <Compile Include="Interface\RedMageHudWindow.cs" />
         <Compile Include="Interface\WhiteMageHudWindow.cs" />
         <Compile Include="Interface\SummonerHudWindow.cs" />
+        <Compile Include="Interface\BlackMageHudWindow.cs" />
         <Compile Include="PluginConfiguration.cs" />
         <Compile Include="Extensions.cs" />
         <Compile Include="Interface\ConfigurationWindow.cs" />
