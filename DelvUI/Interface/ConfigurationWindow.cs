@@ -2777,6 +2777,85 @@ namespace DelvUI.Interface
 
                     ImGui.EndTabItem();
                 }
+                if (ImGui.BeginTabItem("Dragoon"))
+                {
+                    var eyeOfTheDragonHeight = _pluginConfiguration.DRGEyeOfTheDragonHeight;
+                    if (ImGui.DragInt("Eye of the Dragon Bar Height", ref eyeOfTheDragonHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRGEyeOfTheDragonHeight = eyeOfTheDragonHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var eyeOfTheDragonBarWidth = _pluginConfiguration.DRGEyeOfTheDragonBarWidth;
+                    if (ImGui.DragInt("Eye of the Dragon Bar Width", ref eyeOfTheDragonBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRGEyeOfTheDragonBarWidth = eyeOfTheDragonBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var eyeOfTheDragonPadding = _pluginConfiguration.DRGEyeOfTheDragonPadding;
+                    if (ImGui.DragInt("Space between Eye of the Dragon Bars", ref eyeOfTheDragonPadding, .1f, 0, 1000))
+                    {
+                        _pluginConfiguration.DRGEyeOfTheDragonPadding = eyeOfTheDragonPadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drgBaseXOffset = _pluginConfiguration.DRGBaseXOffset;
+                    if (ImGui.DragInt("Base X Offset", ref drgBaseXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.DRGBaseXOffset = drgBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drgBaseYOffset = _pluginConfiguration.DRGBaseYOffset;
+                    if (ImGui.DragInt("Base Y Offset", ref drgBaseYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.DRGBaseYOffset = drgBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drgBloodBarHeight = _pluginConfiguration.DRGBloodBarHeight;
+                    if (ImGui.DragInt("Height of Blood/Life Bar", ref drgBloodBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRGBloodBarHeight = drgBloodBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drgDisembowelBarHeight = _pluginConfiguration.DRGDisembowelBarHeight;
+                    if (ImGui.DragInt("Height of Disembowel Bar", ref drgDisembowelBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRGDisembowelBarHeight = drgDisembowelBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drgChaosThrustBarHeight = _pluginConfiguration.DRGChaosThrustBarHeight;
+                    if (ImGui.DragInt("Height of Chaos Thrust Bar", ref drgChaosThrustBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRGChaosThrustBarHeight = drgChaosThrustBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drgInterBarOffset = _pluginConfiguration.DRGInterBarOffset;
+                    if (ImGui.DragInt("Space Between Bars", ref drgInterBarOffset, .1f, 0, 1000))
+                    {
+                        _pluginConfiguration.DRGInterBarOffset = drgInterBarOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show Chaos Thrust Timer", ref _pluginConfiguration.DRGShowChaosThrustTimer);
+                    changed |= ImGui.Checkbox("Show Disembowel Timer", ref _pluginConfiguration.DRGShowDisembowelBuffTimer);
+                    changed |= ImGui.Checkbox("Show Chaos Thrust Text", ref _pluginConfiguration.DRGShowChaosThrustText);
+                    changed |= ImGui.Checkbox("Show Blood/Life of the Dragon Text", ref _pluginConfiguration.DRGShowBloodText);
+                    changed |= ImGui.Checkbox("Show Disembowel Text", ref _pluginConfiguration.DRGShowDisembowelText);
+
+                    changed |= ImGui.ColorEdit4("Eye of the Dragon Color", ref _pluginConfiguration.DRGEyeOfTheDragonColor);
+                    changed |= ImGui.ColorEdit4("Blood of the Dragon Color", ref _pluginConfiguration.DRGBloodOfTheDragonColor);
+                    changed |= ImGui.ColorEdit4("Life of the Dragon Color", ref _pluginConfiguration.DRGLifeOfTheDragonColor);
+                    changed |= ImGui.ColorEdit4("Disembowel Color", ref _pluginConfiguration.DRGDisembowelColor);
+                    changed |= ImGui.ColorEdit4("Chaos Thrust Color", ref _pluginConfiguration.DRGChaosThrustColor);
+                    changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.DRGEmptyColor);
+                    ImGui.EndTabItem();
+                }
             }
             ImGui.EndTabBar();
         }
