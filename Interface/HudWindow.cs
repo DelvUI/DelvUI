@@ -23,29 +23,34 @@ namespace DelvUIPlugin.Interface {
         protected float CenterY => ImGui.GetMainViewport().Size.Y / 2f;
         protected int XOffset => 160;
         protected int YOffset => 460;
-        protected int BarHeight => 50;
-        protected int BarWidth => 270;
+        protected int HealthBarHeight => PluginConfiguration.HealthBarHeight;
+        protected int HealthBarWidth => PluginConfiguration.HealthBarWidth;
+        protected int TargetBarHeight => PluginConfiguration.TargetBarHeight;
+        protected int TargetBarWidth => PluginConfiguration.TargetBarWidth;
+        protected int ToTBarHeight => PluginConfiguration.ToTBarHeight;
+        protected int ToTBarWidth => PluginConfiguration.ToTBarWidth;
         protected Vector2 BarSize => _barsize;
         
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {
             PluginInterface = pluginInterface;
             PluginConfiguration = pluginConfiguration;
-            _barsize = new Vector2(BarWidth, BarHeight);
+            //_barsize = new Vector2(BarWidth, BarHeight);
         }
 
         protected virtual void DrawHealthBar() {
+            _barsize = new Vector2(HealthBarWidth, HealthBarHeight);
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentHp / actor.MaxHp;
 
-            var cursorPos = new Vector2(CenterX - BarWidth - XOffset, CenterY + YOffset);
+            var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset, CenterY + YOffset);
 
             DrawOutlinedText($"{actor.Name.Abbreviate().Truncate(16)}", new Vector2(cursorPos.X + 5, cursorPos.Y -22));
             
             var hp = $"{actor.MaxHp.KiloFormat(),6} | ";
             var hpSize = ImGui.CalcTextSize(hp);
             var percentageSize = ImGui.CalcTextSize("100");
-            DrawOutlinedText(hp, new Vector2(cursorPos.X + BarWidth - hpSize.X - percentageSize.X - 5, cursorPos.Y -22));
-            DrawOutlinedText($"{(int)(scale * 100),3}", new Vector2(cursorPos.X + BarWidth - percentageSize.X - 5, cursorPos.Y -22));
+            DrawOutlinedText(hp, new Vector2(cursorPos.X + HealthBarWidth - hpSize.X - percentageSize.X - 5, cursorPos.Y -22));
+            DrawOutlinedText($"{(int)(scale * 100),3}", new Vector2(cursorPos.X + HealthBarWidth - percentageSize.X - 5, cursorPos.Y -22));
             
             ImGui.SetCursorPos(cursorPos);
             
@@ -54,7 +59,7 @@ namespace DelvUIPlugin.Interface {
                 var drawList = ImGui.GetWindowDrawList();
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
                 drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(BarWidth * scale, BarHeight), 
+                    cursorPos, cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight), 
                     colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
                 );
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
@@ -89,7 +94,9 @@ namespace DelvUIPlugin.Interface {
             if (target is null) {
                 return;
             }
-            
+
+            _barsize = new Vector2(TargetBarWidth, TargetBarHeight);
+
             var cursorPos = new Vector2(CenterX + XOffset, CenterY + YOffset);
             ImGui.SetCursorPos(cursorPos);
             var drawList = ImGui.GetWindowDrawList();
@@ -98,7 +105,7 @@ namespace DelvUIPlugin.Interface {
                 var friendly = PluginConfiguration.NPCColorMap["friendly"];
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, friendly["background"]);
                 drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(BarWidth, BarHeight), 
+                    cursorPos, cursorPos + new Vector2(TargetBarWidth, TargetBarHeight), 
                     friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"], friendly["gradientLeft"]
                 );
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
@@ -108,7 +115,7 @@ namespace DelvUIPlugin.Interface {
                 var colors = DetermineTargetPlateColors(actor);
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
                 drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(BarWidth * scale, BarHeight), 
+                    cursorPos, cursorPos + new Vector2(TargetBarWidth * scale, TargetBarHeight), 
                     colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
                 );
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
@@ -122,7 +129,7 @@ namespace DelvUIPlugin.Interface {
 
             var name = $"{target.Name.Abbreviate().Truncate(16)}";
             var nameSize = ImGui.CalcTextSize(name);
-            DrawOutlinedText(name, new Vector2(cursorPos.X + BarWidth - nameSize.X - 5, cursorPos.Y - 22));
+            DrawOutlinedText(name, new Vector2(cursorPos.X + TargetBarWidth - nameSize.X - 5, cursorPos.Y - 22));
 
             DrawTargetOfTargetBar(target.TargetActorID);
         }
@@ -140,15 +147,14 @@ namespace DelvUIPlugin.Interface {
                 return;
             }
 
-            const int barWidth = 120;
-            const int barHeight = 20;
-            var barSize = new Vector2(barWidth, barHeight);
+
+            var barSize = new Vector2(ToTBarWidth, ToTBarHeight);
 
             var name = $"{actor.Name.Abbreviate().Truncate(12)}";
             var textSize = ImGui.CalcTextSize(name);
 
-            var cursorPos = new Vector2(CenterX + XOffset + BarWidth + 2, CenterY + YOffset);
-            DrawOutlinedText(name, new Vector2(cursorPos.X + barWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
+            var cursorPos = new Vector2(CenterX + XOffset + TargetBarWidth + 2, CenterY + YOffset);
+            DrawOutlinedText(name, new Vector2(cursorPos.X + ToTBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
             ImGui.SetCursorPos(cursorPos);    
             
             var colors = DetermineTargetPlateColors(actor);
@@ -157,7 +163,7 @@ namespace DelvUIPlugin.Interface {
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["background"]);
                 
                 drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2((float)barWidth * actor.CurrentHp / actor.MaxHp, barHeight), 
+                    cursorPos, cursorPos + new Vector2((float)ToTBarWidth * actor.CurrentHp / actor.MaxHp, ToTBarHeight), 
                     colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
                 );
                 
@@ -257,12 +263,15 @@ namespace DelvUIPlugin.Interface {
         protected abstract void Draw(bool _);
 
         protected virtual unsafe bool ShouldBeVisible() {
-            if (IsVisible) {
-                return true;
-            }
-            
-            if (PluginConfiguration.HideHud) {
+
+            if (PluginConfiguration.HideHud)
+            {
                 return false;
+            }
+
+            if (IsVisible)
+            {
+                return true;
             }
 
             var parameterWidget = (AtkUnitBase*) PluginInterface.Framework.Gui.GetUiObjectByName("_ParameterWidget", 1);

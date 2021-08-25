@@ -8,8 +8,16 @@ using Newtonsoft.Json;
 namespace DelvUIPlugin {
     public class PluginConfiguration : IPluginConfiguration {
         public int Version { get; set; }
-
+        public string Name => "DelvUI";
         public bool HideHud = false;
+
+        public bool LockHud = true;
+        public int HealthBarHeight { get; set; } = 50;
+        public int HealthBarWidth { get; set; } = 270;
+        public int TargetBarHeight { get; set; } = 50;
+        public int TargetBarWidth { get; set; } = 270;
+        public int ToTBarHeight { get; set; } = 20;
+        public int ToTBarWidth { get; set; } = 120;
 
         public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,1f);
         public Vector4 JobColorWAR = new Vector4(153f/255f,23f/255f,23f/255f,1f);
@@ -51,7 +59,7 @@ namespace DelvUIPlugin {
         public void Save() {
             _pluginInterface.SavePluginConfig(this);
         }
-        
+
         public void BuildColorMap() {
             JobColorMap = new Dictionary<uint, Dictionary<string, uint>>
             {

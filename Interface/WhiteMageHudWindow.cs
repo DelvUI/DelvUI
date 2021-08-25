@@ -7,8 +7,8 @@ namespace DelvUIPlugin.Interface {
     public class WhiteMageHudWindow : HudWindow {
         public override uint JobId => 24;
         
-        private new int BarHeight => 13;
-        private new int BarWidth => 254;
+        private int BarHeight => 13;
+        private int BarWidth => 254;
         private new int XOffset => 127;
         private new int YOffset => 466;
         
