@@ -61,6 +61,7 @@
         <Compile Include="Interface\DarkKnightHudWindow.cs" />
         <Compile Include="Interface\RedMageHudWindow.cs" />
         <Compile Include="Interface\WhiteMageHudWindow.cs" />
+        <Compile Include="Interface\SummonerHudWindow.cs" />
         <Compile Include="PluginConfiguration.cs" />
         <Compile Include="Extensions.cs" />
         <Compile Include="Interface\ConfigurationWindow.cs" />
