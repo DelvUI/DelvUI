@@ -4,7 +4,7 @@ using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
 using System.Linq;
-using System.Collections;
+using System.Collections.Generic;
 
 namespace DelvUIPlugin.Interface
 {
@@ -122,27 +122,27 @@ namespace DelvUIPlugin.Interface
             if (gauge.NumPolyglotStacks == 0)
             {
                 var cursorPos = new Vector2(CenterX - barSize.X / 2f, CenterY + YOffset - 85);
-                DrawPolyglotStack(cursorPos, barSize, scale, false);
+                DrawPolyglotStack(cursorPos, barSize, scale);
             } 
             else
             {
                 // 1st stack (charged)
                 var cursorPos = new Vector2(CenterX - barSize.X - 1, CenterY + YOffset - 85);
-                DrawPolyglotStack(cursorPos, barSize, 1, true);
+                DrawPolyglotStack(cursorPos, barSize, 1);
 
                 // 2nd stack
                 bool is2ndCharged = gauge.NumPolyglotStacks == 2;
                 cursorPos.X = CenterX + 1;
-                DrawPolyglotStack(cursorPos, barSize, is2ndCharged ? 1 : scale, is2ndCharged);
+                DrawPolyglotStack(cursorPos, barSize, is2ndCharged ? 1 : scale);
             }
         }
 
-        private void DrawPolyglotStack(Vector2 position, Vector2 size, float scale, bool isFullyCharged)
+        private void DrawPolyglotStack(Vector2 position, Vector2 size, float scale)
         {
             var drawList = ImGui.GetWindowDrawList();
 
             // glow
-            if (isFullyCharged)
+            if (scale == 1)
             {
                 var glowPosition = new Vector2(position.X - 1, position.Y - 1);
                 var glowSize = new Vector2(size.X + 2, size.Y + 2);
@@ -153,7 +153,7 @@ namespace DelvUIPlugin.Interface
             drawList.AddRectFilled(position, position + size, 0x88000000);
 
             // fill
-            if (isFullyCharged)
+            if (scale == 1)
             {
                 drawList.AddRectFilledMultiColor(position, position + size, 0xFF5F3A93, 0xFFBE8FFF, 0xFFBE8FFF, 0xFF5F3A93);
             }
@@ -171,14 +171,14 @@ namespace DelvUIPlugin.Interface
             var tripleStackBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1211);
             var drawList = ImGui.GetWindowDrawList();
 
-            var positions = new ArrayList();
+            var positions = new List<Vector2>();
             positions.Add(new Vector2(CenterX, CenterY + YOffset - 100));
             positions.Add(new Vector2(CenterX - JobBarWidth / 2f + 30, CenterY + YOffset - 85));
             positions.Add(new Vector2(CenterX + JobBarWidth / 2f - 30, CenterY + YOffset - 85));
 
             for (int i = 0; i < tripleStackBuff.StackCount; i++)
             {
-                drawList.AddCircle((Vector2)positions[i], 10, 0xFFFFFFFF, 6, 4);
+                drawList.AddCircle(positions[i], 10, 0xFFFFFFFF, 6, 4);
             }
         }
     }
