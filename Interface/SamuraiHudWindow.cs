@@ -6,13 +6,13 @@ using ImGuiNET;
 
 namespace DelvUIPlugin.Interface {
     public class SamuraiHudWindow : HudWindow {
+
         public override uint JobId => 34;
-        
         private new static int BarHeight => 20;
         private new int BarWidth => 250;
         private new int XOffset => 127;
         private new int YOffset => 467;
-        
+
         public SamuraiHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _) {
@@ -40,7 +40,6 @@ namespace DelvUIPlugin.Interface {
             var scale = (float)Kenki / chunkSize;
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight),
                 0xFF5252FF, 0xFF9C9CFF, 0xFF9C9CFF, 0xFF5252FF
