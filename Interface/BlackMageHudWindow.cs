@@ -176,13 +176,8 @@ namespace DelvUIPlugin.Interface
             positions.Add(new Vector2(CenterX - JobBarWidth / 2f + 30, CenterY + YOffset - 85));
             positions.Add(new Vector2(CenterX + JobBarWidth / 2f - 30, CenterY + YOffset - 85));
 
-            for (int i = 0; i < 3; i++)
+            for (int i = 0; i < tripleStackBuff.StackCount; i++)
             {
-                if (tripleStackBuff.StackCount <= i)
-                {
-                    break;
-                }
-
                 drawList.AddCircle((Vector2)positions[i], 10, 0xFFFFFFFF, 6, 4);
             }
         }
