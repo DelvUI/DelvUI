@@ -11,9 +11,9 @@ namespace DelvUIPlugin.Interface
     {
         public override uint JobId => 27;
 
-        private new static int BarHeight => 20;
+        private static int BarHeight => 20;
         private static int SmallBarHeight => 10;
-        private new static int BarWidth => 254;
+        private static int BarWidth => 254;
         private new static int XOffset => 127;
         private new static int YOffset => 466;
 
