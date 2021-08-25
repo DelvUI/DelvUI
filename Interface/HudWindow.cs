@@ -86,30 +86,41 @@ namespace DelvUIPlugin.Interface {
         protected virtual void DrawTargetBar() {
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (!(target is Chara actor)) {
+            if (target is null) {
                 return;
             }
-
-            var scale = actor.MaxHp > 0f ? (float) actor.CurrentHp / actor.MaxHp : 0f;
+            
             var cursorPos = new Vector2(CenterX + XOffset, CenterY + YOffset);
             ImGui.SetCursorPos(cursorPos);
- 
-            var colors = DetermineTargetPlateColors(actor);
             var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
-            drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + new Vector2(BarWidth * scale, BarHeight), 
-                colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
-            );
-            drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
 
-            var percentage = $"{(int) (scale * 100),3}";
-            var percentageSize = ImGui.CalcTextSize(percentage);
-            var maxPercentageSize = ImGui.CalcTextSize("100");
-            DrawOutlinedText(percentage, new Vector2(cursorPos.X + 5 + maxPercentageSize.X - percentageSize.X, cursorPos.Y - 22));
-            DrawOutlinedText($" | {actor.MaxHp.KiloFormat(),-6}", new Vector2(cursorPos.X + 5 + maxPercentageSize.X, cursorPos.Y - 22));
-            
-            var name = $"{actor.Name.Abbreviate().Truncate(16)}";
+            if (!(target is Chara actor)) {
+                var friendly = PluginConfiguration.NPCColorMap["friendly"];
+                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, friendly["background"]);
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(BarWidth, BarHeight), 
+                    friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"], friendly["gradientLeft"]
+                );
+                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+            }
+            else {
+                var scale = actor.MaxHp > 0f ? (float) actor.CurrentHp / actor.MaxHp : 0f;
+                var colors = DetermineTargetPlateColors(actor);
+                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(BarWidth * scale, BarHeight), 
+                    colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+                );
+                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+
+                var percentage = $"{(int) (scale * 100),3}";
+                var percentageSize = ImGui.CalcTextSize(percentage);
+                var maxPercentageSize = ImGui.CalcTextSize("100");
+                DrawOutlinedText(percentage, new Vector2(cursorPos.X + 5 + maxPercentageSize.X - percentageSize.X, cursorPos.Y - 22));
+                DrawOutlinedText($" | {actor.MaxHp.KiloFormat(),-6}", new Vector2(cursorPos.X + 5 + maxPercentageSize.X, cursorPos.Y - 22));
+            }
+
+            var name = $"{target.Name.Abbreviate().Truncate(16)}";
             var nameSize = ImGui.CalcTextSize(name);
             DrawOutlinedText(name, new Vector2(cursorPos.X + BarWidth - nameSize.X - 5, cursorPos.Y - 22));
 
@@ -156,6 +167,7 @@ namespace DelvUIPlugin.Interface {
                     PluginInterface.ClientState.Targets.SetCurrentTarget(target);
                 }
             }
+            
             ImGui.EndChild();
         }
 
