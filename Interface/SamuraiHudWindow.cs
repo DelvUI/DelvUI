@@ -6,12 +6,12 @@ using ImGuiNET;
 
 namespace DelvUIPlugin.Interface {
     public class SamuraiHudWindow : HudWindow {
-        public override uint JobId => 38;
+        public override uint JobId => 34;
         
-        private new static int BarHeight => 26;
-        private new static int BarWidth => 357;
-        private new static int XOffset => 178;
-        private new static int YOffset => 496;
+        private new static int BarHeight => 20;
+        private new int BarWidth => 250;
+        private new int XOffset => 127;
+        private new int YOffset => 467;
         
         public SamuraiHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
@@ -32,7 +32,7 @@ namespace DelvUIPlugin.Interface {
             var xPos = CenterX - XOffset;
             var yPos = CenterY + YOffset - BarHeight - yPadding;
             var cursorPos = new Vector2(xPos, yPos);
-            const int chunkSize = 50;
+            const int chunkSize = 100;
             var barSize = new Vector2(barWidth, BarHeight);
 
             // Kenki Gauge
@@ -41,25 +41,17 @@ namespace DelvUIPlugin.Interface {
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
 
-            if (scale >= 1.0f)
-            {
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight),
-                    0xFF5252FF, 0xFF9C9CFF, 0xFF9C9CFF, 0xFF5252FF
-                );
-            }
-            else
-            {
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight),
-                    0xFF90827C, 0xFF8E8D8F, 0xFF8E8D8F, 0xFF90827C
-                );
-            }
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight),
+                0xFF5252FF, 0xFF9C9CFF, 0xFF9C9CFF, 0xFF5252FF
+            );
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            var textSize = ImGui.CalcTextSize(gauge.Kenki.ToString());
+            DrawOutlinedText(gauge.Kenki.ToString(), new Vector2(cursorPos.X + BarWidth / 2f - textSize.X / 2f, cursorPos.Y-2));
 
         }
-
+        
         private void DrawSenResourceBar() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
 
@@ -78,17 +70,18 @@ namespace DelvUIPlugin.Interface {
             cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
             if (gauge.HasSetsu()) drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0xFFF7EA59);
             else drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
             // Getsu Bar
             cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
             if (gauge.HasGetsu())drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0xFFF77E59);
             else drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
             // Ka Bar
             cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
             if (gauge.HasKa())drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0XFF5959F7);
             else drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
     
