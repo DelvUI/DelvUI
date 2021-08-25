@@ -2,6 +2,7 @@
 using System.Numerics;
 using Dalamud.Configuration;
 using Dalamud.Plugin;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using Newtonsoft.Json;
 
@@ -132,7 +133,7 @@ namespace DelvUIPlugin {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorDRG.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorDRG.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.NIN] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN),
@@ -210,6 +211,7 @@ namespace DelvUIPlugin {
             JobColorMap.Add(Jobs.PGL, JobColorMap[Jobs.MNK]);
             JobColorMap.Add(Jobs.MRD, JobColorMap[Jobs.WAR]);
             JobColorMap.Add(Jobs.LNC, JobColorMap[Jobs.DRG]);
+            JobColorMap.Add(Jobs.ROG, JobColorMap[Jobs.NIN]);
             JobColorMap.Add(Jobs.ARC, JobColorMap[Jobs.BRD]);
             JobColorMap.Add(Jobs.CNJ, JobColorMap[Jobs.WHM]);
             JobColorMap.Add(Jobs.THM, JobColorMap[Jobs.BLM]);
@@ -272,6 +274,7 @@ namespace DelvUIPlugin {
 
         public const uint PGL = 2;
         public const uint LNC = 4;
+        public const uint ROG = 29;
         public const uint MNK = 20;
         public const uint DRG = 22;
         public const uint NIN = 30;
