@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using ImGuiNET;
@@ -96,6 +99,7 @@ namespace DelvUIPlugin {
                 Jobs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.RDM => new RedMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SMN => new SummonerHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.MCH => new MachinistHudWindow(_pluginInterface, _pluginConfiguration),
                 _ => _hudWindow
             };
         }
