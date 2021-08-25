@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
@@ -8,8 +9,8 @@ namespace DelvUIPlugin.Interface {
     public class DarkKnightHudWindow : HudWindow {
         public override uint JobId => 32;
 
-        private new int BarHeight => 13;
-        private new int BarWidth => 254;
+        private int BarHeight => 13;
+        private int BarWidth => 254;
         private new int XOffset => 127;
         private new int YOffset => 466;
         
@@ -20,10 +21,12 @@ namespace DelvUIPlugin.Interface {
             DrawPrimaryResourceBar();
             DrawSecondaryResourceBar();
             DrawTargetBar();
+            DrawFocusBar();
         }
 
         protected override void DrawPrimaryResourceBar() {
             var actor = PluginInterface.ClientState.LocalPlayer;
+            //var tbn = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1178);
 
             const int xPadding = 2;
             var barWidth = (BarWidth - xPadding * 2)  / 3.0f;

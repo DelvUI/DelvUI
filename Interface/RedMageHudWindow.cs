@@ -9,8 +9,8 @@ namespace DelvUIPlugin.Interface {
     public class RedMageHudWindow : HudWindow {
         public override uint JobId => 35;
         
-        private new int BarHeight => 20;
-        private new int BarWidth => 254;
+        private int BarHeight => 20;
+        private int BarWidth => 254;
         private new int XOffset => 127;
         private new int YOffset => 440;
         
@@ -25,6 +25,7 @@ namespace DelvUIPlugin.Interface {
             DrawDualCastBar();
             DrawCrystalBar();
             DrawTargetBar();
+            DrawFocusBar();
         }
         protected override void DrawPrimaryResourceBar() {
             var actor = PluginInterface.ClientState.LocalPlayer;

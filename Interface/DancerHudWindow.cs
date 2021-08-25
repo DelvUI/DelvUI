@@ -8,8 +8,8 @@ namespace DelvUIPlugin.Interface {
     public class DancerHudWindow : HudWindow {
         public override uint JobId => 38;
         
-        private new static int BarHeight => 13;
-        private new static int BarWidth => 254;
+        private static int BarHeight => 13;
+        private static int BarWidth => 254;
         private new static int XOffset => 127;
         private new static int YOffset => 466;
         
@@ -20,6 +20,7 @@ namespace DelvUIPlugin.Interface {
             DrawPrimaryResourceBar();
             DrawSecondaryResourceBar();
             DrawTargetBar();
+            DrawFocusBar();
         }
 
         protected override void DrawPrimaryResourceBar() {
