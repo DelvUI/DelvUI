@@ -63,8 +63,9 @@ namespace DelvUIPlugin.Interface {
                     PluginInterface.ClientState.Targets.SetCurrentTarget(actor);
                 }
                 
-                ImGui.EndChild();
             }
+            
+            ImGui.EndChild();
         }
 
         protected virtual void DrawPrimaryResourceBar() {
@@ -89,7 +90,7 @@ namespace DelvUIPlugin.Interface {
                 return;
             }
 
-            var scale = (float) (actor.MaxHp > 0.00 ? actor.CurrentHp / actor.MaxHp : 0.00);
+            var scale = actor.MaxHp > 0f ? (float) actor.CurrentHp / actor.MaxHp : 0f;
             var cursorPos = new Vector2(CenterX + XOffset, CenterY + YOffset);
             ImGui.SetCursorPos(cursorPos);
  
@@ -154,9 +155,8 @@ namespace DelvUIPlugin.Interface {
                 if (ImGui.IsItemClicked()) {
                     PluginInterface.ClientState.Targets.SetCurrentTarget(target);
                 }
-                
-                ImGui.EndChild();
             }
+            ImGui.EndChild();
         }
 
         protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor) {
