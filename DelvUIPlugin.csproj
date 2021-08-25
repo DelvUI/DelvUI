@@ -57,6 +57,7 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+		    <Compile Include="Interface\SamuraiHudWindow.cs" />
         <Compile Include="Interface\BardHudWindow.cs" />
         <Compile Include="Interface\DancerHudWindow.cs" />
         <Compile Include="Interface\DarkKnightHudWindow.cs" />
