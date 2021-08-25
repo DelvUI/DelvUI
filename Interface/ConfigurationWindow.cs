@@ -72,6 +72,19 @@ namespace DelvUIPlugin.Interface {
                     {
                         _pluginConfiguration.ToTBarWidth = totBarWidth;
                         _pluginConfiguration.Save();
+                    }                    
+                    var focusBarHeight = _pluginConfiguration.FocusBarHeight;
+                    if (ImGui.DragInt("Focus Height", ref focusBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.FocusBarHeight = focusBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var focusBarWidth = _pluginConfiguration.FocusBarWidth;
+                    if (ImGui.DragInt("Focus Width", ref totBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.FocusBarWidth = focusBarWidth;
+                        _pluginConfiguration.Save();
                     }
 
                     changed |= ImGui.Checkbox("Hide HUD", ref _pluginConfiguration.HideHud);

@@ -19,6 +19,7 @@ namespace DelvUIPlugin.Interface {
             DrawHealthBar();
             DrawPowderGauge();
             DrawTargetBar();
+            DrawFocusBar();
         }
 
         private void DrawPowderGauge() {

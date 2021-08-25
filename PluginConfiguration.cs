@@ -17,6 +17,8 @@ namespace DelvUIPlugin {
         public int TargetBarWidth { get; set; } = 270;
         public int ToTBarHeight { get; set; } = 20;
         public int ToTBarWidth { get; set; } = 120;
+        public int FocusBarHeight { get; set; } = 20;
+        public int FocusBarWidth { get; set; } = 120;
 
         public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,1f);
         public Vector4 JobColorWAR = new Vector4(153f/255f,23f/255f,23f/255f,1f);
