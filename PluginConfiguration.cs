@@ -2,14 +2,21 @@
 using System.Numerics;
 using Dalamud.Configuration;
 using Dalamud.Plugin;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using Newtonsoft.Json;
 
 namespace DelvUIPlugin {
     public class PluginConfiguration : IPluginConfiguration {
         public int Version { get; set; }
-
         public bool HideHud = false;
+        public bool LockHud = true;
+        public int HealthBarHeight { get; set; } = 50;
+        public int HealthBarWidth { get; set; } = 270;
+        public int TargetBarHeight { get; set; } = 50;
+        public int TargetBarWidth { get; set; } = 270;
+        public int ToTBarHeight { get; set; } = 20;
+        public int ToTBarWidth { get; set; } = 120;
 
         public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,1f);
         public Vector4 JobColorWAR = new Vector4(153f/255f,23f/255f,23f/255f,1f);
@@ -51,7 +58,7 @@ namespace DelvUIPlugin {
         public void Save() {
             _pluginInterface.SavePluginConfig(this);
         }
-        
+
         public void BuildColorMap() {
             JobColorMap = new Dictionary<uint, Dictionary<string, uint>>
             {
@@ -126,7 +133,7 @@ namespace DelvUIPlugin {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorDRG.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorDRG.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.NIN] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN),
@@ -204,6 +211,7 @@ namespace DelvUIPlugin {
             JobColorMap.Add(Jobs.PGL, JobColorMap[Jobs.MNK]);
             JobColorMap.Add(Jobs.MRD, JobColorMap[Jobs.WAR]);
             JobColorMap.Add(Jobs.LNC, JobColorMap[Jobs.DRG]);
+            JobColorMap.Add(Jobs.ROG, JobColorMap[Jobs.NIN]);
             JobColorMap.Add(Jobs.ARC, JobColorMap[Jobs.BRD]);
             JobColorMap.Add(Jobs.CNJ, JobColorMap[Jobs.WHM]);
             JobColorMap.Add(Jobs.THM, JobColorMap[Jobs.BLM]);
@@ -266,6 +274,7 @@ namespace DelvUIPlugin {
 
         public const uint PGL = 2;
         public const uint LNC = 4;
+        public const uint ROG = 29;
         public const uint MNK = 20;
         public const uint DRG = 22;
         public const uint NIN = 30;
