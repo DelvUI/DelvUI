@@ -8,9 +8,7 @@ using Newtonsoft.Json;
 namespace DelvUIPlugin {
     public class PluginConfiguration : IPluginConfiguration {
         public int Version { get; set; }
-        public string Name => "DelvUI";
         public bool HideHud = false;
-
         public bool LockHud = true;
         public int HealthBarHeight { get; set; } = 50;
         public int HealthBarWidth { get; set; } = 270;
