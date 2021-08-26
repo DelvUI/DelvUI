@@ -25,6 +25,7 @@ namespace DelvUIPlugin.Interface {
             DrawDualCastBar();
             DrawCrystalBar();
             DrawTargetBar();
+            DrawCastBar();
         }
         protected override void DrawPrimaryResourceBar() {
             var actor = PluginInterface.ClientState.LocalPlayer;

@@ -1,13 +1,24 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Numerics;
+using System.Runtime.InteropServices;
+using System.Text;
+using Dalamud.Data;
+using Dalamud.Data.LuminaExtensions;
 using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
+using Dalamud.Game.ClientState.Structs;
 using Dalamud.Interface;
 using Dalamud.Plugin;
+using DelvUIPlugin.GameStructs;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
+using ImGuiScene;
+using Lumina.Data.Files;
+using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUIPlugin.Interface {
     
@@ -29,7 +40,11 @@ namespace DelvUIPlugin.Interface {
         protected int TargetBarWidth => PluginConfiguration.TargetBarWidth;
         protected int ToTBarHeight => PluginConfiguration.ToTBarHeight;
         protected int ToTBarWidth => PluginConfiguration.ToTBarWidth;
+        protected int CastBarHeight => PluginConfiguration.CastBarHeight;
+        protected int CastBarWidth => PluginConfiguration.CastBarWidth;
         protected Vector2 BarSize => _barsize;
+
+        private Lumina.Excel.GeneratedSheets.Action LastUsedAction;
         
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {
             PluginInterface = pluginInterface;
@@ -177,6 +192,77 @@ namespace DelvUIPlugin.Interface {
             ImGui.EndChild();
         }
 
+        protected virtual unsafe void DrawCastBar()
+        {
+            var castBar = (AddonCastBar*) PluginInterface.Framework.Gui.GetUiObjectByName("_CastBar", 1);
+            if (!IsCasting(castBar)) return;
+
+            var castScale = castBar->CastPercent / 100;
+            var actor = PluginInterface.ClientState.LocalPlayer;
+
+            var castText = "Interrupted";
+            if (!CastIsInterrupted(castBar))
+            {
+                // GameObject.CurrentCastId (for 6.0)
+                var currentCast = GetCurrentCast(actor.Address);
+                var currentAction = PluginInterface.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>()
+                    .GetRow(currentCast);
+                if (currentAction.Name != "") LastUsedAction = currentAction;
+
+                castText = currentAction.Name;
+            }
+
+            var castTime = Math.Round((castBar->CastTime - castBar->CastTime * castScale) / 100, 1)
+                .ToString(CultureInfo.InvariantCulture);
+
+            var barSize = new Vector2(CastBarWidth, CastBarHeight);
+            var cursorPos = new Vector2(CenterX - CastBarWidth / 2f, CenterY + YOffset - 100);
+
+            ImGui.SetCursorPos(cursorPos);
+
+            var drawList = ImGui.GetWindowDrawList();
+
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+
+            if (PluginConfiguration.SlideCast)
+            {
+                var slideColor = PluginConfiguration.CastBarColorMap["slidecast"];
+                var slideCastScale = PluginConfiguration.SlideCastTime / 10f / castBar->CastTime;
+                // Slide Cast
+                drawList.AddRectFilledMultiColor(
+                    cursorPos + barSize - new Vector2(barSize.X * slideCastScale, barSize.Y), cursorPos + barSize,
+                    slideColor["gradientLeft"], slideColor["gradientRight"], slideColor["gradientRight"],
+                    slideColor["gradientLeft"]
+                );
+            }
+
+            var castColor = PluginConfiguration.CastBarColorMap["castbar"];
+            // Actual Cast
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + new Vector2(barSize.X * castScale, barSize.Y),
+                castColor["gradientLeft"], castColor["gradientRight"], castColor["gradientRight"],
+                castColor["gradientLeft"]
+            );
+
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            
+            // Action Icon
+            if (PluginConfiguration.ShowActionIcon)
+            {
+                var iconTexFile = PluginInterface.Data.GetIcon(LastUsedAction.Icon);
+                var texture = PluginInterface.UiBuilder.LoadImageRaw(iconTexFile.GetRgbaImageData(), iconTexFile.Header.Width, iconTexFile.Header.Height, 4);
+            
+                ImGui.Image(texture.ImGuiHandle, new Vector2(CastBarHeight, CastBarHeight));
+                drawList.AddRect(cursorPos, cursorPos + new Vector2(CastBarHeight, CastBarHeight), 0xFF000000);
+            }
+            
+            var castTextSize = ImGui.CalcTextSize(castText);
+            var castTimeTextSize = ImGui.CalcTextSize(castTime);
+            
+            if (PluginConfiguration.ShowCastTime) DrawOutlinedText(castTime, new Vector2(cursorPos.X + CastBarWidth - castTimeTextSize.X - 5, cursorPos.Y + CastBarHeight / 2f - castTimeTextSize.Y / 2f));
+            if (PluginConfiguration.ShowActionName) DrawOutlinedText(castText, new Vector2(cursorPos.X + (PluginConfiguration.ShowActionIcon ? CastBarHeight : 0) + 5, cursorPos.Y + CastBarHeight / 2f - castTextSize.Y / 2f));
+        }
+
         protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor) {
             var colors = PluginConfiguration.NPCColorMap["neutral"];
             
@@ -279,6 +365,32 @@ namespace DelvUIPlugin.Interface {
             
             // Display HUD only if parameter widget is visible and we're not in a fade event
             return PluginInterface.ClientState.LocalPlayer == null || parameterWidget == null || fadeMiddleWidget == null || !parameterWidget->IsVisible || fadeMiddleWidget->IsVisible;
+        }
+
+        private unsafe bool IsCasting(AddonCastBar* castBar)
+        {
+            return castBar != null && castBar->AtkUnitBase.UldManager.NodeList != null &&
+                   castBar->AtkUnitBase.UldManager.NodeListCount > 11 && castBar->AtkUnitBase.IsVisible;
+        }
+        
+        private ushort GetCurrentCast(IntPtr actor)
+        {
+            return (ushort) Marshal.ReadInt16(actor, ActorOffsets.CurrentCastSpellActionId);
+        }
+
+        private unsafe bool CastIsInterrupted(AddonCastBar* castBar)
+        {
+            for (var i = 0; i != castBar->AtkUnitBase.UldManager.NodeListCount; ++i)
+            {
+                var node = castBar->AtkUnitBase.UldManager.NodeList[i];
+                // ReSharper disable once InvertIf
+                if (node->NodeID == 2 && node->IsVisible) // Interrupted text node
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
         
         unsafe bool IsHostileMemory(BattleNpc npc)
