@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Linq;
 using System.Text;
 using Dalamud.Data;
 using Dalamud.Data.LuminaExtensions;
@@ -253,7 +252,6 @@ namespace DelvUIPlugin.Interface {
             var actor = PluginInterface.ClientState.LocalPlayer;
             var castBar = (AddonCastBar*) PluginInterface.Framework.Gui.GetUiObjectByName("_CastBar", 1);
             var isCasting = StatusFlags.IsCasting;
-            if (!IsCasting(actor.Address)) return;
 
             var castScale = castBar->CastPercent / 100;
 

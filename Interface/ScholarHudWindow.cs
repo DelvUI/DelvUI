@@ -28,7 +28,7 @@ namespace DelvUIPlugin.Interface
         protected Dictionary<string, uint> SchFairyColor => PluginConfiguration.JobColorMap[Jobs.SCH * 1000 + 1];
         protected Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.SCH * 1000 + 2];
 
-        protected Vector2 BarSize => _barsize;
+        protected new Vector2 BarSize => _barsize;
         protected Vector2 BarCoords => _barcoords;
 
         public ScholarHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
