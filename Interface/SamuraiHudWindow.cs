@@ -22,6 +22,7 @@ namespace DelvUIPlugin.Interface {
             DrawMeditationResourceBar();
             DrawTargetBar();
             DrawFocusBar();
+            DrawCastBar();
         }
 
         protected override void DrawPrimaryResourceBar()

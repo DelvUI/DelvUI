@@ -92,6 +92,39 @@ namespace DelvUIPlugin.Interface {
                     changed |= ImGui.Checkbox("Lock HUD", ref _pluginConfiguration.LockHud);
                     ImGui.EndTabItem();
                 }
+                if (ImGui.BeginTabItem("Castbar"))
+                {
+                    var castBarHeight = _pluginConfiguration.CastBarHeight;
+                    if (ImGui.DragInt("Castbar Height", ref castBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.CastBarHeight = castBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var castBarWidth = _pluginConfiguration.CastBarWidth;
+                    if (ImGui.DragInt("Castbar Width", ref castBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.CastBarWidth = castBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+                    changed |= ImGui.ColorEdit4("Cast Bar Color", ref _pluginConfiguration.CastBarColor);
+                    
+                    changed |= ImGui.Checkbox("Show Action Icon", ref _pluginConfiguration.ShowActionIcon);
+                    changed |= ImGui.Checkbox("Show Action Name", ref _pluginConfiguration.ShowActionName);
+                    changed |= ImGui.Checkbox("Show Cast Time", ref _pluginConfiguration.ShowCastTime);
+                    changed |= ImGui.Checkbox("Slide Cast Enabled", ref _pluginConfiguration.SlideCast);
+                    
+                    var slideCastTime = _pluginConfiguration.SlideCastTime;
+                    if (ImGui.DragFloat("Slide Cast Offset", ref slideCastTime, 1, 1, 1000))
+                    {
+                        _pluginConfiguration.SlideCastTime = slideCastTime;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    changed |= ImGui.ColorEdit4("Slide Cast Color", ref _pluginConfiguration.SlideCastColor);
+                    
+                    ImGui.EndTabItem();
+                }
                 if (ImGui.BeginTabItem("Color Map")) {
                     changed |= ImGui.ColorEdit4("Job Color PLD", ref _pluginConfiguration.JobColorPLD);
                     changed |= ImGui.ColorEdit4("Job Color WAR", ref _pluginConfiguration.JobColorWAR);
