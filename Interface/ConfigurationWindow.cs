@@ -51,6 +51,20 @@ namespace DelvUIPlugin.Interface {
                         _pluginConfiguration.Save();
                     }
 
+                    var primaryResourceHeight = _pluginConfiguration.PrimaryResourceBarHeight;
+                    if (ImGui.DragInt("Primary Resource Height", ref primaryResourceHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PrimaryResourceBarHeight = primaryResourceHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var primaryResourceWidth = _pluginConfiguration.PrimaryResourceBarWidth;
+                    if (ImGui.DragInt("Primary Resource Width", ref primaryResourceWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PrimaryResourceBarWidth = primaryResourceWidth;
+                        _pluginConfiguration.Save();
+                    }
+
                     var targetBarHeight = _pluginConfiguration.TargetBarHeight;
                     if (ImGui.DragInt("Target Height", ref targetBarHeight, .1f, 1, 1000))
                     {
@@ -86,7 +100,7 @@ namespace DelvUIPlugin.Interface {
                     }
 
                     var focusBarWidth = _pluginConfiguration.FocusBarWidth;
-                    if (ImGui.DragInt("Focus Width", ref totBarWidth, .1f, 1, 1000))
+                    if (ImGui.DragInt("Focus Width", ref focusBarWidth, .1f, 1, 1000))
                     {
                         _pluginConfiguration.FocusBarWidth = focusBarWidth;
                         _pluginConfiguration.Save();
@@ -97,6 +111,7 @@ namespace DelvUIPlugin.Interface {
                     changed |= ImGui.Checkbox("Lock HUD", ref _pluginConfiguration.LockHud);
                     ImGui.EndTabItem();
                 }
+
                 if (ImGui.BeginTabItem("Castbar"))
                 {
                     changed |= ImGui.Checkbox("Show Cast Bar", ref _pluginConfiguration.ShowCastBar);
@@ -147,6 +162,7 @@ namespace DelvUIPlugin.Interface {
 
                     ImGui.EndTabItem();
                 }
+
                 if (ImGui.BeginTabItem("Color Map")) {
                     changed |= ImGui.ColorEdit4("Job Color PLD", ref _pluginConfiguration.JobColorPLD);
                     changed |= ImGui.ColorEdit4("Job Color WAR", ref _pluginConfiguration.JobColorWAR);
@@ -172,6 +188,79 @@ namespace DelvUIPlugin.Interface {
                     changed |= ImGui.ColorEdit4("NPC Color Friendly", ref _pluginConfiguration.NPCColorFriendly);
 
                     //ImGui.Spacing();
+                    ImGui.EndTabItem();
+                }
+
+                if (ImGui.BeginTabItem("Scholar"))
+                {
+
+                    var fairyBarHeight = _pluginConfiguration.FairyBarHeight;
+                    if (ImGui.DragInt("Fairy Gauge Height", ref fairyBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.FairyBarHeight = fairyBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var fairyBarWidth = _pluginConfiguration.FairyBarWidth;
+                    if (ImGui.DragInt("Fairy Gauge Width", ref fairyBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.FairyBarWidth = fairyBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var fairyBarX = _pluginConfiguration.FairyBarX;
+                    if (ImGui.DragInt("Fairy Gauge X Offset", ref fairyBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.FairyBarX = fairyBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var fairyBarY = _pluginConfiguration.FairyBarY;
+                    if (ImGui.DragInt("Fairy Gauge Y Offset", ref fairyBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.FairyBarY = fairyBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schAetherBarHeight = _pluginConfiguration.SchAetherBarHeight;
+                    if (ImGui.DragInt("Aether Gauge Height", ref schAetherBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SchAetherBarHeight = schAetherBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schAetherBarWidth = _pluginConfiguration.SchAetherBarWidth;
+                    if (ImGui.DragInt("Aether Gauge Width", ref schAetherBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SchAetherBarWidth = schAetherBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schAetherBarX = _pluginConfiguration.SchAetherBarX;
+                    if (ImGui.DragInt("Aether Gauge X Offset", ref schAetherBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SchAetherBarX = schAetherBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schAetherBarY = _pluginConfiguration.SchAetherBarY;
+                    if (ImGui.DragInt("Aether Gauge Y Offset", ref schAetherBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SchAetherBarY = schAetherBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schAetherBarPad = _pluginConfiguration.SchAetherBarPad;
+                    if (ImGui.DragInt("Aether Padding", ref schAetherBarPad, .1f, -100, 1000))
+                    {
+                        _pluginConfiguration.SchAetherBarPad = schAetherBarPad;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Fairy Bar Color", ref _pluginConfiguration.SchFairyColor);
+                    changed |= ImGui.ColorEdit4("Aether Bar Color", ref _pluginConfiguration.SchAetherColor);
+                    changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.SchEmptyColor);
+
                     ImGui.EndTabItem();
                 }
 

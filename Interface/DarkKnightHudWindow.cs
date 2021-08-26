@@ -28,7 +28,6 @@ namespace DelvUIPlugin.Interface {
         protected override void DrawPrimaryResourceBar() {
             var actor = PluginInterface.ClientState.LocalPlayer;
             //var tbn = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1178);
-
             const int xPadding = 2;
             var barWidth = (BarWidth - xPadding * 2)  / 3.0f;
             var barSize = new Vector2(barWidth, BarHeight);

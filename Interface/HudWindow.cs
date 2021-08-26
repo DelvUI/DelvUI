@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using System.Linq;
 using System.Text;
 using Dalamud.Data;
 using Dalamud.Data.LuminaExtensions;
@@ -38,6 +38,8 @@ namespace DelvUIPlugin.Interface {
         protected int YOffset => 460;
         protected int HealthBarHeight => PluginConfiguration.HealthBarHeight;
         protected int HealthBarWidth => PluginConfiguration.HealthBarWidth;
+        protected int PrimaryResourceBarHeight => PluginConfiguration.PrimaryResourceBarHeight;
+        protected int PrimaryResourceBarWidth => PluginConfiguration.PrimaryResourceBarWidth;
         protected int TargetBarHeight => PluginConfiguration.TargetBarHeight;
         protected int TargetBarWidth => PluginConfiguration.TargetBarWidth;
         protected int ToTBarHeight => PluginConfiguration.ToTBarHeight;
@@ -64,9 +66,12 @@ namespace DelvUIPlugin.Interface {
             _barsize = new Vector2(HealthBarWidth, HealthBarHeight);
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentHp / actor.MaxHp;
+            
+            if(actor.ClassJob.Id == 19 || actor.ClassJob.Id == 32 || actor.ClassJob.Id == 21 || actor.ClassJob.Id == 37)
+                DrawTankStanceIndicator();
 
+           
             var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset, CenterY + YOffset);
-
             DrawOutlinedText($"{actor.Name.Abbreviate().Truncate(16)}", new Vector2(cursorPos.X + 5, cursorPos.Y -22));
             
             var hp = $"{actor.MaxHp.KiloFormat(),6} | ";
@@ -99,16 +104,16 @@ namespace DelvUIPlugin.Interface {
         protected virtual void DrawPrimaryResourceBar() {
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentMp / actor.MaxMp;
-            var barSize = new Vector2(254, 13);
+            _barsize = new Vector2(PrimaryResourceBarWidth, PrimaryResourceBarHeight);
             var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 27);
             
             var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0x88000000);
             drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + new Vector2(barSize.X * scale, barSize.Y), 
+                cursorPos, cursorPos + new Vector2(BarSize.X * scale, BarSize.Y), 
                 0xFFE6CD00, 0xFFD8Df3C, 0xFFD8Df3C, 0xFFE6CD00
             );
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
         }
         
         protected virtual void DrawTargetBar() {
@@ -246,8 +251,6 @@ namespace DelvUIPlugin.Interface {
 
             var actor = PluginInterface.ClientState.LocalPlayer;
             var castBar = (AddonCastBar*) PluginInterface.Framework.Gui.GetUiObjectByName("_CastBar", 1);
-            var isCasting = StatusFlags.IsCasting;
-            if (!IsCasting(actor.Address)) return;
 
             var castScale = castBar->CastPercent / 100;
 
@@ -261,6 +264,8 @@ namespace DelvUIPlugin.Interface {
                 
                 switch (currentCastType)
                 {
+                    case 0:
+                        return;
                     case 1:
                     {
                         var currentAction = PluginInterface.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>()
@@ -286,6 +291,16 @@ namespace DelvUIPlugin.Interface {
                         LastUsedItem = currentItem;
                         castText = "Using Item...";
                         iconTexFile = PluginInterface.Data.GetIcon(LastUsedItem.Icon);
+                        break;
+                    }                        
+                    case 4:
+                    {
+                        castText = "Interacting...";
+                        break;
+                    }                    
+                    default:
+                    {
+                        castText = "Casting...";
                         break;
                     }
                 }
@@ -327,9 +342,10 @@ namespace DelvUIPlugin.Interface {
             );
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-            
+
+            var emptyIconPath = "ui/icon/000000/000000.tex";
             // Action Icon
-            if (PluginConfiguration.ShowActionIcon)
+            if (PluginConfiguration.ShowActionIcon && iconTexFile.FilePath.Path != emptyIconPath)
             {
                 var texture = PluginInterface.UiBuilder.LoadImageRaw(iconTexFile.GetRgbaImageData(), iconTexFile.Header.Width, iconTexFile.Header.Height, 4);
             
@@ -340,8 +356,56 @@ namespace DelvUIPlugin.Interface {
             var castTextSize = ImGui.CalcTextSize(castText);
             var castTimeTextSize = ImGui.CalcTextSize(castTime);
             
-            if (PluginConfiguration.ShowCastTime) DrawOutlinedText(castTime, new Vector2(cursorPos.X + CastBarWidth - castTimeTextSize.X - 5, cursorPos.Y + CastBarHeight / 2f - castTimeTextSize.Y / 2f));
-            if (PluginConfiguration.ShowActionName) DrawOutlinedText(castText, new Vector2(cursorPos.X + (PluginConfiguration.ShowActionIcon ? CastBarHeight : 0) + 5, cursorPos.Y + CastBarHeight / 2f - castTextSize.Y / 2f));
+            if (PluginConfiguration.ShowCastTime) DrawOutlinedText(castTime, 
+                new Vector2(cursorPos.X + CastBarWidth - castTimeTextSize.X - 5, cursorPos.Y + CastBarHeight / 2f - castTimeTextSize.Y / 2f));
+            if (PluginConfiguration.ShowActionName) DrawOutlinedText(castText, 
+                new Vector2(cursorPos.X + (PluginConfiguration.ShowActionIcon && iconTexFile.FilePath.Path != emptyIconPath ? CastBarHeight : 0) + 5, 
+                cursorPos.Y + CastBarHeight / 2f - castTextSize.Y / 2f));
+        }
+
+        protected virtual void DrawTankStanceIndicator()
+        {
+            var tankStanceBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => 
+                o.EffectId == 79 || //IRON WILL
+                o.EffectId == 91 || //DEFIANCE
+                o.EffectId == 392 || // ROYAL GUARD
+                o.EffectId == 393 || //IRON WILL
+                o.EffectId == 743 || //GRIT
+                o.EffectId == 1396 || //DEFIANCE
+                o.EffectId == 1397 || //GRIT
+                o.EffectId == 1833 //ROYAL GUARD
+            );
+
+            if (tankStanceBuff.Count() != 1)
+            {
+                var barSize = new Vector2(HealthBarHeight>HealthBarWidth?HealthBarWidth:HealthBarHeight, HealthBarHeight);
+                var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset - 5, CenterY + YOffset + 5);
+                ImGui.SetCursorPos(cursorPos);  
+                var drawList = ImGui.GetWindowDrawList();
+            
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + barSize, 
+                    0xFF2000FC, 0xFF2000FC, 0xFF2000FC, 0xFF2000FC
+                );
+                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            }
+            else
+            {
+                var barSize = new Vector2(HealthBarHeight>HealthBarWidth?HealthBarWidth:HealthBarHeight, HealthBarHeight);
+                var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset - 5, CenterY + YOffset + 5);
+                ImGui.SetCursorPos(cursorPos);  
+                var drawList = ImGui.GetWindowDrawList();
+            
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + barSize, 
+                    0xFFE6CD00, 0xFFE6CD00, 0xFFE6CD00, 0xFFE6CD00
+                );
+                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            }
+
+
         }
 
         protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor) {

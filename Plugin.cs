@@ -96,6 +96,7 @@ namespace DelvUIPlugin {
                 
                 //Healers
                 Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.SCH => new ScholarHudWindow(_pluginInterface, _pluginConfiguration),
                 
                 //Melee DPS
                 Jobs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
@@ -140,7 +141,6 @@ namespace DelvUIPlugin {
                 Jobs.PLD => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.MNK => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.NIN => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.SCH => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.AST => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.DRG => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.BLU => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
