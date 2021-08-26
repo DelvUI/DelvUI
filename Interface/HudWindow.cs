@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using System.Linq;
 using System.Text;
 using Dalamud.Data;
 using Dalamud.Data.LuminaExtensions;
@@ -47,10 +48,13 @@ namespace DelvUIPlugin.Interface {
         protected int FocusBarWidth => PluginConfiguration.FocusBarWidth;
         protected int CastBarWidth => PluginConfiguration.CastBarWidth;
         protected int CastBarHeight => PluginConfiguration.CastBarHeight;
+        protected int CastBarXOffset => PluginConfiguration.CastBarXOffset;
+        protected int CastBarYOffset => PluginConfiguration.CastBarYOffset;
         protected Vector2 BarSize => _barsize;
 
         private Lumina.Excel.GeneratedSheets.Action LastUsedAction;
         private Mount LastUsedMount;
+        private Item LastUsedItem;
         
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {
             PluginInterface = pluginInterface;
@@ -239,9 +243,12 @@ namespace DelvUIPlugin.Interface {
 
         protected virtual unsafe void DrawCastBar()
         {
-            
+            if (! PluginConfiguration.ShowCastBar)
+              return;
+
             var actor = PluginInterface.ClientState.LocalPlayer;
             var castBar = (AddonCastBar*) PluginInterface.Framework.Gui.GetUiObjectByName("_CastBar", 1);
+            var isCasting = StatusFlags.IsCasting;
             if (!IsCasting(actor.Address)) return;
 
             var castScale = castBar->CastPercent / 100;
@@ -254,20 +261,35 @@ namespace DelvUIPlugin.Interface {
                 var currentCastId = GetCurrentCast(actor.Address);
                 var currentCastType = GetCurrentCastType(actor.Address);
                 
-                if (currentCastType == 1) {
-                    var currentAction = PluginInterface.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>()
-                    .GetRow(currentCastId);
-                    if (currentAction.Name != "") LastUsedAction = currentAction;
-                    castText = LastUsedAction.Name;
-                    iconTexFile = PluginInterface.Data.GetIcon(LastUsedAction.Icon);
-                }
-                
-                if (currentCastType == 13) {
-                    var currentMount = PluginInterface.Data.GetExcelSheet<Mount>()
-                    .GetRow(currentCastId);
-                    LastUsedMount = currentMount;
-                    castText = LastUsedMount.Singular;
-                    iconTexFile = PluginInterface.Data.GetIcon(LastUsedMount.Icon);
+                switch (currentCastType)
+                {
+                    case 1:
+                    {
+                        var currentAction = PluginInterface.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>()
+                            .GetRow(currentCastId);
+                        if (currentAction.Name != "") LastUsedAction = currentAction;
+                        castText = LastUsedAction.Name;
+                        iconTexFile = PluginInterface.Data.GetIcon(LastUsedAction.Icon);
+                        break;
+                    }
+                    case 13:
+                    {
+                        var currentMount = PluginInterface.Data.GetExcelSheet<Mount>()
+                            .GetRow(currentCastId);
+                        LastUsedMount = currentMount;
+                        castText = LastUsedMount.Singular;
+                        iconTexFile = PluginInterface.Data.GetIcon(LastUsedMount.Icon);
+                        break;
+                    }
+                    case 2:
+                    {
+                        var currentItem = PluginInterface.Data.GetExcelSheet<Item>()
+                            .GetRow(currentCastId);
+                        LastUsedItem = currentItem;
+                        castText = "Using Item...";
+                        iconTexFile = PluginInterface.Data.GetIcon(LastUsedItem.Icon);
+                        break;
+                    }
                 }
             }
 
@@ -275,7 +297,10 @@ namespace DelvUIPlugin.Interface {
                 .ToString(CultureInfo.InvariantCulture);
 
             var barSize = new Vector2(CastBarWidth, CastBarHeight);
-            var cursorPos = new Vector2(CenterX - CastBarWidth / 2f, CenterY + YOffset - 100);
+            var cursorPos = new Vector2(
+                CenterX + PluginConfiguration.CastBarXOffset - CastBarWidth / 2f,
+                CenterY + PluginConfiguration.CastBarYOffset
+            );
 
             ImGui.SetCursorPos(cursorPos);
 

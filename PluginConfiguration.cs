@@ -24,8 +24,11 @@ namespace DelvUIPlugin {
 
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
+        public int CastBarXOffset { get; set; } = 0;
+        public int CastBarYOffset { get; set; } = 460;
         
 
+        public bool ShowCastBar = true;
         public bool ShowActionIcon = true;
         public bool ShowActionName = true;
         public bool ShowCastTime = true;
