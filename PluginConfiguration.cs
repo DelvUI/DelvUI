@@ -19,6 +19,18 @@ namespace DelvUIPlugin {
         public int ToTBarWidth { get; set; } = 120;
         public int FocusBarHeight { get; set; } = 20;
         public int FocusBarWidth { get; set; } = 120;
+        public int CastBarHeight { get; set; } = 25;
+        public int CastBarWidth { get; set; } = 254;
+        
+
+        public bool ShowActionIcon = true;
+        public bool ShowActionName = true;
+        public bool ShowCastTime = true;
+        public bool SlideCast = false;
+        public float SlideCastTime = 500;
+        
+        public Vector4 CastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,1f);
+        public Vector4 SlideCastColor = new Vector4(255f/255f,0f/255f,0f/255f,1f);
 
         public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,1f);
         public Vector4 JobColorWAR = new Vector4(153f/255f,23f/255f,23f/255f,1f);
@@ -34,9 +46,9 @@ namespace DelvUIPlugin {
         public Vector4 JobColorNIN = new Vector4(211f/255f,47f/255f,47f/255f,1f);
         public Vector4 JobColorSAM = new Vector4(255f/255f,202f/255f,40f/255f,1f);
         
-        public Vector4 JobColorBRD = new Vector4(158f/255f,157f,36f,1f);
-        public Vector4 JobColorMCH = new Vector4(0f/255f,151f,167f,1f);
-        public Vector4 JobColorDNC = new Vector4(244f/255f,143f,177f,1f);
+        public Vector4 JobColorBRD = new Vector4(158f/255f,157f/255f,36f/255f,1f);
+        public Vector4 JobColorMCH = new Vector4(0f/255f,151f/255f,167f/255f,1f);
+        public Vector4 JobColorDNC = new Vector4(244f/255f,143f/255f,177f/255f,1f);
 
         public Vector4 JobColorBLM = new Vector4(126f/255f,87f/255f,194f/255f,1f);
         public Vector4 JobColorSMN = new Vector4(46f/255f,125f/255f,50f/255f,1f);
@@ -51,6 +63,7 @@ namespace DelvUIPlugin {
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
         [JsonIgnore] public Dictionary<uint, Dictionary<string, uint>> JobColorMap;
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> NPCColorMap;
+        [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> CastBarColorMap;
 
         public void Init(DalamudPluginInterface pluginInterface) {
             _pluginInterface = pluginInterface;
@@ -257,6 +270,24 @@ namespace DelvUIPlugin {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(NPCColorFriendly.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NPCColorFriendly.AdjustColor(.1f))
                 },
+            };
+            
+            CastBarColorMap = new Dictionary<string, Dictionary<string, uint>>
+            {
+                ["castbar"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(CastBarColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(CastBarColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(CastBarColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(CastBarColor.AdjustColor(.1f))
+                },
+                ["slidecast"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SlideCastColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SlideCastColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SlideCastColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SlideCastColor.AdjustColor(.1f))
+                }
             };
         }
     }
