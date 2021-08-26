@@ -37,8 +37,8 @@ namespace DelvUIPlugin.Interface {
         protected int YOffset => 460;
         protected int HealthBarHeight => PluginConfiguration.HealthBarHeight;
         protected int HealthBarWidth => PluginConfiguration.HealthBarWidth;
-        protected int ManaBarHeight => PluginConfiguration.ManaBarHeight;
-        protected int ManaBarWidth => PluginConfiguration.ManaBarWidth;
+        protected int PrimaryResourceBarHeight => PluginConfiguration.PrimaryResourceBarHeight;
+        protected int PrimaryResourceBarWidth => PluginConfiguration.PrimaryResourceBarWidth;
         protected int TargetBarHeight => PluginConfiguration.TargetBarHeight;
         protected int TargetBarWidth => PluginConfiguration.TargetBarWidth;
         protected int ToTBarHeight => PluginConfiguration.ToTBarHeight;
@@ -97,8 +97,7 @@ namespace DelvUIPlugin.Interface {
         protected virtual void DrawPrimaryResourceBar() {
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentMp / actor.MaxMp;
-            //var barSize = new Vector2(254, 13);
-            _barsize = new Vector2(ManaBarWidth, ManaBarHeight);
+            _barsize = new Vector2(PrimaryResourceBarWidth, PrimaryResourceBarHeight);
             var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 27);
             
             var drawList = ImGui.GetWindowDrawList();

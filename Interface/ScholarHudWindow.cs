@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
@@ -13,13 +14,6 @@ namespace DelvUIPlugin.Interface
         private Vector2 _barsize;
         private Vector2 _barcoords;
 
-        private new int BarHeight => 20;
-        private new int BarWidth => 250;
-        private new int XOffset => 127;
-        private new int YOffset => 461;
-       // protected int ManaBarHeight => PluginConfiguration.ManaBarHeight;
-        //protected int ManaBarWidth => PluginConfiguration.ManaBarWidth;
-
         protected int FairyBarHeight => PluginConfiguration.FairyBarHeight;
         protected int FairyBarWidth => PluginConfiguration.FairyBarWidth;
         protected int FairyBarX => PluginConfiguration.FairyBarX;
@@ -29,6 +23,10 @@ namespace DelvUIPlugin.Interface
         protected int SchAetherBarX => PluginConfiguration.SchAetherBarX;
         protected int SchAetherBarY => PluginConfiguration.SchAetherBarY;
         protected int SchAetherBarPad => PluginConfiguration.SchAetherBarPad;
+
+        protected Dictionary<string, uint> SchAetherColor => PluginConfiguration.JobColorMap[Jobs.SCH * 1000];
+        protected Dictionary<string, uint> SchFairyColor => PluginConfiguration.JobColorMap[Jobs.SCH * 1000 + 1];
+        protected Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.SCH * 1000 + 2];
 
         protected Vector2 BarSize => _barsize;
         protected Vector2 BarCoords => _barcoords;
@@ -45,35 +43,17 @@ namespace DelvUIPlugin.Interface
             DrawFocusBar();
         }
 
-        /**protected override void DrawPrimaryResourceBar()
-        {
-            var actor = PluginInterface.ClientState.LocalPlayer;
-            var scale = (float)actor.CurrentMp / actor.MaxMp;
-            _barsize = new Vector2(ManaBarWidth, ManaBarHeight);
-            //var barSize = new Vector2(250, 13);
-            var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 27);
-
-            var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + _barsize, 0x88000000);
-            drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + new Vector2(_barsize.X * scale, _barsize.Y),
-                0xFFE6CD00, 0xFFD8Df3C, 0xFFD8Df3C, 0xFFE6CD00
-            );
-            drawList.AddRect(cursorPos, cursorPos + _barsize, 0xFF000000);
-        }**/
-
         private void DrawFairyBar()
         {
             var gauge = (float)PluginInterface.ClientState.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
-            //var barSize = new Vector2(BarWidth, BarHeight);
             _barsize = new Vector2(FairyBarWidth, FairyBarHeight);
             _barcoords = new Vector2(FairyBarX, FairyBarY);
             var cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y - 49);
             var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0x88000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(BarSize.X * gauge / 100, BarSize.Y),
-                0x7097CE0D, 0xFF5EFB09, 0xFF5EFB09, 0x7097CE0D
+                SchFairyColor["gradientLeft"], SchFairyColor["gradientRight"], SchFairyColor["gradientRight"], SchFairyColor["gradientLeft"]
             );
 
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
@@ -83,53 +63,51 @@ namespace DelvUIPlugin.Interface
         private void DrawAetherBar()
         {
             var aetherFlowBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
-            //var xPadding = 2;
             var barWidth = (SchAetherBarWidth / 3);
             _barsize = new Vector2(barWidth, SchAetherBarHeight);
             _barcoords = new Vector2(SchAetherBarX, SchAetherBarY);
-            //var cursorPos = new Vector2(CenterX - 43 + BarCoords.X, CenterY + BarCoords.Y - 71);
             var cursorPos = new Vector2(CenterX + BarCoords.X, CenterY + BarCoords.Y - 71);
-            //var barSize = new Vector2(barWidth, BarHeight);
 
             var drawList = ImGui.GetWindowDrawList();
 
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0x88000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
             cursorPos = new Vector2(cursorPos.X + barWidth + SchAetherBarPad, cursorPos.Y);
 
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0x88000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
             cursorPos = new Vector2(cursorPos.X - barWidth*2 - SchAetherBarPad * 2, cursorPos.Y);
 
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0x88000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
 
             switch (aetherFlowBuff.StackCount)
             {
                 case 1:
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0xFF08FF00);
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SchAetherColor["gradientRight"]);
                     drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
 
                     break;
                 case 2:
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0xFF08FF00);
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SchAetherColor["gradientRight"]);
                     drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
                     cursorPos = new Vector2(cursorPos.X + barWidth + SchAetherBarPad, cursorPos.Y);
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0xFF08FF00);
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SchAetherColor["gradientRight"]);
                     drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
                     break;
                 case 3:
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0xFF08FF00);
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SchAetherColor["gradientRight"]);
                     drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
                     cursorPos = new Vector2(cursorPos.X + barWidth + SchAetherBarPad, cursorPos.Y);
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0xFF08FF00);
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SchAetherColor["gradientRight"]);
                     drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
                     cursorPos = new Vector2(cursorPos.X + barWidth + SchAetherBarPad, cursorPos.Y);
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0xFF08FF00);
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SchAetherColor["gradientRight"]);
                     drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
                     break;
             }
 
         }
+
     }
 }

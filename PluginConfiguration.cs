@@ -13,8 +13,8 @@ namespace DelvUIPlugin {
         public bool LockHud = true;
         public int HealthBarHeight { get; set; } = 50;
         public int HealthBarWidth { get; set; } = 270;
-        public int ManaBarHeight { get; set; } = 13;
-        public int ManaBarWidth { get; set; } = 254;
+        public int PrimaryResourceBarHeight { get; set; } = 13;
+        public int PrimaryResourceBarWidth { get; set; } = 254;
         public int TargetBarHeight { get; set; } = 50;
         public int TargetBarWidth { get; set; } = 270;
         public int ToTBarHeight { get; set; } = 20;
@@ -34,16 +34,6 @@ namespace DelvUIPlugin {
         
         public Vector4 CastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,1f);
         public Vector4 SlideCastColor = new Vector4(255f/255f,0f/255f,0f/255f,1f);
-
-        public int FairyBarHeight { get; set; } = 20;
-        public int FairyBarWidth { get; set; } = 254;
-        public int FairyBarX { get; set; } = 127;
-        public int FairyBarY { get; set; } = 460;
-        public int SchAetherBarHeight { get; set; } = 20;
-        public int SchAetherBarWidth { get; set; } = 246;
-        public int SchAetherBarX { get; set; } = -42;
-        public int SchAetherBarY { get; set; } = 460;
-        public int SchAetherBarPad { get; set; } = 2;
 
         public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,1f);
         public Vector4 JobColorWAR = new Vector4(153f/255f,23f/255f,23f/255f,1f);
@@ -89,9 +79,26 @@ namespace DelvUIPlugin {
         public Vector4 WARFellCleaveColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 1f);
         public Vector4 WARNascentChaosColor = new Vector4(240f/255f, 176f/255f, 0f, 1f);
         public Vector4 WAREmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 1f);
-        
+
         #endregion
-        
+
+        #region SCH Configuration
+
+        public int FairyBarHeight { get; set; } = 20;
+        public int FairyBarWidth { get; set; } = 254;
+        public int FairyBarX { get; set; } = 127;
+        public int FairyBarY { get; set; } = 460;
+        public int SchAetherBarHeight { get; set; } = 20;
+        public int SchAetherBarWidth { get; set; } = 250;
+        public int SchAetherBarX { get; set; } = -42;
+        public int SchAetherBarY { get; set; } = 460;
+        public int SchAetherBarPad { get; set; } = 2;
+        public Vector4 SchAetherColor = new Vector4(0f, 1f, 0f, 1f);
+        public Vector4 SchFairyColor = new Vector4(94f / 255f, 250f / 255f, 154f / 255f, 1f);
+        public Vector4 SchEmptyColor = new Vector4(0f, 0f, 0f, 136f / 255f);
+
+        #endregion
+
         [JsonIgnore] private DalamudPluginInterface _pluginInterface;
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
         [JsonIgnore] public Dictionary<uint, Dictionary<string, uint>> JobColorMap;
@@ -190,14 +197,38 @@ namespace DelvUIPlugin {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorWHM.AdjustColor(.1f))
                 },
                 
-                [Jobs.SCH] = new Dictionary<string, uint>
+                [Jobs.SCH] = new Dictionary<string, uint> // Scholar job color
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorSCH),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorSCH.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorSCH.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorSCH.AdjustColor(.1f))
                 },
-                
+
+                [Jobs.SCH * 1000] = new Dictionary<string, uint> // Scholar Aether Bar Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SchAetherColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SchAetherColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SchAetherColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SchAetherColor.AdjustColor(.1f))
+                },
+
+                [Jobs.SCH * 1000 + 1] = new Dictionary<string, uint> // Scholar Fairy Bar Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SchFairyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SchFairyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SchFairyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SchFairyColor.AdjustColor(.1f))
+                },
+
+                [Jobs.SCH * 1000 + 2] = new Dictionary<string, uint> // Scholar Empty Bar Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SchEmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SchEmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SchEmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SchEmptyColor.AdjustColor(.1f))
+                },
+
                 [Jobs.AST] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorAST),
