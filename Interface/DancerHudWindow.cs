@@ -21,6 +21,7 @@ namespace DelvUIPlugin.Interface {
             DrawSecondaryResourceBar();
             DrawTargetBar();
             DrawFocusBar();
+            DrawCastBar();
         }
 
         protected override void DrawPrimaryResourceBar() {
