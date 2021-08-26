@@ -13,12 +13,15 @@ namespace DelvUIPlugin {
         public bool LockHud = true;
         public int HealthBarHeight { get; set; } = 50;
         public int HealthBarWidth { get; set; } = 270;
+        public int ManaBarHeight { get; set; } = 13;
+        public int ManaBarWidth { get; set; } = 254;
         public int TargetBarHeight { get; set; } = 50;
         public int TargetBarWidth { get; set; } = 270;
         public int ToTBarHeight { get; set; } = 20;
         public int ToTBarWidth { get; set; } = 120;
         public int FocusBarHeight { get; set; } = 20;
         public int FocusBarWidth { get; set; } = 120;
+
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
         
@@ -31,6 +34,16 @@ namespace DelvUIPlugin {
         
         public Vector4 CastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,1f);
         public Vector4 SlideCastColor = new Vector4(255f/255f,0f/255f,0f/255f,1f);
+
+        public int FairyBarHeight { get; set; } = 20;
+        public int FairyBarWidth { get; set; } = 254;
+        public int FairyBarX { get; set; } = 127;
+        public int FairyBarY { get; set; } = 460;
+        public int SchAetherBarHeight { get; set; } = 20;
+        public int SchAetherBarWidth { get; set; } = 246;
+        public int SchAetherBarX { get; set; } = -42;
+        public int SchAetherBarY { get; set; } = 460;
+        public int SchAetherBarPad { get; set; } = 2;
 
         public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,1f);
         public Vector4 JobColorWAR = new Vector4(153f/255f,23f/255f,23f/255f,1f);
