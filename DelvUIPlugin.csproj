@@ -63,7 +63,6 @@
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
-		<Compile Include="Interface\SamuraiHudWindow.cs" />
         <Compile Include="GameStructs\AddonCastBar.cs" />
 	    <Compile Include="Interface\SamuraiHudWindow.cs" />
         <Compile Include="Interface\BardHudWindow.cs" />
