@@ -12,8 +12,27 @@ namespace DelvUIPlugin.Interface
     {
         public override uint JobId => Jobs.BLM;
 
-        private static int JobBarWidth = 180;
-        private static int JobBarYOffset = 0;
+        private float OriginX => CenterX;
+        private float OriginY => CenterY + YOffset + PluginConfiguration.BLMVerticalOffset;
+        private int ManaBarWidth => PluginConfiguration.BLMManaBarWidth;
+        private int ManaBarHeight => PluginConfiguration.BLMManaBarHeight;
+        private int UmbralHeartHeight => PluginConfiguration.BLMUmbralHeartHeight;
+        private int PolyglotHeight => PluginConfiguration.BLMPolyglotHeight;
+        private int PolyglotWidth => PluginConfiguration.BLMPolyglotWidth;
+        private int VerticalSpaceBetweenBars => PluginConfiguration.BLMVerticalSpaceBetweenBars;
+        private int HorizontalSpaceBetweenBars => PluginConfiguration.BLMHorizontalSpaceBetweenBars;
+        private bool ShowTripleCast => PluginConfiguration.BLMShowTripleCast;
+        private bool UseBarsForTripleCast => PluginConfiguration.BLMUseBarsForTripleCast;
+        private int TripleCastHeight => PluginConfiguration.BLMTripleCastHeight;
+        private int TripleCastWidth => PluginConfiguration.BLMTripleCastWidth;
+        private int TripleCastRadius => PluginConfiguration.BLMTripleCastRadius;
+        
+        private Dictionary<string, uint> ManaBarNoElementColor => PluginConfiguration.JobColorMap[Jobs.BLM * 1000];
+        private Dictionary<string, uint> ManaBarIceColor => PluginConfiguration.JobColorMap[Jobs.BLM * 1000 + 1];
+        private Dictionary<string, uint> ManaBarFireColor => PluginConfiguration.JobColorMap[Jobs.BLM * 1000 + 2];
+        private Dictionary<string, uint> UmbralHeartColor => PluginConfiguration.JobColorMap[Jobs.BLM * 1000 + 3];
+        private Dictionary<string, uint> PolyglotColor => PluginConfiguration.JobColorMap[Jobs.BLM * 1000 + 4];
+        private Dictionary<string, uint> TriplecastColor => PluginConfiguration.JobColorMap[Jobs.BLM * 1000 + 5];
 
         public BlackMageHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
@@ -22,13 +41,17 @@ namespace DelvUIPlugin.Interface
             DrawHealthBar();
             DrawFocusBar();
             DrawCastBar();
+            DrawTargetBar();
+
 
             DrawEnochian();
             DrawManaBar();
-            DrawUmbralIceStacks();
+            DrawUmbralHeartStacks();
             DrawPolyglot();
-            DrawTargetBar();
-            DrawTripleCast();
+
+            if (ShowTripleCast) {
+                DrawTripleCast();
+            }
         }
 
         protected virtual void DrawManaBar()
@@ -37,32 +60,17 @@ namespace DelvUIPlugin.Interface
 
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float)actor.CurrentMp / actor.MaxMp;
-            var barSize = new Vector2(JobBarWidth, 12);
-            var cursorPos = new Vector2(CenterX - barSize.X / 2, CenterY + YOffset + JobBarYOffset);
+            var barSize = new Vector2(ManaBarWidth, ManaBarHeight);
+            var cursorPos = new Vector2(OriginX - barSize.X / 2, OriginY - ManaBarHeight);
 
             // mana bar
-            var bgColor = 0x88000000;
-            var leftColor = 0xFF450983;
-            var rightColor = 0xFF8F53DC;
-
-            if (gauge.InAstralFire())
-            {
-                bgColor = 0x88000022;
-                leftColor = 0xFF0000AA;
-                rightColor = 0xFF6666FF;
-            } 
-            else if (gauge.InUmbralIce())
-            {
-                bgColor = 0x88220000;
-                leftColor = 0xFF592525;
-                rightColor = 0xFFFFAAAA;
-            }
+            var color = gauge.InAstralFire() ? ManaBarFireColor : (gauge.InUmbralIce() ? ManaBarIceColor : ManaBarNoElementColor);
 
             var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, bgColor);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, color["background"]);
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(barSize.X * scale, barSize.Y),
-                leftColor, rightColor, rightColor, leftColor
+                color["gradientLeft"], color["gradientRight"], color["gradientRight"], color["gradientLeft"]
             );
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
@@ -71,7 +79,7 @@ namespace DelvUIPlugin.Interface
             var time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000 + 1 : 0;
             var text = $"{time,0}";
             var textSize = ImGui.CalcTextSize(text);
-            DrawOutlinedText(text, new Vector2(CenterX - textSize.X / 2f, cursorPos.Y - 6));
+            DrawOutlinedText(text, new Vector2(CenterX - textSize.X / 2f, OriginY - ManaBarHeight / 2f - textSize.Y / 2f));
         }
 
         protected virtual void DrawEnochian()
@@ -82,60 +90,66 @@ namespace DelvUIPlugin.Interface
                 return;
             }
 
-            var barSize = new Vector2(JobBarWidth + 4, 16);
-            var cursorPos = new Vector2(CenterX - barSize.X / 2, CenterY + YOffset + JobBarYOffset - 2);
+            var barSize = new Vector2(ManaBarWidth + 4, ManaBarHeight + 4);
+            var cursorPos = new Vector2(OriginX - barSize.X / 2f, OriginY - ManaBarHeight - 2);
 
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88FFFFFF);
         }
 
-        protected virtual void DrawUmbralIceStacks()
+        protected virtual void DrawUmbralHeartStacks()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
 
-            var barSize = new Vector2((JobBarWidth - 6) / 3, 16);
-            var cursorPos = new Vector2(CenterX - JobBarWidth / 2, CenterY + YOffset + JobBarYOffset - 20);
+            var barSize = new Vector2((ManaBarWidth - (HorizontalSpaceBetweenBars * 2)) / 3, UmbralHeartHeight);
+            var cursorPos = new Vector2(OriginX - ManaBarWidth / 2, OriginY - ManaBarHeight - VerticalSpaceBetweenBars - UmbralHeartHeight);
 
             var drawList = ImGui.GetWindowDrawList();
 
             for (int i = 1; i <= 3; i++)
             {
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, UmbralHeartColor["background"]);
                 if (gauge.NumUmbralHearts >= i)
                 {
                     drawList.AddRectFilledMultiColor(
                         cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y),
-                        0xFFFAC4C3, 0xFFFFEDE8, 0xFFFFEDE8, 0xFFFAC4C3
+                        UmbralHeartColor["gradientLeft"], UmbralHeartColor["gradientRight"], UmbralHeartColor["gradientRight"], UmbralHeartColor["gradientLeft"]
                     );
                 }
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-                cursorPos.X = cursorPos.X + barSize.X + 3;
+                cursorPos.X = cursorPos.X + barSize.X + HorizontalSpaceBetweenBars;
             }
         }
 
         protected virtual void DrawPolyglot()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
-            var barSize = new Vector2(18, 12);
+            var barSize = new Vector2(PolyglotWidth, PolyglotHeight);
             var scale = gauge.IsEnoActive() ? (gauge.NumPolyglotStacks == 2 ? 1 : gauge.TimeUntilNextPolyglot / 30000f) : 1;
             scale = 1 - scale;
+
+            var y = OriginY - ManaBarHeight - VerticalSpaceBetweenBars - UmbralHeartHeight - VerticalSpaceBetweenBars - PolyglotHeight;
+            if (UseBarsForTripleCast)
+            {
+                y = y - VerticalSpaceBetweenBars - TripleCastHeight;
+            }
 
             var drawList = ImGui.GetWindowDrawList();
 
             if (gauge.NumPolyglotStacks == 0)
             {
-                var cursorPos = new Vector2(CenterX - barSize.X / 2f, CenterY + YOffset + JobBarYOffset - 36);
+                var cursorPos = new Vector2(OriginX - barSize.X / 2f, y);
                 DrawPolyglotStack(cursorPos, barSize, scale);
             } 
             else
             {
                 // 1st stack (charged)
-                var cursorPos = new Vector2(CenterX - barSize.X - 1, CenterY + YOffset + JobBarYOffset - 36);
+                var cursorPos = new Vector2(OriginX - barSize.X - (HorizontalSpaceBetweenBars / 2f), y);
                 DrawPolyglotStack(cursorPos, barSize, 1);
 
                 // 2nd stack
-                cursorPos.X = CenterX + 1;
+                cursorPos.X = CenterX + (HorizontalSpaceBetweenBars / 2f);
                 DrawPolyglotStack(cursorPos, barSize, scale);
             }
         }
@@ -153,16 +167,18 @@ namespace DelvUIPlugin.Interface
             }
 
             // background
-            drawList.AddRectFilled(position, position + size, 0x88000000);
+            drawList.AddRectFilled(position, position + size, PolyglotColor["background"]);
 
             // fill
             if (scale == 1)
             {
-                drawList.AddRectFilledMultiColor(position, position + size, 0xFF5F3A93, 0xFFBE8FFF, 0xFFBE8FFF, 0xFF5F3A93);
+                drawList.AddRectFilledMultiColor(position, position + size,
+                    PolyglotColor["gradientLeft"], PolyglotColor["gradientRight"], PolyglotColor["gradientRight"], PolyglotColor["gradientLeft"]
+                );
             }
             else
             {
-                drawList.AddRectFilled(position, position + new Vector2(size.X * scale, size.Y), 0xFF5F3A93);
+                drawList.AddRectFilled(position, position + new Vector2(size.X * scale, size.Y), PolyglotColor["gradientLeft"]);
             }
 
             // black border
@@ -172,16 +188,56 @@ namespace DelvUIPlugin.Interface
         protected virtual void DrawTripleCast()
         {
             var tripleStackBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1211);
+
+            if (UseBarsForTripleCast)
+            {
+                DrawTripleCastBars(tripleStackBuff.StackCount);
+            }
+            else
+            {
+                DrawTeipleCastCircles(tripleStackBuff.StackCount);
+            }
+        }
+
+        private void DrawTripleCastBars(int stackCount)
+        {
+            var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
+
+            var barSize = new Vector2(TripleCastWidth, TripleCastHeight);
+            var totalWidth = barSize.X * 3 + HorizontalSpaceBetweenBars * 2;
+            var cursorPos = new Vector2(OriginX - totalWidth / 2, OriginY - ManaBarHeight - VerticalSpaceBetweenBars - UmbralHeartHeight - VerticalSpaceBetweenBars - barSize.Y);
+
             var drawList = ImGui.GetWindowDrawList();
 
-            var positions = new List<Vector2>();
-            positions.Add(new Vector2(CenterX, CenterY + YOffset - 100));
-            positions.Add(new Vector2(CenterX - JobBarWidth / 2f + 30, CenterY + YOffset + JobBarYOffset - 36));
-            positions.Add(new Vector2(CenterX + JobBarWidth / 2f - 30, CenterY + YOffset + JobBarYOffset - 36));
-
-            for (int i = 0; i < tripleStackBuff.StackCount; i++)
+            for (int i = 1; i <= 3; i++)
             {
-                drawList.AddCircle(positions[i], 10, 0xFFFFFFFF, 6, 4);
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, TriplecastColor["background"]);
+                if (stackCount >= i)
+                {
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y),
+                        TriplecastColor["gradientLeft"], TriplecastColor["gradientRight"], TriplecastColor["gradientRight"], TriplecastColor["gradientLeft"]
+                    );
+                }
+                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+
+                cursorPos.X = cursorPos.X + barSize.X + HorizontalSpaceBetweenBars;
+            }
+        }
+
+        private void DrawTeipleCastCircles(int stackCount)
+        {
+            var drawList = ImGui.GetWindowDrawList();
+
+            var y = OriginY - ManaBarHeight - VerticalSpaceBetweenBars - UmbralHeartHeight - VerticalSpaceBetweenBars;
+            var positions = new List<Vector2>();
+            positions.Add(new Vector2(OriginX, y - PolyglotHeight - VerticalSpaceBetweenBars - TripleCastRadius));
+            positions.Add(new Vector2(OriginX - ManaBarWidth / 2f + ManaBarWidth / 6f, y - TripleCastRadius));
+            positions.Add(new Vector2(OriginX + ManaBarWidth / 2f - ManaBarWidth / 6f, y - TripleCastRadius));
+
+            for (int i = 0; i < stackCount; i++)
+            {
+                drawList.AddCircle(positions[i], TripleCastRadius, TriplecastColor["base"], 6, 4);
             }
         }
     }
