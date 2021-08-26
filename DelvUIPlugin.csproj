@@ -67,6 +67,7 @@
 		    <Compile Include="Interface\SamuraiHudWindow.cs" />
         <Compile Include="Interface\BardHudWindow.cs" />
         <Compile Include="Interface\DancerHudWindow.cs" />
+        <Compile Include="Interface\MonkHudWindow.cs" />
         <Compile Include="Interface\DarkKnightHudWindow.cs" />
         <Compile Include="Interface\GunbreakerHudWindow.cs" />
         <Compile Include="Interface\RedMageHudWindow.cs" />
