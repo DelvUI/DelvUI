@@ -26,6 +26,8 @@ namespace DelvUIPlugin.Interface
             DrawActiveDots();
             DrawAetherBar();
             DrawTargetBar();
+            DrawFocusBar();
+            DrawCastBar();
         }
 
         private void DrawActiveDots()

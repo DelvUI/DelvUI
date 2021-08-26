@@ -19,6 +19,8 @@ namespace DelvUIPlugin.Interface {
             DrawPrimaryResourceBar();
             DrawSecondaryResourceBar();
             DrawTargetBar();
+            DrawFocusBar();
+            DrawCastBar();
         }
 
         private void DrawSecondaryResourceBar() {
@@ -56,7 +58,7 @@ namespace DelvUIPlugin.Interface {
             if (scale < 1) {
                 var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
                 var size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
-                DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y - BarHeight));
+                DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y + BarHeight));
             }
             
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
@@ -83,10 +85,10 @@ namespace DelvUIPlugin.Interface {
                 if (scale < 1) {
                     var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
                     var size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
-                    DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y));
+                    DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y + BarHeight));
                 }
             }
-            
+           
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             
             cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
@@ -111,7 +113,7 @@ namespace DelvUIPlugin.Interface {
                 if (scale < 1) {
                     var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
                     var size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
-                    DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y));
+                    DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y + BarHeight));
                 }
             }
             

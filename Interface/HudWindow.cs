@@ -1,13 +1,26 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Numerics;
+using System.Runtime.InteropServices;
+using System.Linq;
+using System.Text;
+using Dalamud.Data;
+using Dalamud.Data.LuminaExtensions;
 using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
+using Dalamud.Game.ClientState.Structs;
 using Dalamud.Interface;
 using Dalamud.Plugin;
+using DelvUIPlugin.GameStructs;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
+using ImGuiScene;
+using Lumina.Data.Files;
+using Lumina.Excel.GeneratedSheets;
+using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUIPlugin.Interface {
     
@@ -28,8 +41,18 @@ namespace DelvUIPlugin.Interface {
         protected int TargetBarHeight => PluginConfiguration.TargetBarHeight;
         protected int TargetBarWidth => PluginConfiguration.TargetBarWidth;
         protected int ToTBarHeight => PluginConfiguration.ToTBarHeight;
-        protected int ToTBarWidth => PluginConfiguration.ToTBarWidth;
+        protected int ToTBarWidth => PluginConfiguration.ToTBarWidth;        
+        protected int FocusBarHeight => PluginConfiguration.FocusBarHeight;
+        protected int FocusBarWidth => PluginConfiguration.FocusBarWidth;
+        protected int CastBarWidth => PluginConfiguration.CastBarWidth;
+        protected int CastBarHeight => PluginConfiguration.CastBarHeight;
+        protected int CastBarXOffset => PluginConfiguration.CastBarXOffset;
+        protected int CastBarYOffset => PluginConfiguration.CastBarYOffset;
         protected Vector2 BarSize => _barsize;
+
+        private Lumina.Excel.GeneratedSheets.Action LastUsedAction;
+        private Mount LastUsedMount;
+        private Item LastUsedItem;
         
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {
             PluginInterface = pluginInterface;
@@ -133,6 +156,45 @@ namespace DelvUIPlugin.Interface {
 
             DrawTargetOfTargetBar(target.TargetActorID);
         }
+        protected virtual void DrawFocusBar() {
+            var focus = PluginInterface.ClientState.Targets.FocusTarget;
+            if (focus is null) {
+                return;
+            }
+            var barSize = new Vector2(FocusBarWidth, FocusBarHeight);
+            
+            var cursorPos = new Vector2(CenterX - XOffset - HealthBarWidth - FocusBarWidth-2, CenterY + YOffset);
+            ImGui.SetCursorPos(cursorPos);  
+            var drawList = ImGui.GetWindowDrawList();
+            
+            if (!(focus is Chara actor)) {
+                var friendly = PluginConfiguration.NPCColorMap["friendly"];
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, friendly["background"]);
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(FocusBarWidth, FocusBarHeight), 
+                    friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"], friendly["gradientLeft"]
+                );
+                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            }
+            else
+            {
+                var colors = DetermineTargetPlateColors(actor);
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["background"]);
+                
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2((float)FocusBarWidth * actor.CurrentHp / actor.MaxHp, FocusBarHeight), 
+                    colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+                );
+                
+                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            }
+            
+            var name = $"{focus.Name.Abbreviate().Truncate(12)}";
+            var textSize = ImGui.CalcTextSize(name);
+            DrawOutlinedText(name, new Vector2(cursorPos.X + FocusBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
+
+            
+        }
         
         protected virtual void DrawTargetOfTargetBar(int targetActorId) {
             Actor target = null;
@@ -175,6 +237,111 @@ namespace DelvUIPlugin.Interface {
             }
             
             ImGui.EndChild();
+        }
+
+        protected virtual unsafe void DrawCastBar()
+        {
+            if (! PluginConfiguration.ShowCastBar)
+              return;
+
+            var actor = PluginInterface.ClientState.LocalPlayer;
+            var castBar = (AddonCastBar*) PluginInterface.Framework.Gui.GetUiObjectByName("_CastBar", 1);
+            var isCasting = StatusFlags.IsCasting;
+            if (!IsCasting(actor.Address)) return;
+
+            var castScale = castBar->CastPercent / 100;
+
+            var castText = "Interrupted";
+            var iconTexFile = PluginInterface.Data.GetIcon(0);
+            if (!CastIsInterrupted(castBar))
+            {
+                // GameObject.CurrentCastId (for 6.0)
+                var currentCastId = GetCurrentCast(actor.Address);
+                var currentCastType = GetCurrentCastType(actor.Address);
+                
+                switch (currentCastType)
+                {
+                    case 1:
+                    {
+                        var currentAction = PluginInterface.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>()
+                            .GetRow(currentCastId);
+                        if (currentAction.Name != "") LastUsedAction = currentAction;
+                        castText = LastUsedAction.Name;
+                        iconTexFile = PluginInterface.Data.GetIcon(LastUsedAction.Icon);
+                        break;
+                    }
+                    case 13:
+                    {
+                        var currentMount = PluginInterface.Data.GetExcelSheet<Mount>()
+                            .GetRow(currentCastId);
+                        LastUsedMount = currentMount;
+                        castText = LastUsedMount.Singular;
+                        iconTexFile = PluginInterface.Data.GetIcon(LastUsedMount.Icon);
+                        break;
+                    }
+                    case 2:
+                    {
+                        var currentItem = PluginInterface.Data.GetExcelSheet<Item>()
+                            .GetRow(currentCastId);
+                        LastUsedItem = currentItem;
+                        castText = "Using Item...";
+                        iconTexFile = PluginInterface.Data.GetIcon(LastUsedItem.Icon);
+                        break;
+                    }
+                }
+            }
+
+            var castTime = Math.Round((castBar->CastTime - castBar->CastTime * castScale) / 100, 1)
+                .ToString(CultureInfo.InvariantCulture);
+
+            var barSize = new Vector2(CastBarWidth, CastBarHeight);
+            var cursorPos = new Vector2(
+                CenterX + PluginConfiguration.CastBarXOffset - CastBarWidth / 2f,
+                CenterY + PluginConfiguration.CastBarYOffset
+            );
+
+            ImGui.SetCursorPos(cursorPos);
+
+            var drawList = ImGui.GetWindowDrawList();
+
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+
+            if (PluginConfiguration.SlideCast)
+            {
+                var slideColor = PluginConfiguration.CastBarColorMap["slidecast"];
+                var slideCastScale = PluginConfiguration.SlideCastTime / 10f / castBar->CastTime;
+                // Slide Cast
+                drawList.AddRectFilledMultiColor(
+                    cursorPos + barSize - new Vector2(barSize.X * slideCastScale, barSize.Y), cursorPos + barSize,
+                    slideColor["gradientLeft"], slideColor["gradientRight"], slideColor["gradientRight"],
+                    slideColor["gradientLeft"]
+                );
+            }
+
+            var castColor = PluginConfiguration.CastBarColorMap["castbar"];
+            // Actual Cast
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + new Vector2(barSize.X * castScale, barSize.Y),
+                castColor["gradientLeft"], castColor["gradientRight"], castColor["gradientRight"],
+                castColor["gradientLeft"]
+            );
+
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            
+            // Action Icon
+            if (PluginConfiguration.ShowActionIcon)
+            {
+                var texture = PluginInterface.UiBuilder.LoadImageRaw(iconTexFile.GetRgbaImageData(), iconTexFile.Header.Width, iconTexFile.Header.Height, 4);
+            
+                ImGui.Image(texture.ImGuiHandle, new Vector2(CastBarHeight, CastBarHeight));
+                drawList.AddRect(cursorPos, cursorPos + new Vector2(CastBarHeight, CastBarHeight), 0xFF000000);
+            }
+            
+            var castTextSize = ImGui.CalcTextSize(castText);
+            var castTimeTextSize = ImGui.CalcTextSize(castTime);
+            
+            if (PluginConfiguration.ShowCastTime) DrawOutlinedText(castTime, new Vector2(cursorPos.X + CastBarWidth - castTimeTextSize.X - 5, cursorPos.Y + CastBarHeight / 2f - castTimeTextSize.Y / 2f));
+            if (PluginConfiguration.ShowActionName) DrawOutlinedText(castText, new Vector2(cursorPos.X + (PluginConfiguration.ShowActionIcon ? CastBarHeight : 0) + 5, cursorPos.Y + CastBarHeight / 2f - castTextSize.Y / 2f));
         }
 
         protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor) {
@@ -279,6 +446,37 @@ namespace DelvUIPlugin.Interface {
             
             // Display HUD only if parameter widget is visible and we're not in a fade event
             return PluginInterface.ClientState.LocalPlayer == null || parameterWidget == null || fadeMiddleWidget == null || !parameterWidget->IsVisible || fadeMiddleWidget->IsVisible;
+        }
+        
+        private ushort GetCurrentCast(IntPtr actor)
+        {
+            return (ushort) Marshal.ReadInt16(actor, ActorOffsets.CurrentCastSpellActionId);
+        }
+
+        private ushort GetCurrentCastType(IntPtr actor)
+        {
+            return (ushort) Marshal.ReadInt16(actor, 0x1B82);
+            //[FieldOffset(0x1B82)] public ushort CastType; // Mounts = 6 or 9, Regular = 1
+        }
+        
+        private bool IsCasting(IntPtr actor)
+        {
+            return Marshal.ReadInt16(actor, ActorOffsets.IsCasting) > 0;
+        }
+
+        private unsafe bool CastIsInterrupted(AddonCastBar* castBar)
+        {
+            for (var i = 0; i != castBar->AtkUnitBase.UldManager.NodeListCount; ++i)
+            {
+                var node = castBar->AtkUnitBase.UldManager.NodeList[i];
+                // ReSharper disable once InvertIf
+                if (node->NodeID == 2 && node->IsVisible) // Interrupted text node
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
         
         unsafe bool IsHostileMemory(BattleNpc npc)
