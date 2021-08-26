@@ -1,105 +1,108 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-    <PropertyGroup>
-        <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-        <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-        <ProjectGuid>{47ED9FA0-F4D6-48B3-A0C7-6252FC014160}</ProjectGuid>
-        <OutputType>Library</OutputType>
-        <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>DelvUIPlugin</RootNamespace>
-        <AssemblyName>DelvUIPlugin</AssemblyName>
-        <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
-        <FileAlignment>512</FileAlignment>
-        <LangVersion>8</LangVersion>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugSymbols>true</DebugSymbols>
-        <DebugType>full</DebugType>
-        <Optimize>false</Optimize>
-        <OutputPath>bin\Debug\</OutputPath>
-        <DefineConstants>DEBUG;TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    </PropertyGroup>
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <DebugType>pdbonly</DebugType>
-        <Optimize>true</Optimize>
-        <OutputPath>bin\Release\</OutputPath>
-        <DefineConstants>TRACE</DefineConstants>
-        <ErrorReport>prompt</ErrorReport>
-        <WarningLevel>4</WarningLevel>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    </PropertyGroup>
-    <ItemGroup>
-        <Reference Include="Dalamud, Version=5.2.7.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
-        </Reference>
-        <Reference Include="FFXIVClientStructs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>..\FFXIVClientStructs\bin\Debug\FFXIVClientStructs.dll</HintPath>
-        </Reference>
-        <Reference Include="ImGui.NET, Version=1.72.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\ImGui.NET.dll</HintPath>
-        </Reference>
-        <Reference Include="ImGuiScene, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\ImGuiScene.dll</HintPath>
-        </Reference>
-        <Reference Include="Lumina, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null">
-          <HintPath>$(AppData)\XIVLauncher\addon\Hooks\5.2.7.0\Lumina.dll</HintPath>
-        </Reference>
-		<Reference Include="Lumina.Excel">
-		  <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\Lumina.Excel.dll</HintPath>
-		</Reference>
-        <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
-          <HintPath>$(AppData)\XIVLauncher\addon\Hooks\5.2.6.1\Newtonsoft.Json.dll</HintPath>
-        </Reference>
-        <Reference Include="System" />
-        <Reference Include="System.Core" />
-        <Reference Include="System.Data" />
-        <Reference Include="System.Numerics" />
-        <Reference Include="System.Xml" />
-    </ItemGroup>
-    <ItemGroup>
-		    <Compile Include="GameStructs\AddonCastBar.cs" />
-		    <Compile Include="Interface\SamuraiHudWindow.cs" />
-        <Compile Include="Interface\BardHudWindow.cs" />
-        <Compile Include="Interface\DancerHudWindow.cs" />
-        <Compile Include="Interface\DarkKnightHudWindow.cs" />
-        <Compile Include="Interface\GunbreakerHudWindow.cs" />
-        <Compile Include="Interface\RedMageHudWindow.cs" />
-        <Compile Include="Interface\UnitframeOnlyHudWindow.cs" />
-        <Compile Include="Interface\WarriorHudWindow.cs" />
-        <Compile Include="Interface\WhiteMageHudWindow.cs" />
-        <Compile Include="Interface\SummonerHudWindow.cs" />
-        <Compile Include="PluginConfiguration.cs" />
-        <Compile Include="Extensions.cs" />
-        <Compile Include="Interface\ConfigurationWindow.cs" />
-        <Compile Include="Interface\HudWindow.cs" />
-        <Compile Include="Plugin.cs" />
-        <Compile Include="Properties\AssemblyInfo.cs" />
-    </ItemGroup>
-    <ItemGroup>
-      <Content Include="DelvUIPlugin.json" />
-        <Content Include="Media\Fonts\big-noodle-too.ttf">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-    <ItemGroup>
-      <PackageReference Include="DalamudPackager" Version="1.2.1" />
-    </ItemGroup>
-    <ItemGroup>
-      <Folder Include="Media\Textures" />
-    </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-    <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{47ED9FA0-F4D6-48B3-A0C7-6252FC014160}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>DelvUIPlugin</RootNamespace>
+    <AssemblyName>DelvUIPlugin</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <LangVersion>8</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Dalamud, Version=5.2.7.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\Dalamud.dll</HintPath>
+    </Reference>
+    <Reference Include="FFXIVClientStructs, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>..\FFXIVClientStructs\bin\Debug\FFXIVClientStructs.dll</HintPath>
+    </Reference>
+    <Reference Include="ImGui.NET, Version=1.72.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\ImGui.NET.dll</HintPath>
+    </Reference>
+    <Reference Include="ImGuiScene, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\ImGuiScene.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\5.2.6.1\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Lumina, Version=3.0.0.0, Culture=neutral, PublicKeyToken=null">
+      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\5.2.7.0\Lumina.dll</HintPath>
+    </Reference>
+    <Reference Include="Lumina.Excel">
+      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\dev\Lumina.Excel.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed">
+      <HintPath>$(AppData)\XIVLauncher\addon\Hooks\5.2.6.1\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Numerics" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="GameStructs\AddonCastBar.cs" />
+    <Compile Include="Interface\SamuraiHudWindow.cs" />
+    <Compile Include="Interface\BardHudWindow.cs" />
+    <Compile Include="Interface\DancerHudWindow.cs" />
+    <Compile Include="Interface\DarkKnightHudWindow.cs" />
+    <Compile Include="Interface\GunbreakerHudWindow.cs" />
+    <Compile Include="Interface\RedMageHudWindow.cs" />
+    <Compile Include="Interface\ScholarHudWindow.cs" />
+    <Compile Include="Interface\UnitframeOnlyHudWindow.cs" />
+    <Compile Include="Interface\WarriorHudWindow.cs" />
+    <Compile Include="Interface\WhiteMageHudWindow.cs" />
+    <Compile Include="Interface\SummonerHudWindow.cs" />
+    <Compile Include="PluginConfiguration.cs" />
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Interface\ConfigurationWindow.cs" />
+    <Compile Include="Interface\HudWindow.cs" />
+    <Compile Include="Plugin.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DelvUIPlugin.json" />
+    <Content Include="Media\Fonts\big-noodle-too.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="DalamudPackager" Version="1.2.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Media\Textures\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
          Other similar extension points exist, see Microsoft.Common.targets.
     <Target Name="BeforeBuild">
     </Target>
     <Target Name="AfterBuild">
     </Target>
     -->
-
 </Project>

@@ -38,6 +38,8 @@ namespace DelvUIPlugin.Interface {
         protected int YOffset => 460;
         protected int HealthBarHeight => PluginConfiguration.HealthBarHeight;
         protected int HealthBarWidth => PluginConfiguration.HealthBarWidth;
+        protected int PrimaryResourceBarHeight => PluginConfiguration.PrimaryResourceBarHeight;
+        protected int PrimaryResourceBarWidth => PluginConfiguration.PrimaryResourceBarWidth;
         protected int TargetBarHeight => PluginConfiguration.TargetBarHeight;
         protected int TargetBarWidth => PluginConfiguration.TargetBarWidth;
         protected int ToTBarHeight => PluginConfiguration.ToTBarHeight;
@@ -99,16 +101,16 @@ namespace DelvUIPlugin.Interface {
         protected virtual void DrawPrimaryResourceBar() {
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentMp / actor.MaxMp;
-            var barSize = new Vector2(254, 13);
+            _barsize = new Vector2(PrimaryResourceBarWidth, PrimaryResourceBarHeight);
             var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 27);
             
             var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0x88000000);
             drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + new Vector2(barSize.X * scale, barSize.Y), 
+                cursorPos, cursorPos + new Vector2(BarSize.X * scale, BarSize.Y), 
                 0xFFE6CD00, 0xFFD8Df3C, 0xFFD8Df3C, 0xFFE6CD00
             );
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
         }
         
         protected virtual void DrawTargetBar() {
