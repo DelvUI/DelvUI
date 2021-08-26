@@ -376,7 +376,7 @@ namespace DelvUIPlugin.Interface {
                 cursorPos, cursorPos + barSize, 
                 0xFFE6CD00, 0xFFE6CD00, 0xFFE6CD00, 0xFFE6CD00
             );
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFFE6CD00);
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
         }
 
