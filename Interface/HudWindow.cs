@@ -366,14 +366,19 @@ namespace DelvUIPlugin.Interface {
         {
             var tankStanceBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 743 || o.EffectId == 189 || o.EffectId == 392 || o.EffectId == 91);
 
-            if (tankStanceBuff.Count() == 1)
-            {
-                var barSize = new Vector2(HealthBarWidth, HealthBarHeight);
-                var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset, CenterY + YOffset);
-                ImGui.SetCursorPos(cursorPos);  
-                var drawList = ImGui.GetWindowDrawList();
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFFE6CD00);
-            }
+            if (tankStanceBuff.Count() != 1) return;
+            var barSize = new Vector2(HealthBarHeight>HealthBarWidth?HealthBarWidth:HealthBarHeight, HealthBarHeight);
+            var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset - 5, CenterY + YOffset + 5);
+            ImGui.SetCursorPos(cursorPos);  
+            var drawList = ImGui.GetWindowDrawList();
+            
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0xFFE6CD00);
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + barSize, 
+                0xFFE6CD00, 0xFFE6CD00, 0xFFE6CD00, 0xFFE6CD00
+            );
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFFE6CD00);
+
         }
 
         protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor) {
