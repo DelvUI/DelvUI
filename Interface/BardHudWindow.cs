@@ -11,9 +11,9 @@ namespace DelvUIPlugin.Interface {
     public class BardHudWindow : HudWindow {
         public override uint JobId => 23;
 
-        private new int BarHeight => 20;
+        private int BarHeight => 20;
         private int SmallBarHeight => 10;
-        private new int BarWidth => 250;
+        private int BarWidth => 250;
         private new int XOffset => 127;
         private new int YOffset => 440;
         
@@ -25,6 +25,8 @@ namespace DelvUIPlugin.Interface {
             HandleCurrentSong();
             DrawSoulVoiceBar();
             DrawTargetBar();
+            DrawCastBar();
+            DrawFocusBar();
         }
 
         private void DrawActiveDots()

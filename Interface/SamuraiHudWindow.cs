@@ -8,8 +8,8 @@ namespace DelvUIPlugin.Interface {
     public class SamuraiHudWindow : HudWindow {
 
         public override uint JobId => 34;
-        private new static int BarHeight => 20;
-        private new int BarWidth => 250;
+        private static int BarHeight => 20;
+        private int BarWidth => 250;
         private new int XOffset => 127;
         private new int YOffset => 467;
 
@@ -21,6 +21,8 @@ namespace DelvUIPlugin.Interface {
             DrawSenResourceBar();
             DrawMeditationResourceBar();
             DrawTargetBar();
+            DrawFocusBar();
+            DrawCastBar();
         }
 
         protected override void DrawPrimaryResourceBar()

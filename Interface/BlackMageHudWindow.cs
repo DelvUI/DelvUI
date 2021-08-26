@@ -13,12 +13,16 @@ namespace DelvUIPlugin.Interface
         public override uint JobId => Jobs.BLM;
 
         private static int JobBarWidth = 180;
+        private static int JobBarYOffset = 0;
 
         public BlackMageHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _)
         {
             DrawHealthBar();
+            DrawFocusBar();
+            DrawCastBar();
+
             DrawEnochian();
             DrawManaBar();
             DrawUmbralIceStacks();
@@ -34,7 +38,7 @@ namespace DelvUIPlugin.Interface
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float)actor.CurrentMp / actor.MaxMp;
             var barSize = new Vector2(JobBarWidth, 12);
-            var cursorPos = new Vector2(CenterX - barSize.X / 2, CenterY + YOffset - 50);
+            var cursorPos = new Vector2(CenterX - barSize.X / 2, CenterY + YOffset + JobBarYOffset);
 
             // mana bar
             var bgColor = 0x88000000;
@@ -79,7 +83,7 @@ namespace DelvUIPlugin.Interface
             }
 
             var barSize = new Vector2(JobBarWidth + 4, 16);
-            var cursorPos = new Vector2(CenterX - barSize.X / 2, CenterY + YOffset - 52);
+            var cursorPos = new Vector2(CenterX - barSize.X / 2, CenterY + YOffset + JobBarYOffset - 2);
 
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88FFFFFF);
@@ -90,7 +94,7 @@ namespace DelvUIPlugin.Interface
             var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
 
             var barSize = new Vector2((JobBarWidth - 6) / 3, 16);
-            var cursorPos = new Vector2(CenterX - JobBarWidth / 2, CenterY + YOffset - 70);
+            var cursorPos = new Vector2(CenterX - JobBarWidth / 2, CenterY + YOffset + JobBarYOffset - 20);
 
             var drawList = ImGui.GetWindowDrawList();
 
@@ -121,13 +125,13 @@ namespace DelvUIPlugin.Interface
 
             if (gauge.NumPolyglotStacks == 0)
             {
-                var cursorPos = new Vector2(CenterX - barSize.X / 2f, CenterY + YOffset - 85);
+                var cursorPos = new Vector2(CenterX - barSize.X / 2f, CenterY + YOffset + JobBarYOffset - 36);
                 DrawPolyglotStack(cursorPos, barSize, scale);
             } 
             else
             {
                 // 1st stack (charged)
-                var cursorPos = new Vector2(CenterX - barSize.X - 1, CenterY + YOffset - 85);
+                var cursorPos = new Vector2(CenterX - barSize.X - 1, CenterY + YOffset + JobBarYOffset - 36);
                 DrawPolyglotStack(cursorPos, barSize, 1);
 
                 // 2nd stack
@@ -172,8 +176,8 @@ namespace DelvUIPlugin.Interface
 
             var positions = new List<Vector2>();
             positions.Add(new Vector2(CenterX, CenterY + YOffset - 100));
-            positions.Add(new Vector2(CenterX - JobBarWidth / 2f + 30, CenterY + YOffset - 85));
-            positions.Add(new Vector2(CenterX + JobBarWidth / 2f - 30, CenterY + YOffset - 85));
+            positions.Add(new Vector2(CenterX - JobBarWidth / 2f + 30, CenterY + YOffset + JobBarYOffset - 36));
+            positions.Add(new Vector2(CenterX + JobBarWidth / 2f - 30, CenterY + YOffset + JobBarYOffset - 36));
 
             for (int i = 0; i < tripleStackBuff.StackCount; i++)
             {

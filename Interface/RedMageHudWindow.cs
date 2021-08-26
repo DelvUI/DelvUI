@@ -9,8 +9,8 @@ namespace DelvUIPlugin.Interface {
     public class RedMageHudWindow : HudWindow {
         public override uint JobId => 35;
         
-        private new int BarHeight => 20;
-        private new int BarWidth => 254;
+        private int BarHeight => 20;
+        private int BarWidth => 254;
         private new int XOffset => 127;
         private new int YOffset => 440;
         
@@ -25,6 +25,8 @@ namespace DelvUIPlugin.Interface {
             DrawDualCastBar();
             DrawCrystalBar();
             DrawTargetBar();
+            DrawFocusBar();
+            DrawCastBar();
         }
         protected override void DrawPrimaryResourceBar() {
             var actor = PluginInterface.ClientState.LocalPlayer;
@@ -69,7 +71,7 @@ namespace DelvUIPlugin.Interface {
             
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             drawList.AddRect(cursorPos, cursorPos + new Vector2(barSize.X*0.8f, barSize.Y), 0xFF000000);
-            DrawOutlinedText(gauge.ToString(), new Vector2(cursorPos.X+barSize.X * gauge/100-(gauge==100?30:gauge>5?20:0), cursorPos.Y+-2));
+            DrawOutlinedText(gauge.ToString(), new Vector2(cursorPos.X+barSize.X * gauge/100-(gauge==100?30:gauge>3?20:0), cursorPos.Y+-2));
 
 
         }        
@@ -87,7 +89,7 @@ namespace DelvUIPlugin.Interface {
             
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             drawList.AddRect(cursorPos, new Vector2(cursorPos.X + barSize.X*0.8f, cursorPos.Y + barSize.Y), 0xFF000000);
-            DrawOutlinedText(gauge.ToString(), new Vector2(cursorPos.X+barSize.X * gauge/100-(gauge==100?30:gauge>5?20:0), cursorPos.Y+-2));
+            DrawOutlinedText(gauge.ToString(), new Vector2(cursorPos.X+barSize.X * gauge/100-(gauge==100?30:gauge>3?20:0), cursorPos.Y+-2));
 
         }  
         
