@@ -21,6 +21,7 @@ namespace DelvUIPlugin.Interface {
             DrawSenResourceBar();
             DrawMeditationResourceBar();
             DrawTargetBar();
+            DrawFocusBar();
             DrawCastBar();
         }
 

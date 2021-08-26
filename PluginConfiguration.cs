@@ -17,6 +17,8 @@ namespace DelvUIPlugin {
         public int TargetBarWidth { get; set; } = 270;
         public int ToTBarHeight { get; set; } = 20;
         public int ToTBarWidth { get; set; } = 120;
+        public int FocusBarHeight { get; set; } = 20;
+        public int FocusBarWidth { get; set; } = 120;
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
         
@@ -44,9 +46,9 @@ namespace DelvUIPlugin {
         public Vector4 JobColorNIN = new Vector4(211f/255f,47f/255f,47f/255f,1f);
         public Vector4 JobColorSAM = new Vector4(255f/255f,202f/255f,40f/255f,1f);
         
-        public Vector4 JobColorBRD = new Vector4(158f/255f,157f,36f,1f);
-        public Vector4 JobColorMCH = new Vector4(0f/255f,151f,167f,1f);
-        public Vector4 JobColorDNC = new Vector4(244f/255f,143f,177f,1f);
+        public Vector4 JobColorBRD = new Vector4(158f/255f,157f/255f,36f/255f,1f);
+        public Vector4 JobColorMCH = new Vector4(0f/255f,151f/255f,167f/255f,1f);
+        public Vector4 JobColorDNC = new Vector4(244f/255f,143f/255f,177f/255f,1f);
 
         public Vector4 JobColorBLM = new Vector4(126f/255f,87f/255f,194f/255f,1f);
         public Vector4 JobColorSMN = new Vector4(46f/255f,125f/255f,50f/255f,1f);

@@ -40,9 +40,11 @@ namespace DelvUIPlugin.Interface {
         protected int TargetBarHeight => PluginConfiguration.TargetBarHeight;
         protected int TargetBarWidth => PluginConfiguration.TargetBarWidth;
         protected int ToTBarHeight => PluginConfiguration.ToTBarHeight;
-        protected int ToTBarWidth => PluginConfiguration.ToTBarWidth;
-        protected int CastBarHeight => PluginConfiguration.CastBarHeight;
+        protected int ToTBarWidth => PluginConfiguration.ToTBarWidth;        
+        protected int FocusBarHeight => PluginConfiguration.FocusBarHeight;
+        protected int FocusBarWidth => PluginConfiguration.FocusBarWidth;
         protected int CastBarWidth => PluginConfiguration.CastBarWidth;
+        protected int CastBarHeight => PluginConfiguration.CastBarHeight;
         protected Vector2 BarSize => _barsize;
 
         private Lumina.Excel.GeneratedSheets.Action LastUsedAction;
@@ -149,6 +151,45 @@ namespace DelvUIPlugin.Interface {
             DrawOutlinedText(name, new Vector2(cursorPos.X + TargetBarWidth - nameSize.X - 5, cursorPos.Y - 22));
 
             DrawTargetOfTargetBar(target.TargetActorID);
+        }
+        protected virtual void DrawFocusBar() {
+            var focus = PluginInterface.ClientState.Targets.FocusTarget;
+            if (focus is null) {
+                return;
+            }
+            var barSize = new Vector2(FocusBarWidth, FocusBarHeight);
+            
+            var cursorPos = new Vector2(CenterX - XOffset - HealthBarWidth - FocusBarWidth-2, CenterY + YOffset);
+            ImGui.SetCursorPos(cursorPos);  
+            var drawList = ImGui.GetWindowDrawList();
+            
+            if (!(focus is Chara actor)) {
+                var friendly = PluginConfiguration.NPCColorMap["friendly"];
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, friendly["background"]);
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(FocusBarWidth, FocusBarHeight), 
+                    friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"], friendly["gradientLeft"]
+                );
+                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            }
+            else
+            {
+                var colors = DetermineTargetPlateColors(actor);
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["background"]);
+                
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2((float)FocusBarWidth * actor.CurrentHp / actor.MaxHp, FocusBarHeight), 
+                    colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+                );
+                
+                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            }
+            
+            var name = $"{focus.Name.Abbreviate().Truncate(12)}";
+            var textSize = ImGui.CalcTextSize(name);
+            DrawOutlinedText(name, new Vector2(cursorPos.X + FocusBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
+
+            
         }
         
         protected virtual void DrawTargetOfTargetBar(int targetActorId) {
