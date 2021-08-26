@@ -18,6 +18,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using ImGuiScene;
 using Lumina.Data.Files;
+using Lumina.Excel.GeneratedSheets;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUIPlugin.Interface {
@@ -45,6 +46,7 @@ namespace DelvUIPlugin.Interface {
         protected Vector2 BarSize => _barsize;
 
         private Lumina.Excel.GeneratedSheets.Action LastUsedAction;
+        private Mount LastUsedMount;
         
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {
             PluginInterface = pluginInterface;
@@ -194,22 +196,36 @@ namespace DelvUIPlugin.Interface {
 
         protected virtual unsafe void DrawCastBar()
         {
+            
+            var actor = PluginInterface.ClientState.LocalPlayer;
             var castBar = (AddonCastBar*) PluginInterface.Framework.Gui.GetUiObjectByName("_CastBar", 1);
-            if (!IsCasting(castBar)) return;
+            if (!IsCasting(actor.Address)) return;
 
             var castScale = castBar->CastPercent / 100;
-            var actor = PluginInterface.ClientState.LocalPlayer;
 
             var castText = "Interrupted";
+            var iconTexFile = PluginInterface.Data.GetIcon(0);
             if (!CastIsInterrupted(castBar))
             {
                 // GameObject.CurrentCastId (for 6.0)
-                var currentCast = GetCurrentCast(actor.Address);
-                var currentAction = PluginInterface.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>()
-                    .GetRow(currentCast);
-                if (currentAction.Name != "") LastUsedAction = currentAction;
-
-                castText = currentAction.Name;
+                var currentCastId = GetCurrentCast(actor.Address);
+                var currentCastType = GetCurrentCastType(actor.Address);
+                
+                if (currentCastType == 1) {
+                    var currentAction = PluginInterface.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>()
+                    .GetRow(currentCastId);
+                    if (currentAction.Name != "") LastUsedAction = currentAction;
+                    castText = LastUsedAction.Name;
+                    iconTexFile = PluginInterface.Data.GetIcon(LastUsedAction.Icon);
+                }
+                
+                if (currentCastType == 13) {
+                    var currentMount = PluginInterface.Data.GetExcelSheet<Mount>()
+                    .GetRow(currentCastId);
+                    LastUsedMount = currentMount;
+                    castText = LastUsedMount.Singular;
+                    iconTexFile = PluginInterface.Data.GetIcon(LastUsedMount.Icon);
+                }
             }
 
             var castTime = Math.Round((castBar->CastTime - castBar->CastTime * castScale) / 100, 1)
@@ -249,7 +265,6 @@ namespace DelvUIPlugin.Interface {
             // Action Icon
             if (PluginConfiguration.ShowActionIcon)
             {
-                var iconTexFile = PluginInterface.Data.GetIcon(LastUsedAction.Icon);
                 var texture = PluginInterface.UiBuilder.LoadImageRaw(iconTexFile.GetRgbaImageData(), iconTexFile.Header.Width, iconTexFile.Header.Height, 4);
             
                 ImGui.Image(texture.ImGuiHandle, new Vector2(CastBarHeight, CastBarHeight));
@@ -366,16 +381,21 @@ namespace DelvUIPlugin.Interface {
             // Display HUD only if parameter widget is visible and we're not in a fade event
             return PluginInterface.ClientState.LocalPlayer == null || parameterWidget == null || fadeMiddleWidget == null || !parameterWidget->IsVisible || fadeMiddleWidget->IsVisible;
         }
-
-        private unsafe bool IsCasting(AddonCastBar* castBar)
-        {
-            return castBar != null && castBar->AtkUnitBase.UldManager.NodeList != null &&
-                   castBar->AtkUnitBase.UldManager.NodeListCount > 11 && castBar->AtkUnitBase.IsVisible;
-        }
         
         private ushort GetCurrentCast(IntPtr actor)
         {
             return (ushort) Marshal.ReadInt16(actor, ActorOffsets.CurrentCastSpellActionId);
+        }
+
+        private ushort GetCurrentCastType(IntPtr actor)
+        {
+            return (ushort) Marshal.ReadInt16(actor, 0x1B82);
+            //[FieldOffset(0x1B82)] public ushort CastType; // Mounts = 6 or 9, Regular = 1
+        }
+        
+        private bool IsCasting(IntPtr actor)
+        {
+            return Marshal.ReadInt16(actor, ActorOffsets.IsCasting) > 0;
         }
 
         private unsafe bool CastIsInterrupted(AddonCastBar* castBar)
