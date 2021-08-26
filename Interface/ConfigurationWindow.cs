@@ -153,6 +153,85 @@ namespace DelvUIPlugin.Interface {
                     ImGui.EndTabItem();
                 }
 
+                if (ImGui.BeginTabItem("Warrior"))
+                {
+                    var stormsEyeHeight = _pluginConfiguration.WARStormsEyeHeight;
+                    if (ImGui.DragInt("Storm's Eye Height", ref stormsEyeHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.WARStormsEyeHeight = stormsEyeHeight;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var stormsEyeWidth = _pluginConfiguration.WARStormsEyeWidth;
+                    if (ImGui.DragInt("Storm's Eye Width", ref stormsEyeWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.WARStormsEyeWidth = stormsEyeWidth;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var warBaseXOffset = _pluginConfiguration.WARBaseXOffset;
+                    if (ImGui.DragInt("Base X Offset", ref warBaseXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.WARBaseXOffset = warBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var warBaseYOffset = _pluginConfiguration.WARBaseYOffset;
+                    if (ImGui.DragInt("Base Y Offset", ref warBaseYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.WARBaseYOffset = warBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var beastGaugeHeight = _pluginConfiguration.WARBeastGaugeHeight;
+                    if (ImGui.DragInt("Beast Gauge Height", ref beastGaugeHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.WARBeastGaugeHeight = beastGaugeHeight;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var beastGaugeWidth = _pluginConfiguration.WARBeastGaugeWidth;
+                    if (ImGui.DragInt("Beast Gauge Width", ref beastGaugeWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.WARBeastGaugeWidth = beastGaugeWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var beastGaugePadding = _pluginConfiguration.WARBeastGaugePadding;
+                    if (ImGui.DragInt("Beast Gauge Padding", ref beastGaugePadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.WARBeastGaugePadding = beastGaugePadding;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var warBeastGaugeXOffset = _pluginConfiguration.WARBeastGaugeXOffset;
+                    if (ImGui.DragInt("Beast Gauge X Offset", ref warBeastGaugeXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.WARBeastGaugeXOffset = warBeastGaugeXOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var warBeastGaugeYOffset = _pluginConfiguration.WARBeastGaugeYOffset;
+                    if (ImGui.DragInt("Beast Gauge Y Offset", ref warBeastGaugeYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.WARBeastGaugeYOffset = warBeastGaugeYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var warInterBarOffset = _pluginConfiguration.WARInterBarOffset;
+                    if (ImGui.DragInt("Space Between Bars", ref warInterBarOffset, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.WARInterBarOffset = warInterBarOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    changed |= ImGui.ColorEdit4("Inner Release Color", ref _pluginConfiguration.WARInnerReleaseColor);
+                    changed |= ImGui.ColorEdit4("Storm's Eye Color", ref _pluginConfiguration.WARStormsEyeColor);
+                    changed |= ImGui.ColorEdit4("Beast Gauge Full Color", ref _pluginConfiguration.WARFellCleaveColor);
+                    changed |= ImGui.ColorEdit4("Nascent Chaos Ready Color", ref _pluginConfiguration.WARNascentChaosColor);
+                    changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.WAREmptyColor);
+                }
+
                 ImGui.EndTabBar();
             }
 
