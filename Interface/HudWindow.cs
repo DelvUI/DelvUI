@@ -287,6 +287,16 @@ namespace DelvUIPlugin.Interface {
                         castText = "Using Item...";
                         iconTexFile = PluginInterface.Data.GetIcon(LastUsedItem.Icon);
                         break;
+                    }                        
+                    case 4:
+                    {
+                        castText = "Interacting...";
+                        break;
+                    }                    
+                    default:
+                    {
+                        castText = "Casting...";
+                        break;
                     }
                 }
             }
@@ -327,9 +337,10 @@ namespace DelvUIPlugin.Interface {
             );
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-            
+
+            var emptyIconPath = "ui/icon/000000/000000.tex";
             // Action Icon
-            if (PluginConfiguration.ShowActionIcon)
+            if (PluginConfiguration.ShowActionIcon && iconTexFile.FilePath.Path != emptyIconPath)
             {
                 var texture = PluginInterface.UiBuilder.LoadImageRaw(iconTexFile.GetRgbaImageData(), iconTexFile.Header.Width, iconTexFile.Header.Height, 4);
             
@@ -340,8 +351,11 @@ namespace DelvUIPlugin.Interface {
             var castTextSize = ImGui.CalcTextSize(castText);
             var castTimeTextSize = ImGui.CalcTextSize(castTime);
             
-            if (PluginConfiguration.ShowCastTime) DrawOutlinedText(castTime, new Vector2(cursorPos.X + CastBarWidth - castTimeTextSize.X - 5, cursorPos.Y + CastBarHeight / 2f - castTimeTextSize.Y / 2f));
-            if (PluginConfiguration.ShowActionName) DrawOutlinedText(castText, new Vector2(cursorPos.X + (PluginConfiguration.ShowActionIcon ? CastBarHeight : 0) + 5, cursorPos.Y + CastBarHeight / 2f - castTextSize.Y / 2f));
+            if (PluginConfiguration.ShowCastTime) DrawOutlinedText(castTime, 
+                new Vector2(cursorPos.X + CastBarWidth - castTimeTextSize.X - 5, cursorPos.Y + CastBarHeight / 2f - castTimeTextSize.Y / 2f));
+            if (PluginConfiguration.ShowActionName) DrawOutlinedText(castText, 
+                new Vector2(cursorPos.X + (PluginConfiguration.ShowActionIcon && iconTexFile.FilePath.Path != emptyIconPath ? CastBarHeight : 0) + 5, 
+                cursorPos.Y + CastBarHeight / 2f - castTextSize.Y / 2f));
         }
 
         protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor) {
