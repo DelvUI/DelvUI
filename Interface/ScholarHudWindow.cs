@@ -57,22 +57,7 @@ namespace DelvUIPlugin.Interface
             );
 
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-            DrawOutlinedText(gauge.ToString(), new Vector2(cursorPos.X+BarSize.X * gauge/100-(gauge==100?30:gauge>3?20:0), cursorPos.Y + (BarSize.Y / 2) - 12));
-
-        private void DrawFairyBar()
-        {
-            var gauge = (float)PluginInterface.ClientState.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
-            var barSize = new Vector2(BarWidth, BarHeight);
-            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 49);
-            var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-            drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + new Vector2(barSize.X * gauge / 100, barSize.Y),
-                0x7097CE0D, 0xFF5EFB09, 0xFF5EFB09, 0x7097CE0D
-            );
-
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-            DrawOutlinedText(gauge.ToString(), new Vector2(cursorPos.X+barSize.X * gauge/100-(gauge==100?30:gauge>5?20:0), cursorPos.Y+-2));
+            DrawOutlinedText(gauge.ToString(), new Vector2(cursorPos.X + BarSize.X * gauge / 100 - (gauge == 100 ? 30 : gauge > 3 ? 20 : 0), cursorPos.Y + (BarSize.Y / 2) - 12));
         }
 
         private void DrawAetherBar()
