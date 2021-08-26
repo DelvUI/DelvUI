@@ -34,7 +34,7 @@ namespace DelvUIPlugin.Interface {
         protected float CenterX => ImGui.GetMainViewport().Size.X / 2f;
         protected float CenterY => ImGui.GetMainViewport().Size.Y / 2f;
         protected int XOffset => 160;
-        protected int YOffset => 460;
+        protected int YOffset => PluginConfiguration.VerticalOffset;
         protected int HealthBarHeight => PluginConfiguration.HealthBarHeight;
         protected int HealthBarWidth => PluginConfiguration.HealthBarWidth;
         protected int TargetBarHeight => PluginConfiguration.TargetBarHeight;
@@ -45,6 +45,7 @@ namespace DelvUIPlugin.Interface {
         protected int FocusBarWidth => PluginConfiguration.FocusBarWidth;
         protected int CastBarWidth => PluginConfiguration.CastBarWidth;
         protected int CastBarHeight => PluginConfiguration.CastBarHeight;
+        protected int CastBarVerticalOffset => PluginConfiguration.CastBarVerticalOffset;
         protected Vector2 BarSize => _barsize;
 
         private Lumina.Excel.GeneratedSheets.Action LastUsedAction;
@@ -273,7 +274,7 @@ namespace DelvUIPlugin.Interface {
                 .ToString(CultureInfo.InvariantCulture);
 
             var barSize = new Vector2(CastBarWidth, CastBarHeight);
-            var cursorPos = new Vector2(CenterX - CastBarWidth / 2f, CenterY + YOffset - 100);
+            var cursorPos = new Vector2(CenterX - CastBarWidth / 2f, CenterY + YOffset - CastBarVerticalOffset);
 
             ImGui.SetCursorPos(cursorPos);
 
