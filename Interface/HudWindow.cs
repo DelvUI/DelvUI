@@ -251,7 +251,6 @@ namespace DelvUIPlugin.Interface {
 
             var actor = PluginInterface.ClientState.LocalPlayer;
             var castBar = (AddonCastBar*) PluginInterface.Framework.Gui.GetUiObjectByName("_CastBar", 1);
-            var isCasting = StatusFlags.IsCasting;
 
             var castScale = castBar->CastPercent / 100;
 
