@@ -24,6 +24,7 @@ namespace DelvUIPlugin.Interface {
             DrawPrimaryResourceBar();
             DrawTargetBar();
             DrawFocusBar();
+            DrawCastBar();
         }
         
     }
