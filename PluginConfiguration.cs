@@ -11,6 +11,8 @@ namespace DelvUIPlugin {
         public int Version { get; set; }
         public bool HideHud = false;
         public bool LockHud = true;
+
+        public int VerticalOffset { get; set; } = 480;
         public int HealthBarHeight { get; set; } = 50;
         public int HealthBarWidth { get; set; } = 270;
         public int TargetBarHeight { get; set; } = 50;
@@ -79,9 +81,35 @@ namespace DelvUIPlugin {
         public Vector4 WARFellCleaveColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 1f);
         public Vector4 WARNascentChaosColor = new Vector4(240f/255f, 176f/255f, 0f, 1f);
         public Vector4 WAREmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 1f);
-        
+
         #endregion
-        
+
+
+        #region BLM Configuration
+
+        public int BLMVerticalOffset { get; set; } = 0;
+        public int BLMManaBarHeight { get; set; } = 12;
+        public int BLMManaBarWidth { get; set; } = 180;
+        public int BLMUmbralHeartHeight { get; set; } = 16;
+        public int BLMPolyglotHeight { get; set; } = 12;
+        public int BLMPolyglotWidth { get; set; } = 18;
+        public int BLMVerticalSpaceBetweenBars { get; set; } = 4;
+        public int BLMHorizontalSpaceBetweenBars { get; set; } = 2;
+        public bool BLMShowTripleCast = true;
+        public bool BLMUseBarsForTripleCast = false;
+        public int BLMTripleCastHeight { get; set; } = 10;
+        public int BLMTripleCastWidth { get; set; } = 40;
+        public int BLMTripleCastRadius { get; set; } = 10;
+
+        public Vector4 BLMManaBarNoElementColor = new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 1f);
+        public Vector4 BLMManaBarIceColor = new Vector4(89f / 255f, 89f / 255f, 153f / 255f, 1f);
+        public Vector4 BLMManaBarFireColor = new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 1f);
+        public Vector4 BLMUmbralHeartColor = new Vector4(213f / 255f, 216f / 255f, 252f / 255f, 1f);
+        public Vector4 BLMPolyglotColor = new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 1f);
+        public Vector4 BLMTriplecastColor = new Vector4(1f, 1f, 1f, 1f);
+
+        #endregion
+
         [JsonIgnore] private DalamudPluginInterface _pluginInterface;
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
         [JsonIgnore] public Dictionary<uint, Dictionary<string, uint>> JobColorMap;
@@ -259,7 +287,55 @@ namespace DelvUIPlugin {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorBLM.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorBLM.AdjustColor(.1f))
                 },
-                
+
+                [Jobs.BLM * 1000] = new Dictionary<string, uint> // Mana Bar no element
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BLMManaBarNoElementColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BLMManaBarNoElementColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BLMManaBarNoElementColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BLMManaBarNoElementColor.AdjustColor(.1f))
+                },
+
+                [Jobs.BLM * 1000 + 1] = new Dictionary<string, uint> // Mana bar ice
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BLMManaBarIceColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BLMManaBarIceColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BLMManaBarIceColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BLMManaBarIceColor.AdjustColor(.1f))
+                },
+
+                [Jobs.BLM * 1000 + 2] = new Dictionary<string, uint> // Mana bar fire
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BLMManaBarFireColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BLMManaBarFireColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BLMManaBarFireColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BLMManaBarFireColor.AdjustColor(.1f))
+                },
+
+                [Jobs.BLM * 1000 + 3] = new Dictionary<string, uint> // Umbral heart
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BLMUmbralHeartColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BLMUmbralHeartColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BLMUmbralHeartColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BLMUmbralHeartColor.AdjustColor(.1f))
+                },
+
+                [Jobs.BLM * 1000 + 4] = new Dictionary<string, uint> // Polyglot
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BLMPolyglotColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BLMPolyglotColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BLMPolyglotColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BLMPolyglotColor.AdjustColor(.1f))
+                },
+
+                [Jobs.BLM * 1000 + 5] = new Dictionary<string, uint> // Triplecast
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BLMTriplecastColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BLMTriplecastColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BLMTriplecastColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BLMTriplecastColor.AdjustColor(.1f))
+                },
+
                 [Jobs.SMN] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN),
