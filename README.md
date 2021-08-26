@@ -1,5 +1,5 @@
 # DelvUI
-
+![image](https://i.imgur.com/AmbyNFD.png)
 DelvUI is a plugin for Dalamud that aims to replicate the ElvUI experience in Final Fantasy XIV.
 There's also a lot of inspiration taken from ToxiUI.
 

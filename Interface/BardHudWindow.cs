@@ -25,6 +25,8 @@ namespace DelvUIPlugin.Interface {
             HandleCurrentSong();
             DrawSoulVoiceBar();
             DrawTargetBar();
+            DrawCastBar();
+            DrawFocusBar();
         }
 
         private void DrawActiveDots()

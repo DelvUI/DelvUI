@@ -88,15 +88,62 @@ namespace DelvUIPlugin {
         private void SwapJobs() {
             _hudWindow = _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id switch
             {
-                Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
+                //Tanks
                 Jobs.DRK => new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.GNB => new GunbreakerHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.DNC => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.WAR => new WarriorHudWindow(_pluginInterface, _pluginConfiguration),
+
+                
+                //Healers
+                Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
+                
+                //Melee DPS
                 Jobs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
+                
+                //Ranged DPS
                 Jobs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.DNC => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
+                
+                //Caster DPS
                 Jobs.RDM => new RedMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SMN => new SummonerHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.MCH => new MachinistHudWindow(_pluginInterface, _pluginConfiguration),
+                
+                //Low jobs
+                Jobs.MRD => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.GLD => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.CNJ => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.PGL => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.LNC => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.ROG => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.ARC => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.THM => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.ACN => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                
+                //Hand
+                Jobs.CRP => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.BSM => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.ARM => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.GSM => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.LTW => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.WVR => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.ALC => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.CUL => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                
+                //Land
+                Jobs.MIN => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.BOT => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.FSH => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                
+                //dont have packs yet
+                Jobs.BLM => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.MCH => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.PLD => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.MNK => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.NIN => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.SCH => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.AST => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.DRG => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.BLU => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 _ => _hudWindow
             };
         }
