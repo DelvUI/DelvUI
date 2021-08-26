@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Linq;
@@ -66,9 +67,12 @@ namespace DelvUIPlugin.Interface {
             _barsize = new Vector2(HealthBarWidth, HealthBarHeight);
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentHp / actor.MaxHp;
+            
+            if(actor.ClassJob.Id == 19 || actor.ClassJob.Id == 32 || actor.ClassJob.Id == 21 || actor.ClassJob.Id == 37)
+                DrawTankStanceIndicator();
 
+           
             var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset, CenterY + YOffset);
-
             DrawOutlinedText($"{actor.Name.Abbreviate().Truncate(16)}", new Vector2(cursorPos.X + 5, cursorPos.Y -22));
             
             var hp = $"{actor.MaxHp.KiloFormat(),6} | ";
@@ -358,6 +362,25 @@ namespace DelvUIPlugin.Interface {
             if (PluginConfiguration.ShowActionName) DrawOutlinedText(castText, 
                 new Vector2(cursorPos.X + (PluginConfiguration.ShowActionIcon && iconTexFile.FilePath.Path != emptyIconPath ? CastBarHeight : 0) + 5, 
                 cursorPos.Y + CastBarHeight / 2f - castTextSize.Y / 2f));
+        }
+
+        protected virtual void DrawTankStanceIndicator()
+        {
+            var tankStanceBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 743 || o.EffectId == 189 || o.EffectId == 392 || o.EffectId == 91);
+
+            if (tankStanceBuff.Count() != 1) return;
+            var barSize = new Vector2(HealthBarHeight>HealthBarWidth?HealthBarWidth:HealthBarHeight, HealthBarHeight);
+            var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset - 5, CenterY + YOffset + 5);
+            ImGui.SetCursorPos(cursorPos);  
+            var drawList = ImGui.GetWindowDrawList();
+            
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0xFFE6CD00);
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + barSize, 
+                0xFFE6CD00, 0xFFE6CD00, 0xFFE6CD00, 0xFFE6CD00
+            );
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFFE6CD00);
+
         }
 
         protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor) {
