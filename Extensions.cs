@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Numerics;
 using System.Text;
 using FFXIVClientStructs.FFXIV.Client.System.String;
