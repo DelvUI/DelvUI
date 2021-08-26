@@ -28,7 +28,12 @@ namespace DelvUIPlugin.Interface {
             }
 
             var changed = false;
-            
+
+            int ViewportWidth = (int) ImGui.GetMainViewport().Size.X;
+            int ViewportHeight = (int) ImGui.GetMainViewport().Size.Y;
+            int XOffsetLimit = ViewportWidth / 2;
+            int YOffsetLimit = ViewportHeight / 2;
+
             if (ImGui.BeginTabBar("##settings-tabs")) {
                 if (ImGui.BeginTabItem("General"))
                 {
@@ -72,7 +77,7 @@ namespace DelvUIPlugin.Interface {
                     {
                         _pluginConfiguration.ToTBarWidth = totBarWidth;
                         _pluginConfiguration.Save();
-                    }                    
+                    }
                     var focusBarHeight = _pluginConfiguration.FocusBarHeight;
                     if (ImGui.DragInt("Focus Height", ref focusBarHeight, .1f, 1, 1000))
                     {
@@ -94,6 +99,8 @@ namespace DelvUIPlugin.Interface {
                 }
                 if (ImGui.BeginTabItem("Castbar"))
                 {
+                    changed |= ImGui.Checkbox("Show Cast Bar", ref _pluginConfiguration.ShowCastBar);
+
                     var castBarHeight = _pluginConfiguration.CastBarHeight;
                     if (ImGui.DragInt("Castbar Height", ref castBarHeight, .1f, 1, 1000))
                     {
@@ -107,22 +114,37 @@ namespace DelvUIPlugin.Interface {
                         _pluginConfiguration.CastBarWidth = castBarWidth;
                         _pluginConfiguration.Save();
                     }
-                    changed |= ImGui.ColorEdit4("Cast Bar Color", ref _pluginConfiguration.CastBarColor);
-                    
+
+                    var castBarXOffset = _pluginConfiguration.CastBarXOffset;
+                    if (ImGui.DragInt("Castbar X Offset", ref castBarXOffset, .1f, -XOffsetLimit, XOffsetLimit))
+                    {
+                        _pluginConfiguration.CastBarXOffset = castBarXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var castBarYOffset = _pluginConfiguration.CastBarYOffset;
+                    if (ImGui.DragInt("Castbar Y Offset", ref castBarYOffset, .1f, -YOffsetLimit, YOffsetLimit))
+                    {
+                        _pluginConfiguration.CastBarYOffset = castBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Castbar Color", ref _pluginConfiguration.CastBarColor);
+
                     changed |= ImGui.Checkbox("Show Action Icon", ref _pluginConfiguration.ShowActionIcon);
                     changed |= ImGui.Checkbox("Show Action Name", ref _pluginConfiguration.ShowActionName);
                     changed |= ImGui.Checkbox("Show Cast Time", ref _pluginConfiguration.ShowCastTime);
                     changed |= ImGui.Checkbox("Slide Cast Enabled", ref _pluginConfiguration.SlideCast);
-                    
+
                     var slideCastTime = _pluginConfiguration.SlideCastTime;
                     if (ImGui.DragFloat("Slide Cast Offset", ref slideCastTime, 1, 1, 1000))
                     {
                         _pluginConfiguration.SlideCastTime = slideCastTime;
                         _pluginConfiguration.Save();
                     }
-                    
+
                     changed |= ImGui.ColorEdit4("Slide Cast Color", ref _pluginConfiguration.SlideCastColor);
-                    
+
                     ImGui.EndTabItem();
                 }
                 if (ImGui.BeginTabItem("Color Map")) {
