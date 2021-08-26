@@ -46,6 +46,8 @@ namespace DelvUIPlugin.Interface {
         protected int FocusBarWidth => PluginConfiguration.FocusBarWidth;
         protected int CastBarWidth => PluginConfiguration.CastBarWidth;
         protected int CastBarHeight => PluginConfiguration.CastBarHeight;
+        protected int CastBarXOffset => PluginConfiguration.CastBarXOffset;
+        protected int CastBarYOffset => PluginConfiguration.CastBarYOffset;
         protected Vector2 BarSize => _barsize;
 
         private Lumina.Excel.GeneratedSheets.Action LastUsedAction;
@@ -239,7 +241,9 @@ namespace DelvUIPlugin.Interface {
 
         protected virtual unsafe void DrawCastBar()
         {
-            
+            if (! PluginConfiguration.ShowCastBar)
+              return;
+
             var actor = PluginInterface.ClientState.LocalPlayer;
             var castBar = (AddonCastBar*) PluginInterface.Framework.Gui.GetUiObjectByName("_CastBar", 1);
             var isCasting = StatusFlags.IsCasting;
@@ -291,7 +295,10 @@ namespace DelvUIPlugin.Interface {
                 .ToString(CultureInfo.InvariantCulture);
 
             var barSize = new Vector2(CastBarWidth, CastBarHeight);
-            var cursorPos = new Vector2(CenterX - CastBarWidth / 2f, CenterY + YOffset - 100);
+            var cursorPos = new Vector2(
+                CenterX + PluginConfiguration.CastBarXOffset - CastBarWidth / 2f,
+                CenterY + PluginConfiguration.CastBarYOffset
+            );
 
             ImGui.SetCursorPos(cursorPos);
 
