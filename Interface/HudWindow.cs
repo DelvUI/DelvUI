@@ -365,20 +365,46 @@ namespace DelvUIPlugin.Interface {
 
         protected virtual void DrawTankStanceIndicator()
         {
-            var tankStanceBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 743 || o.EffectId == 189 || o.EffectId == 392 || o.EffectId == 91);
-
-            if (tankStanceBuff.Count() != 1) return;
-            var barSize = new Vector2(HealthBarHeight>HealthBarWidth?HealthBarWidth:HealthBarHeight, HealthBarHeight);
-            var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset - 5, CenterY + YOffset + 5);
-            ImGui.SetCursorPos(cursorPos);  
-            var drawList = ImGui.GetWindowDrawList();
-            
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0xFFE6CD00);
-            drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + barSize, 
-                0xFFE6CD00, 0xFFE6CD00, 0xFFE6CD00, 0xFFE6CD00
+            var tankStanceBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => 
+                o.EffectId == 79 || //IRON WILL
+                o.EffectId == 91 || //DEFIANCE
+                o.EffectId == 392 || // ROYAL GUARD
+                o.EffectId == 393 || //IRON WILL
+                o.EffectId == 743 || //GRIT
+                o.EffectId == 1396 || //DEFIANCE
+                o.EffectId == 1397 || //GRIT
+                o.EffectId == 1833 //ROYAL GUARD
             );
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+
+            if (tankStanceBuff.Count() != 1)
+            {
+                var barSize = new Vector2(HealthBarHeight>HealthBarWidth?HealthBarWidth:HealthBarHeight, HealthBarHeight);
+                var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset - 5, CenterY + YOffset + 5);
+                ImGui.SetCursorPos(cursorPos);  
+                var drawList = ImGui.GetWindowDrawList();
+            
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + barSize, 
+                    0xFF2000FC, 0xFF2000FC, 0xFF2000FC, 0xFF2000FC
+                );
+                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            }
+            else
+            {
+                var barSize = new Vector2(HealthBarHeight>HealthBarWidth?HealthBarWidth:HealthBarHeight, HealthBarHeight);
+                var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset - 5, CenterY + YOffset + 5);
+                ImGui.SetCursorPos(cursorPos);  
+                var drawList = ImGui.GetWindowDrawList();
+            
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + barSize, 
+                    0xFFE6CD00, 0xFFE6CD00, 0xFFE6CD00, 0xFFE6CD00
+                );
+                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            }
+
 
         }
 
