@@ -3,7 +3,6 @@ using System.Globalization;
 using System.Numerics;
 using System.Text;
 using FFXIVClientStructs.FFXIV.Client.System.String;
-using System.Globalization;
 
 namespace DelvUIPlugin {
     public static class Extensions {
