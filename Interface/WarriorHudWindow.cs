@@ -45,7 +45,7 @@ namespace DelvUIPlugin.Interface
 
             var barWidth = StormsEyeWidth;
             var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset;
+            var yPos = CenterY + YOffset + initialHeight;
             var cursorPos = new Vector2(xPos, yPos);
             var barSize = new Vector2(barWidth, StormsEyeHeight);
             
@@ -75,7 +75,7 @@ namespace DelvUIPlugin.Interface
             var textSize = ImGui.CalcTextSize(durationText);
             DrawOutlinedText(durationText, new Vector2(cursorPos.X + StormsEyeWidth / 2f - textSize.X / 2f, cursorPos.Y-2));
 
-            return StormsEyeHeight;
+            return StormsEyeHeight + initialHeight;
         }
 
         private int DrawBeastGauge(int initialHeight) {

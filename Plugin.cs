@@ -103,6 +103,7 @@ namespace DelvUIPlugin {
                 //Ranged DPS
                 Jobs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.DNC => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.MCH => new MachinistHudWindow(_pluginInterface, _pluginConfiguration),
                 
                 //Caster DPS
                 Jobs.RDM => new RedMageHudWindow(_pluginInterface, _pluginConfiguration),
@@ -136,7 +137,6 @@ namespace DelvUIPlugin {
                 
                 //dont have packs yet
                 Jobs.BLM => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.MCH => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.PLD => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.MNK => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.NIN => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),

@@ -78,6 +78,37 @@ namespace DelvUIPlugin {
         public Vector4 WAREmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 1f);
         
         #endregion
+
+        #region MCH Configuration
+
+        public int MCHOverheatHeight { get; set; } = 20;
+        public int MCHOverheatWidth { get; set; } = 254;
+        public int MCHBaseXOffset { get; set; } = 127;
+        public int MCHBaseYOffset { get; set; } = 433;
+        public int MCHHeatGaugeHeight { get; set; } = 20;
+        public int MCHHeatGaugeWidth { get; set; } = 254;
+        public int MCHHeatGaugePadding { get; set; } = 2;
+        public int MCHHeatGaugeXOffset { get; set; }
+        public int MCHHeatGaugeYOffset { get; set; }
+        public int MCHBatteryGaugeHeight { get; set; } = 20;
+        public int MCHBatteryGaugeWidth { get; set; } = 254;
+        public int MCHBatteryGaugePadding { get; set; } = 2;
+        public int MCHBatteryGaugeXOffset { get; set; }
+        public int MCHBatteryGaugeYOffset { get; set; }
+        public bool MCHWildfireEnabled { get; set; } = false;
+        public int MCHWildfireHeight { get; set; } = 20;
+        public int MCHWildfireWidth { get; set; } = 254;
+        public int MCHWildfireXOffset { get; set; }
+        public int MCHWildfireYOffset { get; set; }
+        public int MCHInterBarOffset { get; set; } = 2;
+        public Vector4 MCHHeatColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 1f);
+        public Vector4 MCHBatteryColor = new Vector4(106f/255f, 1f, 1f, 1f);
+        public Vector4 MCHRobotColor = new Vector4(153f/255f, 0f, 1f, 1f);
+        public Vector4 MCHOverheatColor = new Vector4(1f, 239f/255f, 14f/255f, 1f);
+        public Vector4 MCHWildfireColor = new Vector4(1f, 0f, 0f, 1f);
+        public Vector4 MCHEmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 1f);
+
+        #endregion
         
         [JsonIgnore] private DalamudPluginInterface _pluginInterface;
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
@@ -241,6 +272,54 @@ namespace DelvUIPlugin {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorMCH.AdjustColor(.1f))
                 },
                 
+                [Jobs.MCH * 1000] = new Dictionary<string, uint> // Heat gauge ready
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.MCH * 1000 + 1] = new Dictionary<string, uint> // Battery gauge ready
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.MCH * 1000 + 2] = new Dictionary<string, uint> // Robot summoned
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.MCH * 1000 + 3] = new Dictionary<string, uint> // Overheated
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.MCH * 1000 + 4] = new Dictionary<string, uint> // Bar not ready
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHEmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHEmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHEmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHEmptyColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.MCH * 1000 + 5] = new Dictionary<string, uint> // Wildfire Active
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHWildfireColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHWildfireColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHWildfireColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHWildfireColor.AdjustColor(.1f))
+                },
+
                 [Jobs.DNC] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC),

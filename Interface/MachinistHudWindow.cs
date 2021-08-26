@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Actors.Types;
@@ -12,40 +13,57 @@ namespace DelvUIPlugin.Interface
     {
         public override uint JobId => 31;
 
-        private new int BarHeight => 20;
-        private new int BarWidth => 254;
-        private new int XOffset => 127;
-        private new int YOffset => 466;
-        private new int InterBarOffset => 2;
-        private new int JobInfoOffset => -33;
+        protected int OverheatHeight => PluginConfiguration.MCHOverheatHeight;
+        protected int OverheatWidth => PluginConfiguration.MCHOverheatWidth;
+        protected new int XOffset => PluginConfiguration.MCHBaseXOffset;
+        protected new int YOffset => PluginConfiguration.MCHBaseYOffset;
+        protected int HeatGaugeHeight => PluginConfiguration.MCHHeatGaugeHeight;
+        protected int HeatGaugeWidth => PluginConfiguration.MCHHeatGaugeWidth;
+        protected int HeatGaugePadding => PluginConfiguration.MCHHeatGaugePadding;
+        protected int HeatGaugeXOffset => PluginConfiguration.MCHHeatGaugeXOffset;
+        protected int HeatGaugeYOffset => PluginConfiguration.MCHHeatGaugeYOffset;
+        protected int BatteryGaugeHeight => PluginConfiguration.MCHBatteryGaugeHeight;
+        protected int BatteryGaugeWidth => PluginConfiguration.MCHBatteryGaugeWidth;
+        protected int BatteryGaugePadding => PluginConfiguration.MCHBatteryGaugePadding;
+        protected int BatteryGaugeXOffset => PluginConfiguration.MCHBatteryGaugeXOffset;
+        protected int BatteryGaugeYOffset => PluginConfiguration.MCHBatteryGaugeYOffset;
+        protected bool WildfireEnabled => PluginConfiguration.MCHWildfireEnabled;
+        protected int WildfireHeight => PluginConfiguration.MCHWildfireHeight;
+        protected int WildfireWidth => PluginConfiguration.MCHWildfireWidth;
+        protected int WildfireXOffset => PluginConfiguration.MCHWildfireXOffset;
+        protected int WildfireYOffset => PluginConfiguration.MCHWildfireYOffset;
+        protected Dictionary<string, uint> HeatColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000];
+        protected Dictionary<string, uint> BatteryColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 1];
+        protected Dictionary<string, uint> RobotColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 2];
+        protected Dictionary<string, uint> OverheatColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 3];
+        protected Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 4];
+        protected Dictionary<string, uint> WildfireColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 5];
+        private int InterBarOffset => PluginConfiguration.MCHInterBarOffset;
         // TODO: Rook auto-turret differences?
-        private new int[] RobotDuration = {12450, 13950, 15450, 16950, 18450, 19950};
+        private int[] RobotDuration = {12450, 13950, 15450, 16950, 18450, 19950};
         
         public MachinistHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _) {
             DrawHealthBar();
-            DrawOverheatBar(0);
-            DrawHeatGauge(1);
-            DrawBatteryGauge(2);
-            // DrawWildfireBar(0);
+            var nextHeight = DrawOverheatBar(0);
+            nextHeight = DrawHeatGauge(nextHeight);
+            nextHeight = DrawBatteryGauge(nextHeight);
+            if (WildfireEnabled)
+                nextHeight = DrawWildfireBar(nextHeight);
             DrawTargetBar();
         }
 
-        private void DrawHeatGauge(short order)
+        private int DrawHeatGauge(int initialHeight)
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
             
-            var heatColor = 0xFF0D0DC9;
-            var emptyColor = 0xFF8E8D8F;
-            
-            const int xPadding = 2;
-            var barWidth = (BarWidth - xPadding) / 2;
-            var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset + BarHeight * order + InterBarOffset * order + JobInfoOffset;
-            var cursorPos = new Vector2(xPos + barWidth + xPadding, yPos);
+            var barWidth = (HeatGaugeWidth - HeatGaugePadding) / 2;
+            var xPos = CenterX - XOffset + HeatGaugeXOffset;
+            var yPos = CenterY + YOffset + initialHeight + HeatGaugeYOffset;
+            var cursorPos = new Vector2(xPos + barWidth + HeatGaugePadding, yPos);
             const int chunkSize = 50;
-            var barSize = new Vector2(barWidth, BarHeight);
+            var barSize = new Vector2(barWidth, HeatGaugeHeight);
             
             var drawList = ImGui.GetWindowDrawList();
             
@@ -59,15 +77,15 @@ namespace DelvUIPlugin.Interface
                 if (scale >= 1.0f)
                 {
                     drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight),
-                        heatColor, heatColor, heatColor, heatColor
+                        cursorPos, cursorPos + new Vector2(barWidth * scale, HeatGaugeHeight),
+                        HeatColor["gradientLeft"], HeatColor["gradientRight"], HeatColor["gradientRight"], HeatColor["gradientLeft"]
                     );
                 }
                 else 
                 {
                     drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + new Vector2(barWidth * scale, BarHeight), 
-                        emptyColor, emptyColor, emptyColor, emptyColor
+                        cursorPos, cursorPos + new Vector2(barWidth * scale, HeatGaugeHeight), 
+                        EmptyColor["gradientLeft"], EmptyColor["gradientRight"], EmptyColor["gradientRight"], EmptyColor["gradientLeft"]
                     );
                 }
         
@@ -75,31 +93,28 @@ namespace DelvUIPlugin.Interface
 
                 var heatText = heat.ToString();
                 var textSize = ImGui.CalcTextSize(heatText);
-                DrawOutlinedText(heatText, new Vector2(cursorPos.X + BarWidth / 4f - textSize.X / 4f, cursorPos.Y-2));
+                DrawOutlinedText(heatText, new Vector2(cursorPos.X + HeatGaugeWidth / 4f - textSize.X / 4f, cursorPos.Y-2));
 
-                cursorPos = new Vector2(cursorPos.X - barWidth - xPadding, cursorPos.Y);
+                cursorPos = new Vector2(cursorPos.X - barWidth - HeatGaugePadding, cursorPos.Y);
             }
+
+            return HeatGaugeHeight + initialHeight + InterBarOffset;
         }
 
-        private void DrawBatteryGauge(short order)
+        private int DrawBatteryGauge(int initialHeight)
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
             var robotTimeLeft = gauge.RobotTimeRemaining;
-            var robotPercentLeft = (float) robotTimeLeft / RobotDuration[gauge.LastRobotBatteryPower / 10 - 5];
+            var robotPercentLeft = gauge.LastRobotBatteryPower != 0 ? (float) robotTimeLeft / RobotDuration[gauge.LastRobotBatteryPower / 10 - 5] : 0f;
             
-            var batteryColor = 0xFFFFFF6A;
-            var robotColor = 0xFFFF0099;
-            var emptyColor = 0xFF8E8D8F;
-            
-            const int xPadding = 2;
-            var barWidth = (BarWidth - xPadding * 9f) / 10;
-            var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset + BarHeight * order + InterBarOffset * order + JobInfoOffset;
-            var cursorPos = new Vector2(xPos + barWidth * 9 + xPadding * 9, yPos);
+            var barWidth = (BatteryGaugeWidth - BatteryGaugePadding * 9f) / 10;
+            var xPos = CenterX - XOffset + BatteryGaugeXOffset;
+            var yPos = CenterY + YOffset + initialHeight + BatteryGaugeYOffset;
+            var cursorPos = new Vector2(xPos + barWidth * 9 + BatteryGaugePadding * 9, yPos);
             const int chunkSizeEnd = 10;
             const int chunkSizeStart = 50;
-            var barSize = new Vector2(barWidth, BarHeight);
-            var batteryGaugeHeight = gauge.IsRobotActive() ? BarHeight / 2 : BarHeight;
+            var barSize = new Vector2(barWidth, BatteryGaugeHeight);
+            var batteryGaugeHeight = gauge.IsRobotActive() ? BatteryGaugeHeight / 2 : BatteryGaugeHeight;
             
             var drawList = ImGui.GetWindowDrawList();
 
@@ -117,14 +132,14 @@ namespace DelvUIPlugin.Interface
                 {
                     drawList.AddRectFilledMultiColor(
                         cursorPos, cursorPos + new Vector2(barWidth * scale, batteryGaugeHeight),
-                        batteryColor, batteryColor, batteryColor, batteryColor
+                        BatteryColor["gradientLeft"], BatteryColor["gradientRight"], BatteryColor["gradientRight"], BatteryColor["gradientLeft"]
                     );
                 }
                 else 
                 {
                     drawList.AddRectFilledMultiColor(
                         cursorPos, cursorPos + new Vector2(barWidth * scale, batteryGaugeHeight), 
-                        emptyColor, emptyColor, emptyColor, emptyColor
+                        EmptyColor["gradientLeft"], EmptyColor["gradientRight"], EmptyColor["gradientRight"], EmptyColor["gradientLeft"]
                     );
                 }
 
@@ -133,20 +148,20 @@ namespace DelvUIPlugin.Interface
                     var robotScale = Math.Min(Math.Max((robotPercentLeft - (i - 1) / 10f) * 10f, 0), 1);
                     drawList.AddRectFilledMultiColor(
                         cursorPos + new Vector2(0, batteryGaugeHeight), cursorPos + new Vector2(barWidth * robotScale, batteryGaugeHeight * 2), 
-                        robotColor, robotColor, robotColor, robotColor
+                        RobotColor["gradientLeft"], RobotColor["gradientRight"], RobotColor["gradientRight"], RobotColor["gradientLeft"]
                     );
                 }
             
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-                cursorPos = new Vector2(cursorPos.X - barWidth - xPadding, cursorPos.Y);
+                cursorPos = new Vector2(cursorPos.X - barWidth - BatteryGaugePadding, cursorPos.Y);
             }
 
             battery = Math.Min((int)gauge.Battery, chunkSizeStart);
             scale = (float) battery / chunkSizeStart;
             cursorPos = new Vector2(xPos, yPos);
-            barWidth = (BarWidth - xPadding) / 2;
-            barSize = new Vector2(barWidth, BarHeight);
+            barWidth = (BatteryGaugeWidth - BatteryGaugePadding) / 2;
+            barSize = new Vector2(barWidth, BatteryGaugeHeight);
             
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
 
@@ -154,14 +169,14 @@ namespace DelvUIPlugin.Interface
             {
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(barWidth * scale, batteryGaugeHeight), 
-                    batteryColor, batteryColor, batteryColor, batteryColor
+                    BatteryColor["gradientLeft"], BatteryColor["gradientRight"], BatteryColor["gradientRight"], BatteryColor["gradientLeft"]
                 );
             }
             else 
             {
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(barWidth * scale, batteryGaugeHeight), 
-                    emptyColor, emptyColor, emptyColor, emptyColor
+                    EmptyColor["gradientLeft"], EmptyColor["gradientRight"], EmptyColor["gradientRight"], EmptyColor["gradientLeft"]
                 );
             }
             
@@ -170,7 +185,7 @@ namespace DelvUIPlugin.Interface
                 var robotScale = Math.Max(Math.Min(robotPercentLeft, chunkSizeStart / 100f), 0);
                 drawList.AddRectFilledMultiColor(
                     cursorPos + new Vector2(0, batteryGaugeHeight), cursorPos + new Vector2(barWidth * robotScale * 2, batteryGaugeHeight * 2), 
-                    robotColor, robotColor, robotColor, robotColor
+                    RobotColor["gradientLeft"], RobotColor["gradientRight"], RobotColor["gradientRight"], RobotColor["gradientLeft"]
                 );
                 
                 var durationText = Math.Round(gauge.RobotTimeRemaining / 1000f).ToString();
@@ -178,20 +193,20 @@ namespace DelvUIPlugin.Interface
             }
             
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+
+            return BatteryGaugeHeight + initialHeight + InterBarOffset;
         }
 
-        private void DrawOverheatBar(short order)
+        private int DrawOverheatBar(int initialHeight)
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
             var displayOverheat = gauge.IsOverheated();
             
-            var overheatColor = 0xFF0EEFFF;
-            
-            var barWidth = BarWidth;
+            var barWidth = OverheatWidth;
             var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset + BarHeight * order + InterBarOffset * order + JobInfoOffset;
+            var yPos = CenterY + YOffset + initialHeight;
             var cursorPos = new Vector2(xPos, yPos);
-            var barSize = new Vector2(barWidth, BarHeight);
+            var barSize = new Vector2(barWidth, OverheatHeight);
             
             var drawList = ImGui.GetWindowDrawList();
             
@@ -202,49 +217,50 @@ namespace DelvUIPlugin.Interface
                 var duration = barWidth / 8000f * gauge.OverheatTimeRemaining;
                 
                 drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(duration, BarHeight),
-                    overheatColor, overheatColor, overheatColor, overheatColor
+                    cursorPos, cursorPos + new Vector2(duration, OverheatHeight),
+                    OverheatColor["gradientLeft"], OverheatColor["gradientRight"], OverheatColor["gradientRight"], OverheatColor["gradientLeft"]
                 );
                 
                 var durationText = Math.Round(gauge.OverheatTimeRemaining / 1000f).ToString();
                 var textSize = ImGui.CalcTextSize(durationText);
-                DrawOutlinedText(durationText, new Vector2(cursorPos.X + BarWidth / 2f - textSize.X / 2f, cursorPos.Y-2));
+                DrawOutlinedText(durationText, new Vector2(cursorPos.X + OverheatWidth / 2f - textSize.X / 2f, cursorPos.Y-2));
             }
             
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+
+            return OverheatHeight + initialHeight + InterBarOffset;
         }
 
-        // TODO: Implement as optional
-        // private void DrawWildfireBar(short order)
-        // {
-        //     var wildfireBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1946);
-        //     
-        //     var wildfireColor = 0xFF0000FF;
-        //
-        //     var barWidth = BarWidth;
-        //     var xPos = CenterX - XOffset;
-        //     var yPos = CenterY + YOffset + BarHeight * order + InterBarOffset * order + JobInfoOffset;
-        //     var cursorPos = new Vector2(xPos, yPos);
-        //     var barSize = new Vector2(barWidth, BarHeight);
-        //
-        //     var drawList = ImGui.GetWindowDrawList();
-        //
-        //     float duration = 0;
-        //     drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-        //     if (wildfireBuff.Any())
-        //     {
-        //         duration = Math.Abs(wildfireBuff.First().Duration);
-        //         drawList.AddRectFilledMultiColor(
-        //             cursorPos, cursorPos + new Vector2(barSize.X / 10 * duration, barSize.Y),
-        //             wildfireColor, wildfireColor, wildfireColor, wildfireColor
-        //         );
-        //     }
-        //     
-        //     drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-        //     
-        //     var durationText = duration != 0 ? Math.Round(duration).ToString() : "";
-        //     var textSize = ImGui.CalcTextSize(durationText);
-        //     DrawOutlinedText(durationText, new Vector2(cursorPos.X + BarWidth / 2f - textSize.X / 2f, cursorPos.Y-2));
-        // }
+        private int DrawWildfireBar(int initialHeight)
+        {
+            var wildfireBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1946);
+        
+            var barWidth = WildfireWidth;
+            var xPos = CenterX - XOffset + WildfireXOffset;
+            var yPos = CenterY + YOffset + initialHeight + WildfireYOffset;
+            var cursorPos = new Vector2(xPos, yPos);
+            var barSize = new Vector2(barWidth, WildfireHeight);
+        
+            var drawList = ImGui.GetWindowDrawList();
+        
+            float duration = 0;
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            if (wildfireBuff.Any())
+            {
+                duration = Math.Abs(wildfireBuff.First().Duration);
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barSize.X / 10 * duration, barSize.Y),
+                    WildfireColor["gradientLeft"], WildfireColor["gradientRight"], WildfireColor["gradientRight"], WildfireColor["gradientLeft"]
+                );
+            }
+            
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            
+            var durationText = duration != 0 ? Math.Round(duration).ToString() : "";
+            var textSize = ImGui.CalcTextSize(durationText);
+            DrawOutlinedText(durationText, new Vector2(cursorPos.X + WildfireWidth / 2f - textSize.X / 2f, cursorPos.Y-2));
+
+            return WildfireHeight + initialHeight + InterBarOffset;
+        }
     }
 }
