@@ -21,8 +21,11 @@ namespace DelvUIPlugin {
         public int FocusBarWidth { get; set; } = 120;
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
+        public int CastBarXOffset { get; set; } = 0;
+        public int CastBarYOffset { get; set; } = 460;
         
 
+        public bool ShowCastBar = true;
         public bool ShowActionIcon = true;
         public bool ShowActionName = true;
         public bool ShowCastTime = true;
@@ -58,6 +61,26 @@ namespace DelvUIPlugin {
         public Vector4 NPCColorHostile = new Vector4(205f/255f, 25f/255f, 25f/255f, 1f);
         public Vector4 NPCColorNeutral = new Vector4(214f/255f, 145f/255f, 64f/255f, 1f);
         public Vector4 NPCColorFriendly = new Vector4(0f/255f, 145f/255f, 6f/255f, 1f);
+
+        #region WAR Configuration
+        
+        public int WARStormsEyeHeight { get; set; } = 20;
+        public int WARStormsEyeWidth { get; set; } = 254;
+        public int WARBaseXOffset { get; set; } = 127;
+        public int WARBaseYOffset { get; set; } = 433;
+        public int WARBeastGaugeHeight { get; set; } = 20;
+        public int WARBeastGaugeWidth { get; set; } = 254;
+        public int WARBeastGaugePadding { get; set; } = 2;
+        public int WARBeastGaugeXOffset { get; set; }
+        public int WARBeastGaugeYOffset { get; set; }
+        public int WARInterBarOffset { get; set; } = 2;
+        public Vector4 WARInnerReleaseColor = new Vector4(1f, 0f, 0f, 1f);
+        public Vector4 WARStormsEyeColor = new Vector4(1f, 136f/255f, 146f/255f, 1f);
+        public Vector4 WARFellCleaveColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 1f);
+        public Vector4 WARNascentChaosColor = new Vector4(240f/255f, 176f/255f, 0f, 1f);
+        public Vector4 WAREmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 1f);
+        
+        #endregion
         
         [JsonIgnore] private DalamudPluginInterface _pluginInterface;
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
@@ -93,6 +116,46 @@ namespace DelvUIPlugin {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(.1f))
                 },
                 
+                [Jobs.WAR * 1000] = new Dictionary<string, uint> // Inner Release
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(WARInnerReleaseColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(WARInnerReleaseColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WARInnerReleaseColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WARInnerReleaseColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.WAR * 1000 + 1] = new Dictionary<string, uint> // Storm's Eye
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(WARStormsEyeColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(WARStormsEyeColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WARStormsEyeColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WARStormsEyeColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.WAR * 1000 + 2] = new Dictionary<string, uint> // Fell Cleave
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(WARFellCleaveColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(WARFellCleaveColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WARFellCleaveColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WARFellCleaveColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.WAR * 1000 + 3] = new Dictionary<string, uint> // Nascent Chaos
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(WARNascentChaosColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(WARNascentChaosColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WARNascentChaosColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WARNascentChaosColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.WAR * 1000 + 4] = new Dictionary<string, uint> // WAR Empty
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(WAREmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(WAREmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WAREmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WAREmptyColor.AdjustColor(.1f))
+                },
+
                 [Jobs.DRK] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK),
