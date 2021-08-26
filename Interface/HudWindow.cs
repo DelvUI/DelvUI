@@ -264,6 +264,8 @@ namespace DelvUIPlugin.Interface {
                 
                 switch (currentCastType)
                 {
+                    case 0:
+                        return;
                     case 1:
                     {
                         var currentAction = PluginInterface.Data.GetExcelSheet<Lumina.Excel.GeneratedSheets.Action>()
