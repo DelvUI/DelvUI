@@ -148,4 +148,4 @@ namespace DelvUIPlugin.Interface {
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
     }
-}-
+}
