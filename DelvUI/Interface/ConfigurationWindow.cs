@@ -719,38 +719,38 @@ namespace DelvUI.Interface {
                         _pluginConfiguration.Save();
                     }
 
-                    var drkDarkArtsBarHeight = _pluginConfiguration.DRKDarkArtsBarHeight;
-                    if (ImGui.DragInt("Dark Arts Bar Height", ref drkDarkArtsBarHeight, .1f, 1, 1000))
+                    var drkBuffBarHeight = _pluginConfiguration.DRKBuffBarHeight;
+                    if (ImGui.DragInt("Buff Bar Height", ref drkBuffBarHeight, .1f, 1, 1000))
                     {
-                        _pluginConfiguration.DRKDarkArtsBarHeight = drkDarkArtsBarHeight;
+                        _pluginConfiguration.DRKBuffBarHeight = drkBuffBarHeight;
                         _pluginConfiguration.Save();
                     }
 
-                    var drkDarkArtsBarWidth = _pluginConfiguration.DRKDarkArtsBarWidth;
-                    if (ImGui.DragInt("Dark Arts Bar Width", ref drkDarkArtsBarWidth, .1f, 1, 1000))
+                    var drkBuffBarWidth = _pluginConfiguration.DRKBuffBarWidth;
+                    if (ImGui.DragInt("Buff Bar Width", ref drkBuffBarWidth, .1f, 1, 1000))
                     {
-                        _pluginConfiguration.DRKDarkArtsBarWidth = drkDarkArtsBarWidth;
+                        _pluginConfiguration.DRKBuffBarWidth = drkBuffBarWidth;
                         _pluginConfiguration.Save();
                     }
 
-                    var drkDarkArtsBarPadding = _pluginConfiguration.DRKDarkArtsBarPadding;
-                    if (ImGui.DragInt("Dark Arts Bar Padding", ref drkDarkArtsBarPadding, .1f, 1, 1000))
+                    var drkBuffBarPadding = _pluginConfiguration.DRKBuffBarPadding;
+                    if (ImGui.DragInt("Buff Bar Padding", ref drkBuffBarPadding, .1f, 1, 1000))
                     {
-                        _pluginConfiguration.DRKDarkArtsBarPadding = drkDarkArtsBarPadding;
+                        _pluginConfiguration.DRKBuffBarPadding = drkBuffBarPadding;
                         _pluginConfiguration.Save();
                     }
 
-                    var drkDarkArtsBarXOffset = _pluginConfiguration.DRKDarkArtsBarXOffset;
-                    if (ImGui.DragInt("Dark Arts Bar X Offset", ref drkDarkArtsBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                    var drkBuffBarXOffset = _pluginConfiguration.DRKBuffBarXOffset;
+                    if (ImGui.DragInt("Buff Bar X Offset", ref drkBuffBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
                     {
-                        _pluginConfiguration.DRKDarkArtsBarXOffset = drkDarkArtsBarXOffset;
+                        _pluginConfiguration.DRKBuffBarXOffset = drkBuffBarXOffset;
                         _pluginConfiguration.Save();
                     }
 
-                    var drkDarkArtsBarYOffset = _pluginConfiguration.DRKDarkArtsBarYOffset;
-                    if (ImGui.DragInt("Dark Arts Bar Y Offset", ref drkDarkArtsBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                    var drkBuffBarYOffset = _pluginConfiguration.DRKBuffBarYOffset;
+                    if (ImGui.DragInt("Buff Bar Y Offset", ref drkBuffBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
                     {
-                        _pluginConfiguration.DRKDarkArtsBarYOffset = drkDarkArtsBarYOffset;
+                        _pluginConfiguration.DRKBuffBarYOffset = drkBuffBarYOffset;
                         _pluginConfiguration.Save();
                     }
 
@@ -765,6 +765,8 @@ namespace DelvUI.Interface {
                     changed |= ImGui.ColorEdit4("Blood Color Left", ref _pluginConfiguration.DRKBloodColorLeft);
                     changed |= ImGui.ColorEdit4("Blood Color Right", ref _pluginConfiguration.DRKBloodColorRight);
                     changed |= ImGui.ColorEdit4("Dark Arts Color", ref _pluginConfiguration.DRKDarkArtsColor);
+                    changed |= ImGui.ColorEdit4("Blood Weapon Color", ref _pluginConfiguration.DRKBloodWeaponColor);
+                    changed |= ImGui.ColorEdit4("Delirium Color", ref _pluginConfiguration.DRKDeliriumColor);
                     changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.DRKEmptyColor);
                 }
 

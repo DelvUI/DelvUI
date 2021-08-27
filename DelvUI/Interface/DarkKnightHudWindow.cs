@@ -27,11 +27,11 @@ namespace DelvUI.Interface {
         private int BloodGaugeXOffset => PluginConfiguration.DRKBloodGaugeXOffset;
         private int BloodGaugeYOffset => PluginConfiguration.DRKBloodGaugeYOffset;
 
-        private int DarkArtsBarHeight => PluginConfiguration.DRKDarkArtsBarHeight;
-        private int DarkArtsBarWidth => PluginConfiguration.DRKDarkArtsBarWidth;
-        private int DarkArtsBarPadding => PluginConfiguration.DRKDarkArtsBarPadding;
-        private int DarkArtsBarXOffset => PluginConfiguration.DRKDarkArtsBarXOffset;
-        private int DarkArtsBarYOffset => PluginConfiguration.DRKDarkArtsBarYOffset;
+        private int BuffBarHeight => PluginConfiguration.DRKBuffBarHeight;
+        private int BuffBarWidth => PluginConfiguration.DRKBuffBarWidth;
+        private int BuffBarPadding => PluginConfiguration.DRKBuffBarPadding;
+        private int BuffBarXOffset => PluginConfiguration.DRKBuffBarXOffset;
+        private int BuffBarYOffset => PluginConfiguration.DRKBuffBarYOffset;
 
         private int InterBarOffset => PluginConfiguration.DRKInterBarOffset;
 
@@ -39,7 +39,9 @@ namespace DelvUI.Interface {
         private Dictionary<string, uint> BloodColorLeft => PluginConfiguration.JobColorMap[Jobs.DRK * 1000 + 1];
         private Dictionary<string, uint> BloodColorRight => PluginConfiguration.JobColorMap[Jobs.DRK * 1000 + 2];
         private Dictionary<string, uint> DarkArtsColor => PluginConfiguration.JobColorMap[Jobs.DRK * 1000 + 3];
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.DRK * 1000 + 4];
+        private Dictionary<string, uint> BloodWeaponColor => PluginConfiguration.JobColorMap[Jobs.DRK * 1000 + 4];
+        private Dictionary<string, uint> DeliriumColor => PluginConfiguration.JobColorMap[Jobs.DRK * 1000 + 5];
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.DRK * 1000 + 6];
 
         private static int BarHeight => 13;
         private static int BarWidth => 254;
@@ -47,14 +49,13 @@ namespace DelvUI.Interface {
         public DarkKnightHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _) {
+            // TODO(poly1k):
+            // merge dark arts into mana bar
+
             DrawHealthBar();
             var nextHeight = DrawManaBar(0);
             nextHeight = DrawBloodGauge(nextHeight);
-            // TODO(poly1k):
-            // merge dark arts into mana bar
-            // create combined delerium/blood weapon buff gauge (copy from paladin)
-
-            DrawDarkArtsBar(nextHeight);
+            DrawBuffBar(nextHeight);
             DrawTargetBar();
             DrawFocusBar();
             DrawCastBar();
@@ -64,6 +65,8 @@ namespace DelvUI.Interface {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
 
             //var tbn = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1178);
+            var darkArtsBuff = PluginInterface.ClientState.JobGauges.Get<DRKGauge>().HasDarkArts();
+
             var actor = PluginInterface.ClientState.LocalPlayer;
             var barWidth = (ManaBarWidth - ManaBarPadding)  / 3.0f;
             var barSize = new Vector2(barWidth, ManaBarHeight);
@@ -88,10 +91,19 @@ namespace DelvUI.Interface {
                     cursorPos = new Vector2(cursorPos.X + barWidth + (ManaBarPadding / 2), cursorPos.Y);
 
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(barSize.X * mana / chunkSize, barSize.Y),
-                    ManaColor["gradientLeft"], ManaColor["gradientRight"], ManaColor["gradientRight"], ManaColor["gradientLeft"]
-                );
+                if (darkArtsBuff) {
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(barSize.X * mana / chunkSize, barSize.Y),
+                        DarkArtsColor["gradientLeft"], DarkArtsColor["gradientRight"], DarkArtsColor["gradientRight"], DarkArtsColor["gradientLeft"]
+                    );
+                }
+                else {
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(barSize.X * mana / chunkSize, barSize.Y),
+                        ManaColor["gradientLeft"], ManaColor["gradientRight"], ManaColor["gradientRight"], ManaColor["gradientLeft"]
+                    );
+                }
+
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
                 DrawManaChunks(index + 1);
@@ -134,7 +146,6 @@ namespace DelvUI.Interface {
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-
             // Chunk 2
             blood = Math.Max(Math.Min((int)gauge.Blood, chunkSize * 2) - chunkSize, 0);
             scale = (float) blood / chunkSize;
@@ -160,27 +171,71 @@ namespace DelvUI.Interface {
             return BloodGaugeHeight + initialHeight + InterBarOffset;
         }
 
-        private void DrawDarkArtsBar(int initialHeight) {
-            var darkArtsBuff = PluginInterface.ClientState.JobGauges.Get<DRKGauge>().HasDarkArts();
+        private int DrawBuffBar(int initialHeight)
+        {
+            var bloodWeaponBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 742);
+            var deliriumBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1972);
 
-            var barWidth = DarkArtsBarWidth;
-            var xPos = CenterX - XOffset + DarkArtsBarXOffset;
-            var yPos = CenterY + YOffset + initialHeight + DarkArtsBarYOffset;
+            var buffBarBarWidth = BuffBarWidth;
+            var xPos = CenterX - XOffset + BuffBarXOffset;
+            var yPos = CenterY + YOffset + initialHeight + BuffBarYOffset;
             var cursorPos = new Vector2(xPos, yPos);
-            var barSize = new Vector2(barWidth, DarkArtsBarHeight);
+            var buffBarBarHeight = BuffBarHeight;
+            var barSize = new Vector2(buffBarBarWidth, buffBarBarHeight);
 
             var drawList = ImGui.GetWindowDrawList();
 
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-            if (darkArtsBuff)
+            if (bloodWeaponBuff.Any() && deliriumBuff.Any())
             {
+                var innerBarHeight = buffBarBarHeight / 2;
+                barSize = new Vector2(buffBarBarWidth, innerBarHeight);
+
+                var bloodWeaponDuration = Math.Abs(bloodWeaponBuff.First().Duration);
+                var deliriumDuration = Math.Abs(deliriumBuff.First().Duration);
+
                 drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y),
-                    DarkArtsColor["gradientLeft"], DarkArtsColor["gradientRight"], DarkArtsColor["gradientRight"], DarkArtsColor["gradientLeft"]
+                    cursorPos, cursorPos + new Vector2(barSize.X / 10f * bloodWeaponDuration, barSize.Y),
+                    BloodWeaponColor["gradientLeft"], BloodWeaponColor["gradientRight"], BloodWeaponColor["gradientRight"], BloodWeaponColor["gradientLeft"]
                 );
+                drawList.AddRectFilledMultiColor(
+                    cursorPos + new Vector2(0.0f, innerBarHeight), cursorPos + new Vector2(barSize.X / 10f * deliriumDuration, barSize.Y * 2f),
+                    DeliriumColor["gradientLeft"], DeliriumColor["gradientRight"], DeliriumColor["gradientRight"], DeliriumColor["gradientLeft"]
+                );
+
+                var bloodWeaponDurationText = bloodWeaponDuration == 0 ? "" : Math.Ceiling(bloodWeaponDuration).ToString();
+                DrawOutlinedText(bloodWeaponDurationText, new Vector2(cursorPos.X + 5f, cursorPos.Y - 2f), PluginConfiguration.DRKBloodWeaponColor, new Vector4(0f, 0f, 0f, 1f));
+
+                var deliriumDurationText = deliriumDuration == 0 ? "" : Math.Ceiling(deliriumDuration).ToString();
+                DrawOutlinedText(deliriumDurationText, new Vector2(cursorPos.X + 27f, cursorPos.Y - 2f), PluginConfiguration.DRKDeliriumColor, new Vector4(0f, 0f, 0f, 1f));
+
+                barSize = new Vector2(buffBarBarWidth, buffBarBarHeight);
+            }
+            else if (bloodWeaponBuff.Any())
+            {
+                var bloodWeaponDuration = Math.Abs(bloodWeaponBuff.First().Duration);
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barSize.X / 10f * bloodWeaponDuration, barSize.Y),
+                    BloodWeaponColor["gradientLeft"], BloodWeaponColor["gradientRight"], BloodWeaponColor["gradientRight"], BloodWeaponColor["gradientLeft"]
+                );
+
+                var bloodWeaponDurationText = bloodWeaponDuration == 0 ? "" : Math.Ceiling(bloodWeaponDuration).ToString();
+                DrawOutlinedText(bloodWeaponDurationText, new Vector2(cursorPos.X + 5f, cursorPos.Y - 2f), PluginConfiguration.DRKBloodWeaponColor, new Vector4(0f, 0f, 0f, 1f));
+            }
+            else if (deliriumBuff.Any())
+            {
+                var deliriumDuration = Math.Abs(deliriumBuff.First().Duration);
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barSize.X / 10f * deliriumDuration, barSize.Y),
+                    DeliriumColor["gradientLeft"], DeliriumColor["gradientRight"], DeliriumColor["gradientRight"], DeliriumColor["gradientLeft"]
+                );
+
+                var deliriumDurationText = deliriumDuration == 0 ? "" : Math.Ceiling(deliriumDuration).ToString();
+                DrawOutlinedText(deliriumDurationText, new Vector2(cursorPos.X + 5f, cursorPos.Y - 2f), PluginConfiguration.DRKDeliriumColor, new Vector4(0f, 0f, 0f, 1f));
             }
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            return BuffBarHeight + initialHeight + InterBarOffset;
         }
     }
 }
