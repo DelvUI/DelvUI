@@ -1,51 +1,69 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
 
-namespace DelvUIPlugin.Interface
+namespace DelvUI.Interface
 {
     public class WarriorHudWindow : HudWindow
     {
         public override uint JobId => 21;
 
-        protected int StormsEyeHeight => PluginConfiguration.WARStormsEyeHeight;
-        protected int StormsEyeWidth => PluginConfiguration.WARStormsEyeWidth;
-        protected new int XOffset => PluginConfiguration.WARBaseXOffset;
-        protected new int YOffset => PluginConfiguration.WARBaseYOffset;
-        protected int BeastGaugeHeight => PluginConfiguration.WARBeastGaugeHeight;
-        protected int BeastGaugeWidth => PluginConfiguration.WARBeastGaugeWidth;
-        protected int BeastGaugePadding => PluginConfiguration.WARBeastGaugePadding;
-        protected int BeastGaugeXOffset => PluginConfiguration.WARBeastGaugeXOffset;
-        protected int BeastGaugeYOffset => PluginConfiguration.WARBeastGaugeYOffset;
-        protected int InterBarOffset => PluginConfiguration.WARInterBarOffset;
-        protected Dictionary<string, uint> InnerReleaseColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000];
-        protected Dictionary<string, uint> StormsEyeColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 1];
-        protected Dictionary<string, uint> FellCleaveColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 2];
-        protected Dictionary<string, uint> NascentChaosColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 3];
-        protected Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 4];
+        private int StormsEyeHeight => PluginConfiguration.WARStormsEyeHeight;
+
+        private int StormsEyeWidth => PluginConfiguration.WARStormsEyeWidth;
+
+        private new int XOffset => PluginConfiguration.WARBaseXOffset;
+
+        private new int YOffset => PluginConfiguration.WARBaseYOffset;
+
+        private int BeastGaugeHeight => PluginConfiguration.WARBeastGaugeHeight;
+
+        private int BeastGaugeWidth => PluginConfiguration.WARBeastGaugeWidth;
+
+        private int BeastGaugePadding => PluginConfiguration.WARBeastGaugePadding;
+
+        private int BeastGaugeXOffset => PluginConfiguration.WARBeastGaugeXOffset;
+
+        private int BeastGaugeYOffset => PluginConfiguration.WARBeastGaugeYOffset;
+
+        private int InterBarOffset => PluginConfiguration.WARInterBarOffset;
+
+        private Dictionary<string, uint> InnerReleaseColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000];
+
+        private Dictionary<string, uint> StormsEyeColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 1];
+
+        private Dictionary<string, uint> FellCleaveColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 2];
+
+        private Dictionary<string, uint> NascentChaosColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 3];
+
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 4];
 
         public WarriorHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _) {
             DrawHealthBar();
             var nextHeight = DrawStormsEyeBar(0);
-            nextHeight = DrawBeastGauge(nextHeight);
+            DrawBeastGauge(nextHeight);
             DrawTargetBar();
             DrawFocusBar();
+            DrawCastBar();
         }
 
         private int DrawStormsEyeBar(int initialHeight)
         {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var innerReleaseBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1177);
             var stormsEyeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
 
             var barWidth = StormsEyeWidth;
             var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset;
+            var yPos = CenterY + YOffset + initialHeight;
             var cursorPos = new Vector2(xPos, yPos);
             var barSize = new Vector2(barWidth, StormsEyeHeight);
             
@@ -71,11 +89,11 @@ namespace DelvUIPlugin.Interface
             }
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-            var durationText = duration != 0 ? Math.Round(duration).ToString() : "";
+            var durationText = duration != 0 ? Math.Round(duration).ToString(CultureInfo.InvariantCulture) : "";
             var textSize = ImGui.CalcTextSize(durationText);
             DrawOutlinedText(durationText, new Vector2(cursorPos.X + StormsEyeWidth / 2f - textSize.X / 2f, cursorPos.Y-2));
 
-            return StormsEyeHeight;
+            return StormsEyeHeight + initialHeight;
         }
 
         private int DrawBeastGauge(int initialHeight) {
