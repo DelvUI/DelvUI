@@ -182,6 +182,8 @@ namespace DelvUI {
         public Vector4 PLDEmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 100f/100f);
         public Vector4 PLDAtonementColor = new Vector4(240f/255f, 176f/255f, 0f/255f, 100f/100f);
 
+        #endregion
+
         [JsonIgnore] private DalamudPluginInterface _pluginInterface;
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
         [JsonIgnore] public Dictionary<uint, Dictionary<string, uint>> JobColorMap;
