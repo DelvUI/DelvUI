@@ -203,12 +203,19 @@ namespace DelvUIPlugin.Interface {
         
         protected virtual void DrawTargetOfTargetBar(int targetActorId) {
             Actor target = null;
-            
-            for (var i = 0; i < 200; i += 2) {
-                if (PluginInterface.ClientState.Actors[i]?.ActorId == targetActorId) {
-                    target = PluginInterface.ClientState.Actors[i];
+            if (targetActorId == 0)
+            {
+                target = PluginInterface.ClientState.LocalPlayer;
+            }
+            else
+            {
+                for (var i = 0; i < 200; i += 2) {
+                    if (PluginInterface.ClientState.Actors[i]?.ActorId == targetActorId) {
+                        target = PluginInterface.ClientState.Actors[i];
+                    }
                 }
             }
+
             
             if (!(target is Chara actor)) {
                 return;
