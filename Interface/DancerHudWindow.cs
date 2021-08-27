@@ -11,7 +11,7 @@ namespace DelvUIPlugin.Interface {
         private static int BarHeight => 13;
         private static int BarWidth => 254;
         private new static int XOffset => 127;
-        private new static int YOffset => 466;
+        private new static int YOffset => 476;
         
         public DancerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 

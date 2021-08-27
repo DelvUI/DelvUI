@@ -11,7 +11,7 @@ namespace DelvUIPlugin.Interface {
         private static int BarHeight => 20;
         private int BarWidth => 250;
         private new int XOffset => 127;
-        private new int YOffset => 467;
+        private new int YOffset => 416;
 
         public SamuraiHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 

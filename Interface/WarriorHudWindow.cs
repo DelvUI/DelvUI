@@ -36,6 +36,7 @@ namespace DelvUIPlugin.Interface
             nextHeight = DrawBeastGauge(nextHeight);
             DrawTargetBar();
             DrawFocusBar();
+            DrawCastBar();
         }
 
         private int DrawStormsEyeBar(int initialHeight)
