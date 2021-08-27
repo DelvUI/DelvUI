@@ -175,24 +175,24 @@ namespace DelvUI {
         #region BLM Configuration
 
         public int BLMVerticalOffset { get; set; } = -2;
-        public int BLMManaBarHeight { get; set; } = 12;
+        public int BLMManaBarHeight { get; set; } = 20;
         public int BLMManaBarWidth { get; set; } = 254;
-        public int BLMUmbralHeartHeight { get; set; } = 18;
+        public int BLMUmbralHeartHeight { get; set; } = 16;
         public int BLMPolyglotHeight { get; set; } = 18;
         public int BLMPolyglotWidth { get; set; } = 18;
         public int BLMVerticalSpaceBetweenBars { get; set; } = 2;
         public int BLMHorizontalSpaceBetweenBars { get; set; } = 2;
         public bool BLMShowTripleCast = true;
         public bool BLMUseBarsForTripleCast = true;
-        public int BLMTripleCastHeight { get; set; } = 10;
+        public int BLMTripleCastHeight { get; set; } = 16;
         public int BLMTripleCastRadius { get; set; } = 10;
 
-        public Vector4 BLMManaBarNoElementColor = new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 1f);
-        public Vector4 BLMManaBarIceColor = new Vector4(89f / 255f, 89f / 255f, 153f / 255f, 1f);
-        public Vector4 BLMManaBarFireColor = new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 1f);
-        public Vector4 BLMUmbralHeartColor = new Vector4(213f / 255f, 216f / 255f, 252f / 255f, 1f);
-        public Vector4 BLMPolyglotColor = new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 1f);
-        public Vector4 BLMTriplecastColor = new Vector4(1f, 1f, 1f, 1f);
+        public Vector4 BLMManaBarNoElementColor = new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f);
+        public Vector4 BLMManaBarIceColor = new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f);
+        public Vector4 BLMManaBarFireColor = new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f);
+        public Vector4 BLMUmbralHeartColor = new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f);
+        public Vector4 BLMPolyglotColor = new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f);
+        public Vector4 BLMTriplecastColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f);
 
         #endregion
 
