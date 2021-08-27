@@ -60,8 +60,7 @@ namespace DelvUI.Interface
                 return;
             }
 
-            var expiryColor = 0xFF2E2EC7;
-            var xPadding = 1;
+            const int xPadding = 1;
             var barWidth = (BuffWidth / 2) - 1;
             var twinSnakes = target.StatusEffects.FirstOrDefault(o => o.EffectId == 101);
             var leadenFist = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1861);
@@ -83,8 +82,6 @@ namespace DelvUI.Interface
                     buffStart, cursorPos + new Vector2(barSize.X, barSize.Y),
                     TwinSnakesColor["gradientLeft"], TwinSnakesColor["gradientRight"], TwinSnakesColor["gradientRight"], TwinSnakesColor["gradientLeft"]
                 );
-
-
 
             if (!PluginConfiguration.ShowBuffTime)
             {
@@ -136,8 +133,7 @@ namespace DelvUI.Interface
                 return;
             }
 
-            var expiryColor = 0xFF2E2EC7;
-            var xPadding = 2;
+            const int xPadding = 2;
             var barWidth = (DemolishWidth) - 1;
             var demolish = target.StatusEffects.FirstOrDefault(o => o.EffectId == 246 || o.EffectId == 1309);
 
