@@ -24,11 +24,11 @@ namespace DelvUI {
         public int TargetBarYOffset { get; set; } = 460;
         public int ToTBarHeight { get; set; } = 20;
         public int ToTBarWidth { get; set; } = 120;
-        public int ToTBarXOffset { get; set; } = 160;
+        public int ToTBarXOffset { get; set; } = 164;
         public int ToTBarYOffset { get; set; } = 460;
         public int FocusBarHeight { get; set; } = 20;
         public int FocusBarWidth { get; set; } = 120;
-        public int FocusBarXOffset { get; set; } = 160;
+        public int FocusBarXOffset { get; set; } = 164;
         public int FocusBarYOffset { get; set; } = 460;
         public int ShieldHeight { get; set; } = 10;
 

@@ -414,7 +414,7 @@ namespace DelvUI.Interface {
             if (tankStanceBuff.Count() != 1)
             {
                 var barSize = new Vector2(HealthBarHeight>HealthBarWidth?HealthBarWidth:HealthBarHeight, HealthBarHeight);
-                var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset - 5, CenterY + YOffset + 5);
+                var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset - 5, CenterY + HealthBarYOffset + 5);
                 ImGui.SetCursorPos(cursorPos);  
                 var drawList = ImGui.GetWindowDrawList();
             
@@ -428,7 +428,7 @@ namespace DelvUI.Interface {
             else
             {
                 var barSize = new Vector2(HealthBarHeight>HealthBarWidth?HealthBarWidth:HealthBarHeight, HealthBarHeight);
-                var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset - 5, CenterY + YOffset + 5);
+                var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset - 5, CenterY + HealthBarYOffset + 5);
                 ImGui.SetCursorPos(cursorPos);  
                 var drawList = ImGui.GetWindowDrawList();
             
