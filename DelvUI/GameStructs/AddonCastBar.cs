@@ -2,7 +2,7 @@
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
-namespace DelvUIPlugin.GameStructs
+namespace DelvUI.GameStructs
 {
     [StructLayout(LayoutKind.Explicit, Size = 1280)]
     public struct AddonCastBar {

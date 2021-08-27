@@ -1,18 +1,18 @@
 ﻿using System;
-using System.Linq;
+using System.Diagnostics;
 using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
 
-namespace DelvUIPlugin.Interface {
+namespace DelvUI.Interface {
     public class DarkKnightHudWindow : HudWindow {
         public override uint JobId => 32;
 
-        private int BarHeight => 13;
-        private int BarWidth => 254;
-        private new int XOffset => 127;
-        private new int YOffset => 466;
+        private static int BarHeight => 13;
+        private static int BarWidth => 254;
+        private new static int XOffset => 127;
+        private new static int YOffset => 466;
         
         public DarkKnightHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
@@ -20,15 +20,17 @@ namespace DelvUIPlugin.Interface {
             DrawHealthBar();
             DrawPrimaryResourceBar();
             DrawSecondaryResourceBar();
+            DrawDarkArtsBar();
             DrawTargetBar();
             DrawFocusBar();
             DrawCastBar();
         }
 
         protected override void DrawPrimaryResourceBar() {
-            var actor = PluginInterface.ClientState.LocalPlayer;
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+			
             //var tbn = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1178);
-
+            var actor = PluginInterface.ClientState.LocalPlayer;
             const int xPadding = 2;
             var barWidth = (BarWidth - xPadding * 2)  / 3.0f;
             var barSize = new Vector2(barWidth, BarHeight);
@@ -126,6 +128,9 @@ namespace DelvUIPlugin.Interface {
             }
             
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+        }
+        private void DrawDarkArtsBar() {
+
         }
     }
 }
