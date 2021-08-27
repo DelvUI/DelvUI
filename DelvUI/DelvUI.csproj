@@ -88,6 +88,7 @@
       <Compile Include="Extensions.cs" />
       <Compile Include="GameStructs\AddonCastBar.cs" />
       <Compile Include="Interface\BardHudWindow.cs" />
+      <Compile Include="Interface\BlackMageHudWindow.cs" />
       <Compile Include="Interface\ConfigurationWindow.cs" />
       <Compile Include="Interface\DancerHudWindow.cs" />
       <Compile Include="Interface\DarkKnightHudWindow.cs" />
