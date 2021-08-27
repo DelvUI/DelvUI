@@ -40,36 +40,36 @@ namespace DelvUI {
         public bool SlideCast = false;
         public float SlideCastTime = 500;
         
-        public Vector4 CastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,1f);
-        public Vector4 SlideCastColor = new Vector4(255f/255f,0f/255f,0f/255f,1f);
-        public Vector4 ShieldColor = new Vector4(255f/255f,255f/255f,0f/255f,1f);
+        public Vector4 CastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,100f/100f);
+        public Vector4 SlideCastColor = new Vector4(255f/255f,0f/255f,0f/255f,100f/100f);
+        public Vector4 ShieldColor = new Vector4(255f/255f,255f/255f,0f/255f,100f/100f);
 
-        public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,1f);
-        public Vector4 JobColorWAR = new Vector4(153f/255f,23f/255f,23f/255f,1f);
-        public Vector4 JobColorDRK = new Vector4(136f/255f,14f/255f,79f/255f,1f);
-        public Vector4 JobColorGNB = new Vector4(78f/255f,52f/255f,46f/255f,1f);
+        public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,100f/100f);
+        public Vector4 JobColorWAR = new Vector4(153f/255f,23f/255f,23f/255f,100f/100f);
+        public Vector4 JobColorDRK = new Vector4(136f/255f,14f/255f,79f/255f,100f/100f);
+        public Vector4 JobColorGNB = new Vector4(78f/255f,52f/255f,46f/255f,100f/100f);
         
-        public Vector4 JobColorWHM = new Vector4(150f/255f,150f/255f,150f/255f,1f);
-        public Vector4 JobColorSCH = new Vector4(121f/255f,134f/255f,203f/255f,1f);
-        public Vector4 JobColorAST = new Vector4(121f/255f,85f/255f,72f/255f,1f);
+        public Vector4 JobColorWHM = new Vector4(150f/255f,150f/255f,150f/255f,100f/100f);
+        public Vector4 JobColorSCH = new Vector4(121f/255f,134f/255f,203f/255f,100f/100f);
+        public Vector4 JobColorAST = new Vector4(121f/255f,85f/255f,72f/255f,100f/100f);
         
-        public Vector4 JobColorMNK = new Vector4(78f/255f,52f/255f,46f/255f,1f);
-        public Vector4 JobColorDRG = new Vector4(63f/255f,81f/255f,181f/255f,1f);
-        public Vector4 JobColorNIN = new Vector4(211f/255f,47f/255f,47f/255f,1f);
-        public Vector4 JobColorSAM = new Vector4(255f/255f,202f/255f,40f/255f,1f);
+        public Vector4 JobColorMNK = new Vector4(78f/255f,52f/255f,46f/255f,100f/100f);
+        public Vector4 JobColorDRG = new Vector4(63f/255f,81f/255f,181f/255f,100f/100f);
+        public Vector4 JobColorNIN = new Vector4(211f/255f,47f/255f,47f/255f,100f/100f);
+        public Vector4 JobColorSAM = new Vector4(255f/255f,202f/255f,40f/255f,100f/100f);
         
-        public Vector4 JobColorBRD = new Vector4(158f/255f,157f/255f,36f/255f,1f);
-        public Vector4 JobColorMCH = new Vector4(0f/255f,151f/255f,167f/255f,1f);
-        public Vector4 JobColorDNC = new Vector4(244f/255f,143f/255f,177f/255f,1f);
+        public Vector4 JobColorBRD = new Vector4(158f/255f,157f/255f,36f/255f,100f/100f);
+        public Vector4 JobColorMCH = new Vector4(0f/255f,151f/255f,167f/255f,100f/100f);
+        public Vector4 JobColorDNC = new Vector4(244f/255f,143f/255f,177f/255f,100f/100f);
 
-        public Vector4 JobColorBLM = new Vector4(126f/255f,87f/255f,194f/255f,1f);
-        public Vector4 JobColorSMN = new Vector4(46f/255f,125f/255f,50f/255f,1f);
-        public Vector4 JobColorRDM = new Vector4(233f/255f,30f/255f,99f/255f,1f);
-        public Vector4 JobColorBLU = new Vector4(0f/255f,185f/255f,247f/255f,1f);
+        public Vector4 JobColorBLM = new Vector4(126f/255f,87f/255f,194f/255f,100f/100f);
+        public Vector4 JobColorSMN = new Vector4(46f/255f,125f/255f,50f/255f,100f/100f);
+        public Vector4 JobColorRDM = new Vector4(233f/255f,30f/255f,99f/255f,100f/100f);
+        public Vector4 JobColorBLU = new Vector4(0f/255f,185f/255f,247f/255f,100f/100f);
 
-        public Vector4 NPCColorHostile = new Vector4(205f/255f, 25f/255f, 25f/255f, 1f);
-        public Vector4 NPCColorNeutral = new Vector4(214f/255f, 145f/255f, 64f/255f, 1f);
-        public Vector4 NPCColorFriendly = new Vector4(0f/255f, 145f/255f, 6f/255f, 1f);
+        public Vector4 NPCColorHostile = new Vector4(205f/255f, 25f/255f, 25f/255f, 100f/100f);
+        public Vector4 NPCColorNeutral = new Vector4(214f/255f, 145f/255f, 64f/255f, 100f/100f);
+        public Vector4 NPCColorFriendly = new Vector4(0f/255f, 145f/255f, 6f/255f, 100f/100f);
 
         #region WAR Configuration
         
@@ -83,11 +83,11 @@ namespace DelvUI {
         public int WARBeastGaugeXOffset { get; set; }
         public int WARBeastGaugeYOffset { get; set; }
         public int WARInterBarOffset { get; set; } = 2;
-        public Vector4 WARInnerReleaseColor = new Vector4(1f, 0f, 0f, 1f);
-        public Vector4 WARStormsEyeColor = new Vector4(1f, 136f/255f, 146f/255f, 1f);
-        public Vector4 WARFellCleaveColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 1f);
-        public Vector4 WARNascentChaosColor = new Vector4(240f/255f, 176f/255f, 0f, 1f);
-        public Vector4 WAREmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 1f);
+        public Vector4 WARInnerReleaseColor = new Vector4(255f, 0f/255f, 0f/255f, 100f/100f);
+        public Vector4 WARStormsEyeColor = new Vector4(255f/255f, 136f/255f, 146f/255f, 100f/100f);
+        public Vector4 WARFellCleaveColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 100f/100f);
+        public Vector4 WARNascentChaosColor = new Vector4(240f/255f, 176f/255f, 0f, 100f/100f);
+        public Vector4 WAREmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 100f/100f);
 
         #endregion
 
@@ -102,9 +102,9 @@ namespace DelvUI {
         public int SchAetherBarX { get; set; } = -42;
         public int SchAetherBarY { get; set; } = 460;
         public int SchAetherBarPad { get; set; } = 2;
-        public Vector4 SchAetherColor = new Vector4(0f, 1f, 0f, 1f);
-        public Vector4 SchFairyColor = new Vector4(94f / 255f, 250f / 255f, 154f / 255f, 1f);
-        public Vector4 SchEmptyColor = new Vector4(0f, 0f, 0f, 136f / 255f);
+        public Vector4 SchAetherColor = new Vector4(0f/255f, 255f/255f, 0f/255f, 100f/100f);
+        public Vector4 SchFairyColor = new Vector4(94f/255f, 250f/255f, 154f/255f, 100f/100f);
+        public Vector4 SchEmptyColor = new Vector4(0f/255f, 0f/255f, 0f/255f, 53f/100f);
 
         #endregion
 
@@ -131,12 +131,12 @@ namespace DelvUI {
         public int MCHWildfireXOffset { get; set; }
         public int MCHWildfireYOffset { get; set; }
         public int MCHInterBarOffset { get; set; } = 2;
-        public Vector4 MCHHeatColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 1f);
-        public Vector4 MCHBatteryColor = new Vector4(106f/255f, 1f, 1f, 1f);
-        public Vector4 MCHRobotColor = new Vector4(153f/255f, 0f, 1f, 1f);
-        public Vector4 MCHOverheatColor = new Vector4(1f, 239f/255f, 14f/255f, 1f);
-        public Vector4 MCHWildfireColor = new Vector4(1f, 0f, 0f, 1f);
-        public Vector4 MCHEmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 1f);
+        public Vector4 MCHHeatColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 100f/100f);
+        public Vector4 MCHBatteryColor = new Vector4(106f/255f, 255f/255f, 255f/255f, 100f/100f);
+        public Vector4 MCHRobotColor = new Vector4(153f/255f, 0f/255f, 255f/255f, 100f/100f);
+        public Vector4 MCHOverheatColor = new Vector4(255f/255f, 239f/255f, 14f/255f, 100f/100f);
+        public Vector4 MCHWildfireColor = new Vector4(255f/255f, 0f/255f, 0f/255f, 100f/100f);
+        public Vector4 MCHEmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 100f/100f);
 
         #endregion
         
