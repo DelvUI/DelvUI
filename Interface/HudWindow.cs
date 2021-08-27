@@ -178,7 +178,7 @@ namespace DelvUIPlugin.Interface {
             
             if (!(focus is Chara actor)) {
                 var friendly = PluginConfiguration.NPCColorMap["friendly"];
-                //drawList.AddRectFilled(cursorPos, cursorPos + barSize, friendly["background"]);
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, friendly["background"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(FocusBarWidth, FocusBarHeight), 
                     friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"], friendly["gradientLeft"]
