@@ -152,7 +152,7 @@ namespace DelvUI {
         #region DRK Configuration
 
         public int DRKBaseXOffset { get; set; } = 127;
-        public int DRKBaseYOffset { get; set; } = 404;
+        public int DRKBaseYOffset { get; set; } = 405;
         public int DRKManaBarHeight { get; set; } = 15;
         public int DRKManaBarWidth { get; set; } = 254;
         public int DRKManaBarPadding { get; set; } = 2;
