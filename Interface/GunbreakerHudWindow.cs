@@ -11,7 +11,7 @@ namespace DelvUIPlugin.Interface {
         private int BarHeight => 13;
         private int BarWidth => 254;
         private new int XOffset => 127;
-        private new int YOffset => 466;
+        private new int YOffset => 479;
         
         public GunbreakerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 

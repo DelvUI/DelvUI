@@ -108,7 +108,7 @@ namespace DelvUIPlugin.Interface {
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentMp / actor.MaxMp;
             _barsize = new Vector2(PrimaryResourceBarWidth, PrimaryResourceBarHeight);
-            var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 27);
+            var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset -16);
             
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0x88000000);
@@ -207,12 +207,19 @@ namespace DelvUIPlugin.Interface {
         
         protected virtual void DrawTargetOfTargetBar(int targetActorId) {
             Actor target = null;
-            
-            for (var i = 0; i < 200; i += 2) {
-                if (PluginInterface.ClientState.Actors[i]?.ActorId == targetActorId) {
-                    target = PluginInterface.ClientState.Actors[i];
+            if (targetActorId == 0)
+            {
+                target = PluginInterface.ClientState.LocalPlayer;
+            }
+            else
+            {
+                for (var i = 0; i < 200; i += 2) {
+                    if (PluginInterface.ClientState.Actors[i]?.ActorId == targetActorId) {
+                        target = PluginInterface.ClientState.Actors[i];
+                    }
                 }
             }
+
             
             if (!(target is Chara actor)) {
                 return;

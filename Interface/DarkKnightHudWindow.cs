@@ -20,6 +20,7 @@ namespace DelvUIPlugin.Interface {
             DrawHealthBar();
             DrawPrimaryResourceBar();
             DrawSecondaryResourceBar();
+            DrawDarkArtsBar();
             DrawTargetBar();
             DrawFocusBar();
             DrawCastBar();
@@ -125,6 +126,9 @@ namespace DelvUIPlugin.Interface {
             }
             
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+        }
+        private void DrawDarkArtsBar() {
+
         }
     }
 }
