@@ -43,9 +43,9 @@
   </PropertyGroup>
 
     <ItemGroup>
-        <None Update="Media\Fonts\big-noodle-too.ttf">
+        <Content Include="Media\Fonts\big-noodle-too.ttf">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
