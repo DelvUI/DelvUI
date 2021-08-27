@@ -159,12 +159,12 @@ namespace DelvUI {
         public int DRKBuffBarXOffset { get; set; }
         public int DRKBuffBarYOffset { get; set; }
         public int DRKInterBarOffset { get; set; } = 2;
-        public Vector4 DRKManaColor = new Vector4(0f, 142f/255f, 254f/255f, 100f/100f);
+        public Vector4 DRKManaColor = new Vector4(0f/255f, 142f/255f, 254f/255f, 100f/100f);
         public Vector4 DRKBloodColorLeft = new Vector4(149f/255f, 11f/255f, 196f/255f, 100f/100f);
         public Vector4 DRKBloodColorRight = new Vector4(155f/255f, 0f/255f, 61f/255f, 100f/100f);
-        public Vector4 DRKDarkArtsColor = new Vector4(240f/255f, 42f/255f, 42f/255f, 100f/100f);
-        public Vector4 DRKBloodWeaponColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 100f/100f);
-        public Vector4 DRKDeliriumColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 100f/100f);
+        public Vector4 DRKDarkArtsColor = new Vector4(35f/255f, 33f/255f, 185f/255f, 100f/100f);
+        public Vector4 DRKBloodWeaponColor = new Vector4(160f/255f, 0f/255f, 0f/255f, 100f/100f);
+        public Vector4 DRKDeliriumColor = new Vector4(225f/255f, 105f/255f, 105f/255f, 100f/100f);
         public Vector4 DRKEmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 100f/100f);
 
         #endregion
