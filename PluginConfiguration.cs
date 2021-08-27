@@ -22,7 +22,11 @@ namespace DelvUIPlugin {
         public int FocusBarHeight { get; set; } = 20;
         public int FocusBarWidth { get; set; } = 120;
         public int ShieldHeight { get; set; } = 10;
-        public bool ShieldHeightPixels { get; set; } = true;
+        
+        public bool ShieldHeightPixels = true;
+        
+        public bool ShieldEnabled = true;
+        
         
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
@@ -39,6 +43,7 @@ namespace DelvUIPlugin {
         
         public Vector4 CastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,1f);
         public Vector4 SlideCastColor = new Vector4(255f/255f,0f/255f,0f/255f,1f);
+        public Vector4 ShieldColor = new Vector4(255f/255f,255f/255f,0f/255f,1f);
 
         public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,1f);
         public Vector4 JobColorWAR = new Vector4(153f/255f,23f/255f,23f/255f,1f);
@@ -140,6 +145,7 @@ namespace DelvUIPlugin {
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
         [JsonIgnore] public Dictionary<uint, Dictionary<string, uint>> JobColorMap;
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> NPCColorMap;
+        [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> ShieldColorMap;
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> CastBarColorMap;
 
         public void Init(DalamudPluginInterface pluginInterface) {
@@ -459,6 +465,17 @@ namespace DelvUIPlugin {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(NPCColorFriendly.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NPCColorFriendly.AdjustColor(.1f))
                 },
+            };
+            
+            ShieldColorMap = new Dictionary<string, Dictionary<string, uint>>
+            {
+                ["shield"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(ShieldColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(ShieldColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ShieldColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ShieldColor.AdjustColor(.1f))
+                }
             };
             
             CastBarColorMap = new Dictionary<string, Dictionary<string, uint>>

@@ -91,10 +91,12 @@ namespace DelvUIPlugin.Interface {
                     colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
                 );
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-
+                
+                /* This needs some check to see if it's in BeginChild or else this will leak into the settings panel.
                 if (ImGui.GetIO().MouseClicked[0]) {
                     PluginInterface.ClientState.Targets.SetCurrentTarget(actor);
                 }
+                */
                 
             }
             DrawTargetShield(actor, cursorPos, _barsize, true);
@@ -176,12 +178,13 @@ namespace DelvUIPlugin.Interface {
             
             if (!(focus is Chara actor)) {
                 var friendly = PluginConfiguration.NPCColorMap["friendly"];
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, friendly["background"]);
+                //drawList.AddRectFilled(cursorPos, cursorPos + barSize, friendly["background"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(FocusBarWidth, FocusBarHeight), 
                     friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"], friendly["gradientLeft"]
                 );
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+                DrawTargetShield(focus, cursorPos, barSize, true);
             }
             else
             {
@@ -194,12 +197,12 @@ namespace DelvUIPlugin.Interface {
                 );
                 
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+                DrawTargetShield(focus, cursorPos, barSize, true);
             }
             
             var name = $"{focus.Name.Abbreviate().Truncate(12)}";
             var textSize = ImGui.CalcTextSize(name);
             DrawOutlinedText(name, new Vector2(cursorPos.X + FocusBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
-            DrawTargetShield(focus, cursorPos, barSize, true);
         }
         
         protected virtual void DrawTargetOfTargetBar(int targetActorId) {
@@ -241,9 +244,9 @@ namespace DelvUIPlugin.Interface {
                     PluginInterface.ClientState.Targets.SetCurrentTarget(target);
                 }
             }
+            DrawTargetShield(target, cursorPos, barSize, true);
             
             ImGui.EndChild();
-            DrawTargetShield(target, cursorPos, barSize, true);
         }
 
         protected virtual unsafe void DrawCastBar()
@@ -367,18 +370,19 @@ namespace DelvUIPlugin.Interface {
 
         protected virtual void DrawTargetShield( Actor actor, Vector2 cursorPos, Vector2 targetBar, bool leftToRight)
         {
+            if (!PluginConfiguration.ShieldEnabled) return;
+            var shieldColor = PluginConfiguration.ShieldColorMap["shield"];
             var shield = ActorShieldValue(actor);
             if (Math.Abs(shield) < 0) return;
             var drawList = ImGui.GetWindowDrawList();
             var y = PluginConfiguration.ShieldHeightPixels
                 ? PluginConfiguration.ShieldHeight
                 : targetBar.Y / 100 * PluginConfiguration.ShieldHeight;
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0x88000000);
             drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + new Vector2(targetBar.X * shield, targetBar.Y / 100 * PluginConfiguration.ShieldHeight), 
-                0xFF00F7FF, 0xFF00F7FF, 0xFF00F7FF, 0xFF00F7FF
+                cursorPos, cursorPos + new Vector2(targetBar.X * shield, y), 
+                shieldColor["gradientLeft"], shieldColor["gradientRight"], shieldColor["gradientRight"], shieldColor["gradientLeft"]
             );
-            drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+            drawList.AddRect(cursorPos, cursorPos + targetBar, 0xFF000000);
         }
 
         protected virtual void DrawTankStanceIndicator()

@@ -105,6 +105,19 @@ namespace DelvUIPlugin.Interface {
                         _pluginConfiguration.FocusBarWidth = focusBarWidth;
                         _pluginConfiguration.Save();
                     }
+                    
+                    changed |= ImGui.Checkbox("Shield Enabled", ref _pluginConfiguration.ShieldEnabled);
+                    
+                    var shieldHeight = _pluginConfiguration.ShieldHeight;
+                    if (ImGui.DragInt("Shield Height", ref shieldHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ShieldHeight = shieldHeight;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    changed |= ImGui.Checkbox("Shield Height in px", ref _pluginConfiguration.ShieldHeightPixels);
+                    
+                    changed |= ImGui.ColorEdit4("Shield Color", ref _pluginConfiguration.ShieldColor);
 
                     changed |= ImGui.Checkbox("Hide HUD", ref _pluginConfiguration.HideHud);
 

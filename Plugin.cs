@@ -71,13 +71,15 @@ namespace DelvUIPlugin {
                 return;
             }
             
+            _configurationWindow.Draw();
+            
             if (_fontBuilt) ImGui.PushFont(_pluginConfiguration.BigNoodleTooFont);
 
             if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
                 SwapJobs();
             }
 
-            _configurationWindow.Draw();
+            
             _hudWindow?.Draw();
 
             if (_fontBuilt) {
