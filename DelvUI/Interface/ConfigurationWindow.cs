@@ -899,6 +899,149 @@ namespace DelvUI.Interface
                     ImGui.EndTabBar();
                 }
 
+                if (ImGui.BeginTabItem("Monk"))
+                {
+                    var MNKDemolishHeight = _pluginConfiguration.MNKDemolishHeight;
+                    if (ImGui.DragInt("Demolish Height", ref MNKDemolishHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MNKDemolishHeight = MNKDemolishHeight;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var MNKDemolishWidth = _pluginConfiguration.MNKDemolishWidth;
+                    if (ImGui.DragInt("Demolish Width", ref MNKDemolishWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MNKDemolishWidth = MNKDemolishWidth;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var MNKDemolishXOffset = _pluginConfiguration.MNKDemolishXOffset;
+                    if (ImGui.DragInt("Demolish X Offset", ref MNKDemolishXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MNKDemolishXOffset = MNKDemolishXOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var MNKDemolishYOffset = _pluginConfiguration.MNKDemolishYOffset;
+                    if (ImGui.DragInt("Demolish Y Offset", ref MNKDemolishYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MNKDemolishYOffset = MNKDemolishYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Demolish Color", ref _pluginConfiguration.MNKDemolishColor);
+
+                    var MNKTimeDemoXOffset = _pluginConfiguration.MNKTimeDemoXOffset;
+                    if (ImGui.DragInt("Demolish Timer X Offset", ref MNKTimeDemoXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MNKTimeDemoXOffset = MNKTimeDemoXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var MNKTimeDemoYOffset = _pluginConfiguration.MNKTimeDemoYOffset;
+                    if (ImGui.DragInt("Demolish Timer Y Offset", ref MNKTimeDemoYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MNKTimeDemoYOffset = MNKTimeDemoYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show Demolish Timer", ref _pluginConfiguration.ShowDemolishTime);
+
+                    var MNKChakraHeight = _pluginConfiguration.MNKChakraHeight;
+                    if (ImGui.DragInt("Chakra Height", ref MNKChakraHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MNKChakraHeight = MNKChakraHeight;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var MNKChakraWidth = _pluginConfiguration.MNKChakraWidth;
+                    if (ImGui.DragInt("Chakra Width", ref MNKChakraWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MNKChakraWidth = MNKChakraWidth;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var MNKChakraXOffset = _pluginConfiguration.MNKChakraXOffset;
+                    if (ImGui.DragInt("Chakra X Offset", ref MNKChakraXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MNKChakraXOffset = MNKChakraXOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var MNKChakraYOffset = _pluginConfiguration.MNKChakraYOffset;
+                    if (ImGui.DragInt("Chakra Y Offset", ref MNKChakraYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MNKChakraYOffset = MNKChakraYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Chakra Color", ref _pluginConfiguration.MNKChakraColor);
+
+                    var MNKBuffHeight = _pluginConfiguration.MNKBuffHeight;
+                    if (ImGui.DragInt("Buff Height", ref MNKBuffHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MNKBuffHeight = MNKBuffHeight;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var MNKBuffWidth = _pluginConfiguration.MNKBuffWidth;
+                    if (ImGui.DragInt("Buff Width", ref MNKBuffWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MNKBuffWidth = MNKBuffWidth;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var MNKBuffXOffset = _pluginConfiguration.MNKBuffXOffset;
+                    if (ImGui.DragInt("Buff X Offset", ref MNKBuffXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MNKBuffXOffset = MNKBuffXOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var MNKBuffYOffset = _pluginConfiguration.MNKBuffYOffset;
+                    if (ImGui.DragInt("Buff Y Offset", ref MNKBuffYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MNKBuffYOffset = MNKBuffYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Leaden Fist Color", ref _pluginConfiguration.MNKLeadenFistColor);
+                    changed |= ImGui.ColorEdit4("Twin Snakes Color", ref _pluginConfiguration.MNKTwinSnakesColor);
+
+                    var MNKTimeTwinXOffset = _pluginConfiguration.MNKTimeTwinXOffset;
+                    if (ImGui.DragInt("Twin Timer X Offset", ref MNKTimeTwinXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MNKTimeTwinXOffset = MNKTimeTwinXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var MNKTimeTwinYOffset = _pluginConfiguration.MNKTimeTwinYOffset;
+                    if (ImGui.DragInt("Twin Timer Y Offset", ref MNKTimeTwinYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MNKTimeTwinYOffset = MNKTimeTwinYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var MNKTimeLeadenXOffset = _pluginConfiguration.MNKTimeLeadenXOffset;
+                    if (ImGui.DragInt("Leaden Timer X Offset", ref MNKTimeLeadenXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MNKTimeLeadenXOffset = MNKTimeLeadenXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var MNKTimeLeadenYOffset = _pluginConfiguration.MNKTimeLeadenYOffset;
+                    if (ImGui.DragInt("Leaden Timer Y Offset", ref MNKTimeLeadenYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MNKTimeLeadenYOffset = MNKTimeLeadenYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show Buff Timers", ref _pluginConfiguration.ShowBuffTime);
+
+                }
+
+                ImGui.EndTabBar();
+            }
                 if (changed)
                 {
                     _pluginConfiguration.BuildColorMap();
