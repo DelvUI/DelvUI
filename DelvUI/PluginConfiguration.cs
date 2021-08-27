@@ -107,8 +107,7 @@ namespace DelvUI {
         public Vector4 SchEmptyColor = new Vector4(0f/255f, 0f/255f, 0f/255f, 53f/100f);
 
         #endregion
-
-
+        
         #region MCH Configuration
 
         public int MCHOverheatHeight { get; set; } = 20;
@@ -146,7 +145,7 @@ namespace DelvUI {
         public int PLDManaWidth { get; set; } = 254;
         public int PLDManaPadding { get; set; } = 2;
         public int PLDBaseXOffset { get; set; } = 127;
-        public int PLDBaseYOffset { get; set; } = 372;
+        public int PLDBaseYOffset { get; set; } = 373;
         public int PLDOathGaugeHeight { get; set; } = 20;
         public int PLDOathGaugeWidth { get; set; } = 254;
         public int PLDOathGaugePadding { get; set; } = 2;

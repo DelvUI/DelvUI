@@ -139,7 +139,6 @@ namespace DelvUI {
                 
                 //dont have packs yet
                 Jobs.BLM => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.PLD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.MNK => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.NIN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.AST => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),

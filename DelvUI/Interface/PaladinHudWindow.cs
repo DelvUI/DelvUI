@@ -1,10 +1,4 @@
-﻿// Decompiled with JetBrains decompiler
-// Type: DelvUIPlugin.Interface.PaladinHudWindow
-// Assembly: DelvUIPlugin, Version=0.9.0.7, Culture=neutral, PublicKeyToken=null
-// MVID: A4BDE8A2-33CB-46AD-954C-2D6E9C95F46F
-// Assembly location: C:\Users\Edward\Desktop\DelvUIPlugin.dll
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -12,7 +6,7 @@ using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
 
-namespace DelvUIPlugin.Interface
+namespace DelvUI.Interface
 {
     public class PaladinHudWindow : HudWindow
     {
