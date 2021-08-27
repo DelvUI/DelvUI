@@ -700,12 +700,34 @@ namespace DelvUI.Interface {
                         _pluginConfiguration.Save();
                     }
 
+                    changed |= ImGui.Checkbox("Show Firestarter Procs", ref _pluginConfiguration.BLMShowFirestarterProcs);
+                    changed |= ImGui.Checkbox("Show Thundercloud Procs", ref _pluginConfiguration.BLMShowThundercloudProcs);
+
+                    var BLMProcsHeight = _pluginConfiguration.BLMProcsHeight;
+                    if (ImGui.DragInt("Procs Height", ref BLMProcsHeight, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.BLMProcsHeight = BLMProcsHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show DoT Timer", ref _pluginConfiguration.BLMShowDotTimer);
+
+                    var BLMDotTimerHeight = _pluginConfiguration.BLMDotTimerHeight;
+                    if (ImGui.DragInt("DoT Timer Height", ref BLMDotTimerHeight, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.BLMDotTimerHeight = BLMDotTimerHeight;
+                        _pluginConfiguration.Save();
+                    }
+
                     changed |= ImGui.ColorEdit4("Mana Bar Color", ref _pluginConfiguration.BLMManaBarNoElementColor);
                     changed |= ImGui.ColorEdit4("Mana Bar Ice Color", ref _pluginConfiguration.BLMManaBarIceColor);
                     changed |= ImGui.ColorEdit4("Mana Bar Fire Color", ref _pluginConfiguration.BLMManaBarFireColor);
                     changed |= ImGui.ColorEdit4("Umbral Heart Color", ref _pluginConfiguration.BLMUmbralHeartColor);
                     changed |= ImGui.ColorEdit4("Polyglot Color", ref _pluginConfiguration.BLMPolyglotColor);
                     changed |= ImGui.ColorEdit4("Triplecast Color", ref _pluginConfiguration.BLMTriplecastColor);
+                    changed |= ImGui.ColorEdit4("Firestarter Proc Color", ref _pluginConfiguration.BLMFirestarterColor);
+                    changed |= ImGui.ColorEdit4("Thundercloud Proc Color", ref _pluginConfiguration.BLMThundercloudColor);
+                    changed |= ImGui.ColorEdit4("DoT Timer Color", ref _pluginConfiguration.BLMDotColor);
                 }
 
                 ImGui.EndTabBar();
