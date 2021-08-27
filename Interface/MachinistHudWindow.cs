@@ -52,6 +52,8 @@ namespace DelvUIPlugin.Interface
             if (WildfireEnabled)
                 nextHeight = DrawWildfireBar(nextHeight);
             DrawTargetBar();
+            DrawFocusBar();
+            DrawCastBar();
         }
 
         private int DrawHeatGauge(int initialHeight)
