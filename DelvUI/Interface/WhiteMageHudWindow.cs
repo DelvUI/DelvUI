@@ -36,7 +36,7 @@ namespace DelvUI.Interface
             var barWidth = (BarWidth - xPadding * (numChunks - 1)) / numChunks;
             var barSize = new Vector2(barWidth, BarHeight);
             var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset - 20;
+            var yPos = CenterY + YOffset - 10;
 
             const float lilyCooldown = 30000f;
 
