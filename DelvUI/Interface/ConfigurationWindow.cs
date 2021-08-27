@@ -508,6 +508,130 @@ namespace DelvUI.Interface {
                     
                     ImGui.EndTabItem();
                 }
+                
+                if (ImGui.BeginTabItem("Paladin"))
+                {
+                    int pldManaHeight = _pluginConfiguration.PLDManaHeight;
+                    if (ImGui.DragInt("Mana Height", ref pldManaHeight, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDManaHeight = pldManaHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldManaWidth = _pluginConfiguration.PLDManaWidth;
+                    if (ImGui.DragInt("Mana Width", ref pldManaWidth, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDManaWidth = pldManaWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldManaPadding = _pluginConfiguration.PLDManaPadding;
+                    if (ImGui.DragInt("Mana Padding", ref pldManaPadding, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDManaPadding = pldManaPadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldBaseXoffset = _pluginConfiguration.PLDBaseXOffset;
+                    if (ImGui.DragInt("Base X Offset", ref pldBaseXoffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDBaseXOffset = pldBaseXoffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldBaseYoffset = _pluginConfiguration.PLDBaseYOffset;
+                    if (ImGui.DragInt("Base Y Offset", ref pldBaseYoffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDBaseYOffset = pldBaseYoffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldOathGaugeHeight = _pluginConfiguration.PLDOathGaugeHeight;
+                    if (ImGui.DragInt("Oath Gauge Height", ref pldOathGaugeHeight, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDOathGaugeHeight = pldOathGaugeHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldOathGaugeWidth = _pluginConfiguration.PLDOathGaugeWidth;
+                    if (ImGui.DragInt("Oath Gauge Width", ref pldOathGaugeWidth, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDOathGaugeWidth = pldOathGaugeWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int oathGaugePadding = _pluginConfiguration.PLDOathGaugePadding;
+                    if (ImGui.DragInt("Oath Gauge Padding", ref oathGaugePadding, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDOathGaugePadding = oathGaugePadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int oathGaugeXoffset = _pluginConfiguration.PLDOathGaugeXOffset;
+                    if (ImGui.DragInt("Oath Gauge X Offset", ref oathGaugeXoffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDOathGaugeXOffset = oathGaugeXoffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int oathGaugeYoffset = _pluginConfiguration.PLDOathGaugeYOffset;
+                    if (ImGui.DragInt("Oath Gauge Y Offset", ref oathGaugeYoffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDOathGaugeYOffset = oathGaugeYoffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    bool oathGaugeText = _pluginConfiguration.PLDOathGaugeText;
+                    if (ImGui.Checkbox("Oath Gauge Text", ref oathGaugeText))
+                    {
+                        _pluginConfiguration.PLDOathGaugeText = oathGaugeText;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldBuffBarHeight = _pluginConfiguration.PLDBuffBarHeight;
+                    if (ImGui.DragInt("Buff Bar Height", ref pldBuffBarHeight, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDBuffBarHeight = pldBuffBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldBuffBarWidth = _pluginConfiguration.PLDBuffBarWidth;
+                    if (ImGui.DragInt("Buff Bar Width", ref pldBuffBarWidth, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDBuffBarWidth = pldBuffBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldBuffBarXoffset = _pluginConfiguration.PLDBuffBarXOffset;
+                    if (ImGui.DragInt("Buff Bar X Offset", ref pldBuffBarXoffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDBuffBarXOffset = pldBuffBarXoffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldBuffBarYoffset = _pluginConfiguration.PLDBuffBarYOffset;
+                    if (ImGui.DragInt("Buff Bar Y Offset", ref pldBuffBarYoffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDBuffBarYOffset = pldBuffBarYoffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldInterBarOffset = _pluginConfiguration.PLDInterBarOffset;
+                    if (ImGui.DragInt("Space Between Bars", ref pldInterBarOffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDInterBarOffset = pldInterBarOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Mana Bar Color", ref _pluginConfiguration.PLDManaColor);
+                    changed |= ImGui.ColorEdit4("Oath Gauge Color", ref _pluginConfiguration.PLDOathGaugeColor);
+                    changed |= ImGui.ColorEdit4("Fight or Flight Color", ref _pluginConfiguration.PLDFightOrFlightColor);
+                    changed |= ImGui.ColorEdit4("Requiescat Color", ref _pluginConfiguration.PLDRequiescatColor);
+                    changed |= ImGui.ColorEdit4("Atonement Color", ref _pluginConfiguration.PLDAtonementColor);
+                    changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.PLDEmptyColor);
+                    
+                    ImGui.EndTabItem();
+                }
 
                 if (ImGui.BeginTabItem("Black Mage"))
                 {
