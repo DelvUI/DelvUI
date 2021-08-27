@@ -16,22 +16,22 @@ namespace DelvUI.Interface
 
         protected int DemolishHeight => PluginConfiguration.MNKDemolishHeight;
         protected int DemolishWidth => PluginConfiguration.MNKDemolishWidth;
-        protected new int DemolishXOffset => PluginConfiguration.MNKDemolishXOffset;
-        protected new int DemolishYOffset => PluginConfiguration.MNKDemolishYOffset;
+        protected int DemolishXOffset => PluginConfiguration.MNKDemolishXOffset;
+        protected int DemolishYOffset => PluginConfiguration.MNKDemolishYOffset;
         protected int ChakraHeight => PluginConfiguration.MNKChakraHeight;
         protected int ChakraWidth => PluginConfiguration.MNKChakraWidth;
-        protected new int ChakraXOffset => PluginConfiguration.MNKChakraXOffset;
-        protected new int ChakraYOffset => PluginConfiguration.MNKChakraYOffset;
+        protected int ChakraXOffset => PluginConfiguration.MNKChakraXOffset;
+        protected int ChakraYOffset => PluginConfiguration.MNKChakraYOffset;
         protected int BuffHeight => PluginConfiguration.MNKBuffHeight;
         protected int BuffWidth => PluginConfiguration.MNKBuffWidth;
-        protected new int BuffXOffset => PluginConfiguration.MNKBuffXOffset;
-        protected new int BuffYOffset => PluginConfiguration.MNKBuffYOffset;
-        protected new int TimeTwinXOffset => PluginConfiguration.MNKTimeTwinXOffset;
-        protected new int TimeTwinYOffset => PluginConfiguration.MNKTimeTwinYOffset;
-        protected new int TimeLeadenXOffset => PluginConfiguration.MNKTimeLeadenXOffset;
-        protected new int TimeLeadenYOffset => PluginConfiguration.MNKTimeLeadenYOffset;
-        protected new int TimeDemoXOffset => PluginConfiguration.MNKTimeDemoXOffset;
-        protected new int TimeDemoYOffset => PluginConfiguration.MNKTimeDemoYOffset;
+        protected int BuffXOffset => PluginConfiguration.MNKBuffXOffset;
+        protected int BuffYOffset => PluginConfiguration.MNKBuffYOffset;
+        protected int TimeTwinXOffset => PluginConfiguration.MNKTimeTwinXOffset;
+        protected int TimeTwinYOffset => PluginConfiguration.MNKTimeTwinYOffset;
+        protected  int TimeLeadenXOffset => PluginConfiguration.MNKTimeLeadenXOffset;
+        protected int TimeLeadenYOffset => PluginConfiguration.MNKTimeLeadenYOffset;
+        protected int TimeDemoXOffset => PluginConfiguration.MNKTimeDemoXOffset;
+        protected int TimeDemoYOffset => PluginConfiguration.MNKTimeDemoYOffset;
 
         protected Dictionary<string, uint> DemolishColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000];
         protected Dictionary<string, uint> ChakraColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 1];
