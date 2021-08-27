@@ -21,6 +21,7 @@ namespace DelvUI.Interface
         private int UmbralHeartHeight => PluginConfiguration.BLMUmbralHeartHeight;
         private int PolyglotHeight => PluginConfiguration.BLMPolyglotHeight;
         private int PolyglotWidth => PluginConfiguration.BLMPolyglotWidth;
+        private bool ShowManaValue => PluginConfiguration.BLMShowManaValue;
         private bool ShowManaThresholdMarker => PluginConfiguration.BLMShowManaThresholdMarker;
         private int ManaThresholdValue => PluginConfiguration.BLMManaThresholdValue;
         private bool ShowTripleCast => PluginConfiguration.BLMShowTripleCast;
@@ -108,6 +109,15 @@ namespace DelvUI.Interface
             var text = $"{time,0}";
             var textSize = ImGui.CalcTextSize(text);
             DrawOutlinedText(text, new Vector2(CenterX - textSize.X / 2f, OriginY - ManaBarHeight / 2f - textSize.Y / 2f));
+
+            // mana
+            if (ShowManaValue)
+            {
+                var mana = PluginInterface.ClientState.LocalPlayer.CurrentMp;
+                text = $"{mana,0}";
+                textSize = ImGui.CalcTextSize(text);
+                DrawOutlinedText(text, new Vector2(CenterX - barSize.X / 2f + 2, OriginY - ManaBarHeight / 2f - textSize.Y / 2f));
+            }
         }
 
         protected virtual void DrawEnochian()

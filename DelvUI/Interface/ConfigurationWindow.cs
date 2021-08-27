@@ -690,7 +690,8 @@ namespace DelvUI.Interface {
                         _pluginConfiguration.BLMPolyglotWidth = BLMPolyglotWidth;
                         _pluginConfiguration.Save();
                     }
-
+                    
+                    changed |= ImGui.Checkbox("Show Mana Value", ref _pluginConfiguration.BLMShowManaValue);
                     changed |= ImGui.Checkbox("Show Mana Threshold Marker", ref _pluginConfiguration.BLMShowManaThresholdMarker);
 
                     var BLMManaThresholdValue = _pluginConfiguration.BLMManaThresholdValue;

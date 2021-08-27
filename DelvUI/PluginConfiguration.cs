@@ -182,6 +182,7 @@ namespace DelvUI {
         public int BLMUmbralHeartHeight { get; set; } = 16;
         public int BLMPolyglotHeight { get; set; } = 18;
         public int BLMPolyglotWidth { get; set; } = 18;
+        public bool BLMShowManaValue = false;
         public bool BLMShowManaThresholdMarker = true;
         public int BLMManaThresholdValue { get; set; } = 2600;
 
