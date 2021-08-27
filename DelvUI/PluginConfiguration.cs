@@ -170,6 +170,35 @@ namespace DelvUI {
         public Vector4 PLDAtonementColor = new Vector4(240f/255f, 176f/255f, 0f/255f, 100f/100f);
 
         #endregion
+
+        #region MNK Configuration
+        
+        public bool ShowDemolishTime = true;
+        public bool ShowBuffTime = true;
+        public int MNKDemolishHeight { get; set; } = 20;
+        public int MNKDemolishWidth { get; set; } = 254;
+        public int MNKDemolishXOffset { get; set; } = 127;
+        public int MNKDemolishYOffset { get; set; } = 370;
+        public int MNKChakraHeight { get; set; } = 20;
+        public int MNKChakraWidth { get; set; } = 254;
+        public int MNKChakraXOffset { get; set; } = 127;
+        public int MNKChakraYOffset { get; set; } = 370;
+        public int MNKBuffHeight { get; set; } = 20;
+        public int MNKBuffWidth { get; set; } = 254;
+        public int MNKBuffXOffset { get; set; } = 127;
+        public int MNKBuffYOffset { get; set; } = 370;
+        public int MNKTimeTwinXOffset { get; set; } = 900;
+        public int MNKTimeTwinYOffset { get; set; } = 900;
+        public int MNKTimeLeadenXOffset { get; set; } = 1015;
+        public int MNKTimeLeadenYOffset { get; set; } = 900;
+        public int MNKTimeDemoXOffset { get; set; } = 959;
+        public int MNKTimeDemoYOffset { get; set; } = 856;
+        public Vector4 MNKDemolishColor = new Vector4(147f/255f, 0f, 83f/255f, 100f);
+        public Vector4 MNKChakraColor = new Vector4(204f/255f, 115f/255f, 0f, 100f);
+        public Vector4 MNKLeadenFistColor = new Vector4(255f/255f, 234f/255f, 0f, 100f);
+        public Vector4 MNKTwinSnakesColor = new Vector4(121f/255f, 0f, 96f/255f, 100f);
+        
+        #endregion
         
         [JsonIgnore] private DalamudPluginInterface _pluginInterface;
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
@@ -364,6 +393,38 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorMNK.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorMNK.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorMNK.AdjustColor(.1f))
+                },
+
+                [Jobs.MNK * 1000] = new Dictionary<string, uint> // Scholar Empty Bar Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKDemolishColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(MNKDemolishColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MNKDemolishColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MNKDemolishColor.AdjustColor(.1f))
+                },
+
+                [Jobs.MNK * 1000 + 1] = new Dictionary<string, uint> // Scholar Empty Bar Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKChakraColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(MNKChakraColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MNKChakraColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MNKChakraColor.AdjustColor(.1f))
+                },
+
+                [Jobs.MNK * 1000 + 2] = new Dictionary<string, uint> // Scholar Empty Bar Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKLeadenFistColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(MNKLeadenFistColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MNKLeadenFistColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MNKLeadenFistColor.AdjustColor(.1f))
+                },
+
+                [Jobs.MNK * 1000 + 3] = new Dictionary<string, uint> // Scholar Empty Bar Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(.1f))
                 },
                 
                 [Jobs.DRG] = new Dictionary<string, uint>

@@ -94,6 +94,7 @@
       <Compile Include="Interface\GunbreakerHudWindow.cs" />
       <Compile Include="Interface\HudWindow.cs" />
       <Compile Include="Interface\MachinistHudWindow.cs" />
+      <Compile Include="Interface\MonkHudWindow.cs" />
       <Compile Include="Interface\PaladinHudWindow.cs" />
       <Compile Include="Interface\RedMageHudWindow.cs" />
       <Compile Include="Interface\SamuraiHudWindow.cs" />
