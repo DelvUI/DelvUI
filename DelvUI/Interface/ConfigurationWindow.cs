@@ -1052,4 +1052,3 @@ namespace DelvUI.Interface
             }
         }
     }
-}
