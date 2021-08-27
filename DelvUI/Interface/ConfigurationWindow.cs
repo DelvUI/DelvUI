@@ -860,123 +860,7 @@ namespace DelvUI.Interface
                     
                     ImGui.EndTabItem();
                 }
-
-                if (ImGui.BeginTabItem("Black Mage"))
-                {
-                    var BLMVerticalOffset = _pluginConfiguration.BLMVerticalOffset;
-                    if (ImGui.DragInt("Vertical Offset", ref BLMVerticalOffset, 1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.BLMVerticalOffset = BLMVerticalOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var BLMVerticalSpaceBetweenBars = _pluginConfiguration.BLMVerticalSpaceBetweenBars;
-                    if (ImGui.DragInt("Vertical Padding", ref BLMVerticalSpaceBetweenBars, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BLMVerticalSpaceBetweenBars = BLMVerticalSpaceBetweenBars;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var BLMHorizontalSpaceBetweenBars = _pluginConfiguration.BLMHorizontalSpaceBetweenBars;
-                    if (ImGui.DragInt("Horizontal Padding", ref BLMHorizontalSpaceBetweenBars, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BLMHorizontalSpaceBetweenBars = BLMHorizontalSpaceBetweenBars;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var BLMManaBarHeight = _pluginConfiguration.BLMManaBarHeight;
-                    if (ImGui.DragInt("Mana Bar Height", ref BLMManaBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BLMManaBarHeight = BLMManaBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var BLMManaBarWidth = _pluginConfiguration.BLMManaBarWidth;
-                    if (ImGui.DragInt("Mana Bar Width", ref BLMManaBarWidth, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.BLMManaBarWidth = BLMManaBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var BLMUmbralHeartHeight = _pluginConfiguration.BLMUmbralHeartHeight;
-                    if (ImGui.DragInt("Umbral Heart Height", ref BLMUmbralHeartHeight, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.BLMUmbralHeartHeight = BLMUmbralHeartHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var BLMPolyglotHeight = _pluginConfiguration.BLMPolyglotHeight;
-                    if (ImGui.DragInt("Polyglot Height", ref BLMPolyglotHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BLMPolyglotHeight = BLMPolyglotHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var BLMPolyglotWidth = _pluginConfiguration.BLMPolyglotWidth;
-                    if (ImGui.DragInt("Polyglot Width", ref BLMPolyglotWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BLMPolyglotWidth = BLMPolyglotWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.Checkbox("Show Mana Value", ref _pluginConfiguration.BLMShowManaValue);
-                    changed |= ImGui.Checkbox("Show Mana Threshold Marker",
-                        ref _pluginConfiguration.BLMShowManaThresholdMarker);
-
-                    var BLMManaThresholdValue = _pluginConfiguration.BLMManaThresholdValue;
-                    if (ImGui.DragInt("Mana Threshold Marker Value", ref BLMManaThresholdValue, 1f, 1, 10000))
-                    {
-                        _pluginConfiguration.BLMManaThresholdValue = BLMManaThresholdValue;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.Checkbox("Show Triplecast", ref _pluginConfiguration.BLMShowTripleCast);
-
-                    var BLMTripleCastHeight = _pluginConfiguration.BLMTripleCastHeight;
-                    if (ImGui.DragInt("Triplecast Bar Height", ref BLMTripleCastHeight, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.BLMTripleCastHeight = BLMTripleCastHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.Checkbox("Show Firestarter Procs",
-                        ref _pluginConfiguration.BLMShowFirestarterProcs);
-                    changed |= ImGui.Checkbox("Show Thundercloud Procs",
-                        ref _pluginConfiguration.BLMShowThundercloudProcs);
-
-                    var BLMProcsHeight = _pluginConfiguration.BLMProcsHeight;
-                    if (ImGui.DragInt("Procs Height", ref BLMProcsHeight, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.BLMProcsHeight = BLMProcsHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.Checkbox("Show DoT Timer", ref _pluginConfiguration.BLMShowDotTimer);
-
-                    var BLMDotTimerHeight = _pluginConfiguration.BLMDotTimerHeight;
-                    if (ImGui.DragInt("DoT Timer Height", ref BLMDotTimerHeight, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.BLMDotTimerHeight = BLMDotTimerHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.ColorEdit4("Mana Bar Color",
-                        ref _pluginConfiguration.BLMManaBarNoElementColor);
-                    changed |= ImGui.ColorEdit4("Mana Bar Ice Color", ref _pluginConfiguration.BLMManaBarIceColor);
-                    changed |= ImGui.ColorEdit4("Mana Bar Fire Color",
-                        ref _pluginConfiguration.BLMManaBarFireColor);
-                    changed |= ImGui.ColorEdit4("Umbral Heart Color", ref _pluginConfiguration.BLMUmbralHeartColor);
-                    changed |= ImGui.ColorEdit4("Polyglot Color", ref _pluginConfiguration.BLMPolyglotColor);
-                    changed |= ImGui.ColorEdit4("Triplecast Color", ref _pluginConfiguration.BLMTriplecastColor);
-                    changed |= ImGui.ColorEdit4("Firestarter Proc Color",
-                        ref _pluginConfiguration.BLMFirestarterColor);
-                    changed |= ImGui.ColorEdit4("Thundercloud Proc Color",
-                        ref _pluginConfiguration.BLMThundercloudColor);
-                    changed |= ImGui.ColorEdit4("DoT Timer Color", ref _pluginConfiguration.BLMDotColor);
-                    
-                    ImGui.EndTabItem();
-                }
-
+                
                 if (ImGui.BeginTabItem("Monk"))
                 {
                     var MNKDemolishHeight = _pluginConfiguration.MNKDemolishHeight;
@@ -1118,6 +1002,278 @@ namespace DelvUI.Interface
 
                     ImGui.EndTabItem();
                 }
+
+                if (ImGui.BeginTabItem("Red Mage"))
+                {
+                    var RDMVerticalOffset = _pluginConfiguration.RDMVerticalOffset;
+                    if (ImGui.DragInt("Vertical Offset", ref RDMVerticalOffset, 1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.RDMVerticalOffset = RDMVerticalOffset;
+                        _pluginConfiguration.Save();
+                    }                    
+                    
+                    var RDMVHorizontalOffset = _pluginConfiguration.RDMVHorizontalOffset;
+                    if (ImGui.DragInt("Horizontal Offset", ref RDMVHorizontalOffset, 1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.RDMVHorizontalOffset = RDMVHorizontalOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var RDMVerticalSpaceBetweenBars = _pluginConfiguration.RDMVerticalSpaceBetweenBars;
+                    if (ImGui.DragInt("Vertical Padding", ref RDMVerticalSpaceBetweenBars, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMVerticalSpaceBetweenBars = RDMVerticalSpaceBetweenBars;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var RDMHorizontalSpaceBetweenBars = _pluginConfiguration.RDMHorizontalSpaceBetweenBars;
+                    if (ImGui.DragInt("Horizontal Padding", ref RDMHorizontalSpaceBetweenBars, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMHorizontalSpaceBetweenBars = RDMHorizontalSpaceBetweenBars;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var RDMManaBarHeight = _pluginConfiguration.RDMManaBarHeight;
+                    if (ImGui.DragInt("Mana Bar Height", ref RDMManaBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMManaBarHeight = RDMManaBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var RDMManaBarWidth = _pluginConfiguration.RDMManaBarWidth;
+                    if (ImGui.DragInt("Mana Bar Width", ref RDMManaBarWidth, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMManaBarWidth = RDMManaBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var RDMBlackManaBarHeight = _pluginConfiguration.RDMBlackManaBarHeight;
+                    if (ImGui.DragInt("Black Mana Height", ref RDMBlackManaBarHeight, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMBlackManaBarHeight = RDMBlackManaBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var RDMBlackManaBarWidth = _pluginConfiguration.RDMBlackManaBarWidth;
+                    if (ImGui.DragInt("Black Mana Width", ref RDMBlackManaBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMBlackManaBarWidth = RDMBlackManaBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var RDMWhiteManaBarHeight = _pluginConfiguration.RDMWhiteManaBarHeight;
+                    if (ImGui.DragInt("White Mana Height", ref RDMWhiteManaBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMWhiteManaBarHeight = RDMWhiteManaBarHeight;
+                        _pluginConfiguration.Save();
+                    }                    
+                    var RDMWhiteManaBarWidth = _pluginConfiguration.RDMWhiteManaBarWidth;
+                    if (ImGui.DragInt("White Mana Width", ref RDMWhiteManaBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMWhiteManaBarWidth = RDMWhiteManaBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    changed |= ImGui.Checkbox("Show Mana Value", ref _pluginConfiguration.RDMShowManaValue);
+                    changed |= ImGui.Checkbox("Show Mana Threshold Marker",
+                        ref _pluginConfiguration.RDMShowManaThresholdMarker);
+                    
+                    var RDMManaThresholdValue = _pluginConfiguration.RDMManaThresholdValue;
+                    if (ImGui.DragInt("Mana Threshold Marker Value", ref RDMManaThresholdValue, 1f, 1, 10000))
+                    {
+                        _pluginConfiguration.RDMManaThresholdValue = RDMManaThresholdValue;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show Dualcast", ref _pluginConfiguration.RDMShowDualCast);
+
+                    var RDMDualCastHeight = _pluginConfiguration.RDMDualCastHeight;
+                    if (ImGui.DragInt("Dualcast Bar Height", ref RDMDualCastHeight, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMDualCastHeight = RDMDualCastHeight;
+                        _pluginConfiguration.Save();
+                    }                    
+                    var RDMDualCastWidth = _pluginConfiguration.RDMDualCastWidth;
+                    if (ImGui.DragInt("Dualcast Bar Width", ref RDMDualCastWidth, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMDualCastWidth = RDMDualCastWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show Verfire Procs",
+                        ref _pluginConfiguration.BLMShowVerfireProcs);
+                    changed |= ImGui.Checkbox("Show Verstone Procs",
+                        ref _pluginConfiguration.BLMShowVerstoneProcs);
+
+                    var RDMProcsHeight = _pluginConfiguration.RDMProcsHeight;
+                    if (ImGui.DragInt("Procs Height", ref RDMProcsHeight, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMProcsHeight = RDMProcsHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show DoT Timer", ref _pluginConfiguration.RDMShowDotTimer);
+
+                    var RDMDotTimerHeight = _pluginConfiguration.RDMDotTimerHeight;
+                    if (ImGui.DragInt("DoT Timer Height", ref RDMDotTimerHeight, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMDotTimerHeight = RDMDotTimerHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Mana Bar Color",
+                        ref _pluginConfiguration.RDMManaBarColor);                    
+                    changed |= ImGui.ColorEdit4("Mana Bar Below Threshold Color",
+                        ref _pluginConfiguration.RDMManaBarBelowThresholdColor);
+                    changed |= ImGui.ColorEdit4("White Mana Bar Color", ref _pluginConfiguration.RDMWhiteManaBarColor);
+                    changed |= ImGui.ColorEdit4("Black Mana Bar Color",
+                        ref _pluginConfiguration.RDMBlackManaBarColor);
+                    changed |= ImGui.ColorEdit4("Acceleration Color", ref _pluginConfiguration.RDMAccelerationBarColor);
+                    changed |= ImGui.ColorEdit4("Dualcast Color", ref _pluginConfiguration.RDMDualcastBarColor);
+                    changed |= ImGui.ColorEdit4("Verfire Proc Color", ref _pluginConfiguration.RDMVerfireBarColor);
+                    changed |= ImGui.ColorEdit4("Verthunder Color", ref _pluginConfiguration.RDMVerthunderBarColor);
+                    changed |= ImGui.ColorEdit4("DoT Timer Color", ref _pluginConfiguration.RDMWDotColor);
+                    
+                    ImGui.EndTabItem();
+                }
+                if (ImGui.BeginTabItem("Black Mage"))
+                {
+                    var BLMVerticalOffset = _pluginConfiguration.BLMVerticalOffset;
+                    if (ImGui.DragInt("Vertical Offset", ref BLMVerticalOffset, 1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.BLMVerticalOffset = BLMVerticalOffset;
+                        _pluginConfiguration.Save();
+                    }                    
+                    
+                    var BLMVHorizontalOffset = _pluginConfiguration.BLMVHorizontalOffset;
+                    if (ImGui.DragInt("Horizontal Offset", ref BLMVHorizontalOffset, 1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.BLMVHorizontalOffset = BLMVHorizontalOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMVerticalSpaceBetweenBars = _pluginConfiguration.BLMVerticalSpaceBetweenBars;
+                    if (ImGui.DragInt("Vertical Padding", ref BLMVerticalSpaceBetweenBars, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BLMVerticalSpaceBetweenBars = BLMVerticalSpaceBetweenBars;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMHorizontalSpaceBetweenBars = _pluginConfiguration.BLMHorizontalSpaceBetweenBars;
+                    if (ImGui.DragInt("Horizontal Padding", ref BLMHorizontalSpaceBetweenBars, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BLMHorizontalSpaceBetweenBars = BLMHorizontalSpaceBetweenBars;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMManaBarHeight = _pluginConfiguration.BLMManaBarHeight;
+                    if (ImGui.DragInt("Mana Bar Height", ref BLMManaBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BLMManaBarHeight = BLMManaBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMManaBarWidth = _pluginConfiguration.BLMManaBarWidth;
+                    if (ImGui.DragInt("Mana Bar Width", ref BLMManaBarWidth, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.BLMManaBarWidth = BLMManaBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMUmbralHeartHeight = _pluginConfiguration.BLMUmbralHeartHeight;
+                    if (ImGui.DragInt("Umbral Heart Height", ref BLMUmbralHeartHeight, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.BLMUmbralHeartHeight = BLMUmbralHeartHeight;
+                        _pluginConfiguration.Save();
+                    }                    
+                    
+                    var BLMUmbralHeartWidth = _pluginConfiguration.BLMUmbralHeartWidth;
+                    if (ImGui.DragInt("Umbral Heart Width", ref BLMUmbralHeartWidth, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.BLMUmbralHeartHeight = BLMUmbralHeartHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMPolyglotHeight = _pluginConfiguration.BLMPolyglotHeight;
+                    if (ImGui.DragInt("Polyglot Height", ref BLMPolyglotHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BLMPolyglotHeight = BLMPolyglotHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMPolyglotWidth = _pluginConfiguration.BLMPolyglotWidth;
+                    if (ImGui.DragInt("Polyglot Width", ref BLMPolyglotWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BLMPolyglotWidth = BLMPolyglotWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show Mana Value", ref _pluginConfiguration.BLMShowManaValue);
+                    changed |= ImGui.Checkbox("Show Mana Threshold Marker",
+                        ref _pluginConfiguration.BLMShowManaThresholdMarker);
+
+                    var BLMManaThresholdValue = _pluginConfiguration.BLMManaThresholdValue;
+                    if (ImGui.DragInt("Mana Threshold Marker Value", ref BLMManaThresholdValue, 1f, 1, 10000))
+                    {
+                        _pluginConfiguration.BLMManaThresholdValue = BLMManaThresholdValue;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show Triplecast", ref _pluginConfiguration.BLMShowTripleCast);
+
+                    var BLMTripleCastHeight = _pluginConfiguration.BLMTripleCastHeight;
+                    if (ImGui.DragInt("Triplecast Bar Height", ref BLMTripleCastHeight, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.BLMTripleCastHeight = BLMTripleCastHeight;
+                        _pluginConfiguration.Save();
+                    }   
+                    
+                    var BLMTripleCastWidth = _pluginConfiguration.BLMTripleCastWidth;
+                    if (ImGui.DragInt("Triplecast Bar Width", ref BLMTripleCastWidth, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.BLMTripleCastWidth = BLMTripleCastWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show Firestarter Procs",
+                        ref _pluginConfiguration.BLMShowFirestarterProcs);
+                    changed |= ImGui.Checkbox("Show Thundercloud Procs",
+                        ref _pluginConfiguration.BLMShowThundercloudProcs);
+
+                    var BLMProcsHeight = _pluginConfiguration.BLMProcsHeight;
+                    if (ImGui.DragInt("Procs Height", ref BLMProcsHeight, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.BLMProcsHeight = BLMProcsHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show DoT Timer", ref _pluginConfiguration.BLMShowDotTimer);
+
+                    var BLMDotTimerHeight = _pluginConfiguration.BLMDotTimerHeight;
+                    if (ImGui.DragInt("DoT Timer Height", ref BLMDotTimerHeight, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.BLMDotTimerHeight = BLMDotTimerHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Mana Bar Color",
+                        ref _pluginConfiguration.BLMManaBarNoElementColor);
+                    changed |= ImGui.ColorEdit4("Mana Bar Ice Color", ref _pluginConfiguration.BLMManaBarIceColor);
+                    changed |= ImGui.ColorEdit4("Mana Bar Fire Color",
+                        ref _pluginConfiguration.BLMManaBarFireColor);
+                    changed |= ImGui.ColorEdit4("Umbral Heart Color", ref _pluginConfiguration.BLMUmbralHeartColor);
+                    changed |= ImGui.ColorEdit4("Polyglot Color", ref _pluginConfiguration.BLMPolyglotColor);
+                    changed |= ImGui.ColorEdit4("Triplecast Color", ref _pluginConfiguration.BLMTriplecastColor);
+                    changed |= ImGui.ColorEdit4("Firestarter Proc Color",
+                        ref _pluginConfiguration.BLMFirestarterColor);
+                    changed |= ImGui.ColorEdit4("Thundercloud Proc Color",
+                        ref _pluginConfiguration.BLMThundercloudColor);
+                    changed |= ImGui.ColorEdit4("DoT Timer Color", ref _pluginConfiguration.BLMDotColor);
+                    
+                    ImGui.EndTabItem();
+                }
+
+                
 
                 ImGui.EndTabBar();
             }
