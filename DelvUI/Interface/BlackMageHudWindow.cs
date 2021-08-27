@@ -22,9 +22,7 @@ namespace DelvUI.Interface
         private int VerticalSpaceBetweenBars => PluginConfiguration.BLMVerticalSpaceBetweenBars;
         private int HorizontalSpaceBetweenBars => PluginConfiguration.BLMHorizontalSpaceBetweenBars;
         private bool ShowTripleCast => PluginConfiguration.BLMShowTripleCast;
-        private bool UseBarsForTripleCast => PluginConfiguration.BLMUseBarsForTripleCast;
         private int TripleCastHeight => PluginConfiguration.BLMTripleCastHeight;
-        private int TripleCastRadius => PluginConfiguration.BLMTripleCastRadius;
 
         private Dictionary<string, uint> ManaBarNoElementColor => PluginConfiguration.JobColorMap[Jobs.BLM * 1000];
         private Dictionary<string, uint> ManaBarIceColor => PluginConfiguration.JobColorMap[Jobs.BLM * 1000 + 1];
@@ -126,15 +124,14 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
             var barSize = new Vector2(PolyglotWidth, PolyglotHeight);
-            var scale = gauge.IsEnoActive() ? (gauge.NumPolyglotStacks == 2 ? 1 : gauge.TimeUntilNextPolyglot / 30000f) : 1;
+            var scale = gauge.NumPolyglotStacks == 2 ? 0 : (gauge.IsEnoActive() ? gauge.TimeUntilNextPolyglot / 30000f : 1);
             scale = 1 - scale;
 
             var y = OriginY - ManaBarHeight - VerticalSpaceBetweenBars - UmbralHeartHeight - VerticalSpaceBetweenBars - PolyglotHeight;
-            if (UseBarsForTripleCast)
+            if (ShowTripleCast)
             {
                 y = y - VerticalSpaceBetweenBars - TripleCastHeight;
             }
-
             var drawList = ImGui.GetWindowDrawList();
 
             if (gauge.NumPolyglotStacks == 0)
@@ -188,21 +185,6 @@ namespace DelvUI.Interface
         protected virtual void DrawTripleCast()
         {
             var tripleStackBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1211);
-
-            if (UseBarsForTripleCast)
-            {
-                DrawTripleCastBars(tripleStackBuff.StackCount);
-            }
-            else
-            {
-                DrawTripleCastCircles(tripleStackBuff.StackCount);
-            }
-        }
-
-        private void DrawTripleCastBars(int stackCount)
-        {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
-
             var barSize = new Vector2((ManaBarWidth - (HorizontalSpaceBetweenBars * 2)) / 3, TripleCastHeight);
             var totalWidth = barSize.X * 3 + HorizontalSpaceBetweenBars * 2;
             var cursorPos = new Vector2(OriginX - totalWidth / 2, OriginY - ManaBarHeight - VerticalSpaceBetweenBars - UmbralHeartHeight - VerticalSpaceBetweenBars - barSize.Y);
@@ -212,7 +194,7 @@ namespace DelvUI.Interface
             for (int i = 1; i <= 3; i++)
             {
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, TriplecastColor["background"]);
-                if (stackCount >= i)
+                if (tripleStackBuff.StackCount >= i)
                 {
                     drawList.AddRectFilledMultiColor(
                         cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y),
@@ -222,22 +204,6 @@ namespace DelvUI.Interface
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
                 cursorPos.X = cursorPos.X + barSize.X + HorizontalSpaceBetweenBars;
-            }
-        }
-
-        private void DrawTripleCastCircles(int stackCount)
-        {
-            var drawList = ImGui.GetWindowDrawList();
-
-            var y = OriginY - ManaBarHeight - VerticalSpaceBetweenBars - UmbralHeartHeight - VerticalSpaceBetweenBars;
-            var positions = new List<Vector2>();
-            positions.Add(new Vector2(OriginX, y - PolyglotHeight - VerticalSpaceBetweenBars - TripleCastRadius));
-            positions.Add(new Vector2(OriginX - ManaBarWidth / 2f + ManaBarWidth / 6f, y - TripleCastRadius));
-            positions.Add(new Vector2(OriginX + ManaBarWidth / 2f - ManaBarWidth / 6f, y - TripleCastRadius));
-
-            for (int i = 0; i < stackCount; i++)
-            {
-                drawList.AddCircle(positions[i], TripleCastRadius, TriplecastColor["base"], 6, 4);
             }
         }
     }

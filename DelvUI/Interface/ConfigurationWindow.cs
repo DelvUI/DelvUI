@@ -692,19 +692,11 @@ namespace DelvUI.Interface {
                     }
 
                     changed |= ImGui.Checkbox("Show Triplecast", ref _pluginConfiguration.BLMShowTripleCast);
-                    changed |= ImGui.Checkbox("Use Bars for Triplecast", ref _pluginConfiguration.BLMUseBarsForTripleCast);
 
                     var BLMTripleCastHeight = _pluginConfiguration.BLMTripleCastHeight;
                     if (ImGui.DragInt("Triplecast Bar Height", ref BLMTripleCastHeight, .1f, -2000, 2000))
                     {
                         _pluginConfiguration.BLMTripleCastHeight = BLMTripleCastHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var BLMTripleCastRadius = _pluginConfiguration.BLMTripleCastRadius;
-                    if (ImGui.DragInt("Triplecast radius", ref BLMTripleCastRadius, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BLMTripleCastRadius = BLMTripleCastRadius;
                         _pluginConfiguration.Save();
                     }
 

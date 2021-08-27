@@ -183,9 +183,7 @@ namespace DelvUI {
         public int BLMVerticalSpaceBetweenBars { get; set; } = 2;
         public int BLMHorizontalSpaceBetweenBars { get; set; } = 2;
         public bool BLMShowTripleCast = true;
-        public bool BLMUseBarsForTripleCast = true;
         public int BLMTripleCastHeight { get; set; } = 16;
-        public int BLMTripleCastRadius { get; set; } = 10;
 
         public Vector4 BLMManaBarNoElementColor = new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f);
         public Vector4 BLMManaBarIceColor = new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f);
