@@ -1042,13 +1042,13 @@ namespace DelvUI.Interface
 
                 ImGui.EndTabBar();
             }
-                if (changed)
-                {
-                    _pluginConfiguration.BuildColorMap();
-                    _pluginConfiguration.Save();
-                }
-
-                ImGui.End();
+            
+            if (changed)
+            {
+                _pluginConfiguration.BuildColorMap();
+                _pluginConfiguration.Save();
+            }
+            ImGui.End();
             }
         }
     }
