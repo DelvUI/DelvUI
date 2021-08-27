@@ -642,6 +642,20 @@ namespace DelvUI.Interface {
                         _pluginConfiguration.Save();
                     }
 
+                    var BLMVerticalSpaceBetweenBars = _pluginConfiguration.BLMVerticalSpaceBetweenBars;
+                    if (ImGui.DragInt("Vertical Padding", ref BLMVerticalSpaceBetweenBars, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BLMVerticalSpaceBetweenBars = BLMVerticalSpaceBetweenBars;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMHorizontalSpaceBetweenBars = _pluginConfiguration.BLMHorizontalSpaceBetweenBars;
+                    if (ImGui.DragInt("Horizontal Padding", ref BLMHorizontalSpaceBetweenBars, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BLMHorizontalSpaceBetweenBars = BLMHorizontalSpaceBetweenBars;
+                        _pluginConfiguration.Save();
+                    }
+
                     var BLMManaBarHeight = _pluginConfiguration.BLMManaBarHeight;
                     if (ImGui.DragInt("Mana Bar Height", ref BLMManaBarHeight, .1f, 1, 1000))
                     {
@@ -677,17 +691,12 @@ namespace DelvUI.Interface {
                         _pluginConfiguration.Save();
                     }
 
-                    var BLMVerticalSpaceBetweenBars = _pluginConfiguration.BLMVerticalSpaceBetweenBars;
-                    if (ImGui.DragInt("Vertical Padding", ref BLMVerticalSpaceBetweenBars, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BLMVerticalSpaceBetweenBars = BLMVerticalSpaceBetweenBars;
-                        _pluginConfiguration.Save();
-                    }
+                    changed |= ImGui.Checkbox("Show Mana Threshold Marker", ref _pluginConfiguration.BLMShowManaThresholdMarker);
 
-                    var BLMHorizontalSpaceBetweenBars = _pluginConfiguration.BLMHorizontalSpaceBetweenBars;
-                    if (ImGui.DragInt("Horizontal Padding", ref BLMHorizontalSpaceBetweenBars, .1f, 1, 1000))
+                    var BLMManaThresholdValue = _pluginConfiguration.BLMManaThresholdValue;
+                    if (ImGui.DragInt("Mana Threshold Marker Value", ref BLMManaThresholdValue, 1f, 1, 10000))
                     {
-                        _pluginConfiguration.BLMHorizontalSpaceBetweenBars = BLMHorizontalSpaceBetweenBars;
+                        _pluginConfiguration.BLMManaThresholdValue = BLMManaThresholdValue;
                         _pluginConfiguration.Save();
                     }
 

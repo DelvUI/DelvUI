@@ -175,13 +175,15 @@ namespace DelvUI {
         #region BLM Configuration
 
         public int BLMVerticalOffset { get; set; } = -2;
+        public int BLMVerticalSpaceBetweenBars { get; set; } = 2;
+        public int BLMHorizontalSpaceBetweenBars { get; set; } = 2;
         public int BLMManaBarHeight { get; set; } = 20;
         public int BLMManaBarWidth { get; set; } = 254;
         public int BLMUmbralHeartHeight { get; set; } = 16;
         public int BLMPolyglotHeight { get; set; } = 18;
         public int BLMPolyglotWidth { get; set; } = 18;
-        public int BLMVerticalSpaceBetweenBars { get; set; } = 2;
-        public int BLMHorizontalSpaceBetweenBars { get; set; } = 2;
+        public bool BLMShowManaThresholdMarker = true;
+        public int BLMManaThresholdValue { get; set; } = 2600;
 
         public bool BLMShowTripleCast = true;
         public int BLMTripleCastHeight { get; set; } = 16;

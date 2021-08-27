@@ -14,13 +14,15 @@ namespace DelvUI.Interface
 
         private float OriginX => CenterX;
         private float OriginY => CenterY + YOffset + PluginConfiguration.BLMVerticalOffset;
+        private int VerticalSpaceBetweenBars => PluginConfiguration.BLMVerticalSpaceBetweenBars;
+        private int HorizontalSpaceBetweenBars => PluginConfiguration.BLMHorizontalSpaceBetweenBars;
         private int ManaBarWidth => PluginConfiguration.BLMManaBarWidth;
         private int ManaBarHeight => PluginConfiguration.BLMManaBarHeight;
         private int UmbralHeartHeight => PluginConfiguration.BLMUmbralHeartHeight;
         private int PolyglotHeight => PluginConfiguration.BLMPolyglotHeight;
         private int PolyglotWidth => PluginConfiguration.BLMPolyglotWidth;
-        private int VerticalSpaceBetweenBars => PluginConfiguration.BLMVerticalSpaceBetweenBars;
-        private int HorizontalSpaceBetweenBars => PluginConfiguration.BLMHorizontalSpaceBetweenBars;
+        private bool ShowManaThresholdMarker => PluginConfiguration.BLMShowManaThresholdMarker;
+        private int ManaThresholdValue => PluginConfiguration.BLMManaThresholdValue;
         private bool ShowTripleCast => PluginConfiguration.BLMShowTripleCast;
         private int TripleCastHeight => PluginConfiguration.BLMTripleCastHeight;
         private bool ShowFirestarterProcs => PluginConfiguration.BLMShowFirestarterProcs;
@@ -89,6 +91,17 @@ namespace DelvUI.Interface
             );
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+
+            // threshold marker
+            if (ShowManaThresholdMarker && gauge.InAstralFire())
+            {
+                var position = new Vector2(OriginX - barSize.X / 2 + (ManaThresholdValue / 10000f) * barSize.X, cursorPos.Y + barSize.Y);
+                var size = new Vector2(3, barSize.Y);
+                drawList.AddRectFilledMultiColor(
+                    position, position - size,
+                    0xFF000000, 0x00000000, 0x00000000, 0xFF000000
+                );
+            }
 
             // element timer
             var time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000 + 1 : 0;
