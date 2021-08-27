@@ -47,6 +47,7 @@ namespace DelvUIPlugin.Interface
             ChakraBar();
             Demolish();
             ActiveBuffs();
+            DrawFocusBar();
             DrawCastBar();
         }
 
