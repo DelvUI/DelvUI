@@ -21,7 +21,9 @@ namespace DelvUIPlugin {
         public int ToTBarWidth { get; set; } = 120;
         public int FocusBarHeight { get; set; } = 20;
         public int FocusBarWidth { get; set; } = 120;
-
+        public int ShieldHeight { get; set; } = 10;
+        public bool ShieldHeightPixels { get; set; } = true;
+        
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
         public int CastBarXOffset { get; set; } = 0;

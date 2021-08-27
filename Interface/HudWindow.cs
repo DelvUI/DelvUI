@@ -92,11 +92,12 @@ namespace DelvUIPlugin.Interface {
                 );
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
 
-                if (ImGui.IsItemClicked()) {
+                if (ImGui.GetIO().MouseClicked[0]) {
                     PluginInterface.ClientState.Targets.SetCurrentTarget(actor);
                 }
                 
             }
+            DrawTargetShield(actor, cursorPos, _barsize, true);
             
             ImGui.EndChild();
         }
@@ -158,6 +159,7 @@ namespace DelvUIPlugin.Interface {
             var name = $"{target.Name.Abbreviate().Truncate(16)}";
             var nameSize = ImGui.CalcTextSize(name);
             DrawOutlinedText(name, new Vector2(cursorPos.X + TargetBarWidth - nameSize.X - 5, cursorPos.Y - 22));
+            DrawTargetShield(target, cursorPos, _barsize, true);
 
             DrawTargetOfTargetBar(target.TargetActorID);
         }
@@ -197,8 +199,7 @@ namespace DelvUIPlugin.Interface {
             var name = $"{focus.Name.Abbreviate().Truncate(12)}";
             var textSize = ImGui.CalcTextSize(name);
             DrawOutlinedText(name, new Vector2(cursorPos.X + FocusBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
-
-            
+            DrawTargetShield(focus, cursorPos, barSize, true);
         }
         
         protected virtual void DrawTargetOfTargetBar(int targetActorId) {
@@ -242,6 +243,7 @@ namespace DelvUIPlugin.Interface {
             }
             
             ImGui.EndChild();
+            DrawTargetShield(target, cursorPos, barSize, true);
         }
 
         protected virtual unsafe void DrawCastBar()
@@ -363,6 +365,22 @@ namespace DelvUIPlugin.Interface {
                 cursorPos.Y + CastBarHeight / 2f - castTextSize.Y / 2f));
         }
 
+        protected virtual void DrawTargetShield( Actor actor, Vector2 cursorPos, Vector2 targetBar, bool leftToRight)
+        {
+            var shield = ActorShieldValue(actor);
+            if (Math.Abs(shield) < 0) return;
+            var drawList = ImGui.GetWindowDrawList();
+            var y = PluginConfiguration.ShieldHeightPixels
+                ? PluginConfiguration.ShieldHeight
+                : targetBar.Y / 100 * PluginConfiguration.ShieldHeight;
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0x88000000);
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + new Vector2(targetBar.X * shield, targetBar.Y / 100 * PluginConfiguration.ShieldHeight), 
+                0xFF00F7FF, 0xFF00F7FF, 0xFF00F7FF, 0xFF00F7FF
+            );
+            drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+        }
+
         protected virtual void DrawTankStanceIndicator()
         {
             var tankStanceBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => 
@@ -406,6 +424,11 @@ namespace DelvUIPlugin.Interface {
             }
 
 
+        }
+
+        protected unsafe virtual float ActorShieldValue(Actor actor)
+        {
+            return Math.Min(*(int*) (actor.Address + 0x1997), 100) / 100f;
         }
 
         protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor) {
