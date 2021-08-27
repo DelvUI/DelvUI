@@ -509,6 +509,141 @@ namespace DelvUI.Interface {
                     ImGui.EndTabItem();
                 }
 
+                if (ImGui.BeginTabItem("Dark Knight"))
+                {
+                    var drkBaseXOffset = _pluginConfiguration.DRKBaseXOffset;
+                    if (ImGui.DragInt("Base X Offset", ref drkBaseXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                    {
+                        _pluginConfiguration.DRKBaseXOffset = drkBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkBaseYOffset = _pluginConfiguration.DRKBaseYOffset;
+                    if (ImGui.DragInt("Base Y Offset", ref drkBaseYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                    {
+                        _pluginConfiguration.DRKBaseYOffset = drkBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkManaBarHeight = _pluginConfiguration.DRKManaBarHeight;
+                    if (ImGui.DragInt("Mana Bar Height", ref drkManaBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRKManaBarHeight = drkManaBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkManaBarWidth = _pluginConfiguration.DRKManaBarWidth;
+                    if (ImGui.DragInt("Mana Bar Width", ref drkManaBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRKManaBarWidth = drkManaBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkManaBarPadding = _pluginConfiguration.DRKManaBarPadding;
+                    if (ImGui.DragInt("Mana Bar Padding", ref drkManaBarPadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRKManaBarPadding = drkManaBarPadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkManaBarXOffset = _pluginConfiguration.DRKManaBarXOffset;
+                    if (ImGui.DragInt("Mana Bar X Offset", ref drkManaBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                    {
+                        _pluginConfiguration.DRKManaBarXOffset = drkManaBarXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkManaBarYOffset = _pluginConfiguration.DRKManaBarYOffset;
+                    if (ImGui.DragInt("Mana Bar Y Offset", ref drkManaBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                    {
+                        _pluginConfiguration.DRKManaBarYOffset = drkManaBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkBloodGaugeHeight = _pluginConfiguration.DRKBloodGaugeHeight;
+                    if (ImGui.DragInt("Blood Gauge Height", ref drkBloodGaugeHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRKBloodGaugeHeight = drkBloodGaugeHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkBloodGaugeWidth = _pluginConfiguration.DRKBloodGaugeWidth;
+                    if (ImGui.DragInt("Blood Gauge Width", ref drkBloodGaugeWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRKBloodGaugeWidth = drkBloodGaugeWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkBloodGaugePadding = _pluginConfiguration.DRKBloodGaugePadding;
+                    if (ImGui.DragInt("Blood Gauge Padding", ref drkBloodGaugePadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRKBloodGaugePadding = drkBloodGaugePadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkBloodGaugeXOffset = _pluginConfiguration.DRKBloodGaugeXOffset;
+                    if (ImGui.DragInt("Blood Gauge X Offset", ref drkBloodGaugeXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                    {
+                        _pluginConfiguration.DRKBloodGaugeXOffset = drkBloodGaugeXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkBloodGaugeYOffset = _pluginConfiguration.DRKBloodGaugeYOffset;
+                    if (ImGui.DragInt("Blood Gauge Y Offset", ref drkBloodGaugeYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                    {
+                        _pluginConfiguration.DRKBloodGaugeYOffset = drkBloodGaugeYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkDarkArtsBarHeight = _pluginConfiguration.DRKDarkArtsBarHeight;
+                    if (ImGui.DragInt("Dark Arts Bar Height", ref drkDarkArtsBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRKDarkArtsBarHeight = drkDarkArtsBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkDarkArtsBarWidth = _pluginConfiguration.DRKDarkArtsBarWidth;
+                    if (ImGui.DragInt("Dark Arts Bar Width", ref drkDarkArtsBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRKDarkArtsBarWidth = drkDarkArtsBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkDarkArtsBarPadding = _pluginConfiguration.DRKDarkArtsBarPadding;
+                    if (ImGui.DragInt("Dark Arts Bar Padding", ref drkDarkArtsBarPadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRKDarkArtsBarPadding = drkDarkArtsBarPadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkDarkArtsBarXOffset = _pluginConfiguration.DRKDarkArtsBarXOffset;
+                    if (ImGui.DragInt("Dark Arts Bar X Offset", ref drkDarkArtsBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                    {
+                        _pluginConfiguration.DRKDarkArtsBarXOffset = drkDarkArtsBarXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkDarkArtsBarYOffset = _pluginConfiguration.DRKDarkArtsBarYOffset;
+                    if (ImGui.DragInt("Dark Arts Bar Y Offset", ref drkDarkArtsBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                    {
+                        _pluginConfiguration.DRKDarkArtsBarYOffset = drkDarkArtsBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var drkInterBarOffset = _pluginConfiguration.DRKInterBarOffset;
+                    if (ImGui.DragInt("Space Between Bars", ref drkInterBarOffset, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DRKInterBarOffset = drkInterBarOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Mana Color", ref _pluginConfiguration.DRKManaColor);
+                    changed |= ImGui.ColorEdit4("Blood Color Left", ref _pluginConfiguration.DRKBloodColorLeft);
+                    changed |= ImGui.ColorEdit4("Blood Color Right", ref _pluginConfiguration.DRKBloodColorRight);
+                    changed |= ImGui.ColorEdit4("Dark Arts Color", ref _pluginConfiguration.DRKDarkArtsColor);
+                    changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.DRKEmptyColor);
+                }
+
                 ImGui.EndTabBar();
             }
 
