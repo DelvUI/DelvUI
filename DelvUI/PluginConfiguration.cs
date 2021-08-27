@@ -6,7 +6,8 @@ using ImGuiNET;
 using Newtonsoft.Json;
 
 namespace DelvUI {
-    public class PluginConfiguration : IPluginConfiguration {
+    public class PluginConfiguration : IPluginConfiguration
+    {
         public int Version { get; set; }
         public bool HideHud = false;
         public bool LockHud = true;
@@ -21,17 +22,15 @@ namespace DelvUI {
         public int FocusBarHeight { get; set; } = 20;
         public int FocusBarWidth { get; set; } = 120;
         public int ShieldHeight { get; set; } = 10;
-        
+
         public bool ShieldHeightPixels = true;
-        
+
         public bool ShieldEnabled = true;
-        
-        
+
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
         public int CastBarXOffset { get; set; } = 0;
         public int CastBarYOffset { get; set; } = 460;
-        
 
         public bool ShowCastBar = true;
         public bool ShowActionIcon = true;
@@ -72,7 +71,7 @@ namespace DelvUI {
         public Vector4 NPCColorFriendly = new Vector4(0f/255f, 145f/255f, 6f/255f, 100f/100f);
 
         #region WAR Configuration
-        
+
         public int WARStormsEyeHeight { get; set; } = 20;
         public int WARStormsEyeWidth { get; set; } = 254;
         public int WARBaseXOffset { get; set; } = 127;
@@ -89,7 +88,7 @@ namespace DelvUI {
         public Vector4 WARNascentChaosColor = new Vector4(240f/255f, 176f/255f, 0f/255f, 100f/100f);
         public Vector4 WAREmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 100f/100f);
 
-        #endregion
+        #endregion WAR Configuration
 
         #region SCH Configuration
 
@@ -106,8 +105,22 @@ namespace DelvUI {
         public Vector4 SchFairyColor = new Vector4(94f/255f, 250f/255f, 154f/255f, 100f/100f);
         public Vector4 SchEmptyColor = new Vector4(0f/255f, 0f/255f, 0f/255f, 53f/100f);
 
-        #endregion
-        
+        #endregion SCH Configuration
+
+        #region WHM Configuration
+
+        public int WHMLilyBarHeight { get; set; } = 13;
+        public int WHMLilyBarWidth { get; set; } = 254;
+        public int WHMLilyBarX { get; set; } = 127;
+        public int WHMLilyBarY { get; set; } = 476;
+        public int WHMLilyBarPad { get; set; } = 4;
+        public Vector4 WHMLilyColor = new Vector4(254f/255f, 254f/255f, 254f/255f, 100f/100f);
+        public Vector4 WHMBloodLilyColor = new Vector4(77f/255f, 37f/255f, 211f/255f, 100f/100f);
+        public Vector4 WHMChargingColor = new Vector4(142f/255f, 141f/255f, 143f/255f, 100f/100f);
+        public Vector4 WHMEmptyColor = new Vector4(0f, 0f, 0f, 50f / 100f);
+
+        #endregion WHM Configuration
+
         #region MCH Configuration
 
         public int MCHOverheatHeight { get; set; } = 20;
@@ -169,8 +182,6 @@ namespace DelvUI {
         public Vector4 PLDEmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 100f/100f);
         public Vector4 PLDAtonementColor = new Vector4(240f/255f, 176f/255f, 0f/255f, 100f/100f);
 
-        #endregion
-        
         [JsonIgnore] private DalamudPluginInterface _pluginInterface;
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
         [JsonIgnore] public Dictionary<uint, Dictionary<string, uint>> JobColorMap;
@@ -178,16 +189,19 @@ namespace DelvUI {
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> ShieldColorMap;
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> CastBarColorMap;
 
-        public void Init(DalamudPluginInterface pluginInterface) {
+        public void Init(DalamudPluginInterface pluginInterface)
+        {
             _pluginInterface = pluginInterface;
             BuildColorMap();
         }
 
-        public void Save() {
+        public void Save()
+        {
             _pluginInterface.SavePluginConfig(this);
         }
 
-        public void BuildColorMap() {
+        public void BuildColorMap()
+        {
             JobColorMap = new Dictionary<uint, Dictionary<string, uint>>
             {
                 [Jobs.PLD] = new Dictionary<string, uint>
@@ -253,7 +267,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.WAR * 1000] = new Dictionary<string, uint> // Inner Release
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(WARInnerReleaseColor),
@@ -261,7 +275,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WARInnerReleaseColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WARInnerReleaseColor.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.WAR * 1000 + 1] = new Dictionary<string, uint> // Storm's Eye
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(WARStormsEyeColor),
@@ -269,7 +283,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WARStormsEyeColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WARStormsEyeColor.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.WAR * 1000 + 2] = new Dictionary<string, uint> // Fell Cleave
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(WARFellCleaveColor),
@@ -277,7 +291,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WARFellCleaveColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WARFellCleaveColor.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.WAR * 1000 + 3] = new Dictionary<string, uint> // Nascent Chaos
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(WARNascentChaosColor),
@@ -285,7 +299,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WARNascentChaosColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WARNascentChaosColor.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.WAR * 1000 + 4] = new Dictionary<string, uint> // WAR Empty
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(WAREmptyColor),
@@ -301,7 +315,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.GNB] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorGNB),
@@ -317,7 +331,39 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorWHM.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorWHM.AdjustColor(.1f))
                 },
-                
+
+                [Jobs.WHM * 1000] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(WHMLilyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(WHMLilyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WHMLilyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WHMLilyColor.AdjustColor(.1f))
+                },
+
+                [Jobs.WHM * 1000 + 1] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(WHMBloodLilyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(WHMBloodLilyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WHMBloodLilyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WHMBloodLilyColor.AdjustColor(.1f))
+                },
+
+                [Jobs.WHM * 1000 + 2] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(WHMChargingColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(WHMChargingColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WHMChargingColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WHMChargingColor.AdjustColor(.1f))
+                },
+
+                [Jobs.WHM * 1000 + 3] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(WHMEmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(WHMEmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WHMEmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WHMEmptyColor.AdjustColor(.1f))
+                },
+
                 [Jobs.SCH] = new Dictionary<string, uint> // Scholar job color
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorSCH),
@@ -357,7 +403,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorAST.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorAST.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.MNK] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorMNK),
@@ -365,7 +411,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorMNK.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorMNK.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.DRG] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorDRG),
@@ -381,7 +427,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.SAM] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorSAM),
@@ -389,7 +435,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorSAM.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorSAM.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.BRD] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorBRD),
@@ -397,7 +443,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorBRD.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorBRD.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.MCH] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorMCH),
@@ -405,7 +451,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorMCH.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorMCH.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.MCH * 1000] = new Dictionary<string, uint> // Heat gauge ready
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor),
@@ -413,7 +459,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.MCH * 1000 + 1] = new Dictionary<string, uint> // Battery gauge ready
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor),
@@ -421,7 +467,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.MCH * 1000 + 2] = new Dictionary<string, uint> // Robot summoned
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor),
@@ -429,7 +475,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.MCH * 1000 + 3] = new Dictionary<string, uint> // Overheated
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor),
@@ -437,7 +483,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.MCH * 1000 + 4] = new Dictionary<string, uint> // Bar not ready
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(MCHEmptyColor),
@@ -445,7 +491,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHEmptyColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHEmptyColor.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.MCH * 1000 + 5] = new Dictionary<string, uint> // Wildfire Active
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(MCHWildfireColor),
@@ -461,7 +507,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.BLM] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorBLM),
@@ -469,7 +515,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorBLM.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorBLM.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.SMN] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN),
@@ -477,7 +523,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.RDM] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorRDM),
@@ -485,7 +531,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorRDM.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorRDM.AdjustColor(.1f))
                 },
-                
+
                 [Jobs.BLU] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorBLU),
@@ -494,7 +540,7 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorBLU.AdjustColor(.1f))
                 },
             };
-            
+
             JobColorMap.Add(Jobs.GLD, JobColorMap[Jobs.PLD]);
             JobColorMap.Add(Jobs.PGL, JobColorMap[Jobs.MNK]);
             JobColorMap.Add(Jobs.MRD, JobColorMap[Jobs.WAR]);
@@ -513,7 +559,7 @@ namespace DelvUI {
             JobColorMap.Add(Jobs.WVR, JobColorMap[Jobs.WAR]);
             JobColorMap.Add(Jobs.ALC, JobColorMap[Jobs.WAR]);
             JobColorMap.Add(Jobs.CUL, JobColorMap[Jobs.WAR]);
-        
+
             JobColorMap.Add(Jobs.MIN, JobColorMap[Jobs.WAR]);
             JobColorMap.Add(Jobs.BOT, JobColorMap[Jobs.WAR]);
             JobColorMap.Add(Jobs.FSH, JobColorMap[Jobs.WAR]);
@@ -527,7 +573,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(NPCColorHostile.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NPCColorHostile.AdjustColor(.1f))
                 },
-                
+
                 ["neutral"] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(NPCColorNeutral),
@@ -535,7 +581,7 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(NPCColorNeutral.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NPCColorNeutral.AdjustColor(.1f))
                 },
-                
+
                 ["friendly"] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(NPCColorFriendly),
@@ -544,7 +590,7 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NPCColorFriendly.AdjustColor(.1f))
                 },
             };
-            
+
             ShieldColorMap = new Dictionary<string, Dictionary<string, uint>>
             {
                 ["shield"] = new Dictionary<string, uint>
@@ -555,7 +601,7 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ShieldColor.AdjustColor(.1f))
                 }
             };
-            
+
             CastBarColorMap = new Dictionary<string, Dictionary<string, uint>>
             {
                 ["castbar"] = new Dictionary<string, uint>
@@ -575,8 +621,9 @@ namespace DelvUI {
             };
         }
     }
-    
-    public static class Jobs {
+
+    public static class Jobs
+    {
         public const uint GLD = 1;
         public const uint MRD = 3;
         public const uint PLD = 19;
@@ -609,15 +656,15 @@ namespace DelvUI {
         public const uint RDM = 35;
         public const uint BLU = 36;
 
-       public const uint CRP = 8;
-       public const uint BSM = 9;
-       public const uint ARM = 10;
-       public const uint GSM = 11;
-       public const uint LTW = 12;
-       public const uint WVR = 13;
-       public const uint ALC = 14;
-       public const uint CUL = 15;
-        
+        public const uint CRP = 8;
+        public const uint BSM = 9;
+        public const uint ARM = 10;
+        public const uint GSM = 11;
+        public const uint LTW = 12;
+        public const uint WVR = 13;
+        public const uint ALC = 14;
+        public const uint CUL = 15;
+
         public const uint MIN = 16;
         public const uint BOT = 17;
         public const uint FSH = 18;

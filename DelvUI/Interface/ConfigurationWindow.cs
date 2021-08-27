@@ -276,6 +276,52 @@ namespace DelvUI.Interface {
                     ImGui.EndTabItem();
                 }
 
+                if (ImGui.BeginTabItem("White mage"))
+                {
+
+                    var lilyBarHeight = _pluginConfiguration.WHMLilyBarHeight;
+                    if (ImGui.DragInt("Lily Bar Height", ref lilyBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.WHMLilyBarHeight = lilyBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var lilyBarWidth = _pluginConfiguration.WHMLilyBarWidth;
+                    if (ImGui.DragInt("Lily Bar Width", ref lilyBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.WHMLilyBarWidth = lilyBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var lilyBarX = _pluginConfiguration.WHMLilyBarX;
+                    if (ImGui.DragInt("Lily Bar X Offset", ref lilyBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.WHMLilyBarX = lilyBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var lilyBarY = _pluginConfiguration.WHMLilyBarY;
+                    if (ImGui.DragInt("Lily Bar Y Offset", ref lilyBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.WHMLilyBarY = lilyBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var whmLilyBarPad = _pluginConfiguration.WHMLilyBarPad;
+                    if (ImGui.DragInt("Lily Bar Padding", ref whmLilyBarPad, .1f, -100, 1000))
+                    {
+                        _pluginConfiguration.WHMLilyBarPad = whmLilyBarPad;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Lily Bar Color", ref _pluginConfiguration.WHMLilyColor);
+                    changed |= ImGui.ColorEdit4("Blood Lily Bar Color", ref _pluginConfiguration.WHMBloodLilyColor);
+                    changed |= ImGui.ColorEdit4("Lily Bar Charging Color", ref _pluginConfiguration.WHMChargingColor);
+                    changed |= ImGui.ColorEdit4("Lily Bar Empty", ref _pluginConfiguration.WHMEmptyColor);
+
+                    ImGui.EndTabItem();
+                }
+
                 if (ImGui.BeginTabItem("Warrior"))
                 {
                     var stormsEyeHeight = _pluginConfiguration.WARStormsEyeHeight;
