@@ -509,6 +509,89 @@ namespace DelvUI.Interface {
                     ImGui.EndTabItem();
                 }
 
+                if (ImGui.BeginTabItem("Black Mage"))
+                {
+                    var BLMVerticalOffset = _pluginConfiguration.BLMVerticalOffset;
+                    if (ImGui.DragInt("Vertical Offset", ref BLMVerticalOffset, 1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.BLMVerticalOffset = BLMVerticalOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMManaBarHeight = _pluginConfiguration.BLMManaBarHeight;
+                    if (ImGui.DragInt("Mana Bar Height", ref BLMManaBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BLMManaBarHeight = BLMManaBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMManaBarWidth = _pluginConfiguration.BLMManaBarWidth;
+                    if (ImGui.DragInt("Mana Bar Width", ref BLMManaBarWidth, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.BLMManaBarWidth = BLMManaBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMUmbralHeartHeight = _pluginConfiguration.BLMUmbralHeartHeight;
+                    if (ImGui.DragInt("Umbral Heart Height", ref BLMUmbralHeartHeight, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.BLMUmbralHeartHeight = BLMUmbralHeartHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMPolyglotHeight = _pluginConfiguration.BLMPolyglotHeight;
+                    if (ImGui.DragInt("Polyglot Height", ref BLMPolyglotHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BLMPolyglotHeight = BLMPolyglotHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMPolyglotWidth = _pluginConfiguration.BLMPolyglotWidth;
+                    if (ImGui.DragInt("Polyglot Width", ref BLMPolyglotWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BLMPolyglotWidth = BLMPolyglotWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMVerticalSpaceBetweenBars = _pluginConfiguration.BLMVerticalSpaceBetweenBars;
+                    if (ImGui.DragInt("Vertical Padding", ref BLMVerticalSpaceBetweenBars, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BLMVerticalSpaceBetweenBars = BLMVerticalSpaceBetweenBars;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMHorizontalSpaceBetweenBars = _pluginConfiguration.BLMHorizontalSpaceBetweenBars;
+                    if (ImGui.DragInt("Horizontal Padding", ref BLMHorizontalSpaceBetweenBars, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BLMHorizontalSpaceBetweenBars = BLMHorizontalSpaceBetweenBars;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show Triplecast", ref _pluginConfiguration.BLMShowTripleCast);
+                    changed |= ImGui.Checkbox("Use Bars for Triplecast", ref _pluginConfiguration.BLMUseBarsForTripleCast);
+
+                    var BLMTripleCastHeight = _pluginConfiguration.BLMTripleCastHeight;
+                    if (ImGui.DragInt("Triplecast Bar Height", ref BLMTripleCastHeight, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.BLMTripleCastHeight = BLMTripleCastHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var BLMTripleCastRadius = _pluginConfiguration.BLMTripleCastRadius;
+                    if (ImGui.DragInt("Triplecast radius", ref BLMTripleCastRadius, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BLMTripleCastRadius = BLMTripleCastRadius;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Mana Bar Color", ref _pluginConfiguration.BLMManaBarNoElementColor);
+                    changed |= ImGui.ColorEdit4("Mana Bar Ice Color", ref _pluginConfiguration.BLMManaBarIceColor);
+                    changed |= ImGui.ColorEdit4("Mana Bar Fire Color", ref _pluginConfiguration.BLMManaBarFireColor);
+                    changed |= ImGui.ColorEdit4("Umbral Heart Color", ref _pluginConfiguration.BLMUmbralHeartColor);
+                    changed |= ImGui.ColorEdit4("Polyglot Color", ref _pluginConfiguration.BLMPolyglotColor);
+                    changed |= ImGui.ColorEdit4("Triplecast Color", ref _pluginConfiguration.BLMTriplecastColor);
+                }
+
                 ImGui.EndTabBar();
             }
 
