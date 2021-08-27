@@ -12,14 +12,24 @@ namespace DelvUI {
         public bool LockHud = true;
         public int HealthBarHeight { get; set; } = 50;
         public int HealthBarWidth { get; set; } = 270;
+        public int HealthBarXOffset { get; set; } = 160;
+        public int HealthBarYOffset { get; set; } = 460;
         public int PrimaryResourceBarHeight { get; set; } = 13;
         public int PrimaryResourceBarWidth { get; set; } = 254;
+        public int PrimaryResourceBarXOffset { get; set; } = 160;
+        public int PrimaryResourceBarYOffset { get; set; } = 460;
         public int TargetBarHeight { get; set; } = 50;
         public int TargetBarWidth { get; set; } = 270;
+        public int TargetBarXOffset { get; set; } = 160;
+        public int TargetBarYOffset { get; set; } = 460;
         public int ToTBarHeight { get; set; } = 20;
         public int ToTBarWidth { get; set; } = 120;
+        public int ToTBarXOffset { get; set; } = 160;
+        public int ToTBarYOffset { get; set; } = 460;
         public int FocusBarHeight { get; set; } = 20;
         public int FocusBarWidth { get; set; } = 120;
+        public int FocusBarXOffset { get; set; } = 160;
+        public int FocusBarYOffset { get; set; } = 460;
         public int ShieldHeight { get; set; } = 10;
 
         public bool ShieldHeightPixels = true;
