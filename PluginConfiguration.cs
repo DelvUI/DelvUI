@@ -81,6 +81,38 @@ namespace DelvUIPlugin {
         public Vector4 WAREmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 1f);
         
         #endregion
+
+        #region PLD Configuration
+
+        public int PLDManaHeight { get; set; } = 20;
+        public int PLDManaWidth { get; set; } = 254;
+        public int PLDManaPadding { get; set; } = 2;
+        public int PLDBaseXOffset { get; set; } = 127;
+        public int PLDBaseYOffset { get; set; } = 372;
+        public int PLDOathGaugeHeight { get; set; } = 20;
+        public int PLDOathGaugeWidth { get; set; } = 254;
+        public int PLDOathGaugePadding { get; set; } = 2;
+        public int PLDOathGaugeXOffset {get; set;}
+        public int PLDOathGaugeYOffset {get; set;}
+        public bool PLDOathGaugeText { get; set; } = false;
+        public int PLDBuffBarHeight { get; set; } = 20;
+        public int PLDBuffBarWidth { get; set; } = 254;
+        public int PLDBuffBarXOffset {get; set;}
+        public int PLDBuffBarYOffset {get; set;}
+        public int PLDAtonementBarHeight { get; set; } = 20;
+        public int PLDAtonementBarWidth { get; set; } = 254;
+        public int PLDAtonementBarPadding { get; set; } = 2;
+        public int PLDAtonementBarXOffset {get; set;}
+        public int PLDAtonementBarYOffset {get; set;}
+        public int PLDInterBarOffset { get; set; } = 2;
+        public Vector4 PLDManaColor = new Vector4(0f, 203f/255f, 230f/255f, 1f);
+        public Vector4 PLDOathGaugeColor = new Vector4(24f/255f, 80f/255f, 175f/255f, 1f);
+        public Vector4 PLDFightOrFlightColor = new Vector4(240f/255f, 50f/255f, 0f, 1f);
+        public Vector4 PLDRequiescatColor = new Vector4(61f/255f, 61f/255f, 1f, 1f);
+        public Vector4 PLDEmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 1f);
+        public Vector4 PLDAtonementColor = new Vector4(240f/255f, 176f/255f, 0f, 1f);
+
+        #endregion
         
         [JsonIgnore] private DalamudPluginInterface _pluginInterface;
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
@@ -106,6 +138,54 @@ namespace DelvUIPlugin {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD.AdjustColor(.1f))
+                },
+                
+                [Jobs.PLD * 1000] = new Dictionary<string, uint> // PLD Mana
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDManaColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDManaColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDManaColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDManaColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.PLD * 1000 + 1] = new Dictionary<string, uint> // Oath Gauge
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDOathGaugeColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDOathGaugeColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDOathGaugeColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDOathGaugeColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.PLD * 1000 + 2] = new Dictionary<string, uint> // Fight Or Flight
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDFightOrFlightColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDFightOrFlightColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDFightOrFlightColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDFightOrFlightColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.PLD * 1000 + 3] = new Dictionary<string, uint> // Requiescat
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDRequiescatColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDRequiescatColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDRequiescatColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDRequiescatColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.PLD * 1000 + 4] = new Dictionary<string, uint> // PLD Empty
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDEmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDEmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDEmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDEmptyColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.PLD * 1000 + 5] = new Dictionary<string, uint> // Atonement
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDAtonementColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDAtonementColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDAtonementColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDAtonementColor.AdjustColor(.1f))
                 },
                 
                 [Jobs.WAR] = new Dictionary<string, uint>

@@ -92,8 +92,8 @@ namespace DelvUIPlugin {
                 Jobs.DRK => new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.GNB => new GunbreakerHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.WAR => new WarriorHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.PLD => new PaladinHudWindow(_pluginInterface, _pluginConfiguration),
 
-                
                 //Healers
                 Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
                 
@@ -137,7 +137,6 @@ namespace DelvUIPlugin {
                 //dont have packs yet
                 Jobs.BLM => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.MCH => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.PLD => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.MNK => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.NIN => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SCH => new UnitframeOnlyHudWindow(_pluginInterface, _pluginConfiguration),

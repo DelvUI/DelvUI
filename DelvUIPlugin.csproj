@@ -64,6 +64,7 @@
     </ItemGroup>
     <ItemGroup>
 		    <Compile Include="GameStructs\AddonCastBar.cs" />
+		    <Compile Include="Interface\PaladinHudWindow.cs" />
 		    <Compile Include="Interface\SamuraiHudWindow.cs" />
         <Compile Include="Interface\BardHudWindow.cs" />
         <Compile Include="Interface\DancerHudWindow.cs" />
