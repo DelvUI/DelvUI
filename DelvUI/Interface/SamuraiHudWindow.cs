@@ -4,7 +4,7 @@ using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
 
-namespace DelvUIPlugin.Interface {
+namespace DelvUI.Interface {
     public class SamuraiHudWindow : HudWindow {
 
         public override uint JobId => 34;
@@ -38,8 +38,8 @@ namespace DelvUIPlugin.Interface {
             var barSize = new Vector2(barWidth, BarHeight);
 
             // Kenki Gauge
-            var Kenki = Math.Min((int)gauge.Kenki, chunkSize);
-            var scale = (float)Kenki / chunkSize;
+            var kenki = Math.Min((int)gauge.Kenki, chunkSize);
+            var scale = (float)kenki / chunkSize;
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
             drawList.AddRectFilledMultiColor(

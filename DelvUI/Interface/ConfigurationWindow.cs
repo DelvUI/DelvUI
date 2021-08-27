@@ -2,9 +2,9 @@
 using Dalamud.Plugin;
 using ImGuiNET;
 
-namespace DelvUIPlugin.Interface {
+namespace DelvUI.Interface {
     public class ConfigurationWindow {
-        public bool IsVisible = false;
+        public bool IsVisible;
         private readonly Plugin _plugin;
         private readonly DalamudPluginInterface _pluginInterface;
         private readonly PluginConfiguration _pluginConfiguration;
@@ -14,7 +14,6 @@ namespace DelvUIPlugin.Interface {
             _pluginInterface = pluginInterface;
             _pluginConfiguration = pluginConfiguration;
         }
-
 
         public void Draw() {
             if (!IsVisible) {
@@ -29,10 +28,10 @@ namespace DelvUIPlugin.Interface {
 
             var changed = false;
 
-            int ViewportWidth = (int) ImGui.GetMainViewport().Size.X;
-            int ViewportHeight = (int) ImGui.GetMainViewport().Size.Y;
-            int XOffsetLimit = ViewportWidth / 2;
-            int YOffsetLimit = ViewportHeight / 2;
+            var viewportWidth = (int) ImGui.GetMainViewport().Size.X;
+            var viewportHeight = (int) ImGui.GetMainViewport().Size.Y;
+            var xOffsetLimit = viewportWidth / 2;
+            var yOffsetLimit = viewportHeight / 2;
 
             if (ImGui.BeginTabBar("##settings-tabs")) {
                 if (ImGui.BeginTabItem("General"))
@@ -144,14 +143,14 @@ namespace DelvUIPlugin.Interface {
                     }
 
                     var castBarXOffset = _pluginConfiguration.CastBarXOffset;
-                    if (ImGui.DragInt("Castbar X Offset", ref castBarXOffset, .1f, -XOffsetLimit, XOffsetLimit))
+                    if (ImGui.DragInt("Castbar X Offset", ref castBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
                     {
                         _pluginConfiguration.CastBarXOffset = castBarXOffset;
                         _pluginConfiguration.Save();
                     }
 
                     var castBarYOffset = _pluginConfiguration.CastBarYOffset;
-                    if (ImGui.DragInt("Castbar Y Offset", ref castBarYOffset, .1f, -YOffsetLimit, YOffsetLimit))
+                    if (ImGui.DragInt("Castbar Y Offset", ref castBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
                     {
                         _pluginConfiguration.CastBarYOffset = castBarYOffset;
                         _pluginConfiguration.Save();

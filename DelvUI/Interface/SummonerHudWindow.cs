@@ -1,11 +1,11 @@
-using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Plugin;
 using ImGuiNET;
 
-namespace DelvUIPlugin.Interface
+namespace DelvUI.Interface
 {
     public class SummonerHudWindow : HudWindow
     {
@@ -71,9 +71,9 @@ namespace DelvUIPlugin.Interface
         }
         private void DrawAetherBar()
         {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var aetherFlowBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
             var xPadding = 2;
-            var xOffset = CenterX - 127;
             var barWidth = (BarWidth / 2) - 1;
             var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 22);
             var barSize = new Vector2(barWidth, BarHeight);
@@ -107,6 +107,7 @@ namespace DelvUIPlugin.Interface
         }
         private void DrawRuinBar()
         {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var ruinBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1212);
             var ruinStacks = ruinBuff.StackCount;
 
@@ -133,16 +134,6 @@ namespace DelvUIPlugin.Interface
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
                 cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
             }
-
-        }
-        private void DrawTranceBar()
-        {
-            //Need to figure this out, trances dont give a visible buff, Api has a buff listing as 808 but unsure if this is correct
-
-        }
-        private void DrawEgiAssaultsBar()
-        {
-            // Does dalamud give ability tracking? This may still need to be a action bar the user creates.
         }
     }
 }

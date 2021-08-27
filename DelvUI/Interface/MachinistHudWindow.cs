@@ -1,46 +1,70 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
 
-namespace DelvUIPlugin.Interface
+namespace DelvUI.Interface
 {
     public class MachinistHudWindow : HudWindow
     {
         public override uint JobId => 31;
 
-        protected int OverheatHeight => PluginConfiguration.MCHOverheatHeight;
-        protected int OverheatWidth => PluginConfiguration.MCHOverheatWidth;
-        protected new int XOffset => PluginConfiguration.MCHBaseXOffset;
-        protected new int YOffset => PluginConfiguration.MCHBaseYOffset;
-        protected int HeatGaugeHeight => PluginConfiguration.MCHHeatGaugeHeight;
-        protected int HeatGaugeWidth => PluginConfiguration.MCHHeatGaugeWidth;
-        protected int HeatGaugePadding => PluginConfiguration.MCHHeatGaugePadding;
-        protected int HeatGaugeXOffset => PluginConfiguration.MCHHeatGaugeXOffset;
-        protected int HeatGaugeYOffset => PluginConfiguration.MCHHeatGaugeYOffset;
-        protected int BatteryGaugeHeight => PluginConfiguration.MCHBatteryGaugeHeight;
-        protected int BatteryGaugeWidth => PluginConfiguration.MCHBatteryGaugeWidth;
-        protected int BatteryGaugePadding => PluginConfiguration.MCHBatteryGaugePadding;
-        protected int BatteryGaugeXOffset => PluginConfiguration.MCHBatteryGaugeXOffset;
-        protected int BatteryGaugeYOffset => PluginConfiguration.MCHBatteryGaugeYOffset;
-        protected bool WildfireEnabled => PluginConfiguration.MCHWildfireEnabled;
-        protected int WildfireHeight => PluginConfiguration.MCHWildfireHeight;
-        protected int WildfireWidth => PluginConfiguration.MCHWildfireWidth;
-        protected int WildfireXOffset => PluginConfiguration.MCHWildfireXOffset;
-        protected int WildfireYOffset => PluginConfiguration.MCHWildfireYOffset;
-        protected Dictionary<string, uint> HeatColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000];
-        protected Dictionary<string, uint> BatteryColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 1];
-        protected Dictionary<string, uint> RobotColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 2];
-        protected Dictionary<string, uint> OverheatColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 3];
-        protected Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 4];
-        protected Dictionary<string, uint> WildfireColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 5];
+        private int OverheatHeight => PluginConfiguration.MCHOverheatHeight;
+
+        private int OverheatWidth => PluginConfiguration.MCHOverheatWidth;
+
+        private new int XOffset => PluginConfiguration.MCHBaseXOffset;
+
+        private new int YOffset => PluginConfiguration.MCHBaseYOffset;
+
+        private int HeatGaugeHeight => PluginConfiguration.MCHHeatGaugeHeight;
+
+        private int HeatGaugeWidth => PluginConfiguration.MCHHeatGaugeWidth;
+
+        private int HeatGaugePadding => PluginConfiguration.MCHHeatGaugePadding;
+
+        private int HeatGaugeXOffset => PluginConfiguration.MCHHeatGaugeXOffset;
+
+        private int HeatGaugeYOffset => PluginConfiguration.MCHHeatGaugeYOffset;
+
+        private int BatteryGaugeHeight => PluginConfiguration.MCHBatteryGaugeHeight;
+
+        private int BatteryGaugeWidth => PluginConfiguration.MCHBatteryGaugeWidth;
+
+        private int BatteryGaugePadding => PluginConfiguration.MCHBatteryGaugePadding;
+
+        private int BatteryGaugeXOffset => PluginConfiguration.MCHBatteryGaugeXOffset;
+
+        private int BatteryGaugeYOffset => PluginConfiguration.MCHBatteryGaugeYOffset;
+
+        private bool WildfireEnabled => PluginConfiguration.MCHWildfireEnabled;
+
+        private int WildfireHeight => PluginConfiguration.MCHWildfireHeight;
+
+        private int WildfireWidth => PluginConfiguration.MCHWildfireWidth;
+
+        private int WildfireXOffset => PluginConfiguration.MCHWildfireXOffset;
+
+        private int WildfireYOffset => PluginConfiguration.MCHWildfireYOffset;
+
+        private Dictionary<string, uint> HeatColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000];
+
+        private Dictionary<string, uint> BatteryColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 1];
+
+        private Dictionary<string, uint> RobotColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 2];
+
+        private Dictionary<string, uint> OverheatColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 3];
+
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 4];
+
+        private Dictionary<string, uint> WildfireColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 5];
         private int InterBarOffset => PluginConfiguration.MCHInterBarOffset;
         // TODO: Rook auto-turret differences?
-        private int[] RobotDuration = {12450, 13950, 15450, 16950, 18450, 19950};
+        private readonly int[] _robotDuration = {12450, 13950, 15450, 16950, 18450, 19950};
         
         public MachinistHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
@@ -50,7 +74,7 @@ namespace DelvUIPlugin.Interface
             nextHeight = DrawHeatGauge(nextHeight);
             nextHeight = DrawBatteryGauge(nextHeight);
             if (WildfireEnabled)
-                nextHeight = DrawWildfireBar(nextHeight);
+                DrawWildfireBar(nextHeight);
             DrawTargetBar();
             DrawFocusBar();
             DrawCastBar();
@@ -107,7 +131,7 @@ namespace DelvUIPlugin.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
             var robotTimeLeft = gauge.RobotTimeRemaining;
-            var robotPercentLeft = gauge.LastRobotBatteryPower != 0 ? (float) robotTimeLeft / RobotDuration[gauge.LastRobotBatteryPower / 10 - 5] : 0f;
+            var robotPercentLeft = gauge.LastRobotBatteryPower != 0 ? (float) robotTimeLeft / _robotDuration[gauge.LastRobotBatteryPower / 10 - 5] : 0f;
             
             var barWidth = (BatteryGaugeWidth - BatteryGaugePadding * 9f) / 10;
             var xPos = CenterX - XOffset + BatteryGaugeXOffset;
@@ -120,8 +144,8 @@ namespace DelvUIPlugin.Interface
             
             var drawList = ImGui.GetWindowDrawList();
 
-            int battery = 0;
-            float scale = 0;
+            int battery;
+            float scale;
             
             for (var i = 10; i >= 6; i--)
             {
@@ -162,7 +186,7 @@ namespace DelvUIPlugin.Interface
             battery = Math.Min((int)gauge.Battery, chunkSizeStart);
             scale = (float) battery / chunkSizeStart;
             cursorPos = new Vector2(xPos, yPos);
-            barWidth = (BatteryGaugeWidth - BatteryGaugePadding) / 2;
+            barWidth = (BatteryGaugeWidth - BatteryGaugePadding) / 2f;
             barSize = new Vector2(barWidth, BatteryGaugeHeight);
             
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
@@ -190,7 +214,7 @@ namespace DelvUIPlugin.Interface
                     RobotColor["gradientLeft"], RobotColor["gradientRight"], RobotColor["gradientRight"], RobotColor["gradientLeft"]
                 );
                 
-                var durationText = Math.Round(gauge.RobotTimeRemaining / 1000f).ToString();
+                var durationText = Math.Round(gauge.RobotTimeRemaining / 1000f).ToString(CultureInfo.InvariantCulture);
                 DrawOutlinedText(durationText, new Vector2(cursorPos.X + 5f, cursorPos.Y-2));
             }
             
@@ -223,7 +247,7 @@ namespace DelvUIPlugin.Interface
                     OverheatColor["gradientLeft"], OverheatColor["gradientRight"], OverheatColor["gradientRight"], OverheatColor["gradientLeft"]
                 );
                 
-                var durationText = Math.Round(gauge.OverheatTimeRemaining / 1000f).ToString();
+                var durationText = Math.Round(gauge.OverheatTimeRemaining / 1000f).ToString(CultureInfo.InvariantCulture);
                 var textSize = ImGui.CalcTextSize(durationText);
                 DrawOutlinedText(durationText, new Vector2(cursorPos.X + OverheatWidth / 2f - textSize.X / 2f, cursorPos.Y-2));
             }
@@ -258,7 +282,7 @@ namespace DelvUIPlugin.Interface
             
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             
-            var durationText = duration != 0 ? Math.Round(duration).ToString() : "";
+            var durationText = duration != 0 ? Math.Round(duration).ToString(CultureInfo.InvariantCulture) : "";
             var textSize = ImGui.CalcTextSize(durationText);
             DrawOutlinedText(durationText, new Vector2(cursorPos.X + WildfireWidth / 2f - textSize.X / 2f, cursorPos.Y-2));
 

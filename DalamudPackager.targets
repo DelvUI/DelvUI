@@ -7,16 +7,6 @@
                 AssemblyName="$(AssemblyName)"
                 MakeZip="true"
                 Include="
-                DelvUIPlugin.dll;
-                Media/Textures/bars.psd;
-                Media/Textures/HealthBar.png;
-                Media/Textures/HealthBarBG.png;
-                Media/Textures/PrimaryBar.png;
-                Media/Textures/PrimaryBarBG.png;
-                Media/Textures/SecondaryBar.png;
-                Media/Textures/SecondaryBarDim.png;
-                Media/Textures/SecondaryBarBG.png
-                Media/Textures/TargetBar.png;
-                Media/Textures/TargetBarBG.png"/>
+                DelvUIPlugin.dll;"/>
     </Target>
 </Project>

@@ -1,17 +1,16 @@
-﻿using System;
-using System.Numerics;
+﻿using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
 
-namespace DelvUIPlugin.Interface {
+namespace DelvUI.Interface {
     public class GunbreakerHudWindow : HudWindow {
         public override uint JobId => 37;
 
-        private int BarHeight => 13;
-        private int BarWidth => 254;
-        private new int XOffset => 127;
-        private new int YOffset => 479;
+        private static int BarHeight => 13;
+        private static int BarWidth => 254;
+        private new static int XOffset => 127;
+        private new static int YOffset => 479;
         
         public GunbreakerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
@@ -25,7 +24,7 @@ namespace DelvUIPlugin.Interface {
 
         private void DrawPowderGauge() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<GNBGauge>();
-            var powderColor = 0xFFFEAD43;
+            const uint powderColor = 0xFFFEAD43;
 
             const int xPadding = 2;
             var barWidth = (BarWidth - xPadding * 2)  / 2;
@@ -36,19 +35,23 @@ namespace DelvUIPlugin.Interface {
 
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-            if(gauge.NumAmmo > 0) drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y), 
-                powderColor, powderColor, powderColor, powderColor
-            );
+            if (gauge.NumAmmo > 0) {
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y), 
+                    powderColor, powderColor, powderColor, powderColor
+                );
+            }
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
             cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
             
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-            if(gauge.NumAmmo > 1) drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y), 
-                powderColor, powderColor, powderColor, powderColor
-            );
+            if(gauge.NumAmmo > 1) {
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y), 
+                    powderColor, powderColor, powderColor, powderColor
+                );
+            }
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
     }

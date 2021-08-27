@@ -4,7 +4,7 @@ using System.Numerics;
 using System.Text;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 
-namespace DelvUIPlugin {
+namespace DelvUI {
     public static class Extensions {
         public static string Abbreviate(this string str) {
             var splits = str.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);

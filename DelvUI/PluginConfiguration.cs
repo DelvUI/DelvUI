@@ -2,11 +2,10 @@
 using System.Numerics;
 using Dalamud.Configuration;
 using Dalamud.Plugin;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using Newtonsoft.Json;
 
-namespace DelvUIPlugin {
+namespace DelvUI {
     public class PluginConfiguration : IPluginConfiguration {
         public int Version { get; set; }
         public bool HideHud = false;

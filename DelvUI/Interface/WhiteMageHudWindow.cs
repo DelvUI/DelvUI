@@ -3,7 +3,7 @@ using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
 
-namespace DelvUIPlugin.Interface
+namespace DelvUI.Interface
 {
     public class WhiteMageHudWindow : HudWindow
     {

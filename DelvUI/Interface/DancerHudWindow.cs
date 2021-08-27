@@ -4,7 +4,7 @@ using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
 
-namespace DelvUIPlugin.Interface {
+namespace DelvUI.Interface {
     public class DancerHudWindow : HudWindow {
         public override uint JobId => 38;
         
@@ -97,10 +97,7 @@ namespace DelvUIPlugin.Interface {
                 {
                     drawList.AddRectFilled(cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y), 0xFF4FD29B);
                 }
-                else
-                {
 
-                }
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
                 cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
             }
