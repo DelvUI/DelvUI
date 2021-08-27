@@ -239,7 +239,7 @@ namespace DelvUI.Interface
                 var position = new Vector2(x, y - totalHeight / 2f);
                 var scale = firestarterTimer / 18f;
 
-                DrawTimerBar(position, scale, FirestarterColor, true);
+                DrawTimerBar(position, scale, ProcsHeight, FirestarterColor, true);
             }
 
             // thundercloud
@@ -248,7 +248,7 @@ namespace DelvUI.Interface
                 var position = new Vector2(x, firestarterTimer == 0 ? y - totalHeight / 2f : y + VerticalSpaceBetweenBars / 2f);
                 var scale = thundercloudTimer / 18f;
 
-                DrawTimerBar(position, scale, ThundercloudColor, true);
+                DrawTimerBar(position, scale, ProcsHeight, ThundercloudColor, true);
             }
         }
 
@@ -283,22 +283,22 @@ namespace DelvUI.Interface
             }
 
             var x = OriginX + HorizontalSpaceBetweenBars * 2f + PolyglotWidth;
-            var y = OriginY - ManaBarHeight - VerticalSpaceBetweenBars - UmbralHeartHeight - VerticalSpaceBetweenBars - PolyglotHeight / 2f - ProcsHeight;
+            var y = OriginY - ManaBarHeight - VerticalSpaceBetweenBars - UmbralHeartHeight - VerticalSpaceBetweenBars - PolyglotHeight / 2f - DotTimerHeight;
             if (ShowTripleCast)
             {
                 y = y - VerticalSpaceBetweenBars - TripleCastHeight;
             }
 
-            var position = new Vector2(x, y + ProcsHeight / 2f);
+            var position = new Vector2(x, y + DotTimerHeight / 2f);
             var scale = timer / maxDuration;
-
-            DrawTimerBar(position, scale, DotColor, false);
+            
+            DrawTimerBar(position, scale, DotTimerHeight, DotColor, false);
         }
 
-        private void DrawTimerBar(Vector2 position, float scale, Dictionary<string, uint> colorMap, bool inverted)
+        private void DrawTimerBar(Vector2 position, float scale, float height, Dictionary<string, uint> colorMap, bool inverted)
         {
             var drawList = ImGui.GetWindowDrawList();
-            var size = new Vector2((ManaBarWidth / 2f - PolyglotWidth - HorizontalSpaceBetweenBars * 2f) * scale, ProcsHeight);
+            var size = new Vector2((ManaBarWidth / 2f - PolyglotWidth - HorizontalSpaceBetweenBars * 2f) * scale, height);
             var endPoint = inverted ? position - size : position + size;
 
             drawList.AddRectFilledMultiColor(position, endPoint,
