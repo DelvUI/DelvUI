@@ -34,14 +34,24 @@ namespace DelvUI.Interface {
         protected static int YOffset => 460;
         protected int HealthBarHeight => PluginConfiguration.HealthBarHeight;
         protected int HealthBarWidth => PluginConfiguration.HealthBarWidth;
+        protected int HealthBarXOffset => PluginConfiguration.HealthBarXOffset;
+        protected int HealthBarYOffset => PluginConfiguration.HealthBarYOffset;
         protected int PrimaryResourceBarHeight => PluginConfiguration.PrimaryResourceBarHeight;
         protected int PrimaryResourceBarWidth => PluginConfiguration.PrimaryResourceBarWidth;
+        protected int PrimaryResourceBarXOffset => PluginConfiguration.PrimaryResourceBarXOffset;
+        protected int PrimaryResourceBarYOffset => PluginConfiguration.PrimaryResourceBarYOffset;
         protected int TargetBarHeight => PluginConfiguration.TargetBarHeight;
         protected int TargetBarWidth => PluginConfiguration.TargetBarWidth;
+        protected int TargetBarXOffset => PluginConfiguration.TargetBarXOffset;
+        protected int TargetBarYOffset => PluginConfiguration.TargetBarYOffset;
         protected int ToTBarHeight => PluginConfiguration.ToTBarHeight;
-        protected int ToTBarWidth => PluginConfiguration.ToTBarWidth;        
+        protected int ToTBarWidth => PluginConfiguration.ToTBarWidth;
+        protected int ToTBarXOffset => PluginConfiguration.ToTBarXOffset;
+        protected int ToTBarYOffset => PluginConfiguration.ToTBarYOffset;
         protected int FocusBarHeight => PluginConfiguration.FocusBarHeight;
         protected int FocusBarWidth => PluginConfiguration.FocusBarWidth;
+        protected int FocusBarXOffset => PluginConfiguration.FocusBarXOffset;
+        protected int FocusBarYOffset => PluginConfiguration.FocusBarYOffset;
         protected int CastBarWidth => PluginConfiguration.CastBarWidth;
         protected int CastBarHeight => PluginConfiguration.CastBarHeight;
         protected int CastBarXOffset => PluginConfiguration.CastBarXOffset;
@@ -68,7 +78,7 @@ namespace DelvUI.Interface {
                 DrawTankStanceIndicator();
 
            
-            var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset, CenterY + YOffset);
+            var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset, CenterY + HealthBarYOffset);
             DrawOutlinedText($"{actor.Name.Abbreviate().Truncate(16)}", new Vector2(cursorPos.X + 5, cursorPos.Y -22));
             
             var hp = $"{actor.MaxHp.KiloFormat(),6} | ";
@@ -107,7 +117,7 @@ namespace DelvUI.Interface {
             var scale = (float) actor.CurrentMp / actor.MaxMp;
 
             _barSize = new Vector2(PrimaryResourceBarWidth, PrimaryResourceBarHeight);
-            var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 16);
+            var cursorPos = new Vector2(CenterX - PrimaryResourceBarXOffset + 33, CenterY + PrimaryResourceBarYOffset - 16);
             
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0x88000000);
@@ -127,7 +137,7 @@ namespace DelvUI.Interface {
 
             _barSize = new Vector2(TargetBarWidth, TargetBarHeight);
 
-            var cursorPos = new Vector2(CenterX + XOffset, CenterY + YOffset);
+            var cursorPos = new Vector2(CenterX + TargetBarXOffset, CenterY + TargetBarYOffset);
             ImGui.SetCursorPos(cursorPos);
             var drawList = ImGui.GetWindowDrawList();
 
@@ -171,7 +181,7 @@ namespace DelvUI.Interface {
             }
             var barSize = new Vector2(FocusBarWidth, FocusBarHeight);
             
-            var cursorPos = new Vector2(CenterX - XOffset - HealthBarWidth - FocusBarWidth-2, CenterY + YOffset);
+            var cursorPos = new Vector2(CenterX - FocusBarXOffset - HealthBarWidth - FocusBarWidth-2, CenterY + FocusBarYOffset);
             ImGui.SetCursorPos(cursorPos);  
             var drawList = ImGui.GetWindowDrawList();
             
@@ -230,7 +240,7 @@ namespace DelvUI.Interface {
             var name = $"{actor.Name.Abbreviate().Truncate(12)}";
             var textSize = ImGui.CalcTextSize(name);
 
-            var cursorPos = new Vector2(CenterX + XOffset + TargetBarWidth + 2, CenterY + YOffset);
+            var cursorPos = new Vector2(CenterX + ToTBarXOffset + TargetBarWidth + 2, CenterY + ToTBarYOffset);
             DrawOutlinedText(name, new Vector2(cursorPos.X + ToTBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
             ImGui.SetCursorPos(cursorPos);    
             
