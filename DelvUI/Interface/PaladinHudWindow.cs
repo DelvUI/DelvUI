@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
@@ -12,34 +13,60 @@ namespace DelvUI.Interface
     {
         public override uint JobId => 19;
 
-        protected int ManaBarHeight => PluginConfiguration.PLDManaHeight;
-        protected int ManaBarWidth => PluginConfiguration.PLDManaWidth;
-        protected int ManaBarPadding => PluginConfiguration.PLDManaPadding;
-        protected new int XOffset => PluginConfiguration.PLDBaseXOffset;
-        protected new int YOffset => PluginConfiguration.PLDBaseYOffset;
-        protected int OathGaugeBarHeight => PluginConfiguration.PLDOathGaugeHeight;
-        protected int OathGaugeBarWidth => PluginConfiguration.PLDOathGaugeWidth;
-        protected int OathGaugeBarPadding => PluginConfiguration.PLDOathGaugePadding;
-        protected int OathGaugeXOffset => PluginConfiguration.PLDOathGaugeXOffset;
-        protected int OathGaugeYOffset => PluginConfiguration.PLDOathGaugeYOffset;
-        protected bool OathGaugeText => PluginConfiguration.PLDOathGaugeText;
-        protected int BuffBarHeight => PluginConfiguration.PLDBuffBarHeight;
-        protected int BuffBarWidth => PluginConfiguration.PLDBuffBarWidth;
-        protected int BuffBarXOffset => PluginConfiguration.PLDBuffBarXOffset;
-        protected int BuffBarYOffset => PluginConfiguration.PLDBuffBarYOffset;
-        protected int AtonementBarHeight => PluginConfiguration.PLDAtonementBarHeight;
-        protected int AtonementBarWidth => PluginConfiguration.PLDAtonementBarWidth;
-        protected int AtonementBarPadding => PluginConfiguration.PLDAtonementBarPadding;
-        protected int AtonementBarXOffset => PluginConfiguration.PLDAtonementBarXOffset;
-        protected int AtonementBarYOffset => PluginConfiguration.PLDAtonementBarYOffset;
-        protected int InterBarOffset => PluginConfiguration.PLDInterBarOffset;
-        protected Dictionary<string, uint> ManaColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000];
-        protected Dictionary<string, uint> OathGaugeColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 1];
-        protected Dictionary<string, uint> FightOrFlightColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 2];
-        protected Dictionary<string, uint> RequiescatColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 3];
-        protected Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 4];
-        protected Dictionary<string, uint> AtonementColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 5];
-
+        private int ManaBarHeight => PluginConfiguration.PLDManaHeight;
+        
+        private int ManaBarWidth => PluginConfiguration.PLDManaWidth;
+        
+        private int ManaBarPadding => PluginConfiguration.PLDManaPadding;
+        
+        private new int XOffset => PluginConfiguration.PLDBaseXOffset;
+        
+        private new int YOffset => PluginConfiguration.PLDBaseYOffset;
+        
+        private int OathGaugeBarHeight => PluginConfiguration.PLDOathGaugeHeight;
+        
+        private int OathGaugeBarWidth => PluginConfiguration.PLDOathGaugeWidth;
+        
+        private int OathGaugeBarPadding => PluginConfiguration.PLDOathGaugePadding;
+        
+        private int OathGaugeXOffset => PluginConfiguration.PLDOathGaugeXOffset;
+        
+        private int OathGaugeYOffset => PluginConfiguration.PLDOathGaugeYOffset;
+        
+        private bool OathGaugeText => PluginConfiguration.PLDOathGaugeText;
+        
+        private int BuffBarHeight => PluginConfiguration.PLDBuffBarHeight;
+        
+        private int BuffBarWidth => PluginConfiguration.PLDBuffBarWidth;
+        
+        private int BuffBarXOffset => PluginConfiguration.PLDBuffBarXOffset;
+        
+        private int BuffBarYOffset => PluginConfiguration.PLDBuffBarYOffset;
+        
+        private int AtonementBarHeight => PluginConfiguration.PLDAtonementBarHeight;
+        
+        private int AtonementBarWidth => PluginConfiguration.PLDAtonementBarWidth;
+        
+        private int AtonementBarPadding => PluginConfiguration.PLDAtonementBarPadding;
+        
+        private int AtonementBarXOffset => PluginConfiguration.PLDAtonementBarXOffset;
+        
+        private int AtonementBarYOffset => PluginConfiguration.PLDAtonementBarYOffset;
+        
+        private int InterBarOffset => PluginConfiguration.PLDInterBarOffset;
+        
+        private Dictionary<string, uint> ManaColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000];
+        
+        private Dictionary<string, uint> OathGaugeColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 1];
+        
+        private Dictionary<string, uint> FightOrFlightColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 2];
+        
+        private Dictionary<string, uint> RequiescatColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 3];
+        
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 4];
+        
+        private Dictionary<string, uint> AtonementColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 5];
+        
         public PaladinHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) {}
 
         protected override void Draw(bool _)
@@ -48,7 +75,7 @@ namespace DelvUI.Interface
             var nextHeight = DrawManaBar(0);
             nextHeight = DrawOathGauge(nextHeight);
             nextHeight = DrawBuffBar(nextHeight);
-            nextHeight = DrawAtonementBar(nextHeight);
+            DrawAtonementBar(nextHeight);
             DrawTargetBar();
             DrawFocusBar();
             DrawCastBar();
@@ -56,20 +83,21 @@ namespace DelvUI.Interface
 
         private int DrawManaBar(int initialHeight)
         {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var actor = PluginInterface.ClientState.LocalPlayer;
 
             var barWidth = (ManaBarWidth - ManaBarPadding * 4f) / 5f;
             var posX = CenterX - XOffset;
             var posY = CenterY + YOffset;
-
             var cursorPos = new Vector2(posX + barWidth * 4 + ManaBarPadding * 4, posY);
+            const int chunkSize = 2000;
             var barSize = new Vector2(barWidth, ManaBarHeight);
 
             var drawList = ImGui.GetWindowDrawList();
 
             for (var i = 5; i >= 1; --i)
             {
-                var scale = Math.Max(Math.Min(actor.CurrentMp, 2000 * i) - 2000 * (i - 1), 0f) / 2000f;
+                var scale = Math.Max(Math.Min(actor.CurrentMp, chunkSize * i) - chunkSize * (i - 1), 0f) / chunkSize;
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
                 if (scale >= 1.0)
                     drawList.AddRectFilledMultiColor(cursorPos,
@@ -96,13 +124,13 @@ namespace DelvUI.Interface
             var xPos = CenterX - XOffset + OathGaugeXOffset;
             var yPos = CenterY + YOffset + initialHeight + OathGaugeYOffset;
             var cursorPos = new Vector2(xPos + barWidth + OathGaugeBarPadding, yPos);
+            const int chunkSize = 50;
             var barSize = new Vector2(barWidth, OathGaugeBarHeight);
 
             var drawList = ImGui.GetWindowDrawList();
             for (var i = 2; i >= 1; --i)
             {
-                var scale = Math.Max(Math.Min(gauge.GaugeAmount, 50 * i) - 50 * (i - 1), 0) /
-                            50f;
+                var scale = Math.Max(Math.Min(gauge.GaugeAmount, chunkSize * i) - chunkSize * (i - 1), 0f) / chunkSize;
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
                 if (scale >= 1.0)
                 {
@@ -113,7 +141,7 @@ namespace DelvUI.Interface
                     
                     if (OathGaugeText)
                     {
-                        var text = (scale * 50).ToString();
+                        var text = (scale * chunkSize).ToString();
                         var textSize = ImGui.CalcTextSize(text);
                         DrawOutlinedText(text, new Vector2(cursorPos.X + barWidth / 2f - textSize.X / 2f, cursorPos.Y-2));                        
                     }
@@ -127,7 +155,7 @@ namespace DelvUI.Interface
                     
                     if (OathGaugeText)
                     {
-                        var text = (scale * 50).ToString();
+                        var text = (scale * chunkSize).ToString();
                         var textSize = ImGui.CalcTextSize(text);
                         DrawOutlinedText(text, new Vector2(cursorPos.X + barWidth / 2f - textSize.X / 2f, cursorPos.Y-2));                        
                     }
@@ -217,6 +245,7 @@ namespace DelvUI.Interface
             var yPos = CenterY + YOffset + initialHeight + AtonementBarYOffset;
             var cursorPos = new Vector2(xPos, yPos);
             var barSize = new Vector2(barWidth, AtonementBarHeight);
+            
             var drawList = ImGui.GetWindowDrawList();
 
             for (var i = 0; i <= 2; i++)

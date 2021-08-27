@@ -83,10 +83,10 @@ namespace DelvUI {
         public int WARBeastGaugeXOffset { get; set; }
         public int WARBeastGaugeYOffset { get; set; }
         public int WARInterBarOffset { get; set; } = 2;
-        public Vector4 WARInnerReleaseColor = new Vector4(255f, 0f/255f, 0f/255f, 100f/100f);
+        public Vector4 WARInnerReleaseColor = new Vector4(255f/255f, 0f/255f, 0f/255f, 100f/100f);
         public Vector4 WARStormsEyeColor = new Vector4(255f/255f, 136f/255f, 146f/255f, 100f/100f);
         public Vector4 WARFellCleaveColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 100f/100f);
-        public Vector4 WARNascentChaosColor = new Vector4(240f/255f, 176f/255f, 0f, 100f/100f);
+        public Vector4 WARNascentChaosColor = new Vector4(240f/255f, 176f/255f, 0f/255f, 100f/100f);
         public Vector4 WAREmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 100f/100f);
 
         #endregion
@@ -124,7 +124,7 @@ namespace DelvUI {
         public int MCHBatteryGaugePadding { get; set; } = 2;
         public int MCHBatteryGaugeXOffset { get; set; }
         public int MCHBatteryGaugeYOffset { get; set; }
-        public bool MCHWildfireEnabled { get; set; } = false;
+        public bool MCHWildfireEnabled { get; set; }
         public int MCHWildfireHeight { get; set; } = 20;
         public int MCHWildfireWidth { get; set; } = 254;
         public int MCHWildfireXOffset { get; set; }
@@ -162,12 +162,12 @@ namespace DelvUI {
         public int PLDAtonementBarXOffset {get; set;}
         public int PLDAtonementBarYOffset {get; set;}
         public int PLDInterBarOffset { get; set; } = 2;
-        public Vector4 PLDManaColor = new Vector4(0f, 203f/255f, 230f/255f, 1f);
-        public Vector4 PLDOathGaugeColor = new Vector4(24f/255f, 80f/255f, 175f/255f, 1f);
-        public Vector4 PLDFightOrFlightColor = new Vector4(240f/255f, 50f/255f, 0f, 1f);
-        public Vector4 PLDRequiescatColor = new Vector4(61f/255f, 61f/255f, 1f, 1f);
-        public Vector4 PLDEmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 1f);
-        public Vector4 PLDAtonementColor = new Vector4(240f/255f, 176f/255f, 0f, 1f);
+        public Vector4 PLDManaColor = new Vector4(0f/255f, 203f/255f, 230f/255f, 100f/100f);
+        public Vector4 PLDOathGaugeColor = new Vector4(24f/255f, 80f/255f, 175f/255f, 100f/100f);
+        public Vector4 PLDFightOrFlightColor = new Vector4(240f/255f, 50f/255f, 0f/255f, 100f/100f);
+        public Vector4 PLDRequiescatColor = new Vector4(61f/255f, 61f/255f, 255f/255f, 100f/100f);
+        public Vector4 PLDEmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 100f/100f);
+        public Vector4 PLDAtonementColor = new Vector4(240f/255f, 176f/255f, 0f/255f, 100f/100f);
 
         #endregion
         

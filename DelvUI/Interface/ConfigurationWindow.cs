@@ -627,6 +627,7 @@ namespace DelvUI.Interface {
                     changed |= ImGui.ColorEdit4("Oath Gauge Color", ref _pluginConfiguration.PLDOathGaugeColor);
                     changed |= ImGui.ColorEdit4("Fight or Flight Color", ref _pluginConfiguration.PLDFightOrFlightColor);
                     changed |= ImGui.ColorEdit4("Requiescat Color", ref _pluginConfiguration.PLDRequiescatColor);
+                    changed |= ImGui.ColorEdit4("Atonement Color", ref _pluginConfiguration.PLDAtonementColor);
                     changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.PLDEmptyColor);
                     
                     ImGui.EndTabItem();
