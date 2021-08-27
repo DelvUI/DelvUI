@@ -43,9 +43,9 @@
   </PropertyGroup>
 
     <ItemGroup>
-        <None Update="Media\Fonts\big-noodle-too.ttf">
+        <Content Include="Media\Fonts\big-noodle-too.ttf">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
@@ -94,6 +94,7 @@
       <Compile Include="Interface\GunbreakerHudWindow.cs" />
       <Compile Include="Interface\HudWindow.cs" />
       <Compile Include="Interface\MachinistHudWindow.cs" />
+      <Compile Include="Interface\PaladinHudWindow.cs" />
       <Compile Include="Interface\RedMageHudWindow.cs" />
       <Compile Include="Interface\SamuraiHudWindow.cs" />
       <Compile Include="Interface\ScholarHudWindow.cs" />
