@@ -76,9 +76,6 @@ namespace DelvUI.Interface {
             if(actor.ClassJob.Id == 19 || actor.ClassJob.Id == 32 || actor.ClassJob.Id == 21 || actor.ClassJob.Id == 37)
                 DrawTankStanceIndicator();
 
-           
-            DrawOutlinedText($"{actor.Name.Abbreviate().Truncate(16)}", new Vector2(cursorPos.X + 5, cursorPos.Y -22));
-
             var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset, CenterY + HealthBarYOffset);
             DrawOutlinedText($"{Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}", new Vector2(cursorPos.X + 5, cursorPos.Y -22));
 
@@ -232,15 +229,14 @@ namespace DelvUI.Interface {
             if (!(target is Chara actor)) {
                 return;
             }
-
-
+            
             var barSize = new Vector2(ToTBarWidth, ToTBarHeight);
 
             var text = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.ToTBarText);
             var textSize = ImGui.CalcTextSize(text);
 
             var cursorPos = new Vector2(CenterX + XOffset + TargetBarWidth + 2, CenterY + YOffset);
-            DrawOutlinedText(name, new Vector2(cursorPos.X + ToTBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
+            DrawOutlinedText(text, new Vector2(cursorPos.X + ToTBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
             ImGui.SetCursorPos(cursorPos);    
             
             var colors = DetermineTargetPlateColors(actor);
