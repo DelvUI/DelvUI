@@ -789,6 +789,39 @@ namespace DelvUI.Interface
                         _pluginConfiguration.PLDBuffBarYOffset = pldBuffBarYoffset;
                         _pluginConfiguration.Save();
                     }
+                    int pldAtonementBarHeight = _pluginConfiguration.PLDAtonementBarHeight;
+                    if (ImGui.DragInt("Atonement Bar Height", ref pldAtonementBarHeight, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarHeight = pldAtonementBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldAtonementBarWidth = _pluginConfiguration.PLDAtonementBarWidth;
+                    if (ImGui.DragInt("Atonement Bar Width", ref pldAtonementBarWidth, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarWidth = pldAtonementBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldAtonementBarXoffset = _pluginConfiguration.PLDAtonementBarXOffset;
+                    if (ImGui.DragInt("Atonement Bar X Offset", ref pldAtonementBarXoffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarXOffset = pldAtonementBarXoffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldAtonementBarYoffset = _pluginConfiguration.PLDAtonementBarYOffset;
+                    if (ImGui.DragInt("Atonement Bar Y Offset", ref pldAtonementBarYoffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarYOffset = pldAtonementBarYoffset;
+                        _pluginConfiguration.Save();
+                    }
+                    int pldAtonementBarPadding = _pluginConfiguration.PLDAtonementBarPadding;
+                    if (ImGui.DragInt("Atonement Bar Padding", ref pldAtonementBarPadding, 0.1f, 1, 2000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarPadding = pldAtonementBarPadding;
+                        _pluginConfiguration.Save();
+                    }
 
                     int pldInterBarOffset = _pluginConfiguration.PLDInterBarOffset;
                     if (ImGui.DragInt("Space Between Bars", ref pldInterBarOffset, 0.1f, -2000, 2000))
