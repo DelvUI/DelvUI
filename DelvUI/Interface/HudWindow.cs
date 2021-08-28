@@ -97,28 +97,31 @@ namespace DelvUI.Interface {
                 DrawTankStanceIndicator();
 
             var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset, CenterY + HealthBarYOffset);
-            DrawOutlinedText(
-                $"{Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}",
-                new Vector2(cursorPos.X + 5 + HealthBarTextLeftXOffset, cursorPos.Y - 22 + HealthBarTextLeftYOffset));
-
-            var text = Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextRight);
-            var textSize = ImGui.CalcTextSize(text);
-            
-            DrawOutlinedText(text,
-                new Vector2(cursorPos.X + HealthBarWidth - textSize.X - 5 + HealthBarTextRightXOffset,
-                    cursorPos.Y - 22 + HealthBarTextRightXOffset));
    
             ImGui.SetCursorPos(cursorPos);
             
             if (ImGui.BeginChild("health_bar", BarSize)) {
                 var colors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
                 var drawList = ImGui.GetWindowDrawList();
+                
+                
+                
+                DrawOutlinedText(
+                    $"{Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}",
+                    new Vector2(cursorPos.X + 5 + HealthBarTextLeftXOffset, cursorPos.Y - 22 + HealthBarTextLeftYOffset));
+
+                var text = Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextRight);
+                var textSize = ImGui.CalcTextSize(text);
+            
+                DrawOutlinedText(text,
+                    new Vector2(cursorPos.X + HealthBarWidth - textSize.X - 5 + HealthBarTextRightXOffset,
+                        cursorPos.Y - 22 + HealthBarTextRightYOffset));
+                
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight), 
                     colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
                 );
-                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
                 
                 /* This needs some check to see if it's in BeginChild or else this will leak into the settings panel.
                 if (ImGui.GetIO().MouseClicked[0]) {
