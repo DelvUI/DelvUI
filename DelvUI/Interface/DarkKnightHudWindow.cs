@@ -16,6 +16,7 @@ namespace DelvUI.Interface {
         private new int YOffset => PluginConfiguration.DRKBaseYOffset;
 
         private bool ManaBarEnabled => PluginConfiguration.DRKManaBarEnabled;
+        private bool ManaBarOverflowEnabled => PluginConfiguration.DRKManaBarOverflowEnabled;
         private int ManaBarHeight => PluginConfiguration.DRKManaBarHeight;
         private int ManaBarWidth => PluginConfiguration.DRKManaBarWidth;
         private int ManaBarPadding => PluginConfiguration.DRKManaBarPadding;
@@ -106,7 +107,6 @@ namespace DelvUI.Interface {
                 if (index > 1)
                     cursorPos = new Vector2(cursorPos.X + barWidth + ManaBarPadding, cursorPos.Y);
 
-
                 if (darkArtsBuff) {
                     var glowPosition = new Vector2(cursorPos.X - 1, cursorPos.Y - 1);
                     var glowSize = new Vector2(barSize.X + 2, barSize.Y + 2);
@@ -135,6 +135,19 @@ namespace DelvUI.Interface {
             }
 
             DrawManaChunks();
+
+            if (ManaBarOverflowEnabled && actor.CurrentMp > 9000) {
+                var over9000 = 9000 - actor.CurrentMp;
+                cursorPos = new Vector2(cursorPos.X + barWidth - 1, cursorPos.Y);
+                var inverseOffset = cursorPos + new Vector2((barSize.X / 10) * over9000 / ManaBarWidth, barSize.Y);
+
+                drawList.AddRectFilledMultiColor(
+                    cursorPos, inverseOffset,
+                    DarkArtsColor["gradientLeft"], DarkArtsColor["gradientRight"], DarkArtsColor["gradientRight"], DarkArtsColor["gradientLeft"]
+                );
+
+                drawList.AddRect(cursorPos, inverseOffset, 0xFF000000);
+            }
 
             return ManaBarHeight + initialHeight + InterBarOffset;
         }

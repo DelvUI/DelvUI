@@ -200,6 +200,7 @@ namespace DelvUI {
         public int DRKBaseXOffset { get; set; } = 127;
         public int DRKBaseYOffset { get; set; } = 415;
         public bool DRKManaBarEnabled { get; set; } = true;
+        public bool DRKManaBarOverflowEnabled { get; set; }
         public int DRKManaBarHeight { get; set; } = 10;
         public int DRKManaBarWidth { get; set; } = 254;
         public int DRKManaBarPadding { get; set; } = 1;

@@ -988,6 +988,13 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
+                    var drkManaBarOverflowEnabled = _pluginConfiguration.DRKManaBarOverflowEnabled;
+                    if (ImGui.Checkbox("Mana Bar Overflow Enabled", ref drkManaBarOverflowEnabled))
+                    {
+                        _pluginConfiguration.DRKManaBarOverflowEnabled = drkManaBarOverflowEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
                     var drkManaBarHeight = _pluginConfiguration.DRKManaBarHeight;
                     if (ImGui.DragInt("Mana Bar Height", ref drkManaBarHeight, .1f, 1, 1000)) {
                         _pluginConfiguration.DRKManaBarHeight = drkManaBarHeight;
