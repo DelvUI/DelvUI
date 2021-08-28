@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Numerics;
+﻿using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 using Dalamud.Game.ClientState.Structs.JobGauge;
+using System.Collections.Generic;
+using System.Numerics;
 using Dalamud.Plugin;
 using ImGuiNET;
-using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 
 namespace DelvUI.Interface
 {
@@ -14,25 +11,33 @@ namespace DelvUI.Interface
     {
         public override uint JobId => 33;
 
-        private new int XOffset => PluginConfiguration.ASTBaseXOffset;
+        private bool DivinationEnabled => PluginConfiguration.AstDivinationEnabled;
 
-        private new int YOffset => PluginConfiguration.ASTBaseYOffset;
+        private int DivinationHeight => PluginConfiguration.AstDivinationHeight;
 
-        private bool DivinationEnabled => PluginConfiguration.ASTDivinationEnabled;
+        private int DivinationWidth => PluginConfiguration.AstDivinationWidth;
 
-        private int DivinationHeight => PluginConfiguration.ASTDivinationHeight;
+        private int DivinationBarX => PluginConfiguration.AstDivinationBarX;
 
-        private int DivinationWidth => PluginConfiguration.ASTDivinationWidth;
+        private int DivinationBarY => PluginConfiguration.AstDivinationBarY;
 
-        private int DivinationBarX => PluginConfiguration.ASTDivinationBarX;
+        private int DivinationBarPad => PluginConfiguration.AstDivinationBarPad;
 
-        private int DivinationBarY => PluginConfiguration.ASTDivinationBarY;
+        private int DrawHeight => PluginConfiguration.AstDrawBarHeight;
 
-        private int DivinationBarPad => PluginConfiguration.ASTDivinationBarPad;
+        private int DrawWidth => PluginConfiguration.AstDrawBarWidth;
 
-        //private int InterBarOffset => PluginConfiguration.ASTInterBarOffset;
+        private int DrawBarX => PluginConfiguration.AstDrawBarX;
+
+        private int DrawBarY => PluginConfiguration.AstDrawBarY;
 
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000];
+
+        private Dictionary<string, uint> SealSunColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 1];
+
+        private Dictionary<string, uint> SealLunarColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 2];
+
+        private Dictionary<string, uint> SealCelestialColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 3];
 
         private new Vector2 BarSize { get; set; }
 
@@ -45,14 +50,22 @@ namespace DelvUI.Interface
             DrawHealthBar();
             DrawPrimaryResourceBar();
             DrawDivinationBar();
+            DrawDraw();
             DrawTargetBar();
             DrawFocusBar();
             DrawCastBar();
         }
-
+        protected new void DrawOutlinedText(string text, Vector2 pos)
+        {
+            DrawOutlinedText(text, pos, Vector4.One, new Vector4(0f, 0f, 0f, 1f));
+        }
         private void DrawDivinationBar()
         {
-            var gauge = FFXIVClientStructs.FFXIV.Client.Game.Gauge.
+            //NOTE: Using FFXIVClientStructs may be a better solution to detect duplicate
+            //https://github.com/aers/FFXIVClientStructs/blob/dd3ec0485395e23592303311bb29d0447e03f06d/FFXIVClientStructs/FFXIV/Client/Game/Gauge/JobGauges.cs#L33
+
+            //var gauge = PluginInterface.ClientState.JobGauges.Get<AstrologianGauge>();
+            var gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
 
             var barWidth = (DivinationWidth / 3);
             BarSize = new Vector2(barWidth, DivinationHeight);
@@ -72,26 +85,95 @@ namespace DelvUI.Interface
             drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
 
+            /*foreach (AstrologianSeal mySeal in gauge.CurrentSeals) {
+                if (gauge.Seals[0] == 1)
+                {
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealSunColor["gradientRight"]);
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                    cursorPos = new Vector2(cursorPos.X + barWidth + DivinationBarPad, cursorPos.Y);
+                }
+                else if (gauge.Seals[0] == 2)
+                {
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealLunarColor["gradientRight"]);
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                    cursorPos = new Vector2(cursorPos.X + barWidth + DivinationBarPad, cursorPos.Y);
+                }
+                else if (gauge.Seals[0] == 3)
+                {
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealCelestialColor["gradientRight"]);
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                    cursorPos = new Vector2(cursorPos.X + barWidth + DivinationBarPad, cursorPos.Y);
+                }
+                else {
+                    //drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
+                }
+               
+            }*/
 
+            //DrawOutlinedText(string.Join(", ", gauge.Seals[0]), new Vector2(cursorPos.X + DivinationWidth / 2f - BarSize.X / 2f, cursorPos.Y - 2));
+            if (gauge.ContainsSeal(SealType.SUN)) 
+                {
+                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealSunColor["gradientRight"]);
+                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+            }
+            cursorPos = new Vector2(cursorPos.X + barWidth + DivinationBarPad, cursorPos.Y);
+            if (gauge.ContainsSeal(SealType.MOON))
+            {
+                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealLunarColor["gradientRight"]);
+                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+            }
+            cursorPos = new Vector2(cursorPos.X + barWidth + DivinationBarPad, cursorPos.Y);
+            if (gauge.ContainsSeal(SealType.CELESTIAL))
+            {
+                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealCelestialColor["gradientRight"]);
+                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+            }      
+        }
+
+        private void DrawDraw()
+        {
+            var gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
+
+            BarSize = new Vector2(DrawWidth, DrawHeight);
+            BarCoords = new Vector2(DrawBarX, DrawBarY);
+            var cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y - 49);
+
+            var drawList = ImGui.GetWindowDrawList();
+
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-
-            //NOTE: in api3, seals are private
-            // private unsafe fixed byte seals[3]
-            // so this a workaround until Net5 Dalamud
-            // https://github.com/aers/FFXIVClientStructs/blob/dd3ec0485395e23592303311bb29d0447e03f06d/FFXIVClientStructs/FFXIV/Client/Game/Gauge/JobGauges.cs#L30
+            switch (gauge.DrawnCard()) {
+                case CardType.BALANCE:
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealSunColor["gradientRight"]);
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                    DrawOutlinedText("MELEE", new Vector2(cursorPos.X + DrawWidth / 2f - ImGui.CalcTextSize("MELEE").X / 2f, cursorPos.Y - 2));
+                    break;
+                case CardType.BOLE:
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealSunColor["gradientRight"]);
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                    DrawOutlinedText("RANGED", new Vector2(cursorPos.X + DrawWidth / 2f - ImGui.CalcTextSize("RANGED").X / 2f, cursorPos.Y - 2));
+                    break;
+                case CardType.ARROW:
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealLunarColor["gradientRight"]);
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                    DrawOutlinedText("MELEE", new Vector2(cursorPos.X + DrawWidth / 2f - ImGui.CalcTextSize("MELEE").X / 2f, cursorPos.Y - 2));
+                    break;
+                case CardType.EWER:
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealLunarColor["gradientRight"]);
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                    DrawOutlinedText("RANGED", new Vector2(cursorPos.X + DrawWidth / 2f - ImGui.CalcTextSize("RANGED").X / 2f, cursorPos.Y - 2));
+                    break;
+                case CardType.SPEAR:
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealCelestialColor["gradientRight"]);
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                    DrawOutlinedText("MELEE", new Vector2(cursorPos.X + DrawWidth / 2f - ImGui.CalcTextSize("MELEE").X / 2f, cursorPos.Y - 2));
+                    break;
+                case CardType.SPIRE:                
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealCelestialColor["gradientRight"]);
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                    DrawOutlinedText("RANGED", new Vector2(cursorPos.X + DrawWidth / 2f - ImGui.CalcTextSize("RANGED").X / 2f, cursorPos.Y - 2));
+                    break;
+            }
         }
     }
 }
-/*
-    //     No seal.
-    NONE = 0,
-
-    //     Sun seal.
-    SUN = 1,
-
-    //     Moon seal.
-    MOON = 2,
-
-    //     Celestial seal.
-    CELESTIAL = 3
-*/
