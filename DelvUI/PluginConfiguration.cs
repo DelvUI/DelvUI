@@ -36,6 +36,26 @@ namespace DelvUI {
 
         public bool ShieldEnabled = true;
 
+        public string HealthBarTextLeft = "[name:abbreviate]";
+        public string HealthBarTextRight = "[health:max-short] | [health:percent]";
+        public int HealthBarTextLeftXOffset { get; set; } = 0;
+        public int HealthBarTextLeftYOffset { get; set; } = 0;
+        public int HealthBarTextRightXOffset { get; set; } = 0;
+        public int HealthBarTextRightYOffset { get; set; } = 0;
+        
+        public string TargetBarTextLeft = "[health:max-short] | [health:percent]";
+        public string TargetBarTextRight = "[name:abbreviate]";
+        public int TargetBarTextLeftXOffset { get; set; } = 0;
+        public int TargetBarTextLeftYOffset { get; set; } = 0;
+        public int TargetBarTextRightXOffset { get; set; } = 0;
+        public int TargetBarTextRightYOffset { get; set; } = 0;
+        
+        public string ToTBarText = "[name:abbreviate]";
+        public string FocusBarText = "[name:abbreviate]";
+        public int ToTBarTextXOffset { get; set; } = 0;
+        public int ToTBarTextYOffset { get; set; } = 0;
+        public int FocusBarTextXOffset { get; set; } = 0;
+        public int FocusBarTextYOffset { get; set; } = 0;
 
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
