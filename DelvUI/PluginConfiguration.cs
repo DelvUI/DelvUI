@@ -118,6 +118,31 @@ namespace DelvUI {
 
         #endregion
 
+        #region SMN Configuration
+
+        public int SmnRuinBarX { get; set; } = 127;
+        public int SmnRuinBarY { get; set; } = 460;
+        public int SmnRuinBarHeight { get; set; } = 10;
+        public int SmnRuinBarWidth { get; set; } = 254;
+        public int SmnDotBarX { get; set; } = 127;
+        public int SmnDotBarY { get; set; } = 460;
+        public int SmnDotBarHeight { get; set; } = 10;
+        public int SmnDotBarWidth { get; set; } = 254;
+        public int SmnAetherBarHeight { get; set; } = 20;
+        public int SmnAetherBarWidth { get; set; } = 254;
+        public int SmnAetherBarX { get; set; } = -42;
+        public int SmnAetherBarY { get; set; } = 460;
+
+        public Vector4 SmnAetherColor = new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f);
+        public Vector4 SmnRuinColor = new Vector4(94f / 255f, 250f / 255f, 154f / 255f, 100f / 100f);
+        public Vector4 SmnEmptyColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 136f / 255f);
+
+        public Vector4 SmnMiasmaColor = new Vector4(106f / 255f, 237f / 255f, 241f / 255f, 100f / 100f);
+        public Vector4 SmnBioColor = new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 100f / 100f);
+        public Vector4 SmnExpiryColor = new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f);
+
+        #endregion
+
         #region MCH Configuration
 
         public int MCHOverheatHeight { get; set; } = 20;
@@ -564,6 +589,62 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(SchEmptyColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SchEmptyColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SchEmptyColor.AdjustColor(.1f))
+                },
+
+                [Jobs.SMN] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN.AdjustColor(.1f))
+                },
+
+                [Jobs.SMN * 1000] = new Dictionary<string, uint> // Aether Bar
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnAetherColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnAetherColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnAetherColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnAetherColor.AdjustColor(.1f))
+                },
+
+                [Jobs.SMN * 1000 + 1] = new Dictionary<string, uint> // Ruin Bar
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnRuinColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnRuinColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnRuinColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnRuinColor.AdjustColor(.1f))
+                },
+
+                [Jobs.SMN * 1000 + 2] = new Dictionary<string, uint> // Empty Bar
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnEmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnEmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnEmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnEmptyColor.AdjustColor(.1f))
+                },
+
+                [Jobs.SMN * 1000 + 3] = new Dictionary<string, uint> // Miasma Bar
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnMiasmaColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnMiasmaColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnMiasmaColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnMiasmaColor.AdjustColor(.1f))
+                },
+
+                [Jobs.SMN * 1000 + 4] = new Dictionary<string, uint> // Bio Bar
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor.AdjustColor(.1f))
+                },
+
+                [Jobs.SMN * 1000 + 5] = new Dictionary<string, uint> // Dot Expiry
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnExpiryColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnExpiryColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnExpiryColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnExpiryColor.AdjustColor(.1f))
                 },
 
                 [Jobs.AST] = new Dictionary<string, uint>

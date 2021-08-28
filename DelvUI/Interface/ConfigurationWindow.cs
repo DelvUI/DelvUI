@@ -352,6 +352,103 @@ namespace DelvUI.Interface
                     ImGui.EndTabItem();
                 }
 
+                if (ImGui.BeginTabItem("Summoner"))
+                {
+
+                    var smnRuinBarX = _pluginConfiguration.SmnRuinBarX;
+                    if (ImGui.DragInt("Ruin Bar X Offset", ref smnRuinBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SmnRuinBarX = smnRuinBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnRuinBarY = _pluginConfiguration.SmnRuinBarY;
+                    if (ImGui.DragInt("Ruin Bar Y Offset", ref smnRuinBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SmnRuinBarY = smnRuinBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnRuinBarHeight = _pluginConfiguration.SmnRuinBarHeight;
+                    if (ImGui.DragInt("Ruin Bar Height", ref smnRuinBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SmnRuinBarHeight = smnRuinBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnRuinBarWidth = _pluginConfiguration.SmnRuinBarWidth;
+                    if (ImGui.DragInt("Ruin Bar Width", ref smnRuinBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SmnRuinBarWidth = smnRuinBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnDotBarX = _pluginConfiguration.SmnDotBarX;
+                    if (ImGui.DragInt("Dot Bar X Offset", ref smnDotBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SmnDotBarX = smnDotBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnDotBarY = _pluginConfiguration.SmnDotBarY;
+                    if (ImGui.DragInt("Dot Bar Y Offset", ref smnDotBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SmnDotBarY = smnDotBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnDotBarHeight = _pluginConfiguration.SmnDotBarHeight;
+                    if (ImGui.DragInt("Dot Bar Height", ref smnDotBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SmnDotBarHeight = smnDotBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnDotBarWidth = _pluginConfiguration.SmnDotBarWidth;
+                    if (ImGui.DragInt("Dot Bar Width", ref smnDotBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SmnDotBarWidth = smnDotBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnAetherBarX = _pluginConfiguration.SmnAetherBarX;
+                    if (ImGui.DragInt("Aether Bar X Offset", ref smnAetherBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SmnAetherBarX = smnAetherBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnAetherBarY = _pluginConfiguration.SmnAetherBarY;
+                    if (ImGui.DragInt("Aether Bar Y Offset", ref smnAetherBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SmnAetherBarY = smnAetherBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnAetherBarHeight = _pluginConfiguration.SmnAetherBarHeight;
+                    if (ImGui.DragInt("Aether Bar Height", ref smnAetherBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SmnAetherBarHeight = smnAetherBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnAetherBarWidth = _pluginConfiguration.SmnAetherBarWidth;
+                    if (ImGui.DragInt("Aether Bar Width", ref smnAetherBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SmnAetherBarWidth = smnAetherBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Aether Bar Color", ref _pluginConfiguration.SmnAetherColor);
+                    changed |= ImGui.ColorEdit4("Ruin Bar Color", ref _pluginConfiguration.SmnRuinColor);
+                    changed |= ImGui.ColorEdit4("Empty Bar Color", ref _pluginConfiguration.SmnEmptyColor);
+                    changed |= ImGui.ColorEdit4("Miasma Color", ref _pluginConfiguration.SmnMiasmaColor);
+                    changed |= ImGui.ColorEdit4("Bio Color", ref _pluginConfiguration.SmnBioColor);
+                    changed |= ImGui.ColorEdit4("Expiry Color", ref _pluginConfiguration.SmnExpiryColor);
+
+                    ImGui.EndTabItem();
+                }
+
                 if (ImGui.BeginTabItem("Warrior"))
                 {
                     var stormsEyeHeight = _pluginConfiguration.WARStormsEyeHeight;
@@ -690,6 +787,39 @@ namespace DelvUI.Interface
                     if (ImGui.DragInt("Buff Bar Y Offset", ref pldBuffBarYoffset, 0.1f, -2000, 2000))
                     {
                         _pluginConfiguration.PLDBuffBarYOffset = pldBuffBarYoffset;
+                        _pluginConfiguration.Save();
+                    }
+                    int pldAtonementBarHeight = _pluginConfiguration.PLDAtonementBarHeight;
+                    if (ImGui.DragInt("Atonement Bar Height", ref pldAtonementBarHeight, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarHeight = pldAtonementBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldAtonementBarWidth = _pluginConfiguration.PLDAtonementBarWidth;
+                    if (ImGui.DragInt("Atonement Bar Width", ref pldAtonementBarWidth, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarWidth = pldAtonementBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldAtonementBarXoffset = _pluginConfiguration.PLDAtonementBarXOffset;
+                    if (ImGui.DragInt("Atonement Bar X Offset", ref pldAtonementBarXoffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarXOffset = pldAtonementBarXoffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldAtonementBarYoffset = _pluginConfiguration.PLDAtonementBarYOffset;
+                    if (ImGui.DragInt("Atonement Bar Y Offset", ref pldAtonementBarYoffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarYOffset = pldAtonementBarYoffset;
+                        _pluginConfiguration.Save();
+                    }
+                    int pldAtonementBarPadding = _pluginConfiguration.PLDAtonementBarPadding;
+                    if (ImGui.DragInt("Atonement Bar Padding", ref pldAtonementBarPadding, 0.1f, 1, 2000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarPadding = pldAtonementBarPadding;
                         _pluginConfiguration.Save();
                     }
 
