@@ -118,6 +118,27 @@ namespace DelvUI {
 
         #endregion
 
+        #region SMN Configuration
+
+        public int SmnRuinBarX { get; set; } = 127;
+        public int SmnRuinBarY { get; set; } = 460;
+        public int SmnRuinBarHeight { get; set; } = 10;
+        public int SmnRuinBarWidth { get; set; } = 254;
+        public int SmnDotBarX { get; set; } = 127;
+        public int SmnDotBarY { get; set; } = 460;
+        public int SmnDotBarHeight { get; set; } = 10;
+        public int SmnDotBarWidth { get; set; } = 254;
+        public int SmnAetherBarHeight { get; set; } = 20;
+        public int SmnAetherBarWidth { get; set; } = 254;
+        public int SmnAetherBarX { get; set; } = -42;
+        public int SmnAetherBarY { get; set; } = 460;
+
+        public Vector4 SmnAetherColor = new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f);
+        public Vector4 SmnRuinColor = new Vector4(94f / 255f, 250f / 255f, 154f / 255f, 100f / 100f);
+        public Vector4 SmnEmptyColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 53f / 100f);
+
+        #endregion
+
         #region MCH Configuration
 
         public int MCHOverheatHeight { get; set; } = 20;
