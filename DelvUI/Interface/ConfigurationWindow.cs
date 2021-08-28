@@ -69,17 +69,45 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    var HealthBarXOffset = _pluginConfiguration.HealthBarXOffset;
-                    if (ImGui.DragInt("Health X Offset", ref HealthBarXOffset, .1f, 1, 1000))
+                    var healthBarXOffset = _pluginConfiguration.HealthBarXOffset;
+                    if (ImGui.DragInt("Health X Offset", ref healthBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
                     {
-                        _pluginConfiguration.HealthBarXOffset = HealthBarXOffset;
+                        _pluginConfiguration.HealthBarXOffset = healthBarXOffset;
                         _pluginConfiguration.Save();
                     }
 
-                    var HealthBarYOffset = _pluginConfiguration.HealthBarYOffset;
-                    if (ImGui.DragInt("Health Y Offset", ref HealthBarYOffset, .1f, 1, 1000))
+                    var healthBarYOffset = _pluginConfiguration.HealthBarYOffset;
+                    if (ImGui.DragInt("Health Y Offset", ref healthBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
                     {
-                        _pluginConfiguration.HealthBarYOffset = HealthBarYOffset;
+                        _pluginConfiguration.HealthBarYOffset = healthBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var healthBarTextLeftXOffset = _pluginConfiguration.HealthBarTextLeftXOffset;
+                    if (ImGui.DragInt("Health Text Left X Offset", ref healthBarTextLeftXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                    {
+                        _pluginConfiguration.HealthBarTextLeftXOffset = healthBarTextLeftXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var healthBarTextLeftYOffset = _pluginConfiguration.HealthBarTextLeftYOffset;
+                    if (ImGui.DragInt("Health Text Left Y Offset", ref healthBarTextLeftYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                    {
+                        _pluginConfiguration.HealthBarTextLeftYOffset = healthBarTextLeftYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var healthBarTextRightXOffset = _pluginConfiguration.HealthBarTextRightXOffset;
+                    if (ImGui.DragInt("Health Text Right X Offset", ref healthBarTextRightXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                    {
+                        _pluginConfiguration.HealthBarTextRightXOffset = healthBarTextRightXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var healthBarTextRightYOffset = _pluginConfiguration.HealthBarTextRightYOffset;
+                    if (ImGui.DragInt("Health Text Right Y Offset", ref healthBarTextRightYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                    {
+                        _pluginConfiguration.HealthBarTextRightYOffset = healthBarTextRightYOffset;
                         _pluginConfiguration.Save();
                     }
 
@@ -97,17 +125,17 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    var PrimaryResourceBarXOffset = _pluginConfiguration.PrimaryResourceBarXOffset;
-                    if (ImGui.DragInt("Primary Resource X Offset", ref PrimaryResourceBarXOffset, .1f, 1, 1000))
+                    var primaryResourceBarXOffset = _pluginConfiguration.PrimaryResourceBarXOffset;
+                    if (ImGui.DragInt("Primary Resource X Offset", ref primaryResourceBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
                     {
-                        _pluginConfiguration.PrimaryResourceBarXOffset = PrimaryResourceBarXOffset;
+                        _pluginConfiguration.PrimaryResourceBarXOffset = primaryResourceBarXOffset;
                         _pluginConfiguration.Save();
                     }
 
-                    var PrimaryResourceBarYOffset = _pluginConfiguration.PrimaryResourceBarYOffset;
-                    if (ImGui.DragInt("Primary Resource Y Offset", ref PrimaryResourceBarYOffset, .1f, 1, 1000))
+                    var primaryResourceBarYOffset = _pluginConfiguration.PrimaryResourceBarYOffset;
+                    if (ImGui.DragInt("Primary Resource Y Offset", ref primaryResourceBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
                     {
-                        _pluginConfiguration.PrimaryResourceBarYOffset = PrimaryResourceBarYOffset;
+                        _pluginConfiguration.PrimaryResourceBarYOffset = primaryResourceBarYOffset;
                         _pluginConfiguration.Save();
                     }
 
@@ -139,17 +167,45 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    var TargetBarXOffset = _pluginConfiguration.TargetBarXOffset;
-                    if (ImGui.DragInt("Target X Offset", ref TargetBarXOffset, .1f, 1, 1000))
+                    var targetBarXOffset = _pluginConfiguration.TargetBarXOffset;
+                    if (ImGui.DragInt("Target X Offset", ref targetBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
                     {
-                        _pluginConfiguration.TargetBarXOffset = TargetBarXOffset;
+                        _pluginConfiguration.TargetBarXOffset = targetBarXOffset;
                         _pluginConfiguration.Save();
                     }
 
-                    var TargetBarYOffset = _pluginConfiguration.TargetBarYOffset;
-                    if (ImGui.DragInt("Target Y Offset", ref TargetBarYOffset, .1f, 1, 1000))
+                    var targetBarYOffset = _pluginConfiguration.TargetBarYOffset;
+                    if (ImGui.DragInt("Target Y Offset", ref targetBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
                     {
-                        _pluginConfiguration.TargetBarYOffset = TargetBarYOffset;
+                        _pluginConfiguration.TargetBarYOffset = targetBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var targetBarTextLeftXOffset = _pluginConfiguration.TargetBarTextLeftXOffset;
+                    if (ImGui.DragInt("Target Text Left X Offset", ref targetBarTextLeftXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                    {
+                        _pluginConfiguration.TargetBarTextLeftXOffset = targetBarTextLeftXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var targetBarTextLeftYOffset = _pluginConfiguration.TargetBarTextLeftYOffset;
+                    if (ImGui.DragInt("Target Text Left Y Offset", ref targetBarTextLeftYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                    {
+                        _pluginConfiguration.TargetBarTextLeftYOffset = targetBarTextLeftYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var targetBarTextRightXOffset = _pluginConfiguration.TargetBarTextRightXOffset;
+                    if (ImGui.DragInt("Target Text Right X Offset", ref targetBarTextRightXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                    {
+                        _pluginConfiguration.TargetBarTextRightXOffset = targetBarTextRightXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var targetBarTextRightYOffset = _pluginConfiguration.TargetBarTextRightYOffset;
+                    if (ImGui.DragInt("Target Text Right Y Offset", ref targetBarTextRightYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                    {
+                        _pluginConfiguration.TargetBarTextRightYOffset = targetBarTextRightYOffset;
                         _pluginConfiguration.Save();
                     }
 
@@ -167,25 +223,38 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    var ToTBarXOffset = _pluginConfiguration.ToTBarXOffset;
-                    if (ImGui.DragInt("Target of Target X Offset", ref ToTBarXOffset, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.ToTBarXOffset = ToTBarXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var ToTBarYOffset = _pluginConfiguration.ToTBarYOffset;
-                    if (ImGui.DragInt("Target of Target Y Offset", ref ToTBarYOffset, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.ToTBarYOffset = ToTBarYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    
                     var totBarText = _pluginConfiguration.ToTBarText;
                     if (ImGui.InputText("Target of Target Text", ref totBarText, 999))
                     {
                         _pluginConfiguration.ToTBarText = totBarText;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var toTBarXOffset = _pluginConfiguration.ToTBarXOffset;
+                    if (ImGui.DragInt("Target of Target X Offset", ref toTBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                    {
+                        _pluginConfiguration.ToTBarXOffset = toTBarXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var toTBarYOffset = _pluginConfiguration.ToTBarYOffset;
+                    if (ImGui.DragInt("Target of Target Y Offset", ref toTBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                    {
+                        _pluginConfiguration.ToTBarYOffset = toTBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var totBarTextXOffset = _pluginConfiguration.ToTBarTextXOffset;
+                    if (ImGui.DragInt("Target of Target Text X Offset", ref totBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                    {
+                        _pluginConfiguration.ToTBarTextXOffset = totBarTextXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var totBarTextYOffset = _pluginConfiguration.ToTBarTextYOffset;
+                    if (ImGui.DragInt("Target of Target Text Y Offset", ref totBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                    {
+                        _pluginConfiguration.ToTBarTextYOffset = totBarTextYOffset;
                         _pluginConfiguration.Save();
                     }
                     
@@ -203,25 +272,38 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    var FocusBarXOffset = _pluginConfiguration.FocusBarXOffset;
-                    if (ImGui.DragInt("Focus X Offset", ref FocusBarXOffset, .1f, 1, 1000))
+                    var focusBarXOffset = _pluginConfiguration.FocusBarXOffset;
+                    if (ImGui.DragInt("Focus X Offset", ref focusBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
                     {
-                        _pluginConfiguration.FocusBarXOffset = FocusBarXOffset;
+                        _pluginConfiguration.FocusBarXOffset = focusBarXOffset;
                         _pluginConfiguration.Save();
                     }
 
-                    var FocusBarYOffset = _pluginConfiguration.FocusBarYOffset;
-                    if (ImGui.DragInt("Focus Y Offset", ref FocusBarYOffset, .1f, 1, 1000))
+                    var focusBarYOffset = _pluginConfiguration.FocusBarYOffset;
+                    if (ImGui.DragInt("Focus Y Offset", ref focusBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
                     {
-                        _pluginConfiguration.FocusBarYOffset = FocusBarYOffset;
+                        _pluginConfiguration.FocusBarYOffset = focusBarYOffset;
                         _pluginConfiguration.Save();
                     }
 
-                    
                     var focusBarText = _pluginConfiguration.FocusBarText;
                     if (ImGui.InputText("Focus Text", ref focusBarText, 999))
                     {
                         _pluginConfiguration.FocusBarText = focusBarText;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var focusBarTextXOffset = _pluginConfiguration.FocusBarTextXOffset;
+                    if (ImGui.DragInt("Focus Text X Offset", ref focusBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                    {
+                        _pluginConfiguration.FocusBarTextXOffset = focusBarTextXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var focusBarTextYOffset = _pluginConfiguration.FocusBarTextYOffset;
+                    if (ImGui.DragInt("Focus Text Y Offset", ref focusBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                    {
+                        _pluginConfiguration.FocusBarTextYOffset = focusBarTextYOffset;
                         _pluginConfiguration.Save();
                     }
                     
