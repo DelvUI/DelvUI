@@ -1012,10 +1012,10 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }                    
                     
-                    var RDMVHorizontalOffset = _pluginConfiguration.RDMVHorizontalOffset;
+                    var RDMVHorizontalOffset = _pluginConfiguration.RDMHorizontalOffset;
                     if (ImGui.DragInt("Horizontal Offset", ref RDMVHorizontalOffset, 1f, -1000, 1000))
                     {
-                        _pluginConfiguration.RDMVHorizontalOffset = RDMVHorizontalOffset;
+                        _pluginConfiguration.RDMHorizontalOffset = RDMVHorizontalOffset;
                         _pluginConfiguration.Save();
                     }
 
@@ -1072,6 +1072,31 @@ namespace DelvUI.Interface
                     {
                         _pluginConfiguration.RDMWhiteManaBarWidth = RDMWhiteManaBarWidth;
                         _pluginConfiguration.Save();
+                    }                            
+                    var RDMBalanceBarHeight = _pluginConfiguration.RDMBalanceBarHeight;
+                    if (ImGui.DragInt("Balance Height", ref RDMBalanceBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMBalanceBarHeight = RDMBalanceBarHeight;
+                        _pluginConfiguration.Save();
+                    }                    
+                    var RDMBalanceBarWidth = _pluginConfiguration.RDMBalanceBarWidth;
+                    if (ImGui.DragInt("Balance Width", ref RDMBalanceBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMBalanceBarWidth = RDMBalanceBarWidth;
+                        _pluginConfiguration.Save();
+                    }        
+                    
+                    var RDMAccelerationBarHeight = _pluginConfiguration.RDMAccelerationBarHeight;
+                    if (ImGui.DragInt("Acceleration Stacks Height", ref RDMAccelerationBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMAccelerationBarHeight = RDMAccelerationBarHeight;
+                        _pluginConfiguration.Save();
+                    }                    
+                    var RDMAccelerationBarWidth = _pluginConfiguration.RDMAccelerationBarWidth;
+                    if (ImGui.DragInt("Acceleration Stacks Width", ref RDMAccelerationBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMAccelerationBarWidth = RDMAccelerationBarWidth;
+                        _pluginConfiguration.Save();
                     }
                     
                     changed |= ImGui.Checkbox("Show Mana Value", ref _pluginConfiguration.RDMShowManaValue);
@@ -1101,9 +1126,9 @@ namespace DelvUI.Interface
                     }
 
                     changed |= ImGui.Checkbox("Show Verfire Procs",
-                        ref _pluginConfiguration.BLMShowVerfireProcs);
+                        ref _pluginConfiguration.RDMShowVerfireProcs);
                     changed |= ImGui.Checkbox("Show Verstone Procs",
-                        ref _pluginConfiguration.BLMShowVerstoneProcs);
+                        ref _pluginConfiguration.RDMShowVerstoneProcs);
 
                     var RDMProcsHeight = _pluginConfiguration.RDMProcsHeight;
                     if (ImGui.DragInt("Procs Height", ref RDMProcsHeight, .1f, -2000, 2000))
@@ -1132,7 +1157,7 @@ namespace DelvUI.Interface
                     changed |= ImGui.ColorEdit4("Dualcast Color", ref _pluginConfiguration.RDMDualcastBarColor);
                     changed |= ImGui.ColorEdit4("Verfire Proc Color", ref _pluginConfiguration.RDMVerfireBarColor);
                     changed |= ImGui.ColorEdit4("Verthunder Color", ref _pluginConfiguration.RDMVerthunderBarColor);
-                    changed |= ImGui.ColorEdit4("DoT Timer Color", ref _pluginConfiguration.RDMWDotColor);
+                    changed |= ImGui.ColorEdit4("DoT Timer Color", ref _pluginConfiguration.RDMDotColor);
                     
                     ImGui.EndTabItem();
                 }
@@ -1209,7 +1234,7 @@ namespace DelvUI.Interface
                     }
 
                     changed |= ImGui.Checkbox("Show Mana Value", ref _pluginConfiguration.BLMShowManaValue);
-                    changed |= ImGui.Checkbox("Show Mana Threshold Marker",
+                    changed |= ImGui.Checkbox("Show Mana Threshold Marker During Astral Fire",
                         ref _pluginConfiguration.BLMShowManaThresholdMarker);
 
                     var BLMManaThresholdValue = _pluginConfiguration.BLMManaThresholdValue;

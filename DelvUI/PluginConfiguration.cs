@@ -283,16 +283,26 @@ namespace DelvUI {
         #region RDM Configuration
 
         public int RDMVerticalOffset { get; set; } = -2;
-        public int RDMVHorizontalOffset { get; set; } = -2;
+        public int RDMHorizontalOffset { get; set; } = 0;
         public int RDMVerticalSpaceBetweenBars { get; set; } = 2;
         public int RDMHorizontalSpaceBetweenBars { get; set; } = 2;
         public int RDMManaBarHeight { get; set; } = 20;
-        public int RDMManaBarWidth { get; set; } = 254;
-        public int RDMBlackManaBarHeight { get; set; } = 16;
-        public int RDMBlackManaBarWidth { get; set; } = 18;
-        public int RDMWhiteManaBarHeight { get; set; } = 18;
-        public int RDMWhiteManaBarWidth { get; set; } = 18;
-        public bool RDMShowManaValue = false;
+        public int RDMManaBarWidth { get; set; } = 246;
+        public int RDMBlackManaBarHeight { get; set; } = 20;
+        public int RDMBlackManaBarWidth { get; set; } = 120;
+        public int RDMWhiteManaBarHeight { get; set; } = 20;
+        public int RDMWhiteManaBarWidth { get; set; } = 120; 
+        
+        public int RDMBalanceBarHeight { get; set; } = 20;
+        
+        public int RDMBalanceBarWidth { get; set; } = 20;   
+        
+        public int RDMAccelerationBarHeight { get; set; } = 10;
+        
+        public int RDMAccelerationBarWidth { get; set; } = 83;
+        
+        public bool RDMShowManaValue = true;
+        
         public bool RDMShowManaThresholdMarker = true;
         public int RDMManaThresholdValue { get; set; } = 2600;
 
@@ -300,9 +310,11 @@ namespace DelvUI {
         public int RDMDualCastHeight { get; set; } = 16;
         public int RDMDualCastWidth { get; set; } = 16;
 
-        public bool BLMShowVerfireProcs = true;
-        public bool BLMShowVerstoneProcs = true;
+        public bool RDMShowVerfireProcs = true;
+        
+        public bool RDMShowVerstoneProcs = true;
         public int RDMProcsHeight { get; set; } = 7;
+        
         public bool RDMShowDotTimer = true;
         public int RDMDotTimerHeight { get; set; } = 10;
 
@@ -312,9 +324,10 @@ namespace DelvUI {
         public Vector4 RDMBlackManaBarColor = new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f);
         public Vector4 RDMAccelerationBarColor = new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f);
         public Vector4 RDMDualcastBarColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f);
+        public Vector4 RDMBalanceBarColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f);
         public Vector4 RDMVerfireBarColor = new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f);
         public Vector4 RDMVerthunderBarColor = new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f);
-        public Vector4 RDMWDotColor = new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f);
+        public Vector4 RDMDotColor = new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f);
 
         #endregion
 
@@ -850,10 +863,17 @@ namespace DelvUI {
 
                 [Jobs.RDM * 1000 + 8] = new Dictionary<string, uint> // DoT
                 {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMWDotColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMWDotColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMWDotColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMWDotColor.AdjustColor(.1f))
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMDotColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMDotColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMDotColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMDotColor.AdjustColor(.1f))
+                },                
+                [Jobs.RDM * 1000 + 9] = new Dictionary<string, uint> // DoT
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMBalanceBarColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMBalanceBarColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMBalanceBarColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMBalanceBarColor.AdjustColor(.1f))
                 },
 
                 [Jobs.SMN] = new Dictionary<string, uint>
@@ -995,14 +1015,14 @@ namespace DelvUI {
         public const uint RDM = 35;
         public const uint BLU = 36;
 
-       public const uint CRP = 8;
-       public const uint BSM = 9;
-       public const uint ARM = 10;
-       public const uint GSM = 11;
-       public const uint LTW = 12;
-       public const uint WVR = 13;
-       public const uint ALC = 14;
-       public const uint CUL = 15;
+        public const uint CRP = 8;
+        public const uint BSM = 9;
+        public const uint ARM = 10;
+        public const uint GSM = 11;
+        public const uint LTW = 12;
+        public const uint WVR = 13;
+        public const uint ALC = 14;
+        public const uint CUL = 15;
 
         public const uint MIN = 16;
         public const uint BOT = 17;
