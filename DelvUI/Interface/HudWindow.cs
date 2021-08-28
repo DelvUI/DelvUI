@@ -181,11 +181,13 @@ namespace DelvUI.Interface {
                 DrawOutlinedText(name, new Vector2(cursorPos.X + TargetBarWidth - nameSize.X - 5, cursorPos.Y - 22));
                 DrawTargetShield(target, cursorPos, BarSize, true);
 
+                /* This needs more testing and solution for game lag(context menu)
                 if (ImGui.GetIO().MouseClicked[1]) {
                     Resolver.Initialize();
                     var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
                     openContextMenuFromTarget(agentHud, target.Address);
                 }
+                */
 
                 DrawTargetOfTargetBar(target.TargetActorID);
             }
@@ -234,7 +236,7 @@ namespace DelvUI.Interface {
             Actor target = null;
             if (targetActorId == 0)
             {
-                target = PluginInterface.ClientState.LocalPlayer;
+                //target = PluginInterface.ClientState.LocalPlayer;
             }
             else
             {
@@ -261,7 +263,7 @@ namespace DelvUI.Interface {
             ImGui.SetCursorPos(cursorPos);    
             
             var colors = DetermineTargetPlateColors(actor);
-            if (ImGui.BeginChild("target_bar", barSize)) {
+            if (ImGui.BeginChild("target_of_target_bar", barSize)) {
                 var drawList = ImGui.GetWindowDrawList();
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["background"]);
                 
