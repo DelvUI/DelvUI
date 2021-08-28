@@ -177,29 +177,39 @@ namespace DelvUI {
         #region DRK Configuration
 
         public int DRKBaseXOffset { get; set; } = 127;
-        public int DRKBaseYOffset { get; set; } = 405;
-        public int DRKManaBarHeight { get; set; } = 15;
+        public int DRKBaseYOffset { get; set; } = 414;
+        public bool DRKManaBarEnabled { get; set; } = true;
+        public int DRKManaBarHeight { get; set; } = 10;
         public int DRKManaBarWidth { get; set; } = 254;
-        public int DRKManaBarPadding { get; set; } = 2;
+        public int DRKManaBarPadding { get; set; } = 1;
         public int DRKManaBarXOffset { get; set; }
         public int DRKManaBarYOffset { get; set; }
-        public int DRKBloodGaugeHeight { get; set; } = 15;
+        public bool DRKBloodGaugeEnabled { get; set; } = true;
+        public int DRKBloodGaugeHeight { get; set; } = 10;
         public int DRKBloodGaugeWidth { get; set; } = 254;
         public int DRKBloodGaugePadding { get; set; } = 2;
         public int DRKBloodGaugeXOffset { get; set; }
         public int DRKBloodGaugeYOffset { get; set; }
+        public bool DRKBuffBarEnabled { get; set; } = true;
         public int DRKBuffBarHeight { get; set; } = 20;
         public int DRKBuffBarWidth { get; set; } = 254;
         public int DRKBuffBarPadding { get; set; } = 2;
         public int DRKBuffBarXOffset { get; set; }
         public int DRKBuffBarYOffset { get; set; }
+        public bool DRKLivingShadowBarEnabled { get; set; }
+        public int DRKLivingShadowBarHeight { get; set; } = 20;
+        public int DRKLivingShadowBarWidth { get; set; } = 254;
+        public int DRKLivingShadowBarPadding { get; set; } = 2;
+        public int DRKLivingShadowBarXOffset { get; set; }
+        public int DRKLivingShadowBarYOffset { get; set; }
         public int DRKInterBarOffset { get; set; } = 2;
         public Vector4 DRKManaColor = new Vector4(0f/255f, 142f/255f, 254f/255f, 100f/100f);
         public Vector4 DRKBloodColorLeft = new Vector4(149f/255f, 11f/255f, 196f/255f, 100f/100f);
         public Vector4 DRKBloodColorRight = new Vector4(155f/255f, 0f/255f, 61f/255f, 100f/100f);
-        public Vector4 DRKDarkArtsColor = new Vector4(35f/255f, 33f/255f, 185f/255f, 100f/100f);
+        public Vector4 DRKDarkArtsColor = new Vector4(210f/255f, 33f/255f, 33f/255f, 100f/100f);
         public Vector4 DRKBloodWeaponColor = new Vector4(160f/255f, 0f/255f, 0f/255f, 100f/100f);
-        public Vector4 DRKDeliriumColor = new Vector4(225f/255f, 105f/255f, 105f/255f, 100f/100f);
+        public Vector4 DRKDeliriumColor = new Vector4(255f/255f, 255f/255f, 255f/255f, 100f/100f);
+        public Vector4 DRKLivingShadowColor = new Vector4(225f/255f, 105f/255f, 205f/255f, 100f/100f);
         public Vector4 DRKEmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 100f/100f);
 
         #endregion
@@ -522,7 +532,15 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DRKDeliriumColor.AdjustColor(.1f))
                 },
 
-                [Jobs.DRK * 1000 + 6] = new Dictionary<string, uint> // Bar not ready
+                [Jobs.DRK * 1000 + 6] = new Dictionary<string, uint> // Living Shadow
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(DRKDeliriumColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(DRKDeliriumColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DRKDeliriumColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DRKDeliriumColor.AdjustColor(.1f))
+                },
+
+                [Jobs.DRK * 1000 + 7] = new Dictionary<string, uint> // Bar not ready
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(DRKEmptyColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(DRKEmptyColor.AdjustColor(-.8f)),
