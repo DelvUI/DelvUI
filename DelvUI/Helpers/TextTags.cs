@@ -69,7 +69,7 @@ namespace DelvUI.Helpers
                     
                     // Misc
                     "[company]" when IsPropertyExist(actor, "CompanyTag") => actor.CompanyTag,
-                    "[level]"  when IsPropertyExist(actor, "Level") => actor.Level,
+                    "[level]"  when IsPropertyExist(actor, "Level") => actor.Level.ToString(),
                     _ => ""
                 };
         }

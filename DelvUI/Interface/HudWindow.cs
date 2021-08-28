@@ -35,6 +35,10 @@ namespace DelvUI.Interface {
         protected int HealthBarWidth => PluginConfiguration.HealthBarWidth;
         protected int HealthBarXOffset => PluginConfiguration.HealthBarXOffset;
         protected int HealthBarYOffset => PluginConfiguration.HealthBarYOffset;
+        protected int HealthBarTextLeftXOffset => PluginConfiguration.HealthBarTextLeftXOffset;
+        protected int HealthBarTextLeftYOffset => PluginConfiguration.HealthBarTextLeftYOffset;
+        protected int HealthBarTextRightXOffset => PluginConfiguration.HealthBarTextRightXOffset;
+        protected int HealthBarTextRightYOffset => PluginConfiguration.HealthBarTextRightYOffset;
         protected int PrimaryResourceBarHeight => PluginConfiguration.PrimaryResourceBarHeight;
         protected int PrimaryResourceBarWidth => PluginConfiguration.PrimaryResourceBarWidth;
         protected int PrimaryResourceBarXOffset => PluginConfiguration.PrimaryResourceBarXOffset;
@@ -43,14 +47,22 @@ namespace DelvUI.Interface {
         protected int TargetBarWidth => PluginConfiguration.TargetBarWidth;
         protected int TargetBarXOffset => PluginConfiguration.TargetBarXOffset;
         protected int TargetBarYOffset => PluginConfiguration.TargetBarYOffset;
+        protected int TargetBarTextLeftXOffset => PluginConfiguration.TargetBarTextLeftXOffset;
+        protected int TargetBarTextLeftYOffset => PluginConfiguration.TargetBarTextLeftYOffset;
+        protected int TargetBarTextRightXOffset => PluginConfiguration.TargetBarTextRightXOffset;
+        protected int TargetBarTextRightYOffset => PluginConfiguration.TargetBarTextRightYOffset;
         protected int ToTBarHeight => PluginConfiguration.ToTBarHeight;
         protected int ToTBarWidth => PluginConfiguration.ToTBarWidth;
         protected int ToTBarXOffset => PluginConfiguration.ToTBarXOffset;
         protected int ToTBarYOffset => PluginConfiguration.ToTBarYOffset;
+        protected int ToTBarTextXOffset => PluginConfiguration.ToTBarTextXOffset;
+        protected int ToTBarTextYOffset => PluginConfiguration.ToTBarTextYOffset;
         protected int FocusBarHeight => PluginConfiguration.FocusBarHeight;
         protected int FocusBarWidth => PluginConfiguration.FocusBarWidth;
         protected int FocusBarXOffset => PluginConfiguration.FocusBarXOffset;
         protected int FocusBarYOffset => PluginConfiguration.FocusBarYOffset;
+        protected int FocusBarTextXOffset => PluginConfiguration.FocusBarTextXOffset;
+        protected int FocusBarTextYOffset => PluginConfiguration.FocusBarTextYOffset;
         protected int CastBarWidth => PluginConfiguration.CastBarWidth;
         protected int CastBarHeight => PluginConfiguration.CastBarHeight;
         protected int CastBarXOffset => PluginConfiguration.CastBarXOffset;
@@ -77,12 +89,16 @@ namespace DelvUI.Interface {
                 DrawTankStanceIndicator();
 
             var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset, CenterY + HealthBarYOffset);
-            DrawOutlinedText($"{Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}", new Vector2(cursorPos.X + 5, cursorPos.Y -22));
+            DrawOutlinedText(
+                $"{Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}",
+                new Vector2(cursorPos.X + 5 + HealthBarTextLeftXOffset, cursorPos.Y - 22 + HealthBarTextLeftYOffset));
 
             var text = Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextRight);
             var textSize = ImGui.CalcTextSize(text);
             
-            DrawOutlinedText(text, new Vector2(cursorPos.X + HealthBarWidth - textSize.X - 5, cursorPos.Y -22));
+            DrawOutlinedText(text,
+                new Vector2(cursorPos.X + HealthBarWidth - textSize.X - 5 + HealthBarTextRightXOffset,
+                    cursorPos.Y - 22 + HealthBarTextRightXOffset));
    
             ImGui.SetCursorPos(cursorPos);
             
@@ -143,7 +159,8 @@ namespace DelvUI.Interface {
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, friendly["background"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(TargetBarWidth, TargetBarHeight), 
-                    friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"], friendly["gradientLeft"]
+                    friendly["gradientLeft"], friendly["gradientRight"], 
+                    friendly["gradientRight"], friendly["gradientLeft"]
                 );
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
             }
@@ -153,19 +170,24 @@ namespace DelvUI.Interface {
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(TargetBarWidth * scale, TargetBarHeight), 
-                    colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+                    colors["gradientLeft"], colors["gradientRight"], 
+                    colors["gradientRight"], colors["gradientLeft"]
                 );
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
 
                 var text = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextLeft);
 
-                DrawOutlinedText(text, new Vector2(cursorPos.X + 5, cursorPos.Y - 22));
+                DrawOutlinedText(text,
+                    new Vector2(cursorPos.X + 5 + TargetBarTextLeftXOffset,
+                        cursorPos.Y - 22 + TargetBarTextLeftYOffset));
             }
 
             var textRight = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextRight);
             var textRightSize = ImGui.CalcTextSize(textRight);
             
-            DrawOutlinedText(textRight, new Vector2(cursorPos.X + TargetBarWidth - textRightSize.X - 5, cursorPos.Y - 22));
+            DrawOutlinedText(textRight,
+                new Vector2(cursorPos.X + TargetBarWidth - textRightSize.X - 5 + TargetBarTextRightXOffset,
+                    cursorPos.Y - 22 + TargetBarTextRightYOffset));
             DrawTargetShield(target, cursorPos, BarSize, true);
 
             DrawTargetOfTargetBar(target.TargetActorID);
@@ -207,7 +229,9 @@ namespace DelvUI.Interface {
             
             var text = Helpers.TextTags.GenerateFormattedTextFromTags(focus, PluginConfiguration.FocusBarText);
             var textSize = ImGui.CalcTextSize(text);
-            DrawOutlinedText(text, new Vector2(cursorPos.X + FocusBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
+            DrawOutlinedText(text,
+                new Vector2((cursorPos.X + FocusBarWidth / 2f - textSize.X / 2f) + FocusBarTextXOffset,
+                    cursorPos.Y - 22 + FocusBarTextYOffset));
         }
         
         protected virtual void DrawTargetOfTargetBar(int targetActorId) {
@@ -235,8 +259,10 @@ namespace DelvUI.Interface {
             var text = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.ToTBarText);
             var textSize = ImGui.CalcTextSize(text);
 
-            var cursorPos = new Vector2(CenterX + XOffset + TargetBarWidth + 2, CenterY + YOffset);
-            DrawOutlinedText(text, new Vector2(cursorPos.X + ToTBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
+            var cursorPos = new Vector2(CenterX + ToTBarXOffset + TargetBarWidth + 2, CenterY + ToTBarYOffset);
+            DrawOutlinedText(text,
+                new Vector2((cursorPos.X + ToTBarWidth / 2f - textSize.X / 2f) + ToTBarTextXOffset,
+                    cursorPos.Y - 22 + ToTBarTextYOffset));
             ImGui.SetCursorPos(cursorPos);    
             
             var colors = DetermineTargetPlateColors(actor);
