@@ -91,6 +91,20 @@ namespace DelvUI.Interface {
                         _pluginConfiguration.TargetBarWidth = targetBarWidth;
                         _pluginConfiguration.Save();
                     }
+                    
+                    var targetBarTextLeft = _pluginConfiguration.TargetBarTextLeft;
+                    if (ImGui.InputText("Target Text Left", ref targetBarTextLeft, 999))
+                    {
+                        _pluginConfiguration.TargetBarTextLeft = targetBarTextLeft;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var targetBarTextRight = _pluginConfiguration.TargetBarTextRight;
+                    if (ImGui.InputText("Target Text Right", ref targetBarTextRight, 999))
+                    {
+                        _pluginConfiguration.TargetBarTextRight = targetBarTextRight;
+                        _pluginConfiguration.Save();
+                    }
 
                     var totBarHeight = _pluginConfiguration.ToTBarHeight;
                     if (ImGui.DragInt("Target of Target Height", ref totBarHeight, .1f, 1, 1000))
@@ -105,6 +119,14 @@ namespace DelvUI.Interface {
                         _pluginConfiguration.ToTBarWidth = totBarWidth;
                         _pluginConfiguration.Save();
                     }
+                    
+                    var totBarText = _pluginConfiguration.ToTBarText;
+                    if (ImGui.InputText("Target of Target Text", ref totBarText, 999))
+                    {
+                        _pluginConfiguration.ToTBarText = totBarText;
+                        _pluginConfiguration.Save();
+                    }
+                    
                     var focusBarHeight = _pluginConfiguration.FocusBarHeight;
                     if (ImGui.DragInt("Focus Height", ref focusBarHeight, .1f, 1, 1000))
                     {
@@ -116,6 +138,13 @@ namespace DelvUI.Interface {
                     if (ImGui.DragInt("Focus Width", ref focusBarWidth, .1f, 1, 1000))
                     {
                         _pluginConfiguration.FocusBarWidth = focusBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var focusBarText = _pluginConfiguration.FocusBarText;
+                    if (ImGui.InputText("Focus Text", ref focusBarText, 999))
+                    {
+                        _pluginConfiguration.FocusBarText = focusBarText;
                         _pluginConfiguration.Save();
                     }
                     

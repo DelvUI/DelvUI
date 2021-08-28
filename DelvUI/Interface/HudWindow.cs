@@ -13,11 +13,9 @@ using Dalamud.Game.ClientState.Structs;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.GameStructs;
-using DelvUI.Models;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
-using static DelvUI.Models.ActivePlayerActor;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface {
@@ -52,12 +50,10 @@ namespace DelvUI.Interface {
         private Lumina.Excel.GeneratedSheets.Action _lastUsedAction;
         private Mount _lastUsedMount;
         private Item _lastUsedItem;
-        private ActivePlayerActor _playerActor;
         
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {
             PluginInterface = pluginInterface;
             PluginConfiguration = pluginConfiguration;
-            _playerActor = new ActivePlayerActor(PluginInterface.ClientState.LocalPlayer, new[]{PluginConfiguration.HealthBarTextLeft, PluginConfiguration.HealthBarTextRight});
             //_barsize = new Vector2(BarWidth, BarHeight);
         }
 
@@ -72,14 +68,13 @@ namespace DelvUI.Interface {
 
            
             var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset, CenterY + YOffset);
-            DrawOutlinedText($"{_playerActor.GenerateTextFromTags(PluginConfiguration.HealthBarTextLeft)}", new Vector2(cursorPos.X + 5, cursorPos.Y -22));
+            DrawOutlinedText($"{Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}", new Vector2(cursorPos.X + 5, cursorPos.Y -22));
+
+            var text = Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextRight);
+            var textSize = ImGui.CalcTextSize(text);
             
-            var hp = $"{actor.MaxHp.KiloFormat(),6} | ";
-            var hpSize = ImGui.CalcTextSize(hp);
-            var percentageSize = ImGui.CalcTextSize("100");
-            DrawOutlinedText(_playerActor.GenerateTextFromTags(PluginConfiguration.HealthBarTextRight), new Vector2(cursorPos.X + HealthBarWidth - hpSize.X - percentageSize.X - 5, cursorPos.Y -22));
-            //DrawOutlinedText($"{(int)(scale * 100),3}", new Vector2(cursorPos.X + HealthBarWidth - percentageSize.X - 5, cursorPos.Y -22));
-            
+            DrawOutlinedText(text, new Vector2(cursorPos.X + HealthBarWidth - textSize.X - 5, cursorPos.Y -22));
+   
             ImGui.SetCursorPos(cursorPos);
             
             if (ImGui.BeginChild("health_bar", BarSize)) {
@@ -153,16 +148,15 @@ namespace DelvUI.Interface {
                 );
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
 
-                var percentage = $"{(int) (scale * 100),3}";
-                var percentageSize = ImGui.CalcTextSize(percentage);
-                var maxPercentageSize = ImGui.CalcTextSize("100");
-                DrawOutlinedText(percentage, new Vector2(cursorPos.X + 5 + maxPercentageSize.X - percentageSize.X, cursorPos.Y - 22));
-                DrawOutlinedText($" | {actor.MaxHp.KiloFormat(),-6}", new Vector2(cursorPos.X + 5 + maxPercentageSize.X, cursorPos.Y - 22));
+                var text = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextLeft);
+
+                DrawOutlinedText(text, new Vector2(cursorPos.X + 5, cursorPos.Y - 22));
             }
 
-            var name = $"{target.Name.Abbreviate().Truncate(16)}";
-            var nameSize = ImGui.CalcTextSize(name);
-            DrawOutlinedText(name, new Vector2(cursorPos.X + TargetBarWidth - nameSize.X - 5, cursorPos.Y - 22));
+            var textRight = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextRight);
+            var textRightSize = ImGui.CalcTextSize(textRight);
+            
+            DrawOutlinedText(textRight, new Vector2(cursorPos.X + TargetBarWidth - textRightSize.X - 5, cursorPos.Y - 22));
             DrawTargetShield(target, cursorPos, BarSize, true);
 
             DrawTargetOfTargetBar(target.TargetActorID);
@@ -202,9 +196,9 @@ namespace DelvUI.Interface {
                 DrawTargetShield(focus, cursorPos, barSize, true);
             }
             
-            var name = $"{focus.Name.Abbreviate().Truncate(12)}";
-            var textSize = ImGui.CalcTextSize(name);
-            DrawOutlinedText(name, new Vector2(cursorPos.X + FocusBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
+            var text = Helpers.TextTags.GenerateFormattedTextFromTags(focus, PluginConfiguration.FocusBarText);
+            var textSize = ImGui.CalcTextSize(text);
+            DrawOutlinedText(text, new Vector2(cursorPos.X + FocusBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
         }
         
         protected virtual void DrawTargetOfTargetBar(int targetActorId) {
@@ -230,12 +224,12 @@ namespace DelvUI.Interface {
 
             var barSize = new Vector2(ToTBarWidth, ToTBarHeight);
 
-            var name = $"{actor.Name.Abbreviate().Truncate(12)}";
-            var textSize = ImGui.CalcTextSize(name);
+            var text = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.ToTBarText);
+            var textSize = ImGui.CalcTextSize(text);
 
             var cursorPos = new Vector2(CenterX + XOffset + TargetBarWidth + 2, CenterY + YOffset);
-            DrawOutlinedText(name, new Vector2(cursorPos.X + ToTBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
-            ImGui.SetCursorPos(cursorPos);    
+            DrawOutlinedText(text, new Vector2(cursorPos.X + ToTBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
+            ImGui.SetCursorPos(cursorPos);
             
             var colors = DetermineTargetPlateColors(actor);
             if (ImGui.BeginChild("target_bar", barSize)) {
