@@ -59,15 +59,15 @@ namespace DelvUI.Interface
         }
         private void DrawDivinationBar()
         {
-            //NOTE: Using FFXIVClientStructs may be a better solution to detect duplicate seals
+            //NOTE: Using FFXIVClientStructs may be a better solution, as it can detect duplicate seals
             //https://github.com/aers/FFXIVClientStructs/blob/dd3ec0485395e23592303311bb29d0447e03f06d/FFXIVClientStructs/FFXIV/Client/Game/Gauge/JobGauges.cs#L33
 
             var gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
 
             var barWidth = (DivinationWidth / 3);
-            BarSize = new Vector2(barWidth, DivinationHeight);
+            BarSize = new Vector2(barWidth+1, DivinationHeight);
             BarCoords = new Vector2(DivinationBarX, DivinationBarY);
-            var cursorPos = new Vector2(CenterX + BarCoords.X, CenterY + BarCoords.Y - 58);
+            var cursorPos = new Vector2(CenterX + BarCoords.X, CenterY + BarCoords.Y - 60);
 
             var drawList = ImGui.GetWindowDrawList();
 
@@ -107,7 +107,7 @@ namespace DelvUI.Interface
 
             BarSize = new Vector2(DrawWidth, DrawHeight);
             BarCoords = new Vector2(DrawBarX, DrawBarY);
-            var cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y - 37);
+            var cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y - 38);
 
             var drawList = ImGui.GetWindowDrawList();
 
