@@ -93,46 +93,57 @@ namespace DelvUI.Interface {
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentHp / actor.MaxHp;
             
-            if(actor.ClassJob.Id == 19 || actor.ClassJob.Id == 32 || actor.ClassJob.Id == 21 || actor.ClassJob.Id == 37)
+            if(actor.ClassJob.Id is 19 or 32 or 21 or 37)
                 DrawTankStanceIndicator();
 
             var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset, CenterY + HealthBarYOffset);
    
             ImGui.SetCursorPos(cursorPos);
             
-            if (ImGui.BeginChild("health_bar", BarSize)) {
-                var colors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
-                var drawList = ImGui.GetWindowDrawList();
-                
-                
-                
-                DrawOutlinedText(
-                    $"{Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}",
-                    new Vector2(cursorPos.X + 5 + HealthBarTextLeftXOffset, cursorPos.Y - 22 + HealthBarTextLeftYOffset));
-
-                var text = Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextRight);
-                var textSize = ImGui.CalcTextSize(text);
+            var colors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
+            var drawList = ImGui.GetWindowDrawList();
             
-                DrawOutlinedText(text,
-                    new Vector2(cursorPos.X + HealthBarWidth - textSize.X - 5 + HealthBarTextRightXOffset,
-                        cursorPos.Y - 22 + HealthBarTextRightYOffset));
-                
+            // Basically make an invisible box for BeginChild to work properly.
+            ImGuiWindowFlags windowFlags = 0;
+            windowFlags |= ImGuiWindowFlags.NoBackground;
+            windowFlags |= ImGuiWindowFlags.NoTitleBar;
+            windowFlags |= ImGuiWindowFlags.NoMove;
+            windowFlags |= ImGuiWindowFlags.NoDecoration;
+            
+            ImGui.SetNextWindowPos(cursorPos);
+            ImGui.SetNextWindowSize(_barSize);
+
+            ImGui.Begin("health_bar", windowFlags);
+            if (ImGui.BeginChild("health_bar", _barSize)) {
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight), 
                     colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
                 );
                 
-                /* This needs some check to see if it's in BeginChild or else this will leak into the settings panel.
-                if (ImGui.GetIO().MouseClicked[0]) {
+                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                
+                // Check if mouse is hovering over the box properly
+                if (ImGui.GetIO().MouseClicked[0] && ImGui.IsMouseHoveringRect(cursorPos, cursorPos + BarSize)) {
                     PluginInterface.ClientState.Targets.SetCurrentTarget(actor);
                 }
-                */
-                
+
+                ImGui.EndChild();
             }
+            ImGui.End();
             DrawTargetShield(actor, cursorPos, _barSize, true);
             
-            ImGui.EndChild();
+            DrawOutlinedText(
+                $"{Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}",
+                new Vector2(cursorPos.X + 5 + HealthBarTextLeftXOffset, cursorPos.Y - 22 + HealthBarTextLeftYOffset));
+
+            var text = Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextRight);
+            var textSize = ImGui.CalcTextSize(text);
+            
+            DrawOutlinedText(text,
+                new Vector2(cursorPos.X + HealthBarWidth - textSize.X - 5 + HealthBarTextRightXOffset,
+                    cursorPos.Y - 22 + HealthBarTextRightYOffset));
+            
         }
 
         protected virtual void DrawPrimaryResourceBar() {
@@ -167,7 +178,7 @@ namespace DelvUI.Interface {
             ImGui.SetCursorPos(cursorPos);
             var drawList = ImGui.GetWindowDrawList();
 
-            if (!(target is Chara actor)) {
+            if (target is not Chara actor) {
                 var friendly = PluginConfiguration.NPCColorMap["friendly"];
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, friendly["background"]);
                 drawList.AddRectFilledMultiColor(
@@ -204,6 +215,7 @@ namespace DelvUI.Interface {
             DrawTargetShield(target, cursorPos, BarSize, true);
 
                 /* This needs more testing and solution for game lag(context menu)
+                   Zeff: This will also need to be wrapped into a Begin->BeginChild and use the same solution healthbar uses.
                 if (ImGui.GetIO().MouseClicked[1]) {
                     Resolver.Initialize();
                     var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
@@ -280,14 +292,24 @@ namespace DelvUI.Interface {
             var textSize = ImGui.CalcTextSize(text);
 
             var cursorPos = new Vector2(CenterX + ToTBarXOffset + TargetBarWidth + 2, CenterY + ToTBarYOffset);
-            DrawOutlinedText(text,
-                new Vector2((cursorPos.X + ToTBarWidth / 2f - textSize.X / 2f) + ToTBarTextXOffset,
-                    cursorPos.Y - 22 + ToTBarTextYOffset));
             ImGui.SetCursorPos(cursorPos);    
             
             var colors = DetermineTargetPlateColors(actor);
+            
+            var drawList = ImGui.GetWindowDrawList();
+            
+            // Basically make an invisible box for BeginChild to work properly.
+            ImGuiWindowFlags windowFlags = 0;
+            windowFlags |= ImGuiWindowFlags.NoBackground;
+            windowFlags |= ImGuiWindowFlags.NoTitleBar;
+            windowFlags |= ImGuiWindowFlags.NoMove;
+            windowFlags |= ImGuiWindowFlags.NoDecoration;
+            
+            ImGui.SetNextWindowPos(cursorPos);
+            ImGui.SetNextWindowSize(barSize);
+            
+            ImGui.Begin("target_of_target_bar", windowFlags);
             if (ImGui.BeginChild("target_of_target_bar", barSize)) {
-                var drawList = ImGui.GetWindowDrawList();
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["background"]);
                 
                 drawList.AddRectFilledMultiColor(
@@ -297,13 +319,18 @@ namespace DelvUI.Interface {
                 
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
                 
-                if (ImGui.IsItemClicked()) {
+                if (ImGui.GetIO().MouseClicked[0] && ImGui.IsMouseHoveringRect(cursorPos, cursorPos + barSize)) {
                     PluginInterface.ClientState.Targets.SetCurrentTarget(target);
-                }
+                }            
+                ImGui.EndChild();
             }
-            DrawTargetShield(target, cursorPos, barSize, true);
+            ImGui.End();
             
-            ImGui.EndChild();
+            DrawTargetShield(target, cursorPos, barSize, true);
+            DrawOutlinedText(text,
+                new Vector2((cursorPos.X + ToTBarWidth / 2f - textSize.X / 2f) + ToTBarTextXOffset,
+                    cursorPos.Y - 22 + ToTBarTextYOffset));
+
         }
 
         protected virtual unsafe void DrawCastBar()
