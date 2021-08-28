@@ -127,15 +127,55 @@ namespace DelvUI {
         public int FairyBarHeight { get; set; } = 20;
         public int FairyBarWidth { get; set; } = 254;
         public int FairyBarX { get; set; } = 127;
-        public int FairyBarY { get; set; } = 460;
+        public int FairyBarY { get; set; } = 450;
         public int SchAetherBarHeight { get; set; } = 20;
         public int SchAetherBarWidth { get; set; } = 250;
         public int SchAetherBarX { get; set; } = -42;
-        public int SchAetherBarY { get; set; } = 460;
+        public int SchAetherBarY { get; set; } = 450;
         public int SchAetherBarPad { get; set; } = 2;
+        public int SCHBioBarHeight { get; set; } = 20;
+        public int SCHBioBarWidth { get; set; } = 254;
+        public int SCHBioBarX { get; set; } = 127;
+        public int SCHBioBarY { get; set; } = 423;
+
+        public bool SCHShowBioBar = true;
+        public bool SCHShowAetherBar = true;
+        public bool SCHShowFairyBar = true;
+        public bool SCHShowPrimaryResourceBar = true;
+
         public Vector4 SchAetherColor = new Vector4(0f/255f, 255f/255f, 0f/255f, 100f/100f);
         public Vector4 SchFairyColor = new Vector4(94f/255f, 250f/255f, 154f/255f, 100f/100f);
         public Vector4 SchEmptyColor = new Vector4(0f/255f, 0f/255f, 0f/255f, 53f/100f);
+        public Vector4 SCHBioColor = new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 1f);
+
+        #endregion
+
+        #region WHM Configuration
+        public int LillyBarHeight { get; set; } = 20;
+        public int LillyBarWidth { get; set; } = 254;
+        public int LillyBarX { get; set; } = 127;
+        public int LillyBarY { get; set; } = 421;
+        public int LillyBarPad { get; set; } = 2;
+        public int BloodLillyBarHeight { get; set; } = 20;
+        public int BloodLillyBarWidth { get; set; } = 254;
+        public int BloodLillyBarX { get; set; } = 42;
+        public int BloodLillyBarY { get; set; } = 421;
+        public int BloodLillyBarPad { get; set; } = 2;
+        public int DiaBarHeight { get; set; } = 20;
+        public int DiaBarWidth { get; set; } = 254;
+        public int DiaBarX { get; set; } = 127;
+        public int DiaBarY { get; set; } = 423;
+
+        public bool WHMShowDiaBar = true;
+        public bool WHMShowLillyBar = true;
+        //public bool WHMShowBloodLillyBar = true;
+        public bool WHMShowPrimaryResourceBar = true;
+
+        public Vector4 WhmLillyColor = new Vector4(0f / 255f, 64f / 255f, 1f, 1f);
+        public Vector4 WhmBloodLillyColor = new Vector4(199f / 255f, 40f / 255f, 9f / 255f, 1f);
+        public Vector4 WhmLillyChargingColor = new Vector4(141f / 255f, 141f / 255f, 141f / 255f, 1f);
+        public Vector4 WhmDiaColor = new Vector4(0f / 255f, 64f / 255f, 1f, 1f);
+        public Vector4 WhmEmptyColor = new Vector4(0f, 0f, 0f, 136f / 255f);
 
         #endregion
 
@@ -608,6 +648,46 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorWHM.AdjustColor(.1f))
                 },
 
+                [Jobs.WHM * 1000] = new Dictionary<string, uint> // White mage Lilly Bar Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(WhmLillyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(WhmLillyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WhmLillyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WhmLillyColor.AdjustColor(.1f))
+                },
+
+                [Jobs.WHM * 1000 + 1] = new Dictionary<string, uint> // White mage Blood Lilly Bar Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(WhmBloodLillyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(WhmBloodLillyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WhmBloodLillyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WhmBloodLillyColor.AdjustColor(.1f))
+                },
+
+                [Jobs.WHM * 1000 + 2] = new Dictionary<string, uint> // White mage Empty Bar Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(WhmEmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(WhmEmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WhmEmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WhmEmptyColor.AdjustColor(.1f))
+                },
+
+                [Jobs.WHM * 1000 + 3] = new Dictionary<string, uint> // White mage Lilly gauge charging color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(WhmLillyChargingColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(WhmLillyChargingColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WhmLillyChargingColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WhmLillyChargingColor.AdjustColor(.1f))
+                },
+
+                [Jobs.WHM * 1000 + 4] = new Dictionary<string, uint> // White mage Dia bar color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(WhmDiaColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(WhmDiaColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WhmDiaColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WhmDiaColor.AdjustColor(.1f))
+                },
+
                 [Jobs.SCH] = new Dictionary<string, uint> // Scholar job color
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorSCH),
@@ -638,6 +718,14 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(SchEmptyColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SchEmptyColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SchEmptyColor.AdjustColor(.1f))
+                },
+
+                [Jobs.SCH * 1000 + 3] = new Dictionary<string, uint> // Scholar Biolysis Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SCHBioColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SCHBioColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SCHBioColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SCHBioColor.AdjustColor(.1f))
                 },
 
                 [Jobs.SMN] = new Dictionary<string, uint>
