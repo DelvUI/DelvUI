@@ -56,6 +56,9 @@ namespace DelvUI.Interface {
         protected int CastBarHeight => PluginConfiguration.CastBarHeight;
         protected int CastBarXOffset => PluginConfiguration.CastBarXOffset;
         protected int CastBarYOffset => PluginConfiguration.CastBarYOffset;
+
+        protected bool InterruptCheck => PluginConfiguration.InterruptCheck;
+
         protected Vector2 BarSize => _barSize;
 
         private Lumina.Excel.GeneratedSheets.Action _lastUsedAction;
@@ -571,6 +574,7 @@ namespace DelvUI.Interface {
 
         private unsafe bool CastIsInterrupted(AddonCastBar* castBar)
         {
+            if (!InterruptCheck) { return false; }
             for (var i = 0; i != castBar->AtkUnitBase.UldManager.NodeListCount; ++i)
             {
                 var node = castBar->AtkUnitBase.UldManager.NodeList[i];
