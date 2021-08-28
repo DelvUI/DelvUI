@@ -1145,10 +1145,10 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }                    
                     
-                    var BLMVHorizontalOffset = _pluginConfiguration.BLMVHorizontalOffset;
-                    if (ImGui.DragInt("Horizontal Offset", ref BLMVHorizontalOffset, 1f, -1000, 1000))
+                    var BLMHorizontalOffset = _pluginConfiguration.BLMHorizontalOffset;
+                    if (ImGui.DragInt("Horizontal Offset", ref BLMHorizontalOffset, 1f, -1000, 1000))
                     {
-                        _pluginConfiguration.BLMVHorizontalOffset = BLMVHorizontalOffset;
+                        _pluginConfiguration.BLMHorizontalOffset = BLMHorizontalOffset;
                         _pluginConfiguration.Save();
                     }
 
@@ -1190,7 +1190,7 @@ namespace DelvUI.Interface
                     var BLMUmbralHeartWidth = _pluginConfiguration.BLMUmbralHeartWidth;
                     if (ImGui.DragInt("Umbral Heart Width", ref BLMUmbralHeartWidth, .1f, -2000, 2000))
                     {
-                        _pluginConfiguration.BLMUmbralHeartHeight = BLMUmbralHeartHeight;
+                        _pluginConfiguration.BLMUmbralHeartWidth = BLMUmbralHeartWidth;
                         _pluginConfiguration.Save();
                     }
 

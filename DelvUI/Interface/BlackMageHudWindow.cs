@@ -12,13 +12,14 @@ namespace DelvUI.Interface
     {
         public override uint JobId => Jobs.BLM;
 
-        private float OriginX => CenterX;
+        private float OriginX => CenterX + PluginConfiguration.BLMHorizontalOffset;
         private float OriginY => CenterY + YOffset + PluginConfiguration.BLMVerticalOffset;
         private int VerticalSpaceBetweenBars => PluginConfiguration.BLMVerticalSpaceBetweenBars;
         private int HorizontalSpaceBetweenBars => PluginConfiguration.BLMHorizontalSpaceBetweenBars;
         private int ManaBarWidth => PluginConfiguration.BLMManaBarWidth;
         private int ManaBarHeight => PluginConfiguration.BLMManaBarHeight;
         private int UmbralHeartHeight => PluginConfiguration.BLMUmbralHeartHeight;
+        private int UmbralHeartWidth=> PluginConfiguration.BLMUmbralHeartWidth;
         private int PolyglotHeight => PluginConfiguration.BLMPolyglotHeight;
         private int PolyglotWidth => PluginConfiguration.BLMPolyglotWidth;
         private bool ShowManaValue => PluginConfiguration.BLMShowManaValue;
@@ -26,6 +27,7 @@ namespace DelvUI.Interface
         private int ManaThresholdValue => PluginConfiguration.BLMManaThresholdValue;
         private bool ShowTripleCast => PluginConfiguration.BLMShowTripleCast;
         private int TripleCastHeight => PluginConfiguration.BLMTripleCastHeight;
+        private int TripleCastWidth => PluginConfiguration.BLMTripleCastWidth;
         private bool ShowFirestarterProcs => PluginConfiguration.BLMShowFirestarterProcs;
         private bool ShowThundercloudProcs => PluginConfiguration.BLMShowThundercloudProcs;
         private int ProcsHeight => PluginConfiguration.BLMProcsHeight;
@@ -108,7 +110,7 @@ namespace DelvUI.Interface
             var time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000 + 1 : 0;
             var text = $"{time,0}";
             var textSize = ImGui.CalcTextSize(text);
-            DrawOutlinedText(text, new Vector2(CenterX - textSize.X / 2f, OriginY - ManaBarHeight / 2f - textSize.Y / 2f));
+            DrawOutlinedText(text, new Vector2(OriginX - textSize.X / 2f, OriginY - ManaBarHeight / 2f - textSize.Y / 2f));
 
             // mana
             if (ShowManaValue)
@@ -116,7 +118,7 @@ namespace DelvUI.Interface
                 var mana = PluginInterface.ClientState.LocalPlayer.CurrentMp;
                 text = $"{mana,0}";
                 textSize = ImGui.CalcTextSize(text);
-                DrawOutlinedText(text, new Vector2(CenterX - barSize.X / 2f + 2, OriginY - ManaBarHeight / 2f - textSize.Y / 2f));
+                DrawOutlinedText(text, new Vector2(OriginX - barSize.X / 2f + 2, OriginY - ManaBarHeight / 2f - textSize.Y / 2f));
             }
         }
 
@@ -139,8 +141,9 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
 
-            var barSize = new Vector2((ManaBarWidth - (HorizontalSpaceBetweenBars * 2)) / 3, UmbralHeartHeight);
-            var cursorPos = new Vector2(OriginX - ManaBarWidth / 2, OriginY - ManaBarHeight - VerticalSpaceBetweenBars - UmbralHeartHeight);
+            var barSize = new Vector2(UmbralHeartWidth, UmbralHeartHeight);
+            var totalWidth = barSize.X * 3 + HorizontalSpaceBetweenBars * 2;
+            var cursorPos = new Vector2(OriginX - totalWidth / 2, OriginY - ManaBarHeight - VerticalSpaceBetweenBars - UmbralHeartHeight);
 
             var drawList = ImGui.GetWindowDrawList();
 
@@ -179,7 +182,7 @@ namespace DelvUI.Interface
             DrawPolyglotStack(cursorPos, barSize, gauge.NumPolyglotStacks == 0 ? scale : 1);
 
             // 2nd stack
-            cursorPos.X = CenterX + (HorizontalSpaceBetweenBars / 2f);
+            cursorPos.X = OriginX + (HorizontalSpaceBetweenBars / 2f);
             DrawPolyglotStack(cursorPos, barSize, gauge.NumPolyglotStacks >= 1 ? scale : 0);
         }
 
@@ -217,7 +220,8 @@ namespace DelvUI.Interface
         protected virtual void DrawTripleCast()
         {
             var tripleStackBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1211);
-            var barSize = new Vector2((ManaBarWidth - (HorizontalSpaceBetweenBars * 2)) / 3, TripleCastHeight);
+
+            var barSize = new Vector2(TripleCastWidth, TripleCastHeight);
             var totalWidth = barSize.X * 3 + HorizontalSpaceBetweenBars * 2;
             var cursorPos = new Vector2(OriginX - totalWidth / 2, OriginY - ManaBarHeight - VerticalSpaceBetweenBars - UmbralHeartHeight - VerticalSpaceBetweenBars - barSize.Y);
 
