@@ -93,14 +93,15 @@ namespace DelvUI {
                 Jobs.DRK => new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.GNB => new GunbreakerHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.WAR => new WarriorHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.PLD => new PaladinHudWindow(_pluginInterface, _pluginConfiguration),
 
-                
                 //Healers
                 Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SCH => new ScholarHudWindow(_pluginInterface, _pluginConfiguration),
                 
                 //Melee DPS
                 Jobs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.MNK => new MonkHudWindow(_pluginInterface, _pluginConfiguration),
                 
                 //Ranged DPS
                 Jobs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
@@ -110,7 +111,8 @@ namespace DelvUI {
                 //Caster DPS
                 Jobs.RDM => new RedMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SMN => new SummonerHudWindow(_pluginInterface, _pluginConfiguration),
-                
+                Jobs.BLM => new BlackMageHudWindow(_pluginInterface, _pluginConfiguration),
+
                 //Low jobs
                 Jobs.MRD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.GLD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
@@ -138,9 +140,6 @@ namespace DelvUI {
                 Jobs.FSH => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 
                 //dont have packs yet
-                Jobs.BLM => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.PLD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.MNK => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.NIN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.AST => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.DRG => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
