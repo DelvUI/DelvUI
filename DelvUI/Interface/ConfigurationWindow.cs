@@ -41,8 +41,9 @@ namespace DelvUI.Interface
             }
 
             ImGui.SetNextWindowSize(new Vector2(1400, 900), ImGuiCond.Appearing);
+            
 
-            if (!ImGui.Begin("DelvUI configuration", ref IsVisible, ImGuiWindowFlags.MenuBar)) {
+            if (!ImGui.Begin("DelvUI configuration", ref IsVisible)) {
                 return;
             }
             var changed = false;
@@ -51,9 +52,12 @@ namespace DelvUI.Interface
             var viewportHeight = (int) ImGui.GetMainViewport().Size.Y;
             var xOffsetLimit = viewportWidth / 2;
             var yOffsetLimit = viewportHeight / 2;
+
             if (ImGui.BeginTabBar("##settings-tabs"))
             {
-                ImGui.Button("IMAGE GOES HERE");
+                var imagePath = Path.Combine(Path.GetDirectoryName(_plugin.AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
+                var delvuiBanner = _pluginInterface.UiBuilder.LoadImage(imagePath);
+                ImGui.Image(delvuiBanner.ImGuiHandle, new Vector2(delvuiBanner.Width, delvuiBanner.Height));
 
                  // Left
                  {
