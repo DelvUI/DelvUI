@@ -26,6 +26,13 @@
         <AssemblyName>DelvUI</AssemblyName>
     </PropertyGroup>
     <ItemGroup>
+        <Content Include="Helpers\TEXTTAGS.md" />
+        <Content Include="Media\Fonts\big-noodle-too.ttf">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
         <Reference Include="Dalamud">
             <Private>false</Private>
             <HintPath>$(APPDATA)\XIVLauncher\addon\Hooks\5.2.7.0\Dalamud.dll</HintPath>
