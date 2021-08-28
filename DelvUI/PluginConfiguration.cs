@@ -52,6 +52,7 @@ namespace DelvUI {
 
 
         public bool ShowCastBar = true;
+        public bool InterruptCheck = true;
         public bool ShowActionIcon = true;
         public bool ShowActionName = true;
         public bool ShowCastTime = true;
