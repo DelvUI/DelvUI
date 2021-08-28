@@ -1175,6 +1175,20 @@ namespace DelvUI.Interface
                     {
                         _pluginConfiguration.RDMManaBarWidth = RDMManaBarWidth;
                         _pluginConfiguration.Save();
+                    }                    
+                    
+                    var RDMManaBarXOffset = _pluginConfiguration.RDMManaBarXOffset;
+                    if (ImGui.DragInt("Mana Bar Horizontal Offset", ref RDMManaBarXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMManaBarXOffset = RDMManaBarXOffset;
+                        _pluginConfiguration.Save();
+                    }                    
+                    
+                    var RDMManaBarYOffset = _pluginConfiguration.RDMManaBarYOffset;
+                    if (ImGui.DragInt("Mana Bar Vertical Offset", ref RDMManaBarYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMManaBarYOffset = RDMManaBarYOffset;
+                        _pluginConfiguration.Save();
                     }
 
                     var RDMBlackManaBarHeight = _pluginConfiguration.RDMBlackManaBarHeight;
@@ -1191,6 +1205,20 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
                     
+                    var RDMBlackManaBarXOffset = _pluginConfiguration.RDMBlackManaBarXOffset;
+                    if (ImGui.DragInt("Black Mana Horizontal Offset", ref RDMBlackManaBarXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMBlackManaBarXOffset = RDMBlackManaBarXOffset;
+                        _pluginConfiguration.Save();
+                    }                    
+                    
+                    var RDMBlackManaBarYOffset = _pluginConfiguration.RDMBlackManaBarYOffset;
+                    if (ImGui.DragInt("Black Mana Vertical Offset", ref RDMBlackManaBarYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMBlackManaBarYOffset = RDMBlackManaBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
                     var RDMWhiteManaBarHeight = _pluginConfiguration.RDMWhiteManaBarHeight;
                     if (ImGui.DragInt("White Mana Height", ref RDMWhiteManaBarHeight, .1f, 1, 1000))
                     {
@@ -1202,7 +1230,22 @@ namespace DelvUI.Interface
                     {
                         _pluginConfiguration.RDMWhiteManaBarWidth = RDMWhiteManaBarWidth;
                         _pluginConfiguration.Save();
-                    }                            
+                    }   
+                    
+                    var RDMWhiteManaBarXOffset = _pluginConfiguration.RDMWhiteManaBarXOffset;
+                    if (ImGui.DragInt("White Mana Horizontal Offset", ref RDMWhiteManaBarXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMWhiteManaBarXOffset = RDMWhiteManaBarXOffset;
+                        _pluginConfiguration.Save();
+                    }                    
+                    
+                    var RDMWhiteManaBarYOffset = _pluginConfiguration.RDMWhiteManaBarYOffset;
+                    if (ImGui.DragInt("White Mana Vertical Offset", ref RDMWhiteManaBarYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMWhiteManaBarYOffset = RDMWhiteManaBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
                     var RDMBalanceBarHeight = _pluginConfiguration.RDMBalanceBarHeight;
                     if (ImGui.DragInt("Balance Height", ref RDMBalanceBarHeight, .1f, 1, 1000))
                     {
@@ -1215,6 +1258,20 @@ namespace DelvUI.Interface
                         _pluginConfiguration.RDMBalanceBarWidth = RDMBalanceBarWidth;
                         _pluginConfiguration.Save();
                     }        
+                    
+                    var RDMBalanceBarXOffset = _pluginConfiguration.RDMBalanceBarXOffset;
+                    if (ImGui.DragInt("Balance Horizontal Offset", ref RDMBalanceBarXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMBalanceBarXOffset = RDMBalanceBarXOffset;
+                        _pluginConfiguration.Save();
+                    }                    
+                    
+                    var RDMBalanceBarYOffset = _pluginConfiguration.RDMBalanceBarYOffset;
+                    if (ImGui.DragInt("Balance Vertical Offset", ref RDMBalanceBarYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMBalanceBarYOffset = RDMBalanceBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
                     
                     var RDMAccelerationBarHeight = _pluginConfiguration.RDMAccelerationBarHeight;
                     if (ImGui.DragInt("Acceleration Stacks Height", ref RDMAccelerationBarHeight, .1f, 1, 1000))

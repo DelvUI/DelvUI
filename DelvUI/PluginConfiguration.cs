@@ -313,18 +313,38 @@ namespace DelvUI {
         public int RDMHorizontalSpaceBetweenBars { get; set; } = 2;
         public int RDMManaBarHeight { get; set; } = 20;
         public int RDMManaBarWidth { get; set; } = 246;
+        
+        public int RDMManaBarXOffset { get; set; } = 246;
+        
+        public int RDMManaBarYOffset { get; set; } = 246;
         public int RDMBlackManaBarHeight { get; set; } = 20;
         public int RDMBlackManaBarWidth { get; set; } = 120;
+        
+        public int RDMBlackManaBarXOffset { get; set; } = 120;
+        
+        public int RDMBlackManaBarYOffset { get; set; } = 120;
         public int RDMWhiteManaBarHeight { get; set; } = 20;
         public int RDMWhiteManaBarWidth { get; set; } = 120; 
+        
+        public int RDMWhiteManaBarXOffset { get; set; } = 120; 
+        
+        public int RDMWhiteManaBarYOffset { get; set; } = 120; 
         
         public int RDMBalanceBarHeight { get; set; } = 20;
         
         public int RDMBalanceBarWidth { get; set; } = 20;   
         
+        public int RDMBalanceBarXOffset { get; set; } = 20;   
+        
+        public int RDMBalanceBarYOffset { get; set; } = 20;   
+        
         public int RDMAccelerationBarHeight { get; set; } = 10;
         
         public int RDMAccelerationBarWidth { get; set; } = 83;
+        
+        public int RDMAccelerationBarXOffset { get; set; } = 83;
+        
+        public int RDMAccelerationBarYOffset { get; set; } = 83;
         
         public bool RDMShowManaValue = true;
         
@@ -334,6 +354,10 @@ namespace DelvUI {
         public bool RDMShowDualCast = true;
         public int RDMDualCastHeight { get; set; } = 16;
         public int RDMDualCastWidth { get; set; } = 16;
+        
+        public int RDMDualCastXOffset { get; set; } = 16;
+        
+        public int RDMDualCastYOffset { get; set; } = 16;
 
         public bool RDMShowVerfireProcs = true;
         
