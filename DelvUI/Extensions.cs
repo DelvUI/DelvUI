@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Dynamic;
 using System.Globalization;
 using System.Numerics;
 using System.Text;
@@ -34,6 +36,14 @@ namespace DelvUI {
             }
 
             return new Vector4(red, green, blue, vec.W);
+        }
+        
+        public static bool IsPropertyExist(dynamic settings, string name)
+        {
+            if (settings is ExpandoObject)
+                return ((IDictionary<string, object>)settings).ContainsKey(name);
+
+            return settings.GetType().GetProperty(name) != null;
         }
         
         public static unsafe string GetString(this Utf8String utf8String) {

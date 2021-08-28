@@ -53,6 +53,7 @@
           <HintPath>$(DalamudLibPath)FFXIVClientStructs.dll</HintPath>
             <Private>False</Private>
         </Reference>
+        <Reference Include="Microsoft.CSharp" />
         <Reference Include="Newtonsoft.Json">
             <HintPath>$(DalamudLibPath)Newtonsoft.Json.dll</HintPath>
             <Private>False</Private>
@@ -87,6 +88,7 @@
     <ItemGroup>
       <Compile Include="Extensions.cs" />
       <Compile Include="GameStructs\AddonCastBar.cs" />
+      <Compile Include="Helpers\TextTags.cs" />
       <Compile Include="Interface\BardHudWindow.cs" />
       <Compile Include="Interface\BlackMageHudWindow.cs" />
       <Compile Include="Interface\ConfigurationWindow.cs" />

@@ -54,6 +54,20 @@ namespace DelvUI.Interface
                         _pluginConfiguration.HealthBarWidth = healthBarWidth;
                         _pluginConfiguration.Save();
                     }
+                    
+                    var healthBarTextLeft = _pluginConfiguration.HealthBarTextLeft;
+                    if (ImGui.InputText("Health Text Left", ref healthBarTextLeft, 999))
+                    {
+                        _pluginConfiguration.HealthBarTextLeft = healthBarTextLeft;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var healthBarTextRight = _pluginConfiguration.HealthBarTextRight;
+                    if (ImGui.InputText("Health Text Right", ref healthBarTextRight, 999))
+                    {
+                        _pluginConfiguration.HealthBarTextRight = healthBarTextRight;
+                        _pluginConfiguration.Save();
+                    }
 
                     var HealthBarXOffset = _pluginConfiguration.HealthBarXOffset;
                     if (ImGui.DragInt("Health X Offset", ref HealthBarXOffset, .1f, 1, 1000))
@@ -110,6 +124,20 @@ namespace DelvUI.Interface
                         _pluginConfiguration.TargetBarWidth = targetBarWidth;
                         _pluginConfiguration.Save();
                     }
+                    
+                    var targetBarTextLeft = _pluginConfiguration.TargetBarTextLeft;
+                    if (ImGui.InputText("Target Text Left", ref targetBarTextLeft, 999))
+                    {
+                        _pluginConfiguration.TargetBarTextLeft = targetBarTextLeft;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var targetBarTextRight = _pluginConfiguration.TargetBarTextRight;
+                    if (ImGui.InputText("Target Text Right", ref targetBarTextRight, 999))
+                    {
+                        _pluginConfiguration.TargetBarTextRight = targetBarTextRight;
+                        _pluginConfiguration.Save();
+                    }
 
                     var TargetBarXOffset = _pluginConfiguration.TargetBarXOffset;
                     if (ImGui.DragInt("Target X Offset", ref TargetBarXOffset, .1f, 1, 1000))
@@ -153,6 +181,14 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
+                    
+                    var totBarText = _pluginConfiguration.ToTBarText;
+                    if (ImGui.InputText("Target of Target Text", ref totBarText, 999))
+                    {
+                        _pluginConfiguration.ToTBarText = totBarText;
+                        _pluginConfiguration.Save();
+                    }
+                    
                     var focusBarHeight = _pluginConfiguration.FocusBarHeight;
                     if (ImGui.DragInt("Focus Height", ref focusBarHeight, .1f, 1, 1000))
                     {
@@ -181,6 +217,14 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
+                    
+                    var focusBarText = _pluginConfiguration.FocusBarText;
+                    if (ImGui.InputText("Focus Text", ref focusBarText, 999))
+                    {
+                        _pluginConfiguration.FocusBarText = focusBarText;
+                        _pluginConfiguration.Save();
+                    }
+                    
                     changed |= ImGui.Checkbox("Shield Enabled", ref _pluginConfiguration.ShieldEnabled);
 
                     var shieldHeight = _pluginConfiguration.ShieldHeight;
