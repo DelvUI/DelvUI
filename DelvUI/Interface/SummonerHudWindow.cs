@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
@@ -24,6 +25,14 @@ namespace DelvUI.Interface
         private int SmnAetherBarX => PluginConfiguration.SmnAetherBarX;
         private int SmnAetherBarY => PluginConfiguration.SmnAetherBarY;
 
+        private Dictionary<string, uint> SmnAetherColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000];
+        private Dictionary<string, uint> SmnRuinColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 1];
+        private Dictionary<string, uint> SmnEmptyColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 2];
+        private Dictionary<string, uint> SmnMiasmaColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 3];
+        private Dictionary<string, uint> SmnBioColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 4];
+        private Dictionary<string, uint> SmnExpiryColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 5];
+
+
         public SummonerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _)
@@ -46,17 +55,16 @@ namespace DelvUI.Interface
                 return;
             }
 
-            var expiryColor = 0xFF2E2EC7;
             var xPadding = 2;
             var barWidth = (SmnDotBarWidth / 2) - 1;
             var miasma = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1215 || o.EffectId == 180);
             var bio = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1214 || o.EffectId == 179 || o.EffectId == 189);
-
+            
             var miasmaDuration = miasma.Duration;
             var bioDuration = bio.Duration;
 
-            var miasmaColor = miasmaDuration > 5 ? 0xFFFAFFA4 : expiryColor;
-            var bioColor = bioDuration > 5 ? 0xFF005239 : expiryColor;
+            var miasmaColor = miasmaDuration > 5 ? SmnMiasmaColor["base"] : SmnExpiryColor["base"];
+            var bioColor = bioDuration > 5 ? SmnBioColor["base"] : SmnExpiryColor["base"];
 
             var xOffset = CenterX - SmnDotBarX;
             var cursorPos = new Vector2(CenterX - SmnDotBarX, CenterY + SmnDotBarY - 46);
@@ -65,16 +73,15 @@ namespace DelvUI.Interface
 
             var dotStart = new Vector2(xOffset + barWidth - (barSize.X / 30) * miasmaDuration, CenterY + SmnDotBarY - 46);
 
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, SmnEmptyColor["base"]);
             drawList.AddRectFilled(dotStart, cursorPos + new Vector2(barSize.X, barSize.Y), miasmaColor);
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
             cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
 
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, SmnEmptyColor["base"]);
             drawList.AddRectFilled(cursorPos, cursorPos + new Vector2((barSize.X / 30) * bioDuration, barSize.Y), bioColor);
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-
         }
         private void DrawAetherBar()
         {
@@ -87,25 +94,25 @@ namespace DelvUI.Interface
 
             var drawList = ImGui.GetWindowDrawList();
 
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, SmnEmptyColor["base"]);
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, SmnEmptyColor["base"]);
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             cursorPos = new Vector2(CenterX - 127, CenterY + SmnAetherBarY - 22);
 
             switch (aetherFlowBuff.StackCount)
             {
                 case 1:
-                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0xFFFFFF00);
+                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, SmnAetherColor["base"]);
                     drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
                     break;
                 case 2:
-                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0xFFFFFF00);
+                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, SmnAetherColor["base"]);
                     drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
                     cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
-                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0xFFFFFF00);
+                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, SmnAetherColor["base"]);
                     drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
                     break;
 
@@ -124,12 +131,13 @@ namespace DelvUI.Interface
             var xPos = CenterX - SmnRuinBarX;
             var yPos = CenterY + SmnRuinBarY - 34;
             var cursorPos = new Vector2(xPos, yPos);
-            var barColor = 0xFFFFFF00;
+            var barColor = SmnRuinColor["base"];
+            var emptyColor = SmnEmptyColor["base"];
 
             var drawList = ImGui.GetWindowDrawList();
             for (var i = 0; i <= 4 - 1; i++)
             {
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, emptyColor);
                 if (ruinStacks > i)
                 {
                     drawList.AddRectFilled(cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y), barColor);
