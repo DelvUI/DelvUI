@@ -113,7 +113,21 @@ namespace DelvUI.Interface {
             if (ImGui.BeginChild("health_bar", BarSize)) {
                 try
                 {
-                    var colors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
+                    var colors = PluginConfiguration.NPCColorMap["friendly"];
+                    if (PluginConfiguration.JobColorMap.ContainsKey(PluginInterface.ClientState.LocalPlayer.ClassJob.Id)) { 
+                        colors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
+                    }
+                    else
+                    {                    
+                        PluginLog.Log("///////////////////////////////////////////////////////////");
+                        PluginLog.Log("NINA BUG CRASHED ON HP BAR COLORING");
+                        PluginLog.Log("PluginConfiguration.JobColorMap.Keys");
+                        PluginLog.Log(PluginConfiguration.JobColorMap.Keys.ToString());
+                        PluginLog.Log("PluginInterface.ClientState.LocalPlayer.ClassJob.Id");
+                        PluginLog.Log(PluginInterface.ClientState.LocalPlayer.ClassJob.Id.ToString());
+                        PluginLog.Log("///////////////////////////////////////////////////////////");
+                        
+                    }
                     var drawList = ImGui.GetWindowDrawList();
                     drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
                     drawList.AddRectFilledMultiColor(
