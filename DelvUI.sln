@@ -1,25 +1,20 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-VisualStudioVersion = 17.0.31423.177
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DelvUI", "DelvUI\DelvUI.csproj", "{47ED9FA0-F4D6-48B3-A0C7-6252FC014160}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DelvUI", "DelvUI\DelvUI.csproj", "{47ED9FA0-F4D6-48B3-A0C7-6252FC014160}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Github Actions", "Github Actions", "{DA30F329-21B7-4179-A758-5B2760C15F20}"
-ProjectSection(SolutionItems) = preProject
-	.github\FUNDING.yml = .github\FUNDING.yml
-	.github\ISSUE_TEMPLATE\BUG-REPORT.yaml = .github\ISSUE_TEMPLATE\BUG-REPORT.yaml
-	.github\ISSUE_TEMPLATE\HELP-WANTED.yml = .github\ISSUE_TEMPLATE\HELP-WANTED.yml
-	.github\ISSUE_TEMPLATE\SUGGESTION.yaml = .github\ISSUE_TEMPLATE\SUGGESTION.yaml
-	.github\workflows\build.yml = .github\workflows\build.yml
-EndProjectSection
+	ProjectSection(SolutionItems) = preProject
+		.github\ISSUE_TEMPLATE\BUG-REPORT.yaml = .github\ISSUE_TEMPLATE\BUG-REPORT.yaml
+		.github\workflows\build.yml = .github\workflows\build.yml
+		.github\FUNDING.yml = .github\FUNDING.yml
+		.github\ISSUE_TEMPLATE\HELP-WANTED.yml = .github\ISSUE_TEMPLATE\HELP-WANTED.yml
+		.github\ISSUE_TEMPLATE\SUGGESTION.yaml = .github\ISSUE_TEMPLATE\SUGGESTION.yaml
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{226FB92B-E6FD-4D1A-9D6F-C4292450B706}"
-ProjectSection(SolutionItems) = preProject
-	.editorconfig = .editorconfig
-	.gitignore = .gitignore
-	README.md = README.md
-	DelvUI.json = DelvUI\Delvui.json
-EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FFXIVClientStructs", "lib\FFXIVClientStructs\FFXIVClientStructs\FFXIVClientStructs.csproj", "{793BA481-2FA4-42CD-B175-15ED8E90B074}"
 EndProject
@@ -35,6 +30,8 @@ Global
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{47ED9FA0-F4D6-48B3-A0C7-6252FC014160}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{47ED9FA0-F4D6-48B3-A0C7-6252FC014160}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47ED9FA0-F4D6-48B3-A0C7-6252FC014160}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47ED9FA0-F4D6-48B3-A0C7-6252FC014160}.Release|Any CPU.Build.0 = Release|Any CPU
 		{793BA481-2FA4-42CD-B175-15ED8E90B074}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{793BA481-2FA4-42CD-B175-15ED8E90B074}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{793BA481-2FA4-42CD-B175-15ED8E90B074}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -50,5 +47,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5821350D-9E05-4920-9364-B952C483B648}
 	EndGlobalSection
 EndGlobal
