@@ -26,7 +26,7 @@ namespace DelvUI.Interface
 
             ImGui.SetNextWindowSize(new Vector2(0, 0), ImGuiCond.Always);
 
-            if (!ImGui.Begin("DelvUI configuration", ref IsVisible, ImGuiWindowFlags.NoCollapse)) {
+            if (!ImGui.Begin("DelvUI configuration", ref IsVisible, ImGuiWindowFlags.MenuBar)) {
                 return;
             }
 
@@ -39,6 +39,63 @@ namespace DelvUI.Interface
 
             if (ImGui.BeginTabBar("##settings-tabs"))
             {
+                if (ImGui.BeginTabItem("Structure"))
+                {
+
+                    ImGui.SetNextWindowSize(new Vector2(500, 440), ImGuiCond.FirstUseEver);
+
+                        if (ImGui.BeginMenuBar())
+                        {
+                            if (ImGui.BeginMenu("Test"))
+                            {
+                                ImGui.EndMenu();
+                            }
+                            ImGui.EndMenuBar();
+                        }
+
+                        // Left
+                        var selected = 0;
+                        {
+                            ImGui.BeginChild("left pane", new Vector2(150, 0), true);
+                            for (int i = 0; i < 20; i++)
+                            {
+                                if (ImGui.Selectable( "Object " + i, selected == i))
+                                    selected = i;
+                            }
+                            ImGui.EndChild();
+                        }
+                        ImGui.SameLine();
+
+                        // Right
+                        {
+                            ImGui.BeginGroup();
+                            ImGui.BeginChild("item view", new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+                            ImGui.Text("MyObject: " + selected);
+                            ImGui.Separator();
+                            if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
+                            {
+                                if (ImGui.BeginTabItem("Description"))
+                                {
+                                    ImGui.TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
+                                    ImGui.EndTabItem();
+                                }
+                                if (ImGui.BeginTabItem("Details"))
+                                {
+                                    ImGui.Text("ID: 0123456789");
+                                    ImGui.EndTabItem();
+                                }
+                                ImGui.EndTabBar();
+                            }
+                            ImGui.EndChild();
+                            if (ImGui.Button("Revert")) {}
+                            ImGui.SameLine();
+                            if (ImGui.Button("Save")) {}
+                            ImGui.EndGroup();
+                        }
+                    
+                    ImGui.End();
+                }
+
                 if (ImGui.BeginTabItem("General"))
                 {
                     var healthBarHeight = _pluginConfiguration.HealthBarHeight;
