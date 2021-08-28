@@ -234,7 +234,6 @@ namespace DelvUI.Interface
 
                     changed |= ImGui.ColorEdit4("Castbar Color", ref _pluginConfiguration.CastBarColor);
 
-                    changed |= ImGui.Checkbox("Show Interrupted", ref _pluginConfiguration.InterruptCheck);
                     changed |= ImGui.Checkbox("Show Action Icon", ref _pluginConfiguration.ShowActionIcon);
                     changed |= ImGui.Checkbox("Show Action Name", ref _pluginConfiguration.ShowActionName);
                     changed |= ImGui.Checkbox("Show Cast Time", ref _pluginConfiguration.ShowCastTime);
