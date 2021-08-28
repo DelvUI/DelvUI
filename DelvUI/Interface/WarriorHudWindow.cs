@@ -100,19 +100,13 @@ namespace DelvUI.Interface
             var xPos = CenterX - XOffset + BeastGaugeXOffset;
             var yPos = CenterY + YOffset + initialHeight + BeastGaugeYOffset;
 
-            // var builder = BarBuilder.Create(xPos, yPos, BeastGaugeHeight, BeastGaugeWidth)
-            //     .SetChunks(2)
-            //     .AddInnerBar(gauge.BeastGaugeAmount, 100, FellCleaveColor, EmptyColor)
-            //     .SetChunkPadding(BeastGaugePadding);
-            // if (nascentChaosBuff.Any())
-            //     builder.SetChunksColors(NascentChaosColor);
-            // var bar = builder.Build();
-
-            var bar = BarBuilder.Create(xPos, yPos, BeastGaugeHeight, BeastGaugeWidth)
-                .SetChunks(3)
-                .SetChunkPadding(2)
-                .AddInnerBooleanBar(new[] {false, true, false}, NascentChaosColor)
-                .Build();
+            var builder = BarBuilder.Create(xPos, yPos, BeastGaugeHeight, BeastGaugeWidth)
+                .SetChunks(2)
+                .AddInnerBar(gauge.BeastGaugeAmount, 100, FellCleaveColor, EmptyColor)
+                .SetChunkPadding(BeastGaugePadding);
+            if (nascentChaosBuff.Any())
+                builder.SetChunksColors(NascentChaosColor);
+            var bar = builder.Build();
 
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);
