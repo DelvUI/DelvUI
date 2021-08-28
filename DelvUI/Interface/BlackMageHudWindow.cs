@@ -107,17 +107,20 @@ namespace DelvUI.Interface
             }
 
             // element timer
-            var time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000 + 1 : 0;
-            var text = $"{time,0}";
-            var textSize = ImGui.CalcTextSize(text);
-            DrawOutlinedText(text, new Vector2(OriginX - textSize.X / 2f, OriginY - ManaBarHeight / 2f - textSize.Y / 2f));
+            if (gauge.InAstralFire() || gauge.InUmbralIce())
+            {
+                var time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000 + 1 : 0;
+                var text = $"{time,0}";
+                var textSize = ImGui.CalcTextSize(text);
+                DrawOutlinedText(text, new Vector2(OriginX - textSize.X / 2f, OriginY - ManaBarHeight / 2f - textSize.Y / 2f));
+            }
 
             // mana
             if (ShowManaValue)
             {
                 var mana = PluginInterface.ClientState.LocalPlayer.CurrentMp;
-                text = $"{mana,0}";
-                textSize = ImGui.CalcTextSize(text);
+                var text = $"{mana,0}";
+                var textSize = ImGui.CalcTextSize(text);
                 DrawOutlinedText(text, new Vector2(OriginX - barSize.X / 2f + 2, OriginY - ManaBarHeight / 2f - textSize.Y / 2f));
             }
         }
@@ -208,9 +211,10 @@ namespace DelvUI.Interface
                     PolyglotColor["gradientLeft"], PolyglotColor["gradientRight"], PolyglotColor["gradientRight"], PolyglotColor["gradientLeft"]
                 );
             }
-            else
+            else if (scale > 0)
             {
-                drawList.AddRectFilled(position, position + new Vector2(size.X * scale, size.Y), PolyglotColor["gradientLeft"]);
+                var width = Math.Max(1, size.X * scale);
+                drawList.AddRectFilled(position, position + new Vector2(width, size.Y), PolyglotColor["gradientLeft"]);
             }
 
             // black border
@@ -246,7 +250,7 @@ namespace DelvUI.Interface
         protected virtual void DrawProcs()
         {
             var firestarterTimer = ShowFirestarterProcs ? Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 165).Duration) : 0;
-            var thundercloudTimer = ShowThundercloudProcs ? PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 164).Duration : 0;
+            var thundercloudTimer = ShowThundercloudProcs ? Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 164).Duration) : 0;
 
             if (firestarterTimer == 0 && thundercloudTimer == 0)
             {
@@ -326,6 +330,7 @@ namespace DelvUI.Interface
         {
             var drawList = ImGui.GetWindowDrawList();
             var size = new Vector2((ManaBarWidth / 2f - PolyglotWidth - HorizontalSpaceBetweenBars * 2f) * scale, height);
+            size.X = Math.Max(1, size.X);
             var endPoint = inverted ? position - size : position + size;
 
             drawList.AddRectFilledMultiColor(position, endPoint,
