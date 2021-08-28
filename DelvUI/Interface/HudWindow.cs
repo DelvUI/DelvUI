@@ -13,6 +13,8 @@ using Dalamud.Game.ClientState.Structs;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.GameStructs;
+using FFXIVClientStructs;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -67,16 +69,22 @@ namespace DelvUI.Interface {
         protected int CastBarHeight => PluginConfiguration.CastBarHeight;
         protected int CastBarXOffset => PluginConfiguration.CastBarXOffset;
         protected int CastBarYOffset => PluginConfiguration.CastBarYOffset;
+        protected bool InterruptCheck => PluginConfiguration.InterruptCheck;
         protected Vector2 BarSize => _barSize;
 
         private Lumina.Excel.GeneratedSheets.Action _lastUsedAction;
         private Mount _lastUsedMount;
         private Item _lastUsedItem;
         
+        private delegate void OpenContextMenuFromTarget(IntPtr agentHud, IntPtr gameObject);
+        private OpenContextMenuFromTarget openContextMenuFromTarget;
+        
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {
             PluginInterface = pluginInterface;
             PluginConfiguration = pluginConfiguration;
             //_barsize = new Vector2(BarWidth, BarHeight);
+            
+            openContextMenuFromTarget = Marshal.GetDelegateForFunctionPointer<OpenContextMenuFromTarget>(PluginInterface.TargetModuleScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
         }
 
         protected virtual void DrawHealthBar() {
@@ -142,13 +150,15 @@ namespace DelvUI.Interface {
         }
         
         protected virtual void DrawTargetBar() {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            unsafe
+            {
+                var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (target is null) {
-                return;
-            }
+                if (target is null) {
+                    return;
+                }
 
-            _barSize = new Vector2(TargetBarWidth, TargetBarHeight);
+                _barSize = new Vector2(TargetBarWidth, TargetBarHeight);
 
             var cursorPos = new Vector2(CenterX + TargetBarXOffset, CenterY + TargetBarYOffset);
             ImGui.SetCursorPos(cursorPos);
@@ -190,7 +200,16 @@ namespace DelvUI.Interface {
                     cursorPos.Y - 22 + TargetBarTextRightYOffset));
             DrawTargetShield(target, cursorPos, BarSize, true);
 
-            DrawTargetOfTargetBar(target.TargetActorID);
+                /* This needs more testing and solution for game lag(context menu)
+                if (ImGui.GetIO().MouseClicked[1]) {
+                    Resolver.Initialize();
+                    var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
+                    openContextMenuFromTarget(agentHud, target.Address);
+                }
+                */
+
+                DrawTargetOfTargetBar(target.TargetActorID);
+            }
         }
         protected virtual void DrawFocusBar() {
             var focus = PluginInterface.ClientState.Targets.FocusTarget;
@@ -238,7 +257,7 @@ namespace DelvUI.Interface {
             Actor target = null;
             if (targetActorId == 0)
             {
-                target = PluginInterface.ClientState.LocalPlayer;
+                //target = PluginInterface.ClientState.LocalPlayer;
             }
             else
             {
@@ -266,7 +285,7 @@ namespace DelvUI.Interface {
             ImGui.SetCursorPos(cursorPos);    
             
             var colors = DetermineTargetPlateColors(actor);
-            if (ImGui.BeginChild("target_bar", barSize)) {
+            if (ImGui.BeginChild("target_of_target_bar", barSize)) {
                 var drawList = ImGui.GetWindowDrawList();
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["background"]);
                 
@@ -598,6 +617,7 @@ namespace DelvUI.Interface {
 
         private unsafe bool CastIsInterrupted(AddonCastBar* castBar)
         {
+            if (!InterruptCheck) { return false; }
             for (var i = 0; i != castBar->AtkUnitBase.UldManager.NodeListCount; ++i)
             {
                 var node = castBar->AtkUnitBase.UldManager.NodeList[i];

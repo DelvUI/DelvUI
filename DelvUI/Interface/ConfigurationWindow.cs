@@ -360,6 +360,7 @@ namespace DelvUI.Interface
 
                     changed |= ImGui.ColorEdit4("Castbar Color", ref _pluginConfiguration.CastBarColor);
 
+                    changed |= ImGui.Checkbox("Show Interrupted", ref _pluginConfiguration.InterruptCheck);
                     changed |= ImGui.Checkbox("Show Action Icon", ref _pluginConfiguration.ShowActionIcon);
                     changed |= ImGui.Checkbox("Show Action Name", ref _pluginConfiguration.ShowActionName);
                     changed |= ImGui.Checkbox("Show Cast Time", ref _pluginConfiguration.ShowCastTime);
@@ -913,6 +914,39 @@ namespace DelvUI.Interface
                     if (ImGui.DragInt("Buff Bar Y Offset", ref pldBuffBarYoffset, 0.1f, -2000, 2000))
                     {
                         _pluginConfiguration.PLDBuffBarYOffset = pldBuffBarYoffset;
+                        _pluginConfiguration.Save();
+                    }
+                    int pldAtonementBarHeight = _pluginConfiguration.PLDAtonementBarHeight;
+                    if (ImGui.DragInt("Atonement Bar Height", ref pldAtonementBarHeight, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarHeight = pldAtonementBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldAtonementBarWidth = _pluginConfiguration.PLDAtonementBarWidth;
+                    if (ImGui.DragInt("Atonement Bar Width", ref pldAtonementBarWidth, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarWidth = pldAtonementBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldAtonementBarXoffset = _pluginConfiguration.PLDAtonementBarXOffset;
+                    if (ImGui.DragInt("Atonement Bar X Offset", ref pldAtonementBarXoffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarXOffset = pldAtonementBarXoffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldAtonementBarYoffset = _pluginConfiguration.PLDAtonementBarYOffset;
+                    if (ImGui.DragInt("Atonement Bar Y Offset", ref pldAtonementBarYoffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarYOffset = pldAtonementBarYoffset;
+                        _pluginConfiguration.Save();
+                    }
+                    int pldAtonementBarPadding = _pluginConfiguration.PLDAtonementBarPadding;
+                    if (ImGui.DragInt("Atonement Bar Padding", ref pldAtonementBarPadding, 0.1f, 1, 2000))
+                    {
+                        _pluginConfiguration.PLDAtonementBarPadding = pldAtonementBarPadding;
                         _pluginConfiguration.Save();
                     }
 
