@@ -19,15 +19,19 @@ namespace DelvUI.Interface {
 
         protected override void Draw(bool _) {
             DrawHealthBar();
+            DrawTargetBar();
+            DrawFocusBar();
+            DrawCastBar();
+            
             DrawPrimaryResourceBar();
             DrawWhiteManaBar();
             DrawBlackManaBar();
             DrawAccelBar();
             DrawDualCastBar();
-            DrawCrystalBar();
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
+            DrawBalanceBar();
+            DrawVerstoneRdyBar();
+            DrawVerfireRdyBar();
+
         }
         protected override void DrawPrimaryResourceBar() {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
@@ -180,7 +184,7 @@ namespace DelvUI.Interface {
                 
         }  
         
-        private void DrawCrystalBar() {
+        private void DrawBalanceBar() {
             var whiteGauge = (float)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().WhiteGauge;
             var blackGauge = (float)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().BlackGauge;
             var gaugeDiff = whiteGauge - blackGauge;
@@ -216,6 +220,34 @@ namespace DelvUI.Interface {
             
             drawList.AddRect(new Vector2(cursorPos.X + barSize.X+2,cursorPos.Y + barSize.Y-53), 
                 new Vector2(cursorPos.X + barSize.X+10,cursorPos.Y + barSize.Y*2+2), 0xFF000000);
+        }
+
+        private void DrawVerstoneRdyBar()
+        {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+            var barSize = new Vector2(BarWidth, BarHeight);
+            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 22);
+            var drawList = ImGui.GetWindowDrawList();
+            var verstoneBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1235);
+            if (verstoneBuff.Count() == 1)
+            {
+                
+            }
+
+        }
+
+        private void DrawVerfireRdyBar()
+        {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+            var barSize = new Vector2(BarWidth, BarHeight);
+            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 22);
+            var drawList = ImGui.GetWindowDrawList();
+            var verfireBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1234);
+            if (verfireBuff.Count() == 1)
+            {
+                
+            }
+
         }
     }
 }

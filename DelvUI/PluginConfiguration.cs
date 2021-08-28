@@ -118,6 +118,31 @@ namespace DelvUI {
 
         #endregion
 
+        #region SMN Configuration
+
+        public int SmnRuinBarX { get; set; } = 127;
+        public int SmnRuinBarY { get; set; } = 460;
+        public int SmnRuinBarHeight { get; set; } = 10;
+        public int SmnRuinBarWidth { get; set; } = 254;
+        public int SmnDotBarX { get; set; } = 127;
+        public int SmnDotBarY { get; set; } = 460;
+        public int SmnDotBarHeight { get; set; } = 10;
+        public int SmnDotBarWidth { get; set; } = 254;
+        public int SmnAetherBarHeight { get; set; } = 20;
+        public int SmnAetherBarWidth { get; set; } = 254;
+        public int SmnAetherBarX { get; set; } = -42;
+        public int SmnAetherBarY { get; set; } = 460;
+
+        public Vector4 SmnAetherColor = new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f);
+        public Vector4 SmnRuinColor = new Vector4(94f / 255f, 250f / 255f, 154f / 255f, 100f / 100f);
+        public Vector4 SmnEmptyColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 136f / 255f);
+
+        public Vector4 SmnMiasmaColor = new Vector4(106f / 255f, 237f / 255f, 241f / 255f, 100f / 100f);
+        public Vector4 SmnBioColor = new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 100f / 100f);
+        public Vector4 SmnExpiryColor = new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f);
+
+        #endregion
+
         #region MCH Configuration
 
         public int MCHOverheatHeight { get; set; } = 20;
@@ -240,23 +265,27 @@ namespace DelvUI {
         
         #endregion
         
-        
         #region BLM Configuration
 
         public int BLMVerticalOffset { get; set; } = -2;
+        public int BLMHorizontalOffset { get; set; } = 0;
         public int BLMVerticalSpaceBetweenBars { get; set; } = 2;
         public int BLMHorizontalSpaceBetweenBars { get; set; } = 2;
         public int BLMManaBarHeight { get; set; } = 20;
-        public int BLMManaBarWidth { get; set; } = 254;
+        public int BLMManaBarWidth { get; set; } = 253;
         public int BLMUmbralHeartHeight { get; set; } = 16;
+        public int BLMUmbralHeartWidth { get; set; } = 83;
         public int BLMPolyglotHeight { get; set; } = 18;
         public int BLMPolyglotWidth { get; set; } = 18;
+        
         public bool BLMShowManaValue = false;
+        
         public bool BLMShowManaThresholdMarker = true;
         public int BLMManaThresholdValue { get; set; } = 2600;
 
         public bool BLMShowTripleCast = true;
         public int BLMTripleCastHeight { get; set; } = 16;
+        public int BLMTripleCastWidth { get; set; } = 83;
 
         public bool BLMShowFirestarterProcs = true;
         public bool BLMShowThundercloudProcs = true;
@@ -273,6 +302,44 @@ namespace DelvUI {
         public Vector4 BLMFirestarterColor = new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f);
         public Vector4 BLMThundercloudColor = new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f);
         public Vector4 BLMDotColor = new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f);
+
+        #endregion        
+        
+        #region RDM Configuration
+
+        public int RDMVerticalOffset { get; set; } = -2;
+        public int RDMVHorizontalOffset { get; set; } = -2;
+        public int RDMVerticalSpaceBetweenBars { get; set; } = 2;
+        public int RDMHorizontalSpaceBetweenBars { get; set; } = 2;
+        public int RDMManaBarHeight { get; set; } = 20;
+        public int RDMManaBarWidth { get; set; } = 254;
+        public int RDMBlackManaBarHeight { get; set; } = 16;
+        public int RDMBlackManaBarWidth { get; set; } = 18;
+        public int RDMWhiteManaBarHeight { get; set; } = 18;
+        public int RDMWhiteManaBarWidth { get; set; } = 18;
+        public bool RDMShowManaValue = false;
+        public bool RDMShowManaThresholdMarker = true;
+        public int RDMManaThresholdValue { get; set; } = 2600;
+
+        public bool RDMShowDualCast = true;
+        public int RDMDualCastHeight { get; set; } = 16;
+        public int RDMDualCastWidth { get; set; } = 16;
+
+        public bool BLMShowVerfireProcs = true;
+        public bool BLMShowVerstoneProcs = true;
+        public int RDMProcsHeight { get; set; } = 7;
+        public bool RDMShowDotTimer = true;
+        public int RDMDotTimerHeight { get; set; } = 10;
+
+        public Vector4 RDMManaBarColor = new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f);
+        public Vector4 RDMManaBarBelowThresholdColor = new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f);
+        public Vector4 RDMWhiteManaBarColor = new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f);
+        public Vector4 RDMBlackManaBarColor = new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f);
+        public Vector4 RDMAccelerationBarColor = new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f);
+        public Vector4 RDMDualcastBarColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f);
+        public Vector4 RDMVerfireBarColor = new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f);
+        public Vector4 RDMVerthunderBarColor = new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f);
+        public Vector4 RDMWDotColor = new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f);
 
         #endregion
 
@@ -511,6 +578,62 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SchEmptyColor.AdjustColor(.1f))
                 },
 
+                [Jobs.SMN] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN.AdjustColor(.1f))
+                },
+
+                [Jobs.SMN * 1000] = new Dictionary<string, uint> // Aether Bar
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnAetherColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnAetherColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnAetherColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnAetherColor.AdjustColor(.1f))
+                },
+
+                [Jobs.SMN * 1000 + 1] = new Dictionary<string, uint> // Ruin Bar
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnRuinColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnRuinColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnRuinColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnRuinColor.AdjustColor(.1f))
+                },
+
+                [Jobs.SMN * 1000 + 2] = new Dictionary<string, uint> // Empty Bar
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnEmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnEmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnEmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnEmptyColor.AdjustColor(.1f))
+                },
+
+                [Jobs.SMN * 1000 + 3] = new Dictionary<string, uint> // Miasma Bar
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnMiasmaColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnMiasmaColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnMiasmaColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnMiasmaColor.AdjustColor(.1f))
+                },
+
+                [Jobs.SMN * 1000 + 4] = new Dictionary<string, uint> // Bio Bar
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor.AdjustColor(.1f))
+                },
+
+                [Jobs.SMN * 1000 + 5] = new Dictionary<string, uint> // Dot Expiry
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnExpiryColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnExpiryColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnExpiryColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnExpiryColor.AdjustColor(.1f))
+                },
+
                 [Jobs.AST] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorAST),
@@ -733,6 +856,85 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(BLMDotColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BLMDotColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BLMDotColor.AdjustColor(.1f))
+                },                
+                [Jobs.RDM] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorRDM),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorRDM.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorRDM.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorRDM.AdjustColor(.1f))
+                },
+
+                [Jobs.RDM * 1000] = new Dictionary<string, uint> // Mana Bar no element
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarColor.AdjustColor(.1f))
+                },
+
+                [Jobs.RDM * 1000 + 1] = new Dictionary<string, uint> // Mana bar ice
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarBelowThresholdColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarBelowThresholdColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarBelowThresholdColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarBelowThresholdColor.AdjustColor(.1f))
+                },
+
+                [Jobs.RDM * 1000 + 2] = new Dictionary<string, uint> // Mana bar fire
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMWhiteManaBarColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMWhiteManaBarColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMWhiteManaBarColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMWhiteManaBarColor.AdjustColor(.1f))
+                },
+
+                [Jobs.RDM * 1000 + 3] = new Dictionary<string, uint> // Umbral heart
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMBlackManaBarColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMBlackManaBarColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMBlackManaBarColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMBlackManaBarColor.AdjustColor(.1f))
+                },
+
+                [Jobs.RDM * 1000 + 4] = new Dictionary<string, uint> // Polyglot
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMAccelerationBarColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMAccelerationBarColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMAccelerationBarColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMAccelerationBarColor.AdjustColor(.1f))
+                },
+
+                [Jobs.RDM * 1000 + 5] = new Dictionary<string, uint> // Triplecast
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMDualcastBarColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMDualcastBarColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMDualcastBarColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMDualcastBarColor.AdjustColor(.1f))
+                },
+
+                [Jobs.RDM * 1000 + 6] = new Dictionary<string, uint> // Firestarter
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMVerfireBarColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMVerfireBarColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMVerfireBarColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMVerfireBarColor.AdjustColor(.1f))
+                },
+
+                [Jobs.RDM * 1000 + 7] = new Dictionary<string, uint> // Thundercloud
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMVerthunderBarColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMVerthunderBarColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMVerthunderBarColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMVerthunderBarColor.AdjustColor(.1f))
+                },
+
+                [Jobs.RDM * 1000 + 8] = new Dictionary<string, uint> // DoT
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMWDotColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMWDotColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMWDotColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMWDotColor.AdjustColor(.1f))
                 },
 
                 [Jobs.SMN] = new Dictionary<string, uint>
