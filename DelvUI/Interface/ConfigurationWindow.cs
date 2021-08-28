@@ -42,19 +42,18 @@ namespace DelvUI.Interface
 
             ImGui.SetNextWindowSize(new Vector2(900, 600), ImGuiCond.Appearing);
 
-            if (!ImGui.Begin("DelvUI configuration", ref IsVisible, ImGuiWindowFlags.MenuBar)) {
+            if (!ImGui.Begin("DelvUI configuration", ref IsVisible)) {
                 return;
             }
             var changed = false;
-
-
 
                 ImGui.BeginGroup();
                 {
                     ImGui.BeginGroup(); // Left
                     {
-                        ImGui.Button("IMAGE GOES HERE");
-                        ImGui.Button("IMAGE GOES HERE");
+                        var imagePath = Path.Combine(Path.GetDirectoryName(_plugin.AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
+                        var delvuiBanner = _pluginInterface.UiBuilder.LoadImage(imagePath);
+                        ImGui.Image(delvuiBanner.ImGuiHandle, new Vector2(delvuiBanner.Width, delvuiBanner.Height));
 
                         ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
 
