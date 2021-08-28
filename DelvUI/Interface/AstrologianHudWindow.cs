@@ -98,7 +98,18 @@ namespace DelvUI.Interface
             {
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealCelestialColor["gradientRight"]);
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-            }      
+            }
+            if (!gauge.ContainsSeal(SealType.NONE))
+            {
+                int sealNumbers = 0;
+                if (gauge.ContainsSeal(SealType.SUN)) { sealNumbers++; }; 
+                if (gauge.ContainsSeal(SealType.MOON)) { sealNumbers++; }; 
+                if (gauge.ContainsSeal(SealType.CELESTIAL)) { sealNumbers++; };
+                //var textSealReady = "READY - " + sealNumbers + " seals";
+                //if (sealNumbers == 1) { textSealReady = "READY - " + sealNumbers + " seal"; }
+                var textSealReady = sealNumbers.ToString();
+                DrawOutlinedText(textSealReady, new Vector2(CenterX + DivinationBarX * 3 + (DivinationWidth / 2f) - (ImGui.CalcTextSize(textSealReady).X / 2f), CenterY + BarCoords.Y - 60 - 2));
+            }
         }
 
         private void DrawDraw()
