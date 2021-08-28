@@ -99,86 +99,79 @@ namespace DelvUI.Interface {
             var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset, CenterY + HealthBarYOffset);
    
             ImGui.SetCursorPos(cursorPos);
-            
-            if (ImGui.BeginChild("health_bar", BarSize)) {
-                try
-                {
-                    var colors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
-                    var drawList = ImGui.GetWindowDrawList();
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight),
-                        colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
-                    );
-                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+            try
+            {
+                  var colors = PluginConfiguration.NPCColorMap["friendly"];
+                  if (PluginConfiguration.JobColorMap.ContainsKey(PluginInterface.ClientState.LocalPlayer.ClassJob.Id)) { 
+                      colors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
+                  }
+                  else
+                  {                    
+                      PluginLog.Log("///////////////////////////////////////////////////////////");
+                      PluginLog.Log("NINA BUG CRASHED ON HP BAR COLORING");
+                      PluginLog.Log("PluginConfiguration.JobColorMap.Keys");
+                      PluginLog.Log(PluginConfiguration.JobColorMap.Keys.ToString());
+                      PluginLog.Log("PluginInterface.ClientState.LocalPlayer.ClassJob.Id");
+                      PluginLog.Log(PluginInterface.ClientState.LocalPlayer.ClassJob.Id.ToString());
+                      PluginLog.Log("///////////////////////////////////////////////////////////");
 
-                    /* This needs some check to see if it's in BeginChild or else this will leak into the settings panel.
-                    if (ImGui.GetIO().MouseClicked[0]) {
-                        PluginInterface.ClientState.Targets.SetCurrentTarget(actor);
-                    }
-                    */
-                }
-                catch(Exception ex)
-                {
-                    PluginLog.Log("///////////////////////////////////////////////////////////");
-                    PluginLog.Log("NINA BUG CRASHED ON HP BAR COLORING");
-                    PluginLog.Log(ex.ToString());
-                    PluginLog.Log("PluginConfiguration.JobColorMap.Keys");
-                    PluginLog.Log(PluginConfiguration.JobColorMap.Keys.ToString());
-                    PluginLog.Log("PluginInterface.ClientState.LocalPlayer.ClassJob.Id");
-                    PluginLog.Log(PluginInterface.ClientState.LocalPlayer.ClassJob.Id.ToString());
-                    PluginLog.Log("///////////////////////////////////////////////////////////");
+                  }
+                  var drawList = ImGui.GetWindowDrawList();
 
-                }
+                  // Basically make an invisible box for BeginChild to work properly.
+                  ImGuiWindowFlags windowFlags = 0;
+                  windowFlags |= ImGuiWindowFlags.NoBackground;
+                  windowFlags |= ImGuiWindowFlags.NoTitleBar;
+                  windowFlags |= ImGuiWindowFlags.NoMove;
+                  windowFlags |= ImGuiWindowFlags.NoDecoration;
+
+                  ImGui.SetNextWindowPos(cursorPos);
+                  ImGui.SetNextWindowSize(_barSize);
+
+                  ImGui.Begin("health_bar", windowFlags);
+                  if (ImGui.BeginChild("health_bar", _barSize)) {
+                      drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
+                      drawList.AddRectFilledMultiColor(
+                          cursorPos, cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight), 
+                          colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+                      );
+
+                      drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+
+                      // Check if mouse is hovering over the box properly
+                      if (ImGui.GetIO().MouseClicked[0] && ImGui.IsMouseHoveringRect(cursorPos, cursorPos + BarSize)) {
+                          PluginInterface.ClientState.Targets.SetCurrentTarget(actor);
+                      }
+
+                      ImGui.EndChild();
+                  }
+                  ImGui.End();
+                  DrawTargetShield(actor, cursorPos, _barSize, true);
+
+                  DrawOutlinedText(
+                      $"{Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}",
+                      new Vector2(cursorPos.X + 5 + HealthBarTextLeftXOffset, cursorPos.Y - 22 + HealthBarTextLeftYOffset));
+
+                  var text = Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextRight);
+                  var textSize = ImGui.CalcTextSize(text);
+
+                  DrawOutlinedText(text,
+                      new Vector2(cursorPos.X + HealthBarWidth - textSize.X - 5 + HealthBarTextRightXOffset,
+                          cursorPos.Y - 22 + HealthBarTextRightYOffset));
             }
-            ImGui.End();
-            DrawTargetShield(actor, cursorPos, _barSize, true);
-            
-            DrawOutlinedText(
-                $"{Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}",
-                new Vector2(cursorPos.X + 5 + HealthBarTextLeftXOffset, cursorPos.Y - 22 + HealthBarTextLeftYOffset));
+            catch(Exception ex)
+            {
+                PluginLog.Log("///////////////////////////////////////////////////////////");
+                PluginLog.Log("NINA BUG CRASHED ON HP BAR COLORING");
+                PluginLog.Log(ex.ToString());
+                PluginLog.Log("PluginConfiguration.JobColorMap.Keys");
+                PluginLog.Log(PluginConfiguration.JobColorMap.Keys.ToString());
+                PluginLog.Log("PluginInterface.ClientState.LocalPlayer.ClassJob.Id");
+                PluginLog.Log(PluginInterface.ClientState.LocalPlayer.ClassJob.Id.ToString());
+                PluginLog.Log("///////////////////////////////////////////////////////////");
 
-            var text = Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextRight);
-            var textSize = ImGui.CalcTextSize(text);
-            
-            DrawOutlinedText(text,
-                new Vector2(cursorPos.X + HealthBarWidth - textSize.X - 5 + HealthBarTextRightXOffset,
-                    cursorPos.Y - 22 + HealthBarTextRightYOffset));
-            
-            if (ImGui.BeginChild("health_bar", BarSize)) {
-                try
-                {
-                    var colors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
-                    var drawList = ImGui.GetWindowDrawList();
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight),
-                        colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
-                    );
-                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-
-                    /* This needs some check to see if it's in BeginChild or else this will leak into the settings panel.
-                    if (ImGui.GetIO().MouseClicked[0]) {
-                        PluginInterface.ClientState.Targets.SetCurrentTarget(actor);
-                    }
-                    */
-                }
-                catch(Exception ex)
-                {
-                    PluginLog.Log("///////////////////////////////////////////////////////////");
-                    PluginLog.Log("NINA BUG CRASHED ON HP BAR COLORING");
-                    PluginLog.Log(ex.ToString());
-                    PluginLog.Log("PluginConfiguration.JobColorMap.Keys");
-                    PluginLog.Log(PluginConfiguration.JobColorMap.Keys.ToString());
-                    PluginLog.Log("PluginInterface.ClientState.LocalPlayer.ClassJob.Id");
-                    PluginLog.Log(PluginInterface.ClientState.LocalPlayer.ClassJob.Id.ToString());
-                    PluginLog.Log("///////////////////////////////////////////////////////////");
-
-                }
             }
-            DrawTargetShield(actor, cursorPos, _barSize, true);
             
-            ImGui.EndChild();
         }
 
         protected virtual void DrawPrimaryResourceBar() {
