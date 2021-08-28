@@ -472,6 +472,34 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
+                    var schBioBarHeight = _pluginConfiguration.SCHBioBarHeight;
+                    if (ImGui.DragInt("Bio Bar Height", ref schBioBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SCHBioBarHeight = schBioBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schBioBarWidth = _pluginConfiguration.SCHBioBarWidth;
+                    if (ImGui.DragInt("Bio Bar Width", ref schBioBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SCHBioBarWidth = schBioBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schBioBarX = _pluginConfiguration.SCHBioBarX;
+                    if (ImGui.DragInt("Bio Bar X Offset", ref schBioBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SCHBioBarX = schBioBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schBioBarY = _pluginConfiguration.SCHBioBarY;
+                    if (ImGui.DragInt("Bio Bar Y Offset", ref schBioBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SCHBioBarY = schBioBarY;
+                        _pluginConfiguration.Save();
+                    }
+
                     changed |= ImGui.Checkbox("Show Aether Bar", ref _pluginConfiguration.SCHShowAetherBar);
                     changed |= ImGui.Checkbox("Show Fairy Bar", ref _pluginConfiguration.SCHShowFairyBar);
                     changed |= ImGui.Checkbox("Show Bio Bar", ref _pluginConfiguration.SCHShowBioBar);
