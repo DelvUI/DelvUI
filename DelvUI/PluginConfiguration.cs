@@ -36,6 +36,14 @@ namespace DelvUI {
 
         public bool ShieldEnabled = true;
 
+        public string HealthBarTextLeft = "[name:abbreviate]";
+        public string HealthBarTextRight = "[health:max-short] | [health:percent]";
+        
+        public string TargetBarTextLeft = "[health:max-short] | [health:percent]";
+        public string TargetBarTextRight = "[name:abbreviate]";
+        
+        public string ToTBarText = "[name:abbreviate]";
+        public string FocusBarText = "[name:abbreviate]";
 
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
@@ -44,6 +52,7 @@ namespace DelvUI {
 
 
         public bool ShowCastBar = true;
+        public bool InterruptCheck = true;
         public bool ShowActionIcon = true;
         public bool ShowActionName = true;
         public bool ShowCastTime = true;

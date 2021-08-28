@@ -13,13 +13,14 @@ using Dalamud.Game.ClientState.Structs;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.GameStructs;
+using FFXIVClientStructs;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface {
-    
     public abstract class HudWindow {
         public bool IsVisible = true;
         protected readonly DalamudPluginInterface PluginInterface;
@@ -56,16 +57,22 @@ namespace DelvUI.Interface {
         protected int CastBarHeight => PluginConfiguration.CastBarHeight;
         protected int CastBarXOffset => PluginConfiguration.CastBarXOffset;
         protected int CastBarYOffset => PluginConfiguration.CastBarYOffset;
+        protected bool InterruptCheck => PluginConfiguration.InterruptCheck;
         protected Vector2 BarSize => _barSize;
 
         private Lumina.Excel.GeneratedSheets.Action _lastUsedAction;
         private Mount _lastUsedMount;
         private Item _lastUsedItem;
         
+        private delegate void OpenContextMenuFromTarget(IntPtr agentHud, IntPtr gameObject);
+        private OpenContextMenuFromTarget openContextMenuFromTarget;
+        
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {
             PluginInterface = pluginInterface;
             PluginConfiguration = pluginConfiguration;
             //_barsize = new Vector2(BarWidth, BarHeight);
+            
+            openContextMenuFromTarget = Marshal.GetDelegateForFunctionPointer<OpenContextMenuFromTarget>(PluginInterface.TargetModuleScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
         }
 
         protected virtual void DrawHealthBar() {
@@ -77,16 +84,14 @@ namespace DelvUI.Interface {
             if(actor.ClassJob.Id == 19 || actor.ClassJob.Id == 32 || actor.ClassJob.Id == 21 || actor.ClassJob.Id == 37)
                 DrawTankStanceIndicator();
 
-           
             var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset, CenterY + HealthBarYOffset);
-            DrawOutlinedText($"{actor.Name.Abbreviate().Truncate(16)}", new Vector2(cursorPos.X + 5, cursorPos.Y -22));
+            DrawOutlinedText($"{Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}", new Vector2(cursorPos.X + 5, cursorPos.Y -22));
+
+            var text = Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextRight);
+            var textSize = ImGui.CalcTextSize(text);
             
-            var hp = $"{actor.MaxHp.KiloFormat(),6} | ";
-            var hpSize = ImGui.CalcTextSize(hp);
-            var percentageSize = ImGui.CalcTextSize("100");
-            DrawOutlinedText(hp, new Vector2(cursorPos.X + HealthBarWidth - hpSize.X - percentageSize.X - 5, cursorPos.Y -22));
-            DrawOutlinedText($"{(int)(scale * 100),3}", new Vector2(cursorPos.X + HealthBarWidth - percentageSize.X - 5, cursorPos.Y -22));
-            
+            DrawOutlinedText(text, new Vector2(cursorPos.X + HealthBarWidth - textSize.X - 5, cursorPos.Y -22));
+   
             ImGui.SetCursorPos(cursorPos);
             
             if (ImGui.BeginChild("health_bar", BarSize)) {
@@ -129,50 +134,60 @@ namespace DelvUI.Interface {
         }
         
         protected virtual void DrawTargetBar() {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            unsafe
+            {
+                var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (target is null) {
-                return;
-            }
+                if (target is null) {
+                    return;
+                }
 
-            _barSize = new Vector2(TargetBarWidth, TargetBarHeight);
+                _barSize = new Vector2(TargetBarWidth, TargetBarHeight);
 
             var cursorPos = new Vector2(CenterX + TargetBarXOffset, CenterY + TargetBarYOffset);
             ImGui.SetCursorPos(cursorPos);
             var drawList = ImGui.GetWindowDrawList();
 
-            if (!(target is Chara actor)) {
-                var friendly = PluginConfiguration.NPCColorMap["friendly"];
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, friendly["background"]);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(TargetBarWidth, TargetBarHeight), 
-                    friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"], friendly["gradientLeft"]
-                );
-                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-            }
-            else {
-                var scale = actor.MaxHp > 0f ? (float) actor.CurrentHp / actor.MaxHp : 0f;
-                var colors = DetermineTargetPlateColors(actor);
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(TargetBarWidth * scale, TargetBarHeight), 
-                    colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
-                );
-                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                if (!(target is Chara actor)) {
+                    var friendly = PluginConfiguration.NPCColorMap["friendly"];
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, friendly["background"]);
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(TargetBarWidth, TargetBarHeight), 
+                        friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"], friendly["gradientLeft"]
+                    );
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                }
+                else {
+                    var scale = actor.MaxHp > 0f ? (float) actor.CurrentHp / actor.MaxHp : 0f;
+                    var colors = DetermineTargetPlateColors(actor);
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(TargetBarWidth * scale, TargetBarHeight), 
+                        colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+                    );
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
 
-                var percentage = $"{(int) (scale * 100),3}";
-                var percentageSize = ImGui.CalcTextSize(percentage);
-                var maxPercentageSize = ImGui.CalcTextSize("100");
-                DrawOutlinedText(percentage, new Vector2(cursorPos.X + 5 + maxPercentageSize.X - percentageSize.X, cursorPos.Y - 22));
-                DrawOutlinedText($" | {actor.MaxHp.KiloFormat(),-6}", new Vector2(cursorPos.X + 5 + maxPercentageSize.X, cursorPos.Y - 22));
+                var text = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextLeft);
+
+                DrawOutlinedText(text, new Vector2(cursorPos.X + 5, cursorPos.Y - 22));
             }
 
-            var name = $"{target.Name.Abbreviate().Truncate(16)}";
-            var nameSize = ImGui.CalcTextSize(name);
-            DrawOutlinedText(name, new Vector2(cursorPos.X + TargetBarWidth - nameSize.X - 5, cursorPos.Y - 22));
+            var textRight = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextRight);
+            var textRightSize = ImGui.CalcTextSize(textRight);
+            
+            DrawOutlinedText(textRight, new Vector2(cursorPos.X + TargetBarWidth - textRightSize.X - 5, cursorPos.Y - 22));
             DrawTargetShield(target, cursorPos, BarSize, true);
 
-            DrawTargetOfTargetBar(target.TargetActorID);
+                /* This needs more testing and solution for game lag(context menu)
+                if (ImGui.GetIO().MouseClicked[1]) {
+                    Resolver.Initialize();
+                    var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
+                    openContextMenuFromTarget(agentHud, target.Address);
+                }
+                */
+
+                DrawTargetOfTargetBar(target.TargetActorID);
+            }
         }
         protected virtual void DrawFocusBar() {
             var focus = PluginInterface.ClientState.Targets.FocusTarget;
@@ -209,16 +224,16 @@ namespace DelvUI.Interface {
                 DrawTargetShield(focus, cursorPos, barSize, true);
             }
             
-            var name = $"{focus.Name.Abbreviate().Truncate(12)}";
-            var textSize = ImGui.CalcTextSize(name);
-            DrawOutlinedText(name, new Vector2(cursorPos.X + FocusBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
+            var text = Helpers.TextTags.GenerateFormattedTextFromTags(focus, PluginConfiguration.FocusBarText);
+            var textSize = ImGui.CalcTextSize(text);
+            DrawOutlinedText(text, new Vector2(cursorPos.X + FocusBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
         }
         
         protected virtual void DrawTargetOfTargetBar(int targetActorId) {
             Actor target = null;
             if (targetActorId == 0)
             {
-                target = PluginInterface.ClientState.LocalPlayer;
+                //target = PluginInterface.ClientState.LocalPlayer;
             }
             else
             {
@@ -233,19 +248,18 @@ namespace DelvUI.Interface {
             if (!(target is Chara actor)) {
                 return;
             }
-
-
+            
             var barSize = new Vector2(ToTBarWidth, ToTBarHeight);
 
-            var name = $"{actor.Name.Abbreviate().Truncate(12)}";
-            var textSize = ImGui.CalcTextSize(name);
+            var text = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.ToTBarText);
+            var textSize = ImGui.CalcTextSize(text);
 
-            var cursorPos = new Vector2(CenterX + ToTBarXOffset + TargetBarWidth + 2, CenterY + ToTBarYOffset);
-            DrawOutlinedText(name, new Vector2(cursorPos.X + ToTBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
+            var cursorPos = new Vector2(CenterX + XOffset + TargetBarWidth + 2, CenterY + YOffset);
+            DrawOutlinedText(text, new Vector2(cursorPos.X + ToTBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 22));
             ImGui.SetCursorPos(cursorPos);    
             
             var colors = DetermineTargetPlateColors(actor);
-            if (ImGui.BeginChild("target_bar", barSize)) {
+            if (ImGui.BeginChild("target_of_target_bar", barSize)) {
                 var drawList = ImGui.GetWindowDrawList();
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["background"]);
                 
@@ -534,6 +548,12 @@ namespace DelvUI.Interface {
         
         protected abstract void Draw(bool _);
 
+        protected virtual void HandleProperties()
+        {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null,  "PluginInterface.ClientState.LocalPlayer != null");
+            var actor = PluginInterface.ClientState.LocalPlayer;
+        }
+
         protected virtual unsafe bool ShouldBeVisible() {
 
             if (PluginConfiguration.HideHud)
@@ -571,6 +591,7 @@ namespace DelvUI.Interface {
 
         private unsafe bool CastIsInterrupted(AddonCastBar* castBar)
         {
+            if (!InterruptCheck) { return false; }
             for (var i = 0; i != castBar->AtkUnitBase.UldManager.NodeListCount; ++i)
             {
                 var node = castBar->AtkUnitBase.UldManager.NodeList[i];
