@@ -1,4 +1,5 @@
-﻿using System.Numerics;
+﻿using System.IO;
+using System.Numerics;
 using Dalamud.Plugin;
 using ImGuiNET;
 
@@ -10,7 +11,8 @@ namespace DelvUI.Interface
         private readonly Plugin _plugin;
         private readonly DalamudPluginInterface _pluginInterface;
         private readonly PluginConfiguration _pluginConfiguration;
-
+        private string AssemblyLocation { get => assemblyLocation; set => assemblyLocation = value; }
+        private string assemblyLocation = System.Reflection.Assembly.GetExecutingAssembly().Location;
         public ConfigurationWindow(Plugin plugin, DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration)
         {
             _plugin = plugin;
@@ -24,12 +26,19 @@ namespace DelvUI.Interface
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(0, 0), ImGuiCond.Always);
+            ImGui.SetNextWindowSize(new Vector2(1400, 900), ImGuiCond.FirstUseEver);
 
             if (!ImGui.Begin("DelvUI configuration", ref IsVisible, ImGuiWindowFlags.MenuBar)) {
                 return;
             }
+            if (ImGui.BeginMenuBar())
+            {
+                var imagePath = Path.Combine(Path.GetDirectoryName(AssemblyLocation), @"../Media/banner_short.png");
+                var delvuiBanner = _pluginInterface.UiBuilder.LoadImage(imagePath);
+                ImGui.Image(delvuiBanner.ImGuiHandle, new Vector2(delvuiBanner.Width, delvuiBanner.Height));
 
+                ImGui.EndMenuBar();
+            }
             var changed = false;
 
             var viewportWidth = (int) ImGui.GetMainViewport().Size.X;
@@ -41,59 +50,47 @@ namespace DelvUI.Interface
             {
                 if (ImGui.BeginTabItem("Structure"))
                 {
-
-                    ImGui.SetNextWindowSize(new Vector2(500, 440), ImGuiCond.FirstUseEver);
-
-                        if (ImGui.BeginMenuBar())
+                    // Left
+                    var selected = 0;
+                    {
+                        ImGui.BeginChild("left pane", new Vector2(150, 0), true);
+                        for (int i = 0; i < 20; i++)
                         {
-                            if (ImGui.BeginMenu("Test"))
-                            {
-                                ImGui.EndMenu();
-                            }
-                            ImGui.EndMenuBar();
+                            if (ImGui.Selectable( "Object " + i, selected == i))
+                                selected = i;
                         }
+                        ImGui.EndChild();
+                    }
+                    ImGui.SameLine();
 
-                        // Left
-                        var selected = 0;
+                    // Right
+                    {
+                        ImGui.BeginGroup();
+                        ImGui.BeginChild("item view", new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+                        ImGui.Text("MyObject: " + selected);
+                        ImGui.Separator();
+                        if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
                         {
-                            ImGui.BeginChild("left pane", new Vector2(150, 0), true);
-                            for (int i = 0; i < 20; i++)
+                            if (ImGui.BeginTabItem("Description"))
                             {
-                                if (ImGui.Selectable( "Object " + i, selected == i))
-                                    selected = i;
+                                ImGui.TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
+                                ImGui.EndTabItem();
                             }
-                            ImGui.EndChild();
+                            if (ImGui.BeginTabItem("Details"))
+                            {
+                                ImGui.Text("ID: 0123456789");
+                                ImGui.EndTabItem();
+                            }
+                            ImGui.EndTabBar();
                         }
+                        ImGui.EndChild();
+                        if (ImGui.Button("Revert")) {}
                         ImGui.SameLine();
-
-                        // Right
-                        {
-                            ImGui.BeginGroup();
-                            ImGui.BeginChild("item view", new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
-                            ImGui.Text("MyObject: " + selected);
-                            ImGui.Separator();
-                            if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
-                            {
-                                if (ImGui.BeginTabItem("Description"))
-                                {
-                                    ImGui.TextWrapped("Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. ");
-                                    ImGui.EndTabItem();
-                                }
-                                if (ImGui.BeginTabItem("Details"))
-                                {
-                                    ImGui.Text("ID: 0123456789");
-                                    ImGui.EndTabItem();
-                                }
-                                ImGui.EndTabBar();
-                            }
-                            ImGui.EndChild();
-                            if (ImGui.Button("Revert")) {}
-                            ImGui.SameLine();
-                            if (ImGui.Button("Save")) {}
-                            ImGui.EndGroup();
-                        }
-                    
-                    ImGui.End();
+                        if (ImGui.Button("Save")) {}
+                        ImGui.EndGroup();
+                    }
+                
+                    ImGui.EndTabItem();
                 }
 
                 if (ImGui.BeginTabItem("General"))
