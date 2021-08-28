@@ -116,7 +116,7 @@ namespace DelvUI.Interface
             if (OathGaugeText)
             {
                 builder.SetTextMode(BarTextMode.EachChunk)
-                    .SetTexts(new BarText(BarTextPosition.CenterMiddle, BarTextType.Current, null));
+                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
             var drawList = ImGui.GetWindowDrawList();
@@ -140,14 +140,14 @@ namespace DelvUI.Interface
                 var fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().Duration);
                 builder.AddInnerBar(fightOrFlightDuration, 25, FightOrFlightColor, null)
                     .SetTextMode(BarTextMode.EachChunk)
-                    .SetTexts(new BarText(BarTextPosition.CenterLeft, BarTextType.Current, PluginConfiguration.PLDFightOrFlightColor, Vector4.UnitW, null));
+                    .SetText(BarTextPosition.CenterLeft, BarTextType.Current, PluginConfiguration.PLDFightOrFlightColor, Vector4.UnitW, null);
             }
             if (requiescatBuff.Any())
             {
                 var requiescatDuration = Math.Abs(requiescatBuff.First().Duration);
                 builder.AddInnerBar(requiescatDuration, 12, RequiescatColor, null)
                     .SetTextMode(BarTextMode.EachChunk)
-                    .SetTexts(new BarText(BarTextPosition.CenterRight, BarTextType.Current, PluginConfiguration.PLDRequiescatColor, Vector4.UnitW, null));
+                    .SetText(BarTextPosition.CenterRight, BarTextType.Current, PluginConfiguration.PLDRequiescatColor, Vector4.UnitW, null);
             }
 
             var drawList = ImGui.GetWindowDrawList();

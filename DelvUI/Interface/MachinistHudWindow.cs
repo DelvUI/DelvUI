@@ -93,7 +93,7 @@ namespace DelvUI.Interface
                 .SetChunkPadding(HeatGaugePadding)
                 .AddInnerBar(gauge.Heat, 100, HeatColor, EmptyColor)
                 .SetTextMode(BarTextMode.EachChunk)
-                .SetTexts(new BarText(BarTextPosition.CenterMiddle, BarTextType.Current, null))
+                .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                 .Build();
             
             var drawList = ImGui.GetWindowDrawList();
@@ -119,7 +119,7 @@ namespace DelvUI.Interface
             {
                 builder.AddInnerBar(gauge.RobotTimeRemaining / 1000f, _robotDuration[gauge.LastRobotBatteryPower / 10 - 5], RobotColor, null)
                     .SetTextMode(BarTextMode.Single)
-                    .SetTexts(new BarText(BarTextPosition.CenterLeft, BarTextType.Current, null));
+                    .SetText(BarTextPosition.CenterLeft, BarTextType.Current);
             }
 
             var drawList = ImGui.GetWindowDrawList();
@@ -142,7 +142,7 @@ namespace DelvUI.Interface
             {
                 builder.AddInnerBar(gauge.OverheatTimeRemaining / 1000f, 8, OverheatColor, null)
                     .SetTextMode(BarTextMode.EachChunk)
-                    .SetTexts(new BarText(BarTextPosition.CenterMiddle, BarTextType.Current, null));
+                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
             
             var drawList = ImGui.GetWindowDrawList();
@@ -165,7 +165,7 @@ namespace DelvUI.Interface
                 var duration = wildfireBuff.First().Duration;
                 builder.AddInnerBar(duration, 10, WildfireColor, null)
                     .SetTextMode(BarTextMode.EachChunk)
-                    .SetTexts(new BarText(BarTextPosition.CenterMiddle, BarTextType.Current, null));
+                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
             var drawList = ImGui.GetWindowDrawList();

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace DelvUI.Interface.Bars
 {
@@ -101,8 +102,7 @@ namespace DelvUI.Interface.Bars
             return AddInnerBar(currentValue, maximumValue, colors, partialColor, BarTextMode.None, null);
         }
 
-        public BarBuilder AddInnerBar(float currentValue, float maximumValue, Dictionary<string, uint>[] chunkColors,
-            Dictionary<string, uint> partialFillColor, BarTextMode textMode, BarText[] texts)
+        public BarBuilder AddInnerBar(float currentValue, float maximumValue, Dictionary<string, uint>[] chunkColors, Dictionary<string, uint> partialFillColor, BarTextMode textMode, BarText[] texts)
         {
             InnerBar innerBar = new InnerBar();
             innerBar.CurrentValue = currentValue;
@@ -116,6 +116,48 @@ namespace DelvUI.Interface.Bars
                 throw new ArgumentException($"Amount of chunk colors (${chunkColors.Length}) must match amount of chunks in bar (${_bar.ChunkSizes.Length})");
 
             currentInnerBar = _bar.AddInnerBar(innerBar);
+            return this;
+        }
+        
+        public BarBuilder AddInnerBooleanBar(bool[] values, Dictionary<string, uint> color)
+        {
+            return AddInnerBooleanBar(values, color, null);
+        }
+
+        public BarBuilder AddInnerBooleanBar(bool[] values, Dictionary<string, uint> color, Dictionary<string, uint> partialColor)
+        {
+            var colors = new Dictionary<string, uint>[_bar.ChunkSizes.Length];
+            for (var i = 0; i < colors.Length; i++)
+            {
+                colors[i] = color;
+            }
+
+            return AddInnerBooleanBar(values, colors, partialColor);
+        }
+
+        public BarBuilder AddInnerBooleanBar(bool[] values, Dictionary<string, uint>[] colors)
+        {
+            return AddInnerBooleanBar(values, colors, null);
+        }
+
+        public BarBuilder AddInnerBooleanBar(bool[] values, Dictionary<string, uint>[] colors, Dictionary<string, uint> partialColor)
+        {
+            return AddInnerBooleanBar(values, colors, partialColor, BarTextMode.None, null);
+        }
+
+        public BarBuilder AddInnerBooleanBar(bool[] values, Dictionary<string, uint>[] chunkColors, Dictionary<string, uint> partialFillColor, BarTextMode textMode, BarText[] texts)
+        {
+            BooleanInnerBar innerBar = new BooleanInnerBar();
+            innerBar.EnableArray = values;
+            innerBar.ChunkColors = chunkColors;
+            innerBar.PartialFillColor = partialFillColor; 
+            innerBar.TextMode = textMode;
+            innerBar.Texts = texts;
+
+            if (chunkColors.Length != _bar.ChunkSizes.Length)
+                throw new ArgumentException($"Amount of chunk colors (${chunkColors.Length}) must match amount of chunks in bar (${_bar.ChunkSizes.Length})");
+
+            currentInnerBar = _bar.AddInnerBooleanBar(innerBar);
             return this;
         }
 
@@ -138,13 +180,34 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
+        public BarBuilder SetFlipDrainDirection(bool flip)
+        {
+            _bar.InnerBars[currentInnerBar].FlipDrainDirection = flip;
+            return this;
+        }
+
         public BarBuilder SetTextMode(BarTextMode mode)
         {
             _bar.InnerBars[currentInnerBar].TextMode = mode;
             return this;
         }
 
-        public BarBuilder SetTexts(BarText text)
+        public BarBuilder SetText(BarTextPosition posotion, BarTextType type)
+        {
+            return SetText(new BarText(posotion, type));
+        }
+
+        public BarBuilder SetText(BarTextPosition position, BarTextType type, string text)
+        {
+            return SetText(new BarText(position, type, text));
+        }
+
+        public BarBuilder SetText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string text)
+        {
+            return SetText(new BarText(position, type, color, outlineColor, text));
+        }
+
+        public BarBuilder SetText(BarText text)
         {
             var texts = new BarText[_bar.ChunkSizes.Length];
             for (var i = 0; i < texts.Length; i++)
@@ -156,7 +219,7 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
-        public BarBuilder SetTexts(BarText[] texts)
+        public BarBuilder SetText(BarText[] texts)
         {
             if (texts.Length != _bar.ChunkSizes.Length)
                 throw new ArgumentException(

@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using ImGuiNET;
 
-namespace DelvUI.Interface
+namespace DelvUI.Helpers
 {
     public class DrawHelper
     {

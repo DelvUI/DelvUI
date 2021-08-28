@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Plugin;
+using DelvUI.Helpers;
 using ImGuiNET;
 
 namespace DelvUI.Interface.Bars
@@ -31,6 +32,14 @@ namespace DelvUI.Interface.Bars
         }
 
         public int AddInnerBar(InnerBar innerBar)
+        {
+            innerBar.Parent = this;
+            innerBar.ChildNum = InnerBars.Count;
+            InnerBars.Add(innerBar);
+            return innerBar.ChildNum;
+        }
+
+        public int AddInnerBooleanBar(BooleanInnerBar innerBar)
         {
             innerBar.Parent = this;
             innerBar.ChildNum = InnerBars.Count;
@@ -83,10 +92,11 @@ namespace DelvUI.Interface.Bars
         public float CurrentValue { get; set; }
         public Dictionary<string, uint>[] ChunkColors { get; set; }
         public Dictionary<string, uint> PartialFillColor { get; set; }
+        public bool FlipDrainDirection { get; set; }
         public BarTextMode TextMode { get; set; }
         public BarText[] Texts { get; set; }
 
-        public void Draw(ImDrawListPtr drawList)
+        public virtual void Draw(ImDrawListPtr drawList)
         {
             var barWidth = Parent.BarWidth + Parent.ChunkPadding; // For loop adds one extra padding more than is needed
             var barHeight = (float) 1 / Parent.InnerBars.Count * Parent.BarHeight;
@@ -94,36 +104,77 @@ namespace DelvUI.Interface.Bars
             var cursorPos = new Vector2(Parent.XPosition, yPos);
 
             var currentFill = CurrentValue / MaximumValue;
+            if (FlipDrainDirection)
+                currentFill = 1 - currentFill;
             var i = 0;
             foreach (var chunkSize in Parent.ChunkSizes)
             {
                 var barSize = new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
-                var fillPercentage = (float) Math.Round(Math.Min(currentFill / chunkSize, 1f), 5); // Rounding due to floating point precision shenanigans
 
-                if (fillPercentage >= 1f)
+                if (!FlipDrainDirection)
                 {
-                    currentFill -= chunkSize;
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + barSize,
-                        ChunkColors[i]["gradientLeft"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientLeft"]
-                    );
-                }
-                else
-                {
-                    currentFill = 0f;
-                    if (PartialFillColor != null)
+                    var fillPercentage = (float) Math.Round(Math.Min(currentFill / chunkSize, 1f), 5); // Rounding due to floating point precision shenanigans
+                    if (fillPercentage >= 1f)
                     {
+                        currentFill -= chunkSize;
                         drawList.AddRectFilledMultiColor(
-                            cursorPos, cursorPos + new Vector2(barSize.X * fillPercentage, barSize.Y),
-                            PartialFillColor["gradientLeft"], PartialFillColor["gradientRight"], PartialFillColor["gradientRight"], PartialFillColor["gradientLeft"]
+                            cursorPos, cursorPos + barSize,
+                            ChunkColors[i]["gradientLeft"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientLeft"]
                         );
                     }
                     else
                     {
+                        currentFill = 0f;
+                        if (PartialFillColor != null)
+                        {
+                            drawList.AddRectFilledMultiColor(
+                                cursorPos, cursorPos + new Vector2(barSize.X * fillPercentage, barSize.Y),
+                                PartialFillColor["gradientLeft"], PartialFillColor["gradientRight"], PartialFillColor["gradientRight"], PartialFillColor["gradientLeft"]
+                            );
+                        }
+                        else
+                        {
+                            drawList.AddRectFilledMultiColor(
+                                cursorPos, cursorPos + new Vector2(barSize.X * fillPercentage, barSize.Y),
+                                ChunkColors[i]["gradientLeft"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientLeft"]
+                            );
+                        }
+                    }
+                }
+                else
+                {
+                    // TODO: Make this work well with non-standard chunk sizes, maybe need to redo the entire loop
+                    var percentageEmpty = (float) Math.Round(currentFill * Parent.ChunkSizes.Length, 5); // Rounding due to floating point precision shenanigans
+                    if (percentageEmpty <= 0f)
+                    {
                         drawList.AddRectFilledMultiColor(
-                            cursorPos, cursorPos + new Vector2(barSize.X * fillPercentage, barSize.Y),
+                            cursorPos, cursorPos + barSize,
                             ChunkColors[i]["gradientLeft"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientLeft"]
                         );
+                        currentFill = 0f;
+                    }
+                    else if (percentageEmpty < 1f)
+                    {
+                        if (PartialFillColor != null)
+                        {
+                            drawList.AddRectFilledMultiColor(
+                                cursorPos + new Vector2(barSize.X * percentageEmpty, 0), cursorPos + barSize,
+                                PartialFillColor["gradientLeft"], PartialFillColor["gradientRight"], PartialFillColor["gradientRight"], PartialFillColor["gradientLeft"]
+                            );
+                        }
+                        else
+                        {
+                            drawList.AddRectFilledMultiColor(
+                                cursorPos + new Vector2(barSize.X * percentageEmpty, 0), cursorPos + barSize,
+                                ChunkColors[i]["gradientLeft"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientLeft"]
+                            );
+                        }
+
+                        currentFill -= (float) 1 / Parent.ChunkSizes.Length;
+                    }
+                    else
+                    {
+                        currentFill -= (float) 1 / Parent.ChunkSizes.Length;
                     }
                 }
 
@@ -200,7 +251,60 @@ namespace DelvUI.Interface.Bars
 
     public class BooleanInnerBar : InnerBar
     {
-        // TODO: Bar where any chunk can be filled without an order needed, for SAM stickers and other such bars
+        private bool[] _enableArray;
+        
+        public bool[] EnableArray
+        {
+            get => _enableArray;
+            set
+            {
+                var trues = 0;
+                
+                foreach (var val in value)
+                {
+                    trues += val ? 1 : 0;
+                }
+
+                CurrentValue = trues;
+                MaximumValue = value.Length;
+                _enableArray = value;
+            }
+        }
+
+        public override void Draw(ImDrawListPtr drawList)
+        {
+            var barWidth = Parent.BarWidth + Parent.ChunkPadding; // For loop adds one extra padding more than is needed
+            var barHeight = (float) 1 / Parent.InnerBars.Count * Parent.BarHeight;
+            var yPos = Parent.YPosition + (float) ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
+            var cursorPos = new Vector2(Parent.XPosition, yPos);
+
+            var i = 0;
+            foreach (var chunkSize in Parent.ChunkSizes)
+            {
+                var barSize = new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
+
+                if (EnableArray[i])
+                {
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + barSize,
+                        ChunkColors[i]["gradientLeft"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientLeft"]
+                    );
+                }
+                else
+                {
+                    if (PartialFillColor != null)
+                    {
+                        drawList.AddRectFilledMultiColor(
+                            cursorPos, cursorPos + barSize,
+                            PartialFillColor["gradientLeft"], PartialFillColor["gradientRight"], PartialFillColor["gradientRight"], PartialFillColor["gradientLeft"]
+                        );
+                    }
+                }
+
+                i++;
+                cursorPos += new Vector2(barWidth * chunkSize, 0);
+            }
+        }
     }
 
     public class BarText
@@ -226,6 +330,15 @@ namespace DelvUI.Interface.Bars
             Position = position;
             Type = type;
             Text = text;
+            Color = Vector4.One;
+            OutlineColor = new Vector4(0f, 0f, 0f, 1f);
+        }
+        
+        public BarText(BarTextPosition position, BarTextType type)
+        {
+            Position = position;
+            Type = type;
+            Text = null;
             Color = Vector4.One;
             OutlineColor = new Vector4(0f, 0f, 0f, 1f);
         }

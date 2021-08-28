@@ -13,6 +13,7 @@ using Dalamud.Game.ClientState.Structs;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.GameStructs;
+using DelvUI.Helpers;
 using FFXIVClientStructs;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Component.GUI;
