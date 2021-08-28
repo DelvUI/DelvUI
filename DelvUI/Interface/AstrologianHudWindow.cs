@@ -11,8 +11,6 @@ namespace DelvUI.Interface
     {
         public override uint JobId => 33;
 
-        private bool DivinationEnabled => PluginConfiguration.AstDivinationEnabled;
-
         private int DivinationHeight => PluginConfiguration.AstDivinationHeight;
 
         private int DivinationWidth => PluginConfiguration.AstDivinationWidth;
@@ -61,16 +59,15 @@ namespace DelvUI.Interface
         }
         private void DrawDivinationBar()
         {
-            //NOTE: Using FFXIVClientStructs may be a better solution to detect duplicate
+            //NOTE: Using FFXIVClientStructs may be a better solution to detect duplicate seals
             //https://github.com/aers/FFXIVClientStructs/blob/dd3ec0485395e23592303311bb29d0447e03f06d/FFXIVClientStructs/FFXIV/Client/Game/Gauge/JobGauges.cs#L33
 
-            //var gauge = PluginInterface.ClientState.JobGauges.Get<AstrologianGauge>();
             var gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
 
             var barWidth = (DivinationWidth / 3);
             BarSize = new Vector2(barWidth, DivinationHeight);
             BarCoords = new Vector2(DivinationBarX, DivinationBarY);
-            var cursorPos = new Vector2(CenterX + BarCoords.X, CenterY + BarCoords.Y - 71);
+            var cursorPos = new Vector2(CenterX + BarCoords.X, CenterY + BarCoords.Y - 58);
 
             var drawList = ImGui.GetWindowDrawList();
 
@@ -85,32 +82,6 @@ namespace DelvUI.Interface
             drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
 
-            /*foreach (AstrologianSeal mySeal in gauge.CurrentSeals) {
-                if (gauge.Seals[0] == 1)
-                {
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealSunColor["gradientRight"]);
-                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                    cursorPos = new Vector2(cursorPos.X + barWidth + DivinationBarPad, cursorPos.Y);
-                }
-                else if (gauge.Seals[0] == 2)
-                {
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealLunarColor["gradientRight"]);
-                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                    cursorPos = new Vector2(cursorPos.X + barWidth + DivinationBarPad, cursorPos.Y);
-                }
-                else if (gauge.Seals[0] == 3)
-                {
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealCelestialColor["gradientRight"]);
-                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                    cursorPos = new Vector2(cursorPos.X + barWidth + DivinationBarPad, cursorPos.Y);
-                }
-                else {
-                    //drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
-                }
-               
-            }*/
-
-            //DrawOutlinedText(string.Join(", ", gauge.Seals[0]), new Vector2(cursorPos.X + DivinationWidth / 2f - BarSize.X / 2f, cursorPos.Y - 2));
             if (gauge.ContainsSeal(SealType.SUN)) 
                 {
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealSunColor["gradientRight"]);
@@ -136,7 +107,7 @@ namespace DelvUI.Interface
 
             BarSize = new Vector2(DrawWidth, DrawHeight);
             BarCoords = new Vector2(DrawBarX, DrawBarY);
-            var cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y - 49);
+            var cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y - 37);
 
             var drawList = ImGui.GetWindowDrawList();
 
