@@ -42,7 +42,7 @@ namespace DelvUI.Interface
 
             ImGui.SetNextWindowSize(new Vector2(900, 600), ImGuiCond.Appearing);
 
-            if (!ImGui.Begin("DelvUI configuration", ref IsVisible)) {
+            if (!ImGui.Begin(" ", ref IsVisible, ImGuiWindowFlags.NoResize)) {
                 return;
             }
             var changed = false;
@@ -75,28 +75,27 @@ namespace DelvUI.Interface
                     ImGui.BeginGroup();
                     {
                         var subConfigs = configMap[selected];
-
-
-                        ImGui.BeginChild("item view",
-                            new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
-                        if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
+                        
+                        ImGui.BeginChild("item view",new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
                         {
-                            foreach (string sunConfig in subConfigs)
+                            if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
                             {
+                                foreach (string sunConfig in subConfigs)
+                                {
 
-                                if (!ImGui.BeginTabItem(sunConfig)) continue;
-                                ImGui.BeginChild("subconfig value", new Vector2(0, 0), true);
-                                ImGui.TextWrapped(sunConfig);
-                                ImGui.EndChild();
-                                ImGui.EndTabItem();
+                                    if (!ImGui.BeginTabItem(sunConfig)) continue;
+                                    ImGui.BeginChild("subconfig value", new Vector2(0, 0), true);
+                                    ImGui.TextWrapped(sunConfig);
+                                    ImGui.EndChild();
+                                    ImGui.EndTabItem();
+                                }
+
+                                ImGui.EndTabBar();
+                                
                             }
-
-                            ImGui.EndTabBar();
-
                         }
-
                         ImGui.EndChild();
-
+                        
                     }
                     ImGui.EndGroup();
                 }
@@ -104,7 +103,10 @@ namespace DelvUI.Interface
                 
                 ImGui.BeginGroup();
 
-                if (ImGui.Button("Lock HUD")) {}
+                if (ImGui.Button("Lock HUD"))
+                {
+                    IsVisible = false;
+                }
                 ImGui.SameLine();
                 if (ImGui.Button("Hide HUD")) {}                
                 ImGui.SameLine();
