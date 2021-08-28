@@ -2,7 +2,7 @@
 
 namespace DelvUI.Interface {
     public class UnitFrameOnlyHudWindow : HudWindow {
-        public override uint JobId => 23;
+        public override uint JobId => 0;
 
         public UnitFrameOnlyHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
