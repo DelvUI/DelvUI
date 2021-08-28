@@ -101,6 +101,7 @@
       <Compile Include="Interface\UnitframeOnlyHudWindow.cs" />
       <Compile Include="Interface\WarriorHudWindow.cs" />
       <Compile Include="Interface\WhiteMageHudWindow.cs" />
+      <Compile Include="Models\ActivePlayerActor.cs" />
       <Compile Include="Plugin.cs" />
       <Compile Include="PluginConfiguration.cs" />
     </ItemGroup>

@@ -25,8 +25,10 @@ namespace DelvUI {
         public bool ShieldHeightPixels = true;
         
         public bool ShieldEnabled = true;
-        
-        
+
+        public string HealthBarTextLeft = "[name:abbreviate]";
+        public string HealthBarTextRight = "[health:max-short] | [health:percent]";
+
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
         public int CastBarXOffset { get; set; } = 0;

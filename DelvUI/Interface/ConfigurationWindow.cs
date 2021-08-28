@@ -49,6 +49,20 @@ namespace DelvUI.Interface {
                         _pluginConfiguration.HealthBarWidth = healthBarWidth;
                         _pluginConfiguration.Save();
                     }
+                    
+                    var healthBarTextLeft = _pluginConfiguration.HealthBarTextLeft;
+                    if (ImGui.InputText("Health Text Left", ref healthBarTextLeft, 999))
+                    {
+                        _pluginConfiguration.HealthBarTextLeft = healthBarTextLeft;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var healthBarTextRight = _pluginConfiguration.HealthBarTextRight;
+                    if (ImGui.InputText("Health Text Right", ref healthBarTextRight, 999))
+                    {
+                        _pluginConfiguration.HealthBarTextRight = healthBarTextRight;
+                        _pluginConfiguration.Save();
+                    }
 
                     var primaryResourceHeight = _pluginConfiguration.PrimaryResourceBarHeight;
                     if (ImGui.DragInt("Primary Resource Height", ref primaryResourceHeight, .1f, 1, 1000))

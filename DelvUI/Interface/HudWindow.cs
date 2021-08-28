@@ -13,13 +13,14 @@ using Dalamud.Game.ClientState.Structs;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.GameStructs;
+using DelvUI.Models;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
+using static DelvUI.Models.ActivePlayerActor;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface {
-    
     public abstract class HudWindow {
         public bool IsVisible = true;
         protected readonly DalamudPluginInterface PluginInterface;
@@ -51,10 +52,12 @@ namespace DelvUI.Interface {
         private Lumina.Excel.GeneratedSheets.Action _lastUsedAction;
         private Mount _lastUsedMount;
         private Item _lastUsedItem;
+        private ActivePlayerActor _playerActor;
         
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {
             PluginInterface = pluginInterface;
             PluginConfiguration = pluginConfiguration;
+            _playerActor = new ActivePlayerActor(PluginInterface.ClientState.LocalPlayer, new[]{PluginConfiguration.HealthBarTextLeft, PluginConfiguration.HealthBarTextRight});
             //_barsize = new Vector2(BarWidth, BarHeight);
         }
 
@@ -69,13 +72,13 @@ namespace DelvUI.Interface {
 
            
             var cursorPos = new Vector2(CenterX - HealthBarWidth - XOffset, CenterY + YOffset);
-            DrawOutlinedText($"{actor.Name.Abbreviate().Truncate(16)}", new Vector2(cursorPos.X + 5, cursorPos.Y -22));
+            DrawOutlinedText($"{_playerActor.GenerateTextFromTags(PluginConfiguration.HealthBarTextLeft)}", new Vector2(cursorPos.X + 5, cursorPos.Y -22));
             
             var hp = $"{actor.MaxHp.KiloFormat(),6} | ";
             var hpSize = ImGui.CalcTextSize(hp);
             var percentageSize = ImGui.CalcTextSize("100");
-            DrawOutlinedText(hp, new Vector2(cursorPos.X + HealthBarWidth - hpSize.X - percentageSize.X - 5, cursorPos.Y -22));
-            DrawOutlinedText($"{(int)(scale * 100),3}", new Vector2(cursorPos.X + HealthBarWidth - percentageSize.X - 5, cursorPos.Y -22));
+            DrawOutlinedText(_playerActor.GenerateTextFromTags(PluginConfiguration.HealthBarTextRight), new Vector2(cursorPos.X + HealthBarWidth - hpSize.X - percentageSize.X - 5, cursorPos.Y -22));
+            //DrawOutlinedText($"{(int)(scale * 100),3}", new Vector2(cursorPos.X + HealthBarWidth - percentageSize.X - 5, cursorPos.Y -22));
             
             ImGui.SetCursorPos(cursorPos);
             
@@ -523,6 +526,12 @@ namespace DelvUI.Interface {
         }
         
         protected abstract void Draw(bool _);
+
+        protected virtual void HandleProperties()
+        {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null,  "PluginInterface.ClientState.LocalPlayer != null");
+            var actor = PluginInterface.ClientState.LocalPlayer;
+        }
 
         protected virtual unsafe bool ShouldBeVisible() {
 
