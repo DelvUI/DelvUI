@@ -26,10 +26,10 @@ namespace DelvUI.Interface
             _pluginInterface = pluginInterface;
             _pluginConfiguration = pluginConfiguration;
             configMap.Add("General", new [] {"General","Color Map"});
-            configMap.Add("Unitframes", new [] {"General", "Self", "Target", "Target of Target"});
-            configMap.Add("Castbar", new [] {"General", "Enemy Castbar"});
-            configMap.Add("Jobs", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"
-            });
+            configMap.Add("Individual Unitframes", new [] {"General", "Player", "Target", "Target of Target", "Focus"});
+            configMap.Add("Group Unitframes", new [] {"General", "Party", "8man", "24man", "Enemies"});
+            configMap.Add("Castbars", new [] {"General", "Player Castbar", "Enemy Castbar"});
+            configMap.Add("Jobs", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"});
 
         }
 
@@ -40,61 +40,80 @@ namespace DelvUI.Interface
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(1400, 900), ImGuiCond.Appearing);
+            ImGui.SetNextWindowSize(new Vector2(900, 600), ImGuiCond.Appearing);
 
             if (!ImGui.Begin("DelvUI configuration", ref IsVisible, ImGuiWindowFlags.MenuBar)) {
                 return;
             }
             var changed = false;
 
-            var viewportWidth = (int) ImGui.GetMainViewport().Size.X;
-            var viewportHeight = (int) ImGui.GetMainViewport().Size.Y;
-            var xOffsetLimit = viewportWidth / 2;
-            var yOffsetLimit = viewportHeight / 2;
-            if (ImGui.BeginTabBar("##settings-tabs"))
-            {
-                ImGui.Button("IMAGE GOES HERE");
 
-                 // Left
-                 {
-                     ImGui.BeginChild("left pane", new Vector2(150, 0), true);
-                     
-                     foreach (var config in configMap.Keys)
-                     {
-                         if (ImGui.Selectable( config, selected == config))
-                             selected = config;
-                     }
-                     ImGui.EndChild();
-                 }
-                 ImGui.SameLine();
 
-                 // Right
-                 {
-                     var subConfigs = configMap[selected];
+                ImGui.BeginGroup();
+                {
+                    ImGui.BeginGroup(); // Left
+                    {
+                        ImGui.Button("IMAGE GOES HERE");
+                        ImGui.Button("IMAGE GOES HERE");
 
-                     ImGui.BeginGroup();
-                     ImGui.BeginChild("item view", new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
-                     if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
-                     {
-                         foreach (string job in subConfigs)
-                         {
-                            if (!ImGui.BeginTabItem(job)) continue;
-                             ImGui.TextWrapped(job);
-                             ImGui.EndTabItem();
-                         }
+                        ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
 
-                         ImGui.EndTabBar();
-                     }
-                     ImGui.EndChild();
+                        foreach (var config in configMap.Keys)
+                        {
+                            if (ImGui.Selectable(config, selected == config))
+                                selected = config;
+                        }
 
-                 }
+                        ImGui.EndChild();
+
+
+                    }
+                    ImGui.EndGroup();
+
+                    ImGui.SameLine();
+
+                    // Right
+                    ImGui.BeginGroup();
+                    {
+                        var subConfigs = configMap[selected];
+
+
+                        ImGui.BeginChild("item view",
+                            new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+                        if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
+                        {
+                            foreach (string sunConfig in subConfigs)
+                            {
+
+                                if (!ImGui.BeginTabItem(sunConfig)) continue;
+                                ImGui.BeginChild("subconfig value", new Vector2(0, 0), true);
+                                ImGui.TextWrapped(sunConfig);
+                                ImGui.EndChild();
+                                ImGui.EndTabItem();
+                            }
+
+                            ImGui.EndTabBar();
+
+                        }
+
+                        ImGui.EndChild();
+
+                    }
+                    ImGui.EndGroup();
+                }
+                ImGui.EndGroup();
                 
+                ImGui.BeginGroup();
 
-            }
-            ImGui.EndTabBar();
-            if (ImGui.Button("Revert")) {}
-            ImGui.SameLine();
-            if (ImGui.Button("Save")) {}
+                if (ImGui.Button("Lock HUD")) {}
+                ImGui.SameLine();
+                if (ImGui.Button("Hide HUD")) {}                
+                ImGui.SameLine();
+                if (ImGui.Button("Reset HUD")) {}
+                 
+
+                ImGui.EndGroup();
+                
 
             if (changed)
             {
