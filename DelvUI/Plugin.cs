@@ -98,7 +98,9 @@ namespace DelvUI {
                 //Healers
                 Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SCH => new ScholarHudWindow(_pluginInterface, _pluginConfiguration),
-                
+                Jobs.AST => new AstrologianHudWindow(_pluginInterface, _pluginConfiguration),
+
+
                 //Melee DPS
                 Jobs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.MNK => new MonkHudWindow(_pluginInterface, _pluginConfiguration),
@@ -141,7 +143,6 @@ namespace DelvUI {
                 
                 //dont have packs yet
                 Jobs.NIN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.AST => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.DRG => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.BLU => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 _ => _hudWindow

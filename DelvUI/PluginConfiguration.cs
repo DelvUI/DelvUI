@@ -118,6 +118,20 @@ namespace DelvUI {
 
         #endregion
 
+        #region AST Configuration
+
+        public int ASTBaseXOffset { get; set; } = 127;
+        public int ASTBaseYOffset { get; set; } = 460;
+        public bool ASTDivinationEnabled = true;
+        public int ASTDivinationHeight { get; set; } = 20;
+        public int ASTDivinationWidth { get; set; } = 250;
+        public int ASTDivinationBarX { get; set; } = -42;
+        public int ASTDivinationBarY { get; set; } = 460;
+        public int ASTDivinationBarPad { get; set; } = 2;
+        public Vector4 ASTEmptyColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 53f / 100f);
+
+        #endregion
+
         #region SMN Configuration
 
         public int SmnRuinBarX { get; set; } = 127;
@@ -640,6 +654,14 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorAST.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorAST.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorAST.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000] = new Dictionary<string, uint> // Empty Bar Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTEmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTEmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTEmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTEmptyColor.AdjustColor(.1f))
                 },
 
                 [Jobs.MNK] = new Dictionary<string, uint>
