@@ -23,14 +23,8 @@
     <PropertyGroup>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-        <AssemblyName>DelvUINoDeps</AssemblyName>
+        <AssemblyName>DelvUI</AssemblyName>
     </PropertyGroup>
-    <ItemGroup>
-        <PackageReference Include="ILMerge" Version="3.0.41" />
-    </ItemGroup>
-    <Target Name="ILMerge" AfterTargets="PostBuildEvent">
-        <Exec Command="$(ILMergeConsolePath) /target:library /out:$(TargetDir)/../DelvUI.dll /log /lib:$(APPDATA)\XIVLauncher\addon\Hooks\5.2.7.0 $(TargetDir)DelvUINoDeps.dll $(TargetDir)FFXIVClientStructs.dll&#xD;&#xA;powershell -Command &quot;Remove-Item '$(TargetDir)\*.*';Move-Item '$(TargetDir)\..\DelvUI.*' -Destination '$(TargetDir)';&quot;" />
-    </Target>
     <ItemGroup>
         <Reference Include="Dalamud">
             <Private>false</Private>
@@ -62,4 +56,14 @@
             <HintPath>$(APPDATA)\XIVLauncher\addon\Hooks\5.2.7.0\Lumina.Excel.dll</HintPath>
         </Reference>
     </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="ILRepack" Version="2.1.0-beta1" GeneratePathProperty="true" />
+    </ItemGroup>
+    <Target Name="ILRepack" AfterTargets="PostBuildEvent">
+        <ItemGroup>
+            <InputAssemblies Include="$(TargetPath)" />
+            <InputAssemblies Include="$(TargetDir)*.dll" Exclude="$(TargetPath)" />
+        </ItemGroup>
+        <Exec Command="$(PkgILRepack)\tools\ILRepack.exe /lib:$(AppData)\XIVLauncher\addon\Hooks\5.2.7.0 /out:$(TargetDir)..\$(Configuration).ILMerge\$(TargetFileName) @(InputAssemblies, ' ')" />
+    </Target>
 </Project>
