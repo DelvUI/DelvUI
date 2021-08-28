@@ -13,6 +13,8 @@ using Dalamud.Game.ClientState.Structs;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.GameStructs;
+using FFXIVClientStructs;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -62,10 +64,15 @@ namespace DelvUI.Interface {
         private Mount _lastUsedMount;
         private Item _lastUsedItem;
         
+        private delegate void OpenContextMenuFromTarget(IntPtr agentHud, IntPtr gameObject);
+        private OpenContextMenuFromTarget openContextMenuFromTarget;
+        
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {
             PluginInterface = pluginInterface;
             PluginConfiguration = pluginConfiguration;
             //_barsize = new Vector2(BarWidth, BarHeight);
+            
+            openContextMenuFromTarget = Marshal.GetDelegateForFunctionPointer<OpenContextMenuFromTarget>(PluginInterface.TargetModuleScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
         }
 
         protected virtual void DrawHealthBar() {
@@ -129,50 +136,59 @@ namespace DelvUI.Interface {
         }
         
         protected virtual void DrawTargetBar() {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            unsafe
+            {
+                var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (target is null) {
-                return;
-            }
+                if (target is null) {
+                    return;
+                }
 
-            _barSize = new Vector2(TargetBarWidth, TargetBarHeight);
+                _barSize = new Vector2(TargetBarWidth, TargetBarHeight);
 
             var cursorPos = new Vector2(CenterX + TargetBarXOffset, CenterY + TargetBarYOffset);
             ImGui.SetCursorPos(cursorPos);
             var drawList = ImGui.GetWindowDrawList();
 
-            if (!(target is Chara actor)) {
-                var friendly = PluginConfiguration.NPCColorMap["friendly"];
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, friendly["background"]);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(TargetBarWidth, TargetBarHeight), 
-                    friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"], friendly["gradientLeft"]
-                );
-                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                if (!(target is Chara actor)) {
+                    var friendly = PluginConfiguration.NPCColorMap["friendly"];
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, friendly["background"]);
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(TargetBarWidth, TargetBarHeight), 
+                        friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"], friendly["gradientLeft"]
+                    );
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                }
+                else {
+                    var scale = actor.MaxHp > 0f ? (float) actor.CurrentHp / actor.MaxHp : 0f;
+                    var colors = DetermineTargetPlateColors(actor);
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(TargetBarWidth * scale, TargetBarHeight), 
+                        colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+                    );
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+
+                    var percentage = $"{(int) (scale * 100),3}";
+                    var percentageSize = ImGui.CalcTextSize(percentage);
+                    var maxPercentageSize = ImGui.CalcTextSize("100");
+                    DrawOutlinedText(percentage, new Vector2(cursorPos.X + 5 + maxPercentageSize.X - percentageSize.X, cursorPos.Y - 22));
+                    DrawOutlinedText($" | {actor.MaxHp.KiloFormat(),-6}", new Vector2(cursorPos.X + 5 + maxPercentageSize.X, cursorPos.Y - 22));
+                }
+
+                var name = $"{target.Name.Abbreviate().Truncate(16)}";
+                var nameSize = ImGui.CalcTextSize(name);
+                DrawOutlinedText(name, new Vector2(cursorPos.X + TargetBarWidth - nameSize.X - 5, cursorPos.Y - 22));
+                DrawTargetShield(target, cursorPos, BarSize, true);
+
+                if (ImGui.GetIO().MouseClicked[1]) {
+                    Resolver.Initialize();
+                    var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
+                    openContextMenuFromTarget(agentHud, target.Address);
+                }
+
+                DrawTargetOfTargetBar(target.TargetActorID);
             }
-            else {
-                var scale = actor.MaxHp > 0f ? (float) actor.CurrentHp / actor.MaxHp : 0f;
-                var colors = DetermineTargetPlateColors(actor);
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(TargetBarWidth * scale, TargetBarHeight), 
-                    colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
-                );
-                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-
-                var percentage = $"{(int) (scale * 100),3}";
-                var percentageSize = ImGui.CalcTextSize(percentage);
-                var maxPercentageSize = ImGui.CalcTextSize("100");
-                DrawOutlinedText(percentage, new Vector2(cursorPos.X + 5 + maxPercentageSize.X - percentageSize.X, cursorPos.Y - 22));
-                DrawOutlinedText($" | {actor.MaxHp.KiloFormat(),-6}", new Vector2(cursorPos.X + 5 + maxPercentageSize.X, cursorPos.Y - 22));
-            }
-
-            var name = $"{target.Name.Abbreviate().Truncate(16)}";
-            var nameSize = ImGui.CalcTextSize(name);
-            DrawOutlinedText(name, new Vector2(cursorPos.X + TargetBarWidth - nameSize.X - 5, cursorPos.Y - 22));
-            DrawTargetShield(target, cursorPos, BarSize, true);
-
-            DrawTargetOfTargetBar(target.TargetActorID);
         }
         protected virtual void DrawFocusBar() {
             var focus = PluginInterface.ClientState.Targets.FocusTarget;
