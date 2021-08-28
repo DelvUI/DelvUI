@@ -183,12 +183,10 @@ namespace DelvUI {
 
         public int AstBaseXOffset { get; set; } = 127;
         public int AstBaseYOffset { get; set; } = 460;
-
         public int AstDrawBarHeight { get; set; } = 20;
         public int AstDrawBarWidth { get; set; } = 254;
         public int AstDrawBarX { get; set; } = 127;
         public int AstDrawBarY { get; set; } = 460;
-
         public bool AstDivinationEnabled = true;
         public int AstDivinationHeight { get; set; } = 20;
         public int AstDivinationWidth { get; set; } = 250;
@@ -199,6 +197,7 @@ namespace DelvUI {
         public Vector4 AstSealSunColor = new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f);
         public Vector4 AstSealLunarColor = new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f);
         public Vector4 AstSealCelestialColor = new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f);
+        
         #endregion
 
         #region SMN Configuration
