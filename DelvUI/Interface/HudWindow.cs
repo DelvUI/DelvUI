@@ -257,7 +257,7 @@ namespace DelvUI.Interface {
             Actor target = null;
             if (targetActorId == 0)
             {
-                //target = PluginInterface.ClientState.LocalPlayer;
+                target = PluginInterface.ClientState.LocalPlayer;
             }
             else
             {
@@ -267,11 +267,9 @@ namespace DelvUI.Interface {
                     }
                 }
             }
-
             
-            if (!(target is Chara actor)) {
-                return;
-            }
+            if (target is not Chara actor) return;
+            
             
             var barSize = new Vector2(ToTBarWidth, ToTBarHeight);
 
