@@ -1604,6 +1604,129 @@ namespace DelvUI.Interface
                     ImGui.EndTabItem();
                 }
 
+                if (ImGui.BeginTabItem("Samurai"))
+                {
+                    var SAMGaugeXOffset = _pluginConfiguration.SAMGaugeXOffset;
+                    if (ImGui.DragInt("Gauge-Bar X Offset", ref SAMGaugeXOffset, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SAMGaugeXOffset = SAMGaugeXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMGaugeYOffset = _pluginConfiguration.SAMGaugeYOffset;
+                    if (ImGui.DragInt("Gauge-Bar Y Offset", ref SAMGaugeYOffset, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SAMGaugeYOffset = SAMGaugeYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMGaugeHeight = _pluginConfiguration.SAMGaugeHeight;
+                    if (ImGui.DragInt("Gauge Bar Height", ref SAMGaugeHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SAMGaugeHeight = SAMGaugeHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMGaugeWidth = _pluginConfiguration.SAMGaugeWidth;
+                    if (ImGui.DragInt("Gauge Bar Width", ref SAMGaugeWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SAMGaugeWidth = SAMGaugeWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMGaugeEnabled = _pluginConfiguration.SAMGaugeEnabled;
+                    if (ImGui.Checkbox("SAM Gauge Enabled", ref SAMGaugeEnabled))
+                    {
+                        _pluginConfiguration.SAMGaugeEnabled = SAMGaugeEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMSenXOffset = _pluginConfiguration.SAMSenXOffset;
+                    if (ImGui.DragInt("Sen-Bar X Offset", ref SAMSenXOffset, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SAMSenXOffset = SAMSenXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMSenYOffset = _pluginConfiguration.SAMSenYOffset;
+                    if (ImGui.DragInt("Sen-Bar Y Offset", ref SAMSenYOffset, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SAMSenYOffset = SAMSenYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMSenHeight = _pluginConfiguration.SAMSenHeight;
+                    if (ImGui.DragInt("Sen-Bar Height", ref SAMSenHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SAMSenHeight = SAMSenHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMSenWidth = _pluginConfiguration.SAMSenWidth;
+                    if (ImGui.DragInt("Sen-Bar Width", ref SAMSenWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SAMSenWidth = SAMSenWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMSenPadding = _pluginConfiguration.SAMSenPadding;
+                    if (ImGui.DragInt("Sen Bar Padding", ref SAMSenPadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SAMSenPadding = SAMSenPadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMSenEnabled = _pluginConfiguration.SAMSenEnabled;
+                    if (ImGui.Checkbox("SAM Sen Enabled", ref SAMSenEnabled))
+                    {
+                        _pluginConfiguration.SAMSenEnabled = SAMSenEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMMeditationXOffset = _pluginConfiguration.SAMMeditationXOffset;
+                    if (ImGui.DragInt("Meditation-Bar X Offset", ref SAMMeditationXOffset, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SAMMeditationXOffset = SAMMeditationXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMMeditationYOffset = _pluginConfiguration.SAMMeditationYOffset;
+                    if (ImGui.DragInt("Meditation-Bar Y Offset", ref SAMMeditationYOffset, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SAMMeditationYOffset = SAMMeditationYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMMeditationHeight = _pluginConfiguration.SAMMeditationHeight;
+                    if (ImGui.DragInt("Meditation-Bar Height", ref SAMMeditationHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SAMMeditationHeight = SAMMeditationHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMMeditationWidth = _pluginConfiguration.SAMMeditationWidth;
+                    if (ImGui.DragInt("Meditation-Bar Width", ref SAMMeditationWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SAMMeditationWidth = SAMMeditationWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMMeditationPadding = _pluginConfiguration.SAMMeditationPadding;
+                    if (ImGui.DragInt("Meditation Bar Padding", ref SAMMeditationPadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SAMMeditationPadding = SAMMeditationPadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMMeditationEnabled = _pluginConfiguration.SAMMeditationEnabled;
+                    if (ImGui.Checkbox("SAM Meditation Enabled", ref SAMMeditationEnabled))
+                    {
+                        _pluginConfiguration.SAMMeditationEnabled = SAMMeditationEnabled;
+                        _pluginConfiguration.Save();
+                    }
+                    ImGui.EndTabItem();
+                }
+
                 if (ImGui.BeginTabItem("Red Mage"))
                 {
                     var RDMVerticalOffset = _pluginConfiguration.RDMVerticalOffset;

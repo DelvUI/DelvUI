@@ -179,6 +179,28 @@ namespace DelvUI {
 
         #endregion
 
+        #region SAM Configuration
+
+        public bool SAMGaugeEnabled { get; set; } = true;
+        public int SAMGaugeYOffset { get; set; } = -86;
+        public int SAMGaugeXOffset { get; set; } = 1;
+        public int SAMGaugeHeight { get; set; } = 20;
+        public int SAMGaugeWidth { get; set; } = 249;
+        public int SAMSenPadding { get; set; } = 3;
+        public bool SAMSenEnabled { get; set; } = true;
+        public int SAMSenYOffset { get; set; } = 416;
+        public int SAMSenXOffset { get; set; } = 159;
+        public int SAMSenHeight { get; set; } = 20;
+        public int SAMSenWidth { get; set; } = 250;
+        public bool SAMMeditationEnabled { get; set; } = true;
+        public int SAMMeditationPadding { get; set; } = 3;
+        public int SAMMeditationYOffset { get; set; } = 419;
+        public int SAMMeditationXOffset { get; set; } = 159;
+        public int SAMMeditationHeight { get; set; } = 20;
+        public int SAMMeditationWidth { get; set; } = 250;
+
+        #endregion
+
         #region SMN Configuration
 
         public int SmnRuinBarX { get; set; } = 127;

@@ -1,15 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
+using System.Collections.Generic;
 using System.Numerics;
+using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Plugin;
 using ImGuiNET;
 
-namespace DelvUI.Interface {
-    public class SamuraiHudWindow : HudWindow {
+namespace DelvUI.Interface
+{
+    public class SamuraiHudWindow : HudWindow
+    {
 
         public override uint JobId => 34;
         private int SamHiganbanaBarX => PluginConfiguration.SamHiganbanaBarX;
@@ -48,14 +50,27 @@ namespace DelvUI.Interface {
         private Dictionary<string, uint> SamEmptyColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 8]; 
         private Dictionary<string, uint> SamExpiryColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 9];
 
+        private bool GaugeEnabled => PluginConfiguration.SAMGaugeEnabled;
+
+        private bool SenEnabled => PluginConfiguration.SAMSenEnabled;
+        protected int SenPadding => PluginConfiguration.SAMSenPadding;
+
+
+        private bool MeditationEnabled => PluginConfiguration.SAMMeditationEnabled;
+        protected int MeditationPadding => PluginConfiguration.SAMMeditationPadding;
+
 
         public SamuraiHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
-        protected override void Draw(bool _) {
+        protected override void Draw(bool _)
+        {
             DrawHealthBar();
-            DrawKenkiBar();
-            DrawSenResourceBar();
-            DrawMeditationResourceBar();
+            if (GaugeEnabled)
+                DrawKenkiBar();
+            if (SenEnabled)
+                DrawSenResourceBar();
+            if (MeditationEnabled)
+                DrawMeditationResourceBar();
             DrawTargetBar();
             DrawFocusBar();
             DrawCastBar();
@@ -87,7 +102,6 @@ namespace DelvUI.Interface {
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             var textSize = ImGui.CalcTextSize(gauge.Kenki.ToString());
             DrawOutlinedText(gauge.Kenki.ToString(), new Vector2(cursorPos.X + SamKenkiBarWidth / 2f - textSize.X / 2f, cursorPos.Y-2));
-
         }
 
         private void DrawHiganbanaBar()
@@ -224,7 +238,7 @@ namespace DelvUI.Interface {
             else drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["base"]);
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
-    
+
 
         private void DrawMeditationResourceBar()
         {
@@ -243,7 +257,7 @@ namespace DelvUI.Interface {
             // Meditation Stacks
             for (var i = 1; i < 4; i++)
             {
-                cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
+                cursorPos = new Vector2(cursorPos.X + MeditationPadding + MeditationBarWidth, cursorPos.Y);
 
                 if (gauge.MeditationStacks >= i)
                 {
@@ -253,8 +267,7 @@ namespace DelvUI.Interface {
                 {
                     drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["base"]);
                 }
-
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+                drawList.AddRect(cursorPos, cursorPos + MeditationBarSize, 0xFF000000);
             }
         }
     }
