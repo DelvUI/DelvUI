@@ -74,6 +74,8 @@ namespace DelvUI.Interface {
         protected int MPTickerWidth => PluginConfiguration.MPTickerWidth;
         protected int MPTickerXOffset => PluginConfiguration.MPTickerXOffset;
         protected int MPTickerYOffset => PluginConfiguration.MPTickerYOffset;
+        protected bool MPTickerShowBorder => PluginConfiguration.MPTickerShowBorder;
+        protected bool MPTickerHideOnFullMp => PluginConfiguration.MPTickerHideOnFullMp;
 
         protected int CastBarWidth => PluginConfiguration.CastBarWidth;
         protected int CastBarHeight => PluginConfiguration.CastBarHeight;
@@ -538,6 +540,16 @@ namespace DelvUI.Interface {
                 return;
             }
 
+            if (MPTickerHideOnFullMp)
+            {
+                Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+                var actor = PluginInterface.ClientState.LocalPlayer;
+                if (actor.CurrentMp >= actor.MaxMp)
+                {
+                    return;
+                }
+            }
+
             if (mpTickHelper == null)
             {
                 mpTickHelper = new MpTickHelper(PluginInterface);
@@ -554,15 +566,21 @@ namespace DelvUI.Interface {
                 scale = 1;
             }
 
+            var fullSize = new Vector2(MPTickerWidth, MPTickerHeight);
             var barSize = new Vector2(Math.Max(1f, MPTickerWidth * scale), MPTickerHeight);
             var position = new Vector2(CenterX + MPTickerXOffset - MPTickerWidth / 2f, CenterY + MPTickerYOffset);
             var colors = PluginConfiguration.MPTickerColorMap["mpTicker"];
 
             var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(position, position + new Vector2(MPTickerWidth, MPTickerHeight), 0x88000000);
+            drawList.AddRectFilled(position, position + fullSize, 0x88000000);
             drawList.AddRectFilledMultiColor(position, position + barSize,
                 colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
             );
+
+            if (MPTickerShowBorder)
+            {
+                drawList.AddRect(position, position + fullSize, 0xFF000000);
+            }
         }
 
         protected unsafe virtual float ActorShieldValue(Actor actor) {

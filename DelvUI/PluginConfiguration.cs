@@ -69,6 +69,8 @@ namespace DelvUI {
         public int MPTickerWidth { get; set; } = 254;
         public int MPTickerXOffset { get; set; } = 0;
         public int MPTickerYOffset { get; set; } = 470;
+        public bool MPTickerShowBorder = false;
+        public bool MPTickerHideOnFullMp = false;
 
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;

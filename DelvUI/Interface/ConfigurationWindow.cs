@@ -332,33 +332,35 @@ namespace DelvUI.Interface
                     changed |= ImGui.Checkbox("Show MP Ticker", ref _pluginConfiguration.MPTickerEnabled);
 
                     var mpTickerHeight = _pluginConfiguration.MPTickerHeight;
-                    if (ImGui.DragInt("MPTicker Height", ref mpTickerHeight, .1f, 1, 1000))
+                    if (ImGui.DragInt("MP Ticker Height", ref mpTickerHeight, .1f, 1, 1000))
                     {
                         _pluginConfiguration.MPTickerHeight = mpTickerHeight;
                         _pluginConfiguration.Save();
                     }
 
                     var mpTickerWidth = _pluginConfiguration.MPTickerWidth;
-                    if (ImGui.DragInt("MPTicker Width", ref mpTickerWidth, .1f, 1, 1000))
+                    if (ImGui.DragInt("MP Ticker Width", ref mpTickerWidth, .1f, 1, 1000))
                     {
                         _pluginConfiguration.MPTickerWidth = mpTickerWidth;
                         _pluginConfiguration.Save();
                     }
 
                     var mpTickerXOffset = _pluginConfiguration.MPTickerXOffset;
-                    if (ImGui.DragInt("MPTicker X Offset", ref mpTickerXOffset, 1f, -2000, 2000))
+                    if (ImGui.DragInt("MP Ticker X Offset", ref mpTickerXOffset, 1f, -2000, 2000))
                     {
                         _pluginConfiguration.MPTickerXOffset = mpTickerXOffset;
                         _pluginConfiguration.Save();
                     }
 
                     var mpTickerYOffset = _pluginConfiguration.MPTickerYOffset;
-                    if (ImGui.DragInt("MPTicker Y Offset", ref mpTickerYOffset, 1f, -2000, 2000))
+                    if (ImGui.DragInt("MP Ticker Y Offset", ref mpTickerYOffset, 1f, -2000, 2000))
                     {
                         _pluginConfiguration.MPTickerYOffset = mpTickerYOffset;
                         _pluginConfiguration.Save();
                     }
 
+                    changed |= ImGui.Checkbox("Show MP Ticker border", ref _pluginConfiguration.MPTickerShowBorder);
+                    changed |= ImGui.Checkbox("Hide MP Ticker on full mp", ref _pluginConfiguration.MPTickerHideOnFullMp);
                     changed |= ImGui.ColorEdit4("MP Ticker Color", ref _pluginConfiguration.MPTickerColor);
 
                     changed |= ImGui.Checkbox("Hide HUD", ref _pluginConfiguration.HideHud);
