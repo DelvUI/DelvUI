@@ -57,11 +57,6 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _)
         {
-            DrawHealthBar();
-            if (ShowPrimaryResourceBar)
-            {
-                DrawPrimaryResourceBar();
-            }
             if (ShowFairyBar)
             {
                 DrawFairyBar();
@@ -74,9 +69,16 @@ namespace DelvUI.Interface
             {
                 DrawAetherBar();
             }
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
+        }
+
+        protected override void DrawPrimaryResourceBar()
+        {
+            if (!ShowPrimaryResourceBar)
+            {
+                return;
+            }
+
+            base.DrawPrimaryResourceBar();
         }
 
         private void DrawFairyBar()

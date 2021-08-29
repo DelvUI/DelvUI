@@ -40,20 +40,19 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _)
         {
-            DrawHealthBar();
-            if (GaugeEnabled)
-                DrawPrimaryResourceBar();
             if (SenEnabled)
                 DrawSenResourceBar();
             if (MeditationEnabled)
                 DrawMeditationResourceBar();
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
         }
 
         protected override void DrawPrimaryResourceBar()
         {
+            if (!GaugeEnabled)
+            {
+                return;
+            }
+
             var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
 
             var xPos = CenterX - XOffset + GaugeXOffset;

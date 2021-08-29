@@ -61,8 +61,6 @@ namespace DelvUI.Interface {
         public DarkKnightHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _) {
-            DrawHealthBar();
-
             var nextHeight = 0;
             if (ManaBarEnabled)
                 nextHeight = DrawManaBar(nextHeight);
@@ -72,10 +70,9 @@ namespace DelvUI.Interface {
                 nextHeight = DrawBuffBar(nextHeight);
             if (LivingShadowBarEnabled)
                 DrawLivingShadowBar(nextHeight);
-
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
+        }
+        protected override void DrawPrimaryResourceBar()
+        {
         }
 
         private int DrawManaBar(int initialHeight) {

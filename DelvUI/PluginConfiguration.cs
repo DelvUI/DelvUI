@@ -66,7 +66,6 @@ namespace DelvUI {
         public int MPTickerWidth { get; set; } = 254;
         public int MPTickerXOffset { get; set; } = 0;
         public int MPTickerYOffset { get; set; } = 470;
-        public Vector4 MPTickerColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f);
 
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
@@ -85,6 +84,7 @@ namespace DelvUI {
         public Vector4 CastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,100f/100f);
         public Vector4 SlideCastColor = new Vector4(255f/255f,0f/255f,0f/255f,100f/100f);
         public Vector4 ShieldColor = new Vector4(255f/255f,255f/255f,0f/255f,100f/100f);
+        public Vector4 MPTickerColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f);
 
         public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,100f/100f);
         public Vector4 JobColorWAR = new Vector4(153f/255f,23f/255f,23f/255f,100f/100f);

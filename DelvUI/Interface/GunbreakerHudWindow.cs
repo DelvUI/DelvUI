@@ -15,11 +15,10 @@ namespace DelvUI.Interface {
         public GunbreakerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _) {
-            DrawHealthBar();
             DrawPowderGauge();
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
+        }
+        protected override void DrawPrimaryResourceBar()
+        {
         }
 
         private void DrawPowderGauge() {

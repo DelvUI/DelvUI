@@ -72,9 +72,8 @@ namespace DelvUI.Interface {
 
         protected int MPTickerHeight => PluginConfiguration.MPTickerHeight;
         protected int MPTickerWidth => PluginConfiguration.MPTickerWidth;
-        protected int MPTickerXOffset => PluginConfiguration.MPTickerHeight;
-        protected int MPTickerYOffset => PluginConfiguration.MPTickerHeight;
-        protected int MPTickerXHeight => PluginConfiguration.MPTickerHeight;
+        protected int MPTickerXOffset => PluginConfiguration.MPTickerXOffset;
+        protected int MPTickerYOffset => PluginConfiguration.MPTickerYOffset;
 
         protected int CastBarWidth => PluginConfiguration.CastBarWidth;
         protected int CastBarHeight => PluginConfiguration.CastBarHeight;
@@ -555,6 +554,7 @@ namespace DelvUI.Interface {
             var colors = PluginConfiguration.MPTickerColorMap["mpTicker"];
 
             var drawList = ImGui.GetWindowDrawList();
+            drawList.AddRectFilled(position, position + new Vector2(MPTickerWidth, MPTickerHeight), 0x88000000);
             drawList.AddRectFilledMultiColor(position, position + barSize,
                 colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
             );
@@ -643,9 +643,21 @@ namespace DelvUI.Interface {
                 return;
             }
 
+            DrawGenericElements();
+
             Draw(true);
 
             ImGui.End();
+        }
+        
+        protected void DrawGenericElements()
+        {
+            DrawHealthBar();
+            DrawPrimaryResourceBar();
+            DrawTargetBar();
+            DrawFocusBar();
+            DrawCastBar();
+            DrawMPTicker();
         }
 
         protected abstract void Draw(bool _);
