@@ -700,7 +700,6 @@ namespace DelvUI.Interface
                         _pluginConfiguration.SamHiganbanaBarWidth = samHiganbanaBarWidth;
                         _pluginConfiguration.Save();
                     }
-
                     var samBuffsBarX = _pluginConfiguration.SamBuffsBarX;
                     if (ImGui.DragInt("Shifu/Jinpu X Offset", ref samBuffsBarX, .1f, -1000, 1000))
                     {
@@ -866,6 +865,27 @@ namespace DelvUI.Interface
                     if (ImGui.Checkbox("Jinpu/Shifu Enabled", ref SAMBuffsEnabled))
                     {
                         _pluginConfiguration.SAMBuffsEnabled = SAMBuffsEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMKenkiText = _pluginConfiguration.SAMKenkiText;
+                    if (ImGui.Checkbox("Show Current Kenki", ref SAMKenkiText))
+                    {
+                        _pluginConfiguration.SAMKenkiText = SAMKenkiText;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMHiganbanaText = _pluginConfiguration.SAMHiganbanaText;
+                    if (ImGui.Checkbox("Show Higanbana Duration Text", ref SAMHiganbanaText))
+                    {
+                        _pluginConfiguration.SAMHiganbanaText = SAMHiganbanaText;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMBuffText = _pluginConfiguration.SAMBuffText;
+                    if (ImGui.Checkbox("Show Jinpu/Shifu Duration Text", ref SAMBuffText))
+                    {
+                        _pluginConfiguration.SAMBuffText = SAMBuffText;
                         _pluginConfiguration.Save();
                     }
 
