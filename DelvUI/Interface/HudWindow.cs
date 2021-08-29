@@ -143,8 +143,8 @@ namespace DelvUI.Interface {
                           PluginInterface.ClientState.Targets.SetCurrentTarget(actor);
                       }
 
-                      ImGui.EndChild();
                   }
+                  ImGui.EndChild();
                   ImGui.End();
                   DrawTargetShield(actor, cursorPos, _barSize, true);
 
@@ -349,9 +349,9 @@ namespace DelvUI.Interface {
                 
                 if (ImGui.GetIO().MouseClicked[0] && ImGui.IsMouseHoveringRect(cursorPos, cursorPos + barSize)) {
                     PluginInterface.ClientState.Targets.SetCurrentTarget(target);
-                }            
-                ImGui.EndChild();
+                }
             }
+            ImGui.EndChild();
             ImGui.End();
             
             DrawTargetShield(target, cursorPos, barSize, true);
