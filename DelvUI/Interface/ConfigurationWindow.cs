@@ -40,9 +40,9 @@ namespace DelvUI.Interface
             if (!IsVisible) {
                 return;
             }
-            //TODO
+            //Todo
             //ImGui.GetIO().FontGlobalScale;
-            ImGui.SetNextWindowSize(ImGuiHelpers.S(900, 600), ImGuiCond.Appearing);
+            ImGui.SetNextWindowSize(new Vector2(900, 600), ImGuiCond.Appearing);
 
 
             if (!ImGui.Begin("titlebar", ref IsVisible, ImGuiWindowFlags.NoTitleBar)) {
