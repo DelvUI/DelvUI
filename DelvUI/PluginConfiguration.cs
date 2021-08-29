@@ -181,8 +181,6 @@ namespace DelvUI {
 
         #region AST Configuration
 
-        public int AstBaseXOffset { get; set; } = 127;
-        public int AstBaseYOffset { get; set; } = 460;
         public int AstDrawBarHeight { get; set; } = 20;
         public int AstDrawBarWidth { get; set; } = 254;
         public int AstDrawBarX { get; set; } = 127;
@@ -193,6 +191,9 @@ namespace DelvUI {
         public int AstDivinationBarX { get; set; } = -42;
         public int AstDivinationBarY { get; set; } = 460;
         public int AstDivinationBarPad { get; set; } = 2;
+        public bool AstShowDivinationBar = true;
+        public bool AstShowDrawBar = true;
+        public bool AstShowPrimaryResourceBar = true;
         public Vector4 AstEmptyColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 53f / 100f);
         public Vector4 AstSealSunColor = new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f);
         public Vector4 AstSealLunarColor = new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f);

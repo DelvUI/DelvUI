@@ -12,33 +12,27 @@ namespace DelvUI.Interface
         public override uint JobId => 33;
 
         private int DivinationHeight => PluginConfiguration.AstDivinationHeight;
-
         private int DivinationWidth => PluginConfiguration.AstDivinationWidth;
-
         private int DivinationBarX => PluginConfiguration.AstDivinationBarX;
-
         private int DivinationBarY => PluginConfiguration.AstDivinationBarY;
-
         private int DivinationBarPad => PluginConfiguration.AstDivinationBarPad;
 
         private int DrawHeight => PluginConfiguration.AstDrawBarHeight;
-
         private int DrawWidth => PluginConfiguration.AstDrawBarWidth;
-
         private int DrawBarX => PluginConfiguration.AstDrawBarX;
-
         private int DrawBarY => PluginConfiguration.AstDrawBarY;
+
+        private bool ShowDivinationBar => PluginConfiguration.AstShowDivinationBar;
+        private bool ShowDrawBar => PluginConfiguration.AstShowDrawBar;
+        private bool ShowPrimaryResourceBar => PluginConfiguration.AstShowPrimaryResourceBar;
 
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000];
 
         private Dictionary<string, uint> SealSunColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 1];
-
         private Dictionary<string, uint> SealLunarColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 2];
-
         private Dictionary<string, uint> SealCelestialColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 3];
 
         private new Vector2 BarSize { get; set; }
-
         private Vector2 BarCoords { get; set; }
 
         public AstrologianHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
@@ -46,9 +40,18 @@ namespace DelvUI.Interface
         protected override void Draw(bool _)
         {
             DrawHealthBar();
-            DrawPrimaryResourceBar();
-            DrawDivinationBar();
-            DrawDraw();
+            if (ShowPrimaryResourceBar)
+            {
+                DrawPrimaryResourceBar();
+            }
+            if (ShowDivinationBar)
+            {
+                DrawDivinationBar();
+            }
+            if (ShowDrawBar)
+            {
+                DrawDraw();
+            }
             DrawTargetBar();
             DrawFocusBar();
             DrawCastBar();
