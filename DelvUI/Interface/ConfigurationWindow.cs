@@ -15,7 +15,9 @@ namespace DelvUI.Interface
         private readonly DalamudPluginInterface _pluginInterface;
         private readonly PluginConfiguration _pluginConfiguration;
         private string selected = "Individual Unitframes";
+        private string selectedColorType = "Tanks";
         private Dictionary<string, Array> configMap = new Dictionary<string, Array>() ;
+        private string[] configColorMap = new[] {"Tanks", "Healers", "Melee", "Ranged", "Casters", "NPC"};
         private bool changed;
         private int viewportWidth = (int) ImGui.GetMainViewport().Size.X;
         private int viewportHeight = (int) ImGui.GetMainViewport().Size.Y;
@@ -30,7 +32,12 @@ namespace DelvUI.Interface
             _pluginInterface = pluginInterface;
             _pluginConfiguration = pluginConfiguration;
             //configMap.Add("General", new [] {"General"});
-            configMap.Add("Individual Unitframes", new [] {"General","Colors", "Shields", "Player", "Target", "Target of Target", "Focus"});
+            configMap.Add("Individual Unitframes", new []
+            {
+                "General",
+                //"Colors", "Shields", 
+                "Player", "Focus", "Target", "Target of Target"
+            });
             //configMap.Add("Group Unitframes", new [] {"General", "Party", "8man", "24man", "Enemies"});
             configMap.Add("Castbars", new [] {
                 //"General", 
@@ -176,9 +183,6 @@ namespace DelvUI.Interface
                         //TODO NEST COLOR MAP AND SHIELDS ON GENERAL
                         case "General":
                             DrawIndividualUnitFramesGeneralConfig();
-                            break;   
-                        case "Colors":
-                            DrawGeneralColorMapConfig();
                             break;
                         case "Shields":
                             DrawIndividualUnitFramesShieldsConfig();
@@ -264,115 +268,204 @@ namespace DelvUI.Interface
 
         }
 
-        private void DrawGeneralColorMapConfig()
-        {
-            if (ImGui.BeginTabBar("##ColorTabs", ImGuiTabBarFlags.None))
-            {
-                if (ImGui.BeginTabItem("Tanks"))
-                {                            
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Paladin");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorPLD);
-                    
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Warrior");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorWAR);
-                    
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Dark Knight");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorDRK);
-                    
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Gunbreaker");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorGNB);
-                    
-                    ImGui.EndTabItem();
-                }
-
-                if (ImGui.BeginTabItem("Healers"))
-                {
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("White Mage");
-                    changed |= ImGui.ColorEdit4(" ", ref _pluginConfiguration.JobColorWHM);
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Scholar");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorSCH);
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Astrologian");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorAST);
-                    ImGui.EndTabItem();
-                }
-
-                if (ImGui.BeginTabItem("Melee"))
-                {
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Monk");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorMNK);
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Dragoon");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorDRG);
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Ninja");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorNIN);
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Samurai");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorSAM);
-                    ImGui.EndTabItem();
-                }
-
-                if (ImGui.BeginTabItem("Ranged"))
-                {
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Bard");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorBRD);
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Machinist");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorMCH);
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Dancer");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorDNC);
-                    ImGui.EndTabItem();
-                }
-
-                if (ImGui.BeginTabItem("Casters"))
-                {
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Black Mage");
-                    changed |= ImGui.ColorEdit4(" ", ref _pluginConfiguration.JobColorBLM);
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Summoner");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorSMN);
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Red Mage");
-                    changed |= ImGui.ColorEdit4(" ", ref _pluginConfiguration.JobColorRDM);
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Blue Mage");
-                    changed |= ImGui.ColorEdit4(" ", ref _pluginConfiguration.JobColorBLU);
-                    ImGui.EndTabItem();
-                }
-
-                if (ImGui.BeginTabItem("NPC"))
-                {
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Hostile");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.NPCColorHostile);
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Neutral");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.NPCColorNeutral);
-                    ImGui.Text("");//SPACING
-                    ImGui.Text("Friendly");
-                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.NPCColorFriendly);
-                    ImGui.EndTabItem();
-                }
-                ImGui.EndTabBar();
-            }
-            
-        }
-        private void DrawLeftRightConfigBoxes(){}
         private void DrawIndividualUnitFramesGeneralConfig()
         {
-            //TODO NEST COLOR MAP AND SHIELDS ON GENERAL
-            ImGui.Text("this has no configs yet");
+            ImGui.Text("Colors");
+            ImGui.BeginGroup();
+            {
+                ImGui.BeginGroup(); // Left
+                {
+                  
+
+                    ImGui.BeginChild("leftpane", new Vector2(150, ImGui.GetWindowHeight()/4), true);
+
+                    foreach (var colorType in configColorMap)
+                    {
+                        if (ImGui.Selectable(colorType, selectedColorType == colorType))
+                            selectedColorType = colorType;
+                    }
+
+                    ImGui.EndChild();
+
+
+                }
+                ImGui.EndGroup();
+
+                ImGui.SameLine();
+
+                // Right
+                ImGui.BeginGroup();
+                {
+
+                        
+                    ImGui.BeginChild("itemview",new Vector2(0, ImGui.GetWindowHeight()/4)); // Leave room for 1 line below us
+                    {
+
+
+
+
+                                ImGui.BeginChild("subconfig value", new Vector2(0, 0), true);
+                                ImGui.BeginChild("leftpane", new Vector2(ImGui.GetWindowWidth()/2, 0), false);
+                                switch (selectedColorType)
+                                {
+                                    case "Tanks":
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Paladin");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorPLD);
+                    
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Warrior");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorWAR);
+                                        
+                                        ImGui.EndChild();
+                                        ImGui.SameLine();
+                                        ImGui.BeginChild("leftp3ane", new Vector2(ImGui.GetWindowWidth()/2, 0), false);
+                                        
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Dark Knight");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorDRK);
+                    
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Gunbreaker");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorGNB);
+                                        break;
+                                    case "Healers":
+                                       
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("White Mage");
+                                        changed |= ImGui.ColorEdit4(" ", ref _pluginConfiguration.JobColorWHM);
+
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Scholar");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorSCH);
+                                        
+                                        ImGui.EndChild();
+                                        ImGui.SameLine();
+                                        ImGui.BeginChild("leftpa2ne", new Vector2(ImGui.GetWindowWidth()/2, 0), false);
+                                        
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Astrologian");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorAST);
+
+                                        
+                                        break;
+                                    case "Melee":
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Monk");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorMNK);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Dragoon");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorDRG);
+                                        ImGui.EndChild();
+                                        ImGui.SameLine();
+                                        ImGui.BeginChild("leftpa2ne", new Vector2(ImGui.GetWindowWidth()/2, 0), false);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Ninja");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorNIN);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Samurai");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorSAM);
+
+
+                                        break;
+                                    case "Ranged":
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Bard");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorBRD);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Machinist");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorMCH);
+                                        ImGui.EndChild();
+                                        ImGui.SameLine();
+                                        ImGui.BeginChild("leftpa2ne", new Vector2(ImGui.GetWindowWidth()/2, 0), false);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Dancer");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorDNC);
+
+
+                                        break;
+                                    case "Casters":
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Black Mage");
+                                        changed |= ImGui.ColorEdit4(" ", ref _pluginConfiguration.JobColorBLM);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Summoner");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorSMN);
+                                        ImGui.EndChild();
+                                        ImGui.SameLine();
+                                        ImGui.BeginChild("leftpa2ne", new Vector2(ImGui.GetWindowWidth()/2, 0), false);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Red Mage");
+                                        changed |= ImGui.ColorEdit4(" ", ref _pluginConfiguration.JobColorRDM);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Blue Mage");
+                                        changed |= ImGui.ColorEdit4(" ", ref _pluginConfiguration.JobColorBLU);
+ 
+
+                                        break;
+                                    case "NPC":
+                                        
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Hostile");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.NPCColorHostile);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Neutral");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.NPCColorNeutral);
+                                        ImGui.EndChild();
+                                        ImGui.SameLine();
+                                        ImGui.BeginChild("leftpa2ne", new Vector2(ImGui.GetWindowWidth()/2, 0), false);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Friendly");
+                                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.NPCColorFriendly);
+                                        
+
+                                        break;
+                                }
+                                ImGui.EndChild();
+                                ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+                        
+                }
+                ImGui.EndGroup();
+            }
+            ImGui.EndGroup();
+            ImGui.Text("");//SPACING
+            changed |= ImGui.Checkbox("Shields", ref _pluginConfiguration.ShieldEnabled);
+            ImGui.BeginGroup();
+            ImGui.BeginChild("itemview2",new Vector2(0, ImGui.GetWindowHeight()/5), true); 
+            {
+                ImGui.BeginChild("itemvi2213ew2",new Vector2(ImGui.GetWindowWidth()/2, 0) );
+                {
+                    var shieldHeight = _pluginConfiguration.ShieldHeight;
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Height");
+                   
+                    if (ImGui.DragInt("", ref shieldHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ShieldHeight = shieldHeight;
+                        _pluginConfiguration.Save();
+                    }
+                    ImGui.SameLine();
+                    changed |= ImGui.Checkbox("in pixels", ref _pluginConfiguration.ShieldHeightPixels);
+                    
+                }
+                ImGui.EndChild();
+                ImGui.SameLine();
+                ImGui.BeginChild("ite4123mview2",new Vector2(ImGui.GetWindowWidth()/2, 0));
+                {
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Color");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.ShieldColor);
+                }
+                ImGui.EndChild();
+
+            }
+            ImGui.EndChild();
+
+
+            ImGui.EndGroup();
         }
         
         private void DrawIndividualUnitFramesShieldsConfig()
@@ -709,6 +802,7 @@ namespace DelvUI.Interface
                 ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
                     ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                     {
+
                         ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                         {
                             ImGui.Text("");//SPACING
@@ -766,78 +860,100 @@ namespace DelvUI.Interface
             ImGui.EndGroup();
             ImGui.EndGroup();
             ImGui.Text("");//SPACING
-
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
             {
-                //TODO FIX WIDTH LIKE CASTBAR, TEXT FORMAT 100% XY 50 50
-                //TODO COPY PASTA DESIGN TO FOCUS BAR
                 ImGui.Text("Text Format");
-                ImGui.BeginChild("hptxtpane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-                    ImGui.BeginChild("hptxtformatpane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                ImGui.BeginChild("hpp2ane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                ImGui.BeginChild("castbar2color", new Vector2(0,ImGui.GetWindowHeight()/3),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                {
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Text Format");
+                    var ToTBarText = _pluginConfiguration.ToTBarText;
+                    if (ImGui.InputText("", ref ToTBarText, 999))
                     {
-                        ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        _pluginConfiguration.ToTBarText = ToTBarText;
+                        _pluginConfiguration.Save();
+                    }
+
+                        
+                }
+                ImGui.EndChild();
+                ImGui.Text("");//SPACING
+
+                ImGui.BeginChild("hpsize2pane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                {
+                    ImGui.BeginChild("hpheight2pane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.Text("");//SPACING
+                        ImGui.Text("X Offset");
+                        var ToTBarTextXOffset = _pluginConfiguration.ToTBarTextXOffset;
+                        if (ImGui.DragInt("", ref ToTBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
                         {
-                            ImGui.Text("");//SPACING
-
-                            ImGui.Text("Text Format");
-                            var ToTBarText = _pluginConfiguration.ToTBarText;
-                            if (ImGui.InputText("", ref ToTBarText, 999))
-                            {
-                                _pluginConfiguration.ToTBarText = ToTBarText;
-                                _pluginConfiguration.Save();
-                            }
-                            ImGui.Text("");//SPACING
-
-                            ImGui.Text("Text X Offset");
-                            var ToTBarTextXOffset = _pluginConfiguration.ToTBarTextXOffset;
-                            if (ImGui.DragInt("", ref ToTBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                            {
-                                _pluginConfiguration.ToTBarTextXOffset = ToTBarTextXOffset;
-                                _pluginConfiguration.Save();
-                            }
-                            ImGui.Text("");//SPACING
-
-                            ImGui.Text("Text Y Offset");
-                            var ToTBarTextYOffset = _pluginConfiguration.ToTBarTextYOffset;
-                            if (ImGui.DragInt("", ref ToTBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                            {
-                                _pluginConfiguration.ToTBarTextYOffset = ToTBarTextYOffset;
-                                _pluginConfiguration.Save();
-                            }
+                            _pluginConfiguration.ToTBarTextXOffset = ToTBarTextXOffset;
+                            _pluginConfiguration.Save();
                         }
-                        ImGui.EndChild();
-                        
-                        
                     }
                     ImGui.EndChild();
-                    
+                        
+                    ImGui.SameLine();
+                        
+                    ImGui.BeginChild("hpwidt2hpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.Text("");//SPACING
+
+                        ImGui.Text("Text Y Offset");
+                        var ToTBarTextYOffset = _pluginConfiguration.ToTBarTextYOffset;
+                        if (ImGui.DragInt("", ref ToTBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                        {
+                            _pluginConfiguration.ToTBarTextYOffset = ToTBarTextYOffset;
+                            _pluginConfiguration.Save();
+                        }
+
+                    }
+                    ImGui.EndChild();
+                        
+                }
+                ImGui.EndChild();
+
 
                 ImGui.EndChild();
 
             }
             ImGui.EndGroup();
-            ImGui.EndGroup();
+            ImGui.EndGroup();   
                 
         } 
- 
-        private void DrawIndividualUnitFramesToTConfigss(){
+        private void DrawIndividualUnitFramesFocusConfig(){
+                
             bool disabled = true;
-            ImGui.Checkbox("Enabled", ref disabled);//TODO CODE THIS
+            ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
             {
                 ImGui.Text("Bar Size & Position");
-                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
-                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                     {
+
                         ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                         {
+                            ImGui.Text("");//SPACING
+
                             ImGui.Text("Height");
-                            var ToTBarHeight = _pluginConfiguration.ToTBarHeight;
-                            if (ImGui.DragInt("", ref ToTBarHeight, .1f, 1, 1000))
+                            var FocusBarHeight = _pluginConfiguration.FocusBarHeight;
+                            if (ImGui.DragInt("", ref FocusBarHeight, .1f, 1, 1000))
                             {
-                                _pluginConfiguration.ToTBarHeight = ToTBarHeight;
+                                _pluginConfiguration.FocusBarHeight = FocusBarHeight;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("X Offset");
+                            var FocusBarXOffset = _pluginConfiguration.FocusBarXOffset;
+                            if (ImGui.DragInt("", ref FocusBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.FocusBarXOffset = FocusBarXOffset;
                                 _pluginConfiguration.Save();
                             }
                         }
@@ -847,42 +963,22 @@ namespace DelvUI.Interface
                         
                         ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                         {
+                            ImGui.Text("");//SPACING
+
                             ImGui.Text("Width");
-                            var ToTBarWidth = _pluginConfiguration.ToTBarWidth;
-                            if (ImGui.DragInt("", ref ToTBarWidth, .1f, 1, 1000))
+                            var FocusBarWidth = _pluginConfiguration.FocusBarWidth;
+                            if (ImGui.DragInt("", ref FocusBarWidth, .1f, 1, 1000))
                             {
-                                _pluginConfiguration.ToTBarWidth = ToTBarWidth;
+                                _pluginConfiguration.FocusBarWidth = FocusBarWidth;
                                 _pluginConfiguration.Save();
                             }
-                        }
-                        ImGui.EndChild();
-                        
-                    }
-                    ImGui.EndChild();
-                    ImGui.Separator();
-                    ImGui.BeginChild("hpoffsetpane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-                    {
-                        ImGui.BeginChild("hpxpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-                        {
-                            ImGui.Text("X Offset");
-                            var ToTBarXOffset = _pluginConfiguration.ToTBarXOffset;
-                            if (ImGui.DragInt("", ref ToTBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                            {
-                                _pluginConfiguration.ToTBarXOffset = ToTBarXOffset;
-                                _pluginConfiguration.Save();
-                            }
-                        }
-                        ImGui.EndChild();
-                        
-                        ImGui.SameLine();
-                        
-                        ImGui.BeginChild("hpypane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-                        {
+                            ImGui.Text("");//SPACING
+
                             ImGui.Text("Y Offset");
-                            var ToTBarYOffset = _pluginConfiguration.ToTBarYOffset;
-                            if (ImGui.DragInt("", ref ToTBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            var FocusBarYOffset = _pluginConfiguration.FocusBarYOffset;
+                            if (ImGui.DragInt("", ref FocusBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
                             {
-                                _pluginConfiguration.ToTBarYOffset = ToTBarYOffset;
+                                _pluginConfiguration.FocusBarYOffset = FocusBarYOffset;
                                 _pluginConfiguration.Save();
                             }
                         }
@@ -891,75 +987,78 @@ namespace DelvUI.Interface
                     }
                     ImGui.EndChild();
 
-                ImGui.EndChild();
+                    ImGui.EndChild();
 
             }
             ImGui.EndGroup();
             ImGui.EndGroup();
-            
+            ImGui.Text("");//SPACING
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
             {
                 ImGui.Text("Text Format");
-                ImGui.BeginChild("hptxtpane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-                    ImGui.BeginChild("hptxtformatpane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                ImGui.BeginChild("hpp2ane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                ImGui.BeginChild("castbar2color", new Vector2(0,ImGui.GetWindowHeight()/3),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                {
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Text Format");
+                    var FocusBarText = _pluginConfiguration.FocusBarText;
+                    if (ImGui.InputText("", ref FocusBarText, 999))
                     {
-                        ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-                        {
-                            ImGui.Text("Text Format");
-                            var ToTBarText = _pluginConfiguration.ToTBarText;
-                            if (ImGui.InputText("", ref ToTBarText, 999))
-                            {
-                                _pluginConfiguration.ToTBarText = ToTBarText;
-                                _pluginConfiguration.Save();
-                            }
-                        }
-                        ImGui.EndChild();
-                        
+                        _pluginConfiguration.FocusBarText = FocusBarText;
+                        _pluginConfiguration.Save();
+                    }
 
                         
-                    }
-                    ImGui.EndChild();
-                    ImGui.Separator();
-                    ImGui.BeginChild("hptxtoffsetpane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                }
+                ImGui.EndChild();
+                ImGui.Text("");//SPACING
+
+                ImGui.BeginChild("hpsize2pane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                {
+                    ImGui.BeginChild("hpheight2pane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                     {
-                        ImGui.BeginChild("hptxtleftxpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        ImGui.Text("");//SPACING
+                        ImGui.Text("X Offset");
+                        var FocusBarTextXOffset = _pluginConfiguration.FocusBarTextXOffset;
+                        if (ImGui.DragInt("", ref FocusBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
                         {
-                            ImGui.Text("Text X Offset");
-                            var ToTBarTextXOffset = _pluginConfiguration.ToTBarTextXOffset;
-                            if (ImGui.DragInt("", ref ToTBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                            {
-                                _pluginConfiguration.ToTBarTextXOffset = ToTBarTextXOffset;
-                                _pluginConfiguration.Save();
-                            }
+                            _pluginConfiguration.FocusBarTextXOffset = FocusBarTextXOffset;
+                            _pluginConfiguration.Save();
                         }
-                        ImGui.EndChild();
-                        
-                        ImGui.SameLine();
-                        
-                        ImGui.BeginChild("hptxtleftypane", new Vector2(ImGui.GetWindowWidth()/2, 0));
-                        {
-                            ImGui.Text("Text Y Offset");
-                            var ToTBarTextYOffset = _pluginConfiguration.ToTBarTextYOffset;
-                            if (ImGui.DragInt("", ref ToTBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                            {
-                                _pluginConfiguration.ToTBarTextYOffset = ToTBarTextYOffset;
-                                _pluginConfiguration.Save();
-                            }
-                        }
-                        ImGui.EndChild();
-                        
                     }
                     ImGui.EndChild();
+                        
+                    ImGui.SameLine();
+                        
+                    ImGui.BeginChild("hpwidt2hpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.Text("");//SPACING
+
+                        ImGui.Text("Text Y Offset");
+                        var FocusBarTextYOffset = _pluginConfiguration.FocusBarTextYOffset;
+                        if (ImGui.DragInt("", ref FocusBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                        {
+                            _pluginConfiguration.FocusBarTextYOffset = FocusBarTextYOffset;
+                            _pluginConfiguration.Save();
+                        }
+
+                    }
+                    ImGui.EndChild();
+                        
+                }
+                ImGui.EndChild();
+
 
                 ImGui.EndChild();
 
             }
             ImGui.EndGroup();
-            ImGui.EndGroup();
+            ImGui.EndGroup();   
                 
-        }        
-        private void DrawIndividualUnitFramesFocusConfig(){
+        } 
+        
+        private void DrawIndividualUnitFramesFocusConfigss(){
             bool disabled = true;
             ImGui.Checkbox("Enabled", ref disabled);//TODO CODE THIS
             ImGui.BeginGroup();
@@ -1280,51 +1379,6 @@ namespace DelvUI.Interface
             
         }
 
-        private void DrawCastbarsPlayerConfigss()
-        {
-
-                    var castBarHeight = _pluginConfiguration.CastBarHeight;
-                    if (ImGui.DragInt("Castbar Height", ref castBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.CastBarHeight = castBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var castBarWidth = _pluginConfiguration.CastBarWidth;
-                    if (ImGui.DragInt("Castbar Width", ref castBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.CastBarWidth = castBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var castBarXOffset = _pluginConfiguration.CastBarXOffset;
-                    if (ImGui.DragInt("Castbar X Offset", ref castBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.CastBarXOffset = castBarXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var castBarYOffset = _pluginConfiguration.CastBarYOffset;
-                    if (ImGui.DragInt("Castbar Y Offset", ref castBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.CastBarYOffset = castBarYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-
-
-
-
-
-                    var slideCastTime = _pluginConfiguration.SlideCastTime;
-                    if (ImGui.DragFloat("Slide Cast Offset", ref slideCastTime, 1, 1, 1000))
-                    {
-                        _pluginConfiguration.SlideCastTime = slideCastTime;
-                        _pluginConfiguration.Save();
-                    }
-
-
-        }
 
         private void DrawCastbarsEnemyConfig()
         {
