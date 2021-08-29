@@ -317,12 +317,44 @@ namespace DelvUI.Interface
                     }
 
                     changed |= ImGui.Checkbox("Shield Height in px", ref _pluginConfiguration.ShieldHeightPixels);
-
                     changed |= ImGui.ColorEdit4("Shield Color", ref _pluginConfiguration.ShieldColor);
 
-                    changed |= ImGui.Checkbox("Hide HUD", ref _pluginConfiguration.HideHud);
+                    // mp ticker
+                    changed |= ImGui.Checkbox("Show MP Ticker", ref _pluginConfiguration.MPTickerEnabled);
 
+                    var MPTickerHeight = _pluginConfiguration.MPTickerHeight;
+                    if (ImGui.DragInt("MP Ticker Height", ref MPTickerHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MPTickerHeight = MPTickerHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var MPTickerWidth = _pluginConfiguration.MPTickerWidth;
+                    if (ImGui.DragInt("MP Ticker Width", ref MPTickerWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MPTickerWidth = MPTickerWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var MPTickerXOffset = _pluginConfiguration.MPTickerXOffset;
+                    if (ImGui.DragInt("MP Ticker X Offset", ref MPTickerXOffset, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MPTickerXOffset = MPTickerXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var MPTickerYOffset = _pluginConfiguration.MPTickerYOffset;
+                    if (ImGui.DragInt("MP Ticker Y Offset", ref MPTickerYOffset, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MPTickerYOffset = MPTickerYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("MP Ticker Color", ref _pluginConfiguration.MPTickerColor);
+
+                    changed |= ImGui.Checkbox("Hide HUD", ref _pluginConfiguration.HideHud);
                     changed |= ImGui.Checkbox("Lock HUD", ref _pluginConfiguration.LockHud);
+
                     ImGui.EndTabItem();
                 }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Configuration;
 using Dalamud.Plugin;
@@ -7,6 +8,9 @@ using Newtonsoft.Json;
 
 namespace DelvUI {
     public class PluginConfiguration : IPluginConfiguration {
+
+        public event EventHandler<EventArgs> ConfigChangedEvent;
+
         public int Version { get; set; }
         public bool HideHud = false;
         public bool LockHud = true;
@@ -56,6 +60,13 @@ namespace DelvUI {
         public int ToTBarTextYOffset { get; set; } = 0;
         public int FocusBarTextXOffset { get; set; } = 0;
         public int FocusBarTextYOffset { get; set; } = 0;
+
+        public bool MPTickerEnabled = false;
+        public int MPTickerHeight { get; set; } = 4;
+        public int MPTickerWidth { get; set; } = 254;
+        public int MPTickerXOffset { get; set; } = 0;
+        public int MPTickerYOffset { get; set; } = 470;
+        public Vector4 MPTickerColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f);
 
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
@@ -442,6 +453,7 @@ namespace DelvUI {
         [JsonIgnore] public Dictionary<uint, Dictionary<string, uint>> JobColorMap;
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> NPCColorMap;
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> ShieldColorMap;
+        [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> MPTickerColorMap;
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> CastBarColorMap;
 
         public void Init(DalamudPluginInterface pluginInterface) {
@@ -451,6 +463,12 @@ namespace DelvUI {
 
         public void Save() {
             _pluginInterface.SavePluginConfig(this);
+
+            // call event when the config changes
+            if (ConfigChangedEvent != null)
+            {
+                ConfigChangedEvent(this, null);
+            }
         }
 
         public void BuildColorMap() {
@@ -1170,6 +1188,17 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(ShieldColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ShieldColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ShieldColor.AdjustColor(.1f))
+                }
+            };
+
+            MPTickerColorMap = new Dictionary<string, Dictionary<string, uint>>
+            {
+                ["mpTicker"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MPTickerColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(MPTickerColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MPTickerColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MPTickerColor.AdjustColor(.1f))
                 }
             };
 
