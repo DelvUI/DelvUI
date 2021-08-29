@@ -185,12 +185,11 @@ namespace DelvUI {
         public int AstDrawBarWidth { get; set; } = 254;
         public int AstDrawBarX { get; set; } = 127;
         public int AstDrawBarY { get; set; } = 460;
-        public bool AstDivinationEnabled = true;
         public int AstDivinationHeight { get; set; } = 20;
-        public int AstDivinationWidth { get; set; } = 250;
+        public int AstDivinationWidth { get; set; } = 253;
         public int AstDivinationBarX { get; set; } = -42;
         public int AstDivinationBarY { get; set; } = 460;
-        public int AstDivinationBarPad { get; set; } = 2;
+        public int AstDivinationBarPad { get; set; } = 1;
         public bool AstShowDivinationBar = true;
         public bool AstShowDrawBar = true;
         public bool AstShowPrimaryResourceBar = true;

@@ -653,7 +653,7 @@ namespace DelvUI.Interface
                     var AstDrawBarY = _pluginConfiguration.AstDrawBarY;
                     if (ImGui.DragInt("Draw Gauge Y Offset", ref AstDrawBarY, .1f, -1000, 1000))
                     {
-                        _pluginConfiguration.FairyBarY = AstDrawBarY;
+                        _pluginConfiguration.AstDrawBarY = AstDrawBarY;
                         _pluginConfiguration.Save();
                     }
 
@@ -674,21 +674,21 @@ namespace DelvUI.Interface
                     var AstDivinationBarX = _pluginConfiguration.AstDivinationBarX;
                     if (ImGui.DragInt("Divination Gauge X Offset", ref AstDivinationBarX, .1f, -1000, 1000))
                     {
-                        _pluginConfiguration.SchAetherBarX = AstDivinationBarX;
+                        _pluginConfiguration.AstDivinationBarX = AstDivinationBarX;
                         _pluginConfiguration.Save();
                     }
 
                     var AstDivinationBarY = _pluginConfiguration.AstDivinationBarY;
                     if (ImGui.DragInt("Divination Gauge Y Offset", ref AstDivinationBarY, .1f, -1000, 1000))
                     {
-                        _pluginConfiguration.SchAetherBarY = AstDivinationBarY;
+                        _pluginConfiguration.AstDivinationBarY = AstDivinationBarY;
                         _pluginConfiguration.Save();
                     }
 
                     var AstDivinationBarPad = _pluginConfiguration.AstDivinationBarPad;
                     if (ImGui.DragInt("Divination Padding", ref AstDivinationBarPad, .1f, -100, 1000))
                     {
-                        _pluginConfiguration.SchAetherBarPad = AstDivinationBarPad;
+                        _pluginConfiguration.AstDivinationBarPad = AstDivinationBarPad;
                         _pluginConfiguration.Save();
                     }
 

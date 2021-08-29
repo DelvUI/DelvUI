@@ -68,7 +68,7 @@ namespace DelvUI.Interface
             var gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
 
             var barWidth = (DivinationWidth / 3);
-            BarSize = new Vector2(barWidth+1, DivinationHeight);
+            BarSize = new Vector2(barWidth, DivinationHeight);
             BarCoords = new Vector2(DivinationBarX, DivinationBarY);
             var cursorPos = new Vector2(CenterX + BarCoords.X, CenterY + BarCoords.Y - 60);
 
