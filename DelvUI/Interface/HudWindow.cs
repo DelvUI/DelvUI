@@ -97,7 +97,7 @@ namespace DelvUI.Interface {
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentHp / actor.MaxHp;
 
-            if (actor.ClassJob.Id is 19 or 32 or 21 or 37) {
+            if (PluginConfiguration.TankStanceIndicatorEnabled && (actor.ClassJob.Id is 19 or 32 or 21 or 37)) {
                 DrawTankStanceIndicator();
             }
 
@@ -480,12 +480,15 @@ namespace DelvUI.Interface {
                     o.EffectId == 1833    // ROYAL GUARD
             );
 
-            if (tankStanceBuff.Count() != 1) {
+            var offset = PluginConfiguration.TankStanceIndicatorWidth + 1;
+            if (tankStanceBuff.Count() != 1)
+            {
                 var barSize = new Vector2(HealthBarHeight > HealthBarWidth ? HealthBarWidth : HealthBarHeight, HealthBarHeight);
-                var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset - 5, CenterY + HealthBarYOffset + 5);
+                var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset - offset, CenterY + HealthBarYOffset + offset);
                 ImGui.SetCursorPos(cursorPos);
 
                 var drawList = ImGui.GetWindowDrawList();
+
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + barSize,
@@ -493,12 +496,14 @@ namespace DelvUI.Interface {
                 );
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             }
-            else {
+            else
+            {
                 var barSize = new Vector2(HealthBarHeight > HealthBarWidth ? HealthBarWidth : HealthBarHeight, HealthBarHeight);
-                var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset - 5, CenterY + HealthBarYOffset + 5);
+                var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset - offset, CenterY + HealthBarYOffset + offset);
                 ImGui.SetCursorPos(cursorPos);
 
                 var drawList = ImGui.GetWindowDrawList();
+
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + barSize,

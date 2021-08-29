@@ -320,6 +320,15 @@ namespace DelvUI.Interface
 
                     changed |= ImGui.ColorEdit4("Shield Color", ref _pluginConfiguration.ShieldColor);
 
+                    changed |= ImGui.Checkbox("Tank Stance Indicator Enabled", ref _pluginConfiguration.TankStanceIndicatorEnabled);
+
+                    var tankStanceIndicatorWidth = _pluginConfiguration.TankStanceIndicatorWidth;
+                    if (ImGui.DragInt("Tank Stance Indicator Width", ref tankStanceIndicatorWidth, .1f, 1, 6))
+                    {
+                        _pluginConfiguration.TankStanceIndicatorWidth = tankStanceIndicatorWidth;
+                        _pluginConfiguration.Save();
+                    }
+
                     changed |= ImGui.Checkbox("Hide HUD", ref _pluginConfiguration.HideHud);
 
                     changed |= ImGui.Checkbox("Lock HUD", ref _pluginConfiguration.LockHud);
