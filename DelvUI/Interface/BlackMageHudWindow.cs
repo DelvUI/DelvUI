@@ -344,15 +344,16 @@ namespace DelvUI.Interface
 
         private void DrawTimerBar(Vector2 position, float scale, float height, Dictionary<string, uint> colorMap, bool inverted)
         {
-            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-
             var drawList = ImGui.GetWindowDrawList();
             var size = new Vector2((ManaBarWidth / 2f - PolyglotWidth - HorizontalSpaceBetweenBars * 2f) * scale, height);
             size.X = Math.Max(1, size.X);
-            var endPoint = inverted ? position - size : position + size;
 
-            drawList.AddRectFilledMultiColor(position, endPoint,
-                colorMap["gradientLeft"], colorMap["gradientRight"], colorMap["gradientRight"], colorMap["gradientLeft"]
+            var startPoint = inverted ? position - size : position;
+            var leftColor = inverted ? colorMap["gradientRight"] : colorMap["gradientLeft"];
+            var rightColor = inverted ? colorMap["gradientLeft"] : colorMap["gradientRight"];
+
+            drawList.AddRectFilledMultiColor(startPoint, startPoint + size,
+                leftColor, rightColor, rightColor, leftColor
             );
         }
     }
