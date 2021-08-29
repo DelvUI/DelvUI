@@ -68,16 +68,19 @@ namespace DelvUI.Interface
         
         public MachinistHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
-        protected override void Draw(bool _) {
-            DrawHealthBar();
+        protected override void Draw(bool _) 
+        {
             var nextHeight = DrawOverheatBar(0);
             nextHeight = DrawHeatGauge(nextHeight);
             nextHeight = DrawBatteryGauge(nextHeight);
             if (WildfireEnabled)
+            {
                 DrawWildfireBar(nextHeight);
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
+            }
+        }
+
+        protected override void DrawPrimaryResourceBar()
+        {
         }
 
         private int DrawHeatGauge(int initialHeight)

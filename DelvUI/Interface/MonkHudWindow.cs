@@ -42,13 +42,13 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _)
         {
-            DrawHealthBar();
-            DrawTargetBar();
             ChakraBar();
             Demolish();
             ActiveBuffs();
-            DrawFocusBar();
-            DrawCastBar();
+        }
+
+        protected override void DrawPrimaryResourceBar()
+        {
         }
 
         private void ActiveBuffs()

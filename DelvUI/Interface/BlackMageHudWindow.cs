@@ -5,6 +5,7 @@ using Dalamud.Plugin;
 using ImGuiNET;
 using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace DelvUI.Interface
 {
@@ -48,11 +49,6 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _)
         {
-            DrawHealthBar();
-            DrawFocusBar();
-            DrawCastBar();
-            DrawTargetBar();
-
             DrawEnochian();
             DrawManaBar();
             DrawUmbralHeartStacks();
@@ -74,8 +70,14 @@ namespace DelvUI.Interface
             }
         }
 
+        protected override void DrawPrimaryResourceBar()
+        {
+        }
+
         protected virtual void DrawManaBar()
         {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+
             var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
 
             var actor = PluginInterface.ClientState.LocalPlayer;
@@ -127,6 +129,8 @@ namespace DelvUI.Interface
 
         protected virtual void DrawEnochian()
         {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+
             var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
             if (!gauge.IsEnoActive())
             {
@@ -142,6 +146,8 @@ namespace DelvUI.Interface
 
         protected virtual void DrawUmbralHeartStacks()
         {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+
             var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
 
             var barSize = new Vector2(UmbralHeartWidth, UmbralHeartHeight);
@@ -168,6 +174,8 @@ namespace DelvUI.Interface
 
         protected virtual void DrawPolyglot()
         {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+
             var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
             var barSize = new Vector2(PolyglotWidth, PolyglotHeight);
             var scale = gauge.NumPolyglotStacks == 2 ? 0 : (gauge.IsEnoActive() ? gauge.TimeUntilNextPolyglot / 30000f : 1);
@@ -191,6 +199,8 @@ namespace DelvUI.Interface
 
         private void DrawPolyglotStack(Vector2 position, Vector2 size, float scale)
         {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+
             var drawList = ImGui.GetWindowDrawList();
 
             // glow
@@ -223,6 +233,8 @@ namespace DelvUI.Interface
 
         protected virtual void DrawTripleCast()
         {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+
             var tripleStackBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1211);
 
             var barSize = new Vector2(TripleCastWidth, TripleCastHeight);
@@ -249,6 +261,8 @@ namespace DelvUI.Interface
 
         protected virtual void DrawProcs()
         {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+
             var firestarterTimer = ShowFirestarterProcs ? Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 165).Duration) : 0;
             var thundercloudTimer = ShowThundercloudProcs ? Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 164).Duration) : 0;
 
@@ -285,6 +299,8 @@ namespace DelvUI.Interface
 
         protected virtual void DrawDotTimer()
         {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             if (target is null)
             {
@@ -300,7 +316,7 @@ namespace DelvUI.Interface
 
             for (int i = 0; i < 4; i++)
             {
-                timer = target.StatusEffects.FirstOrDefault(o => o.EffectId == dotIDs[i]).Duration;
+                timer = target.StatusEffects.FirstOrDefault(o => o.EffectId == dotIDs[i] && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId).Duration;
                 if (timer > 0)
                 {
                     maxDuration = dotDurations[i];
@@ -331,10 +347,13 @@ namespace DelvUI.Interface
             var drawList = ImGui.GetWindowDrawList();
             var size = new Vector2((ManaBarWidth / 2f - PolyglotWidth - HorizontalSpaceBetweenBars * 2f) * scale, height);
             size.X = Math.Max(1, size.X);
-            var endPoint = inverted ? position - size : position + size;
 
-            drawList.AddRectFilledMultiColor(position, endPoint,
-                colorMap["gradientLeft"], colorMap["gradientRight"], colorMap["gradientRight"], colorMap["gradientLeft"]
+            var startPoint = inverted ? position - size : position;
+            var leftColor = inverted ? colorMap["gradientRight"] : colorMap["gradientLeft"];
+            var rightColor = inverted ? colorMap["gradientLeft"] : colorMap["gradientRight"];
+
+            drawList.AddRectFilledMultiColor(startPoint, startPoint + size,
+                leftColor, rightColor, rightColor, leftColor
             );
         }
     }
