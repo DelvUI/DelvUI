@@ -116,6 +116,8 @@ namespace DelvUI.Interface {
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["base"]);
             drawList.AddRectFilled(dotStart, cursorPos + new Vector2(barSize.X, barSize.Y), higanbanaColor);
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            var textSize = ImGui.CalcTextSize(Math.Round(higanbanaDuration).ToString());
+            DrawOutlinedText(Math.Round(higanbanaDuration).ToString(), new Vector2(cursorPos.X + SamKenkiBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 2));
 
         }
 

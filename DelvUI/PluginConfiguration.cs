@@ -207,8 +207,8 @@ namespace DelvUI {
         #region SAM Configuration
 
         public int SamHiganbanaBarX { get; set; } = 127;
-        public int SamHiganbanaBarY { get; set; } = 380;
-        public int SamHiganbanaBarHeight { get; set; } = 10;
+        public int SamHiganbanaBarY { get; set; } = 370;
+        public int SamHiganbanaBarHeight { get; set; } = 20;
         public int SamHiganbanaBarWidth { get; set; } = 254;
         public int SamBuffsBarX { get; set; } = 127;
         public int SamBuffsBarY { get; set; } = 392;
