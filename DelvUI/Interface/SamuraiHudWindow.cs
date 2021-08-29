@@ -64,22 +64,20 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _)
         {
-            DrawHealthBar();
             if (GaugeEnabled)
                 DrawKenkiBar();
             if (SenEnabled)
                 DrawSenResourceBar();
             if (MeditationEnabled)
                 DrawMeditationResourceBar();
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
             if (HiganbanaEnabled)
                 DrawHiganbanaBar();
             if (BuffsEnabled)
                 DrawActiveBuffs();
         }
-
+        protected override void DrawPrimaryResourceBar()
+        {
+        }
         private void DrawKenkiBar()
         {
             if (!GaugeEnabled)
