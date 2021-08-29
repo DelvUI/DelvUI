@@ -111,21 +111,49 @@ namespace DelvUI.Interface {
             ImGui.SetCursorPos(cursorPos);
             
             if (ImGui.BeginChild("health_bar", BarSize)) {
-                var colors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
-                var drawList = ImGui.GetWindowDrawList();
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight), 
-                    colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
-                );
-                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                
-                /* This needs some check to see if it's in BeginChild or else this will leak into the settings panel.
-                if (ImGui.GetIO().MouseClicked[0]) {
-                    PluginInterface.ClientState.Targets.SetCurrentTarget(actor);
+                try
+                {
+                    var colors = PluginConfiguration.NPCColorMap["friendly"];
+                    if (PluginConfiguration.JobColorMap.ContainsKey(PluginInterface.ClientState.LocalPlayer.ClassJob.Id)) { 
+                        colors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
+                    }
+                    else
+                    {                    
+                        PluginLog.Log("///////////////////////////////////////////////////////////");
+                        PluginLog.Log("NINA BUG CRASHED ON HP BAR COLORING");
+                        PluginLog.Log("PluginConfiguration.JobColorMap.Keys");
+                        PluginLog.Log(PluginConfiguration.JobColorMap.Keys.ToString());
+                        PluginLog.Log("PluginInterface.ClientState.LocalPlayer.ClassJob.Id");
+                        PluginLog.Log(PluginInterface.ClientState.LocalPlayer.ClassJob.Id.ToString());
+                        PluginLog.Log("///////////////////////////////////////////////////////////");
+                        
+                    }
+                    var drawList = ImGui.GetWindowDrawList();
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight),
+                        colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+                    );
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+
+                    /* This needs some check to see if it's in BeginChild or else this will leak into the settings panel.
+                    if (ImGui.GetIO().MouseClicked[0]) {
+                        PluginInterface.ClientState.Targets.SetCurrentTarget(actor);
+                    }
+                    */
                 }
-                */
-                
+                catch(Exception ex)
+                {
+                    PluginLog.Log("///////////////////////////////////////////////////////////");
+                    PluginLog.Log("NINA BUG CRASHED ON HP BAR COLORING");
+                    PluginLog.Log(ex.ToString());
+                    PluginLog.Log("PluginConfiguration.JobColorMap.Keys");
+                    PluginLog.Log(PluginConfiguration.JobColorMap.Keys.ToString());
+                    PluginLog.Log("PluginInterface.ClientState.LocalPlayer.ClassJob.Id");
+                    PluginLog.Log(PluginInterface.ClientState.LocalPlayer.ClassJob.Id.ToString());
+                    PluginLog.Log("///////////////////////////////////////////////////////////");
+
+                }
             }
             DrawTargetShield(actor, cursorPos, _barSize, true);
             
