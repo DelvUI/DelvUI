@@ -29,10 +29,10 @@ namespace DelvUI.Interface
             configMap.Add("General", new [] {"General","Color Map"});
             configMap.Add("Individual Unitframes", new [] {"General", "Player", "Target", "Target of Target", "Focus"});
             configMap.Add("Group Unitframes", new [] {"General", "Party", "8man", "24man", "Enemies"});
-            configMap.Add("Castbars", new [] {"General", "Player Castbar", "Enemy Castbar"});
+            configMap.Add("Castbars", new [] {"General", "Player", "Enemy"});
             configMap.Add("Jobs", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"});
 
-        }
+        }   
 
 
         public void Draw()
@@ -93,12 +93,13 @@ namespace DelvUI.Interface
                     {
                         if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
                         {
-                            foreach (string sunConfig in subConfigs)
+                            foreach (string subConfig in subConfigs)
                             {
 
-                                if (!ImGui.BeginTabItem(sunConfig)) continue;
+                                if (!ImGui.BeginTabItem(subConfig)) continue;
                                 ImGui.BeginChild("subconfig value", new Vector2(0, 0), true);
-                                ImGui.TextWrapped(sunConfig);
+                                ImGui.TextWrapped(subConfig);
+                                DrawSubConfig(selected, subConfig);
                                 ImGui.EndChild();
                                 ImGui.EndTabItem();
                             }
@@ -137,5 +138,201 @@ namespace DelvUI.Interface
             
             ImGui.End();
         }
+        private void DrawSubConfig(string config, string subConfig)
+        {
+            switch (config)
+            {
+                case "General":
+                    switch (subConfig)
+                    {
+                        case "General":
+                            DrawGeneralGeneralConfig();
+                            break;
+                        case "Color Map":
+                            DrawGeneralColorMapConfig();
+                            break;
+                    }
+                    break;
+                case "Individual Unitframes":
+                    switch (subConfig)
+                    {
+                        case "General":
+                            DrawIndividualUnitFramesGeneralConfig();
+                            break;
+                        case "Player":
+                            DrawIndividualUnitFramesPlayerConfig();
+                            break;                        
+                        case "Target":
+                            DrawIndividualUnitFramesTargetConfig();
+                            break;                        
+                        case "Target of Target":
+                            DrawIndividualUnitFramesToTConfig();
+                            break;                        
+                        case "Focus":
+                            DrawIndividualUnitFramesFocusConfig();
+                            break;
+                    }
+                    break;
+                case "Group Unitframes":
+                    switch (subConfig)
+                    {
+                        case "General":
+                            DrawGroupUnitFramesGeneralConfig();
+                            break;
+                        case "Party":
+                            DrawGroupUnitFramesPartyConfig();
+                            break;                        
+                        case "8man":
+                            DrawGroupUnitFrames8manConfig();
+                            break;                        
+                        case "24man":
+                            DrawGroupUnitFrames24manConfig();
+                            break;                        
+                        case "Enemies":
+                            DrawGroupUnitFramesEnemiesConfig();
+                            break;
+                    }
+                    break;
+                case "Castbars":
+                    switch (subConfig)
+                    {
+                        case "General":
+                            DrawCastbarsGeneralConfig();
+                            break;
+                        case "Player":
+                            DrawCastbarsPlayerConfig();
+                            break;
+                        case "Enemy":
+                            DrawCastbarsEnemyConfig();
+                            break;
+                    }
+                    break;
+                case "Jobs":
+                    switch (subConfig)
+                    {          
+                        case "General":
+                            DrawJobsGeneralConfig();
+                            break;
+                        case "Tank":
+                            DrawJobsTankConfig();
+                            break;                        
+                        case "Healer":  
+                            DrawJobsHealerConfig();
+                            break;                        
+                        case "Melee":
+                            DrawJobsMeleeConfig();
+                            break;                        
+                        case "Ranged":
+                            DrawJobsRangedConfig();
+                            break;                        
+                        case "Caster":
+                            DrawJobsCasterConfig();
+                            break;
+                    }
+                    break;
+            }
+            
+        }
+
+        private void DrawGeneralGeneralConfig()
+        {
+            
+        }
+
+        private void DrawGeneralColorMapConfig()
+        {
+            
+        }
+
+        private void DrawIndividualUnitFramesGeneralConfig()
+        {
+            
+        }
+
+        private void DrawIndividualUnitFramesPlayerConfig()
+        {
+            
+        }
+
+        private void DrawIndividualUnitFramesTargetConfig()
+        {
+            
+        }
+
+        private void DrawIndividualUnitFramesFocusConfig()
+        {
+            
+        }
+
+        private void DrawGroupUnitFramesGeneralConfig()
+        {
+            
+        }
+
+        private void DrawGroupUnitFramesPartyConfig()
+        {
+            
+        }
+
+        private void DrawGroupUnitFrames8manConfig()
+        {
+            
+        }
+
+        private void DrawGroupUnitFrames24manConfig()
+        {
+            
+        }
+
+        private void DrawGroupUnitFramesEnemiesConfig()
+        {
+            
+        }
+
+        private void DrawCastbarsGeneralConfig()
+        {
+            
+        }
+
+        private void DrawCastbarsPlayerConfig()
+        {
+            
+        }
+
+        private void DrawCastbarsEnemyConfig()
+        {
+            
+        }
+
+        private void DrawJobsGeneralConfig()
+        {
+            
+        }
+
+        private void DrawJobsTankConfig()
+        {
+            
+        }
+
+        private void DrawJobsHealerConfig()
+        {
+            
+        }
+
+        private void DrawJobsMeleeConfig()
+        {
+            
+        }
+
+        private void DrawJobsRangedConfig()
+        {
+            
+        }
+
+        private void DrawJobsCasterConfig()
+        {
+            
+        }
+
     }
 }
