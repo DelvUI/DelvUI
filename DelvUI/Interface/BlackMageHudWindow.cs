@@ -316,7 +316,7 @@ namespace DelvUI.Interface
 
             for (int i = 0; i < 4; i++)
             {
-                timer = target.StatusEffects.FirstOrDefault(o => o.EffectId == dotIDs[i]).Duration;
+                timer = target.StatusEffects.FirstOrDefault(o => o.EffectId == dotIDs[i] && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId).Duration;
                 if (timer > 0)
                 {
                     maxDuration = dotDurations[i];
