@@ -179,28 +179,6 @@ namespace DelvUI {
 
         #endregion
 
-        #region SAM Configuration
-
-        public bool SAMGaugeEnabled { get; set; } = true;
-        public int SAMGaugeYOffset { get; set; } = -86;
-        public int SAMGaugeXOffset { get; set; } = 1;
-        public int SAMGaugeHeight { get; set; } = 20;
-        public int SAMGaugeWidth { get; set; } = 249;
-        public int SAMSenPadding { get; set; } = 3;
-        public bool SAMSenEnabled { get; set; } = true;
-        public int SAMSenYOffset { get; set; } = 416;
-        public int SAMSenXOffset { get; set; } = 159;
-        public int SAMSenHeight { get; set; } = 20;
-        public int SAMSenWidth { get; set; } = 250;
-        public bool SAMMeditationEnabled { get; set; } = true;
-        public int SAMMeditationPadding { get; set; } = 3;
-        public int SAMMeditationYOffset { get; set; } = 419;
-        public int SAMMeditationXOffset { get; set; } = 159;
-        public int SAMMeditationHeight { get; set; } = 20;
-        public int SAMMeditationWidth { get; set; } = 250;
-
-        #endregion
-
         #region SMN Configuration
 
         public int SmnRuinBarX { get; set; } = 127;
@@ -228,6 +206,11 @@ namespace DelvUI {
 
         #region SAM Configuration
 
+        public bool SAMGaugeEnabled { get; set; } = true;
+        public bool SAMSenEnabled { get; set; } = true;
+        public bool SAMMeditationEnabled { get; set; } = true;
+        public bool SAMHiganbanaEnabled { get; set; } = true;
+        public bool SAMBuffsEnabled { get; set; } = true;
         public int SamHiganbanaBarX { get; set; } = 127;
         public int SamHiganbanaBarY { get; set; } = 370;
         public int SamHiganbanaBarHeight { get; set; } = 20;
@@ -244,6 +227,7 @@ namespace DelvUI {
         public int SamKenkiBarY { get; set; } = 414;
         public int SamKenkiBarHeight { get; set; } = 20;
         public int SamKenkiBarWidth { get; set; } = 254;
+        public int SAMSenPadding { get; set; } = 2;
         public int SamSenBarX { get; set; } = 127;
         public int SamSenBarY { get; set; } = 436;
         public int SamSenBarHeight { get; set; } = 10;
@@ -252,7 +236,8 @@ namespace DelvUI {
         public int SamMeditationBarY { get; set; } = 448;
         public int SamMeditationBarHeight { get; set; } = 10;
         public int SamMeditationBarWidth { get; set; } = 254;
-
+        public int SAMMeditationPadding { get; set; } = 2;
+        public int SAMBuffsPadding { get; set; } = 2;
 
         public Vector4 SamHiganbanaColor = new Vector4(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f);
         public Vector4 SamShifuColor = new Vector4(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f);
@@ -267,8 +252,6 @@ namespace DelvUI {
 
         public Vector4 SamExpiryColor = new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f);
         public Vector4 SamEmptyColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 136f / 255f);
-
-
 
         #endregion
 
