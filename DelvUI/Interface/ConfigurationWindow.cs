@@ -14,30 +14,29 @@ namespace DelvUI.Interface
         private readonly Plugin _plugin;
         private readonly DalamudPluginInterface _pluginInterface;
         private readonly PluginConfiguration _pluginConfiguration;
-        private string selected = "General";
+        private string selected = "Individual Unitframes";
         private Dictionary<string, Array> configMap = new Dictionary<string, Array>() ;
         private bool changed;
         private int viewportWidth = (int) ImGui.GetMainViewport().Size.X;
         private int viewportHeight = (int) ImGui.GetMainViewport().Size.Y;
         private int xOffsetLimit;
         private int yOffsetLimit;
-        
-
-
-
 
         public ConfigurationWindow(Plugin plugin, DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration)
         {
-            //TODO ADD PRIMARYRESOURCEBAR TO CONFIGMAP
-            //TODO ADD SHIELD TO CONFIGMAP
-            //TODO ADD SHIELD TO CONFIGMAP
+            //TODO ADD PRIMARYRESOURCEBAR TO CONFIGMAP jobs general
+
             _plugin = plugin;
             _pluginInterface = pluginInterface;
             _pluginConfiguration = pluginConfiguration;
-            configMap.Add("General", new [] {"General","Color Map"});
-            configMap.Add("Individual Unitframes", new [] {"General", "Player", "Target", "Target of Target", "Focus"});
-            configMap.Add("Group Unitframes", new [] {"General", "Party", "8man", "24man", "Enemies"});
-            configMap.Add("Castbars", new [] {"General", "Player", "Enemy"});
+            //configMap.Add("General", new [] {"General"});
+            configMap.Add("Individual Unitframes", new [] {"General","Colors", "Shields", "Player", "Target", "Target of Target", "Focus"});
+            //configMap.Add("Group Unitframes", new [] {"General", "Party", "8man", "24man", "Enemies"});
+            configMap.Add("Castbars", new [] {
+                //"General", 
+                "Player"
+                //, "Enemy"
+                });
             configMap.Add("Jobs", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"});
 
         }   
@@ -48,9 +47,9 @@ namespace DelvUI.Interface
             if (!IsVisible) {
                 return;
             }
-            //Todo
+            //Todo future reference dalamud native ui scaling
             //ImGui.GetIO().FontGlobalScale;
-            ImGui.SetNextWindowSize(new Vector2(900, 600), ImGuiCond.Appearing);
+            ImGui.SetNextWindowSize(new Vector2(1050, 750), ImGuiCond.Appearing);
 
 
             if (!ImGui.Begin("titlebar", ref IsVisible, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize)) {
@@ -139,8 +138,14 @@ namespace DelvUI.Interface
             }                
             ImGui.SameLine();
             if (ImGui.Button("Reset HUD")) {}
-                 
-
+            ImGui.SameLine();
+            
+            pos = ImGui.GetCursorPos();
+            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth()-60, ImGui.GetCursorPos().Y));
+            if (ImGui.Button("Donate!"))
+            {
+            }
+            ImGui.SetCursorPos(pos);
             ImGui.EndGroup();
                 
 
@@ -162,24 +167,25 @@ namespace DelvUI.Interface
                         case "General":
                             DrawGeneralGeneralConfig();
                             break;
-                        case "Color Map":
-                            DrawGeneralColorMapConfig();
-                            break;
+
                     }
                     break;
                 case "Individual Unitframes":
                     switch (subConfig)
                     {
+                        //TODO NEST COLOR MAP AND SHIELDS ON GENERAL
                         case "General":
                             DrawIndividualUnitFramesGeneralConfig();
+                            break;   
+                        case "Colors":
+                            DrawGeneralColorMapConfig();
+                            break;
+                        case "Shields":
+                            DrawIndividualUnitFramesShieldsConfig();
                             break;
                         case "Player":
-                            
-                            //SubConfigWindowMap.Categories
-                            DrawLeftRightConfigBoxes();
-                            break;      
-                        
-                  
+                            DrawIndividualUnitFramesPlayerConfig();
+                            break;
                         case "Target":
                             DrawIndividualUnitFramesTargetConfig();
                             break;                        
@@ -254,7 +260,8 @@ namespace DelvUI.Interface
 
         private void DrawGeneralGeneralConfig()
         {
-            ImGui.Text("No Configs Yet");
+            ImGui.Text("this has no configs yet");
+
         }
 
         private void DrawGeneralColorMapConfig()
@@ -262,129 +269,144 @@ namespace DelvUI.Interface
             if (ImGui.BeginTabBar("##ColorTabs", ImGuiTabBarFlags.None))
             {
                 if (ImGui.BeginTabItem("Tanks"))
-                {
-                    changed |= ImGui.ColorEdit4("Paladin", ref _pluginConfiguration.JobColorPLD);
-                    changed |= ImGui.ColorEdit4("Warrior", ref _pluginConfiguration.JobColorWAR);
-                    changed |= ImGui.ColorEdit4("Dark Knight", ref _pluginConfiguration.JobColorDRK);
-                    changed |= ImGui.ColorEdit4("Gunbreaker", ref _pluginConfiguration.JobColorGNB);
+                {                            
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Paladin");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorPLD);
+                    
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Warrior");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorWAR);
+                    
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Dark Knight");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorDRK);
+                    
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Gunbreaker");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorGNB);
+                    
                     ImGui.EndTabItem();
                 }
 
                 if (ImGui.BeginTabItem("Healers"))
                 {
-                    changed |= ImGui.ColorEdit4("White Mage", ref _pluginConfiguration.JobColorWHM);
-                    changed |= ImGui.ColorEdit4("Scholar", ref _pluginConfiguration.JobColorSCH);
-                    changed |= ImGui.ColorEdit4("Astrologian", ref _pluginConfiguration.JobColorAST);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("White Mage");
+                    changed |= ImGui.ColorEdit4(" ", ref _pluginConfiguration.JobColorWHM);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Scholar");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorSCH);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Astrologian");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorAST);
                     ImGui.EndTabItem();
                 }
 
                 if (ImGui.BeginTabItem("Melee"))
                 {
-                    changed |= ImGui.ColorEdit4("Monk", ref _pluginConfiguration.JobColorMNK);
-                    changed |= ImGui.ColorEdit4("Dragoon", ref _pluginConfiguration.JobColorDRG);
-                    changed |= ImGui.ColorEdit4("Ninja", ref _pluginConfiguration.JobColorNIN);
-                    changed |= ImGui.ColorEdit4("Samurai", ref _pluginConfiguration.JobColorSAM);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Monk");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorMNK);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Dragoon");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorDRG);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Ninja");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorNIN);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Samurai");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorSAM);
                     ImGui.EndTabItem();
                 }
 
                 if (ImGui.BeginTabItem("Ranged"))
                 {
-                    changed |= ImGui.ColorEdit4("Bard", ref _pluginConfiguration.JobColorBRD);
-                    changed |= ImGui.ColorEdit4("Machinist", ref _pluginConfiguration.JobColorMCH);
-                    changed |= ImGui.ColorEdit4("Dancer", ref _pluginConfiguration.JobColorDNC);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Bard");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorBRD);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Machinist");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorMCH);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Dancer");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorDNC);
                     ImGui.EndTabItem();
                 }
 
                 if (ImGui.BeginTabItem("Casters"))
                 {
-                    changed |= ImGui.ColorEdit4("Black Mage", ref _pluginConfiguration.JobColorBLM);
-                    changed |= ImGui.ColorEdit4("Summoner", ref _pluginConfiguration.JobColorSMN);
-                    changed |= ImGui.ColorEdit4("Red Mage", ref _pluginConfiguration.JobColorRDM);
-                    changed |= ImGui.ColorEdit4("Blue Mage", ref _pluginConfiguration.JobColorBLU);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Black Mage");
+                    changed |= ImGui.ColorEdit4(" ", ref _pluginConfiguration.JobColorBLM);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Summoner");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.JobColorSMN);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Red Mage");
+                    changed |= ImGui.ColorEdit4(" ", ref _pluginConfiguration.JobColorRDM);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Blue Mage");
+                    changed |= ImGui.ColorEdit4(" ", ref _pluginConfiguration.JobColorBLU);
                     ImGui.EndTabItem();
                 }
 
                 if (ImGui.BeginTabItem("NPC"))
                 {
-                    changed |= ImGui.ColorEdit4("Hostile", ref _pluginConfiguration.NPCColorHostile);
-                    changed |= ImGui.ColorEdit4("Neutral", ref _pluginConfiguration.NPCColorNeutral);
-                    changed |= ImGui.ColorEdit4("Friendly", ref _pluginConfiguration.NPCColorFriendly);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Hostile");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.NPCColorHostile);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Neutral");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.NPCColorNeutral);
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Friendly");
+                    changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.NPCColorFriendly);
                     ImGui.EndTabItem();
                 }
                 ImGui.EndTabBar();
             }
             
         }
-
+        private void DrawLeftRightConfigBoxes(){}
         private void DrawIndividualUnitFramesGeneralConfig()
         {
-            
+            //TODO NEST COLOR MAP AND SHIELDS ON GENERAL
+            ImGui.Text("this has no configs yet");
         }
-        private class StructureBuilder
+        
+        private void DrawIndividualUnitFramesShieldsConfig()
         {
-            private BarSizeOptions BarSizeOptions { get; set; }
-        }
-        public class Example
-        {
-            private StructureBuilder _structureBuilder = new StructureBuilder()
+            changed |= ImGui.Checkbox("Enabled", ref _pluginConfiguration.ShieldEnabled);
+
+            var shieldHeight = _pluginConfiguration.ShieldHeight;
+            if (ImGui.DragInt("Height", ref shieldHeight, .1f, 1, 1000))
             {
-                BarSizeOptions = new BarSizeOptions()
-                {
-                    left = new Left()
-                    {
-                        options = new Dictionary<string, OptionValues>()
-                        {
-                            { "Height", new OptionValues() { type = "string", value = "object" } },
-                            { "XOffset", new OptionValues() { type = "string", value = "object" } }
-                        }
-                    },
-                    right = new Right()
-                    {
-                        options = new Dictionary<string, OptionValues>()
-                        {
-                            { "Width", new OptionValues() { type = "string", value = "object" } },
-                            { "YOffset", new OptionValues() { type = "string", value = "object" } }
-                        }
-                    }
-                }
-            };
-        }
-private class BarSizeOptions
-        {
-            private Left left;
-            private Right right;
-        }
+                _pluginConfiguration.ShieldHeight = shieldHeight;
+                _pluginConfiguration.Save();
+            }
 
-private class Left
-        {
-            private Dictionary<string, OptionValues> options;
-        }
-    
-private class Right
-        {
-            private Dictionary<string, OptionValues> options;
-        }
-    
-private class OptionValues
-        {
-            private object value;
-            private string type;
-        }
+            changed |= ImGui.Checkbox("Height in px", ref _pluginConfiguration.ShieldHeightPixels);
 
-private void DrawLeftRightConfigBoxes(){}
-private void DrawIndividualUnitFramesPlayerConfig(){
-            
+            changed |= ImGui.ColorEdit4("Color", ref _pluginConfiguration.ShieldColor);
+
+        }
+        
+        private void DrawIndividualUnitFramesPlayerConfig(){
+                
             bool disabled = true;
-            ImGui.Checkbox("Enabled", ref disabled);
+            ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
             {
                 ImGui.Text("Bar Size & Position");
-                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()*0.3f), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
-                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()*0.5f),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                     {
-                        ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth() / 2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                         {
+                            ImGui.Text("");//SPACING
+
                             ImGui.Text("Height");
                             var healthBarHeight = _pluginConfiguration.HealthBarHeight;
                             if (ImGui.DragInt("", ref healthBarHeight, .1f, 1, 1000))
@@ -392,30 +414,8 @@ private void DrawIndividualUnitFramesPlayerConfig(){
                                 _pluginConfiguration.HealthBarHeight = healthBarHeight;
                                 _pluginConfiguration.Save();
                             }
-                        }
-                        ImGui.EndChild();
-                        
-                        ImGui.SameLine();
-                        
-                        ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth() / 2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-                        {
-                            ImGui.Text("Width");
-                            var healthBarWidth = _pluginConfiguration.HealthBarWidth;
-                            if (ImGui.DragInt("", ref healthBarWidth, .1f, 1, 1000))
-                            {
-                                _pluginConfiguration.HealthBarWidth = healthBarWidth;
-                                _pluginConfiguration.Save();
-                            }
-                        }
-                        ImGui.EndChild();
-                        
-                    }
-                    ImGui.EndChild();
-                    ImGui.Separator();
-                    ImGui.BeginChild("hpoffsetpane", new Vector2(0,ImGui.GetWindowHeight()*0.5f),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-                    {
-                        ImGui.BeginChild("hpxpane", new Vector2(ImGui.GetWindowWidth() / 2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-                        {
+                            ImGui.Text("");//SPACING
+
                             ImGui.Text("X Offset");
                             var healthBarXOffset = _pluginConfiguration.HealthBarXOffset;
                             if (ImGui.DragInt("", ref healthBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
@@ -428,13 +428,461 @@ private void DrawIndividualUnitFramesPlayerConfig(){
                         
                         ImGui.SameLine();
                         
-                        ImGui.BeginChild("hpypane", new Vector2(ImGui.GetWindowWidth() / 2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                         {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Width");
+                            var healthBarWidth = _pluginConfiguration.HealthBarWidth;
+                            if (ImGui.DragInt("", ref healthBarWidth, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.HealthBarWidth = healthBarWidth;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
                             ImGui.Text("Y Offset");
                             var healthBarYOffset = _pluginConfiguration.HealthBarYOffset;
                             if (ImGui.DragInt("", ref healthBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
                             {
                                 _pluginConfiguration.HealthBarYOffset = healthBarYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+
+                    ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+            ImGui.Text("");//SPACING
+
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Text Format");
+                ImGui.BeginChild("hptxtpane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    ImGui.BeginChild("hptxtformatpane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Left Text Format");
+                            var healthBarTextLeft = _pluginConfiguration.HealthBarTextLeft;
+                            if (ImGui.InputText("", ref healthBarTextLeft, 999))
+                            {
+                                _pluginConfiguration.HealthBarTextLeft = healthBarTextLeft;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Left Text X Offset");
+                            var healthBarTextLeftXOffset = _pluginConfiguration.HealthBarTextLeftXOffset;
+                            if (ImGui.DragInt("", ref healthBarTextLeftXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.HealthBarTextLeftXOffset = healthBarTextLeftXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Left Text Y Offset");
+                            var healthBarTextLeftYOffset = _pluginConfiguration.HealthBarTextLeftYOffset;
+                            if (ImGui.DragInt("", ref healthBarTextLeftYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.HealthBarTextLeftYOffset = healthBarTextLeftYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hptxtformatrightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Right Text Format");
+                            var healthBarTextRight = _pluginConfiguration.HealthBarTextRight;
+                            if (ImGui.InputText("", ref healthBarTextRight, 999))
+                            {
+                                _pluginConfiguration.HealthBarTextRight = healthBarTextRight;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Right Text X Offset");
+                            var healthBarTextRightXOffset = _pluginConfiguration.HealthBarTextRightXOffset;
+                            if (ImGui.DragInt("", ref healthBarTextRightXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.HealthBarTextRightXOffset = healthBarTextRightXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Right Text Y Offset");
+                            var healthBarTextRightYOffset = _pluginConfiguration.HealthBarTextRightYOffset;
+                            if (ImGui.DragInt("", ref healthBarTextRightYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.HealthBarTextRightYOffset = healthBarTextRightYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+                    
+
+                ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+                
+        } 
+        private void DrawIndividualUnitFramesTargetConfig(){
+                
+            bool disabled = true;
+            ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Bar Size & Position");
+                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Height");
+                            var TargetBarHeight = _pluginConfiguration.TargetBarHeight;
+                            if (ImGui.DragInt("", ref TargetBarHeight, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.TargetBarHeight = TargetBarHeight;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("X Offset");
+                            var TargetBarXOffset = _pluginConfiguration.TargetBarXOffset;
+                            if (ImGui.DragInt("", ref TargetBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.TargetBarXOffset = TargetBarXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Width");
+                            var TargetBarWidth = _pluginConfiguration.TargetBarWidth;
+                            if (ImGui.DragInt("", ref TargetBarWidth, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.TargetBarWidth = TargetBarWidth;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Y Offset");
+                            var TargetBarYOffset = _pluginConfiguration.TargetBarYOffset;
+                            if (ImGui.DragInt("", ref TargetBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.TargetBarYOffset = TargetBarYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+
+                    ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+            ImGui.Text("");//SPACING
+
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Text Format");
+                ImGui.BeginChild("hptxtpane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    ImGui.BeginChild("hptxtformatpane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Left Text Format");
+                            var TargetBarTextLeft = _pluginConfiguration.TargetBarTextLeft;
+                            if (ImGui.InputText("", ref TargetBarTextLeft, 999))
+                            {
+                                _pluginConfiguration.TargetBarTextLeft = TargetBarTextLeft;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Left Text X Offset");
+                            var TargetBarTextLeftXOffset = _pluginConfiguration.TargetBarTextLeftXOffset;
+                            if (ImGui.DragInt("", ref TargetBarTextLeftXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.TargetBarTextLeftXOffset = TargetBarTextLeftXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Left Text Y Offset");
+                            var TargetBarTextLeftYOffset = _pluginConfiguration.TargetBarTextLeftYOffset;
+                            if (ImGui.DragInt("", ref TargetBarTextLeftYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.TargetBarTextLeftYOffset = TargetBarTextLeftYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hptxtformatrightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Right Text Format");
+                            var TargetBarTextRight = _pluginConfiguration.TargetBarTextRight;
+                            if (ImGui.InputText("", ref TargetBarTextRight, 999))
+                            {
+                                _pluginConfiguration.TargetBarTextRight = TargetBarTextRight;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Right Text X Offset");
+                            var TargetBarTextRightXOffset = _pluginConfiguration.TargetBarTextRightXOffset;
+                            if (ImGui.DragInt("", ref TargetBarTextRightXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.TargetBarTextRightXOffset = TargetBarTextRightXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Right Text Y Offset");
+                            var TargetBarTextRightYOffset = _pluginConfiguration.TargetBarTextRightYOffset;
+                            if (ImGui.DragInt("", ref TargetBarTextRightYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.TargetBarTextRightYOffset = TargetBarTextRightYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+                    
+
+                ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+                
+        } 
+        private void DrawIndividualUnitFramesToTConfig(){
+                
+            bool disabled = true;
+            ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Bar Size & Position");
+                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Height");
+                            var ToTBarHeight = _pluginConfiguration.ToTBarHeight;
+                            if (ImGui.DragInt("", ref ToTBarHeight, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.ToTBarHeight = ToTBarHeight;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("X Offset");
+                            var ToTBarXOffset = _pluginConfiguration.ToTBarXOffset;
+                            if (ImGui.DragInt("", ref ToTBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.ToTBarXOffset = ToTBarXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Width");
+                            var ToTBarWidth = _pluginConfiguration.ToTBarWidth;
+                            if (ImGui.DragInt("", ref ToTBarWidth, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.ToTBarWidth = ToTBarWidth;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Y Offset");
+                            var ToTBarYOffset = _pluginConfiguration.ToTBarYOffset;
+                            if (ImGui.DragInt("", ref ToTBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.ToTBarYOffset = ToTBarYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+
+                    ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+            ImGui.Text("");//SPACING
+
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                //TODO FIX WIDTH LIKE CASTBAR, TEXT FORMAT 100% XY 50 50
+                //TODO COPY PASTA DESIGN TO FOCUS BAR
+                ImGui.Text("Text Format");
+                ImGui.BeginChild("hptxtpane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    ImGui.BeginChild("hptxtformatpane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Text Format");
+                            var ToTBarText = _pluginConfiguration.ToTBarText;
+                            if (ImGui.InputText("", ref ToTBarText, 999))
+                            {
+                                _pluginConfiguration.ToTBarText = ToTBarText;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Text X Offset");
+                            var ToTBarTextXOffset = _pluginConfiguration.ToTBarTextXOffset;
+                            if (ImGui.DragInt("", ref ToTBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.ToTBarTextXOffset = ToTBarTextXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Text Y Offset");
+                            var ToTBarTextYOffset = _pluginConfiguration.ToTBarTextYOffset;
+                            if (ImGui.DragInt("", ref ToTBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.ToTBarTextYOffset = ToTBarTextYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        
+                    }
+                    ImGui.EndChild();
+                    
+
+                ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+                
+        } 
+ 
+        private void DrawIndividualUnitFramesToTConfigss(){
+            bool disabled = true;
+            ImGui.Checkbox("Enabled", ref disabled);//TODO CODE THIS
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Bar Size & Position");
+                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("Height");
+                            var ToTBarHeight = _pluginConfiguration.ToTBarHeight;
+                            if (ImGui.DragInt("", ref ToTBarHeight, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.ToTBarHeight = ToTBarHeight;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("Width");
+                            var ToTBarWidth = _pluginConfiguration.ToTBarWidth;
+                            if (ImGui.DragInt("", ref ToTBarWidth, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.ToTBarWidth = ToTBarWidth;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+                    ImGui.Separator();
+                    ImGui.BeginChild("hpoffsetpane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hpxpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("X Offset");
+                            var ToTBarXOffset = _pluginConfiguration.ToTBarXOffset;
+                            if (ImGui.DragInt("", ref ToTBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.ToTBarXOffset = ToTBarXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hpypane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("Y Offset");
+                            var ToTBarYOffset = _pluginConfiguration.ToTBarYOffset;
+                            if (ImGui.DragInt("", ref ToTBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.ToTBarYOffset = ToTBarYOffset;
                                 _pluginConfiguration.Save();
                             }
                         }
@@ -453,16 +901,35 @@ private void DrawIndividualUnitFramesPlayerConfig(){
             ImGui.BeginGroup(); // Left
             {
                 ImGui.Text("Text Format");
-                ImGui.BeginChild("hptxtpane", new Vector2(0,ImGui.GetWindowHeight()*0.7f), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-                    ImGui.BeginChild("hptxtformatpane", new Vector2(0,ImGui.GetWindowHeight()/3),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                ImGui.BeginChild("hptxtpane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    ImGui.BeginChild("hptxtformatpane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                     {
-                        ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth() / 2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                         {
-                            ImGui.Text("Left Text Format");
-                            var healthBarTextLeft = _pluginConfiguration.HealthBarTextLeft;
-                            if (ImGui.InputText("", ref healthBarTextLeft, 999))
+                            ImGui.Text("Text Format");
+                            var ToTBarText = _pluginConfiguration.ToTBarText;
+                            if (ImGui.InputText("", ref ToTBarText, 999))
                             {
-                                _pluginConfiguration.HealthBarTextLeft = healthBarTextLeft;
+                                _pluginConfiguration.ToTBarText = ToTBarText;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+
+                        
+                    }
+                    ImGui.EndChild();
+                    ImGui.Separator();
+                    ImGui.BeginChild("hptxtoffsetpane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hptxtleftxpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("Text X Offset");
+                            var ToTBarTextXOffset = _pluginConfiguration.ToTBarTextXOffset;
+                            if (ImGui.DragInt("", ref ToTBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.ToTBarTextXOffset = ToTBarTextXOffset;
                                 _pluginConfiguration.Save();
                             }
                         }
@@ -470,13 +937,59 @@ private void DrawIndividualUnitFramesPlayerConfig(){
                         
                         ImGui.SameLine();
                         
-                        ImGui.BeginChild("hptxtformatrightpane", new Vector2(ImGui.GetWindowWidth() / 2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        ImGui.BeginChild("hptxtleftypane", new Vector2(ImGui.GetWindowWidth()/2, 0));
                         {
-                            ImGui.Text("Right Text Format");
-                            var healthBarTextRight = _pluginConfiguration.HealthBarTextRight;
-                            if (ImGui.InputText("", ref healthBarTextRight, 999))
+                            ImGui.Text("Text Y Offset");
+                            var ToTBarTextYOffset = _pluginConfiguration.ToTBarTextYOffset;
+                            if (ImGui.DragInt("", ref ToTBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
                             {
-                                _pluginConfiguration.HealthBarTextRight = healthBarTextRight;
+                                _pluginConfiguration.ToTBarTextYOffset = ToTBarTextYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+
+                ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+                
+        }        
+        private void DrawIndividualUnitFramesFocusConfig(){
+            bool disabled = true;
+            ImGui.Checkbox("Enabled", ref disabled);//TODO CODE THIS
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Bar Size & Position");
+                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("Height");
+                            var FocusBarHeight = _pluginConfiguration.FocusBarHeight;
+                            if (ImGui.DragInt("", ref FocusBarHeight, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.FocusBarHeight = FocusBarHeight;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("Width");
+                            var FocusBarWidth = _pluginConfiguration.FocusBarWidth;
+                            if (ImGui.DragInt("", ref FocusBarWidth, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.FocusBarWidth = FocusBarWidth;
                                 _pluginConfiguration.Save();
                             }
                         }
@@ -485,15 +998,15 @@ private void DrawIndividualUnitFramesPlayerConfig(){
                     }
                     ImGui.EndChild();
                     ImGui.Separator();
-                    ImGui.BeginChild("hptxtoffsetpane", new Vector2(0,ImGui.GetWindowHeight()/3),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    ImGui.BeginChild("hpoffsetpane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                     {
-                        ImGui.BeginChild("hptxtleftxpane", new Vector2(ImGui.GetWindowWidth() / 2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        ImGui.BeginChild("hpxpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                         {
-                            ImGui.Text("Left Text X Offset");
-                            var healthBarTextLeftXOffset = _pluginConfiguration.HealthBarTextLeftXOffset;
-                            if (ImGui.DragInt("", ref healthBarTextLeftXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            ImGui.Text("X Offset");
+                            var FocusBarXOffset = _pluginConfiguration.FocusBarXOffset;
+                            if (ImGui.DragInt("", ref FocusBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
                             {
-                                _pluginConfiguration.HealthBarTextLeftXOffset = healthBarTextLeftXOffset;
+                                _pluginConfiguration.FocusBarXOffset = FocusBarXOffset;
                                 _pluginConfiguration.Save();
                             }
                         }
@@ -501,44 +1014,13 @@ private void DrawIndividualUnitFramesPlayerConfig(){
                         
                         ImGui.SameLine();
                         
-                        ImGui.BeginChild("hptxtleftypane", new Vector2(ImGui.GetWindowWidth() / 2, 0));
+                        ImGui.BeginChild("hpypane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                         {
-                            ImGui.Text("Left Text Y Offset");
-                            var healthBarTextLeftYOffset = _pluginConfiguration.HealthBarTextLeftYOffset;
-                            if (ImGui.DragInt("", ref healthBarTextLeftYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            ImGui.Text("Y Offset");
+                            var FocusBarYOffset = _pluginConfiguration.FocusBarYOffset;
+                            if (ImGui.DragInt("", ref FocusBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
                             {
-                                _pluginConfiguration.HealthBarTextLeftYOffset = healthBarTextLeftYOffset;
-                                _pluginConfiguration.Save();
-                            }
-                        }
-                        ImGui.EndChild();
-                        
-                    }
-                    ImGui.EndChild();
-                    ImGui.Separator();
-                    ImGui.BeginChild("hpoffsetpane", new Vector2(0,ImGui.GetWindowHeight()/2));
-                    {
-                        ImGui.BeginChild("hpxleftpane", new Vector2(ImGui.GetWindowWidth() / 2, 0));
-                        {
-                            ImGui.Text("Right Text X Offset");
-                            var healthBarTextRightXOffset = _pluginConfiguration.HealthBarTextRightXOffset;
-                            if (ImGui.DragInt("", ref healthBarTextRightXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                            {
-                                _pluginConfiguration.HealthBarTextRightXOffset = healthBarTextRightXOffset;
-                                _pluginConfiguration.Save();
-                            }
-                        }
-                        ImGui.EndChild();
-                        
-                        ImGui.SameLine();
-                        
-                        ImGui.BeginChild("hpypane", new Vector2(ImGui.GetWindowWidth() / 2, 0));
-                        {
-                            ImGui.Text("Right Text Y Offset");
-                            var healthBarTextRightYOffset = _pluginConfiguration.HealthBarTextRightYOffset;
-                            if (ImGui.DragInt("", ref healthBarTextRightYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                            {
-                                _pluginConfiguration.HealthBarTextRightYOffset = healthBarTextRightYOffset;
+                                _pluginConfiguration.FocusBarYOffset = FocusBarYOffset;
                                 _pluginConfiguration.Save();
                             }
                         }
@@ -553,144 +1035,220 @@ private void DrawIndividualUnitFramesPlayerConfig(){
             ImGui.EndGroup();
             ImGui.EndGroup();
             
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Text Format");
+                ImGui.BeginChild("hptxtpane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    ImGui.BeginChild("hptxtformatpane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("Text Format");
+                            var FocusBarText = _pluginConfiguration.FocusBarText;
+                            if (ImGui.InputText("", ref FocusBarText, 999))
+                            {
+                                _pluginConfiguration.FocusBarText = FocusBarText;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+
+                        
+                    }
+                    ImGui.EndChild();
+                    ImGui.Separator();
+                    ImGui.BeginChild("hptxtoffsetpane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hptxtleftxpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("Text X Offset");
+                            var FocusBarTextXOffset = _pluginConfiguration.FocusBarTextXOffset;
+                            if (ImGui.DragInt("", ref FocusBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.FocusBarTextXOffset = FocusBarTextXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hptxtleftypane", new Vector2(ImGui.GetWindowWidth()/2, 0));
+                        {
+                            ImGui.Text("Text Y Offset");
+                            var FocusBarTextYOffset = _pluginConfiguration.FocusBarTextYOffset;
+                            if (ImGui.DragInt("", ref FocusBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.ToTBarTextYOffset = FocusBarTextYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+
+                ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+                
+        }        
+        private void DrawCastbarsPlayerConfig(){
+            bool disabled = true;
+            changed |= ImGui.Checkbox("Enabled", ref _pluginConfiguration.ShowCastBar);
+
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Bar Size & Position");
+                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Height");
+                            var CastBarHeight = _pluginConfiguration.CastBarHeight;
+                            if (ImGui.DragInt("", ref CastBarHeight, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.CastBarHeight = CastBarHeight;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("X Offset");
+                            var CastBarXOffset = _pluginConfiguration.CastBarXOffset;
+                            if (ImGui.DragInt("", ref CastBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.CastBarXOffset = CastBarXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Width");
+                            var CastBarWidth = _pluginConfiguration.CastBarWidth;
+                            if (ImGui.DragInt("", ref CastBarWidth, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.CastBarWidth = CastBarWidth;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Y Offset");
+                            var CastBarYOffset = _pluginConfiguration.CastBarYOffset;
+                            if (ImGui.DragInt("", ref CastBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.CastBarYOffset = CastBarYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+                    ImGui.Text("");//SPACING
+
+                    ImGui.BeginChild("castbarcolor", new Vector2(0,ImGui.GetWindowHeight()/3),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.Text("Color");
+                        changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.CastBarColor);
+
+                        
+                    }
+                    ImGui.EndChild();
+                ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();   
+            ImGui.Text("");//SPACING
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Other Options");
+                ImGui.BeginChild("otheroptions", new Vector2(0,ImGui.GetWindowHeight()/4), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("otheroptions1", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("otheroptions2", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+                            changed |= ImGui.Checkbox("Show Interrupted", ref _pluginConfiguration.InterruptCheck);
+                            ImGui.Text("");//SPACING
+                            changed |= ImGui.Checkbox("Show Action Icon", ref _pluginConfiguration.ShowActionIcon);
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("otheroptions3", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+                            changed |= ImGui.Checkbox("Show Action Name", ref _pluginConfiguration.ShowActionName);
+                            ImGui.Text("");//SPACING
+                            changed |= ImGui.Checkbox("Show Cast Time", ref _pluginConfiguration.ShowCastTime);
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+
+                    ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+            ImGui.Text("");//SPACING
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {                        
+                changed |= ImGui.Checkbox("SlideCast", ref _pluginConfiguration.SlideCast);
+                ImGui.BeginChild("hptxtpane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    ImGui.BeginChild("hptxtformatpane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth(), 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+                            ImGui.Text("Offset");
+                            var SlideCastTime = _pluginConfiguration.SlideCastTime;
+                            if (ImGui.DragFloat("", ref SlideCastTime, 1, 1, 1000))
+                            {
+                                _pluginConfiguration.SlideCastTime = SlideCastTime;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+                            ImGui.Text("Color");
+                            changed |= ImGui.ColorEdit4("", ref _pluginConfiguration.SlideCastColor);
+
+                        }
+                        ImGui.EndChild();
+                        
+
+                        
+                    }
+                    ImGui.EndChild();
+                    ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+                
         }        
         
 
-
-        private void DrawIndividualUnitFramesTargetConfig()
-        {
-            var primaryResourceHeight = _pluginConfiguration.PrimaryResourceBarHeight;
-            if (ImGui.DragInt("Primary Resource Height", ref primaryResourceHeight, .1f, 1, 1000))
-            {
-                _pluginConfiguration.PrimaryResourceBarHeight = primaryResourceHeight;
-                _pluginConfiguration.Save();
-            }
-
-            var primaryResourceWidth = _pluginConfiguration.PrimaryResourceBarWidth;
-            if (ImGui.DragInt("Primary Resource Width", ref primaryResourceWidth, .1f, 1, 1000))
-            {
-                _pluginConfiguration.PrimaryResourceBarWidth = primaryResourceWidth;
-                _pluginConfiguration.Save();
-            }
-
-            var primaryResourceBarXOffset = _pluginConfiguration.PrimaryResourceBarXOffset;
-            if (ImGui.DragInt("Primary Resource X Offset", ref primaryResourceBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-            {
-                _pluginConfiguration.PrimaryResourceBarXOffset = primaryResourceBarXOffset;
-                _pluginConfiguration.Save();
-            }
-
-            var primaryResourceBarYOffset = _pluginConfiguration.PrimaryResourceBarYOffset;
-            if (ImGui.DragInt("Primary Resource Y Offset", ref primaryResourceBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-            {
-                _pluginConfiguration.PrimaryResourceBarYOffset = primaryResourceBarYOffset;
-                _pluginConfiguration.Save();
-            }
-        }
+     
         
-        private void DrawIndividualUnitFramesToTConfig()
-        {
-            var totBarHeight = _pluginConfiguration.ToTBarHeight;
-                    if (ImGui.DragInt("Target of Target Height", ref totBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.ToTBarHeight = totBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var totBarWidth = _pluginConfiguration.ToTBarWidth;
-                    if (ImGui.DragInt("Target of Target Width", ref totBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.ToTBarWidth = totBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var totBarText = _pluginConfiguration.ToTBarText;
-                    if (ImGui.InputText("Target of Target Text", ref totBarText, 999))
-                    {
-                        _pluginConfiguration.ToTBarText = totBarText;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var toTBarXOffset = _pluginConfiguration.ToTBarXOffset;
-                    if (ImGui.DragInt("Target of Target X Offset", ref toTBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.ToTBarXOffset = toTBarXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var toTBarYOffset = _pluginConfiguration.ToTBarYOffset;
-                    if (ImGui.DragInt("Target of Target Y Offset", ref toTBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.ToTBarYOffset = toTBarYOffset;
-                        _pluginConfiguration.Save();
-                    }
-                    
-                    var totBarTextXOffset = _pluginConfiguration.ToTBarTextXOffset;
-                    if (ImGui.DragInt("Target of Target Text X Offset", ref totBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.ToTBarTextXOffset = totBarTextXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var totBarTextYOffset = _pluginConfiguration.ToTBarTextYOffset;
-                    if (ImGui.DragInt("Target of Target Text Y Offset", ref totBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.ToTBarTextYOffset = totBarTextYOffset;
-                        _pluginConfiguration.Save();
-                    }
-        }
-        
-        private void DrawIndividualUnitFramesFocusConfig()
-        {
-            var focusBarHeight = _pluginConfiguration.FocusBarHeight;
-                    if (ImGui.DragInt("Focus Height", ref focusBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.FocusBarHeight = focusBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var focusBarWidth = _pluginConfiguration.FocusBarWidth;
-                    if (ImGui.DragInt("Focus Width", ref focusBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.FocusBarWidth = focusBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var focusBarXOffset = _pluginConfiguration.FocusBarXOffset;
-                    if (ImGui.DragInt("Focus X Offset", ref focusBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.FocusBarXOffset = focusBarXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var focusBarYOffset = _pluginConfiguration.FocusBarYOffset;
-                    if (ImGui.DragInt("Focus Y Offset", ref focusBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.FocusBarYOffset = focusBarYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var focusBarText = _pluginConfiguration.FocusBarText;
-                    if (ImGui.InputText("Focus Text", ref focusBarText, 999))
-                    {
-                        _pluginConfiguration.FocusBarText = focusBarText;
-                        _pluginConfiguration.Save();
-                    }
-                    
-                    var focusBarTextXOffset = _pluginConfiguration.FocusBarTextXOffset;
-                    if (ImGui.DragInt("Focus Text X Offset", ref focusBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.FocusBarTextXOffset = focusBarTextXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var focusBarTextYOffset = _pluginConfiguration.FocusBarTextYOffset;
-                    if (ImGui.DragInt("Focus Text Y Offset", ref focusBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.FocusBarTextYOffset = focusBarTextYOffset;
-                        _pluginConfiguration.Save();
-                    }
-        }
 
         private void DrawGroupUnitFramesGeneralConfig()
         {
@@ -722,9 +1280,50 @@ private void DrawIndividualUnitFramesPlayerConfig(){
             
         }
 
-        private void DrawCastbarsPlayerConfig()
+        private void DrawCastbarsPlayerConfigss()
         {
-            
+
+                    var castBarHeight = _pluginConfiguration.CastBarHeight;
+                    if (ImGui.DragInt("Castbar Height", ref castBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.CastBarHeight = castBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var castBarWidth = _pluginConfiguration.CastBarWidth;
+                    if (ImGui.DragInt("Castbar Width", ref castBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.CastBarWidth = castBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var castBarXOffset = _pluginConfiguration.CastBarXOffset;
+                    if (ImGui.DragInt("Castbar X Offset", ref castBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                    {
+                        _pluginConfiguration.CastBarXOffset = castBarXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var castBarYOffset = _pluginConfiguration.CastBarYOffset;
+                    if (ImGui.DragInt("Castbar Y Offset", ref castBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                    {
+                        _pluginConfiguration.CastBarYOffset = castBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+
+
+
+
+
+                    var slideCastTime = _pluginConfiguration.SlideCastTime;
+                    if (ImGui.DragFloat("Slide Cast Offset", ref slideCastTime, 1, 1, 1000))
+                    {
+                        _pluginConfiguration.SlideCastTime = slideCastTime;
+                        _pluginConfiguration.Save();
+                    }
+
+
         }
 
         private void DrawCastbarsEnemyConfig()

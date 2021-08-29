@@ -33,72 +33,13 @@
                         _pluginConfiguration.Save();
                     }
                     
-                    changed |= ImGui.Checkbox("Shield Enabled", ref _pluginConfiguration.ShieldEnabled);
-
-                    var shieldHeight = _pluginConfiguration.ShieldHeight;
-                    if (ImGui.DragInt("Shield Height", ref shieldHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.ShieldHeight = shieldHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.Checkbox("Shield Height in px", ref _pluginConfiguration.ShieldHeightPixels);
-
-                    changed |= ImGui.ColorEdit4("Shield Color", ref _pluginConfiguration.ShieldColor);
 
 
-                    ImGui.EndTabItem();
                 }
 
                 if (ImGui.BeginTabItem("Castbar"))
                 {
-                    changed |= ImGui.Checkbox("Show Cast Bar", ref _pluginConfiguration.ShowCastBar);
-
-                    var castBarHeight = _pluginConfiguration.CastBarHeight;
-                    if (ImGui.DragInt("Castbar Height", ref castBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.CastBarHeight = castBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var castBarWidth = _pluginConfiguration.CastBarWidth;
-                    if (ImGui.DragInt("Castbar Width", ref castBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.CastBarWidth = castBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var castBarXOffset = _pluginConfiguration.CastBarXOffset;
-                    if (ImGui.DragInt("Castbar X Offset", ref castBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.CastBarXOffset = castBarXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var castBarYOffset = _pluginConfiguration.CastBarYOffset;
-                    if (ImGui.DragInt("Castbar Y Offset", ref castBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.CastBarYOffset = castBarYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.ColorEdit4("Castbar Color", ref _pluginConfiguration.CastBarColor);
-
-                    changed |= ImGui.Checkbox("Show Interrupted", ref _pluginConfiguration.InterruptCheck);
-                    changed |= ImGui.Checkbox("Show Action Icon", ref _pluginConfiguration.ShowActionIcon);
-                    changed |= ImGui.Checkbox("Show Action Name", ref _pluginConfiguration.ShowActionName);
-                    changed |= ImGui.Checkbox("Show Cast Time", ref _pluginConfiguration.ShowCastTime);
-                    changed |= ImGui.Checkbox("Slide Cast Enabled", ref _pluginConfiguration.SlideCast);
-
-                    var slideCastTime = _pluginConfiguration.SlideCastTime;
-                    if (ImGui.DragFloat("Slide Cast Offset", ref slideCastTime, 1, 1, 1000))
-                    {
-                        _pluginConfiguration.SlideCastTime = slideCastTime;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.ColorEdit4("Slide Cast Color", ref _pluginConfiguration.SlideCastColor);
-
+                    
                     ImGui.EndTabItem();
                 }
 
