@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using Dalamud.Interface;
 using Dalamud.Plugin;
 using ImGuiNET;
 
@@ -39,81 +40,93 @@ namespace DelvUI.Interface
             if (!IsVisible) {
                 return;
             }
+            //TODO
+            //ImGui.GetIO().FontGlobalScale;
+            ImGui.SetNextWindowSize(ImGuiHelpers.S(900, 600), ImGuiCond.Appearing);
 
-            ImGui.SetNextWindowSize(new Vector2(900, 600), ImGuiCond.Appearing);
 
-            if (!ImGui.Begin(" ", ref IsVisible, ImGuiWindowFlags.NoResize)) {
+            if (!ImGui.Begin("titlebar", ref IsVisible, ImGuiWindowFlags.NoTitleBar)) {
                 return;
             }
+
             var changed = false;
-
-                ImGui.BeginGroup();
+            var pos = ImGui.GetCursorPos();
+            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth()-26, 0));
+            ImGui.PushFont(UiBuilder.IconFont);
+            if (ImGui.Button(FontAwesomeIcon.Times.ToIconString()))
+            {
+                IsVisible = false;
+            }
+            ImGui.PopFont();
+            ImGui.SetCursorPos(pos);
+            
+            ImGui.BeginGroup();
+            {
+                ImGui.BeginGroup(); // Left
                 {
-                    ImGui.BeginGroup(); // Left
+                    var imagePath = Path.Combine(Path.GetDirectoryName(_plugin.AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
+                    var delvuiBanner = _pluginInterface.UiBuilder.LoadImage(imagePath);
+                    ImGui.Image(delvuiBanner.ImGuiHandle, new Vector2(delvuiBanner.Width, delvuiBanner.Height));
+
+                    ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
+
+                    foreach (var config in configMap.Keys)
                     {
-                        var imagePath = Path.Combine(Path.GetDirectoryName(_plugin.AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
-                        var delvuiBanner = _pluginInterface.UiBuilder.LoadImage(imagePath);
-                        ImGui.Image(delvuiBanner.ImGuiHandle, new Vector2(delvuiBanner.Width, delvuiBanner.Height));
-
-                        ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
-
-                        foreach (var config in configMap.Keys)
-                        {
-                            if (ImGui.Selectable(config, selected == config))
-                                selected = config;
-                        }
-
-                        ImGui.EndChild();
-
-
+                        if (ImGui.Selectable(config, selected == config))
+                            selected = config;
                     }
-                    ImGui.EndGroup();
 
-                    ImGui.SameLine();
+                    ImGui.EndChild();
 
-                    // Right
-                    ImGui.BeginGroup();
-                    {
-                        var subConfigs = configMap[selected];
-                        
-                        ImGui.BeginChild("item view",new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
-                        {
-                            if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
-                            {
-                                foreach (string sunConfig in subConfigs)
-                                {
 
-                                    if (!ImGui.BeginTabItem(sunConfig)) continue;
-                                    ImGui.BeginChild("subconfig value", new Vector2(0, 0), true);
-                                    ImGui.TextWrapped(sunConfig);
-                                    ImGui.EndChild();
-                                    ImGui.EndTabItem();
-                                }
-
-                                ImGui.EndTabBar();
-                                
-                            }
-                        }
-                        ImGui.EndChild();
-                        
-                    }
-                    ImGui.EndGroup();
                 }
                 ImGui.EndGroup();
-                
-                ImGui.BeginGroup();
 
-                if (ImGui.Button("Lock HUD"))
+                ImGui.SameLine();
+
+                // Right
+                ImGui.BeginGroup();
                 {
-                    IsVisible = false;
+                    var subConfigs = configMap[selected];
+                        
+                    ImGui.BeginChild("item view",new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+                    {
+                        if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
+                        {
+                            foreach (string sunConfig in subConfigs)
+                            {
+
+                                if (!ImGui.BeginTabItem(sunConfig)) continue;
+                                ImGui.BeginChild("subconfig value", new Vector2(0, 0), true);
+                                ImGui.TextWrapped(sunConfig);
+                                ImGui.EndChild();
+                                ImGui.EndTabItem();
+                            }
+
+                            ImGui.EndTabBar();
+                                
+                        }
+                    }
+                    ImGui.EndChild();
+                        
                 }
-                ImGui.SameLine();
-                if (ImGui.Button("Hide HUD")) {}                
-                ImGui.SameLine();
-                if (ImGui.Button("Reset HUD")) {}
+                ImGui.EndGroup();
+            }
+            ImGui.EndGroup();
+                
+            ImGui.BeginGroup();
+
+            if (ImGui.Button("Lock HUD"))
+            {
+                IsVisible = false;
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Hide HUD")) {}                
+            ImGui.SameLine();
+            if (ImGui.Button("Reset HUD")) {}
                  
 
-                ImGui.EndGroup();
+            ImGui.EndGroup();
                 
 
             if (changed)
