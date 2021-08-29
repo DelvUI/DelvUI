@@ -36,6 +36,9 @@ namespace DelvUI {
 
         public bool ShieldEnabled = true;
 
+        public int TankStanceIndicatorWidth { get; set; } = 2;
+        public bool TankStanceIndicatorEnabled = true;
+
         public string HealthBarTextLeft = "[name:abbreviate]";
         public string HealthBarTextRight = "[health:max-short] | [health:percent]";
         public int HealthBarTextLeftXOffset { get; set; } = 0;
