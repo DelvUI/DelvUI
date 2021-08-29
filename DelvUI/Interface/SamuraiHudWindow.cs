@@ -122,8 +122,8 @@ namespace DelvUI.Interface
                 return;
             }
 
-            var higanbana = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1228 || o.EffectId == 1319);
-
+            int actorID = PluginInterface.ClientState.LocalPlayer.ActorId;
+            var higanbana = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1228 && o.OwnerId == actorID || o.EffectId == 1319 && o.OwnerId == actorID);
             var higanbanaDuration = higanbana.Duration;
 
             var higanbanaColor = higanbanaDuration > 5 ? SamHiganbanaColor["base"] : SamExpiryColor["base"];
