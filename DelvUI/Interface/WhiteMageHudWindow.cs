@@ -84,7 +84,9 @@ namespace DelvUI.Interface
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
                 return;
             }
-            var dia = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1871 || o.EffectId == 144 || o.EffectId == 143);
+            var dia = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1871 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
+                                                               o.EffectId == 144 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
+                                                               o.EffectId == 143 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
             var diaCooldown = dia.EffectId == 1871 ? 30f : 18f;
             var diaDuration = dia.Duration;
             var xOffset = CenterX;
