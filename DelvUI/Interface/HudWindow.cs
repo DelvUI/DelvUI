@@ -17,6 +17,7 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
+using DelvUI.Helpers;
 
 namespace DelvUI.Interface {
     public abstract class HudWindow {
@@ -69,6 +70,11 @@ namespace DelvUI.Interface {
         protected int FocusBarTextXOffset => PluginConfiguration.FocusBarTextXOffset;
         protected int FocusBarTextYOffset => PluginConfiguration.FocusBarTextYOffset;
 
+        protected int MPTickerHeight => PluginConfiguration.MPTickerHeight;
+        protected int MPTickerWidth => PluginConfiguration.MPTickerWidth;
+        protected int MPTickerXOffset => PluginConfiguration.MPTickerXOffset;
+        protected int MPTickerYOffset => PluginConfiguration.MPTickerYOffset;
+
         protected int CastBarWidth => PluginConfiguration.CastBarWidth;
         protected int CastBarHeight => PluginConfiguration.CastBarHeight;
         protected int CastBarXOffset => PluginConfiguration.CastBarXOffset;
@@ -84,11 +90,23 @@ namespace DelvUI.Interface {
         private delegate void OpenContextMenuFromTarget(IntPtr agentHud, IntPtr gameObject);
         private OpenContextMenuFromTarget openContextMenuFromTarget;
 
+        private MpTickHelper mpTickHelper = null;
+
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {
             PluginInterface = pluginInterface;
             PluginConfiguration = pluginConfiguration;
 
             openContextMenuFromTarget = Marshal.GetDelegateForFunctionPointer<OpenContextMenuFromTarget>(PluginInterface.TargetModuleScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
+
+            PluginConfiguration.ConfigChangedEvent += OnConfigChanged;
+        }
+
+        protected void OnConfigChanged(object sender, EventArgs args)
+        {
+            if (!PluginConfiguration.MPTickerEnabled)
+            {
+                mpTickHelper = null;
+            } 
         }
 
         protected virtual void DrawHealthBar() {
@@ -97,7 +115,7 @@ namespace DelvUI.Interface {
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentHp / actor.MaxHp;
 
-            if (actor.ClassJob.Id is 19 or 32 or 21 or 37) {
+            if (PluginConfiguration.TankStanceIndicatorEnabled && (actor.ClassJob.Id is 19 or 32 or 21 or 37)) {
                 DrawTankStanceIndicator();
             }
 
@@ -267,7 +285,7 @@ namespace DelvUI.Interface {
 
         protected virtual void DrawTargetOfTargetBar(int targetActorId) {
             Actor target = null;
-            if (targetActorId == 0) {
+            if (targetActorId == 0 && PluginInterface.ClientState.LocalPlayer.TargetActorID == 0) {
                 target = PluginInterface.ClientState.LocalPlayer;
             }
             else {
@@ -480,12 +498,15 @@ namespace DelvUI.Interface {
                     o.EffectId == 1833    // ROYAL GUARD
             );
 
-            if (tankStanceBuff.Count() != 1) {
+            var offset = PluginConfiguration.TankStanceIndicatorWidth + 1;
+            if (tankStanceBuff.Count() != 1)
+            {
                 var barSize = new Vector2(HealthBarHeight > HealthBarWidth ? HealthBarWidth : HealthBarHeight, HealthBarHeight);
-                var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset - 5, CenterY + HealthBarYOffset + 5);
+                var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset - offset, CenterY + HealthBarYOffset + offset);
                 ImGui.SetCursorPos(cursorPos);
 
                 var drawList = ImGui.GetWindowDrawList();
+
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + barSize,
@@ -493,12 +514,14 @@ namespace DelvUI.Interface {
                 );
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             }
-            else {
+            else
+            {
                 var barSize = new Vector2(HealthBarHeight > HealthBarWidth ? HealthBarWidth : HealthBarHeight, HealthBarHeight);
-                var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset - 5, CenterY + HealthBarYOffset + 5);
+                var cursorPos = new Vector2(CenterX - HealthBarWidth - HealthBarXOffset - offset, CenterY + HealthBarYOffset + offset);
                 ImGui.SetCursorPos(cursorPos);
 
                 var drawList = ImGui.GetWindowDrawList();
+
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + barSize,
@@ -506,6 +529,40 @@ namespace DelvUI.Interface {
                 );
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             }
+        }
+
+        protected virtual void DrawMPTicker()
+        {
+            if (!PluginConfiguration.MPTickerEnabled)
+            {
+                return;
+            }
+
+            if (mpTickHelper == null)
+            {
+                mpTickHelper = new MpTickHelper(PluginInterface);
+            }
+
+            var now = ImGui.GetTime();
+            var scale = (float)((now - mpTickHelper.lastTick) / MpTickHelper.serverTickRate);
+            if (scale <= 0)
+            {
+                return;
+            } 
+            else if (scale > 1)
+            {
+                scale = 1;
+            }
+
+            var barSize = new Vector2(Math.Max(1f, MPTickerWidth * scale), MPTickerHeight);
+            var position = new Vector2(CenterX + MPTickerXOffset - MPTickerWidth / 2f, CenterY + MPTickerYOffset);
+            var colors = PluginConfiguration.MPTickerColorMap["mpTicker"];
+
+            var drawList = ImGui.GetWindowDrawList();
+            drawList.AddRectFilled(position, position + new Vector2(MPTickerWidth, MPTickerHeight), 0x88000000);
+            drawList.AddRectFilledMultiColor(position, position + barSize,
+                colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+            );
         }
 
         protected unsafe virtual float ActorShieldValue(Actor actor) {
@@ -591,9 +648,21 @@ namespace DelvUI.Interface {
                 return;
             }
 
+            DrawGenericElements();
+
             Draw(true);
 
             ImGui.End();
+        }
+        
+        protected void DrawGenericElements()
+        {
+            DrawHealthBar();
+            DrawPrimaryResourceBar();
+            DrawTargetBar();
+            DrawFocusBar();
+            DrawCastBar();
+            DrawMPTicker();
         }
 
         protected abstract void Draw(bool _);

@@ -16,12 +16,8 @@ namespace DelvUI.Interface {
         public DancerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _) {
-            DrawHealthBar();
             DrawPrimaryResourceBar();
             DrawSecondaryResourceBar();
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
         }
 
         protected override void DrawPrimaryResourceBar() {
