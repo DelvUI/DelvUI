@@ -4,9 +4,9 @@ using System.Reflection;
 using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using ImGuiNET;
-using DelvUIPlugin.Interface;
+using DelvUI.Interface;
 
-namespace DelvUIPlugin {
+namespace DelvUI {
     // ReSharper disable once ClassNeverInstantiated.Global
     public class Plugin : IDalamudPlugin {
         public string Name => "DelvUI";
@@ -35,9 +35,12 @@ namespace DelvUIPlugin {
                 ShowInHelp = true
             });
 
-            _pluginInterface.UiBuilder.OnBuildUi += BuildUi;
+            _pluginInterface.UiBuilder.OnBuildUi += Draw;
             _pluginInterface.UiBuilder.OnBuildFonts += BuildFont;
             _pluginInterface.UiBuilder.OnOpenConfigUi += OpenConfigUi;
+            if (!_fontBuilt && !_fontLoadFailed) {
+                _pluginInterface.UiBuilder.RebuildFonts();
+            }
         }
         
         private void BuildFont() {
@@ -63,21 +66,19 @@ namespace DelvUIPlugin {
             _configurationWindow.IsVisible = !_configurationWindow.IsVisible;
         }
 
-        private void BuildUi() {
+        private void Draw() {
             _pluginInterface.UiBuilder.OverrideGameCursor = false;
             
-            if (!_fontBuilt && !_fontLoadFailed) {
-                _pluginInterface.UiBuilder.RebuildFonts();
-                return;
+            _configurationWindow.Draw();
+
+            if (_fontBuilt) {
+                ImGui.PushFont(_pluginConfiguration.BigNoodleTooFont);
             }
             
-            if (_fontBuilt) ImGui.PushFont(_pluginConfiguration.BigNoodleTooFont);
-
             if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
                 SwapJobs();
             }
 
-            _configurationWindow.Draw();
             _hudWindow?.Draw();
 
             if (_fontBuilt) {
@@ -88,13 +89,61 @@ namespace DelvUIPlugin {
         private void SwapJobs() {
             _hudWindow = _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id switch
             {
-                Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
+                //Tanks
                 Jobs.DRK => new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.DNC => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.GNB => new GunbreakerHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.WAR => new WarriorHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.PLD => new PaladinHudWindow(_pluginInterface, _pluginConfiguration),
+
+                //Healers
+                Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.SCH => new ScholarHudWindow(_pluginInterface, _pluginConfiguration),
+                
+                //Melee DPS
                 Jobs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.MNK => new MonkHudWindow(_pluginInterface, _pluginConfiguration),
+                
+                //Ranged DPS
                 Jobs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.DNC => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.MCH => new MachinistHudWindow(_pluginInterface, _pluginConfiguration),
+                
+                //Caster DPS
                 Jobs.RDM => new RedMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SMN => new SummonerHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.BLM => new BlackMageHudWindow(_pluginInterface, _pluginConfiguration),
+
+                //Low jobs
+                Jobs.MRD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.GLD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.CNJ => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.PGL => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.LNC => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.ROG => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.ARC => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.THM => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.ACN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                
+                //Hand
+                Jobs.CRP => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.BSM => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.ARM => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.GSM => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.LTW => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.WVR => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.ALC => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.CUL => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                
+                //Land
+                Jobs.MIN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.BOT => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.FSH => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                
+                //dont have packs yet
+                Jobs.NIN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.AST => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.DRG => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.BLU => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 _ => _hudWindow
             };
         }
@@ -115,7 +164,7 @@ namespace DelvUIPlugin {
             }
 
             _pluginInterface.CommandManager.RemoveHandler("/pdelvui");
-            _pluginInterface.UiBuilder.OnBuildUi -= BuildUi;
+            _pluginInterface.UiBuilder.OnBuildUi -= Draw;
             _pluginInterface.UiBuilder.OnBuildFonts -= BuildFont;
             _pluginInterface.UiBuilder.OnOpenConfigUi -= OpenConfigUi;
             _pluginInterface.UiBuilder.RebuildFonts();

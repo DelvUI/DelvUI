@@ -1,32 +1,40 @@
-﻿using System;
+﻿using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
 
-namespace DelvUIPlugin.Interface {
+namespace DelvUI.Interface {
     public class RedMageHudWindow : HudWindow {
         public override uint JobId => 35;
         
-        private new int BarHeight => 20;
-        private new int BarWidth => 254;
+        private int BarHeight => 20;
+        private int BarWidth => 254;
         private new int XOffset => 127;
-        private new int YOffset => 440;
+        private new int YOffset => 439;
         
         public RedMageHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _) {
             DrawHealthBar();
+            DrawTargetBar();
+            DrawFocusBar();
+            DrawCastBar();
+            
             DrawPrimaryResourceBar();
             DrawWhiteManaBar();
             DrawBlackManaBar();
             DrawAccelBar();
             DrawDualCastBar();
-            DrawCrystalBar();
-            DrawTargetBar();
+            DrawBalanceBar();
+            DrawVerstoneRdyBar();
+            DrawVerfireRdyBar();
+
         }
         protected override void DrawPrimaryResourceBar() {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentMp / actor.MaxMp;
             var barSize = new Vector2(BarWidth, BarHeight);
@@ -69,7 +77,7 @@ namespace DelvUIPlugin.Interface {
             
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             drawList.AddRect(cursorPos, cursorPos + new Vector2(barSize.X*0.8f, barSize.Y), 0xFF000000);
-            DrawOutlinedText(gauge.ToString(), new Vector2(cursorPos.X+barSize.X * gauge/100-(gauge==100?30:gauge>5?20:0), cursorPos.Y+-2));
+            DrawOutlinedText(gauge.ToString(CultureInfo.InvariantCulture), new Vector2(cursorPos.X+barSize.X * gauge/100-(gauge==100?30:gauge>3?20:0), cursorPos.Y+-2));
 
 
         }        
@@ -87,12 +95,13 @@ namespace DelvUIPlugin.Interface {
             
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             drawList.AddRect(cursorPos, new Vector2(cursorPos.X + barSize.X*0.8f, cursorPos.Y + barSize.Y), 0xFF000000);
-            DrawOutlinedText(gauge.ToString(), new Vector2(cursorPos.X+barSize.X * gauge/100-(gauge==100?30:gauge>5?20:0), cursorPos.Y+-2));
+            DrawOutlinedText(gauge.ToString(CultureInfo.InvariantCulture), new Vector2(cursorPos.X+barSize.X * gauge/100-(gauge==100?30:gauge>3?20:0), cursorPos.Y+-2));
 
         }  
         
         private void DrawAccelBar() {
-            var barSize = new Vector2(BarWidth/3-1, BarHeight/2);
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+            var barSize = new Vector2(BarWidth/3-1, BarHeight/2f);
             var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 55);
             var drawList = ImGui.GetWindowDrawList();
             var accelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1238);
@@ -153,6 +162,7 @@ namespace DelvUIPlugin.Interface {
         }    
         
         private void DrawDualCastBar() {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var barSize = new Vector2(BarWidth, BarHeight);
             var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 22);
             var drawList = ImGui.GetWindowDrawList();
@@ -174,7 +184,7 @@ namespace DelvUIPlugin.Interface {
                 
         }  
         
-        private void DrawCrystalBar() {
+        private void DrawBalanceBar() {
             var whiteGauge = (float)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().WhiteGauge;
             var blackGauge = (float)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().BlackGauge;
             var gaugeDiff = whiteGauge - blackGauge;
@@ -210,6 +220,34 @@ namespace DelvUIPlugin.Interface {
             
             drawList.AddRect(new Vector2(cursorPos.X + barSize.X+2,cursorPos.Y + barSize.Y-53), 
                 new Vector2(cursorPos.X + barSize.X+10,cursorPos.Y + barSize.Y*2+2), 0xFF000000);
+        }
+
+        private void DrawVerstoneRdyBar()
+        {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+            var barSize = new Vector2(BarWidth, BarHeight);
+            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 22);
+            var drawList = ImGui.GetWindowDrawList();
+            var verstoneBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1235);
+            if (verstoneBuff.Count() == 1)
+            {
+                
+            }
+
+        }
+
+        private void DrawVerfireRdyBar()
+        {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+            var barSize = new Vector2(BarWidth, BarHeight);
+            var cursorPos = new Vector2(CenterX - XOffset, CenterY + YOffset - 22);
+            var drawList = ImGui.GetWindowDrawList();
+            var verfireBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1234);
+            if (verfireBuff.Count() == 1)
+            {
+                
+            }
+
         }
     }
 }

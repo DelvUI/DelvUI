@@ -1,30 +1,31 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
 
-namespace DelvUIPlugin.Interface {
+namespace DelvUI.Interface {
     public class BardHudWindow : HudWindow {
         public override uint JobId => 23;
 
-        private new int BarHeight => 20;
-        private int SmallBarHeight => 10;
-        private new int BarWidth => 250;
-        private new int XOffset => 127;
-        private new int YOffset => 440;
+        private static int BarHeight => 20;
+        private static int SmallBarHeight => 10;
+        private static int BarWidth => 250;
+        private new static int XOffset => 127;
+        private new static int YOffset => 440;
         
         public BardHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _) {
             DrawHealthBar();
+            DrawFocusBar();
+            DrawCastBar();
+            DrawTargetBar();
+            
             DrawActiveDots();
             HandleCurrentSong();
             DrawSoulVoiceBar();
-            DrawTargetBar();
         }
 
         private void DrawActiveDots()

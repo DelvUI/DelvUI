@@ -4,14 +4,14 @@ using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
 
-namespace DelvUIPlugin.Interface {
+namespace DelvUI.Interface {
     public class DancerHudWindow : HudWindow {
         public override uint JobId => 38;
         
-        private new static int BarHeight => 13;
-        private new static int BarWidth => 254;
+        private static int BarHeight => 13;
+        private static int BarWidth => 254;
         private new static int XOffset => 127;
-        private new static int YOffset => 466;
+        private new static int YOffset => 476;
         
         public DancerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
@@ -20,6 +20,8 @@ namespace DelvUIPlugin.Interface {
             DrawPrimaryResourceBar();
             DrawSecondaryResourceBar();
             DrawTargetBar();
+            DrawFocusBar();
+            DrawCastBar();
         }
 
         protected override void DrawPrimaryResourceBar() {
@@ -95,10 +97,7 @@ namespace DelvUIPlugin.Interface {
                 {
                     drawList.AddRectFilled(cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y), 0xFF4FD29B);
                 }
-                else
-                {
 
-                }
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
                 cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
             }
