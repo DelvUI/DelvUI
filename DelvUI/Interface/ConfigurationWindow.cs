@@ -317,8 +317,91 @@ namespace DelvUI.Interface
             
         }
 
+        private class SubConfigWindowMap
+        {
+            private Dictionary<string, LeftRight>[] subConfigWindowMap;
+
+            private Dictionary<string, OptionConfigProperties> Left { get; set; }
+            private Dictionary<string, LeftRight> Option{ get; set; }
+            private string[] SummaryWords { get; set; }
+        }
+        private class OptionConfigProperties
+        {
+            private object Value { get; set; }
+            private string Type { get; set; }
+        }
+
+        private class Left
+        {
+            private Dictionary<string, OptionConfigProperties> LeftRight { get; set; }
+        }
+        private class Right
+        {
+            private Dictionary<string, OptionConfigProperties> LeftRight { get; set; }
+        }
+        private void DrawLeftRightConfigBox(){}
         private void DrawIndividualUnitFramesPlayerConfig()
         {
+            {
+                "Bar Size & Position": //VALUE
+                {
+                    "Left": //STATIC
+                    {
+                        "Height": //VALUE
+                        {
+                            "value": configMap, //VALUE
+                            "type": "textbox" //VALUE
+                        },
+                        "XOffset":
+                        {
+                            "value": configMap,
+                            "type": "textbox"
+                        },
+                    },
+                    "Right":
+                    {
+                        "Width":
+                        {
+                            "value": configMap,
+                            "type": "textbox"
+                        },
+                        "YOffset"::
+                        {
+                            "value": configMap,
+                            "type": "textbox"
+                        }
+                    }
+                },
+                "Text Format":
+                {
+                    "Left":
+                    {
+                        "Height":
+                        {
+                            "value": configMap,
+                            "type": "textbox"
+                        },
+                        "XOffset"::
+                        {
+                            "value": configMap,
+                            "type": "textbox"
+                        },
+                    },
+                    "Right":
+                    {
+                        "Width":
+                        {
+                            "value": configMap,
+                            "type": "textbox"
+                        },
+                        "YOffset"::
+                        {
+                            "value": configMap,
+                            "type": "textbox"
+                        }
+                    }
+                }
+            }
             bool disabled = true;
             ImGui.Checkbox("Enabled", ref disabled);
             ImGui.BeginGroup();
