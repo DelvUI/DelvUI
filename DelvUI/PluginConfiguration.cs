@@ -827,7 +827,13 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnMiasmaColor.AdjustColor(.1f))
                 },
 
- 
+                [Jobs.SMN * 1000 + 4] = new Dictionary<string, uint> // Bio Bar
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor.AdjustColor(.1f))
+                },
 
                 [Jobs.SMN * 1000 + 5] = new Dictionary<string, uint> // Dot Expiry
                 {
@@ -1208,14 +1214,6 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(RDMWDotColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMWDotColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMWDotColor.AdjustColor(.1f))
-                },
-
-                [Jobs.SMN] = new Dictionary<string, uint>
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN.AdjustColor(.1f))
                 },
 
                 [Jobs.RDM] = new Dictionary<string, uint>
