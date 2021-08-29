@@ -174,8 +174,12 @@ namespace DelvUI.Interface
                             DrawIndividualUnitFramesGeneralConfig();
                             break;
                         case "Player":
-                            DrawIndividualUnitFramesPlayerConfig();
-                            break;                        
+                            
+                            //SubConfigWindowMap.Categories
+                            DrawLeftRightConfigBoxes();
+                            break;      
+                        
+                  
                         case "Target":
                             DrawIndividualUnitFramesTargetConfig();
                             break;                        
@@ -316,92 +320,60 @@ namespace DelvUI.Interface
         {
             
         }
-
-        private class SubConfigWindowMap
+        private class StructureBuilder
         {
-            private Dictionary<string, LeftRight>[] subConfigWindowMap;
-
-            private Dictionary<string, OptionConfigProperties> Left { get; set; }
-            private Dictionary<string, LeftRight> Option{ get; set; }
-            private string[] SummaryWords { get; set; }
+            private BarSizeOptions BarSizeOptions { get; set; }
         }
-        private class OptionConfigProperties
+        public class Example
         {
-            private object Value { get; set; }
-            private string Type { get; set; }
-        }
-
-        private class Left
-        {
-            private Dictionary<string, OptionConfigProperties> LeftRight { get; set; }
-        }
-        private class Right
-        {
-            private Dictionary<string, OptionConfigProperties> LeftRight { get; set; }
-        }
-        private void DrawLeftRightConfigBox(){}
-        private void DrawIndividualUnitFramesPlayerConfig()
-        {
+            private StructureBuilder _structureBuilder = new StructureBuilder()
             {
-                "Bar Size & Position": //VALUE
+                BarSizeOptions = new BarSizeOptions()
                 {
-                    "Left": //STATIC
+                    left = new Left()
                     {
-                        "Height": //VALUE
+                        options = new Dictionary<string, OptionValues>()
                         {
-                            "value": configMap, //VALUE
-                            "type": "textbox" //VALUE
-                        },
-                        "XOffset":
-                        {
-                            "value": configMap,
-                            "type": "textbox"
-                        },
-                    },
-                    "Right":
-                    {
-                        "Width":
-                        {
-                            "value": configMap,
-                            "type": "textbox"
-                        },
-                        "YOffset"::
-                        {
-                            "value": configMap,
-                            "type": "textbox"
+                            { "Height", new OptionValues() { type = "string", value = "object" } },
+                            { "XOffset", new OptionValues() { type = "string", value = "object" } }
                         }
-                    }
-                },
-                "Text Format":
-                {
-                    "Left":
-                    {
-                        "Height":
-                        {
-                            "value": configMap,
-                            "type": "textbox"
-                        },
-                        "XOffset"::
-                        {
-                            "value": configMap,
-                            "type": "textbox"
-                        },
                     },
-                    "Right":
+                    right = new Right()
                     {
-                        "Width":
+                        options = new Dictionary<string, OptionValues>()
                         {
-                            "value": configMap,
-                            "type": "textbox"
-                        },
-                        "YOffset"::
-                        {
-                            "value": configMap,
-                            "type": "textbox"
+                            { "Width", new OptionValues() { type = "string", value = "object" } },
+                            { "YOffset", new OptionValues() { type = "string", value = "object" } }
                         }
                     }
                 }
-            }
+            };
+        }
+private class BarSizeOptions
+        {
+            private Left left;
+            private Right right;
+        }
+
+private class Left
+        {
+            private Dictionary<string, OptionValues> options;
+        }
+    
+private class Right
+        {
+            private Dictionary<string, OptionValues> options;
+        }
+    
+private class OptionValues
+        {
+            private object value;
+            private string type;
+        }
+
+private void DrawLeftRightConfigBoxes(){}
+private void DrawIndividualUnitFramesPlayerConfig(){
+            
             bool disabled = true;
             ImGui.Checkbox("Enabled", ref disabled);
             ImGui.BeginGroup();
