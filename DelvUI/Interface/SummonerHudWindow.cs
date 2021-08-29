@@ -37,13 +37,13 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _)
         {
-            DrawHealthBar();
             DrawRuinBar();
             DrawActiveDots();
             DrawAetherBar();
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
+        }
+
+        protected override void DrawPrimaryResourceBar()
+        {
         }
 
         private void DrawActiveDots()

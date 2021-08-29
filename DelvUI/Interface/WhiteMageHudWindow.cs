@@ -46,11 +46,6 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _)
         {
-            DrawHealthBar();
-            if (ShowPrimaryResourceBar)
-            {
-                DrawPrimaryResourceBar();
-            }
             if (ShowLillyBar)
             {
                 DrawSecondaryResourceBar();
@@ -59,9 +54,16 @@ namespace DelvUI.Interface
             {
                 DrawDiaBar();
             }
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
+        }
+
+        protected override void DrawPrimaryResourceBar()
+        {
+            if (!ShowPrimaryResourceBar)
+            {
+                return;
+            }
+
+            base.DrawPrimaryResourceBar();
         }
 
         private void DrawDiaBar()
@@ -83,15 +85,19 @@ namespace DelvUI.Interface
                 return;
             }
             var dia = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1871 || o.EffectId == 144 || o.EffectId == 143);
-
-            var diaDuration = (int)dia.Duration;
+            var diaCooldown = dia.EffectId == 1871 ? 30f : 18f;
+            var diaDuration = dia.Duration;
             var xOffset = CenterX;
 
             drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
-            drawList.AddRectFilled(cursorPos, cursorPos + new Vector2((BarSize.X / 30) * diaDuration, BarSize.Y), WhmDiaColor["gradientRight"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + new Vector2((BarSize.X / diaCooldown) * diaDuration, BarSize.Y), WhmDiaColor["gradientRight"]);
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-            DrawOutlinedText(diaDuration.ToString(CultureInfo.InvariantCulture), new Vector2(cursorPos.X + BarSize.X * diaDuration / 30 - (diaDuration == 30 ? 30 : diaDuration > 3 ? 20 : 0), cursorPos.Y + (BarSize.Y / 2) - 12));
-
+            DrawOutlinedText(string.Format(CultureInfo.InvariantCulture, "{0,2:N0}", diaDuration), // keeps 10 -> 9 from jumping
+                new Vector2(cursorPos.X + BarSize.X * diaDuration / diaCooldown - (diaDuration ==
+                diaCooldown ? diaCooldown :
+                                        diaDuration > 3 ? 20 :
+                                        diaDuration * (20f / 3f)), // smooths transition of counter to the right of the emptying bar
+                cursorPos.Y + (BarSize.Y / 2) - 12));
         }
 
         private void DrawSecondaryResourceBar()
