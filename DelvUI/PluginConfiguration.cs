@@ -69,6 +69,8 @@ namespace DelvUI {
         public int MPTickerWidth { get; set; } = 254;
         public int MPTickerXOffset { get; set; } = 0;
         public int MPTickerYOffset { get; set; } = 470;
+        public bool MPTickerShowBorder = false;
+        public bool MPTickerHideOnFullMp = false;
 
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
@@ -225,6 +227,10 @@ namespace DelvUI {
         public bool SAMMeditationEnabled { get; set; } = true;
         public bool SAMHiganbanaEnabled { get; set; } = true;
         public bool SAMBuffsEnabled { get; set; } = true;
+
+        public bool SAMHiganbanaText { get; set; } = true;
+        public bool SAMBuffText { get; set; } = true;
+        public bool SAMKenkiText { get; set; } = true;
         public int SamHiganbanaBarX { get; set; } = 127;
         public int SamHiganbanaBarY { get; set; } = 370;
         public int SamHiganbanaBarHeight { get; set; } = 20;
@@ -252,6 +258,7 @@ namespace DelvUI {
         public int SamMeditationBarWidth { get; set; } = 254;
         public int SAMMeditationPadding { get; set; } = 2;
         public int SAMBuffsPadding { get; set; } = 2;
+
 
         public Vector4 SamHiganbanaColor = new Vector4(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f);
         public Vector4 SamShifuColor = new Vector4(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f);
