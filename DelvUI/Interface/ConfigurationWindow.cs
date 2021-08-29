@@ -635,6 +635,220 @@ namespace DelvUI.Interface
                     ImGui.EndTabItem();
                 }
 
+
+                if (ImGui.BeginTabItem("Samurai"))
+                {
+
+                    var samHiganbanaBarX = _pluginConfiguration.SamHiganbanaBarX;
+                    if (ImGui.DragInt("Higanbana X Offset", ref samHiganbanaBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamHiganbanaBarX = samHiganbanaBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samHiganbanaBarY = _pluginConfiguration.SamHiganbanaBarY;
+                    if (ImGui.DragInt("Higanbana Y Offset", ref samHiganbanaBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamHiganbanaBarY = samHiganbanaBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samHiganbanaBarHeight = _pluginConfiguration.SamHiganbanaBarHeight;
+                    if (ImGui.DragInt("Higanbana Height", ref samHiganbanaBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamHiganbanaBarHeight = samHiganbanaBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samHiganbanaBarWidth = _pluginConfiguration.SamHiganbanaBarWidth;
+                    if (ImGui.DragInt("Higanbana Width", ref samHiganbanaBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamHiganbanaBarWidth = samHiganbanaBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samBuffsBarX = _pluginConfiguration.SamBuffsBarX;
+                    if (ImGui.DragInt("Shifu/Jinpu X Offset", ref samBuffsBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamBuffsBarX = samBuffsBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samBuffsBarY = _pluginConfiguration.SamBuffsBarY;
+                    if (ImGui.DragInt("Shifu/Jinpu Y Offset", ref samBuffsBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamBuffsBarY = samBuffsBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samBuffsBarHeight = _pluginConfiguration.SamBuffsBarHeight;
+                    if (ImGui.DragInt("Shifu/Jinpu Height", ref samBuffsBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamBuffsBarHeight = samBuffsBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samBuffsBarWidth = _pluginConfiguration.SamBuffsBarWidth;
+                    if (ImGui.DragInt("Shifu/Jinpu Width", ref samBuffsBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamBuffsBarWidth = samBuffsBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samKenkiBarX = _pluginConfiguration.SamKenkiBarX;
+                    if (ImGui.DragInt("Kenki X Offset", ref samKenkiBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamKenkiBarX = samKenkiBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samKenkiBarY = _pluginConfiguration.SamKenkiBarY;
+                    if (ImGui.DragInt("Kenki Y Offset", ref samKenkiBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamKenkiBarY = samKenkiBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samKenkiBarHeight = _pluginConfiguration.SamKenkiBarHeight;
+                    if (ImGui.DragInt("Kenki Height", ref samKenkiBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamKenkiBarHeight = samKenkiBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samKenkiBarWidth = _pluginConfiguration.SamKenkiBarWidth;
+                    if (ImGui.DragInt("Kenki Width", ref samKenkiBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamKenkiBarWidth = samKenkiBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samSenBarX = _pluginConfiguration.SamSenBarX;
+                    if (ImGui.DragInt("Sen X Offset", ref samSenBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamSenBarX = samSenBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samSenBarY = _pluginConfiguration.SamSenBarY;
+                    if (ImGui.DragInt("Sen Y Offset", ref samSenBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamSenBarY = samSenBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samSenBarHeight = _pluginConfiguration.SamSenBarHeight;
+                    if (ImGui.DragInt("Sen Height", ref samSenBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamSenBarHeight = samSenBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samSenBarWidth = _pluginConfiguration.SamSenBarWidth;
+                    if (ImGui.DragInt("Sen Width", ref samSenBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamSenBarWidth = samSenBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMSenPadding = _pluginConfiguration.SAMSenPadding;
+                    if (ImGui.DragInt("Sen Bar Padding", ref SAMSenPadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SAMSenPadding = SAMSenPadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samMeditationBarX = _pluginConfiguration.SamMeditationBarX;
+                    if (ImGui.DragInt("Meditation X Offset", ref samMeditationBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamMeditationBarX = samMeditationBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samMeditationBarY = _pluginConfiguration.SamMeditationBarY;
+                    if (ImGui.DragInt("Meditation Y Offset", ref samMeditationBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamMeditationBarY = samMeditationBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samMeditationBarHeight = _pluginConfiguration.SamMeditationBarHeight;
+                    if (ImGui.DragInt("Meditation Height", ref samMeditationBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamMeditationBarHeight = samMeditationBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samMeditationBarWidth = _pluginConfiguration.SamMeditationBarWidth;
+                    if (ImGui.DragInt("Meditation Width", ref samMeditationBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamMeditationBarWidth = samMeditationBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMMeditationPadding = _pluginConfiguration.SAMMeditationPadding;
+                    if (ImGui.DragInt("Meditation Bar Padding", ref SAMMeditationPadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SAMMeditationPadding = SAMMeditationPadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMBuffsPadding = _pluginConfiguration.SAMBuffsPadding;
+                    if (ImGui.DragInt("Jinpu/Shifu Bar Padding", ref SAMBuffsPadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SAMBuffsPadding = SAMBuffsPadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMGaugeEnabled = _pluginConfiguration.SAMGaugeEnabled;
+                    if (ImGui.Checkbox("Kenki Enabled", ref SAMGaugeEnabled))
+                    {
+                        _pluginConfiguration.SAMGaugeEnabled = SAMGaugeEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMSenEnabled = _pluginConfiguration.SAMSenEnabled;
+                    if (ImGui.Checkbox("Sen Enabled", ref SAMSenEnabled))
+                    {
+                        _pluginConfiguration.SAMSenEnabled = SAMSenEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMMeditationEnabled = _pluginConfiguration.SAMMeditationEnabled;
+                    if (ImGui.Checkbox("Meditation Enabled", ref SAMMeditationEnabled))
+                    {
+                        _pluginConfiguration.SAMMeditationEnabled = SAMMeditationEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMHiganbanaEnabled = _pluginConfiguration.SAMHiganbanaEnabled;
+                    if (ImGui.Checkbox("Higanbana Enabled", ref SAMHiganbanaEnabled))
+                    {
+                        _pluginConfiguration.SAMHiganbanaEnabled = SAMHiganbanaEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMBuffsEnabled = _pluginConfiguration.SAMBuffsEnabled;
+                    if (ImGui.Checkbox("Jinpu/Shifu Enabled", ref SAMBuffsEnabled))
+                    {
+                        _pluginConfiguration.SAMBuffsEnabled = SAMBuffsEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Higanbana Bar Color", ref _pluginConfiguration.SamHiganbanaColor);
+                    changed |= ImGui.ColorEdit4("Shifu Bar Color", ref _pluginConfiguration.SamShifuColor);
+                    changed |= ImGui.ColorEdit4("Jinpu Bar Color", ref _pluginConfiguration.SamJinpuColor);
+                    changed |= ImGui.ColorEdit4("Setsu Color", ref _pluginConfiguration.SamSetsuColor);
+                    changed |= ImGui.ColorEdit4("Getsu Color", ref _pluginConfiguration.SamGetsuColor);
+                    changed |= ImGui.ColorEdit4("Ka Color", ref _pluginConfiguration.SamKaColor);
+                    changed |= ImGui.ColorEdit4("Meditation Color", ref _pluginConfiguration.SamMeditationColor);
+                    changed |= ImGui.ColorEdit4("Kenki Color", ref _pluginConfiguration.SamKenkiColor);
+                    changed |= ImGui.ColorEdit4("Expiry Color", ref _pluginConfiguration.SamExpiryColor);
+                    changed |= ImGui.ColorEdit4("Empty Color", ref _pluginConfiguration.SamEmptyColor);
+
+                    ImGui.EndTabItem();
+                }
+
                 if (ImGui.BeginTabItem("Summoner"))
                 {
 
@@ -1455,128 +1669,6 @@ namespace DelvUI.Interface
                     ImGui.EndTabItem();
                 }
 
-                if (ImGui.BeginTabItem("Samurai"))
-                {
-                    var SAMGaugeXOffset = _pluginConfiguration.SAMGaugeXOffset;
-                    if (ImGui.DragInt("Gauge-Bar X Offset", ref SAMGaugeXOffset, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SAMGaugeXOffset = SAMGaugeXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMGaugeYOffset = _pluginConfiguration.SAMGaugeYOffset;
-                    if (ImGui.DragInt("Gauge-Bar Y Offset", ref SAMGaugeYOffset, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SAMGaugeYOffset = SAMGaugeYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMGaugeHeight = _pluginConfiguration.SAMGaugeHeight;
-                    if (ImGui.DragInt("Gauge Bar Height", ref SAMGaugeHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SAMGaugeHeight = SAMGaugeHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMGaugeWidth = _pluginConfiguration.SAMGaugeWidth;
-                    if (ImGui.DragInt("Gauge Bar Width", ref SAMGaugeWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SAMGaugeWidth = SAMGaugeWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMGaugeEnabled = _pluginConfiguration.SAMGaugeEnabled;
-                    if (ImGui.Checkbox("SAM Gauge Enabled", ref SAMGaugeEnabled))
-                    {
-                        _pluginConfiguration.SAMGaugeEnabled = SAMGaugeEnabled;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMSenXOffset = _pluginConfiguration.SAMSenXOffset;
-                    if (ImGui.DragInt("Sen-Bar X Offset", ref SAMSenXOffset, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SAMSenXOffset = SAMSenXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMSenYOffset = _pluginConfiguration.SAMSenYOffset;
-                    if (ImGui.DragInt("Sen-Bar Y Offset", ref SAMSenYOffset, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SAMSenYOffset = SAMSenYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMSenHeight = _pluginConfiguration.SAMSenHeight;
-                    if (ImGui.DragInt("Sen-Bar Height", ref SAMSenHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SAMSenHeight = SAMSenHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMSenWidth = _pluginConfiguration.SAMSenWidth;
-                    if (ImGui.DragInt("Sen-Bar Width", ref SAMSenWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SAMSenWidth = SAMSenWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMSenPadding = _pluginConfiguration.SAMSenPadding;
-                    if (ImGui.DragInt("Sen Bar Padding", ref SAMSenPadding, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SAMSenPadding = SAMSenPadding;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMSenEnabled = _pluginConfiguration.SAMSenEnabled;
-                    if (ImGui.Checkbox("SAM Sen Enabled", ref SAMSenEnabled))
-                    {
-                        _pluginConfiguration.SAMSenEnabled = SAMSenEnabled;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMMeditationXOffset = _pluginConfiguration.SAMMeditationXOffset;
-                    if (ImGui.DragInt("Meditation-Bar X Offset", ref SAMMeditationXOffset, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SAMMeditationXOffset = SAMMeditationXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMMeditationYOffset = _pluginConfiguration.SAMMeditationYOffset;
-                    if (ImGui.DragInt("Meditation-Bar Y Offset", ref SAMMeditationYOffset, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SAMMeditationYOffset = SAMMeditationYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMMeditationHeight = _pluginConfiguration.SAMMeditationHeight;
-                    if (ImGui.DragInt("Meditation-Bar Height", ref SAMMeditationHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SAMMeditationHeight = SAMMeditationHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMMeditationWidth = _pluginConfiguration.SAMMeditationWidth;
-                    if (ImGui.DragInt("Meditation-Bar Width", ref SAMMeditationWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SAMMeditationWidth = SAMMeditationWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMMeditationPadding = _pluginConfiguration.SAMMeditationPadding;
-                    if (ImGui.DragInt("Meditation Bar Padding", ref SAMMeditationPadding, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SAMMeditationPadding = SAMMeditationPadding;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMMeditationEnabled = _pluginConfiguration.SAMMeditationEnabled;
-                    if (ImGui.Checkbox("SAM Meditation Enabled", ref SAMMeditationEnabled))
-                    {
-                        _pluginConfiguration.SAMMeditationEnabled = SAMMeditationEnabled;
-                        _pluginConfiguration.Save();
-                    }
-                    ImGui.EndTabItem();
-                }
 
                 if (ImGui.BeginTabItem("Red Mage"))
                 {
