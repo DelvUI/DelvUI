@@ -29,7 +29,7 @@ Needs Video
 
 ### DRK
 
-Needs Video
+[![DRK](https://img.youtube.com/vi/nb6ivlkG2P4/0.jpg)](https://youtube.com/watch?v=nb6ivlkG2P4 "DelvUI DRK")
 
 ### GNB
 

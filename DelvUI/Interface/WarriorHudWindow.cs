@@ -48,12 +48,12 @@ namespace DelvUI.Interface
         public WarriorHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _) {
-            DrawHealthBar();
             var nextHeight = DrawStormsEyeBar(0);
             DrawBeastGauge(nextHeight);
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
+        }
+
+        protected override void DrawPrimaryResourceBar()
+        {
         }
 
         private int DrawStormsEyeBar(int initialHeight)
