@@ -71,14 +71,14 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _)
         {
-            DrawHealthBar();
             var nextHeight = DrawManaBar(0);
             nextHeight = DrawOathGauge(nextHeight);
             nextHeight = DrawBuffBar(nextHeight);
             DrawAtonementBar(nextHeight);
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
+        }
+
+        protected override void DrawPrimaryResourceBar()
+        {
         }
 
         private int DrawManaBar(int initialHeight)

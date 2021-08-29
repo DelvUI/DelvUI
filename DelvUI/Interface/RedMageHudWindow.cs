@@ -18,12 +18,6 @@ namespace DelvUI.Interface {
         public RedMageHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _) {
-            DrawHealthBar();
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
-            
-            DrawPrimaryResourceBar();
             DrawWhiteManaBar();
             DrawBlackManaBar();
             DrawAccelBar();
@@ -31,8 +25,8 @@ namespace DelvUI.Interface {
             DrawBalanceBar();
             DrawVerstoneRdyBar();
             DrawVerfireRdyBar();
-
         }
+
         protected override void DrawPrimaryResourceBar() {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var actor = PluginInterface.ClientState.LocalPlayer;

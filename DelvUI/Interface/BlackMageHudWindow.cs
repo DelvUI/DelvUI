@@ -49,11 +49,6 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _)
         {
-            DrawHealthBar();
-            DrawFocusBar();
-            DrawCastBar();
-            DrawTargetBar();
-
             DrawEnochian();
             DrawManaBar();
             DrawUmbralHeartStacks();
@@ -73,6 +68,10 @@ namespace DelvUI.Interface
             {
                 DrawDotTimer();
             }
+        }
+
+        protected override void DrawPrimaryResourceBar()
+        {
         }
 
         protected virtual void DrawManaBar()
