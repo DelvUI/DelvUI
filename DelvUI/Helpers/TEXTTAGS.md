@@ -24,6 +24,7 @@ There are several tag for formatting the text shown at the healthbar and target 
     [health:max] | shows max hp
     [health:max-short] | shows max hp in kilo format
     [health:percent] | shows % hp
+    [health:percent-decimal] | shows % hp including 1 decimal place, 100% displays as 100%
     [health:deficit] | shows deficite hp
     [health:deficit-short] | shows deficite in kilo format
 

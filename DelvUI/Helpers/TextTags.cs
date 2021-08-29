@@ -33,6 +33,7 @@ namespace DelvUI.Helpers
                     "[health:max]" => actor.MaxHp.ToString(),
                     "[health:max-short]" => ((int) actor.MaxHp).KiloFormat(),
                     "[health:percent]" => $"{Math.Round(100f / actor.MaxHp * actor.CurrentHp)}%",
+                    "[health:percent-decimal]" => $"{(100f / actor.MaxHp * actor.CurrentHp):##0.#}%",
                     "[health:deficit]" => $"-{actor.MaxHp - actor.CurrentHp}",
                     "[health:deficit-short]" => $"-{((int) actor.MaxHp - (int) actor.CurrentHp).KiloFormat()}",
                     
