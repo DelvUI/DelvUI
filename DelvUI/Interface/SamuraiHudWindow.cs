@@ -45,6 +45,9 @@ namespace DelvUI.Interface
         protected int BuffsPadding => PluginConfiguration.SAMBuffsPadding;
         private bool BuffsEnabled => PluginConfiguration.SAMBuffsEnabled;
         private bool HiganbanaEnabled => PluginConfiguration.SAMHiganbanaEnabled;
+        private bool HiganbanaText => PluginConfiguration.SAMHiganbanaText;
+        private bool KenkiText => PluginConfiguration.SAMKenkiText;
+        private bool BuffText => PluginConfiguration.SAMBuffText;
 
         private Dictionary<string, uint> SamHiganbanaColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000];
         private Dictionary<string, uint> SamShifuColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 1];
@@ -106,7 +109,8 @@ namespace DelvUI.Interface
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             var textSize = ImGui.CalcTextSize(gauge.Kenki.ToString());
-            DrawOutlinedText(gauge.Kenki.ToString(), new Vector2(cursorPos.X + SamKenkiBarWidth / 2f - textSize.X / 2f, cursorPos.Y-2));
+            if(KenkiText)
+                DrawOutlinedText(gauge.Kenki.ToString(), new Vector2(cursorPos.X + SamKenkiBarWidth / 2f - textSize.X / 2f, cursorPos.Y + (barSize.Y / 2) - 12));
         }
 
         private void DrawHiganbanaBar()
@@ -136,7 +140,9 @@ namespace DelvUI.Interface
             drawList.AddRectFilled(dotStart, cursorPos + new Vector2(barSize.X, barSize.Y), higanbanaColor);
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             var textSize = ImGui.CalcTextSize(Math.Round(higanbanaDuration).ToString());
-            DrawOutlinedText(Math.Round(higanbanaDuration).ToString(), new Vector2(cursorPos.X + SamKenkiBarWidth / 2f - textSize.X / 2f, cursorPos.Y - 2));
+
+            if (HiganbanaText)
+                DrawOutlinedText(Math.Round(higanbanaDuration).ToString(), new Vector2(cursorPos.X + SamHiganbanaBarWidth / 2f - textSize.X / 2f, cursorPos.Y + (barSize.Y / 2) - 12));
 
         }
 
@@ -192,7 +198,8 @@ namespace DelvUI.Interface
             else
             {
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-                DrawOutlinedText(Math.Round(shifuDuration).ToString(), new Vector2(cursorPos.X + BuffsBarWidth / 2f - shifuTextSize.X /2f, cursorPos.Y - 2));
+                if (BuffText)
+                    DrawOutlinedText(Math.Round(shifuDuration).ToString(), new Vector2(cursorPos.X + BuffsBarWidth / 2f - shifuTextSize.X /2f, cursorPos.Y + (barSize.Y / 2) - 12));
 
                 cursorPos = new Vector2(cursorPos.X + BuffsBarWidth + BuffsPadding, cursorPos.Y);
                 var jinpuXOffset = CenterX - SamTimeJinpuXOffset;
@@ -207,7 +214,8 @@ namespace DelvUI.Interface
                     jinpuDuration > 0 ? SamJinpuColor["gradientLeft"] : 0x00202E3
                 );
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-                DrawOutlinedText(Math.Round(jinpuDuration).ToString(), new Vector2(cursorPos.X + BuffsBarWidth / 2f - jinpuTextSize.X / 2f, cursorPos.Y - 2));
+                if (BuffText)
+                    DrawOutlinedText(Math.Round(jinpuDuration).ToString(), new Vector2(cursorPos.X + BuffsBarWidth / 2f - jinpuTextSize.X / 2f, cursorPos.Y + (barSize.Y / 2) - 12));
             }
         }
 
