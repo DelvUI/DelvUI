@@ -153,7 +153,7 @@ namespace DelvUI.Interface {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DRKGauge>();
 
             var barWidth = (BloodGaugeWidth - BloodGaugePadding) / 2;
-            var xPos = CenterX - XOffset;
+            var xPos = CenterX - XOffset + BloodGaugeXOffset;
             var yPos = CenterY + YOffset + initialHeight + BloodGaugeYOffset;
             var cursorPos = new Vector2(xPos, yPos);
             const int chunkSize = 50;
