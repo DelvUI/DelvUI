@@ -70,7 +70,7 @@ namespace DelvUI.Interface.Bars
             var barWidth = BarWidth + ChunkPadding; // For loop adds one extra padding more than is needed
             var barHeight = BarHeight + ChunkPadding; // For loop adds one extra padding more than is needed
             var cursorPos = new Vector2(XPosition, YPosition);
-            var backgroundColor = _backgroundColorSet ? 0x88000000 : BackgroundColor;
+            var backgroundColor = _backgroundColorSet ? BackgroundColor : 0x88000000;
 
             foreach (var chunkSize in ChunkSizes)
             {
