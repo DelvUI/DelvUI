@@ -78,10 +78,11 @@ namespace DelvUI.Interface
             {
                 ImGui.BeginGroup(); // Left
                 {
+                    /*
                     var imagePath = Path.Combine(Path.GetDirectoryName(_plugin.AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
                     var delvuiBanner = _pluginInterface.UiBuilder.LoadImage(imagePath);
                     ImGui.Image(delvuiBanner.ImGuiHandle, new Vector2(delvuiBanner.Width, delvuiBanner.Height));
-
+*/
                     ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
 
                     foreach (var config in configMap.Keys)
