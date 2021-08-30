@@ -122,7 +122,7 @@ namespace DelvUI.Interface {
             var mana = PluginInterface.ClientState.LocalPlayer.CurrentMp;
             var text = $"{mana,0}";
             var textSize = ImGui.CalcTextSize(text);
-            DrawOutlinedText(text, new Vector2(OriginX - barSize.X / 2f + 2, OriginY - ManaBarHeight / 2f - textSize.Y / 2f));
+            DrawOutlinedText(text, new Vector2(cursorPos.X + 2, OriginY - barSize.Y / 2f + ManaBarYOffset - textSize.Y / 2f));
         }
 
         private void DrawBalanceBar()
