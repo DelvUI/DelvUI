@@ -32,10 +32,10 @@ namespace DelvUI.Interface
 
         private int SchAetherBarPad => PluginConfiguration.SchAetherBarPad;
 
-        protected int BioBarHeight => PluginConfiguration.SCHBioBarHeight;
-        protected int BioBarWidth => PluginConfiguration.SCHBioBarWidth;
-        protected int BioBarX => PluginConfiguration.SCHBioBarX;
-        protected int BioBarY => PluginConfiguration.SCHBioBarY;
+        private int BioBarHeight => PluginConfiguration.SCHBioBarHeight;
+        private int BioBarWidth => PluginConfiguration.SCHBioBarWidth;
+        private int BioBarX => PluginConfiguration.SCHBioBarX;
+        private int BioBarY => PluginConfiguration.SCHBioBarY;
 
         private bool ShowBioBar => PluginConfiguration.SCHShowBioBar;
         private bool ShowFairyBar => PluginConfiguration.SCHShowFairyBar;

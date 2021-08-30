@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Dynamic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Dalamud.Game.ClientState.Actors.Types;
 using static DelvUI.Extensions;
-using Actor = Dalamud.Game.ClientState.Structs.Actor;
 
 namespace DelvUI.Helpers
 {
