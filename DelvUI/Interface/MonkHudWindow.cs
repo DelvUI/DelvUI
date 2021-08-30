@@ -28,7 +28,7 @@ namespace DelvUI.Interface
         protected int BuffYOffset => PluginConfiguration.MNKBuffYOffset;
         protected int TimeTwinXOffset => PluginConfiguration.MNKTimeTwinXOffset;
         protected int TimeTwinYOffset => PluginConfiguration.MNKTimeTwinYOffset;
-        protected  int TimeLeadenXOffset => PluginConfiguration.MNKTimeLeadenXOffset;
+        protected int TimeLeadenXOffset => PluginConfiguration.MNKTimeLeadenXOffset;
         protected int TimeLeadenYOffset => PluginConfiguration.MNKTimeLeadenYOffset;
         protected int TimeDemoXOffset => PluginConfiguration.MNKTimeDemoXOffset;
         protected int TimeDemoYOffset => PluginConfiguration.MNKTimeDemoYOffset;
@@ -42,9 +42,9 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _)
         {
-            ChakraBar();
-            Demolish();
             ActiveBuffs();
+            Demolish();
+            ChakraBar();
         }
 
         protected override void DrawPrimaryResourceBar()
@@ -69,13 +69,13 @@ namespace DelvUI.Interface
             var leadenFistDuration = leadenFist.Duration;
 
             var xOffset = CenterX - BuffXOffset;
-            var cursorPos = new Vector2(CenterX - BuffXOffset, CenterY + BuffYOffset - 8);
+            var cursorPos = new Vector2(CenterX - BuffXOffset, CenterY + BuffYOffset + 68);
             var barSize = new Vector2(barWidth, BuffHeight);
             var drawList = ImGui.GetWindowDrawList();
             var twinXOffset = TimeTwinXOffset;
             var twinYOffset = TimeTwinYOffset;
 
-            var buffStart = new Vector2(xOffset + barWidth - (barSize.X / 15) * twinSnakesDuration, CenterY + BuffYOffset - 8);
+            var buffStart = new Vector2(xOffset + barWidth - (barSize.X / 15) * twinSnakesDuration, CenterY + BuffYOffset + 68);
 
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
             drawList.AddRectFilledMultiColor(
@@ -102,7 +102,7 @@ namespace DelvUI.Interface
             else
             {
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-                DrawOutlinedText(Math.Round(twinSnakesDuration).ToString(), new Vector2(twinXOffset, twinYOffset));
+                DrawOutlinedText(Math.Round(twinSnakesDuration).ToString(), new Vector2(CenterX - twinXOffset, cursorPos.Y - twinYOffset));
 
                 cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
                 var leadenXOffset = TimeLeadenXOffset;
@@ -118,15 +118,15 @@ namespace DelvUI.Interface
                 );
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
                 if (leadenFistDuration <= 0)
-                    DrawOutlinedText("0", new Vector2(leadenXOffset, leadenYOffset));
+                    DrawOutlinedText("0", new Vector2(CenterX + leadenXOffset, cursorPos.Y - leadenYOffset));
                 else
-                    DrawOutlinedText(Math.Round(leadenFistDuration).ToString(), new Vector2(leadenXOffset, leadenYOffset));
+                    DrawOutlinedText(Math.Round(leadenFistDuration).ToString(), new Vector2(CenterX + leadenXOffset, cursorPos.Y - leadenYOffset));
             }
         }
 
         private void Demolish()
         {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            var target = PluginInterface.ClientState.LocalPlayer ?? PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
             if (!(target is Chara))
             {
@@ -141,7 +141,7 @@ namespace DelvUI.Interface
             var demolishColor = DemolishColor;
 
             var xOffset = CenterX - DemolishXOffset;
-            var cursorPos = new Vector2(CenterX - DemolishXOffset - 255, CenterY + DemolishYOffset - 52);
+            var cursorPos = new Vector2(CenterX - DemolishXOffset - 255, CenterY + DemolishYOffset + 24);
             var barSize = new Vector2(barWidth, DemolishHeight);
             var drawList = ImGui.GetWindowDrawList();
 
@@ -159,7 +159,7 @@ namespace DelvUI.Interface
             if (!PluginConfiguration.ShowDemolishTime)
                 return;
             else
-                DrawOutlinedText(Math.Round(demolishDuration).ToString(), new Vector2(demoXOffset, demoYOffset));
+                DrawOutlinedText(Math.Round(demolishDuration).ToString(), new Vector2(CenterX + demoXOffset, cursorPos.Y - demoYOffset));
 
         }
 
@@ -171,7 +171,7 @@ namespace DelvUI.Interface
             var barWidth = (ChakraWidth - xPadding * 3) / 5;
             var barSize = new Vector2(barWidth, ChakraHeight);
             var xPos = CenterX - ChakraXOffset;
-            var yPos = CenterY + ChakraYOffset - 30;
+            var yPos = CenterY + ChakraYOffset + 46;
             var cursorPos = new Vector2(xPos, yPos);
 
             var drawList = ImGui.GetWindowDrawList();
