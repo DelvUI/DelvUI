@@ -1788,16 +1788,16 @@ namespace DelvUI.Interface
                 if (ImGui.BeginTabItem("Red Mage"))
                 {
                     var RDMVerticalOffset = _pluginConfiguration.RDMVerticalOffset;
-                    if (ImGui.DragInt("Vertical Offset", ref RDMVerticalOffset, 1f, -1000, 1000))
+                    if (ImGui.DragInt("Vertical Offset", ref RDMVerticalOffset, 1f, -2000, 2000))
                     {
                         _pluginConfiguration.RDMVerticalOffset = RDMVerticalOffset;
                         _pluginConfiguration.Save();
                     }                    
                     
-                    var RDMVHorizontalOffset = _pluginConfiguration.RDMVHorizontalOffset;
-                    if (ImGui.DragInt("Horizontal Offset", ref RDMVHorizontalOffset, 1f, -1000, 1000))
+                    var RDMVHorizontalOffset = _pluginConfiguration.RDMHorizontalOffset;
+                    if (ImGui.DragInt("Horizontal Offset", ref RDMVHorizontalOffset, 1f, -2000, 2000))
                     {
-                        _pluginConfiguration.RDMVHorizontalOffset = RDMVHorizontalOffset;
+                        _pluginConfiguration.RDMHorizontalOffset = RDMVHorizontalOffset;
                         _pluginConfiguration.Save();
                     }
 
@@ -1827,6 +1827,20 @@ namespace DelvUI.Interface
                     {
                         _pluginConfiguration.RDMManaBarWidth = RDMManaBarWidth;
                         _pluginConfiguration.Save();
+                    }                    
+                    
+                    var RDMManaBarXOffset = _pluginConfiguration.RDMManaBarXOffset;
+                    if (ImGui.DragInt("Mana Bar Horizontal Offset", ref RDMManaBarXOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMManaBarXOffset = RDMManaBarXOffset;
+                        _pluginConfiguration.Save();
+                    }                    
+                    
+                    var RDMManaBarYOffset = _pluginConfiguration.RDMManaBarYOffset;
+                    if (ImGui.DragInt("Mana Bar Vertical Offset", ref RDMManaBarYOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMManaBarYOffset = RDMManaBarYOffset;
+                        _pluginConfiguration.Save();
                     }
 
                     var RDMBlackManaBarHeight = _pluginConfiguration.RDMBlackManaBarHeight;
@@ -1843,6 +1857,20 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
                     
+                    var RDMBlackManaBarXOffset = _pluginConfiguration.RDMBlackManaBarXOffset;
+                    if (ImGui.DragInt("Black Mana Horizontal Offset", ref RDMBlackManaBarXOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMBlackManaBarXOffset = RDMBlackManaBarXOffset;
+                        _pluginConfiguration.Save();
+                    }                    
+                    
+                    var RDMBlackManaBarYOffset = _pluginConfiguration.RDMBlackManaBarYOffset;
+                    if (ImGui.DragInt("Black Mana Vertical Offset", ref RDMBlackManaBarYOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMBlackManaBarYOffset = RDMBlackManaBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
                     var RDMWhiteManaBarHeight = _pluginConfiguration.RDMWhiteManaBarHeight;
                     if (ImGui.DragInt("White Mana Height", ref RDMWhiteManaBarHeight, .1f, 1, 1000))
                     {
@@ -1854,8 +1882,74 @@ namespace DelvUI.Interface
                     {
                         _pluginConfiguration.RDMWhiteManaBarWidth = RDMWhiteManaBarWidth;
                         _pluginConfiguration.Save();
+                    }   
+                    
+                    var RDMWhiteManaBarXOffset = _pluginConfiguration.RDMWhiteManaBarXOffset;
+                    if (ImGui.DragInt("White Mana Horizontal Offset", ref RDMWhiteManaBarXOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMWhiteManaBarXOffset = RDMWhiteManaBarXOffset;
+                        _pluginConfiguration.Save();
+                    }                    
+                    
+                    var RDMWhiteManaBarYOffset = _pluginConfiguration.RDMWhiteManaBarYOffset;
+                    if (ImGui.DragInt("White Mana Vertical Offset", ref RDMWhiteManaBarYOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMWhiteManaBarYOffset = RDMWhiteManaBarYOffset;
+                        _pluginConfiguration.Save();
                     }
                     
+                    var RDMBalanceBarHeight = _pluginConfiguration.RDMBalanceBarHeight;
+                    if (ImGui.DragInt("Balance Height", ref RDMBalanceBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMBalanceBarHeight = RDMBalanceBarHeight;
+                        _pluginConfiguration.Save();
+                    }                    
+                    var RDMBalanceBarWidth = _pluginConfiguration.RDMBalanceBarWidth;
+                    if (ImGui.DragInt("Balance Width", ref RDMBalanceBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMBalanceBarWidth = RDMBalanceBarWidth;
+                        _pluginConfiguration.Save();
+                    }        
+                    
+                    var RDMBalanceBarXOffset = _pluginConfiguration.RDMBalanceBarXOffset;
+                    if (ImGui.DragInt("Balance Horizontal Offset", ref RDMBalanceBarXOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMBalanceBarXOffset = RDMBalanceBarXOffset;
+                        _pluginConfiguration.Save();
+                    }                    
+                    
+                    var RDMBalanceBarYOffset = _pluginConfiguration.RDMBalanceBarYOffset;
+                    if (ImGui.DragInt("Balance Vertical Offset", ref RDMBalanceBarYOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMBalanceBarYOffset = RDMBalanceBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var RDMAccelerationBarHeight = _pluginConfiguration.RDMAccelerationBarHeight;
+                    if (ImGui.DragInt("Acceleration Stacks Height", ref RDMAccelerationBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMAccelerationBarHeight = RDMAccelerationBarHeight;
+                        _pluginConfiguration.Save();
+                    }                    
+                    var RDMAccelerationBarWidth = _pluginConfiguration.RDMAccelerationBarWidth;
+                    if (ImGui.DragInt("Acceleration Stacks Width", ref RDMAccelerationBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMAccelerationBarWidth = RDMAccelerationBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+                    var RDMAccelerationBarXOffset = _pluginConfiguration.RDMAccelerationBarXOffset;
+                    if (ImGui.DragInt("Acceleration X Offset", ref RDMAccelerationBarXOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMAccelerationBarXOffset = RDMAccelerationBarXOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    var RDMAccelerationBarYOffset = _pluginConfiguration.RDMAccelerationBarYOffset;
+                    if (ImGui.DragInt("Acceleration Y Offset", ref RDMAccelerationBarYOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMAccelerationBarYOffset = RDMAccelerationBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
                     changed |= ImGui.Checkbox("Show Mana Value", ref _pluginConfiguration.RDMShowManaValue);
                     changed |= ImGui.Checkbox("Show Mana Threshold Marker",
                         ref _pluginConfiguration.RDMShowManaThresholdMarker);
@@ -1881,11 +1975,23 @@ namespace DelvUI.Interface
                         _pluginConfiguration.RDMDualCastWidth = RDMDualCastWidth;
                         _pluginConfiguration.Save();
                     }
+                    var RDMDualCastXOffset = _pluginConfiguration.RDMDualCastXOffset;
+                    if (ImGui.DragInt("Dualcast X Offset", ref RDMDualCastXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMDualCastXOffset = RDMDualCastXOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    var RDMDualCastYOffset = _pluginConfiguration.RDMDualCastYOffset;
+                    if (ImGui.DragInt("Dualcast Y Offset", ref RDMDualCastYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMDualCastYOffset = RDMDualCastYOffset;
+                        _pluginConfiguration.Save();
+                    }
 
-                    changed |= ImGui.Checkbox("Show Verfire Procs",
-                        ref _pluginConfiguration.BLMShowVerfireProcs);
                     changed |= ImGui.Checkbox("Show Verstone Procs",
-                        ref _pluginConfiguration.BLMShowVerstoneProcs);
+                        ref _pluginConfiguration.RDMShowVerstoneProcs);
+                    changed |= ImGui.Checkbox("Show Verfire Procs",
+                        ref _pluginConfiguration.RDMShowVerfireProcs);
 
                     var RDMProcsHeight = _pluginConfiguration.RDMProcsHeight;
                     if (ImGui.DragInt("Procs Height", ref RDMProcsHeight, .1f, -2000, 2000))
@@ -1894,27 +2000,15 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    changed |= ImGui.Checkbox("Show DoT Timer", ref _pluginConfiguration.RDMShowDotTimer);
-
-                    var RDMDotTimerHeight = _pluginConfiguration.RDMDotTimerHeight;
-                    if (ImGui.DragInt("DoT Timer Height", ref RDMDotTimerHeight, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.RDMDotTimerHeight = RDMDotTimerHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.ColorEdit4("Mana Bar Color",
-                        ref _pluginConfiguration.RDMManaBarColor);                    
-                    changed |= ImGui.ColorEdit4("Mana Bar Below Threshold Color",
-                        ref _pluginConfiguration.RDMManaBarBelowThresholdColor);
+                    changed |= ImGui.ColorEdit4("Mana Bar Color", ref _pluginConfiguration.RDMManaBarColor);                    
+                    changed |= ImGui.ColorEdit4("Mana Bar Below Threshold Color", ref _pluginConfiguration.RDMManaBarBelowThresholdColor);
                     changed |= ImGui.ColorEdit4("White Mana Bar Color", ref _pluginConfiguration.RDMWhiteManaBarColor);
-                    changed |= ImGui.ColorEdit4("Black Mana Bar Color",
-                        ref _pluginConfiguration.RDMBlackManaBarColor);
+                    changed |= ImGui.ColorEdit4("Black Mana Bar Color",ref _pluginConfiguration.RDMBlackManaBarColor);
+                    changed |= ImGui.ColorEdit4("Balance Color", ref _pluginConfiguration.RDMBalanceBarColor);
                     changed |= ImGui.ColorEdit4("Acceleration Color", ref _pluginConfiguration.RDMAccelerationBarColor);
                     changed |= ImGui.ColorEdit4("Dualcast Color", ref _pluginConfiguration.RDMDualcastBarColor);
-                    changed |= ImGui.ColorEdit4("Verfire Proc Color", ref _pluginConfiguration.RDMVerfireBarColor);
-                    changed |= ImGui.ColorEdit4("Verthunder Color", ref _pluginConfiguration.RDMVerthunderBarColor);
-                    changed |= ImGui.ColorEdit4("DoT Timer Color", ref _pluginConfiguration.RDMWDotColor);
+                    changed |= ImGui.ColorEdit4("Verstone Ready Proc Color", ref _pluginConfiguration.RDMVerstoneBarColor);
+                    changed |= ImGui.ColorEdit4("Verfire Ready Proc Color", ref _pluginConfiguration.RDMVerfireBarColor);
                     
                     ImGui.EndTabItem();
                 }
@@ -1991,7 +2085,7 @@ namespace DelvUI.Interface
                     }
 
                     changed |= ImGui.Checkbox("Show Mana Value", ref _pluginConfiguration.BLMShowManaValue);
-                    changed |= ImGui.Checkbox("Show Mana Threshold Marker",
+                    changed |= ImGui.Checkbox("Show Mana Threshold Marker During Astral Fire",
                         ref _pluginConfiguration.BLMShowManaThresholdMarker);
 
                     var BLMManaThresholdValue = _pluginConfiguration.BLMManaThresholdValue;

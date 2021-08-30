@@ -13,6 +13,7 @@ using Dalamud.Game.ClientState.Structs;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.GameStructs;
+using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using ImGuiNET;
@@ -234,16 +235,18 @@ namespace DelvUI.Interface {
                 var text = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextLeft);
                 DrawOutlinedText(text, new Vector2(cursorPos.X + 5 + TargetBarTextLeftXOffset, cursorPos.Y - 22 + TargetBarTextLeftYOffset));
             }
+            
+            var textLeft = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextLeft);
+            DrawOutlinedText(textLeft,
+                new Vector2(cursorPos.X + 5 + TargetBarTextLeftXOffset,
+                    cursorPos.Y - 22 + TargetBarTextLeftYOffset));
 
             var textRight = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextRight);
             var textRightSize = ImGui.CalcTextSize(textRight);
 
             DrawOutlinedText(textRight,
-                new Vector2(
-                    cursorPos.X + TargetBarWidth - textRightSize.X - 5 + TargetBarTextRightXOffset,
-                    cursorPos.Y - 22 + TargetBarTextRightYOffset
-                )
-            );
+                new Vector2(cursorPos.X + TargetBarWidth - textRightSize.X - 5 + TargetBarTextRightXOffset,
+                    cursorPos.Y - 22 + TargetBarTextRightYOffset));
 
             DrawTargetOfTargetBar(target.TargetActorID);
         }
@@ -663,36 +666,11 @@ namespace DelvUI.Interface {
         }
 
         protected void DrawOutlinedText(string text, Vector2 pos) {
-            DrawOutlinedText(text, pos, Vector4.One, new Vector4(0f, 0f, 0f, 1f));
+            DrawHelper.DrawOutlinedText(text, pos);
         }
 
         protected void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor) {
-            ImGui.SetCursorPos(new Vector2(pos.X - 1, pos.Y + 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X, pos.Y + 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X + 1, pos.Y + 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X - 1, pos.Y));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X + 1, pos.Y));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X - 1, pos.Y - 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X, pos.Y - 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X + 1, pos.Y - 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X, pos.Y));
-            ImGui.TextColored(color, text);
+            DrawHelper.DrawOutlinedText(text, pos, color, outlineColor);
         }
 
         public void Draw() {
