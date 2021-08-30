@@ -57,11 +57,6 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _)
         {
-            DrawHealthBar();
-            if (ShowPrimaryResourceBar)
-            {
-                DrawPrimaryResourceBar();
-            }
             if (ShowFairyBar)
             {
                 DrawFairyBar();
@@ -74,9 +69,16 @@ namespace DelvUI.Interface
             {
                 DrawAetherBar();
             }
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
+        }
+
+        protected override void DrawPrimaryResourceBar()
+        {
+            if (!ShowPrimaryResourceBar)
+            {
+                return;
+            }
+
+            base.DrawPrimaryResourceBar();
         }
 
         private void DrawFairyBar()
@@ -161,7 +163,9 @@ namespace DelvUI.Interface
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
                 return;
             }
-            var bio = target.StatusEffects.FirstOrDefault(o => o.EffectId == 179 || o.EffectId == 189 || o.EffectId == 1895);
+            var bio = target.StatusEffects.FirstOrDefault(o => o.EffectId == 179 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
+                                                               o.EffectId == 189 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
+                                                               o.EffectId == 1895 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
             var bioDuration = (int)bio.Duration;
             var xOffset = CenterX;
 

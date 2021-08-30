@@ -2,12 +2,12 @@
 
 ![image](https://i.imgur.com/AmbyNFD.png)
 DelvUI is a plugin for Dalamud that aims to replicate the ElvUI experience in Final Fantasy XIV.
-There's also a lot of inspiration taken from ToxiUI.
+There's also a lot of inspiration taken from ToxiUI.  
 
 ## Contributing
 
-You can help us contributing job packs or anything that's still missing.
-Hop in over on our Discord: https://discord.gg/JDVsJCGkk7
+You can help us contributing job packs or anything that's still missing.  
+Hop in over on our Discord: https://discord.gg/xzde5qQayh  
 
 ## Jobs currently available
 
@@ -29,7 +29,7 @@ Needs Video
 
 ### DRK
 
-Needs Video
+[![DRK](https://img.youtube.com/vi/nb6ivlkG2P4/0.jpg)](https://youtube.com/watch?v=nb6ivlkG2P4 "DelvUI DRK")
 
 ### GNB
 
