@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Plugin;
 using DelvUI.Helpers;
 using ImGuiNET;
 
@@ -317,8 +316,6 @@ namespace DelvUI.Interface.Bars
 
                         var textPos = Parent.Vertical ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y) : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
 
-                        // PluginLog.Log(textPos.ToString());
-
                         DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor);
                     }
 
@@ -364,8 +361,6 @@ namespace DelvUI.Interface.Bars
                         };
 
                         var textPos = Parent.Vertical ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y) : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
-
-                        // PluginLog.Log(textPos.ToString());
                         
                         DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor);
                     }
