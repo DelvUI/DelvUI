@@ -6,6 +6,7 @@ using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using ImGuiNET;
 using DelvUI.Interface;
+using FFXIVClientStructs;
 
 namespace DelvUI {
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -42,6 +43,8 @@ namespace DelvUI {
             if (!_fontBuilt && !_fontLoadFailed) {
                 _pluginInterface.UiBuilder.RebuildFonts();
             }
+
+            Resolver.Initialize();
         }
         
         private void BuildFont() {
@@ -116,7 +119,8 @@ namespace DelvUI {
                 //Melee DPS
                 Jobs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.MNK => new MonkHudWindow(_pluginInterface, _pluginConfiguration),
-                
+                Jobs.NIN => new NinjaHudWindow(_pluginInterface, _pluginConfiguration),
+
                 //Ranged DPS
                 Jobs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.DNC => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
@@ -154,7 +158,6 @@ namespace DelvUI {
                 Jobs.FSH => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 
                 //dont have packs yet
-                Jobs.NIN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.DRG => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.BLU => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 _ => _hudWindow

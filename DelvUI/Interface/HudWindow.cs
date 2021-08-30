@@ -75,6 +75,12 @@ namespace DelvUI.Interface {
         protected bool MPTickerShowBorder => PluginConfiguration.MPTickerShowBorder;
         protected bool MPTickerHideOnFullMp => PluginConfiguration.MPTickerHideOnFullMp;
 
+        protected int GCDIndicatorHeight => PluginConfiguration.GCDIndicatorHeight;
+        protected int GCDIndicatorWidth => PluginConfiguration.GCDIndicatorWidth;
+        protected int GCDIndicatorXOffset => PluginConfiguration.GCDIndicatorXOffset;
+        protected int GCDIndicatorYOffset => PluginConfiguration.GCDIndicatorYOffset;
+        protected bool GCDIndicatorShowBorder => PluginConfiguration.GCDIndicatorShowBorder;
+
         protected int CastBarWidth => PluginConfiguration.CastBarWidth;
         protected int CastBarHeight => PluginConfiguration.CastBarHeight;
         protected int CastBarXOffset => PluginConfiguration.CastBarXOffset;
@@ -397,6 +403,11 @@ namespace DelvUI.Interface {
             }
 
             var castColor = PluginConfiguration.CastBarColorMap["castbar"];
+            if (PluginConfiguration.ColorCastBarByJob)
+            {
+                PluginConfiguration.JobColorMap.TryGetValue(PluginInterface.ClientState.LocalPlayer.ClassJob.Id, out castColor);
+                castColor ??= PluginConfiguration.CastBarColorMap["castbar"];
+            }
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(barSize.X * castScale, barSize.Y),
                 castColor["gradientLeft"], castColor["gradientRight"], castColor["gradientRight"], castColor["gradientLeft"]
@@ -545,7 +556,7 @@ namespace DelvUI.Interface {
                 return;
             }
 
-            var shieldColor = PluginConfiguration.ShieldColorMap["shield"];
+            var shieldColor = PluginConfiguration.MiscColorMap["shield"];
             var shield = ActorShieldValue(actor);
             if (Math.Abs(shield) < 0) {
                 return;
@@ -645,7 +656,7 @@ namespace DelvUI.Interface {
             var fullSize = new Vector2(MPTickerWidth, MPTickerHeight);
             var barSize = new Vector2(Math.Max(1f, MPTickerWidth * scale), MPTickerHeight);
             var position = new Vector2(CenterX + MPTickerXOffset - MPTickerWidth / 2f, CenterY + MPTickerYOffset);
-            var colors = PluginConfiguration.MPTickerColorMap["mpTicker"];
+            var colors = PluginConfiguration.MiscColorMap["mpTicker"];
 
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(position, position + fullSize, 0x88000000);
@@ -654,6 +665,35 @@ namespace DelvUI.Interface {
             );
 
             if (MPTickerShowBorder)
+            {
+                drawList.AddRect(position, position + fullSize, 0xFF000000);
+            }
+        }
+        protected virtual void DrawGCDIndicator()
+        {
+            if (!PluginConfiguration.GCDIndicatorEnabled || PluginInterface.ClientState.LocalPlayer is null)
+            {
+                return;
+            }
+
+            GCDHelper.GetGCDInfo(PluginInterface.ClientState.LocalPlayer, out var elapsed, out var total);
+            if (total == 0) return;
+
+            var scale = elapsed / total;
+            if (scale <= 0) return;
+
+            var fullSize = new Vector2(GCDIndicatorWidth, GCDIndicatorHeight);
+            var barSize = new Vector2(Math.Max(1f, GCDIndicatorWidth * scale), GCDIndicatorHeight);
+            var position = new Vector2(CenterX + GCDIndicatorXOffset - GCDIndicatorWidth / 2f, CenterY + GCDIndicatorYOffset);
+            var colors = PluginConfiguration.MiscColorMap["mpTicker"];
+
+            var drawList = ImGui.GetWindowDrawList();
+            drawList.AddRectFilled(position, position + fullSize, 0x88000000);
+            drawList.AddRectFilledMultiColor(position, position + barSize,
+                colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+            );
+
+            if (GCDIndicatorShowBorder)
             {
                 drawList.AddRect(position, position + fullSize, 0xFF000000);
             }
@@ -733,6 +773,7 @@ namespace DelvUI.Interface {
             DrawCastBar();
             DrawTargetCastBar();
             DrawMPTicker();
+            DrawGCDIndicator();
         }
 
         protected abstract void Draw(bool _);
