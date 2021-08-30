@@ -1,4 +1,8 @@
-﻿using System.Numerics;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Numerics;
+using Dalamud.Interface;
 using Dalamud.Plugin;
 using ImGuiNET;
 
@@ -10,326 +14,252 @@ namespace DelvUI.Interface
         private readonly Plugin _plugin;
         private readonly DalamudPluginInterface _pluginInterface;
         private readonly PluginConfiguration _pluginConfiguration;
+        private string selected = "General";
+        private string selectedColorType = "Tanks";
+        private Dictionary<string, Array> configMap = new Dictionary<string, Array>() ;
+        private string[] configColorMap = new[] {"Tanks", "Healers", "Melee", "Ranged", "Casters", "NPC"};
+        private bool changed;
+        private int viewportWidth = (int) ImGui.GetMainViewport().Size.X;
+        private int viewportHeight = (int) ImGui.GetMainViewport().Size.Y;
+        private int xOffsetLimit;
+        private int yOffsetLimit;
 
         public ConfigurationWindow(Plugin plugin, DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration)
         {
+            //TODO ADD PRIMARYRESOURCEBAR TO CONFIGMAP jobs general
+
             _plugin = plugin;
             _pluginInterface = pluginInterface;
             _pluginConfiguration = pluginConfiguration;
-        }
+            configMap.Add("General", new [] {"General"});
+            configMap.Add("Individual Unitframes", new []
+            {
+                "General",
+                "Player", "Focus", "Target", "Target of Target"
+            });
+            //configMap.Add("Group Unitframes", new [] {"General", "Party", "8man", "24man", "Enemies"});
+            configMap.Add("Castbars", new [] {
+                //"General", 
+                "Player"
+                , "Enemy"
+                });
+            configMap.Add("Jobs", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"});
+
+        }   
+
 
         public void Draw()
         {
             if (!IsVisible) {
                 return;
             }
+            //Todo future reference dalamud native ui scaling
+            //ImGui.GetIO().FontGlobalScale;
+            ImGui.SetNextWindowSize(new Vector2(1050, 750), ImGuiCond.Appearing);
 
-            ImGui.SetNextWindowSize(new Vector2(0, 0), ImGuiCond.Always);
 
-            if (!ImGui.Begin("DelvUI configuration", ref IsVisible, ImGuiWindowFlags.NoCollapse)) {
+            if (!ImGui.Begin("titlebar", ref IsVisible, ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse)) {
                 return;
             }
-
-            var changed = false;
-
-            var viewportWidth = (int) ImGui.GetMainViewport().Size.X;
-            var viewportHeight = (int) ImGui.GetMainViewport().Size.Y;
-            var xOffsetLimit = viewportWidth / 2;
-            var yOffsetLimit = viewportHeight / 2;
-
-            if (ImGui.BeginTabBar("##settings-tabs"))
+            xOffsetLimit = viewportWidth / 2;
+            yOffsetLimit = viewportHeight / 2;
+            changed = false;
+            var pos = ImGui.GetCursorPos();
+            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth()-26, 0));
+            ImGui.PushFont(UiBuilder.IconFont);
+            if (ImGui.Button(FontAwesomeIcon.Times.ToIconString()))
             {
-                if (ImGui.BeginTabItem("General"))
+                IsVisible = false;
+            }
+            ImGui.PopFont();
+            ImGui.SetCursorPos(pos);
+            
+            ImGui.BeginGroup();
+            {
+                ImGui.BeginGroup(); // Left
                 {
-                    var healthBarHeight = _pluginConfiguration.HealthBarHeight;
-                    if (ImGui.DragInt("Health Height", ref healthBarHeight, .1f, 1, 1000))
+                    var imagePath = Path.Combine(Path.GetDirectoryName(_plugin.AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
+                    var delvuiBanner = _pluginInterface.UiBuilder.LoadImage(imagePath);
+                    ImGui.Image(delvuiBanner.ImGuiHandle, new Vector2(delvuiBanner.Width, delvuiBanner.Height));
+
+                    ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
+
+                    foreach (var config in configMap.Keys)
                     {
-                        _pluginConfiguration.HealthBarHeight = healthBarHeight;
-                        _pluginConfiguration.Save();
+                        if (ImGui.Selectable(config, selected == config))
+                            selected = config;
                     }
 
-                    var healthBarWidth = _pluginConfiguration.HealthBarWidth;
-                    if (ImGui.DragInt("Health Width", ref healthBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.HealthBarWidth = healthBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-                    
-                    var healthBarTextLeft = _pluginConfiguration.HealthBarTextLeft;
-                    if (ImGui.InputText("Health Text Left", ref healthBarTextLeft, 999))
-                    {
-                        _pluginConfiguration.HealthBarTextLeft = healthBarTextLeft;
-                        _pluginConfiguration.Save();
-                    }
-                    
-                    var healthBarTextRight = _pluginConfiguration.HealthBarTextRight;
-                    if (ImGui.InputText("Health Text Right", ref healthBarTextRight, 999))
-                    {
-                        _pluginConfiguration.HealthBarTextRight = healthBarTextRight;
-                        _pluginConfiguration.Save();
-                    }
+                    ImGui.EndChild();
 
-                    var healthBarXOffset = _pluginConfiguration.HealthBarXOffset;
-                    if (ImGui.DragInt("Health X Offset", ref healthBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.HealthBarXOffset = healthBarXOffset;
-                        _pluginConfiguration.Save();
-                    }
 
-                    var healthBarYOffset = _pluginConfiguration.HealthBarYOffset;
-                    if (ImGui.DragInt("Health Y Offset", ref healthBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.HealthBarYOffset = healthBarYOffset;
-                        _pluginConfiguration.Save();
-                    }
-                    
-                    var healthBarTextLeftXOffset = _pluginConfiguration.HealthBarTextLeftXOffset;
-                    if (ImGui.DragInt("Health Text Left X Offset", ref healthBarTextLeftXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.HealthBarTextLeftXOffset = healthBarTextLeftXOffset;
-                        _pluginConfiguration.Save();
-                    }
+                }
+                ImGui.EndGroup();
 
-                    var healthBarTextLeftYOffset = _pluginConfiguration.HealthBarTextLeftYOffset;
-                    if (ImGui.DragInt("Health Text Left Y Offset", ref healthBarTextLeftYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.HealthBarTextLeftYOffset = healthBarTextLeftYOffset;
-                        _pluginConfiguration.Save();
-                    }
-                    
-                    var healthBarTextRightXOffset = _pluginConfiguration.HealthBarTextRightXOffset;
-                    if (ImGui.DragInt("Health Text Right X Offset", ref healthBarTextRightXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.HealthBarTextRightXOffset = healthBarTextRightXOffset;
-                        _pluginConfiguration.Save();
-                    }
+                ImGui.SameLine();
 
-                    var healthBarTextRightYOffset = _pluginConfiguration.HealthBarTextRightYOffset;
-                    if (ImGui.DragInt("Health Text Right Y Offset", ref healthBarTextRightYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                // Right
+                ImGui.BeginGroup();
+                {
+                    var subConfigs = configMap[selected];
+                        
+                    ImGui.BeginChild("item view",new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
                     {
-                        _pluginConfiguration.HealthBarTextRightYOffset = healthBarTextRightYOffset;
-                        _pluginConfiguration.Save();
-                    }
+                        if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
+                        {
+                            foreach (string subConfig in subConfigs)
+                            {
 
-                    var primaryResourceHeight = _pluginConfiguration.PrimaryResourceBarHeight;
-                    if (ImGui.DragInt("Primary Resource Height", ref primaryResourceHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.PrimaryResourceBarHeight = primaryResourceHeight;
-                        _pluginConfiguration.Save();
-                    }
+                                if (!ImGui.BeginTabItem(subConfig)) continue;
+                                ImGui.BeginChild("subconfig value", new Vector2(0, 0), true);
+                                DrawSubConfig(selected, subConfig);
+                                ImGui.EndChild();
+                                ImGui.EndTabItem();
+                            }
 
-                    var primaryResourceWidth = _pluginConfiguration.PrimaryResourceBarWidth;
-                    if (ImGui.DragInt("Primary Resource Width", ref primaryResourceWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.PrimaryResourceBarWidth = primaryResourceWidth;
-                        _pluginConfiguration.Save();
+                            ImGui.EndTabBar();
+                                
+                        }
                     }
+                    ImGui.EndChild();
+                        
+                }
+                ImGui.EndGroup();
+            }
+            ImGui.EndGroup();
+            ImGui.Separator();
 
-                    var primaryResourceBarXOffset = _pluginConfiguration.PrimaryResourceBarXOffset;
-                    if (ImGui.DragInt("Primary Resource X Offset", ref primaryResourceBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.PrimaryResourceBarXOffset = primaryResourceBarXOffset;
-                        _pluginConfiguration.Save();
-                    }
+            ImGui.BeginGroup();
 
-                    var primaryResourceBarYOffset = _pluginConfiguration.PrimaryResourceBarYOffset;
-                    if (ImGui.DragInt("Primary Resource Y Offset", ref primaryResourceBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.PrimaryResourceBarYOffset = primaryResourceBarYOffset;
-                        _pluginConfiguration.Save();
-                    }
+            if (ImGui.Button("Lock HUD"))
+            {
+                changed |= ImGui.Checkbox("Lock HUD", ref _pluginConfiguration.LockHud);
 
-                    var targetBarHeight = _pluginConfiguration.TargetBarHeight;
-                    if (ImGui.DragInt("Target Height", ref targetBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.TargetBarHeight = targetBarHeight;
-                        _pluginConfiguration.Save();
-                    }
+            }
+            ImGui.SameLine();
+            if (ImGui.Button("Hide HUD"))
+            {
+                changed |= ImGui.Checkbox("Hide HUD", ref _pluginConfiguration.HideHud);
 
-                    var targetBarWidth = _pluginConfiguration.TargetBarWidth;
-                    if (ImGui.DragInt("Target Width", ref targetBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.TargetBarWidth = targetBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-                    
-                    var targetBarTextLeft = _pluginConfiguration.TargetBarTextLeft;
-                    if (ImGui.InputText("Target Text Left", ref targetBarTextLeft, 999))
-                    {
-                        _pluginConfiguration.TargetBarTextLeft = targetBarTextLeft;
-                        _pluginConfiguration.Save();
-                    }
-                    
-                    var targetBarTextRight = _pluginConfiguration.TargetBarTextRight;
-                    if (ImGui.InputText("Target Text Right", ref targetBarTextRight, 999))
-                    {
-                        _pluginConfiguration.TargetBarTextRight = targetBarTextRight;
-                        _pluginConfiguration.Save();
-                    }
+            }                
+            ImGui.SameLine();
+            if (ImGui.Button("Reset HUD")) {}
+            ImGui.SameLine();
+            
+            pos = ImGui.GetCursorPos();
+            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth()-60, ImGui.GetCursorPos().Y));
+            if (ImGui.Button("Donate!"))
+            {
+            }
+            ImGui.SetCursorPos(pos);
+            ImGui.EndGroup();
+                
 
-                    var targetBarXOffset = _pluginConfiguration.TargetBarXOffset;
-                    if (ImGui.DragInt("Target X Offset", ref targetBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+            if (changed)
+            {
+                _pluginConfiguration.BuildColorMap();
+                _pluginConfiguration.Save();
+            }
+            
+            ImGui.End();
+        }
+        private void DrawSubConfig(string config, string subConfig)
+        {
+            switch (config)
+            {
+                case "General":
+                    switch (subConfig)
                     {
-                        _pluginConfiguration.TargetBarXOffset = targetBarXOffset;
-                        _pluginConfiguration.Save();
-                    }
+                        case "General":
+                            DrawGeneralGeneralConfig();
+                            break;
 
-                    var targetBarYOffset = _pluginConfiguration.TargetBarYOffset;
-                    if (ImGui.DragInt("Target Y Offset", ref targetBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.TargetBarYOffset = targetBarYOffset;
-                        _pluginConfiguration.Save();
                     }
-                    
-                    var targetBarTextLeftXOffset = _pluginConfiguration.TargetBarTextLeftXOffset;
-                    if (ImGui.DragInt("Target Text Left X Offset", ref targetBarTextLeftXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                    break;
+                case "Individual Unitframes":
+                    switch (subConfig)
                     {
-                        _pluginConfiguration.TargetBarTextLeftXOffset = targetBarTextLeftXOffset;
-                        _pluginConfiguration.Save();
+                        case "General":
+                            DrawIndividualUnitFramesGeneralConfig();
+                            break;
+                        case "Player":
+                            DrawIndividualUnitFramesPlayerConfig();
+                            break;
+                        case "Target":
+                            DrawIndividualUnitFramesTargetConfig();
+                            break;                        
+                        case "Target of Target":
+                            DrawIndividualUnitFramesToTConfig();
+                            break;                        
+                        case "Focus":
+                            DrawIndividualUnitFramesFocusConfig();
+                            break;
                     }
+                    break;
+                case "Group Unitframes":
+                    switch (subConfig)
+                    {
+                        case "General":
+                            DrawGroupUnitFramesGeneralConfig();
+                            break;
+                        case "Party":
+                            DrawGroupUnitFramesPartyConfig();
+                            break;                        
+                        case "8man":
+                            DrawGroupUnitFrames8manConfig();
+                            break;                        
+                        case "24man":
+                            DrawGroupUnitFrames24manConfig();
+                            break;                        
+                        case "Enemies":
+                            DrawGroupUnitFramesEnemiesConfig();
+                            break;
+                    }
+                    break;
+                case "Castbars":
+                    switch (subConfig)
+                    {
+                        case "General":
+                            DrawCastbarsGeneralConfig();
+                            break;
+                        case "Player":
+                            DrawCastbarsPlayerConfig();
+                            break;
+                        case "Enemy":
+                            DrawCastbarsEnemyConfig();
+                            break;
+                    }
+                    break;
+                case "Jobs":
+                    switch (subConfig)
+                    {          
+                        case "General":
+                            DrawJobsGeneralConfig();
+                            break;
+                        case "Tank":
+                            DrawJobsTankConfig();
+                            break;                        
+                        case "Healer":  
+                            DrawJobsHealerConfig();
+                            break;                        
+                        case "Melee":
+                            DrawJobsMeleeConfig();
+                            break;                        
+                        case "Ranged":
+                            DrawJobsRangedConfig();
+                            break;                        
+                        case "Caster":
+                            DrawJobsCasterConfig();
+                            break;
+                    }
+                    break;
+            }
+            
+        }
 
-                    var targetBarTextLeftYOffset = _pluginConfiguration.TargetBarTextLeftYOffset;
-                    if (ImGui.DragInt("Target Text Left Y Offset", ref targetBarTextLeftYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.TargetBarTextLeftYOffset = targetBarTextLeftYOffset;
-                        _pluginConfiguration.Save();
-                    }
-                    
-                    var targetBarTextRightXOffset = _pluginConfiguration.TargetBarTextRightXOffset;
-                    if (ImGui.DragInt("Target Text Right X Offset", ref targetBarTextRightXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.TargetBarTextRightXOffset = targetBarTextRightXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var targetBarTextRightYOffset = _pluginConfiguration.TargetBarTextRightYOffset;
-                    if (ImGui.DragInt("Target Text Right Y Offset", ref targetBarTextRightYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.TargetBarTextRightYOffset = targetBarTextRightYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var totBarHeight = _pluginConfiguration.ToTBarHeight;
-                    if (ImGui.DragInt("Target of Target Height", ref totBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.ToTBarHeight = totBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var totBarWidth = _pluginConfiguration.ToTBarWidth;
-                    if (ImGui.DragInt("Target of Target Width", ref totBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.ToTBarWidth = totBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var totBarText = _pluginConfiguration.ToTBarText;
-                    if (ImGui.InputText("Target of Target Text", ref totBarText, 999))
-                    {
-                        _pluginConfiguration.ToTBarText = totBarText;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var toTBarXOffset = _pluginConfiguration.ToTBarXOffset;
-                    if (ImGui.DragInt("Target of Target X Offset", ref toTBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.ToTBarXOffset = toTBarXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var toTBarYOffset = _pluginConfiguration.ToTBarYOffset;
-                    if (ImGui.DragInt("Target of Target Y Offset", ref toTBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.ToTBarYOffset = toTBarYOffset;
-                        _pluginConfiguration.Save();
-                    }
-                    
-                    var totBarTextXOffset = _pluginConfiguration.ToTBarTextXOffset;
-                    if (ImGui.DragInt("Target of Target Text X Offset", ref totBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.ToTBarTextXOffset = totBarTextXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var totBarTextYOffset = _pluginConfiguration.ToTBarTextYOffset;
-                    if (ImGui.DragInt("Target of Target Text Y Offset", ref totBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.ToTBarTextYOffset = totBarTextYOffset;
-                        _pluginConfiguration.Save();
-                    }
-                    
-                    var focusBarHeight = _pluginConfiguration.FocusBarHeight;
-                    if (ImGui.DragInt("Focus Height", ref focusBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.FocusBarHeight = focusBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var focusBarWidth = _pluginConfiguration.FocusBarWidth;
-                    if (ImGui.DragInt("Focus Width", ref focusBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.FocusBarWidth = focusBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var focusBarXOffset = _pluginConfiguration.FocusBarXOffset;
-                    if (ImGui.DragInt("Focus X Offset", ref focusBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.FocusBarXOffset = focusBarXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var focusBarYOffset = _pluginConfiguration.FocusBarYOffset;
-                    if (ImGui.DragInt("Focus Y Offset", ref focusBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.FocusBarYOffset = focusBarYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var focusBarText = _pluginConfiguration.FocusBarText;
-                    if (ImGui.InputText("Focus Text", ref focusBarText, 999))
-                    {
-                        _pluginConfiguration.FocusBarText = focusBarText;
-                        _pluginConfiguration.Save();
-                    }
-                    
-                    var focusBarTextXOffset = _pluginConfiguration.FocusBarTextXOffset;
-                    if (ImGui.DragInt("Focus Text X Offset", ref focusBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.FocusBarTextXOffset = focusBarTextXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var focusBarTextYOffset = _pluginConfiguration.FocusBarTextYOffset;
-                    if (ImGui.DragInt("Focus Text Y Offset", ref focusBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.FocusBarTextYOffset = focusBarTextYOffset;
-                        _pluginConfiguration.Save();
-                    }
-                    
-                    changed |= ImGui.Checkbox("Shield Enabled", ref _pluginConfiguration.ShieldEnabled);
-
-                    var shieldHeight = _pluginConfiguration.ShieldHeight;
-                    if (ImGui.DragInt("Shield Height", ref shieldHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.ShieldHeight = shieldHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.Checkbox("Shield Height in px", ref _pluginConfiguration.ShieldHeightPixels);
-                    changed |= ImGui.ColorEdit4("Shield Color", ref _pluginConfiguration.ShieldColor);
-
-                    changed |= ImGui.Checkbox("Tank Stance Indicator Enabled", ref _pluginConfiguration.TankStanceIndicatorEnabled);
-
-                    var tankStanceIndicatorWidth = _pluginConfiguration.TankStanceIndicatorWidth;
-                    if (ImGui.DragInt("Tank Stance Indicator Width", ref tankStanceIndicatorWidth, .1f, 1, 6))
-                    {
-                        _pluginConfiguration.TankStanceIndicatorWidth = tankStanceIndicatorWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    // mp ticker
-                    changed |= ImGui.Checkbox("Show MP Ticker", ref _pluginConfiguration.MPTickerEnabled);
+        private void DrawGeneralGeneralConfig()
+        {
+            changed |= ImGui.Checkbox("Show MP Ticker", ref _pluginConfiguration.MPTickerEnabled);
 
                     var mpTickerHeight = _pluginConfiguration.MPTickerHeight;
                     if (ImGui.DragInt("MP Ticker Height", ref mpTickerHeight, .1f, 1, 1000))
@@ -363,61 +293,1139 @@ namespace DelvUI.Interface
                     changed |= ImGui.Checkbox("Hide MP Ticker on full mp", ref _pluginConfiguration.MPTickerHideOnFullMp);
                     changed |= ImGui.ColorEdit4("MP Ticker Color", ref _pluginConfiguration.MPTickerColor);
 
-                    changed |= ImGui.Checkbox("Hide HUD", ref _pluginConfiguration.HideHud);
-                    changed |= ImGui.Checkbox("Lock HUD", ref _pluginConfiguration.LockHud);
+                    // gcd indicator
+                    changed |= ImGui.Checkbox("Show GCD Indicator", ref _pluginConfiguration.GCDIndicatorEnabled);
 
-                    ImGui.EndTabItem();
-                }
+                    var GCDIndicatorHeight = _pluginConfiguration.GCDIndicatorHeight;
+                    if (ImGui.DragInt("GCD Indicator Height", ref GCDIndicatorHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.GCDIndicatorHeight = GCDIndicatorHeight;
+                        _pluginConfiguration.Save();
+                    }
 
-                if (ImGui.BeginTabItem("Castbar"))
+                    var GCDIndicatorWidth = _pluginConfiguration.GCDIndicatorWidth;
+                    if (ImGui.DragInt("GCD Indicator Width", ref GCDIndicatorWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.GCDIndicatorWidth = GCDIndicatorWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var GCDIndicatorXOffset = _pluginConfiguration.GCDIndicatorXOffset;
+                    if (ImGui.DragInt("GCD Indicator X Offset", ref GCDIndicatorXOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.GCDIndicatorXOffset = GCDIndicatorXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var GCDIndicatorYOffset = _pluginConfiguration.GCDIndicatorYOffset;
+                    if (ImGui.DragInt("GCD Indicator Y Offset", ref GCDIndicatorYOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.GCDIndicatorYOffset = GCDIndicatorYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show GCD Indicator border", ref _pluginConfiguration.GCDIndicatorShowBorder);
+                    changed |= ImGui.ColorEdit4("GCD Indicator Color", ref _pluginConfiguration.GCDIndicatorColor);
+
+
+        }
+
+        private void DrawIndividualUnitFramesGeneralConfig()
+        {
+            ImGui.Text("Colors");
+            ImGui.BeginGroup();
+            {
+                ImGui.BeginGroup(); // Left
                 {
-                    changed |= ImGui.Checkbox("Show Cast Bar", ref _pluginConfiguration.ShowCastBar);
+                  
 
-                    var castBarHeight = _pluginConfiguration.CastBarHeight;
-                    if (ImGui.DragInt("Castbar Height", ref castBarHeight, .1f, 1, 1000))
+                    ImGui.BeginChild("leftpane", new Vector2(150, ImGui.GetWindowHeight()/4), true);
+
+                    foreach (var colorType in configColorMap)
                     {
-                        _pluginConfiguration.CastBarHeight = castBarHeight;
-                        _pluginConfiguration.Save();
+                        if (ImGui.Selectable(colorType, selectedColorType == colorType))
+                            selectedColorType = colorType;
                     }
 
-                    var castBarWidth = _pluginConfiguration.CastBarWidth;
-                    if (ImGui.DragInt("Castbar Width", ref castBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.CastBarWidth = castBarWidth;
-                        _pluginConfiguration.Save();
-                    }
+                    ImGui.EndChild();
 
-                    var castBarXOffset = _pluginConfiguration.CastBarXOffset;
-                    if (ImGui.DragInt("Castbar X Offset", ref castBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
-                    {
-                        _pluginConfiguration.CastBarXOffset = castBarXOffset;
-                        _pluginConfiguration.Save();
-                    }
 
-                    var castBarYOffset = _pluginConfiguration.CastBarYOffset;
-                    if (ImGui.DragInt("Castbar Y Offset", ref castBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
-                    {
-                        _pluginConfiguration.CastBarYOffset = castBarYOffset;
-                        _pluginConfiguration.Save();
-                    }
+                }
+                ImGui.EndGroup();
 
-                    changed |= ImGui.ColorEdit4("Castbar Color", ref _pluginConfiguration.CastBarColor);
+                ImGui.SameLine();
+
+                // Right
+                ImGui.BeginGroup();
+                {
+
+                        
+                    ImGui.BeginChild("itemview",new Vector2(0, ImGui.GetWindowHeight()/4)); // Leave room for 1 line below us
+                    {
+                        
+                                ImGui.BeginChild("subconfig value", new Vector2(0, 0), true);
+                                ImGui.BeginChild("leftpane", new Vector2(ImGui.GetWindowWidth()/2, 0), false);
+                                switch (selectedColorType)
+                                {
+                                    case "Tanks":
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Paladin");
+                                        changed |= ImGui.ColorEdit4("##JobColorPLD", ref _pluginConfiguration.JobColorPLD);
                     
-                    changed |= ImGui.Checkbox("Show Action Icon", ref _pluginConfiguration.ShowActionIcon);
-                    changed |= ImGui.Checkbox("Show Action Name", ref _pluginConfiguration.ShowActionName);
-                    changed |= ImGui.Checkbox("Show Cast Time", ref _pluginConfiguration.ShowCastTime);
-                    changed |= ImGui.Checkbox("Slide Cast Enabled", ref _pluginConfiguration.SlideCast);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Warrior");
+                                        changed |= ImGui.ColorEdit4("##JobColorWAR", ref _pluginConfiguration.JobColorWAR);
+                                        
+                                        ImGui.EndChild();
+                                        ImGui.SameLine();
+                                        ImGui.BeginChild("leftp3ane", new Vector2(ImGui.GetWindowWidth()/2, 0), false);
+                                        
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Dark Knight");
+                                        changed |= ImGui.ColorEdit4("##JobColorDRK", ref _pluginConfiguration.JobColorDRK);
+                    
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Gunbreaker");
+                                        changed |= ImGui.ColorEdit4("##JobColorGNB", ref _pluginConfiguration.JobColorGNB);
+                                        break;
+                                    case "Healers":
+                                       
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("White Mage");
+                                        changed |= ImGui.ColorEdit4("##JobColorWHM", ref _pluginConfiguration.JobColorWHM);
 
-                    var slideCastTime = _pluginConfiguration.SlideCastTime;
-                    if (ImGui.DragFloat("Slide Cast Offset", ref slideCastTime, 1, 1, 1000))
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Scholar");
+                                        changed |= ImGui.ColorEdit4("##JobColorSCH", ref _pluginConfiguration.JobColorSCH);
+                                        
+                                        ImGui.EndChild();
+                                        ImGui.SameLine();
+                                        ImGui.BeginChild("leftpa2ne", new Vector2(ImGui.GetWindowWidth()/2, 0), false);
+                                        
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Astrologian");
+                                        changed |= ImGui.ColorEdit4("##JobColorAST", ref _pluginConfiguration.JobColorAST);
+
+                                        
+                                        break;
+                                    case "Melee":
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Monk");
+                                        changed |= ImGui.ColorEdit4("##JobColorMNK", ref _pluginConfiguration.JobColorMNK);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Dragoon");
+                                        changed |= ImGui.ColorEdit4("##JobColorDRG", ref _pluginConfiguration.JobColorDRG);
+                                        ImGui.EndChild();
+                                        ImGui.SameLine();
+                                        ImGui.BeginChild("leftpa2ne", new Vector2(ImGui.GetWindowWidth()/2, 0), false);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Ninja");
+                                        changed |= ImGui.ColorEdit4("##JobColorNIN", ref _pluginConfiguration.JobColorNIN);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Samurai");
+                                        changed |= ImGui.ColorEdit4("##JobColorSAM", ref _pluginConfiguration.JobColorSAM);
+
+
+                                        break;
+                                    case "Ranged":
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Bard");
+                                        changed |= ImGui.ColorEdit4("##JobColorBRD", ref _pluginConfiguration.JobColorBRD);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Machinist");
+                                        changed |= ImGui.ColorEdit4("##JobColorMCH", ref _pluginConfiguration.JobColorMCH);
+                                        ImGui.EndChild();
+                                        ImGui.SameLine();
+                                        ImGui.BeginChild("leftpa2ne", new Vector2(ImGui.GetWindowWidth()/2, 0), false);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Dancer");
+                                        changed |= ImGui.ColorEdit4("##JobColorDNC", ref _pluginConfiguration.JobColorDNC);
+
+
+                                        break;
+                                    case "Casters":
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Black Mage");
+                                        changed |= ImGui.ColorEdit4("##JobColorBLM", ref _pluginConfiguration.JobColorBLM);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Summoner");
+                                        changed |= ImGui.ColorEdit4("##JobColorSMN", ref _pluginConfiguration.JobColorSMN);
+                                        ImGui.EndChild();
+                                        ImGui.SameLine();
+                                        ImGui.BeginChild("leftpa2ne", new Vector2(ImGui.GetWindowWidth()/2, 0), false);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Red Mage");
+                                        changed |= ImGui.ColorEdit4("##JobColorRDM", ref _pluginConfiguration.JobColorRDM);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Blue Mage");
+                                        changed |= ImGui.ColorEdit4("##JobColorBLU", ref _pluginConfiguration.JobColorBLU);
+ 
+
+                                        break;
+                                    case "NPC":
+                                        
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Hostile");
+                                        changed |= ImGui.ColorEdit4("##NPCColorHostile", ref _pluginConfiguration.NPCColorHostile);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Neutral");
+                                        changed |= ImGui.ColorEdit4("##NPCColorNeutral", ref _pluginConfiguration.NPCColorNeutral);
+                                        ImGui.EndChild();
+                                        ImGui.SameLine();
+                                        ImGui.BeginChild("leftpa2ne", new Vector2(ImGui.GetWindowWidth()/2, 0), false);
+                                        ImGui.Text("");//SPACING
+                                        ImGui.Text("Friendly");
+                                        changed |= ImGui.ColorEdit4("##NPCColorFriendly", ref _pluginConfiguration.NPCColorFriendly);
+                                        
+
+                                        break;
+                                }
+                                ImGui.EndChild();
+                                ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+                        
+                }
+                ImGui.EndGroup();
+            }
+            ImGui.EndGroup();
+            ImGui.Text("");//SPACING
+            changed |= ImGui.Checkbox("Shields", ref _pluginConfiguration.ShieldEnabled);
+            ImGui.BeginGroup();
+            ImGui.BeginChild("itemview2",new Vector2(0, ImGui.GetWindowHeight()/5), true); 
+            {
+                ImGui.BeginChild("itemvi2213ew2",new Vector2(ImGui.GetWindowWidth()/2, 0) );
+                {
+                    var shieldHeight = _pluginConfiguration.ShieldHeight;
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Height");
+                   
+                    if (ImGui.DragInt("##ShieldHeight", ref shieldHeight, .1f, 1, 1000))
                     {
-                        _pluginConfiguration.SlideCastTime = slideCastTime;
+                        _pluginConfiguration.ShieldHeight = shieldHeight;
+                        _pluginConfiguration.Save();
+                    }
+                    ImGui.SameLine();
+                    changed |= ImGui.Checkbox("in pixels", ref _pluginConfiguration.ShieldHeightPixels);
+                    
+                }
+                ImGui.EndChild();
+                ImGui.SameLine();
+                ImGui.BeginChild("ite4123mview2",new Vector2(ImGui.GetWindowWidth()/2, 0));
+                {
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Color");
+                    changed |= ImGui.ColorEdit4("##ShieldColor", ref _pluginConfiguration.ShieldColor);
+                }
+                ImGui.EndChild();
+
+            }
+            ImGui.EndChild();
+
+
+            ImGui.EndGroup();
+        }
+
+        private void DrawIndividualUnitFramesPlayerConfig(){
+                
+            bool disabled = true;
+            ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Bar Size & Position");
+                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Height");
+                            var healthBarHeight = _pluginConfiguration.HealthBarHeight;
+                            if (ImGui.DragInt("##HealthBarHeight", ref healthBarHeight, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.HealthBarHeight = healthBarHeight;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("X Offset");
+                            var healthBarXOffset = _pluginConfiguration.HealthBarXOffset;
+                            if (ImGui.DragInt("##HealthBarXOffset", ref healthBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.HealthBarXOffset = healthBarXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Width");
+                            var healthBarWidth = _pluginConfiguration.HealthBarWidth;
+                            if (ImGui.DragInt("##HealthBarWidth", ref healthBarWidth, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.HealthBarWidth = healthBarWidth;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Y Offset");
+                            var healthBarYOffset = _pluginConfiguration.HealthBarYOffset;
+                            if (ImGui.DragInt("##HealthBarYOffset", ref healthBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.HealthBarYOffset = healthBarYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+
+                    ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+            ImGui.Text("");//SPACING
+
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Text Format");
+                ImGui.BeginChild("hptxtpane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    ImGui.BeginChild("hptxtformatpane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Left Text Format");
+                            var healthBarTextLeft = _pluginConfiguration.HealthBarTextLeft;
+                            if (ImGui.InputText("##HealthBarTextLeft", ref healthBarTextLeft, 999))
+                            {
+                                _pluginConfiguration.HealthBarTextLeft = healthBarTextLeft;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Left Text X Offset");
+                            var healthBarTextLeftXOffset = _pluginConfiguration.HealthBarTextLeftXOffset;
+                            if (ImGui.DragInt("##HealthBarTextLeftXOffset", ref healthBarTextLeftXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.HealthBarTextLeftXOffset = healthBarTextLeftXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Left Text Y Offset");
+                            var healthBarTextLeftYOffset = _pluginConfiguration.HealthBarTextLeftYOffset;
+                            if (ImGui.DragInt("##HealthBarTextLeftYOffset", ref healthBarTextLeftYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.HealthBarTextLeftYOffset = healthBarTextLeftYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hptxtformatrightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Right Text Format");
+                            var healthBarTextRight = _pluginConfiguration.HealthBarTextRight;
+                            if (ImGui.InputText("##HealthBarTextRight", ref healthBarTextRight, 999))
+                            {
+                                _pluginConfiguration.HealthBarTextRight = healthBarTextRight;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Right Text X Offset");
+                            var healthBarTextRightXOffset = _pluginConfiguration.HealthBarTextRightXOffset;
+                            if (ImGui.DragInt("##HealthBarTextRightXOffset", ref healthBarTextRightXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.HealthBarTextRightXOffset = healthBarTextRightXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Right Text Y Offset");
+                            var healthBarTextRightYOffset = _pluginConfiguration.HealthBarTextRightYOffset;
+                            if (ImGui.DragInt("##HealthBarTextRightYOffset", ref healthBarTextRightYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.HealthBarTextRightYOffset = healthBarTextRightYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+                    
+
+                ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+            //TODO CONFIG FIX THIS
+            changed |= ImGui.Checkbox("Custom Healthbar Color Enabled", ref _pluginConfiguration.CustomHealthBarColorEnabled);
+            changed |= ImGui.ColorEdit4("Custom Healthbar Color", ref _pluginConfiguration.CustomHealthBarColor);
+
+        } 
+        private void DrawIndividualUnitFramesTargetConfig(){
+                
+            bool disabled = true;
+            ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Bar Size & Position");
+                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Height");
+                            var TargetBarHeight = _pluginConfiguration.TargetBarHeight;
+                            if (ImGui.DragInt("##TargetBarHeight", ref TargetBarHeight, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.TargetBarHeight = TargetBarHeight;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("X Offset");
+                            var TargetBarXOffset = _pluginConfiguration.TargetBarXOffset;
+                            if (ImGui.DragInt("##TargetBarXOffset", ref TargetBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.TargetBarXOffset = TargetBarXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Width");
+                            var TargetBarWidth = _pluginConfiguration.TargetBarWidth;
+                            if (ImGui.DragInt("##TargetBarWidth", ref TargetBarWidth, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.TargetBarWidth = TargetBarWidth;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Y Offset");
+                            var TargetBarYOffset = _pluginConfiguration.TargetBarYOffset;
+                            if (ImGui.DragInt("##TargetBarYOffset", ref TargetBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.TargetBarYOffset = TargetBarYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+
+                    ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+            ImGui.Text("");//SPACING
+
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Text Format");
+                ImGui.BeginChild("hptxtpane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    ImGui.BeginChild("hptxtformatpane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Left Text Format");
+                            var TargetBarTextLeft = _pluginConfiguration.TargetBarTextLeft;
+                            if (ImGui.InputText("##TargetBarTextLeft", ref TargetBarTextLeft, 999))
+                            {
+                                _pluginConfiguration.TargetBarTextLeft = TargetBarTextLeft;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Left Text X Offset");
+                            var TargetBarTextLeftXOffset = _pluginConfiguration.TargetBarTextLeftXOffset;
+                            if (ImGui.DragInt("##TargetBarTextLeftXOffset", ref TargetBarTextLeftXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.TargetBarTextLeftXOffset = TargetBarTextLeftXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Left Text Y Offset");
+                            var TargetBarTextLeftYOffset = _pluginConfiguration.TargetBarTextLeftYOffset;
+                            if (ImGui.DragInt("##TargetBarTextLeftYOffset", ref TargetBarTextLeftYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.TargetBarTextLeftYOffset = TargetBarTextLeftYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hptxtformatrightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Right Text Format");
+                            var TargetBarTextRight = _pluginConfiguration.TargetBarTextRight;
+                            if (ImGui.InputText("##TargetBarTextRight", ref TargetBarTextRight, 999))
+                            {
+                                _pluginConfiguration.TargetBarTextRight = TargetBarTextRight;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Right Text X Offset");
+                            var TargetBarTextRightXOffset = _pluginConfiguration.TargetBarTextRightXOffset;
+                            if (ImGui.DragInt("##TargetBarTextRightXOffset", ref TargetBarTextRightXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.TargetBarTextRightXOffset = TargetBarTextRightXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Right Text Y Offset");
+                            var TargetBarTextRightYOffset = _pluginConfiguration.TargetBarTextRightYOffset;
+                            if (ImGui.DragInt("##TargetBarTextRightYOffset", ref TargetBarTextRightYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.TargetBarTextRightYOffset = TargetBarTextRightYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+                    
+
+                ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+                
+        } 
+        private void DrawIndividualUnitFramesToTConfig(){
+                
+            bool disabled = true;
+            ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Bar Size & Position");
+                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+
+                        ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Height");
+                            var ToTBarHeight = _pluginConfiguration.ToTBarHeight;
+                            if (ImGui.DragInt("##ToTBarHeight", ref ToTBarHeight, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.ToTBarHeight = ToTBarHeight;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("X Offset");
+                            var ToTBarXOffset = _pluginConfiguration.ToTBarXOffset;
+                            if (ImGui.DragInt("##ToTBarXOffset", ref ToTBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.ToTBarXOffset = ToTBarXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Width");
+                            var ToTBarWidth = _pluginConfiguration.ToTBarWidth;
+                            if (ImGui.DragInt("##ToTBarWidth", ref ToTBarWidth, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.ToTBarWidth = ToTBarWidth;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Y Offset");
+                            var ToTBarYOffset = _pluginConfiguration.ToTBarYOffset;
+                            if (ImGui.DragInt("##ToTBarYOffset", ref ToTBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.ToTBarYOffset = ToTBarYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+
+                    ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+            ImGui.Text("");//SPACING
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Text Format");
+                ImGui.BeginChild("hpp2ane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                ImGui.BeginChild("castbar2color", new Vector2(0,ImGui.GetWindowHeight()/3),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                {
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Text Format");
+                    var ToTBarText = _pluginConfiguration.ToTBarText;
+                    if (ImGui.InputText("##ToTBarText", ref ToTBarText, 999))
+                    {
+                        _pluginConfiguration.ToTBarText = ToTBarText;
                         _pluginConfiguration.Save();
                     }
 
-                    changed |= ImGui.ColorEdit4("Slide Cast Color", ref _pluginConfiguration.SlideCastColor);
-                    
-                    changed |= ImGui.Checkbox("Show Target Cast Bar", ref _pluginConfiguration.ShowTargetCastBar);
+                        
+                }
+                ImGui.EndChild();
+                ImGui.Text("");//SPACING
+
+                ImGui.BeginChild("hpsize2pane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                {
+                    ImGui.BeginChild("hpheight2pane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.Text("");//SPACING
+                        ImGui.Text("X Offset");
+                        var ToTBarTextXOffset = _pluginConfiguration.ToTBarTextXOffset;
+                        if (ImGui.DragInt("##ToTBarTextXOffset", ref ToTBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                        {
+                            _pluginConfiguration.ToTBarTextXOffset = ToTBarTextXOffset;
+                            _pluginConfiguration.Save();
+                        }
+                    }
+                    ImGui.EndChild();
+                        
+                    ImGui.SameLine();
+                        
+                    ImGui.BeginChild("hpwidt2hpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.Text("");//SPACING
+
+                        ImGui.Text("Text Y Offset");
+                        var ToTBarTextYOffset = _pluginConfiguration.ToTBarTextYOffset;
+                        if (ImGui.DragInt("##ToTBarTextYOffset", ref ToTBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                        {
+                            _pluginConfiguration.ToTBarTextYOffset = ToTBarTextYOffset;
+                            _pluginConfiguration.Save();
+                        }
+
+                    }
+                    ImGui.EndChild();
+                        
+                }
+                ImGui.EndChild();
+
+
+                ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();   
+                
+        } 
+        private void DrawIndividualUnitFramesFocusConfig(){
+                
+            bool disabled = true;
+            ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Bar Size & Position");
+                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+
+                        ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Height");
+                            var FocusBarHeight = _pluginConfiguration.FocusBarHeight;
+                            if (ImGui.DragInt("##FocusBarHeight", ref FocusBarHeight, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.FocusBarHeight = FocusBarHeight;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("X Offset");
+                            var FocusBarXOffset = _pluginConfiguration.FocusBarXOffset;
+                            if (ImGui.DragInt("##FocusBarXOffset", ref FocusBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.FocusBarXOffset = FocusBarXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Width");
+                            var FocusBarWidth = _pluginConfiguration.FocusBarWidth;
+                            if (ImGui.DragInt("##FocusBarWidth", ref FocusBarWidth, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.FocusBarWidth = FocusBarWidth;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Y Offset");
+                            var FocusBarYOffset = _pluginConfiguration.FocusBarYOffset;
+                            if (ImGui.DragInt("##FocusBarYOffset", ref FocusBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.FocusBarYOffset = FocusBarYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+
+                    ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+            ImGui.Text("");//SPACING
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Text Format");
+                ImGui.BeginChild("hpp2ane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                ImGui.BeginChild("castbar2color", new Vector2(0,ImGui.GetWindowHeight()/3),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                {
+                    ImGui.Text("");//SPACING
+                    ImGui.Text("Text Format");
+                    var FocusBarText = _pluginConfiguration.FocusBarText;
+                    if (ImGui.InputText("##FocusBarText", ref FocusBarText, 999))
+                    {
+                        _pluginConfiguration.FocusBarText = FocusBarText;
+                        _pluginConfiguration.Save();
+                    }
+
+                        
+                }
+                ImGui.EndChild();
+                ImGui.Text("");//SPACING
+
+                ImGui.BeginChild("hpsize2pane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                {
+                    ImGui.BeginChild("hpheight2pane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.Text("");//SPACING
+                        ImGui.Text("X Offset");
+                        var FocusBarTextXOffset = _pluginConfiguration.FocusBarTextXOffset;
+                        if (ImGui.DragInt("##FocusBarTextXOffset", ref FocusBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                        {
+                            _pluginConfiguration.FocusBarTextXOffset = FocusBarTextXOffset;
+                            _pluginConfiguration.Save();
+                        }
+                    }
+                    ImGui.EndChild();
+                        
+                    ImGui.SameLine();
+                        
+                    ImGui.BeginChild("hpwidt2hpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.Text("");//SPACING
+
+                        ImGui.Text("Text Y Offset");
+                        var FocusBarTextYOffset = _pluginConfiguration.FocusBarTextYOffset;
+                        if (ImGui.DragInt("##FocusBarTextYOffset", ref FocusBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                        {
+                            _pluginConfiguration.FocusBarTextYOffset = FocusBarTextYOffset;
+                            _pluginConfiguration.Save();
+                        }
+
+                    }
+                    ImGui.EndChild();
+                        
+                }
+                ImGui.EndChild();
+
+
+                ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();   
+                
+        } 
+        
+        private void DrawIndividualUnitFramesFocusConfigss(){
+            bool disabled = true;
+            ImGui.Checkbox("Enabled", ref disabled);//TODO CODE THIS
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Bar Size & Position");
+                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("Height");
+                            var FocusBarHeight = _pluginConfiguration.FocusBarHeight;
+                            if (ImGui.DragInt("##FocusBarHeight", ref FocusBarHeight, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.FocusBarHeight = FocusBarHeight;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("Width");
+                            var FocusBarWidth = _pluginConfiguration.FocusBarWidth;
+                            if (ImGui.DragInt("##FocusBarWidth", ref FocusBarWidth, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.FocusBarWidth = FocusBarWidth;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+                    ImGui.Separator();
+                    ImGui.BeginChild("hpoffsetpane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hpxpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("X Offset");
+                            var FocusBarXOffset = _pluginConfiguration.FocusBarXOffset;
+                            if (ImGui.DragInt("##FocusBarXOffset", ref FocusBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.FocusBarXOffset = FocusBarXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hpypane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("Y Offset");
+                            var FocusBarYOffset = _pluginConfiguration.FocusBarYOffset;
+                            if (ImGui.DragInt("##FocusBarYOffset", ref FocusBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.FocusBarYOffset = FocusBarYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+
+                ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+            
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Text Format");
+                ImGui.BeginChild("hptxtpane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    ImGui.BeginChild("hptxtformatpane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("Text Format");
+                            var FocusBarText = _pluginConfiguration.FocusBarText;
+                            if (ImGui.InputText("##FocusBarText", ref FocusBarText, 999))
+                            {
+                                _pluginConfiguration.FocusBarText = FocusBarText;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+
+                        
+                    }
+                    ImGui.EndChild();
+                    ImGui.Separator();
+                    ImGui.BeginChild("hptxtoffsetpane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hptxtleftxpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("Text X Offset");
+                            var FocusBarTextXOffset = _pluginConfiguration.FocusBarTextXOffset;
+                            if (ImGui.DragInt("##FocusBarTextXOffset", ref FocusBarTextXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.FocusBarTextXOffset = FocusBarTextXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hptxtleftypane", new Vector2(ImGui.GetWindowWidth()/2, 0));
+                        {
+                            ImGui.Text("Text Y Offset");
+                            var FocusBarTextYOffset = _pluginConfiguration.FocusBarTextYOffset;
+                            if (ImGui.DragInt("##FocusBarTextYOffset", ref FocusBarTextYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.ToTBarTextYOffset = FocusBarTextYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+
+                ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+                
+        }        
+        private void DrawCastbarsPlayerConfig(){
+            bool disabled = true;
+            changed |= ImGui.Checkbox("Enabled", ref _pluginConfiguration.ShowCastBar);
+
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Bar Size & Position");
+                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Height");
+                            var CastBarHeight = _pluginConfiguration.CastBarHeight;
+                            if (ImGui.DragInt("##CastBarHeight", ref CastBarHeight, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.CastBarHeight = CastBarHeight;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("X Offset");
+                            var CastBarXOffset = _pluginConfiguration.CastBarXOffset;
+                            if (ImGui.DragInt("##CastBarXOffset", ref CastBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            {
+                                _pluginConfiguration.CastBarXOffset = CastBarXOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Width");
+                            var CastBarWidth = _pluginConfiguration.CastBarWidth;
+                            if (ImGui.DragInt("##CastBarWidth", ref CastBarWidth, .1f, 1, 1000))
+                            {
+                                _pluginConfiguration.CastBarWidth = CastBarWidth;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+
+                            ImGui.Text("Y Offset");
+                            var CastBarYOffset = _pluginConfiguration.CastBarYOffset;
+                            if (ImGui.DragInt("##CastBarYOffset", ref CastBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            {
+                                _pluginConfiguration.CastBarYOffset = CastBarYOffset;
+                                _pluginConfiguration.Save();
+                            }
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+                    ImGui.Text("");//SPACING
+
+                    ImGui.BeginChild("castbarcolor", new Vector2(0,ImGui.GetWindowHeight()/3),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.Text("Color");
+                        changed |= ImGui.ColorEdit4("##CastBarColor", ref _pluginConfiguration.CastBarColor);
+
+                        
+                    }
+                    ImGui.EndChild();
+                ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();   
+            ImGui.Text("");//SPACING
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {
+                ImGui.Text("Other Options");
+                ImGui.BeginChild("otheroptions", new Vector2(0,ImGui.GetWindowHeight()/4), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("otheroptions1", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("otheroptions2", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+                            changed |= ImGui.Checkbox("Show Action Icon", ref _pluginConfiguration.ShowActionIcon);
+                        }
+                        ImGui.EndChild();
+                        
+                        ImGui.SameLine();
+                        
+                        ImGui.BeginChild("otheroptions3", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+                            changed |= ImGui.Checkbox("Show Action Name", ref _pluginConfiguration.ShowActionName);
+                            ImGui.Text("");//SPACING
+                            changed |= ImGui.Checkbox("Show Cast Time", ref _pluginConfiguration.ShowCastTime);
+                        }
+                        ImGui.EndChild();
+                        
+                    }
+                    ImGui.EndChild();
+
+                    ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+            ImGui.Text("");//SPACING
+            ImGui.BeginGroup();
+            ImGui.BeginGroup(); // Left
+            {                        
+                changed |= ImGui.Checkbox("SlideCast", ref _pluginConfiguration.SlideCast);
+                ImGui.BeginChild("hptxtpane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    ImGui.BeginChild("hptxtformatpane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth(), 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        {
+                            ImGui.Text("");//SPACING
+                            ImGui.Text("Offset");
+                            var SlideCastTime = _pluginConfiguration.SlideCastTime;
+                            if (ImGui.DragFloat("##SlideCastTime", ref SlideCastTime, 1, 1, 1000))
+                            {
+                                _pluginConfiguration.SlideCastTime = SlideCastTime;
+                                _pluginConfiguration.Save();
+                            }
+                            ImGui.Text("");//SPACING
+                            ImGui.Text("Color");
+                            changed |= ImGui.ColorEdit4("##SlideCastColor", ref _pluginConfiguration.SlideCastColor);
+
+                        }
+                        ImGui.EndChild();
+                        
+
+                        
+                    }
+                    ImGui.EndChild();
+                    ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+                
+        }        
+        
+
+     
+        
+
+        private void DrawGroupUnitFramesGeneralConfig()
+        {
+            
+        }
+
+        private void DrawGroupUnitFramesPartyConfig()
+        {
+            
+        }
+
+        private void DrawGroupUnitFrames8manConfig()
+        {
+            
+        }
+
+        private void DrawGroupUnitFrames24manConfig()
+        {
+            
+        }
+
+        private void DrawGroupUnitFramesEnemiesConfig()
+        {
+            
+        }
+
+        private void DrawCastbarsGeneralConfig()
+        {
+            
+        }
+
+
+        private void DrawCastbarsEnemyConfig()
+        {
+            changed |= ImGui.Checkbox("Show Target Cast Bar", ref _pluginConfiguration.ShowTargetCastBar);
 
                     var targetCastBarHeight = _pluginConfiguration.TargetCastBarHeight;
                     if (ImGui.DragInt("Target Castbar Height", ref targetCastBarHeight, .1f, 1, 1000))
@@ -460,588 +1468,57 @@ namespace DelvUI.Interface
                     changed |= ImGui.Checkbox("Show Target Cast Time", ref _pluginConfiguration.ShowTargetCastTime);
                     changed |= ImGui.Checkbox("Show Interruptable Casts", ref _pluginConfiguration.ShowTargetInterrupt);
 
-                    ImGui.EndTabItem();
-                }
+        }
 
-                if (ImGui.BeginTabItem("Color Map"))
+        private void DrawJobsGeneralConfig()
+        {
+            var primaryResourceHeight = _pluginConfiguration.PrimaryResourceBarHeight;
+            if (ImGui.DragInt("Primary Resource Height", ref primaryResourceHeight, .1f, 1, 1000))
+            {
+                _pluginConfiguration.PrimaryResourceBarHeight = primaryResourceHeight;
+                _pluginConfiguration.Save();
+            }
+
+            var primaryResourceWidth = _pluginConfiguration.PrimaryResourceBarWidth;
+            if (ImGui.DragInt("Primary Resource Width", ref primaryResourceWidth, .1f, 1, 1000))
+            {
+                _pluginConfiguration.PrimaryResourceBarWidth = primaryResourceWidth;
+                _pluginConfiguration.Save();
+            }
+
+            var primaryResourceBarXOffset = _pluginConfiguration.PrimaryResourceBarXOffset;
+            if (ImGui.DragInt("Primary Resource X Offset", ref primaryResourceBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+            {
+                _pluginConfiguration.PrimaryResourceBarXOffset = primaryResourceBarXOffset;
+                _pluginConfiguration.Save();
+            }
+
+            var primaryResourceBarYOffset = _pluginConfiguration.PrimaryResourceBarYOffset;
+            if (ImGui.DragInt("Primary Resource Y Offset", ref primaryResourceBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+            {
+                _pluginConfiguration.PrimaryResourceBarYOffset = primaryResourceBarYOffset;
+                _pluginConfiguration.Save();
+            }
+        }
+
+        private void DrawJobsTankConfig()
+        {
+
+            if (ImGui.BeginTabBar("##tanks-tabs"))
+            {
+                if (ImGui.BeginTabItem("General"))
                 {
-                    changed |= ImGui.ColorEdit4("Job Color PLD", ref _pluginConfiguration.JobColorPLD);
-                    changed |= ImGui.ColorEdit4("Job Color WAR", ref _pluginConfiguration.JobColorWAR);
-                    changed |= ImGui.ColorEdit4("Job Color DRK", ref _pluginConfiguration.JobColorDRK);
-                    changed |= ImGui.ColorEdit4("Job Color GNB", ref _pluginConfiguration.JobColorGNB);
-                    changed |= ImGui.ColorEdit4("Job Color WHM", ref _pluginConfiguration.JobColorWHM);
-                    changed |= ImGui.ColorEdit4("Job Color AST", ref _pluginConfiguration.JobColorAST);
-                    changed |= ImGui.ColorEdit4("Job Color SCH", ref _pluginConfiguration.JobColorSCH);
-                    changed |= ImGui.ColorEdit4("Job Color MNK", ref _pluginConfiguration.JobColorMNK);
-                    changed |= ImGui.ColorEdit4("Job Color DRG", ref _pluginConfiguration.JobColorDRG);
-                    changed |= ImGui.ColorEdit4("Job Color NIN", ref _pluginConfiguration.JobColorNIN);
-                    changed |= ImGui.ColorEdit4("Job Color SAM", ref _pluginConfiguration.JobColorSAM);
-                    changed |= ImGui.ColorEdit4("Job Color BRD", ref _pluginConfiguration.JobColorBRD);
-                    changed |= ImGui.ColorEdit4("Job Color MCH", ref _pluginConfiguration.JobColorMCH);
-                    changed |= ImGui.ColorEdit4("Job Color DNC", ref _pluginConfiguration.JobColorDNC);
-                    changed |= ImGui.ColorEdit4("Job Color BLM", ref _pluginConfiguration.JobColorBLM);
-                    changed |= ImGui.ColorEdit4("Job Color SMN", ref _pluginConfiguration.JobColorSMN);
-                    changed |= ImGui.ColorEdit4("Job Color RDM", ref _pluginConfiguration.JobColorRDM);
-                    changed |= ImGui.ColorEdit4("Job Color BLU", ref _pluginConfiguration.JobColorBLU);
+                    changed |= ImGui.Checkbox("Tank Stance Indicator Enabled", ref _pluginConfiguration.TankStanceIndicatorEnabled);
 
-                    changed |= ImGui.ColorEdit4("NPC Color Hostile", ref _pluginConfiguration.NPCColorHostile);
-                    changed |= ImGui.ColorEdit4("NPC Color Neutral", ref _pluginConfiguration.NPCColorNeutral);
-                    changed |= ImGui.ColorEdit4("NPC Color Friendly", ref _pluginConfiguration.NPCColorFriendly);
-
+                    var tankStanceIndicatorWidth = _pluginConfiguration.TankStanceIndicatorWidth;
+                    if (ImGui.DragInt("Tank Stance Indicator Width", ref tankStanceIndicatorWidth, .1f, 1, 6))
+                    {
+                        _pluginConfiguration.TankStanceIndicatorWidth = tankStanceIndicatorWidth;
+                        _pluginConfiguration.Save();
+                    }
                     ImGui.EndTabItem();
                 }
-
-                if (ImGui.BeginTabItem("Scholar"))
-                {
-
-                    var fairyBarHeight = _pluginConfiguration.FairyBarHeight;
-                    if (ImGui.DragInt("Fairy Gauge Height", ref fairyBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.FairyBarHeight = fairyBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var fairyBarWidth = _pluginConfiguration.FairyBarWidth;
-                    if (ImGui.DragInt("Fairy Gauge Width", ref fairyBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.FairyBarWidth = fairyBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var fairyBarX = _pluginConfiguration.FairyBarX;
-                    if (ImGui.DragInt("Fairy Gauge X Offset", ref fairyBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.FairyBarX = fairyBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var fairyBarY = _pluginConfiguration.FairyBarY;
-                    if (ImGui.DragInt("Fairy Gauge Y Offset", ref fairyBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.FairyBarY = fairyBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var schAetherBarHeight = _pluginConfiguration.SchAetherBarHeight;
-                    if (ImGui.DragInt("Aether Gauge Height", ref schAetherBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SchAetherBarHeight = schAetherBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var schAetherBarWidth = _pluginConfiguration.SchAetherBarWidth;
-                    if (ImGui.DragInt("Aether Gauge Width", ref schAetherBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SchAetherBarWidth = schAetherBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var schAetherBarX = _pluginConfiguration.SchAetherBarX;
-                    if (ImGui.DragInt("Aether Gauge X Offset", ref schAetherBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SchAetherBarX = schAetherBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var schAetherBarY = _pluginConfiguration.SchAetherBarY;
-                    if (ImGui.DragInt("Aether Gauge Y Offset", ref schAetherBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SchAetherBarY = schAetherBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var schAetherBarPad = _pluginConfiguration.SchAetherBarPad;
-                    if (ImGui.DragInt("Aether Padding", ref schAetherBarPad, .1f, -100, 1000))
-                    {
-                        _pluginConfiguration.SchAetherBarPad = schAetherBarPad;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var schBioBarHeight = _pluginConfiguration.SCHBioBarHeight;
-                    if (ImGui.DragInt("Bio Bar Height", ref schBioBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SCHBioBarHeight = schBioBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var schBioBarWidth = _pluginConfiguration.SCHBioBarWidth;
-                    if (ImGui.DragInt("Bio Bar Width", ref schBioBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SCHBioBarWidth = schBioBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var schBioBarX = _pluginConfiguration.SCHBioBarX;
-                    if (ImGui.DragInt("Bio Bar X Offset", ref schBioBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SCHBioBarX = schBioBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var schBioBarY = _pluginConfiguration.SCHBioBarY;
-                    if (ImGui.DragInt("Bio Bar Y Offset", ref schBioBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SCHBioBarY = schBioBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.Checkbox("Show Aether Bar", ref _pluginConfiguration.SCHShowAetherBar);
-                    changed |= ImGui.Checkbox("Show Fairy Bar", ref _pluginConfiguration.SCHShowFairyBar);
-                    changed |= ImGui.Checkbox("Show Bio Bar", ref _pluginConfiguration.SCHShowBioBar);
-                    changed |= ImGui.Checkbox("Show Primary Resource Bar", ref _pluginConfiguration.SCHShowPrimaryResourceBar);
-
-                    changed |= ImGui.ColorEdit4("Fairy Bar Color", ref _pluginConfiguration.SchFairyColor);
-                    changed |= ImGui.ColorEdit4("Aether Bar Color", ref _pluginConfiguration.SchAetherColor);
-                    changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.SchEmptyColor);
-
-                    ImGui.EndTabItem();
-                }
-
-                if (ImGui.BeginTabItem("White Mage"))
-                {
-
-                    var lillyBarHeight = _pluginConfiguration.LillyBarHeight;
-                    if (ImGui.DragInt("Lilly Gauge Height", ref lillyBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.LillyBarHeight = lillyBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var lillyBarWidth = _pluginConfiguration.LillyBarWidth;
-                    if (ImGui.DragInt("Lilly Gauge Width", ref lillyBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.LillyBarWidth = lillyBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var lillyBarX = _pluginConfiguration.LillyBarX;
-                    if (ImGui.DragInt("Lilly Gauge X Offset", ref lillyBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.LillyBarX = lillyBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var lillyBarY = _pluginConfiguration.LillyBarY;
-                    if (ImGui.DragInt("Lilly Gauge Y Offset", ref lillyBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.LillyBarY = lillyBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var lillyBarPad = _pluginConfiguration.LillyBarPad;
-                    if (ImGui.DragInt("Lilly Gauge Padding", ref lillyBarPad, .1f, -100, 1000))
-                    {
-                        _pluginConfiguration.LillyBarPad = lillyBarPad;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var bloodLillyBarHeight = _pluginConfiguration.BloodLillyBarHeight;
-                    if (ImGui.DragInt("Blood Lilly Gauge Height", ref bloodLillyBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BloodLillyBarHeight = bloodLillyBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var bloodLillyBarWidth = _pluginConfiguration.BloodLillyBarWidth;
-                    if (ImGui.DragInt("Blood Lilly Gauge Width", ref bloodLillyBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BloodLillyBarWidth = bloodLillyBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var bloodLillyBarX = _pluginConfiguration.BloodLillyBarX;
-                    if (ImGui.DragInt("Blood Lilly Gauge X Offset", ref bloodLillyBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.BloodLillyBarX = bloodLillyBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var bloodLillyBarY = _pluginConfiguration.BloodLillyBarY;
-                    if (ImGui.DragInt("Blood Lilly Gauge Y Offset", ref bloodLillyBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.BloodLillyBarY = bloodLillyBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var bloodLillyBarPad = _pluginConfiguration.BloodLillyBarPad;
-                    if (ImGui.DragInt("Blood Lilly Gauge Padding", ref bloodLillyBarPad, .1f, -100, 1000))
-                    {
-                        _pluginConfiguration.BloodLillyBarPad = bloodLillyBarPad;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var diaBarHeight = _pluginConfiguration.DiaBarHeight;
-                    if (ImGui.DragInt("Dia Bar Height", ref diaBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.DiaBarHeight = diaBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var diaBarWidth = _pluginConfiguration.DiaBarWidth;
-                    if (ImGui.DragInt("Dia Bar Width", ref diaBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.DiaBarWidth = diaBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var diaBarX = _pluginConfiguration.DiaBarX;
-                    if (ImGui.DragInt("Dia Bar X Offset", ref diaBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.DiaBarX = diaBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var diaBarY = _pluginConfiguration.DiaBarY;
-                    if (ImGui.DragInt("Dia Bar Y Offset", ref diaBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.DiaBarY = diaBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.Checkbox("Show Lilly Bar", ref _pluginConfiguration.WHMShowLillyBar);
-                    changed |= ImGui.Checkbox("Show Dia Bar", ref _pluginConfiguration.WHMShowDiaBar);
-                    changed |= ImGui.Checkbox("Show Primary Resource Bar", ref _pluginConfiguration.WHMShowPrimaryResourceBar);
-
-                    changed |= ImGui.ColorEdit4("Lilly Bar Color", ref _pluginConfiguration.WhmLillyColor);
-                    changed |= ImGui.ColorEdit4("Lilly Charging Bar Color", ref _pluginConfiguration.WhmLillyChargingColor);
-                    changed |= ImGui.ColorEdit4("Blood Lilly Bar Color", ref _pluginConfiguration.WhmBloodLillyColor);
-                    changed |= ImGui.ColorEdit4("Dia Bar Color", ref _pluginConfiguration.WhmDiaColor);
-                    changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.WhmEmptyColor);
-
-                    ImGui.EndTabItem();
-                }
-
-
-                if (ImGui.BeginTabItem("Samurai"))
-                {
-
-                    var samHiganbanaBarX = _pluginConfiguration.SamHiganbanaBarX;
-                    if (ImGui.DragInt("Higanbana X Offset", ref samHiganbanaBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SamHiganbanaBarX = samHiganbanaBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samHiganbanaBarY = _pluginConfiguration.SamHiganbanaBarY;
-                    if (ImGui.DragInt("Higanbana Y Offset", ref samHiganbanaBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SamHiganbanaBarY = samHiganbanaBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samHiganbanaBarHeight = _pluginConfiguration.SamHiganbanaBarHeight;
-                    if (ImGui.DragInt("Higanbana Height", ref samHiganbanaBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SamHiganbanaBarHeight = samHiganbanaBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samHiganbanaBarWidth = _pluginConfiguration.SamHiganbanaBarWidth;
-                    if (ImGui.DragInt("Higanbana Width", ref samHiganbanaBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SamHiganbanaBarWidth = samHiganbanaBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-                    var samBuffsBarX = _pluginConfiguration.SamBuffsBarX;
-                    if (ImGui.DragInt("Shifu/Jinpu X Offset", ref samBuffsBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SamBuffsBarX = samBuffsBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samBuffsBarY = _pluginConfiguration.SamBuffsBarY;
-                    if (ImGui.DragInt("Shifu/Jinpu Y Offset", ref samBuffsBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SamBuffsBarY = samBuffsBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samBuffsBarHeight = _pluginConfiguration.SamBuffsBarHeight;
-                    if (ImGui.DragInt("Shifu/Jinpu Height", ref samBuffsBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SamBuffsBarHeight = samBuffsBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samBuffsBarWidth = _pluginConfiguration.SamBuffsBarWidth;
-                    if (ImGui.DragInt("Shifu/Jinpu Width", ref samBuffsBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SamBuffsBarWidth = samBuffsBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samKenkiBarX = _pluginConfiguration.SamKenkiBarX;
-                    if (ImGui.DragInt("Kenki X Offset", ref samKenkiBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SamKenkiBarX = samKenkiBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samKenkiBarY = _pluginConfiguration.SamKenkiBarY;
-                    if (ImGui.DragInt("Kenki Y Offset", ref samKenkiBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SamKenkiBarY = samKenkiBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samKenkiBarHeight = _pluginConfiguration.SamKenkiBarHeight;
-                    if (ImGui.DragInt("Kenki Height", ref samKenkiBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SamKenkiBarHeight = samKenkiBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samKenkiBarWidth = _pluginConfiguration.SamKenkiBarWidth;
-                    if (ImGui.DragInt("Kenki Width", ref samKenkiBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SamKenkiBarWidth = samKenkiBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samSenBarX = _pluginConfiguration.SamSenBarX;
-                    if (ImGui.DragInt("Sen X Offset", ref samSenBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SamSenBarX = samSenBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samSenBarY = _pluginConfiguration.SamSenBarY;
-                    if (ImGui.DragInt("Sen Y Offset", ref samSenBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SamSenBarY = samSenBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samSenBarHeight = _pluginConfiguration.SamSenBarHeight;
-                    if (ImGui.DragInt("Sen Height", ref samSenBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SamSenBarHeight = samSenBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samSenBarWidth = _pluginConfiguration.SamSenBarWidth;
-                    if (ImGui.DragInt("Sen Width", ref samSenBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SamSenBarWidth = samSenBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMSenPadding = _pluginConfiguration.SAMSenPadding;
-                    if (ImGui.DragInt("Sen Bar Padding", ref SAMSenPadding, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SAMSenPadding = SAMSenPadding;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samMeditationBarX = _pluginConfiguration.SamMeditationBarX;
-                    if (ImGui.DragInt("Meditation X Offset", ref samMeditationBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SamMeditationBarX = samMeditationBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samMeditationBarY = _pluginConfiguration.SamMeditationBarY;
-                    if (ImGui.DragInt("Meditation Y Offset", ref samMeditationBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SamMeditationBarY = samMeditationBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samMeditationBarHeight = _pluginConfiguration.SamMeditationBarHeight;
-                    if (ImGui.DragInt("Meditation Height", ref samMeditationBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SamMeditationBarHeight = samMeditationBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var samMeditationBarWidth = _pluginConfiguration.SamMeditationBarWidth;
-                    if (ImGui.DragInt("Meditation Width", ref samMeditationBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SamMeditationBarWidth = samMeditationBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMMeditationPadding = _pluginConfiguration.SAMMeditationPadding;
-                    if (ImGui.DragInt("Meditation Bar Padding", ref SAMMeditationPadding, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SAMMeditationPadding = SAMMeditationPadding;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMBuffsPadding = _pluginConfiguration.SAMBuffsPadding;
-                    if (ImGui.DragInt("Jinpu/Shifu Bar Padding", ref SAMBuffsPadding, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SAMBuffsPadding = SAMBuffsPadding;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMGaugeEnabled = _pluginConfiguration.SAMGaugeEnabled;
-                    if (ImGui.Checkbox("Kenki Enabled", ref SAMGaugeEnabled))
-                    {
-                        _pluginConfiguration.SAMGaugeEnabled = SAMGaugeEnabled;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMSenEnabled = _pluginConfiguration.SAMSenEnabled;
-                    if (ImGui.Checkbox("Sen Enabled", ref SAMSenEnabled))
-                    {
-                        _pluginConfiguration.SAMSenEnabled = SAMSenEnabled;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMMeditationEnabled = _pluginConfiguration.SAMMeditationEnabled;
-                    if (ImGui.Checkbox("Meditation Enabled", ref SAMMeditationEnabled))
-                    {
-                        _pluginConfiguration.SAMMeditationEnabled = SAMMeditationEnabled;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMHiganbanaEnabled = _pluginConfiguration.SAMHiganbanaEnabled;
-                    if (ImGui.Checkbox("Higanbana Enabled", ref SAMHiganbanaEnabled))
-                    {
-                        _pluginConfiguration.SAMHiganbanaEnabled = SAMHiganbanaEnabled;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMBuffsEnabled = _pluginConfiguration.SAMBuffsEnabled;
-                    if (ImGui.Checkbox("Jinpu/Shifu Enabled", ref SAMBuffsEnabled))
-                    {
-                        _pluginConfiguration.SAMBuffsEnabled = SAMBuffsEnabled;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMKenkiText = _pluginConfiguration.SAMKenkiText;
-                    if (ImGui.Checkbox("Show Current Kenki", ref SAMKenkiText))
-                    {
-                        _pluginConfiguration.SAMKenkiText = SAMKenkiText;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMHiganbanaText = _pluginConfiguration.SAMHiganbanaText;
-                    if (ImGui.Checkbox("Show Higanbana Duration Text", ref SAMHiganbanaText))
-                    {
-                        _pluginConfiguration.SAMHiganbanaText = SAMHiganbanaText;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var SAMBuffText = _pluginConfiguration.SAMBuffText;
-                    if (ImGui.Checkbox("Show Jinpu/Shifu Duration Text", ref SAMBuffText))
-                    {
-                        _pluginConfiguration.SAMBuffText = SAMBuffText;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.ColorEdit4("Higanbana Bar Color", ref _pluginConfiguration.SamHiganbanaColor);
-                    changed |= ImGui.ColorEdit4("Shifu Bar Color", ref _pluginConfiguration.SamShifuColor);
-                    changed |= ImGui.ColorEdit4("Jinpu Bar Color", ref _pluginConfiguration.SamJinpuColor);
-                    changed |= ImGui.ColorEdit4("Setsu Color", ref _pluginConfiguration.SamSetsuColor);
-                    changed |= ImGui.ColorEdit4("Getsu Color", ref _pluginConfiguration.SamGetsuColor);
-                    changed |= ImGui.ColorEdit4("Ka Color", ref _pluginConfiguration.SamKaColor);
-                    changed |= ImGui.ColorEdit4("Meditation Color", ref _pluginConfiguration.SamMeditationColor);
-                    changed |= ImGui.ColorEdit4("Kenki Color", ref _pluginConfiguration.SamKenkiColor);
-                    changed |= ImGui.ColorEdit4("Expiry Color", ref _pluginConfiguration.SamExpiryColor);
-                    changed |= ImGui.ColorEdit4("Empty Color", ref _pluginConfiguration.SamEmptyColor);
-
-                    ImGui.EndTabItem();
-                }
-
-                if (ImGui.BeginTabItem("Summoner"))
-                {
-
-                    var smnRuinBarX = _pluginConfiguration.SmnRuinBarX;
-                    if (ImGui.DragInt("Ruin Bar X Offset", ref smnRuinBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SmnRuinBarX = smnRuinBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnRuinBarY = _pluginConfiguration.SmnRuinBarY;
-                    if (ImGui.DragInt("Ruin Bar Y Offset", ref smnRuinBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SmnRuinBarY = smnRuinBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnRuinBarHeight = _pluginConfiguration.SmnRuinBarHeight;
-                    if (ImGui.DragInt("Ruin Bar Height", ref smnRuinBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SmnRuinBarHeight = smnRuinBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnRuinBarWidth = _pluginConfiguration.SmnRuinBarWidth;
-                    if (ImGui.DragInt("Ruin Bar Width", ref smnRuinBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SmnRuinBarWidth = smnRuinBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnDotBarX = _pluginConfiguration.SmnDotBarX;
-                    if (ImGui.DragInt("Dot Bar X Offset", ref smnDotBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SmnDotBarX = smnDotBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnDotBarY = _pluginConfiguration.SmnDotBarY;
-                    if (ImGui.DragInt("Dot Bar Y Offset", ref smnDotBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SmnDotBarY = smnDotBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnDotBarHeight = _pluginConfiguration.SmnDotBarHeight;
-                    if (ImGui.DragInt("Dot Bar Height", ref smnDotBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SmnDotBarHeight = smnDotBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnDotBarWidth = _pluginConfiguration.SmnDotBarWidth;
-                    if (ImGui.DragInt("Dot Bar Width", ref smnDotBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SmnDotBarWidth = smnDotBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnAetherBarX = _pluginConfiguration.SmnAetherBarX;
-                    if (ImGui.DragInt("Aether Bar X Offset", ref smnAetherBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SmnAetherBarX = smnAetherBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnAetherBarY = _pluginConfiguration.SmnAetherBarY;
-                    if (ImGui.DragInt("Aether Bar Y Offset", ref smnAetherBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SmnAetherBarY = smnAetherBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnAetherBarHeight = _pluginConfiguration.SmnAetherBarHeight;
-                    if (ImGui.DragInt("Aether Bar Height", ref smnAetherBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SmnAetherBarHeight = smnAetherBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnAetherBarWidth = _pluginConfiguration.SmnAetherBarWidth;
-                    if (ImGui.DragInt("Aether Bar Width", ref smnAetherBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SmnAetherBarWidth = smnAetherBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.ColorEdit4("Aether Bar Color", ref _pluginConfiguration.SmnAetherColor);
-                    changed |= ImGui.ColorEdit4("Ruin Bar Color", ref _pluginConfiguration.SmnRuinColor);
-                    changed |= ImGui.ColorEdit4("Empty Bar Color", ref _pluginConfiguration.SmnEmptyColor);
-                    changed |= ImGui.ColorEdit4("Miasma Color", ref _pluginConfiguration.SmnMiasmaColor);
-                    changed |= ImGui.ColorEdit4("Bio Color", ref _pluginConfiguration.SmnBioColor);
-                    changed |= ImGui.ColorEdit4("Expiry Color", ref _pluginConfiguration.SmnExpiryColor);
-
-                    ImGui.EndTabItem();
-                }
-
+                
                 if (ImGui.BeginTabItem("Warrior"))
                 {
                     var stormsEyeHeight = _pluginConfiguration.WARStormsEyeHeight;
@@ -1123,159 +1600,6 @@ namespace DelvUI.Interface
 
                     ImGui.EndTabItem();
                 }
-
-                if (ImGui.BeginTabItem("Machinist"))
-                {
-                    var overheatHeight = _pluginConfiguration.MCHOverheatHeight;
-                    if (ImGui.DragInt("Overheat Height", ref overheatHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.MCHOverheatHeight = overheatHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var overheatWidth = _pluginConfiguration.MCHOverheatWidth;
-                    if (ImGui.DragInt("Overheat Width", ref overheatWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.MCHOverheatWidth = overheatWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var mchBaseXOffset = _pluginConfiguration.MCHBaseXOffset;
-                    if (ImGui.DragInt("MCH Base X Offset", ref mchBaseXOffset, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.MCHBaseXOffset = mchBaseXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var mchBaseYOffset = _pluginConfiguration.MCHBaseYOffset;
-                    if (ImGui.DragInt("MCH Base Y Offset", ref mchBaseYOffset, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.MCHBaseYOffset = mchBaseYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var heatGaugeHeight = _pluginConfiguration.MCHHeatGaugeHeight;
-                    if (ImGui.DragInt("Heat Gauge Height", ref heatGaugeHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.MCHHeatGaugeHeight = heatGaugeHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var heatGaugeWidth = _pluginConfiguration.MCHHeatGaugeWidth;
-                    if (ImGui.DragInt("Heat Gauge Width", ref heatGaugeWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.MCHHeatGaugeWidth = heatGaugeWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var heatGaugePadding = _pluginConfiguration.MCHHeatGaugePadding;
-                    if (ImGui.DragInt("Heat Gauge Padding", ref heatGaugePadding, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.MCHHeatGaugePadding = heatGaugePadding;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var heatGaugeXOffset = _pluginConfiguration.MCHHeatGaugeXOffset;
-                    if (ImGui.DragInt("Heat Gauge X Offset", ref heatGaugeXOffset, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.MCHHeatGaugeXOffset = heatGaugeXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var heatGaugeYOffset = _pluginConfiguration.MCHHeatGaugeYOffset;
-                    if (ImGui.DragInt("Heat Gauge Y Offset", ref heatGaugeYOffset, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.MCHHeatGaugeYOffset = heatGaugeYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var batteryGaugeHeight = _pluginConfiguration.MCHBatteryGaugeHeight;
-                    if (ImGui.DragInt("Battery Gauge Height", ref batteryGaugeHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.MCHBatteryGaugeHeight = batteryGaugeHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var batteryGaugeWidth = _pluginConfiguration.MCHBatteryGaugeWidth;
-                    if (ImGui.DragInt("Battery Gauge Width", ref batteryGaugeWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.MCHBatteryGaugeWidth = batteryGaugeWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var batteryGaugePadding = _pluginConfiguration.MCHBatteryGaugePadding;
-                    if (ImGui.DragInt("Battery Gauge Padding", ref batteryGaugePadding, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.MCHBatteryGaugePadding = batteryGaugePadding;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var batteryGaugeXOffset = _pluginConfiguration.MCHBatteryGaugeXOffset;
-                    if (ImGui.DragInt("Battery Gauge X Offset", ref batteryGaugeXOffset, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.MCHBatteryGaugeXOffset = batteryGaugeXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var batteryGaugeYOffset = _pluginConfiguration.MCHBatteryGaugeYOffset;
-                    if (ImGui.DragInt("Battery Gauge Y Offset", ref batteryGaugeYOffset, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.MCHBatteryGaugeYOffset = batteryGaugeYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var wildfireEnabled = _pluginConfiguration.MCHWildfireEnabled;
-                    if (ImGui.Checkbox("Wildfire Bar Enabled", ref wildfireEnabled))
-                    {
-                        _pluginConfiguration.MCHWildfireEnabled = wildfireEnabled;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var wildfireHeight = _pluginConfiguration.MCHWildfireHeight;
-                    if (ImGui.DragInt("Wildfire Bar Height", ref wildfireHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.MCHWildfireHeight = wildfireHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var wildfireWidth = _pluginConfiguration.MCHWildfireWidth;
-                    if (ImGui.DragInt("Wildfire Bar Width", ref wildfireWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.MCHWildfireWidth = wildfireWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var wildfireXOffset = _pluginConfiguration.MCHWildfireXOffset;
-                    if (ImGui.DragInt("Wildfire Bar X Offset", ref wildfireXOffset, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.MCHWildfireXOffset = wildfireXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var wildfireYOffset = _pluginConfiguration.MCHWildfireYOffset;
-                    if (ImGui.DragInt("Wildfire Bar Y Offset", ref wildfireYOffset, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.MCHWildfireYOffset = wildfireYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var mchInterBarOffset = _pluginConfiguration.MCHInterBarOffset;
-                    if (ImGui.DragInt("Space Between Bars", ref mchInterBarOffset, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.MCHInterBarOffset = mchInterBarOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    changed |= ImGui.ColorEdit4("Heat Bar Color", ref _pluginConfiguration.MCHHeatColor);
-                    changed |= ImGui.ColorEdit4("Battery Bar Color", ref _pluginConfiguration.MCHBatteryColor);
-                    changed |= ImGui.ColorEdit4("Robot Summon Bar Color", ref _pluginConfiguration.MCHRobotColor);
-                    changed |= ImGui.ColorEdit4("Overheat Bar Color", ref _pluginConfiguration.MCHOverheatColor);
-                    changed |= ImGui.ColorEdit4("Wildfire Bar Color", ref _pluginConfiguration.MCHWildfireColor);
-                    changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.MCHEmptyColor);
-
-                    ImGui.EndTabItem();
-                }
-
                 if (ImGui.BeginTabItem("Paladin"))
                 {
                     int pldManaHeight = _pluginConfiguration.PLDManaHeight;
@@ -1648,8 +1972,665 @@ namespace DelvUI.Interface
 
                     ImGui.EndTabItem();
                 }
+            }
+            ImGui.EndTabBar();
+        }
 
-                if (ImGui.BeginTabItem("Monk"))
+        private void DrawJobsHealerConfig()
+        {
+            if (ImGui.BeginTabBar("##HEALERS-tabs"))
+            {
+                if (ImGui.BeginTabItem("Scholar"))
+                {
+
+                    var fairyBarHeight = _pluginConfiguration.FairyBarHeight;
+                    if (ImGui.DragInt("Fairy Gauge Height", ref fairyBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.FairyBarHeight = fairyBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var fairyBarWidth = _pluginConfiguration.FairyBarWidth;
+                    if (ImGui.DragInt("Fairy Gauge Width", ref fairyBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.FairyBarWidth = fairyBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var fairyBarX = _pluginConfiguration.FairyBarX;
+                    if (ImGui.DragInt("Fairy Gauge X Offset", ref fairyBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.FairyBarX = fairyBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var fairyBarY = _pluginConfiguration.FairyBarY;
+                    if (ImGui.DragInt("Fairy Gauge Y Offset", ref fairyBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.FairyBarY = fairyBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schAetherBarHeight = _pluginConfiguration.SchAetherBarHeight;
+                    if (ImGui.DragInt("Aether Gauge Height", ref schAetherBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SchAetherBarHeight = schAetherBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schAetherBarWidth = _pluginConfiguration.SchAetherBarWidth;
+                    if (ImGui.DragInt("Aether Gauge Width", ref schAetherBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SchAetherBarWidth = schAetherBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schAetherBarX = _pluginConfiguration.SchAetherBarX;
+                    if (ImGui.DragInt("Aether Gauge X Offset", ref schAetherBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SchAetherBarX = schAetherBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schAetherBarY = _pluginConfiguration.SchAetherBarY;
+                    if (ImGui.DragInt("Aether Gauge Y Offset", ref schAetherBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SchAetherBarY = schAetherBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schAetherBarPad = _pluginConfiguration.SchAetherBarPad;
+                    if (ImGui.DragInt("Aether Padding", ref schAetherBarPad, .1f, -100, 1000))
+                    {
+                        _pluginConfiguration.SchAetherBarPad = schAetherBarPad;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schBioBarHeight = _pluginConfiguration.SCHBioBarHeight;
+                    if (ImGui.DragInt("Bio Bar Height", ref schBioBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SCHBioBarHeight = schBioBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schBioBarWidth = _pluginConfiguration.SCHBioBarWidth;
+                    if (ImGui.DragInt("Bio Bar Width", ref schBioBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SCHBioBarWidth = schBioBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schBioBarX = _pluginConfiguration.SCHBioBarX;
+                    if (ImGui.DragInt("Bio Bar X Offset", ref schBioBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SCHBioBarX = schBioBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schBioBarY = _pluginConfiguration.SCHBioBarY;
+                    if (ImGui.DragInt("Bio Bar Y Offset", ref schBioBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SCHBioBarY = schBioBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show Aether Bar", ref _pluginConfiguration.SCHShowAetherBar);
+                    changed |= ImGui.Checkbox("Show Fairy Bar", ref _pluginConfiguration.SCHShowFairyBar);
+                    changed |= ImGui.Checkbox("Show Bio Bar", ref _pluginConfiguration.SCHShowBioBar);
+                    changed |= ImGui.Checkbox("Show Primary Resource Bar",
+                        ref _pluginConfiguration.SCHShowPrimaryResourceBar);
+
+                    changed |= ImGui.ColorEdit4("Fairy Bar Color", ref _pluginConfiguration.SchFairyColor);
+                    changed |= ImGui.ColorEdit4("Aether Bar Color", ref _pluginConfiguration.SchAetherColor);
+                    changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.SchEmptyColor);
+
+                    ImGui.EndTabItem();
+                }
+
+                if (ImGui.BeginTabItem("White Mage"))
+                {
+
+                    var lillyBarHeight = _pluginConfiguration.LillyBarHeight;
+                    if (ImGui.DragInt("Lilly Gauge Height", ref lillyBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.LillyBarHeight = lillyBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var lillyBarWidth = _pluginConfiguration.LillyBarWidth;
+                    if (ImGui.DragInt("Lilly Gauge Width", ref lillyBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.LillyBarWidth = lillyBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var lillyBarX = _pluginConfiguration.LillyBarX;
+                    if (ImGui.DragInt("Lilly Gauge X Offset", ref lillyBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.LillyBarX = lillyBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var lillyBarY = _pluginConfiguration.LillyBarY;
+                    if (ImGui.DragInt("Lilly Gauge Y Offset", ref lillyBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.LillyBarY = lillyBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var lillyBarPad = _pluginConfiguration.LillyBarPad;
+                    if (ImGui.DragInt("Lilly Gauge Padding", ref lillyBarPad, .1f, -100, 1000))
+                    {
+                        _pluginConfiguration.LillyBarPad = lillyBarPad;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var bloodLillyBarHeight = _pluginConfiguration.BloodLillyBarHeight;
+                    if (ImGui.DragInt("Blood Lilly Gauge Height", ref bloodLillyBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BloodLillyBarHeight = bloodLillyBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var bloodLillyBarWidth = _pluginConfiguration.BloodLillyBarWidth;
+                    if (ImGui.DragInt("Blood Lilly Gauge Width", ref bloodLillyBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.BloodLillyBarWidth = bloodLillyBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var bloodLillyBarX = _pluginConfiguration.BloodLillyBarX;
+                    if (ImGui.DragInt("Blood Lilly Gauge X Offset", ref bloodLillyBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.BloodLillyBarX = bloodLillyBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var bloodLillyBarY = _pluginConfiguration.BloodLillyBarY;
+                    if (ImGui.DragInt("Blood Lilly Gauge Y Offset", ref bloodLillyBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.BloodLillyBarY = bloodLillyBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var bloodLillyBarPad = _pluginConfiguration.BloodLillyBarPad;
+                    if (ImGui.DragInt("Blood Lilly Gauge Padding", ref bloodLillyBarPad, .1f, -100, 1000))
+                    {
+                        _pluginConfiguration.BloodLillyBarPad = bloodLillyBarPad;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var diaBarHeight = _pluginConfiguration.DiaBarHeight;
+                    if (ImGui.DragInt("Dia Bar Height", ref diaBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DiaBarHeight = diaBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var diaBarWidth = _pluginConfiguration.DiaBarWidth;
+                    if (ImGui.DragInt("Dia Bar Width", ref diaBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DiaBarWidth = diaBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var diaBarX = _pluginConfiguration.DiaBarX;
+                    if (ImGui.DragInt("Dia Bar X Offset", ref diaBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.DiaBarX = diaBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var diaBarY = _pluginConfiguration.DiaBarY;
+                    if (ImGui.DragInt("Dia Bar Y Offset", ref diaBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.DiaBarY = diaBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show Lilly Bar", ref _pluginConfiguration.WHMShowLillyBar);
+                    changed |= ImGui.Checkbox("Show Dia Bar", ref _pluginConfiguration.WHMShowDiaBar);
+                    changed |= ImGui.Checkbox("Show Primary Resource Bar",
+                        ref _pluginConfiguration.WHMShowPrimaryResourceBar);
+
+                    changed |= ImGui.ColorEdit4("Lilly Bar Color", ref _pluginConfiguration.WhmLillyColor);
+                    changed |= ImGui.ColorEdit4("Lilly Charging Bar Color",
+                        ref _pluginConfiguration.WhmLillyChargingColor);
+                    changed |= ImGui.ColorEdit4("Blood Lilly Bar Color", ref _pluginConfiguration.WhmBloodLillyColor);
+                    changed |= ImGui.ColorEdit4("Dia Bar Color", ref _pluginConfiguration.WhmDiaColor);
+                    changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.WhmEmptyColor);
+
+                    ImGui.EndTabItem();
+                }
+
+                if (ImGui.BeginTabItem("Astrologian"))
+                {
+
+                    var ASTDrawBarHeight = _pluginConfiguration.ASTDrawBarHeight;
+                    if (ImGui.DragInt("Draw Gauge Height", ref ASTDrawBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTDrawBarHeight = ASTDrawBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDrawBarWidth = _pluginConfiguration.ASTDrawBarWidth;
+                    if (ImGui.DragInt("Draw Gauge Width", ref ASTDrawBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTDrawBarWidth = ASTDrawBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDrawBarX = _pluginConfiguration.ASTDrawBarX;
+                    if (ImGui.DragInt("Draw Gauge X Offset", ref ASTDrawBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTDrawBarX = ASTDrawBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDrawBarY = _pluginConfiguration.ASTDrawBarY;
+                    if (ImGui.DragInt("Draw Gauge Y Offset", ref ASTDrawBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTDrawBarY = ASTDrawBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDivinationHeight = _pluginConfiguration.ASTDivinationHeight;
+                    if (ImGui.DragInt("Divination Gauge Height", ref ASTDivinationHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTDivinationHeight = ASTDivinationHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDivinationWidth = _pluginConfiguration.ASTDivinationWidth;
+                    if (ImGui.DragInt("Divination Gauge Width", ref ASTDivinationWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTDivinationWidth = ASTDivinationWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDivinationBarX = _pluginConfiguration.ASTDivinationBarX;
+                    if (ImGui.DragInt("Divination Gauge X Offset", ref ASTDivinationBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTDivinationBarX = ASTDivinationBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDivinationBarY = _pluginConfiguration.ASTDivinationBarY;
+                    if (ImGui.DragInt("Divination Gauge Y Offset", ref ASTDivinationBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTDivinationBarY = ASTDivinationBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDivinationBarPad = _pluginConfiguration.ASTDivinationBarPad;
+                    if (ImGui.DragInt("Divination Padding", ref ASTDivinationBarPad, .1f, -100, 1000))
+                    {
+                        _pluginConfiguration.ASTDivinationBarPad = ASTDivinationBarPad;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDotBarHeight = _pluginConfiguration.ASTDotBarHeight;
+                    if (ImGui.DragInt("Dot Gauge Height", ref ASTDotBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTDotBarHeight = ASTDotBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDotBarWidth = _pluginConfiguration.ASTDotBarWidth;
+                    if (ImGui.DragInt("Dot Gauge Width", ref ASTDotBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTDotBarWidth = ASTDotBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDotBarX = _pluginConfiguration.ASTDotBarX;
+                    if (ImGui.DragInt("Dot Gauge X Offset", ref ASTDotBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTDotBarX = ASTDotBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDotBarY = _pluginConfiguration.ASTDotBarY;
+                    if (ImGui.DragInt("Dot Gauge Y Offset", ref ASTDotBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTDotBarY = ASTDotBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show Divination Bar", ref _pluginConfiguration.ASTShowDivinationBar);
+                    changed |= ImGui.Checkbox("Show Draw Bar", ref _pluginConfiguration.ASTShowDrawBar);
+                    changed |= ImGui.Checkbox("Show Dot Bar", ref _pluginConfiguration.ASTShowDotBar);
+                    changed |= ImGui.Checkbox("Show Primary Resource Bar",
+                        ref _pluginConfiguration.ASTShowPrimaryResourceBar);
+
+                    changed |= ImGui.ColorEdit4("Seal Sun Color", ref _pluginConfiguration.ASTSealSunColor);
+                    changed |= ImGui.ColorEdit4("Seal Lunar Color", ref _pluginConfiguration.ASTSealLunarColor);
+                    changed |= ImGui.ColorEdit4("Seal Celestial Color", ref _pluginConfiguration.ASTSealCelestialColor);
+                    changed |= ImGui.ColorEdit4("Dot Color", ref _pluginConfiguration.ASTDotColor);
+                    changed |= ImGui.ColorEdit4("Bar Empty Color", ref _pluginConfiguration.ASTEmptyColor);
+
+                    ImGui.EndTabItem();
+                }
+            }
+            ImGui.EndTabBar();
+        }
+
+        private void DrawJobsMeleeConfig()
+        {
+            if (ImGui.BeginTabBar("##melee-tabs"))
+            {
+            if (ImGui.BeginTabItem("Samurai"))
+                {
+
+                    var samHiganbanaBarX = _pluginConfiguration.SamHiganbanaBarX;
+                    if (ImGui.DragInt("Higanbana X Offset", ref samHiganbanaBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamHiganbanaBarX = samHiganbanaBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samHiganbanaBarY = _pluginConfiguration.SamHiganbanaBarY;
+                    if (ImGui.DragInt("Higanbana Y Offset", ref samHiganbanaBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamHiganbanaBarY = samHiganbanaBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samHiganbanaBarHeight = _pluginConfiguration.SamHiganbanaBarHeight;
+                    if (ImGui.DragInt("Higanbana Height", ref samHiganbanaBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamHiganbanaBarHeight = samHiganbanaBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samHiganbanaBarWidth = _pluginConfiguration.SamHiganbanaBarWidth;
+                    if (ImGui.DragInt("Higanbana Width", ref samHiganbanaBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamHiganbanaBarWidth = samHiganbanaBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+                    var samBuffsBarX = _pluginConfiguration.SamBuffsBarX;
+                    if (ImGui.DragInt("Shifu/Jinpu X Offset", ref samBuffsBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamBuffsBarX = samBuffsBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samBuffsBarY = _pluginConfiguration.SamBuffsBarY;
+                    if (ImGui.DragInt("Shifu/Jinpu Y Offset", ref samBuffsBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamBuffsBarY = samBuffsBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samBuffsBarHeight = _pluginConfiguration.SamBuffsBarHeight;
+                    if (ImGui.DragInt("Shifu/Jinpu Height", ref samBuffsBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamBuffsBarHeight = samBuffsBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samBuffsBarWidth = _pluginConfiguration.SamBuffsBarWidth;
+                    if (ImGui.DragInt("Shifu/Jinpu Width", ref samBuffsBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamBuffsBarWidth = samBuffsBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samKenkiBarX = _pluginConfiguration.SamKenkiBarX;
+                    if (ImGui.DragInt("Kenki X Offset", ref samKenkiBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamKenkiBarX = samKenkiBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samKenkiBarY = _pluginConfiguration.SamKenkiBarY;
+                    if (ImGui.DragInt("Kenki Y Offset", ref samKenkiBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamKenkiBarY = samKenkiBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samKenkiBarHeight = _pluginConfiguration.SamKenkiBarHeight;
+                    if (ImGui.DragInt("Kenki Height", ref samKenkiBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamKenkiBarHeight = samKenkiBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samKenkiBarWidth = _pluginConfiguration.SamKenkiBarWidth;
+                    if (ImGui.DragInt("Kenki Width", ref samKenkiBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamKenkiBarWidth = samKenkiBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samSenBarX = _pluginConfiguration.SamSenBarX;
+                    if (ImGui.DragInt("Sen X Offset", ref samSenBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamSenBarX = samSenBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samSenBarY = _pluginConfiguration.SamSenBarY;
+                    if (ImGui.DragInt("Sen Y Offset", ref samSenBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamSenBarY = samSenBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samSenBarHeight = _pluginConfiguration.SamSenBarHeight;
+                    if (ImGui.DragInt("Sen Height", ref samSenBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamSenBarHeight = samSenBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samSenBarWidth = _pluginConfiguration.SamSenBarWidth;
+                    if (ImGui.DragInt("Sen Width", ref samSenBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamSenBarWidth = samSenBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMSenPadding = _pluginConfiguration.SAMSenPadding;
+                    if (ImGui.DragInt("Sen Bar Padding", ref SAMSenPadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SAMSenPadding = SAMSenPadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samMeditationBarX = _pluginConfiguration.SamMeditationBarX;
+                    if (ImGui.DragInt("Meditation X Offset", ref samMeditationBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamMeditationBarX = samMeditationBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samMeditationBarY = _pluginConfiguration.SamMeditationBarY;
+                    if (ImGui.DragInt("Meditation Y Offset", ref samMeditationBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SamMeditationBarY = samMeditationBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samMeditationBarHeight = _pluginConfiguration.SamMeditationBarHeight;
+                    if (ImGui.DragInt("Meditation Height", ref samMeditationBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamMeditationBarHeight = samMeditationBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samMeditationBarWidth = _pluginConfiguration.SamMeditationBarWidth;
+                    if (ImGui.DragInt("Meditation Width", ref samMeditationBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SamMeditationBarWidth = samMeditationBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMMeditationPadding = _pluginConfiguration.SAMMeditationPadding;
+                    if (ImGui.DragInt("Meditation Bar Padding", ref SAMMeditationPadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SAMMeditationPadding = SAMMeditationPadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMBuffsPadding = _pluginConfiguration.SAMBuffsPadding;
+                    if (ImGui.DragInt("Jinpu/Shifu Bar Padding", ref SAMBuffsPadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SAMBuffsPadding = SAMBuffsPadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMGaugeEnabled = _pluginConfiguration.SAMGaugeEnabled;
+                    if (ImGui.Checkbox("Kenki Enabled", ref SAMGaugeEnabled))
+                    {
+                        _pluginConfiguration.SAMGaugeEnabled = SAMGaugeEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMSenEnabled = _pluginConfiguration.SAMSenEnabled;
+                    if (ImGui.Checkbox("Sen Enabled", ref SAMSenEnabled))
+                    {
+                        _pluginConfiguration.SAMSenEnabled = SAMSenEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMMeditationEnabled = _pluginConfiguration.SAMMeditationEnabled;
+                    if (ImGui.Checkbox("Meditation Enabled", ref SAMMeditationEnabled))
+                    {
+                        _pluginConfiguration.SAMMeditationEnabled = SAMMeditationEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMHiganbanaEnabled = _pluginConfiguration.SAMHiganbanaEnabled;
+                    if (ImGui.Checkbox("Higanbana Enabled", ref SAMHiganbanaEnabled))
+                    {
+                        _pluginConfiguration.SAMHiganbanaEnabled = SAMHiganbanaEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMBuffsEnabled = _pluginConfiguration.SAMBuffsEnabled;
+                    if (ImGui.Checkbox("Jinpu/Shifu Enabled", ref SAMBuffsEnabled))
+                    {
+                        _pluginConfiguration.SAMBuffsEnabled = SAMBuffsEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMKenkiText = _pluginConfiguration.SAMKenkiText;
+                    if (ImGui.Checkbox("Show Current Kenki", ref SAMKenkiText))
+                    {
+                        _pluginConfiguration.SAMKenkiText = SAMKenkiText;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMHiganbanaText = _pluginConfiguration.SAMHiganbanaText;
+                    if (ImGui.Checkbox("Show Higanbana Duration Text", ref SAMHiganbanaText))
+                    {
+                        _pluginConfiguration.SAMHiganbanaText = SAMHiganbanaText;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var SAMBuffText = _pluginConfiguration.SAMBuffText;
+                    if (ImGui.Checkbox("Show Jinpu/Shifu Duration Text", ref SAMBuffText))
+                    {
+                        _pluginConfiguration.SAMBuffText = SAMBuffText;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Higanbana Bar Color", ref _pluginConfiguration.SamHiganbanaColor);
+                    changed |= ImGui.ColorEdit4("Shifu Bar Color", ref _pluginConfiguration.SamShifuColor);
+                    changed |= ImGui.ColorEdit4("Jinpu Bar Color", ref _pluginConfiguration.SamJinpuColor);
+                    changed |= ImGui.ColorEdit4("Setsu Color", ref _pluginConfiguration.SamSetsuColor);
+                    changed |= ImGui.ColorEdit4("Getsu Color", ref _pluginConfiguration.SamGetsuColor);
+                    changed |= ImGui.ColorEdit4("Ka Color", ref _pluginConfiguration.SamKaColor);
+                    changed |= ImGui.ColorEdit4("Meditation Color", ref _pluginConfiguration.SamMeditationColor);
+                    changed |= ImGui.ColorEdit4("Kenki Color", ref _pluginConfiguration.SamKenkiColor);
+                    changed |= ImGui.ColorEdit4("Expiry Color", ref _pluginConfiguration.SamExpiryColor);
+                    changed |= ImGui.ColorEdit4("Empty Color", ref _pluginConfiguration.SamEmptyColor);
+
+                    ImGui.EndTabItem();
+                }
+            if (ImGui.BeginTabItem("Ninja"))
+                {
+                    var NINBaseXOffset = _pluginConfiguration.NINBaseXOffset;
+                    if (ImGui.DragInt("NIN Base X Offset", ref NINBaseXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.NINBaseXOffset = NINBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINBaseYOffset = _pluginConfiguration.NINBaseYOffset;
+                    if (ImGui.DragInt("NIN Base Y Offset", ref NINBaseYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.NINBaseYOffset = NINBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINHutonGaugeHeight = _pluginConfiguration.NINHutonGaugeHeight;
+                    if (ImGui.DragInt("Huton Gauge Height", ref NINHutonGaugeHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINHutonGaugeHeight = NINHutonGaugeHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINHutonGaugeWidth = _pluginConfiguration.NINHutonGaugeWidth;
+                    if (ImGui.DragInt("Huton Gauge Width", ref NINHutonGaugeWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINHutonGaugeWidth = NINHutonGaugeWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugeHeight = _pluginConfiguration.NINNinkiGaugeHeight;
+                    if (ImGui.DragInt("Ninki Gauge Height", ref NINNinkiGaugeHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugeHeight = NINNinkiGaugeHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugeWidth = _pluginConfiguration.NINNinkiGaugeWidth;
+                    if (ImGui.DragInt("Ninki Gauge Width", ref NINNinkiGaugeWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugeWidth = NINNinkiGaugeWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugePadding = _pluginConfiguration.NINNinkiGaugePadding;
+                    if (ImGui.DragInt("Ninki Gauge Padding", ref NINNinkiGaugePadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugePadding = NINNinkiGaugePadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugeXOffset = _pluginConfiguration.NINNinkiGaugeXOffset;
+                    if (ImGui.DragInt("Ninki Gauge X Offset", ref NINNinkiGaugeXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugeXOffset = NINNinkiGaugeXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugeYOffset = _pluginConfiguration.NINNinkiGaugeYOffset;
+                    if (ImGui.DragInt("Ninki Gauge Y Offset", ref NINNinkiGaugeYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugeYOffset = NINNinkiGaugeYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+
+                    var NINInterBarOffset = _pluginConfiguration.NINInterBarOffset;
+                    if (ImGui.DragInt("Space Between Bars", ref NINInterBarOffset, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINInterBarOffset = NINInterBarOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Empty Color", ref _pluginConfiguration.NINEmptyColor);
+                    changed |= ImGui.ColorEdit4("Huton Bar Color", ref _pluginConfiguration.NINHutonColor);
+                    changed |= ImGui.ColorEdit4("Ninki Bar Color", ref _pluginConfiguration.NINNinkiColor);
+
+                    ImGui.EndTabItem();
+                }
+                            if (ImGui.BeginTabItem("Monk"))
                 {
                     var MNKDemolishHeight = _pluginConfiguration.MNKDemolishHeight;
                     if (ImGui.DragInt("Demolish Height", ref MNKDemolishHeight, .1f, 1, 1000))
@@ -1790,9 +2771,270 @@ namespace DelvUI.Interface
 
                     ImGui.EndTabItem();
                 }
+            }
+            ImGui.EndTabBar();
+        }
 
+        private void DrawJobsRangedConfig()
+        {
+            if (ImGui.BeginTabBar("##ranged-tabs"))
+            {
+                if (ImGui.BeginTabItem("Machinist"))
+                {
+                    var overheatHeight = _pluginConfiguration.MCHOverheatHeight;
+                    if (ImGui.DragInt("Overheat Height", ref overheatHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MCHOverheatHeight = overheatHeight;
+                        _pluginConfiguration.Save();
+                    }
 
-                if (ImGui.BeginTabItem("Red Mage"))
+                    var overheatWidth = _pluginConfiguration.MCHOverheatWidth;
+                    if (ImGui.DragInt("Overheat Width", ref overheatWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MCHOverheatWidth = overheatWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var mchBaseXOffset = _pluginConfiguration.MCHBaseXOffset;
+                    if (ImGui.DragInt("MCH Base X Offset", ref mchBaseXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MCHBaseXOffset = mchBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var mchBaseYOffset = _pluginConfiguration.MCHBaseYOffset;
+                    if (ImGui.DragInt("MCH Base Y Offset", ref mchBaseYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MCHBaseYOffset = mchBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var heatGaugeHeight = _pluginConfiguration.MCHHeatGaugeHeight;
+                    if (ImGui.DragInt("Heat Gauge Height", ref heatGaugeHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MCHHeatGaugeHeight = heatGaugeHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var heatGaugeWidth = _pluginConfiguration.MCHHeatGaugeWidth;
+                    if (ImGui.DragInt("Heat Gauge Width", ref heatGaugeWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MCHHeatGaugeWidth = heatGaugeWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var heatGaugePadding = _pluginConfiguration.MCHHeatGaugePadding;
+                    if (ImGui.DragInt("Heat Gauge Padding", ref heatGaugePadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MCHHeatGaugePadding = heatGaugePadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var heatGaugeXOffset = _pluginConfiguration.MCHHeatGaugeXOffset;
+                    if (ImGui.DragInt("Heat Gauge X Offset", ref heatGaugeXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MCHHeatGaugeXOffset = heatGaugeXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var heatGaugeYOffset = _pluginConfiguration.MCHHeatGaugeYOffset;
+                    if (ImGui.DragInt("Heat Gauge Y Offset", ref heatGaugeYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MCHHeatGaugeYOffset = heatGaugeYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var batteryGaugeHeight = _pluginConfiguration.MCHBatteryGaugeHeight;
+                    if (ImGui.DragInt("Battery Gauge Height", ref batteryGaugeHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MCHBatteryGaugeHeight = batteryGaugeHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var batteryGaugeWidth = _pluginConfiguration.MCHBatteryGaugeWidth;
+                    if (ImGui.DragInt("Battery Gauge Width", ref batteryGaugeWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MCHBatteryGaugeWidth = batteryGaugeWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var batteryGaugePadding = _pluginConfiguration.MCHBatteryGaugePadding;
+                    if (ImGui.DragInt("Battery Gauge Padding", ref batteryGaugePadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MCHBatteryGaugePadding = batteryGaugePadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var batteryGaugeXOffset = _pluginConfiguration.MCHBatteryGaugeXOffset;
+                    if (ImGui.DragInt("Battery Gauge X Offset", ref batteryGaugeXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MCHBatteryGaugeXOffset = batteryGaugeXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var batteryGaugeYOffset = _pluginConfiguration.MCHBatteryGaugeYOffset;
+                    if (ImGui.DragInt("Battery Gauge Y Offset", ref batteryGaugeYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MCHBatteryGaugeYOffset = batteryGaugeYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var wildfireEnabled = _pluginConfiguration.MCHWildfireEnabled;
+                    if (ImGui.Checkbox("Wildfire Bar Enabled", ref wildfireEnabled))
+                    {
+                        _pluginConfiguration.MCHWildfireEnabled = wildfireEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var wildfireHeight = _pluginConfiguration.MCHWildfireHeight;
+                    if (ImGui.DragInt("Wildfire Bar Height", ref wildfireHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MCHWildfireHeight = wildfireHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var wildfireWidth = _pluginConfiguration.MCHWildfireWidth;
+                    if (ImGui.DragInt("Wildfire Bar Width", ref wildfireWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MCHWildfireWidth = wildfireWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var wildfireXOffset = _pluginConfiguration.MCHWildfireXOffset;
+                    if (ImGui.DragInt("Wildfire Bar X Offset", ref wildfireXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MCHWildfireXOffset = wildfireXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var wildfireYOffset = _pluginConfiguration.MCHWildfireYOffset;
+                    if (ImGui.DragInt("Wildfire Bar Y Offset", ref wildfireYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.MCHWildfireYOffset = wildfireYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var mchInterBarOffset = _pluginConfiguration.MCHInterBarOffset;
+                    if (ImGui.DragInt("Space Between Bars", ref mchInterBarOffset, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.MCHInterBarOffset = mchInterBarOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Heat Bar Color", ref _pluginConfiguration.MCHHeatColor);
+                    changed |= ImGui.ColorEdit4("Battery Bar Color", ref _pluginConfiguration.MCHBatteryColor);
+                    changed |= ImGui.ColorEdit4("Robot Summon Bar Color", ref _pluginConfiguration.MCHRobotColor);
+                    changed |= ImGui.ColorEdit4("Overheat Bar Color", ref _pluginConfiguration.MCHOverheatColor);
+                    changed |= ImGui.ColorEdit4("Wildfire Bar Color", ref _pluginConfiguration.MCHWildfireColor);
+                    changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.MCHEmptyColor);
+
+                    ImGui.EndTabItem();
+                }
+            }
+            ImGui.EndTabBar();
+        }
+
+        private void DrawJobsCasterConfig()
+        {
+            if (ImGui.BeginTabBar("##caster-tabs"))
+            {
+                                if (ImGui.BeginTabItem("Summoner"))
+                {
+
+                    var smnRuinBarX = _pluginConfiguration.SmnRuinBarX;
+                    if (ImGui.DragInt("Ruin Bar X Offset", ref smnRuinBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SmnRuinBarX = smnRuinBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnRuinBarY = _pluginConfiguration.SmnRuinBarY;
+                    if (ImGui.DragInt("Ruin Bar Y Offset", ref smnRuinBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SmnRuinBarY = smnRuinBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnRuinBarHeight = _pluginConfiguration.SmnRuinBarHeight;
+                    if (ImGui.DragInt("Ruin Bar Height", ref smnRuinBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SmnRuinBarHeight = smnRuinBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnRuinBarWidth = _pluginConfiguration.SmnRuinBarWidth;
+                    if (ImGui.DragInt("Ruin Bar Width", ref smnRuinBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SmnRuinBarWidth = smnRuinBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnDotBarX = _pluginConfiguration.SmnDotBarX;
+                    if (ImGui.DragInt("Dot Bar X Offset", ref smnDotBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SmnDotBarX = smnDotBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnDotBarY = _pluginConfiguration.SmnDotBarY;
+                    if (ImGui.DragInt("Dot Bar Y Offset", ref smnDotBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SmnDotBarY = smnDotBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnDotBarHeight = _pluginConfiguration.SmnDotBarHeight;
+                    if (ImGui.DragInt("Dot Bar Height", ref smnDotBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SmnDotBarHeight = smnDotBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnDotBarWidth = _pluginConfiguration.SmnDotBarWidth;
+                    if (ImGui.DragInt("Dot Bar Width", ref smnDotBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SmnDotBarWidth = smnDotBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnAetherBarX = _pluginConfiguration.SmnAetherBarX;
+                    if (ImGui.DragInt("Aether Bar X Offset", ref smnAetherBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SmnAetherBarX = smnAetherBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnAetherBarY = _pluginConfiguration.SmnAetherBarY;
+                    if (ImGui.DragInt("Aether Bar Y Offset", ref smnAetherBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.SmnAetherBarY = smnAetherBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnAetherBarHeight = _pluginConfiguration.SmnAetherBarHeight;
+                    if (ImGui.DragInt("Aether Bar Height", ref smnAetherBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SmnAetherBarHeight = smnAetherBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var smnAetherBarWidth = _pluginConfiguration.SmnAetherBarWidth;
+                    if (ImGui.DragInt("Aether Bar Width", ref smnAetherBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SmnAetherBarWidth = smnAetherBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Aether Bar Color", ref _pluginConfiguration.SmnAetherColor);
+                    changed |= ImGui.ColorEdit4("Ruin Bar Color", ref _pluginConfiguration.SmnRuinColor);
+                    changed |= ImGui.ColorEdit4("Empty Bar Color", ref _pluginConfiguration.SmnEmptyColor);
+                    changed |= ImGui.ColorEdit4("Miasma Color", ref _pluginConfiguration.SmnMiasmaColor);
+                    changed |= ImGui.ColorEdit4("Bio Color", ref _pluginConfiguration.SmnBioColor);
+                    changed |= ImGui.ColorEdit4("Expiry Color", ref _pluginConfiguration.SmnExpiryColor);
+
+                    ImGui.EndTabItem();
+                }
+                                                if (ImGui.BeginTabItem("Red Mage"))
                 {
                     var RDMVerticalOffset = _pluginConfiguration.RDMVerticalOffset;
                     if (ImGui.DragInt("Vertical Offset", ref RDMVerticalOffset, 1f, -2000, 2000))
@@ -1805,13 +3047,6 @@ namespace DelvUI.Interface
                     if (ImGui.DragInt("Horizontal Offset", ref RDMVHorizontalOffset, 1f, -2000, 2000))
                     {
                         _pluginConfiguration.RDMHorizontalOffset = RDMVHorizontalOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var RDMVerticalSpaceBetweenBars = _pluginConfiguration.RDMVerticalSpaceBetweenBars;
-                    if (ImGui.DragInt("Vertical Padding", ref RDMVerticalSpaceBetweenBars, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.RDMVerticalSpaceBetweenBars = RDMVerticalSpaceBetweenBars;
                         _pluginConfiguration.Save();
                     }
 
@@ -2162,19 +3397,9 @@ namespace DelvUI.Interface
                     
                     ImGui.EndTabItem();
                 }
-
-                
-
-                ImGui.EndTabBar();
             }
-            
-            if (changed)
-            {
-                _pluginConfiguration.BuildColorMap();
-                _pluginConfiguration.Save();
-            }
-            
-            ImGui.End();
+            ImGui.EndTabBar();
         }
+
     }
 }
