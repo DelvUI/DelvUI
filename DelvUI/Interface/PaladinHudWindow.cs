@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
+using DelvUI.Interface.Bars;
 using ImGuiNET;
 
 namespace DelvUI.Interface
@@ -86,32 +87,16 @@ namespace DelvUI.Interface
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var actor = PluginInterface.ClientState.LocalPlayer;
 
-            var barWidth = (ManaBarWidth - ManaBarPadding * 4f) / 5f;
             var posX = CenterX - XOffset;
             var posY = CenterY + YOffset;
-            var cursorPos = new Vector2(posX + barWidth * 4 + ManaBarPadding * 4, posY);
-            const int chunkSize = 2000;
-            var barSize = new Vector2(barWidth, ManaBarHeight);
+
+            var builder = BarBuilder.Create(posX, posY, ManaBarHeight, ManaBarWidth)
+                .SetChunks(5)
+                .SetChunkPadding(ManaBarPadding)
+                .AddInnerBar(actor.CurrentMp, actor.MaxMp, ManaColor, EmptyColor);
 
             var drawList = ImGui.GetWindowDrawList();
-
-            for (var i = 5; i >= 1; --i)
-            {
-                var scale = Math.Max(Math.Min(actor.CurrentMp, chunkSize * i) - chunkSize * (i - 1), 0f) / chunkSize;
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-                if (scale >= 1.0)
-                    drawList.AddRectFilledMultiColor(cursorPos,
-                        cursorPos + new Vector2(barWidth * scale, ManaBarHeight),
-                        ManaColor["gradientLeft"], ManaColor["gradientRight"], ManaColor["gradientRight"], ManaColor["gradientLeft"]
-                    );
-                else
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + new Vector2(barWidth * scale, ManaBarHeight),
-                        EmptyColor["gradientLeft"], EmptyColor["gradientRight"], EmptyColor["gradientRight"], EmptyColor["gradientLeft"]
-                    );
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-                cursorPos = new Vector2(cursorPos.X - barWidth - ManaBarPadding, cursorPos.Y);
-            }
+            builder.Build().Draw(drawList);
 
             return ManaBarHeight + initialHeight + InterBarOffset;
         }
@@ -120,50 +105,22 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<PLDGauge>();
 
-            var barWidth = (OathGaugeBarWidth - OathGaugeBarPadding) / 2f;
             var xPos = CenterX - XOffset + OathGaugeXOffset;
             var yPos = CenterY + YOffset + initialHeight + OathGaugeYOffset;
-            var cursorPos = new Vector2(xPos + barWidth + OathGaugeBarPadding, yPos);
-            const int chunkSize = 50;
-            var barSize = new Vector2(barWidth, OathGaugeBarHeight);
+
+            var builder = BarBuilder.Create(xPos, yPos, OathGaugeBarHeight, OathGaugeBarWidth)
+                .SetChunks(2)
+                .SetChunkPadding(OathGaugeBarPadding)
+                .AddInnerBar(gauge.GaugeAmount, 100, OathGaugeColor, EmptyColor);
+
+            if (OathGaugeText)
+            {
+                builder.SetTextMode(BarTextMode.EachChunk)
+                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+            }
 
             var drawList = ImGui.GetWindowDrawList();
-            for (var i = 2; i >= 1; --i)
-            {
-                var scale = Math.Max(Math.Min(gauge.GaugeAmount, chunkSize * i) - chunkSize * (i - 1), 0f) / chunkSize;
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-                if (scale >= 1.0)
-                {
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + new Vector2(barWidth * scale, OathGaugeBarHeight),
-                        OathGaugeColor["gradientLeft"], OathGaugeColor["gradientRight"], OathGaugeColor["gradientRight"], OathGaugeColor["gradientLeft"]
-                    );
-                    
-                    if (OathGaugeText)
-                    {
-                        var text = (scale * chunkSize).ToString();
-                        var textSize = ImGui.CalcTextSize(text);
-                        DrawOutlinedText(text, new Vector2(cursorPos.X + barWidth / 2f - textSize.X / 2f, cursorPos.Y-2));                        
-                    }
-                }
-                else
-                {
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + new Vector2(barWidth * scale, OathGaugeBarHeight),
-                        EmptyColor["gradientLeft"], EmptyColor["gradientRight"], EmptyColor["gradientRight"], EmptyColor["gradientLeft"]
-                    );
-                    
-                    if (OathGaugeText)
-                    {
-                        var text = (scale * chunkSize).ToString();
-                        var textSize = ImGui.CalcTextSize(text);
-                        DrawOutlinedText(text, new Vector2(cursorPos.X + barWidth / 2f - textSize.X / 2f, cursorPos.Y-2));                        
-                    }
-                }
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-
-                cursorPos = new Vector2(cursorPos.X - barWidth - OathGaugeBarPadding, cursorPos.Y);
-            }
+            builder.Build().Draw(drawList);
 
             return OathGaugeBarHeight + initialHeight + InterBarOffset;
         }
@@ -173,65 +130,29 @@ namespace DelvUI.Interface
             var fightOrFlightBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 76);
             var requiescatBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1368);
             
-            var buffBarBarWidth = BuffBarWidth;
             var xPos = CenterX - XOffset + BuffBarXOffset;
             var yPos = CenterY + YOffset + initialHeight + BuffBarYOffset;
-            var cursorPos = new Vector2(xPos, yPos);
-            var buffBarBarHeight = BuffBarHeight;
-            var barSize = new Vector2(buffBarBarWidth, buffBarBarHeight);
-            
-            var drawList = ImGui.GetWindowDrawList();
-            
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-            if (fightOrFlightBuff.Any() && requiescatBuff.Any())
-            {
-                var innerBarHeight = buffBarBarHeight / 2;
-                barSize = new Vector2(buffBarBarWidth, innerBarHeight);
-                
-                var fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().Duration);
-                var requiescatDuration = Math.Abs(requiescatBuff.First().Duration);
-                
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(barSize.X / 25f * fightOrFlightDuration, barSize.Y), 
-                    FightOrFlightColor["gradientLeft"], FightOrFlightColor["gradientRight"], FightOrFlightColor["gradientRight"], FightOrFlightColor["gradientLeft"]
-                );
-                drawList.AddRectFilledMultiColor(
-                    cursorPos + new Vector2(0.0f, innerBarHeight), cursorPos + new Vector2(barSize.X / 12f * requiescatDuration, barSize.Y * 2f),
-                    RequiescatColor["gradientLeft"], RequiescatColor["gradientRight"], RequiescatColor["gradientRight"], RequiescatColor["gradientLeft"]
-                );
-                
-                var fightOrFlightDurationText = fightOrFlightDuration == 0 ? "" : Math.Round(fightOrFlightDuration).ToString();
-                DrawOutlinedText(fightOrFlightDurationText, new Vector2(cursorPos.X + 5f, cursorPos.Y - 2f), PluginConfiguration.PLDFightOrFlightColor, new Vector4(0f, 0f, 0f, 1f));
-                
-                var requiescatDurationText = requiescatDuration == 0 ? "" : Math.Round(requiescatDuration).ToString();
-                DrawOutlinedText(requiescatDurationText, new Vector2(cursorPos.X + 27f, cursorPos.Y - 2f), PluginConfiguration.PLDRequiescatColor, new Vector4(0f, 0f, 0f, 1f));
-                
-                barSize = new Vector2(buffBarBarWidth, buffBarBarHeight);
-            }
-            else if (fightOrFlightBuff.Any())
+
+            var builder = BarBuilder.Create(xPos, yPos, BuffBarHeight, BuffBarWidth);
+
+            if (fightOrFlightBuff.Any())
             {
                 var fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().Duration);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(barSize.X / 25f * fightOrFlightDuration, barSize.Y), 
-                    FightOrFlightColor["gradientLeft"], FightOrFlightColor["gradientRight"], FightOrFlightColor["gradientRight"], FightOrFlightColor["gradientLeft"]
-                );
-                
-                var fightOrFlightDurationText = fightOrFlightDuration == 0 ? "" : Math.Round(fightOrFlightDuration).ToString();
-                DrawOutlinedText(fightOrFlightDurationText, new Vector2(cursorPos.X + 5f, cursorPos.Y - 2f), PluginConfiguration.PLDFightOrFlightColor, new Vector4(0f, 0f, 0f, 1f));
+                builder.AddInnerBar(fightOrFlightDuration, 25, FightOrFlightColor, null)
+                    .SetTextMode(BarTextMode.EachChunk)
+                    .SetText(BarTextPosition.CenterLeft, BarTextType.Current, PluginConfiguration.PLDFightOrFlightColor, Vector4.UnitW, null);
             }
-            else if (requiescatBuff.Any())
+            if (requiescatBuff.Any())
             {
                 var requiescatDuration = Math.Abs(requiescatBuff.First().Duration);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(barSize.X / 12f * requiescatDuration, barSize.Y), 
-                    RequiescatColor["gradientLeft"], RequiescatColor["gradientRight"], RequiescatColor["gradientRight"], RequiescatColor["gradientLeft"]
-                );
-                
-                var requiescatDurationText = requiescatDuration == 0 ? "" : Math.Round(requiescatDuration).ToString();
-                DrawOutlinedText(requiescatDurationText, new Vector2(cursorPos.X + 5f, cursorPos.Y - 2f), PluginConfiguration.PLDRequiescatColor, new Vector4(0f, 0f, 0f, 1f));
+                builder.AddInnerBar(requiescatDuration, 12, RequiescatColor, null)
+                    .SetTextMode(BarTextMode.EachChunk)
+                    .SetText(BarTextPosition.CenterRight, BarTextType.Current, PluginConfiguration.PLDRequiescatColor, Vector4.UnitW, null);
             }
 
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            var drawList = ImGui.GetWindowDrawList();
+            builder.Build().Draw(drawList);
+            
             return BuffBarHeight + initialHeight + InterBarOffset;
         }
 
@@ -240,29 +161,16 @@ namespace DelvUI.Interface
             var atonementBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1902);
             var stackCount = atonementBuff.Any() ? atonementBuff.First().StackCount : 0;
             
-            var barWidth = (AtonementBarWidth - AtonementBarPadding * 2) / 3f;
             var xPos = CenterX - XOffset + AtonementBarXOffset;
             var yPos = CenterY + YOffset + initialHeight + AtonementBarYOffset;
-            var cursorPos = new Vector2(xPos, yPos);
-            var barSize = new Vector2(barWidth, AtonementBarHeight);
             
+            var builder = BarBuilder.Create(xPos, yPos, AtonementBarHeight, AtonementBarWidth)
+                .SetChunks(3)
+                .SetChunkPadding(AtonementBarPadding)
+                .AddInnerBar(stackCount, 3, AtonementColor, null);
+
             var drawList = ImGui.GetWindowDrawList();
-
-            for (var i = 0; i <= 2; i++)
-            {
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-                if (stackCount > 0)
-                {
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + new Vector2(barWidth, AtonementBarHeight),
-                        AtonementColor["gradientLeft"], AtonementColor["gradientRight"], AtonementColor["gradientRight"], AtonementColor["gradientLeft"]
-                    );
-                    stackCount--;
-                }
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-
-                cursorPos += new Vector2(barWidth + AtonementBarPadding, 0);
-            }
+            builder.Build().Draw(drawList);
 
             return AtonementBarHeight + initialHeight + InterBarOffset;
         }
