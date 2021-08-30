@@ -28,7 +28,6 @@ namespace DelvUI.Helpers
 
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
-            Debug.Assert(pluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             if (pluginInterface.ClientState.LocalPlayer == null) return;
 
             var now = ImGui.GetTime();
@@ -65,6 +64,11 @@ namespace DelvUI.Helpers
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        ~MpTickHelper()
+        {
+            Dispose(true);
         }
     }
 }
