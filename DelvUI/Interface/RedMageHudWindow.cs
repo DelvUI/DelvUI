@@ -20,14 +20,18 @@ namespace DelvUI.Interface {
         private int ManaBarHeight => PluginConfiguration.RDMManaBarHeight;
         private int ManaBarXOffset => PluginConfiguration.RDMManaBarXOffset;
         private int ManaBarYOffset => PluginConfiguration.RDMManaBarYOffset;
-        private int BlackManaBarHeight => PluginConfiguration.RDMBlackManaBarHeight;
-        private int BlackManaBarWidth => PluginConfiguration.RDMBlackManaBarWidth;
-        private int BlackManaBarXOffset => PluginConfiguration.RDMBlackManaBarXOffset;
-        private int BlackManaBarYOffset => PluginConfiguration.RDMBlackManaBarYOffset;
         private int WhiteManaBarHeight => PluginConfiguration.RDMWhiteManaBarHeight;
         private int WhiteManaBarWidth => PluginConfiguration.RDMWhiteManaBarWidth;
         private int WhiteManaBarXOffset => PluginConfiguration.RDMWhiteManaBarXOffset;
         private int WhiteManaBarYOffset => PluginConfiguration.RDMWhiteManaBarYOffset;
+        private bool WhiteManaBarInversed => PluginConfiguration.RDMWhiteManaBarInversed;
+        private bool ShowWhiteManaValue => PluginConfiguration.RDMShowWhiteManaValue;
+        private int BlackManaBarHeight => PluginConfiguration.RDMBlackManaBarHeight;
+        private int BlackManaBarWidth => PluginConfiguration.RDMBlackManaBarWidth;
+        private int BlackManaBarXOffset => PluginConfiguration.RDMBlackManaBarXOffset;
+        private int BlackManaBarYOffset => PluginConfiguration.RDMBlackManaBarYOffset;
+        private bool BlackManaBarInversed => PluginConfiguration.RDMBlackManaBarInversed;
+        private bool ShowBlackManaValue => PluginConfiguration.RDMShowBlackManaValue;
         private int AccelBarHeight => PluginConfiguration.RDMAccelerationBarHeight;
         private int AccelBarWidth => PluginConfiguration.RDMAccelerationBarWidth;
         private int AccelerationBarXOffset => PluginConfiguration.RDMAccelerationBarXOffset;
@@ -159,65 +163,62 @@ namespace DelvUI.Interface {
 
         private void DrawWhiteManaBar()
         {
-            var gauge = (float)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().WhiteGauge;
-            var scale = gauge / 100;
-            var barSize = new Vector2(WhiteManaBarWidth, WhiteManaBarHeight);
-            var cursorPos = new Vector2(
-                OriginX - BalanceBarWidth / 2f - HorizontalSpaceBetweenBars - WhiteManaBarWidth + WhiteManaBarXOffset, 
+            var gauge = (int)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().WhiteGauge;
+            var scale = gauge / 100f;
+            var size = new Vector2(WhiteManaBarWidth, WhiteManaBarHeight);
+            var position = new Vector2(
+                OriginX - BalanceBarWidth / 2f - HorizontalSpaceBetweenBars + WhiteManaBarXOffset,
                 OriginY - ManaBarHeight - VerticalSpaceBetweenBars - WhiteManaBarHeight + WhiteManaBarYOffset
             );
 
-            var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, WhiteManaBarColor["background"]);
-
-            var barStartPos = new Vector2(cursorPos.X + barSize.X * (1 - scale), cursorPos.Y);
-
-            if (scale > 0)
-            {
-                drawList.AddRectFilledMultiColor(
-                    barStartPos, barStartPos + new Vector2(Math.Max(1, barSize.X * scale), barSize.Y),
-                    WhiteManaBarColor["gradientRight"], WhiteManaBarColor["gradientLeft"], WhiteManaBarColor["gradientLeft"], WhiteManaBarColor["gradientRight"]
-                );
-            }
-
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-
-            var thresholdPos = new Vector2(cursorPos.X + barSize.X * 0.2f, cursorPos.Y);
-            drawList.AddRect(thresholdPos, thresholdPos + new Vector2(2, barSize.Y), 0xFF000000);
-
-            var text = $"{gauge}";
-            var textSize = ImGui.CalcTextSize(text);
-            var textPos = new Vector2(OriginX - BalanceBarWidth / 2f - HorizontalSpaceBetweenBars + WhiteManaBarXOffset - 10 - textSize.X, cursorPos.Y - 2);
-            DrawOutlinedText(text, textPos);
+            DrawManaBar(position, size, WhiteManaBarColor, gauge, scale, WhiteManaBarInversed, ShowWhiteManaValue);
         }
 
-        private void DrawBlackManaBar() 
+        private void DrawBlackManaBar()
         {
-            var gauge = (float)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().BlackGauge;
-            var scale = gauge / 100;
-            var barSize = new Vector2(BlackManaBarWidth, BlackManaBarHeight);
-            var cursorPos = new Vector2(
-                OriginX + BalanceBarWidth / 2f + HorizontalSpaceBetweenBars + BlackManaBarXOffset, 
+            var gauge = (int)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().BlackGauge;
+            var scale = gauge / 100f;
+            var size = new Vector2(BlackManaBarWidth, BlackManaBarHeight);
+            var position = new Vector2(
+                OriginX + BalanceBarWidth / 2f + HorizontalSpaceBetweenBars + BlackManaBarXOffset,
                 OriginY - ManaBarHeight - VerticalSpaceBetweenBars - BlackManaBarHeight + BlackManaBarYOffset
             );
 
-            var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, BlackManaBarColor["background"]);
+            DrawManaBar(position, size, BlackManaBarColor, gauge, scale, BlackManaBarInversed, ShowBlackManaValue);
+        }
 
+        private void DrawManaBar(Vector2 position, Vector2 size, Dictionary<string, uint> color, int value, float scale, bool inversed, bool showText)
+        {
+            var origin = inversed ? new Vector2(position.X - size.X, position.Y) : position;
+
+            // bar
+            var drawList = ImGui.GetWindowDrawList();
+            drawList.AddRectFilled(origin, origin + size, color["background"]);
+
+            // fill
             if (scale > 0)
             {
+                var barStartPos = inversed ? new Vector2(origin.X + size.X * (1 - scale), origin.Y) : origin;
                 drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(Math.Max(1, barSize.X * scale), barSize.Y),
-                    BlackManaBarColor["gradientLeft"], BlackManaBarColor["gradientRight"], BlackManaBarColor["gradientRight"], BlackManaBarColor["gradientLeft"]
+                    barStartPos, barStartPos + new Vector2(Math.Max(1, size.X * scale), size.Y),
+                    color["gradientLeft"], color["gradientRight"], color["gradientRight"], color["gradientLeft"]
                 );
             }
 
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            // border
+            drawList.AddRect(origin, origin + size, 0xFF000000);
 
-            var thresholdPos = new Vector2(cursorPos.X + barSize.X * 0.8f, cursorPos.Y);
-            drawList.AddRect(thresholdPos, thresholdPos + new Vector2(2, barSize.Y), 0xFF000000);
+            // threshold
+            var thresholdRatio = inversed ? 0.2f : 0.8f;
+            var thresholdPos = new Vector2(origin.X + size.X * thresholdRatio, origin.Y);
+            drawList.AddRect(thresholdPos, thresholdPos + new Vector2(2, size.Y), 0xFF000000);
 
-            DrawOutlinedText($"{gauge}", new Vector2(cursorPos.X + 10, cursorPos.Y - 2));
+            // text
+            if (!showText) return;
+            var text = $"{value}";
+            var textSize = ImGui.CalcTextSize(text);
+            var textPos = inversed ? new Vector2(origin.X + size.X - 10 - textSize.X, origin.Y - 2) : new Vector2(origin.X + 10, origin.Y - 2);
+            DrawOutlinedText(text, textPos);
         }
         
         private void DrawAccelerationBar()
