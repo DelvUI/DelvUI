@@ -60,6 +60,11 @@ namespace DelvUI.Interface.Bars
             return innerBar.ChildNum;
         }
 
+        public Vector2 GetBarSize()
+        {
+            return new Vector2(BarWidth, BarHeight);
+        }
+
         public void Draw(ImDrawListPtr drawList)
         {
             var barWidth = BarWidth + ChunkPadding; // For loop adds one extra padding more than is needed
