@@ -83,7 +83,7 @@ namespace DelvUI.Interface
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float)actor.CurrentMp / actor.MaxMp;
             var barSize = new Vector2(ManaBarWidth, ManaBarHeight);
-            var cursorPos = new Vector2(OriginX - barSize.X / 2, OriginY - ManaBarHeight);
+            var cursorPos = new Vector2(OriginX - barSize.X / 2, OriginY - barSize.Y);
 
             // mana bar
             var color = gauge.InAstralFire() ? ManaBarFireColor : (gauge.InUmbralIce() ? ManaBarIceColor : ManaBarNoElementColor);
@@ -138,7 +138,7 @@ namespace DelvUI.Interface
             }
 
             var barSize = new Vector2(ManaBarWidth + 4, ManaBarHeight + 4);
-            var cursorPos = new Vector2(OriginX - barSize.X / 2f, OriginY - ManaBarHeight - 2);
+            var cursorPos = new Vector2(OriginX - barSize.X / 2f, OriginY - barSize.Y - 2);
 
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88FFFFFF);
