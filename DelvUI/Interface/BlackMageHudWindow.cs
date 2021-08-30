@@ -49,11 +49,6 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _)
         {
-            DrawHealthBar();
-            DrawFocusBar();
-            DrawCastBar();
-            DrawTargetBar();
-
             DrawEnochian();
             DrawManaBar();
             DrawUmbralHeartStacks();
@@ -75,6 +70,10 @@ namespace DelvUI.Interface
             }
         }
 
+        protected override void DrawPrimaryResourceBar()
+        {
+        }
+
         protected virtual void DrawManaBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
@@ -84,7 +83,7 @@ namespace DelvUI.Interface
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float)actor.CurrentMp / actor.MaxMp;
             var barSize = new Vector2(ManaBarWidth, ManaBarHeight);
-            var cursorPos = new Vector2(OriginX - barSize.X / 2, OriginY - ManaBarHeight);
+            var cursorPos = new Vector2(OriginX - barSize.X / 2, OriginY - barSize.Y);
 
             // mana bar
             var color = gauge.InAstralFire() ? ManaBarFireColor : (gauge.InUmbralIce() ? ManaBarIceColor : ManaBarNoElementColor);
@@ -139,7 +138,7 @@ namespace DelvUI.Interface
             }
 
             var barSize = new Vector2(ManaBarWidth + 4, ManaBarHeight + 4);
-            var cursorPos = new Vector2(OriginX - barSize.X / 2f, OriginY - ManaBarHeight - 2);
+            var cursorPos = new Vector2(OriginX - barSize.X / 2f, OriginY - barSize.Y - 2);
 
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88FFFFFF);
@@ -317,7 +316,7 @@ namespace DelvUI.Interface
 
             for (int i = 0; i < 4; i++)
             {
-                timer = target.StatusEffects.FirstOrDefault(o => o.EffectId == dotIDs[i]).Duration;
+                timer = target.StatusEffects.FirstOrDefault(o => o.EffectId == dotIDs[i] && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId).Duration;
                 if (timer > 0)
                 {
                     maxDuration = dotDurations[i];
@@ -345,15 +344,16 @@ namespace DelvUI.Interface
 
         private void DrawTimerBar(Vector2 position, float scale, float height, Dictionary<string, uint> colorMap, bool inverted)
         {
-            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-
             var drawList = ImGui.GetWindowDrawList();
             var size = new Vector2((ManaBarWidth / 2f - PolyglotWidth - HorizontalSpaceBetweenBars * 2f) * scale, height);
             size.X = Math.Max(1, size.X);
-            var endPoint = inverted ? position - size : position + size;
 
-            drawList.AddRectFilledMultiColor(position, endPoint,
-                colorMap["gradientLeft"], colorMap["gradientRight"], colorMap["gradientRight"], colorMap["gradientLeft"]
+            var startPoint = inverted ? position - size : position;
+            var leftColor = inverted ? colorMap["gradientRight"] : colorMap["gradientLeft"];
+            var rightColor = inverted ? colorMap["gradientLeft"] : colorMap["gradientRight"];
+
+            drawList.AddRectFilledMultiColor(startPoint, startPoint + size,
+                leftColor, rightColor, rightColor, leftColor
             );
         }
     }

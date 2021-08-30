@@ -32,10 +32,10 @@ namespace DelvUI.Interface
 
         private int SchAetherBarPad => PluginConfiguration.SchAetherBarPad;
 
-        protected int BioBarHeight => PluginConfiguration.SCHBioBarHeight;
-        protected int BioBarWidth => PluginConfiguration.SCHBioBarWidth;
-        protected int BioBarX => PluginConfiguration.SCHBioBarX;
-        protected int BioBarY => PluginConfiguration.SCHBioBarY;
+        private int BioBarHeight => PluginConfiguration.SCHBioBarHeight;
+        private int BioBarWidth => PluginConfiguration.SCHBioBarWidth;
+        private int BioBarX => PluginConfiguration.SCHBioBarX;
+        private int BioBarY => PluginConfiguration.SCHBioBarY;
 
         private bool ShowBioBar => PluginConfiguration.SCHShowBioBar;
         private bool ShowFairyBar => PluginConfiguration.SCHShowFairyBar;
@@ -57,11 +57,6 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _)
         {
-            DrawHealthBar();
-            if (ShowPrimaryResourceBar)
-            {
-                DrawPrimaryResourceBar();
-            }
             if (ShowFairyBar)
             {
                 DrawFairyBar();
@@ -74,9 +69,16 @@ namespace DelvUI.Interface
             {
                 DrawAetherBar();
             }
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
+        }
+
+        protected override void DrawPrimaryResourceBar()
+        {
+            if (!ShowPrimaryResourceBar)
+            {
+                return;
+            }
+
+            base.DrawPrimaryResourceBar();
         }
 
         private void DrawFairyBar()
@@ -161,7 +163,9 @@ namespace DelvUI.Interface
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
                 return;
             }
-            var bio = target.StatusEffects.FirstOrDefault(o => o.EffectId == 179 || o.EffectId == 189 || o.EffectId == 1895);
+            var bio = target.StatusEffects.FirstOrDefault(o => o.EffectId == 179 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
+                                                               o.EffectId == 189 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
+                                                               o.EffectId == 1895 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
             var bioDuration = (int)bio.Duration;
             var xOffset = CenterX;
 
