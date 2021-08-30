@@ -222,20 +222,19 @@ namespace DelvUI.Interface {
                     colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
                 );
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-
-                var text = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextLeft);
-                DrawOutlinedText(text, new Vector2(cursorPos.X + 5 + TargetBarTextLeftXOffset, cursorPos.Y - 22 + TargetBarTextLeftYOffset));
             }
+            
+            var textLeft = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextLeft);
+            DrawOutlinedText(textLeft,
+                new Vector2(cursorPos.X + 5 + TargetBarTextLeftXOffset,
+                    cursorPos.Y - 22 + TargetBarTextLeftYOffset));
 
             var textRight = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextRight);
             var textRightSize = ImGui.CalcTextSize(textRight);
 
             DrawOutlinedText(textRight,
-                new Vector2(
-                    cursorPos.X + TargetBarWidth - textRightSize.X - 5 + TargetBarTextRightXOffset,
-                    cursorPos.Y - 22 + TargetBarTextRightYOffset
-                )
-            );
+                new Vector2(cursorPos.X + TargetBarWidth - textRightSize.X - 5 + TargetBarTextRightXOffset,
+                    cursorPos.Y - 22 + TargetBarTextRightYOffset));
 
             DrawTargetShield(target, cursorPos, BarSize, true);
             DrawTargetOfTargetBar(target.TargetActorID);
