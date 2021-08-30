@@ -9,26 +9,20 @@ using Dalamud.Data.LuminaExtensions;
 using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
-using Dalamud.Game.ClientState.Structs;
 using Dalamud.Interface;
 using Dalamud.Plugin;
-using DelvUI.GameStructs;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
-using DelvUI.Helpers;
-using FFXIVClientStructs.FFXIV.Client.Game;
-using Action = System.Action;
 
 namespace DelvUI.Interface {
     public abstract class HudWindow {
         public bool IsVisible = true;
         protected readonly DalamudPluginInterface PluginInterface;
         protected readonly PluginConfiguration PluginConfiguration;
-        private Vector2 _barSize;
 
         public abstract uint JobId { get; }
 
@@ -81,6 +75,12 @@ namespace DelvUI.Interface {
         protected bool MPTickerShowBorder => PluginConfiguration.MPTickerShowBorder;
         protected bool MPTickerHideOnFullMp => PluginConfiguration.MPTickerHideOnFullMp;
 
+        protected int GCDIndicatorHeight => PluginConfiguration.GCDIndicatorHeight;
+        protected int GCDIndicatorWidth => PluginConfiguration.GCDIndicatorWidth;
+        protected int GCDIndicatorXOffset => PluginConfiguration.GCDIndicatorXOffset;
+        protected int GCDIndicatorYOffset => PluginConfiguration.GCDIndicatorYOffset;
+        protected bool GCDIndicatorShowBorder => PluginConfiguration.GCDIndicatorShowBorder;
+
         protected int CastBarWidth => PluginConfiguration.CastBarWidth;
         protected int CastBarHeight => PluginConfiguration.CastBarHeight;
         protected int CastBarXOffset => PluginConfiguration.CastBarXOffset;
@@ -91,7 +91,7 @@ namespace DelvUI.Interface {
         protected int TargetCastBarXOffset => PluginConfiguration.TargetCastBarXOffset;
         protected int TargetCastBarYOffset => PluginConfiguration.TargetCastBarYOffset;
 
-        protected Vector2 BarSize => _barSize;
+        protected Vector2 BarSize { get; private set; }
 
         private LastUsedCast _lastPlayerUsedCast;
         private LastUsedCast _lastTargetUsedCast;
@@ -120,7 +120,7 @@ namespace DelvUI.Interface {
 
         protected virtual void DrawHealthBar() {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            _barSize = new Vector2(HealthBarWidth, HealthBarHeight);
+            BarSize = new Vector2(HealthBarWidth, HealthBarHeight);
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentHp / actor.MaxHp;
 
@@ -144,10 +144,10 @@ namespace DelvUI.Interface {
             windowFlags |= ImGuiWindowFlags.NoDecoration;
 
             ImGui.SetNextWindowPos(cursorPos);
-            ImGui.SetNextWindowSize(_barSize);
+            ImGui.SetNextWindowSize(BarSize);
 
             ImGui.Begin("health_bar", windowFlags);
-            if (ImGui.BeginChild("health_bar", _barSize)) {
+            if (ImGui.BeginChild("health_bar", BarSize)) {
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight),
@@ -164,7 +164,7 @@ namespace DelvUI.Interface {
             ImGui.EndChild();
             ImGui.End();
 
-            DrawTargetShield(actor, cursorPos, _barSize, true);
+            DrawTargetShield(actor, cursorPos, BarSize, true);
 
             DrawOutlinedText(
                 $"{Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}",
@@ -183,7 +183,7 @@ namespace DelvUI.Interface {
 
         protected virtual void DrawPrimaryResourceBar() {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            _barSize = new Vector2(PrimaryResourceBarWidth, PrimaryResourceBarHeight);
+            BarSize = new Vector2(PrimaryResourceBarWidth, PrimaryResourceBarHeight);
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentMp / actor.MaxMp;
             var cursorPos = new Vector2(CenterX - PrimaryResourceBarXOffset + 33, CenterY + PrimaryResourceBarYOffset - 16);
@@ -204,7 +204,7 @@ namespace DelvUI.Interface {
                 return;
             }
 
-            _barSize = new Vector2(TargetBarWidth, TargetBarHeight);
+            BarSize = new Vector2(TargetBarWidth, TargetBarHeight);
 
             var cursorPos = new Vector2(CenterX + TargetBarXOffset, CenterY + TargetBarYOffset);
             ImGui.SetCursorPos(cursorPos);
@@ -373,7 +373,7 @@ namespace DelvUI.Interface {
             var currentCastTime = castInfo.CurrentCastTime;
             var totalCastTime = castInfo.TotalCastTime;
 
-            _lastPlayerUsedCast = new LastUsedCast(currentCastId, currentCastType, PluginInterface);
+            _lastPlayerUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, PluginInterface);
             var iconTexFile = _lastPlayerUsedCast.Icon;
             var castText = _lastPlayerUsedCast.ActionText;
 
@@ -403,6 +403,11 @@ namespace DelvUI.Interface {
             }
 
             var castColor = PluginConfiguration.CastBarColorMap["castbar"];
+            if (PluginConfiguration.ColorCastBarByJob)
+            {
+                PluginConfiguration.JobColorMap.TryGetValue(PluginInterface.ClientState.LocalPlayer.ClassJob.Id, out castColor);
+                castColor ??= PluginConfiguration.CastBarColorMap["castbar"];
+            }
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(barSize.X * castScale, barSize.Y),
                 castColor["gradientLeft"], castColor["gradientRight"], castColor["gradientRight"], castColor["gradientLeft"]
@@ -457,7 +462,7 @@ namespace DelvUI.Interface {
             var currentCastTime = castInfo.CurrentCastTime;
             var totalCastTime = castInfo.TotalCastTime;
 
-            _lastTargetUsedCast = new LastUsedCast(currentCastId, currentCastType, PluginInterface);
+            _lastTargetUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, PluginInterface);
             var iconTexFile = _lastTargetUsedCast.Icon;
             var castText = _lastTargetUsedCast.ActionText;
 
@@ -477,6 +482,36 @@ namespace DelvUI.Interface {
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
 
             var castColor = PluginConfiguration.CastBarColorMap["targetcastbar"];
+
+            if (PluginConfiguration.ColorCastBarByDamageType)
+            {
+                switch (_lastTargetUsedCast.DamageType)
+                {
+                    case DamageType.Physical:
+                    case DamageType.Blunt:
+                    case DamageType.Slashing:
+                    case DamageType.Piercing:
+                        castColor = PluginConfiguration.CastBarColorMap["targetphysicalcastbar"];
+                        break;
+                    case DamageType.Magic:
+                        castColor = PluginConfiguration.CastBarColorMap["targetmagicalcastbar"];
+                        break;
+                    case DamageType.Darkness:
+                        castColor = PluginConfiguration.CastBarColorMap["targetdarknesscastbar"];
+                        break;
+                    case DamageType.Unknown:
+                    case DamageType.LimitBreak:
+                        castColor = PluginConfiguration.CastBarColorMap["targetcastbar"];
+                        break;
+                    default:
+                        castColor = PluginConfiguration.CastBarColorMap["targetcastbar"];
+                        break;
+                }
+            }
+
+            if (PluginConfiguration.ShowTargetInterrupt && _lastTargetUsedCast.Interruptable) castColor = PluginConfiguration.CastBarColorMap["targetinterruptcastbar"];
+
+            
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(barSize.X * castScale, barSize.Y),
                 castColor["gradientLeft"], castColor["gradientRight"], castColor["gradientRight"], castColor["gradientLeft"]
@@ -521,7 +556,7 @@ namespace DelvUI.Interface {
                 return;
             }
 
-            var shieldColor = PluginConfiguration.ShieldColorMap["shield"];
+            var shieldColor = PluginConfiguration.MiscColorMap["shield"];
             var shield = ActorShieldValue(actor);
             if (Math.Abs(shield) < 0) {
                 return;
@@ -621,7 +656,7 @@ namespace DelvUI.Interface {
             var fullSize = new Vector2(MPTickerWidth, MPTickerHeight);
             var barSize = new Vector2(Math.Max(1f, MPTickerWidth * scale), MPTickerHeight);
             var position = new Vector2(CenterX + MPTickerXOffset - MPTickerWidth / 2f, CenterY + MPTickerYOffset);
-            var colors = PluginConfiguration.MPTickerColorMap["mpTicker"];
+            var colors = PluginConfiguration.MiscColorMap["mpTicker"];
 
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(position, position + fullSize, 0x88000000);
@@ -630,6 +665,35 @@ namespace DelvUI.Interface {
             );
 
             if (MPTickerShowBorder)
+            {
+                drawList.AddRect(position, position + fullSize, 0xFF000000);
+            }
+        }
+        protected virtual void DrawGCDIndicator()
+        {
+            if (!PluginConfiguration.GCDIndicatorEnabled || PluginInterface.ClientState.LocalPlayer is null)
+            {
+                return;
+            }
+
+            GCDHelper.GetGCDInfo(PluginInterface.ClientState.LocalPlayer, out var elapsed, out var total);
+            if (total == 0) return;
+
+            var scale = elapsed / total;
+            if (scale <= 0) return;
+
+            var fullSize = new Vector2(GCDIndicatorWidth, GCDIndicatorHeight);
+            var barSize = new Vector2(Math.Max(1f, GCDIndicatorWidth * scale), GCDIndicatorHeight);
+            var position = new Vector2(CenterX + GCDIndicatorXOffset - GCDIndicatorWidth / 2f, CenterY + GCDIndicatorYOffset);
+            var colors = PluginConfiguration.MiscColorMap["mpTicker"];
+
+            var drawList = ImGui.GetWindowDrawList();
+            drawList.AddRectFilled(position, position + fullSize, 0x88000000);
+            drawList.AddRectFilledMultiColor(position, position + barSize,
+                colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+            );
+
+            if (GCDIndicatorShowBorder)
             {
                 drawList.AddRect(position, position + fullSize, 0xFF000000);
             }
@@ -709,6 +773,7 @@ namespace DelvUI.Interface {
             DrawCastBar();
             DrawTargetCastBar();
             DrawMPTicker();
+            DrawGCDIndicator();
         }
 
         protected abstract void Draw(bool _);

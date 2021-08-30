@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing.Design;
 using System.IO;
 using System.Reflection;
 using Dalamud.Game.ClientState;
@@ -7,6 +6,7 @@ using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using ImGuiNET;
 using DelvUI.Interface;
+using FFXIVClientStructs;
 
 namespace DelvUI {
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -43,6 +43,8 @@ namespace DelvUI {
             if (!_fontBuilt && !_fontLoadFailed) {
                 _pluginInterface.UiBuilder.RebuildFonts();
             }
+
+            Resolver.Initialize();
         }
         
         private void BuildFont() {
@@ -81,13 +83,14 @@ namespace DelvUI {
             
             _configurationWindow.Draw();
 
+            if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
+                SwapJobs();
+            }
+
             if (_fontBuilt) {
                 ImGui.PushFont(_pluginConfiguration.BigNoodleTooFont);
             }
             
-            if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
-                SwapJobs();
-            }
 
             if (!hudState) { 
                 _hudWindow?.Draw();
@@ -110,11 +113,14 @@ namespace DelvUI {
                 //Healers
                 Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SCH => new ScholarHudWindow(_pluginInterface, _pluginConfiguration),
-                
+                Jobs.AST => new AstrologianHudWindow(_pluginInterface, _pluginConfiguration),
+
+
                 //Melee DPS
                 Jobs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.MNK => new MonkHudWindow(_pluginInterface, _pluginConfiguration),
-                
+                Jobs.NIN => new NinjaHudWindow(_pluginInterface, _pluginConfiguration),
+
                 //Ranged DPS
                 Jobs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.DNC => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
@@ -152,8 +158,6 @@ namespace DelvUI {
                 Jobs.FSH => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 
                 //dont have packs yet
-                Jobs.NIN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.AST => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.DRG => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.BLU => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 _ => _hudWindow

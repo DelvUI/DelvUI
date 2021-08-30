@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
-using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Interface.Bars;
@@ -16,33 +14,23 @@ namespace DelvUI.Interface
         public override uint JobId => 21;
 
         private int StormsEyeHeight => PluginConfiguration.WARStormsEyeHeight;
-
         private int StormsEyeWidth => PluginConfiguration.WARStormsEyeWidth;
 
         private new int XOffset => PluginConfiguration.WARBaseXOffset;
-
         private new int YOffset => PluginConfiguration.WARBaseYOffset;
 
         private int BeastGaugeHeight => PluginConfiguration.WARBeastGaugeHeight;
-
         private int BeastGaugeWidth => PluginConfiguration.WARBeastGaugeWidth;
-
         private int BeastGaugePadding => PluginConfiguration.WARBeastGaugePadding;
-
         private int BeastGaugeXOffset => PluginConfiguration.WARBeastGaugeXOffset;
-
         private int BeastGaugeYOffset => PluginConfiguration.WARBeastGaugeYOffset;
 
         private int InterBarOffset => PluginConfiguration.WARInterBarOffset;
 
         private Dictionary<string, uint> InnerReleaseColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000];
-
         private Dictionary<string, uint> StormsEyeColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 1];
-
         private Dictionary<string, uint> FellCleaveColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 2];
-
         private Dictionary<string, uint> NascentChaosColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 3];
-
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 4];
 
         public WarriorHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
@@ -52,12 +40,10 @@ namespace DelvUI.Interface
             DrawBeastGauge(nextHeight);
         }
 
-        protected override void DrawPrimaryResourceBar()
-        {
+        protected override void DrawPrimaryResourceBar() {
         }
 
-        private int DrawStormsEyeBar(int initialHeight)
-        {
+        private int DrawStormsEyeBar(int initialHeight) {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var innerReleaseBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1177);
             var stormsEyeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
@@ -67,22 +53,20 @@ namespace DelvUI.Interface
 
             var builder = BarBuilder.Create(xPos, yPos, StormsEyeHeight, StormsEyeWidth);
 
-            float duration = 0f;
-            float maximum = 10f;
-            Dictionary<string, uint> color = EmptyColor;
-            if (innerReleaseBuff.Any())
-            {
+            var duration = 0f;
+            var maximum = 10f;
+            var color = EmptyColor;
+            if (innerReleaseBuff.Any()) {
                 duration = Math.Abs(innerReleaseBuff.First().Duration);
                 color = InnerReleaseColor;
             }
-            else if (stormsEyeBuff.Any())
-            {
+            else if (stormsEyeBuff.Any()) {
                 duration = Math.Abs(stormsEyeBuff.First().Duration);
                 maximum = 60f;
                 color = StormsEyeColor;
             }
 
-            Bar bar = builder.AddInnerBar(duration, maximum, color)
+            var bar = builder.AddInnerBar(duration, maximum, color)
                 .SetTextMode(BarTextMode.EachChunk)
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                 .Build();
