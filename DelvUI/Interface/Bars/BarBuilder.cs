@@ -76,6 +76,18 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
+        public BarBuilder SetVertical(bool vertical)
+        {
+            _bar.Vertical = vertical;
+            return this;
+        }
+
+        public BarBuilder SetBackgroundColor(uint backgroundColor)
+        {
+            _bar.BackgroundColor = backgroundColor;
+            return this;
+        }
+
         public BarBuilder AddInnerBar(float currentValue, float maximumValue, Dictionary<string, uint> color)
         {
             return AddInnerBar(currentValue, maximumValue, color, null);
@@ -161,6 +173,14 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
+        public BarBuilder SetGlowColor(uint glowColor)
+        {
+            if (currentInnerBar == -1)
+                throw new InvalidOperationException("Operation requires defined inner bar");
+            _bar.InnerBars[currentInnerBar].GlowColor = glowColor;
+            return this;
+        }
+
         public BarBuilder SetChunksColors(Dictionary<string, uint> color)
         {
             var colors = new Dictionary<string, uint>[_bar.ChunkSizes.Length];
@@ -174,6 +194,8 @@ namespace DelvUI.Interface.Bars
 
         public BarBuilder SetChunksColors(Dictionary<string, uint>[] colors)
         {
+            if (currentInnerBar == -1)
+                throw new InvalidOperationException("Operation requires defined inner bar");
             if (colors.Length != _bar.ChunkSizes.Length)
                 throw new ArgumentException($"Amount of chunk colors (${colors.Length}) must match amount of chunks in bar (${_bar.ChunkSizes.Length})");
             _bar.InnerBars[currentInnerBar].ChunkColors = colors;
@@ -182,12 +204,16 @@ namespace DelvUI.Interface.Bars
 
         public BarBuilder SetFlipDrainDirection(bool flip)
         {
+            if (currentInnerBar == -1)
+                throw new InvalidOperationException("Operation requires defined inner bar");
             _bar.InnerBars[currentInnerBar].FlipDrainDirection = flip;
             return this;
         }
 
         public BarBuilder SetTextMode(BarTextMode mode)
         {
+            if (currentInnerBar == -1)
+                throw new InvalidOperationException("Operation requires defined inner bar");
             _bar.InnerBars[currentInnerBar].TextMode = mode;
             return this;
         }
@@ -209,6 +235,8 @@ namespace DelvUI.Interface.Bars
 
         public BarBuilder SetText(BarText text)
         {
+            if (currentInnerBar == -1)
+                throw new InvalidOperationException("Operation requires defined inner bar");
             var texts = new BarText[_bar.ChunkSizes.Length];
             for (var i = 0; i < texts.Length; i++)
             {
@@ -221,10 +249,24 @@ namespace DelvUI.Interface.Bars
 
         public BarBuilder SetText(BarText[] texts)
         {
+            if (currentInnerBar == -1)
+                throw new InvalidOperationException("Operation requires defined inner bar");
             if (texts.Length != _bar.ChunkSizes.Length)
                 throw new ArgumentException(
                     $"Amount of bar texts (${texts.Length}) must match amount of chunks in bar (${_bar.ChunkSizes.Length})");
             _bar.InnerBars[currentInnerBar].Texts = texts;
+            return this;
+        }
+
+        public BarBuilder AddPrimaryText(BarText text)
+        {
+            _bar.PrimaryTexts.Add(text);
+            return this;
+        }
+
+        public BarBuilder SetPrimaryTexts(List<BarText> texts)
+        {
+            _bar.PrimaryTexts = texts;
             return this;
         }
     }

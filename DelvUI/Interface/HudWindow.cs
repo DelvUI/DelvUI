@@ -18,7 +18,6 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
-using DelvUI.Helpers;
 
 namespace DelvUI.Interface {
     public abstract class HudWindow {
