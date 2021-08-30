@@ -1843,6 +1843,36 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
+                    var RDMWhiteManaBarHeight = _pluginConfiguration.RDMWhiteManaBarHeight;
+                    if (ImGui.DragInt("White Mana Height", ref RDMWhiteManaBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMWhiteManaBarHeight = RDMWhiteManaBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+                    var RDMWhiteManaBarWidth = _pluginConfiguration.RDMWhiteManaBarWidth;
+                    if (ImGui.DragInt("White Mana Width", ref RDMWhiteManaBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.RDMWhiteManaBarWidth = RDMWhiteManaBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var RDMWhiteManaBarXOffset = _pluginConfiguration.RDMWhiteManaBarXOffset;
+                    if (ImGui.DragInt("White Mana Horizontal Offset", ref RDMWhiteManaBarXOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMWhiteManaBarXOffset = RDMWhiteManaBarXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var RDMWhiteManaBarYOffset = _pluginConfiguration.RDMWhiteManaBarYOffset;
+                    if (ImGui.DragInt("White Mana Vertical Offset", ref RDMWhiteManaBarYOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.RDMWhiteManaBarYOffset = RDMWhiteManaBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Invert White Mana Bar", ref _pluginConfiguration.RDMWhiteManaBarInversed);
+                    changed |= ImGui.Checkbox("Show White Mana Value", ref _pluginConfiguration.RDMShowWhiteManaValue);
+
                     var RDMBlackManaBarHeight = _pluginConfiguration.RDMBlackManaBarHeight;
                     if (ImGui.DragInt("Black Mana Height", ref RDMBlackManaBarHeight, .1f, -2000, 2000))
                     {
@@ -1870,34 +1900,10 @@ namespace DelvUI.Interface
                         _pluginConfiguration.RDMBlackManaBarYOffset = RDMBlackManaBarYOffset;
                         _pluginConfiguration.Save();
                     }
-                    
-                    var RDMWhiteManaBarHeight = _pluginConfiguration.RDMWhiteManaBarHeight;
-                    if (ImGui.DragInt("White Mana Height", ref RDMWhiteManaBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.RDMWhiteManaBarHeight = RDMWhiteManaBarHeight;
-                        _pluginConfiguration.Save();
-                    }                    
-                    var RDMWhiteManaBarWidth = _pluginConfiguration.RDMWhiteManaBarWidth;
-                    if (ImGui.DragInt("White Mana Width", ref RDMWhiteManaBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.RDMWhiteManaBarWidth = RDMWhiteManaBarWidth;
-                        _pluginConfiguration.Save();
-                    }   
-                    
-                    var RDMWhiteManaBarXOffset = _pluginConfiguration.RDMWhiteManaBarXOffset;
-                    if (ImGui.DragInt("White Mana Horizontal Offset", ref RDMWhiteManaBarXOffset, 1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.RDMWhiteManaBarXOffset = RDMWhiteManaBarXOffset;
-                        _pluginConfiguration.Save();
-                    }                    
-                    
-                    var RDMWhiteManaBarYOffset = _pluginConfiguration.RDMWhiteManaBarYOffset;
-                    if (ImGui.DragInt("White Mana Vertical Offset", ref RDMWhiteManaBarYOffset, 1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.RDMWhiteManaBarYOffset = RDMWhiteManaBarYOffset;
-                        _pluginConfiguration.Save();
-                    }
-                    
+
+                    changed |= ImGui.Checkbox("Invert Black Mana Bar", ref _pluginConfiguration.RDMBlackManaBarInversed);
+                    changed |= ImGui.Checkbox("Show Black Mana Value", ref _pluginConfiguration.RDMShowBlackManaValue);
+
                     var RDMBalanceBarHeight = _pluginConfiguration.RDMBalanceBarHeight;
                     if (ImGui.DragInt("Balance Height", ref RDMBalanceBarHeight, .1f, 1, 1000))
                     {
@@ -2000,18 +2006,19 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    changed |= ImGui.ColorEdit4("Mana Bar Color", ref _pluginConfiguration.RDMManaBarColor);                    
+                    changed |= ImGui.ColorEdit4("Mana Bar Color", ref _pluginConfiguration.RDMManaBarColor);
                     changed |= ImGui.ColorEdit4("Mana Bar Below Threshold Color", ref _pluginConfiguration.RDMManaBarBelowThresholdColor);
                     changed |= ImGui.ColorEdit4("White Mana Bar Color", ref _pluginConfiguration.RDMWhiteManaBarColor);
-                    changed |= ImGui.ColorEdit4("Black Mana Bar Color",ref _pluginConfiguration.RDMBlackManaBarColor);
+                    changed |= ImGui.ColorEdit4("Black Mana Bar Color", ref _pluginConfiguration.RDMBlackManaBarColor);
                     changed |= ImGui.ColorEdit4("Balance Color", ref _pluginConfiguration.RDMBalanceBarColor);
                     changed |= ImGui.ColorEdit4("Acceleration Color", ref _pluginConfiguration.RDMAccelerationBarColor);
                     changed |= ImGui.ColorEdit4("Dualcast Color", ref _pluginConfiguration.RDMDualcastBarColor);
                     changed |= ImGui.ColorEdit4("Verstone Ready Proc Color", ref _pluginConfiguration.RDMVerstoneBarColor);
                     changed |= ImGui.ColorEdit4("Verfire Ready Proc Color", ref _pluginConfiguration.RDMVerfireBarColor);
-                    
+
                     ImGui.EndTabItem();
                 }
+
                 if (ImGui.BeginTabItem("Black Mage"))
                 {
                     var BLMVerticalOffset = _pluginConfiguration.BLMVerticalOffset;
