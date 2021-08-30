@@ -126,7 +126,7 @@ namespace DelvUI.Interface
 
         private void Demolish()
         {
-            var target = PluginInterface.ClientState.LocalPlayer ?? PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            var target =PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget ?? PluginInterface.ClientState.LocalPlayer;
 
             if (!(target is Chara))
             {
