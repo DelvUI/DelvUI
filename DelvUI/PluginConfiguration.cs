@@ -95,9 +95,15 @@ namespace DelvUI {
         public bool ShowTargetActionIcon = true;
         public bool ShowTargetActionName = true;
         public bool ShowTargetCastTime = true;
+        public bool ShowTargetInterrupt = true;
+        public bool ColorCastBarByDamageType = false;
 
         public Vector4 CastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,100f/100f);
         public Vector4 TargetCastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,100f/100f);
+        public Vector4 TargetCastBarPhysicalColor = new Vector4(255f/255f,0/255f,0f/255f,100f/100f);
+        public Vector4 TargetCastBarMagicalColor = new Vector4(0f/255f,0/255f,255f/255f,100f/100f);
+        public Vector4 TargetCastBarDarknessColor = new Vector4(255f/255f,0/255f,255f/255f,100f/100f);
+        public Vector4 TargetCastBarInterruptColor = new Vector4(255f/255f,0/255f,255f/255f,100f/100f);
         public Vector4 SlideCastColor = new Vector4(255f/255f,0f/255f,0f/255f,100f/100f);
         public Vector4 ShieldColor = new Vector4(255f/255f,255f/255f,0f/255f,100f/100f);
         public Vector4 MPTickerColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f);
@@ -134,7 +140,7 @@ namespace DelvUI {
         public int WARStormsEyeHeight { get; set; } = 20;
         public int WARStormsEyeWidth { get; set; } = 254;
         public int WARBaseXOffset { get; set; } = 127;
-        public int WARBaseYOffset { get; set; } = 395;
+        public int WARBaseYOffset { get; set; } = 416;
         public int WARBeastGaugeHeight { get; set; } = 20;
         public int WARBeastGaugeWidth { get; set; } = 254;
         public int WARBeastGaugePadding { get; set; } = 2;
@@ -1339,6 +1345,34 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarColor.AdjustColor(.1f))
+                },
+                ["targetphysicalcastbar"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarPhysicalColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarPhysicalColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarPhysicalColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarPhysicalColor.AdjustColor(.1f))
+                },
+                ["targetmagicalcastbar"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarMagicalColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarMagicalColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarMagicalColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarMagicalColor.AdjustColor(.1f))
+                },
+                ["targetdarknesscastbar"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarDarknessColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarDarknessColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarDarknessColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarDarknessColor.AdjustColor(.1f))
+                },
+                ["targetinterruptcastbar"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarInterruptColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarInterruptColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarInterruptColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarInterruptColor.AdjustColor(.1f))
                 },
                 ["slidecast"] = new Dictionary<string, uint>
                 {

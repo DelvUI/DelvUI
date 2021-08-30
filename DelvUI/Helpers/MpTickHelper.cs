@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Linq;
-using Dalamud.Game.ClientState.Actors;
-using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Game.Internal;
 using Dalamud.Plugin;
 using ImGuiNET;
