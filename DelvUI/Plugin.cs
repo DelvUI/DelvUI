@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using ImGuiNET;
@@ -67,19 +68,30 @@ namespace DelvUI {
         }
 
         private void Draw() {
+            
+            var hudState = _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene]
+                             || _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene78]
+                             || _pluginInterface.ClientState.Condition[ConditionFlag.OccupiedInCutSceneEvent]
+                             || _pluginInterface.ClientState.Condition[ConditionFlag.CreatingCharacter]
+                             || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas]
+                             || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas51];
+
             _pluginInterface.UiBuilder.OverrideGameCursor = false;
             
             _configurationWindow.Draw();
+
+            if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
+                SwapJobs();
+            }
 
             if (_fontBuilt) {
                 ImGui.PushFont(_pluginConfiguration.BigNoodleTooFont);
             }
             
-            if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
-                SwapJobs();
-            }
 
-            _hudWindow?.Draw();
+            if (!hudState) { 
+                _hudWindow?.Draw();
+            }
 
             if (_fontBuilt) {
                 ImGui.PopFont();

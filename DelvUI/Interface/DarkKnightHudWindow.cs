@@ -255,10 +255,10 @@ namespace DelvUI.Interface {
                     DeliriumColor["gradientLeft"], DeliriumColor["gradientRight"], DeliriumColor["gradientRight"], DeliriumColor["gradientLeft"]
                 );
 
-                var bloodWeaponDurationText = bloodWeaponDuration == 0 ? "" : Math.Ceiling(bloodWeaponDuration).ToString();
+                var bloodWeaponDurationText = bloodWeaponDuration == 0 ? "" : Math.Ceiling(bloodWeaponDuration).ToString(CultureInfo.InvariantCulture);
                 DrawOutlinedText(bloodWeaponDurationText, new Vector2(cursorPos.X + 5f, cursorPos.Y - 2f), PluginConfiguration.DRKBloodWeaponColor, new Vector4(0f, 0f, 0f, 1f));
 
-                var deliriumDurationText = deliriumDuration == 0 ? "" : Math.Ceiling(deliriumDuration).ToString();
+                var deliriumDurationText = deliriumDuration == 0 ? "" : Math.Ceiling(deliriumDuration).ToString(CultureInfo.InvariantCulture);
                 DrawOutlinedText(deliriumDurationText, new Vector2(cursorPos.X + 27f, cursorPos.Y - 2f), PluginConfiguration.DRKDeliriumColor, new Vector4(0f, 0f, 0f, 1f));
 
                 barSize = new Vector2(buffBarBarWidth, buffBarBarHeight);
@@ -282,7 +282,7 @@ namespace DelvUI.Interface {
                     DeliriumColor["gradientLeft"], DeliriumColor["gradientRight"], DeliriumColor["gradientRight"], DeliriumColor["gradientLeft"]
                 );
 
-                var deliriumDurationText = deliriumDuration == 0 ? "" : Math.Ceiling(deliriumDuration).ToString();
+                var deliriumDurationText = deliriumDuration == 0 ? "" : Math.Ceiling(deliriumDuration).ToString(CultureInfo.InvariantCulture);
                 DrawOutlinedText(deliriumDurationText, new Vector2(cursorPos.X + 5f, cursorPos.Y - 2f), PluginConfiguration.DRKDeliriumColor, new Vector4(0f, 0f, 0f, 1f));
             }
 
