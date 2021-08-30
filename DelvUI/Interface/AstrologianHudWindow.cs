@@ -194,7 +194,7 @@ namespace DelvUI.Interface
             }
         }
 
-        private void DrawDotV2()
+        private void DrawDot()
         {
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             var drawList = ImGui.GetWindowDrawList();
