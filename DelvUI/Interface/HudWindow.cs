@@ -11,6 +11,7 @@ using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
 using Dalamud.Interface;
 using Dalamud.Plugin;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
@@ -366,7 +367,7 @@ namespace DelvUI.Interface {
             var currentCastTime = castInfo.CurrentCastTime;
             var totalCastTime = castInfo.TotalCastTime;
 
-            _lastPlayerUsedCast = new LastUsedCast(currentCastId, currentCastType, PluginInterface);
+            _lastPlayerUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, PluginInterface);
             var iconTexFile = _lastPlayerUsedCast.Icon;
             var castText = _lastPlayerUsedCast.ActionText;
 
@@ -450,7 +451,7 @@ namespace DelvUI.Interface {
             var currentCastTime = castInfo.CurrentCastTime;
             var totalCastTime = castInfo.TotalCastTime;
 
-            _lastTargetUsedCast = new LastUsedCast(currentCastId, currentCastType, PluginInterface);
+            _lastTargetUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, PluginInterface);
             var iconTexFile = _lastTargetUsedCast.Icon;
             var castText = _lastTargetUsedCast.ActionText;
 
@@ -470,6 +471,36 @@ namespace DelvUI.Interface {
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
 
             var castColor = PluginConfiguration.CastBarColorMap["targetcastbar"];
+
+            if (PluginConfiguration.ColorCastBarByDamageType)
+            {
+                switch (_lastTargetUsedCast.DamageType)
+                {
+                    case DamageType.Physical:
+                    case DamageType.Blunt:
+                    case DamageType.Slashing:
+                    case DamageType.Piercing:
+                        castColor = PluginConfiguration.CastBarColorMap["targetphysicalcastbar"];
+                        break;
+                    case DamageType.Magic:
+                        castColor = PluginConfiguration.CastBarColorMap["targetmagicalcastbar"];
+                        break;
+                    case DamageType.Darkness:
+                        castColor = PluginConfiguration.CastBarColorMap["targetdarknesscastbar"];
+                        break;
+                    case DamageType.Unknown:
+                    case DamageType.LimitBreak:
+                        castColor = PluginConfiguration.CastBarColorMap["targetcastbar"];
+                        break;
+                    default:
+                        castColor = PluginConfiguration.CastBarColorMap["targetcastbar"];
+                        break;
+                }
+            }
+
+            if (PluginConfiguration.ShowTargetInterrupt && _lastTargetUsedCast.Interruptable) castColor = PluginConfiguration.CastBarColorMap["targetinterruptcastbar"];
+
+            
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(barSize.X * castScale, barSize.Y),
                 castColor["gradientLeft"], castColor["gradientRight"], castColor["gradientRight"], castColor["gradientLeft"]
