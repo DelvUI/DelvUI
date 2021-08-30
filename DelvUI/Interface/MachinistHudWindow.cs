@@ -108,7 +108,6 @@ namespace DelvUI.Interface
         private int DrawBatteryGauge(int initialHeight)
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
-            var robotTimeLeft = gauge.RobotTimeRemaining;
             
             var xPos = CenterX - XOffset + BatteryGaugeXOffset;
             var yPos = CenterY + YOffset + initialHeight + BatteryGaugeYOffset;

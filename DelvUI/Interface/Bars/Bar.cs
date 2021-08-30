@@ -154,20 +154,17 @@ namespace DelvUI.Interface.Bars
         {
             var barWidth = Parent.Vertical ? (float) 1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
             var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float) 1 / Parent.InnerBars.Count * Parent.BarHeight;
-            var xPos = Parent.Vertical ? Parent.XPosition + (float) ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition;
-            var yPos = Parent.Vertical ? Parent.YPosition : Parent.YPosition + (float) ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
-            var cursorPos = new Vector2(xPos, yPos);
-
             var currentFill = CurrentValue / MaximumValue;
-            if (FlipDrainDirection)
-                currentFill = 1 - currentFill;
             var i = 0;
-            foreach (var chunkSize in Parent.ChunkSizes)
-            {
-                var barSize = Parent.Vertical ? new Vector2(barWidth, barHeight * chunkSize - Parent.ChunkPadding) : new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
-
-                if (!FlipDrainDirection)
+            if (!FlipDrainDirection)
+            {            
+                var xPos = Parent.Vertical ? Parent.XPosition + (float) ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition;
+                var yPos = Parent.Vertical ? Parent.YPosition : Parent.YPosition + (float) ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
+                var cursorPos = new Vector2(xPos, yPos);
+                foreach (var chunkSize in Parent.ChunkSizes)
                 {
+                    var barSize = Parent.Vertical ? new Vector2(barWidth, barHeight * chunkSize - Parent.ChunkPadding) : new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
+                    
                     var fillPercentage = (float) Math.Round(Math.Min(currentFill / chunkSize, 1f), 5); // Rounding due to floating point precision shenanigans
                     if (fillPercentage >= 1f)
                     {
@@ -196,63 +193,76 @@ namespace DelvUI.Interface.Bars
                             );
                         }
                     }
-                }
-                else
-                {
-                    // TODO: Make this work well with non-standard chunk sizes, maybe need to redo the entire loop
-                    var percentageEmpty = (float) Math.Round(currentFill * Parent.ChunkSizes.Length, 5); // Rounding due to floating point precision shenanigans
-                    if (percentageEmpty <= 0f)
+
+                    if (_glowColorSet)
                     {
+                        var glowPosition = new Vector2(cursorPos.X - 1, cursorPos.Y - 1);
+                        var glowSize = new Vector2(barSize.X + 2, barSize.Y + 2);
+                        
+                        drawList.AddRect(glowPosition, glowPosition + glowSize, GlowColor);
+                    }
+
+                    i++;
+                    cursorPos += Parent.Vertical ?  new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
+                }
+            }
+            else
+            {
+                var xPos = Parent.Vertical ? Parent.XPosition - (float) ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition + barWidth;
+                var yPos = Parent.Vertical ? Parent.YPosition + barHeight : Parent.YPosition - (float) ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
+                var cursorPos = new Vector2(xPos, yPos);
+                foreach (var chunkSize in Parent.ChunkSizes.AsEnumerable().Reverse().ToList())
+                {
+                    cursorPos -= Parent.Vertical ?  new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
+                    var barSize = Parent.Vertical ? new Vector2(barWidth, barHeight * chunkSize - Parent.ChunkPadding) : new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
+
+                    var fillPercentage = (float) Math.Round(Math.Min(currentFill / chunkSize, 1f), 5); // Rounding due to floating point precision shenanigans
+                    if (fillPercentage >= 1f)
+                    {
+                        currentFill -= chunkSize;
                         drawList.AddRectFilledMultiColor(
                             cursorPos, cursorPos + barSize,
                             ChunkColors[i]["gradientLeft"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientLeft"]
                         );
-                        currentFill = 0f;
                     }
-                    else if (percentageEmpty < 1f)
+                    else
                     {
-                        var fillVector = Parent.Vertical ? new Vector2(0, barSize.Y * percentageEmpty) : new Vector2(barSize.X * percentageEmpty, 0);
+                        currentFill = 0f;
+                        var fillVector = Parent.Vertical ? new Vector2(barSize.X, barSize.Y * fillPercentage) : new Vector2(barSize.X * fillPercentage, barSize.Y);
                         if (PartialFillColor != null)
                         {
                             drawList.AddRectFilledMultiColor(
-                                cursorPos + fillVector, cursorPos + barSize,
+                                cursorPos + barSize - fillVector, cursorPos + barSize,
                                 PartialFillColor["gradientLeft"], PartialFillColor["gradientRight"], PartialFillColor["gradientRight"], PartialFillColor["gradientLeft"]
                             );
                         }
                         else
                         {
                             drawList.AddRectFilledMultiColor(
-                                cursorPos + fillVector, cursorPos + barSize,
+                                cursorPos + barSize - fillVector, cursorPos + barSize,
                                 ChunkColors[i]["gradientLeft"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientLeft"]
                             );
                         }
-
-                        currentFill -= (float) 1 / Parent.ChunkSizes.Length;
                     }
-                    else
+
+                    if (_glowColorSet)
                     {
-                        currentFill -= (float) 1 / Parent.ChunkSizes.Length;
+                        var glowPosition = new Vector2(cursorPos.X - 1, cursorPos.Y - 1);
+                        var glowSize = new Vector2(barSize.X + 2, barSize.Y + 2);
+                        
+                        drawList.AddRect(glowPosition, glowPosition + glowSize, GlowColor);
                     }
-                }
 
-                if (_glowColorSet)
-                {
-                    var glowPosition = new Vector2(cursorPos.X - 1, cursorPos.Y - 1);
-                    var glowSize = new Vector2(barSize.X + 2, barSize.Y + 2);
-                    
-                    drawList.AddRect(glowPosition, glowPosition + glowSize, GlowColor);
+                    i++;
                 }
-
-                i++;
-                cursorPos += Parent.Vertical ?  new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
             }
         }
 
         public void DrawText(ImDrawListPtr drawList)
         {
-            var barWidth = Parent.BarWidth + Parent.ChunkPadding; // For loop adds one extra padding more than is needed
-            var barHeight = (float) 1 / Parent.InnerBars.Count * Parent.BarHeight;
-            var cursorPos = new Vector2(Parent.XPosition, Parent.YPosition);
+            var barWidth = Parent.Vertical ? (float) 1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
+            var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float) 1 / Parent.InnerBars.Count * Parent.BarHeight;
+            Vector2 cursorPos = new Vector2(Parent.XPosition, Parent.YPosition);
 
             if (TextMode == BarTextMode.Single)
             {
@@ -273,43 +283,95 @@ namespace DelvUI.Interface.Bars
 
             var currentFill = CurrentValue / MaximumValue;
             var i = 0;
-            foreach (var chunkSize in Parent.ChunkSizes)
+            if (!FlipDrainDirection)
             {
-                var barValue = Math.Min(currentFill, chunkSize) * MaximumValue;
-                var barMaximum = chunkSize * MaximumValue;
-                
-                var fillPercentage = Math.Min(currentFill / chunkSize, 1f);
-
-                var barSize = new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
-
-                if (fillPercentage >= 1f)
+                foreach (var chunkSize in Parent.ChunkSizes)
                 {
-                    currentFill -= chunkSize;
-                }
-                else
-                {
-                    currentFill = 0f;
-                }
+                    var barValue = Math.Min(currentFill, chunkSize) * MaximumValue;
+                    var barMaximum = chunkSize * MaximumValue;
 
-                if (TextMode == BarTextMode.EachChunk)
-                {
-                    var textObj = Texts[i];
-                    var text = textObj.Type switch
+                    var fillPercentage = Math.Min(currentFill / chunkSize, 1f);
+
+                    var barSize = Parent.Vertical ?  new Vector2(barWidth, barHeight * chunkSize - Parent.ChunkPadding) : new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
+
+                    if (fillPercentage >= 1f)
                     {
-                        BarTextType.Current => Math.Round(barValue).ToString(CultureInfo.InvariantCulture),
-                        BarTextType.Maximum => Math.Round(barMaximum).ToString(CultureInfo.InvariantCulture),
-                        BarTextType.Percentage => Math.Round(currentFill * 100f).ToString(CultureInfo.InvariantCulture),
-                        BarTextType.Custom => textObj.Text,
-                        _ => "ERROR LOADING TEXT, INVALID TYPE"
-                    };
+                        currentFill -= chunkSize;
+                    }
+                    else
+                    {
+                        currentFill = 0f;
+                    }
 
-                    var textPos = textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
-                    
-                    DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor);
+                    if (TextMode == BarTextMode.EachChunk)
+                    {
+                        var textObj = Texts[i];
+                        var text = textObj.Type switch
+                        {
+                            BarTextType.Current => Math.Round(barValue).ToString(CultureInfo.InvariantCulture),
+                            BarTextType.Maximum => Math.Round(barMaximum).ToString(CultureInfo.InvariantCulture),
+                            BarTextType.Percentage => Math.Round(currentFill * 100f).ToString(CultureInfo.InvariantCulture),
+                            BarTextType.Custom => textObj.Text,
+                            _ => "ERROR LOADING TEXT, INVALID TYPE"
+                        };
+
+                        var textPos = Parent.Vertical ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y) : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
+
+                        // PluginLog.Log(textPos.ToString());
+
+                        DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor);
+                    }
+
+                    i++;
+                    cursorPos += Parent.Vertical ? new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
                 }
+            }
+            else
+            {
+                var xPos = Parent.Vertical ? Parent.XPosition : Parent.XPosition + barWidth;
+                var yPos = Parent.Vertical ? Parent.YPosition + barHeight : Parent.YPosition;
+                cursorPos = new Vector2(xPos, yPos);
+                foreach (var chunkSize in Parent.ChunkSizes.AsEnumerable().Reverse().ToList())
+                {
+                    cursorPos -= Parent.Vertical ? new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
+                    
+                    var barValue = Math.Min(currentFill, chunkSize) * MaximumValue;
+                    var barMaximum = chunkSize * MaximumValue;
 
-                i++;
-                cursorPos += new Vector2(barWidth * chunkSize, 0);
+                    var fillPercentage = Math.Min(currentFill / chunkSize, 1f);
+
+                    var barSize = new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
+
+                    if (fillPercentage >= 1f)
+                    {
+                        currentFill -= chunkSize;
+                    }
+                    else
+                    {
+                        currentFill = 0f;
+                    }
+
+                    if (TextMode == BarTextMode.EachChunk)
+                    {
+                        var textObj = Texts[i];
+                        var text = textObj.Type switch
+                        {
+                            BarTextType.Current => Math.Round(barValue).ToString(CultureInfo.InvariantCulture),
+                            BarTextType.Maximum => Math.Round(barMaximum).ToString(CultureInfo.InvariantCulture),
+                            BarTextType.Percentage => Math.Round(currentFill * 100f).ToString(CultureInfo.InvariantCulture),
+                            BarTextType.Custom => textObj.Text,
+                            _ => "ERROR LOADING TEXT, INVALID TYPE"
+                        };
+
+                        var textPos = Parent.Vertical ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y) : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
+
+                        // PluginLog.Log(textPos.ToString());
+                        
+                        DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor);
+                    }
+
+                    i++;
+                }
             }
         }
     }
