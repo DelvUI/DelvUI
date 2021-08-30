@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Drawing.Design;
 using System.IO;
 using System.Reflection;
 using Dalamud.Game.ClientState;
@@ -81,13 +80,14 @@ namespace DelvUI {
             
             _configurationWindow.Draw();
 
+            if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
+                SwapJobs();
+            }
+
             if (_fontBuilt) {
                 ImGui.PushFont(_pluginConfiguration.BigNoodleTooFont);
             }
             
-            if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
-                SwapJobs();
-            }
 
             if (!hudState) { 
                 _hudWindow?.Draw();

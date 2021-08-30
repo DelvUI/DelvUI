@@ -1,5 +1,4 @@
-﻿using System;
-using Dalamud.Plugin;
+﻿using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using Lumina.Data.Files;
 using Lumina.Excel.GeneratedSheets;

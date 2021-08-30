@@ -9,26 +9,19 @@ using Dalamud.Data.LuminaExtensions;
 using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
-using Dalamud.Game.ClientState.Structs;
 using Dalamud.Interface;
 using Dalamud.Plugin;
-using DelvUI.GameStructs;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
-using DelvUI.Helpers;
-using FFXIVClientStructs.FFXIV.Client.Game;
-using Action = System.Action;
 
 namespace DelvUI.Interface {
     public abstract class HudWindow {
         public bool IsVisible = true;
         protected readonly DalamudPluginInterface PluginInterface;
         protected readonly PluginConfiguration PluginConfiguration;
-        private Vector2 _barSize;
 
         public abstract uint JobId { get; }
 
@@ -91,7 +84,7 @@ namespace DelvUI.Interface {
         protected int TargetCastBarXOffset => PluginConfiguration.TargetCastBarXOffset;
         protected int TargetCastBarYOffset => PluginConfiguration.TargetCastBarYOffset;
 
-        protected Vector2 BarSize => _barSize;
+        protected Vector2 BarSize { get; private set; }
 
         private LastUsedCast _lastPlayerUsedCast;
         private LastUsedCast _lastTargetUsedCast;
@@ -120,7 +113,7 @@ namespace DelvUI.Interface {
 
         protected virtual void DrawHealthBar() {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            _barSize = new Vector2(HealthBarWidth, HealthBarHeight);
+            BarSize = new Vector2(HealthBarWidth, HealthBarHeight);
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentHp / actor.MaxHp;
 
@@ -144,10 +137,10 @@ namespace DelvUI.Interface {
             windowFlags |= ImGuiWindowFlags.NoDecoration;
 
             ImGui.SetNextWindowPos(cursorPos);
-            ImGui.SetNextWindowSize(_barSize);
+            ImGui.SetNextWindowSize(BarSize);
 
             ImGui.Begin("health_bar", windowFlags);
-            if (ImGui.BeginChild("health_bar", _barSize)) {
+            if (ImGui.BeginChild("health_bar", BarSize)) {
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight),
@@ -164,7 +157,7 @@ namespace DelvUI.Interface {
             ImGui.EndChild();
             ImGui.End();
 
-            DrawTargetShield(actor, cursorPos, _barSize, true);
+            DrawTargetShield(actor, cursorPos, BarSize, true);
 
             DrawOutlinedText(
                 $"{Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}",
@@ -183,7 +176,7 @@ namespace DelvUI.Interface {
 
         protected virtual void DrawPrimaryResourceBar() {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            _barSize = new Vector2(PrimaryResourceBarWidth, PrimaryResourceBarHeight);
+            BarSize = new Vector2(PrimaryResourceBarWidth, PrimaryResourceBarHeight);
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float) actor.CurrentMp / actor.MaxMp;
             var cursorPos = new Vector2(CenterX - PrimaryResourceBarXOffset + 33, CenterY + PrimaryResourceBarYOffset - 16);
@@ -204,7 +197,7 @@ namespace DelvUI.Interface {
                 return;
             }
 
-            _barSize = new Vector2(TargetBarWidth, TargetBarHeight);
+            BarSize = new Vector2(TargetBarWidth, TargetBarHeight);
 
             var cursorPos = new Vector2(CenterX + TargetBarXOffset, CenterY + TargetBarYOffset);
             ImGui.SetCursorPos(cursorPos);

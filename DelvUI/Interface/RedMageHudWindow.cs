@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
@@ -135,7 +134,7 @@ namespace DelvUI.Interface {
             var scale = gauge.WhiteGauge - gauge.BlackGauge;
             var barSize = new Vector2(BalanceBarWidth, BalanceBarHeight);
             var cursorPos = new Vector2(
-                OriginX - BalanceBarWidth / 2 + BalanceBarXOffset, 
+                OriginX - BalanceBarWidth / 2f + BalanceBarXOffset, 
                 OriginY - ManaBarHeight - VerticalSpaceBetweenBars - BalanceBarHeight + BalanceBarYOffset
             );
 
