@@ -90,6 +90,7 @@ namespace DelvUI {
         public bool ShowActionName = true;
         public bool ShowCastTime = true;
         public bool SlideCast = false;
+        public bool ColorCastBarByJob = false;
         public float SlideCastTime = 500;
         
         public int TargetCastBarHeight { get; set; } = 25;

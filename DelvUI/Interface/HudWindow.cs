@@ -403,6 +403,11 @@ namespace DelvUI.Interface {
             }
 
             var castColor = PluginConfiguration.CastBarColorMap["castbar"];
+            if (PluginConfiguration.ColorCastBarByJob)
+            {
+                PluginConfiguration.JobColorMap.TryGetValue(PluginInterface.ClientState.LocalPlayer.ClassJob.Id, out castColor);
+                castColor ??= PluginConfiguration.CastBarColorMap["castbar"];
+            }
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(barSize.X * castScale, barSize.Y),
                 castColor["gradientLeft"], castColor["gradientRight"], castColor["gradientRight"], castColor["gradientLeft"]

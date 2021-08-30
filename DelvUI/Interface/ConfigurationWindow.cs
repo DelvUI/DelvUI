@@ -440,6 +440,7 @@ namespace DelvUI.Interface
                     changed |= ImGui.Checkbox("Show Action Icon", ref _pluginConfiguration.ShowActionIcon);
                     changed |= ImGui.Checkbox("Show Action Name", ref _pluginConfiguration.ShowActionName);
                     changed |= ImGui.Checkbox("Show Cast Time", ref _pluginConfiguration.ShowCastTime);
+                    changed |= ImGui.Checkbox("Color CastBar by Job", ref _pluginConfiguration.ColorCastBarByJob);
                     changed |= ImGui.Checkbox("Slide Cast Enabled", ref _pluginConfiguration.SlideCast);
 
                     var slideCastTime = _pluginConfiguration.SlideCastTime;
