@@ -220,6 +220,27 @@ namespace DelvUI {
 
         #endregion
 
+        #region AST Configuration
+
+        public int AstDrawBarHeight { get; set; } = 20;
+        public int AstDrawBarWidth { get; set; } = 254;
+        public int AstDrawBarX { get; set; } = 127;
+        public int AstDrawBarY { get; set; } = 460;
+        public int AstDivinationHeight { get; set; } = 20;
+        public int AstDivinationWidth { get; set; } = 253;
+        public int AstDivinationBarX { get; set; } = -42;
+        public int AstDivinationBarY { get; set; } = 460;
+        public int AstDivinationBarPad { get; set; } = 1;
+        public bool AstShowDivinationBar = true;
+        public bool AstShowDrawBar = true;
+        public bool AstShowPrimaryResourceBar = true;
+        public Vector4 AstEmptyColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 53f / 100f);
+        public Vector4 AstSealSunColor = new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f);
+        public Vector4 AstSealLunarColor = new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f);
+        public Vector4 AstSealCelestialColor = new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f);
+        
+        #endregion
+
         #region SMN Configuration
 
         public int SmnRuinBarX { get; set; } = 127;
@@ -908,6 +929,38 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorAST.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorAST.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorAST.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000] = new Dictionary<string, uint> // Empty Bar Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(AstEmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(AstEmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(AstEmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(AstEmptyColor.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000 + 1] = new Dictionary<string, uint> // Seal Color [Sun]
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(AstSealSunColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(AstSealSunColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(AstSealSunColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(AstSealSunColor.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000 + 2] = new Dictionary<string, uint> // Seal Color [Lunar]
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(AstSealLunarColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(AstSealLunarColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(AstSealLunarColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(AstSealLunarColor.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000 + 3] = new Dictionary<string, uint> // Seal Color [Celestial]
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(AstSealCelestialColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(AstSealCelestialColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(AstSealCelestialColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(AstSealCelestialColor.AdjustColor(.1f))
                 },
 
                 [Jobs.MNK] = new Dictionary<string, uint>
