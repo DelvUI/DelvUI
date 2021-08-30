@@ -1808,13 +1808,6 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    var RDMVerticalSpaceBetweenBars = _pluginConfiguration.RDMVerticalSpaceBetweenBars;
-                    if (ImGui.DragInt("Vertical Padding", ref RDMVerticalSpaceBetweenBars, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.RDMVerticalSpaceBetweenBars = RDMVerticalSpaceBetweenBars;
-                        _pluginConfiguration.Save();
-                    }
-
                     var RDMHorizontalSpaceBetweenBars = _pluginConfiguration.RDMHorizontalSpaceBetweenBars;
                     if (ImGui.DragInt("Horizontal Padding", ref RDMHorizontalSpaceBetweenBars, .1f, 1, 1000))
                     {
