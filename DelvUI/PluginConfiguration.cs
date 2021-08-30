@@ -42,6 +42,7 @@ namespace DelvUI {
 
         public int TankStanceIndicatorWidth { get; set; } = 2;
         public bool TankStanceIndicatorEnabled = true;
+        public bool CustomHealthBarColorEnabled = false;
 
         public string HealthBarTextLeft = "[name:abbreviate]";
         public string HealthBarTextRight = "[health:max-short] | [health:percent]";
@@ -106,6 +107,7 @@ namespace DelvUI {
         public bool ShowTargetInterrupt = true;
         public bool ColorCastBarByDamageType = false;
 
+        public Vector4 CustomHealthBarColor = new Vector4(0f/255f, 145f/255f, 6f/255f, 100f/100f);
         public Vector4 CastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,100f/100f);
         public Vector4 TargetCastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,100f/100f);
         public Vector4 TargetCastBarPhysicalColor = new Vector4(255f/255f,0/255f,0f/255f,100f/100f);
@@ -1422,6 +1424,13 @@ namespace DelvUI {
 
             MiscColorMap = new Dictionary<string, Dictionary<string, uint>>
             {
+                ["customhealth"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(CustomHealthBarColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(CustomHealthBarColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(CustomHealthBarColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(CustomHealthBarColor.AdjustColor(.1f))
+                },
                 ["shield"] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(ShieldColor),

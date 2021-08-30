@@ -110,6 +110,9 @@ namespace DelvUI.Interface
                         _pluginConfiguration.HealthBarTextRightYOffset = healthBarTextRightYOffset;
                         _pluginConfiguration.Save();
                     }
+                    
+                    changed |= ImGui.Checkbox("Custom Healthbar Color Enabled", ref _pluginConfiguration.CustomHealthBarColorEnabled);
+                    changed |= ImGui.ColorEdit4("Custom Healthbar Color", ref _pluginConfiguration.CustomHealthBarColor);
 
                     var primaryResourceHeight = _pluginConfiguration.PrimaryResourceBarHeight;
                     if (ImGui.DragInt("Primary Resource Height", ref primaryResourceHeight, .1f, 1, 1000))
