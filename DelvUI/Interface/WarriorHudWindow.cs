@@ -11,6 +11,8 @@ namespace DelvUI.Interface
 {
     public class WarriorHudWindow : HudWindow
     {
+        public WarriorHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
+
         public override uint JobId => 21;
 
         private int StormsEyeHeight => PluginConfiguration.WARStormsEyeHeight;
@@ -33,8 +35,6 @@ namespace DelvUI.Interface
         private Dictionary<string, uint> NascentChaosColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 3];
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 4];
 
-        public WarriorHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
-
         protected override void Draw(bool _) {
             var nextHeight = DrawStormsEyeBar(0);
             DrawBeastGauge(nextHeight);
@@ -56,6 +56,7 @@ namespace DelvUI.Interface
             var duration = 0f;
             var maximum = 10f;
             var color = EmptyColor;
+
             if (innerReleaseBuff.Any()) {
                 duration = Math.Abs(innerReleaseBuff.First().Duration);
                 color = InnerReleaseColor;
@@ -70,7 +71,7 @@ namespace DelvUI.Interface
                 .SetTextMode(BarTextMode.EachChunk)
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                 .Build();
-            
+
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);
 
@@ -80,7 +81,7 @@ namespace DelvUI.Interface
         private int DrawBeastGauge(int initialHeight) {
             var gauge = PluginInterface.ClientState.JobGauges.Get<WARGauge>();
             var nascentChaosBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1897);
-            
+
             var xPos = CenterX - XOffset + BeastGaugeXOffset;
             var yPos = CenterY + YOffset + initialHeight + BeastGaugeYOffset;
 
@@ -88,8 +89,10 @@ namespace DelvUI.Interface
                 .SetChunks(2)
                 .AddInnerBar(gauge.BeastGaugeAmount, 100, FellCleaveColor, EmptyColor)
                 .SetChunkPadding(BeastGaugePadding);
+
             if (nascentChaosBuff.Any())
                 builder.SetChunksColors(NascentChaosColor);
+
             var bar = builder.Build();
 
             var drawList = ImGui.GetWindowDrawList();

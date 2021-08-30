@@ -6,15 +6,15 @@ using System.Numerics;
 using System.Text;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 
-namespace DelvUI {
-    public static class Extensions {
+namespace DelvUI
+{
+    public static class Extensions
+    {
         public static string Abbreviate(this string str) {
             var splits = str.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
-            
-            for (var i = 0; i < splits.Length - 1; i++) {
-                splits[i] = splits[i][0].ToString();
-            }
-    
+
+            for (var i = 0; i < splits.Length - 1; i++) splits[i] = splits[i][0].ToString();
+
             return string.Join(". ", splits).ToUpper();
         }
 
@@ -37,26 +37,26 @@ namespace DelvUI {
 
             return new Vector4(red, green, blue, vec.W);
         }
-        
-        public static bool IsPropertyExist(dynamic settings, string name)
-        {
+
+        public static bool IsPropertyExist(dynamic settings, string name) {
             if (settings is ExpandoObject)
                 return ((IDictionary<string, object>)settings).ContainsKey(name);
 
             return settings.GetType().GetProperty(name) != null;
         }
-        
+
         public static unsafe string GetString(this Utf8String utf8String) {
-            var s = utf8String.BufUsed > int.MaxValue ? int.MaxValue : (int) utf8String.BufUsed;
+            var s = utf8String.BufUsed > int.MaxValue ? int.MaxValue : (int)utf8String.BufUsed;
+
             try {
                 return s <= 1 ? string.Empty : Encoding.UTF8.GetString(utf8String.StringPtr, s - 1);
-            } catch (Exception ex) {
+            }
+            catch (Exception ex) {
                 return $"<<{ex.Message}>>";
             }
         }
-        
-        public static string KiloFormat(this int num)
-        {
+
+        public static string KiloFormat(this int num) {
             if (num >= 100000000)
                 return (num / 1000000).ToString("#,0M", CultureInfo.InvariantCulture);
 
@@ -71,11 +71,11 @@ namespace DelvUI {
 
             return num.ToString("#,0", CultureInfo.InvariantCulture);
         }
-        
-        public static string Truncate(this string value, int maxLength)
-        {
+
+        public static string Truncate(this string value, int maxLength) {
             if (string.IsNullOrEmpty(value)) return value;
-            return value.Length <= maxLength ? value : value.Substring(0, maxLength); 
+
+            return value.Length <= maxLength ? value : value.Substring(0, maxLength);
         }
     }
 }

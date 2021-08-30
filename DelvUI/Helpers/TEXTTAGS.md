@@ -10,7 +10,7 @@ There are several tag for formatting the text shown at the healthbar and target 
     [name:short] | 10 characters long
     [name:medium] | 15 characters long
     [name:long] | 20 characters long
-    
+
 ### Health Tags
 
     [health:current] | current hp
@@ -29,7 +29,7 @@ There are several tag for formatting the text shown at the healthbar and target 
     [health:deficit-short] | shows deficite in kilo format
 
 ### Mana Tags
-    
+
     [mana:current] | current mana
     [mana:current-short] | current mana in kilo format
     [mana:current-percent] | current % mana
@@ -45,6 +45,6 @@ There are several tag for formatting the text shown at the healthbar and target 
     [mana:deficit-short] | shows deficite in kilo format
 
 ### MISC Tags
-    
+
     [level] | shows current level
     [company] displays company name

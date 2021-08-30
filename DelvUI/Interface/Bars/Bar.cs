@@ -10,29 +10,10 @@ namespace DelvUI.Interface.Bars
 {
     public class Bar
     {
-        public List<InnerBar> InnerBars { get; set; }
-        public float XPosition { get; set; }
-        public float YPosition { get; set; }
-        public int BarHeight { get; set; }
-        public int BarWidth { get; set; }
-        public bool Vertical { get; set; }
-        public int ChunkPadding { get; set; }
-        public float[] ChunkSizes { get; set; }
-        public List<BarText> PrimaryTexts { get; set; }
         private uint _backgroundColor;
-        public uint BackgroundColor
-        {
-            get => _backgroundColor;
-            set
-            {
-                _backgroundColorSet = true;
-                _backgroundColor = value;
-            }
-        }
         private bool _backgroundColorSet;
 
-        public Bar(float xPosition, float yPosition, int height, int width)
-        {
+        public Bar(float xPosition, float yPosition, int height, int width) {
             XPosition = xPosition;
             YPosition = yPosition;
             BarHeight = height;
@@ -43,36 +24,53 @@ namespace DelvUI.Interface.Bars
             ChunkSizes = new[] {1f};
         }
 
-        public int AddInnerBar(InnerBar innerBar)
+        public List<InnerBar> InnerBars { get; set; }
+        public float XPosition { get; set; }
+        public float YPosition { get; set; }
+        public int BarHeight { get; set; }
+        public int BarWidth { get; set; }
+        public bool Vertical { get; set; }
+        public int ChunkPadding { get; set; }
+        public float[] ChunkSizes { get; set; }
+        public List<BarText> PrimaryTexts { get; set; }
+
+        public uint BackgroundColor
         {
+            get => _backgroundColor;
+            set
+            {
+                _backgroundColorSet = true;
+                _backgroundColor = value;
+            }
+        }
+
+        public int AddInnerBar(InnerBar innerBar) {
             innerBar.Parent = this;
             innerBar.ChildNum = InnerBars.Count;
             InnerBars.Add(innerBar);
+
             return innerBar.ChildNum;
         }
 
-        public int AddInnerBooleanBar(BooleanInnerBar innerBar)
-        {
+        public int AddInnerBooleanBar(BooleanInnerBar innerBar) {
             innerBar.Parent = this;
             innerBar.ChildNum = InnerBars.Count;
             InnerBars.Add(innerBar);
+
             return innerBar.ChildNum;
         }
 
-        public Vector2 GetBarSize()
-        {
+        public Vector2 GetBarSize() {
             return new Vector2(BarWidth, BarHeight);
         }
 
-        public void Draw(ImDrawListPtr drawList)
-        {
-            var barWidth = BarWidth + ChunkPadding; // For loop adds one extra padding more than is needed
+        public void Draw(ImDrawListPtr drawList) {
+            var barWidth = BarWidth + ChunkPadding;   // For loop adds one extra padding more than is needed
             var barHeight = BarHeight + ChunkPadding; // For loop adds one extra padding more than is needed
             var cursorPos = new Vector2(XPosition, YPosition);
             var backgroundColor = _backgroundColorSet ? BackgroundColor : 0x88000000;
 
-            foreach (var chunkSize in ChunkSizes)
-            {
+            foreach (var chunkSize in ChunkSizes) {
                 var barSize = Vertical ? new Vector2(BarWidth, barHeight * chunkSize - ChunkPadding) : new Vector2(barWidth * chunkSize - ChunkPadding, BarHeight);
 
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, backgroundColor);
@@ -80,34 +78,25 @@ namespace DelvUI.Interface.Bars
                 cursorPos += Vertical ? new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
             }
 
-            foreach (var innerBar in InnerBars)
-            {
-                innerBar.Draw(drawList);
-            }
+            foreach (var innerBar in InnerBars) innerBar.Draw(drawList);
 
-            foreach (var innerBar in InnerBars)
-            {
-                innerBar.DrawText(drawList);
-            }
+            foreach (var innerBar in InnerBars) innerBar.DrawText(drawList);
 
             cursorPos = new Vector2(XPosition, YPosition);
 
-            foreach (var chunkSize in ChunkSizes)
-            {
+            foreach (var chunkSize in ChunkSizes) {
                 var barSize = Vertical ? new Vector2(BarWidth, barHeight * chunkSize - ChunkPadding) : new Vector2(barWidth * chunkSize - ChunkPadding, BarHeight);
 
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
                 cursorPos += Vertical ? new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
             }
-            
+
             DrawText(drawList);
         }
 
-        public void DrawText(ImDrawListPtr drawList)
-        {
-            foreach (var text in PrimaryTexts)
-            {
+        public void DrawText(ImDrawListPtr drawList) {
+            foreach (var text in PrimaryTexts) {
                 var cursorPos = new Vector2(XPosition, YPosition);
 
                 var strText = text.Type switch
@@ -128,13 +117,15 @@ namespace DelvUI.Interface.Bars
 
     public class InnerBar
     {
+        private uint _glowColor;
+        private bool _glowColorSet;
         public Bar Parent { get; set; }
         public int ChildNum { get; set; }
         public float MaximumValue { get; set; }
         public float CurrentValue { get; set; }
         public Dictionary<string, uint>[] ChunkColors { get; set; }
         public Dictionary<string, uint> PartialFillColor { get; set; }
-        private uint _glowColor;
+
         public uint GlowColor
         {
             get => _glowColor;
@@ -142,113 +133,99 @@ namespace DelvUI.Interface.Bars
             {
                 _glowColorSet = true;
                 _glowColor = value;
-            } 
+            }
         }
-        private bool _glowColorSet;
+
         public bool FlipDrainDirection { get; set; }
         public BarTextMode TextMode { get; set; }
         public BarText[] Texts { get; set; }
 
-        public virtual void Draw(ImDrawListPtr drawList)
-        {
-            var barWidth = Parent.Vertical ? (float) 1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
-            var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float) 1 / Parent.InnerBars.Count * Parent.BarHeight;
+        public virtual void Draw(ImDrawListPtr drawList) {
+            var barWidth = Parent.Vertical ? (float)1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
+            var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float)1 / Parent.InnerBars.Count * Parent.BarHeight;
             var currentFill = CurrentValue / MaximumValue;
             var i = 0;
-            if (!FlipDrainDirection)
-            {            
-                var xPos = Parent.Vertical ? Parent.XPosition + (float) ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition;
-                var yPos = Parent.Vertical ? Parent.YPosition : Parent.YPosition + (float) ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
+
+            if (!FlipDrainDirection) {
+                var xPos = Parent.Vertical ? Parent.XPosition + (float)ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition;
+                var yPos = Parent.Vertical ? Parent.YPosition : Parent.YPosition + (float)ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
                 var cursorPos = new Vector2(xPos, yPos);
-                foreach (var chunkSize in Parent.ChunkSizes)
-                {
+
+                foreach (var chunkSize in Parent.ChunkSizes) {
                     var barSize = Parent.Vertical ? new Vector2(barWidth, barHeight * chunkSize - Parent.ChunkPadding) : new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
-                    
-                    var fillPercentage = (float) Math.Round(Math.Min(currentFill / chunkSize, 1f), 5); // Rounding due to floating point precision shenanigans
-                    if (fillPercentage >= 1f)
-                    {
+
+                    var fillPercentage = (float)Math.Round(Math.Min(currentFill / chunkSize, 1f), 5); // Rounding due to floating point precision shenanigans
+
+                    if (fillPercentage >= 1f) {
                         currentFill -= chunkSize;
                         drawList.AddRectFilledMultiColor(
                             cursorPos, cursorPos + barSize,
                             ChunkColors[i]["gradientLeft"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientLeft"]
                         );
                     }
-                    else
-                    {
+                    else {
                         currentFill = 0f;
                         var fillVector = Parent.Vertical ? new Vector2(barSize.X, barSize.Y * fillPercentage) : new Vector2(barSize.X * fillPercentage, barSize.Y);
                         if (PartialFillColor != null)
-                        {
                             drawList.AddRectFilledMultiColor(
                                 cursorPos, cursorPos + fillVector,
                                 PartialFillColor["gradientLeft"], PartialFillColor["gradientRight"], PartialFillColor["gradientRight"], PartialFillColor["gradientLeft"]
                             );
-                        }
                         else
-                        {
                             drawList.AddRectFilledMultiColor(
                                 cursorPos, cursorPos + fillVector,
                                 ChunkColors[i]["gradientLeft"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientLeft"]
                             );
-                        }
                     }
 
-                    if (_glowColorSet)
-                    {
+                    if (_glowColorSet) {
                         var glowPosition = new Vector2(cursorPos.X - 1, cursorPos.Y - 1);
                         var glowSize = new Vector2(barSize.X + 2, barSize.Y + 2);
-                        
+
                         drawList.AddRect(glowPosition, glowPosition + glowSize, GlowColor);
                     }
 
                     i++;
-                    cursorPos += Parent.Vertical ?  new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
+                    cursorPos += Parent.Vertical ? new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
                 }
             }
-            else
-            {
-                var xPos = Parent.Vertical ? Parent.XPosition - (float) ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition + barWidth;
-                var yPos = Parent.Vertical ? Parent.YPosition + barHeight : Parent.YPosition - (float) ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
+            else {
+                var xPos = Parent.Vertical ? Parent.XPosition - (float)ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition + barWidth;
+                var yPos = Parent.Vertical ? Parent.YPosition + barHeight : Parent.YPosition - (float)ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
                 var cursorPos = new Vector2(xPos, yPos);
-                foreach (var chunkSize in Parent.ChunkSizes.AsEnumerable().Reverse().ToList())
-                {
-                    cursorPos -= Parent.Vertical ?  new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
+
+                foreach (var chunkSize in Parent.ChunkSizes.AsEnumerable().Reverse().ToList()) {
+                    cursorPos -= Parent.Vertical ? new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
                     var barSize = Parent.Vertical ? new Vector2(barWidth, barHeight * chunkSize - Parent.ChunkPadding) : new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
 
-                    var fillPercentage = (float) Math.Round(Math.Min(currentFill / chunkSize, 1f), 5); // Rounding due to floating point precision shenanigans
-                    if (fillPercentage >= 1f)
-                    {
+                    var fillPercentage = (float)Math.Round(Math.Min(currentFill / chunkSize, 1f), 5); // Rounding due to floating point precision shenanigans
+
+                    if (fillPercentage >= 1f) {
                         currentFill -= chunkSize;
                         drawList.AddRectFilledMultiColor(
                             cursorPos, cursorPos + barSize,
                             ChunkColors[i]["gradientLeft"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientLeft"]
                         );
                     }
-                    else
-                    {
+                    else {
                         currentFill = 0f;
                         var fillVector = Parent.Vertical ? new Vector2(barSize.X, barSize.Y * fillPercentage) : new Vector2(barSize.X * fillPercentage, barSize.Y);
                         if (PartialFillColor != null)
-                        {
                             drawList.AddRectFilledMultiColor(
                                 cursorPos + barSize - fillVector, cursorPos + barSize,
                                 PartialFillColor["gradientLeft"], PartialFillColor["gradientRight"], PartialFillColor["gradientRight"], PartialFillColor["gradientLeft"]
                             );
-                        }
                         else
-                        {
                             drawList.AddRectFilledMultiColor(
                                 cursorPos + barSize - fillVector, cursorPos + barSize,
                                 ChunkColors[i]["gradientLeft"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientLeft"]
                             );
-                        }
                     }
 
-                    if (_glowColorSet)
-                    {
+                    if (_glowColorSet) {
                         var glowPosition = new Vector2(cursorPos.X - 1, cursorPos.Y - 1);
                         var glowSize = new Vector2(barSize.X + 2, barSize.Y + 2);
-                        
+
                         drawList.AddRect(glowPosition, glowPosition + glowSize, GlowColor);
                     }
 
@@ -257,14 +234,12 @@ namespace DelvUI.Interface.Bars
             }
         }
 
-        public void DrawText(ImDrawListPtr drawList)
-        {
-            var barWidth = Parent.Vertical ? (float) 1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
-            var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float) 1 / Parent.InnerBars.Count * Parent.BarHeight;
-            Vector2 cursorPos = new Vector2(Parent.XPosition, Parent.YPosition);
+        public void DrawText(ImDrawListPtr drawList) {
+            var barWidth = Parent.Vertical ? (float)1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
+            var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float)1 / Parent.InnerBars.Count * Parent.BarHeight;
+            var cursorPos = new Vector2(Parent.XPosition, Parent.YPosition);
 
-            if (TextMode == BarTextMode.Single)
-            {
+            if (TextMode == BarTextMode.Single) {
                 var textObj = Texts[0];
                 var text = textObj.Type switch
                 {
@@ -274,36 +249,28 @@ namespace DelvUI.Interface.Bars
                     BarTextType.Custom => textObj.Text,
                     _ => "ERROR LOADING TEXT, INVALID TYPE"
                 };
-                
+
                 var textPos = textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, Parent.BarHeight);
-                    
+
                 DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor);
             }
 
             var currentFill = CurrentValue / MaximumValue;
             var i = 0;
-            if (!FlipDrainDirection)
-            {
-                foreach (var chunkSize in Parent.ChunkSizes)
-                {
+
+            if (!FlipDrainDirection) {
+                foreach (var chunkSize in Parent.ChunkSizes) {
                     var barValue = Math.Min(currentFill, chunkSize) * MaximumValue;
                     var barMaximum = chunkSize * MaximumValue;
 
                     var fillPercentage = Math.Min(currentFill / chunkSize, 1f);
 
-                    var barSize = Parent.Vertical ?  new Vector2(barWidth, barHeight * chunkSize - Parent.ChunkPadding) : new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
+                    var barSize = Parent.Vertical ? new Vector2(barWidth, barHeight * chunkSize - Parent.ChunkPadding) : new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
 
-                    if (fillPercentage >= 1f)
-                    {
-                        currentFill -= chunkSize;
-                    }
-                    else
-                    {
-                        currentFill = 0f;
-                    }
+                    if (fillPercentage >= 1f) currentFill -= chunkSize;
+                    else currentFill = 0f;
 
-                    if (TextMode == BarTextMode.EachChunk)
-                    {
+                    if (TextMode == BarTextMode.EachChunk) {
                         var textObj = Texts[i];
                         var text = textObj.Type switch
                         {
@@ -323,15 +290,14 @@ namespace DelvUI.Interface.Bars
                     cursorPos += Parent.Vertical ? new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
                 }
             }
-            else
-            {
+            else {
                 var xPos = Parent.Vertical ? Parent.XPosition : Parent.XPosition + barWidth;
                 var yPos = Parent.Vertical ? Parent.YPosition + barHeight : Parent.YPosition;
                 cursorPos = new Vector2(xPos, yPos);
-                foreach (var chunkSize in Parent.ChunkSizes.AsEnumerable().Reverse().ToList())
-                {
+
+                foreach (var chunkSize in Parent.ChunkSizes.AsEnumerable().Reverse().ToList()) {
                     cursorPos -= Parent.Vertical ? new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
-                    
+
                     var barValue = Math.Min(currentFill, chunkSize) * MaximumValue;
                     var barMaximum = chunkSize * MaximumValue;
 
@@ -339,17 +305,10 @@ namespace DelvUI.Interface.Bars
 
                     var barSize = new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
 
-                    if (fillPercentage >= 1f)
-                    {
-                        currentFill -= chunkSize;
-                    }
-                    else
-                    {
-                        currentFill = 0f;
-                    }
+                    if (fillPercentage >= 1f) currentFill -= chunkSize;
+                    else currentFill = 0f;
 
-                    if (TextMode == BarTextMode.EachChunk)
-                    {
+                    if (TextMode == BarTextMode.EachChunk) {
                         var textObj = Texts[i];
                         var text = textObj.Type switch
                         {
@@ -361,7 +320,7 @@ namespace DelvUI.Interface.Bars
                         };
 
                         var textPos = Parent.Vertical ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y) : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
-                        
+
                         DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor);
                     }
 
@@ -374,18 +333,15 @@ namespace DelvUI.Interface.Bars
     public class BooleanInnerBar : InnerBar
     {
         private bool[] _enableArray;
-        
+
         public bool[] EnableArray
         {
             get => _enableArray;
             set
             {
                 var trues = 0;
-                
-                foreach (var val in value)
-                {
-                    trues += val ? 1 : 0;
-                }
+
+                foreach (var val in value) trues += val ? 1 : 0;
 
                 CurrentValue = trues;
                 MaximumValue = value.Length;
@@ -393,54 +349,41 @@ namespace DelvUI.Interface.Bars
             }
         }
 
-        public override void Draw(ImDrawListPtr drawList)
-        {
-            var barWidth = Parent.Vertical ? (float) 1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
-            var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float) 1 / Parent.InnerBars.Count * Parent.BarHeight;
-            var xPos = Parent.Vertical ? Parent.XPosition + (float) ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition;
-            var yPos = Parent.Vertical ? Parent.YPosition : Parent.YPosition + (float) ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
+        public override void Draw(ImDrawListPtr drawList) {
+            var barWidth = Parent.Vertical ? (float)1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
+            var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float)1 / Parent.InnerBars.Count * Parent.BarHeight;
+            var xPos = Parent.Vertical ? Parent.XPosition + (float)ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition;
+            var yPos = Parent.Vertical ? Parent.YPosition : Parent.YPosition + (float)ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
             var cursorPos = new Vector2(xPos, yPos);
 
             var i = 0;
-            foreach (var chunkSize in Parent.ChunkSizes)
-            {
+
+            foreach (var chunkSize in Parent.ChunkSizes) {
                 var barSize = Parent.Vertical ? new Vector2(barWidth, barHeight * chunkSize - Parent.ChunkPadding) : new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
 
-                if (EnableArray[i])
-                {
+                if (EnableArray[i]) {
                     drawList.AddRectFilledMultiColor(
                         cursorPos, cursorPos + barSize,
                         ChunkColors[i]["gradientLeft"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientRight"], ChunkColors[i]["gradientLeft"]
                     );
                 }
-                else
-                {
+                else {
                     if (PartialFillColor != null)
-                    {
                         drawList.AddRectFilledMultiColor(
                             cursorPos, cursorPos + barSize,
                             PartialFillColor["gradientLeft"], PartialFillColor["gradientRight"], PartialFillColor["gradientRight"], PartialFillColor["gradientLeft"]
                         );
-                    }
                 }
 
                 i++;
-                cursorPos += Parent.Vertical ?  new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
+                cursorPos += Parent.Vertical ? new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
             }
         }
     }
 
     public class BarText
     {
-        // TODO: Proper text tags
-        public BarTextPosition Position { get; set; }
-        public BarTextType Type { get; set; }
-        public Vector4 Color { get; set; }
-        public Vector4 OutlineColor { get; set; }
-        public string Text { get; set; }
-
-        public BarText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string text)
-        {
+        public BarText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string text) {
             Position = position;
             Type = type;
             Color = color;
@@ -448,17 +391,15 @@ namespace DelvUI.Interface.Bars
             Text = text;
         }
 
-        public BarText(BarTextPosition position, BarTextType type, string text)
-        {
+        public BarText(BarTextPosition position, BarTextType type, string text) {
             Position = position;
             Type = type;
             Text = text;
             Color = Vector4.One;
             OutlineColor = new Vector4(0f, 0f, 0f, 1f);
         }
-        
-        public BarText(BarTextPosition position, BarTextType type)
-        {
+
+        public BarText(BarTextPosition position, BarTextType type) {
             Position = position;
             Type = type;
             Text = null;
@@ -466,99 +407,125 @@ namespace DelvUI.Interface.Bars
             OutlineColor = new Vector4(0f, 0f, 0f, 1f);
         }
 
-        public Vector2 CalcTextPosition(Vector2 cursorPos, string text, float barWidth, float barHeight)
-        {
+        // TODO: Proper text tags
+        public BarTextPosition Position { get; set; }
+        public BarTextType Type { get; set; }
+        public Vector4 Color { get; set; }
+        public Vector4 OutlineColor { get; set; }
+        public string Text { get; set; }
+
+        public Vector2 CalcTextPosition(Vector2 cursorPos, string text, float barWidth, float barHeight) {
             float textXPos;
             float textYPos;
-            
+
             var textSize = ImGui.CalcTextSize(text);
 
-            switch (Position)
-            {
+            switch (Position) {
                 case BarTextPosition.TopLeft:
                     textXPos = cursorPos.X + 2;
                     textYPos = cursorPos.Y - 2;
+
                     break;
                 default:
                 case BarTextPosition.TopMiddle:
                     textXPos = cursorPos.X + barWidth / 2f - textSize.X / 2f;
                     textYPos = cursorPos.Y - 2;
+
                     break;
                 case BarTextPosition.TopRight:
                     textXPos = cursorPos.X + barWidth - textSize.X - 2;
                     textYPos = cursorPos.Y - 2;
+
                     break;
                 case BarTextPosition.CenterLeft:
                     textXPos = cursorPos.X + 2;
                     textYPos = cursorPos.Y + barHeight / 2f - textSize.Y / 2f;
+
                     break;
                 case BarTextPosition.CenterMiddle:
                     textXPos = cursorPos.X + barWidth / 2f - textSize.X / 2f;
                     textYPos = cursorPos.Y + barHeight / 2f - textSize.Y / 2f;
+
                     break;
                 case BarTextPosition.CenterRight:
                     textXPos = cursorPos.X + barWidth - textSize.X - 2;
                     textYPos = cursorPos.Y + barHeight / 2f - textSize.Y / 2f;
+
                     break;
                 case BarTextPosition.BottomLeft:
                     textXPos = cursorPos.X + 2;
                     textYPos = cursorPos.Y + barHeight - textSize.Y + 2;
+
                     break;
                 case BarTextPosition.BottomMiddle:
                     textXPos = cursorPos.X + barWidth / 2f - textSize.X / 2f;
                     textYPos = cursorPos.Y + barHeight - textSize.Y + 2;
+
                     break;
                 case BarTextPosition.BottomRight:
                     textXPos = cursorPos.X + barWidth - textSize.X - 2;
                     textYPos = cursorPos.Y + barHeight - textSize.Y + 2;
+
                     break;
                 case BarTextPosition.AboveLeft:
                     textXPos = cursorPos.X + 2;
                     textYPos = cursorPos.Y + 2 - textSize.Y;
+
                     break;
                 case BarTextPosition.AboveMiddle:
                     textXPos = cursorPos.X + barWidth / 2f - textSize.X / 2f;
                     textYPos = cursorPos.Y + 2 - textSize.Y;
+
                     break;
                 case BarTextPosition.AboveRight:
                     textXPos = cursorPos.X + barWidth - textSize.X - 2;
                     textYPos = cursorPos.Y + 2 - textSize.Y;
-                    break;                        
+
+                    break;
                 case BarTextPosition.BelowLeft:
                     textXPos = cursorPos.X + 2;
                     textYPos = cursorPos.Y + barHeight - 2;
+
                     break;
                 case BarTextPosition.BelowMiddle:
                     textXPos = cursorPos.X + barWidth / 2f - textSize.X / 2f;
                     textYPos = cursorPos.Y + barHeight - 2;
+
                     break;
                 case BarTextPosition.BelowRight:
                     textXPos = cursorPos.X + barWidth - textSize.X - 2;
                     textYPos = cursorPos.Y + barHeight - 2;
+
                     break;
                 case BarTextPosition.LeftUpper:
                     textXPos = cursorPos.X - textSize.X - 2;
                     textYPos = cursorPos.Y - 2;
+
                     break;
                 case BarTextPosition.RightUpper:
                     textXPos = cursorPos.X + barWidth + 2;
                     textYPos = cursorPos.Y - 2;
+
                     break;
                 case BarTextPosition.LeftCenter:
-                    textXPos = cursorPos.X - textSize.X -  2;
+                    textXPos = cursorPos.X - textSize.X - 2;
                     textYPos = cursorPos.Y + barHeight / 2f - textSize.Y / 2f;
+
                     break;
                 case BarTextPosition.RightCenter:
                     textXPos = cursorPos.X + barWidth + 2;
                     textYPos = cursorPos.Y + barHeight / 2f - textSize.Y / 2f;
+
                     break;
                 case BarTextPosition.LeftLower:
-                    textXPos = cursorPos.X  - textSize.X -  2;
+                    textXPos = cursorPos.X - textSize.X - 2;
                     textYPos = cursorPos.Y + barHeight - textSize.Y + 2;
+
                     break;
                 case BarTextPosition.RightLower:
-                    textXPos = cursorPos.X + barWidth  + 2;
+                    textXPos = cursorPos.X + barWidth + 2;
                     textYPos = cursorPos.Y + barHeight - textSize.Y + 2;
+
                     break;
             }
 
@@ -584,15 +551,28 @@ namespace DelvUI.Interface.Bars
     public enum BarTextPosition
     {
         // INSIDE
-        TopLeft, TopMiddle, TopRight,
-        CenterLeft, CenterMiddle, CenterRight,
-        BottomLeft, BottomMiddle, BottomRight,
-        
+        TopLeft,
+        TopMiddle,
+        TopRight,
+        CenterLeft,
+        CenterMiddle,
+        CenterRight,
+        BottomLeft,
+        BottomMiddle,
+        BottomRight,
+
         // OUTSIDE
-        AboveLeft, AboveMiddle, AboveRight,
-        LeftUpper, RightUpper,
-        LeftCenter, RightCenter,
-        LeftLower, RightLower,
-        BelowLeft, BelowMiddle, BelowRight
+        AboveLeft,
+        AboveMiddle,
+        AboveRight,
+        LeftUpper,
+        RightUpper,
+        LeftCenter,
+        RightCenter,
+        LeftLower,
+        RightLower,
+        BelowLeft,
+        BelowMiddle,
+        BelowRight
     }
 }

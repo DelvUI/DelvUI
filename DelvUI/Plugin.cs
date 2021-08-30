@@ -4,25 +4,27 @@ using System.Reflection;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
 using Dalamud.Plugin;
-using ImGuiNET;
 using DelvUI.Interface;
+using ImGuiNET;
 
-namespace DelvUI {
+namespace DelvUI
+{
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class Plugin : IDalamudPlugin {
-        public string Name => "DelvUI";
-
-        private DalamudPluginInterface _pluginInterface;
-        private PluginConfiguration _pluginConfiguration;
-        private HudWindow _hudWindow;
+    public class Plugin : IDalamudPlugin
+    {
         private ConfigurationWindow _configurationWindow;
 
         private bool _fontBuilt;
         private bool _fontLoadFailed;
-        
+        private HudWindow _hudWindow;
+        private PluginConfiguration _pluginConfiguration;
+
+        private DalamudPluginInterface _pluginInterface;
+
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         // ReSharper disable once MemberCanBePrivate.Global
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
+        public string Name => "DelvUI";
 
         public void Initialize(DalamudPluginInterface pluginInterface) {
             _pluginInterface = pluginInterface;
@@ -30,34 +32,41 @@ namespace DelvUI {
             _pluginConfiguration.Init(_pluginInterface);
             _configurationWindow = new ConfigurationWindow(this, _pluginInterface, _pluginConfiguration);
 
-            _pluginInterface.CommandManager.AddHandler("/pdelvui", new CommandInfo(PluginCommand)
-            {
-                HelpMessage = "Opens the DelvUI configuration window.", 
-                ShowInHelp = true
-            });
+            _pluginInterface.CommandManager.AddHandler(
+                "/pdelvui", new CommandInfo(PluginCommand)
+                {
+                    HelpMessage = "Opens the DelvUI configuration window.",
+                    ShowInHelp = true
+                }
+            );
 
             _pluginInterface.UiBuilder.OnBuildUi += Draw;
             _pluginInterface.UiBuilder.OnBuildFonts += BuildFont;
             _pluginInterface.UiBuilder.OnOpenConfigUi += OpenConfigUi;
-            if (!_fontBuilt && !_fontLoadFailed) {
-                _pluginInterface.UiBuilder.RebuildFonts();
-            }
+            if (!_fontBuilt && !_fontLoadFailed) _pluginInterface.UiBuilder.RebuildFonts();
         }
-        
+
+        public void Dispose() {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         private void BuildFont() {
             var fontFile = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Fonts", "big-noodle-too.ttf");
             _fontBuilt = false;
-            
+
             if (File.Exists(fontFile)) {
                 try {
                     _pluginConfiguration.BigNoodleTooFont = ImGui.GetIO().Fonts.AddFontFromFileTTF(fontFile, 24);
                     _fontBuilt = true;
-                } catch (Exception ex) {
+                }
+                catch (Exception ex) {
                     PluginLog.Log($"Font failed to load. {fontFile}");
                     PluginLog.Log(ex.ToString());
                     _fontLoadFailed = true;
                 }
-            } else {
+            }
+            else {
                 PluginLog.Log($"Font doesn't exist. {fontFile}");
                 _fontLoadFailed = true;
             }
@@ -68,34 +77,26 @@ namespace DelvUI {
         }
 
         private void Draw() {
-            
+
             var hudState = _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene]
-                             || _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene78]
-                             || _pluginInterface.ClientState.Condition[ConditionFlag.OccupiedInCutSceneEvent]
-                             || _pluginInterface.ClientState.Condition[ConditionFlag.CreatingCharacter]
-                             || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas]
-                             || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas51];
+                           || _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene78]
+                           || _pluginInterface.ClientState.Condition[ConditionFlag.OccupiedInCutSceneEvent]
+                           || _pluginInterface.ClientState.Condition[ConditionFlag.CreatingCharacter]
+                           || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas]
+                           || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas51];
 
             _pluginInterface.UiBuilder.OverrideGameCursor = false;
-            
+
             _configurationWindow.Draw();
 
-            if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
-                SwapJobs();
-            }
+            if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) SwapJobs();
 
-            if (_fontBuilt) {
-                ImGui.PushFont(_pluginConfiguration.BigNoodleTooFont);
-            }
-            
+            if (_fontBuilt) ImGui.PushFont(_pluginConfiguration.BigNoodleTooFont);
 
-            if (!hudState) { 
-                _hudWindow?.Draw();
-            }
 
-            if (_fontBuilt) {
-                ImGui.PopFont();
-            }
+            if (!hudState) _hudWindow?.Draw();
+
+            if (_fontBuilt) ImGui.PopFont();
         }
 
         private void SwapJobs() {
@@ -110,16 +111,16 @@ namespace DelvUI {
                 //Healers
                 Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SCH => new ScholarHudWindow(_pluginInterface, _pluginConfiguration),
-                
+
                 //Melee DPS
                 Jobs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.MNK => new MonkHudWindow(_pluginInterface, _pluginConfiguration),
-                
+
                 //Ranged DPS
                 Jobs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.DNC => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.MCH => new MachinistHudWindow(_pluginInterface, _pluginConfiguration),
-                
+
                 //Caster DPS
                 Jobs.RDM => new RedMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SMN => new SummonerHudWindow(_pluginInterface, _pluginConfiguration),
@@ -135,7 +136,7 @@ namespace DelvUI {
                 Jobs.ARC => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.THM => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.ACN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                
+
                 //Hand
                 Jobs.CRP => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.BSM => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
@@ -145,12 +146,12 @@ namespace DelvUI {
                 Jobs.WVR => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.ALC => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.CUL => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                
+
                 //Land
                 Jobs.MIN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.BOT => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.FSH => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                
+
                 //dont have packs yet
                 Jobs.NIN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.AST => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
@@ -159,32 +160,23 @@ namespace DelvUI {
                 _ => _hudWindow
             };
         }
-        
+
         private void OpenConfigUi(object sender, EventArgs e) {
             _configurationWindow.IsVisible = !_configurationWindow.IsVisible;
         }
 
         protected virtual void Dispose(bool disposing) {
-            if (!disposing) {
-                return;
-            }
+            if (!disposing) return;
 
             _configurationWindow.IsVisible = false;
 
-            if (_hudWindow != null) {
-                _hudWindow.IsVisible = false;
-            }
+            if (_hudWindow != null) _hudWindow.IsVisible = false;
 
             _pluginInterface.CommandManager.RemoveHandler("/pdelvui");
             _pluginInterface.UiBuilder.OnBuildUi -= Draw;
             _pluginInterface.UiBuilder.OnBuildFonts -= BuildFont;
             _pluginInterface.UiBuilder.OnOpenConfigUi -= OpenConfigUi;
             _pluginInterface.UiBuilder.RebuildFonts();
-        }
-
-        public void Dispose() {
-            Dispose(true);
-            GC.SuppressFinalize(this);
         }
     }
 }
