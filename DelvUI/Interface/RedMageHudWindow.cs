@@ -13,7 +13,6 @@ namespace DelvUI.Interface {
 
         private float OriginY => CenterY + YOffset + PluginConfiguration.RDMVerticalOffset;
         private float OriginX => CenterX + PluginConfiguration.RDMHorizontalOffset;
-        private int VerticalSpaceBetweenBars => PluginConfiguration.RDMVerticalSpaceBetweenBars;
         private int HorizontalSpaceBetweenBars => PluginConfiguration.RDMHorizontalSpaceBetweenBars;
         private int ManaBarWidth => PluginConfiguration.RDMManaBarWidth;
         private int ManaBarHeight => PluginConfiguration.RDMManaBarHeight;
@@ -134,8 +133,8 @@ namespace DelvUI.Interface {
             var scale = gauge.WhiteGauge - gauge.BlackGauge;
             var barSize = new Vector2(BalanceBarWidth, BalanceBarHeight);
             var cursorPos = new Vector2(
-                OriginX - BalanceBarWidth / 2f + BalanceBarXOffset, 
-                OriginY - ManaBarHeight - VerticalSpaceBetweenBars - BalanceBarHeight + BalanceBarYOffset
+                OriginX - barSize.X /2f + BalanceBarXOffset, 
+                OriginY + BalanceBarYOffset
             );
 
             var drawList = ImGui.GetWindowDrawList();
@@ -166,8 +165,8 @@ namespace DelvUI.Interface {
             var scale = gauge / 100f;
             var size = new Vector2(WhiteManaBarWidth, WhiteManaBarHeight);
             var position = new Vector2(
-                OriginX - BalanceBarWidth / 2f - HorizontalSpaceBetweenBars + WhiteManaBarXOffset,
-                OriginY - ManaBarHeight - VerticalSpaceBetweenBars - WhiteManaBarHeight + WhiteManaBarYOffset
+                OriginX + WhiteManaBarXOffset,
+                OriginY + WhiteManaBarYOffset
             );
 
             DrawManaBar(position, size, WhiteManaBarColor, gauge, scale, WhiteManaBarInversed, ShowWhiteManaValue);
@@ -179,8 +178,8 @@ namespace DelvUI.Interface {
             var scale = gauge / 100f;
             var size = new Vector2(BlackManaBarWidth, BlackManaBarHeight);
             var position = new Vector2(
-                OriginX + BalanceBarWidth / 2f + HorizontalSpaceBetweenBars + BlackManaBarXOffset,
-                OriginY - ManaBarHeight - VerticalSpaceBetweenBars - BlackManaBarHeight + BlackManaBarYOffset
+                OriginX + BlackManaBarXOffset,
+                OriginY + BlackManaBarYOffset
             );
 
             DrawManaBar(position, size, BlackManaBarColor, gauge, scale, BlackManaBarInversed, ShowBlackManaValue);
@@ -227,7 +226,7 @@ namespace DelvUI.Interface {
             var totalWidth = barSize.X * 3 + HorizontalSpaceBetweenBars * 2;
             var cursorPos = new Vector2(
                 OriginX - totalWidth / 2 + AccelerationBarXOffset, 
-                OriginY - ManaBarHeight - VerticalSpaceBetweenBars - BalanceBarHeight - VerticalSpaceBetweenBars - AccelBarHeight + AccelerationBarYOffset
+                OriginY + AccelerationBarYOffset
             );
             var accelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1238);
             
@@ -253,8 +252,7 @@ namespace DelvUI.Interface {
             var barSize = new Vector2(DualCastWidth, DualCastHeight);
             var cursorPos = new Vector2(
                 OriginX - DualCastWidth / 2f + DualCastXOffset, 
-                OriginY - ManaBarHeight - VerticalSpaceBetweenBars - BalanceBarHeight - VerticalSpaceBetweenBars 
-                - AccelBarHeight - VerticalSpaceBetweenBars - DualCastHeight + DualCastYOffset
+                OriginY + DualCastYOffset
             );
             
             var dualCastBuff = Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1249).Duration);
@@ -283,10 +281,9 @@ namespace DelvUI.Interface {
                 return;
             }
 
-            var y = OriginY - ManaBarHeight - VerticalSpaceBetweenBars - BalanceBarHeight - VerticalSpaceBetweenBars - AccelBarHeight - VerticalSpaceBetweenBars - DualCastHeight / 2f;
             var position = new Vector2(
                 OriginX - HorizontalSpaceBetweenBars - DualCastWidth,
-                y + ProcsHeight / 2f
+                OriginY + DualCastYOffset + DualCastHeight / 2f + ProcsHeight / 2f
             );
 
             var scale = duration / 30f;
@@ -303,10 +300,9 @@ namespace DelvUI.Interface {
                 return;
             }
 
-            var y = OriginY - ManaBarHeight - VerticalSpaceBetweenBars - BalanceBarHeight - VerticalSpaceBetweenBars - AccelBarHeight - VerticalSpaceBetweenBars - DualCastHeight / 2f;
             var position = new Vector2(
                 OriginX + HorizontalSpaceBetweenBars + DualCastWidth,
-                y - ProcsHeight / 2f
+                OriginY + DualCastYOffset + DualCastHeight / 2f - ProcsHeight / 2f
             );
 
             var scale = duration / 30f;

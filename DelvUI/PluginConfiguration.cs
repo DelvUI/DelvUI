@@ -472,7 +472,6 @@ namespace DelvUI {
 
         public int RDMVerticalOffset { get; set; } = -2;
         public int RDMHorizontalOffset { get; set; } = 0;
-        public int RDMVerticalSpaceBetweenBars { get; set; } = 2;
         public int RDMHorizontalSpaceBetweenBars { get; set; } = 2;
         public int RDMManaBarHeight { get; set; } = 18;
         public int RDMManaBarWidth { get; set; } = 253;
@@ -480,24 +479,24 @@ namespace DelvUI {
         public int RDMManaBarYOffset { get; set; } = 0;
         public int RDMWhiteManaBarHeight { get; set; } = 20;
         public int RDMWhiteManaBarWidth { get; set; } = 114;
-        public int RDMWhiteManaBarXOffset { get; set; } = 0;
-        public int RDMWhiteManaBarYOffset { get; set; } = 0;
+        public int RDMWhiteManaBarXOffset { get; set; } = -13;
+        public int RDMWhiteManaBarYOffset { get; set; } = -40;
         public bool RDMWhiteManaBarInversed = true;
         public bool RDMShowWhiteManaValue = true;
         public int RDMBlackManaBarHeight { get; set; } = 20;
         public int RDMBlackManaBarWidth { get; set; } = 114;
-        public int RDMBlackManaBarXOffset { get; set; } = 0;
-        public int RDMBlackManaBarYOffset { get; set; } = 0;
+        public int RDMBlackManaBarXOffset { get; set; } = 13;
+        public int RDMBlackManaBarYOffset { get; set; } = -40;
         public bool RDMBlackManaBarInversed = false;
         public bool RDMShowBlackManaValue = true;
         public int RDMBalanceBarHeight { get; set; } = 20;
         public int RDMBalanceBarWidth { get; set; } = 21;
         public int RDMBalanceBarXOffset { get; set; } = 0;
-        public int RDMBalanceBarYOffset { get; set; } = 0;
+        public int RDMBalanceBarYOffset { get; set; } = -40;
         public int RDMAccelerationBarHeight { get; set; } = 12;
         public int RDMAccelerationBarWidth { get; set; } = 83;
         public int RDMAccelerationBarXOffset { get; set; } = 0;
-        public int RDMAccelerationBarYOffset { get; set; } = 0;
+        public int RDMAccelerationBarYOffset { get; set; } = -54;
         public bool RDMShowManaValue = true;
         public bool RDMShowManaThresholdMarker = true;
         public int RDMManaThresholdValue { get; set; } = 2600;
@@ -505,7 +504,7 @@ namespace DelvUI {
         public int RDMDualCastHeight { get; set; } = 16;
         public int RDMDualCastWidth { get; set; } = 16;
         public int RDMDualCastXOffset { get; set; } = 0;
-        public int RDMDualCastYOffset { get; set; } = 0;
+        public int RDMDualCastYOffset { get; set; } = -72;
         public bool RDMShowVerstoneProcs = true;
         public bool RDMShowVerfireProcs = true;
         public int RDMProcsHeight { get; set; } = 7;
