@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing.Design;
 using System.IO;
 using System.Reflection;
 using Dalamud.Game.ClientState;
@@ -69,10 +70,12 @@ namespace DelvUI {
 
         private void Draw() {
             
-            var inCutscene = _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene]
+            var hudState = _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene]
                              || _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene78]
                              || _pluginInterface.ClientState.Condition[ConditionFlag.OccupiedInCutSceneEvent]
-                             || _pluginInterface.ClientState.Condition[ConditionFlag.CreatingCharacter];
+                             || _pluginInterface.ClientState.Condition[ConditionFlag.CreatingCharacter]
+                             || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas]
+                             || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas51];
 
             _pluginInterface.UiBuilder.OverrideGameCursor = false;
             
@@ -86,7 +89,7 @@ namespace DelvUI {
                 SwapJobs();
             }
 
-            if (!inCutscene) { 
+            if (!hudState) { 
                 _hudWindow?.Draw();
             }
 
