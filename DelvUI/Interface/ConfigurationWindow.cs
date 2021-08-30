@@ -110,6 +110,9 @@ namespace DelvUI.Interface
                         _pluginConfiguration.HealthBarTextRightYOffset = healthBarTextRightYOffset;
                         _pluginConfiguration.Save();
                     }
+                    
+                    changed |= ImGui.Checkbox("Custom Healthbar Color Enabled", ref _pluginConfiguration.CustomHealthBarColorEnabled);
+                    changed |= ImGui.ColorEdit4("Custom Healthbar Color", ref _pluginConfiguration.CustomHealthBarColor);
 
                     var primaryResourceHeight = _pluginConfiguration.PrimaryResourceBarHeight;
                     if (ImGui.DragInt("Primary Resource Height", ref primaryResourceHeight, .1f, 1, 1000))
@@ -363,6 +366,40 @@ namespace DelvUI.Interface
                     changed |= ImGui.Checkbox("Hide MP Ticker on full mp", ref _pluginConfiguration.MPTickerHideOnFullMp);
                     changed |= ImGui.ColorEdit4("MP Ticker Color", ref _pluginConfiguration.MPTickerColor);
 
+                    // gcd indicator
+                    changed |= ImGui.Checkbox("Show GCD Indicator", ref _pluginConfiguration.GCDIndicatorEnabled);
+
+                    var GCDIndicatorHeight = _pluginConfiguration.GCDIndicatorHeight;
+                    if (ImGui.DragInt("GCD Indicator Height", ref GCDIndicatorHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.GCDIndicatorHeight = GCDIndicatorHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var GCDIndicatorWidth = _pluginConfiguration.GCDIndicatorWidth;
+                    if (ImGui.DragInt("GCD Indicator Width", ref GCDIndicatorWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.GCDIndicatorWidth = GCDIndicatorWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var GCDIndicatorXOffset = _pluginConfiguration.GCDIndicatorXOffset;
+                    if (ImGui.DragInt("GCD Indicator X Offset", ref GCDIndicatorXOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.GCDIndicatorXOffset = GCDIndicatorXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var GCDIndicatorYOffset = _pluginConfiguration.GCDIndicatorYOffset;
+                    if (ImGui.DragInt("GCD Indicator Y Offset", ref GCDIndicatorYOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.GCDIndicatorYOffset = GCDIndicatorYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show GCD Indicator border", ref _pluginConfiguration.GCDIndicatorShowBorder);
+                    changed |= ImGui.ColorEdit4("GCD Indicator Color", ref _pluginConfiguration.GCDIndicatorColor);
+
                     changed |= ImGui.Checkbox("Hide HUD", ref _pluginConfiguration.HideHud);
                     changed |= ImGui.Checkbox("Lock HUD", ref _pluginConfiguration.LockHud);
 
@@ -406,6 +443,7 @@ namespace DelvUI.Interface
                     changed |= ImGui.Checkbox("Show Action Icon", ref _pluginConfiguration.ShowActionIcon);
                     changed |= ImGui.Checkbox("Show Action Name", ref _pluginConfiguration.ShowActionName);
                     changed |= ImGui.Checkbox("Show Cast Time", ref _pluginConfiguration.ShowCastTime);
+                    changed |= ImGui.Checkbox("Color CastBar by Job", ref _pluginConfiguration.ColorCastBarByJob);
                     changed |= ImGui.Checkbox("Slide Cast Enabled", ref _pluginConfiguration.SlideCast);
 
                     var slideCastTime = _pluginConfiguration.SlideCastTime;
@@ -941,6 +979,194 @@ namespace DelvUI.Interface
                     changed |= ImGui.ColorEdit4("Kenki Color", ref _pluginConfiguration.SamKenkiColor);
                     changed |= ImGui.ColorEdit4("Expiry Color", ref _pluginConfiguration.SamExpiryColor);
                     changed |= ImGui.ColorEdit4("Empty Color", ref _pluginConfiguration.SamEmptyColor);
+
+                    ImGui.EndTabItem();
+                }
+
+                if (ImGui.BeginTabItem("Ninja"))
+                {
+                    var NINBaseXOffset = _pluginConfiguration.NINBaseXOffset;
+                    if (ImGui.DragInt("NIN Base X Offset", ref NINBaseXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.NINBaseXOffset = NINBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINBaseYOffset = _pluginConfiguration.NINBaseYOffset;
+                    if (ImGui.DragInt("NIN Base Y Offset", ref NINBaseYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.NINBaseYOffset = NINBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINHutonGaugeHeight = _pluginConfiguration.NINHutonGaugeHeight;
+                    if (ImGui.DragInt("Huton Gauge Height", ref NINHutonGaugeHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINHutonGaugeHeight = NINHutonGaugeHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINHutonGaugeWidth = _pluginConfiguration.NINHutonGaugeWidth;
+                    if (ImGui.DragInt("Huton Gauge Width", ref NINHutonGaugeWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINHutonGaugeWidth = NINHutonGaugeWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugeHeight = _pluginConfiguration.NINNinkiGaugeHeight;
+                    if (ImGui.DragInt("Ninki Gauge Height", ref NINNinkiGaugeHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugeHeight = NINNinkiGaugeHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugeWidth = _pluginConfiguration.NINNinkiGaugeWidth;
+                    if (ImGui.DragInt("Ninki Gauge Width", ref NINNinkiGaugeWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugeWidth = NINNinkiGaugeWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugePadding = _pluginConfiguration.NINNinkiGaugePadding;
+                    if (ImGui.DragInt("Ninki Gauge Padding", ref NINNinkiGaugePadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugePadding = NINNinkiGaugePadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugeXOffset = _pluginConfiguration.NINNinkiGaugeXOffset;
+                    if (ImGui.DragInt("Ninki Gauge X Offset", ref NINNinkiGaugeXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugeXOffset = NINNinkiGaugeXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugeYOffset = _pluginConfiguration.NINNinkiGaugeYOffset;
+                    if (ImGui.DragInt("Ninki Gauge Y Offset", ref NINNinkiGaugeYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugeYOffset = NINNinkiGaugeYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+
+                    var NINInterBarOffset = _pluginConfiguration.NINInterBarOffset;
+                    if (ImGui.DragInt("Space Between Bars", ref NINInterBarOffset, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINInterBarOffset = NINInterBarOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Empty Color", ref _pluginConfiguration.NINEmptyColor);
+                    changed |= ImGui.ColorEdit4("Huton Bar Color", ref _pluginConfiguration.NINHutonColor);
+                    changed |= ImGui.ColorEdit4("Ninki Bar Color", ref _pluginConfiguration.NINNinkiColor);
+
+                    ImGui.EndTabItem();
+                }
+                
+                if (ImGui.BeginTabItem("Astrologian"))
+                {
+
+                    var ASTDrawBarHeight = _pluginConfiguration.ASTDrawBarHeight;
+                    if (ImGui.DragInt("Draw Gauge Height", ref ASTDrawBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTDrawBarHeight = ASTDrawBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDrawBarWidth = _pluginConfiguration.ASTDrawBarWidth;
+                    if (ImGui.DragInt("Draw Gauge Width", ref ASTDrawBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTDrawBarWidth = ASTDrawBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDrawBarX = _pluginConfiguration.ASTDrawBarX;
+                    if (ImGui.DragInt("Draw Gauge X Offset", ref ASTDrawBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTDrawBarX = ASTDrawBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDrawBarY = _pluginConfiguration.ASTDrawBarY;
+                    if (ImGui.DragInt("Draw Gauge Y Offset", ref ASTDrawBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTDrawBarY = ASTDrawBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDivinationHeight = _pluginConfiguration.ASTDivinationHeight;
+                    if (ImGui.DragInt("Divination Gauge Height", ref ASTDivinationHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTDivinationHeight = ASTDivinationHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDivinationWidth = _pluginConfiguration.ASTDivinationWidth;
+                    if (ImGui.DragInt("Divination Gauge Width", ref ASTDivinationWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTDivinationWidth = ASTDivinationWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDivinationBarX = _pluginConfiguration.ASTDivinationBarX;
+                    if (ImGui.DragInt("Divination Gauge X Offset", ref ASTDivinationBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTDivinationBarX = ASTDivinationBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDivinationBarY = _pluginConfiguration.ASTDivinationBarY;
+                    if (ImGui.DragInt("Divination Gauge Y Offset", ref ASTDivinationBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTDivinationBarY = ASTDivinationBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDivinationBarPad = _pluginConfiguration.ASTDivinationBarPad;
+                    if (ImGui.DragInt("Divination Padding", ref ASTDivinationBarPad, .1f, -100, 1000))
+                    {
+                        _pluginConfiguration.ASTDivinationBarPad = ASTDivinationBarPad;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDotBarHeight = _pluginConfiguration.ASTDotBarHeight;
+                    if (ImGui.DragInt("Dot Gauge Height", ref ASTDotBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTDotBarHeight = ASTDotBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDotBarWidth = _pluginConfiguration.ASTDotBarWidth;
+                    if (ImGui.DragInt("Dot Gauge Width", ref ASTDotBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTDotBarWidth = ASTDotBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDotBarX = _pluginConfiguration.ASTDotBarX;
+                    if (ImGui.DragInt("Dot Gauge X Offset", ref ASTDotBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTDotBarX = ASTDotBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDotBarY = _pluginConfiguration.ASTDotBarY;
+                    if (ImGui.DragInt("Dot Gauge Y Offset", ref ASTDotBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTDotBarY = ASTDotBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show Divination Bar", ref _pluginConfiguration.ASTShowDivinationBar);
+                    changed |= ImGui.Checkbox("Show Draw Bar", ref _pluginConfiguration.ASTShowDrawBar);
+                    changed |= ImGui.Checkbox("Show Dot Bar", ref _pluginConfiguration.ASTShowDotBar);
+                    changed |= ImGui.Checkbox("Show Primary Resource Bar", ref _pluginConfiguration.ASTShowPrimaryResourceBar);
+
+                    changed |= ImGui.ColorEdit4("Seal Sun Color", ref _pluginConfiguration.ASTSealSunColor);
+                    changed |= ImGui.ColorEdit4("Seal Lunar Color", ref _pluginConfiguration.ASTSealLunarColor);
+                    changed |= ImGui.ColorEdit4("Seal Celestial Color", ref _pluginConfiguration.ASTSealCelestialColor);
+                    changed |= ImGui.ColorEdit4("Dot Color", ref _pluginConfiguration.ASTDotColor);
+                    changed |= ImGui.ColorEdit4("Bar Empty Color", ref _pluginConfiguration.ASTEmptyColor);
 
                     ImGui.EndTabItem();
                 }
