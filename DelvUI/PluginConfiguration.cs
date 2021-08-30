@@ -307,6 +307,26 @@ namespace DelvUI {
 
         #endregion
 
+
+        #region NIN Configuration
+
+        public int NINBaseXOffset { get; set; } = 127;
+        public int NINBaseYOffset { get; set; } = 420;
+        public int NINHutonGaugeHeight { get; set; } = 20;
+        public int NINHutonGaugeWidth { get; set; } = 254;
+        public int NINNinkiGaugeHeight { get; set; } = 20;
+        public int NINNinkiGaugeWidth { get; set; } = 254;
+        public int NINNinkiGaugePadding { get; set; } = 2;
+        public int NINNinkiGaugeXOffset { get; set; }
+        public int NINNinkiGaugeYOffset { get; set; }
+
+        public int NINInterBarOffset { get; set; } = 2;
+        public Vector4 NINHutonColor = new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f);
+        public Vector4 NINNinkiColor = new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f);
+        public Vector4 NINEmptyColor = new Vector4(143f / 255f, 141f / 255f, 142f / 255f, 100f / 100f);
+
+        #endregion
+
         #region DRK Configuration
 
         public int DRKBaseXOffset { get; set; } = 127;
@@ -996,6 +1016,38 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SamExpiryColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SamExpiryColor.AdjustColor(.1f))
                 },
+
+                [Jobs.NIN] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN.AdjustColor(.1f))
+                },
+
+                [Jobs.NIN * 1000] = new Dictionary<string, uint> // Bar not ready
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(NINEmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(NINEmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(NINEmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NINEmptyColor.AdjustColor(.1f))
+                },
+
+                [Jobs.NIN * 1000 + 1] = new Dictionary<string, uint> // Battery gauge ready
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(NINHutonColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(NINHutonColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(NINHutonColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NINHutonColor.AdjustColor(.1f))
+                },
+
+                [Jobs.NIN * 1000 + 2] = new Dictionary<string, uint> // Robot summoned
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(NINNinkiColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(NINNinkiColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(NINNinkiColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NINNinkiColor.AdjustColor(.1f))
+                },                
 
                 [Jobs.BRD] = new Dictionary<string, uint>
                 {

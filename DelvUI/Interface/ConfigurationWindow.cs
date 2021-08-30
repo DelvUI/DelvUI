@@ -903,6 +903,86 @@ namespace DelvUI.Interface
                     ImGui.EndTabItem();
                 }
 
+                if (ImGui.BeginTabItem("Ninja"))
+                {
+                    var NINBaseXOffset = _pluginConfiguration.NINBaseXOffset;
+                    if (ImGui.DragInt("NIN Base X Offset", ref NINBaseXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.NINBaseXOffset = NINBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINBaseYOffset = _pluginConfiguration.NINBaseYOffset;
+                    if (ImGui.DragInt("NIN Base Y Offset", ref NINBaseYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.NINBaseYOffset = NINBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINHutonGaugeHeight = _pluginConfiguration.NINHutonGaugeHeight;
+                    if (ImGui.DragInt("Huton Gauge Height", ref NINHutonGaugeHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINHutonGaugeHeight = NINHutonGaugeHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINHutonGaugeWidth = _pluginConfiguration.NINHutonGaugeWidth;
+                    if (ImGui.DragInt("Huton Gauge Width", ref NINHutonGaugeWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINHutonGaugeWidth = NINHutonGaugeWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugeHeight = _pluginConfiguration.NINNinkiGaugeHeight;
+                    if (ImGui.DragInt("Ninki Gauge Height", ref NINNinkiGaugeHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugeHeight = NINNinkiGaugeHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugeWidth = _pluginConfiguration.NINNinkiGaugeWidth;
+                    if (ImGui.DragInt("Ninki Gauge Width", ref NINNinkiGaugeWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugeWidth = NINNinkiGaugeWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugePadding = _pluginConfiguration.NINNinkiGaugePadding;
+                    if (ImGui.DragInt("Ninki Gauge Padding", ref NINNinkiGaugePadding, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugePadding = NINNinkiGaugePadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugeXOffset = _pluginConfiguration.NINNinkiGaugeXOffset;
+                    if (ImGui.DragInt("Ninki Gauge X Offset", ref NINNinkiGaugeXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugeXOffset = NINNinkiGaugeXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var NINNinkiGaugeYOffset = _pluginConfiguration.NINNinkiGaugeYOffset;
+                    if (ImGui.DragInt("Ninki Gauge Y Offset", ref NINNinkiGaugeYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.NINNinkiGaugeYOffset = NINNinkiGaugeYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+
+                    var NINInterBarOffset = _pluginConfiguration.NINInterBarOffset;
+                    if (ImGui.DragInt("Space Between Bars", ref NINInterBarOffset, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINInterBarOffset = NINInterBarOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.ColorEdit4("Empty Color", ref _pluginConfiguration.NINEmptyColor);
+                    changed |= ImGui.ColorEdit4("Huton Bar Color", ref _pluginConfiguration.NINHutonColor);
+                    changed |= ImGui.ColorEdit4("Ninki Bar Color", ref _pluginConfiguration.NINNinkiColor);
+
+                    ImGui.EndTabItem();
+                }
+
                 if (ImGui.BeginTabItem("Summoner"))
                 {
 
