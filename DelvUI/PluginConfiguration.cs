@@ -79,14 +79,25 @@ namespace DelvUI {
 
 
         public bool ShowCastBar = true;
-        public bool InterruptCheck = true;
         public bool ShowActionIcon = true;
         public bool ShowActionName = true;
         public bool ShowCastTime = true;
         public bool SlideCast = false;
         public float SlideCastTime = 500;
+        
+        public int TargetCastBarHeight { get; set; } = 25;
+        public int TargetCastBarWidth { get; set; } = 254;
+        public int TargetCastBarXOffset { get; set; } = 0;
+        public int TargetCastBarYOffset { get; set; } = 320;
+
+
+        public bool ShowTargetCastBar = true;
+        public bool ShowTargetActionIcon = true;
+        public bool ShowTargetActionName = true;
+        public bool ShowTargetCastTime = true;
 
         public Vector4 CastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,100f/100f);
+        public Vector4 TargetCastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,100f/100f);
         public Vector4 SlideCastColor = new Vector4(255f/255f,0f/255f,0f/255f,100f/100f);
         public Vector4 ShieldColor = new Vector4(255f/255f,255f/255f,0f/255f,100f/100f);
         public Vector4 MPTickerColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f);
@@ -1317,6 +1328,13 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(CastBarColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(CastBarColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(CastBarColor.AdjustColor(.1f))
+                },
+                ["targetcastbar"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(TargetCastBarColor.AdjustColor(.1f))
                 },
                 ["slidecast"] = new Dictionary<string, uint>
                 {
