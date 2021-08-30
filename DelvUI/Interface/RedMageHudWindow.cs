@@ -10,7 +10,7 @@ using ImGuiNET;
 
 namespace DelvUI.Interface {
     public class RedMageHudWindow : HudWindow {
-        public override uint JobId => Jobs.BLM;
+        public override uint JobId => Jobs.RDM;
 
         private float OriginY => CenterY + YOffset + PluginConfiguration.RDMVerticalOffset;
         private float OriginX => CenterX + PluginConfiguration.RDMHorizontalOffset;
