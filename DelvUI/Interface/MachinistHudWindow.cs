@@ -1,8 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Interface.Bars;
@@ -108,7 +105,6 @@ namespace DelvUI.Interface
         private int DrawBatteryGauge(int initialHeight)
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
-            var robotTimeLeft = gauge.RobotTimeRemaining;
             
             var xPos = CenterX - XOffset + BatteryGaugeXOffset;
             var yPos = CenterY + YOffset + initialHeight + BatteryGaugeYOffset;

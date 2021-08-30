@@ -6,6 +6,7 @@ using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using ImGuiNET;
 using DelvUI.Interface;
+using FFXIVClientStructs;
 
 namespace DelvUI {
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -42,6 +43,8 @@ namespace DelvUI {
             if (!_fontBuilt && !_fontLoadFailed) {
                 _pluginInterface.UiBuilder.RebuildFonts();
             }
+
+            Resolver.Initialize();
         }
         
         private void BuildFont() {
@@ -69,24 +72,27 @@ namespace DelvUI {
 
         private void Draw() {
             
-            var inCutscene = _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene]
+            var hudState = _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene]
                              || _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene78]
                              || _pluginInterface.ClientState.Condition[ConditionFlag.OccupiedInCutSceneEvent]
-                             || _pluginInterface.ClientState.Condition[ConditionFlag.CreatingCharacter];
+                             || _pluginInterface.ClientState.Condition[ConditionFlag.CreatingCharacter]
+                             || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas]
+                             || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas51];
 
             _pluginInterface.UiBuilder.OverrideGameCursor = false;
             
             _configurationWindow.Draw();
 
-            if (_fontBuilt) {
-                ImGui.PushFont(_pluginConfiguration.BigNoodleTooFont);
-            }
-            
             if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
                 SwapJobs();
             }
 
-            if (!inCutscene) { 
+            if (_fontBuilt) {
+                ImGui.PushFont(_pluginConfiguration.BigNoodleTooFont);
+            }
+            
+
+            if (!hudState) { 
                 _hudWindow?.Draw();
             }
 
@@ -113,7 +119,8 @@ namespace DelvUI {
                 //Melee DPS
                 Jobs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.MNK => new MonkHudWindow(_pluginInterface, _pluginConfiguration),
-                
+                Jobs.NIN => new NinjaHudWindow(_pluginInterface, _pluginConfiguration),
+
                 //Ranged DPS
                 Jobs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.DNC => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
@@ -151,7 +158,6 @@ namespace DelvUI {
                 Jobs.FSH => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 
                 //dont have packs yet
-                Jobs.NIN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.DRG => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.BLU => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 _ => _hudWindow

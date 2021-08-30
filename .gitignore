@@ -3,6 +3,9 @@
 bin/
 Debug/
 obj/
+dalamud/
 
 DelvUI.sln.DotSettings.user
 Folder.DotSettings.user
+
+DelvUI/DelvUI.csproj.user
