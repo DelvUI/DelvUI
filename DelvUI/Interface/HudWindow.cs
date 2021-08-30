@@ -99,7 +99,7 @@ namespace DelvUI.Interface {
         private delegate void OpenContextMenuFromTarget(IntPtr agentHud, IntPtr gameObject);
         private OpenContextMenuFromTarget openContextMenuFromTarget;
 
-        private MpTickHelper mpTickHelper = null;
+        private MpTickHelper _mpTickHelper;
 
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {
             PluginInterface = pluginInterface;
@@ -114,7 +114,7 @@ namespace DelvUI.Interface {
         {
             if (!PluginConfiguration.MPTickerEnabled)
             {
-                mpTickHelper = null;
+                _mpTickHelper = null;
             } 
         }
 
@@ -410,7 +410,7 @@ namespace DelvUI.Interface {
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
             var emptyIconPath = "ui/icon/000000/000000.tex";
-            if (PluginConfiguration.ShowActionIcon && iconTexFile?.FilePath.Path != emptyIconPath) {
+            if (PluginConfiguration.ShowActionIcon && iconTexFile?.FilePath.Path != emptyIconPath && iconTexFile != null) {
                 var texture = PluginInterface.UiBuilder.LoadImageRaw(iconTexFile.GetRgbaImageData(), iconTexFile.Header.Width, iconTexFile.Header.Height, 4);
 
                 ImGui.Image(texture.ImGuiHandle, new Vector2(CastBarHeight, CastBarHeight));
@@ -431,7 +431,7 @@ namespace DelvUI.Interface {
                 DrawOutlinedText(
                     castText,
                     new Vector2(
-                        cursorPos.X + (PluginConfiguration.ShowActionIcon && iconTexFile.FilePath.Path != emptyIconPath ? CastBarHeight : 0) + 5,
+                        cursorPos.X + (PluginConfiguration.ShowActionIcon && iconTexFile?.FilePath.Path != emptyIconPath ? CastBarHeight : 0) + 5,
                         cursorPos.Y + CastBarHeight / 2f - castTextSize.Y / 2f
                     )
                 );
@@ -484,7 +484,7 @@ namespace DelvUI.Interface {
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
             var emptyIconPath = "ui/icon/000000/000000.tex";
-            if (PluginConfiguration.ShowTargetActionIcon && iconTexFile?.FilePath.Path != emptyIconPath) {
+            if (PluginConfiguration.ShowTargetActionIcon && iconTexFile?.FilePath.Path != emptyIconPath && iconTexFile != null) {
                 var texture = PluginInterface.UiBuilder.LoadImageRaw(iconTexFile.GetRgbaImageData(), iconTexFile.Header.Width, iconTexFile.Header.Height, 4);
 
                 ImGui.Image(texture.ImGuiHandle, new Vector2(TargetCastBarHeight, TargetCastBarHeight));
@@ -505,7 +505,7 @@ namespace DelvUI.Interface {
                 DrawOutlinedText(
                     castText,
                     new Vector2(
-                        cursorPos.X + (PluginConfiguration.ShowTargetActionIcon && iconTexFile.FilePath.Path != emptyIconPath ? TargetCastBarHeight : 0) + 5,
+                        cursorPos.X + (PluginConfiguration.ShowTargetActionIcon && iconTexFile?.FilePath.Path != emptyIconPath ? TargetCastBarHeight : 0) + 5,
                         cursorPos.Y + TargetCastBarHeight / 2f - castTextSize.Y / 2f
                     )
                 );
@@ -602,13 +602,13 @@ namespace DelvUI.Interface {
                 }
             }
 
-            if (mpTickHelper == null)
+            if (_mpTickHelper == null)
             {
-                mpTickHelper = new MpTickHelper(PluginInterface);
+                _mpTickHelper = new MpTickHelper(PluginInterface);
             }
 
             var now = ImGui.GetTime();
-            var scale = (float)((now - mpTickHelper.lastTick) / MpTickHelper.serverTickRate);
+            var scale = (float)((now - _mpTickHelper.lastTick) / MpTickHelper.serverTickRate);
             if (scale <= 0)
             {
                 return;
