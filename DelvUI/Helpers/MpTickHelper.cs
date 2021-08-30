@@ -3,6 +3,7 @@ using System.Linq;
 using Dalamud.Game.Internal;
 using Dalamud.Plugin;
 using ImGuiNET;
+using System.Diagnostics;
 
 
 namespace DelvUI.Helpers
@@ -27,6 +28,9 @@ namespace DelvUI.Helpers
 
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
+            Debug.Assert(pluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+            if (pluginInterface.ClientState.LocalPlayer == null) return;
+
             var now = ImGui.GetTime();
             if (now - lastUpdate < pollingRate)
             {
