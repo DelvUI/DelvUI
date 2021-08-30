@@ -1062,81 +1062,111 @@ namespace DelvUI.Interface
 
                     ImGui.EndTabItem();
                 }
-
+                
                 if (ImGui.BeginTabItem("Astrologian"))
                 {
 
-                    var AstDrawBarHeight = _pluginConfiguration.AstDrawBarHeight;
-                    if (ImGui.DragInt("Draw Gauge Height", ref AstDrawBarHeight, .1f, 1, 1000))
+                    var ASTDrawBarHeight = _pluginConfiguration.ASTDrawBarHeight;
+                    if (ImGui.DragInt("Draw Gauge Height", ref ASTDrawBarHeight, .1f, 1, 1000))
                     {
-                        _pluginConfiguration.AstDrawBarHeight = AstDrawBarHeight;
+                        _pluginConfiguration.ASTDrawBarHeight = ASTDrawBarHeight;
                         _pluginConfiguration.Save();
                     }
 
-                    var AstDrawBarWidth = _pluginConfiguration.AstDrawBarWidth;
-                    if (ImGui.DragInt("Draw Gauge Width", ref AstDrawBarWidth, .1f, 1, 1000))
+                    var ASTDrawBarWidth = _pluginConfiguration.ASTDrawBarWidth;
+                    if (ImGui.DragInt("Draw Gauge Width", ref ASTDrawBarWidth, .1f, 1, 1000))
                     {
-                        _pluginConfiguration.AstDrawBarWidth = AstDrawBarWidth;
+                        _pluginConfiguration.ASTDrawBarWidth = ASTDrawBarWidth;
                         _pluginConfiguration.Save();
                     }
 
-                    var AstDrawBarX = _pluginConfiguration.AstDrawBarX;
-                    if (ImGui.DragInt("Draw Gauge X Offset", ref AstDrawBarX, .1f, -1000, 1000))
+                    var ASTDrawBarX = _pluginConfiguration.ASTDrawBarX;
+                    if (ImGui.DragInt("Draw Gauge X Offset", ref ASTDrawBarX, .1f, -1000, 1000))
                     {
-                        _pluginConfiguration.AstDrawBarX = AstDrawBarX;
+                        _pluginConfiguration.ASTDrawBarX = ASTDrawBarX;
                         _pluginConfiguration.Save();
                     }
 
-                    var AstDrawBarY = _pluginConfiguration.AstDrawBarY;
-                    if (ImGui.DragInt("Draw Gauge Y Offset", ref AstDrawBarY, .1f, -1000, 1000))
+                    var ASTDrawBarY = _pluginConfiguration.ASTDrawBarY;
+                    if (ImGui.DragInt("Draw Gauge Y Offset", ref ASTDrawBarY, .1f, -1000, 1000))
                     {
-                        _pluginConfiguration.AstDrawBarY = AstDrawBarY;
+                        _pluginConfiguration.ASTDrawBarY = ASTDrawBarY;
                         _pluginConfiguration.Save();
                     }
 
-                    var AstDivinationHeight = _pluginConfiguration.AstDivinationHeight;
-                    if (ImGui.DragInt("Divination Gauge Height", ref AstDivinationHeight, .1f, 1, 1000))
+                    var ASTDivinationHeight = _pluginConfiguration.ASTDivinationHeight;
+                    if (ImGui.DragInt("Divination Gauge Height", ref ASTDivinationHeight, .1f, 1, 1000))
                     {
-                        _pluginConfiguration.AstDivinationHeight = AstDivinationHeight;
+                        _pluginConfiguration.ASTDivinationHeight = ASTDivinationHeight;
                         _pluginConfiguration.Save();
                     }
 
-                    var AstDivinationWidth = _pluginConfiguration.AstDivinationWidth;
-                    if (ImGui.DragInt("Divination Gauge Width", ref AstDivinationWidth, .1f, 1, 1000))
+                    var ASTDivinationWidth = _pluginConfiguration.ASTDivinationWidth;
+                    if (ImGui.DragInt("Divination Gauge Width", ref ASTDivinationWidth, .1f, 1, 1000))
                     {
-                        _pluginConfiguration.AstDivinationWidth = AstDivinationWidth;
+                        _pluginConfiguration.ASTDivinationWidth = ASTDivinationWidth;
                         _pluginConfiguration.Save();
                     }
 
-                    var AstDivinationBarX = _pluginConfiguration.AstDivinationBarX;
-                    if (ImGui.DragInt("Divination Gauge X Offset", ref AstDivinationBarX, .1f, -1000, 1000))
+                    var ASTDivinationBarX = _pluginConfiguration.ASTDivinationBarX;
+                    if (ImGui.DragInt("Divination Gauge X Offset", ref ASTDivinationBarX, .1f, -1000, 1000))
                     {
-                        _pluginConfiguration.AstDivinationBarX = AstDivinationBarX;
+                        _pluginConfiguration.ASTDivinationBarX = ASTDivinationBarX;
                         _pluginConfiguration.Save();
                     }
 
-                    var AstDivinationBarY = _pluginConfiguration.AstDivinationBarY;
-                    if (ImGui.DragInt("Divination Gauge Y Offset", ref AstDivinationBarY, .1f, -1000, 1000))
+                    var ASTDivinationBarY = _pluginConfiguration.ASTDivinationBarY;
+                    if (ImGui.DragInt("Divination Gauge Y Offset", ref ASTDivinationBarY, .1f, -1000, 1000))
                     {
-                        _pluginConfiguration.AstDivinationBarY = AstDivinationBarY;
+                        _pluginConfiguration.ASTDivinationBarY = ASTDivinationBarY;
                         _pluginConfiguration.Save();
                     }
 
-                    var AstDivinationBarPad = _pluginConfiguration.AstDivinationBarPad;
-                    if (ImGui.DragInt("Divination Padding", ref AstDivinationBarPad, .1f, -100, 1000))
+                    var ASTDivinationBarPad = _pluginConfiguration.ASTDivinationBarPad;
+                    if (ImGui.DragInt("Divination Padding", ref ASTDivinationBarPad, .1f, -100, 1000))
                     {
-                        _pluginConfiguration.AstDivinationBarPad = AstDivinationBarPad;
+                        _pluginConfiguration.ASTDivinationBarPad = ASTDivinationBarPad;
                         _pluginConfiguration.Save();
                     }
 
-                    changed |= ImGui.Checkbox("Show Divination Bar", ref _pluginConfiguration.AstShowDivinationBar);
-                    changed |= ImGui.Checkbox("Show Draw Bar", ref _pluginConfiguration.AstShowDrawBar);
-                    changed |= ImGui.Checkbox("Show Primary Resource Bar", ref _pluginConfiguration.AstShowPrimaryResourceBar);
+                    var ASTDotBarHeight = _pluginConfiguration.ASTDotBarHeight;
+                    if (ImGui.DragInt("Dot Gauge Height", ref ASTDotBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTDotBarHeight = ASTDotBarHeight;
+                        _pluginConfiguration.Save();
+                    }
 
-                    changed |= ImGui.ColorEdit4("Seal Sun Color", ref _pluginConfiguration.AstSealSunColor);
-                    changed |= ImGui.ColorEdit4("Seal Lunar Color", ref _pluginConfiguration.AstSealLunarColor);
-                    changed |= ImGui.ColorEdit4("Seal Celestial Color", ref _pluginConfiguration.AstSealCelestialColor);
-                    changed |= ImGui.ColorEdit4("Bar Empty Color", ref _pluginConfiguration.AstEmptyColor);
+                    var ASTDotBarWidth = _pluginConfiguration.ASTDotBarWidth;
+                    if (ImGui.DragInt("Dot Gauge Width", ref ASTDotBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTDotBarWidth = ASTDotBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDotBarX = _pluginConfiguration.ASTDotBarX;
+                    if (ImGui.DragInt("Dot Gauge X Offset", ref ASTDotBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTDotBarX = ASTDotBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTDotBarY = _pluginConfiguration.ASTDotBarY;
+                    if (ImGui.DragInt("Dot Gauge Y Offset", ref ASTDotBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTDotBarY = ASTDotBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show Divination Bar", ref _pluginConfiguration.ASTShowDivinationBar);
+                    changed |= ImGui.Checkbox("Show Draw Bar", ref _pluginConfiguration.ASTShowDrawBar);
+                    changed |= ImGui.Checkbox("Show Dot Bar", ref _pluginConfiguration.ASTShowDotBar);
+                    changed |= ImGui.Checkbox("Show Primary Resource Bar", ref _pluginConfiguration.ASTShowPrimaryResourceBar);
+
+                    changed |= ImGui.ColorEdit4("Seal Sun Color", ref _pluginConfiguration.ASTSealSunColor);
+                    changed |= ImGui.ColorEdit4("Seal Lunar Color", ref _pluginConfiguration.ASTSealLunarColor);
+                    changed |= ImGui.ColorEdit4("Seal Celestial Color", ref _pluginConfiguration.ASTSealCelestialColor);
+                    changed |= ImGui.ColorEdit4("Dot Color", ref _pluginConfiguration.ASTDotColor);
+                    changed |= ImGui.ColorEdit4("Bar Empty Color", ref _pluginConfiguration.ASTEmptyColor);
 
                     ImGui.EndTabItem();
                 }
