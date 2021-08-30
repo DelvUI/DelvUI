@@ -363,6 +363,40 @@ namespace DelvUI.Interface
                     changed |= ImGui.Checkbox("Hide MP Ticker on full mp", ref _pluginConfiguration.MPTickerHideOnFullMp);
                     changed |= ImGui.ColorEdit4("MP Ticker Color", ref _pluginConfiguration.MPTickerColor);
 
+                    // gcd indicator
+                    changed |= ImGui.Checkbox("Show GCD Indicator", ref _pluginConfiguration.GCDIndicatorEnabled);
+
+                    var GCDIndicatorHeight = _pluginConfiguration.GCDIndicatorHeight;
+                    if (ImGui.DragInt("GCD Indicator Height", ref GCDIndicatorHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.GCDIndicatorHeight = GCDIndicatorHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var GCDIndicatorWidth = _pluginConfiguration.GCDIndicatorWidth;
+                    if (ImGui.DragInt("GCD Indicator Width", ref GCDIndicatorWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.GCDIndicatorWidth = GCDIndicatorWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var GCDIndicatorXOffset = _pluginConfiguration.GCDIndicatorXOffset;
+                    if (ImGui.DragInt("GCD Indicator X Offset", ref GCDIndicatorXOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.GCDIndicatorXOffset = GCDIndicatorXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var GCDIndicatorYOffset = _pluginConfiguration.GCDIndicatorYOffset;
+                    if (ImGui.DragInt("GCD Indicator Y Offset", ref GCDIndicatorYOffset, 1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.GCDIndicatorYOffset = GCDIndicatorYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    changed |= ImGui.Checkbox("Show GCD Indicator border", ref _pluginConfiguration.GCDIndicatorShowBorder);
+                    changed |= ImGui.ColorEdit4("GCD Indicator Color", ref _pluginConfiguration.GCDIndicatorColor);
+
                     changed |= ImGui.Checkbox("Hide HUD", ref _pluginConfiguration.HideHud);
                     changed |= ImGui.Checkbox("Lock HUD", ref _pluginConfiguration.LockHud);
 

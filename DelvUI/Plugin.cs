@@ -6,6 +6,7 @@ using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using ImGuiNET;
 using DelvUI.Interface;
+using FFXIVClientStructs;
 
 namespace DelvUI {
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -42,6 +43,8 @@ namespace DelvUI {
             if (!_fontBuilt && !_fontLoadFailed) {
                 _pluginInterface.UiBuilder.RebuildFonts();
             }
+
+            Resolver.Initialize();
         }
         
         private void BuildFont() {

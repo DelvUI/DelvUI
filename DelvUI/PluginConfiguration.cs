@@ -72,6 +72,13 @@ namespace DelvUI {
         public bool MPTickerShowBorder = false;
         public bool MPTickerHideOnFullMp = false;
 
+        public bool GCDIndicatorEnabled = false;
+        public int GCDIndicatorHeight { get; set; } = 4;
+        public int GCDIndicatorWidth { get; set; } = 254;
+        public int GCDIndicatorXOffset { get; set; } = 0;
+        public int GCDIndicatorYOffset { get; set; } = 480;
+        public bool GCDIndicatorShowBorder = false;
+
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
         public int CastBarXOffset { get; set; } = 0;
@@ -107,6 +114,7 @@ namespace DelvUI {
         public Vector4 SlideCastColor = new Vector4(255f/255f,0f/255f,0f/255f,100f/100f);
         public Vector4 ShieldColor = new Vector4(255f/255f,255f/255f,0f/255f,100f/100f);
         public Vector4 MPTickerColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f);
+        public Vector4 GCDIndicatorColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f);
 
         public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,100f/100f);
         public Vector4 JobColorWAR = new Vector4(153f/255f,23f/255f,23f/255f,100f/100f);
@@ -525,8 +533,7 @@ namespace DelvUI {
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
         [JsonIgnore] public Dictionary<uint, Dictionary<string, uint>> JobColorMap;
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> NPCColorMap;
-        [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> ShieldColorMap;
-        [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> MPTickerColorMap;
+        [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> MiscColorMap;
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> CastBarColorMap;
 
         public void Init(DalamudPluginInterface pluginInterface) {
@@ -1307,7 +1314,7 @@ namespace DelvUI {
                 },
             };
 
-            ShieldColorMap = new Dictionary<string, Dictionary<string, uint>>
+            MiscColorMap = new Dictionary<string, Dictionary<string, uint>>
             {
                 ["shield"] = new Dictionary<string, uint>
                 {
@@ -1315,12 +1322,15 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(ShieldColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ShieldColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ShieldColor.AdjustColor(.1f))
-                }
-            };
-
-            MPTickerColorMap = new Dictionary<string, Dictionary<string, uint>>
-            {
+                },
                 ["mpTicker"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MPTickerColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(MPTickerColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MPTickerColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MPTickerColor.AdjustColor(.1f))
+                },
+                ["gcd"] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(MPTickerColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(MPTickerColor.AdjustColor(-.8f)),
