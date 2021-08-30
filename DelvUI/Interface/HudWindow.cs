@@ -229,11 +229,8 @@ namespace DelvUI.Interface {
                     colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
                 );
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                
-                DrawTargetShield(target, cursorPos, BarSize, true);
 
-                var text = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextLeft);
-                DrawOutlinedText(text, new Vector2(cursorPos.X + 5 + TargetBarTextLeftXOffset, cursorPos.Y - 22 + TargetBarTextLeftYOffset));
+                DrawTargetShield(target, cursorPos, BarSize, true);
             }
             
             var textLeft = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextLeft);
@@ -517,6 +514,10 @@ namespace DelvUI.Interface {
 
         protected virtual void DrawTargetShield(Actor actor, Vector2 cursorPos, Vector2 targetBar, bool leftToRight) {
             if (!PluginConfiguration.ShieldEnabled) {
+                return;
+            }
+
+            if (actor.ObjectKind is not ObjectKind.Player) {
                 return;
             }
 
