@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Numerics;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
@@ -102,7 +103,7 @@ namespace DelvUI.Interface
             else
             {
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-                DrawOutlinedText(Math.Round(twinSnakesDuration).ToString(), new Vector2(CenterX - twinXOffset, cursorPos.Y - twinYOffset));
+                DrawOutlinedText(Math.Round(twinSnakesDuration).ToString(CultureInfo.InvariantCulture), new Vector2(CenterX - twinXOffset, cursorPos.Y - twinYOffset));
 
                 cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
                 var leadenXOffset = TimeLeadenXOffset;
@@ -120,7 +121,7 @@ namespace DelvUI.Interface
                 if (leadenFistDuration <= 0)
                     DrawOutlinedText("0", new Vector2(CenterX + leadenXOffset, cursorPos.Y - leadenYOffset));
                 else
-                    DrawOutlinedText(Math.Round(leadenFistDuration).ToString(), new Vector2(CenterX + leadenXOffset, cursorPos.Y - leadenYOffset));
+                    DrawOutlinedText(Math.Round(leadenFistDuration).ToString(CultureInfo.InvariantCulture), new Vector2(CenterX + leadenXOffset, cursorPos.Y - leadenYOffset));
             }
         }
 
@@ -159,8 +160,7 @@ namespace DelvUI.Interface
             if (!PluginConfiguration.ShowDemolishTime)
                 return;
             else
-                DrawOutlinedText(Math.Round(demolishDuration).ToString(), new Vector2(CenterX + demoXOffset, cursorPos.Y - demoYOffset));
-
+                DrawOutlinedText(Math.Round(demolishDuration).ToString(CultureInfo.InvariantCulture), new Vector2(CenterX + demoXOffset, cursorPos.Y - demoYOffset));
         }
 
         private void ChakraBar()
@@ -185,10 +185,7 @@ namespace DelvUI.Interface
                             ChakraColor["gradientLeft"], ChakraColor["gradientRight"], ChakraColor["gradientRight"], ChakraColor["gradientLeft"]
                         );
                 }
-                else
-                {
 
-                }
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
                 cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
             }
