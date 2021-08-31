@@ -31,19 +31,19 @@ namespace DelvUI {
             _pluginConfiguration.Init(_pluginInterface);
             _configurationWindow = new ConfigurationWindow(_pluginConfiguration);
 
+            BuildBanner();
+            _pluginInterface.UiBuilder.OnBuildUi += Draw;
+            _pluginInterface.UiBuilder.OnBuildFonts += BuildFont;
+            _pluginInterface.UiBuilder.OnOpenConfigUi += OpenConfigUi;
+            if (!_fontBuilt && !_fontLoadFailed) {
+                _pluginInterface.UiBuilder.RebuildFonts();
+            }
+
             _pluginInterface.CommandManager.AddHandler("/pdelvui", new CommandInfo(PluginCommand)
             {
                 HelpMessage = "Opens the DelvUI configuration window.", 
                 ShowInHelp = true
             });
-
-            _pluginInterface.UiBuilder.OnBuildUi += Draw;
-            _pluginInterface.UiBuilder.OnBuildFonts += BuildFont;
-            _pluginInterface.UiBuilder.OnOpenConfigUi += BuildBanner;
-            _pluginInterface.UiBuilder.OnOpenConfigUi += OpenConfigUi;
-            if (!_fontBuilt && !_fontLoadFailed) {
-                _pluginInterface.UiBuilder.RebuildFonts();
-            }
 
             Resolver.Initialize();
         }
@@ -67,7 +67,7 @@ namespace DelvUI {
             }
         }
 
-        private void BuildBanner(object sender, EventArgs eventArgs)
+        private void BuildBanner()
         {
             var bannerImage = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
 
@@ -200,7 +200,6 @@ namespace DelvUI {
             _pluginInterface.CommandManager.RemoveHandler("/pdelvui");
             _pluginInterface.UiBuilder.OnBuildUi -= Draw;
             _pluginInterface.UiBuilder.OnBuildFonts -= BuildFont;
-            _pluginInterface.UiBuilder.OnOpenConfigUi -= BuildBanner;
             _pluginInterface.UiBuilder.OnOpenConfigUi -= OpenConfigUi;
             _pluginInterface.UiBuilder.RebuildFonts();
         }
