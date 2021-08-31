@@ -79,7 +79,7 @@ namespace DelvUI.Helpers
                 case ActionType.KeyItem:
                 case ActionType.Item:
                     _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Item>()?.GetRow(CastId);
-                    ActionText = ActionText.ToString() != "" ? _lastUsedAction?.Name.ToString() : "Using item...";
+                    ActionText = _lastUsedAction?.Name.ToString() ?? "Using item...";
                     _icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
                     DamageType = DamageType.Unknown;
                     break;
