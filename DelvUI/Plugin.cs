@@ -20,7 +20,7 @@ namespace DelvUI {
 
         private bool _fontBuilt;
         private bool _fontLoadFailed;
-        
+
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         // ReSharper disable once MemberCanBePrivate.Global
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
@@ -29,7 +29,7 @@ namespace DelvUI {
             _pluginInterface = pluginInterface;
             _pluginConfiguration = pluginInterface.GetPluginConfig() as PluginConfiguration ?? new PluginConfiguration();
             _pluginConfiguration.Init(_pluginInterface);
-            _configurationWindow = new ConfigurationWindow(this, _pluginInterface, _pluginConfiguration);
+            _configurationWindow = new ConfigurationWindow(_pluginConfiguration);
 
             _pluginInterface.CommandManager.AddHandler("/pdelvui", new CommandInfo(PluginCommand)
             {
@@ -39,6 +39,7 @@ namespace DelvUI {
 
             _pluginInterface.UiBuilder.OnBuildUi += Draw;
             _pluginInterface.UiBuilder.OnBuildFonts += BuildFont;
+            _pluginInterface.UiBuilder.OnOpenConfigUi += BuildBanner;
             _pluginInterface.UiBuilder.OnOpenConfigUi += OpenConfigUi;
             if (!_fontBuilt && !_fontLoadFailed) {
                 _pluginInterface.UiBuilder.RebuildFonts();
@@ -64,6 +65,24 @@ namespace DelvUI {
                 PluginLog.Log($"Font doesn't exist. {fontFile}");
                 _fontLoadFailed = true;
             }
+        }
+
+        private void BuildBanner(object sender, EventArgs eventArgs)
+        {
+            var bannerImage = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
+            
+            if (File.Exists(bannerImage)) {
+                try {
+                    _pluginConfiguration.BannerImage = _pluginInterface.UiBuilder.LoadImage(bannerImage);
+                } catch (Exception ex) {
+                    PluginLog.Log($"Image failed to load. {bannerImage}");
+                    PluginLog.Log(ex.ToString());
+                }
+            } else {
+                PluginLog.Log($"Image doesn't exist. {bannerImage}");
+            }
+            
+
         }
 
         private void PluginCommand(string command, string arguments) {
@@ -182,8 +201,10 @@ namespace DelvUI {
             _pluginInterface.CommandManager.RemoveHandler("/pdelvui");
             _pluginInterface.UiBuilder.OnBuildUi -= Draw;
             _pluginInterface.UiBuilder.OnBuildFonts -= BuildFont;
+            _pluginInterface.UiBuilder.OnOpenConfigUi -= BuildBanner;
             _pluginInterface.UiBuilder.OnOpenConfigUi -= OpenConfigUi;
             _pluginInterface.UiBuilder.RebuildFonts();
+            
         }
 
         public void Dispose() {
