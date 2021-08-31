@@ -1528,14 +1528,9 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    var gnbPowderGaugeEnablewd = _pluginConfiguration.GNBPowderGaugeEnabled;
-                    if (ImGui.Checkbox("Powder Gauge Enabled", ref gnbPowderGaugeEnablewd))
-                    {
-                        _pluginConfiguration.GNBPowderGaugeEnabled = gnbPowderGaugeEnablewd;
-                        _pluginConfiguration.Save();
-                    }
+                    _changed |= ImGui.Checkbox("Powder Gauge Enabled", ref _pluginConfiguration.GNBPowderGaugeEnabled);
 
-                    if (gnbPowderGaugeEnablewd) {
+                    if (_pluginConfiguration.GNBPowderGaugeEnabled) {
                         var gnbPowderGaugeHeight = _pluginConfiguration.GNBPowderGaugeHeight;
                         if (ImGui.DragInt("Powder Gauge Height", ref gnbPowderGaugeHeight, .1f, 1, _yOffsetLimit)) {
                             _pluginConfiguration.GNBPowderGaugeHeight = gnbPowderGaugeHeight;
@@ -1569,14 +1564,9 @@ namespace DelvUI.Interface
                         _changed |= ImGui.ColorEdit4("Powder Gauge Color", ref _pluginConfiguration.GNBGunPowderColor);
                     }
 
-                    var gnbNoMercyBarEnablewd = _pluginConfiguration.GNBNoMercyBarEnabled;
-                    if (ImGui.Checkbox("No Mercy Bar Enabled", ref gnbNoMercyBarEnablewd))
-                    {
-                        _pluginConfiguration.GNBNoMercyBarEnabled = gnbNoMercyBarEnablewd;
-                        _pluginConfiguration.Save();
-                    }
+                    _changed |= ImGui.Checkbox("No Mercy Bar Enabled", ref _pluginConfiguration.GNBNoMercyBarEnabled);
 
-                    if (gnbNoMercyBarEnablewd) {
+                    if (_pluginConfiguration.GNBNoMercyBarEnabled) {
                         var gnbNoMercyBarHeight = _pluginConfiguration.GNBNoMercyBarHeight;
                         if (ImGui.DragInt("No Mercy Bar Height", ref gnbNoMercyBarHeight, .1f, 1, _yOffsetLimit)) {
                             _pluginConfiguration.GNBNoMercyBarHeight = gnbNoMercyBarHeight;
@@ -1602,13 +1592,6 @@ namespace DelvUI.Interface
                         }
 
                         _changed |= ImGui.ColorEdit4("No Mercy Color", ref _pluginConfiguration.GNBNoMercyColor);
-                    }
-
-                    var gnbInterBarOffset = _pluginConfiguration.GNBInterBarOffset;
-                    if (ImGui.DragInt("Space Between Bars", ref gnbInterBarOffset, .1f, 0, 1000))
-                    {
-                        _pluginConfiguration.GNBInterBarOffset = gnbInterBarOffset;
-                        _pluginConfiguration.Save();
                     }
 
                     ImGui.EndTabItem();
