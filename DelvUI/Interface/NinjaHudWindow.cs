@@ -17,8 +17,13 @@ namespace DelvUI.Interface
         private new int XOffset => PluginConfiguration.NINBaseXOffset;
         private new int YOffset => PluginConfiguration.NINBaseYOffset;
 
+        private bool HutonGaugeEnabled => PluginConfiguration.NINHutonGaugeEnabled;
         private int HutonGaugeHeight => PluginConfiguration.NINHutonGaugeHeight;
         private int HutonGaugeWidth => PluginConfiguration.NINHutonGaugeWidth;
+        private int HutonGaugeXOffset => PluginConfiguration.NINHutonGaugeXOffset;
+        private int HutonGaugeYOffset => PluginConfiguration.NINHutonGaugeYOffset;
+
+        private bool NinkiGaugeEnabled => PluginConfiguration.NINNinkiGaugeEnabled;
         private int NinkiGaugeHeight => PluginConfiguration.NINNinkiGaugeHeight;
         private int NinkiGaugeWidth => PluginConfiguration.NINNinkiGaugeWidth;
         private int NinkiGaugePadding => PluginConfiguration.NINNinkiGaugePadding;
@@ -29,27 +34,27 @@ namespace DelvUI.Interface
         private Dictionary<string, uint> HutonColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 1];
         private Dictionary<string, uint> NinkiColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 2];
 
-        private int InterBarOffset => PluginConfiguration.NINInterBarOffset;
-
         public NinjaHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _)
         {
-            var nextHeight = DrawHutonGauge(0);
-            nextHeight = DrawNinkiGauge(nextHeight);
+            if (HutonGaugeEnabled)
+                DrawHutonGauge();
+            if (NinkiGaugeEnabled)
+                DrawNinkiGauge();
         }
 
         protected override void DrawPrimaryResourceBar()
         {
         }
 
-        private int DrawHutonGauge(int initialHeight)
+        private void DrawHutonGauge()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
             var hutonDurationLeft = (int)Math.Ceiling((float) (gauge.HutonTimeLeft / (double)1000));
 
-            var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset + initialHeight;
+            var xPos = CenterX - XOffset + HutonGaugeXOffset;
+            var yPos = CenterY + YOffset + HutonGaugeYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, HutonGaugeHeight, HutonGaugeWidth);
             float maximum = 70f;
@@ -61,16 +66,14 @@ namespace DelvUI.Interface
 
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);
-
-            return HutonGaugeHeight + initialHeight + InterBarOffset;
         }
 
-        private int DrawNinkiGauge(int initialHeight)
+        private void DrawNinkiGauge()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
 
             var xPos = CenterX - XOffset + NinkiGaugeXOffset;
-            var yPos = CenterY + YOffset + initialHeight + NinkiGaugeYOffset;
+            var yPos = CenterY + YOffset + NinkiGaugeYOffset;
 
             var bar = BarBuilder.Create(xPos, yPos, NinkiGaugeHeight, NinkiGaugeWidth)
                 .SetChunks(2)
@@ -80,8 +83,6 @@ namespace DelvUI.Interface
 
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);
-
-            return NinkiGaugeHeight + initialHeight + InterBarOffset;
         }
     }
 }
