@@ -2856,6 +2856,20 @@ namespace DelvUI.Interface
             {
                 if (ImGui.BeginTabItem("Machinist"))
                 {
+                    var overheatEnabled = _pluginConfiguration.MCHOverheatEnable;
+                    if (ImGui.Checkbox("Overheat Bar Enabled", ref overheatEnabled))
+                    {
+                        _pluginConfiguration.MCHOverheatEnable = overheatEnabled;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var overheatText = _pluginConfiguration.MCHOverheatText;
+                    if (ImGui.Checkbox("Overheat Bar Text", ref overheatText))
+                    {
+                        _pluginConfiguration.MCHOverheatText = overheatText;
+                        _pluginConfiguration.Save();
+                    }
+                    
                     var overheatHeight = _pluginConfiguration.MCHOverheatHeight;
                     if (ImGui.DragInt("Overheat Height", ref overheatHeight, .1f, 1, 1000))
                     {
@@ -2870,17 +2884,31 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    var mchBaseXOffset = _pluginConfiguration.MCHBaseXOffset;
-                    if (ImGui.DragInt("MCH Base X Offset", ref mchBaseXOffset, .1f, -2000, 2000))
+                    var overheatXOffset = _pluginConfiguration.MCHOverheatXOffset;
+                    if (ImGui.DragInt("Overheat X Offset", ref overheatXOffset, .1f, -2000, 2000))
                     {
-                        _pluginConfiguration.MCHBaseXOffset = mchBaseXOffset;
+                        _pluginConfiguration.MCHOverheatXOffset = overheatXOffset;
                         _pluginConfiguration.Save();
                     }
 
-                    var mchBaseYOffset = _pluginConfiguration.MCHBaseYOffset;
-                    if (ImGui.DragInt("MCH Base Y Offset", ref mchBaseYOffset, .1f, -2000, 2000))
+                    var overheatYOffset = _pluginConfiguration.MCHOverheatYOffset;
+                    if (ImGui.DragInt("Overheat Y Offset", ref overheatYOffset, .1f, -2000, 2000))
                     {
-                        _pluginConfiguration.MCHBaseYOffset = mchBaseYOffset;
+                        _pluginConfiguration.MCHOverheatYOffset = overheatYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var heatGaugeEnabled = _pluginConfiguration.MCHHeatGaugeEnable;
+                    if (ImGui.Checkbox("Heat Gauge Enabled", ref heatGaugeEnabled))
+                    {
+                        _pluginConfiguration.MCHHeatGaugeEnable = heatGaugeEnabled;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var heatGaugeText = _pluginConfiguration.MCHHeatGaugeText;
+                    if (ImGui.Checkbox("Heat Gauge Text", ref heatGaugeText))
+                    {
+                        _pluginConfiguration.MCHHeatGaugeText = heatGaugeText;
                         _pluginConfiguration.Save();
                     }
 
@@ -2918,6 +2946,42 @@ namespace DelvUI.Interface
                         _pluginConfiguration.MCHHeatGaugeYOffset = heatGaugeYOffset;
                         _pluginConfiguration.Save();
                     }
+
+                    var batteryGaugeEnabled = _pluginConfiguration.MCHBatteryGaugeEnable;
+                    if (ImGui.Checkbox("Battery Gauge Enabled", ref batteryGaugeEnabled))
+                    {
+                        _pluginConfiguration.MCHBatteryGaugeEnable = batteryGaugeEnabled;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var batteryGaugeShowBattery = _pluginConfiguration.MCHBatteryGaugeShowBattery;
+                    if (ImGui.Checkbox("Battery Gauge Show Battery Level", ref batteryGaugeShowBattery))
+                    {
+                        _pluginConfiguration.MCHBatteryGaugeShowBattery = batteryGaugeShowBattery;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var batteryGaugeBatteryText = _pluginConfiguration.MCHBatteryGaugeBatteryText;
+                    if (ImGui.Checkbox("Battery Gauge Show Battery Text", ref batteryGaugeBatteryText))
+                    {
+                        _pluginConfiguration.MCHBatteryGaugeBatteryText = batteryGaugeBatteryText;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var batteryGaugeShowRobot = _pluginConfiguration.MCHBatteryGaugeShowRobotDuration;
+                    if (ImGui.Checkbox("Battery Gauge Show Robot Duration", ref batteryGaugeShowRobot))
+                    {
+                        _pluginConfiguration.MCHBatteryGaugeShowRobotDuration = batteryGaugeShowRobot;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var batteryGaugeRobotText = _pluginConfiguration.MCHBatteryGaugeRobotDurationText;
+                    if (ImGui.Checkbox("Battery Gauge Show Robot Duration Text", ref batteryGaugeRobotText))
+                    {
+                        _pluginConfiguration.MCHBatteryGaugeRobotDurationText = batteryGaugeRobotText;
+                        _pluginConfiguration.Save();
+                    }
+
 
                     var batteryGaugeHeight = _pluginConfiguration.MCHBatteryGaugeHeight;
                     if (ImGui.DragInt("Battery Gauge Height", ref batteryGaugeHeight, .1f, 1, 1000))
@@ -2960,6 +3024,13 @@ namespace DelvUI.Interface
                         _pluginConfiguration.MCHWildfireEnabled = wildfireEnabled;
                         _pluginConfiguration.Save();
                     }
+                    
+                    var wildfireText = _pluginConfiguration.MCHWildfireText;
+                    if (ImGui.Checkbox("Wildfire Text", ref wildfireText))
+                    {
+                        _pluginConfiguration.MCHWildfireText = wildfireText;
+                        _pluginConfiguration.Save();
+                    }
 
                     var wildfireHeight = _pluginConfiguration.MCHWildfireHeight;
                     if (ImGui.DragInt("Wildfire Bar Height", ref wildfireHeight, .1f, 1, 1000))
@@ -2986,13 +3057,6 @@ namespace DelvUI.Interface
                     if (ImGui.DragInt("Wildfire Bar Y Offset", ref wildfireYOffset, .1f, -2000, 2000))
                     {
                         _pluginConfiguration.MCHWildfireYOffset = wildfireYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var mchInterBarOffset = _pluginConfiguration.MCHInterBarOffset;
-                    if (ImGui.DragInt("Space Between Bars", ref mchInterBarOffset, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.MCHInterBarOffset = mchInterBarOffset;
                         _pluginConfiguration.Save();
                     }
 

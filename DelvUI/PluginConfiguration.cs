@@ -334,26 +334,35 @@ namespace DelvUI {
 
         #region MCH Configuration
 
+        public bool MCHOverheatEnable { get; set; } = true;
+        public bool MCHOverheatText { get; set; } = true;
         public int MCHOverheatHeight { get; set; } = 20;
         public int MCHOverheatWidth { get; set; } = 254;
-        public int MCHBaseXOffset { get; set; } = 127;
-        public int MCHBaseYOffset { get; set; } = 395;
+        public int MCHOverheatXOffset { get; set; } = 127;
+        public int MCHOverheatYOffset { get; set; } = 395;
+        public bool MCHHeatGaugeEnable { get; set; } = true;
+        public bool MCHHeatGaugeText { get; set; } = true;
         public int MCHHeatGaugeHeight { get; set; } = 20;
         public int MCHHeatGaugeWidth { get; set; } = 254;
         public int MCHHeatGaugePadding { get; set; } = 2;
-        public int MCHHeatGaugeXOffset { get; set; }
-        public int MCHHeatGaugeYOffset { get; set; }
+        public int MCHHeatGaugeXOffset { get; set; } = 127;
+        public int MCHHeatGaugeYOffset { get; set; } = 417;
+        public bool MCHBatteryGaugeEnable { get; set; } = true;
+        public bool MCHBatteryGaugeShowBattery { get; set; } = true;
+        public bool MCHBatteryGaugeBatteryText { get; set; }
+        public bool MCHBatteryGaugeShowRobotDuration { get; set; } = true;
+        public bool MCHBatteryGaugeRobotDurationText { get; set; } = true;
         public int MCHBatteryGaugeHeight { get; set; } = 20;
         public int MCHBatteryGaugeWidth { get; set; } = 254;
         public int MCHBatteryGaugePadding { get; set; } = 2;
-        public int MCHBatteryGaugeXOffset { get; set; }
-        public int MCHBatteryGaugeYOffset { get; set; }
+        public int MCHBatteryGaugeXOffset { get; set; } = 127;
+        public int MCHBatteryGaugeYOffset { get; set; } = 439;
         public bool MCHWildfireEnabled { get; set; }
+        public bool MCHWildfireText { get; set; } = true;
         public int MCHWildfireHeight { get; set; } = 20;
         public int MCHWildfireWidth { get; set; } = 254;
-        public int MCHWildfireXOffset { get; set; }
-        public int MCHWildfireYOffset { get; set; }
-        public int MCHInterBarOffset { get; set; } = 2;
+        public int MCHWildfireXOffset { get; set; } = 127;
+        public int MCHWildfireYOffset { get; set; } = 373;
         public Vector4 MCHHeatColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 100f/100f);
         public Vector4 MCHBatteryColor = new Vector4(106f/255f, 255f/255f, 255f/255f, 100f/100f);
         public Vector4 MCHRobotColor = new Vector4(153f/255f, 0f/255f, 255f/255f, 100f/100f);
