@@ -608,6 +608,20 @@ namespace DelvUI {
 
         #endregion
 
+        #region GNB Configuration
+
+        public int GNBVerticalOffset { get; set; } = 479;
+        public int GNBHorizontalOffset { get; set; } = 127;
+        public bool GNBCartridgeBarEnabled { get; set; } = true;
+        public int GNBCartridgeBarHeight { get; set; } = 13;
+        public int GNBCartridgeBarWidth { get; set; } = 254;
+        public int GNBCartridgeBarPadding { get; set; } = 2;
+
+        public Vector4 GNBCartridgeColorLeft = new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f);
+        public Vector4 GNBCartridgeColorRight = new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f);
+
+        #endregion
+
         [JsonIgnore] private DalamudPluginInterface _pluginInterface;
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
         [JsonIgnore] public TextureWrap BannerImage = null;
