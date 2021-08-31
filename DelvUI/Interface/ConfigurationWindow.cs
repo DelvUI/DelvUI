@@ -129,11 +129,11 @@ namespace DelvUI.Interface
 
             }
             ImGui.SameLine();
-            if (ImGui.Button("Hide HUD"))
+            if (ImGui.Button(_pluginConfiguration.HideHud ? "Show HUD" : "Hide HUD"))
             {
-                _changed |= ImGui.Checkbox("Hide HUD", ref _pluginConfiguration.HideHud);
-
-            }                
+                _pluginConfiguration.HideHud = ! _pluginConfiguration.HideHud;
+                _changed = true;
+            }
             ImGui.SameLine();
             if (ImGui.Button("Reset HUD")) {}
             ImGui.SameLine();
@@ -1514,6 +1514,107 @@ namespace DelvUI.Interface
                     }
                     ImGui.EndTabItem();
                 }
+                
+                if (ImGui.BeginTabItem("Gunbreaker")) {
+                    var gnbBaseXOffset = _pluginConfiguration.GNBBaseXOffset;
+                    if (ImGui.DragInt("Base X Offset", ref gnbBaseXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
+                        _pluginConfiguration.GNBBaseXOffset = gnbBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var gnbBaseYOffset = _pluginConfiguration.GNBBaseYOffset;
+                    if (ImGui.DragInt("Base Y Offset", ref gnbBaseYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
+                        _pluginConfiguration.GNBBaseYOffset = gnbBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var gnbPowderGaugeEnablewd = _pluginConfiguration.GNBPowderGaugeEnabled;
+                    if (ImGui.Checkbox("Powder Gauge Enabled", ref gnbPowderGaugeEnablewd))
+                    {
+                        _pluginConfiguration.GNBPowderGaugeEnabled = gnbPowderGaugeEnablewd;
+                        _pluginConfiguration.Save();
+                    }
+
+                    if (gnbPowderGaugeEnablewd) {
+                        var gnbPowderGaugeHeight = _pluginConfiguration.GNBPowderGaugeHeight;
+                        if (ImGui.DragInt("Powder Gauge Height", ref gnbPowderGaugeHeight, .1f, 1, _yOffsetLimit)) {
+                            _pluginConfiguration.GNBPowderGaugeHeight = gnbPowderGaugeHeight;
+                            _pluginConfiguration.Save();
+                        }
+
+                        var gnbPowderGaugeWidth = _pluginConfiguration.GNBPowderGaugeWidth;
+                        if (ImGui.DragInt("Powder Gauge Width", ref gnbPowderGaugeWidth, .1f, 1, _xOffsetLimit)) {
+                            _pluginConfiguration.GNBPowderGaugeWidth = gnbPowderGaugeWidth;
+                            _pluginConfiguration.Save();
+                        }
+
+                        var gnbPowderGaugeXOffset = _pluginConfiguration.GNBPowderGaugeXOffset;
+                        if (ImGui.DragInt("Powder Gauge X Offset", ref gnbPowderGaugeXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
+                            _pluginConfiguration.GNBPowderGaugeXOffset = gnbPowderGaugeXOffset;
+                            _pluginConfiguration.Save();
+                        }
+
+                        var gnbPowderGaugeYOffset = _pluginConfiguration.GNBPowderGaugeYOffset;
+                        if (ImGui.DragInt("Powder Gauge Y Offset", ref gnbPowderGaugeYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
+                            _pluginConfiguration.GNBPowderGaugeYOffset = gnbPowderGaugeYOffset;
+                            _pluginConfiguration.Save();
+                        }
+
+                        var gnbPowderGaugePadding = _pluginConfiguration.GNBPowderGaugePadding;
+                        if (ImGui.DragInt("Powder Gauge Padding", ref gnbPowderGaugePadding, .1f, -1, 1000)) {
+                            _pluginConfiguration.GNBPowderGaugePadding = gnbPowderGaugePadding;
+                            _pluginConfiguration.Save();
+                        }
+
+                        _changed |= ImGui.ColorEdit4("Powder Gauge Color", ref _pluginConfiguration.GNBGunPowderColor);
+                    }
+
+                    var gnbNoMercyBarEnablewd = _pluginConfiguration.GNBNoMercyBarEnabled;
+                    if (ImGui.Checkbox("No Mercy Bar Enabled", ref gnbNoMercyBarEnablewd))
+                    {
+                        _pluginConfiguration.GNBNoMercyBarEnabled = gnbNoMercyBarEnablewd;
+                        _pluginConfiguration.Save();
+                    }
+
+                    if (gnbNoMercyBarEnablewd) {
+                        var gnbNoMercyBarHeight = _pluginConfiguration.GNBNoMercyBarHeight;
+                        if (ImGui.DragInt("No Mercy Bar Height", ref gnbNoMercyBarHeight, .1f, 1, _yOffsetLimit)) {
+                            _pluginConfiguration.GNBNoMercyBarHeight = gnbNoMercyBarHeight;
+                            _pluginConfiguration.Save();
+                        }
+
+                        var gnbNoMercyBarWidth = _pluginConfiguration.GNBNoMercyBarWidth;
+                        if (ImGui.DragInt("No Mercy Bar Width", ref gnbNoMercyBarWidth, .1f, 1, _xOffsetLimit)) {
+                            _pluginConfiguration.GNBNoMercyBarWidth = gnbNoMercyBarWidth;
+                            _pluginConfiguration.Save();
+                        }
+
+                        var gnbNoMercyBarXOffset = _pluginConfiguration.GNBNoMercyBarXOffset;
+                        if (ImGui.DragInt("No Mercy Bar X Offset", ref gnbNoMercyBarXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
+                            _pluginConfiguration.GNBNoMercyBarXOffset = gnbNoMercyBarXOffset;
+                            _pluginConfiguration.Save();
+                        }
+
+                        var gnbNoMercyBarYOffset = _pluginConfiguration.GNBNoMercyBarYOffset;
+                        if (ImGui.DragInt("No Mercy Bar Y Offset", ref gnbNoMercyBarYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
+                            _pluginConfiguration.GNBNoMercyBarYOffset = gnbNoMercyBarYOffset;
+                            _pluginConfiguration.Save();
+                        }
+
+                        _changed |= ImGui.ColorEdit4("No Mercy Color", ref _pluginConfiguration.GNBNoMercyColor);
+                    }
+
+                    var gnbInterBarOffset = _pluginConfiguration.GNBInterBarOffset;
+                    if (ImGui.DragInt("Space Between Bars", ref gnbInterBarOffset, .1f, 0, 1000))
+                    {
+                        _pluginConfiguration.GNBInterBarOffset = gnbInterBarOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    ImGui.EndTabItem();
+                }
+
+
                 
                 if (ImGui.BeginTabItem("Warrior"))
                 {
