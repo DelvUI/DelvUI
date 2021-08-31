@@ -14,15 +14,19 @@ namespace DelvUI.Interface
     {
         public override uint JobId => 19;
 
+        private bool ManaEnabled => PluginConfiguration.PLDManaEnabled;
+        
         private int ManaBarHeight => PluginConfiguration.PLDManaHeight;
         
         private int ManaBarWidth => PluginConfiguration.PLDManaWidth;
         
         private int ManaBarPadding => PluginConfiguration.PLDManaPadding;
         
-        private new int XOffset => PluginConfiguration.PLDBaseXOffset;
+        private new int ManaXOffset => PluginConfiguration.PLDManaXOffset;
         
-        private new int YOffset => PluginConfiguration.PLDBaseYOffset;
+        private new int ManaYOffset => PluginConfiguration.PLDManaYOffset;
+        
+        private bool OathGaugeEnabled => PluginConfiguration.PLDOathGaugeEnabled;
         
         private int OathGaugeBarHeight => PluginConfiguration.PLDOathGaugeHeight;
         
@@ -36,6 +40,10 @@ namespace DelvUI.Interface
         
         private bool OathGaugeText => PluginConfiguration.PLDOathGaugeText;
         
+        private bool BuffBarEnabled => PluginConfiguration.PLDBuffBarEnabled;
+        
+        private bool BuffBarText => PluginConfiguration.PLDBuffBarText;
+        
         private int BuffBarHeight => PluginConfiguration.PLDBuffBarHeight;
         
         private int BuffBarWidth => PluginConfiguration.PLDBuffBarWidth;
@@ -43,6 +51,8 @@ namespace DelvUI.Interface
         private int BuffBarXOffset => PluginConfiguration.PLDBuffBarXOffset;
         
         private int BuffBarYOffset => PluginConfiguration.PLDBuffBarYOffset;
+        
+        private bool AtonementEnabled => PluginConfiguration.PLDAtonementBarEnabled;
         
         private int AtonementBarHeight => PluginConfiguration.PLDAtonementBarHeight;
         
@@ -53,8 +63,6 @@ namespace DelvUI.Interface
         private int AtonementBarXOffset => PluginConfiguration.PLDAtonementBarXOffset;
         
         private int AtonementBarYOffset => PluginConfiguration.PLDAtonementBarYOffset;
-        
-        private int InterBarOffset => PluginConfiguration.PLDInterBarOffset;
         
         private Dictionary<string, uint> ManaColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000];
         
@@ -72,23 +80,27 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _)
         {
-            var nextHeight = DrawManaBar(0);
-            nextHeight = DrawOathGauge(nextHeight);
-            nextHeight = DrawBuffBar(nextHeight);
-            DrawAtonementBar(nextHeight);
+            if (ManaEnabled)
+                DrawManaBar();
+            if (OathGaugeEnabled)
+                DrawOathGauge();
+            if (BuffBarEnabled)
+                DrawBuffBar();
+            if (AtonementEnabled)
+                DrawAtonementBar();
         }
 
         protected override void DrawPrimaryResourceBar()
         {
         }
 
-        private int DrawManaBar(int initialHeight)
+        private void DrawManaBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var actor = PluginInterface.ClientState.LocalPlayer;
 
-            var posX = CenterX - XOffset;
-            var posY = CenterY + YOffset;
+            var posX = CenterX - ManaXOffset;
+            var posY = CenterY + ManaYOffset;
 
             var builder = BarBuilder.Create(posX, posY, ManaBarHeight, ManaBarWidth)
                 .SetChunks(5)
@@ -97,16 +109,14 @@ namespace DelvUI.Interface
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
-
-            return ManaBarHeight + initialHeight + InterBarOffset;
         }
 
-        private int DrawOathGauge(int initialHeight)
+        private void DrawOathGauge()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<PLDGauge>();
 
-            var xPos = CenterX - XOffset + OathGaugeXOffset;
-            var yPos = CenterY + YOffset + initialHeight + OathGaugeYOffset;
+            var xPos = CenterX - OathGaugeXOffset;
+            var yPos = CenterY + OathGaugeYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, OathGaugeBarHeight, OathGaugeBarWidth)
                 .SetChunks(2)
@@ -121,49 +131,48 @@ namespace DelvUI.Interface
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
-
-            return OathGaugeBarHeight + initialHeight + InterBarOffset;
         }
 
-        private int DrawBuffBar(int initialHeight)
+        private void DrawBuffBar()
         {
             var fightOrFlightBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 76);
             var requiescatBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1368);
-            
-            var xPos = CenterX - XOffset + BuffBarXOffset;
-            var yPos = CenterY + YOffset + initialHeight + BuffBarYOffset;
+
+            var xPos = CenterX - BuffBarXOffset;
+            var yPos = CenterY + BuffBarYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, BuffBarHeight, BuffBarWidth);
 
             if (fightOrFlightBuff.Any())
             {
                 var fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().Duration);
-                builder.AddInnerBar(fightOrFlightDuration, 25, FightOrFlightColor, null)
-                    .SetTextMode(BarTextMode.EachChunk)
-                    .SetText(BarTextPosition.CenterLeft, BarTextType.Current, PluginConfiguration.PLDFightOrFlightColor, Vector4.UnitW, null);
+                builder.AddInnerBar(fightOrFlightDuration, 25, FightOrFlightColor);
+                if (BuffBarText)
+                    builder.SetTextMode(BarTextMode.EachChunk)
+                        .SetText(BarTextPosition.CenterLeft, BarTextType.Current, PluginConfiguration.PLDFightOrFlightColor, Vector4.UnitW, null);
             }
+
             if (requiescatBuff.Any())
             {
                 var requiescatDuration = Math.Abs(requiescatBuff.First().Duration);
-                builder.AddInnerBar(requiescatDuration, 12, RequiescatColor, null)
-                    .SetTextMode(BarTextMode.EachChunk)
-                    .SetText(BarTextPosition.CenterRight, BarTextType.Current, PluginConfiguration.PLDRequiescatColor, Vector4.UnitW, null);
+                builder.AddInnerBar(requiescatDuration, 12, RequiescatColor);
+                if (BuffBarText)
+                    builder.SetTextMode(BarTextMode.EachChunk)
+                        .SetText(BarTextPosition.CenterRight, BarTextType.Current, PluginConfiguration.PLDRequiescatColor, Vector4.UnitW, null);
             }
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
-            
-            return BuffBarHeight + initialHeight + InterBarOffset;
         }
 
-        private int DrawAtonementBar(int initialHeight)
+        private void DrawAtonementBar()
         {
             var atonementBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1902);
             var stackCount = atonementBuff.Any() ? atonementBuff.First().StackCount : 0;
-            
-            var xPos = CenterX - XOffset + AtonementBarXOffset;
-            var yPos = CenterY + YOffset + initialHeight + AtonementBarYOffset;
-            
+
+            var xPos = CenterX - AtonementBarXOffset;
+            var yPos = CenterY + AtonementBarYOffset;
+
             var builder = BarBuilder.Create(xPos, yPos, AtonementBarHeight, AtonementBarWidth)
                 .SetChunks(3)
                 .SetChunkPadding(AtonementBarPadding)
@@ -171,8 +180,6 @@ namespace DelvUI.Interface
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
-
-            return AtonementBarHeight + initialHeight + InterBarOffset;
         }
     }
 }

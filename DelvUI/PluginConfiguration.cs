@@ -428,27 +428,31 @@ namespace DelvUI {
 
         #region PLD Configuration
 
+        public bool PLDManaEnabled { get; set; } = true;
         public int PLDManaHeight { get; set; } = 20;
         public int PLDManaWidth { get; set; } = 254;
         public int PLDManaPadding { get; set; } = 2;
-        public int PLDBaseXOffset { get; set; } = 127;
-        public int PLDBaseYOffset { get; set; } = 373;
+        public int PLDManaXOffset { get; set; } = 127;
+        public int PLDManaYOffset { get; set; } = 373;
+        public bool PLDOathGaugeEnabled { get; set; } = true;
         public int PLDOathGaugeHeight { get; set; } = 20;
         public int PLDOathGaugeWidth { get; set; } = 254;
         public int PLDOathGaugePadding { get; set; } = 2;
-        public int PLDOathGaugeXOffset {get; set;}
-        public int PLDOathGaugeYOffset {get; set;}
-        public bool PLDOathGaugeText { get; set; } = false;
+        public int PLDOathGaugeXOffset { get; set; } = 127;
+        public int PLDOathGaugeYOffset { get; set; } = 395;
+        public bool PLDOathGaugeText { get; set; }
+        public bool PLDBuffBarEnabled { get; set; } = true;
+        public bool PLDBuffBarText { get; set; } = true;
         public int PLDBuffBarHeight { get; set; } = 20;
         public int PLDBuffBarWidth { get; set; } = 254;
-        public int PLDBuffBarXOffset {get; set;}
-        public int PLDBuffBarYOffset {get; set;}
+        public int PLDBuffBarXOffset { get; set; } = 127;
+        public int PLDBuffBarYOffset { get; set; } = 417;
+        public bool PLDAtonementBarEnabled { get; set; } = true;
         public int PLDAtonementBarHeight { get; set; } = 20;
         public int PLDAtonementBarWidth { get; set; } = 254;
         public int PLDAtonementBarPadding { get; set; } = 2;
-        public int PLDAtonementBarXOffset {get; set;}
-        public int PLDAtonementBarYOffset {get; set;}
-        public int PLDInterBarOffset { get; set; } = 2;
+        public int PLDAtonementBarXOffset { get; set; } = 127;
+        public int PLDAtonementBarYOffset { get; set; } = 439;
         public Vector4 PLDManaColor = new Vector4(0f/255f, 203f/255f, 230f/255f, 100f/100f);
         public Vector4 PLDOathGaugeColor = new Vector4(24f/255f, 80f/255f, 175f/255f, 100f/100f);
         public Vector4 PLDFightOrFlightColor = new Vector4(240f/255f, 50f/255f, 0f/255f, 100f/100f);
