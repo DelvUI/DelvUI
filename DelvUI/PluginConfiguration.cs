@@ -391,16 +391,21 @@ namespace DelvUI {
 
 
         #region NIN Configuration
-
         public int NINBaseXOffset { get; set; } = 127;
-        public int NINBaseYOffset { get; set; } = 420;
+        public int NINBaseYOffset { get; set; } = 417;
+
+        public bool NINHutonGaugeEnabled = true;
         public int NINHutonGaugeHeight { get; set; } = 20;
         public int NINHutonGaugeWidth { get; set; } = 254;
+        public int NINHutonGaugeXOffset { get; set; }
+        public int NINHutonGaugeYOffset { get; set; }
+
+        public bool NINNinkiGaugeEnabled = true;
         public int NINNinkiGaugeHeight { get; set; } = 20;
         public int NINNinkiGaugeWidth { get; set; } = 254;
         public int NINNinkiGaugePadding { get; set; } = 2;
         public int NINNinkiGaugeXOffset { get; set; }
-        public int NINNinkiGaugeYOffset { get; set; }
+        public int NINNinkiGaugeYOffset { get; set; } = 22;
 
         public int NINInterBarOffset { get; set; } = 2;
         public Vector4 NINHutonColor = new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f);

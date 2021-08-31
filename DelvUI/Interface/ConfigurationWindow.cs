@@ -2647,66 +2647,84 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    var ninHutonGaugeHeight = _pluginConfiguration.NINHutonGaugeHeight;
-                    if (ImGui.DragInt("Huton Gauge Height", ref ninHutonGaugeHeight, .1f, 1, 1000))
+                    _changed |= ImGui.Checkbox("Enable Huton Gauge", ref _pluginConfiguration.NINHutonGaugeEnabled);
+
+                    if (_pluginConfiguration.NINHutonGaugeEnabled)
                     {
-                        _pluginConfiguration.NINHutonGaugeHeight = ninHutonGaugeHeight;
-                        _pluginConfiguration.Save();
+                        var ninHutonGaugeHeight = _pluginConfiguration.NINHutonGaugeHeight;
+                        if (ImGui.DragInt("Huton Gauge Height", ref ninHutonGaugeHeight, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.NINHutonGaugeHeight = ninHutonGaugeHeight;
+                            _pluginConfiguration.Save();
+                        }
+
+                        var ninHutonGaugeWidth = _pluginConfiguration.NINHutonGaugeWidth;
+                        if (ImGui.DragInt("Huton Gauge Width", ref ninHutonGaugeWidth, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.NINHutonGaugeWidth = ninHutonGaugeWidth;
+                            _pluginConfiguration.Save();
+                        }
+
+                        var ninHutonGaugeXOffset = _pluginConfiguration.NINHutonGaugeXOffset;
+                        if (ImGui.DragInt("Huton Gauge X Offset", ref ninHutonGaugeXOffset, .1f, -2000, 2000))
+                        {
+                            _pluginConfiguration.NINHutonGaugeXOffset = ninHutonGaugeXOffset;
+                            _pluginConfiguration.Save();
+                        }
+
+                        var ninHutonGaugeYOffset = _pluginConfiguration.NINHutonGaugeYOffset;
+                        if (ImGui.DragInt("Huton Gauge Y Offset", ref ninHutonGaugeYOffset, .1f, -2000, 2000))
+                        {
+                            _pluginConfiguration.NINHutonGaugeYOffset = ninHutonGaugeYOffset;
+                            _pluginConfiguration.Save();
+                        }
+
+                        _changed |= ImGui.ColorEdit4("Huton Bar Color", ref _pluginConfiguration.NINHutonColor);
                     }
 
-                    var ninHutonGaugeWidth = _pluginConfiguration.NINHutonGaugeWidth;
-                    if (ImGui.DragInt("Huton Gauge Width", ref ninHutonGaugeWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.NINHutonGaugeWidth = ninHutonGaugeWidth;
-                        _pluginConfiguration.Save();
-                    }
+                    _changed |= ImGui.Checkbox("Enable Ninki Gauge", ref _pluginConfiguration.NINNinkiGaugeEnabled);
 
-                    var ninNinkiGaugeHeight = _pluginConfiguration.NINNinkiGaugeHeight;
-                    if (ImGui.DragInt("Ninki Gauge Height", ref ninNinkiGaugeHeight, .1f, 1, 1000))
+                    if (_pluginConfiguration.NINNinkiGaugeEnabled)
                     {
-                        _pluginConfiguration.NINNinkiGaugeHeight = ninNinkiGaugeHeight;
-                        _pluginConfiguration.Save();
-                    }
+                        var ninNinkiGaugeHeight = _pluginConfiguration.NINNinkiGaugeHeight;
+                        if (ImGui.DragInt("Ninki Gauge Height", ref ninNinkiGaugeHeight, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.NINNinkiGaugeHeight = ninNinkiGaugeHeight;
+                            _pluginConfiguration.Save();
+                        }
 
-                    var ninNinkiGaugeWidth = _pluginConfiguration.NINNinkiGaugeWidth;
-                    if (ImGui.DragInt("Ninki Gauge Width", ref ninNinkiGaugeWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.NINNinkiGaugeWidth = ninNinkiGaugeWidth;
-                        _pluginConfiguration.Save();
-                    }
+                        var ninNinkiGaugeWidth = _pluginConfiguration.NINNinkiGaugeWidth;
+                        if (ImGui.DragInt("Ninki Gauge Width", ref ninNinkiGaugeWidth, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.NINNinkiGaugeWidth = ninNinkiGaugeWidth;
+                            _pluginConfiguration.Save();
+                        }
 
-                    var ninNinkiGaugePadding = _pluginConfiguration.NINNinkiGaugePadding;
-                    if (ImGui.DragInt("Ninki Gauge Padding", ref ninNinkiGaugePadding, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.NINNinkiGaugePadding = ninNinkiGaugePadding;
-                        _pluginConfiguration.Save();
-                    }
+                        var ninNinkiGaugePadding = _pluginConfiguration.NINNinkiGaugePadding;
+                        if (ImGui.DragInt("Ninki Gauge Padding", ref ninNinkiGaugePadding, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.NINNinkiGaugePadding = ninNinkiGaugePadding;
+                            _pluginConfiguration.Save();
+                        }
 
-                    var ninNinkiGaugeXOffset = _pluginConfiguration.NINNinkiGaugeXOffset;
-                    if (ImGui.DragInt("Ninki Gauge X Offset", ref ninNinkiGaugeXOffset, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.NINNinkiGaugeXOffset = ninNinkiGaugeXOffset;
-                        _pluginConfiguration.Save();
-                    }
+                        var ninNinkiGaugeXOffset = _pluginConfiguration.NINNinkiGaugeXOffset;
+                        if (ImGui.DragInt("Ninki Gauge X Offset", ref ninNinkiGaugeXOffset, .1f, -2000, 2000))
+                        {
+                            _pluginConfiguration.NINNinkiGaugeXOffset = ninNinkiGaugeXOffset;
+                            _pluginConfiguration.Save();
+                        }
 
-                    var ninNinkiGaugeYOffset = _pluginConfiguration.NINNinkiGaugeYOffset;
-                    if (ImGui.DragInt("Ninki Gauge Y Offset", ref ninNinkiGaugeYOffset, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.NINNinkiGaugeYOffset = ninNinkiGaugeYOffset;
-                        _pluginConfiguration.Save();
-                    }
+                        var ninNinkiGaugeYOffset = _pluginConfiguration.NINNinkiGaugeYOffset;
+                        if (ImGui.DragInt("Ninki Gauge Y Offset", ref ninNinkiGaugeYOffset, .1f, -2000, 2000))
+                        {
+                            _pluginConfiguration.NINNinkiGaugeYOffset = ninNinkiGaugeYOffset;
+                            _pluginConfiguration.Save();
+                        }
 
-
-                    var ninInterBarOffset = _pluginConfiguration.NINInterBarOffset;
-                    if (ImGui.DragInt("Space Between Bars", ref ninInterBarOffset, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.NINInterBarOffset = ninInterBarOffset;
-                        _pluginConfiguration.Save();
+                        _changed |= ImGui.ColorEdit4("Ninki Bar Color", ref _pluginConfiguration.NINNinkiColor);
                     }
 
                     _changed |= ImGui.ColorEdit4("Empty Color", ref _pluginConfiguration.NINEmptyColor);
-                    _changed |= ImGui.ColorEdit4("Huton Bar Color", ref _pluginConfiguration.NINHutonColor);
-                    _changed |= ImGui.ColorEdit4("Ninki Bar Color", ref _pluginConfiguration.NINNinkiColor);
 
                     ImGui.EndTabItem();
                 }
