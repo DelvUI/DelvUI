@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Interface;
@@ -2400,16 +2400,75 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
+                    var ASTStarBarHeight = _pluginConfiguration.ASTStarBarHeight;
+                    if (ImGui.DragInt("Star Gauge Height", ref ASTStarBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTStarBarHeight = ASTStarBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTStarBarWidth = _pluginConfiguration.ASTStarBarWidth;
+                    if (ImGui.DragInt("Star Gauge Width", ref ASTStarBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTStarBarWidth = ASTStarBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTStarBarX = _pluginConfiguration.ASTStarBarX;
+                    if (ImGui.DragInt("Star Gauge X Offset", ref ASTStarBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTStarBarX = ASTStarBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTStarBarY = _pluginConfiguration.ASTStarBarY;
+                    if (ImGui.DragInt("Star Gauge Y Offset", ref ASTStarBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTStarBarY = ASTStarBarY;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTLightspeedBarHeight = _pluginConfiguration.ASTLightspeedBarHeight;
+                    if (ImGui.DragInt("Lightspeed Gauge Height", ref ASTLightspeedBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTLightspeedBarHeight = ASTLightspeedBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTLightspeedBarWidth = _pluginConfiguration.ASTLightspeedBarWidth;
+                    if (ImGui.DragInt("Lightspeed Gauge Width", ref ASTLightspeedBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.ASTLightspeedBarWidth = ASTLightspeedBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTLightspeedBarX = _pluginConfiguration.ASTLightspeedBarX;
+                    if (ImGui.DragInt("Lightspeed Gauge X Offset", ref ASTLightspeedBarX, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTLightspeedBarX = ASTLightspeedBarX;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ASTLightspeedBarY = _pluginConfiguration.ASTLightspeedBarY;
+                    if (ImGui.DragInt("Lightspeed Gauge Y Offset", ref ASTLightspeedBarY, .1f, -1000, 1000))
+                    {
+                        _pluginConfiguration.ASTLightspeedBarY = ASTLightspeedBarY;
+                        _pluginConfiguration.Save();
+                    }
+
                     _changed |= ImGui.Checkbox("Show Divination Bar", ref _pluginConfiguration.ASTShowDivinationBar);
                     _changed |= ImGui.Checkbox("Show Draw Bar", ref _pluginConfiguration.ASTShowDrawBar);
                     _changed |= ImGui.Checkbox("Show Dot Bar", ref _pluginConfiguration.ASTShowDotBar);
-                    _changed |= ImGui.Checkbox("Show Primary Resource Bar",
-                        ref _pluginConfiguration.ASTShowPrimaryResourceBar);
-
+                    _changed |= ImGui.Checkbox("Show Star Bar", ref _pluginConfiguration.ASTShowStarBar);
+                    _changed |= ImGui.Checkbox("Show Lightspeed Bar", ref _pluginConfiguration.ASTShowLightspeedBar);
+                    _changed |= ImGui.Checkbox("Show Primary Resource Bar", ref _pluginConfiguration.ASTShowPrimaryResourceBar);
                     _changed |= ImGui.ColorEdit4("Seal Sun Color", ref _pluginConfiguration.ASTSealSunColor);
                     _changed |= ImGui.ColorEdit4("Seal Lunar Color", ref _pluginConfiguration.ASTSealLunarColor);
                     _changed |= ImGui.ColorEdit4("Seal Celestial Color", ref _pluginConfiguration.ASTSealCelestialColor);
                     _changed |= ImGui.ColorEdit4("Dot Color", ref _pluginConfiguration.ASTDotColor);
+                    _changed |= ImGui.ColorEdit4("Star Earthly Color", ref _pluginConfiguration.ASTStarEarthlyColor);
+                    _changed |= ImGui.ColorEdit4("Star Giant Color", ref _pluginConfiguration.ASTStarGiantColor);
+                    _changed |= ImGui.ColorEdit4("Lightspeed Color", ref _pluginConfiguration.ASTLightspeedColor);
                     _changed |= ImGui.ColorEdit4("Bar Empty Color", ref _pluginConfiguration.ASTEmptyColor);
 
                     ImGui.EndTabItem();
