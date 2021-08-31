@@ -252,19 +252,36 @@ namespace DelvUI {
         #endregion
 
         #region SMN Configuration
-
-        public int SmnRuinBarX { get; set; } = 127;
-        public int SmnRuinBarY { get; set; } = 460;
-        public int SmnRuinBarHeight { get; set; } = 10;
+        public int SmnBaseXOffset { get; set; } = 127; 
+        public int SmnBaseYOffset { get; set; } = 395;
+        public bool SmnMiasmaBarEnabled { get; set; } = true;
+        public int SmnMiasmaBarWidth { get; set; } = 126;
+        public int SmnMiasmaBarHeight { get; set; } = 20;
+        public int SmnMiasmaBarXOffset { get; set; } = 0;
+        public int SmnMiasmaBarYOffset { get; set; }
+        public bool SmnMiasmaBarFlipped { get; set; }
+        public bool SmnBioBarEnabled { get; set; } = true;
+        public int SmnBioBarWidth { get; set; } = 126;
+        public int SmnBioBarHeight { get; set; } = 20;
+        public int SmnBioBarXOffset { get; set; } = 128;
+        public int SmnBioBarYOffset { get; set; }
+        public bool SmnBioBarFlipped { get; set; } = true;
+        public int SmnInterBarOffset { get; set; } = 2;
+        public bool SmnRuinBarEnabled { get; set; } = true;
+        public int SmnRuinBarXOffset { get; set; }
+        public int SmnRuinBarYOffset { get; set; } = 22;
+        public int SmnRuinBarHeight { get; set; } = 20;
         public int SmnRuinBarWidth { get; set; } = 254;
-        public int SmnDotBarX { get; set; } = 127;
-        public int SmnDotBarY { get; set; } = 460;
-        public int SmnDotBarHeight { get; set; } = 10;
-        public int SmnDotBarWidth { get; set; } = 254;
+        public int SmnRuinBarPadding { get; set; } = 2;
+        public bool SmnAetherBarEnabled { get; set; } = true;
         public int SmnAetherBarHeight { get; set; } = 20;
         public int SmnAetherBarWidth { get; set; } = 254;
-        public int SmnAetherBarX { get; set; } = -42;
-        public int SmnAetherBarY { get; set; } = 460;
+        public int SmnAetherBarPadding { get; set; } = 2;
+        public int SmnAetherBarXOffset { get; set; }
+        public int SmnAetherBarYOffset { get; set; } = 44;
+
+        
+        // public int SmnTranceBarHeight { get; set; } = 10;
 
         public Vector4 SmnAetherColor = new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f);
         public Vector4 SmnRuinColor = new Vector4(94f / 255f, 250f / 255f, 154f / 255f, 100f / 100f);
