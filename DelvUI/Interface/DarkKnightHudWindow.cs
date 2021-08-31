@@ -46,8 +46,6 @@ namespace DelvUI.Interface {
         private int LivingShadowBarXOffset => PluginConfiguration.DRKLivingShadowBarXOffset;
         private int LivingShadowBarYOffset => PluginConfiguration.DRKLivingShadowBarYOffset;
 
-        private int InterBarOffset => PluginConfiguration.DRKInterBarOffset;
-
         private Dictionary<string, uint> ManaColor => PluginConfiguration.JobColorMap[Jobs.DRK * 1000];
         private Dictionary<string, uint> BloodColorLeft => PluginConfiguration.JobColorMap[Jobs.DRK * 1000 + 1];
         private Dictionary<string, uint> BloodColorRight => PluginConfiguration.JobColorMap[Jobs.DRK * 1000 + 2];
@@ -63,21 +61,20 @@ namespace DelvUI.Interface {
         public DarkKnightHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _) {
-            var nextHeight = 0;
             if (ManaBarEnabled)
-                nextHeight = DrawManaBar(nextHeight);
+                DrawManaBar();
             if (BloodGaugeEnabled)
-                nextHeight = DrawBloodGauge(nextHeight);
+                DrawBloodGauge();
             if (BuffBarEnabled)
-                nextHeight = DrawBuffBar(nextHeight);
+                DrawBuffBar();
             if (LivingShadowBarEnabled)
-                DrawLivingShadowBar(nextHeight);
+                DrawLivingShadowBar();
         }
         protected override void DrawPrimaryResourceBar()
         {
         }
 
-        private int DrawManaBar(int initialHeight) {
+        private void DrawManaBar() {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
 
             //var tbn = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1178);
@@ -87,7 +84,7 @@ namespace DelvUI.Interface {
             var barWidth = (ManaBarWidth - ManaBarPadding * 2)  / 3.0f;
             var barSize = new Vector2(barWidth, ManaBarHeight);
             var xPos = CenterX - XOffset + ManaBarXOffset;
-            var yPos = CenterY + YOffset + ManaBarYOffset + initialHeight;
+            var yPos = CenterY + YOffset + ManaBarYOffset;
             var cursorPos = new Vector2(xPos, yPos);
             const int chunkSize = 3000;
 
@@ -147,17 +144,15 @@ namespace DelvUI.Interface {
 
                 drawList.AddRect(cursorPos, inverseOffset, 0xFF000000);
             }
-
-            return ManaBarHeight + initialHeight + InterBarOffset;
         }
 
-        private int DrawBloodGauge(int initialHeight) {
+        private void DrawBloodGauge() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DRKGauge>();
 
             var padding = BloodGaugeSplit ? BloodGaugePadding : 0;
             var barWidth = (BloodGaugeWidth - padding) / 2;
             var xPos = CenterX - XOffset + BloodGaugeXOffset;
-            var yPos = CenterY + YOffset + initialHeight + BloodGaugeYOffset;
+            var yPos = CenterY + YOffset + BloodGaugeYOffset;
 
             var cursorPos = new Vector2(xPos, yPos);
             var thresholdCursorPos = new Vector2(cursorPos.X + barWidth, cursorPos.Y);
@@ -219,18 +214,16 @@ namespace DelvUI.Interface {
                 if (BloodGaugeThreshold)
                     drawList.AddLine(thresholdCursorPos, new Vector2(thresholdCursorPos.X, thresholdCursorPos.Y + BloodGaugeHeight), 0x88000000);
             }
-
-            return BloodGaugeHeight + initialHeight + InterBarOffset;
         }
 
-        private int DrawBuffBar(int initialHeight)
+        private void DrawBuffBar()
         {
             var bloodWeaponBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 742);
             var deliriumBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1972);
 
             var buffBarBarWidth = BuffBarWidth;
             var xPos = CenterX - XOffset + BuffBarXOffset;
-            var yPos = CenterY + YOffset + initialHeight + BuffBarYOffset;
+            var yPos = CenterY + YOffset + BuffBarYOffset;
             var cursorPos = new Vector2(xPos, yPos);
             var buffBarBarHeight = BuffBarHeight;
             var barSize = new Vector2(buffBarBarWidth, buffBarBarHeight);
@@ -287,18 +280,16 @@ namespace DelvUI.Interface {
             }
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-
-            return BuffBarHeight + initialHeight + InterBarOffset;
         }
 
-        private int DrawLivingShadowBar(int initialHeight) {
+        private void DrawLivingShadowBar() {
             var actor = PluginInterface.ClientState.LocalPlayer;
             var shadowTimeRemaining = PluginInterface.ClientState.JobGauges.Get<DRKGauge>().ShadowTimeRemaining / 100; // ms
             var livingShadow = actor.Level >= 80 && shadowTimeRemaining > 0 && shadowTimeRemaining <= 24;
 
             var barWidth = LivingShadowBarWidth;
             var xPos = CenterX - XOffset + LivingShadowBarXOffset;
-            var yPos = CenterY + YOffset + initialHeight + LivingShadowBarYOffset;
+            var yPos = CenterY + YOffset + LivingShadowBarYOffset;
             var cursorPos = new Vector2(xPos, yPos);
             var barSize = new Vector2(barWidth, LivingShadowBarHeight);
 
@@ -320,8 +311,6 @@ namespace DelvUI.Interface {
             var durationText = duration != 0 ? Math.Round(duration).ToString(CultureInfo.InvariantCulture) : "";
             var textSize = ImGui.CalcTextSize(durationText);
             DrawOutlinedText(durationText, new Vector2(cursorPos.X + LivingShadowBarWidth / 2f - textSize.X / 2f, cursorPos.Y-2));
-
-            return LivingShadowBarHeight + initialHeight + InterBarOffset;
         }
     }
 }

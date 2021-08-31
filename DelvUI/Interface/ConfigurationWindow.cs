@@ -2061,12 +2061,6 @@ namespace DelvUI.Interface
                         _changed |= ImGui.ColorEdit4("Living Shadow Color", ref _pluginConfiguration.DRKLivingShadowColor);
                     }
 
-                    var drkInterBarOffset = _pluginConfiguration.DRKInterBarOffset;
-                    if (ImGui.DragInt("Space Between Bars", ref drkInterBarOffset, .1f, 1, 1000)) {
-                        _pluginConfiguration.DRKInterBarOffset = drkInterBarOffset;
-                        _pluginConfiguration.Save();
-                    }
-
                     ImGui.EndTabItem();
                 }
             }
