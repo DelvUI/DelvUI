@@ -432,20 +432,19 @@ namespace DelvUI {
         public int DRKBloodGaugeWidth { get; set; } = 254;
         public int DRKBloodGaugePadding { get; set; } = 2;
         public int DRKBloodGaugeXOffset { get; set; }
-        public int DRKBloodGaugeYOffset { get; set; }
+        public int DRKBloodGaugeYOffset { get; set; } = 12;
         public bool DRKBuffBarEnabled { get; set; } = true;
         public int DRKBuffBarHeight { get; set; } = 20;
         public int DRKBuffBarWidth { get; set; } = 254;
         public int DRKBuffBarPadding { get; set; } = 2;
         public int DRKBuffBarXOffset { get; set; }
-        public int DRKBuffBarYOffset { get; set; }
+        public int DRKBuffBarYOffset { get; set; } = 24;
         public bool DRKLivingShadowBarEnabled { get; set; }
         public int DRKLivingShadowBarHeight { get; set; } = 20;
         public int DRKLivingShadowBarWidth { get; set; } = 254;
         public int DRKLivingShadowBarPadding { get; set; } = 2;
         public int DRKLivingShadowBarXOffset { get; set; }
         public int DRKLivingShadowBarYOffset { get; set; }
-        public int DRKInterBarOffset { get; set; } = 2;
         public Vector4 DRKManaColor = new Vector4(0f/255f, 142f/255f, 254f/255f, 100f/100f);
         public Vector4 DRKBloodColorLeft = new Vector4(196f/255f, 20f/255f, 122f/255f, 100f/100f);
         public Vector4 DRKBloodColorRight = new Vector4(216f/255f, 0f/255f, 73f/255f, 100f/100f);
