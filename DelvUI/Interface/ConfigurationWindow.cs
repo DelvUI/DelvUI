@@ -2958,13 +2958,13 @@ namespace DelvUI.Interface
                 if (ImGui.BeginTabItem("Bard"))
                 {
                     var brdBaseXOffset = _pluginConfiguration.BRDBaseXOffset;
-                    if (ImGui.DragInt("Base X Offset", ref brdBaseXOffset, .1f, -xOffsetLimit, xOffsetLimit)) {
+                    if (ImGui.DragInt("Base X Offset", ref brdBaseXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
                         _pluginConfiguration.BRDBaseXOffset = brdBaseXOffset;
                         _pluginConfiguration.Save();
                     }
                     
                     var brdBaseYOffset = _pluginConfiguration.BRDBaseYOffset;
-                    if (ImGui.DragInt("Base Y Offset", ref brdBaseYOffset, .1f, -yOffsetLimit, yOffsetLimit)) {
+                    if (ImGui.DragInt("Base Y Offset", ref brdBaseYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
                         _pluginConfiguration.BRDBaseYOffset = brdBaseYOffset;
                         _pluginConfiguration.Save();
                     }
@@ -2995,20 +2995,20 @@ namespace DelvUI.Interface
                     }
                     
                     var brdSongGaugeXOffset = _pluginConfiguration.BRDSongGaugeXOffset;
-                    if (ImGui.DragInt("Song Gauge X Offset", ref brdSongGaugeXOffset, .1f, -xOffsetLimit, xOffsetLimit)) {
+                    if (ImGui.DragInt("Song Gauge X Offset", ref brdSongGaugeXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
                         _pluginConfiguration.BRDSongGaugeXOffset = brdSongGaugeXOffset;
                         _pluginConfiguration.Save();
                     }
                     
                     var brdSongGaugeYOffset = _pluginConfiguration.BRDSongGaugeYOffset;
-                    if (ImGui.DragInt("Song Gauge Y Offset", ref brdSongGaugeYOffset, .1f, -yOffsetLimit, yOffsetLimit)) {
+                    if (ImGui.DragInt("Song Gauge Y Offset", ref brdSongGaugeYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
                         _pluginConfiguration.BRDSongGaugeYOffset = brdSongGaugeYOffset;
                         _pluginConfiguration.Save();
                     }
                     
-                    changed |= ImGui.ColorEdit4("Wanderer's Minuet Color", ref _pluginConfiguration.BRDWMColor);
-                    changed |= ImGui.ColorEdit4("Mage's Ballad Color", ref _pluginConfiguration.BRDMBColor);
-                    changed |= ImGui.ColorEdit4("Army's Paeon Color", ref _pluginConfiguration.BRDAPColor);
+                    _changed |= ImGui.ColorEdit4("Wanderer's Minuet Color", ref _pluginConfiguration.BRDWMColor);
+                    _changed |= ImGui.ColorEdit4("Mage's Ballad Color", ref _pluginConfiguration.BRDMBColor);
+                    _changed |= ImGui.ColorEdit4("Army's Paeon Color", ref _pluginConfiguration.BRDAPColor);
                     
                     var brdShowSoulGauge = _pluginConfiguration.BRDShowSoulGauge;
                     if (ImGui.Checkbox("Soul Gauge Enabled", ref brdShowSoulGauge))
@@ -3030,18 +3030,18 @@ namespace DelvUI.Interface
                     }
                     
                     var brdSoulGaugeXOffset = _pluginConfiguration.BRDSoulGaugeXOffset;
-                    if (ImGui.DragInt("Soul Gauge X Offset", ref brdSoulGaugeXOffset, .1f, -xOffsetLimit, xOffsetLimit)) {
+                    if (ImGui.DragInt("Soul Gauge X Offset", ref brdSoulGaugeXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
                         _pluginConfiguration.BRDSoulGaugeXOffset = brdSoulGaugeXOffset;
                         _pluginConfiguration.Save();
                     }
                     
                     var brdSoulGaugeYOffset = _pluginConfiguration.BRDSoulGaugeYOffset;
-                    if (ImGui.DragInt("Soul Gauge Y Offset", ref brdSoulGaugeYOffset, .1f, -yOffsetLimit, yOffsetLimit)) {
+                    if (ImGui.DragInt("Soul Gauge Y Offset", ref brdSoulGaugeYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
                         _pluginConfiguration.BRDSoulGaugeYOffset = brdSoulGaugeYOffset;
                         _pluginConfiguration.Save();
                     }
                     
-                    changed |= ImGui.ColorEdit4("Soul Gauge Color", ref _pluginConfiguration.BRDSVColor);
+                    _changed |= ImGui.ColorEdit4("Soul Gauge Color", ref _pluginConfiguration.BRDSVColor);
                     
                     var brdShowWMStack = _pluginConfiguration.BRDShowWMStacks;
                     if (ImGui.Checkbox("Wanderer's Minuet Stacks Enabled", ref brdShowWMStack))
@@ -3077,13 +3077,13 @@ namespace DelvUI.Interface
                     }
                     
                     var brdStackXOffset = _pluginConfiguration.BRDStackXOffset;
-                    if (ImGui.DragInt("Stack X Offset", ref brdStackXOffset, .1f, -xOffsetLimit, xOffsetLimit)) {
+                    if (ImGui.DragInt("Stack X Offset", ref brdStackXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
                         _pluginConfiguration.BRDStackXOffset = brdStackXOffset;
                         _pluginConfiguration.Save();
                     }
                     
                     var brdStackYOffset = _pluginConfiguration.BRDStackYOffset;
-                    if (ImGui.DragInt("Stack Y Offset", ref brdStackYOffset, .1f, -yOffsetLimit, yOffsetLimit)) {
+                    if (ImGui.DragInt("Stack Y Offset", ref brdStackYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
                         _pluginConfiguration.BRDStackYOffset = brdStackYOffset;
                         _pluginConfiguration.Save();
                     }
@@ -3094,9 +3094,9 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
                     
-                    changed |= ImGui.ColorEdit4("Wanderer's Minuet Stacks Color", ref _pluginConfiguration.BRDWMStackColor);
-                    changed |= ImGui.ColorEdit4("Mage's Ballad Proc Color", ref _pluginConfiguration.BRDMBProcColor);
-                    changed |= ImGui.ColorEdit4("Army's Paeon Stacks Color", ref _pluginConfiguration.BRDAPStackColor);
+                    _changed |= ImGui.ColorEdit4("Wanderer's Minuet Stacks Color", ref _pluginConfiguration.BRDWMStackColor);
+                    _changed |= ImGui.ColorEdit4("Mage's Ballad Proc Color", ref _pluginConfiguration.BRDMBProcColor);
+                    _changed |= ImGui.ColorEdit4("Army's Paeon Stacks Color", ref _pluginConfiguration.BRDAPStackColor);
 
                     var brdShowCB = _pluginConfiguration.BRDShowCB;
                     if (ImGui.Checkbox("Caustic Bite Enabled", ref brdShowCB))
@@ -3125,18 +3125,18 @@ namespace DelvUI.Interface
                     }
                     
                     var brdCBXOffset = _pluginConfiguration.BRDCBXOffset;
-                    if (ImGui.DragInt("Caustic Bite X Offset", ref brdCBXOffset, .1f, -xOffsetLimit, xOffsetLimit)) {
+                    if (ImGui.DragInt("Caustic Bite X Offset", ref brdCBXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
                         _pluginConfiguration.BRDCBXOffset = brdCBXOffset;
                         _pluginConfiguration.Save();
                     }
                     
                     var brdCBYOffset = _pluginConfiguration.BRDCBYOffset;
-                    if (ImGui.DragInt("Caustic Bite Y Offset", ref brdCBYOffset, .1f, -yOffsetLimit, yOffsetLimit)) {
+                    if (ImGui.DragInt("Caustic Bite Y Offset", ref brdCBYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
                         _pluginConfiguration.BRDCBYOffset = brdCBYOffset;
                         _pluginConfiguration.Save();
                     }
                     
-                    changed |= ImGui.ColorEdit4("Caustic Bite Color", ref _pluginConfiguration.BRDCBColor);
+                    _changed |= ImGui.ColorEdit4("Caustic Bite Color", ref _pluginConfiguration.BRDCBColor);
                     
                     var brdShowSB = _pluginConfiguration.BRDShowSB;
                     if (ImGui.Checkbox("Stormbite Enabled", ref brdShowSB))
@@ -3165,21 +3165,21 @@ namespace DelvUI.Interface
                     }
                     
                     var brdSBXOffset = _pluginConfiguration.BRDSBXOffset;
-                    if (ImGui.DragInt("Stormbite X Offset", ref brdSBXOffset, .1f, -xOffsetLimit, xOffsetLimit)) {
+                    if (ImGui.DragInt("Stormbite X Offset", ref brdSBXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
                         _pluginConfiguration.BRDSBXOffset = brdSBXOffset;
                         _pluginConfiguration.Save();
                     }
                     
                     var brdSBYOffset = _pluginConfiguration.BRDSBYOffset;
-                    if (ImGui.DragInt("Stormbite Y Offset", ref brdSBYOffset, .1f, -yOffsetLimit, yOffsetLimit)) {
+                    if (ImGui.DragInt("Stormbite Y Offset", ref brdSBYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
                         _pluginConfiguration.BRDSBYOffset = brdSBYOffset;
                         _pluginConfiguration.Save();
                     }
                     
-                    changed |= ImGui.ColorEdit4("Stormbite Color", ref _pluginConfiguration.BRDSBColor);
+                    _changed |= ImGui.ColorEdit4("Stormbite Color", ref _pluginConfiguration.BRDSBColor);
                     
-                    changed |= ImGui.ColorEdit4("Empty Color", ref _pluginConfiguration.BRDEmptyColor);
-                    changed |= ImGui.ColorEdit4("DoT Expire Color", ref _pluginConfiguration.BRDExpireColor);
+                    _changed |= ImGui.ColorEdit4("Empty Color", ref _pluginConfiguration.BRDEmptyColor);
+                    _changed |= ImGui.ColorEdit4("DoT Expire Color", ref _pluginConfiguration.BRDExpireColor);
                     
                     ImGui.EndTabItem();
                 }
