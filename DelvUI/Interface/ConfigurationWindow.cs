@@ -1601,6 +1601,20 @@ namespace DelvUI.Interface
                 
                 if (ImGui.BeginTabItem("Warrior"))
                 {
+                    var stormsEyeEnabled = _pluginConfiguration.WARStormsEyeEnabled;
+                    if (ImGui.Checkbox("Storm's Eye Enabled", ref stormsEyeEnabled))
+                    {
+                        _pluginConfiguration.WARStormsEyeEnabled = stormsEyeEnabled;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var stormsEyeText = _pluginConfiguration.WARStormsEyeText;
+                    if (ImGui.Checkbox("Storm's Eye Text", ref stormsEyeText))
+                    {
+                        _pluginConfiguration.WARStormsEyeText = stormsEyeText;
+                        _pluginConfiguration.Save();
+                    }
+                    
                     var stormsEyeHeight = _pluginConfiguration.WARStormsEyeHeight;
                     if (ImGui.DragInt("Storm's Eye Height", ref stormsEyeHeight, .1f, 1, 1000))
                     {
@@ -1615,17 +1629,31 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    var warBaseXOffset = _pluginConfiguration.WARBaseXOffset;
-                    if (ImGui.DragInt("Base X Offset", ref warBaseXOffset, .1f, -2000, 2000))
+                    var warStormsEyeXOffset = _pluginConfiguration.WARStormsEyeXOffset;
+                    if (ImGui.DragInt("Storm's Eye X Offset", ref warStormsEyeXOffset, .1f, -2000, 2000))
                     {
-                        _pluginConfiguration.WARBaseXOffset = warBaseXOffset;
+                        _pluginConfiguration.WARStormsEyeXOffset = warStormsEyeXOffset;
                         _pluginConfiguration.Save();
                     }
 
-                    var warBaseYOffset = _pluginConfiguration.WARBaseYOffset;
-                    if (ImGui.DragInt("Base Y Offset", ref warBaseYOffset, .1f, -2000, 2000))
+                    var warStormsEyeYOffset = _pluginConfiguration.WARStormsEyeYOffset;
+                    if (ImGui.DragInt("Storm's Eye Y Offset", ref warStormsEyeYOffset, .1f, -2000, 2000))
                     {
-                        _pluginConfiguration.WARBaseYOffset = warBaseYOffset;
+                        _pluginConfiguration.WARStormsEyeYOffset = warStormsEyeYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var beastGaugeEnabled = _pluginConfiguration.WARBeastGaugeEnabled;
+                    if (ImGui.Checkbox("Beast Gauge Enabled", ref beastGaugeEnabled))
+                    {
+                        _pluginConfiguration.WARBeastGaugeEnabled = beastGaugeEnabled;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var beastGaugeText = _pluginConfiguration.WARBeastGaugeText;
+                    if (ImGui.Checkbox("Beast Gauge Text", ref beastGaugeText))
+                    {
+                        _pluginConfiguration.WARBeastGaugeText = beastGaugeText;
                         _pluginConfiguration.Save();
                     }
 
@@ -1661,13 +1689,6 @@ namespace DelvUI.Interface
                     if (ImGui.DragInt("Beast Gauge Y Offset", ref warBeastGaugeYOffset, .1f, -2000, 2000))
                     {
                         _pluginConfiguration.WARBeastGaugeYOffset = warBeastGaugeYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var warInterBarOffset = _pluginConfiguration.WARInterBarOffset;
-                    if (ImGui.DragInt("Space Between Bars", ref warInterBarOffset, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.WARInterBarOffset = warInterBarOffset;
                         _pluginConfiguration.Save();
                     }
 
