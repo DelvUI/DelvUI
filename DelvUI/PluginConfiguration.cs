@@ -147,6 +147,58 @@ namespace DelvUI {
         public Vector4 NPCColorNeutral = new Vector4(214f/255f, 145f/255f, 64f/255f, 100f/100f);
         public Vector4 NPCColorFriendly = new Vector4(0f/255f, 145f/255f, 6f/255f, 100f/100f);
 
+        
+        #region BRD Configuration
+        
+        public int BRDBaseXOffset { get; set; } = 127;
+        public int BRDBaseYOffset { get; set; } = 405;
+        public int BRDSongGaugeWidth { get; set; } = 254;
+        public int BRDSongGaugeHeight { get; set; } = 20;
+        public int BRDSongGaugeXOffset { get; set; }
+        public int BRDSongGaugeYOffset { get; set; }
+        public int BRDSoulGaugeWidth { get; set; } = 254;
+        public int BRDSoulGaugeHeight { get; set; } = 10;
+        public int BRDSoulGaugeXOffset { get; set; }
+        public int BRDSoulGaugeYOffset { get; set; }
+        public int BRDStackWidth { get; set; } = 254;
+        public int BRDStackHeight { get; set; } = 10;
+        public int BRDStackXOffset { get; set; }
+        public int BRDStackYOffset { get; set; }
+        public int BRDStackPadding { get; set; } = 2;
+        public int BRDCBWidth { get; set; } = 126;
+        public int BRDCBHeight { get; set; } = 10;
+        public int BRDCBXOffset { get; set; }
+        public int BRDCBYOffset { get; set; }
+        public int BRDSBWidth { get; set; } = 126;
+        public int BRDSBHeight { get; set; } = 10;
+        public int BRDSBXOffset { get; set; } = 128;
+        public int BRDSBYOffset { get; set; }
+        public int BRDInterBarOffset { get; set; } = 2;
+        
+        public bool BRDShowSB = true;
+        public bool BRDShowCB = true;
+        public bool BRDSBInverted = false;
+        public bool BRDCBInverted = true;
+        public bool BRDShowSongGauge = true;
+        public bool BRDShowSoulGauge = true;
+        public bool BRDShowWMStacks = true;
+        public bool BRDShowMBProc = true;
+        public bool BRDShowAPStacks = true;
+        
+        public Vector4 BRDEmptyColor = new Vector4(0f/255f, 0f/255f, 0f/255f, 53f/100f);
+        public Vector4 BRDExpireColor = new Vector4(199f/255f, 46f/255f, 46f/255f, 100f/100f);
+        public Vector4 BRDCBColor = new Vector4(182f/255f, 68f/255f, 235f/255f, 100f/100f);
+        public Vector4 BRDSBColor = new Vector4(72f/255f, 117f/255f, 202f/255f, 100f/100f);
+        public Vector4 BRDWMStackColor = new Vector4(150f/255f, 215f/255f, 232f/255f, 100f/100f);
+        public Vector4 BRDWMColor = new Vector4(158f/255f, 157f/255f, 36f/255f, 100f/100f);
+        public Vector4 BRDMBColor = new Vector4(143f/255f, 90f/255f, 143f/255f, 100f/100f);
+        public Vector4 BRDMBProcColor = new Vector4(199f/255f, 46f/255f, 46f/255f, 100f/100f);
+        public Vector4 BRDAPStackColor = new Vector4(0f/255f, 222f/255f, 177f/255f, 100f/100f);
+        public Vector4 BRDAPColor = new Vector4(207f/255f, 205f/255f, 52f/255f, 100f/100f);
+        public Vector4 BRDSVColor = new Vector4(248f/255f, 227f/255f, 0f/255f, 100f/100f);
+
+        #endregion
+        
         #region WAR Configuration
 
         public int WARStormsEyeHeight { get; set; } = 20;
@@ -1302,6 +1354,94 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorBRD.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorBRD.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorBRD.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000] = new Dictionary<string, uint> // Empty Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDEmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDEmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDEmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDEmptyColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 1] = new Dictionary<string, uint> // Expire Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDExpireColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDExpireColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDExpireColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDExpireColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 2] = new Dictionary<string, uint> // Wanderer's Minuet Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDWMColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDWMColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDWMColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDWMColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 3] = new Dictionary<string, uint> // Mage's Ballad Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDMBColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDMBColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDMBColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDMBColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 4] = new Dictionary<string, uint> // Army's Paeon Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDAPColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDAPColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDAPColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDAPColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 5] = new Dictionary<string, uint> // WM Stack Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDWMStackColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDWMStackColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDWMStackColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDWMStackColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 6] = new Dictionary<string, uint> // MB Proc Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDMBProcColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDMBProcColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDMBProcColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDMBProcColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 7] = new Dictionary<string, uint> // AP Stack Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDAPStackColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDAPStackColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDAPStackColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDAPStackColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 8] = new Dictionary<string, uint> // SB Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDSBColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDSBColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDSBColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDSBColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 9] = new Dictionary<string, uint> // CB Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDCBColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDCBColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDCBColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDCBColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 10] = new Dictionary<string, uint> // Soul Voice Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDSVColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDSVColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDSVColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDSVColor.AdjustColor(.1f))
                 },
 
                 [Jobs.MCH] = new Dictionary<string, uint>
