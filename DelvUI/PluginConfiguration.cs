@@ -651,10 +651,8 @@ namespace DelvUI {
         public int GNBNoMercyBarHeight { get; set; } = 20;
         public int GNBNoMercyBarWidth { get; set; } = 254;
         public int GNBNoMercyBarXOffset { get; set; }
-        public int GNBNoMercyBarYOffset { get; set; }
+        public int GNBNoMercyBarYOffset { get; set; } = 22;
         public Vector4 GNBNoMercyColor = new Vector4(252f / 255f, 204f / 255f, 255f / 255f, 1f);
-
-        public int GNBInterBarOffset { get; set; } = 2;
 
         #endregion
 

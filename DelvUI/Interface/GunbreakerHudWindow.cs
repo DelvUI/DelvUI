@@ -31,26 +31,23 @@ namespace DelvUI.Interface {
         private int NoMercyBarYOffset => PluginConfiguration.GNBNoMercyBarYOffset;
         private Dictionary<string, uint> NoMercyColor => PluginConfiguration.JobColorMap[Jobs.GNB * 1000 + 1];
 
-        private int InterBarOffset => PluginConfiguration.GNBInterBarOffset;
-
         public GunbreakerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _) {
-            var initialOffset = YOffset;
             if (PowderGaugeEnabled)
-                initialOffset = DrawPowderGauge(initialOffset);
+                DrawPowderGauge();
             if (NoMercyBarEnabled)
-                DrawNoMercyBar(initialOffset);
+                DrawNoMercyBar();
         }
         protected override void DrawPrimaryResourceBar()
         {
         }
 
-        private int DrawPowderGauge(int initialOffset) {
+        private void DrawPowderGauge() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<GNBGauge>();
 
             var xPos = CenterX - XOffset + PowderGaugeXOffset;
-            var yPos = CenterY + initialOffset + PowderGaugeYOffset;
+            var yPos = CenterY + YOffset + PowderGaugeYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, PowderGaugeHeight, PowderGaugeWidth);
             builder.SetChunks(2)
@@ -59,13 +56,11 @@ namespace DelvUI.Interface {
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
-
-            return initialOffset + PowderGaugeHeight + InterBarOffset;
         }
 
-        private void DrawNoMercyBar(int initialOffset) {
+        private void DrawNoMercyBar() {
             var xPos = CenterX - XOffset + NoMercyBarXOffset;
-            var yPos = CenterY + initialOffset + NoMercyBarYOffset;
+            var yPos = CenterY + YOffset + NoMercyBarYOffset;
 
             var noMercyBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1831);
 
