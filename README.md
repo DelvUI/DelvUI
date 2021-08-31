@@ -5,96 +5,32 @@
 ![image](https://i.imgur.com/AmbyNFD.png)
 ***
 
-**Contributing**
+**How to contribute**  
+
+https://github.com/DelvUI/DelvUI/wiki/Contributing  
 ***
 
-You can help us contributing job packs or anything that's still missing.  
-Hop in over on our Discord: https://discord.gg/xzde5qQayh  
+**Tank Previews (DRK - GNB - WAR - PLD)**  
+
+https://github.com/DelvUI/DelvUI/wiki/Tanks  
 ***
 
-**Current Job previews [WIP]**
+**Healer Previews (WHM - SCH - AST)**  
+
+https://github.com/DelvUI/DelvUI/wiki/Healer  
 ***
 
-### BLM
+**Melee Previews (DRG - SAM - MNK - NIN)**  
 
-[![BLM](https://img.youtube.com/vi/7_k_wDY3OK8/0.jpg)](https://www.youtube.com/watch?v=7_k_wDY3OK8 "DelvUI BLM")
-
+https://github.com/DelvUI/DelvUI/wiki/Melee  
 ***
 
-### BRD
+**Ranged Previews (BRD - DNC - MCH)**  
 
-[![BRD](https://img.youtube.com/vi/bnwpUAuPWuc/0.jpg)](https://www.youtube.com/watch?v=bnwpUAuPWuc "DelvUI BRD")
-
+https://github.com/DelvUI/DelvUI/wiki/Ranged  
 ***
 
-### DNC
+**Caster Previews (RDM - BLM - SMN - BLU)**  
 
-Needs Video
-
-***
-
-### DRG
-
-Needs Video
-
-***
-
-### DRK
-
-[![DRK](https://img.youtube.com/vi/nb6ivlkG2P4/0.jpg)](https://youtube.com/watch?v=nb6ivlkG2P4 "DelvUI DRK")
-
-***
-
-### GNB
-
-[![GNB](https://img.youtube.com/vi/O_9PuKNAOb8/0.jpg)](https://www.youtube.com/watch?v=O_9PuKNAOb8 "DelvUI GNB")
-
-***
-
-### MCH
-
-[![MCH](https://img.youtube.com/vi/LfqFgIPI9PM/0.jpg)](https://www.youtube.com/watch?v=LfqFgIPI9PM "DelvUI MCH")
-
-***
-
-### PLD
-
-[![PLD](https://img.youtube.com/vi/m6mXp86JIy4/0.jpg)](https://www.youtube.com/watch?v=m6mXp86JIy4 "DelvUI PLD")
-
-***
-
-### SAM
-
-Needs Video
-
-***
-
-### SCH
-
-[![SCH](https://img.youtube.com/vi/bZ_5_dgdiZc/0.jpg)](https://www.youtube.com/watch?v=bZ_5_dgdiZc "DelvUI SCH")
-
-***
-
-### SMN
-
-[![SMN](https://img.youtube.com/vi/AvMa03LL4AI/0.jpg)](https://www.youtube.com/watch?v=AvMa03LL4AI "DelvUI SMN")
-
-***
-
-### RDM
-
-[![RDM](https://img.youtube.com/vi/C2Dus-LuZHc/0.jpg)](https://www.youtube.com/watch?v=C2Dus-LuZHc "DelvUI RDM")
-
-***
-
-### WAR
-
-[![WAR](https://img.youtube.com/vi/zelBywyAC0Y/0.jpg)](https://www.youtube.com/watch?v=zelBywyAC0Y "DelvUI WAR")
-
-***
-
-### WHM
-
-Needs Video
-
+https://github.com/DelvUI/DelvUI/wiki/Caster  
 ***
