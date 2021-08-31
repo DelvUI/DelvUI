@@ -153,16 +153,15 @@ namespace DelvUI {
         public bool WARStormsEyeText { get; set; } = true;
         public int WARStormsEyeHeight { get; set; } = 20;
         public int WARStormsEyeWidth { get; set; } = 254;
-        public int WARBaseXOffset { get; set; } = 127;
-        public int WARBaseYOffset { get; set; } = 417;
+        public int WARStormsEyeXOffset { get; set; } = 127;
+        public int WARStormsEyeYOffset { get; set; } = 417;
         public bool WARBeastGaugeEnabled { get; set; } = true;
         public bool WARBeastGaugeText { get; set; }
         public int WARBeastGaugeHeight { get; set; } = 20;
         public int WARBeastGaugeWidth { get; set; } = 254;
         public int WARBeastGaugePadding { get; set; } = 2;
-        public int WARBeastGaugeXOffset { get; set; }
-        public int WARBeastGaugeYOffset { get; set; }
-        public int WARInterBarOffset { get; set; } = 2;
+        public int WARBeastGaugeXOffset { get; set; } = 127;
+        public int WARBeastGaugeYOffset { get; set; } = 439;
         public Vector4 WARInnerReleaseColor = new Vector4(255f/255f, 0f/255f, 0f/255f, 100f/100f);
         public Vector4 WARStormsEyeColor = new Vector4(255f/255f, 136f/255f, 146f/255f, 100f/100f);
         public Vector4 WARFellCleaveColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 100f/100f);

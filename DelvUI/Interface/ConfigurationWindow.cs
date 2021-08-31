@@ -1545,17 +1545,17 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    var warBaseXOffset = _pluginConfiguration.WARBaseXOffset;
-                    if (ImGui.DragInt("Base X Offset", ref warBaseXOffset, .1f, -2000, 2000))
+                    var warStormsEyeXOffset = _pluginConfiguration.WARStormsEyeXOffset;
+                    if (ImGui.DragInt("Storm's Eye X Offset", ref warStormsEyeXOffset, .1f, -2000, 2000))
                     {
-                        _pluginConfiguration.WARBaseXOffset = warBaseXOffset;
+                        _pluginConfiguration.WARStormsEyeXOffset = warStormsEyeXOffset;
                         _pluginConfiguration.Save();
                     }
 
-                    var warBaseYOffset = _pluginConfiguration.WARBaseYOffset;
-                    if (ImGui.DragInt("Base Y Offset", ref warBaseYOffset, .1f, -2000, 2000))
+                    var warStormsEyeYOffset = _pluginConfiguration.WARStormsEyeYOffset;
+                    if (ImGui.DragInt("Storm's Eye Y Offset", ref warStormsEyeYOffset, .1f, -2000, 2000))
                     {
-                        _pluginConfiguration.WARBaseYOffset = warBaseYOffset;
+                        _pluginConfiguration.WARStormsEyeYOffset = warStormsEyeYOffset;
                         _pluginConfiguration.Save();
                     }
                     
@@ -1605,13 +1605,6 @@ namespace DelvUI.Interface
                     if (ImGui.DragInt("Beast Gauge Y Offset", ref warBeastGaugeYOffset, .1f, -2000, 2000))
                     {
                         _pluginConfiguration.WARBeastGaugeYOffset = warBeastGaugeYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var warInterBarOffset = _pluginConfiguration.WARInterBarOffset;
-                    if (ImGui.DragInt("Space Between Bars", ref warInterBarOffset, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.WARInterBarOffset = warInterBarOffset;
                         _pluginConfiguration.Save();
                     }
 
