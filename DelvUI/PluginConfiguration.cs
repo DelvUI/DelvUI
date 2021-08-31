@@ -4,6 +4,7 @@ using System.Numerics;
 using Dalamud.Configuration;
 using Dalamud.Plugin;
 using ImGuiNET;
+using ImGuiScene;
 using Newtonsoft.Json;
 
 namespace DelvUI {
@@ -609,6 +610,7 @@ namespace DelvUI {
 
         [JsonIgnore] private DalamudPluginInterface _pluginInterface;
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
+        [JsonIgnore] public TextureWrap BannerImage = null;
         [JsonIgnore] public Dictionary<uint, Dictionary<string, uint>> JobColorMap;
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> NPCColorMap;
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> MiscColorMap;
