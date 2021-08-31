@@ -2612,6 +2612,33 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
+                    var ninTrickBarHeight = _pluginConfiguration.NINTrickBarHeight;
+                    if (ImGui.DragInt("Trick Bar Height", ref ninTrickBarHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINTrickBarHeight = ninTrickBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ninTrickBarWidth = _pluginConfiguration.NINTrickBarWidth;
+                    if (ImGui.DragInt("Trick Bar Width", ref ninTrickBarWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.NINTrickBarWidth = ninTrickBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ninTrickBarXOffset = _pluginConfiguration.NINTrickBarXOffset;
+                    if (ImGui.DragInt("Trick Bar X Offset", ref ninTrickBarXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.NINTrickBarXOffset = ninTrickBarXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var ninTrickBarYOffset = _pluginConfiguration.NINTrickBarYOffset;
+                    if (ImGui.DragInt("Trick Bar Y Offset", ref ninTrickBarYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.NINTrickBarYOffset = ninTrickBarYOffset;
+                        _pluginConfiguration.Save();
+                    }
 
                     var ninInterBarOffset = _pluginConfiguration.NINInterBarOffset;
                     if (ImGui.DragInt("Space Between Bars", ref ninInterBarOffset, .1f, 1, 1000))
@@ -2623,6 +2650,8 @@ namespace DelvUI.Interface
                     _changed |= ImGui.ColorEdit4("Empty Color", ref _pluginConfiguration.NINEmptyColor);
                     _changed |= ImGui.ColorEdit4("Huton Bar Color", ref _pluginConfiguration.NINHutonColor);
                     _changed |= ImGui.ColorEdit4("Ninki Bar Color", ref _pluginConfiguration.NINNinkiColor);
+                    _changed |= ImGui.ColorEdit4("Trick Bar Color", ref _pluginConfiguration.NINTrickColor);
+                    _changed |= ImGui.ColorEdit4("Suiton Bar Color", ref _pluginConfiguration.NINSuitonColor);
 
                     ImGui.EndTabItem();
                 }

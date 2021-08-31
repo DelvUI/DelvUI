@@ -24,10 +24,16 @@ namespace DelvUI.Interface
         private int NinkiGaugePadding => PluginConfiguration.NINNinkiGaugePadding;
         private int NinkiGaugeXOffset => PluginConfiguration.NINNinkiGaugeXOffset;
         private int NinkiGaugeYOffset => PluginConfiguration.NINNinkiGaugeYOffset;
+        private int TrickBarHeight => PluginConfiguration.NINTrickBarHeight;
+        private int TrickBarWidth => PluginConfiguration.NINTrickBarWidth;
+        private int TrickBarXOffset => PluginConfiguration.NINTrickBarXOffset;
+        private int TrickBarYOffset => PluginConfiguration.NINTrickBarYOffset;
 
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000];
         private Dictionary<string, uint> HutonColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 1];
         private Dictionary<string, uint> NinkiColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 2];
+        private Dictionary<string, uint> TrickColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 3];
+        private Dictionary<string, uint> SuitonColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 4];
 
         private int InterBarOffset => PluginConfiguration.NINInterBarOffset;
 
@@ -37,6 +43,7 @@ namespace DelvUI.Interface
         {
             var nextHeight = DrawHutonGauge(0);
             nextHeight = DrawNinkiGauge(nextHeight);
+            DrawTrickAndSuitonBar(nextHeight);
         }
 
         protected override void DrawPrimaryResourceBar()
@@ -82,6 +89,59 @@ namespace DelvUI.Interface
             bar.Draw(drawList);
 
             return NinkiGaugeHeight + initialHeight + InterBarOffset;
+        }
+
+        private int DrawTrickAndSuitonBar(int initialHeight)
+        {
+            var xPos = CenterX - XOffset + TrickBarXOffset;
+            var yPos = CenterY + YOffset + initialHeight + TrickBarYOffset;
+
+            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            var bar = BarBuilder.Create(xPos, yPos, TrickBarHeight, TrickBarWidth);
+            var targeted = target is Dalamud.Game.ClientState.Actors.Types.Chara;
+            if(targeted)
+            {
+                // TODO figure out which one of these is actually the trick attack vuln up debuff!
+                var trickStatus = target.StatusEffects.FirstOrDefault(o => o.EffectId == 2014 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
+                                                                           o.EffectId == 64 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
+                                                                           o.EffectId == 444 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
+                                                                           o.EffectId == 638 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
+                                                                           o.EffectId == 1054 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
+                                                                           o.EffectId == 1208 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
+                                                                           o.EffectId == 1402 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
+                                                                           o.EffectId == 1845 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
+                var trickDuration = trickStatus.Duration;
+                var trickIsUp = trickStatus.Duration > 0;
+
+                // TODO without the conditional, get a flash of -15 for some reason
+                bar.AddInnerBar((trickIsUp ? trickDuration : 0), 15, TrickColor);
+
+                // only show trick attack timer text if it's is up
+                if (trickIsUp)
+                    bar.SetTextMode(BarTextMode.EachChunk)
+                       .SetText(BarTextPosition.CenterLeft, BarTextType.Current, PluginConfiguration.NINTrickColor, Vector4.UnitW, null);
+            }
+            else
+            {
+                // nothing is targeted, draw an empty bar
+                bar.AddInnerBar(0, 15, EmptyColor);
+            }
+
+            var suitonBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 507);
+            if (suitonBuff.Any())
+            {
+                var suitonDuration = Math.Abs(suitonBuff.First().Duration);
+                bar.AddInnerBar(suitonDuration, 20, SuitonColor)
+                   .SetTextMode(BarTextMode.EachChunk)
+                   .SetText(BarTextPosition.CenterRight, BarTextType.Current, PluginConfiguration.NINSuitonColor, Vector4.UnitW, null);
+            }
+
+            // draw the Suiton bar
+            var drawList = ImGui.GetWindowDrawList();
+            bar.Build()
+               .Draw(drawList);
+
+            return TrickBarHeight + initialHeight + InterBarOffset;
         }
     }
 }

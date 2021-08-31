@@ -375,10 +375,17 @@ namespace DelvUI {
         public int NINNinkiGaugePadding { get; set; } = 2;
         public int NINNinkiGaugeXOffset { get; set; }
         public int NINNinkiGaugeYOffset { get; set; }
+        public int NINTrickBarHeight { get; set; } = 20;
+        public int NINTrickBarWidth { get; set; } = 254;
+        public int NINTrickBarXOffset { get; set; }
+        public int NINTrickBarYOffset { get; set; }
+
 
         public int NINInterBarOffset { get; set; } = 2;
         public Vector4 NINHutonColor = new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f);
         public Vector4 NINNinkiColor = new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f);
+        public Vector4 NINTrickColor = new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f);
+        public Vector4 NINSuitonColor = new Vector4(218f / 255f, 236f / 255f, 246f / 255f, 100f / 100f);
         public Vector4 NINEmptyColor = new Vector4(143f / 255f, 141f / 255f, 142f / 255f, 100f / 100f);
 
         #endregion
@@ -1208,7 +1215,7 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NINEmptyColor.AdjustColor(.1f))
                 },
 
-                [Jobs.NIN * 1000 + 1] = new Dictionary<string, uint> // Battery gauge ready
+                [Jobs.NIN * 1000 + 1] = new Dictionary<string, uint> // Huton gauge
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(NINHutonColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(NINHutonColor.AdjustColor(-.8f)),
@@ -1216,13 +1223,29 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NINHutonColor.AdjustColor(.1f))
                 },
 
-                [Jobs.NIN * 1000 + 2] = new Dictionary<string, uint> // Robot summoned
+                [Jobs.NIN * 1000 + 2] = new Dictionary<string, uint> // Ninki gauge
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(NINNinkiColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(NINNinkiColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(NINNinkiColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NINNinkiColor.AdjustColor(.1f))
-                },                
+                },
+                
+                [Jobs.NIN * 1000 + 3] = new Dictionary<string, uint> // Trick attack bar
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(NINTrickColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(NINTrickColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(NINTrickColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NINTrickColor.AdjustColor(.1f))
+                },
+
+                [Jobs.NIN * 1000 + 4] = new Dictionary<string, uint> // Suiton bar
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(NINSuitonColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(NINSuitonColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(NINSuitonColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NINSuitonColor.AdjustColor(.1f))
+                },
 
                 [Jobs.BRD] = new Dictionary<string, uint>
                 {
