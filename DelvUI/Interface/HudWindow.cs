@@ -780,7 +780,7 @@ namespace DelvUI.Interface {
 
             ImGui.End();
         }
-        
+
         protected void DrawGenericElements()
         {
             DrawHealthBar();
