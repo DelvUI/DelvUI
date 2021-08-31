@@ -1,4 +1,5 @@
-﻿using Dalamud.Plugin;
+﻿using Dalamud.Data.LuminaExtensions;
+using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using Lumina.Data.Files;
@@ -6,44 +7,57 @@ using Lumina.Excel.GeneratedSheets;
 using Action = Lumina.Excel.GeneratedSheets.Action;
 using Companion = Lumina.Excel.GeneratedSheets.Companion;
 using DelvUI.Enums;
+using ImGuiScene;
 
 namespace DelvUI.Helpers
 {
     public class LastUsedCast
     {
-        private readonly uint _castId;
         private dynamic _lastUsedAction;
         private readonly BattleChara.CastInfo _castInfo;
-        private readonly ActionType _actionType;
         private readonly DalamudPluginInterface _pluginInterface;
+        private TexFile _icon;
+        public readonly uint CastId;
+        public readonly ActionType ActionType;
         public string ActionText;
-        public TexFile Icon;
         public DamageType DamageType;
+        public TextureWrap IconTexture;
+        public bool HasIcon;
         public bool Interruptable;
 
         public LastUsedCast(uint castId, ActionType actionType, BattleChara.CastInfo castInfo, DalamudPluginInterface pluginInterface)
         {
-            _castId = castId;
-            _actionType = actionType;
+            CastId = castId;
+            ActionType = actionType;
             _castInfo = castInfo;
             _pluginInterface = pluginInterface;
             SetCastProperties();
+            LoadAndCacheTexture();
+            PluginLog.Log("Loaded new icon");
+        }
+
+        private void LoadAndCacheTexture()
+        {
+            HasIcon = false;
+            if (_icon?.FilePath.Path == "ui/icon/000000/000000.tex" || _icon == null) return;
+            IconTexture = _pluginInterface.UiBuilder.LoadImageRaw(_icon.GetRgbaImageData(), _icon.Header.Width, _icon.Header.Height, 4);
+            HasIcon = true;
         }
 
         private void SetCastProperties()
         {
             _lastUsedAction = null;
             Interruptable = _castInfo.Interruptible > 0;
-            if (_castId == 1)
+            if (CastId == 1)
             {
                 ActionText = "Interacting...";
-                Icon = _pluginInterface.Data.GetIcon(0);
+                _icon = _pluginInterface.Data.GetIcon(0);
                 return;
             }
             ActionText = "Casting";
-            Icon = _pluginInterface.Data.GetIcon(0);
+            _icon = _pluginInterface.Data.GetIcon(0);
             
-            switch (_actionType)
+            switch (ActionType)
             {
                 case ActionType.PetAction:
                 case ActionType.Spell:
@@ -51,28 +65,28 @@ namespace DelvUI.Helpers
                 case ActionType.PvPAction:
                 case ActionType.CraftAction:
                 case ActionType.Ability:
-                    _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Action>()?.GetRow(_castId);
+                    _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Action>()?.GetRow(CastId);
                     ActionText = _lastUsedAction?.Name.ToString();
-                    Icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
+                    _icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
                     DamageType = GetDamageType(_lastUsedAction);
                     break;
                 case ActionType.Mount:
-                    _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Mount>()?.GetRow(_castId);
+                    _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Mount>()?.GetRow(CastId);
                     ActionText = _lastUsedAction?.Singular.ToString();
-                    Icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
+                    _icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
                     DamageType = DamageType.Unknown;
                     break;
                 case ActionType.KeyItem:
                 case ActionType.Item:
-                    _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Item>()?.GetRow(_castId);
+                    _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Item>()?.GetRow(CastId);
                     ActionText = ActionText.ToString() != "" ? _lastUsedAction?.Name.ToString() : "Using item...";
-                    Icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
+                    _icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
                     DamageType = DamageType.Unknown;
                     break;
                 case ActionType.Companion:
-                    _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Companion>()?.GetRow(_castId);
+                    _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Companion>()?.GetRow(CastId);
                     ActionText = _lastUsedAction?.Singular.ToString();
-                    Icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
+                    _icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
                     DamageType = DamageType.Unknown;
                     break;
                 case ActionType.None:
@@ -88,13 +102,13 @@ namespace DelvUI.Helpers
                 case ActionType.Accessory:
                     _lastUsedAction = null;
                     ActionText = "Casting...";
-                    Icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
+                    _icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
                     DamageType = DamageType.Unknown;
                     break;
                 default:
                     _lastUsedAction = null;
                     ActionText = "Casting...";
-                    Icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
+                    _icon = _pluginInterface.Data.GetIcon(_lastUsedAction?.Icon ?? 0);
                     DamageType = DamageType.Unknown;
                     break;
             }

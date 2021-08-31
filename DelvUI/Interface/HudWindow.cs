@@ -375,8 +375,18 @@ namespace DelvUI.Interface {
             var currentCastTime = castInfo.CurrentCastTime;
             var totalCastTime = castInfo.TotalCastTime;
 
-            _lastPlayerUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, PluginInterface);
-            var iconTexFile = _lastPlayerUsedCast.Icon;
+            if (_lastPlayerUsedCast != null)
+            {
+                if (!(_lastPlayerUsedCast.CastId == currentCastId && _lastPlayerUsedCast.ActionType == currentCastType))
+                {
+                    _lastPlayerUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, PluginInterface);
+                }
+            }
+            else
+            {
+                _lastPlayerUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, PluginInterface);
+            }
+            
             var castText = _lastPlayerUsedCast.ActionText;
 
             var castPercent = 100f / totalCastTime * currentCastTime;
@@ -415,12 +425,9 @@ namespace DelvUI.Interface {
                 castColor["gradientLeft"], castColor["gradientRight"], castColor["gradientRight"], castColor["gradientLeft"]
             );
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-
-            var emptyIconPath = "ui/icon/000000/000000.tex";
-            if (PluginConfiguration.ShowActionIcon && iconTexFile?.FilePath.Path != emptyIconPath && iconTexFile != null) {
-                var texture = PluginInterface.UiBuilder.LoadImageRaw(iconTexFile.GetRgbaImageData(), iconTexFile.Header.Width, iconTexFile.Header.Height, 4);
-
-                ImGui.Image(texture.ImGuiHandle, new Vector2(CastBarHeight, CastBarHeight));
+            
+            if (PluginConfiguration.ShowActionIcon && _lastPlayerUsedCast.HasIcon) {
+                ImGui.Image(_lastPlayerUsedCast.IconTexture.ImGuiHandle, new Vector2(CastBarHeight, CastBarHeight));
                 drawList.AddRect(cursorPos, cursorPos + new Vector2(CastBarHeight, CastBarHeight), 0xFF000000);
             }
 
@@ -438,7 +445,7 @@ namespace DelvUI.Interface {
                 DrawOutlinedText(
                     castText,
                     new Vector2(
-                        cursorPos.X + (PluginConfiguration.ShowActionIcon && iconTexFile?.FilePath.Path != emptyIconPath ? CastBarHeight : 0) + 5,
+                        cursorPos.X + (PluginConfiguration.ShowActionIcon && _lastPlayerUsedCast.HasIcon ? CastBarHeight : 0) + 5,
                         cursorPos.Y + CastBarHeight / 2f - castTextSize.Y / 2f
                     )
                 );
@@ -463,9 +470,19 @@ namespace DelvUI.Interface {
             var currentCastType = castInfo.ActionType;
             var currentCastTime = castInfo.CurrentCastTime;
             var totalCastTime = castInfo.TotalCastTime;
+            
+            if (_lastTargetUsedCast != null)
+            {
+                if (!(_lastTargetUsedCast.CastId == currentCastId && _lastTargetUsedCast.ActionType == currentCastType))
+                {
+                    _lastTargetUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, PluginInterface);
+                }
+            }
+            else
+            {
+                _lastTargetUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, PluginInterface);
+            }
 
-            _lastTargetUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, PluginInterface);
-            var iconTexFile = _lastTargetUsedCast.Icon;
             var castText = _lastTargetUsedCast.ActionText;
 
             var castPercent = 100f / totalCastTime * currentCastTime;
@@ -520,11 +537,9 @@ namespace DelvUI.Interface {
             );
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-            var emptyIconPath = "ui/icon/000000/000000.tex";
-            if (PluginConfiguration.ShowTargetActionIcon && iconTexFile?.FilePath.Path != emptyIconPath && iconTexFile != null) {
-                var texture = PluginInterface.UiBuilder.LoadImageRaw(iconTexFile.GetRgbaImageData(), iconTexFile.Header.Width, iconTexFile.Header.Height, 4);
-
-                ImGui.Image(texture.ImGuiHandle, new Vector2(TargetCastBarHeight, TargetCastBarHeight));
+            if (PluginConfiguration.ShowTargetActionIcon && _lastTargetUsedCast.HasIcon) {
+                
+                ImGui.Image(_lastTargetUsedCast.IconTexture.ImGuiHandle, new Vector2(TargetCastBarHeight, TargetCastBarHeight));
                 drawList.AddRect(cursorPos, cursorPos + new Vector2(TargetCastBarHeight, TargetCastBarHeight), 0xFF000000);
             }
 
@@ -542,7 +557,7 @@ namespace DelvUI.Interface {
                 DrawOutlinedText(
                     castText,
                     new Vector2(
-                        cursorPos.X + (PluginConfiguration.ShowTargetActionIcon && iconTexFile?.FilePath.Path != emptyIconPath ? TargetCastBarHeight : 0) + 5,
+                        cursorPos.X + (PluginConfiguration.ShowTargetActionIcon && _lastTargetUsedCast.HasIcon ? TargetCastBarHeight : 0) + 5,
                         cursorPos.Y + TargetCastBarHeight / 2f - castTextSize.Y / 2f
                     )
                 );
