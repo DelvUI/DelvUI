@@ -47,7 +47,7 @@ Needs Video
 
 ### GNB
 
-[![GNB](https://img.youtube.com/vi/sF4fcRdO5uE/0.jpg)](https://www.youtube.com/watch?v=sF4fcRdO5uE "DelvUI GNB")
+[![GNB](https://img.youtube.com/vi/IJITUgYU32U/0.jpg)](https://www.youtube.com/watch?v=IJITUgYU32U "DelvUI GNB")
 
 ***
 
