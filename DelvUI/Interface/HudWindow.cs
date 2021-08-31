@@ -443,7 +443,7 @@ namespace DelvUI.Interface {
 
             if (PluginConfiguration.ShowActionName) {
                 DrawOutlinedText(
-                    castText ??= "",
+                    castText,
                     new Vector2(
                         cursorPos.X + (PluginConfiguration.ShowActionIcon && _lastPlayerUsedCast.HasIcon ? CastBarHeight : 0) + 5,
                         cursorPos.Y + CastBarHeight / 2f - castTextSize.Y / 2f

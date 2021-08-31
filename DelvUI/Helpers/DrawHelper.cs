@@ -10,6 +10,9 @@ namespace DelvUI.Helpers
         }
         
         public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor) {
+            // super ugly temporary hack to avoid crashes on certain quest interactions
+            text ??= "";
+
             ImGui.SetCursorPos(new Vector2(pos.X - 1, pos.Y + 1));
             ImGui.TextColored(outlineColor, text);
                 
