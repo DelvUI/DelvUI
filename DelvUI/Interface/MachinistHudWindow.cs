@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Interface.Bars;
@@ -11,13 +12,21 @@ namespace DelvUI.Interface
     {
         public override uint JobId => 31;
 
+        private bool OverheatEnabled => PluginConfiguration.MCHOverheatEnable;
+
+        private bool OverheatText => PluginConfiguration.MCHOverheatText;
+        
         private int OverheatHeight => PluginConfiguration.MCHOverheatHeight;
 
         private int OverheatWidth => PluginConfiguration.MCHOverheatWidth;
 
-        private new int XOffset => PluginConfiguration.MCHBaseXOffset;
+        private int OverheatXOffset => PluginConfiguration.MCHOverheatXOffset;
 
-        private new int YOffset => PluginConfiguration.MCHBaseYOffset;
+        private int OverheatYOffset => PluginConfiguration.MCHOverheatYOffset;
+
+        private bool HeatGaugeEnabled => PluginConfiguration.MCHHeatGaugeEnable;
+
+        private bool HeatGaugeText => PluginConfiguration.MCHHeatGaugeText;
 
         private int HeatGaugeHeight => PluginConfiguration.MCHHeatGaugeHeight;
 
@@ -28,6 +37,16 @@ namespace DelvUI.Interface
         private int HeatGaugeXOffset => PluginConfiguration.MCHHeatGaugeXOffset;
 
         private int HeatGaugeYOffset => PluginConfiguration.MCHHeatGaugeYOffset;
+
+        private bool BatteryGaugeEnabled => PluginConfiguration.MCHBatteryGaugeEnable;
+
+        private bool BatteryGaugeShowBattery => PluginConfiguration.MCHBatteryGaugeShowBattery;
+
+        private bool BatteryGaugeBatteryText => PluginConfiguration.MCHBatteryGaugeBatteryText;
+
+        private bool BatteryGaugeShowRobotDuration => PluginConfiguration.MCHBatteryGaugeShowRobotDuration;
+
+        private bool BatteryGaugeRobotDurationText => PluginConfiguration.MCHBatteryGaugeRobotDurationText;
 
         private int BatteryGaugeHeight => PluginConfiguration.MCHBatteryGaugeHeight;
 
@@ -40,6 +59,8 @@ namespace DelvUI.Interface
         private int BatteryGaugeYOffset => PluginConfiguration.MCHBatteryGaugeYOffset;
 
         private bool WildfireEnabled => PluginConfiguration.MCHWildfireEnabled;
+
+        private bool WildfireText => PluginConfiguration.MCHWildfireText;
 
         private int WildfireHeight => PluginConfiguration.MCHWildfireHeight;
 
@@ -60,7 +81,6 @@ namespace DelvUI.Interface
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 4];
 
         private Dictionary<string, uint> WildfireColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 5];
-        private int InterBarOffset => PluginConfiguration.MCHInterBarOffset;
         // TODO: Rook auto-turret differences?
         private readonly float[] _robotDuration = {12.450f, 13.950f, 15.450f, 16.950f, 18.450f, 19.950f};
         
@@ -68,109 +88,112 @@ namespace DelvUI.Interface
 
         protected override void Draw(bool _) 
         {
-            var nextHeight = DrawOverheatBar(0);
-            nextHeight = DrawHeatGauge(nextHeight);
-            nextHeight = DrawBatteryGauge(nextHeight);
+            if (OverheatEnabled)
+                DrawOverheatBar();
+            if (HeatGaugeEnabled)
+                DrawHeatGauge();
+            if (BatteryGaugeEnabled)
+                DrawBatteryGauge();
             if (WildfireEnabled)
-            {
-                DrawWildfireBar(nextHeight);
-            }
+                DrawWildfireBar();
         }
 
         protected override void DrawPrimaryResourceBar()
         {
         }
 
-        private int DrawHeatGauge(int initialHeight)
+        private void DrawHeatGauge()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
             
-            var xPos = CenterX - XOffset + HeatGaugeXOffset;
-            var yPos = CenterY + YOffset + initialHeight + HeatGaugeYOffset;
+            var xPos = CenterX - HeatGaugeXOffset;
+            var yPos = CenterY + HeatGaugeYOffset;
             
-            var bar = BarBuilder.Create(xPos, yPos, HeatGaugeHeight, HeatGaugeWidth)
+            var builder = BarBuilder.Create(xPos, yPos, HeatGaugeHeight, HeatGaugeWidth)
                 .SetChunks(2)
                 .SetChunkPadding(HeatGaugePadding)
-                .AddInnerBar(gauge.Heat, 100, HeatColor, EmptyColor)
-                .SetTextMode(BarTextMode.EachChunk)
-                .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                .Build();
+                .AddInnerBar(gauge.Heat, 100, HeatColor, EmptyColor);
+            if (HeatGaugeText)
+                builder.SetTextMode(BarTextMode.EachChunk)
+                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
-
-            return HeatGaugeHeight + initialHeight + InterBarOffset;
+            builder.Build().Draw(drawList);
         }
 
-        private int DrawBatteryGauge(int initialHeight)
+        private void DrawBatteryGauge()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
             
-            var xPos = CenterX - XOffset + BatteryGaugeXOffset;
-            var yPos = CenterY + YOffset + initialHeight + BatteryGaugeYOffset;
+            var xPos = CenterX - BatteryGaugeXOffset;
+            var yPos = CenterY + BatteryGaugeYOffset;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, BatteryGaugeHeight, BatteryGaugeWidth)
                 .SetChunks(new[] {.5f, .1f, .1f, .1f, .1f, .1f})
-                .SetChunkPadding(BatteryGaugePadding)
-                .AddInnerBar(gauge.Battery, 100, BatteryColor, EmptyColor);
+                .SetChunkPadding(BatteryGaugePadding);
 
-            if (gauge.IsRobotActive())
+            if (BatteryGaugeShowBattery)
             {
-                builder.AddInnerBar(gauge.RobotTimeRemaining / 1000f, _robotDuration[gauge.LastRobotBatteryPower / 10 - 5], RobotColor, null)
-                    .SetTextMode(BarTextMode.Single)
-                    .SetText(BarTextPosition.CenterLeft, BarTextType.Current);
+                builder.AddInnerBar(gauge.Battery, 100, BatteryColor, EmptyColor);
+                if (BatteryGaugeBatteryText)
+                    builder.SetTextMode(BarTextMode.Single)
+                        .SetText(BarTextPosition.CenterLeft, BarTextType.Current, PluginConfiguration.MCHBatteryColor, Vector4.UnitW, null);
+            }
+
+            if (gauge.IsRobotActive() && BatteryGaugeShowRobotDuration)
+            {
+                builder.AddInnerBar(gauge.RobotTimeRemaining / 1000f, _robotDuration[gauge.LastRobotBatteryPower / 10 - 5], RobotColor, null);
+                if (BatteryGaugeRobotDurationText)
+                    builder.SetTextMode(BarTextMode.Single)
+                        .SetText(BarTextPosition.CenterRight, BarTextType.Current, PluginConfiguration.MCHRobotColor, Vector4.UnitW, null);
             }
 
             var drawList = ImGui.GetWindowDrawList();
             var bar = builder.Build();
             bar.Draw(drawList);
-
-            return BatteryGaugeHeight + initialHeight + InterBarOffset;
         }
 
-        private int DrawOverheatBar(int initialHeight)
+        private void DrawOverheatBar()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
             
-            var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset + initialHeight;
+            var xPos = CenterX - OverheatXOffset;
+            var yPos = CenterY + OverheatYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, OverheatHeight, OverheatWidth);
 
             if (gauge.IsOverheated())
             {
-                builder.AddInnerBar(gauge.OverheatTimeRemaining / 1000f, 8, OverheatColor, null)
-                    .SetTextMode(BarTextMode.EachChunk)
-                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                builder.AddInnerBar(gauge.OverheatTimeRemaining / 1000f, 8, OverheatColor, null);
+                if (OverheatText)
+                    builder.SetTextMode(BarTextMode.EachChunk)
+                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
             
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
-
-            return OverheatHeight + initialHeight + InterBarOffset;
         }
 
-        private int DrawWildfireBar(int initialHeight)
+        private void DrawWildfireBar()
         {
             var wildfireBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1946);
         
-            var xPos = CenterX - XOffset + WildfireXOffset;
-            var yPos = CenterY + YOffset + initialHeight + WildfireYOffset;
+            var xPos = CenterX - WildfireXOffset;
+            var yPos = CenterY + WildfireYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, WildfireHeight, WildfireWidth);
 
             if (wildfireBuff.Any())
             {
                 var duration = wildfireBuff.First().Duration;
-                builder.AddInnerBar(duration, 10, WildfireColor, null)
-                    .SetTextMode(BarTextMode.EachChunk)
-                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                builder.AddInnerBar(duration, 10, WildfireColor, null);
+                if (WildfireText)
+                    builder.SetTextMode(BarTextMode.EachChunk)
+                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
-
-            return WildfireHeight + initialHeight + InterBarOffset;
         }
     }
 }
