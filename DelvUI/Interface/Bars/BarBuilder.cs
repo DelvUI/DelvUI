@@ -21,6 +21,12 @@ namespace DelvUI.Interface.Bars
             return new BarBuilder(bar);
         }
 
+        public static BarBuilder Create(Vector2 position, Vector2 size)
+        {
+            var bar = new Bar(position.X, position.Y, (int)size.Y, (int)size.X);
+            return new BarBuilder(bar);
+        }
+
         public Bar Build() => _bar;
 
         public BarBuilder SetX(int xPos)
@@ -85,6 +91,12 @@ namespace DelvUI.Interface.Bars
         public BarBuilder SetBackgroundColor(uint backgroundColor)
         {
             _bar.BackgroundColor = backgroundColor;
+            return this;
+        }
+
+        public BarBuilder SetDrawBorder(bool drawBorder)
+        {
+            _bar.DrawBorder = drawBorder;
             return this;
         }
 
@@ -178,6 +190,14 @@ namespace DelvUI.Interface.Bars
             if (currentInnerBar == -1)
                 throw new InvalidOperationException("Operation requires defined inner bar");
             _bar.InnerBars[currentInnerBar].GlowColor = glowColor;
+            return this;
+        }
+
+        public BarBuilder SetGlowSize(uint size)
+        {
+            if (currentInnerBar == -1)
+                throw new InvalidOperationException("Operation requires defined inner bar");
+            _bar.InnerBars[currentInnerBar].GlowSize = size;
             return this;
         }
 
