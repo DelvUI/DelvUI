@@ -536,27 +536,27 @@ namespace DelvUI.Interface
             ImGui.BeginGroup(); // Left
             {
                 ImGui.Text("Bar Size & Position");
-                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/3), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
-                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                     {
                         ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                         {
                             ImGui.Text("");//SPACING
 
                             ImGui.Text("Height");
-                            var healthBarHeight = _pluginConfiguration.HealthBarHeight;
-                            if (ImGui.DragInt("##HealthBarHeight", ref healthBarHeight, .1f, 1, 1000))
+                            var HealthBarHeight = _pluginConfiguration.HealthBarHeight;
+                            if (ImGui.DragInt("##HealthBarHeight", ref HealthBarHeight, .1f, 1, 1000))
                             {
-                                _pluginConfiguration.HealthBarHeight = healthBarHeight;
+                                _pluginConfiguration.HealthBarHeight = HealthBarHeight;
                                 _pluginConfiguration.Save();
                             }
                             ImGui.Text("");//SPACING
 
                             ImGui.Text("X Offset");
-                            var healthBarXOffset = _pluginConfiguration.HealthBarXOffset;
-                            if (ImGui.DragInt("##HealthBarXOffset", ref healthBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
+                            var HealthBarXOffset = _pluginConfiguration.HealthBarXOffset;
+                            if (ImGui.DragInt("##HealthBarXOffset", ref HealthBarXOffset, .1f, -xOffsetLimit, xOffsetLimit))
                             {
-                                _pluginConfiguration.HealthBarXOffset = healthBarXOffset;
+                                _pluginConfiguration.HealthBarXOffset = HealthBarXOffset;
                                 _pluginConfiguration.Save();
                             }
                         }
@@ -569,19 +569,19 @@ namespace DelvUI.Interface
                             ImGui.Text("");//SPACING
 
                             ImGui.Text("Width");
-                            var healthBarWidth = _pluginConfiguration.HealthBarWidth;
-                            if (ImGui.DragInt("##HealthBarWidth", ref healthBarWidth, .1f, 1, 1000))
+                            var HealthBarWidth = _pluginConfiguration.HealthBarWidth;
+                            if (ImGui.DragInt("##HealthBarWidth", ref HealthBarWidth, .1f, 1, 1000))
                             {
-                                _pluginConfiguration.HealthBarWidth = healthBarWidth;
+                                _pluginConfiguration.HealthBarWidth = HealthBarWidth;
                                 _pluginConfiguration.Save();
                             }
                             ImGui.Text("");//SPACING
 
                             ImGui.Text("Y Offset");
-                            var healthBarYOffset = _pluginConfiguration.HealthBarYOffset;
-                            if (ImGui.DragInt("##HealthBarYOffset", ref healthBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
+                            var HealthBarYOffset = _pluginConfiguration.HealthBarYOffset;
+                            if (ImGui.DragInt("##HealthBarYOffset", ref HealthBarYOffset, .1f, -yOffsetLimit, yOffsetLimit))
                             {
-                                _pluginConfiguration.HealthBarYOffset = healthBarYOffset;
+                                _pluginConfiguration.HealthBarYOffset = HealthBarYOffset;
                                 _pluginConfiguration.Save();
                             }
                         }
@@ -589,12 +589,20 @@ namespace DelvUI.Interface
                         
                     }
                     ImGui.EndChild();
+                    ImGui.Text("");//SPACING
 
+                    ImGui.BeginChild("castbarcolor", new Vector2(0,ImGui.GetWindowHeight()/3),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        changed |= ImGui.Checkbox("Custom Color", ref _pluginConfiguration.CustomHealthBarColorEnabled);
+                        changed |= ImGui.ColorEdit4("##CustomHealthbarColor", ref _pluginConfiguration.CustomHealthBarColor);
+                    }
                     ImGui.EndChild();
+                ImGui.EndChild();
 
             }
             ImGui.EndGroup();
-            ImGui.EndGroup();
+            ImGui.EndGroup();   
+            
             ImGui.Text("");//SPACING
 
             ImGui.BeginGroup();
@@ -679,9 +687,6 @@ namespace DelvUI.Interface
             }
             ImGui.EndGroup();
             ImGui.EndGroup();
-            //TODO CONFIG FIX THIS
-            changed |= ImGui.Checkbox("Custom Healthbar Color Enabled", ref _pluginConfiguration.CustomHealthBarColorEnabled);
-            changed |= ImGui.ColorEdit4("Custom Healthbar Color", ref _pluginConfiguration.CustomHealthBarColor);
 
         } 
         private void DrawIndividualUnitFramesTargetConfig(){
