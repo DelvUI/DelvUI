@@ -27,7 +27,7 @@ namespace DelvUI.Interface
         public ConfigurationWindow(Plugin plugin, DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration)
         {
             //TODO ADD PRIMARYRESOURCEBAR TO CONFIGMAP jobs general
-
+//test commit
             _plugin = plugin;
             _pluginInterface = pluginInterface;
             _pluginConfiguration = pluginConfiguration;
