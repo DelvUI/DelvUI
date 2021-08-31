@@ -129,11 +129,11 @@ namespace DelvUI.Interface
 
             }
             ImGui.SameLine();
-            if (ImGui.Button("Hide HUD"))
+            if (ImGui.Button(_pluginConfiguration.HideHud ? "Show HUD" : "Hide HUD"))
             {
-                _changed |= ImGui.Checkbox("Hide HUD", ref _pluginConfiguration.HideHud);
-
-            }                
+                _pluginConfiguration.HideHud = ! _pluginConfiguration.HideHud;
+                _changed = true;
+            }
             ImGui.SameLine();
             if (ImGui.Button("Reset HUD")) {}
             ImGui.SameLine();
