@@ -117,6 +117,7 @@ namespace DelvUI {
 
 
                 //Melee DPS
+                Jobs.DRG => new DragoonHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.MNK => new MonkHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.NIN => new NinjaHudWindow(_pluginInterface, _pluginConfiguration),
@@ -158,7 +159,6 @@ namespace DelvUI {
                 Jobs.FSH => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 
                 //dont have packs yet
-                Jobs.DRG => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.BLU => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 _ => _hudWindow
             };
