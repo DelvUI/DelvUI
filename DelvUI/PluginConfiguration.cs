@@ -228,26 +228,39 @@ namespace DelvUI {
 
         public int ASTDrawBarHeight { get; set; } = 20;
         public int ASTDrawBarWidth { get; set; } = 254;
-        public int ASTDrawBarX { get; set; } = 127;
-        public int ASTDrawBarY { get; set; } = 438;
+        public int ASTDrawBarX { get; set; } = -127;
+        public int ASTDrawBarY { get; set; } = 400;
         public int ASTDivinationHeight { get; set; } = 20;
-        public int ASTDivinationWidth { get; set; } = 253;
-        public int ASTDivinationBarX { get; set; } = -42;
-        public int ASTDivinationBarY { get; set; } = 438;
+        public int ASTDivinationWidth { get; set; } = 254;
+        public int ASTDivinationBarX { get; set; } = -127;
+        public int ASTDivinationBarY { get; set; } = 378;
         public int ASTDivinationBarPad { get; set; } = 1;
         public int ASTDotBarHeight { get; set; } = 20;
         public int ASTDotBarWidth { get; set; } = 254;
         public int ASTDotBarX { get; set; } = 33;
         public int ASTDotBarY { get; set; } = -38;
+        public int ASTStarBarHeight { get; set; } = 86;
+        public int ASTStarBarWidth { get; set; } = 20;
+        public int ASTStarBarX { get; set; } = 11;
+        public int ASTStarBarY { get; set; } = -82;
+        public int ASTLightspeedBarHeight { get; set; } = 86;
+        public int ASTLightspeedBarWidth { get; set; } = 20;
+        public int ASTLightspeedBarX { get; set; } = 289;
+        public int ASTLightspeedBarY { get; set; } = -82;
         public bool ASTShowDivinationBar = true;
         public bool ASTShowDrawBar = true;
         public bool ASTShowDotBar = true;
+        public bool ASTShowStarBar = true;
+        public bool ASTShowLightspeedBar = true;
         public bool ASTShowPrimaryResourceBar = true;
         public Vector4 ASTEmptyColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 53f / 100f);
         public Vector4 ASTSealSunColor = new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f);
         public Vector4 ASTSealLunarColor = new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f);
         public Vector4 ASTSealCelestialColor = new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f);
         public Vector4 ASTDotColor = new Vector4(20f / 255f, 80f / 255f, 168f / 255f, 100f / 100f);
+        public Vector4 ASTStarEarthlyColor = new Vector4(37f / 255f, 181f / 255f, 177f / 255f, 100f / 100f);
+        public Vector4 ASTStarGiantColor = new Vector4(198f / 255f, 154f / 255f, 199f / 255f, 100f / 100f);
+        public Vector4 ASTLightspeedColor = new Vector4(255f / 255f, 255f / 255f, 173f / 255f, 100f / 100f);
 
         #endregion
 
@@ -362,7 +375,6 @@ namespace DelvUI {
         public Vector4 MCHEmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 100f/100f);
 
         #endregion
-
 
         #region NIN Configuration
 
@@ -1042,7 +1054,31 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTSealCelestialColor.AdjustColor(.1f))
                 },
 
-                [Jobs.AST * 1000 + 4] = new Dictionary<string, uint> // Dots
+                [Jobs.AST * 1000 + 4] = new Dictionary<string, uint> // Star
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTStarEarthlyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTStarEarthlyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTStarEarthlyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTStarEarthlyColor.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000 + 5] = new Dictionary<string, uint> // Star
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTStarGiantColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTStarGiantColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTStarGiantColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTStarGiantColor.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000 + 6] = new Dictionary<string, uint> // LightSpeed
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTLightspeedColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTLightspeedColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTLightspeedColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTLightspeedColor.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000 + 7] = new Dictionary<string, uint> // Dots
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(ASTDotColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(ASTDotColor.AdjustColor(-.8f)),
