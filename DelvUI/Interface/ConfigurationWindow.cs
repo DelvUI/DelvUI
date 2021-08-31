@@ -1682,6 +1682,13 @@ namespace DelvUI.Interface
                 }
                 if (ImGui.BeginTabItem("Paladin"))
                 {
+                    bool pldManaEnabled = _pluginConfiguration.PLDManaEnabled;
+                    if (ImGui.Checkbox("Mana Enabled", ref pldManaEnabled))
+                    {
+                        _pluginConfiguration.PLDManaEnabled = pldManaEnabled;
+                        _pluginConfiguration.Save();
+                    }
+                    
                     int pldManaHeight = _pluginConfiguration.PLDManaHeight;
                     if (ImGui.DragInt("Mana Height", ref pldManaHeight, 0.1f, 1, 1000))
                     {
@@ -1703,17 +1710,31 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    int pldBaseXoffset = _pluginConfiguration.PLDBaseXOffset;
-                    if (ImGui.DragInt("Base X Offset", ref pldBaseXoffset, 0.1f, -2000, 2000))
+                    int pldManaXoffset = _pluginConfiguration.PLDManaXOffset;
+                    if (ImGui.DragInt("Mana X Offset", ref pldManaXoffset, 0.1f, -2000, 2000))
                     {
-                        _pluginConfiguration.PLDBaseXOffset = pldBaseXoffset;
+                        _pluginConfiguration.PLDManaXOffset = pldManaXoffset;
                         _pluginConfiguration.Save();
                     }
 
-                    int pldBaseYoffset = _pluginConfiguration.PLDBaseYOffset;
-                    if (ImGui.DragInt("Base Y Offset", ref pldBaseYoffset, 0.1f, -2000, 2000))
+                    int pldManaYoffset = _pluginConfiguration.PLDManaYOffset;
+                    if (ImGui.DragInt("Mana Y Offset", ref pldManaYoffset, 0.1f, -2000, 2000))
                     {
-                        _pluginConfiguration.PLDBaseYOffset = pldBaseYoffset;
+                        _pluginConfiguration.PLDManaYOffset = pldManaYoffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    bool pldOathGauge = _pluginConfiguration.PLDOathGaugeEnabled;
+                    if (ImGui.Checkbox("Oath Gauge Enabled", ref pldOathGauge))
+                    {
+                        _pluginConfiguration.PLDOathGaugeEnabled = pldOathGauge;
+                        _pluginConfiguration.Save();
+                    }
+
+                    bool oathGaugeText = _pluginConfiguration.PLDOathGaugeText;
+                    if (ImGui.Checkbox("Oath Gauge Text", ref oathGaugeText))
+                    {
+                        _pluginConfiguration.PLDOathGaugeText = oathGaugeText;
                         _pluginConfiguration.Save();
                     }
 
@@ -1752,10 +1773,17 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
-                    bool oathGaugeText = _pluginConfiguration.PLDOathGaugeText;
-                    if (ImGui.Checkbox("Oath Gauge Text", ref oathGaugeText))
+                    bool buffBarEnabled = _pluginConfiguration.PLDBuffBarEnabled;
+                    if (ImGui.Checkbox("Buff Bar Enabled", ref buffBarEnabled))
                     {
-                        _pluginConfiguration.PLDOathGaugeText = oathGaugeText;
+                        _pluginConfiguration.PLDBuffBarEnabled = buffBarEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    bool buffBarText = _pluginConfiguration.PLDBuffBarText;
+                    if (ImGui.Checkbox("Buff Bar Text", ref buffBarText))
+                    {
+                        _pluginConfiguration.PLDBuffBarText = buffBarText;
                         _pluginConfiguration.Save();
                     }
 
@@ -1786,6 +1814,14 @@ namespace DelvUI.Interface
                         _pluginConfiguration.PLDBuffBarYOffset = pldBuffBarYoffset;
                         _pluginConfiguration.Save();
                     }
+
+                    bool atonementBarEnabled = _pluginConfiguration.PLDAtonementBarEnabled;
+                    if (ImGui.Checkbox("Atonement Bar Enabled", ref atonementBarEnabled))
+                    {
+                        _pluginConfiguration.PLDAtonementBarEnabled = atonementBarEnabled;
+                        _pluginConfiguration.Save();
+                    }
+                    
                     int pldAtonementBarHeight = _pluginConfiguration.PLDAtonementBarHeight;
                     if (ImGui.DragInt("Atonement Bar Height", ref pldAtonementBarHeight, 0.1f, 1, 1000))
                     {
@@ -1817,13 +1853,6 @@ namespace DelvUI.Interface
                     if (ImGui.DragInt("Atonement Bar Padding", ref pldAtonementBarPadding, 0.1f, 1, 2000))
                     {
                         _pluginConfiguration.PLDAtonementBarPadding = pldAtonementBarPadding;
-                        _pluginConfiguration.Save();
-                    }
-
-                    int pldInterBarOffset = _pluginConfiguration.PLDInterBarOffset;
-                    if (ImGui.DragInt("Space Between Bars", ref pldInterBarOffset, 0.1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.PLDInterBarOffset = pldInterBarOffset;
                         _pluginConfiguration.Save();
                     }
 
