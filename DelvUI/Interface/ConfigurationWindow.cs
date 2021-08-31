@@ -1517,6 +1517,20 @@ namespace DelvUI.Interface
                 
                 if (ImGui.BeginTabItem("Warrior"))
                 {
+                    var stormsEyeEnabled = _pluginConfiguration.WARStormsEyeEnabled;
+                    if (ImGui.Checkbox("Storm's Eye Enabled", ref stormsEyeEnabled))
+                    {
+                        _pluginConfiguration.WARStormsEyeEnabled = stormsEyeEnabled;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var stormsEyeText = _pluginConfiguration.WARStormsEyeText;
+                    if (ImGui.Checkbox("Storm's Eye Text", ref stormsEyeText))
+                    {
+                        _pluginConfiguration.WARStormsEyeText = stormsEyeText;
+                        _pluginConfiguration.Save();
+                    }
+                    
                     var stormsEyeHeight = _pluginConfiguration.WARStormsEyeHeight;
                     if (ImGui.DragInt("Storm's Eye Height", ref stormsEyeHeight, .1f, 1, 1000))
                     {
@@ -1542,6 +1556,20 @@ namespace DelvUI.Interface
                     if (ImGui.DragInt("Base Y Offset", ref warBaseYOffset, .1f, -2000, 2000))
                     {
                         _pluginConfiguration.WARBaseYOffset = warBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var beastGaugeEnabled = _pluginConfiguration.WARBeastGaugeEnabled;
+                    if (ImGui.Checkbox("Beast Gauge Enabled", ref beastGaugeEnabled))
+                    {
+                        _pluginConfiguration.WARBeastGaugeEnabled = beastGaugeEnabled;
+                        _pluginConfiguration.Save();
+                    }
+                    
+                    var beastGaugeText = _pluginConfiguration.WARBeastGaugeText;
+                    if (ImGui.Checkbox("Beast Gauge Text", ref beastGaugeText))
+                    {
+                        _pluginConfiguration.WARBeastGaugeText = beastGaugeText;
                         _pluginConfiguration.Save();
                     }
 

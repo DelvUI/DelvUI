@@ -149,10 +149,14 @@ namespace DelvUI {
 
         #region WAR Configuration
 
+        public bool WARStormsEyeEnabled { get; set; } = true;
+        public bool WARStormsEyeText { get; set; } = true;
         public int WARStormsEyeHeight { get; set; } = 20;
         public int WARStormsEyeWidth { get; set; } = 254;
         public int WARBaseXOffset { get; set; } = 127;
-        public int WARBaseYOffset { get; set; } = 416;
+        public int WARBaseYOffset { get; set; } = 417;
+        public bool WARBeastGaugeEnabled { get; set; } = true;
+        public bool WARBeastGaugeText { get; set; }
         public int WARBeastGaugeHeight { get; set; } = 20;
         public int WARBeastGaugeWidth { get; set; } = 254;
         public int WARBeastGaugePadding { get; set; } = 2;
