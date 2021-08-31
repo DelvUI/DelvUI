@@ -3116,89 +3116,182 @@ namespace DelvUI.Interface
             {
                                 if (ImGui.BeginTabItem("Summoner"))
                 {
-
-                    var smnRuinBarX = _pluginConfiguration.SmnRuinBarX;
-                    if (ImGui.DragInt("Ruin Bar X Offset", ref smnRuinBarX, .1f, -1000, 1000))
+                    var smnBaseXOffset = _pluginConfiguration.SmnBaseXOffset;
+                    if (ImGui.DragInt("Summoner Base X Offset", ref smnBaseXOffset, .1f, 1, 1000))
                     {
-                        _pluginConfiguration.SmnRuinBarX = smnRuinBarX;
+                        _pluginConfiguration.SmnBaseXOffset = smnBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    var smnBaseYOffset = _pluginConfiguration.SmnBaseYOffset;
+                    if (ImGui.DragInt("Summoner Base Y Offset", ref smnBaseYOffset, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.SmnBaseYOffset = smnBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
+                    var smnMiasmaBarEnabled = _pluginConfiguration.SmnMiasmaBarEnabled;
+                    if (ImGui.Checkbox("Enable the Miasma Tracker", ref smnMiasmaBarEnabled))
+                    {
+                        _pluginConfiguration.SmnMiasmaBarEnabled = smnMiasmaBarEnabled;
                         _pluginConfiguration.Save();
                     }
 
-                    var smnRuinBarY = _pluginConfiguration.SmnRuinBarY;
-                    if (ImGui.DragInt("Ruin Bar Y Offset", ref smnRuinBarY, .1f, -1000, 1000))
+                    if (smnMiasmaBarEnabled)
                     {
-                        _pluginConfiguration.SmnRuinBarY = smnRuinBarY;
+                        var smnMiasmaBarHeight = _pluginConfiguration.SmnMiasmaBarHeight;
+                        if (ImGui.DragInt("Miasma Bar Height", ref smnMiasmaBarHeight, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.SmnMiasmaBarHeight = smnMiasmaBarHeight;
+                            _pluginConfiguration.Save();
+                        }
+                    
+                        var smnMiasmaBarWidth = _pluginConfiguration.SmnMiasmaBarWidth;
+                        if (ImGui.DragInt("Miasma Bar Width", ref smnMiasmaBarWidth, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.SmnMiasmaBarWidth = smnMiasmaBarWidth;
+                            _pluginConfiguration.Save();
+                        }
+                        
+                        var smnMiasmaBarXOffset = _pluginConfiguration.SmnMiasmaBarXOffset;
+                        if (ImGui.DragInt("Miasma Bar X Offset", ref smnMiasmaBarXOffset, .1f, -1000, 1000))
+                        {
+                            _pluginConfiguration.SmnMiasmaBarXOffset = smnMiasmaBarXOffset;
+                            _pluginConfiguration.Save();
+                        }
+                    
+                        var smnMiasmaBarYOffset = _pluginConfiguration.SmnMiasmaBarYOffset;
+                        if (ImGui.DragInt("Miasma Bar Y Offset", ref smnMiasmaBarYOffset, .1f, -1000, 1000))
+                        {
+                            _pluginConfiguration.SmnMiasmaBarYOffset = smnMiasmaBarYOffset;
+                            _pluginConfiguration.Save();
+                        }
+                        
+                        var smnMiasmaBarFlipped = _pluginConfiguration.SmnMiasmaBarFlipped;
+                        if (ImGui.Checkbox("Flip Miasma Direction", ref smnMiasmaBarFlipped))
+                        {
+                            _pluginConfiguration.SmnMiasmaBarFlipped = smnMiasmaBarFlipped;
+                            _pluginConfiguration.Save();
+                        }
+                    }
+                    var smnBioBarEnabled = _pluginConfiguration.SmnBioBarEnabled;
+                    if (ImGui.Checkbox("Enable the Bio Tracker", ref smnBioBarEnabled))
+                    {
+                        _pluginConfiguration.SmnBioBarEnabled = smnBioBarEnabled;
                         _pluginConfiguration.Save();
                     }
 
-                    var smnRuinBarHeight = _pluginConfiguration.SmnRuinBarHeight;
-                    if (ImGui.DragInt("Ruin Bar Height", ref smnRuinBarHeight, .1f, 1, 1000))
+                    if (smnBioBarEnabled)
                     {
-                        _pluginConfiguration.SmnRuinBarHeight = smnRuinBarHeight;
+                        var smnBioBarHeight = _pluginConfiguration.SmnBioBarHeight;
+                        if (ImGui.DragInt("Bio Bar Height", ref smnBioBarHeight, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.SmnBioBarHeight = smnBioBarHeight;
+                            _pluginConfiguration.Save();
+                        }
+                    
+                        var smnBioBarWidth = _pluginConfiguration.SmnBioBarWidth;
+                        if (ImGui.DragInt("Bio Bar Width", ref smnBioBarWidth, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.SmnBioBarWidth = smnBioBarWidth;
+                            _pluginConfiguration.Save();
+                        }
+                        
+                        var smnBioBarXOffset = _pluginConfiguration.SmnBioBarXOffset;
+                        if (ImGui.DragInt("Bio Bar X Offset", ref smnBioBarXOffset, .1f, -1000, 1000))
+                        {
+                            _pluginConfiguration.SmnBioBarXOffset = smnBioBarXOffset;
+                            _pluginConfiguration.Save();
+                        }
+                    
+                        var smnBioBarYOffset = _pluginConfiguration.SmnBioBarYOffset;
+                        if (ImGui.DragInt("Bio Bar Y Offset", ref smnBioBarYOffset, .1f, -1000, 1000))
+                        {
+                            _pluginConfiguration.SmnBioBarYOffset = smnBioBarYOffset;
+                            _pluginConfiguration.Save();
+                        }
+                        
+                        var smnBioBarFlipped = _pluginConfiguration.SmnBioBarFlipped;
+                        if (ImGui.Checkbox("Flip Bio Direction", ref smnBioBarFlipped))
+                        {
+                            _pluginConfiguration.SmnBioBarFlipped = smnBioBarFlipped;
+                            _pluginConfiguration.Save();
+                        }
+                    }
+                    var smnRuinBarEnabled = _pluginConfiguration.SmnRuinBarEnabled;
+                    if (ImGui.Checkbox("Enable the Ruin Tracker", ref smnRuinBarEnabled))
+                    {
+                        _pluginConfiguration.SmnRuinBarEnabled = smnRuinBarEnabled;
                         _pluginConfiguration.Save();
                     }
 
-                    var smnRuinBarWidth = _pluginConfiguration.SmnRuinBarWidth;
-                    if (ImGui.DragInt("Ruin Bar Width", ref smnRuinBarWidth, .1f, 1, 1000))
+                    if (smnRuinBarEnabled)
                     {
-                        _pluginConfiguration.SmnRuinBarWidth = smnRuinBarWidth;
+                        var smnRuinBarXOffset = _pluginConfiguration.SmnRuinBarXOffset;
+                        if (ImGui.DragInt("Ruin Bar XOffset", ref smnRuinBarXOffset, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.SmnRuinBarXOffset = smnRuinBarXOffset;
+                            _pluginConfiguration.Save();
+                        }
+                        var smnRuinBarYOffset = _pluginConfiguration.SmnRuinBarYOffset;
+                        if (ImGui.DragInt("Ruin Bar YOffset", ref smnRuinBarYOffset, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.SmnRuinBarYOffset = smnRuinBarYOffset;
+                            _pluginConfiguration.Save();
+                        }
+                        var smnRuinBarHeight = _pluginConfiguration.SmnRuinBarHeight;
+                        if (ImGui.DragInt("Ruin Bar Height", ref smnRuinBarHeight, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.SmnRuinBarHeight = smnRuinBarHeight;
+                            _pluginConfiguration.Save();
+                        }
+                        var smnRuinBarWidth = _pluginConfiguration.SmnRuinBarWidth;
+                        if (ImGui.DragInt("Ruin Bar Width", ref smnRuinBarWidth, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.SmnRuinBarWidth = smnRuinBarWidth;
+                            _pluginConfiguration.Save();
+                        }
+                        var smnRuinBarPadding = _pluginConfiguration.SmnRuinBarPadding;
+                        if (ImGui.DragInt("Ruin Bar Padding", ref smnRuinBarPadding, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.SmnRuinBarPadding = smnRuinBarPadding;
+                            _pluginConfiguration.Save();
+                        }
+                    }
+                    var smnAetherBarEnabled = _pluginConfiguration.SmnAetherBarEnabled;
+                    if (ImGui.Checkbox("Enable the Aether Tracker", ref smnAetherBarEnabled))
+                    {
+                        _pluginConfiguration.SmnAetherBarEnabled = smnAetherBarEnabled;
                         _pluginConfiguration.Save();
                     }
 
-                    var smnDotBarX = _pluginConfiguration.SmnDotBarX;
-                    if (ImGui.DragInt("Dot Bar X Offset", ref smnDotBarX, .1f, -1000, 1000))
+                    if (smnAetherBarEnabled)
                     {
-                        _pluginConfiguration.SmnDotBarX = smnDotBarX;
-                        _pluginConfiguration.Save();
-                    }
+                        var smnAetherBarX = _pluginConfiguration.SmnAetherBarXOffset;
+                        if (ImGui.DragInt("Aether Bar X Offset", ref smnAetherBarX, .1f, -1000, 1000))
+                        {
+                            _pluginConfiguration.SmnAetherBarXOffset = smnAetherBarX;
+                            _pluginConfiguration.Save();
+                        }
 
-                    var smnDotBarY = _pluginConfiguration.SmnDotBarY;
-                    if (ImGui.DragInt("Dot Bar Y Offset", ref smnDotBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SmnDotBarY = smnDotBarY;
-                        _pluginConfiguration.Save();
-                    }
+                        var smnAetherBarY = _pluginConfiguration.SmnAetherBarYOffset;
+                        if (ImGui.DragInt("Aether Bar Y Offset", ref smnAetherBarY, .1f, -1000, 1000))
+                        {
+                            _pluginConfiguration.SmnAetherBarYOffset = smnAetherBarY;
+                            _pluginConfiguration.Save();
+                        }
 
-                    var smnDotBarHeight = _pluginConfiguration.SmnDotBarHeight;
-                    if (ImGui.DragInt("Dot Bar Height", ref smnDotBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SmnDotBarHeight = smnDotBarHeight;
-                        _pluginConfiguration.Save();
-                    }
+                        var smnAetherBarHeight = _pluginConfiguration.SmnAetherBarHeight;
+                        if (ImGui.DragInt("Aether Bar Height", ref smnAetherBarHeight, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.SmnAetherBarHeight = smnAetherBarHeight;
+                            _pluginConfiguration.Save();
+                        }
 
-                    var smnDotBarWidth = _pluginConfiguration.SmnDotBarWidth;
-                    if (ImGui.DragInt("Dot Bar Width", ref smnDotBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SmnDotBarWidth = smnDotBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnAetherBarX = _pluginConfiguration.SmnAetherBarX;
-                    if (ImGui.DragInt("Aether Bar X Offset", ref smnAetherBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SmnAetherBarX = smnAetherBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnAetherBarY = _pluginConfiguration.SmnAetherBarY;
-                    if (ImGui.DragInt("Aether Bar Y Offset", ref smnAetherBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.SmnAetherBarY = smnAetherBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnAetherBarHeight = _pluginConfiguration.SmnAetherBarHeight;
-                    if (ImGui.DragInt("Aether Bar Height", ref smnAetherBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SmnAetherBarHeight = smnAetherBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var smnAetherBarWidth = _pluginConfiguration.SmnAetherBarWidth;
-                    if (ImGui.DragInt("Aether Bar Width", ref smnAetherBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.SmnAetherBarWidth = smnAetherBarWidth;
-                        _pluginConfiguration.Save();
+                        var smnAetherBarWidth = _pluginConfiguration.SmnAetherBarWidth;
+                        if (ImGui.DragInt("Aether Bar Width", ref smnAetherBarWidth, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.SmnAetherBarWidth = smnAetherBarWidth;
+                            _pluginConfiguration.Save();
+                        }
                     }
 
                     _changed |= ImGui.ColorEdit4("Aether Bar Color", ref _pluginConfiguration.SmnAetherColor);
