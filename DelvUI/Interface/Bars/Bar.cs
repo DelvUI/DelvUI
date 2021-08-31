@@ -150,6 +150,17 @@ namespace DelvUI.Interface.Bars
             } 
         }
         private bool _glowColorSet;
+        private bool[] _glowChunks;
+        public bool[] GlowChunks
+        {
+            get => _glowChunks;
+            set
+            {
+                _glowChunksSet = true;
+                _glowChunks = value;
+            }
+        }
+        private bool _glowChunksSet;
         public uint GlowSize { get; set; } = 1;
         public bool FlipDrainDirection { get; set; }
         public BarTextMode TextMode { get; set; }
@@ -199,7 +210,7 @@ namespace DelvUI.Interface.Bars
                         }
                     }
 
-                    if (_glowColorSet)
+                    if (_glowColorSet && (!_glowChunksSet || GlowChunks[i]))
                     {
                         var glowPosition = new Vector2(cursorPos.X - 1, cursorPos.Y - 1);
                         var glowSize = new Vector2(barSize.X + 2, barSize.Y + 2);
