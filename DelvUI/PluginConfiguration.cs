@@ -523,9 +523,10 @@ namespace DelvUI {
         public Vector4 BLMFirestarterColor = new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f);
         public Vector4 BLMThundercloudColor = new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f);
         public Vector4 BLMDotColor = new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f);
+        public Vector4 BLMEmptyColor = new Vector4(143f / 255f, 141f / 255f, 142f / 255f, 100f / 100f);
 
-        #endregion        
-        
+        #endregion
+
         #region RDM Configuration
 
         public int RDMVerticalOffset { get; set; } = -2;
@@ -1296,7 +1297,16 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(BLMDotColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BLMDotColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BLMDotColor.AdjustColor(.1f))
-                },                
+                },
+
+                [Jobs.BLM * 1000 + 9] = new Dictionary<string, uint> // Empty
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BLMEmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BLMEmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BLMEmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BLMEmptyColor.AdjustColor(.1f))
+                },
+
                 [Jobs.RDM] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorRDM),

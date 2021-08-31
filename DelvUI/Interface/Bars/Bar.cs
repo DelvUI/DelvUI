@@ -30,6 +30,7 @@ namespace DelvUI.Interface.Bars
             }
         }
         private bool _backgroundColorSet;
+        public bool DrawBorder;
 
         public Bar(float xPosition, float yPosition, int height, int width)
         {
@@ -41,6 +42,7 @@ namespace DelvUI.Interface.Bars
             PrimaryTexts = new List<BarText>();
             ChunkPadding = 0;
             ChunkSizes = new[] {1f};
+            DrawBorder = true;
         }
 
         public int AddInnerBar(InnerBar innerBar)
@@ -85,22 +87,25 @@ namespace DelvUI.Interface.Bars
                 innerBar.Draw(drawList);
             }
 
+            cursorPos = new Vector2(XPosition, YPosition);
+
+            if (DrawBorder)
+            {
+                foreach (var chunkSize in ChunkSizes)
+                {
+                    var barSize = Vertical ? new Vector2(BarWidth, barHeight * chunkSize - ChunkPadding) : new Vector2(barWidth * chunkSize - ChunkPadding, BarHeight);
+
+                    drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+
+                    cursorPos += Vertical ? new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
+                }
+            }
+
             foreach (var innerBar in InnerBars)
             {
                 innerBar.DrawText(drawList);
             }
 
-            cursorPos = new Vector2(XPosition, YPosition);
-
-            foreach (var chunkSize in ChunkSizes)
-            {
-                var barSize = Vertical ? new Vector2(BarWidth, barHeight * chunkSize - ChunkPadding) : new Vector2(barWidth * chunkSize - ChunkPadding, BarHeight);
-
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-
-                cursorPos += Vertical ? new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
-            }
-            
             DrawText(drawList);
         }
 
@@ -145,6 +150,7 @@ namespace DelvUI.Interface.Bars
             } 
         }
         private bool _glowColorSet;
+        public uint GlowSize { get; set; } = 1;
         public bool FlipDrainDirection { get; set; }
         public BarTextMode TextMode { get; set; }
         public BarText[] Texts { get; set; }
@@ -197,8 +203,8 @@ namespace DelvUI.Interface.Bars
                     {
                         var glowPosition = new Vector2(cursorPos.X - 1, cursorPos.Y - 1);
                         var glowSize = new Vector2(barSize.X + 2, barSize.Y + 2);
-                        
-                        drawList.AddRect(glowPosition, glowPosition + glowSize, GlowColor);
+
+                        drawList.AddRect(glowPosition, glowPosition + glowSize, GlowColor, 0, ImDrawFlags.None, GlowSize);
                     }
 
                     i++;
