@@ -608,6 +608,30 @@ namespace DelvUI {
 
         #endregion
 
+        #region GNB Configuration
+
+        public int GNBBaseXOffset { get; set; } = 127;
+        public int GNBBaseYOffset { get; set; } = 417;
+
+        public bool GNBPowderGaugeEnabled = true;
+        public int GNBPowderGaugeHeight { get; set; } = 20;
+        public int GNBPowderGaugeWidth { get; set; } = 254;
+        public int GNBPowderGaugeXOffset { get; set; }
+        public int GNBPowderGaugeYOffset { get; set; }
+        public int GNBPowderGaugePadding { get; set; } = 2;
+        public Vector4 GNBGunPowderColor = new Vector4(46f / 255f, 179f / 255f, 255f / 255f, 1f);
+
+        public bool GNBNoMercyBarEnabled = true;
+        public int GNBNoMercyBarHeight { get; set; } = 20;
+        public int GNBNoMercyBarWidth { get; set; } = 254;
+        public int GNBNoMercyBarXOffset { get; set; }
+        public int GNBNoMercyBarYOffset { get; set; }
+        public Vector4 GNBNoMercyColor = new Vector4(252f / 255f, 204f / 255f, 255f / 255f, 1f);
+
+        public int GNBInterBarOffset { get; set; } = 2;
+
+        #endregion
+
         [JsonIgnore] private DalamudPluginInterface _pluginInterface;
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
         [JsonIgnore] public TextureWrap BannerImage = null;
@@ -816,6 +840,22 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorGNB.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorGNB.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorGNB.AdjustColor(.1f))
+                },
+
+                [Jobs.GNB * 1000] = new Dictionary<string, uint> // Bar not ready
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(GNBGunPowderColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(GNBGunPowderColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(GNBGunPowderColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(GNBGunPowderColor.AdjustColor(.1f))
+                },
+
+                [Jobs.GNB * 1000 + 1] = new Dictionary<string, uint> // Bar not ready
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(GNBNoMercyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(GNBNoMercyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(GNBNoMercyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(GNBNoMercyColor.AdjustColor(.1f))
                 },
 
                 [Jobs.WHM] = new Dictionary<string, uint>
