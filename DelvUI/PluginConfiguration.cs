@@ -147,18 +147,73 @@ namespace DelvUI {
         public Vector4 NPCColorNeutral = new Vector4(214f/255f, 145f/255f, 64f/255f, 100f/100f);
         public Vector4 NPCColorFriendly = new Vector4(0f/255f, 145f/255f, 6f/255f, 100f/100f);
 
+        
+        #region BRD Configuration
+        
+        public int BRDBaseXOffset { get; set; } = 127;
+        public int BRDBaseYOffset { get; set; } = 405;
+        public int BRDSongGaugeWidth { get; set; } = 254;
+        public int BRDSongGaugeHeight { get; set; } = 20;
+        public int BRDSongGaugeXOffset { get; set; }
+        public int BRDSongGaugeYOffset { get; set; }
+        public int BRDSoulGaugeWidth { get; set; } = 254;
+        public int BRDSoulGaugeHeight { get; set; } = 10;
+        public int BRDSoulGaugeXOffset { get; set; }
+        public int BRDSoulGaugeYOffset { get; set; }
+        public int BRDStackWidth { get; set; } = 254;
+        public int BRDStackHeight { get; set; } = 10;
+        public int BRDStackXOffset { get; set; }
+        public int BRDStackYOffset { get; set; }
+        public int BRDStackPadding { get; set; } = 2;
+        public int BRDCBWidth { get; set; } = 126;
+        public int BRDCBHeight { get; set; } = 10;
+        public int BRDCBXOffset { get; set; }
+        public int BRDCBYOffset { get; set; }
+        public int BRDSBWidth { get; set; } = 126;
+        public int BRDSBHeight { get; set; } = 10;
+        public int BRDSBXOffset { get; set; } = 128;
+        public int BRDSBYOffset { get; set; }
+        public int BRDInterBarOffset { get; set; } = 2;
+        
+        public bool BRDShowSB = true;
+        public bool BRDShowCB = true;
+        public bool BRDSBInverted = false;
+        public bool BRDCBInverted = true;
+        public bool BRDShowSongGauge = true;
+        public bool BRDShowSoulGauge = true;
+        public bool BRDShowWMStacks = true;
+        public bool BRDShowMBProc = true;
+        public bool BRDShowAPStacks = true;
+        
+        public Vector4 BRDEmptyColor = new Vector4(0f/255f, 0f/255f, 0f/255f, 53f/100f);
+        public Vector4 BRDExpireColor = new Vector4(199f/255f, 46f/255f, 46f/255f, 100f/100f);
+        public Vector4 BRDCBColor = new Vector4(182f/255f, 68f/255f, 235f/255f, 100f/100f);
+        public Vector4 BRDSBColor = new Vector4(72f/255f, 117f/255f, 202f/255f, 100f/100f);
+        public Vector4 BRDWMStackColor = new Vector4(150f/255f, 215f/255f, 232f/255f, 100f/100f);
+        public Vector4 BRDWMColor = new Vector4(158f/255f, 157f/255f, 36f/255f, 100f/100f);
+        public Vector4 BRDMBColor = new Vector4(143f/255f, 90f/255f, 143f/255f, 100f/100f);
+        public Vector4 BRDMBProcColor = new Vector4(199f/255f, 46f/255f, 46f/255f, 100f/100f);
+        public Vector4 BRDAPStackColor = new Vector4(0f/255f, 222f/255f, 177f/255f, 100f/100f);
+        public Vector4 BRDAPColor = new Vector4(207f/255f, 205f/255f, 52f/255f, 100f/100f);
+        public Vector4 BRDSVColor = new Vector4(248f/255f, 227f/255f, 0f/255f, 100f/100f);
+
+        #endregion
+        
         #region WAR Configuration
 
+        public bool WARStormsEyeEnabled { get; set; } = true;
+        public bool WARStormsEyeText { get; set; } = true;
         public int WARStormsEyeHeight { get; set; } = 20;
         public int WARStormsEyeWidth { get; set; } = 254;
-        public int WARBaseXOffset { get; set; } = 127;
-        public int WARBaseYOffset { get; set; } = 416;
+        public int WARStormsEyeXOffset { get; set; } = 127;
+        public int WARStormsEyeYOffset { get; set; } = 417;
+        public bool WARBeastGaugeEnabled { get; set; } = true;
+        public bool WARBeastGaugeText { get; set; }
         public int WARBeastGaugeHeight { get; set; } = 20;
         public int WARBeastGaugeWidth { get; set; } = 254;
         public int WARBeastGaugePadding { get; set; } = 2;
-        public int WARBeastGaugeXOffset { get; set; }
-        public int WARBeastGaugeYOffset { get; set; }
-        public int WARInterBarOffset { get; set; } = 2;
+        public int WARBeastGaugeXOffset { get; set; } = 127;
+        public int WARBeastGaugeYOffset { get; set; } = 439;
         public Vector4 WARInnerReleaseColor = new Vector4(255f/255f, 0f/255f, 0f/255f, 100f/100f);
         public Vector4 WARStormsEyeColor = new Vector4(255f/255f, 136f/255f, 146f/255f, 100f/100f);
         public Vector4 WARFellCleaveColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 100f/100f);
@@ -228,43 +283,73 @@ namespace DelvUI {
 
         public int ASTDrawBarHeight { get; set; } = 20;
         public int ASTDrawBarWidth { get; set; } = 254;
-        public int ASTDrawBarX { get; set; } = 127;
-        public int ASTDrawBarY { get; set; } = 438;
+        public int ASTDrawBarX { get; set; } = -127;
+        public int ASTDrawBarY { get; set; } = 400;
         public int ASTDivinationHeight { get; set; } = 20;
-        public int ASTDivinationWidth { get; set; } = 253;
-        public int ASTDivinationBarX { get; set; } = -42;
-        public int ASTDivinationBarY { get; set; } = 438;
+        public int ASTDivinationWidth { get; set; } = 254;
+        public int ASTDivinationBarX { get; set; } = -127;
+        public int ASTDivinationBarY { get; set; } = 378;
         public int ASTDivinationBarPad { get; set; } = 1;
         public int ASTDotBarHeight { get; set; } = 20;
         public int ASTDotBarWidth { get; set; } = 254;
         public int ASTDotBarX { get; set; } = 33;
         public int ASTDotBarY { get; set; } = -38;
+        public int ASTStarBarHeight { get; set; } = 86;
+        public int ASTStarBarWidth { get; set; } = 20;
+        public int ASTStarBarX { get; set; } = 11;
+        public int ASTStarBarY { get; set; } = -82;
+        public int ASTLightspeedBarHeight { get; set; } = 86;
+        public int ASTLightspeedBarWidth { get; set; } = 20;
+        public int ASTLightspeedBarX { get; set; } = 289;
+        public int ASTLightspeedBarY { get; set; } = -82;
         public bool ASTShowDivinationBar = true;
         public bool ASTShowDrawBar = true;
         public bool ASTShowDotBar = true;
+        public bool ASTShowStarBar = true;
+        public bool ASTShowLightspeedBar = true;
         public bool ASTShowPrimaryResourceBar = true;
         public Vector4 ASTEmptyColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 53f / 100f);
         public Vector4 ASTSealSunColor = new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f);
         public Vector4 ASTSealLunarColor = new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f);
         public Vector4 ASTSealCelestialColor = new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f);
         public Vector4 ASTDotColor = new Vector4(20f / 255f, 80f / 255f, 168f / 255f, 100f / 100f);
+        public Vector4 ASTStarEarthlyColor = new Vector4(37f / 255f, 181f / 255f, 177f / 255f, 100f / 100f);
+        public Vector4 ASTStarGiantColor = new Vector4(198f / 255f, 154f / 255f, 199f / 255f, 100f / 100f);
+        public Vector4 ASTLightspeedColor = new Vector4(255f / 255f, 255f / 255f, 173f / 255f, 100f / 100f);
 
         #endregion
 
         #region SMN Configuration
-
-        public int SmnRuinBarX { get; set; } = 127;
-        public int SmnRuinBarY { get; set; } = 460;
-        public int SmnRuinBarHeight { get; set; } = 10;
+        public int SmnBaseXOffset { get; set; } = 127; 
+        public int SmnBaseYOffset { get; set; } = 395;
+        public bool SmnMiasmaBarEnabled { get; set; } = true;
+        public int SmnMiasmaBarWidth { get; set; } = 126;
+        public int SmnMiasmaBarHeight { get; set; } = 20;
+        public int SmnMiasmaBarXOffset { get; set; } = 0;
+        public int SmnMiasmaBarYOffset { get; set; }
+        public bool SmnMiasmaBarFlipped { get; set; }
+        public bool SmnBioBarEnabled { get; set; } = true;
+        public int SmnBioBarWidth { get; set; } = 126;
+        public int SmnBioBarHeight { get; set; } = 20;
+        public int SmnBioBarXOffset { get; set; } = 128;
+        public int SmnBioBarYOffset { get; set; }
+        public bool SmnBioBarFlipped { get; set; } = true;
+        public int SmnInterBarOffset { get; set; } = 2;
+        public bool SmnRuinBarEnabled { get; set; } = true;
+        public int SmnRuinBarXOffset { get; set; }
+        public int SmnRuinBarYOffset { get; set; } = 22;
+        public int SmnRuinBarHeight { get; set; } = 20;
         public int SmnRuinBarWidth { get; set; } = 254;
-        public int SmnDotBarX { get; set; } = 127;
-        public int SmnDotBarY { get; set; } = 460;
-        public int SmnDotBarHeight { get; set; } = 10;
-        public int SmnDotBarWidth { get; set; } = 254;
+        public int SmnRuinBarPadding { get; set; } = 2;
+        public bool SmnAetherBarEnabled { get; set; } = true;
         public int SmnAetherBarHeight { get; set; } = 20;
         public int SmnAetherBarWidth { get; set; } = 254;
-        public int SmnAetherBarX { get; set; } = -42;
-        public int SmnAetherBarY { get; set; } = 460;
+        public int SmnAetherBarPadding { get; set; } = 2;
+        public int SmnAetherBarXOffset { get; set; }
+        public int SmnAetherBarYOffset { get; set; } = 44;
+
+        
+        // public int SmnTranceBarHeight { get; set; } = 10;
 
         public Vector4 SmnAetherColor = new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f);
         public Vector4 SmnRuinColor = new Vector4(94f / 255f, 250f / 255f, 154f / 255f, 100f / 100f);
@@ -334,26 +419,35 @@ namespace DelvUI {
 
         #region MCH Configuration
 
+        public bool MCHOverheatEnable { get; set; } = true;
+        public bool MCHOverheatText { get; set; } = true;
         public int MCHOverheatHeight { get; set; } = 20;
         public int MCHOverheatWidth { get; set; } = 254;
-        public int MCHBaseXOffset { get; set; } = 127;
-        public int MCHBaseYOffset { get; set; } = 395;
+        public int MCHOverheatXOffset { get; set; } = 127;
+        public int MCHOverheatYOffset { get; set; } = 395;
+        public bool MCHHeatGaugeEnable { get; set; } = true;
+        public bool MCHHeatGaugeText { get; set; } = true;
         public int MCHHeatGaugeHeight { get; set; } = 20;
         public int MCHHeatGaugeWidth { get; set; } = 254;
         public int MCHHeatGaugePadding { get; set; } = 2;
-        public int MCHHeatGaugeXOffset { get; set; }
-        public int MCHHeatGaugeYOffset { get; set; }
+        public int MCHHeatGaugeXOffset { get; set; } = 127;
+        public int MCHHeatGaugeYOffset { get; set; } = 417;
+        public bool MCHBatteryGaugeEnable { get; set; } = true;
+        public bool MCHBatteryGaugeShowBattery { get; set; } = true;
+        public bool MCHBatteryGaugeBatteryText { get; set; }
+        public bool MCHBatteryGaugeShowRobotDuration { get; set; } = true;
+        public bool MCHBatteryGaugeRobotDurationText { get; set; } = true;
         public int MCHBatteryGaugeHeight { get; set; } = 20;
         public int MCHBatteryGaugeWidth { get; set; } = 254;
         public int MCHBatteryGaugePadding { get; set; } = 2;
-        public int MCHBatteryGaugeXOffset { get; set; }
-        public int MCHBatteryGaugeYOffset { get; set; }
+        public int MCHBatteryGaugeXOffset { get; set; } = 127;
+        public int MCHBatteryGaugeYOffset { get; set; } = 439;
         public bool MCHWildfireEnabled { get; set; }
+        public bool MCHWildfireText { get; set; } = true;
         public int MCHWildfireHeight { get; set; } = 20;
         public int MCHWildfireWidth { get; set; } = 254;
-        public int MCHWildfireXOffset { get; set; }
-        public int MCHWildfireYOffset { get; set; }
-        public int MCHInterBarOffset { get; set; } = 2;
+        public int MCHWildfireXOffset { get; set; } = 127;
+        public int MCHWildfireYOffset { get; set; } = 373;
         public Vector4 MCHHeatColor = new Vector4(201f/255f, 13f/255f, 13f/255f, 100f/100f);
         public Vector4 MCHBatteryColor = new Vector4(106f/255f, 255f/255f, 255f/255f, 100f/100f);
         public Vector4 MCHRobotColor = new Vector4(153f/255f, 0f/255f, 255f/255f, 100f/100f);
@@ -363,18 +457,22 @@ namespace DelvUI {
 
         #endregion
 
-
         #region NIN Configuration
-
         public int NINBaseXOffset { get; set; } = 127;
-        public int NINBaseYOffset { get; set; } = 420;
+        public int NINBaseYOffset { get; set; } = 417;
+
+        public bool NINHutonGaugeEnabled = true;
         public int NINHutonGaugeHeight { get; set; } = 20;
         public int NINHutonGaugeWidth { get; set; } = 254;
+        public int NINHutonGaugeXOffset { get; set; }
+        public int NINHutonGaugeYOffset { get; set; }
+
+        public bool NINNinkiGaugeEnabled = true;
         public int NINNinkiGaugeHeight { get; set; } = 20;
         public int NINNinkiGaugeWidth { get; set; } = 254;
         public int NINNinkiGaugePadding { get; set; } = 2;
         public int NINNinkiGaugeXOffset { get; set; }
-        public int NINNinkiGaugeYOffset { get; set; }
+        public int NINNinkiGaugeYOffset { get; set; } = 22;
 
         public int NINInterBarOffset { get; set; } = 2;
         public Vector4 NINHutonColor = new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f);
@@ -401,20 +499,19 @@ namespace DelvUI {
         public int DRKBloodGaugeWidth { get; set; } = 254;
         public int DRKBloodGaugePadding { get; set; } = 2;
         public int DRKBloodGaugeXOffset { get; set; }
-        public int DRKBloodGaugeYOffset { get; set; }
+        public int DRKBloodGaugeYOffset { get; set; } = 12;
         public bool DRKBuffBarEnabled { get; set; } = true;
         public int DRKBuffBarHeight { get; set; } = 20;
         public int DRKBuffBarWidth { get; set; } = 254;
         public int DRKBuffBarPadding { get; set; } = 2;
         public int DRKBuffBarXOffset { get; set; }
-        public int DRKBuffBarYOffset { get; set; }
+        public int DRKBuffBarYOffset { get; set; } = 24;
         public bool DRKLivingShadowBarEnabled { get; set; }
         public int DRKLivingShadowBarHeight { get; set; } = 20;
         public int DRKLivingShadowBarWidth { get; set; } = 254;
         public int DRKLivingShadowBarPadding { get; set; } = 2;
         public int DRKLivingShadowBarXOffset { get; set; }
         public int DRKLivingShadowBarYOffset { get; set; }
-        public int DRKInterBarOffset { get; set; } = 2;
         public Vector4 DRKManaColor = new Vector4(0f/255f, 142f/255f, 254f/255f, 100f/100f);
         public Vector4 DRKBloodColorLeft = new Vector4(196f/255f, 20f/255f, 122f/255f, 100f/100f);
         public Vector4 DRKBloodColorRight = new Vector4(216f/255f, 0f/255f, 73f/255f, 100f/100f);
@@ -428,27 +525,31 @@ namespace DelvUI {
 
         #region PLD Configuration
 
+        public bool PLDManaEnabled { get; set; } = true;
         public int PLDManaHeight { get; set; } = 20;
         public int PLDManaWidth { get; set; } = 254;
         public int PLDManaPadding { get; set; } = 2;
-        public int PLDBaseXOffset { get; set; } = 127;
-        public int PLDBaseYOffset { get; set; } = 373;
+        public int PLDManaXOffset { get; set; } = 127;
+        public int PLDManaYOffset { get; set; } = 373;
+        public bool PLDOathGaugeEnabled { get; set; } = true;
         public int PLDOathGaugeHeight { get; set; } = 20;
         public int PLDOathGaugeWidth { get; set; } = 254;
         public int PLDOathGaugePadding { get; set; } = 2;
-        public int PLDOathGaugeXOffset {get; set;}
-        public int PLDOathGaugeYOffset {get; set;}
-        public bool PLDOathGaugeText { get; set; } = false;
+        public int PLDOathGaugeXOffset { get; set; } = 127;
+        public int PLDOathGaugeYOffset { get; set; } = 395;
+        public bool PLDOathGaugeText { get; set; }
+        public bool PLDBuffBarEnabled { get; set; } = true;
+        public bool PLDBuffBarText { get; set; } = true;
         public int PLDBuffBarHeight { get; set; } = 20;
         public int PLDBuffBarWidth { get; set; } = 254;
-        public int PLDBuffBarXOffset {get; set;}
-        public int PLDBuffBarYOffset {get; set;}
+        public int PLDBuffBarXOffset { get; set; } = 127;
+        public int PLDBuffBarYOffset { get; set; } = 417;
+        public bool PLDAtonementBarEnabled { get; set; } = true;
         public int PLDAtonementBarHeight { get; set; } = 20;
         public int PLDAtonementBarWidth { get; set; } = 254;
         public int PLDAtonementBarPadding { get; set; } = 2;
-        public int PLDAtonementBarXOffset {get; set;}
-        public int PLDAtonementBarYOffset {get; set;}
-        public int PLDInterBarOffset { get; set; } = 2;
+        public int PLDAtonementBarXOffset { get; set; } = 127;
+        public int PLDAtonementBarYOffset { get; set; } = 439;
         public Vector4 PLDManaColor = new Vector4(0f/255f, 203f/255f, 230f/255f, 100f/100f);
         public Vector4 PLDOathGaugeColor = new Vector4(24f/255f, 80f/255f, 175f/255f, 100f/100f);
         public Vector4 PLDFightOrFlightColor = new Vector4(240f/255f, 50f/255f, 0f/255f, 100f/100f);
@@ -625,10 +726,8 @@ namespace DelvUI {
         public int GNBNoMercyBarHeight { get; set; } = 20;
         public int GNBNoMercyBarWidth { get; set; } = 254;
         public int GNBNoMercyBarXOffset { get; set; }
-        public int GNBNoMercyBarYOffset { get; set; }
+        public int GNBNoMercyBarYOffset { get; set; } = 22;
         public Vector4 GNBNoMercyColor = new Vector4(252f / 255f, 204f / 255f, 255f / 255f, 1f);
-
-        public int GNBInterBarOffset { get; set; } = 2;
 
         #endregion
 
@@ -1042,7 +1141,31 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTSealCelestialColor.AdjustColor(.1f))
                 },
 
-                [Jobs.AST * 1000 + 4] = new Dictionary<string, uint> // Dots
+                [Jobs.AST * 1000 + 4] = new Dictionary<string, uint> // Star
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTStarEarthlyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTStarEarthlyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTStarEarthlyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTStarEarthlyColor.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000 + 5] = new Dictionary<string, uint> // Star
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTStarGiantColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTStarGiantColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTStarGiantColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTStarGiantColor.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000 + 6] = new Dictionary<string, uint> // LightSpeed
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTLightspeedColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTLightspeedColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTLightspeedColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTLightspeedColor.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000 + 7] = new Dictionary<string, uint> // Dots
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(ASTDotColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(ASTDotColor.AdjustColor(-.8f)),
@@ -1270,6 +1393,94 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorBRD.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorBRD.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorBRD.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000] = new Dictionary<string, uint> // Empty Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDEmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDEmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDEmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDEmptyColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 1] = new Dictionary<string, uint> // Expire Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDExpireColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDExpireColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDExpireColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDExpireColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 2] = new Dictionary<string, uint> // Wanderer's Minuet Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDWMColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDWMColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDWMColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDWMColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 3] = new Dictionary<string, uint> // Mage's Ballad Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDMBColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDMBColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDMBColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDMBColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 4] = new Dictionary<string, uint> // Army's Paeon Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDAPColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDAPColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDAPColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDAPColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 5] = new Dictionary<string, uint> // WM Stack Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDWMStackColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDWMStackColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDWMStackColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDWMStackColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 6] = new Dictionary<string, uint> // MB Proc Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDMBProcColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDMBProcColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDMBProcColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDMBProcColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 7] = new Dictionary<string, uint> // AP Stack Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDAPStackColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDAPStackColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDAPStackColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDAPStackColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 8] = new Dictionary<string, uint> // SB Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDSBColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDSBColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDSBColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDSBColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 9] = new Dictionary<string, uint> // CB Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDCBColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDCBColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDCBColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDCBColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.BRD * 1000 + 10] = new Dictionary<string, uint> // Soul Voice Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(BRDSVColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(BRDSVColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(BRDSVColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(BRDSVColor.AdjustColor(.1f))
                 },
 
                 [Jobs.MCH] = new Dictionary<string, uint>
