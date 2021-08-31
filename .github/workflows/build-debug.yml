@@ -1,0 +1,50 @@
+name: Debug Build and Test
+
+on: [push, pull_request]
+
+jobs:
+  build-debug:
+    runs-on: windows-latest
+
+    env:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+    steps:
+      - name: Checkout and initialise
+        uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: CSProj Cache
+        id: cache-csproj
+        uses: actions/cache@v2
+        with:
+          path: |
+            ./dalamud
+            ~/.nuget/packages
+          key: ${{ runner.os }}-csproj-${{ hashFiles('**/*.csproj') }}
+
+      - name: Setup Dalamud
+        if: steps.cache-csproj.outputs.cache-hit != 'true'
+        shell: pwsh
+        run: |
+          mkdir ./dalamud
+          Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/latest.zip -OutFile ./dalamud/latest.zip
+          Expand-Archive -Path ./dalamud/latest.zip ./dalamud
+
+      - name: Restore project dependencies
+        run: dotnet restore --verbosity normal
+
+      - name: Build Debug
+        run: dotnet build --no-restore --verbosity normal --configuration Debug
+
+      - name: Test Debug
+        run: dotnet test --no-build --verbosity normal --configuration Debug
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: DelvUI-debug-${{ github.head_ref }}${{ github.sha }}
+          path: |
+            DelvUI/bin/Debug.ILMerge
+            !DelvUI/bin/Debug.ILMerge/DelvUI
