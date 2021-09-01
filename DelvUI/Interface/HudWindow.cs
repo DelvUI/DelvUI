@@ -497,7 +497,7 @@ namespace DelvUI.Interface {
             );
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             
-            if (PluginConfiguration.ShowActionIcon && _lastPlayerUsedCast.HasIcon) {
+            if (PluginConfiguration.ShowActionIcon && _lastPlayerUsedCast.IconTexture != null) {
                 ImGui.Image(_lastPlayerUsedCast.IconTexture.ImGuiHandle, new Vector2(CastBarHeight, CastBarHeight));
                 drawList.AddRect(cursorPos, cursorPos + new Vector2(CastBarHeight, CastBarHeight), 0xFF000000);
             }
@@ -516,7 +516,7 @@ namespace DelvUI.Interface {
                 DrawOutlinedText(
                     castText,
                     new Vector2(
-                        cursorPos.X + (PluginConfiguration.ShowActionIcon && _lastPlayerUsedCast.HasIcon ? CastBarHeight : 0) + 5,
+                        cursorPos.X + (PluginConfiguration.ShowActionIcon && _lastPlayerUsedCast.IconTexture != null ? CastBarHeight : 0) + 5,
                         cursorPos.Y + CastBarHeight / 2f - castTextSize.Y / 2f
                     )
                 );
@@ -608,7 +608,7 @@ namespace DelvUI.Interface {
             );
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-            if (PluginConfiguration.ShowTargetActionIcon && _lastTargetUsedCast.HasIcon) {
+            if (PluginConfiguration.ShowTargetActionIcon && _lastTargetUsedCast.IconTexture != null) {
                 
                 ImGui.Image(_lastTargetUsedCast.IconTexture.ImGuiHandle, new Vector2(TargetCastBarHeight, TargetCastBarHeight));
                 drawList.AddRect(cursorPos, cursorPos + new Vector2(TargetCastBarHeight, TargetCastBarHeight), 0xFF000000);
@@ -628,7 +628,7 @@ namespace DelvUI.Interface {
                 DrawOutlinedText(
                     castText,
                     new Vector2(
-                        cursorPos.X + (PluginConfiguration.ShowTargetActionIcon && _lastTargetUsedCast.HasIcon ? TargetCastBarHeight : 0) + 5,
+                        cursorPos.X + (PluginConfiguration.ShowTargetActionIcon && _lastTargetUsedCast.IconTexture != null ? TargetCastBarHeight : 0) + 5,
                         cursorPos.Y + TargetCastBarHeight / 2f - castTextSize.Y / 2f
                     )
                 );

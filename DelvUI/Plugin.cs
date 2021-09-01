@@ -7,6 +7,7 @@ using Dalamud.Plugin;
 using ImGuiNET;
 using DelvUI.Interface;
 using FFXIVClientStructs;
+using DelvUI.Helpers;
 
 namespace DelvUI {
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -45,6 +46,7 @@ namespace DelvUI {
                 ShowInHelp = true
             });
 
+            TexturesCache.Initialize(pluginInterface);
             Resolver.Initialize();
         }
         
