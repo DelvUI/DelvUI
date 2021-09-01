@@ -42,7 +42,10 @@ namespace DelvUI {
 
             _pluginInterface.CommandManager.AddHandler("/pdelvui", new CommandInfo(PluginCommand)
             {
-                HelpMessage = "Opens the DelvUI configuration window.", 
+                HelpMessage = (
+                    "Opens the DelvUI configuration window.\n" +
+                    "/pdelvui toggle → Toggles HUD visibility."
+                ),
                 ShowInHelp = true
             });
 
@@ -87,7 +90,11 @@ namespace DelvUI {
 
         }
         private void PluginCommand(string command, string arguments) {
-            _configurationWindow.IsVisible = !_configurationWindow.IsVisible;
+            if (arguments == "toggle") {
+                _configurationWindow.ToggleHud();
+            } else {
+                _configurationWindow.IsVisible = !_configurationWindow.IsVisible;
+            }
         }
 
         private void Draw() {
