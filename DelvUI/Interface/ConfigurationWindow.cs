@@ -531,7 +531,6 @@ namespace DelvUI.Interface
 
 
             ImGui.EndGroup();
-            _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.EmptyColor);
 
         }
 
@@ -1511,6 +1510,9 @@ namespace DelvUI.Interface
                 _pluginConfiguration.PrimaryResourceBarYOffset = primaryResourceBarYOffset;
                 _pluginConfiguration.Save();
             }
+            
+            _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.EmptyColor);
+
         }
 
         private void DrawJobsTankConfig()
