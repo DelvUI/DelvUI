@@ -51,7 +51,6 @@ namespace DelvUI.Interface.Party
         private List<IGroupMember> _groupMembers = new List<IGroupMember>();
         public IReadOnlyCollection<IGroupMember> GroupMembers => _groupMembers.AsReadOnly();
         public uint MemberCount => (uint)_groupMembers.Count;
-        private int lastCount = 0;
 
         private bool Testing;
 
@@ -68,22 +67,26 @@ namespace DelvUI.Interface.Party
 
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
+            if (Testing) return;
+            //if (asd) return;
+
             var player = pluginInterface.ClientState.LocalPlayer;
             if (player is null || player is not PlayerCharacter) return;
 
             var manager = GroupManager.Instance();
-            if (lastCount == manager->MemberCount) return;
+            if (_groupMembers.Count == manager->MemberCount) return;
 
             try
             {
                 _groupMembers.Clear();
+
                 for (int i = 0; i < manager->MemberCount; i++)
                 {
                     PartyMember* partyMember = (PartyMember*)(new IntPtr(manager->PartyMembers) + 0x230 * i);
                     _groupMembers.Add(new GroupMember(partyMember, pluginInterface));
                 }
             }
-            catch 
+            catch
             {
                 _groupMembers.Clear();
             }
