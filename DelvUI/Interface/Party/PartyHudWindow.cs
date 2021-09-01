@@ -1,13 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ImGuiNET;
 using System.Numerics;
-using DelvUI.Interface.Party;
-using DelvUI.Helpers;
-using Lumina.Excel.GeneratedSheets;
 
 namespace DelvUI.Interface.Party
 {
@@ -20,14 +15,110 @@ namespace DelvUI.Interface.Party
                                                         ImGuiWindowFlags.NoNav |
                                                         ImGuiWindowFlags.NoInputs;
         private const string MainWindowName = "Party List";
-        private int HorizonalPadding => pluginConfiguration.PartyListHorizontalPadding;
-        private int VerticalPadding => pluginConfiguration.PartyListVerticalPadding;
-        private bool FillRowsFirst => pluginConfiguration.PartyListFillRowsFirst;
+        
+        // layout
+        private Vector2 lastSize;
+        private uint lastRowCount = 0;
+        private uint lastColCount = 0;
+        private Vector2 lastOrigin;
+        private Vector2 lastBarSize;
+        private int lastHorizontalPadding;
+        private int lastVerticalPadding;
+        private bool lastFillRowsFirst;
+        private bool lastUseRoleColors;
+
+        private List<PartyHealthBar> bars;
 
 
         public PartyHudWindow(PluginConfiguration pluginConfiguration)
         {
             this.pluginConfiguration = pluginConfiguration;
+            pluginConfiguration.ConfigChangedEvent += OnConfigChanged;
+
+            lastSize = pluginConfiguration.PartyListSize;
+            lastBarSize = new Vector2(pluginConfiguration.PartyListHealthBarWidth, pluginConfiguration.PartyListHealthBarHeight);
+            lastHorizontalPadding = pluginConfiguration.PartyListHorizontalPadding;
+            lastVerticalPadding = pluginConfiguration.PartyListVerticalPadding;
+            lastFillRowsFirst = pluginConfiguration.PartyListFillRowsFirst;
+            lastUseRoleColors = pluginConfiguration.PartyListUseRoleColors;
+
+            bars = new List<PartyHealthBar>(8);
+            for (int i = 0; i < bars.Capacity; i++)
+            {
+                bars.Add(new PartyHealthBar(pluginConfiguration));
+            }
+
+            PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
+        }
+
+        ~PartyHudWindow()
+        {
+            pluginConfiguration.ConfigChangedEvent -= OnConfigChanged;
+            pluginConfiguration = null;
+            bars.Clear();
+
+            PartyManager.Instance.MembersChangedEvent -= OnMembersChanged;
+        }
+
+        private void OnMembersChanged(object sender, EventArgs args)
+        {
+            var barSize = new Vector2(pluginConfiguration.PartyListHealthBarWidth, pluginConfiguration.PartyListHealthBarHeight);
+            UpdateBars(lastOrigin, barSize, lastRowCount, lastColCount, lastHorizontalPadding, lastVerticalPadding, lastFillRowsFirst);
+        }
+
+        public void UpdateBars(Vector2 origin, Vector2 barSize, uint rowCount, uint colCount, int horizontalPadding, int verticalPadding, bool fillRowsFirst)
+        {
+            var memberCount = PartyManager.Instance.MemberCount;
+            int row = 0;
+            int col = 0;
+
+            for (int i = 0; i < bars.Count; i++)
+            {
+                PartyHealthBar bar = bars[i];
+                if (i >= memberCount)
+                {
+                    bar.Visible = false;
+                    continue;
+                }
+
+                // update bar
+                IGroupMember member = PartyManager.Instance.GroupMembers.ElementAt(i);
+                bar.Member = member;
+                bar.Position = new Vector2(
+                    origin.X + barSize.X * col + horizontalPadding * col,
+                    origin.Y + barSize.Y * row + verticalPadding * row
+                );
+                bar.Size = barSize;
+                bar.Visible = true;
+
+                // layout
+                if (fillRowsFirst)
+                {
+                    col = col + 1;
+                    if (col >= colCount)
+                    {
+                        col = 0;
+                        row = row + 1;
+                    }
+                }
+                else
+                {
+                    row = row + 1;
+                    if (row >= rowCount)
+                    {
+                        row = 0;
+                        col = col + 1;
+                    }
+                }
+            }
+        }
+
+        private void UpdateBarsPosition(Vector2 delta)
+        {
+            foreach (var bar in bars)
+            {
+                bar.Position = bar.Position + delta;
+            }
         }
 
         public void Draw()
@@ -51,162 +142,64 @@ namespace DelvUI.Interface.Party
 
             var count = PartyManager.Instance.MemberCount;
             if (count < 1) return;
-
-            // draw window
+            
+            // recalculate layout on settings or size change
             var margin = ImGui.GetWindowContentRegionMin().X;
             var origin = windowPos + new Vector2(margin, 0);
             var maxSize = windowSize - new Vector2(margin + 5, 0);
             var barSize = new Vector2(pluginConfiguration.PartyListHealthBarWidth, pluginConfiguration.PartyListHealthBarHeight);
-            var drawList = ImGui.GetWindowDrawList();
+            var horizontalPadding = pluginConfiguration.PartyListHorizontalPadding;
+            var verticalPadding = pluginConfiguration.PartyListVerticalPadding;
+            var fillRowsFirst = pluginConfiguration.PartyListFillRowsFirst;
+            var rowCount = lastRowCount;
+            var colCount = lastColCount;
 
-            CalculateLayout(
-                maxSize,
-                barSize,
-                PartyManager.Instance.MemberCount,
-                HorizonalPadding,
-                VerticalPadding,
-                FillRowsFirst,
-                out uint rowCount,
-                out uint colCount
-            );
-
-            int row = 0;
-            int col = 0;
-            for (int i = 0; i < count; i++)
+            if (lastSize != windowSize || lastBarSize != barSize ||
+                lastHorizontalPadding != horizontalPadding || lastVerticalPadding != verticalPadding ||
+                lastFillRowsFirst != fillRowsFirst)
             {
-                IGroupMember member = PartyManager.Instance.GroupMembers.ElementAt(i);
-
-                // color
-                Dictionary<string, uint> colors = null;
-                if (pluginConfiguration.PartyListUseRoleColors)
-                {
-                    if (JobsHelper.isJobTank(member.JobId))
-                    {
-                        colors = pluginConfiguration.PartyListColorMap["tank"];
-                    }
-                    else if (JobsHelper.isJobHealer(member.JobId))
-                    {
-                        colors = pluginConfiguration.PartyListColorMap["healer"];
-                    }
-                    else if (JobsHelper.isJobDPS(member.JobId))
-                    {
-                        colors = pluginConfiguration.PartyListColorMap["dps"];
-                    }
-                    else
-                    {
-                        colors = pluginConfiguration.PartyListColorMap["generic_role"];
-                    }
-                }
-                else
-                {
-                    pluginConfiguration.JobColorMap.TryGetValue(member.JobId, out colors);
-                    colors ??= pluginConfiguration.NPCColorMap["friendly"];
-                }
-
-                // bg
-                var isClose = member.MaxHP > 0;
-                var cursorPos = new Vector2(
-                    origin.X + barSize.X * col + HorizonalPadding * col,
-                    origin.Y + barSize.Y * row + VerticalPadding * row
+                CalculateLayoutSize(
+                    maxSize,
+                    barSize,
+                    PartyManager.Instance.MemberCount,
+                    horizontalPadding,
+                    verticalPadding,
+                    fillRowsFirst,
+                    out rowCount,
+                    out colCount
                 );
+            }
 
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, isClose ? (uint)0x66000000 : (uint)0x22000000);
+            if (rowCount != lastRowCount || colCount != lastColCount)
+            {
+                UpdateBars(lastOrigin, barSize, rowCount, colCount, horizontalPadding, verticalPadding, fillRowsFirst);
+            }
+            else if (lastOrigin != origin)
+            {
+                UpdateBarsPosition(origin - lastOrigin);
+            }
 
-                // hp
-                if (isClose)
-                {
-                    var scale = member.MaxHP > 0 ? (float)member.HP / (float)member.MaxHP : 1;
-                    var fillPos = cursorPos;
-                    var fillSize = new Vector2(Math.Max(1, barSize.X * scale), barSize.Y / 2f);
-                    drawList.AddRectFilledMultiColor(
-                        fillPos, fillPos + fillSize,
-                        colors["gradientLeft"], colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"]
-                    );
+            // save values
+            lastSize = windowSize;
+            lastOrigin = origin;
+            lastBarSize = barSize;
+            lastHorizontalPadding = horizontalPadding;
+            lastVerticalPadding = verticalPadding;
+            lastFillRowsFirst = fillRowsFirst;
+            lastRowCount = rowCount;
+            lastColCount = colCount;
 
-                    fillPos.Y = fillPos.Y + barSize.Y / 2f;
-                    drawList.AddRectFilledMultiColor(
-                        fillPos, fillPos + fillSize,
-                        colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"], colors["gradientLeft"]
-                    );
-                }
-
-                // shield
-                if (pluginConfiguration.PartyListShieldEnabled)
-                {
-                    if (pluginConfiguration.PartyListShieldFillHealthFirst && member.MaxHP > 0)
-                    {
-                        DrawHelper.DrawShield(member.Shield, (float)member.HP / member.MaxHP, cursorPos, barSize, 
-                            pluginConfiguration.PartyListShieldHeight, !pluginConfiguration.PartyListShieldHeightPixels, 
-                            pluginConfiguration.PartyListColorMap["shield"]);
-                    }
-                    else
-                    {
-                        DrawHelper.DrawShield(member.Shield, cursorPos, barSize,
-                            pluginConfiguration.PartyListShieldHeight, !pluginConfiguration.PartyListShieldHeightPixels,
-                            pluginConfiguration.PartyListColorMap["shield"]);
-                    }                    
-                }
-
-                // buffs / debuffs
-                var statusEffects = member.StatusEffects;
-                var pos = cursorPos + barSize - origin + new Vector2(6, 1);
-
-                for (int s = 0; s < statusEffects.Length; s++)
-                {
-                    var id = (uint)statusEffects[s].EffectId;
-                    if (id == 0) continue;
-
-                    var texture = TexturesCache.Instance.GetTexture<Status>(id, (uint)Math.Max(0, statusEffects[s].StackCount - 1));
-                    if (texture == null) continue;
-
-                    var size = new Vector2(texture.Width, texture.Height);
-                    ImGui.SetCursorPos(pos - size);
-                    ImGui.Image(texture.ImGuiHandle, size);
-
-                    pos.X = pos.X - size.X - 1;
-                }
-
-                // name
-                var actor = member.GetActor();
-                var name = member.Name.Abbreviate() ?? "";
-                
-                if (actor != null)
-                {
-                    name = TextTags.GenerateFormattedTextFromTags(actor, pluginConfiguration.PartyListHealthBarText);
-                }
-
-                var textSize = ImGui.CalcTextSize(name);
-                var textPos = new Vector2(cursorPos.X + barSize.X / 2f - textSize.X / 2f, cursorPos.Y + barSize.Y / 2f - textSize.Y / 2f);
-                drawList.AddText(textPos, actor == null ? 0x44FFFFFF : 0xFFFFFFFF, name);
-
-                // border
-                //drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-
-                // layout
-                if (FillRowsFirst)
-                {
-                    col = col + 1;
-                    if (col >= colCount)
-                    {
-                        col = 0;
-                        row = row + 1;
-                    }
-                }
-                else
-                {
-                    row = row + 1;
-                    if (row >= rowCount)
-                    {
-                        row = 0;
-                        col = col + 1;
-                    }
-                }
+            // draw
+            var drawList = ImGui.GetWindowDrawList();
+            for (int i = 0; i < bars.Count; i++)
+            {
+                bars[i].Draw(drawList, lastOrigin);
             }
 
             ImGui.End();
         }
 
-        private void CalculateLayout(Vector2 maxSize, Vector2 barSize, uint count, int horizontalPadding, int verticalPadding, bool fillRowsFirst, out uint rowCount, out uint colCount)
+        private void CalculateLayoutSize(Vector2 maxSize, Vector2 barSize, uint count, int horizontalPadding, int verticalPadding, bool fillRowsFirst, out uint rowCount, out uint colCount)
         {
             rowCount = 1;
             colCount = 1;
@@ -253,6 +246,16 @@ namespace DelvUI.Interface.Party
 
             pluginConfiguration.PartyListPosition = position;
             pluginConfiguration.PartyListSize = size;
+        }
+
+        private void OnConfigChanged(object sender, EventArgs args)
+        {
+            if (lastUseRoleColors == pluginConfiguration.PartyListUseRoleColors) return;
+
+            foreach (PartyHealthBar bar in bars) 
+            {
+                bar.UpdateColor();
+            }
         }
     }
 }

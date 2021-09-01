@@ -52,6 +52,8 @@ namespace DelvUI.Interface.Party
         public IReadOnlyCollection<IGroupMember> GroupMembers => _groupMembers.AsReadOnly();
         public uint MemberCount => (uint)_groupMembers.Count;
 
+        public event EventHandler<EventArgs> MembersChangedEvent;
+
         private bool Testing;
 
         public bool isInParty
@@ -68,7 +70,6 @@ namespace DelvUI.Interface.Party
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
             if (Testing) return;
-            //if (asd) return;
 
             var player = pluginInterface.ClientState.LocalPlayer;
             if (player is null || player is not PlayerCharacter) return;
@@ -90,6 +91,11 @@ namespace DelvUI.Interface.Party
             {
                 _groupMembers.Clear();
             }
+
+            if (MembersChangedEvent != null)
+            {
+                MembersChangedEvent(this, null);
+            }
         }
 
         private void OnConfigChanged(object sender, EventArgs args)
@@ -110,6 +116,11 @@ namespace DelvUI.Interface.Party
                 {
                     _groupMembers.Add(new FakeGroupMember());
                 }
+            }
+
+            if (MembersChangedEvent != null)
+            {
+                MembersChangedEvent(this, null);
             }
         }
     }
