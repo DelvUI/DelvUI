@@ -525,6 +525,8 @@ namespace DelvUI {
         #region PLD Configuration
 
         public bool PLDManaEnabled { get; set; } = true;
+        public bool PLDManaChunked { get; set; } = true;
+        public bool PLDManaBarText { get; set; } = false;
         public int PLDManaHeight { get; set; } = 20;
         public int PLDManaWidth { get; set; } = 254;
         public int PLDManaPadding { get; set; } = 2;
