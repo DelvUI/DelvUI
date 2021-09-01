@@ -17,6 +17,10 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using ImGuiNET;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
+using FFXIVClientStructs.FFXIV.Client.Game;
+using Action = System.Action;
+using DelvUI.Interface.Party;
+
 
 namespace DelvUI.Interface {
     public abstract class HudWindow {
@@ -166,7 +170,7 @@ namespace DelvUI.Interface {
             ImGui.EndChild();
             ImGui.End();
 
-            DrawTargetShield(actor, cursorPos, BarSize, true);
+            DrawTargetShield(actor, cursorPos, BarSize);
 
             DrawOutlinedText(
                 $"{Helpers.TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}",
@@ -232,7 +236,7 @@ namespace DelvUI.Interface {
                 );
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
 
-                DrawTargetShield(target, cursorPos, BarSize, true);
+                DrawTargetShield(target, cursorPos, BarSize);
             }
             
             var textLeft = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextLeft);
@@ -270,7 +274,7 @@ namespace DelvUI.Interface {
                     friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"], friendly["gradientLeft"]
                 );
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-                DrawTargetShield(focus, cursorPos, barSize, true);
+                DrawTargetShield(focus, cursorPos, barSize);
             }
             else {
                 var colors = DetermineTargetPlateColors(actor);
@@ -281,7 +285,7 @@ namespace DelvUI.Interface {
                 );
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-                DrawTargetShield(focus, cursorPos, barSize, true);
+                DrawTargetShield(focus, cursorPos, barSize);
             }
 
             var text = Helpers.TextTags.GenerateFormattedTextFromTags(focus, PluginConfiguration.FocusBarText);
@@ -347,7 +351,7 @@ namespace DelvUI.Interface {
             ImGui.EndChild();
             ImGui.End();
 
-            DrawTargetShield(target, cursorPos, barSize, true);
+            DrawTargetShield(target, cursorPos, barSize);
 
             DrawOutlinedText(text,
                 new Vector2(
@@ -564,7 +568,7 @@ namespace DelvUI.Interface {
             }
         }
 
-        protected virtual void DrawTargetShield(Actor actor, Vector2 cursorPos, Vector2 targetBar, bool leftToRight) {
+        protected virtual void DrawTargetShield(Actor actor, Vector2 cursorPos, Vector2 targetBar) {
             if (!PluginConfiguration.ShieldEnabled) {
                 return;
             }
@@ -574,21 +578,9 @@ namespace DelvUI.Interface {
             }
 
             var shieldColor = PluginConfiguration.MiscColorMap["shield"];
-            var shield = ActorShieldValue(actor);
-            if (Math.Abs(shield) < 0) {
-                return;
-            }
-
-            var drawList = ImGui.GetWindowDrawList();
-            var y = PluginConfiguration.ShieldHeightPixels
-                ? PluginConfiguration.ShieldHeight
-                : targetBar.Y / 100 * PluginConfiguration.ShieldHeight;
+            var shield = Utils.ActorShieldValue(actor);
             
-            drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + new Vector2(targetBar.X * shield, y),
-                shieldColor["gradientLeft"], shieldColor["gradientRight"], shieldColor["gradientRight"], shieldColor["gradientLeft"]
-            );
-            drawList.AddRect(cursorPos, cursorPos + targetBar, 0xFF000000);
+            DrawHelper.DrawShield(shield, cursorPos, targetBar, PluginConfiguration.ShieldHeight, !PluginConfiguration.ShieldHeightPixels, PluginConfiguration.MiscColorMap["shield"]);
         }
 
         protected virtual void DrawTankStanceIndicator() {
@@ -716,10 +708,6 @@ namespace DelvUI.Interface {
             }
         }
 
-        protected unsafe virtual float ActorShieldValue(Actor actor) {
-            return Math.Min(*(int*) (actor.Address + 0x1997), 100) / 100f;
-        }
-
         protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor) {
             var colors = PluginConfiguration.NPCColorMap["neutral"];
 
@@ -736,7 +724,7 @@ namespace DelvUI.Interface {
 
                 case ObjectKind.BattleNpc:
                 {
-                    if (!IsHostileMemory((BattleNpc) actor)) {
+                    if (!Utils.IsHostileMemory((BattleNpc) actor)) {
                         colors = PluginConfiguration.NPCColorMap["friendly"];
                     }
 
@@ -814,12 +802,6 @@ namespace DelvUI.Interface {
 
             // Display HUD only if parameter widget is visible and we're not in a fade event
             return PluginInterface.ClientState.LocalPlayer == null || parameterWidget == null || fadeMiddleWidget == null || !parameterWidget->IsVisible || fadeMiddleWidget->IsVisible;
-        }
-
-        private static unsafe bool IsHostileMemory(BattleNpc npc) {
-            return (npc.BattleNpcKind == BattleNpcSubKind.Enemy || (int) npc.BattleNpcKind == 1)
-                   && *(byte*) (npc.Address + 0x1980) != 0
-                   && *(byte*) (npc.Address + 0x193C) != 1;
         }
     }
 }

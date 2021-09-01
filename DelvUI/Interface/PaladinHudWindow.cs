@@ -7,6 +7,7 @@ using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
+using DelvUI.Helpers;
 
 namespace DelvUI.Interface
 {
@@ -22,9 +23,9 @@ namespace DelvUI.Interface
         
         private int ManaBarPadding => PluginConfiguration.PLDManaPadding;
         
-        private new int ManaXOffset => PluginConfiguration.PLDManaXOffset;
+        private int ManaXOffset => PluginConfiguration.PLDManaXOffset;
         
-        private new int ManaYOffset => PluginConfiguration.PLDManaYOffset;
+        private int ManaYOffset => PluginConfiguration.PLDManaYOffset;
         
         private bool OathGaugeEnabled => PluginConfiguration.PLDOathGaugeEnabled;
         

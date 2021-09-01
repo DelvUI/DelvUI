@@ -6,6 +6,7 @@ using System.Globalization;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
+using DelvUI.Helpers;
 
 namespace DelvUI.Interface
 {

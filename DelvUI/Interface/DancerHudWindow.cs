@@ -8,6 +8,7 @@ using Dalamud.Plugin;
 using DelvUI.GameStructs;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
+using DelvUI.Helpers;
 
 namespace DelvUI.Interface {
     public class DancerHudWindow : HudWindow {

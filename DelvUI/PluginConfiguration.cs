@@ -6,6 +6,7 @@ using Dalamud.Plugin;
 using ImGuiNET;
 using ImGuiScene;
 using Newtonsoft.Json;
+using DelvUI.Helpers;
 
 namespace DelvUI {
     public class PluginConfiguration : IPluginConfiguration {
@@ -15,6 +16,8 @@ namespace DelvUI {
         public int Version { get; set; }
         public bool HideHud = false;
         public bool LockHud = true;
+
+        #region unit frames
         public int HealthBarHeight { get; set; } = 50;
         public int HealthBarWidth { get; set; } = 270;
         public int HealthBarXOffset { get; set; } = 160;
@@ -35,11 +38,11 @@ namespace DelvUI {
         public int FocusBarWidth { get; set; } = 120;
         public int FocusBarXOffset { get; set; } = 164;
         public int FocusBarYOffset { get; set; } = 460;
-        public int ShieldHeight { get; set; } = 10;
-
-        public bool ShieldHeightPixels = true;
 
         public bool ShieldEnabled = true;
+        public int ShieldHeight { get; set; } = 10;
+        public bool ShieldHeightPixels = true;
+        public bool ShieldFillHealthFirst = false;
 
         public int TankStanceIndicatorWidth { get; set; } = 2;
         public bool TankStanceIndicatorEnabled = true;
@@ -65,7 +68,9 @@ namespace DelvUI {
         public int ToTBarTextYOffset { get; set; } = 0;
         public int FocusBarTextXOffset { get; set; } = 0;
         public int FocusBarTextYOffset { get; set; } = 0;
+        #endregion
 
+        #region misc
         public bool MPTickerEnabled = false;
         public int MPTickerHeight { get; set; } = 4;
         public int MPTickerWidth { get; set; } = 254;
@@ -80,7 +85,9 @@ namespace DelvUI {
         public int GCDIndicatorXOffset { get; set; } = 0;
         public int GCDIndicatorYOffset { get; set; } = 480;
         public bool GCDIndicatorShowBorder = false;
+        #endregion
 
+        #region cast bar
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
         public int CastBarXOffset { get; set; } = 0;
@@ -100,14 +107,15 @@ namespace DelvUI {
         public int TargetCastBarXOffset { get; set; } = 0;
         public int TargetCastBarYOffset { get; set; } = 320;
 
-
         public bool ShowTargetCastBar = true;
         public bool ShowTargetActionIcon = true;
         public bool ShowTargetActionName = true;
         public bool ShowTargetCastTime = true;
         public bool ShowTargetInterrupt = true;
         public bool ColorCastBarByDamageType = false;
+        #endregion
 
+        #region colors
         public Vector4 CustomHealthBarColor = new Vector4(0f/255f, 145f/255f, 6f/255f, 100f/100f);
         public Vector4 CastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,100f/100f);
         public Vector4 TargetCastBarColor = new Vector4(255f/255f,158f/255f,208f/255f,100f/100f);
@@ -146,10 +154,39 @@ namespace DelvUI {
         public Vector4 NPCColorHostile = new Vector4(205f/255f, 25f/255f, 25f/255f, 100f/100f);
         public Vector4 NPCColorNeutral = new Vector4(214f/255f, 145f/255f, 64f/255f, 100f/100f);
         public Vector4 NPCColorFriendly = new Vector4(0f/255f, 145f/255f, 6f/255f, 100f/100f);
+        #endregion
 
-        
+        #region party list
+        public Vector2 PartyListPosition { get; set; } = new Vector2(200, 200);
+        public Vector2 PartyListSize { get; set; } = new Vector2(650, 150);
+
+        public bool ShowPartyList = true;
+        public bool PartyListTestingEnabled = false;
+        public bool PartyListLocked = false;
+        public bool PartyListFillRowsFirst = false;
+
+        public int PartyListHealthBarWidth { get; set; } = 150;
+        public int PartyListHealthBarHeight { get; set; } = 50;
+        public int PartyListHorizontalPadding { get; set; } = 2;
+        public int PartyListVerticalPadding { get; set; } = 2;
+
+        public bool PartyListShieldEnabled = true;
+        public int PartyListShieldHeight { get; set; } = 10;
+        public bool PartyListShieldHeightPixels = true;
+        public bool PartyListShieldFillHealthFirst = true;
+
+        public bool PartyListUseRoleColors = true;
+
+        public Vector4 PartyListShieldColor = new Vector4(240f / 255f, 255f / 255f, 0f / 205f, 60f / 100f);
+        public Vector4 PartyListTankRoleColor = new Vector4(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f);
+        public Vector4 PartyListDPSRoleColor = new Vector4(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f);
+        public Vector4 PartyListHealerRoleColor = new Vector4(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f);
+        public Vector4 PartyListGenericRoleColor = new Vector4(214f / 255f, 145f / 255f, 64f / 255f, 100f / 100f);
+        #endregion
+
+
         #region BRD Configuration
-        
+
         public int BRDBaseXOffset { get; set; } = 127;
         public int BRDBaseYOffset { get; set; } = 405;
         public int BRDSongGaugeWidth { get; set; } = 254;
@@ -794,6 +831,7 @@ namespace DelvUI {
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> NPCColorMap;
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> MiscColorMap;
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> CastBarColorMap;
+        [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> PartyListColorMap;
 
         public void Init(DalamudPluginInterface pluginInterface) {
             _pluginInterface = pluginInterface;
@@ -2018,53 +2056,46 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SlideCastColor.AdjustColor(.1f))
                 }
             };
+
+            PartyListColorMap = new Dictionary<string, Dictionary<string, uint>>
+            {
+                ["shield"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListShieldColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListShieldColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListShieldColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListShieldColor.AdjustColor(.1f))
+                },
+                ["tank"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListTankRoleColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListTankRoleColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListTankRoleColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListTankRoleColor.AdjustColor(.1f))
+                },
+                ["dps"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListDPSRoleColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListDPSRoleColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListDPSRoleColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListDPSRoleColor.AdjustColor(.1f))
+                },
+                ["healer"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListHealerRoleColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListHealerRoleColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListHealerRoleColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListHealerRoleColor.AdjustColor(.1f))
+                },
+                ["generic_role"] = new Dictionary<string, uint>
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListGenericRoleColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListGenericRoleColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListGenericRoleColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListGenericRoleColor.AdjustColor(.1f))
+                }
+
+            };
         }
-    }
-
-    public static class Jobs {
-        public const uint GLD = 1;
-        public const uint MRD = 3;
-        public const uint PLD = 19;
-        public const uint WAR = 21;
-        public const uint DRK = 32;
-        public const uint GNB = 37;
-
-        public const uint CNJ = 6;
-        public const uint WHM = 24;
-        public const uint SCH = 28;
-        public const uint AST = 33;
-
-        public const uint PGL = 2;
-        public const uint LNC = 4;
-        public const uint ROG = 29;
-        public const uint MNK = 20;
-        public const uint DRG = 22;
-        public const uint NIN = 30;
-        public const uint SAM = 34;
-
-        public const uint ARC = 5;
-        public const uint BRD = 23;
-        public const uint MCH = 31;
-        public const uint DNC = 38;
-
-        public const uint THM = 7;
-        public const uint ACN = 26;
-        public const uint BLM = 25;
-        public const uint SMN = 27;
-        public const uint RDM = 35;
-        public const uint BLU = 36;
-
-        public const uint CRP = 8;
-        public const uint BSM = 9;
-        public const uint ARM = 10;
-        public const uint GSM = 11;
-        public const uint LTW = 12;
-        public const uint WVR = 13;
-        public const uint ALC = 14;
-        public const uint CUL = 15;
-
-        public const uint MIN = 16;
-        public const uint BOT = 17;
-        public const uint FSH = 18;
     }
 }

@@ -6,7 +6,9 @@ using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using ImGuiNET;
 using DelvUI.Interface;
+using DelvUI.Interface.Party;
 using FFXIVClientStructs;
+using DelvUI.Helpers;
 
 namespace DelvUI {
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -16,6 +18,7 @@ namespace DelvUI {
         private DalamudPluginInterface _pluginInterface;
         private PluginConfiguration _pluginConfiguration;
         private HudWindow _hudWindow;
+        private PartyHudWindow _partyHudWindow;
         private ConfigurationWindow _configurationWindow;
 
         private bool _fontBuilt;
@@ -45,6 +48,9 @@ namespace DelvUI {
                 ShowInHelp = true
             });
 
+            _partyHudWindow = new PartyHudWindow(_pluginConfiguration);
+
+            PartyManager.Initialize(pluginInterface, _pluginConfiguration);
             Resolver.Initialize();
         }
         
@@ -112,6 +118,7 @@ namespace DelvUI {
 
             if (!hudState) { 
                 _hudWindow?.Draw();
+                _partyHudWindow?.Draw();
             }
 
             if (_fontBuilt) {
@@ -196,6 +203,9 @@ namespace DelvUI {
             if (_hudWindow != null) {
                 _hudWindow.IsVisible = false;
             }
+            _hudWindow = null;
+
+            _partyHudWindow = null;
 
             _pluginInterface.CommandManager.RemoveHandler("/pdelvui");
             _pluginInterface.UiBuilder.OnBuildUi -= Draw;

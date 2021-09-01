@@ -5,6 +5,7 @@ using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
+using DelvUI.Helpers;
 
 namespace DelvUI.Interface {
     public class GunbreakerHudWindow : HudWindow {

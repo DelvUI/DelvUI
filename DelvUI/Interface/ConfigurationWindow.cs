@@ -38,7 +38,7 @@ namespace DelvUI.Interface
                 , "Enemy"
                 });
             _configMap.Add("Jobs", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"});
-
+            _configMap.Add("Party List", new[] { "General" });
         }   
 
 
@@ -242,6 +242,14 @@ namespace DelvUI.Interface
                             break;                        
                         case "Caster":
                             DrawJobsCasterConfig();
+                            break;
+                    }
+                    break;
+                case "Party List":
+                    switch (subConfig)
+                    {
+                        case "General":
+                            DrawPartyListGeneralConfig();
                             break;
                     }
                     break;
@@ -485,9 +493,9 @@ namespace DelvUI.Interface
             ImGui.Text("");//SPACING
             _changed |= ImGui.Checkbox("Shields", ref _pluginConfiguration.ShieldEnabled);
             ImGui.BeginGroup();
-            ImGui.BeginChild("itemview2",new Vector2(0, ImGui.GetWindowHeight()/5), true); 
+            ImGui.BeginChild("itemview2",new Vector2(0, ImGui.GetWindowHeight()/4), true); 
             {
-                ImGui.BeginChild("itemvi2213ew2",new Vector2(ImGui.GetWindowWidth()/2, 0) );
+                ImGui.BeginChild("itemvi2213ew2",new Vector2(ImGui.GetWindowWidth()/2, 80) );
                 {
                     var shieldHeight = _pluginConfiguration.ShieldHeight;
                     ImGui.Text("");//SPACING
@@ -504,14 +512,18 @@ namespace DelvUI.Interface
                 }
                 ImGui.EndChild();
                 ImGui.SameLine();
-                ImGui.BeginChild("ite4123mview2",new Vector2(ImGui.GetWindowWidth()/2, 0));
+                ImGui.BeginChild("ite4123mview2",new Vector2(ImGui.GetWindowWidth()/2, 80));
                 {
                     ImGui.Text("");//SPACING
                     ImGui.Text("Color");
                     _changed |= ImGui.ColorEdit4("##ShieldColor", ref _pluginConfiguration.ShieldColor);
                 }
                 ImGui.EndChild();
-
+                ImGui.NewLine();
+                ImGui.BeginChild("shieldOptions", new Vector2(ImGui.GetWindowWidth()/2, 80));
+                {
+                    _changed |= ImGui.Checkbox("Fill Health First", ref _pluginConfiguration.ShieldFillHealthFirst);
+                }
             }
             ImGui.EndChild();
 
@@ -1238,7 +1250,8 @@ namespace DelvUI.Interface
             ImGui.EndGroup();
                 
         }        
-        private void DrawCastbarsPlayerConfig(){
+        private void DrawCastbarsPlayerConfig()
+        {    
             _changed |= ImGui.Checkbox("Enabled", ref _pluginConfiguration.ShowCastBar);
 
             ImGui.BeginGroup();
@@ -3977,7 +3990,8 @@ namespace DelvUI.Interface
 
                     ImGui.EndTabItem();
                 }
-                                                if (ImGui.BeginTabItem("Red Mage"))
+                
+                if (ImGui.BeginTabItem("Red Mage"))
                 {
                     var rdmVerticalOffset = _pluginConfiguration.RDMVerticalOffset;
                     if (ImGui.DragInt("Vertical Offset", ref rdmVerticalOffset, 1f, -2000, 2000))
@@ -4344,5 +4358,57 @@ namespace DelvUI.Interface
             ImGui.EndTabBar();
         }
 
+        private void DrawPartyListGeneralConfig()
+        {
+            _changed |= ImGui.Checkbox("Enabled", ref _pluginConfiguration.ShowPartyList);
+            _changed |= ImGui.Checkbox("Preview", ref _pluginConfiguration.PartyListTestingEnabled);
+            _changed |= ImGui.Checkbox("Lock", ref _pluginConfiguration.PartyListLocked);
+            _changed |= ImGui.Checkbox("Fill Rows First", ref _pluginConfiguration.PartyListFillRowsFirst);
+
+            var PartyListHealthBarWidth = _pluginConfiguration.PartyListHealthBarWidth;
+            if (ImGui.DragInt("Health Bars Width", ref PartyListHealthBarWidth, .1f, 1, 500))
+            {
+                _pluginConfiguration.PartyListHealthBarWidth = PartyListHealthBarWidth;
+                _pluginConfiguration.Save();
+            }
+
+            var PartyListHealthBarHeight = _pluginConfiguration.PartyListHealthBarHeight;
+            if (ImGui.DragInt("Health Bars Height", ref PartyListHealthBarHeight, .1f, 1, 500))
+            {
+                _pluginConfiguration.PartyListHealthBarHeight = PartyListHealthBarHeight;
+                _pluginConfiguration.Save();
+            }
+
+            var PartyListHorizontalPadding = _pluginConfiguration.PartyListHorizontalPadding;
+            if (ImGui.DragInt("Horizonal Padding", ref PartyListHorizontalPadding, .1f, -50, 50))
+            {
+                _pluginConfiguration.PartyListHorizontalPadding = PartyListHorizontalPadding;
+                _pluginConfiguration.Save();
+            }
+
+            var PartyListVerticalPadding = _pluginConfiguration.PartyListVerticalPadding;
+            if (ImGui.DragInt("Vertical Padding", ref PartyListVerticalPadding, .1f, -50, 50))
+            {
+                _pluginConfiguration.PartyListVerticalPadding = PartyListVerticalPadding;
+                _pluginConfiguration.Save();
+            }
+
+            _changed |= ImGui.Checkbox("Shields Enabled", ref _pluginConfiguration.PartyListShieldEnabled);
+            
+            var PartyListShieldHeight = _pluginConfiguration.PartyListShieldHeight;
+            if (ImGui.DragInt("Shield Size", ref PartyListShieldHeight, .1f, -1, 1000))
+            {
+                _pluginConfiguration.PartyListShieldHeight = PartyListShieldHeight;
+                _pluginConfiguration.Save();
+            }
+            _changed |= ImGui.Checkbox("Size in pixels", ref _pluginConfiguration.PartyListShieldHeightPixels);
+            _changed |= ImGui.Checkbox("Fill Health First", ref _pluginConfiguration.PartyListShieldFillHealthFirst);
+            _changed |= ImGui.ColorEdit4("Shield Color", ref _pluginConfiguration.PartyListShieldColor);
+
+            _changed |= ImGui.Checkbox("Use Role Colors", ref _pluginConfiguration.PartyListUseRoleColors);
+            _changed |= ImGui.ColorEdit4("Tank Color", ref _pluginConfiguration.PartyListTankRoleColor);
+            _changed |= ImGui.ColorEdit4("DPS Color", ref _pluginConfiguration.PartyListDPSRoleColor);
+            _changed |= ImGui.ColorEdit4("Healer Color", ref _pluginConfiguration.PartyListHealerRoleColor);
+        }
     }
 }

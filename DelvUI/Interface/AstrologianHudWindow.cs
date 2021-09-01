@@ -11,6 +11,7 @@ using System.Linq;
 using Dalamud.Game.ClientState.Actors.Types;
 using DelvUI.Interface.Bars;
 using System;
+using DelvUI.Helpers;
 
 namespace DelvUI.Interface
 {
