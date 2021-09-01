@@ -3806,6 +3806,51 @@ namespace DelvUI.Interface
                         _pluginConfiguration.DNCStepPadding = stepPadding;
                         _pluginConfiguration.Save();
                     }
+
+                    var procEnabled = _pluginConfiguration.DNCProcEnabled;
+                    if (ImGui.Checkbox("Proc Bar Enabled", ref procEnabled))
+                    {
+                        _pluginConfiguration.DNCProcEnabled = procEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var procHeight = _pluginConfiguration.DNCProcHeight;
+                    if (ImGui.DragInt("Proc Bar Height", ref procHeight, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DNCProcHeight = procHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var procWidth = _pluginConfiguration.DNCProcWidth;
+                    if (ImGui.DragInt("Proc Bar Width", ref procWidth, .1f, 1, 1000))
+                    {
+                        _pluginConfiguration.DNCProcWidth = procWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var procXOffset = _pluginConfiguration.DNCProcXOffset;
+                    if (ImGui.DragInt("Proc X Offset", ref procXOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.DNCProcXOffset = procXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var procYOffset = _pluginConfiguration.DNCProcYOffset;
+                    if (ImGui.DragInt("Proc Y Offset", ref procYOffset, .1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.DNCProcYOffset = procYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var procPadding = _pluginConfiguration.DNCProcPadding;
+                    if (ImGui.DragInt("Proc Padding", ref procPadding, .1f, 0, 1000))
+                    {
+                        _pluginConfiguration.DNCProcPadding = procPadding;
+                        _pluginConfiguration.Save();
+                    }
+
+                   
+                    
                     
                     _changed |= ImGui.ColorEdit4("Esprit Bar Color", ref _pluginConfiguration.DNCEspritColor);
                     _changed |= ImGui.ColorEdit4("Feather Bar Color", ref _pluginConfiguration.DNCFeatherColor);
@@ -3819,6 +3864,8 @@ namespace DelvUI.Interface
                     _changed |= ImGui.ColorEdit4("Entrechat Step Color", ref _pluginConfiguration.DNCStepEntrechatColor);
                     _changed |= ImGui.ColorEdit4("Jete Step Color", ref _pluginConfiguration.DNCStepJeteColor);
                     _changed |= ImGui.ColorEdit4("Pirouette Color", ref _pluginConfiguration.DNCStepPirouetteColor);
+                    _changed |= ImGui.ColorEdit4("Flourishing Cascade Color", ref _pluginConfiguration.DNCFlourishingCascadeColor);
+                    _changed |= ImGui.ColorEdit4("Flourishing Fountain Color", ref _pluginConfiguration.DNCFlourishingFountainColor);
                     _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.DNCEmptyColor);
 
                     ImGui.EndTabItem();
