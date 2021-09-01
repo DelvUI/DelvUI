@@ -39,8 +39,23 @@ namespace DelvUI.Interface
                 });
             _configMap.Add("Jobs", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"});
 
-        }   
+        }
 
+        public void ToggleHud()
+        {
+            _pluginConfiguration.HideHud = ! _pluginConfiguration.HideHud;
+            _changed = true;
+        }
+        public void ShowHud()
+        {
+            _pluginConfiguration.HideHud = false;
+            _changed = true;
+        }
+        public void HideHud()
+        {
+            _pluginConfiguration.HideHud = true;
+            _changed = true;
+        }
 
         public void Draw()
         {
@@ -131,8 +146,7 @@ namespace DelvUI.Interface
             ImGui.SameLine();
             if (ImGui.Button(_pluginConfiguration.HideHud ? "Show HUD" : "Hide HUD"))
             {
-                _pluginConfiguration.HideHud = ! _pluginConfiguration.HideHud;
-                _changed = true;
+                ToggleHud();
             }
             ImGui.SameLine();
             if (ImGui.Button("Reset HUD")) {}
