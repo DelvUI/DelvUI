@@ -116,10 +116,17 @@ namespace DelvUI.Interface.Party
                 if (isClose)
                 {
                     var scale = member.MaxHP > 0 ? (float)member.HP / (float)member.MaxHP : 1;
-                    var fillSize = new Vector2(Math.Max(1, barSize.X * scale), barSize.Y);
+                    var fillPos = cursorPos;
+                    var fillSize = new Vector2(Math.Max(1, barSize.X * scale), barSize.Y / 2f);
                     drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + fillSize,
-                        colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+                        fillPos, fillPos + fillSize,
+                        colors["gradientLeft"], colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"]
+                    );
+
+                    fillPos.Y = fillPos.Y + barSize.Y / 2f;
+                    drawList.AddRectFilledMultiColor(
+                        fillPos, fillPos + fillSize,
+                        colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"], colors["gradientLeft"]
                     );
                 }
 
@@ -141,10 +148,16 @@ namespace DelvUI.Interface.Party
                 }
 
                 // name
-                var textSize = ImGui.CalcTextSize(member.Name);
+                var name = member.Name.Abbreviate() ?? "";
+                var actor = member.GetActor();
+                if (actor != null)
+                {
+                    name = TextTags.GenerateFormattedTextFromTags(actor, pluginConfiguration.PartyListHealthBarText);
+                }
+
+                var textSize = ImGui.CalcTextSize(name);
                 var textPos = new Vector2(cursorPos.X + barSize.X / 2f - textSize.X / 2f, cursorPos.Y + barSize.Y / 2f - textSize.Y / 2f);
-                //DrawHelper.DrawOutlinedText(member.Name, textPos);
-                drawList.AddText(textPos, 0xFFFFFFFF, member.Name);
+                drawList.AddText(textPos, actor == null ? 0x44FFFFFF : 0xFFFFFFFF, name);
 
                 // border
                 //drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);

@@ -165,6 +165,7 @@ namespace DelvUI {
         public bool PartyListLocked = false;
         public bool PartyListFillRowsFirst = false;
 
+        public string PartyListHealthBarText = "[name:veryshort]";
         public int PartyListHealthBarWidth { get; set; } = 150;
         public int PartyListHealthBarHeight { get; set; } = 50;
         public int PartyListHorizontalPadding { get; set; } = 2;

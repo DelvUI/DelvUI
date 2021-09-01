@@ -4365,6 +4365,14 @@ namespace DelvUI.Interface
             _changed |= ImGui.Checkbox("Lock", ref _pluginConfiguration.PartyListLocked);
             _changed |= ImGui.Checkbox("Fill Rows First", ref _pluginConfiguration.PartyListFillRowsFirst);
 
+            ImGui.Text("Health Bars Text Format");
+            var PartyListHealthBarText = _pluginConfiguration.PartyListHealthBarText;
+            if (ImGui.InputText("##PartyListHealthBarText", ref PartyListHealthBarText, 999))
+            {
+                _pluginConfiguration.PartyListHealthBarText = PartyListHealthBarText;
+                _pluginConfiguration.Save();
+            }
+
             var PartyListHealthBarWidth = _pluginConfiguration.PartyListHealthBarWidth;
             if (ImGui.DragInt("Health Bars Width", ref PartyListHealthBarWidth, .1f, 1, 500))
             {

@@ -2,6 +2,7 @@
 using Dalamud.Plugin;
 using Dalamud.Game.Internal;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using PartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
 using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
@@ -28,15 +29,8 @@ namespace DelvUI.Interface.Party
         public uint MaxHP => partyMember->MaxHP;
         public uint MP => partyMember->CurrentMP;
         public uint MaxMP => partyMember->MaxMP;
-        public float Shield
-        {
-            get
-            {
-                var actor = pluginInterface.ClientState.Actors.FirstOrDefault(o => o.ActorId == partyMember->ObjectID);
-                return Utils.ActorShieldValue(actor);
-            }
-        }
-
+        public float Shield => Utils.ActorShieldValue(GetActor());
+        
         public GroupMember(PartyMember *partyMember, DalamudPluginInterface pluginInterface)
         {
             this.pluginInterface = pluginInterface;
@@ -48,8 +42,13 @@ namespace DelvUI.Interface.Party
             var text = System.Text.Encoding.Default.GetString(nameBytes);
             if (text != null)
             {
-                _name = Regex.Replace(text, "[^a-zA-Z0-9_.]+", "", RegexOptions.Compiled);
+                _name = Regex.Replace(text, "[^a-zA-Z0-9_. ]+", "", RegexOptions.Compiled);
             } 
+        }
+
+        public Actor GetActor()
+        {
+            return pluginInterface.ClientState.Actors.FirstOrDefault(o => o.ActorId == ActorID);
         }
     }
 
@@ -91,6 +90,10 @@ namespace DelvUI.Interface.Party
             _mp = (uint)(_maxMP * FakeGroupMember.RNG.Next(100) / 100f);
             _shield = FakeGroupMember.RNG.Next(100) / 100f;
         }
+        public Actor GetActor()
+        {
+            return null;
+        }
     }
 
     public interface IGroupMember
@@ -104,5 +107,7 @@ namespace DelvUI.Interface.Party
         public uint MP { get; }
         public uint MaxMP { get; }
         public float Shield { get; }
+
+        public abstract Actor GetActor();
     }
 }
