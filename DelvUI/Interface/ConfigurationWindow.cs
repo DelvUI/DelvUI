@@ -1304,7 +1304,7 @@ namespace DelvUI.Interface
                     {
                         ImGui.Text("Color");
                         _changed |= ImGui.ColorEdit4("##CastBarColor", ref _pluginConfiguration.CastBarColor);
-
+                        _changed |= ImGui.Checkbox("Color Castbar by Job", ref _pluginConfiguration.ColorCastBarByJob);
                         
                     }
                     ImGui.EndChild();
