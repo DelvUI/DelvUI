@@ -531,6 +531,8 @@ namespace DelvUI.Interface
 
 
             ImGui.EndGroup();
+            _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.EmptyColor);
+
         }
 
         private void DrawIndividualUnitFramesPlayerConfig(){
@@ -1711,7 +1713,6 @@ namespace DelvUI.Interface
                     _changed |= ImGui.ColorEdit4("Beast Gauge Full Color", ref _pluginConfiguration.WARFellCleaveColor);
                     _changed |= ImGui.ColorEdit4("Nascent Chaos Ready Color",
                         ref _pluginConfiguration.WARNascentChaosColor);
-                    _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.WAREmptyColor);
 
                     ImGui.EndTabItem();
                 }
@@ -1954,7 +1955,6 @@ namespace DelvUI.Interface
                     _changed |= ImGui.ColorEdit4("Requiescat Color", ref _pluginConfiguration.PLDRequiescatColor);
                     _changed |= ImGui.ColorEdit4("Atonement Color", ref _pluginConfiguration.PLDAtonementColor);
                     _changed |= ImGui.ColorEdit4("Goring Blade Color", ref _pluginConfiguration.PLDDoTColor);
-                    _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.PLDEmptyColor);
 
                     ImGui.EndTabItem();
                 }
@@ -2079,7 +2079,6 @@ namespace DelvUI.Interface
 
                         _changed |= ImGui.ColorEdit4("Blood Color Left", ref _pluginConfiguration.DRKBloodColorLeft);
                         _changed |= ImGui.ColorEdit4("Blood Color Right", ref _pluginConfiguration.DRKBloodColorRight);
-                        _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.DRKEmptyColor);
                     }
 
                     var drkBuffBarEnabled = _pluginConfiguration.DRKBuffBarEnabled;
@@ -2277,7 +2276,6 @@ namespace DelvUI.Interface
 
                     _changed |= ImGui.ColorEdit4("Fairy Bar Color", ref _pluginConfiguration.SchFairyColor);
                     _changed |= ImGui.ColorEdit4("Aether Bar Color", ref _pluginConfiguration.SchAetherColor);
-                    _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.SchEmptyColor);
 
                     ImGui.EndTabItem();
                 }
@@ -2393,7 +2391,6 @@ namespace DelvUI.Interface
                         ref _pluginConfiguration.WhmLillyChargingColor);
                     _changed |= ImGui.ColorEdit4("Blood Lilly Bar Color", ref _pluginConfiguration.WhmBloodLillyColor);
                     _changed |= ImGui.ColorEdit4("Dia Bar Color", ref _pluginConfiguration.WhmDiaColor);
-                    _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.WhmEmptyColor);
 
                     ImGui.EndTabItem();
                 }
@@ -2561,7 +2558,6 @@ namespace DelvUI.Interface
                     _changed |= ImGui.ColorEdit4("Star Earthly Color", ref _pluginConfiguration.ASTStarEarthlyColor);
                     _changed |= ImGui.ColorEdit4("Star Giant Color", ref _pluginConfiguration.ASTStarGiantColor);
                     _changed |= ImGui.ColorEdit4("Lightspeed Color", ref _pluginConfiguration.ASTLightspeedColor);
-                    _changed |= ImGui.ColorEdit4("Bar Empty Color", ref _pluginConfiguration.ASTEmptyColor);
 
                     ImGui.EndTabItem();
                 }
@@ -2801,7 +2797,6 @@ namespace DelvUI.Interface
                     _changed |= ImGui.ColorEdit4("Meditation Color", ref _pluginConfiguration.SamMeditationColor);
                     _changed |= ImGui.ColorEdit4("Kenki Color", ref _pluginConfiguration.SamKenkiColor);
                     _changed |= ImGui.ColorEdit4("Expiry Color", ref _pluginConfiguration.SamExpiryColor);
-                    _changed |= ImGui.ColorEdit4("Empty Color", ref _pluginConfiguration.SamEmptyColor);
 
                     ImGui.EndTabItem();
                 }
@@ -2898,7 +2893,6 @@ namespace DelvUI.Interface
                         _changed |= ImGui.ColorEdit4("Ninki Bar Color", ref _pluginConfiguration.NINNinkiColor);
                     }
 
-                    _changed |= ImGui.ColorEdit4("Empty Color", ref _pluginConfiguration.NINEmptyColor);
 
                     ImGui.EndTabItem();
                 }
@@ -3191,7 +3185,6 @@ namespace DelvUI.Interface
                     _changed |= ImGui.ColorEdit4("Life of the Dragon Color", ref _pluginConfiguration.DRGLifeOfTheDragonColor);
                     _changed |= ImGui.ColorEdit4("Disembowel Color", ref _pluginConfiguration.DRGDisembowelColor);
                     _changed |= ImGui.ColorEdit4("Chaos Thrust Color", ref _pluginConfiguration.DRGChaosThrustColor);
-                    _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.DRGEmptyColor);
                     ImGui.EndTabItem();
                 }
             }
@@ -3419,7 +3412,6 @@ namespace DelvUI.Interface
                     
                     _changed |= ImGui.ColorEdit4("Stormbite Color", ref _pluginConfiguration.BRDSBColor);
                     
-                    _changed |= ImGui.ColorEdit4("Empty Color", ref _pluginConfiguration.BRDEmptyColor);
                     _changed |= ImGui.ColorEdit4("DoT Expire Color", ref _pluginConfiguration.BRDExpireColor);
                     
                     ImGui.EndTabItem();
@@ -3635,7 +3627,6 @@ namespace DelvUI.Interface
                     _changed |= ImGui.ColorEdit4("Robot Summon Bar Color", ref _pluginConfiguration.MCHRobotColor);
                     _changed |= ImGui.ColorEdit4("Overheat Bar Color", ref _pluginConfiguration.MCHOverheatColor);
                     _changed |= ImGui.ColorEdit4("Wildfire Bar Color", ref _pluginConfiguration.MCHWildfireColor);
-                    _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.MCHEmptyColor);
 
                     ImGui.EndTabItem();
                 }
@@ -3913,7 +3904,6 @@ namespace DelvUI.Interface
                     _changed |= ImGui.ColorEdit4("Entrechat Step Color", ref _pluginConfiguration.DNCStepEntrechatColor);
                     _changed |= ImGui.ColorEdit4("Jete Step Color", ref _pluginConfiguration.DNCStepJeteColor);
                     _changed |= ImGui.ColorEdit4("Pirouette Color", ref _pluginConfiguration.DNCStepPirouetteColor);
-                    _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.DNCEmptyColor);
 
                     ImGui.EndTabItem();
                 }
@@ -4107,7 +4097,6 @@ namespace DelvUI.Interface
 
                     _changed |= ImGui.ColorEdit4("Aether Bar Color", ref _pluginConfiguration.SmnAetherColor);
                     _changed |= ImGui.ColorEdit4("Ruin Bar Color", ref _pluginConfiguration.SmnRuinColor);
-                    _changed |= ImGui.ColorEdit4("Empty Bar Color", ref _pluginConfiguration.SmnEmptyColor);
                     _changed |= ImGui.ColorEdit4("Miasma Color", ref _pluginConfiguration.SmnMiasmaColor);
                     _changed |= ImGui.ColorEdit4("Bio Color", ref _pluginConfiguration.SmnBioColor);
                     _changed |= ImGui.ColorEdit4("Expiry Color", ref _pluginConfiguration.SmnExpiryColor);
