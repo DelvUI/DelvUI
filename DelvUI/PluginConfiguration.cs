@@ -22,7 +22,7 @@ namespace DelvUI {
         public int PrimaryResourceBarHeight { get; set; } = 20;
         public int PrimaryResourceBarWidth { get; set; } = 254;
         public int PrimaryResourceBarXOffset { get; set; } = 160;
-        public int PrimaryResourceBarYOffset { get; set; } = 460;
+        public int PrimaryResourceBarYOffset { get; set; } = 455;
         public int TargetBarHeight { get; set; } = 50;
         public int TargetBarWidth { get; set; } = 270;
         public int TargetBarXOffset { get; set; } = 160;
@@ -227,16 +227,16 @@ namespace DelvUI {
         public int FairyBarHeight { get; set; } = 20;
         public int FairyBarWidth { get; set; } = 254;
         public int FairyBarX { get; set; } = 127;
-        public int FairyBarY { get; set; } = 450;
+        public int FairyBarY { get; set; } = 444;
         public int SchAetherBarHeight { get; set; } = 20;
         public int SchAetherBarWidth { get; set; } = 250;
         public int SchAetherBarX { get; set; } = -42;
-        public int SchAetherBarY { get; set; } = 450;
+        public int SchAetherBarY { get; set; } = 444;
         public int SchAetherBarPad { get; set; } = 2;
         public int SCHBioBarHeight { get; set; } = 20;
         public int SCHBioBarWidth { get; set; } = 254;
         public int SCHBioBarX { get; set; } = 127;
-        public int SCHBioBarY { get; set; } = 423;
+        public int SCHBioBarY { get; set; } = 417;
 
         public bool SCHShowBioBar = true;
         public bool SCHShowAetherBar = true;
@@ -254,17 +254,17 @@ namespace DelvUI {
         public int LillyBarHeight { get; set; } = 20;
         public int LillyBarWidth { get; set; } = 254;
         public int LillyBarX { get; set; } = 127;
-        public int LillyBarY { get; set; } = 421;
+        public int LillyBarY { get; set; } = 415;
         public int LillyBarPad { get; set; } = 2;
         public int BloodLillyBarHeight { get; set; } = 20;
         public int BloodLillyBarWidth { get; set; } = 254;
         public int BloodLillyBarX { get; set; } = 42;
-        public int BloodLillyBarY { get; set; } = 421;
+        public int BloodLillyBarY { get; set; } = 415;
         public int BloodLillyBarPad { get; set; } = 2;
         public int DiaBarHeight { get; set; } = 20;
         public int DiaBarWidth { get; set; } = 254;
         public int DiaBarX { get; set; } = 127;
-        public int DiaBarY { get; set; } = 423;
+        public int DiaBarY { get; set; } = 417;
 
         public bool WHMShowDiaBar = true;
         public bool WHMShowLillyBar = true;
@@ -283,17 +283,17 @@ namespace DelvUI {
 
         public int ASTDrawBarHeight { get; set; } = 20;
         public int ASTDrawBarWidth { get; set; } = 254;
-        public int ASTDrawBarX { get; set; } = -127;
+        public int ASTDrawBarX { get; set; } = 395;
         public int ASTDrawBarY { get; set; } = 400;
         public int ASTDivinationHeight { get; set; } = 20;
         public int ASTDivinationWidth { get; set; } = 254;
         public int ASTDivinationBarX { get; set; } = -127;
-        public int ASTDivinationBarY { get; set; } = 378;
+        public int ASTDivinationBarY { get; set; } = 373;
         public int ASTDivinationBarPad { get; set; } = 1;
         public int ASTDotBarHeight { get; set; } = 20;
         public int ASTDotBarWidth { get; set; } = 254;
         public int ASTDotBarX { get; set; } = 33;
-        public int ASTDotBarY { get; set; } = -38;
+        public int ASTDotBarY { get; set; } = -43;
         public int ASTStarBarHeight { get; set; } = 86;
         public int ASTStarBarWidth { get; set; } = 20;
         public int ASTStarBarX { get; set; } = 11;
@@ -332,7 +332,7 @@ namespace DelvUI {
         public int SmnBioBarWidth { get; set; } = 126;
         public int SmnBioBarHeight { get; set; } = 20;
         public int SmnBioBarXOffset { get; set; } = 128;
-        public int SmnBioBarYOffset { get; set; }
+        public int SmnBioBarYOffset { get; set; } 
         public bool SmnBioBarFlipped { get; set; } = true;
         public int SmnInterBarOffset { get; set; } = 2;
         public bool SmnRuinBarEnabled { get; set; } = true;
