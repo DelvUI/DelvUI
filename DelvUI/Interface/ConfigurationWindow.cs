@@ -59,14 +59,7 @@ namespace DelvUI.Interface
             _yOffsetLimit = _viewportHeight / 2;
             _changed = false;
             var pos = ImGui.GetCursorPos();
-            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth()-26, 0));
-            ImGui.PushFont(UiBuilder.IconFont);
-            if (ImGui.Button(FontAwesomeIcon.Times.ToIconString()))
-            {
-                IsVisible = false;
-            }
-            ImGui.PopFont();
-            ImGui.SetCursorPos(pos);
+
             
             ImGui.BeginGroup();
             {
@@ -110,7 +103,14 @@ namespace DelvUI.Interface
                             }
 
                             ImGui.EndTabBar();
-                                
+                            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth()-20, 0));
+                            ImGui.PushFont(UiBuilder.IconFont);
+                            if (ImGui.Button(FontAwesomeIcon.Times.ToIconString()))
+                            {
+                                IsVisible = false;
+                            }
+                            ImGui.PopFont();
+                            ImGui.SetCursorPos(pos);
                         }
                     }
                     ImGui.EndChild();

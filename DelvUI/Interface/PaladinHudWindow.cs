@@ -22,9 +22,9 @@ namespace DelvUI.Interface
         
         private int ManaBarPadding => PluginConfiguration.PLDManaPadding;
         
-        private new int ManaXOffset => PluginConfiguration.PLDManaXOffset;
+        private int ManaXOffset => PluginConfiguration.PLDManaXOffset;
         
-        private new int ManaYOffset => PluginConfiguration.PLDManaYOffset;
+        private int ManaYOffset => PluginConfiguration.PLDManaYOffset;
         
         private bool OathGaugeEnabled => PluginConfiguration.PLDOathGaugeEnabled;
         
