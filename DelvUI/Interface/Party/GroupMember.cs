@@ -11,6 +11,9 @@ using System.Text.RegularExpressions;
 using System.Linq;
 using DelvUI.Helpers;
 using ImGuiNET;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using Dalamud.Game.ClientState.Structs;
+using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 
 namespace DelvUI.Interface.Party
@@ -20,17 +23,31 @@ namespace DelvUI.Interface.Party
         private DalamudPluginInterface pluginInterface = null;
         protected PartyMember* partyMember = null;
 
-        public int ActorID => (int)partyMember->ObjectID;
+        public int ActorID => partyMember != null ? (int)partyMember->ObjectID : Actor.ActorId;
         protected string _name;
         public string Name => _name == null ? "???" : _name;
-        public uint Level => partyMember->Level;
-        public uint JobId => partyMember->ClassJob;
-        public uint HP => partyMember->CurrentHP;
-        public uint MaxHP => partyMember->MaxHP;
-        public uint MP => partyMember->CurrentMP;
-        public uint MaxMP => partyMember->MaxMP;
+        public uint Level => partyMember != null ? partyMember->Level : BattleCharacter->Character.Level;
+        public uint JobId => partyMember != null ? partyMember->ClassJob : BattleCharacter->Character.ClassJob;
+        public uint HP => partyMember != null ? partyMember->CurrentHP : BattleCharacter->Character.Health;
+        public uint MaxHP => partyMember != null ? partyMember->MaxHP : BattleCharacter->Character.MaxHealth;
+        public uint MP => partyMember != null ? partyMember->CurrentMP : BattleCharacter->Character.Mana;
+        public uint MaxMP => partyMember != null ? partyMember->MaxMP : BattleCharacter->Character.MaxMana;
         public float Shield => Utils.ActorShieldValue(GetActor());
-        
+        public StatusEffect[] StatusEffects
+        {
+            get
+            {
+                var actor = GetActor();
+                if (actor == null) return new StatusEffect[0];
+
+                return actor.StatusEffects;
+            }
+        }
+
+        private Actor Actor = null;
+        private BattleChara *BattleCharacter => (BattleChara *)GetActor().Address;
+
+
         public GroupMember(PartyMember *partyMember, DalamudPluginInterface pluginInterface)
         {
             this.pluginInterface = pluginInterface;
@@ -46,9 +63,16 @@ namespace DelvUI.Interface.Party
             } 
         }
 
+        public GroupMember(Actor actor, DalamudPluginInterface pluginInterface)
+        {
+            this.pluginInterface = pluginInterface;
+            Actor = actor;
+            _name = Actor.Name;
+        }
+
         public Actor GetActor()
         {
-            return pluginInterface.ClientState.Actors.FirstOrDefault(o => o.ActorId == ActorID);
+            return Actor ?? pluginInterface.ClientState.Actors.FirstOrDefault(o => o.ActorId == ActorID);
         }
     }
 
@@ -80,6 +104,9 @@ namespace DelvUI.Interface.Party
         private float _shield;
         public float Shield => _shield;
 
+        private StatusEffect _fakeEffect;
+        public StatusEffect[] StatusEffects => new StatusEffect[] { _fakeEffect };
+
         public FakeGroupMember()
         {
             _level = (uint)FakeGroupMember.RNG.Next(1, 80);
@@ -89,6 +116,11 @@ namespace DelvUI.Interface.Party
             _maxMP = 10000;
             _mp = (uint)(_maxMP * FakeGroupMember.RNG.Next(100) / 100f);
             _shield = FakeGroupMember.RNG.Next(100) / 100f;
+
+            _fakeEffect = new StatusEffect();
+            _fakeEffect.Duration = FakeGroupMember.RNG.Next(1, 30);
+            _fakeEffect.EffectId = (short)FakeGroupMember.RNG.Next(1, 200);
+            _fakeEffect.StackCount = (byte)FakeGroupMember.RNG.Next(0, 3);
         }
         public Actor GetActor()
         {
@@ -107,6 +139,7 @@ namespace DelvUI.Interface.Party
         public uint MP { get; }
         public uint MaxMP { get; }
         public float Shield { get; }
+        public StatusEffect[] StatusEffects { get; }
 
         public abstract Actor GetActor();
     }

@@ -7,7 +7,7 @@ using ImGuiNET;
 using System.Numerics;
 using DelvUI.Interface.Party;
 using DelvUI.Helpers;
-
+using Lumina.Excel.GeneratedSheets;
 
 namespace DelvUI.Interface.Party
 {
@@ -147,9 +147,29 @@ namespace DelvUI.Interface.Party
                     }                    
                 }
 
+                // buffs / debuffs
+                var statusEffects = member.StatusEffects;
+                var pos = cursorPos + barSize - origin + new Vector2(6, 1);
+
+                for (int s = 0; s < statusEffects.Length; s++)
+                {
+                    var id = statusEffects[s].EffectId;
+                    if (id == 0) continue;
+
+                    var texture = TexturesCache.Instance.GetTexture<Status>((uint)id);
+                    if (texture == null) continue;
+
+                    var size = new Vector2(texture.Width, texture.Height);
+                    ImGui.SetCursorPos(pos - size);
+                    ImGui.Image(texture.ImGuiHandle, size);
+
+                    pos.X = pos.X - size.X - 1;
+                }
+
                 // name
-                var name = member.Name.Abbreviate() ?? "";
                 var actor = member.GetActor();
+                var name = member.Name.Abbreviate() ?? "";
+                
                 if (actor != null)
                 {
                     name = TextTags.GenerateFormattedTextFromTags(actor, pluginConfiguration.PartyListHealthBarText);
