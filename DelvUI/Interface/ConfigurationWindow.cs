@@ -1876,6 +1876,48 @@ namespace DelvUI.Interface
                         _pluginConfiguration.PLDAtonementBarPadding = pldAtonementBarPadding;
                         _pluginConfiguration.Save();
                     }
+                    
+                    bool pldDoTBar = _pluginConfiguration.PLDDoTBarEnabled;
+                    if (ImGui.Checkbox("Goring Blade Bar Enabled", ref pldDoTBar))
+                    {
+                        _pluginConfiguration.PLDDoTBarEnabled = pldDoTBar;
+                        _pluginConfiguration.Save();
+                    }
+
+                    bool pldDoTBarText = _pluginConfiguration.PLDDoTBarText;
+                    if (ImGui.Checkbox("Goring Blade Bar Text", ref pldDoTBarText))
+                    {
+                        _pluginConfiguration.PLDDoTBarText = pldDoTBarText;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldDoTBarHeight = _pluginConfiguration.PLDDoTBarHeight;
+                    if (ImGui.DragInt("Goring Blade Bar Height", ref pldDoTBarHeight, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDDoTBarHeight = pldDoTBarHeight;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int pldDoTBarWidth = _pluginConfiguration.PLDDoTBarWidth;
+                    if (ImGui.DragInt("Goring Blade Bar Width", ref pldDoTBarWidth, 0.1f, 1, 1000))
+                    {
+                        _pluginConfiguration.PLDDoTBarWidth = pldDoTBarWidth;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int dotBarXoffset = _pluginConfiguration.PLDDoTBarXOffset;
+                    if (ImGui.DragInt("Goring Blade Bar X Offset", ref dotBarXoffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDDoTBarXOffset = dotBarXoffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    int dotBarYoffset = _pluginConfiguration.PLDDoTBarYOffset;
+                    if (ImGui.DragInt("Goring Blade Bar Y Offset", ref dotBarYoffset, 0.1f, -2000, 2000))
+                    {
+                        _pluginConfiguration.PLDDoTBarYOffset = dotBarYoffset;
+                        _pluginConfiguration.Save();
+                    }
 
                     _changed |= ImGui.ColorEdit4("Mana Bar Color", ref _pluginConfiguration.PLDManaColor);
                     _changed |= ImGui.ColorEdit4("Oath Gauge Color", ref _pluginConfiguration.PLDOathGaugeColor);
@@ -1883,6 +1925,7 @@ namespace DelvUI.Interface
                         ref _pluginConfiguration.PLDFightOrFlightColor);
                     _changed |= ImGui.ColorEdit4("Requiescat Color", ref _pluginConfiguration.PLDRequiescatColor);
                     _changed |= ImGui.ColorEdit4("Atonement Color", ref _pluginConfiguration.PLDAtonementColor);
+                    _changed |= ImGui.ColorEdit4("Goring Blade Color", ref _pluginConfiguration.PLDDoTColor);
                     _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.PLDEmptyColor);
 
                     ImGui.EndTabItem();
