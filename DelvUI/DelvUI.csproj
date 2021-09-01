@@ -83,10 +83,8 @@
 
     <!-- NuGet Packages -->
     <ItemGroup>
-        <PackageReference Include="CheapLoc" Version="1.1.6" />
         <PackageReference Include="DalamudPackager" Version="2.1.2" />
         <PackageReference Include="ILRepack" Version="2.1.0-beta1" GeneratePathProperty="true" />
-        <PackageReference Include="XivCommon" Version="2.3.0" />
     </ItemGroup>
 
     <!-- ILRepack Task -->
@@ -96,7 +94,6 @@
             <InputAssemblies Include="&quot;$(TargetDir)FFXIVClientStructs.dll&quot;" Exclude="$(TargetPath)" />
             <InputAssemblies Include="&quot;$(TargetDir)FFXIVClientStructs.Common.dll&quot;" Exclude="$(TargetPath)" />
             <InputAssemblies Include="&quot;$(TargetDir)Serilog.dll&quot;" Exclude="$(TargetPath)" />
-            <InputAssemblies Include="&quot;$(TargetDir)XivCommon.dll&quot;" Exclude="$(TargetPath)" />
         </ItemGroup>
         <Exec Command="$(PkgILRepack)\tools\ILRepack.exe /lib:$(DalamudLocal) /lib:$(DalamudXIVLauncher) /out:&quot;$(TargetDir)..\$(Configuration).ILMerge\$(TargetFileName)&quot; @(InputAssemblies, ' ')" />
     </Target>
