@@ -779,6 +779,7 @@ namespace DelvUI {
         public int DNCStepYOffset { get; set; } = 365;
         public int DNCStepPadding { get; set; } = 2;
         public bool DNCProcEnabled { get; set; } = true;
+        public bool DNCProcTimersEnabled { get; set; } = false;
         public int DNCProcHeight { get; set; } = 13;
         public int DNCProcWidth { get; set; } = 62;
         public int DNCProcPadding { get; set; } = 2;
@@ -799,8 +800,9 @@ namespace DelvUI {
         public Vector4 DNCDanceReadyColor = new Vector4(255f/255f, 215f/255f, 0f/255f, 100f/100f);
         public Vector4 DNCDevilmentColor = new Vector4(52f/255f, 78f/255f, 29f/255f, 100f/100f);
         public Vector4 DNCFlourishingCascadeColor = new Vector4(0f/255f, 255f/255f, 0f/255f, 100f/100f);
-
         public Vector4 DNCFlourishingFountainColor = new Vector4(255f/255f, 215f/255f, 0f/255f, 100f/100f);
+        public Vector4 DNCFlourishingWindmillColor = new Vector4(0f/255f, 215f/255f, 215f/255f, 100f/100f);
+        public Vector4 DNCFlourishingShowerColor = new Vector4(255f/255f, 100f/255f, 0f/255f, 100f/100f);
 
         #endregion
 
@@ -1744,6 +1746,20 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(DNCFlourishingFountainColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DNCFlourishingFountainColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DNCFlourishingFountainColor.AdjustColor(.1f))
+                },
+                [Jobs.DNC * 1000 + 15] = new Dictionary<string, uint> // Devilment
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(DNCFlourishingWindmillColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(DNCFlourishingWindmillColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DNCFlourishingWindmillColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DNCFlourishingWindmillColor.AdjustColor(.1f))
+                },
+                [Jobs.DNC * 1000 + 16] = new Dictionary<string, uint> // Devilment
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(DNCFlourishingShowerColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(DNCFlourishingShowerColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DNCFlourishingShowerColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DNCFlourishingShowerColor.AdjustColor(.1f))
                 },
 
                 [Jobs.BLM] = new Dictionary<string, uint>

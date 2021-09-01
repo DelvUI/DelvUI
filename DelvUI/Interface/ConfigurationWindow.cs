@@ -3822,6 +3822,13 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
 
+                    var procTimersEnabled = _pluginConfiguration.DNCProcTimersEnabled;
+                    if (ImGui.Checkbox("Proc Timers Enabled", ref procTimersEnabled))
+                    {
+                        _pluginConfiguration.DNCProcTimersEnabled = procTimersEnabled;
+                        _pluginConfiguration.Save();
+                    }
+
                     var procHeight = _pluginConfiguration.DNCProcHeight;
                     if (ImGui.DragInt("Proc Bar Height", ref procHeight, .1f, 1, 1000))
                     {
@@ -3874,6 +3881,8 @@ namespace DelvUI.Interface
                     _changed |= ImGui.ColorEdit4("Pirouette Color", ref _pluginConfiguration.DNCStepPirouetteColor);
                     _changed |= ImGui.ColorEdit4("Flourishing Cascade Color", ref _pluginConfiguration.DNCFlourishingCascadeColor);
                     _changed |= ImGui.ColorEdit4("Flourishing Fountain Color", ref _pluginConfiguration.DNCFlourishingFountainColor);
+                    _changed |= ImGui.ColorEdit4("Flourishing Windmill Color", ref _pluginConfiguration.DNCFlourishingWindmillColor);
+                    _changed |= ImGui.ColorEdit4("Flourishing Shower Color", ref _pluginConfiguration.DNCFlourishingShowerColor);
                     _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.DNCEmptyColor);
 
                     ImGui.EndTabItem();
