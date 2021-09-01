@@ -45,29 +45,29 @@ namespace DelvUI.Helpers
             [typeof(Companion)] = new Dictionary<uint, TextureWrap>()
         };
 
-        public TextureWrap GetTexture<T>(uint rowId) where T : ExcelRow
+        public TextureWrap GetTexture<T>(uint rowId, uint stackCount = 0) where T : ExcelRow
         {
             var sheet = pluginInterface.Data.GetExcelSheet<T>();
             if (sheet == null) return null;
 
-            return GetTexture<T>(sheet.GetRow(rowId));
+            return GetTexture<T>(sheet.GetRow(rowId), stackCount);
         }
 
-        public TextureWrap GetTexture<T>(dynamic row) where T : ExcelRow
+        public TextureWrap GetTexture<T>(dynamic row, uint stackCount = 0) where T : ExcelRow
         {
             if (row == null) return null;
 
             var iconId = row?.Icon;
             if (iconId == null) return null;
 
-            return GetTextureFromIconId<T>(iconId);
+            return GetTextureFromIconId<T>(iconId, stackCount);
         }
 
-        public TextureWrap GetTextureFromIconId<T>(uint iconId) where T : ExcelRow
+        public TextureWrap GetTextureFromIconId<T>(uint iconId, uint stackCount = 0) where T : ExcelRow
         {
             if (Cache.TryGetValue(typeof(T), out var map))
             {
-                if (map.TryGetValue(iconId, out TextureWrap texture))
+                if (map.TryGetValue(iconId + stackCount, out TextureWrap texture))
                 {
                     return texture;
                 }
@@ -75,11 +75,11 @@ namespace DelvUI.Helpers
 
             if (map == null) return null;
 
-            TexFile iconFile = pluginInterface.Data.GetIcon((int)iconId);
+            TexFile iconFile = pluginInterface.Data.GetIcon((int)iconId + (int)stackCount);
             if (iconFile == null) return null;
 
             var newTexture = pluginInterface.UiBuilder.LoadImageRaw(iconFile.GetRgbaImageData(), iconFile.Header.Width, iconFile.Header.Height, 4);
-            map.Add(iconId, newTexture);
+            map.Add(iconId + stackCount, newTexture);
 
             return newTexture;
         }

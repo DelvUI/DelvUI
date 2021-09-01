@@ -153,10 +153,10 @@ namespace DelvUI.Interface.Party
 
                 for (int s = 0; s < statusEffects.Length; s++)
                 {
-                    var id = statusEffects[s].EffectId;
+                    var id = (uint)statusEffects[s].EffectId;
                     if (id == 0) continue;
 
-                    var texture = TexturesCache.Instance.GetTexture<Status>((uint)id);
+                    var texture = TexturesCache.Instance.GetTexture<Status>(id, (uint)Math.Max(0, statusEffects[s].StackCount - 1));
                     if (texture == null) continue;
 
                     var size = new Vector2(texture.Width, texture.Height);
