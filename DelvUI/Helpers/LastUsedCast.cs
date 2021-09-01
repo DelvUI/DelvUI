@@ -8,6 +8,7 @@ using Action = Lumina.Excel.GeneratedSheets.Action;
 using Companion = Lumina.Excel.GeneratedSheets.Companion;
 using DelvUI.Enums;
 using ImGuiScene;
+using Dalamud.Game.ClientState.Actors;
 
 namespace DelvUI.Helpers
 {
@@ -46,9 +47,26 @@ namespace DelvUI.Helpers
 
         private void SetCastProperties()
         {
+            var target = _pluginInterface.ClientState.Targets.SoftTarget ?? _pluginInterface.ClientState.Targets.CurrentTarget;
+            var targetKind = target?.ObjectKind;
+
+            switch (targetKind)
+            {
+                case null: break;
+                case ObjectKind.Aetheryte:
+                    ActionText = "Attuning...";
+                    _icon = _pluginInterface.Data.GetIcon(112);
+                    return;
+                case ObjectKind.EventObj:
+                case ObjectKind.EventNpc:
+                    ActionText = "Interacting...";
+                    _icon = _pluginInterface.Data.GetIcon(0);
+                    return;
+            }
+
             _lastUsedAction = null;
             Interruptable = _castInfo.Interruptible > 0;
-            if (CastId == 1)
+            if (CastId == 1 && ActionType != ActionType.Mount)
             {
                 ActionText = "Interacting...";
                 _icon = _pluginInterface.Data.GetIcon(0);
