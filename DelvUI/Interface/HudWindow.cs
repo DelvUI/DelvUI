@@ -15,6 +15,7 @@ using DelvUI.Enums;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
@@ -23,6 +24,7 @@ namespace DelvUI.Interface {
         public bool IsVisible = true;
         protected readonly DalamudPluginInterface PluginInterface;
         protected readonly PluginConfiguration PluginConfiguration;
+        protected readonly Plugin _plugin;
 
         public abstract uint JobId { get; }
 
@@ -212,29 +214,55 @@ namespace DelvUI.Interface {
             ImGui.SetCursorPos(cursorPos);
 
             var drawList = ImGui.GetWindowDrawList();
-            if (target is not Chara actor) {
-                var friendly = PluginConfiguration.NPCColorMap["friendly"];
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, friendly["background"]);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(TargetBarWidth, TargetBarHeight),
-                    friendly["gradientLeft"], friendly["gradientRight"],
-                    friendly["gradientRight"], friendly["gradientLeft"]
-                );
-                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-            }
-            else {
-                var scale = actor.MaxHp > 0f ? (float) actor.CurrentHp / actor.MaxHp : 0f;
-                var colors = DetermineTargetPlateColors(actor);
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(TargetBarWidth * scale, TargetBarHeight),
-                    colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
-                );
-                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-
-                DrawTargetShield(target, cursorPos, BarSize, true);
-            }
+            ImGuiWindowFlags windowFlags = 0;
+            windowFlags |= ImGuiWindowFlags.NoBackground;
+            windowFlags |= ImGuiWindowFlags.NoTitleBar;
+            windowFlags |= ImGuiWindowFlags.NoMove;
+            windowFlags |= ImGuiWindowFlags.NoDecoration;
             
+            ImGui.SetNextWindowSize(BarSize);
+            ImGui.SetNextWindowPos(cursorPos);
+            
+            ImGui.Begin("t_bar", windowFlags);
+            if (ImGui.BeginChild("t_bar", BarSize))
+            {
+                if (target is not Chara actor)
+                {
+                    var friendly = PluginConfiguration.NPCColorMap["friendly"];
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, friendly["background"]);
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(TargetBarWidth, TargetBarHeight),
+                        friendly["gradientLeft"], friendly["gradientRight"],
+                        friendly["gradientRight"], friendly["gradientLeft"]
+                    );
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                }
+                else
+                {
+                    var scale = actor.MaxHp > 0f ? (float) actor.CurrentHp / actor.MaxHp : 0f;
+                    var colors = DetermineTargetPlateColors(actor);
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(TargetBarWidth * scale, TargetBarHeight),
+                        colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+                    );
+                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+
+                    DrawTargetShield(target, cursorPos, BarSize, true);
+                }
+                if (ImGui.GetIO().MouseClicked[1] && ImGui.IsMouseHoveringRect(cursorPos, cursorPos + BarSize))
+                {
+                    unsafe
+                    {
+                        //PluginLog.Information();
+                        var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
+                        openContextMenuFromTarget(agentHud, target.Address);
+                    }
+                }
+            }
+            ImGui.EndChild();
+            ImGui.End();
+
             var textLeft = Helpers.TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextLeft);
             DrawOutlinedText(textLeft,
                 new Vector2(cursorPos.X + 5 + TargetBarTextLeftXOffset,
@@ -262,27 +290,59 @@ namespace DelvUI.Interface {
             ImGui.SetCursorPos(cursorPos);
 
             var drawList = ImGui.GetWindowDrawList();
-            if (focus is not Chara actor) {
-                var friendly = PluginConfiguration.NPCColorMap["friendly"];
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, friendly["background"]);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(FocusBarWidth, FocusBarHeight),
-                    friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"], friendly["gradientLeft"]
-                );
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-                DrawTargetShield(focus, cursorPos, barSize, true);
-            }
-            else {
-                var colors = DetermineTargetPlateColors(actor);
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["background"]);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2((float) FocusBarWidth * actor.CurrentHp / actor.MaxHp, FocusBarHeight),
-                    colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
-                );
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            
+            ImGuiWindowFlags windowFlags = 0;
+            windowFlags |= ImGuiWindowFlags.NoBackground;
+            windowFlags |= ImGuiWindowFlags.NoTitleBar;
+            windowFlags |= ImGuiWindowFlags.NoMove;
+            windowFlags |= ImGuiWindowFlags.NoDecoration;
+            
+            ImGui.SetNextWindowPos(cursorPos);
+            ImGui.SetNextWindowSize(barSize);
+            
+            ImGui.Begin("focus_bar", windowFlags);
+            if (ImGui.BeginChild("focus_bar", BarSize))
+            {
+                if (focus is not Chara actor)
+                {
+                    var friendly = PluginConfiguration.NPCColorMap["friendly"];
+                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, friendly["background"]);
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos, cursorPos + new Vector2(FocusBarWidth, FocusBarHeight),
+                        friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"],
+                        friendly["gradientLeft"]
+                    );
+                    drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+                    DrawTargetShield(focus, cursorPos, barSize, true);
+                }
+                else
+                {
+                    var colors = DetermineTargetPlateColors(actor);
+                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["background"]);
+                    drawList.AddRectFilledMultiColor(
+                        cursorPos,
+                        cursorPos + new Vector2((float) FocusBarWidth * actor.CurrentHp / actor.MaxHp, FocusBarHeight),
+                        colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
+                    );
+                    drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-                DrawTargetShield(focus, cursorPos, barSize, true);
+                    DrawTargetShield(focus, cursorPos, barSize, true);
+                }
+
+                if (ImGui.GetIO().MouseClicked[1] && ImGui.IsMouseHoveringRect(cursorPos, cursorPos + BarSize))
+                {
+                    unsafe
+                    {
+                        //PluginLog.Information();
+                        var agentHud =
+                            new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
+                        openContextMenuFromTarget(agentHud, focus.Address);
+                    }
+                }
             }
+
+            ImGui.EndChild();
+            ImGui.End();
 
             var text = Helpers.TextTags.GenerateFormattedTextFromTags(focus, PluginConfiguration.FocusBarText);
             var textSize = ImGui.CalcTextSize(text);
@@ -340,8 +400,19 @@ namespace DelvUI.Interface {
                 );
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-                if (ImGui.GetIO().MouseClicked[0] && ImGui.IsMouseHoveringRect(cursorPos, cursorPos + barSize)) {
-                    PluginInterface.ClientState.Targets.SetCurrentTarget(target);
+                if (ImGui.IsMouseHoveringRect(cursorPos, cursorPos + barSize))
+                {
+                    if (ImGui.GetIO().MouseClicked[0]) {
+                        PluginInterface.ClientState.Targets.SetCurrentTarget(target);
+                    }
+                    if (ImGui.GetIO().MouseClicked[1]) {
+                        unsafe
+                        {
+                            //PluginLog.Information();
+                            var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
+                            openContextMenuFromTarget(agentHud, target.Address);
+                        }
+                    }
                 }
             }
             ImGui.EndChild();
