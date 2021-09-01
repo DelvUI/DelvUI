@@ -41,9 +41,19 @@ namespace DelvUI.Interface
 
         }
 
-		public void ToggleHud()
+        public void ToggleHud()
         {
             _pluginConfiguration.HideHud = ! _pluginConfiguration.HideHud;
+            _changed = true;
+        }
+        public void ShowHud()
+        {
+            _pluginConfiguration.HideHud = false;
+            _changed = true;
+        }
+        public void HideHud()
+        {
+            _pluginConfiguration.HideHud = true;
             _changed = true;
         }
 
