@@ -201,6 +201,16 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
+        public BarBuilder SetGlowChunks(bool[] chunks)
+        {
+            if (currentInnerBar == -1)
+                throw new InvalidOperationException("Operation requires defined inner bar");
+            if (chunks.Length != _bar.ChunkSizes.Length)
+                throw new ArgumentException($"Amount of glow chunks (${chunks.Length}) must match amount of chunks in bar (${_bar.ChunkSizes.Length})");
+            _bar.InnerBars[currentInnerBar].GlowChunks = chunks;
+            return this;
+        }
+
         public BarBuilder SetChunksColors(Dictionary<string, uint> color)
         {
             var colors = new Dictionary<string, uint>[_bar.ChunkSizes.Length];
