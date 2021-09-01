@@ -149,17 +149,17 @@ namespace DelvUI {
 
         
         #region BRD Configuration
-        
+
         public int BRDBaseXOffset { get; set; } = 127;
-        public int BRDBaseYOffset { get; set; } = 405;
+        public int BRDBaseYOffset { get; set; } = 415;
         public int BRDSongGaugeWidth { get; set; } = 254;
         public int BRDSongGaugeHeight { get; set; } = 20;
         public int BRDSongGaugeXOffset { get; set; }
-        public int BRDSongGaugeYOffset { get; set; }
+        public int BRDSongGaugeYOffset { get; set; } = 12;
         public int BRDSoulGaugeWidth { get; set; } = 254;
         public int BRDSoulGaugeHeight { get; set; } = 10;
         public int BRDSoulGaugeXOffset { get; set; }
-        public int BRDSoulGaugeYOffset { get; set; }
+        public int BRDSoulGaugeYOffset { get; set; } = 34;
         public int BRDStackWidth { get; set; } = 254;
         public int BRDStackHeight { get; set; } = 10;
         public int BRDStackXOffset { get; set; }
@@ -168,13 +168,12 @@ namespace DelvUI {
         public int BRDCBWidth { get; set; } = 126;
         public int BRDCBHeight { get; set; } = 10;
         public int BRDCBXOffset { get; set; }
-        public int BRDCBYOffset { get; set; }
+        public int BRDCBYOffset { get; set; } = -12;
         public int BRDSBWidth { get; set; } = 126;
         public int BRDSBHeight { get; set; } = 10;
         public int BRDSBXOffset { get; set; } = 128;
-        public int BRDSBYOffset { get; set; }
-        public int BRDInterBarOffset { get; set; } = 2;
-        
+        public int BRDSBYOffset { get; set; } = -12;
+
         public bool BRDShowSB = true;
         public bool BRDShowCB = true;
         public bool BRDSBInverted = false;
@@ -184,7 +183,7 @@ namespace DelvUI {
         public bool BRDShowWMStacks = true;
         public bool BRDShowMBProc = true;
         public bool BRDShowAPStacks = true;
-        
+
         public Vector4 BRDEmptyColor = new Vector4(0f/255f, 0f/255f, 0f/255f, 53f/100f);
         public Vector4 BRDExpireColor = new Vector4(199f/255f, 46f/255f, 46f/255f, 100f/100f);
         public Vector4 BRDCBColor = new Vector4(182f/255f, 68f/255f, 235f/255f, 100f/100f);
