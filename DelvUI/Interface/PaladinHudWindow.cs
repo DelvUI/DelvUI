@@ -16,7 +16,11 @@ namespace DelvUI.Interface
         public override uint JobId => 19;
 
         private bool ManaEnabled => PluginConfiguration.PLDManaEnabled;
-        
+
+        private bool ManaChunked => PluginConfiguration.PLDManaChunked;
+
+        private bool ManaBarText => PluginConfiguration.PLDManaBarText;
+
         private int ManaBarHeight => PluginConfiguration.PLDManaHeight;
         
         private int ManaBarWidth => PluginConfiguration.PLDManaWidth;
@@ -119,10 +123,24 @@ namespace DelvUI.Interface
             var posX = CenterX - ManaXOffset;
             var posY = CenterY + ManaYOffset;
 
-            var builder = BarBuilder.Create(posX, posY, ManaBarHeight, ManaBarWidth)
-                .SetChunks(5)
-                .SetChunkPadding(ManaBarPadding)
-                .AddInnerBar(actor.CurrentMp, actor.MaxMp, ManaColor, EmptyColor);
+            var builder = BarBuilder.Create(posX, posY, ManaBarHeight, ManaBarWidth);
+
+            if(ManaChunked)
+            {
+                builder.SetChunks(5)
+                       .SetChunkPadding(ManaBarPadding)
+                       .AddInnerBar(actor.CurrentMp, actor.MaxMp, ManaColor, EmptyColor);
+            } else
+            {
+                builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, ManaColor);
+            }
+
+            if (ManaBarText)
+            {
+                var formattedManaText = Helpers.TextTags.GenerateFormattedTextFromTags(actor, "[mana:current-short]");
+                builder.SetTextMode(BarTextMode.Single)
+                       .SetText(BarTextPosition.CenterLeft, BarTextType.Custom, formattedManaText);
+            }
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
