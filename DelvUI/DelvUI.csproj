@@ -103,12 +103,7 @@
         <ItemGroup>
             <_CopyMedia Include="$(OutputPath)\Media\**\*.*" />
         </ItemGroup>
-        <Copy SourceFiles="@(_CopyMedia)"
-              DestinationFolder="$(TargetDir)..\$(Configuration).ILMerge\Media\%(RecursiveDir)"
-              SkipUnchangedFiles="true"
-              OverwriteReadOnlyFiles="true"
-              Retries="3"
-              RetryDelayMilliseconds="500"/> 
+        <Copy SourceFiles="@(_CopyMedia)" DestinationFolder="$(TargetDir)..\$(Configuration).ILMerge\Media\%(RecursiveDir)" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" Retries="3" RetryDelayMilliseconds="500" /> 
     </Target>
 
             <!-- Dalamud Packager Task-->
