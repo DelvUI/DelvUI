@@ -7,6 +7,7 @@ using ImGuiNET;
 using ImGuiScene;
 using Newtonsoft.Json;
 using DelvUI.Helpers;
+using DelvUI.Interface.Party;
 
 namespace DelvUI {
     public class PluginConfiguration : IPluginConfiguration {
@@ -170,19 +171,21 @@ namespace DelvUI {
         public int PartyListHealthBarHeight { get; set; } = 50;
         public int PartyListHorizontalPadding { get; set; } = 2;
         public int PartyListVerticalPadding { get; set; } = 2;
+        public Vector4 PartyListHealthBarBackgroundColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 70f / 100f);
 
         public bool PartyListShieldEnabled = true;
         public int PartyListShieldHeight { get; set; } = 10;
         public bool PartyListShieldHeightPixels = true;
         public bool PartyListShieldFillHealthFirst = true;
+        public Vector4 PartyListShieldColor = new Vector4(240f / 255f, 255f / 255f, 0f / 205f, 60f / 100f);
 
         public bool PartyListUseRoleColors = true;
-
-        public Vector4 PartyListShieldColor = new Vector4(240f / 255f, 255f / 255f, 0f / 205f, 60f / 100f);
         public Vector4 PartyListTankRoleColor = new Vector4(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f);
         public Vector4 PartyListDPSRoleColor = new Vector4(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f);
         public Vector4 PartyListHealerRoleColor = new Vector4(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f);
         public Vector4 PartyListGenericRoleColor = new Vector4(214f / 255f, 145f / 255f, 64f / 255f, 100f / 100f);
+
+        public PartySortingMode PartyListSortingMode = PartySortingMode.Tank_Healer_DPS;
         #endregion
 
 
@@ -2074,6 +2077,11 @@ namespace DelvUI {
 
             PartyListColorMap = new Dictionary<string, Dictionary<string, uint>>
             {
+                ["background"] = new Dictionary<string, uint>
+                {
+                    ["default"] = ImGui.ColorConvertFloat4ToU32(PartyListHealthBarBackgroundColor),
+                    ["outOfRange"] = ImGui.ColorConvertFloat4ToU32(PartyListHealthBarBackgroundColor.AdjustColorAlpha(-.5f)),
+                },
                 ["shield"] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListShieldColor),

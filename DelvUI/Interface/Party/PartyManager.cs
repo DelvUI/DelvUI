@@ -26,6 +26,7 @@ namespace DelvUI.Interface.Party
             this.pluginConfiguration.ConfigChangedEvent += OnConfigChanged;
 
             UpdateTesting(pluginConfiguration.PartyListTestingEnabled);
+            SortingMode = pluginConfiguration.PartyListSortingMode;
         }
 
         ~PartyManager()
@@ -55,6 +56,7 @@ namespace DelvUI.Interface.Party
         public event EventHandler<EventArgs> MembersChangedEvent;
 
         private bool Testing;
+        private PartySortingMode SortingMode;
 
         public bool isInParty
         {
@@ -86,6 +88,8 @@ namespace DelvUI.Interface.Party
                     PartyMember* partyMember = (PartyMember*)(new IntPtr(manager->PartyMembers) + 0x230 * i);
                     _groupMembers.Add(new GroupMember(partyMember, pluginInterface));
                 }
+
+                PartySortingHelper.SortPartyMembers(ref _groupMembers, SortingMode);
             }
             catch
             {
@@ -101,6 +105,7 @@ namespace DelvUI.Interface.Party
         private void OnConfigChanged(object sender, EventArgs args)
         {
             UpdateTesting(pluginConfiguration.PartyListTestingEnabled);
+            UpdateSortingMode(pluginConfiguration.PartyListSortingMode);
         }
 
         private void UpdateTesting(bool testing)
@@ -116,7 +121,21 @@ namespace DelvUI.Interface.Party
                 {
                     _groupMembers.Add(new FakeGroupMember());
                 }
+
+                PartySortingHelper.SortPartyMembers(ref _groupMembers, SortingMode);
             }
+
+            if (MembersChangedEvent != null)
+            {
+                MembersChangedEvent(this, null);
+            }
+        }
+        private void UpdateSortingMode(PartySortingMode mode)
+        {
+            if (SortingMode == mode) return;
+            SortingMode = mode;
+
+            PartySortingHelper.SortPartyMembers(ref _groupMembers, SortingMode);
 
             if (MembersChangedEvent != null)
             {

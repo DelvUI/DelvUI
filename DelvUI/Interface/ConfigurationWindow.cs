@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Interface;
 using ImGuiNET;
+using DelvUI.Interface.Party;
 
 namespace DelvUI.Interface
 {
@@ -38,7 +39,12 @@ namespace DelvUI.Interface
                 , "Enemy"
                 });
             _configMap.Add("Jobs", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"});
-            _configMap.Add("Party List", new[] { "General" });
+            _configMap.Add("Party List", new[] { 
+                "General",
+                "Health Bars Style",
+                "Sorting",
+                "Buffs / Debuffs"
+            });
         }   
 
 
@@ -250,6 +256,15 @@ namespace DelvUI.Interface
                     {
                         case "General":
                             DrawPartyListGeneralConfig();
+                            break;
+                        case "Health Bars Style":
+                            DrawPartyListHealthBarsStyleConfig();
+                            break;
+                        case "Sorting":
+                            DrawPartyListSortingConfig();
+                            break;
+                        case "Buffs / Debuffs":
+                            DrawPartyListBuffsDebuffsConfig();
                             break;
                     }
                     break;
@@ -4401,7 +4416,10 @@ namespace DelvUI.Interface
             _changed |= ImGui.Checkbox("Preview", ref _pluginConfiguration.PartyListTestingEnabled);
             _changed |= ImGui.Checkbox("Lock", ref _pluginConfiguration.PartyListLocked);
             _changed |= ImGui.Checkbox("Fill Rows First", ref _pluginConfiguration.PartyListFillRowsFirst);
+        }
 
+        private void DrawPartyListHealthBarsStyleConfig()
+        {
             ImGui.Text("Health Bars Text Format");
             var PartyListHealthBarText = _pluginConfiguration.PartyListHealthBarText;
             if (ImGui.InputText("##PartyListHealthBarText", ref PartyListHealthBarText, 999))
@@ -4438,8 +4456,10 @@ namespace DelvUI.Interface
                 _pluginConfiguration.Save();
             }
 
-            _changed |= ImGui.Checkbox("Shields Enabled", ref _pluginConfiguration.PartyListShieldEnabled);
+            _changed |= ImGui.ColorEdit4("Health Bars Background Color", ref _pluginConfiguration.PartyListHealthBarBackgroundColor);
             
+            _changed |= ImGui.Checkbox("Shields Enabled", ref _pluginConfiguration.PartyListShieldEnabled);
+
             var PartyListShieldHeight = _pluginConfiguration.PartyListShieldHeight;
             if (ImGui.DragInt("Shield Size", ref PartyListShieldHeight, .1f, -1, 1000))
             {
@@ -4449,11 +4469,27 @@ namespace DelvUI.Interface
             _changed |= ImGui.Checkbox("Size in pixels", ref _pluginConfiguration.PartyListShieldHeightPixels);
             _changed |= ImGui.Checkbox("Fill Health First", ref _pluginConfiguration.PartyListShieldFillHealthFirst);
             _changed |= ImGui.ColorEdit4("Shield Color", ref _pluginConfiguration.PartyListShieldColor);
+        }
+
+        private void DrawPartyListSortingConfig()
+        {
+            int selection = (int)_pluginConfiguration.PartyListSortingMode;
+            var names = PartySortingHelper.SortingModesNames;
+            if (ImGui.Combo("Sorting priority", ref selection, PartySortingHelper.SortingModesNames, names.Length)) 
+            {
+                _pluginConfiguration.PartyListSortingMode = (PartySortingMode)selection;
+                _pluginConfiguration.Save();
+            }
 
             _changed |= ImGui.Checkbox("Use Role Colors", ref _pluginConfiguration.PartyListUseRoleColors);
             _changed |= ImGui.ColorEdit4("Tank Color", ref _pluginConfiguration.PartyListTankRoleColor);
             _changed |= ImGui.ColorEdit4("DPS Color", ref _pluginConfiguration.PartyListDPSRoleColor);
             _changed |= ImGui.ColorEdit4("Healer Color", ref _pluginConfiguration.PartyListHealerRoleColor);
+        }
+
+        private void DrawPartyListBuffsDebuffsConfig()
+        {
+
         }
     }
 }

@@ -6,55 +6,94 @@ using System.Threading.Tasks;
 
 namespace DelvUI.Helpers
 {
+    public enum JobRoles
+    {
+        Tank = 0,
+        DPS = 1,
+        Healer = 2,
+        Crafter = 3,
+        Gatherer = 4,
+        Unknown
+    }
+
     public static class JobsHelper
     {
-        public static List<uint> tankJobIds = new List<uint>() { 
-            Jobs.GLD, Jobs.MRD, Jobs.PLD, Jobs.WAR, Jobs.DRK, Jobs.GNB 
-        };
-
-        public static List<uint> healerJobIds = new List<uint>() {
-            Jobs.CNJ, Jobs.WHM, Jobs.SCH, Jobs.AST 
-        };
-
-        public static List<uint> dpsJobIds = new List<uint>() {
-            Jobs.PGL, Jobs.LNC, Jobs.ROG, Jobs.MNK, Jobs.DRG, Jobs.NIN, Jobs.SAM,
-            Jobs.ARC, Jobs.BRD, Jobs.MCH, Jobs.DNC,
-            Jobs.THM, Jobs.ACN, Jobs.BLM, Jobs.SMN, Jobs.RDM, Jobs.BLU,
-        };
-
-        public static List<uint> gathererJobIds = new List<uint>() { 
-            Jobs.MIN, Jobs.BOT, Jobs.FSH
-        };
-
-        public static List<uint> crafterJobIds = new List<uint>() { 
-            Jobs.CRP, Jobs.BSM, Jobs.ARM, Jobs.GSM, 
-            Jobs.LTW, Jobs.WVR, Jobs.ALC, Jobs.CUL
-        };
-
-        public static bool isJobTank(uint jobId)
+        public static JobRoles RoleForJob(uint jobId)
         {
-            return tankJobIds.Contains(jobId);
+            if (JobRolesMap.TryGetValue(jobId, out var role))
+            {
+                return role;
+            }
+
+            return JobRoles.Unknown;
+        }
+
+        public static bool IsJobARole(uint jobId, JobRoles role)
+        {
+            if (JobRolesMap.TryGetValue(jobId, out var r))
+            {
+                return r == role;
+            }
+
+            return false;
+        }
+
+        public static bool IsJobTank(uint jobId)
+        {
+            return IsJobARole(jobId, JobRoles.Tank);
         }
         
-        public static bool isJobHealer(uint jobId)
+        public static bool IsJobHealer(uint jobId)
         {
-            return healerJobIds.Contains(jobId);
+            return IsJobARole(jobId, JobRoles.Healer);
         }
 
-        public static bool isJobDPS(uint jobId)
+        public static bool IsJobDPS(uint jobId)
         {
-            return dpsJobIds.Contains(jobId);
+            return IsJobARole(jobId, JobRoles.DPS);
         }
 
-        public static bool isJobCrafter(uint jobId)
+        public static bool IsJobCrafter(uint jobId)
         {
-            return crafterJobIds.Contains(jobId);
+            return IsJobARole(jobId, JobRoles.Crafter);
         }
 
-        public static bool isJobGatherer(uint jobId)
+        public static bool IsJobGatherer(uint jobId)
         {
-            return gathererJobIds.Contains(jobId);
+            return IsJobARole(jobId, JobRoles.Gatherer);
         }
+
+        public static Dictionary<uint, JobRoles> JobRolesMap = new Dictionary<uint, JobRoles>()
+        {
+            // tanks
+            [Jobs.GLD] = JobRoles.Tank, [Jobs.MRD] = JobRoles.Tank, [Jobs.PLD] = JobRoles.Tank, 
+            [Jobs.WAR] = JobRoles.Tank, [Jobs.DRK] = JobRoles.Tank, [Jobs.GNB] = JobRoles.Tank,
+
+            // melee dps
+            [Jobs.PGL] = JobRoles.DPS, [Jobs.LNC] = JobRoles.DPS, [Jobs.ROG] = JobRoles.DPS, [Jobs.MNK] = JobRoles.DPS,
+            [Jobs.DRG] = JobRoles.DPS, [Jobs.NIN] = JobRoles.DPS, [Jobs.SAM] = JobRoles.DPS,
+
+            // ranged phys dps
+            [Jobs.ARC] = JobRoles.DPS, [Jobs.BRD] = JobRoles.DPS,
+            [Jobs.MCH] = JobRoles.DPS, [Jobs.DNC] = JobRoles.DPS,
+
+            // ranged magic dps
+            [Jobs.THM] = JobRoles.DPS, [Jobs.ACN] = JobRoles.DPS, [Jobs.BLM] = JobRoles.DPS,
+            [Jobs.SMN] = JobRoles.DPS, [Jobs.RDM] = JobRoles.DPS, [Jobs.BLU] = JobRoles.DPS,
+
+            // healers
+            [Jobs.CNJ] = JobRoles.Healer, [Jobs.WHM] = JobRoles.Healer,
+            [Jobs.SCH] = JobRoles.Healer, [Jobs.AST] = JobRoles.Healer,
+
+            // crafters
+            [Jobs.CRP] = JobRoles.Crafter, [Jobs.BSM] = JobRoles.Crafter,
+            [Jobs.ARM] = JobRoles.Crafter, [Jobs.GSM] = JobRoles.Crafter,
+            [Jobs.LTW] = JobRoles.Crafter, [Jobs.WVR] = JobRoles.Crafter,
+            [Jobs.ALC] = JobRoles.Crafter, [Jobs.CUL] = JobRoles.Crafter,
+
+            // gatherers
+            [Jobs.MIN] = JobRoles.Gatherer, [Jobs.BOT] = JobRoles.Gatherer, [Jobs.FSH] = JobRoles.Gatherer,
+        };
     }
 
     public static class Jobs

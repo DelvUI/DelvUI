@@ -37,7 +37,12 @@ namespace DelvUI {
 
             return new Vector4(red, green, blue, vec.W);
         }
-        
+
+        public static Vector4 AdjustColorAlpha(this Vector4 vec, float correctionFactor)
+        {
+            return new Vector4(vec.X, vec.Y, vec.Z, Math.Min(1, Math.Max(0, vec.W + 1 * correctionFactor)));
+        }
+
         public static bool IsPropertyExist(dynamic settings, string name)
         {
             if (settings is ExpandoObject)

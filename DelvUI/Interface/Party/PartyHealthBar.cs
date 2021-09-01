@@ -40,27 +40,25 @@ namespace DelvUI.Interface.Party
 
             if (pluginConfiguration.PartyListUseRoleColors)
             {
-                if (JobsHelper.isJobTank(Member.JobId))
-                {
-                    color = pluginConfiguration.PartyListColorMap["tank"];
-                }
-                else if (JobsHelper.isJobHealer(Member.JobId))
-                {
-                    color = pluginConfiguration.PartyListColorMap["healer"];
-                }
-                else if (JobsHelper.isJobDPS(Member.JobId))
-                {
-                    color = pluginConfiguration.PartyListColorMap["dps"];
-                }
-                else
-                {
-                    color = pluginConfiguration.PartyListColorMap["generic_role"];
-                }
+                color = ColorForJob(Member.JobId);
             }
             else
             {
                 pluginConfiguration.JobColorMap.TryGetValue(Member.JobId, out color);
             }
+        }
+
+        private Dictionary<string, uint> ColorForJob(uint jodId)
+        {
+            var role = JobsHelper.RoleForJob(jodId);
+
+            switch (role) {
+                case JobRoles.Tank: return pluginConfiguration.PartyListColorMap["tank"];
+                case JobRoles.DPS: return pluginConfiguration.PartyListColorMap["dps"];
+                case JobRoles.Healer: return pluginConfiguration.PartyListColorMap["healer"];
+            }
+
+            return pluginConfiguration.PartyListColorMap["generic_role"];
         }
 
         public void Draw(ImDrawListPtr drawList, Vector2 origin)
@@ -69,7 +67,8 @@ namespace DelvUI.Interface.Party
 
             // bg
             var isClose = Member.MaxHP > 0;
-            drawList.AddRectFilled(Position, Position + Size, isClose ? (uint)0x66000000 : (uint)0x22000000);
+            var bgColorMap = pluginConfiguration.PartyListColorMap["background"];
+            drawList.AddRectFilled(Position, Position + Size, isClose ? (uint)bgColorMap["default"] : (uint)bgColorMap["outOfRange"]);
 
             // hp
             if (isClose)

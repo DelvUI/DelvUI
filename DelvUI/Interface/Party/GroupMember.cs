@@ -112,10 +112,10 @@ namespace DelvUI.Interface.Party
             _level = (uint)FakeGroupMember.RNG.Next(1, 80);
             _jobId = (uint)FakeGroupMember.RNG.Next(19, 38);
             _maxHP = (uint)FakeGroupMember.RNG.Next(90000, 150000);
-            _hp = (uint)(_maxHP * FakeGroupMember.RNG.Next(100) / 100f);
+            _hp = (uint)(_maxHP * FakeGroupMember.RNG.Next(50, 100) / 100f);
             _maxMP = 10000;
             _mp = (uint)(_maxMP * FakeGroupMember.RNG.Next(100) / 100f);
-            _shield = FakeGroupMember.RNG.Next(100) / 100f;
+            _shield = FakeGroupMember.RNG.Next(30) / 100f;
 
             _fakeEffect = new StatusEffect();
             _fakeEffect.Duration = FakeGroupMember.RNG.Next(1, 30);

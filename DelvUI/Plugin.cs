@@ -216,6 +216,7 @@ namespace DelvUI {
         }
 
         public void Dispose() {
+            _pluginConfiguration.Save();
             Dispose(true);
             GC.SuppressFinalize(this);
         }

@@ -26,6 +26,7 @@ namespace DelvUI.Interface.Party
         private int lastVerticalPadding;
         private bool lastFillRowsFirst;
         private bool lastUseRoleColors;
+        private uint lastMemberCount = 0;
 
         private List<PartyHealthBar> bars;
 
@@ -154,7 +155,7 @@ namespace DelvUI.Interface.Party
             var rowCount = lastRowCount;
             var colCount = lastColCount;
 
-            if (lastSize != windowSize || lastBarSize != barSize ||
+            if (lastSize != windowSize || lastBarSize != barSize || lastMemberCount < count ||
                 lastHorizontalPadding != horizontalPadding || lastVerticalPadding != verticalPadding ||
                 lastFillRowsFirst != fillRowsFirst)
             {
@@ -168,9 +169,10 @@ namespace DelvUI.Interface.Party
                     out rowCount,
                     out colCount
                 );
-            }
 
-            if (rowCount != lastRowCount || colCount != lastColCount)
+                UpdateBars(lastOrigin, barSize, rowCount, colCount, horizontalPadding, verticalPadding, fillRowsFirst);
+            }
+            else if (rowCount != lastRowCount || colCount != lastColCount)
             {
                 UpdateBars(lastOrigin, barSize, rowCount, colCount, horizontalPadding, verticalPadding, fillRowsFirst);
             }
@@ -188,6 +190,7 @@ namespace DelvUI.Interface.Party
             lastFillRowsFirst = fillRowsFirst;
             lastRowCount = rowCount;
             lastColCount = colCount;
+            lastMemberCount = count;
 
             // draw
             var drawList = ImGui.GetWindowDrawList();
@@ -251,6 +254,7 @@ namespace DelvUI.Interface.Party
         private void OnConfigChanged(object sender, EventArgs args)
         {
             if (lastUseRoleColors == pluginConfiguration.PartyListUseRoleColors) return;
+            lastUseRoleColors = pluginConfiguration.PartyListUseRoleColors;
 
             foreach (PartyHealthBar bar in bars) 
             {
