@@ -1709,7 +1709,21 @@ namespace DelvUI.Interface
                         _pluginConfiguration.PLDManaEnabled = pldManaEnabled;
                         _pluginConfiguration.Save();
                     }
-                    
+
+                    bool pldManaChunked = _pluginConfiguration.PLDManaChunked;
+                    if (ImGui.Checkbox("Mana Chunked", ref pldManaChunked))
+                    {
+                        _pluginConfiguration.PLDManaChunked = pldManaChunked;
+                        _pluginConfiguration.Save();
+                    }
+
+                    bool pldManaBarText = _pluginConfiguration.PLDManaBarText;
+                    if (ImGui.Checkbox("Mana Bar Text", ref pldManaBarText))
+                    {
+                        _pluginConfiguration.PLDManaBarText = pldManaBarText;
+                        _pluginConfiguration.Save();
+                    }
+
                     int pldManaHeight = _pluginConfiguration.PLDManaHeight;
                     if (ImGui.DragInt("Mana Height", ref pldManaHeight, 0.1f, 1, 1000))
                     {
@@ -3116,12 +3130,6 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
                     
-                    var brdInterBarOffset = _pluginConfiguration.BRDInterBarOffset;
-                    if (ImGui.DragInt("Space Between Bars", ref brdInterBarOffset, .1f, 0, 1000)) {
-                        _pluginConfiguration.BRDInterBarOffset = brdInterBarOffset;
-                        _pluginConfiguration.Save();
-                    }
-
                     var brdShowSongGauge = _pluginConfiguration.BRDShowSongGauge;
                     if (ImGui.Checkbox("Song Gauge Enabled", ref brdShowSongGauge))
                     {
