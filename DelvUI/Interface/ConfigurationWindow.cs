@@ -3116,12 +3116,6 @@ namespace DelvUI.Interface
                         _pluginConfiguration.Save();
                     }
                     
-                    var brdInterBarOffset = _pluginConfiguration.BRDInterBarOffset;
-                    if (ImGui.DragInt("Space Between Bars", ref brdInterBarOffset, .1f, 0, 1000)) {
-                        _pluginConfiguration.BRDInterBarOffset = brdInterBarOffset;
-                        _pluginConfiguration.Save();
-                    }
-
                     var brdShowSongGauge = _pluginConfiguration.BRDShowSongGauge;
                     if (ImGui.Checkbox("Song Gauge Enabled", ref brdShowSongGauge))
                     {
