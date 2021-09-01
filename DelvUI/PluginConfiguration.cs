@@ -690,16 +690,27 @@ namespace DelvUI {
 
         #region DRG Configuration
 
-        public int DRGEyeOfTheDragonHeight { get; set; } = 20;
-        public int DRGEyeOfTheDragonBarWidth { get; set; } = 125;
-        public int DRGEyeOfTheDragonPadding { get; set; } = 2;
         public int DRGBaseXOffset { get; set; } = 127;
         public int DRGBaseYOffset { get; set; } = 373;
-        public int DRGBloodBarHeight { get; set; } = 20;
-
-        public int DRGDisembowelBarHeight { get; set; } = 20;
+        public int DRGChaosThrustBarWidth { get; set; } = 254;
         public int DRGChaosThrustBarHeight { get; set; } = 20;
-        public int DRGInterBarOffset { get; set; } = 2;
+        public int DRGChaosThrustXOffset { get; set; } = 0;
+        public int DRGChaosThrustYOffset { get; set; } = 0;
+        public int DRGDisembowelBarWidth { get; set; } = 254;
+        public int DRGDisembowelBarHeight { get; set; } = 20;
+        public int DRGDisembowelBarXOffset { get; set; } = 0;
+        public int DRGDisembowelBarYOffset { get; set; } = 21;
+        public int DRGEyeOfTheDragonHeight { get; set; } = 20;
+        public int DRGEyeOfTheDragonBarWidth { get; set; } = 126;
+        public int DRGEyeOfTheDragonPadding { get; set; } = 2;
+        public int DRGEyeOfTheDragonXOffset { get; set; } = 0;
+        public int DRGEyeOfTheDragonYOffset { get; set; } = 42;
+        public int DRGBloodBarWidth { get; set; } = 254;
+        public int DRGBloodBarHeight { get; set; } = 20;
+        public int DRGBloodBarXOffset { get; set; } = 0;
+        public int DRGBloodBarYOffset { get; set; } = 63;
+        public bool DRGShowEyeOfTheDragon = true;
+        public bool DRGShowBloodBar = true;
         public bool DRGShowChaosThrustTimer = true;
         public bool DRGShowDisembowelBuffTimer = true;
         public bool DRGShowChaosThrustText = true;
