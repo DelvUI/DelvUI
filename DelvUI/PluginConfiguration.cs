@@ -550,12 +550,19 @@ namespace DelvUI {
         public int PLDAtonementBarPadding { get; set; } = 2;
         public int PLDAtonementBarXOffset { get; set; } = 127;
         public int PLDAtonementBarYOffset { get; set; } = 439;
+        public bool PLDDoTBarEnabled { get; set; } = true;
+        public int PLDDoTBarHeight { get; set; } = 20;
+        public int PLDDoTBarWidth { get; set; } = 254;
+        public int PLDDoTBarXOffset { get; set; } = 127;
+        public int PLDDoTBarYOffset { get; set; } = 351;
+        public bool PLDDoTBarText { get; set; }
         public Vector4 PLDManaColor = new Vector4(0f/255f, 203f/255f, 230f/255f, 100f/100f);
         public Vector4 PLDOathGaugeColor = new Vector4(24f/255f, 80f/255f, 175f/255f, 100f/100f);
         public Vector4 PLDFightOrFlightColor = new Vector4(240f/255f, 50f/255f, 0f/255f, 100f/100f);
         public Vector4 PLDRequiescatColor = new Vector4(61f/255f, 61f/255f, 255f/255f, 100f/100f);
         public Vector4 PLDEmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 100f/100f);
         public Vector4 PLDAtonementColor = new Vector4(240f/255f, 176f/255f, 0f/255f, 100f/100f);
+        public Vector4 PLDDoTColor = new Vector4(255f/255f, 128f/255f, 0f/255f, 100f/100f); 
 
         #endregion
 
@@ -867,6 +874,14 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(PLDAtonementColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDAtonementColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDAtonementColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.PLD * 1000 + 6] = new Dictionary<string, uint> // DoT
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor.AdjustColor(.1f))
                 },
                 
                 [Jobs.WAR] = new Dictionary<string, uint>
