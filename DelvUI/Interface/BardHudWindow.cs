@@ -36,7 +36,6 @@ namespace DelvUI.Interface {
         private int BRDSBXOffset => PluginConfiguration.BRDSBXOffset;
         private int BRDSBYOffset => PluginConfiguration.BRDSBYOffset;
         private int BRDStackPadding => PluginConfiguration.BRDStackPadding;
-        private int InterBarOffset => PluginConfiguration.BRDInterBarOffset;
         private bool BRDShowSongGauge => PluginConfiguration.BRDShowSongGauge;
         private bool BRDShowSoulGauge => PluginConfiguration.BRDShowSoulGauge;
         private bool BRDShowWMStacks => PluginConfiguration.BRDShowWMStacks;
@@ -61,26 +60,25 @@ namespace DelvUI.Interface {
 
         protected override void Draw(bool _)
         {
-            var nextHeight = DrawActiveDots(-2);
-            nextHeight = HandleCurrentSong(nextHeight);
-            DrawSoulVoiceBar(nextHeight);
+            DrawActiveDots();
+            HandleCurrentSong();
+            DrawSoulVoiceBar();
         }
 
         protected override void DrawPrimaryResourceBar()
         {
         }
 
-        private int DrawActiveDots(int initialHeight)
+        private void DrawActiveDots()
         {
-            var nextHeight = Math.Abs(BRDCBYOffset - BRDSBYOffset) + BRDCBHeight;
-            if (!BRDShowCB && !BRDShowSB) return nextHeight;
+            if (!BRDShowCB && !BRDShowSB) return;
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
             if (target is not Chara) {
-                return nextHeight;
+                return;
             }
             var xPos = CenterX - XOffset + BRDCBXOffset;
-            var yPos = CenterY + YOffset + BRDCBYOffset + initialHeight;
+            var yPos = CenterY + YOffset + BRDCBYOffset;
 
             var barDrawList = new List<Bar>();
 
@@ -92,36 +90,36 @@ namespace DelvUI.Interface {
                 var duration = Math.Abs(cb.Duration);
 
                 var color = duration <= 5 ? ExpireColor : CBColor;
-            
+
                 var builder = BarBuilder.Create(xPos, yPos, BRDCBHeight, BRDCBWidth);
-                
+
                 var cbBar = builder.AddInnerBar(duration, 30f, color)
                     .SetFlipDrainDirection(BRDCBInverted)
                     .Build();
                 barDrawList.Add(cbBar);
             }
-            
+
             xPos = CenterX - XOffset + BRDSBXOffset;
-            yPos = CenterY + YOffset + BRDSBYOffset + initialHeight;
-            
+            yPos = CenterY + YOffset + BRDSBYOffset;
+
             if (BRDShowSB)
             {
                 var sb = target.StatusEffects.FirstOrDefault(o =>
                     o.EffectId == 1201 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
                     o.EffectId == 129 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
                 var duration = Math.Abs(sb.Duration);
-                
+
                 var color = duration <= 5 ? ExpireColor : SBColor;
-            
+
                 var builder = BarBuilder.Create(xPos, yPos, BRDSBHeight, BRDSBWidth);
-                
+
                 var sbBar = builder.AddInnerBar(duration, 30f, color)
                     .SetFlipDrainDirection(BRDSBInverted)
                     .Build();
                 barDrawList.Add(sbBar);
 
             }
-            
+
             if (barDrawList.Count > 0)
             {
                 var drawList = ImGui.GetWindowDrawList();
@@ -130,89 +128,87 @@ namespace DelvUI.Interface {
                     bar.Draw(drawList);
                 }
             }
-            return nextHeight;
         }
 
-        private int HandleCurrentSong(int initialHeight)
+        private void HandleCurrentSong()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<BRDGauge>();
             var songStacks = gauge.NumSongStacks;
             var song = gauge.ActiveSong;
             var songTimer = gauge.SongTimer;
-            
-            var nextHeight = BRDStackHeight + initialHeight + InterBarOffset;
-            
+
             switch (song)
             {
                 case CurrentSong.WANDERER:
-                    if(BRDShowWMStacks) nextHeight = DrawStacks(initialHeight, songStacks, 3, WMStackColor);
-                    return DrawSongTimer(nextHeight, songTimer, WMColor);
+                    if (BRDShowWMStacks)
+                        DrawStacks(songStacks, 3, WMStackColor);
+                    DrawSongTimer(songTimer, WMColor);
+                    break;
                 case CurrentSong.MAGE:
-                    if(BRDShowMBProc) nextHeight = DrawBloodletterReady(initialHeight, MBStackColor);
-                    return DrawSongTimer(nextHeight, songTimer, MBColor);
+                    if (BRDShowMBProc)
+                        DrawBloodletterReady(MBStackColor);
+                    DrawSongTimer(songTimer, MBColor);
+                    break;
                 case CurrentSong.ARMY:
-                    if(BRDShowAPStacks) nextHeight = DrawStacks(initialHeight, songStacks, 4, APStackColor);
-                    return DrawSongTimer(nextHeight, songTimer, APColor);
+                    if (BRDShowAPStacks)
+                        DrawStacks(songStacks, 4, APStackColor);
+                    DrawSongTimer(songTimer, APColor);
+                    break;
                 case CurrentSong.NONE:
-                    return DrawSongTimer(nextHeight, 0, EmptyColor);
+                    DrawSongTimer(0, EmptyColor);
+                    break;
                 default:
-                    return DrawSongTimer(nextHeight, 0, EmptyColor);
+                    DrawSongTimer(0, EmptyColor);
+                    break;
             }
         }
 
-        private int DrawBloodletterReady(int initialHeight, Dictionary<string, uint> color)
+        private void DrawBloodletterReady(Dictionary<string, uint> color)
         {
             // I want to draw Bloodletter procs here (just color entire bar red to indicate cooldown is ready).
             // But can't find a way yet to accomplish this.
-            return initialHeight + BRDStackHeight + InterBarOffset;
         }
 
-        private int DrawSongTimer(int initialHeight, short songTimer, Dictionary<string, uint> songColor)
+        private void DrawSongTimer(short songTimer, Dictionary<string, uint> songColor)
         {
-            var nextHeight = BRDSongGaugeHeight + initialHeight + InterBarOffset;
-            if (!BRDShowSongGauge) return nextHeight;
+            if (!BRDShowSongGauge) return;
             var xPos = CenterX - XOffset + BRDSongGaugeXOffset;
-            var yPos = CenterY + YOffset + BRDSongGaugeYOffset + initialHeight;
-            
+            var yPos = CenterY + YOffset + BRDSongGaugeYOffset;
+
             var builder = BarBuilder.Create(xPos, yPos, BRDSongGaugeHeight, BRDSongGaugeWidth);
 
             var duration = Math.Abs(songTimer);
-            
+
             var bar = builder.AddInnerBar(duration / 1000f, 30f, songColor)
                 .SetTextMode(BarTextMode.EachChunk)
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                 .Build();
-            
+
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);
-            
-            return nextHeight;
         }
 
-        private int DrawSoulVoiceBar(int initialHeight)
+        private void DrawSoulVoiceBar()
         {
-            var nextHeight = BRDSoulGaugeHeight + initialHeight + InterBarOffset;
-            if (!BRDShowSoulGauge) return nextHeight;
+            if (!BRDShowSoulGauge) return;
             var soulVoice = PluginInterface.ClientState.JobGauges.Get<BRDGauge>().SoulVoiceValue;
 
             var xPos = CenterX - XOffset + BRDSoulGaugeXOffset;
-            var yPos = CenterY + YOffset + BRDSoulGaugeYOffset + initialHeight;
-            
+            var yPos = CenterY + YOffset + BRDSoulGaugeYOffset;
+
             var builder = BarBuilder.Create(xPos, yPos, BRDSoulGaugeHeight, BRDSoulGaugeWidth);
-            
+
             var bar = builder.AddInnerBar(soulVoice, 100f, SVColor)
                 .Build();
-            
+
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);
-            
-            return nextHeight;
         }
 
-        private int DrawStacks(int initialHeight, int amount, int max, Dictionary<string, uint> stackColor)
+        private void DrawStacks(int amount, int max, Dictionary<string, uint> stackColor)
         {
             var xPos = CenterX - XOffset + BRDStackXOffset;
-            var yPos = CenterY + YOffset + initialHeight + BRDStackYOffset;
+            var yPos = CenterY + YOffset + BRDStackYOffset;
             var bar = BarBuilder.Create(xPos, yPos, BRDStackHeight, BRDStackWidth)
                 .SetChunks(max)
                 .SetChunkPadding(BRDStackPadding)
@@ -220,8 +216,6 @@ namespace DelvUI.Interface {
                 .Build();
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);
-
-            return BRDStackHeight + initialHeight + InterBarOffset;
         }
     }
 }

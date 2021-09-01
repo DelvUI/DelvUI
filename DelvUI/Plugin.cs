@@ -51,6 +51,7 @@ namespace DelvUI {
             _partyHudWindow = new PartyHudWindow(_pluginConfiguration);
 
             PartyManager.Initialize(pluginInterface, _pluginConfiguration);
+            TexturesCache.Initialize(pluginInterface);
             Resolver.Initialize();
         }
         

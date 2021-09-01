@@ -22,14 +22,14 @@ namespace DelvUI {
         public int HealthBarWidth { get; set; } = 270;
         public int HealthBarXOffset { get; set; } = 160;
         public int HealthBarYOffset { get; set; } = 460;
-        public int PrimaryResourceBarHeight { get; set; } = 13;
+        public int PrimaryResourceBarHeight { get; set; } = 20;
         public int PrimaryResourceBarWidth { get; set; } = 254;
         public int PrimaryResourceBarXOffset { get; set; } = 160;
-        public int PrimaryResourceBarYOffset { get; set; } = 460;
+        public int PrimaryResourceBarYOffset { get; set; } = 455;
         public int TargetBarHeight { get; set; } = 50;
         public int TargetBarWidth { get; set; } = 270;
         public int TargetBarXOffset { get; set; } = 160;
-        public int TargetBarYOffset { get; set; } = 460;
+        public int TargetBarYOffset { get; set; } = 455;
         public int ToTBarHeight { get; set; } = 20;
         public int ToTBarWidth { get; set; } = 120;
         public int ToTBarXOffset { get; set; } = 164;
@@ -189,15 +189,15 @@ namespace DelvUI {
         #region BRD Configuration
 
         public int BRDBaseXOffset { get; set; } = 127;
-        public int BRDBaseYOffset { get; set; } = 405;
+        public int BRDBaseYOffset { get; set; } = 415;
         public int BRDSongGaugeWidth { get; set; } = 254;
         public int BRDSongGaugeHeight { get; set; } = 20;
         public int BRDSongGaugeXOffset { get; set; }
-        public int BRDSongGaugeYOffset { get; set; }
+        public int BRDSongGaugeYOffset { get; set; } = 12;
         public int BRDSoulGaugeWidth { get; set; } = 254;
         public int BRDSoulGaugeHeight { get; set; } = 10;
         public int BRDSoulGaugeXOffset { get; set; }
-        public int BRDSoulGaugeYOffset { get; set; }
+        public int BRDSoulGaugeYOffset { get; set; } = 34;
         public int BRDStackWidth { get; set; } = 254;
         public int BRDStackHeight { get; set; } = 10;
         public int BRDStackXOffset { get; set; }
@@ -206,13 +206,12 @@ namespace DelvUI {
         public int BRDCBWidth { get; set; } = 126;
         public int BRDCBHeight { get; set; } = 10;
         public int BRDCBXOffset { get; set; }
-        public int BRDCBYOffset { get; set; }
+        public int BRDCBYOffset { get; set; } = -12;
         public int BRDSBWidth { get; set; } = 126;
         public int BRDSBHeight { get; set; } = 10;
         public int BRDSBXOffset { get; set; } = 128;
-        public int BRDSBYOffset { get; set; }
-        public int BRDInterBarOffset { get; set; } = 2;
-        
+        public int BRDSBYOffset { get; set; } = -12;
+
         public bool BRDShowSB = true;
         public bool BRDShowCB = true;
         public bool BRDSBInverted = false;
@@ -222,7 +221,7 @@ namespace DelvUI {
         public bool BRDShowWMStacks = true;
         public bool BRDShowMBProc = true;
         public bool BRDShowAPStacks = true;
-        
+
         public Vector4 BRDEmptyColor = new Vector4(0f/255f, 0f/255f, 0f/255f, 53f/100f);
         public Vector4 BRDExpireColor = new Vector4(199f/255f, 46f/255f, 46f/255f, 100f/100f);
         public Vector4 BRDCBColor = new Vector4(182f/255f, 68f/255f, 235f/255f, 100f/100f);
@@ -265,16 +264,16 @@ namespace DelvUI {
         public int FairyBarHeight { get; set; } = 20;
         public int FairyBarWidth { get; set; } = 254;
         public int FairyBarX { get; set; } = 127;
-        public int FairyBarY { get; set; } = 450;
+        public int FairyBarY { get; set; } = 444;
         public int SchAetherBarHeight { get; set; } = 20;
         public int SchAetherBarWidth { get; set; } = 250;
         public int SchAetherBarX { get; set; } = -42;
-        public int SchAetherBarY { get; set; } = 450;
+        public int SchAetherBarY { get; set; } = 444;
         public int SchAetherBarPad { get; set; } = 2;
         public int SCHBioBarHeight { get; set; } = 20;
         public int SCHBioBarWidth { get; set; } = 254;
         public int SCHBioBarX { get; set; } = 127;
-        public int SCHBioBarY { get; set; } = 423;
+        public int SCHBioBarY { get; set; } = 417;
 
         public bool SCHShowBioBar = true;
         public bool SCHShowAetherBar = true;
@@ -292,17 +291,17 @@ namespace DelvUI {
         public int LillyBarHeight { get; set; } = 20;
         public int LillyBarWidth { get; set; } = 254;
         public int LillyBarX { get; set; } = 127;
-        public int LillyBarY { get; set; } = 421;
+        public int LillyBarY { get; set; } = 415;
         public int LillyBarPad { get; set; } = 2;
         public int BloodLillyBarHeight { get; set; } = 20;
         public int BloodLillyBarWidth { get; set; } = 254;
         public int BloodLillyBarX { get; set; } = 42;
-        public int BloodLillyBarY { get; set; } = 421;
+        public int BloodLillyBarY { get; set; } = 415;
         public int BloodLillyBarPad { get; set; } = 2;
         public int DiaBarHeight { get; set; } = 20;
         public int DiaBarWidth { get; set; } = 254;
         public int DiaBarX { get; set; } = 127;
-        public int DiaBarY { get; set; } = 423;
+        public int DiaBarY { get; set; } = 417;
 
         public bool WHMShowDiaBar = true;
         public bool WHMShowLillyBar = true;
@@ -321,25 +320,25 @@ namespace DelvUI {
 
         public int ASTDrawBarHeight { get; set; } = 20;
         public int ASTDrawBarWidth { get; set; } = 254;
-        public int ASTDrawBarX { get; set; } = -127;
-        public int ASTDrawBarY { get; set; } = 400;
+        public int ASTDrawBarX { get; set; } = 33;
+        public int ASTDrawBarY { get; set; } = -65;
         public int ASTDivinationHeight { get; set; } = 20;
         public int ASTDivinationWidth { get; set; } = 254;
-        public int ASTDivinationBarX { get; set; } = -127;
-        public int ASTDivinationBarY { get; set; } = 378;
+        public int ASTDivinationBarX { get; set; } = 33;
+        public int ASTDivinationBarY { get; set; } = -87;
         public int ASTDivinationBarPad { get; set; } = 1;
         public int ASTDotBarHeight { get; set; } = 20;
         public int ASTDotBarWidth { get; set; } = 254;
         public int ASTDotBarX { get; set; } = 33;
-        public int ASTDotBarY { get; set; } = -38;
+        public int ASTDotBarY { get; set; } = -43;
         public int ASTStarBarHeight { get; set; } = 86;
         public int ASTStarBarWidth { get; set; } = 20;
         public int ASTStarBarX { get; set; } = 11;
-        public int ASTStarBarY { get; set; } = -82;
+        public int ASTStarBarY { get; set; } = -87;
         public int ASTLightspeedBarHeight { get; set; } = 86;
         public int ASTLightspeedBarWidth { get; set; } = 20;
         public int ASTLightspeedBarX { get; set; } = 289;
-        public int ASTLightspeedBarY { get; set; } = -82;
+        public int ASTLightspeedBarY { get; set; } = -87;
         public bool ASTShowDivinationBar = true;
         public bool ASTShowDrawBar = true;
         public bool ASTShowDotBar = true;
@@ -370,7 +369,7 @@ namespace DelvUI {
         public int SmnBioBarWidth { get; set; } = 126;
         public int SmnBioBarHeight { get; set; } = 20;
         public int SmnBioBarXOffset { get; set; } = 128;
-        public int SmnBioBarYOffset { get; set; }
+        public int SmnBioBarYOffset { get; set; } 
         public bool SmnBioBarFlipped { get; set; } = true;
         public int SmnInterBarOffset { get; set; } = 2;
         public bool SmnRuinBarEnabled { get; set; } = true;
@@ -588,12 +587,19 @@ namespace DelvUI {
         public int PLDAtonementBarPadding { get; set; } = 2;
         public int PLDAtonementBarXOffset { get; set; } = 127;
         public int PLDAtonementBarYOffset { get; set; } = 439;
+        public bool PLDDoTBarEnabled { get; set; } = true;
+        public int PLDDoTBarHeight { get; set; } = 20;
+        public int PLDDoTBarWidth { get; set; } = 254;
+        public int PLDDoTBarXOffset { get; set; } = 127;
+        public int PLDDoTBarYOffset { get; set; } = 351;
+        public bool PLDDoTBarText { get; set; }
         public Vector4 PLDManaColor = new Vector4(0f/255f, 203f/255f, 230f/255f, 100f/100f);
         public Vector4 PLDOathGaugeColor = new Vector4(24f/255f, 80f/255f, 175f/255f, 100f/100f);
         public Vector4 PLDFightOrFlightColor = new Vector4(240f/255f, 50f/255f, 0f/255f, 100f/100f);
         public Vector4 PLDRequiescatColor = new Vector4(61f/255f, 61f/255f, 255f/255f, 100f/100f);
         public Vector4 PLDEmptyColor = new Vector4(143f/255f, 141f/255f, 142f/255f, 100f/100f);
         public Vector4 PLDAtonementColor = new Vector4(240f/255f, 176f/255f, 0f/255f, 100f/100f);
+        public Vector4 PLDDoTColor = new Vector4(255f/255f, 128f/255f, 0f/255f, 100f/100f); 
 
         #endregion
 
@@ -738,12 +744,12 @@ namespace DelvUI {
         public bool DRGShowBloodText = true;
         public bool DRGShowDisembowelText = true;
 
-        public Vector4 DRGEyeOfTheDragonColor = new Vector4(1f, 182f / 255f, 194f / 255f, 1f);
-        public Vector4 DRGBloodOfTheDragonColor = new Vector4(78f / 255f, 198f / 255f, 238f / 255f, 1f);
-        public Vector4 DRGLifeOfTheDragonColor = new Vector4(139f / 255f, 24f / 255f, 24f / 255f, 1f);
-        public Vector4 DRGDisembowelColor = new Vector4(244f / 255f, 206f / 255f, 191f / 255f, 1f);
-        public Vector4 DRGChaosThrustColor = new Vector4(106f / 255f, 82f / 255f, 148f / 255f, 1f);
-        public Vector4 DRGEmptyColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 1f);
+        public Vector4 DRGEyeOfTheDragonColor = new Vector4(1f, 182f / 255f, 194f / 255f, 100f/100f);
+        public Vector4 DRGBloodOfTheDragonColor = new Vector4(78f / 255f, 198f / 255f, 238f / 255f, 100f/100f);
+        public Vector4 DRGLifeOfTheDragonColor = new Vector4(139f / 255f, 24f / 255f, 24f / 255f, 100f/100f);
+        public Vector4 DRGDisembowelColor = new Vector4(244f / 255f, 206f / 255f, 191f / 255f, 100f/100f);
+        public Vector4 DRGChaosThrustColor = new Vector4(106f / 255f, 82f / 255f, 148f / 255f, 100f/100f);
+        public Vector4 DRGEmptyColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 88f/100f);
 
         #endregion
 
@@ -906,6 +912,14 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(PLDAtonementColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDAtonementColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDAtonementColor.AdjustColor(.1f))
+                },
+                
+                [Jobs.PLD * 1000 + 6] = new Dictionary<string, uint> // DoT
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor.AdjustColor(.1f))
                 },
                 
                 [Jobs.WAR] = new Dictionary<string, uint>

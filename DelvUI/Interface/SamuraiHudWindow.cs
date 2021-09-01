@@ -244,7 +244,7 @@ namespace DelvUI.Interface
 
             // Ka Bar
             cursorPos = new Vector2(cursorPos.X + SenPadding + senBarWidth, cursorPos.Y);
-            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasKa() ? SamKaColor["base"] : SamEmptyColor["base"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasSetsu() ? SamSetsuColor["base"] : SamEmptyColor["base"]);
             drawList.AddRect(cursorPos, cursorPos + senBarSize, 0xFF000000);
 
             // Getsu Bar
@@ -254,7 +254,7 @@ namespace DelvUI.Interface
 
             // Setsu Bar
             cursorPos = new Vector2(cursorPos.X + SenPadding + senBarWidth, cursorPos.Y);
-            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasSetsu() ? SamSetsuColor["base"] : SamEmptyColor["base"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasKa() ? SamKaColor["base"] : SamEmptyColor["base"]);
             drawList.AddRect(cursorPos, cursorPos + senBarSize, 0xFF000000);
         }
 

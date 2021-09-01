@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Interface.Bars;
@@ -65,6 +66,18 @@ namespace DelvUI.Interface
         
         private int AtonementBarYOffset => PluginConfiguration.PLDAtonementBarYOffset;
         
+        private bool DoTBarEnabled => PluginConfiguration.PLDDoTBarEnabled;
+        
+        private int DoTBarHeight => PluginConfiguration.PLDDoTBarHeight;
+        
+        private int DoTBarWidth => PluginConfiguration.PLDDoTBarWidth;
+        
+        private int DoTBarXOffset => PluginConfiguration.PLDDoTBarXOffset;
+        
+        private int DoTBarYOffset => PluginConfiguration.PLDDoTBarYOffset;
+        
+        private bool DoTBarText => PluginConfiguration.PLDDoTBarText;
+        
         private Dictionary<string, uint> ManaColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000];
         
         private Dictionary<string, uint> OathGaugeColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 1];
@@ -76,7 +89,9 @@ namespace DelvUI.Interface
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 4];
         
         private Dictionary<string, uint> AtonementColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 5];
-        
+
+        private Dictionary<string, uint> DoTColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 6];
+
         public PaladinHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) {}
 
         protected override void Draw(bool _)
@@ -89,6 +104,8 @@ namespace DelvUI.Interface
                 DrawBuffBar();
             if (AtonementEnabled)
                 DrawAtonementBar();
+            if (DoTBarEnabled)
+                DrawDoTBar();
         }
 
         protected override void DrawPrimaryResourceBar()
@@ -178,6 +195,33 @@ namespace DelvUI.Interface
                 .SetChunks(3)
                 .SetChunkPadding(AtonementBarPadding)
                 .AddInnerBar(stackCount, 3, AtonementColor, null);
+
+            var drawList = ImGui.GetWindowDrawList();
+            builder.Build().Draw(drawList);
+        }
+
+        private void DrawDoTBar()
+        {
+            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+
+            if (target is not Chara)
+                return;
+
+            var goringBlade = target.StatusEffects.FirstOrDefault(o =>
+                o.EffectId == 725 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
+            var duration = Math.Abs(goringBlade.Duration);
+            
+            var xPos = CenterX - DoTBarXOffset;
+            var yPos = CenterY + DoTBarYOffset;
+
+            var builder = BarBuilder.Create(xPos, yPos, DoTBarHeight, DoTBarWidth)
+                .AddInnerBar(duration, 21, DoTColor);
+
+            if (DoTBarText)
+            {
+                builder.SetTextMode(BarTextMode.EachChunk)
+                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+            }
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
