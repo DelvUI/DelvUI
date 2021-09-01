@@ -706,12 +706,12 @@ namespace DelvUI {
         public bool DRGShowBloodText = true;
         public bool DRGShowDisembowelText = true;
 
-        public Vector4 DRGEyeOfTheDragonColor = new Vector4(1f, 182f / 255f, 194f / 255f, 1f);
-        public Vector4 DRGBloodOfTheDragonColor = new Vector4(78f / 255f, 198f / 255f, 238f / 255f, 1f);
-        public Vector4 DRGLifeOfTheDragonColor = new Vector4(139f / 255f, 24f / 255f, 24f / 255f, 1f);
-        public Vector4 DRGDisembowelColor = new Vector4(244f / 255f, 206f / 255f, 191f / 255f, 1f);
-        public Vector4 DRGChaosThrustColor = new Vector4(106f / 255f, 82f / 255f, 148f / 255f, 1f);
-        public Vector4 DRGEmptyColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 1f);
+        public Vector4 DRGEyeOfTheDragonColor = new Vector4(1f, 182f / 255f, 194f / 255f, 100f/100f);
+        public Vector4 DRGBloodOfTheDragonColor = new Vector4(78f / 255f, 198f / 255f, 238f / 255f, 100f/100f);
+        public Vector4 DRGLifeOfTheDragonColor = new Vector4(139f / 255f, 24f / 255f, 24f / 255f, 100f/100f);
+        public Vector4 DRGDisembowelColor = new Vector4(244f / 255f, 206f / 255f, 191f / 255f, 100f/100f);
+        public Vector4 DRGChaosThrustColor = new Vector4(106f / 255f, 82f / 255f, 148f / 255f, 100f/100f);
+        public Vector4 DRGEmptyColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 88f/100f);
 
         #endregion
 
