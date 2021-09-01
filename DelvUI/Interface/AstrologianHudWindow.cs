@@ -1,12 +1,10 @@
-﻿using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+﻿using Dalamud.Game.ClientState.Structs.JobGauge;
 using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Plugin;
 using ImGuiNET;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Globalization;
 using System.Linq;
 using Dalamud.Game.ClientState.Actors.Types;
 using DelvUI.Interface.Bars;
@@ -102,15 +100,10 @@ namespace DelvUI.Interface
         {
             DrawOutlinedText(text, pos, Vector4.One, new Vector4(0f, 0f, 0f, 1f));
         }
-
+        
         private void DrawDivinationBar()
         {
-            var barWidth = (DivinationWidth / 3);
-            BarSize = new Vector2(barWidth, DivinationHeight);
-            BarCoords = new Vector2(DivinationBarX, DivinationBarY);
-            var cursorPos = new Vector2(CenterX + BarCoords.X, CenterY + BarCoords.Y );
-
-            var drawList = ImGui.GetWindowDrawList();
+            List<Dictionary<string, uint>> chunkColors = new List<Dictionary<string, uint>>();
             if ((PluginInterface.ClientState.LocalPlayer?.ClassJob.Id) != 33)
             {
                 return;
@@ -120,6 +113,7 @@ namespace DelvUI.Interface
                 var gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
                 var field = typeof(ASTGauge).GetField("seals", BindingFlags.NonPublic | BindingFlags.GetField |
                                                                BindingFlags.Instance);
+                var textSealReady = "";
                 var result = field.GetValue(gauge);
                 GCHandle hdl = GCHandle.Alloc(result, GCHandleType.Pinned);
                 byte* p = (byte*)hdl.AddrOfPinnedObject();
@@ -130,24 +124,16 @@ namespace DelvUI.Interface
                     switch (type)
                     {
                         case SealType.NONE:
-                            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
-                            drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                            cursorPos = new Vector2(cursorPos.X + barWidth + DivinationBarPad, cursorPos.Y);
+                            chunkColors.Add(EmptyColor);
                             break;
                         case SealType.MOON:
-                            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealLunarColor["gradientRight"]);
-                            drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                            cursorPos = new Vector2(cursorPos.X + barWidth + DivinationBarPad, cursorPos.Y);
+                            chunkColors.Add(SealLunarColor);
                             break;
                         case SealType.SUN:
-                            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealSunColor["gradientRight"]);
-                            drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                            cursorPos = new Vector2(cursorPos.X + barWidth + DivinationBarPad, cursorPos.Y);
+                            chunkColors.Add(SealSunColor);
                             break;
                         case SealType.CELESTIAL:
-                            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealCelestialColor["gradientRight"]);
-                            drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                            cursorPos = new Vector2(cursorPos.X + barWidth + DivinationBarPad, cursorPos.Y);
+                            chunkColors.Add(SealCelestialColor);
                             break;
                     }
                     if (!gauge.ContainsSeal(SealType.NONE))
@@ -156,10 +142,23 @@ namespace DelvUI.Interface
                         if (gauge.ContainsSeal(SealType.SUN)) { sealNumbers++; };
                         if (gauge.ContainsSeal(SealType.MOON)) { sealNumbers++; };
                         if (gauge.ContainsSeal(SealType.CELESTIAL)) { sealNumbers++; };
-                        var textSealReady = sealNumbers.ToString();
-                        DrawOutlinedText(textSealReady, new Vector2(CenterX + DivinationBarX + (DivinationWidth / 2f) - (ImGui.CalcTextSize(textSealReady).X / 2f), CenterY + DivinationBarY + (DivinationHeight / 2f) - (ImGui.CalcTextSize(textSealReady).Y / 2f)));
+                        textSealReady = sealNumbers.ToString();
                     }
                 }
+                hdl.Free();
+                var xPos = CenterX - XOffset + DivinationBarX;
+                var yPos = CenterY + YOffset + DivinationBarY;
+
+                var builder = BarBuilder.Create(xPos, yPos, DivinationHeight, DivinationWidth)
+                    .SetChunks(3)
+                    .SetChunkPadding(DivinationBarPad)
+                    .AddInnerBar(3, 3, chunkColors.ToArray())
+                    .SetTextMode(BarTextMode.Single)
+                    .SetBackgroundColor(EmptyColor["gradientRight"])
+                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, textSealReady);
+
+                var drawList = ImGui.GetWindowDrawList();
+                builder.Build().Draw(drawList);
             }
 
         }
@@ -168,71 +167,76 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
 
-            BarSize = new Vector2(DrawWidth, DrawHeight);
-            BarCoords = new Vector2(DrawBarX, DrawBarY);
-            var cursorPos = new Vector2(CenterX + BarCoords.X, CenterY + BarCoords.Y);
+            var xPos = CenterX - XOffset + DrawBarX;
+            var yPos = CenterY + YOffset + DrawBarY;
 
-            var drawList = ImGui.GetWindowDrawList();
+            var cardJob = "";
+            var cardColor = EmptyColor;
+            var builder = BarBuilder.Create(xPos, yPos, DrawHeight, DrawWidth);
 
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
-            drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-            switch (gauge.DrawnCard()) {
+            switch (gauge.DrawnCard())
+            {
                 case CardType.BALANCE:
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealSunColor["gradientRight"]);
-                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                    DrawOutlinedText("MELEE", new Vector2(cursorPos.X + DrawWidth / 2f - ImGui.CalcTextSize("MELEE").X / 2f, cursorPos.Y - 2));
+                    cardColor = SealSunColor;
+                    cardJob = "MELEE";
                     break;
                 case CardType.BOLE:
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealSunColor["gradientRight"]);
-                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                    DrawOutlinedText("RANGED", new Vector2(cursorPos.X + DrawWidth / 2f - ImGui.CalcTextSize("RANGED").X / 2f, cursorPos.Y - 2));
+                    cardColor = SealSunColor;
+                    cardJob = "RANGED";
                     break;
                 case CardType.ARROW:
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealLunarColor["gradientRight"]);
-                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                    DrawOutlinedText("MELEE", new Vector2(cursorPos.X + DrawWidth / 2f - ImGui.CalcTextSize("MELEE").X / 2f, cursorPos.Y - 2));
+                    cardColor = SealLunarColor;
+                    cardJob = "MELEE";
                     break;
                 case CardType.EWER:
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealLunarColor["gradientRight"]);
-                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                    DrawOutlinedText("RANGED", new Vector2(cursorPos.X + DrawWidth / 2f - ImGui.CalcTextSize("RANGED").X / 2f, cursorPos.Y - 2));
+                    cardColor = SealLunarColor;
+                    cardJob = "RANGED";
                     break;
                 case CardType.SPEAR:
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealCelestialColor["gradientRight"]);
-                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                    DrawOutlinedText("MELEE", new Vector2(cursorPos.X + DrawWidth / 2f - ImGui.CalcTextSize("MELEE").X / 2f, cursorPos.Y - 2));
+                    cardColor = SealCelestialColor;
+                    cardJob = "MELEE";
                     break;
-                case CardType.SPIRE:                
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, SealCelestialColor["gradientRight"]);
-                    drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                    DrawOutlinedText("RANGED", new Vector2(cursorPos.X + DrawWidth / 2f - ImGui.CalcTextSize("RANGED").X / 2f, cursorPos.Y - 2));
+                case CardType.SPIRE:
+                    cardColor = SealCelestialColor;
+                    cardJob = "RANGED";
                     break;
             }
+            
+            var drawList = ImGui.GetWindowDrawList();
+
+            Bar bar = builder.AddInnerBar(1f, 1f, cardColor)
+                .SetTextMode(BarTextMode.Single)
+                .SetBackgroundColor(EmptyColor["gradientRight"])
+                .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, cardJob)
+                .Build();
+
+            bar.Draw(drawList);
         }
 
         private void DrawDot()
         {
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
-            var drawList = ImGui.GetWindowDrawList();
-
             var xPos = CenterX - XOffset + DotBarX;
             var yPos = CenterY + YOffset + DotBarY;
-
-            var cursorPos = new Vector2(xPos, yPos);
-
-            if (!(target is Chara))
+            var drawList = ImGui.GetWindowDrawList();
+            var builder = BarBuilder.Create(xPos, yPos, DotHeight, DotWidth);
+            
+            if (target is not Chara)
             {
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
-                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                Bar barNoTarget = builder.AddInnerBar(0, 30f, DotColor)
+                    .SetTextMode(BarTextMode.Single)
+                    .SetBackgroundColor(EmptyColor["gradientRight"])
+                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                    .Build();
+                barNoTarget.Draw(drawList);
                 return;
-            }
+            };
             var dot = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1881 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
                                                                o.EffectId == 843 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
                                                                o.EffectId == 838 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
             var dotCooldown = dot.EffectId == 838 ? 18f : 30f;
             var dotDuration = dot.Duration;
 
-            var builder = BarBuilder.Create(xPos, yPos, DotHeight, DotWidth);
 
             Bar bar = builder.AddInnerBar(System.Math.Abs(dotDuration), dotCooldown, DotColor)
                 .SetTextMode(BarTextMode.Single)
@@ -248,8 +252,6 @@ namespace DelvUI.Interface
             var lightspeedBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 841);
             var lightspeedDuration = 0f;
             const float lightspeedMaxDuration = 15f;
-
-            var drawList = ImGui.GetWindowDrawList();
 
             var xPos = CenterX - XOffset + LightspeedBarX;
             var yPos = CenterY + YOffset + LightspeedBarY;
@@ -269,6 +271,7 @@ namespace DelvUI.Interface
                 .SetVertical(true)
                 .Build();
 
+            var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);
         }
 
@@ -278,7 +281,6 @@ namespace DelvUI.Interface
             var starPostCookingBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1248);
             var starDuration = 0f;
             const float starMaxDuration = 10f;
-            var drawList = ImGui.GetWindowDrawList();
 
             var xPos = CenterX - XOffset + StarBarX;
             var yPos = CenterY + YOffset + StarBarY;
@@ -306,6 +308,7 @@ namespace DelvUI.Interface
                 .SetVertical(true)
                 .Build();
 
+            var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);
         }
     }

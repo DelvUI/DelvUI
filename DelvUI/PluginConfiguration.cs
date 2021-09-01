@@ -282,12 +282,12 @@ namespace DelvUI {
 
         public int ASTDrawBarHeight { get; set; } = 20;
         public int ASTDrawBarWidth { get; set; } = 254;
-        public int ASTDrawBarX { get; set; } = 395;
-        public int ASTDrawBarY { get; set; } = 400;
+        public int ASTDrawBarX { get; set; } = 33;
+        public int ASTDrawBarY { get; set; } = -65;
         public int ASTDivinationHeight { get; set; } = 20;
         public int ASTDivinationWidth { get; set; } = 254;
-        public int ASTDivinationBarX { get; set; } = -127;
-        public int ASTDivinationBarY { get; set; } = 373;
+        public int ASTDivinationBarX { get; set; } = 33;
+        public int ASTDivinationBarY { get; set; } = -87;
         public int ASTDivinationBarPad { get; set; } = 1;
         public int ASTDotBarHeight { get; set; } = 20;
         public int ASTDotBarWidth { get; set; } = 254;
@@ -296,11 +296,11 @@ namespace DelvUI {
         public int ASTStarBarHeight { get; set; } = 86;
         public int ASTStarBarWidth { get; set; } = 20;
         public int ASTStarBarX { get; set; } = 11;
-        public int ASTStarBarY { get; set; } = -82;
+        public int ASTStarBarY { get; set; } = -87;
         public int ASTLightspeedBarHeight { get; set; } = 86;
         public int ASTLightspeedBarWidth { get; set; } = 20;
         public int ASTLightspeedBarX { get; set; } = 289;
-        public int ASTLightspeedBarY { get; set; } = -82;
+        public int ASTLightspeedBarY { get; set; } = -87;
         public bool ASTShowDivinationBar = true;
         public bool ASTShowDrawBar = true;
         public bool ASTShowDotBar = true;
