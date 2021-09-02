@@ -2787,6 +2787,7 @@ namespace DelvUI.Interface
                     _changed |= ImGui.Checkbox("Show numbers of different seals for Divination with text", ref _pluginConfiguration.ASTShowDivinationTextBar);
                     _changed |= ImGui.Checkbox("Show card preferred target with glow", ref _pluginConfiguration.ASTShowDrawGlowBar);
                     _changed |= ImGui.Checkbox("Show card preferred target with text", ref _pluginConfiguration.ASTShowDrawTextBar);
+                    _changed |= ImGui.Checkbox("Show Redraw Stacks & Cooldowns", ref _pluginConfiguration.ASTShowRedrawBar);
                     _changed |= ImGui.Checkbox("Show Primary Resource Bar", ref _pluginConfiguration.ASTShowPrimaryResourceBar);
                     _changed |= ImGui.ColorEdit4("Seal Sun Color", ref _pluginConfiguration.ASTSealSunColor);
                     _changed |= ImGui.ColorEdit4("Seal Lunar Color", ref _pluginConfiguration.ASTSealLunarColor);
