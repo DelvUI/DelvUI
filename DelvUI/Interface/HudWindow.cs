@@ -964,7 +964,7 @@ namespace DelvUI.Interface {
             {
                 parsedDuration = t.Minutes+"m";
             }
-            else if (t.Minutes < 5)
+            else if (t.Minutes > 5)
             {
                 parsedDuration = t.Minutes + ":" + t.Seconds;
             }
