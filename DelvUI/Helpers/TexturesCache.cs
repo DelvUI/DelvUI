@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Dalamud.Data.LuminaExtensions;
 using Dalamud.Plugin;
 using ImGuiScene;
+using Lumina;
 using Lumina.Data.Files;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
@@ -14,24 +15,25 @@ namespace DelvUI.Helpers
     public class TexturesCache
     {
         #region Singleton
-        private static TexturesCache instance = null;
-        private DalamudPluginInterface pluginInterface;
+        private static TexturesCache _instance = null;
+        private DalamudPluginInterface _pluginInterface;
+        private GameData _gameData;
 
         private TexturesCache(DalamudPluginInterface pluginInterface)
         {
-            this.pluginInterface = pluginInterface;
+            this._pluginInterface = pluginInterface;
         }
 
         public static void Initialize(DalamudPluginInterface pluginInterface)
         {
-            instance = new TexturesCache(pluginInterface);
+            _instance = new TexturesCache(pluginInterface);
         }
 
         public static TexturesCache Instance
         {
             get
             {
-                return instance;
+                return _instance;
             }
         }
         #endregion
@@ -45,25 +47,25 @@ namespace DelvUI.Helpers
             [typeof(Companion)] = new Dictionary<uint, TextureWrap>()
         };
 
-        public TextureWrap GetTexture<T>(uint rowId) where T : ExcelRow
+        public TextureWrap GetTexture<T>(uint rowId, bool hdIcon) where T : ExcelRow
         {
-            var sheet = pluginInterface.Data.GetExcelSheet<T>();
+            var sheet = _pluginInterface.Data.GetExcelSheet<T>();
             if (sheet == null) return null;
 
-            return GetTexture<T>(sheet.GetRow(rowId));
+            return GetTexture<T>(sheet.GetRow(rowId), hdIcon);
         }
 
-        public TextureWrap GetTexture<T>(dynamic row) where T : ExcelRow
+        public TextureWrap GetTexture<T>(dynamic row, bool hdIcon) where T : ExcelRow
         {
             if (row == null) return null;
 
             var iconId = row?.Icon;
             if (iconId == null) return null;
 
-            return GetTextureFromIconId<T>(iconId);
+            return GetTextureFromIconId<T>(iconId, hdIcon);
         }
 
-        public TextureWrap GetTextureFromIconId<T>(uint iconId) where T : ExcelRow
+        public TextureWrap GetTextureFromIconId<T>(uint iconId, bool hdIcon) where T : ExcelRow
         {
             if (Cache.TryGetValue(typeof(T), out var map))
             {
@@ -75,18 +77,26 @@ namespace DelvUI.Helpers
 
             if (map == null) return null;
 
-            TexFile iconFile = pluginInterface.Data.GetIcon((int)iconId);
+            TexFile iconFile = LoadIcon(iconId, hdIcon);
+            //TexFile iconFile = pluginInterface.Data.GetIcon((int)iconId);
             if (iconFile == null) return null;
 
-            var newTexture = pluginInterface.UiBuilder.LoadImageRaw(iconFile.GetRgbaImageData(), iconFile.Header.Width, iconFile.Header.Height, 4);
+            var newTexture = _pluginInterface.UiBuilder.LoadImageRaw(iconFile.GetRgbaImageData(), iconFile.Header.Width, iconFile.Header.Height, 4);
             map.Add(iconId, newTexture);
 
             return newTexture;
         }
+        
+        private TexFile? LoadIcon(uint id, bool hdIcon)
+        {
+            var hdString = hdIcon ? "_hr1" : "" ;
+            var path = $"ui/icon/{id / 1000 * 1000:000000}/{id:000000}{hdString}.tex";
+            return _pluginInterface.Data.GetFile<TexFile>(path);
+        }
 
         private void RemoveTexture<T>(uint rowId) where T : ExcelRow
         {
-            var sheet = pluginInterface.Data.GetExcelSheet<T>();
+            var sheet = _pluginInterface.Data.GetExcelSheet<T>();
             if (sheet == null) return;
 
             RemoveTexture<T>(sheet.GetRow(rowId));

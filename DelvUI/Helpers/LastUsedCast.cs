@@ -44,7 +44,7 @@ namespace DelvUI.Helpers
                 case null: break;
                 case ObjectKind.Aetheryte:
                     ActionText = "Attuning...";
-                    IconTexture = TexturesCache.Instance.GetTextureFromIconId<Action>(112);
+                    IconTexture = TexturesCache.Instance.GetTextureFromIconId<Action>(112, true);
                     return;
                 case ObjectKind.EventObj:
                 case ObjectKind.EventNpc:
@@ -72,26 +72,26 @@ namespace DelvUI.Helpers
                 case ActionType.Ability:
                     _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Action>()?.GetRow(CastId);
                     ActionText = _lastUsedAction?.Name.ToString();
-                    IconTexture = TexturesCache.Instance.GetTexture<Action>(_lastUsedAction);
+                    IconTexture = TexturesCache.Instance.GetTexture<Action>(_lastUsedAction, true);
                     DamageType = GetDamageType(_lastUsedAction);
                     break;
                 case ActionType.Mount:
                     _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Mount>()?.GetRow(CastId);
                     ActionText = _lastUsedAction?.Singular.ToString();
-                    IconTexture = TexturesCache.Instance.GetTexture<Mount>(_lastUsedAction);
+                    IconTexture = TexturesCache.Instance.GetTexture<Mount>(_lastUsedAction, true);
                     DamageType = DamageType.Unknown;
                     break;
                 case ActionType.KeyItem:
                 case ActionType.Item:
                     _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Item>()?.GetRow(CastId);
                     ActionText = _lastUsedAction?.Name.ToString() ?? "Using item...";
-                    IconTexture = TexturesCache.Instance.GetTexture<Item>(_lastUsedAction);
+                    IconTexture = TexturesCache.Instance.GetTexture<Item>(_lastUsedAction, true);
                     DamageType = DamageType.Unknown;
                     break;
                 case ActionType.Companion:
                     _lastUsedAction = _pluginInterface.Data.GetExcelSheet<Companion>()?.GetRow(CastId);
                     ActionText = _lastUsedAction?.Singular.ToString();
-                    IconTexture = TexturesCache.Instance.GetTexture<Companion>(_lastUsedAction);
+                    IconTexture = TexturesCache.Instance.GetTexture<Companion>(_lastUsedAction, true);
                     DamageType = DamageType.Unknown;
                     break;
                 case ActionType.None:
