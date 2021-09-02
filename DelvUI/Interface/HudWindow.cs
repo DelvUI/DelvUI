@@ -994,8 +994,8 @@ namespace DelvUI.Interface {
             var hidePermaBuffs = settings.HidePermaBuffs;
             
             
-            var buffList = new Dictionary<Status, StatusEffect>();
-            var debuffList = new Dictionary<Status, StatusEffect>();
+            var buffList = new Dictionary<StatusEffect, Status>();
+            var debuffList = new Dictionary<StatusEffect, Status>();
             foreach (var status in actor.StatusEffects)
             {
                 if (status.EffectId == 0) continue;
@@ -1005,17 +1005,17 @@ namespace DelvUI.Interface {
                 if (hidePermaBuffs && statusEffect.IsPermanent) continue;
                 if (isBuff)
                 {
-                    if(buffsEnabled) buffList.Add(statusEffect, status);
+                    if(buffsEnabled) buffList.Add(status, statusEffect);
                 }
                 else
                 {
-                    if(debuffsEnabled) debuffList.Add(statusEffect, status);
+                    if(debuffsEnabled) debuffList.Add(status, statusEffect);
                 }
             }
             
             var currentBuffRow = 0;
             var buffCount = 0;
-            var hasFoodBuff = buffList.Where(o => o.Value.EffectId == 48).Count();
+            var hasFoodBuff = buffList.Where(o => o.Key.EffectId == 48).Count();
             if (hasFoodBuff == 0)
             {
                 //just add wtv here
@@ -1026,9 +1026,9 @@ namespace DelvUI.Interface {
                 var position = currentBuffPos;
                 var size = buffSize;
                 var padding = buffPadding;
-                var duration = Math.Round(buff.Value.Duration);
-                var text = !buff.Key.IsFcBuff ? duration > 0 ? parseDuration(duration): "" : "";
-                IconHandler.DrawIcon<Status>(buff.Key, new Vector2(size, size), position, true);
+                var duration = Math.Round(buff.Key.Duration);
+                var text = !buff.Value.IsFcBuff ? duration > 0 ? parseDuration(duration): "" : "";
+                IconHandler.DrawIcon<Status>(buff.Value, new Vector2(size, size), position, true);
                 var textSize = ImGui.CalcTextSize(text);
                 DrawOutlinedText(text,position + new Vector2(size / 2f - textSize.X / 2f, size / 2f - textSize.Y / 2f));
 
@@ -1039,8 +1039,8 @@ namespace DelvUI.Interface {
                     currentBuffRow++;
                     currentBuffPos = buffGrowDown switch
                     {
-                        true => new Vector2(530, 850 + (size + padding) * currentBuffRow),
-                        false => new Vector2(530, 850 - (size + padding) * currentBuffRow)
+                        true => new Vector2(settings.BuffPosition.X, settings.BuffPosition.Y + (size + padding) * currentBuffRow),
+                        false => new Vector2(settings.BuffPosition.X, settings.BuffPosition.Y - (size + padding) * currentBuffRow)
                     };
                     buffCount = 0;
                 }
@@ -1065,9 +1065,9 @@ namespace DelvUI.Interface {
                 var position = currentDebuffPos;
                 var size = debuffSize;
                 var padding = debuffPadding;
-                var duration = Math.Round(debuff.Value.Duration);
+                var duration = Math.Round(debuff.Key.Duration);
                 var text = duration > 0 ? parseDuration(duration): "";
-                IconHandler.DrawIcon<Status>(debuff.Key, new Vector2(size, size), position, true);
+                IconHandler.DrawIcon<Status>(debuff.Value, new Vector2(size, size), position, true);
                 var textSize = ImGui.CalcTextSize(text);
                 DrawOutlinedText(text,position + new Vector2(size / 2f - textSize.X / 2f, size / 2f - textSize.Y / 2f));
 
@@ -1075,10 +1075,10 @@ namespace DelvUI.Interface {
                 if (debuffCount > debuffColumns)
                 {
                     currentDebuffRow++;
-                    currentDebuffPos = debuffGrowRight switch
+                    currentDebuffPos = debuffGrowDown switch
                     {
-                        true => new Vector2(530, 960 + (size + padding) * currentDebuffRow),
-                        false => new Vector2(530, 960 - (size + padding) * currentDebuffRow)
+                        true => new Vector2(settings.DebuffPosition.X, settings.DebuffPosition.Y + (size + padding) * currentDebuffRow),
+                        false => new Vector2(settings.DebuffPosition.X, settings.DebuffPosition.Y - (size + padding) * currentDebuffRow)
                     };
                     debuffCount = 0;
                 }
