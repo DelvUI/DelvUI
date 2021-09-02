@@ -862,9 +862,7 @@ namespace DelvUI.Interface {
             var scale = elapsed / total;
             if (scale <= 0) return;
 
-            (int Height, int Width) barSize = GCDIndicatorVertical
-                ?  (-1 * GCDIndicatorWidth, GCDIndicatorHeight) :
-                 (GCDIndicatorHeight, GCDIndicatorWidth);
+            (int Height, int Width) barSize = (GCDIndicatorHeight, GCDIndicatorWidth);
 
             var position = new Vector2(CenterX + GCDIndicatorXOffset - GCDIndicatorWidth / 2f, CenterY + GCDIndicatorYOffset);
             var colors = PluginConfiguration.MiscColorMap["gcd"];
