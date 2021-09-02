@@ -419,6 +419,7 @@ namespace DelvUI {
         public bool SAMMeditationEnabled { get; set; } = true;
         public bool SAMHiganbanaEnabled { get; set; } = true;
         public bool SAMBuffsEnabled { get; set; } = true;
+        public bool ShowBuffTime { get; set; } = true;
 
         public bool SAMHiganbanaText { get; set; } = true;
         public bool SAMBuffText { get; set; } = true;

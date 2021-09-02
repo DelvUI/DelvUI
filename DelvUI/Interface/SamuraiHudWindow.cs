@@ -51,6 +51,7 @@ namespace DelvUI.Interface
         private int SenPadding => PluginConfiguration.SAMSenPadding;
 		
         private bool BuffsEnabled => PluginConfiguration.SAMBuffsEnabled;
+        private bool ShowBuffTime => PluginConfiguration.ShowBuffTime;
         private bool GaugeEnabled => PluginConfiguration.SAMGaugeEnabled;
         private bool HiganbanaEnabled => PluginConfiguration.SAMHiganbanaEnabled;
         private bool MeditationEnabled => PluginConfiguration.SAMMeditationEnabled;
