@@ -115,10 +115,11 @@ namespace DelvUI.Interface
                 .AddInnerBar(gauge.Heat, 100, HeatColor, EmptyColor);
             if (HeatGaugeText)
                 builder.SetTextMode(BarTextMode.EachChunk)
-                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                    .SetBackgroundColor(EmptyColor["background"]);
             
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawBatteryGauge()
@@ -130,7 +131,8 @@ namespace DelvUI.Interface
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, BatteryGaugeHeight, BatteryGaugeWidth)
                 .SetChunks(new[] {.5f, .1f, .1f, .1f, .1f, .1f})
-                .SetChunkPadding(BatteryGaugePadding);
+                .SetChunkPadding(BatteryGaugePadding)
+                .SetBackgroundColor(EmptyColor["background"]);
 
             if (BatteryGaugeShowBattery)
             {
@@ -150,7 +152,7 @@ namespace DelvUI.Interface
 
             var drawList = ImGui.GetWindowDrawList();
             var bar = builder.Build();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawOverheatBar()
@@ -160,7 +162,7 @@ namespace DelvUI.Interface
             var xPos = CenterX - OverheatXOffset;
             var yPos = CenterY + OverheatYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, OverheatHeight, OverheatWidth);
+            var builder = BarBuilder.Create(xPos, yPos, OverheatHeight, OverheatWidth).SetBackgroundColor(EmptyColor["background"]);
 
             if (gauge.IsOverheated())
             {
@@ -171,7 +173,7 @@ namespace DelvUI.Interface
             }
             
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawWildfireBar()
@@ -189,11 +191,12 @@ namespace DelvUI.Interface
                 builder.AddInnerBar(duration, 10, WildfireColor, null);
                 if (WildfireText)
                     builder.SetTextMode(BarTextMode.EachChunk)
+                        .SetBackgroundColor(EmptyColor["background"])
                         .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
     }
 }

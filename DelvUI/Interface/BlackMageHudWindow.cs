@@ -87,7 +87,7 @@ namespace DelvUI.Interface
             var color = gauge.InAstralFire() ? ManaBarFireColor : (gauge.InUmbralIce() ? ManaBarIceColor : ManaBarNoElementColor);
 
             var builder = BarBuilder.Create(OriginX - ManaBarWidth / 2, OriginY - ManaBarHeight, ManaBarHeight, ManaBarWidth);
-            builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, color);
+            builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, color).SetBackgroundColor(EmptyColor["background"]);
 
             // element timer
             if (gauge.InAstralFire() || gauge.InUmbralIce())
@@ -105,7 +105,7 @@ namespace DelvUI.Interface
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
 
             // threshold marker
             if (ShowManaThresholdMarker && gauge.InAstralFire())
@@ -140,11 +140,11 @@ namespace DelvUI.Interface
             var bar = BarBuilder.Create(cursorPos.X, cursorPos.Y, UmbralHeartHeight, totalWidth)
                 .SetChunks(3)
                 .SetChunkPadding(HorizontalSpaceBetweenBars)
-                .AddInnerBar(gauge.NumUmbralHearts, 3, UmbralHeartColor, EmptyColor)
+                .AddInnerBar(gauge.NumUmbralHearts, 3, UmbralHeartColor, EmptyColor).SetBackgroundColor(EmptyColor["background"])
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         protected virtual void DrawPolyglot()
@@ -164,25 +164,26 @@ namespace DelvUI.Interface
 
             // 1
             var builder = BarBuilder.Create(OriginX - totalWidth / 2, y, PolyglotHeight, PolyglotWidth)
-                .AddInnerBar(gauge.NumPolyglotStacks < 1 ? scale : 1, 1, PolyglotColor);
+                .AddInnerBar(gauge.NumPolyglotStacks < 1 ? scale : 1, 1, PolyglotColor).SetBackgroundColor(
+                EmptyColor["background"]);
 
             if (gauge.NumPolyglotStacks >= 1)
             {
                 builder.SetGlowColor(0x88FFFFFF);
             }
 
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
 
             // 2
             builder = BarBuilder.Create(OriginX - totalWidth / 2 + PolyglotWidth + HorizontalSpaceBetweenBars, y, PolyglotHeight, PolyglotWidth)
-                .AddInnerBar(gauge.NumPolyglotStacks == 1 ? scale : gauge.NumPolyglotStacks == 0 ? 0 : 1, 1, PolyglotColor);
+                .AddInnerBar(gauge.NumPolyglotStacks == 1 ? scale : gauge.NumPolyglotStacks == 0 ? 0 : 1, 1, PolyglotColor).SetBackgroundColor(EmptyColor["background"]);
 
             if (gauge.NumPolyglotStacks == 2)
             {
                 builder.SetGlowColor(0x88FFFFFF);
             }
 
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         protected virtual void DrawTripleCast()
@@ -197,11 +198,11 @@ namespace DelvUI.Interface
             var bar = BarBuilder.Create(cursorPos.X, cursorPos.Y, TripleCastHeight, totalWidth)
                 .SetChunks(3)
                 .SetChunkPadding(HorizontalSpaceBetweenBars)
-                .AddInnerBar(tripleStackBuff.StackCount, 3, TriplecastColor, EmptyColor)
+                .AddInnerBar(tripleStackBuff.StackCount, 3, TriplecastColor, EmptyColor).SetBackgroundColor(EmptyColor["background"])
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         protected virtual void DrawProcs()

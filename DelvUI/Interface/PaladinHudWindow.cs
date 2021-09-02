@@ -123,8 +123,9 @@ namespace DelvUI.Interface
             var posX = CenterX - ManaXOffset;
             var posY = CenterY + ManaYOffset;
 
-            var builder = BarBuilder.Create(posX, posY, ManaBarHeight, ManaBarWidth);
-
+            var builder = BarBuilder.Create(posX, posY, ManaBarHeight, ManaBarWidth)                
+                .SetBackgroundColor(EmptyColor["background"]);
+            
             if(ManaChunked)
             {
                 builder.SetChunks(5)
@@ -143,7 +144,7 @@ namespace DelvUI.Interface
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawOathGauge()
@@ -156,6 +157,7 @@ namespace DelvUI.Interface
             var builder = BarBuilder.Create(xPos, yPos, OathGaugeBarHeight, OathGaugeBarWidth)
                 .SetChunks(2)
                 .SetChunkPadding(OathGaugeBarPadding)
+                .SetBackgroundColor(EmptyColor["background"])
                 .AddInnerBar(gauge.GaugeAmount, 100, OathGaugeColor, EmptyColor);
 
             if (OathGaugeText)
@@ -165,7 +167,7 @@ namespace DelvUI.Interface
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawBuffBar()
@@ -176,7 +178,9 @@ namespace DelvUI.Interface
             var xPos = CenterX - BuffBarXOffset;
             var yPos = CenterY + BuffBarYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, BuffBarHeight, BuffBarWidth);
+            var builder = BarBuilder.Create(xPos, yPos, BuffBarHeight, BuffBarWidth)                
+                .SetBackgroundColor(EmptyColor["background"]);
+            
 
             if (fightOrFlightBuff.Any())
             {
@@ -197,7 +201,7 @@ namespace DelvUI.Interface
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawAtonementBar()
@@ -211,10 +215,11 @@ namespace DelvUI.Interface
             var builder = BarBuilder.Create(xPos, yPos, AtonementBarHeight, AtonementBarWidth)
                 .SetChunks(3)
                 .SetChunkPadding(AtonementBarPadding)
+                .SetBackgroundColor(EmptyColor["background"])
                 .AddInnerBar(stackCount, 3, AtonementColor, null);
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawDoTBar()
@@ -232,7 +237,9 @@ namespace DelvUI.Interface
             var yPos = CenterY + DoTBarYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, DoTBarHeight, DoTBarWidth)
-                .AddInnerBar(duration, 21, DoTColor);
+                .AddInnerBar(duration, 21, DoTColor)
+                .SetBackgroundColor(EmptyColor["background"]);
+
 
             if (DoTBarText)
             {
@@ -241,7 +248,7 @@ namespace DelvUI.Interface
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
     }
 }

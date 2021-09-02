@@ -94,6 +94,7 @@ namespace DelvUI.Interface {
 
                 var cbBar = builder.AddInnerBar(duration, 30f, color)
                     .SetFlipDrainDirection(BRDCBInverted)
+                    .SetBackgroundColor(EmptyColor["background"])
                     .Build();
                 barDrawList.Add(cbBar);
             }
@@ -114,6 +115,7 @@ namespace DelvUI.Interface {
 
                 var sbBar = builder.AddInnerBar(duration, 30f, color)
                     .SetFlipDrainDirection(BRDSBInverted)
+                    .SetBackgroundColor(EmptyColor["background"])
                     .Build();
                 barDrawList.Add(sbBar);
 
@@ -124,7 +126,7 @@ namespace DelvUI.Interface {
                 var drawList = ImGui.GetWindowDrawList();
                 foreach (var bar in barDrawList)
                 {
-                    bar.Draw(drawList);
+                    bar.Draw(drawList, PluginConfiguration);
                 }
             }
         }
@@ -181,10 +183,11 @@ namespace DelvUI.Interface {
             var bar = builder.AddInnerBar(duration / 1000f, 30f, songColor)
                 .SetTextMode(BarTextMode.EachChunk)
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                .SetBackgroundColor(EmptyColor["background"])
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawSoulVoiceBar()
@@ -198,10 +201,11 @@ namespace DelvUI.Interface {
             var builder = BarBuilder.Create(xPos, yPos, BRDSoulGaugeHeight, BRDSoulGaugeWidth);
 
             var bar = builder.AddInnerBar(soulVoice, 100f, SVColor)
+                .SetBackgroundColor(EmptyColor["background"])
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawStacks(int amount, int max, Dictionary<string, uint> stackColor)
@@ -212,9 +216,10 @@ namespace DelvUI.Interface {
                 .SetChunks(max)
                 .SetChunkPadding(BRDStackPadding)
                 .AddInnerBar(amount, max, stackColor)
+                .SetBackgroundColor(EmptyColor["background"])
                 .Build();
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
     }
 }

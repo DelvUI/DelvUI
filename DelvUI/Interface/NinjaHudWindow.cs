@@ -62,10 +62,11 @@ namespace DelvUI.Interface
             Bar bar = builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, HutonColor)
                 .SetTextMode(BarTextMode.EachChunk)
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                .SetBackgroundColor(EmptyColor["background"])
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawNinkiGauge()
@@ -79,10 +80,11 @@ namespace DelvUI.Interface
                 .SetChunks(2)
                 .SetChunkPadding(NinkiGaugePadding)
                 .AddInnerBar(gauge.Ninki, 100, NinkiColor, EmptyColor)
+                .SetBackgroundColor(EmptyColor["background"])
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
     }
 }
