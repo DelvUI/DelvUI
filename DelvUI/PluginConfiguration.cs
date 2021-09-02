@@ -23,6 +23,11 @@ namespace DelvUI {
         public int PrimaryResourceBarWidth { get; set; } = 254;
         public int PrimaryResourceBarXOffset { get; set; } = 160;
         public int PrimaryResourceBarYOffset { get; set; } = 455;
+        public int PrimaryResourceBarTextXOffset { get; set; } = 0;
+        public int PrimaryResourceBarTextYOffset { get; set; } = 0;
+        public bool ShowPrimaryResourceBarValue = false;
+        public bool ShowPrimaryResourceBarThresholdMarker = false;
+        public int PrimaryResourceBarThresholdValue { get; set; } = 7000;
         public int TargetBarHeight { get; set; } = 50;
         public int TargetBarWidth { get; set; } = 270;
         public int TargetBarXOffset { get; set; } = 160;
