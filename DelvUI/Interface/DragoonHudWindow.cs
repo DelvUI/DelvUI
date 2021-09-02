@@ -82,7 +82,7 @@ namespace DelvUI.Interface
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             var scale = 0f;
             var duration = 0;
-            if ((target is Chara))
+            if (target is Chara)
             {
                 var chaosThrust = target.StatusEffects.FirstOrDefault(o => (o.EffectId == 1312 || o.EffectId == 118) && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
                 scale = chaosThrust.Duration / 24f;

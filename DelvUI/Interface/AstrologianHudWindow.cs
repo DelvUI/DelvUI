@@ -9,6 +9,7 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using FFXIVClientStructs.FFXIV.Client.Game;
 
 namespace DelvUI.Interface
 {
@@ -46,6 +47,12 @@ namespace DelvUI.Interface
         private bool ShowDotBar => PluginConfiguration.ASTShowDotBar;
         private bool ShowStarBar => PluginConfiguration.ASTShowStarBar;
         private bool ShowLightspeedBar => PluginConfiguration.ASTShowLightspeedBar;
+        private bool ShowStarGlowBar => PluginConfiguration.ASTShowStarGlowBar;
+        private bool ShowDivinationGlowBar => PluginConfiguration.ASTShowDivinationGlowBar;
+        private bool ShowDrawGlowBar => PluginConfiguration.ASTShowDrawGlowBar;
+
+        private bool ShowDivinationTextBar => PluginConfiguration.ASTShowDivinationTextBar;
+        private bool ShowDrawTextBar => PluginConfiguration.ASTShowDrawTextBar;
 
         private bool ShowPrimaryResourceBar => PluginConfiguration.ASTShowPrimaryResourceBar;
 
@@ -58,6 +65,12 @@ namespace DelvUI.Interface
         private Dictionary<string, uint> StarGiantColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 5];
         private Dictionary<string, uint> LightspeedColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 6];
         private Dictionary<string, uint> DotColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 7];
+        private Dictionary<string, uint> StarGlowColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 8];
+        private Dictionary<string, uint> DivinationGlowColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 9];
+        private Dictionary<string, uint> DrawMeleeGlowColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 10];
+        private Dictionary<string, uint> DrawRangedGlowColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 11];
+        private Dictionary<string, uint> DrawCDColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 12];
+        private Dictionary<string, uint> DrawCDReadyColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000 + 13];
 
         private new Vector2 BarSize { get; set; }
         private Vector2 BarCoords { get; set; }
@@ -150,16 +163,34 @@ namespace DelvUI.Interface
                 var xPos = CenterX - XOffset + DivinationBarX;
                 var yPos = CenterY + YOffset + DivinationBarY;
 
-                var builder = BarBuilder.Create(xPos, yPos, DivinationHeight, DivinationWidth)
-                    .SetBackgroundColor(EmptyColor["gradientRight"])
+                var bar = BarBuilder.Create(xPos, yPos, DivinationHeight, DivinationWidth)
+                    .SetBackgroundColor(EmptyColor["background"])
                     .SetChunks(3)
                     .SetChunkPadding(DivinationBarPad)
                     .AddInnerBar(chunkColors.Count(n => n != EmptyColor), 3, chunkColors.ToArray())
                     .SetTextMode(BarTextMode.Single)
                     .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, textSealReady);
+                
+                if (!ShowDivinationTextBar)
+                {
+                    textSealReady = "";
+                };
+
+                bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, textSealReady);
+
+                if (ShowDivinationGlowBar)
+                {
+                    var chucksToGlow = new bool[3];
+                    for (int i = 0; i < sealNumbers; i++)
+                    {
+                        chucksToGlow[i] = true;
+                    }
+                    bar.SetGlowChunks(chucksToGlow);
+                    bar.SetGlowColor(DivinationGlowColor["background"]);
+                };
 
                 var drawList = ImGui.GetWindowDrawList();
-                builder.Build().Draw(drawList, PluginConfiguration);
+                bar.Build().Draw(drawList, PluginConfiguration);
             }
 
         }
@@ -202,16 +233,60 @@ namespace DelvUI.Interface
                     cardJob = "RANGED";
                     break;
             }
-            
-            var drawList = ImGui.GetWindowDrawList();
-            var cardPresent = cardJob != "" ? 1f :0f;
-            Bar bar = builder.AddInnerBar(cardPresent, 1f, cardColor)
-                .SetBackgroundColor(EmptyColor["gradientRight"])
-                .SetTextMode(BarTextMode.Single)
-                .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, cardJob)
-                .Build();
 
-            bar.Draw(drawList, PluginConfiguration);
+            var castInfo = 0f;
+            var cardPresent = 0f;
+            var cardMax = 0f;
+            var drawList = ImGui.GetWindowDrawList();
+            unsafe
+            {
+                var actionManager = ActionManager.Instance();
+                var adjustedId = actionManager->GetAdjustedActionId(3590);
+                var timeElapsed = actionManager->GetRecastTimeElapsed(ActionType.Spell, adjustedId);
+                var timeTotal = actionManager->GetRecastTime(ActionType.Spell, adjustedId);
+                castInfo = Math.Abs(timeTotal - timeElapsed);
+            }
+            
+            if (cardJob != "")
+            {
+                cardPresent = 1f;
+                cardMax = 1f;
+            }
+            else
+            {
+                cardPresent = castInfo > 0 ? castInfo: 1f;
+                cardJob = castInfo > 0 ? Math.Abs(castInfo).ToString("N1") : "READY";
+                cardColor = castInfo> 0 ? DrawCDColor : DrawCDReadyColor;
+                cardMax = castInfo > 0 ? 30f : 1f;
+            }
+
+            var bar = builder.AddInnerBar(Math.Abs(cardPresent), cardMax, cardColor)
+                .SetBackgroundColor(EmptyColor["background"])
+                .SetTextMode(BarTextMode.Single);
+
+            if (ShowDrawGlowBar)
+            {
+                switch (cardJob)
+                {
+                    case "RANGED":
+                        bar.SetGlowColor(DrawRangedGlowColor["gradientRight"]);
+                        break;
+                    case "MELEE":
+                        bar.SetGlowColor(DrawMeleeGlowColor["gradientRight"]);
+                        break;
+                };
+            }
+
+            if (!ShowDrawTextBar)
+            {
+                cardJob = "";
+            }
+
+            bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, cardJob);
+
+            
+
+            bar.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawDot()
@@ -225,7 +300,7 @@ namespace DelvUI.Interface
             if (target is not Chara)
             {
                 Bar barNoTarget = builder.AddInnerBar(0, 30f, DotColor)
-                    .SetBackgroundColor(EmptyColor["gradientRight"])
+                    .SetBackgroundColor(EmptyColor["background"])
                     .SetTextMode(BarTextMode.Single)
                     .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                     .Build();
@@ -239,8 +314,8 @@ namespace DelvUI.Interface
             var dotDuration = dot.Duration;
 
 
-            Bar bar = builder.AddInnerBar(System.Math.Abs(dotDuration), dotCooldown, DotColor)
-                .SetBackgroundColor(EmptyColor["gradientRight"])
+            var bar = builder.AddInnerBar(System.Math.Abs(dotDuration), dotCooldown, DotColor)
+                .SetBackgroundColor(EmptyColor["background"])
                 .SetTextMode(BarTextMode.Single)
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                 .Build();
@@ -264,12 +339,11 @@ namespace DelvUI.Interface
 
             var builder = BarBuilder.Create(xPos, yPos, LightspeedHeight, LightspeedWidth);
 
-            Bar bar = builder.AddInnerBar(lightspeedDuration, lightspeedMaxDuration, EmptyColor, LightspeedColor)               
+            var bar = builder.AddInnerBar(lightspeedDuration, lightspeedMaxDuration, EmptyColor, LightspeedColor)               
                 .SetTextMode(BarTextMode.Single)
-                .SetBackgroundColor(EmptyColor["gradientRight"])
+                .SetBackgroundColor(EmptyColor["background"])
                 .SetFlipDrainDirection(true)
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                .SetVertical(true)
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
@@ -301,16 +375,18 @@ namespace DelvUI.Interface
 
             var builder = BarBuilder.Create(xPos, yPos, StarHeight, StarWidth);
 
-            Bar bar = builder.AddInnerBar(starDuration, starMaxDuration, EmptyColor, starColorSelector)
+            var bar = builder.AddInnerBar(starDuration, starMaxDuration, EmptyColor, starColorSelector)
                 .SetTextMode(BarTextMode.Single)
-                .SetBackgroundColor(EmptyColor["gradientRight"])
-                .SetFlipDrainDirection(true)
-                .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                .SetVertical(true)
-                .Build();
+                .SetBackgroundColor(EmptyColor["background"])
+                .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+
+            if (starColorSelector == StarGiantColor && ShowStarGlowBar)
+            {
+                bar.SetGlowColor(StarGlowColor["background"]);
+            };
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Build().Draw(drawList, PluginConfiguration);
         }
     }
 }

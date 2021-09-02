@@ -88,7 +88,7 @@ namespace DelvUI.Interface
             BarCoords = new Vector2(FairyBarX, FairyBarY);
             var cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y - 49);
             var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["background"]);
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(BarSize.X * gauge / 100, BarSize.Y),
                 SchFairyColor["gradientLeft"], SchFairyColor["gradientRight"], SchFairyColor["gradientRight"], SchFairyColor["gradientLeft"]
@@ -109,15 +109,15 @@ namespace DelvUI.Interface
 
             var drawList = ImGui.GetWindowDrawList();
 
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["background"]);
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
             cursorPos = new Vector2(cursorPos.X + barWidth + SchAetherBarPad, cursorPos.Y);
 
-            drawList.AddRectFilled(cursorPos, cursorPos + new Vector2(barWidth+1, SchAetherBarHeight), EmptyColor["gradientRight"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + new Vector2(barWidth+1, SchAetherBarHeight), EmptyColor["background"]);
             drawList.AddRect(cursorPos, cursorPos + new Vector2(barWidth + 1, SchAetherBarHeight), 0xFF000000);
             cursorPos = new Vector2(cursorPos.X - barWidth*2 - SchAetherBarPad * 2, cursorPos.Y);
 
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["background"]);
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
             
             switch (aetherFlowBuff.StackCount)
@@ -159,7 +159,7 @@ namespace DelvUI.Interface
 
             if (!(target is Chara))
             {
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
+                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["background"]);
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
                 return;
             }
@@ -169,7 +169,7 @@ namespace DelvUI.Interface
             var bioDuration = (int)bio.Duration;
             var xOffset = CenterX;
 
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["background"]);
             drawList.AddRectFilled(cursorPos, cursorPos + new Vector2((BarSize.X / 30) * bioDuration, BarSize.Y), SCHBioColor["gradientRight"]);
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
             DrawOutlinedText(bioDuration.ToString(CultureInfo.InvariantCulture), new Vector2(cursorPos.X + BarSize.X * bioDuration / 30 - (bioDuration == 30 ? 30 : bioDuration > 3 ? 20 : 0), cursorPos.Y + (BarSize.Y / 2) - 12));
