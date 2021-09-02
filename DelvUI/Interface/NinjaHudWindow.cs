@@ -65,7 +65,7 @@ namespace DelvUI.Interface
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawNinkiGauge()
@@ -82,7 +82,7 @@ namespace DelvUI.Interface
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
     }
 }

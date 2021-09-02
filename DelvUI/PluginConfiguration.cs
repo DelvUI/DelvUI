@@ -205,12 +205,14 @@ namespace DelvUI {
 
         public bool WARStormsEyeEnabled { get; set; } = true;
         public bool WARStormsEyeText { get; set; } = true;
+        public float WARStormsEyeTextScale { get; set; } = 1.0f;
         public int WARStormsEyeHeight { get; set; } = 20;
         public int WARStormsEyeWidth { get; set; } = 254;
         public int WARStormsEyeXOffset { get; set; } = 127;
         public int WARStormsEyeYOffset { get; set; } = 417;
         public bool WARBeastGaugeEnabled { get; set; } = true;
         public bool WARBeastGaugeText { get; set; }
+        public float WARBeastGaugeTextScale { get; set; } = 1.0f;
         public int WARBeastGaugeHeight { get; set; } = 20;
         public int WARBeastGaugeWidth { get; set; } = 254;
         public int WARBeastGaugePadding { get; set; } = 2;

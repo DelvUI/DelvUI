@@ -124,7 +124,7 @@ namespace DelvUI.Interface {
                 var drawList = ImGui.GetWindowDrawList();
                 foreach (var bar in barDrawList)
                 {
-                    bar.Draw(drawList);
+                    bar.Draw(drawList, PluginConfiguration);
                 }
             }
         }
@@ -184,7 +184,7 @@ namespace DelvUI.Interface {
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawSoulVoiceBar()
@@ -201,7 +201,7 @@ namespace DelvUI.Interface {
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawStacks(int amount, int max, Dictionary<string, uint> stackColor)
@@ -214,7 +214,7 @@ namespace DelvUI.Interface {
                 .AddInnerBar(amount, max, stackColor)
                 .Build();
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
     }
 }

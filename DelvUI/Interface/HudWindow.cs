@@ -817,7 +817,7 @@ namespace DelvUI.Interface {
                 .SetVertical(GCDIndicatorVertical)
                 .Build();
             
-            gcdBar.Draw(drawList);
+            gcdBar.Draw(drawList, PluginConfiguration);
         }
 
         protected unsafe virtual float ActorShieldValue(Actor actor) {

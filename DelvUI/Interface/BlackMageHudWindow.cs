@@ -105,7 +105,7 @@ namespace DelvUI.Interface
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
 
             // threshold marker
             if (ShowManaThresholdMarker && gauge.InAstralFire())
@@ -144,7 +144,7 @@ namespace DelvUI.Interface
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         protected virtual void DrawPolyglot()
@@ -171,7 +171,7 @@ namespace DelvUI.Interface
                 builder.SetGlowColor(0x88FFFFFF);
             }
 
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
 
             // 2
             builder = BarBuilder.Create(OriginX - totalWidth / 2 + PolyglotWidth + HorizontalSpaceBetweenBars, y, PolyglotHeight, PolyglotWidth)
@@ -182,7 +182,7 @@ namespace DelvUI.Interface
                 builder.SetGlowColor(0x88FFFFFF);
             }
 
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         protected virtual void DrawTripleCast()
@@ -201,7 +201,7 @@ namespace DelvUI.Interface
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         protected virtual void DrawProcs()
