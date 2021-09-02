@@ -207,6 +207,10 @@ namespace DelvUI.Interface {
             ImGui.Begin("health_bar", windowFlags);
             if (ImGui.BeginChild("health_bar", BarSize)) {
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
+                if (HasTankInvuln() == 1)
+                {
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["gradientLeft"]);
+                }
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight),
                     colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
@@ -976,6 +980,23 @@ namespace DelvUI.Interface {
             }
 
             return parsedDuration;
+        }
+
+        private int HasTankInvuln()
+        {
+
+            var tankInvulnBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o =>
+                    o.EffectId == 810   || // Living Dead
+                    o.EffectId == 1302  || // Hollow Ground
+                    o.EffectId == 409  || // Holmgang
+                    o.EffectId == 1836   // Bolide
+
+            );
+
+            return tankInvulnBuff.Count();
+            
+
+
         }
         private void DrawActorStatusEffects(Actor actor, StatusSettings settings)
         {
