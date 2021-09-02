@@ -1013,8 +1013,8 @@ namespace DelvUI.Interface {
                     currentBuffRow++;
                     currentBuffPos = buffGrowDown switch
                     {
-                        true => new Vector2(530, 850 + (size + padding) * currentBuffRow),
-                        false => new Vector2(530, 850 - (size + padding) * currentBuffRow)
+                        true => new Vector2(settings.BuffPosition.X, settings.BuffPosition.Y + (size + padding) * currentBuffRow),
+                        false => new Vector2(settings.BuffPosition.X, settings.BuffPosition.Y - (size + padding) * currentBuffRow)
                     };
                     buffCount = 0;
                 }
@@ -1049,10 +1049,10 @@ namespace DelvUI.Interface {
                 if (debuffCount > debuffColumns)
                 {
                     currentDebuffRow++;
-                    currentDebuffPos = debuffGrowRight switch
+                    currentDebuffPos = debuffGrowDown switch
                     {
-                        true => new Vector2(530, 960 + (size + padding) * currentDebuffRow),
-                        false => new Vector2(530, 960 - (size + padding) * currentDebuffRow)
+                        true => new Vector2(settings.DebuffPosition.X, settings.DebuffPosition.Y + (size + padding) * currentDebuffRow),
+                        false => new Vector2(settings.DebuffPosition.X, settings.DebuffPosition.Y - (size + padding) * currentDebuffRow)
                     };
                     debuffCount = 0;
                 }
