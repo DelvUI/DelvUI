@@ -2554,6 +2554,11 @@ namespace DelvUI.Interface
                     _changed |= ImGui.Checkbox("Show Dot Bar", ref _pluginConfiguration.ASTShowDotBar);
                     _changed |= ImGui.Checkbox("Show Star Bar", ref _pluginConfiguration.ASTShowStarBar);
                     _changed |= ImGui.Checkbox("Show Lightspeed Bar", ref _pluginConfiguration.ASTShowLightspeedBar);
+                    _changed |= ImGui.Checkbox("Enable Star bar glow when Giant Dominance is ready", ref _pluginConfiguration.ASTShowStarGlowBar);
+                    _changed |= ImGui.Checkbox("Show numbers of different seals for Divination with glow", ref _pluginConfiguration.ASTShowDivinationGlowBar);
+                    _changed |= ImGui.Checkbox("Show numbers of different seals for Divination with text", ref _pluginConfiguration.ASTShowDivinationTextBar);
+                    _changed |= ImGui.Checkbox("Show card preferred target with glow", ref _pluginConfiguration.ASTShowDrawGlowBar);
+                    _changed |= ImGui.Checkbox("Show card preferred target with text", ref _pluginConfiguration.ASTShowDrawTextBar);
                     _changed |= ImGui.Checkbox("Show Primary Resource Bar", ref _pluginConfiguration.ASTShowPrimaryResourceBar);
                     _changed |= ImGui.ColorEdit4("Seal Sun Color", ref _pluginConfiguration.ASTSealSunColor);
                     _changed |= ImGui.ColorEdit4("Seal Lunar Color", ref _pluginConfiguration.ASTSealLunarColor);
@@ -2562,6 +2567,13 @@ namespace DelvUI.Interface
                     _changed |= ImGui.ColorEdit4("Star Earthly Color", ref _pluginConfiguration.ASTStarEarthlyColor);
                     _changed |= ImGui.ColorEdit4("Star Giant Color", ref _pluginConfiguration.ASTStarGiantColor);
                     _changed |= ImGui.ColorEdit4("Lightspeed Color", ref _pluginConfiguration.ASTLightspeedColor);
+                    _changed |= ImGui.ColorEdit4("Star Glow Color", ref _pluginConfiguration.ASTStarGlowColor);
+                    _changed |= ImGui.ColorEdit4("Divination Glow Color", ref _pluginConfiguration.ASTDivinationGlowColor);
+                    _changed |= ImGui.ColorEdit4("Draw Melee Glow Color", ref _pluginConfiguration.ASTDrawMeleeGlowColor);
+                    _changed |= ImGui.ColorEdit4("Draw Ranged Glow Color", ref _pluginConfiguration.ASTDrawRangedGlowColor);
+                    _changed |= ImGui.ColorEdit4("Draw on CD Color", ref _pluginConfiguration.ASTDrawCDColor);
+                    _changed |= ImGui.ColorEdit4("Draw Ready Color", ref _pluginConfiguration.ASTDrawCDReadyColor);
+                    _changed |= ImGui.ColorEdit4("Bar Empty Color", ref _pluginConfiguration.EmptyColor);
 
                     ImGui.EndTabItem();
                 }
