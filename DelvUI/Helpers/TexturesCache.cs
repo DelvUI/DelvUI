@@ -17,7 +17,6 @@ namespace DelvUI.Helpers
         #region Singleton
         private static TexturesCache _instance = null;
         private DalamudPluginInterface _pluginInterface;
-        private GameData _gameData;
 
         private TexturesCache(DalamudPluginInterface pluginInterface)
         {
@@ -47,29 +46,29 @@ namespace DelvUI.Helpers
             [typeof(Companion)] = new Dictionary<uint, TextureWrap>()
         };
 
-        public TextureWrap GetTexture<T>(uint rowId, bool hdIcon) where T : ExcelRow
+        public TextureWrap GetTexture<T>(uint rowId, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
         {
             var sheet = _pluginInterface.Data.GetExcelSheet<T>();
             if (sheet == null) return null;
 
-            return GetTexture<T>(sheet.GetRow(rowId), hdIcon);
+            return GetTexture<T>(sheet.GetRow(rowId), stackCount, hdIcon);
         }
 
-        public TextureWrap GetTexture<T>(dynamic row, bool hdIcon) where T : ExcelRow
+        public TextureWrap GetTexture<T>(dynamic row, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
         {
             if (row == null) return null;
 
             var iconId = row?.Icon;
             if (iconId == null) return null;
 
-            return GetTextureFromIconId<T>(iconId, hdIcon);
+            return GetTextureFromIconId<T>(iconId, stackCount, hdIcon);
         }
 
-        public TextureWrap GetTextureFromIconId<T>(uint iconId, bool hdIcon) where T : ExcelRow
+        public TextureWrap GetTextureFromIconId<T>(uint iconId, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
         {
             if (Cache.TryGetValue(typeof(T), out var map))
             {
-                if (map.TryGetValue(iconId, out TextureWrap texture))
+                if (map.TryGetValue(iconId + stackCount, out TextureWrap texture))
                 {
                     return texture;
                 }
@@ -77,19 +76,19 @@ namespace DelvUI.Helpers
 
             if (map == null) return null;
 
-            TexFile iconFile = LoadIcon(iconId, hdIcon);
-            //TexFile iconFile = pluginInterface.Data.GetIcon((int)iconId);
+            //TexFile iconFile = pluginInterface.Data.GetIcon((int)iconId + (int)stackCount);
+            TexFile iconFile = LoadIcon(iconId + stackCount, hdIcon);
             if (iconFile == null) return null;
 
             var newTexture = _pluginInterface.UiBuilder.LoadImageRaw(iconFile.GetRgbaImageData(), iconFile.Header.Width, iconFile.Header.Height, 4);
-            map.Add(iconId, newTexture);
+            map.Add(iconId + stackCount, newTexture);
 
             return newTexture;
         }
-        
-        private TexFile? LoadIcon(uint id, bool hdIcon)
+
+        private TexFile LoadIcon(uint id, bool hdIcon)
         {
-            var hdString = hdIcon ? "_hr1" : "" ;
+            var hdString = hdIcon ? "_hr1" : "";
             var path = $"ui/icon/{id / 1000 * 1000:000000}/{id:000000}{hdString}.tex";
             return _pluginInterface.Data.GetFile<TexFile>(path);
         }

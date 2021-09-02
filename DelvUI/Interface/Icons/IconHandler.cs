@@ -29,7 +29,7 @@ namespace DelvUI.Interface.Icons
         public static void DrawIcon<T>(dynamic row, Vector2 size, Vector2 position, bool drawBorder) where T : ExcelRow
         {
             // Status = 24x32, show from 2,7 until 22,26
-            var texture = TexturesCache.Instance.GetTexture<T>(row, true);
+            var texture = TexturesCache.Instance.GetTexture<T>(row);
             if (texture == null) return;
             var uv0 = new Vector2(4f / texture.Width, 14f / texture.Height);
             var uv1 = new Vector2(1f - 4f / texture.Width, 1f - 12f / texture.Height);
