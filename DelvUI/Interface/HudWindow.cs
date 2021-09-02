@@ -14,6 +14,7 @@ using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.Enums;
 using DelvUI.Helpers;
+using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
@@ -82,6 +83,8 @@ namespace DelvUI.Interface {
         protected int GCDIndicatorXOffset => PluginConfiguration.GCDIndicatorXOffset;
         protected int GCDIndicatorYOffset => PluginConfiguration.GCDIndicatorYOffset;
         protected bool GCDIndicatorShowBorder => PluginConfiguration.GCDIndicatorShowBorder;
+
+        protected bool GCDIndicatorVertical => PluginConfiguration.GCDIndicatorVertical;
 
         protected int CastBarWidth => PluginConfiguration.CastBarWidth;
         protected int CastBarHeight => PluginConfiguration.CastBarHeight;
@@ -794,26 +797,27 @@ namespace DelvUI.Interface {
             }
 
             GCDHelper.GetGCDInfo(PluginInterface.ClientState.LocalPlayer, out var elapsed, out var total);
-            if (total == 0) return;
+            if (total == 0 && !PluginConfiguration.GCDAlwaysShow) return;
 
             var scale = elapsed / total;
             if (scale <= 0) return;
 
-            var fullSize = new Vector2(GCDIndicatorWidth, GCDIndicatorHeight);
-            var barSize = new Vector2(Math.Max(1f, GCDIndicatorWidth * scale), GCDIndicatorHeight);
+            (int Height, int Width) barSize = GCDIndicatorVertical
+                ?  (-1 * GCDIndicatorWidth, GCDIndicatorHeight) :
+                 (GCDIndicatorHeight, GCDIndicatorWidth);
+
             var position = new Vector2(CenterX + GCDIndicatorXOffset - GCDIndicatorWidth / 2f, CenterY + GCDIndicatorYOffset);
-            var colors = PluginConfiguration.MiscColorMap["mpTicker"];
+            var colors = PluginConfiguration.MiscColorMap["gcd"];
 
             var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(position, position + fullSize, 0x88000000);
-            drawList.AddRectFilledMultiColor(position, position + barSize,
-                colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
-            );
 
-            if (GCDIndicatorShowBorder)
-            {
-                drawList.AddRect(position, position + fullSize, 0xFF000000);
-            }
+            var builder = BarBuilder.Create(position.X, position.Y, barSize.Height, barSize.Width);
+            var gcdBar = builder.AddInnerBar(elapsed, total, colors)
+                .SetDrawBorder(GCDIndicatorShowBorder)
+                .SetVertical(GCDIndicatorVertical)
+                .Build();
+            
+            gcdBar.Draw(drawList);
         }
 
         protected unsafe virtual float ActorShieldValue(Actor actor) {

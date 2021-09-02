@@ -75,6 +75,8 @@ namespace DelvUI {
         public bool MPTickerHideOnFullMp = false;
 
         public bool GCDIndicatorEnabled = false;
+        public bool GCDAlwaysShow = false;
+        public bool GCDIndicatorVertical = false;
         public int GCDIndicatorHeight { get; set; } = 4;
         public int GCDIndicatorWidth { get; set; } = 254;
         public int GCDIndicatorXOffset { get; set; } = 0;
@@ -2013,10 +2015,10 @@ namespace DelvUI {
                 },
                 ["gcd"] = new Dictionary<string, uint>
                 {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MPTickerColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MPTickerColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MPTickerColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MPTickerColor.AdjustColor(.1f))
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(GCDIndicatorColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(GCDIndicatorColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(GCDIndicatorColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(GCDIndicatorColor.AdjustColor(.1f))
                 }
             };
 
