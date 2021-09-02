@@ -5,6 +5,11 @@
 ![image](https://i.imgur.com/AmbyNFD.png)
 ***
 
+**Discord**  
+
+https://discord.gg/delvui
+***
+
 **How to contribute**  
 
 https://github.com/DelvUI/DelvUI/wiki/Contributing  
