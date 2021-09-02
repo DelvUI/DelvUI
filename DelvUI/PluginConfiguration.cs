@@ -281,31 +281,36 @@ namespace DelvUI {
         #region AST Configuration
 
         public int ASTDrawBarHeight { get; set; } = 20;
-        public int ASTDrawBarWidth { get; set; } = 254;
-        public int ASTDrawBarX { get; set; } = 33;
+        public int ASTDrawBarWidth { get; set; } = 84;
+        public int ASTDrawBarX { get; set; } = 118;
         public int ASTDrawBarY { get; set; } = -65;
-        public int ASTDivinationHeight { get; set; } = 20;
+        public int ASTDivinationHeight { get; set; } = 10;
         public int ASTDivinationWidth { get; set; } = 254;
         public int ASTDivinationBarX { get; set; } = 33;
-        public int ASTDivinationBarY { get; set; } = -87;
+        public int ASTDivinationBarY { get; set; } = -77;
         public int ASTDivinationBarPad { get; set; } = 1;
         public int ASTDotBarHeight { get; set; } = 20;
         public int ASTDotBarWidth { get; set; } = 254;
         public int ASTDotBarX { get; set; } = 33;
         public int ASTDotBarY { get; set; } = -43;
-        public int ASTStarBarHeight { get; set; } = 86;
-        public int ASTStarBarWidth { get; set; } = 20;
-        public int ASTStarBarX { get; set; } = 11;
-        public int ASTStarBarY { get; set; } = -87;
-        public int ASTLightspeedBarHeight { get; set; } = 86;
-        public int ASTLightspeedBarWidth { get; set; } = 20;
-        public int ASTLightspeedBarX { get; set; } = 289;
-        public int ASTLightspeedBarY { get; set; } = -87;
+        public int ASTStarBarHeight { get; set; } = 20;
+        public int ASTStarBarWidth { get; set; } = 84;
+        public int ASTStarBarX { get; set; } = 33;
+        public int ASTStarBarY { get; set; } = -65;
+        public int ASTLightspeedBarHeight { get; set; } = 20;
+        public int ASTLightspeedBarWidth { get; set; } = 84;
+        public int ASTLightspeedBarX { get; set; } = 203;
+        public int ASTLightspeedBarY { get; set; } = -65;
         public bool ASTShowDivinationBar = true;
         public bool ASTShowDrawBar = true;
         public bool ASTShowDotBar = true;
         public bool ASTShowStarBar = true;
         public bool ASTShowLightspeedBar = true;
+        public bool ASTShowStarGlowBar = true;
+        public bool ASTShowDivinationGlowBar = true;
+        public bool ASTShowDivinationTextBar = false;
+        public bool ASTShowDrawGlowBar = false;
+        public bool ASTShowDrawTextBar = true;
         public bool ASTShowPrimaryResourceBar = true;
         public Vector4 ASTSealSunColor = new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f);
         public Vector4 ASTSealLunarColor = new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f);
@@ -314,7 +319,12 @@ namespace DelvUI {
         public Vector4 ASTStarEarthlyColor = new Vector4(37f / 255f, 181f / 255f, 177f / 255f, 100f / 100f);
         public Vector4 ASTStarGiantColor = new Vector4(198f / 255f, 154f / 255f, 199f / 255f, 100f / 100f);
         public Vector4 ASTLightspeedColor = new Vector4(255f / 255f, 255f / 255f, 173f / 255f, 100f / 100f);
-
+        public Vector4 ASTStarGlowColor = new Vector4(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f);
+        public Vector4 ASTDivinationGlowColor = new Vector4(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f);
+        public Vector4 ASTDrawMeleeGlowColor = new Vector4(83f / 255f, 34f / 255f, 120f / 255f, 100f / 100f);
+        public Vector4 ASTDrawRangedGlowColor = new Vector4(124f / 255f, 34f / 255f, 120f / 255f, 100f / 100f);
+        public Vector4 ASTDrawCDColor = new Vector4(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f);
+        public Vector4 ASTDrawCDReadyColor = new Vector4(137f/255f, 26f/255f, 42f/255f, 100f/100f);
         #endregion
 
         #region SMN Configuration
@@ -1256,6 +1266,55 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTDotColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTDotColor.AdjustColor(.1f))
                 },
+
+                [Jobs.AST * 1000 + 8] = new Dictionary<string, uint> // Star Glow
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTStarGlowColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTStarGlowColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTStarGlowColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTStarGlowColor.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000 + 9] = new Dictionary<string, uint> // Divination Glow
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTDivinationGlowColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTDivinationGlowColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTDivinationGlowColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTDivinationGlowColor.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000 + 10] = new Dictionary<string, uint> // Draw Melee Glow
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTDrawMeleeGlowColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTDrawMeleeGlowColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTDrawMeleeGlowColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTDrawMeleeGlowColor.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000 + 11] = new Dictionary<string, uint> // Draw Ranged Glow
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTDrawRangedGlowColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTDrawRangedGlowColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTDrawRangedGlowColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTDrawRangedGlowColor.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000 + 12] = new Dictionary<string, uint> // Draw CD
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDColor.AdjustColor(.1f))
+                },
+
+                [Jobs.AST * 1000 + 13] = new Dictionary<string, uint> // Draw CD Ready
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDReadyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDReadyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDReadyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDReadyColor.AdjustColor(.1f))
+                },
+                
 
                 [Jobs.MNK] = new Dictionary<string, uint>
                 {
