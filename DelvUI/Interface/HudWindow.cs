@@ -975,8 +975,8 @@ namespace DelvUI.Interface {
             var hidePermaBuffs = settings.HidePermaBuffs;
             
             
-            var buffList = new Dictionary<Status, StatusEffect>();
-            var debuffList = new Dictionary<Status, StatusEffect>();
+            var buffList = new Dictionary<StatusEffect, Status>();
+            var debuffList = new Dictionary<StatusEffect, Status>();
             foreach (var status in actor.StatusEffects)
             {
                 if (status.EffectId == 0) continue;
@@ -986,11 +986,11 @@ namespace DelvUI.Interface {
                 if (hidePermaBuffs && statusEffect.IsPermanent) continue;
                 if (isBuff)
                 {
-                    if(buffsEnabled) buffList.Add(statusEffect, status);
+                    if(buffsEnabled) buffList.Add(status, statusEffect);
                 }
                 else
                 {
-                    if(debuffsEnabled) debuffList.Add(statusEffect, status);
+                    if(debuffsEnabled) debuffList.Add(status, statusEffect);
                 }
             }
             
@@ -1001,9 +1001,9 @@ namespace DelvUI.Interface {
                 var position = currentBuffPos;
                 var size = buffSize;
                 var padding = buffPadding;
-                var duration = Math.Round(buff.Value.Duration);
+                var duration = Math.Round(buff.Key.Duration);
                 var text = duration != 0 ? duration.ToString() : "";
-                IconHandler.DrawIcon<Status>(buff.Key, new Vector2(size, size), position, true);
+                IconHandler.DrawIcon<Status>(buff.Value, new Vector2(size, size), position, true);
                 var textSize = ImGui.CalcTextSize(text);
                 DrawOutlinedText(text,position + new Vector2(size / 2f - textSize.X / 2f, size / 2f - textSize.Y / 2f));
 
@@ -1039,9 +1039,9 @@ namespace DelvUI.Interface {
                 var position = currentDebuffPos;
                 var size = debuffSize;
                 var padding = debuffPadding;
-                var duration = Math.Round(debuff.Value.Duration);
+                var duration = Math.Round(debuff.Key.Duration);
                 var text = duration != 0 ? duration.ToString() : "";
-                IconHandler.DrawIcon<Status>(debuff.Key, new Vector2(size, size), position, true);
+                IconHandler.DrawIcon<Status>(debuff.Value, new Vector2(size, size), position, true);
                 var textSize = ImGui.CalcTextSize(text);
                 DrawOutlinedText(text,position + new Vector2(size / 2f - textSize.X / 2f, size / 2f - textSize.Y / 2f));
 
