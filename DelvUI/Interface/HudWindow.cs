@@ -977,6 +977,8 @@ namespace DelvUI.Interface {
         }
         private void DrawActorStatusEffects(Actor actor, StatusSettings settings)
         {
+            if (actor.ObjectKind != ObjectKind.Player && actor.ObjectKind != ObjectKind.BattleNpc) return;
+
             var buffsEnabled = settings.BuffsEnabled;
             var debuffsEnabled = settings.DebuffsEnabled;
             var currentBuffPos = settings.BuffPosition;
