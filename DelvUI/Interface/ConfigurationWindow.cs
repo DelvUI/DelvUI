@@ -1433,6 +1433,11 @@ namespace DelvUI.Interface
                             _changed = true;
                         }
                     }
+                    ImGui.SameLine();
+                    if (ImGui.Button("Paste from clipboard"))
+                    {
+                        _importString = ImGui.GetClipboardText();
+                    }
                 }
                 ImGui.EndChild();
 

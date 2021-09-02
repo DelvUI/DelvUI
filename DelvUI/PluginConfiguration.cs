@@ -893,10 +893,10 @@ namespace DelvUI {
 
         public void TransferConfig(PluginConfiguration fromOtherConfig)
         {
-            foreach (var item in typeof(PluginConfiguration).GetProperties())
+            foreach (var item in typeof(PluginConfiguration).GetFields())
             {
-                // ignore fields with the JsonIgnore attribute
                 if (item.GetCustomAttributes(typeof(JsonIgnoreAttribute), false).Length > 0) continue;
+                PluginLog.Log($"Found: {item.FieldType} \t {item.Name}");
                 item.SetValue(this, item.GetValue(fromOtherConfig));
             }
         }
