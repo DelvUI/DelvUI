@@ -3964,7 +3964,6 @@ namespace DelvUI.Interface
                     _changed |= ImGui.ColorEdit4("Flourishing Fountain Color", ref _pluginConfiguration.DNCFlourishingFountainColor);
                     _changed |= ImGui.ColorEdit4("Flourishing Windmill Color", ref _pluginConfiguration.DNCFlourishingWindmillColor);
                     _changed |= ImGui.ColorEdit4("Flourishing Shower Color", ref _pluginConfiguration.DNCFlourishingShowerColor);
-                    _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.DNCEmptyColor);
 
                     ImGui.EndTabItem();
                 }
