@@ -50,7 +50,14 @@ namespace DelvUI.Interface {
         private int StepXOffset => PluginConfiguration.DNCStepXOffset;
         private int StepYOffset => PluginConfiguration.DNCStepYOffset;
         private int StepPadding => PluginConfiguration.DNCStepPadding;
-        
+        private bool ProcEnabled => PluginConfiguration.DNCProcEnabled;
+        private bool ProcTimersEnabled => PluginConfiguration.DNCProcTimersEnabled;
+        private int ProcHeight => PluginConfiguration.DNCProcHeight;
+        private int ProcWidth => PluginConfiguration.DNCProcWidth;
+        private int ProcPadding => PluginConfiguration.DNCProcPadding;
+        private int ProcXOffset => PluginConfiguration.DNCProcXOffset;
+        private int ProcYOffset => PluginConfiguration.DNCProcYOffset;
+
         private Dictionary<string, uint> EspritColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000]; 
         private Dictionary<string, uint> FeatherColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 1]; 
         private Dictionary<string, uint> FlourishingProcColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 2]; 
@@ -64,12 +71,18 @@ namespace DelvUI.Interface {
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 10];
         private Dictionary<string, uint> DanceReadyColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 11];
         private Dictionary<string, uint> DevilmentColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 12];
+        private Dictionary<string, uint> FlourishingCascadeColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 13];
+        private Dictionary<string, uint> FlourishingFountainColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 14];
+        private Dictionary<string, uint> FlourishingWindmillColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 15];
+        private Dictionary<string, uint> FlourishingShowerColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 16];
 
         public DancerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _) {
             if (EspritEnabled)
                 DrawEspritBar();
+            if (ProcEnabled)
+                DrawProcBar();
             if (FeatherEnabled)
                 DrawFeathersBar();
             if (BuffEnabled)
@@ -256,6 +269,48 @@ namespace DelvUI.Interface {
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
         }
-    }
-}
 
+        private void DrawProcBar()
+        {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+            var flourishingCascadeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1814);
+            var flourishingFountainBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1815);
+            var flourishingWindmillBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1816);
+            var flourishingShowerBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1817);
+
+            var xPos = CenterX - ProcXOffset;
+            var yPos = CenterY + ProcYOffset;
+
+            var cascadeBuilder = BarBuilder.Create(xPos, yPos, ProcHeight, ProcWidth);
+            var fountainBuilder = BarBuilder.Create(xPos + ProcWidth + ProcPadding, yPos, ProcHeight, ProcWidth);
+            var windmillBuilder = BarBuilder.Create(xPos + 2 * ProcWidth + 2 * ProcPadding, yPos, ProcHeight, ProcWidth);
+            var showerBuilder = BarBuilder.Create(xPos + 3 * ProcWidth + 3 * ProcPadding, yPos, ProcHeight, ProcWidth);
+
+            if (flourishingCascadeBuff.Any() && ProcEnabled)
+            {
+                var cascadeStart = ProcTimersEnabled ? Math.Abs(flourishingCascadeBuff.First().Duration) : 20;
+                cascadeBuilder.AddInnerBar(cascadeStart, 20, FlourishingCascadeColor);
+            }
+            if (flourishingFountainBuff.Any() && ProcEnabled)
+            {
+                var fountainStart = ProcTimersEnabled ? Math.Abs(flourishingFountainBuff.First().Duration) : 20;
+                fountainBuilder.AddInnerBar(fountainStart, 20, FlourishingFountainColor);
+            }
+            if (flourishingWindmillBuff.Any() && ProcEnabled)
+            {
+                var windmillStart = ProcTimersEnabled ? Math.Abs(flourishingWindmillBuff.First().Duration) : 20;
+                windmillBuilder.AddInnerBar(windmillStart, 20, FlourishingWindmillColor);
+            }
+            if (flourishingShowerBuff.Any() && ProcEnabled)
+            {
+                var showerStart = ProcTimersEnabled ? Math.Abs(flourishingShowerBuff.First().Duration) : 20;
+                showerBuilder.AddInnerBar(showerStart, 20, FlourishingShowerColor);
+            }
+            var drawList = ImGui.GetWindowDrawList();
+            cascadeBuilder.Build().Draw(drawList);
+            fountainBuilder.Build().Draw(drawList);
+            windmillBuilder.Build().Draw(drawList);
+            showerBuilder.Build().Draw(drawList);
+        }
+}
+}
