@@ -124,8 +124,8 @@ namespace DelvUI.Interface {
         protected bool PlayerHidePermaBuffs => PluginConfiguration.PlayerHidePermaBuffs;
         
         
-        protected bool TargetBuffsEnabled => PluginConfiguration.PlayerBuffsEnabled;
-        protected bool TargetDebuffsEnabled => PluginConfiguration.PlayerDebuffsEnabled;
+        protected bool TargetBuffsEnabled => PluginConfiguration.TargetBuffsEnabled;
+        protected bool TargetDebuffsEnabled => PluginConfiguration.TargetDebuffsEnabled;
         protected int TargetBuffColumns => PluginConfiguration.TargetBuffColumns;
         protected int TargetDebuffColumns => PluginConfiguration.TargetDebuffColumns;
         protected int TargetBuffPositionX => PluginConfiguration.TargetBuffPositionX;
@@ -915,6 +915,8 @@ namespace DelvUI.Interface {
             if (target is null) {
                 return;
             }
+
+            if (target.ObjectKind != ObjectKind.Player && target.ObjectKind != ObjectKind.BattleNpc) return;
 
             var settings = new StatusSettings
             {
