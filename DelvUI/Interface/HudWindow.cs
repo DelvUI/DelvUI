@@ -9,14 +9,17 @@ using Dalamud.Data.LuminaExtensions;
 using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
+using Dalamud.Game.ClientState.Structs;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.Enums;
 using DelvUI.Helpers;
+using DelvUI.Interface.Icons;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
+using Lumina.Excel.GeneratedSheets;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface {
@@ -93,6 +96,42 @@ namespace DelvUI.Interface {
         protected int TargetCastBarXOffset => PluginConfiguration.TargetCastBarXOffset;
         protected int TargetCastBarYOffset => PluginConfiguration.TargetCastBarYOffset;
 
+        protected bool PlayerBuffsEnabled => PluginConfiguration.PlayerBuffsEnabled;
+        protected bool PlayerDebuffsEnabled => PluginConfiguration.PlayerDebuffsEnabled;
+        protected int PlayerBuffColumns => PluginConfiguration.PlayerBuffColumns;
+        protected int PlayerDebuffColumns => PluginConfiguration.PlayerDebuffColumns;
+        protected int PlayerBuffPositionX => PluginConfiguration.PlayerBuffPositionX;
+        protected int PlayerBuffPositionY => PluginConfiguration.PlayerBuffPositionY;
+        protected int PlayerDebuffPositionX => PluginConfiguration.PlayerDebuffPositionX;
+        protected int PlayerDebuffPositionY => PluginConfiguration.PlayerDebuffPositionY;
+        protected int PlayerBuffSize => PluginConfiguration.PlayerBuffSize;
+        protected int PlayerDebuffSize => PluginConfiguration.PlayerDebuffSize;
+        protected int PlayerBuffPadding => PluginConfiguration.PlayerBuffPadding;
+        protected int PlayerDebuffPadding => PluginConfiguration.PlayerDebuffPadding;
+        protected bool PlayerBuffGrowRight => PluginConfiguration.PlayerBuffGrowRight;
+        protected bool PlayerDebuffGrowRight => PluginConfiguration.PlayerDebuffGrowRight;
+        protected bool PlayerBuffGrowDown => PluginConfiguration.PlayerBuffGrowDown;
+        protected bool PlayerDebuffGrowDown => PluginConfiguration.PlayerDebuffGrowDown;
+        protected bool PlayerHidePermaBuffs => PluginConfiguration.PlayerHidePermaBuffs;
+        
+        
+        protected bool TargetBuffsEnabled => PluginConfiguration.PlayerBuffsEnabled;
+        protected bool TargetDebuffsEnabled => PluginConfiguration.PlayerDebuffsEnabled;
+        protected int TargetBuffColumns => PluginConfiguration.TargetBuffColumns;
+        protected int TargetDebuffColumns => PluginConfiguration.TargetDebuffColumns;
+        protected int TargetBuffPositionX => PluginConfiguration.TargetBuffPositionX;
+        protected int TargetBuffPositionY => PluginConfiguration.TargetBuffPositionY;
+        protected int TargetDebuffPositionX => PluginConfiguration.TargetDebuffPositionX;
+        protected int TargetDebuffPositionY => PluginConfiguration.TargetDebuffPositionY;
+        protected int TargetBuffSize => PluginConfiguration.TargetBuffSize;
+        protected int TargetDebuffSize => PluginConfiguration.TargetDebuffSize;
+        protected int TargetBuffPadding => PluginConfiguration.TargetBuffPadding;
+        protected int TargetDebuffPadding => PluginConfiguration.TargetDebuffPadding;
+        protected bool TargetBuffGrowRight => PluginConfiguration.TargetBuffGrowRight;
+        protected bool TargetDebuffGrowRight => PluginConfiguration.TargetDebuffGrowRight;
+        protected bool TargetBuffGrowDown => PluginConfiguration.TargetBuffGrowDown;
+        protected bool TargetDebuffGrowDown => PluginConfiguration.TargetDebuffGrowDown;
+        
         protected Vector2 BarSize { get; private set; }
 
         private LastUsedCast _lastPlayerUsedCast;
@@ -787,6 +826,198 @@ namespace DelvUI.Interface {
             }
         }
 
+        private void DrawPlayerStatusEffects()
+        {
+            if (!PlayerBuffsEnabled && !PlayerDebuffsEnabled) return;
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
+            var actor = PluginInterface.ClientState.LocalPlayer;
+
+            var settings = new StatusSettings
+            {
+                BuffsEnabled = PlayerBuffsEnabled,
+                DebuffsEnabled = PlayerDebuffsEnabled,
+                BuffColumns = PlayerBuffColumns,
+                DebuffColumns = PlayerDebuffColumns,
+                BuffPosition = new Vector2(PlayerBuffPositionX, PlayerBuffPositionY),
+                DebuffPosition = new Vector2(PlayerDebuffPositionX, PlayerDebuffPositionY),
+                BuffSize = PlayerBuffSize,
+                DebuffSize = PlayerDebuffSize,
+                BuffPadding = PlayerBuffPadding,
+                DebuffPadding = PlayerDebuffPadding,
+                BuffGrowRight = PlayerBuffGrowRight,
+                DebuffGrowRight = PlayerDebuffGrowRight,
+                BuffGrowDown = PlayerBuffGrowDown,
+                DebuffGrowDown = PlayerDebuffGrowDown,
+                HidePermaBuffs = PlayerHidePermaBuffs
+            };
+            
+            DrawActorStatusEffects(actor, settings);
+        }
+        
+        private void DrawTargetStatusEffects()
+        {
+            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+
+            if (target is null) {
+                return;
+            }
+
+            var settings = new StatusSettings
+            {
+                BuffsEnabled = TargetBuffsEnabled,
+                DebuffsEnabled = TargetDebuffsEnabled,
+                BuffColumns = TargetBuffColumns,
+                DebuffColumns = TargetDebuffColumns,
+                BuffPosition = new Vector2(CenterX + TargetBuffPositionX, CenterY + TargetBuffPositionY),
+                DebuffPosition = new Vector2(CenterX + TargetDebuffPositionX, CenterY + TargetDebuffPositionY),
+                BuffSize = TargetBuffSize,
+                DebuffSize = TargetDebuffSize,
+                BuffPadding = TargetBuffPadding,
+                DebuffPadding = TargetDebuffPadding,
+                BuffGrowRight = TargetBuffGrowRight,
+                DebuffGrowRight = TargetDebuffGrowRight,
+                BuffGrowDown = TargetBuffGrowDown,
+                DebuffGrowDown = TargetDebuffGrowDown
+            };
+            
+            DrawActorStatusEffects(target, settings);
+        }
+
+        private class StatusSettings
+        {
+            public bool BuffsEnabled { get; set; }
+            public bool DebuffsEnabled { get; set; }
+            public int BuffColumns { get; set; }
+            public int DebuffColumns { get; set; }
+            public Vector2 BuffPosition { get; set; }
+            public Vector2 DebuffPosition { get; set; }
+            public int BuffSize { get; set; }
+            public int DebuffSize { get; set; }
+            public int BuffPadding { get; set; }
+            public int DebuffPadding { get; set; }
+            public bool BuffGrowRight { get; set; }
+            public bool DebuffGrowRight { get; set; }
+            public bool BuffGrowDown { get; set; }
+            public bool DebuffGrowDown { get; set; }
+            public bool HidePermaBuffs { get; set; }
+        }
+
+        private void DrawActorStatusEffects(Actor actor, StatusSettings settings)
+        {
+            var buffsEnabled = settings.BuffsEnabled;
+            var debuffsEnabled = settings.DebuffsEnabled;
+            var currentBuffPos = settings.BuffPosition;
+            var currentDebuffPos = settings.DebuffPosition;
+            var buffColumns = settings.BuffColumns - 1;
+            var debuffColumns = settings.DebuffColumns - 1;
+            var buffSize = settings.BuffSize;
+            var debuffSize = settings.DebuffSize;
+            var buffPadding = settings.BuffPadding;
+            var debuffPadding = settings.DebuffPadding;
+            var buffGrowRight = settings.BuffGrowRight;
+            var debuffGrowRight = settings.DebuffGrowRight;
+            var buffGrowDown = settings.BuffGrowDown;
+            var debuffGrowDown = settings.DebuffGrowDown;
+            var hidePermaBuffs = settings.HidePermaBuffs;
+            
+            
+            var buffList = new Dictionary<Status, StatusEffect>();
+            var debuffList = new Dictionary<Status, StatusEffect>();
+            foreach (var status in actor.StatusEffects)
+            {
+                if (status.EffectId == 0) continue;
+                var statusEffect = PluginInterface.Data.GetExcelSheet<Status>()?.GetRow((uint)status.EffectId);
+                if (statusEffect == null) continue;
+                var isBuff = statusEffect.Category == 1;
+                if (hidePermaBuffs && statusEffect.IsPermanent) continue;
+                if (isBuff)
+                {
+                    if(buffsEnabled) buffList.Add(statusEffect, status);
+                }
+                else
+                {
+                    if(debuffsEnabled) debuffList.Add(statusEffect, status);
+                }
+            }
+            
+            var currentBuffRow = 0;
+            var buffCount = 0;
+            foreach (var buff in buffList)
+            {
+                var position = currentBuffPos;
+                var size = buffSize;
+                var padding = buffPadding;
+                var duration = Math.Round(buff.Value.Duration);
+                var text = duration != 0 ? duration.ToString() : "";
+                IconHandler.DrawIcon<Status>(buff.Key, new Vector2(size, size), position, true);
+                var textSize = ImGui.CalcTextSize(text);
+                DrawOutlinedText(text,position + new Vector2(size / 2f - textSize.X / 2f, size / 2f - textSize.Y / 2f));
+
+                buffCount++;
+                if (buffCount > buffColumns)
+                {
+                    currentBuffRow++;
+                    currentBuffPos = buffGrowDown switch
+                    {
+                        true => new Vector2(530, 850 + (size + padding) * currentBuffRow),
+                        false => new Vector2(530, 850 - (size + padding) * currentBuffRow)
+                    };
+                    buffCount = 0;
+                }
+                else
+                {
+                    switch (buffGrowRight)
+                    {
+                        case true:
+                            currentBuffPos += new Vector2(size + padding, 0);
+                            break;
+                        case false:
+                            currentBuffPos -= new Vector2(size + padding, 0);
+                            break;
+                    }
+                }
+            }
+            
+            var currentDebuffRow = 0;
+            var debuffCount = 0;
+            foreach (var debuff in debuffList)
+            {
+                var position = currentDebuffPos;
+                var size = debuffSize;
+                var padding = debuffPadding;
+                var duration = Math.Round(debuff.Value.Duration);
+                var text = duration != 0 ? duration.ToString() : "";
+                IconHandler.DrawIcon<Status>(debuff.Key, new Vector2(size, size), position, true);
+                var textSize = ImGui.CalcTextSize(text);
+                DrawOutlinedText(text,position + new Vector2(size / 2f - textSize.X / 2f, size / 2f - textSize.Y / 2f));
+
+                debuffCount++;
+                if (debuffCount > debuffColumns)
+                {
+                    currentDebuffRow++;
+                    currentDebuffPos = debuffGrowRight switch
+                    {
+                        true => new Vector2(530, 960 + (size + padding) * currentDebuffRow),
+                        false => new Vector2(530, 960 - (size + padding) * currentDebuffRow)
+                    };
+                    debuffCount = 0;
+                }
+                else
+                {
+                    switch (debuffGrowRight)
+                    {
+                        case true:
+                            currentDebuffPos += new Vector2(size + padding, 0);
+                            break;
+                        case false:
+                            currentDebuffPos -= new Vector2(size + padding, 0);
+                            break;
+                    }
+                }
+            }
+
+        }
+
         protected unsafe virtual float ActorShieldValue(Actor actor) {
             return Math.Min(*(int*) (actor.Address + 0x1997), 100) / 100f;
         }
@@ -862,6 +1093,8 @@ namespace DelvUI.Interface {
             DrawTargetCastBar();
             DrawMPTicker();
             DrawGCDIndicator();
+            DrawPlayerStatusEffects();
+            DrawTargetStatusEffects();
         }
 
         protected abstract void Draw(bool _);
