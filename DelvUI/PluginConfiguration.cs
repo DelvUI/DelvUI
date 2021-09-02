@@ -720,8 +720,8 @@ namespace DelvUI {
         public bool RDMShowVerfireProcs = true;
         public int RDMProcsHeight { get; set; } = 7;
 
-        public Vector4 RDMManaBarColor = new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f);
-        public Vector4 RDMManaBarBelowThresholdColor = new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f);
+        public Vector4 RDMManaBarColor = new Vector4(0f/255f, 142f/255f, 254f/255f, 100f/100f);
+        public Vector4 RDMManaBarBelowThresholdColor = new Vector4(210f/255f, 33f/255f, 33f/255f, 100f/100f);
         public Vector4 RDMWhiteManaBarColor = new Vector4(221f / 255f, 212f / 255f, 212f / 255f, 100f / 100f);
         public Vector4 RDMBlackManaBarColor = new Vector4(60f / 255f, 81f / 255f, 197f / 255f, 100f / 100f);
         public Vector4 RDMBalanceBarColor = new Vector4(195f / 255f, 35f / 255f, 35f / 255f, 100f / 100f);

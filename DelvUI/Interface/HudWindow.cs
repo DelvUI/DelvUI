@@ -956,6 +956,25 @@ namespace DelvUI.Interface {
             public bool HidePermaBuffs { get; set; }
         }
 
+        private string parseDuration(double duration)
+        {
+            TimeSpan t = TimeSpan.FromSeconds( duration );
+            string parsedDuration;
+            if (t.Minutes >= 5)
+            {
+                parsedDuration = t.Minutes+"m";
+            }
+            else if (t.Minutes > 5)
+            {
+                parsedDuration = t.Minutes + ":" + t.Seconds;
+            }
+            else
+            {
+                parsedDuration = t.Seconds+"s";
+            }
+
+            return parsedDuration;
+        }
         private void DrawActorStatusEffects(Actor actor, StatusSettings settings)
         {
             var buffsEnabled = settings.BuffsEnabled;
@@ -996,16 +1015,22 @@ namespace DelvUI.Interface {
             
             var currentBuffRow = 0;
             var buffCount = 0;
+            var hasFoodBuff = buffList.Where(o => o.Value.Description == "Enjoying the benefits of a full belly.").Count();
+            if (hasFoodBuff == 0)
+            {
+                //just add wtv here
+            }
             foreach (var buff in buffList)
             {
                 var position = currentBuffPos;
                 var size = buffSize;
                 var padding = buffPadding;
                 var duration = Math.Round(buff.Key.Duration);
-                var text = duration != 0 ? duration.ToString() : "";
+                var text = !buff.Value.IsFcBuff ? duration > 0 ? parseDuration(duration): "" : "";
                 IconHandler.DrawIcon<Status>(buff.Value, new Vector2(size, size), position, true);
                 var textSize = ImGui.CalcTextSize(text);
                 DrawOutlinedText(text,position + new Vector2(size / 2f - textSize.X / 2f, size / 2f - textSize.Y / 2f));
+
 
                 buffCount++;
                 if (buffCount > buffColumns)
@@ -1040,7 +1065,7 @@ namespace DelvUI.Interface {
                 var size = debuffSize;
                 var padding = debuffPadding;
                 var duration = Math.Round(debuff.Key.Duration);
-                var text = duration != 0 ? duration.ToString() : "";
+                var text = duration > 0 ? parseDuration(duration): "";
                 IconHandler.DrawIcon<Status>(debuff.Value, new Vector2(size, size), position, true);
                 var textSize = ImGui.CalcTextSize(text);
                 DrawOutlinedText(text,position + new Vector2(size / 2f - textSize.X / 2f, size / 2f - textSize.Y / 2f));
