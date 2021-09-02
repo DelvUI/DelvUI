@@ -121,7 +121,7 @@ namespace DelvUI {
         public Vector4 ShieldColor = new Vector4(255f/255f,255f/255f,0f/255f,100f/100f);
         public Vector4 MPTickerColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f);
         public Vector4 GCDIndicatorColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f);
-        public Vector4 EmptyColor = new Vector4(0f/255f, 0f/255f, 0f/255f, 88f/100f);
+        public Vector4 EmptyColor = new Vector4(0f/255f, 0f/255f, 0f/255f, 50f/100f);
 
 
         public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,100f/100f);
@@ -1050,6 +1050,13 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(GNBNoMercyColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(GNBNoMercyColor.AdjustColor(.1f))
                 },
+                [Jobs.GNB * 1000 + 2] = new Dictionary<string, uint> // Bar not ready
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
+                },
 
                 [Jobs.WHM] = new Dictionary<string, uint>
                 {
@@ -1354,6 +1361,13 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(.1f))
+                },                
+                [Jobs.MNK * 1000 + 4] = new Dictionary<string, uint> // Scholar Empty Bar Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
                 },
                 
                 [Jobs.DRG] = new Dictionary<string, uint>

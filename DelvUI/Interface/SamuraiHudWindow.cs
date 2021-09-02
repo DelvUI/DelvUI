@@ -115,7 +115,7 @@ namespace DelvUI.Interface
             var kenki = Math.Min((int)gauge.Kenki, chunkSize);
             var scale = (float)kenki / chunkSize;
             var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["base"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["background"]);
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(SamKenkiBarWidth * scale, SamKenkiBarHeight),
                 SamKenkiColor["gradientLeft"], SamKenkiColor["gradientRight"], SamKenkiColor["gradientRight"], SamKenkiColor["gradientRight"]
@@ -149,7 +149,7 @@ namespace DelvUI.Interface
 
             var dotStart = new Vector2(xOffset + SamHiganbanaBarWidth - (barSize.X / 60) * higanbanaDuration, yOffset);
 
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["base"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["background"]);
             drawList.AddRectFilled(dotStart, cursorPos + new Vector2(barSize.X, barSize.Y), higanbanaColor);
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
@@ -182,7 +182,7 @@ namespace DelvUI.Interface
 
             var buffStart = new Vector2(xOffset + buffsBarWidth - (barSize.X / 40) * shifuDuration, CenterY + SamBuffsBarY);
 
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["base"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["background"]);
             drawList.AddRectFilledMultiColor(
                     buffStart, cursorPos + new Vector2(barSize.X, barSize.Y),
                     SamShifuColor["gradientLeft"], SamShifuColor["gradientRight"], SamShifuColor["gradientRight"], SamShifuColor["gradientLeft"]
@@ -194,7 +194,7 @@ namespace DelvUI.Interface
 
                 cursorPos = new Vector2(cursorPos.X + buffsBarWidth + BuffsPadding, cursorPos.Y);
 
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["base"]);
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["background"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2((barSize.X / 30) * jinpuDuration, barSize.Y),
                     jinpuDuration > 0 ? SamJinpuColor["gradientLeft"] : 0x00202E3,
@@ -215,7 +215,7 @@ namespace DelvUI.Interface
                 var jinpuXOffset = CenterX - SamTimeJinpuXOffset;
                 var jinpuYOffset = CenterY + SamTimeJinpuYOffset;
 
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["base"]);
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["background"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2((barSize.X / 40) * jinpuDuration, barSize.Y),
                     jinpuDuration > 0 ? SamJinpuColor["gradientLeft"] : 0x00202E3,
@@ -243,17 +243,17 @@ namespace DelvUI.Interface
 
             // Ka Bar
             cursorPos = new Vector2(cursorPos.X + SenPadding + senBarWidth, cursorPos.Y);
-            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasSetsu() ? SamSetsuColor["base"] : SamEmptyColor["base"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasSetsu() ? SamSetsuColor["base"] : SamEmptyColor["background"]);
             drawList.AddRect(cursorPos, cursorPos + senBarSize, 0xFF000000);
 
             // Getsu Bar
             cursorPos = new Vector2(cursorPos.X + SenPadding + senBarWidth, cursorPos.Y);
-            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasGetsu() ? SamGetsuColor["base"] : SamEmptyColor["base"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasGetsu() ? SamGetsuColor["base"] : SamEmptyColor["background"]);
             drawList.AddRect(cursorPos, cursorPos + senBarSize, 0xFF000000);
 
             // Setsu Bar
             cursorPos = new Vector2(cursorPos.X + SenPadding + senBarWidth, cursorPos.Y);
-            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasKa() ? SamKaColor["base"] : SamEmptyColor["base"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + senBarSize, gauge.HasKa() ? SamKaColor["base"] : SamEmptyColor["background"]);
             drawList.AddRect(cursorPos, cursorPos + senBarSize, 0xFF000000);
         }
 
@@ -274,7 +274,7 @@ namespace DelvUI.Interface
             for (var i = 1; i < 4; i++) {
                 cursorPos = new Vector2(cursorPos.X + MeditationPadding + meditationBarWidth, cursorPos.Y);
 
-                drawList.AddRectFilled(cursorPos, cursorPos + meditationBarSize, gauge.MeditationStacks >= i ? SamMeditationColor["base"] : SamEmptyColor["base"]);
+                drawList.AddRectFilled(cursorPos, cursorPos + meditationBarSize, gauge.MeditationStacks >= i ? SamMeditationColor["base"] : SamEmptyColor["background"]);
                 drawList.AddRect(cursorPos, cursorPos + meditationBarSize, 0xFF000000);
             }
         }

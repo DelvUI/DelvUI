@@ -79,7 +79,7 @@ namespace DelvUI.Interface
 
             if (!(target is Chara))
             {
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
+                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["background"]);
                 drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
                 return;
             }
@@ -89,7 +89,7 @@ namespace DelvUI.Interface
             var diaCooldown = dia.EffectId == 1871 ? 30f : 18f;
             var diaDuration = dia.Duration;
 
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["gradientRight"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["background"]);
             drawList.AddRectFilled(cursorPos, cursorPos + new Vector2((BarSize.X / diaCooldown) * diaDuration, BarSize.Y), WhmDiaColor["gradientRight"]);
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
             DrawOutlinedText(string.Format(CultureInfo.InvariantCulture, "{0,2:N0}", diaDuration), // keeps 10 -> 9 from jumping
@@ -122,7 +122,7 @@ namespace DelvUI.Interface
             var drawList = ImGui.GetWindowDrawList();
 
             var scale = gauge.NumLilies == 0 ? gauge.LilyTimer / lilyCooldown : 1;
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["gradientRight"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
 
             if (gauge.NumLilies >= 1) {
                 drawList.AddRectFilledMultiColor(
@@ -148,7 +148,7 @@ namespace DelvUI.Interface
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
             cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["gradientRight"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
 
             if (gauge.NumLilies > 0) {
                 scale = gauge.NumLilies == 1 ? gauge.LilyTimer / lilyCooldown : 1;
@@ -178,7 +178,7 @@ namespace DelvUI.Interface
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
             cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["gradientRight"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
 
             if (gauge.NumLilies > 1) {
                 scale = gauge.NumLilies == 2 ? gauge.LilyTimer / lilyCooldown : 1;
@@ -218,7 +218,7 @@ namespace DelvUI.Interface
 
             cursorPos = new Vector2(xPos + xPadding + barWidth, yPos);
             scale = gauge.NumBloodLily > 0 ? 1 : 0;
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["gradientRight"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(barSize.X * scale, barSize.Y),
                 BloodLillyColor["gradientLeft"], BloodLillyColor["gradientRight"], BloodLillyColor["gradientRight"], BloodLillyColor["gradientLeft"]
@@ -227,7 +227,7 @@ namespace DelvUI.Interface
 
             cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
             scale = gauge.NumBloodLily > 1 ? 1 : 0;
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["gradientRight"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(barSize.X * scale, barSize.Y),
                 BloodLillyColor["gradientLeft"], BloodLillyColor["gradientRight"], BloodLillyColor["gradientRight"], BloodLillyColor["gradientLeft"]
@@ -236,7 +236,7 @@ namespace DelvUI.Interface
 
             cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
             scale = gauge.NumBloodLily > 2 ? 1 : 0;
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["gradientRight"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(barSize.X * scale, barSize.Y),
                 BloodLillyColor["gradientLeft"], BloodLillyColor["gradientRight"], BloodLillyColor["gradientRight"], BloodLillyColor["gradientLeft"]

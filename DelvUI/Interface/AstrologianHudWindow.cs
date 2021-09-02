@@ -164,7 +164,7 @@ namespace DelvUI.Interface
                 var yPos = CenterY + YOffset + DivinationBarY;
 
                 var bar = BarBuilder.Create(xPos, yPos, DivinationHeight, DivinationWidth)
-                    .SetBackgroundColor(EmptyColor["gradientRight"])
+                    .SetBackgroundColor(EmptyColor["background"])
                     .SetChunks(3)
                     .SetChunkPadding(DivinationBarPad)
                     .AddInnerBar(chunkColors.Count(n => n != EmptyColor), 3, chunkColors.ToArray())
@@ -186,7 +186,7 @@ namespace DelvUI.Interface
                         chucksToGlow[i] = true;
                     }
                     bar.SetGlowChunks(chucksToGlow);
-                    bar.SetGlowColor(DivinationGlowColor["gradientRight"]);
+                    bar.SetGlowColor(DivinationGlowColor["background"]);
                 };
 
                 var drawList = ImGui.GetWindowDrawList();
@@ -261,7 +261,7 @@ namespace DelvUI.Interface
             }
 
             var bar = builder.AddInnerBar(Math.Abs(cardPresent), cardMax, cardColor)
-                .SetBackgroundColor(EmptyColor["gradientRight"])
+                .SetBackgroundColor(EmptyColor["background"])
                 .SetTextMode(BarTextMode.Single);
 
             if (ShowDrawGlowBar)
@@ -300,7 +300,7 @@ namespace DelvUI.Interface
             if (target is not Chara)
             {
                 Bar barNoTarget = builder.AddInnerBar(0, 30f, DotColor)
-                    .SetBackgroundColor(EmptyColor["gradientRight"])
+                    .SetBackgroundColor(EmptyColor["background"])
                     .SetTextMode(BarTextMode.Single)
                     .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                     .Build();
@@ -315,7 +315,7 @@ namespace DelvUI.Interface
 
 
             var bar = builder.AddInnerBar(System.Math.Abs(dotDuration), dotCooldown, DotColor)
-                .SetBackgroundColor(EmptyColor["gradientRight"])
+                .SetBackgroundColor(EmptyColor["background"])
                 .SetTextMode(BarTextMode.Single)
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                 .Build();
@@ -341,7 +341,7 @@ namespace DelvUI.Interface
 
             var bar = builder.AddInnerBar(lightspeedDuration, lightspeedMaxDuration, EmptyColor, LightspeedColor)               
                 .SetTextMode(BarTextMode.Single)
-                .SetBackgroundColor(EmptyColor["gradientRight"])
+                .SetBackgroundColor(EmptyColor["background"])
                 .SetFlipDrainDirection(true)
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                 .Build();
@@ -377,12 +377,12 @@ namespace DelvUI.Interface
 
             var bar = builder.AddInnerBar(starDuration, starMaxDuration, EmptyColor, starColorSelector)
                 .SetTextMode(BarTextMode.Single)
-                .SetBackgroundColor(EmptyColor["gradientRight"])
+                .SetBackgroundColor(EmptyColor["background"])
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
 
             if (starColorSelector == StarGiantColor && ShowStarGlowBar)
             {
-                bar.SetGlowColor(StarGlowColor["gradientRight"]);
+                bar.SetGlowColor(StarGlowColor["background"]);
             };
 
             var drawList = ImGui.GetWindowDrawList();

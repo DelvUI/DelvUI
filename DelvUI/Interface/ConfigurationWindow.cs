@@ -35,7 +35,7 @@ namespace DelvUI.Interface
             _configMap.Add("Castbars", new [] {
                 //"General", 
                 "Player"
-                , "Enemy"
+                , "Target"
                 });
             _configMap.Add("Jobs", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"});
 
@@ -231,8 +231,8 @@ namespace DelvUI.Interface
                         case "Player":
                             DrawCastbarsPlayerConfig();
                             break;
-                        case "Enemy":
-                            DrawCastbarsEnemyConfig();
+                        case "Target":
+                            DrawCastbarsTargetConfig();
                             break;
                     }
                     break;
@@ -1436,7 +1436,7 @@ namespace DelvUI.Interface
         }
 
 
-        private void DrawCastbarsEnemyConfig()
+        private void DrawCastbarsTargetConfig()
         {
             _changed |= ImGui.Checkbox("Show Target Cast Bar", ref _pluginConfiguration.ShowTargetCastBar);
 

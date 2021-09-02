@@ -106,6 +106,7 @@ namespace DelvUI.Interface {
             var builder = BarBuilder.Create(xPos, yPos, EspritHeight, EspritWidth)
                 .SetChunks(2)
                 .SetChunkPadding(EspritPadding)
+                .SetBackgroundColor(EmptyColor["background"])
                 .AddInnerBar(gauge.Esprit, 100, EspritColor, EmptyColor);
 
             if (EspritText)
@@ -128,6 +129,7 @@ namespace DelvUI.Interface {
             
             var builder = BarBuilder.Create(xPos, yPos, FeatherHeight, FeatherWidth)
                 .SetChunks(4)
+                .SetBackgroundColor(EmptyColor["background"])
                 .SetChunkPadding(FeatherPadding)
                 .AddInnerBar(gauge.NumFeathers, 4, FeatherColor);
 
@@ -194,6 +196,7 @@ namespace DelvUI.Interface {
             var builder = BarBuilder.Create(xPos, yPos, StepHeight, StepWidth)
                 .SetChunks(chunkCount)
                 .SetChunkPadding(StepPadding)
+                .SetBackgroundColor(EmptyColor["background"])
                 .AddInnerBar(chunkCount, chunkCount, chunkColors.ToArray());
 
             if (danceReady && DanceReadyGlow)
@@ -219,7 +222,7 @@ namespace DelvUI.Interface {
             var xPos = CenterX - BuffXOffset;
             var yPos = CenterY + BuffYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, BuffHeight, BuffWidth);
+            var builder = BarBuilder.Create(xPos, yPos, BuffHeight, BuffWidth).SetBackgroundColor(EmptyColor["background"]);
 
             if (technicalFinishBuff.Any() && TechnicalBarEnabled)
             {
@@ -267,7 +270,7 @@ namespace DelvUI.Interface {
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.SetBackgroundColor(EmptyColor["background"]).Build().Draw(drawList);
         }
 
         private void DrawProcBar()
@@ -281,10 +284,10 @@ namespace DelvUI.Interface {
             var xPos = CenterX - ProcXOffset;
             var yPos = CenterY + ProcYOffset;
 
-            var cascadeBuilder = BarBuilder.Create(xPos, yPos, ProcHeight, ProcWidth);
-            var fountainBuilder = BarBuilder.Create(xPos + ProcWidth + ProcPadding, yPos, ProcHeight, ProcWidth);
-            var windmillBuilder = BarBuilder.Create(xPos + 2 * ProcWidth + 2 * ProcPadding, yPos, ProcHeight, ProcWidth);
-            var showerBuilder = BarBuilder.Create(xPos + 3 * ProcWidth + 3 * ProcPadding, yPos, ProcHeight, ProcWidth);
+            var cascadeBuilder = BarBuilder.Create(xPos, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
+            var fountainBuilder = BarBuilder.Create(xPos + ProcWidth + ProcPadding, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
+            var windmillBuilder = BarBuilder.Create(xPos + 2 * ProcWidth + 2 * ProcPadding, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
+            var showerBuilder = BarBuilder.Create(xPos + 3 * ProcWidth + 3 * ProcPadding, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
 
             if (flourishingCascadeBuff.Any() && ProcEnabled)
             {

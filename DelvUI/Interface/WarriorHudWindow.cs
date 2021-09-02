@@ -55,7 +55,7 @@ namespace DelvUI.Interface
             var xPos = CenterX - StormsEyeXOffset;
             var yPos = CenterY + StormsEyeYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, StormsEyeHeight, StormsEyeWidth);
+            var builder = BarBuilder.Create(xPos, yPos, StormsEyeHeight, StormsEyeWidth).SetBackgroundColor(EmptyColor["background"]);
 
             var duration = 0f;
             var maximum = 10f;
@@ -93,7 +93,7 @@ namespace DelvUI.Interface
 
             var builder = BarBuilder.Create(xPos, yPos, BeastGaugeHeight, BeastGaugeWidth)
                 .SetChunks(2)
-                .AddInnerBar(gauge.BeastGaugeAmount, 100, FellCleaveColor, EmptyColor)
+                .AddInnerBar(gauge.BeastGaugeAmount, 100, FellCleaveColor).SetBackgroundColor(EmptyColor["background"])
                 .SetChunkPadding(BeastGaugePadding);
             if (nascentChaosBuff.Any())
                 builder.SetChunksColors(NascentChaosColor);
