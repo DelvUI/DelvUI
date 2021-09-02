@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
 using Dalamud.Configuration;
 using Dalamud.Plugin;
@@ -811,11 +812,11 @@ namespace DelvUI {
         {
             if (pluginInterface == null) return;
             var configDirectory = pluginInterface.GetPluginConfigDirectory();
-            var configFile = System.IO.Path.Combine(configDirectory, filename + ".json");
+            var configFile = Path.Combine(configDirectory, filename + ".json");
             try
             {
                 var jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
-                System.IO.File.WriteAllText(configFile, jsonString);
+                File.WriteAllText(configFile, jsonString);
             }
             catch (Exception ex)
             {
@@ -824,16 +825,36 @@ namespace DelvUI {
             }
         }
 
+        public static string GenerateExportString(PluginConfiguration config)
+        {
+            var jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
+            return CompressAndBase64Encode(jsonString);
+        }
+
+        public static PluginConfiguration LoadImportString(string importString)
+        {
+            try
+            {
+                var jsonString = Base64DecodeAndDecompress(importString);
+                return JsonConvert.DeserializeObject<PluginConfiguration>(jsonString);
+            }
+            catch (Exception ex)
+            {
+                PluginLog.Log(ex.StackTrace);
+                return null;
+            }
+        }
+
         public static PluginConfiguration ReadConfig(string filename, DalamudPluginInterface pluginInterface)
         {
             if (pluginInterface == null) return null;
             var configDirectory = pluginInterface.GetPluginConfigDirectory();
-            var configFile = System.IO.Path.Combine(configDirectory, filename + ".json");
+            var configFile = Path.Combine(configDirectory, filename + ".json");
             try
             {
-                if (System.IO.File.Exists(configFile))
+                if (File.Exists(configFile))
                 {
-                    var jsonString = System.IO.File.ReadAllText(configFile);
+                    var jsonString = File.ReadAllText(configFile);
                     return JsonConvert.DeserializeObject<PluginConfiguration>(jsonString);
                 }
             }
@@ -843,6 +864,31 @@ namespace DelvUI {
                 PluginLog.Log(ex.StackTrace);
             }
             return null;
+        }
+
+        public static string CompressAndBase64Encode(string jsonString)
+        {
+            using MemoryStream output = new();
+            using (System.IO.Compression.DeflateStream gzip = new(output, System.IO.Compression.CompressionLevel.Fastest))
+            {
+                using StreamWriter writer = new(gzip, System.Text.Encoding.UTF8);
+                writer.Write(jsonString);
+            }
+            return System.Convert.ToBase64String(output.ToArray());
+        }
+
+        public static string Base64DecodeAndDecompress(string base64String)
+        {
+            var base64EncodedBytes = System.Convert.FromBase64String(base64String);
+            var decodedString = "";
+
+            using (MemoryStream inputStream = new(base64EncodedBytes))
+            {
+                using System.IO.Compression.DeflateStream gzip = new(inputStream, System.IO.Compression.CompressionMode.Decompress);
+                using StreamReader reader = new(gzip, System.Text.Encoding.UTF8);
+                decodedString = reader.ReadToEnd();
+            }
+            return decodedString;
         }
 
         public void TransferConfig(PluginConfiguration fromOtherConfig)

@@ -79,6 +79,7 @@
         <Reference Include="Lumina.Excel">
             <Private>false</Private>
         </Reference>
+        <Reference Include="System.Windows.Forms" />
     </ItemGroup>
 
     <!-- NuGet Packages -->

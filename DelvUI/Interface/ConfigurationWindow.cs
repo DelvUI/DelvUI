@@ -21,6 +21,8 @@ namespace DelvUI.Interface
         private readonly int _viewportHeight = (int) ImGui.GetMainViewport().Size.Y;
         private int _xOffsetLimit;
         private int _yOffsetLimit;
+        private string _importString = "";
+        private string _exportString = "";
 
         public ConfigurationWindow(PluginConfiguration pluginConfiguration, DalamudPluginInterface pluginInterface)
         {
@@ -41,7 +43,7 @@ namespace DelvUI.Interface
                 , "Enemy"
                 });
             _configMap.Add("Jobs", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"});
-
+            _configMap.Add("Import/Export", new[] { "General" });
         }
 
         public void ToggleHud()
@@ -262,6 +264,14 @@ namespace DelvUI.Interface
                             break;                        
                         case "Caster":
                             DrawJobsCasterConfig();
+                            break;
+                    }
+                    break;
+                case "Import/Export":
+                    switch (subConfig)
+                    {
+                        case "General":
+                            DrawImportExportGeneralConfig();
                             break;
                     }
                     break;
@@ -1405,7 +1415,45 @@ namespace DelvUI.Interface
                 
         }        
         
+        private void DrawImportExportGeneralConfig()
+        {
+            ImGui.BeginGroup();
+            {
+                uint maxLength = 40000;
+                ImGui.BeginChild("importpane", new Vector2(0, ImGui.GetWindowHeight() / 4), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                {
+                    ImGui.Text("Import string:");
+                    ImGui.InputText("", ref _importString, maxLength);
+                    if (ImGui.Button("Import configuration"))
+                    {
+                        var importedConfig = PluginConfiguration.LoadImportString(_importString.Trim());
+                        if (importedConfig != null)
+                        {
+                            _pluginConfiguration.TransferConfig(importedConfig);
+                            _changed = true;
+                        }
+                    }
+                }
+                ImGui.EndChild();
 
+                ImGui.BeginChild("exportpane", new Vector2(0, ImGui.GetWindowHeight() / 4), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                {
+                    ImGui.Text("Export string:");
+                    ImGui.InputText("", ref _exportString, maxLength, ImGuiInputTextFlags.ReadOnly);
+                    if (ImGui.Button("Export configuration"))
+                    {
+                        _exportString = PluginConfiguration.GenerateExportString(_pluginConfiguration);
+                    }
+                    ImGui.SameLine();
+                    if (ImGui.Button("Copy to clipboard") && _exportString != "")
+                    {
+                        ImGui.SetClipboardText(_exportString);
+                    }
+                }
+                ImGui.EndChild();
+            }
+            ImGui.EndGroup();
+        }
      
         
 
