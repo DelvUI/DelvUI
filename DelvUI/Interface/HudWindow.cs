@@ -1015,10 +1015,11 @@ namespace DelvUI.Interface {
             
             var currentBuffRow = 0;
             var buffCount = 0;
-            var hasFoodBuff = buffList.Where(o => o.Key.Description == "Enjoying the benefits of a full belly.").Count();
+            var hasFoodBuff = buffList.Where(o => o.Value.EffectId == 48).Count();
             if (hasFoodBuff == 0)
             {
                 //just add wtv here
+                
             }
             foreach (var buff in buffList)
             {
