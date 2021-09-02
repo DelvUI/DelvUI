@@ -1695,7 +1695,38 @@ namespace DelvUI.Interface
                 _pluginConfiguration.PrimaryResourceBarYOffset = primaryResourceBarYOffset;
                 _pluginConfiguration.Save();
             }
-            
+
+            _changed |= ImGui.Checkbox("Show Primary Resource Value", ref _pluginConfiguration.ShowPrimaryResourceBarValue);
+
+            if (_pluginConfiguration.ShowPrimaryResourceBarValue)
+            {
+                var primaryResourceBarTextXOffset = _pluginConfiguration.PrimaryResourceBarTextXOffset;
+                if (ImGui.DragInt("Primary Resource Text X Offset", ref primaryResourceBarTextXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
+                {
+                    _pluginConfiguration.PrimaryResourceBarTextXOffset = primaryResourceBarTextXOffset;
+                    _pluginConfiguration.Save();
+                }
+
+                var primaryResourceBarTextYOffset = _pluginConfiguration.PrimaryResourceBarTextYOffset;
+                if (ImGui.DragInt("Primary Resource Text Y Offset", ref primaryResourceBarTextYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
+                {
+                    _pluginConfiguration.PrimaryResourceBarTextYOffset = primaryResourceBarTextYOffset;
+                    _pluginConfiguration.Save();
+                }
+            }
+
+            _changed |= ImGui.Checkbox("Show Primary Resource Threshold Marker", ref _pluginConfiguration.ShowPrimaryResourceBarThresholdMarker);
+                
+            if (_pluginConfiguration.ShowPrimaryResourceBarThresholdMarker)
+            {
+                var primaryResourceBarThresholdValue = _pluginConfiguration.PrimaryResourceBarThresholdValue;
+                if (ImGui.DragInt("Primary Resource Bar Threshold Marker Value", ref primaryResourceBarThresholdValue, 1f, 1, 10000))
+                {
+                    _pluginConfiguration.PrimaryResourceBarThresholdValue = primaryResourceBarThresholdValue;
+                    _pluginConfiguration.Save();
+                }
+            }
+        
             _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.EmptyColor);
 
         }
