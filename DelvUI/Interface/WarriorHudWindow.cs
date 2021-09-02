@@ -16,6 +16,7 @@ namespace DelvUI.Interface
 
         private bool StormsEyeEnabled => PluginConfiguration.WARStormsEyeEnabled;
         private bool StormsEyeText => PluginConfiguration.WARStormsEyeText;
+        private float StormsEyeTextScale => PluginConfiguration.WARStormsEyeTextScale;
         private int StormsEyeHeight => PluginConfiguration.WARStormsEyeHeight;
         private int StormsEyeWidth => PluginConfiguration.WARStormsEyeWidth;
 
@@ -24,6 +25,7 @@ namespace DelvUI.Interface
 
         private bool BeastGaugeEnabled => PluginConfiguration.WARBeastGaugeEnabled;
         private bool BeastGaugeText => PluginConfiguration.WARBeastGaugeText;
+        private float BeastGaugeTextScale => PluginConfiguration.WARBeastGaugeTextScale;
         private int BeastGaugeHeight => PluginConfiguration.WARBeastGaugeHeight;
         private int BeastGaugeWidth => PluginConfiguration.WARBeastGaugeWidth;
         private int BeastGaugePadding => PluginConfiguration.WARBeastGaugePadding;
@@ -78,11 +80,11 @@ namespace DelvUI.Interface
             if (StormsEyeText)
             {
                 builder.SetTextMode(BarTextMode.EachChunk)
-                    .SetText(new BarText(BarTextPosition.CenterMiddle, BarTextType.Current));
+                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current, StormsEyeTextScale);
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawBeastGauge() {
@@ -101,11 +103,11 @@ namespace DelvUI.Interface
             if (BeastGaugeText)
             {
                 builder.SetTextMode(BarTextMode.EachChunk)
-                    .SetText(new BarText(BarTextPosition.CenterMiddle, BarTextType.Current));
+                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current, BeastGaugeTextScale);
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
     }
 }

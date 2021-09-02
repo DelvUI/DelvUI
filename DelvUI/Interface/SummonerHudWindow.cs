@@ -100,7 +100,7 @@ namespace DelvUI.Interface
                 var drawList = ImGui.GetWindowDrawList();
                 foreach (var bar in barDrawList)
                 {
-                    bar.Draw(drawList);
+                    bar.Draw(drawList, PluginConfiguration);
                 }
             }
         }
@@ -117,7 +117,7 @@ namespace DelvUI.Interface
                 .AddInnerBar(ruinBuff.StackCount, 4, SmnRuinColor).SetBackgroundColor(SmnEmptyColor["background"])
                 .Build();
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
         private void DrawAetherBar()
         {
@@ -132,7 +132,7 @@ namespace DelvUI.Interface
                 .AddInnerBar(aetherFlowBuff.StackCount, 2, SmnAetherColor).SetBackgroundColor(SmnEmptyColor["background"])
                 .Build();
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
     }
 }

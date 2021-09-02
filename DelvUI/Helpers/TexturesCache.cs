@@ -88,7 +88,7 @@ namespace DelvUI.Helpers
         
         private TexFile LoadIcon(uint id, bool hdIcon)
         {
-            var hdString = hdIcon ? "_hr1" : "" ;
+            var hdString = hdIcon ? "_hr1" : "";
             var path = $"ui/icon/{id / 1000 * 1000:000000}/{id:000000}{hdString}.tex";
             return _pluginInterface.Data.GetFile<TexFile>(path);
         }

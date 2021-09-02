@@ -120,7 +120,7 @@ namespace DelvUI.Interface
                     .SetBackgroundColor(EmptyColor["background"]);
             
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawBatteryGauge()
@@ -153,7 +153,7 @@ namespace DelvUI.Interface
 
             var drawList = ImGui.GetWindowDrawList();
             var bar = builder.Build();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawOverheatBar()
@@ -174,7 +174,7 @@ namespace DelvUI.Interface
             }
             
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawWildfireBar()
@@ -197,7 +197,7 @@ namespace DelvUI.Interface
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
     }
 }

@@ -8,10 +8,30 @@ using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Helpers
 {
-    public class DrawHelper
+    public static class DrawHelper
     {
+        public static void DrawOutlinedText(string text, Vector2 pos, float fontScale, PluginConfiguration pluginConfiguration)
+        {
+            DrawOutlinedText(text, pos, Vector4.One, Vector4.UnitW, fontScale, pluginConfiguration);
+        }
+        
+        public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor, float fontScale, PluginConfiguration pluginConfiguration)
+        {
+            DrawOutlinedText(text, pos, color, outlineColor, fontScale, pluginConfiguration.BigNoodleTooFont);
+        }
+        
+        public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor, float fontScale, ImFontPtr fontPtr)
+        {
+            var originalScale = fontPtr.Scale;
+            fontPtr.Scale = fontScale;
+            ImGui.PushFont(fontPtr);
+            DrawOutlinedText(text, pos, color, outlineColor);
+            ImGui.PopFont();
+            fontPtr.Scale = originalScale;
+        }
+        
         public static void DrawOutlinedText(string text, Vector2 pos) {
-            DrawOutlinedText(text, pos, Vector4.One, new Vector4(0f, 0f, 0f, 1f));
+            DrawOutlinedText(text, pos, Vector4.One, Vector4.UnitW);
         }
         
         public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor) {

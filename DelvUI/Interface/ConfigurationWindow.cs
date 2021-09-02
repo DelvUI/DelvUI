@@ -38,12 +38,13 @@ namespace DelvUI.Interface
                 "Player"
                 , "Target"
                 });
-            _configMap.Add("Buffs / Debuffs", new [] {
+            _configMap.Add("Buffs and Debuffs", new [] {
                 //"General", 
                 "Player"
                 , "Target"
             });
-            _configMap.Add("Jobs", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"});
+            _configMap.Add("Job Specific Bars", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"});
+
             _configMap.Add("Party List", new[] { 
                 "General",
                 "Health Bars Style",
@@ -247,7 +248,7 @@ namespace DelvUI.Interface
                             break;
                     }
                     break;
-                case "Buffs / Debuffs":
+                case "Buffs and Debuffs":
                     switch (subConfig)
                     {
                         case "Player":
@@ -258,7 +259,7 @@ namespace DelvUI.Interface
                             break;
                     }
                     break;
-                case "Jobs":
+                case "Job Specific Bars":
                     switch (subConfig)
                     {          
                         case "General":
@@ -1876,6 +1877,13 @@ namespace DelvUI.Interface
                         _pluginConfiguration.WARStormsEyeText = stormsEyeText;
                         _pluginConfiguration.Save();
                     }
+
+                    var stormsEyeTextScale = _pluginConfiguration.WARStormsEyeTextScale;
+                    if (ImGui.DragFloat("Storm's Eye Text Scale", ref stormsEyeTextScale, .005f, 0f, 20f))
+                    {
+                        _pluginConfiguration.WARStormsEyeTextScale = stormsEyeTextScale;
+                        _pluginConfiguration.Save();
+                    }
                     
                     var stormsEyeHeight = _pluginConfiguration.WARStormsEyeHeight;
                     if (ImGui.DragInt("Storm's Eye Height", ref stormsEyeHeight, .1f, 1, 1000))
@@ -1916,6 +1924,13 @@ namespace DelvUI.Interface
                     if (ImGui.Checkbox("Beast Gauge Text", ref beastGaugeText))
                     {
                         _pluginConfiguration.WARBeastGaugeText = beastGaugeText;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var beastGaugeTextScale = _pluginConfiguration.WARBeastGaugeTextScale;
+                    if (ImGui.DragFloat("Beast Gauge Text Scale", ref beastGaugeTextScale, .005f, 0f, 20f))
+                    {
+                        _pluginConfiguration.WARBeastGaugeTextScale = beastGaugeTextScale;
                         _pluginConfiguration.Save();
                     }
 

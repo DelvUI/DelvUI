@@ -248,9 +248,14 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
-        public BarBuilder SetText(BarTextPosition posotion, BarTextType type)
+        public BarBuilder SetText(BarTextPosition position, BarTextType type)
         {
-            return SetText(new BarText(posotion, type));
+            return SetText(new BarText(position, type));
+        }
+
+        public BarBuilder SetText(BarTextPosition position, BarTextType type, float scale)
+        {
+            return SetText(position, type, null, scale);
         }
 
         public BarBuilder SetText(BarTextPosition position, BarTextType type, string text)
@@ -258,9 +263,19 @@ namespace DelvUI.Interface.Bars
             return SetText(new BarText(position, type, text));
         }
 
+        public BarBuilder SetText(BarTextPosition position, BarTextType type, string text, float scale)
+        {
+            return SetText(position, type, Vector4.One, Vector4.UnitW, text, scale);
+        }
+
         public BarBuilder SetText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string text)
         {
             return SetText(new BarText(position, type, color, outlineColor, text));
+        }
+
+        public BarBuilder SetText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string text, float scale)
+        {
+            return SetText(new BarText(position, type, color, outlineColor, text, scale));
         }
 
         public BarBuilder SetText(BarText text)

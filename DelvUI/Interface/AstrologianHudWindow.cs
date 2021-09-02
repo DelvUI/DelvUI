@@ -195,7 +195,7 @@ namespace DelvUI.Interface
                 };
 
                 var drawList = ImGui.GetWindowDrawList();
-                bar.Build().Draw(drawList);
+                bar.Build().Draw(drawList, PluginConfiguration);
             }
 
         }
@@ -291,7 +291,7 @@ namespace DelvUI.Interface
 
             
 
-            bar.Build().Draw(drawList);
+            bar.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawDot()
@@ -309,7 +309,7 @@ namespace DelvUI.Interface
                     .SetTextMode(BarTextMode.Single)
                     .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                     .Build();
-                barNoTarget.Draw(drawList);
+                barNoTarget.Draw(drawList, PluginConfiguration);
                 return;
             };
             var dot = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1881 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
@@ -325,7 +325,7 @@ namespace DelvUI.Interface
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                 .Build();
 
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawLightspeed()
@@ -352,7 +352,7 @@ namespace DelvUI.Interface
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawStar()
@@ -391,7 +391,7 @@ namespace DelvUI.Interface
             };
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Build().Draw(drawList);
+            bar.Build().Draw(drawList, PluginConfiguration);
         }
     }
 }
