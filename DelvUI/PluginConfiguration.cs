@@ -959,10 +959,17 @@ namespace DelvUI {
 
         public void TransferConfig(PluginConfiguration fromOtherConfig)
         {
+            // write fields
             foreach (var item in typeof(PluginConfiguration).GetFields())
             {
                 if (item.GetCustomAttributes(typeof(JsonIgnoreAttribute), false).Length > 0) continue;
-                PluginLog.Log($"Found: {item.FieldType} \t {item.Name}");
+                item.SetValue(this, item.GetValue(fromOtherConfig));
+            }
+            
+            // write properties
+            foreach (var item in typeof(PluginConfiguration).GetProperties())
+            {
+                if (item.GetCustomAttributes(typeof(JsonIgnoreAttribute), false).Length > 0) continue;
                 item.SetValue(this, item.GetValue(fromOtherConfig));
             }
         }
