@@ -610,39 +610,69 @@ namespace DelvUI {
         public Vector4 PLDFightOrFlightColor = new Vector4(240f/255f, 50f/255f, 0f/255f, 100f/100f);
         public Vector4 PLDRequiescatColor = new Vector4(61f/255f, 61f/255f, 255f/255f, 100f/100f);
         public Vector4 PLDAtonementColor = new Vector4(240f/255f, 176f/255f, 0f/255f, 100f/100f);
-        public Vector4 PLDDoTColor = new Vector4(255f/255f, 128f/255f, 0f/255f, 100f/100f); 
+        public Vector4 PLDDoTColor = new Vector4(255f/255f, 128f/255f, 0f/255f, 100f/100f);
 
         #endregion
 
         #region MNK Configuration
-        
-        public bool ShowDemolishTime = true;
-        public bool ShowBuffTime = true;
+
+        public int MNKBaseXOffset { get; set; } = 160;
+        public int MNKBaseYOffset { get; set; } = 460;
+        public bool TwinSnakesBarFlipped { get; set; } = true;
+        public bool RiddleOfEarthBarFlipped { get; set; } = true;
+        public bool PerfectBalanceBarFlipped { get; set; } = true;
+        public bool DemolishEnabled { get; set; } = true;
+        public bool ChakraEnabled { get; set; } = true;
+        public bool LeadenFistEnabled { get; set; } = true;
+        public bool TwinSnakesEnabled { get; set; } = true;
+        public bool RiddleOfEarthEnabled { get; set; } = true;
+        public bool PerfectBalanceEnabled { get; set; } = true;
+        public bool TrueNorthEnabled { get; set; } = true;
+        public bool FormsEnabled { get; set; } = false;
         public int MNKDemolishHeight { get; set; } = 20;
-        public int MNKDemolishWidth { get; set; } = 254;
-        public int MNKDemolishXOffset { get; set; } = 127;
-        public int MNKDemolishYOffset { get; set; } = 370;
+        public int MNKDemolishWidth { get; set; } = 111;
+        public int MNKDemolishXOffset { get; set; }
+        public int MNKDemolishYOffset { get; set; }
         public int MNKChakraHeight { get; set; } = 20;
         public int MNKChakraWidth { get; set; } = 254;
-        public int MNKChakraXOffset { get; set; } = 127;
-        public int MNKChakraYOffset { get; set; } = 370;
-        public int MNKBuffHeight { get; set; } = 20;
-        public int MNKBuffWidth { get; set; } = 254;
-        public int MNKBuffXOffset { get; set; } = 127;
-        public int MNKBuffYOffset { get; set; } = 370;
-        public int MNKTimeTwinXOffset { get; set; } = 60;
-        public int MNKTimeTwinYOffset { get; set; } = 2;
-        public int MNKTimeLeadenXOffset { get; set; } = 60;
-        public int MNKTimeLeadenYOffset { get; set; } = 2;
-        public int MNKTimeDemoXOffset { get; set; } = 0;
-        public int MNKTimeDemoYOffset { get; set; } = 2;
-        public Vector4 MNKDemolishColor = new Vector4(147f/255f, 0f, 83f/255f, 100f);
-        public Vector4 MNKChakraColor = new Vector4(204f/255f, 115f/255f, 0f, 100f);
-        public Vector4 MNKLeadenFistColor = new Vector4(255f/255f, 234f/255f, 0f, 100f);
-        public Vector4 MNKTwinSnakesColor = new Vector4(121f/255f, 0f, 96f/255f, 100f);
-        
+        public int MNKChakraXOffset { get; set; }
+        public int MNKChakraYOffset { get; set; }
+        public int MNKLeadenFistHeight { get; set; } = 20;
+        public int MNKLeadenFistWidth { get; set; } = 28;
+        public int MNKLeadenFistXOffset { get; set; }
+        public int MNKLeadenFistYOffset { get; set; }
+        public int MNKTwinSnakesHeight { get; set; } = 20;
+        public int MNKTwinSnakesWidth { get; set; } = 111;
+        public int MNKTwinSnakesXOffset { get; set; }
+        public int MNKTwinSnakesYOffset { get; set; }
+        public int MNKRiddleOfEarthHeight { get; set; } = 20;
+        public int MNKRiddleOfEarthWidth { get; set; } = 115;
+        public int MNKRiddleOfEarthXOffset { get; set; }
+        public int MNKRiddleOfEarthYOffset { get; set; }
+        public int MNKPerfectBalanceHeight { get; set; } = 20;
+        public int MNKPerfectBalanceWidth { get; set; } = 20;
+        public int MNKPerfectBalanceXOffset { get; set; }
+        public int MNKPerfectBalanceYOffset { get; set; }
+        public int MNKTrueNorthHeight { get; set; } = 20;
+        public int MNKTrueNorthWidth { get; set; } = 115;
+        public int MNKTrueNorthXOffset { get; set; }
+        public int MNKTrueNorthYOffset { get; set; }
+        public int MNKFormsHeight { get; set; } = 20;
+        public int MNKFormsWidth { get; set; } = 254;
+        public int MNKFormsXOffset { get; set; }
+        public int MNKFormsYOffset { get; set; }
+
+        public Vector4 MNKDemolishColor = new Vector4(246f / 255f, 169f / 255f, 255f / 255f, 100f);
+        public Vector4 MNKChakraColor = new Vector4(204f / 255f, 115f / 255f, 0f, 100f);
+        public Vector4 MNKLeadenFistColor = new Vector4(255f / 255f, 0f, 0f, 100f);
+        public Vector4 MNKTwinSnakesColor = new Vector4(227f / 255f, 255f, 64f / 255f, 100f);
+        public Vector4 MNKRiddleOfEarthColor = new Vector4(157f / 255f, 59f / 255f, 255f, 100f);
+        public Vector4 MNKPerfectBalanceColor = new Vector4(150f / 255f, 255f, 255f, 100f);
+        public Vector4 MNKTrueNorthColor = new Vector4(255f, 225f / 255f, 189f / 255f, 100f);
+        public Vector4 MNKFormsColor = new Vector4(36f / 255f, 131f / 255f, 255f, 100f);
+
         #endregion
-        
+
         #region BLM Configuration
 
         public int BLMVerticalOffset { get; set; } = -2;
