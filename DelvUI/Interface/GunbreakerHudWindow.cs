@@ -56,7 +56,7 @@ namespace DelvUI.Interface {
                 .SetBackgroundColor(EmptyColor["background"]);
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawNoMercyBar() {
@@ -77,7 +77,7 @@ namespace DelvUI.Interface {
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
     }
 }

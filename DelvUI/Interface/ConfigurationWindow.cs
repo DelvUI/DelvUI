@@ -1848,6 +1848,13 @@ namespace DelvUI.Interface
                         _pluginConfiguration.WARStormsEyeText = stormsEyeText;
                         _pluginConfiguration.Save();
                     }
+
+                    var stormsEyeTextScale = _pluginConfiguration.WARStormsEyeTextScale;
+                    if (ImGui.DragFloat("Storm's Eye Text Scale", ref stormsEyeTextScale, .005f, 0f, 20f))
+                    {
+                        _pluginConfiguration.WARStormsEyeTextScale = stormsEyeTextScale;
+                        _pluginConfiguration.Save();
+                    }
                     
                     var stormsEyeHeight = _pluginConfiguration.WARStormsEyeHeight;
                     if (ImGui.DragInt("Storm's Eye Height", ref stormsEyeHeight, .1f, 1, 1000))
@@ -1888,6 +1895,13 @@ namespace DelvUI.Interface
                     if (ImGui.Checkbox("Beast Gauge Text", ref beastGaugeText))
                     {
                         _pluginConfiguration.WARBeastGaugeText = beastGaugeText;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var beastGaugeTextScale = _pluginConfiguration.WARBeastGaugeTextScale;
+                    if (ImGui.DragFloat("Beast Gauge Text Scale", ref beastGaugeTextScale, .005f, 0f, 20f))
+                    {
+                        _pluginConfiguration.WARBeastGaugeTextScale = beastGaugeTextScale;
                         _pluginConfiguration.Save();
                     }
 

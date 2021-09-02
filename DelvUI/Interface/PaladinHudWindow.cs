@@ -144,7 +144,7 @@ namespace DelvUI.Interface
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawOathGauge()
@@ -167,7 +167,7 @@ namespace DelvUI.Interface
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawBuffBar()
@@ -201,7 +201,7 @@ namespace DelvUI.Interface
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawAtonementBar()
@@ -219,7 +219,7 @@ namespace DelvUI.Interface
                 .AddInnerBar(stackCount, 3, AtonementColor, null);
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawDoTBar()
@@ -248,7 +248,7 @@ namespace DelvUI.Interface
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
     }
 }

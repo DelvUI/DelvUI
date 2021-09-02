@@ -116,7 +116,7 @@ namespace DelvUI.Interface {
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
         
         private void DrawFeathersBar() {
@@ -139,7 +139,7 @@ namespace DelvUI.Interface {
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private unsafe void DrawStepBar()
@@ -210,7 +210,7 @@ namespace DelvUI.Interface {
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawBuffBar()
@@ -246,7 +246,7 @@ namespace DelvUI.Interface {
             }
             
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawStandardBar()
@@ -270,7 +270,7 @@ namespace DelvUI.Interface {
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.SetBackgroundColor(EmptyColor["background"]).Build().Draw(drawList);
+            builder.SetBackgroundColor(EmptyColor["background"]).Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawProcBar()
@@ -310,10 +310,10 @@ namespace DelvUI.Interface {
                 showerBuilder.AddInnerBar(showerStart, 20, FlourishingShowerColor);
             }
             var drawList = ImGui.GetWindowDrawList();
-            cascadeBuilder.Build().Draw(drawList);
-            fountainBuilder.Build().Draw(drawList);
-            windmillBuilder.Build().Draw(drawList);
-            showerBuilder.Build().Draw(drawList);
+            cascadeBuilder.Build().Draw(drawList, PluginConfiguration);
+            fountainBuilder.Build().Draw(drawList, PluginConfiguration);
+            windmillBuilder.Build().Draw(drawList, PluginConfiguration);
+            showerBuilder.Build().Draw(drawList, PluginConfiguration);
         }
 }
 }

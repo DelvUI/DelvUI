@@ -877,7 +877,7 @@ namespace DelvUI.Interface {
                 .SetVertical(GCDIndicatorVertical)
                 .Build();
             
-            gcdBar.Draw(drawList);
+            gcdBar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawPlayerStatusEffects()
