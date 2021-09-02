@@ -936,6 +936,25 @@ namespace DelvUI.Interface {
             public bool HidePermaBuffs { get; set; }
         }
 
+        private string parseDuration(double duration)
+        {
+            TimeSpan t = TimeSpan.FromSeconds( duration );
+            string parsedDuration;
+            if (t.Minutes >= 5)
+            {
+                parsedDuration = t.Minutes+"m";
+            }
+            else if (t.Minutes < 5)
+            {
+                parsedDuration = t.Minutes + ":" + t.Seconds;
+            }
+            else
+            {
+                parsedDuration = t.Seconds+"s";
+            }
+
+            return parsedDuration;
+        }
         private void DrawActorStatusEffects(Actor actor, StatusSettings settings)
         {
             var buffsEnabled = settings.BuffsEnabled;
@@ -982,11 +1001,11 @@ namespace DelvUI.Interface {
                 var size = buffSize;
                 var padding = buffPadding;
                 var duration = Math.Round(buff.Value.Duration);
-                var text = duration != 0 ? duration.ToString() : "";
+                var text = !buff.Key.IsFcBuff ? duration > 0 ? parseDuration(duration): "" : "";
                 IconHandler.DrawIcon<Status>(buff.Key, new Vector2(size, size), position, true);
                 var textSize = ImGui.CalcTextSize(text);
                 DrawOutlinedText(text,position + new Vector2(size / 2f - textSize.X / 2f, size / 2f - textSize.Y / 2f));
-
+                
                 buffCount++;
                 if (buffCount > buffColumns)
                 {
@@ -1020,7 +1039,7 @@ namespace DelvUI.Interface {
                 var size = debuffSize;
                 var padding = debuffPadding;
                 var duration = Math.Round(debuff.Value.Duration);
-                var text = duration != 0 ? duration.ToString() : "";
+                var text = duration > 0 ? parseDuration(duration): "";
                 IconHandler.DrawIcon<Status>(debuff.Key, new Vector2(size, size), position, true);
                 var textSize = ImGui.CalcTextSize(text);
                 DrawOutlinedText(text,position + new Vector2(size / 2f - textSize.X / 2f, size / 2f - textSize.Y / 2f));
