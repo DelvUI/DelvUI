@@ -1,14 +1,14 @@
-﻿using Dalamud.Game.ClientState.Structs.JobGauge;
-using System.Collections.Generic;
-using System.Numerics;
+﻿using Dalamud.Game.ClientState.Actors.Types;
+using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
+using DelvUI.Interface.Bars;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Linq;
-using Dalamud.Game.ClientState.Actors.Types;
-using DelvUI.Interface.Bars;
-using System;
 
 namespace DelvUI.Interface
 {
@@ -114,6 +114,7 @@ namespace DelvUI.Interface
                 var field = typeof(ASTGauge).GetField("seals", BindingFlags.NonPublic | BindingFlags.GetField |
                                                                BindingFlags.Instance);
                 var textSealReady = "";
+                var sealNumbers = 0;
                 var result = field.GetValue(gauge);
                 GCHandle hdl = GCHandle.Alloc(result, GCHandleType.Pinned);
                 byte* p = (byte*)hdl.AddrOfPinnedObject();
@@ -138,7 +139,7 @@ namespace DelvUI.Interface
                     }
                     if (!gauge.ContainsSeal(SealType.NONE))
                     {
-                        int sealNumbers = 0;
+                        sealNumbers = 0;
                         if (gauge.ContainsSeal(SealType.SUN)) { sealNumbers++; };
                         if (gauge.ContainsSeal(SealType.MOON)) { sealNumbers++; };
                         if (gauge.ContainsSeal(SealType.CELESTIAL)) { sealNumbers++; };
@@ -150,11 +151,11 @@ namespace DelvUI.Interface
                 var yPos = CenterY + YOffset + DivinationBarY;
 
                 var builder = BarBuilder.Create(xPos, yPos, DivinationHeight, DivinationWidth)
+                    .SetBackgroundColor(EmptyColor["gradientRight"])
                     .SetChunks(3)
                     .SetChunkPadding(DivinationBarPad)
-                    .AddInnerBar(3, 3, chunkColors.ToArray())
+                    .AddInnerBar(chunkColors.Count(n => n != EmptyColor), 3, chunkColors.ToArray())
                     .SetTextMode(BarTextMode.Single)
-                    .SetBackgroundColor(EmptyColor["gradientRight"])
                     .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, textSealReady);
 
                 var drawList = ImGui.GetWindowDrawList();
@@ -203,10 +204,10 @@ namespace DelvUI.Interface
             }
             
             var drawList = ImGui.GetWindowDrawList();
-
-            Bar bar = builder.AddInnerBar(1f, 1f, cardColor)
-                .SetTextMode(BarTextMode.Single)
+            var cardPresent = cardJob != "" ? 1f :0f;
+            Bar bar = builder.AddInnerBar(cardPresent, 1f, cardColor)
                 .SetBackgroundColor(EmptyColor["gradientRight"])
+                .SetTextMode(BarTextMode.Single)
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, cardJob)
                 .Build();
 
@@ -224,8 +225,8 @@ namespace DelvUI.Interface
             if (target is not Chara)
             {
                 Bar barNoTarget = builder.AddInnerBar(0, 30f, DotColor)
-                    .SetTextMode(BarTextMode.Single)
                     .SetBackgroundColor(EmptyColor["gradientRight"])
+                    .SetTextMode(BarTextMode.Single)
                     .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                     .Build();
                 barNoTarget.Draw(drawList);
@@ -239,8 +240,8 @@ namespace DelvUI.Interface
 
 
             Bar bar = builder.AddInnerBar(System.Math.Abs(dotDuration), dotCooldown, DotColor)
-                .SetTextMode(BarTextMode.Single)
                 .SetBackgroundColor(EmptyColor["gradientRight"])
+                .SetTextMode(BarTextMode.Single)
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                 .Build();
 
