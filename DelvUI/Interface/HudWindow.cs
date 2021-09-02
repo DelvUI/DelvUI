@@ -1015,6 +1015,11 @@ namespace DelvUI.Interface {
             
             var currentBuffRow = 0;
             var buffCount = 0;
+            var hasFoodBuff = buffList.Where(o => o.Key.Description == "Enjoying the benefits of a full belly.").Count();
+            if (hasFoodBuff == 0)
+            {
+                //just add wtv here
+            }
             foreach (var buff in buffList)
             {
                 var position = currentBuffPos;
@@ -1025,7 +1030,8 @@ namespace DelvUI.Interface {
                 IconHandler.DrawIcon<Status>(buff.Key, new Vector2(size, size), position, true);
                 var textSize = ImGui.CalcTextSize(text);
                 DrawOutlinedText(text,position + new Vector2(size / 2f - textSize.X / 2f, size / 2f - textSize.Y / 2f));
-                
+
+
                 buffCount++;
                 if (buffCount > buffColumns)
                 {

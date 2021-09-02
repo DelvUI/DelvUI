@@ -37,12 +37,12 @@ namespace DelvUI.Interface
                 "Player"
                 , "Target"
                 });
-            _configMap.Add("Buffs / Debuffs", new [] {
+            _configMap.Add("Buffs and Debuffs", new [] {
                 //"General", 
                 "Player"
                 , "Target"
             });
-            _configMap.Add("Jobs", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"});
+            _configMap.Add("Job Specific Bars", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"});
 
         }
 
@@ -241,7 +241,7 @@ namespace DelvUI.Interface
                             break;
                     }
                     break;
-                case "Buffs / Debuffs":
+                case "Buffs and Debuffs":
                     switch (subConfig)
                     {
                         case "Player":
@@ -252,7 +252,7 @@ namespace DelvUI.Interface
                             break;
                     }
                     break;
-                case "Jobs":
+                case "Job Specific Bars":
                     switch (subConfig)
                     {          
                         case "General":
