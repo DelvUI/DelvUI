@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Interface;
 using ImGuiNET;
+using Dalamud.Plugin;
 
 namespace DelvUI.Interface
 {
@@ -10,6 +11,7 @@ namespace DelvUI.Interface
     {
         public bool IsVisible;
         private readonly PluginConfiguration _pluginConfiguration;
+        private readonly DalamudPluginInterface _pluginInterface;
         private string _selected = "General";
         private string _selectedColorType = "Tanks";
         private readonly Dictionary<string, Array> _configMap = new Dictionary<string, Array>() ;
@@ -20,11 +22,12 @@ namespace DelvUI.Interface
         private int _xOffsetLimit;
         private int _yOffsetLimit;
 
-        public ConfigurationWindow(PluginConfiguration pluginConfiguration)
+        public ConfigurationWindow(PluginConfiguration pluginConfiguration, DalamudPluginInterface pluginInterface)
         {
             //TODO ADD PRIMARYRESOURCEBAR TO CONFIGMAP jobs general
 
             _pluginConfiguration = pluginConfiguration;
+            _pluginInterface = pluginInterface;
             _configMap.Add("General", new [] {"General"});
             _configMap.Add("Individual Unitframes", new []
             {
@@ -149,7 +152,10 @@ namespace DelvUI.Interface
                 ToggleHud();
             }
             ImGui.SameLine();
-            if (ImGui.Button("Reset HUD")) {}
+            if (ImGui.Button("Reset HUD")) {
+                _pluginConfiguration.TransferConfig(PluginConfiguration.ReadConfig("default", _pluginInterface));
+                _changed = true;
+            }
             ImGui.SameLine();
             
             pos = ImGui.GetCursorPos();

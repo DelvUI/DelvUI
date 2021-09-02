@@ -807,8 +807,57 @@ namespace DelvUI {
             BuildColorMap();
         }
 
+        public static void WriteConfig(string filename, DalamudPluginInterface pluginInterface, PluginConfiguration config)
+        {
+            if (pluginInterface == null) return;
+            var configDirectory = pluginInterface.GetPluginConfigDirectory();
+            var configFile = System.IO.Path.Combine(configDirectory, filename + ".json");
+            try
+            {
+                var jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
+                System.IO.File.WriteAllText(configFile, jsonString);
+            }
+            catch (Exception ex)
+            {
+                PluginLog.Log($"Failed to write configuration {configFile} to JSON");
+                PluginLog.Log(ex.StackTrace);
+            }
+        }
+
+        public static PluginConfiguration ReadConfig(string filename, DalamudPluginInterface pluginInterface)
+        {
+            if (pluginInterface == null) return null;
+            var configDirectory = pluginInterface.GetPluginConfigDirectory();
+            var configFile = System.IO.Path.Combine(configDirectory, filename + ".json");
+            try
+            {
+                if (System.IO.File.Exists(configFile))
+                {
+                    var jsonString = System.IO.File.ReadAllText(configFile);
+                    return JsonConvert.DeserializeObject<PluginConfiguration>(jsonString);
+                }
+            }
+            catch (Exception ex)
+            {
+                PluginLog.Log($"Failed to load configuration file: {configFile}");
+                PluginLog.Log(ex.StackTrace);
+            }
+            return null;
+        }
+
+        public void TransferConfig(PluginConfiguration fromOtherConfig)
+        {
+            foreach (var item in typeof(PluginConfiguration).GetProperties())
+            {
+                // ignore fields with the JsonIgnore attribute
+                if (item.GetCustomAttributes(typeof(JsonIgnoreAttribute), false).Length > 0) continue;
+                item.SetValue(this, item.GetValue(fromOtherConfig));
+            }
+        }
+
         public void Save() {
-            _pluginInterface.SavePluginConfig(this);
+            // TODO should not use the name explicitly here
+            PluginConfiguration.WriteConfig("DelvUI", _pluginInterface, this);
 
             // call event when the config changes
             if (ConfigChangedEvent != null)
