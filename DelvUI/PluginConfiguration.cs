@@ -324,18 +324,18 @@ namespace DelvUI {
         #region AST Configuration
 
         public int ASTDrawBarHeight { get; set; } = 20;
-        public int ASTDrawBarWidth { get; set; } = 84;
-        public int ASTDrawBarX { get; set; } = 118;
-        public int ASTDrawBarY { get; set; } = -65;
+        public int ASTDrawBarWidth { get; set; } = 254;
+        public int ASTDrawBarX { get; set; } = 33;
+        public int ASTDrawBarY { get; set; } = -43;
         public int ASTDivinationHeight { get; set; } = 10;
         public int ASTDivinationWidth { get; set; } = 254;
         public int ASTDivinationBarX { get; set; } = 33;
         public int ASTDivinationBarY { get; set; } = -77;
         public int ASTDivinationBarPad { get; set; } = 1;
         public int ASTDotBarHeight { get; set; } = 20;
-        public int ASTDotBarWidth { get; set; } = 254;
-        public int ASTDotBarX { get; set; } = 33;
-        public int ASTDotBarY { get; set; } = -43;
+        public int ASTDotBarWidth { get; set; } = 84;
+        public int ASTDotBarX { get; set; } = 118;
+        public int ASTDotBarY { get; set; } = -65;
         public int ASTStarBarHeight { get; set; } = 20;
         public int ASTStarBarWidth { get; set; } = 84;
         public int ASTStarBarX { get; set; } = 33;
@@ -354,6 +354,7 @@ namespace DelvUI {
         public bool ASTShowDivinationTextBar = false;
         public bool ASTShowDrawGlowBar = false;
         public bool ASTShowDrawTextBar = true;
+        public bool ASTShowRedrawBar = true;
         public bool ASTShowPrimaryResourceBar = true;
         public Vector4 ASTSealSunColor = new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f);
         public Vector4 ASTSealLunarColor = new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f);
