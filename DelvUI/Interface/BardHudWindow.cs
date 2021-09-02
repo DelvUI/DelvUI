@@ -95,6 +95,7 @@ namespace DelvUI.Interface {
 
                 var cbBar = builder.AddInnerBar(duration, 30f, color)
                     .SetFlipDrainDirection(BRDCBInverted)
+                    .SetBackgroundColor(EmptyColor["background"])
                     .Build();
                 barDrawList.Add(cbBar);
             }
@@ -115,6 +116,7 @@ namespace DelvUI.Interface {
 
                 var sbBar = builder.AddInnerBar(duration, 30f, color)
                     .SetFlipDrainDirection(BRDSBInverted)
+                    .SetBackgroundColor(EmptyColor["background"])
                     .Build();
                 barDrawList.Add(sbBar);
 
@@ -182,6 +184,7 @@ namespace DelvUI.Interface {
             var bar = builder.AddInnerBar(duration / 1000f, 30f, songColor)
                 .SetTextMode(BarTextMode.EachChunk)
                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                .SetBackgroundColor(EmptyColor["background"])
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
@@ -199,6 +202,7 @@ namespace DelvUI.Interface {
             var builder = BarBuilder.Create(xPos, yPos, BRDSoulGaugeHeight, BRDSoulGaugeWidth);
 
             var bar = builder.AddInnerBar(soulVoice, 100f, SVColor)
+                .SetBackgroundColor(EmptyColor["background"])
                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
@@ -213,6 +217,7 @@ namespace DelvUI.Interface {
                 .SetChunks(max)
                 .SetChunkPadding(BRDStackPadding)
                 .AddInnerBar(amount, max, stackColor)
+                .SetBackgroundColor(EmptyColor["background"])
                 .Build();
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);

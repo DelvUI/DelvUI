@@ -39,6 +39,7 @@ namespace DelvUI.Interface
         protected Dictionary<string, uint> ChakraColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 1];
         protected Dictionary<string, uint> LeadenFistColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 2];
         protected Dictionary<string, uint> TwinSnakesColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 3];
+        protected Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 4];
 
         public MonkHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
@@ -79,7 +80,7 @@ namespace DelvUI.Interface
 
             var buffStart = new Vector2(xOffset + barWidth - (barSize.X / 15) * twinSnakesDuration, CenterY + BuffYOffset + 68);
 
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
             drawList.AddRectFilledMultiColor(
                     buffStart, cursorPos + new Vector2(barSize.X, barSize.Y),
                     TwinSnakesColor["gradientLeft"], TwinSnakesColor["gradientRight"], TwinSnakesColor["gradientRight"], TwinSnakesColor["gradientLeft"]
@@ -91,7 +92,7 @@ namespace DelvUI.Interface
 
                 cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
 
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2((barSize.X / 30) * leadenFistDuration, barSize.Y),
                     leadenFistDuration > 0 ? LeadenFistColor["gradientLeft"] : 0x00202E3,
@@ -110,7 +111,7 @@ namespace DelvUI.Interface
                 var leadenXOffset = TimeLeadenXOffset;
                 var leadenYOffset = TimeLeadenYOffset;
 
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2((barSize.X / 30) * leadenFistDuration, barSize.Y),
                     leadenFistDuration > 0 ? LeadenFistColor["gradientLeft"] : 0x00202E3,
@@ -152,7 +153,7 @@ namespace DelvUI.Interface
 
             cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
 
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
             drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2((barSize.X / 18) * demolishDuration, barSize.Y),
                     demolishColor["gradientLeft"], demolishColor["gradientRight"], demolishColor["gradientRight"], demolishColor["gradientLeft"]
@@ -178,7 +179,7 @@ namespace DelvUI.Interface
             var drawList = ImGui.GetWindowDrawList();
             for (var i = 0; i <= 5 - 1; i++)
             {
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
                 if (gauge.NumChakra > i)
                 {
                     drawList.AddRectFilledMultiColor(

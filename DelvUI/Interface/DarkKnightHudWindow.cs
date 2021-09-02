@@ -166,7 +166,7 @@ namespace DelvUI.Interface {
             var drawList = ImGui.GetWindowDrawList();
 
             if (! BloodGaugeSplit)
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
 
             void DrawBloodChunks(int index = 1) {
                 if (index > 2)
@@ -185,7 +185,7 @@ namespace DelvUI.Interface {
                 }
 
                 if (BloodGaugeSplit)
-                    drawList.AddRectFilled(cursorPos, cursorPos + barSplitSize, 0x88000000);
+                    drawList.AddRectFilled(cursorPos, cursorPos + barSplitSize, EmptyColor["background"]);
 
                 if (scale >= 1.0f) {
                     drawList.AddRectFilledMultiColor(
@@ -231,7 +231,7 @@ namespace DelvUI.Interface {
 
             var drawList = ImGui.GetWindowDrawList();
 
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
             if (bloodWeaponBuff.Any() && deliriumBuff.Any())
             {
                 var innerBarHeight = buffBarBarHeight / 2;
@@ -297,7 +297,7 @@ namespace DelvUI.Interface {
             var drawList = ImGui.GetWindowDrawList();
 
             float duration = 0;
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
             if (livingShadow)
             {
                 duration = Math.Abs(shadowTimeRemaining);

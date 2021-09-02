@@ -114,7 +114,7 @@ namespace DelvUI.Interface
             var bar = BarBuilder.Create(xPos, yPos, RuinBarHeight, RuinBarWidth)
                 .SetChunks(4)
                 .SetChunkPadding(RuinBarPadding)
-                .AddInnerBar(ruinBuff.StackCount, 4, SmnRuinColor, SmnEmptyColor)
+                .AddInnerBar(ruinBuff.StackCount, 4, SmnRuinColor).SetBackgroundColor(SmnEmptyColor["background"])
                 .Build();
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);
@@ -129,7 +129,7 @@ namespace DelvUI.Interface
             var bar = BarBuilder.Create(xPos, yPos, AetherBarHeight, AetherBarWidth)
                 .SetChunks(2)
                 .SetChunkPadding(AetherBarPadding)
-                .AddInnerBar(aetherFlowBuff.StackCount, 2, SmnAetherColor, SmnEmptyColor)
+                .AddInnerBar(aetherFlowBuff.StackCount, 2, SmnAetherColor).SetBackgroundColor(SmnEmptyColor["background"])
                 .Build();
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);

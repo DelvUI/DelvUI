@@ -27,6 +27,11 @@ namespace DelvUI {
         public int PrimaryResourceBarWidth { get; set; } = 254;
         public int PrimaryResourceBarXOffset { get; set; } = 160;
         public int PrimaryResourceBarYOffset { get; set; } = 455;
+        public int PrimaryResourceBarTextXOffset { get; set; } = 0;
+        public int PrimaryResourceBarTextYOffset { get; set; } = 0;
+        public bool ShowPrimaryResourceBarValue = false;
+        public bool ShowPrimaryResourceBarThresholdMarker = false;
+        public int PrimaryResourceBarThresholdValue { get; set; } = 7000;
         public int TargetBarHeight { get; set; } = 50;
         public int TargetBarWidth { get; set; } = 270;
         public int TargetBarXOffset { get; set; } = 160;
@@ -90,6 +95,41 @@ namespace DelvUI {
         public bool GCDIndicatorShowBorder = false;
         #endregion
 
+        public bool PlayerBuffsEnabled = true;
+        public bool PlayerDebuffsEnabled = true;
+        public int PlayerBuffColumns { get; set; } = 8;
+        public int PlayerDebuffColumns { get; set; } = 8;
+        public int PlayerBuffPositionX { get; set; } = 1650;
+        public int PlayerBuffPositionY { get; set; } = 60;
+        public int PlayerDebuffPositionX { get; set; } = 1650;
+        public int PlayerDebuffPositionY { get; set; } = 160;
+        public int PlayerBuffSize { get; set; } = 40;
+        public int PlayerDebuffSize { get; set; } = 40;
+        public int PlayerBuffPadding { get; set; } = 2;
+        public int PlayerDebuffPadding { get; set; } = 2;
+        public bool PlayerBuffGrowRight = false;
+        public bool PlayerDebuffGrowRight = false;
+        public bool PlayerBuffGrowDown = true;
+        public bool PlayerDebuffGrowDown = true;
+        public bool PlayerHidePermaBuffs = false;
+        
+        public bool TargetBuffsEnabled = true;
+        public bool TargetDebuffsEnabled = true;
+        public int TargetBuffColumns { get; set; } = 8;
+        public int TargetDebuffColumns { get; set; } = 8;
+        public int TargetBuffPositionX { get; set; } = 160;
+        public int TargetBuffPositionY { get; set; } = 415;
+        public int TargetDebuffPositionX { get; set; } = 160;
+        public int TargetDebuffPositionY { get; set; } = 505;
+        public int TargetBuffSize { get; set; } = 40;
+        public int TargetDebuffSize { get; set; } = 40;
+        public int TargetBuffPadding { get; set; } = 2;
+        public int TargetDebuffPadding { get; set; } = 2;
+        public bool TargetBuffGrowRight = true;
+        public bool TargetDebuffGrowRight = true;
+        public bool TargetBuffGrowDown = true;
+        public bool TargetDebuffGrowDown = true;
+
         #region cast bar
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
@@ -130,7 +170,7 @@ namespace DelvUI {
         public Vector4 ShieldColor = new Vector4(255f/255f,255f/255f,0f/255f,100f/100f);
         public Vector4 MPTickerColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f);
         public Vector4 GCDIndicatorColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f);
-        public Vector4 EmptyColor = new Vector4(0f/255f, 0f/255f, 0f/255f, 88f/100f);
+        public Vector4 EmptyColor = new Vector4(0f/255f, 0f/255f, 0f/255f, 50f/100f);
 
 
         public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,100f/100f);
@@ -1092,6 +1132,13 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(GNBNoMercyColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(GNBNoMercyColor.AdjustColor(.1f))
                 },
+                [Jobs.GNB * 1000 + 2] = new Dictionary<string, uint> // Bar not ready
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
+                },
 
                 [Jobs.WHM] = new Dictionary<string, uint>
                 {
@@ -1396,6 +1443,13 @@ namespace DelvUI {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(.1f))
+                },                
+                [Jobs.MNK * 1000 + 4] = new Dictionary<string, uint> // Scholar Empty Bar Color
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
                 },
                 
                 [Jobs.DRG] = new Dictionary<string, uint>
