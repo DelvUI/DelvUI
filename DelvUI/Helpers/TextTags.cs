@@ -21,7 +21,7 @@ namespace DelvUI.Helpers
                         ? ((int) actor.CurrentHp).KiloFormat()
                         : $"{Math.Round(100f / actor.MaxHp * actor.CurrentHp)}",
                     "[health:current-max]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => $"{actor.CurrentHp.ToString()} | {actor.MaxHp}",
-                    "[health:current-max-short]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => $"{actor.CurrentHp.KiloFormat()} | {((int) actor.MaxHp).KiloFormat()}",
+                    "[health:current-max-short]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => $"{((int) actor.CurrentHp).KiloFormat()} | {((int) actor.MaxHp).KiloFormat()}",
                     "[health:current-max-percent]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => actor.CurrentHp == actor.MaxHp
                         ? $"{Math.Round(100f / actor.MaxHp * actor.CurrentHp)} - 100" : $"{actor.CurrentHp} - {actor.MaxHp}",
                     "[health:current-max-percent-short]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => actor.CurrentHp == actor.MaxHp
