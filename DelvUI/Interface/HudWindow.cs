@@ -51,6 +51,11 @@ namespace DelvUI.Interface {
         protected int PrimaryResourceBarWidth => PluginConfiguration.PrimaryResourceBarWidth;
         protected int PrimaryResourceBarXOffset => PluginConfiguration.PrimaryResourceBarXOffset;
         protected int PrimaryResourceBarYOffset => PluginConfiguration.PrimaryResourceBarYOffset;
+        protected int PrimaryResourceBarTextXOffset => PluginConfiguration.PrimaryResourceBarTextXOffset;
+        protected int PrimaryResourceBarTextYOffset => PluginConfiguration.PrimaryResourceBarTextYOffset;
+        protected bool ShowPrimaryResourceBarValue => PluginConfiguration.ShowPrimaryResourceBarValue;
+        protected bool ShowPrimaryResourceBarThresholdMarker => PluginConfiguration.ShowPrimaryResourceBarThresholdMarker;
+        protected int PrimaryResourceBarThresholdValue => PluginConfiguration.PrimaryResourceBarThresholdValue;
 
         protected int TargetBarHeight => PluginConfiguration.TargetBarHeight;
         protected int TargetBarWidth => PluginConfiguration.TargetBarWidth;
@@ -248,6 +253,21 @@ namespace DelvUI.Interface {
                 0xFFE6CD00, 0xFFD8Df3C, 0xFFD8Df3C, 0xFFE6CD00
             );
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+
+            if (ShowPrimaryResourceBarThresholdMarker)
+            {
+                // threshold
+                var position = new Vector2(cursorPos.X + (PrimaryResourceBarThresholdValue / 10000f) * BarSize.X - 3, cursorPos.Y);
+                var size = new Vector2(2, BarSize.Y);
+                drawList.AddRect(position, position + size, 0xFF000000);
+            }
+
+            if (!ShowPrimaryResourceBarValue) return;
+
+            // text
+            var mana = PluginInterface.ClientState.LocalPlayer.CurrentMp;
+            var text = $"{mana,0}";
+            DrawOutlinedText(text, new Vector2(cursorPos.X + 2 + PrimaryResourceBarTextXOffset, cursorPos.Y - 3 + PrimaryResourceBarTextYOffset));
         }
 
         protected virtual void DrawTargetBar() {
