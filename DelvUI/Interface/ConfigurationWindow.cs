@@ -3193,6 +3193,10 @@ namespace DelvUI.Interface
 
                     if (_pluginConfiguration.NINNinkiGaugeEnabled)
                     {
+                        _changed |= ImGui.Checkbox("Ninki Gauge Text", ref _pluginConfiguration.NINNinkiGaugeText);
+
+                        _changed |= ImGui.Checkbox("Ninki Gauge Chunked", ref _pluginConfiguration.NINNinkiChunked);
+
                         var ninNinkiGaugeHeight = _pluginConfiguration.NINNinkiGaugeHeight;
                         if (ImGui.DragInt("Ninki Gauge Height", ref ninNinkiGaugeHeight, .1f, 1, 1000))
                         {
@@ -3229,6 +3233,51 @@ namespace DelvUI.Interface
                         }
 
                         _changed |= ImGui.ColorEdit4("Ninki Bar Color", ref _pluginConfiguration.NINNinkiColor);
+
+                        if(_pluginConfiguration.NINNinkiChunked)
+                        {
+                            _changed |= ImGui.ColorEdit4("Ninki Bar Not Filled Chunk Color", ref _pluginConfiguration.NINNinkiNotFullColor);
+                        }
+                    }
+
+                    _changed |= ImGui.Checkbox("Enable Trick Bar", ref _pluginConfiguration.NINTrickBarEnabled);
+
+                    if (_pluginConfiguration.NINTrickBarEnabled)
+                    {
+                        _changed |= ImGui.Checkbox("Trick Bar Text", ref _pluginConfiguration.NINTrickBarText);
+
+                        _changed |= ImGui.Checkbox("Suiton Bar Text", ref _pluginConfiguration.NINSuitonBarText);
+
+                        var ninTrickBarHeight = _pluginConfiguration.NINTrickBarHeight;
+                        if (ImGui.DragInt("Trick Bar Height", ref ninTrickBarHeight, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.NINTrickBarHeight = ninTrickBarHeight;
+                            _pluginConfiguration.Save();
+                        }
+
+                        var ninTrickBarWidth = _pluginConfiguration.NINTrickBarWidth;
+                        if (ImGui.DragInt("Trick Bar Width", ref ninTrickBarWidth, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.NINTrickBarWidth = ninTrickBarWidth;
+                            _pluginConfiguration.Save();
+                        }
+
+                        var ninTrickBarXOffset = _pluginConfiguration.NINTrickBarXOffset;
+                        if (ImGui.DragInt("Trick Bar X Offset", ref ninTrickBarXOffset, .1f, -2000, 2000))
+                        {
+                            _pluginConfiguration.NINTrickBarXOffset = ninTrickBarXOffset;
+                            _pluginConfiguration.Save();
+                        }
+
+                        var ninTrickBarYOffset = _pluginConfiguration.NINTrickBarYOffset;
+                        if (ImGui.DragInt("Trick Bar Y Offset", ref ninTrickBarYOffset, .1f, -2000, 2000))
+                        {
+                            _pluginConfiguration.NINTrickBarYOffset = ninTrickBarYOffset;
+                            _pluginConfiguration.Save();
+                        }
+
+                        _changed |= ImGui.ColorEdit4("Trick Bar Color", ref _pluginConfiguration.NINTrickColor);
+                        _changed |= ImGui.ColorEdit4("Suiton Bar Color", ref _pluginConfiguration.NINSuitonColor);
                     }
 
 
