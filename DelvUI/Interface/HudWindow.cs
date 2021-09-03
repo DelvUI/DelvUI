@@ -106,8 +106,8 @@ namespace DelvUI.Interface {
         protected int TargetCastBarXOffset => PluginConfiguration.TargetCastBarXOffset;
         protected int TargetCastBarYOffset => PluginConfiguration.TargetCastBarYOffset;
 
-        #endregion
-
+        protected uint UnitFrameEmptyColor => ImGui.ColorConvertFloat4ToU32(PluginConfiguration.UnitFrameEmptyColor);
+        
         protected Vector2 BarSize { get; private set; }
 
         private LastUsedCast _lastPlayerUsedCast;
@@ -126,7 +126,7 @@ namespace DelvUI.Interface {
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) {
             PluginInterface = pluginInterface;
             PluginConfiguration = pluginConfiguration;
-            
+
             _childFlags |= ImGuiWindowFlags.NoTitleBar;
             _childFlags |= ImGuiWindowFlags.NoScrollbar;
             _childFlags |= ImGuiWindowFlags.AlwaysAutoResize;
@@ -134,7 +134,7 @@ namespace DelvUI.Interface {
             _childFlags |= ImGuiWindowFlags.NoBringToFrontOnFocus;
             
             openContextMenuFromTarget = Marshal.GetDelegateForFunctionPointer<OpenContextMenuFromTarget>(PluginInterface.TargetModuleScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
-
+            
             PluginConfiguration.ConfigChangedEvent += OnConfigChanged;
 
             var center = new Vector2(CenterX, CenterY);
@@ -191,8 +191,9 @@ namespace DelvUI.Interface {
 
             ImGui.Begin("health_bar", windowFlags);
             if (ImGui.BeginChild("health_bar", BarSize)) {
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
-                drawList.AddRectFilledMultiColor(
+                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, UnitFrameEmptyColor);
+                if (HasTankInvuln(actor) == 1) drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["invuln"]);
+                    drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight),
                     colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
                 );
@@ -306,7 +307,7 @@ namespace DelvUI.Interface {
                     if (target is not Chara actor)
                     {
                         var friendly = PluginConfiguration.NPCColorMap["friendly"];
-                        drawListPtr.AddRectFilled(cursorPos, cursorPos + BarSize, friendly["background"]);
+                        drawListPtr.AddRectFilled(cursorPos, cursorPos + BarSize, ImGui.ColorConvertFloat4ToU32(PluginConfiguration.UnitFrameEmptyColor));
                         drawListPtr.AddRectFilledMultiColor(
                             cursorPos, cursorPos + new Vector2(TargetBarWidth, TargetBarHeight),
                             friendly["gradientLeft"], friendly["gradientRight"],
@@ -318,7 +319,8 @@ namespace DelvUI.Interface {
                     {
                         var scale = actor.MaxHp > 0f ? (float) actor.CurrentHp / actor.MaxHp : 0f;
                         var colors = DetermineTargetPlateColors(actor);
-                        drawListPtr.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
+                        drawListPtr.AddRectFilled(cursorPos, cursorPos + BarSize, UnitFrameEmptyColor);
+                        if (HasTankInvuln(actor) == 1) drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["invuln"]);
                         drawListPtr.AddRectFilledMultiColor(
                             cursorPos, cursorPos + new Vector2(TargetBarWidth * scale, TargetBarHeight),
                             colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
@@ -384,7 +386,7 @@ namespace DelvUI.Interface {
                 if (focus is not Chara actor)
                 {
                     var friendly = PluginConfiguration.NPCColorMap["friendly"];
-                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, friendly["background"]);
+                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, UnitFrameEmptyColor);
                     drawList.AddRectFilledMultiColor(
                         cursorPos, cursorPos + new Vector2(FocusBarWidth, FocusBarHeight),
                         friendly["gradientLeft"], friendly["gradientRight"], friendly["gradientRight"],
@@ -396,7 +398,8 @@ namespace DelvUI.Interface {
                 else
                 {
                     var colors = DetermineTargetPlateColors(actor);
-                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["background"]);
+                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, UnitFrameEmptyColor);
+                    if (HasTankInvuln(actor) == 1) drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["invuln"]);
                     drawList.AddRectFilledMultiColor(
                         cursorPos,
                         cursorPos + new Vector2((float) FocusBarWidth * actor.CurrentHp / actor.MaxHp, FocusBarHeight),
@@ -471,7 +474,8 @@ namespace DelvUI.Interface {
 
             ImGui.Begin("target_of_target_bar", windowFlags);
             if (ImGui.BeginChild("target_of_target_bar", barSize)) {
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["background"]);
+                drawList.AddRectFilled(cursorPos, cursorPos + barSize, UnitFrameEmptyColor);
+                if (HasTankInvuln(actor) == 1) drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["invuln"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2((float) ToTBarWidth * actor.CurrentHp / actor.MaxHp, ToTBarHeight),
                     colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
@@ -834,6 +838,7 @@ namespace DelvUI.Interface {
                 drawList.AddRect(position, position + fullSize, 0xFF000000);
             }
         }
+
         protected virtual void DrawGCDIndicator()
         {
             if (!PluginConfiguration.GCDIndicatorEnabled || PluginInterface.ClientState.LocalPlayer is null)
@@ -847,9 +852,7 @@ namespace DelvUI.Interface {
             var scale = elapsed / total;
             if (scale <= 0) return;
 
-            (int Height, int Width) barSize = GCDIndicatorVertical
-                ?  (-1 * GCDIndicatorWidth, GCDIndicatorHeight) :
-                 (GCDIndicatorHeight, GCDIndicatorWidth);
+            (int Height, int Width) barSize = GCDIndicatorVertical ? (-GCDIndicatorHeight, GCDIndicatorWidth) : (GCDIndicatorHeight, GCDIndicatorWidth);
 
             var position = new Vector2(CenterX + GCDIndicatorXOffset - GCDIndicatorWidth / 2f, CenterY + GCDIndicatorYOffset);
             var colors = PluginConfiguration.MiscColorMap["gcd"];
@@ -885,6 +888,22 @@ namespace DelvUI.Interface {
             _targetDebuffList.Draw();
         }
 
+        private int HasTankInvuln(Actor actor)
+        {
+
+            var tankInvulnBuff = actor.StatusEffects.Where(o =>
+                    o.EffectId == 810 || // Living Dead
+                    o.EffectId == 1302 || // Hollow Ground
+                    o.EffectId == 409 || // Holmgang
+                    o.EffectId == 1836   // Bolide
+
+            );
+
+            return tankInvulnBuff.Count();
+
+
+
+        }
         protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor) {
             var colors = PluginConfiguration.NPCColorMap["neutral"];
 

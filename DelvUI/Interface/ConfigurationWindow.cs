@@ -337,16 +337,22 @@ namespace DelvUI.Interface
                     // gcd indicator
                     _changed |= ImGui.Checkbox("Show GCD Indicator", ref _pluginConfiguration.GCDIndicatorEnabled);
                     _changed |= ImGui.Checkbox("Always Show GCD Indicator", ref _pluginConfiguration.GCDAlwaysShow);
-                    _changed |= ImGui.Checkbox("Vertical GCD Indicator", ref _pluginConfiguration.GCDIndicatorVertical);
                     
-                    var gcdIndicatorHeight = _pluginConfiguration.GCDIndicatorVertical ? _pluginConfiguration.GCDIndicatorWidth : _pluginConfiguration.GCDIndicatorHeight;
+                    if (ImGui.Checkbox("Vertical GCD Indicator", ref _pluginConfiguration.GCDIndicatorVertical))
+                    {
+                        var __temp = _pluginConfiguration.GCDIndicatorWidth;
+                        _pluginConfiguration.GCDIndicatorWidth = _pluginConfiguration.GCDIndicatorHeight;
+                        _pluginConfiguration.GCDIndicatorHeight = __temp;
+                    }
+                    
+                    var gcdIndicatorHeight = _pluginConfiguration.GCDIndicatorHeight;
                     if (ImGui.DragInt("GCD Indicator Height", ref gcdIndicatorHeight, .1f, 1, 1000))
                     {
                         _pluginConfiguration.GCDIndicatorHeight = gcdIndicatorHeight;
                         _pluginConfiguration.Save();
                     }
 
-                    var gcdIndicatorWidth = _pluginConfiguration.GCDIndicatorVertical ? _pluginConfiguration.GCDIndicatorHeight : _pluginConfiguration.GCDIndicatorWidth;
+                    var gcdIndicatorWidth = _pluginConfiguration.GCDIndicatorWidth;
                     if (ImGui.DragInt("GCD Indicator Width", ref gcdIndicatorWidth, .1f, 1, 1000))
                     {
                         _pluginConfiguration.GCDIndicatorWidth = gcdIndicatorWidth;
