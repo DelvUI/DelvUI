@@ -1507,7 +1507,7 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorMNK.AdjustColor(.1f))
                 },
 
-                [Jobs.MNK * 1000] = new Dictionary<string, uint> // Scholar Empty Bar Color
+                [Jobs.MNK * 1000] = new Dictionary<string, uint> // Demolish
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(MNKDemolishColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(MNKDemolishColor.AdjustColor(-.8f)),
@@ -1515,7 +1515,7 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MNKDemolishColor.AdjustColor(.1f))
                 },
 
-                [Jobs.MNK * 1000 + 1] = new Dictionary<string, uint> // Scholar Empty Bar Color
+                [Jobs.MNK * 1000 + 1] = new Dictionary<string, uint> // Chakra
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(MNKChakraColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(MNKChakraColor.AdjustColor(-.8f)),
@@ -1523,7 +1523,7 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MNKChakraColor.AdjustColor(.1f))
                 },
 
-                [Jobs.MNK * 1000 + 2] = new Dictionary<string, uint> // Scholar Empty Bar Color
+                [Jobs.MNK * 1000 + 2] = new Dictionary<string, uint> // Leaden Fist
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(MNKLeadenFistColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(MNKLeadenFistColor.AdjustColor(-.8f)),
@@ -1531,14 +1531,42 @@ namespace DelvUI {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MNKLeadenFistColor.AdjustColor(.1f))
                 },
 
-                [Jobs.MNK * 1000 + 3] = new Dictionary<string, uint> // Scholar Empty Bar Color
+                [Jobs.MNK * 1000 + 3] = new Dictionary<string, uint> // Twin Snakes
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(.1f))
                 },                
-                [Jobs.MNK * 1000 + 4] = new Dictionary<string, uint> // Scholar Empty Bar Color
+                [Jobs.MNK * 1000 + 4] = new Dictionary<string, uint> // Empty
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
+                },
+                [Jobs.MNK * 1000 + 5] = new Dictionary<string, uint> // Riddle Of Earth
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
+                },
+                [Jobs.MNK * 1000 + 6] = new Dictionary<string, uint> // Perfect Balance
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
+                },
+                [Jobs.MNK * 1000 + 7] = new Dictionary<string, uint> // True North
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
+                },
+                [Jobs.MNK * 1000 + 8] = new Dictionary<string, uint> // Forms
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
