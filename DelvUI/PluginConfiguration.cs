@@ -163,6 +163,7 @@ namespace DelvUI {
         public Vector4 MPTickerColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f);
         public Vector4 GCDIndicatorColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f);
         public Vector4 EmptyColor = new Vector4(0f/255f, 0f/255f, 0f/255f, 50f/100f);
+        public Vector4 UnitFrameEmptyColor = new Vector4(0f/255f, 0f/255f, 0f/255f, 95f/100f);
 
 
         public Vector4 JobColorPLD = new Vector4(21f/255f,28f/255f,100f/255f,100f/100f);
