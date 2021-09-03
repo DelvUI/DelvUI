@@ -13,6 +13,9 @@ namespace DelvUI.Interface
     {
         public override uint JobId => 21;
 
+        private int BaseXOffset => PluginConfiguration.WARBaseXOffset;
+        private int BaseYOffset => PluginConfiguration.WARBaseYOffset;
+
         private bool StormsEyeEnabled => PluginConfiguration.WARStormsEyeEnabled;
         private bool StormsEyeText => PluginConfiguration.WARStormsEyeText;
         private float StormsEyeTextScale => PluginConfiguration.WARStormsEyeTextScale;
@@ -54,8 +57,8 @@ namespace DelvUI.Interface
             var innerReleaseBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1177);
             var stormsEyeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
 
-            var xPos = CenterX - StormsEyeXOffset;
-            var yPos = CenterY + StormsEyeYOffset;
+            var xPos = CenterX + BaseXOffset - StormsEyeXOffset;
+            var yPos = CenterY + BaseYOffset + StormsEyeYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, StormsEyeHeight, StormsEyeWidth).SetBackgroundColor(EmptyColor["background"]);
 
@@ -90,8 +93,8 @@ namespace DelvUI.Interface
             var gauge = PluginInterface.ClientState.JobGauges.Get<WARGauge>();
             var nascentChaosBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1897);
 
-            var xPos = CenterX - BeastGaugeXOffset;
-            var yPos = CenterY + BeastGaugeYOffset;
+            var xPos = CenterX + BaseXOffset - BeastGaugeXOffset;
+            var yPos = CenterY + BaseYOffset + BeastGaugeYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, BeastGaugeHeight, BeastGaugeWidth)
                 .SetChunks(2)

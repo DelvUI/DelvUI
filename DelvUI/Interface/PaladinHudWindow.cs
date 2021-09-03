@@ -15,6 +15,10 @@ namespace DelvUI.Interface
     {
         public override uint JobId => 19;
 
+        private int BaseXOffset => PluginConfiguration.PLDBaseXOffset;
+
+        private int BaseYOffset => PluginConfiguration.PLDBaseYOffset;
+
         private bool ManaEnabled => PluginConfiguration.PLDManaEnabled;
 
         private bool ManaChunked => PluginConfiguration.PLDManaChunked;
@@ -120,8 +124,8 @@ namespace DelvUI.Interface
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var actor = PluginInterface.ClientState.LocalPlayer;
 
-            var posX = CenterX - ManaXOffset;
-            var posY = CenterY + ManaYOffset;
+            var posX = CenterX + BaseXOffset - ManaXOffset;
+            var posY = CenterY + BaseYOffset + ManaYOffset;
 
             var builder = BarBuilder.Create(posX, posY, ManaBarHeight, ManaBarWidth)                
                 .SetBackgroundColor(EmptyColor["background"]);
@@ -151,8 +155,8 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<PLDGauge>();
 
-            var xPos = CenterX - OathGaugeXOffset;
-            var yPos = CenterY + OathGaugeYOffset;
+            var xPos = CenterX + BaseXOffset - OathGaugeXOffset;
+            var yPos = CenterY + BaseYOffset + OathGaugeYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, OathGaugeBarHeight, OathGaugeBarWidth)
                 .SetChunks(2)
@@ -175,8 +179,8 @@ namespace DelvUI.Interface
             var fightOrFlightBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 76);
             var requiescatBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1368);
 
-            var xPos = CenterX - BuffBarXOffset;
-            var yPos = CenterY + BuffBarYOffset;
+            var xPos = CenterX + BaseXOffset - BuffBarXOffset;
+            var yPos = CenterY + BaseYOffset + BuffBarYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, BuffBarHeight, BuffBarWidth)                
                 .SetBackgroundColor(EmptyColor["background"]);
@@ -209,8 +213,8 @@ namespace DelvUI.Interface
             var atonementBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1902);
             var stackCount = atonementBuff.Any() ? atonementBuff.First().StackCount : 0;
 
-            var xPos = CenterX - AtonementBarXOffset;
-            var yPos = CenterY + AtonementBarYOffset;
+            var xPos = CenterX + BaseXOffset - AtonementBarXOffset;
+            var yPos = CenterY + BaseYOffset + AtonementBarYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, AtonementBarHeight, AtonementBarWidth)
                 .SetChunks(3)
@@ -233,8 +237,8 @@ namespace DelvUI.Interface
                 o.EffectId == 725 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
             var duration = Math.Abs(goringBlade.Duration);
             
-            var xPos = CenterX - DoTBarXOffset;
-            var yPos = CenterY + DoTBarYOffset;
+            var xPos = CenterX + BaseXOffset - DoTBarXOffset;
+            var yPos = CenterY + BaseYOffset + DoTBarYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, DoTBarHeight, DoTBarWidth)
                 .AddInnerBar(duration, 21, DoTColor)
