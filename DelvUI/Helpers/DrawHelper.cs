@@ -1,5 +1,8 @@
 ﻿using System.Numerics;
 using ImGuiNET;
+using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
+using Lumina.Excel;
+using Lumina.Excel.GeneratedSheets;
 
 namespace DelvUI.Helpers
 {
@@ -56,6 +59,24 @@ namespace DelvUI.Helpers
                 
             ImGui.SetCursorPos(new Vector2(pos.X, pos.Y));
             ImGui.TextColored(color, text);
+        }
+
+        public static void DrawIcon<T>(dynamic row, Vector2 size, Vector2 position, bool drawBorder) where T : ExcelRow
+        {
+            // Status = 24x32, show from 2,7 until 22,26
+            var texture = TexturesCache.Instance.GetTexture<T>(row);
+            if (texture == null) return;
+            var uv0 = new Vector2(4f / texture.Width, 14f / texture.Height);
+            var uv1 = new Vector2(1f - 4f / texture.Width, 1f - 12f / texture.Height);
+
+            ImGui.SetCursorPos(position);
+            ImGui.Image(texture.ImGuiHandle, size, uv0, uv1);
+
+            if (drawBorder)
+            {
+                var drawList = ImGui.GetWindowDrawList();
+                drawList.AddRect(position, position + size, 0xFF000000);
+            }
         }
     }
 }

@@ -13,6 +13,8 @@ namespace DelvUI.Interface
     {
         public override uint JobId => 24;
 
+        private int BaseXOffset => PluginConfiguration.WHMBaseXOffset;
+        private int BaseYOffset => PluginConfiguration.WHMBaseYOffset;
 		
         private int LillyBarHeight => PluginConfiguration.LillyBarHeight;
         private int LillyBarWidth => PluginConfiguration.LillyBarWidth;
@@ -70,7 +72,7 @@ namespace DelvUI.Interface
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             //var cursorPos = new Vector2(CenterX - 127, CenterY + 424);
             BarSize = new Vector2(DiaBarWidth, DiaBarHeight);
-            BarCoords = new Vector2(DiaBarX, DiaBarY);
+            BarCoords = new Vector2(DiaBarX + BaseXOffset, DiaBarY + BaseYOffset);
             var cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y);
 
             //var barWidth = 253;
@@ -106,7 +108,7 @@ namespace DelvUI.Interface
             var gauge = PluginInterface.ClientState.JobGauges.Get<WHMGauge>();
 
             BarSize = new Vector2(LillyBarWidth, LillyBarHeight);
-            BarCoords = new Vector2(LillyBarX, LillyBarY);
+            BarCoords = new Vector2(LillyBarX + BaseXOffset, LillyBarY + BaseYOffset);
 
             var xPadding = LillyBarPad;
             const int numChunks = 6;
@@ -208,7 +210,7 @@ namespace DelvUI.Interface
             // Blood Lilies
 
             BarSize = new Vector2(BloodLillyBarWidth, BloodLillyBarHeight);
-            BarCoords = new Vector2(BloodLillyBarX, BloodLillyBarY);
+            BarCoords = new Vector2(BloodLillyBarX + BaseXOffset, BloodLillyBarY +  BaseYOffset);
 
             barWidth = (BarSize.X - xPadding * (numChunks - 1)) / numChunks;
             barSize = new Vector2(barWidth, BarSize.Y);

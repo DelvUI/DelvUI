@@ -17,6 +17,10 @@ namespace DelvUI.Interface
     class AstrologianHudWindow : HudWindow
     {
         public override uint JobId => 33;
+
+        private int BaseXOffset => PluginConfiguration.ASTBaseXOffset;
+        private int BaseYOffset => PluginConfiguration.ASTBaseYOffset;
+
         private int DivinationHeight => PluginConfiguration.ASTDivinationHeight;
         private int DivinationWidth => PluginConfiguration.ASTDivinationWidth;
         private int DivinationBarX => PluginConfiguration.ASTDivinationBarX;
@@ -158,8 +162,8 @@ namespace DelvUI.Interface
                     }
                 }
                 hdl.Free();
-                var xPos = CenterX - XOffset + DivinationBarX;
-                var yPos = CenterY + YOffset + DivinationBarY;
+                var xPos = CenterX - XOffset + BaseXOffset + DivinationBarX;
+                var yPos = CenterY + YOffset + BaseYOffset + DivinationBarY;
 
                 var bar = BarBuilder.Create(xPos, yPos, DivinationHeight, DivinationWidth)
                     .SetBackgroundColor(EmptyColor["background"])
@@ -197,8 +201,8 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
 
-            var xPos = CenterX - XOffset + DrawBarX;
-            var yPos = CenterY + YOffset + DrawBarY;
+            var xPos = CenterX - XOffset + BaseXOffset + DrawBarX;
+            var yPos = CenterY + YOffset + BaseYOffset + DrawBarY;
 
             var cardJob = "";
             var cardColor = EmptyColor;
@@ -301,8 +305,8 @@ namespace DelvUI.Interface
         private void DrawDot()
         {
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
-            var xPos = CenterX - XOffset + DotBarX;
-            var yPos = CenterY + YOffset + DotBarY;
+            var xPos = CenterX - XOffset + BaseXOffset + DotBarX;
+            var yPos = CenterY + YOffset + BaseYOffset + DotBarY;
             var drawList = ImGui.GetWindowDrawList();
             var builder = BarBuilder.Create(xPos, yPos, DotHeight, DotWidth);
             
@@ -338,8 +342,8 @@ namespace DelvUI.Interface
             var lightspeedDuration = 0f;
             const float lightspeedMaxDuration = 15f;
 
-            var xPos = CenterX - XOffset + LightspeedBarX;
-            var yPos = CenterY + YOffset + LightspeedBarY;
+            var xPos = CenterX - XOffset + BaseXOffset + LightspeedBarX;
+            var yPos = CenterY + YOffset + BaseYOffset + LightspeedBarY;
 
             if (lightspeedBuff.Any())
             {
@@ -366,8 +370,8 @@ namespace DelvUI.Interface
             var starDuration = 0f;
             const float starMaxDuration = 10f;
 
-            var xPos = CenterX - XOffset + StarBarX;
-            var yPos = CenterY + YOffset + StarBarY;
+            var xPos = CenterX - XOffset + BaseXOffset + StarBarX;
+            var yPos = CenterY + YOffset + BaseYOffset + StarBarY;
             var starColorSelector = EmptyColor;
 
             if (starPreCookingBuff.Any())

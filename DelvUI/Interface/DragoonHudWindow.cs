@@ -99,7 +99,6 @@ namespace DelvUI.Interface
             var cursorPos = new Vector2(xPos, yPos);
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             var chaosThrustBarSize = new Vector2(ChaosThrustBarWidth * scale, ChaosThrustBarHeight);
             
             drawList.AddRectFilledMultiColor(
@@ -112,6 +111,7 @@ namespace DelvUI.Interface
                 var textSize = ImGui.CalcTextSize(durationText);
                 DrawOutlinedText(duration.ToString(), new Vector2(cursorPos.X + 5f, cursorPos.Y + ChaosThrustBarHeight / 2f - textSize.Y / 2f));
             }
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
 
         private void DrawEyeOfTheDragonBars()
@@ -149,22 +149,21 @@ namespace DelvUI.Interface
 
             var xPos = CenterX - XOffset + BloodBarXOffset;
             var yPos = CenterY + YOffset + BloodBarYOffset;
-            var barWidth = EyeOfTheDragonBarWidth * 2 + EyeOfTheDragonPadding;
             var cursorPos = new Vector2(xPos, yPos);
-            var barSize = new Vector2(barWidth, BloodBarHeight);
+            var barSize = new Vector2(BloodBarWidth, BloodBarHeight);
 
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
             var maxTimerMs = 30 * 1000;
             var currTimerMs = gauge.BOTDTimer;
             if (currTimerMs == 0)
             {
+                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
                 return;
             }
             var scale = (float)currTimerMs / maxTimerMs;
-            var botdBarSize = new Vector2(barWidth * scale, BloodBarHeight);
+            var botdBarSize = new Vector2(BloodBarWidth * scale, BloodBarHeight);
             if (gauge.BOTDState == BOTDState.LOTD)
             {
                 drawList.AddRectFilledMultiColor(
@@ -183,6 +182,7 @@ namespace DelvUI.Interface
                 var textSize = ImGui.CalcTextSize(durationText);
                 DrawOutlinedText(durationText, new Vector2(cursorPos.X + 5f, cursorPos.Y + BloodBarHeight / 2f - textSize.Y / 2f));
             }
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
 
         private void DrawDisembowelBar()
@@ -195,14 +195,15 @@ namespace DelvUI.Interface
             var drawList = ImGui.GetWindowDrawList();
             var disembowelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1914 || o.EffectId == 121);
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             if (disembowelBuff.Count() == 0)
             {
+                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
                 return;
             }
             var buff = disembowelBuff.First();
             if (buff.Duration <= 0)
             {
+                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
                 return;
             }
             var scale = buff.Duration / 30f;
@@ -217,6 +218,7 @@ namespace DelvUI.Interface
                 var textSize = ImGui.CalcTextSize(durationText);
                 DrawOutlinedText(durationText, new Vector2(cursorPos.X + 5f, cursorPos.Y + BloodBarHeight / 2f - textSize.Y / 2f));
             }
+            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
     }
 }
