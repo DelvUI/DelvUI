@@ -33,7 +33,7 @@ namespace DelvUI {
         public int TargetBarHeight { get; set; } = 50;
         public int TargetBarWidth { get; set; } = 270;
         public int TargetBarXOffset { get; set; } = 160;
-        public int TargetBarYOffset { get; set; } = 455;
+        public int TargetBarYOffset { get; set; } = 460;
         public int ToTBarHeight { get; set; } = 20;
         public int ToTBarWidth { get; set; } = 120;
         public int ToTBarXOffset { get; set; } = 164;
