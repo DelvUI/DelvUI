@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.Globalization;
 using System.Collections.Generic;
 using Dalamud.Game.ClientState.Actors.Types;
 using System.Linq;
@@ -8,6 +7,7 @@ using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
+using DelvUI.Config;
 
 namespace DelvUI.Interface
 {

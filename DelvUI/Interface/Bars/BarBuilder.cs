@@ -15,6 +15,10 @@ namespace DelvUI.Interface.Bars
             _bar = initialBar;
         }
 
+        public static BarBuilder Create(float xPosition, float yPosition, float height, float width)
+        {
+            return Create(xPosition, yPosition, (int)height, (int)width);
+        }
         public static BarBuilder Create(float xPosition, float yPosition, int height, int width)
         {
             var bar = new Bar(xPosition, yPosition, height, width);
@@ -53,6 +57,10 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
+        public BarBuilder SetChunkPadding(float padding)
+        {
+            return SetChunkPadding((int)padding);
+        }
         public BarBuilder SetChunkPadding(int padding)
         {
             _bar.ChunkPadding = padding;

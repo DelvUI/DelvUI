@@ -17,13 +17,11 @@ namespace DelvUI.Interface.StatusEffects
             // border
             if (config.ShowDispellableBorder && statusEffectData.data.CanDispel)
             {
-                var color = ImGui.ColorConvertFloat4ToU32(config.DispellableBorderColor);
-                drawList.AddRect(position, position + config.Size, color, 0, ImDrawFlags.None, config.DispellableBorderThickness);
+                drawList.AddRect(position, position + config.Size, config.DispellableBorderColor.Base, 0, ImDrawFlags.None, config.DispellableBorderThickness);
             }
             else if (config.ShowBorder)
             {
-                var color = ImGui.ColorConvertFloat4ToU32(config.BorderColor);
-                drawList.AddRect(position, position + config.Size, color, 0, ImDrawFlags.None, config.BorderThickness);
+                drawList.AddRect(position, position + config.Size, config.BorderColor.Base, 0, ImDrawFlags.None, config.BorderThickness);
             }
 
             // duration

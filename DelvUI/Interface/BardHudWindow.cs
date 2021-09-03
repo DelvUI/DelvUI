@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Numerics;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
+using DelvUI.Config;
 
 namespace DelvUI.Interface {
     public class BardHudWindow : HudWindow {

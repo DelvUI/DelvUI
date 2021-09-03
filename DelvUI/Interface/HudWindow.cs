@@ -5,13 +5,9 @@ using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using Dalamud.Configuration;
-using Dalamud.Data.LuminaExtensions;
 using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
-using Dalamud.Game.ClientState.Structs;
-using Dalamud.Game.Internal.Gui.Addon;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.Enums;
@@ -21,10 +17,10 @@ using FFXIVClientStructs.FFXIV.Component.GUI;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 using Addon = Dalamud.Game.Internal.Gui.Addon.Addon;
 using DelvUI.Interface.StatusEffects;
+using DelvUI.Config;
 
 namespace DelvUI.Interface {
     public abstract class HudWindow {
