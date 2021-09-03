@@ -63,6 +63,7 @@ namespace DelvUI.Helpers
                     
                     // Name
                     "[name]" when IsPropertyExist(actor, "Name") => actor.Name.ToString(),
+                    "[name:initials]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Initials(),
                     "[name:abbreviate]" when IsPropertyExist(actor, "Name") => ((string) actor.Name).Abbreviate(),
                     "[name:veryshort]" when IsPropertyExist(actor, "Name") => ((string) actor.Name).Truncate(5),
                     "[name:short]" when IsPropertyExist(actor, "Name") => ((string) actor.Name).Truncate(10),

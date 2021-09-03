@@ -18,6 +18,18 @@ namespace DelvUI {
             return string.Join(". ", splits).ToUpper();
         }
 
+        public static string Initials(this string str)
+        {
+            var splits = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+
+            for (var i = 0; i < splits.Length; i++)
+            {
+                splits[i] = splits[i][0].ToString();
+            }
+
+            return string.Join(". ", splits).ToUpper() + ".";
+        }
+
         public static Vector4 AdjustColor(this Vector4 vec, float correctionFactor) {
             var red = vec.X;
             var green = vec.Y;

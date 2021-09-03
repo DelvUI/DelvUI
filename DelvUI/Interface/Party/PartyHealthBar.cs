@@ -10,7 +10,8 @@ namespace DelvUI.Interface.Party
 {
     class PartyHealthBar
     {
-        private PluginConfiguration pluginConfiguration;
+        private PluginConfiguration _pluginConfiguration;
+        private PartyHudConfig _config;
 
         private IGroupMember _member = null;
         public IGroupMember Member
@@ -27,24 +28,26 @@ namespace DelvUI.Interface.Party
         public Vector2 Size;
         private Dictionary<string, uint> color;
 
-        public PartyHealthBar(PluginConfiguration pluginConfiguration)
+        public PartyHealthBar(PluginConfiguration pluginConfiguration, PartyHudConfig config)
         {
-            this.pluginConfiguration = pluginConfiguration;
+            _pluginConfiguration = pluginConfiguration;
+            _config = config;
+
             color = pluginConfiguration.NPCColorMap["friendly"];
         }
 
         public void UpdateColor()
         {
-            color = pluginConfiguration.NPCColorMap["friendly"];
+            color = _pluginConfiguration.NPCColorMap["friendly"];
             if (Member == null) return;
 
-            if (pluginConfiguration.PartyListUseRoleColors)
+            if (_config.SortConfig.UseRoleColors)
             {
                 color = ColorForJob(Member.JobId);
             }
             else
             {
-                pluginConfiguration.JobColorMap.TryGetValue(Member.JobId, out color);
+                _pluginConfiguration.JobColorMap.TryGetValue(Member.JobId, out color);
             }
         }
 
@@ -53,12 +56,12 @@ namespace DelvUI.Interface.Party
             var role = JobsHelper.RoleForJob(jodId);
 
             switch (role) {
-                case JobRoles.Tank: return pluginConfiguration.PartyListColorMap["tank"];
-                case JobRoles.DPS: return pluginConfiguration.PartyListColorMap["dps"];
-                case JobRoles.Healer: return pluginConfiguration.PartyListColorMap["healer"];
+                case JobRoles.Tank: return _pluginConfiguration.PartyListColorMap["tank"];
+                case JobRoles.DPS: return _pluginConfiguration.PartyListColorMap["dps"];
+                case JobRoles.Healer: return _pluginConfiguration.PartyListColorMap["healer"];
             }
 
-            return pluginConfiguration.PartyListColorMap["generic_role"];
+            return _pluginConfiguration.PartyListColorMap["generic_role"];
         }
 
         public void Draw(ImDrawListPtr drawList, Vector2 origin)
@@ -67,7 +70,7 @@ namespace DelvUI.Interface.Party
 
             // bg
             var isClose = Member.MaxHP > 0;
-            var bgColorMap = pluginConfiguration.PartyListColorMap["background"];
+            var bgColorMap = _pluginConfiguration.PartyListColorMap["background"];
             drawList.AddRectFilled(Position, Position + Size, isClose ? (uint)bgColorMap["default"] : (uint)bgColorMap["outOfRange"]);
 
             // hp
@@ -89,40 +92,40 @@ namespace DelvUI.Interface.Party
             }
 
             // shield
-            if (pluginConfiguration.PartyListShieldEnabled)
+            if (_config.HealthBarsConfig.ShieldsConfig.Enabled)
             {
-                if (pluginConfiguration.PartyListShieldFillHealthFirst && Member.MaxHP > 0)
+                if (_config.HealthBarsConfig.ShieldsConfig.FillHealthFirst && Member.MaxHP > 0)
                 {
                     DrawHelper.DrawShield(Member.Shield, (float)Member.HP / Member.MaxHP, Position, Size,
-                        pluginConfiguration.PartyListShieldHeight, !pluginConfiguration.PartyListShieldHeightPixels,
-                        pluginConfiguration.PartyListColorMap["shield"]);
+                        _config.HealthBarsConfig.ShieldsConfig.Height, !_config.HealthBarsConfig.ShieldsConfig.HeightInPixels,
+                        _pluginConfiguration.PartyListColorMap["shield"]);
                 }
                 else
                 {
                     DrawHelper.DrawShield(Member.Shield, Position, Size,
-                        pluginConfiguration.PartyListShieldHeight, !pluginConfiguration.PartyListShieldHeightPixels,
-                        pluginConfiguration.PartyListColorMap["shield"]);
+                        _config.HealthBarsConfig.ShieldsConfig.Height, !_config.HealthBarsConfig.ShieldsConfig.HeightInPixels,
+                        _pluginConfiguration.PartyListColorMap["shield"]);
                 }
             }
 
             // buffs / debuffs
-            var statusEffects = Member.StatusEffects;
-            var pos = Position + Size - origin + new Vector2(6, 1);
+            //var statusEffects = Member.StatusEffects;
+            //var pos = Position + Size - origin + new Vector2(6, 1);
 
-            for (int s = 0; s < statusEffects.Length; s++)
-            {
-                var id = (uint)statusEffects[s].EffectId;
-                if (id == 0) continue;
+            //for (int s = 0; s < statusEffects.Length; s++)
+            //{
+            //    var id = (uint)statusEffects[s].EffectId;
+            //    if (id == 0) continue;
 
-                var texture = TexturesCache.Instance.GetTexture<Status>(id, (uint)Math.Max(0, statusEffects[s].StackCount - 1));
-                if (texture == null) continue;
+            //    var texture = TexturesCache.Instance.GetTexture<Status>(id, (uint)Math.Max(0, statusEffects[s].StackCount - 1));
+            //    if (texture == null) continue;
 
-                var size = new Vector2(texture.Width, texture.Height);
-                ImGui.SetCursorPos(pos - size);
-                ImGui.Image(texture.ImGuiHandle, size);
+            //    var size = new Vector2(texture.Width, texture.Height);
+            //    ImGui.SetCursorPos(pos - size);
+            //    ImGui.Image(texture.ImGuiHandle, size);
 
-                pos.X = pos.X - size.X - 1;
-            }
+            //    pos.X = pos.X - size.X - 1;
+            //}
 
             // name
             var actor = Member.GetActor();
@@ -130,7 +133,7 @@ namespace DelvUI.Interface.Party
 
             if (actor != null)
             {
-                name = TextTags.GenerateFormattedTextFromTags(actor, pluginConfiguration.PartyListHealthBarText);
+                name = TextTags.GenerateFormattedTextFromTags(actor, _config.HealthBarsConfig.TextFormat);
             }
 
             var textSize = ImGui.CalcTextSize(name);

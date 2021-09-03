@@ -182,36 +182,7 @@ namespace DelvUI {
         public Vector4 NPCColorFriendly = new Vector4(0f/255f, 145f/255f, 6f/255f, 100f/100f);
         #endregion
 
-        #region party list
-        public Vector2 PartyListPosition { get; set; } = new Vector2(200, 200);
-        public Vector2 PartyListSize { get; set; } = new Vector2(650, 150);
-
-        public bool ShowPartyList = true;
-        public bool PartyListTestingEnabled = false;
-        public bool PartyListLocked = false;
-        public bool PartyListFillRowsFirst = false;
-
-        public string PartyListHealthBarText = "[name:veryshort]";
-        public int PartyListHealthBarWidth { get; set; } = 150;
-        public int PartyListHealthBarHeight { get; set; } = 50;
-        public int PartyListHorizontalPadding { get; set; } = 2;
-        public int PartyListVerticalPadding { get; set; } = 2;
-        public Vector4 PartyListHealthBarBackgroundColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 70f / 100f);
-
-        public bool PartyListShieldEnabled = true;
-        public int PartyListShieldHeight { get; set; } = 10;
-        public bool PartyListShieldHeightPixels = true;
-        public bool PartyListShieldFillHealthFirst = true;
-        public Vector4 PartyListShieldColor = new Vector4(240f / 255f, 255f / 255f, 0f / 205f, 60f / 100f);
-
-        public bool PartyListUseRoleColors = true;
-        public Vector4 PartyListTankRoleColor = new Vector4(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f);
-        public Vector4 PartyListDPSRoleColor = new Vector4(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f);
-        public Vector4 PartyListHealerRoleColor = new Vector4(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f);
-        public Vector4 PartyListGenericRoleColor = new Vector4(214f / 255f, 145f / 255f, 64f / 255f, 100f / 100f);
-
-        public PartySortingMode PartyListSortingMode = PartySortingMode.Tank_Healer_DPS;
-        #endregion
+        public PartyHudConfig PartyListHudConfig = new PartyHudConfig();
 
 
         #region BRD Configuration
@@ -2395,43 +2366,43 @@ namespace DelvUI {
             {
                 ["background"] = new Dictionary<string, uint>
                 {
-                    ["default"] = ImGui.ColorConvertFloat4ToU32(PartyListHealthBarBackgroundColor),
-                    ["outOfRange"] = ImGui.ColorConvertFloat4ToU32(PartyListHealthBarBackgroundColor.AdjustColorAlpha(-.5f)),
+                    ["default"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.HealthBarsConfig.BackgroundColor),
+                    ["outOfRange"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.HealthBarsConfig.BackgroundColor.AdjustColorAlpha(-.5f)),
                 },
                 ["shield"] = new Dictionary<string, uint>
                 {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListShieldColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListShieldColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListShieldColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListShieldColor.AdjustColor(.1f))
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.HealthBarsConfig.ShieldsConfig.Color),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.HealthBarsConfig.ShieldsConfig.Color.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.HealthBarsConfig.ShieldsConfig.Color.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.HealthBarsConfig.ShieldsConfig.Color.AdjustColor(.1f))
                 },
                 ["tank"] = new Dictionary<string, uint>
                 {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListTankRoleColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListTankRoleColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListTankRoleColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListTankRoleColor.AdjustColor(.1f))
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.TankRoleColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.TankRoleColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.TankRoleColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.TankRoleColor.AdjustColor(.1f))
                 },
                 ["dps"] = new Dictionary<string, uint>
                 {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListDPSRoleColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListDPSRoleColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListDPSRoleColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListDPSRoleColor.AdjustColor(.1f))
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.DPSRoleColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.DPSRoleColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.DPSRoleColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.DPSRoleColor.AdjustColor(.1f))
                 },
                 ["healer"] = new Dictionary<string, uint>
                 {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListHealerRoleColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListHealerRoleColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListHealerRoleColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListHealerRoleColor.AdjustColor(.1f))
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.HealerRoleColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.HealerRoleColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.HealerRoleColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.HealerRoleColor.AdjustColor(.1f))
                 },
                 ["generic_role"] = new Dictionary<string, uint>
                 {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListGenericRoleColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListGenericRoleColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListGenericRoleColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListGenericRoleColor.AdjustColor(.1f))
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.GenericRoleColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.GenericRoleColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.GenericRoleColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartyListHudConfig.SortConfig.GenericRoleColor.AdjustColor(.1f))
                 }
 
             };

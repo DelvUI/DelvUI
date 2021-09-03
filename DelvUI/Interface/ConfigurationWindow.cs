@@ -50,7 +50,6 @@ namespace DelvUI.Interface
             _configMap.Add("Party List", new[] { 
                 "General",
                 "Health Bars Style",
-                "Sorting",
                 "Buffs / Debuffs"
             });
    
@@ -295,20 +294,18 @@ namespace DelvUI.Interface
                             break;
                     }
                     break;
+
                 case "Party List":
                     switch (subConfig)
                     {
                         case "General":
-                            DrawPartyListGeneralConfig();
+                            _changed |= _pluginConfiguration.PartyListHudConfig.Draw();
                             break;
                         case "Health Bars Style":
-                            DrawPartyListHealthBarsStyleConfig();
-                            break;
-                        case "Sorting":
-                            DrawPartyListSortingConfig();
+                            _changed |= _pluginConfiguration.PartyListHudConfig.HealthBarsConfig.Draw();
                             break;
                         case "Buffs / Debuffs":
-                            DrawPartyListBuffsDebuffsConfig();
+                            // TODO                            
                             break;
                     }
                     break;
@@ -5117,88 +5114,6 @@ namespace DelvUI.Interface
                 }
             }
             ImGui.EndTabBar();
-        }
-
-        private void DrawPartyListGeneralConfig()
-        {
-            _changed |= ImGui.Checkbox("Enabled", ref _pluginConfiguration.ShowPartyList);
-            _changed |= ImGui.Checkbox("Preview", ref _pluginConfiguration.PartyListTestingEnabled);
-            _changed |= ImGui.Checkbox("Lock", ref _pluginConfiguration.PartyListLocked);
-            _changed |= ImGui.Checkbox("Fill Rows First", ref _pluginConfiguration.PartyListFillRowsFirst);
-        }
-
-        private void DrawPartyListHealthBarsStyleConfig()
-        {
-            ImGui.Text("Health Bars Text Format");
-            var PartyListHealthBarText = _pluginConfiguration.PartyListHealthBarText;
-            if (ImGui.InputText("##PartyListHealthBarText", ref PartyListHealthBarText, 999))
-            {
-                _pluginConfiguration.PartyListHealthBarText = PartyListHealthBarText;
-                _pluginConfiguration.Save();
-            }
-
-            var PartyListHealthBarWidth = _pluginConfiguration.PartyListHealthBarWidth;
-            if (ImGui.DragInt("Health Bars Width", ref PartyListHealthBarWidth, .1f, 1, 500))
-            {
-                _pluginConfiguration.PartyListHealthBarWidth = PartyListHealthBarWidth;
-                _pluginConfiguration.Save();
-            }
-
-            var PartyListHealthBarHeight = _pluginConfiguration.PartyListHealthBarHeight;
-            if (ImGui.DragInt("Health Bars Height", ref PartyListHealthBarHeight, .1f, 1, 500))
-            {
-                _pluginConfiguration.PartyListHealthBarHeight = PartyListHealthBarHeight;
-                _pluginConfiguration.Save();
-            }
-
-            var PartyListHorizontalPadding = _pluginConfiguration.PartyListHorizontalPadding;
-            if (ImGui.DragInt("Horizonal Padding", ref PartyListHorizontalPadding, .1f, -50, 50))
-            {
-                _pluginConfiguration.PartyListHorizontalPadding = PartyListHorizontalPadding;
-                _pluginConfiguration.Save();
-            }
-
-            var PartyListVerticalPadding = _pluginConfiguration.PartyListVerticalPadding;
-            if (ImGui.DragInt("Vertical Padding", ref PartyListVerticalPadding, .1f, -50, 50))
-            {
-                _pluginConfiguration.PartyListVerticalPadding = PartyListVerticalPadding;
-                _pluginConfiguration.Save();
-            }
-
-            _changed |= ImGui.ColorEdit4("Health Bars Background Color", ref _pluginConfiguration.PartyListHealthBarBackgroundColor);
-            
-            _changed |= ImGui.Checkbox("Shields Enabled", ref _pluginConfiguration.PartyListShieldEnabled);
-
-            var PartyListShieldHeight = _pluginConfiguration.PartyListShieldHeight;
-            if (ImGui.DragInt("Shield Size", ref PartyListShieldHeight, .1f, -1, 1000))
-            {
-                _pluginConfiguration.PartyListShieldHeight = PartyListShieldHeight;
-                _pluginConfiguration.Save();
-            }
-            _changed |= ImGui.Checkbox("Size in pixels", ref _pluginConfiguration.PartyListShieldHeightPixels);
-            _changed |= ImGui.Checkbox("Fill Health First", ref _pluginConfiguration.PartyListShieldFillHealthFirst);
-            _changed |= ImGui.ColorEdit4("Shield Color", ref _pluginConfiguration.PartyListShieldColor);
-        }
-
-        private void DrawPartyListSortingConfig()
-        {
-            int selection = (int)_pluginConfiguration.PartyListSortingMode;
-            var names = PartySortingHelper.SortingModesNames;
-            if (ImGui.Combo("Sorting priority", ref selection, PartySortingHelper.SortingModesNames, names.Length)) 
-            {
-                _pluginConfiguration.PartyListSortingMode = (PartySortingMode)selection;
-                _pluginConfiguration.Save();
-            }
-
-            _changed |= ImGui.Checkbox("Use Role Colors", ref _pluginConfiguration.PartyListUseRoleColors);
-            _changed |= ImGui.ColorEdit4("Tank Color", ref _pluginConfiguration.PartyListTankRoleColor);
-            _changed |= ImGui.ColorEdit4("DPS Color", ref _pluginConfiguration.PartyListDPSRoleColor);
-            _changed |= ImGui.ColorEdit4("Healer Color", ref _pluginConfiguration.PartyListHealerRoleColor);
-        }
-
-        private void DrawPartyListBuffsDebuffsConfig()
-        {
-
         }
     }
 }

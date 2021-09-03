@@ -64,11 +64,11 @@ namespace DelvUI {
                 ShowInHelp = true
             });
 
-            PartyManager.Initialize(pluginInterface, _pluginConfiguration);
+            PartyManager.Initialize(pluginInterface, _pluginConfiguration, _pluginConfiguration.PartyListHudConfig);
             TexturesCache.Initialize(pluginInterface);
             Resolver.Initialize();
                         
-            _partyHudWindow = new PartyHudWindow(_pluginConfiguration);
+            _partyHudWindow = new PartyHudWindow(_pluginConfiguration, _pluginConfiguration.PartyListHudConfig);
         }
         
         private void BuildFont() {
