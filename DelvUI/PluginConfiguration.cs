@@ -613,6 +613,7 @@ namespace DelvUI {
         public Vector4 PLDRequiescatColor = new Vector4(61f/255f, 61f/255f, 255f/255f, 100f/100f);
         public Vector4 PLDAtonementColor = new Vector4(240f/255f, 176f/255f, 0f/255f, 100f/100f);
         public Vector4 PLDDoTColor = new Vector4(255f/255f, 128f/255f, 0f/255f, 100f/100f);
+        public Vector4 PLDOathNotFullColor = new Vector4(186 / 255f, 177f / 255f, 183f / 255f, 100f / 100f);
 
         #endregion
 
@@ -1087,6 +1088,15 @@ namespace DelvUI {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor.AdjustColor(.1f))
                 },
+
+                [Jobs.PLD * 1000 + 7] = new Dictionary<string, uint> // DoT
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDOathNotFullColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDOathNotFullColor.AdjustColor(-.8f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDOathNotFullColor.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDOathNotFullColor.AdjustColor(.1f))
+                },
+
                 [Jobs.WAR] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR),

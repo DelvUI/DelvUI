@@ -2231,6 +2231,7 @@ namespace DelvUI.Interface
 
                     _changed |= ImGui.ColorEdit4("Mana Bar Color", ref _pluginConfiguration.PLDManaColor);
                     _changed |= ImGui.ColorEdit4("Oath Gauge Color", ref _pluginConfiguration.PLDOathGaugeColor);
+                    _changed |= ImGui.ColorEdit4("Oath Gauge Not Full Chunk Color", ref _pluginConfiguration.PLDOathNotFullColor);
                     _changed |= ImGui.ColorEdit4("Fight or Flight Color",
                         ref _pluginConfiguration.PLDFightOrFlightColor);
                     _changed |= ImGui.ColorEdit4("Requiescat Color", ref _pluginConfiguration.PLDRequiescatColor);
