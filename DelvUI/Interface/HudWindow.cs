@@ -107,6 +107,8 @@ namespace DelvUI.Interface {
         protected int TargetCastBarYOffset => PluginConfiguration.TargetCastBarYOffset;
 
         protected uint UnitFrameEmptyColor => ImGui.ColorConvertFloat4ToU32(PluginConfiguration.UnitFrameEmptyColor);
+
+        #endregion
         
         protected Vector2 BarSize { get; private set; }
 

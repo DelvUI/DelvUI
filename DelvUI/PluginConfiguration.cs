@@ -100,7 +100,7 @@ namespace DelvUI {
             new Vector2(160, 415), true, false, true, GrowthDirections.RIGHT | GrowthDirections.UP
         );
         public StatusEffectsListConfig TargetDebuffListConfig = new StatusEffectsListConfig(
-            new Vector2(160, 505), false, true, true, GrowthDirections.RIGHT | GrowthDirections.UP
+            new Vector2(160, 315), false, true, true, GrowthDirections.RIGHT | GrowthDirections.UP
         );
 
         public int CastBarHeight { get; set; } = 25;
