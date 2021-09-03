@@ -207,11 +207,8 @@ namespace DelvUI.Interface {
             ImGui.Begin("health_bar", windowFlags);
             if (ImGui.BeginChild("health_bar", BarSize)) {
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
-                if (HasTankInvuln() == 1)
-                {
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["gradientLeft"]);
-                }
-                drawList.AddRectFilledMultiColor(
+                if (HasTankInvuln() == 1) drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["invuln"]);
+                    drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight),
                     colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
                 );
@@ -338,6 +335,7 @@ namespace DelvUI.Interface {
                         var scale = actor.MaxHp > 0f ? (float) actor.CurrentHp / actor.MaxHp : 0f;
                         var colors = DetermineTargetPlateColors(actor);
                         drawListPtr.AddRectFilled(cursorPos, cursorPos + BarSize, colors["background"]);
+                        if (HasTankInvuln() == 1) drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["invuln"]);
                         drawListPtr.AddRectFilledMultiColor(
                             cursorPos, cursorPos + new Vector2(TargetBarWidth * scale, TargetBarHeight),
                             colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
@@ -416,6 +414,7 @@ namespace DelvUI.Interface {
                 {
                     var colors = DetermineTargetPlateColors(actor);
                     drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["background"]);
+                    if (HasTankInvuln() == 1) drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["invuln"]);
                     drawList.AddRectFilledMultiColor(
                         cursorPos,
                         cursorPos + new Vector2((float) FocusBarWidth * actor.CurrentHp / actor.MaxHp, FocusBarHeight),
@@ -491,6 +490,7 @@ namespace DelvUI.Interface {
             ImGui.Begin("target_of_target_bar", windowFlags);
             if (ImGui.BeginChild("target_of_target_bar", barSize)) {
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["background"]);
+                if (HasTankInvuln() == 1) drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["invuln"]);
                 drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2((float) ToTBarWidth * actor.CurrentHp / actor.MaxHp, ToTBarHeight),
                     colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
@@ -1042,7 +1042,6 @@ namespace DelvUI.Interface {
             if (hasFoodBuff == 0)
             {
                 //just add wtv here
-                
             }
             foreach (var buff in buffList)
             {
