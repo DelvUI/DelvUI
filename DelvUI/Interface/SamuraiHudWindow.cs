@@ -16,6 +16,9 @@ namespace DelvUI.Interface
 
         public override uint JobId => 34;
 
+        private int BaseXOffset => PluginConfiguration.SAMBaseXOffset;
+        private int BaseYOffset => PluginConfiguration.SAMBaseYOffset;
+
         private int SamBuffsBarHeight => PluginConfiguration.SamBuffsBarHeight;
         private int SamBuffsBarWidth => PluginConfiguration.SamBuffsBarWidth;
         private int SamBuffsBarX => PluginConfiguration.SamBuffsBarX;
@@ -52,6 +55,7 @@ namespace DelvUI.Interface
         private int SenPadding => PluginConfiguration.SAMSenPadding;
 		
         private bool BuffsEnabled => PluginConfiguration.SAMBuffsEnabled;
+        private bool ShowBuffTime => PluginConfiguration.ShowBuffTime;
         private bool GaugeEnabled => PluginConfiguration.SAMGaugeEnabled;
         private bool HiganbanaEnabled => PluginConfiguration.SAMHiganbanaEnabled;
         private bool MeditationEnabled => PluginConfiguration.SAMMeditationEnabled;
@@ -106,8 +110,8 @@ namespace DelvUI.Interface
             var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
 
 
-            var xPos = CenterX - SamKenkiBarX;
-            var yPos = CenterY + SamKenkiBarY;
+            var xPos = CenterX + BaseXOffset - SamKenkiBarX;
+            var yPos = CenterY + BaseYOffset + SamKenkiBarY;
             var cursorPos = new Vector2(xPos, yPos);
             const int chunkSize = 100;
             var barSize = new Vector2(SamKenkiBarWidth, SamKenkiBarHeight);
@@ -142,8 +146,8 @@ namespace DelvUI.Interface
 
             var higanbanaColor = higanbanaDuration > 5 ? SamHiganbanaColor["base"] : SamExpiryColor["base"];
 
-            var xOffset = CenterX - SamHiganbanaBarX;
-            var yOffset = CenterY + SamHiganbanaBarY;
+            var xOffset = CenterX + BaseXOffset - SamHiganbanaBarX;
+            var yOffset = CenterY + BaseYOffset + SamHiganbanaBarY;
             var cursorPos = new Vector2(xOffset, yOffset);
             var barSize = new Vector2(SamHiganbanaBarWidth, SamHiganbanaBarHeight);
             var drawList = ImGui.GetWindowDrawList();
@@ -172,16 +176,16 @@ namespace DelvUI.Interface
             var shifuDuration = shifu.Duration;
             var jinpuDuration = jinpu.Duration;
 
-            var xOffset = CenterX - SamBuffsBarX;
-            var cursorPos = new Vector2(CenterX - SamBuffsBarX, CenterY + SamBuffsBarY);
+            var xOffset = CenterX + BaseXOffset - SamBuffsBarX;
+            var cursorPos = new Vector2(CenterX + BaseXOffset - SamBuffsBarX, CenterY + BaseYOffset + SamBuffsBarY);
             var barSize = new Vector2(buffsBarWidth, SamBuffsBarHeight);
             var drawList = ImGui.GetWindowDrawList();
-            var shifuXOffset = CenterX - SamTimeShifuXOffset;
-            var shifuYOffset = CenterY + SamTimeShifuYOffset;
+            var shifuXOffset = CenterX + BaseXOffset - SamTimeShifuXOffset;
+            var shifuYOffset = CenterY + BaseYOffset + SamTimeShifuYOffset;
             var shifuTextSize = ImGui.CalcTextSize(Math.Round(shifuDuration).ToString(CultureInfo.InvariantCulture));
             var jinpuTextSize = ImGui.CalcTextSize(Math.Round(jinpuDuration).ToString(CultureInfo.InvariantCulture));
 
-            var buffStart = new Vector2(xOffset + buffsBarWidth - (barSize.X / 40) * shifuDuration, CenterY + SamBuffsBarY);
+            var buffStart = new Vector2(xOffset + buffsBarWidth - (barSize.X / 40) * shifuDuration, CenterY + BaseYOffset + SamBuffsBarY);
 
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["background"]);
             drawList.AddRectFilledMultiColor(
@@ -213,8 +217,8 @@ namespace DelvUI.Interface
                 }
 
                 cursorPos = new Vector2(cursorPos.X + buffsBarWidth + BuffsPadding, cursorPos.Y);
-                var jinpuXOffset = CenterX - SamTimeJinpuXOffset;
-                var jinpuYOffset = CenterY + SamTimeJinpuYOffset;
+                var jinpuXOffset = CenterX + BaseXOffset - SamTimeJinpuXOffset;
+                var jinpuYOffset = CenterY + BaseYOffset + SamTimeJinpuYOffset;
 
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, SamEmptyColor["background"]);
                 drawList.AddRectFilledMultiColor(
@@ -236,8 +240,8 @@ namespace DelvUI.Interface
             
             var senBarWidth = (SamSenBarWidth - SenPadding * 2) / 3f;
             var senBarSize = new Vector2(senBarWidth, SamSenBarHeight);
-            var xPos = CenterX - SamSenBarX;
-            var yPos = CenterY + SamSenBarY;
+            var xPos = CenterX + BaseXOffset - SamSenBarX;
+            var yPos = CenterY + BaseYOffset + SamSenBarY;
             var cursorPos = new Vector2(xPos - SenPadding - senBarWidth, yPos);
             
             var drawList = ImGui.GetWindowDrawList();
@@ -265,8 +269,8 @@ namespace DelvUI.Interface
 
             var meditationBarWidth = (SamMeditationBarWidth - MeditationPadding * 2) / 3f;
             var meditationBarSize = new Vector2(meditationBarWidth, SamMeditationBarHeight);
-            var xPos = CenterX - SamMeditationBarX;
-            var yPos = CenterY + SamMeditationBarY;
+            var xPos = CenterX + BaseXOffset - SamMeditationBarX;
+            var yPos = CenterY + BaseYOffset + SamMeditationBarY;
             var cursorPos = new Vector2(xPos - MeditationPadding - meditationBarWidth, yPos);
 
             var drawList = ImGui.GetWindowDrawList();

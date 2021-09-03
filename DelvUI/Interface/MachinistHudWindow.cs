@@ -13,6 +13,10 @@ namespace DelvUI.Interface
     {
         public override uint JobId => 31;
 
+        private int BaseXOffset => PluginConfiguration.MCHBaseXOffset;
+
+        private int BaseYOffset => PluginConfiguration.MCHBaseYOffset;
+
         private bool OverheatEnabled => PluginConfiguration.MCHOverheatEnable;
 
         private bool OverheatText => PluginConfiguration.MCHOverheatText;
@@ -107,8 +111,8 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
             
-            var xPos = CenterX - HeatGaugeXOffset;
-            var yPos = CenterY + HeatGaugeYOffset;
+            var xPos = CenterX + BaseXOffset - HeatGaugeXOffset;
+            var yPos = CenterY + BaseYOffset + HeatGaugeYOffset;
             
             var builder = BarBuilder.Create(xPos, yPos, HeatGaugeHeight, HeatGaugeWidth)
                 .SetChunks(2)
@@ -127,8 +131,8 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
             
-            var xPos = CenterX - BatteryGaugeXOffset;
-            var yPos = CenterY + BatteryGaugeYOffset;
+            var xPos = CenterX + BaseXOffset - BatteryGaugeXOffset;
+            var yPos = CenterY + BaseYOffset + BatteryGaugeYOffset;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, BatteryGaugeHeight, BatteryGaugeWidth)
                 .SetChunks(new[] {.5f, .1f, .1f, .1f, .1f, .1f})
@@ -160,8 +164,8 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
             
-            var xPos = CenterX - OverheatXOffset;
-            var yPos = CenterY + OverheatYOffset;
+            var xPos = CenterX + BaseXOffset - OverheatXOffset;
+            var yPos = CenterY + BaseYOffset + OverheatYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, OverheatHeight, OverheatWidth).SetBackgroundColor(EmptyColor["background"]);
 
@@ -181,8 +185,8 @@ namespace DelvUI.Interface
         {
             var wildfireBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1946);
         
-            var xPos = CenterX - WildfireXOffset;
-            var yPos = CenterY + WildfireYOffset;
+            var xPos = CenterX + BaseXOffset - WildfireXOffset;
+            var yPos = CenterY + BaseYOffset + WildfireYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, WildfireHeight, WildfireWidth);
 

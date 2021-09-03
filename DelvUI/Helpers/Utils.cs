@@ -22,5 +22,18 @@ namespace DelvUI.Helpers
 
             return Math.Min(*(int*)(actor.Address + 0x1997), 100) / 100f;
         }
+
+        public static string DurationToString(double duration)
+        {
+            if (duration == 0) return "";
+
+            TimeSpan t = TimeSpan.FromSeconds(duration);
+
+            if (t.Hours > 1) return t.Hours + "h";
+            if (t.Minutes >= 5) return t.Minutes + "m";
+            if (t.Minutes >= 1) return t.Minutes + ":" + t.Seconds;
+
+            return t.Seconds.ToString();
+        }
     }
 }

@@ -15,22 +15,18 @@ namespace DelvUI.Interface
     {
         public override uint JobId => 28;
 
+        private int BaseXOffset => PluginConfiguration.SCHBaseXOffset;
+        private int BaseYOffset => PluginConfiguration.SCHBaseYOffset;
+
         private int FairyBarHeight => PluginConfiguration.FairyBarHeight;
-
         private int FairyBarWidth => PluginConfiguration.FairyBarWidth;
-
         private int FairyBarX => PluginConfiguration.FairyBarX;
-
         private int FairyBarY => PluginConfiguration.FairyBarY;
 
         private int SchAetherBarHeight => PluginConfiguration.SchAetherBarHeight;
-
         private int SchAetherBarWidth => PluginConfiguration.SchAetherBarWidth;
-
         private int SchAetherBarX => PluginConfiguration.SchAetherBarX;
-
         private int SchAetherBarY => PluginConfiguration.SchAetherBarY;
-
         private int SchAetherBarPad => PluginConfiguration.SchAetherBarPad;
 
         private int BioBarHeight => PluginConfiguration.SCHBioBarHeight;
@@ -86,7 +82,7 @@ namespace DelvUI.Interface
         {
             var gauge = (float)PluginInterface.ClientState.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
             BarSize = new Vector2(FairyBarWidth, FairyBarHeight);
-            BarCoords = new Vector2(FairyBarX, FairyBarY);
+            BarCoords = new Vector2(FairyBarX - BaseXOffset, FairyBarY + BaseYOffset);
             var cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y - 49);
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["background"]);
@@ -105,7 +101,7 @@ namespace DelvUI.Interface
             var aetherFlowBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
             var barWidth = (SchAetherBarWidth / 3);
             BarSize = new Vector2(barWidth, SchAetherBarHeight);
-            BarCoords = new Vector2(SchAetherBarX, SchAetherBarY);
+            BarCoords = new Vector2(SchAetherBarX + BaseXOffset, SchAetherBarY + BaseYOffset);
             var cursorPos = new Vector2(CenterX + BarCoords.X, CenterY + BarCoords.Y - 71);
 
             var drawList = ImGui.GetWindowDrawList();
@@ -154,7 +150,9 @@ namespace DelvUI.Interface
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             BarSize = new Vector2(BioBarWidth, BioBarHeight);
             BarCoords = new Vector2(BioBarX, BioBarY);
-            var cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y);
+            var xOffset = CenterX + BaseXOffset - BarCoords.X;
+            var yOffset = CenterY + BaseYOffset + BarCoords.Y;
+            var cursorPos = new Vector2(xOffset, yOffset);
 
             var drawList = ImGui.GetWindowDrawList();;
 
@@ -168,7 +166,6 @@ namespace DelvUI.Interface
                                                                o.EffectId == 189 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
                                                                o.EffectId == 1895 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
             var bioDuration = (int)bio.Duration;
-            var xOffset = CenterX;
 
             drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["background"]);
             drawList.AddRectFilled(cursorPos, cursorPos + new Vector2((BarSize.X / 30) * bioDuration, BarSize.Y), SCHBioColor["gradientRight"]);

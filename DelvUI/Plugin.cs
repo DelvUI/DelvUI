@@ -8,7 +8,7 @@ using ImGuiNET;
 using DelvUI.Interface;
 using DelvUI.Interface.Party;
 using FFXIVClientStructs;
-using DelvUI.Helpers;
+using DelvUI.Helpers; 
 
 namespace DelvUI {
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -30,9 +30,20 @@ namespace DelvUI {
 
         public void Initialize(DalamudPluginInterface pluginInterface) {
             _pluginInterface = pluginInterface;
-            _pluginConfiguration = pluginInterface.GetPluginConfig() as PluginConfiguration ?? new PluginConfiguration();
+
+            // load a configuration with default parameters and write it to file
+            _pluginConfiguration = new PluginConfiguration();
+            PluginConfiguration.WriteConfig("default", _pluginInterface, _pluginConfiguration);
+
+            // if a previously used configuration exists, use it instead
+            var oldConfiguration = PluginConfiguration.ReadConfig(this.Name, _pluginInterface);
+            if (oldConfiguration != null)
+            {
+                _pluginConfiguration = oldConfiguration;
+            }
+
             _pluginConfiguration.Init(_pluginInterface);
-            _configurationWindow = new ConfigurationWindow(_pluginConfiguration);
+            _configurationWindow = new ConfigurationWindow(_pluginConfiguration, _pluginInterface);
 
             BuildBanner();
             _pluginInterface.UiBuilder.OnBuildUi += Draw;

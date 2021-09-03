@@ -9,10 +9,6 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Linq;
-using Dalamud.Game.ClientState.Actors.Types;
-using DelvUI.Interface.Bars;
-using System;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
 
@@ -21,6 +17,10 @@ namespace DelvUI.Interface
     class AstrologianHudWindow : HudWindow
     {
         public override uint JobId => 33;
+
+        private int BaseXOffset => PluginConfiguration.ASTBaseXOffset;
+        private int BaseYOffset => PluginConfiguration.ASTBaseYOffset;
+
         private int DivinationHeight => PluginConfiguration.ASTDivinationHeight;
         private int DivinationWidth => PluginConfiguration.ASTDivinationWidth;
         private int DivinationBarX => PluginConfiguration.ASTDivinationBarX;
@@ -58,7 +58,7 @@ namespace DelvUI.Interface
 
         private bool ShowDivinationTextBar => PluginConfiguration.ASTShowDivinationTextBar;
         private bool ShowDrawTextBar => PluginConfiguration.ASTShowDrawTextBar;
-
+        private bool ShowRedrawBar => PluginConfiguration.ASTShowRedrawBar;
         private bool ShowPrimaryResourceBar => PluginConfiguration.ASTShowPrimaryResourceBar;
 
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.AST * 1000];
@@ -79,6 +79,8 @@ namespace DelvUI.Interface
 
         private new Vector2 BarSize { get; set; }
         private Vector2 BarCoords { get; set; }
+
+        private readonly SpellHelper spellHelper = new SpellHelper();
 
         public AstrologianHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
@@ -112,11 +114,6 @@ namespace DelvUI.Interface
             }
 
             base.DrawPrimaryResourceBar();
-        }
-
-        protected new void DrawOutlinedText(string text, Vector2 pos)
-        {
-            DrawOutlinedText(text, pos, Vector4.One, new Vector4(0f, 0f, 0f, 1f));
         }
         
         private void DrawDivinationBar()
@@ -165,8 +162,8 @@ namespace DelvUI.Interface
                     }
                 }
                 hdl.Free();
-                var xPos = CenterX - XOffset + DivinationBarX;
-                var yPos = CenterY + YOffset + DivinationBarY;
+                var xPos = CenterX - XOffset + BaseXOffset + DivinationBarX;
+                var yPos = CenterY + YOffset + BaseYOffset + DivinationBarY;
 
                 var bar = BarBuilder.Create(xPos, yPos, DivinationHeight, DivinationWidth)
                     .SetBackgroundColor(EmptyColor["background"])
@@ -191,7 +188,7 @@ namespace DelvUI.Interface
                         chucksToGlow[i] = true;
                     }
                     bar.SetGlowChunks(chucksToGlow);
-                    bar.SetGlowColor(DivinationGlowColor["background"]);
+                    bar.SetGlowColor(DivinationGlowColor["base"]);
                 };
 
                 var drawList = ImGui.GetWindowDrawList();
@@ -204,8 +201,8 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
 
-            var xPos = CenterX - XOffset + DrawBarX;
-            var yPos = CenterY + YOffset + DrawBarY;
+            var xPos = CenterX - XOffset + BaseXOffset + DrawBarX;
+            var yPos = CenterY + YOffset + BaseYOffset + DrawBarY;
 
             var cardJob = "";
             var cardColor = EmptyColor;
@@ -239,19 +236,14 @@ namespace DelvUI.Interface
                     break;
             }
 
-            var castInfo = 0f;
             var cardPresent = 0f;
             var cardMax = 0f;
             var drawList = ImGui.GetWindowDrawList();
-            unsafe
-            {
-                var actionManager = ActionManager.Instance();
-                var adjustedId = actionManager->GetAdjustedActionId(3590);
-                var timeElapsed = actionManager->GetRecastTimeElapsed(ActionType.Spell, adjustedId);
-                var timeTotal = actionManager->GetRecastTime(ActionType.Spell, adjustedId);
-                castInfo = Math.Abs(timeTotal - timeElapsed);
-            }
-            
+            var drawCastInfo = spellHelper.GetSpellCooldown(3590);
+            var redrawCastInfo = spellHelper.GetSpellCooldownInt(3593);
+            var redrawStacks = spellHelper.GetStackCount(3, 3593);
+
+
             if (cardJob != "")
             {
                 cardPresent = 1f;
@@ -259,10 +251,10 @@ namespace DelvUI.Interface
             }
             else
             {
-                cardPresent = castInfo > 0 ? castInfo: 1f;
-                cardJob = castInfo > 0 ? Math.Abs(castInfo).ToString("N1") : "READY";
-                cardColor = castInfo> 0 ? DrawCDColor : DrawCDReadyColor;
-                cardMax = castInfo > 0 ? 30f : 1f;
+                cardPresent = drawCastInfo > 0 ? drawCastInfo : 1f;
+                cardJob = drawCastInfo > 0 ? Math.Abs(drawCastInfo).ToString("N0") : "READY";
+                cardColor = drawCastInfo > 0 ? DrawCDColor : DrawCDReadyColor;
+                cardMax = drawCastInfo > 0 ? 30f : 1f;
             }
 
             var bar = builder.AddInnerBar(Math.Abs(cardPresent), cardMax, cardColor)
@@ -274,10 +266,10 @@ namespace DelvUI.Interface
                 switch (cardJob)
                 {
                     case "RANGED":
-                        bar.SetGlowColor(DrawRangedGlowColor["gradientRight"]);
+                        bar.SetGlowColor(DrawRangedGlowColor["base"]);
                         break;
                     case "MELEE":
-                        bar.SetGlowColor(DrawMeleeGlowColor["gradientRight"]);
+                        bar.SetGlowColor(DrawMeleeGlowColor["base"]);
                         break;
                 };
             }
@@ -287,18 +279,34 @@ namespace DelvUI.Interface
                 cardJob = "";
             }
 
-            bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, cardJob);
-
-            
-
+            switch (cardJob)
+            {
+                case "RANGED":
+                    bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, cardJob);
+                    break;
+                case "MELEE":
+                    bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, cardJob);
+                    break;
+                case "READY":
+                    bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, cardJob);
+                    break;
+                default:
+                    bar.SetText(BarTextPosition.CenterLeft, BarTextType.Custom, cardJob);
+                    break;
+            };
+            if (ShowRedrawBar)
+            {
+                var redrawText = (redrawCastInfo > 0 ? redrawCastInfo.ToString("N0") + " [" + redrawStacks.ToString("N0") + "]" : redrawStacks.ToString("N0"));
+                bar.AddPrimaryText(new BarText(BarTextPosition.CenterRight, BarTextType.Custom, redrawText));
+            }
             bar.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawDot()
         {
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
-            var xPos = CenterX - XOffset + DotBarX;
-            var yPos = CenterY + YOffset + DotBarY;
+            var xPos = CenterX - XOffset + BaseXOffset + DotBarX;
+            var yPos = CenterY + YOffset + BaseYOffset + DotBarY;
             var drawList = ImGui.GetWindowDrawList();
             var builder = BarBuilder.Create(xPos, yPos, DotHeight, DotWidth);
             
@@ -334,8 +342,8 @@ namespace DelvUI.Interface
             var lightspeedDuration = 0f;
             const float lightspeedMaxDuration = 15f;
 
-            var xPos = CenterX - XOffset + LightspeedBarX;
-            var yPos = CenterY + YOffset + LightspeedBarY;
+            var xPos = CenterX - XOffset + BaseXOffset + LightspeedBarX;
+            var yPos = CenterY + YOffset + BaseYOffset + LightspeedBarY;
 
             if (lightspeedBuff.Any())
             {
@@ -362,8 +370,8 @@ namespace DelvUI.Interface
             var starDuration = 0f;
             const float starMaxDuration = 10f;
 
-            var xPos = CenterX - XOffset + StarBarX;
-            var yPos = CenterY + YOffset + StarBarY;
+            var xPos = CenterX - XOffset + BaseXOffset + StarBarX;
+            var yPos = CenterY + YOffset + BaseYOffset + StarBarY;
             var starColorSelector = EmptyColor;
 
             if (starPreCookingBuff.Any())
@@ -387,7 +395,7 @@ namespace DelvUI.Interface
 
             if (starColorSelector == StarGiantColor && ShowStarGlowBar)
             {
-                bar.SetGlowColor(StarGlowColor["background"]);
+                bar.SetGlowColor(StarGlowColor["base"]);
             };
 
             var drawList = ImGui.GetWindowDrawList();

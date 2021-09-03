@@ -14,6 +14,9 @@ namespace DelvUI.Interface {
     public class DancerHudWindow : HudWindow {
         public override uint JobId => 38;
 
+        private int BaseXOffset => PluginConfiguration.DNCBaseXOffset;
+        private int BaseYOffset => PluginConfiguration.DNCBaseYOffset;
+
         private bool EspritEnabled => PluginConfiguration.DNCEspritEnabled;
         private bool EspritText => PluginConfiguration.DNCEspritText;
         private int EspritHeight => PluginConfiguration.DNCEspritHeight;
@@ -101,8 +104,8 @@ namespace DelvUI.Interface {
         private void DrawEspritBar() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
             
-            var xPos = CenterX - EspritXOffset;
-            var yPos = CenterY + EspritYOffset;
+            var xPos = CenterX + BaseXOffset - EspritXOffset;
+            var yPos = CenterY + BaseYOffset + EspritYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, EspritHeight, EspritWidth)
                 .SetChunks(2)
@@ -125,8 +128,8 @@ namespace DelvUI.Interface {
             var flourishingBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1820 or 2021);
             var gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
             
-            var xPos = CenterX - FeatherXOffset;
-            var yPos = CenterY + FeatherYOffset;
+            var xPos = CenterX + BaseXOffset - FeatherXOffset;
+            var yPos = CenterY + BaseYOffset + FeatherYOffset;
             
             var builder = BarBuilder.Create(xPos, yPos, FeatherHeight, FeatherWidth)
                 .SetChunks(4)
@@ -191,8 +194,8 @@ namespace DelvUI.Interface {
                 }
             }
 
-            var xPos = CenterX - StepXOffset;
-            var yPos = CenterY + StepYOffset;
+            var xPos = CenterX + BaseXOffset - StepXOffset;
+            var yPos = CenterY + BaseYOffset + StepYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, StepHeight, StepWidth)
                 .SetChunks(chunkCount)
@@ -220,8 +223,8 @@ namespace DelvUI.Interface {
             var devilmentBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1825);
             var technicalFinishBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1822 or 2050);
 
-            var xPos = CenterX - BuffXOffset;
-            var yPos = CenterY + BuffYOffset;
+            var xPos = CenterX + BaseXOffset - BuffXOffset;
+            var yPos = CenterY + BaseYOffset + BuffYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, BuffHeight, BuffWidth).SetBackgroundColor(EmptyColor["background"]);
 
@@ -255,8 +258,8 @@ namespace DelvUI.Interface {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var standardFinishBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1821 or 2024 or 2105 or 2113);
             
-            var xPos = CenterX - StandardXOffset;
-            var yPos = CenterY + StandardYOffset;
+            var xPos = CenterX + BaseXOffset - StandardXOffset;
+            var yPos = CenterY + BaseYOffset + StandardYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, StandardHeight, StandardWidth);
 
@@ -282,8 +285,8 @@ namespace DelvUI.Interface {
             var flourishingWindmillBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1816);
             var flourishingShowerBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1817);
 
-            var xPos = CenterX - ProcXOffset;
-            var yPos = CenterY + ProcYOffset;
+            var xPos = CenterX + BaseXOffset - ProcXOffset;
+            var yPos = CenterY + BaseYOffset + ProcYOffset;
 
             var cascadeBuilder = BarBuilder.Create(xPos, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
             var fountainBuilder = BarBuilder.Create(xPos + ProcWidth + ProcPadding, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
