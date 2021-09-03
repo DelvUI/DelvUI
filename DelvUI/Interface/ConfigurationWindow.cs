@@ -4,6 +4,7 @@ using System.Numerics;
 using Dalamud.Interface;
 using ImGuiNET;
 using Dalamud.Plugin;
+using DelvUI.Interface.StatusEffects;
 
 namespace DelvUI.Interface
 {
@@ -38,14 +39,10 @@ namespace DelvUI.Interface
             });
             //configMap.Add("Group Unitframes", new [] {"General", "Party", "8man", "24man", "Enemies"});
             _configMap.Add("Castbars", new [] {
-                //"General", 
-                "Player"
-                , "Target"
-                });
+                "Player", "Target"
+            });
             _configMap.Add("Buffs and Debuffs", new [] {
-                //"General", 
-                "Player"
-                , "Target"
+                "Player Buffs", "Player Debuffs", "Target Buffs", "Target Debuffs"
             });
             _configMap.Add("Job Specific Bars", new [] {"General", "Tank", "Healer", "Melee","Ranged", "Caster"});
             _configMap.Add("Import/Export", new[] { "General" });
@@ -252,11 +249,17 @@ namespace DelvUI.Interface
                 case "Buffs and Debuffs":
                     switch (subConfig)
                     {
-                        case "Player":
-                            DrawStatusPlayerConfig();
+                        case "Player Buffs":
+                            DrawPlayerBuffsConfig();
                             break;
-                        case "Target":
-                            DrawStatusTargetConfig();
+                        case "Player Debuffs":
+                            DrawPlayerDebuffsConfig();
+                            break;
+                        case "Target Buffs":
+                            DrawTargetBuffsConfig();
+                            break;
+                        case "Target Debuffs":
+                            DrawTargetDebuffsConfig();
                             break;
                     }
                     break;
@@ -1563,174 +1566,131 @@ namespace DelvUI.Interface
                     _changed |= ImGui.Checkbox("Show Interruptable Casts", ref _pluginConfiguration.ShowTargetInterrupt);
 
         }
-        
-        private void DrawStatusPlayerConfig()
+
+        private void DrawPlayerBuffsConfig()
         {
-            _changed |= ImGui.Checkbox("Show Player Buffs", ref _pluginConfiguration.PlayerBuffsEnabled);
-
-            var playerBuffColumns = _pluginConfiguration.PlayerBuffColumns;
-            if (ImGui.DragInt("Player Buff Columns Per Row", ref playerBuffColumns, .1f, 1, 1000))
-            {
-                _pluginConfiguration.PlayerBuffColumns = playerBuffColumns;
-                _pluginConfiguration.Save();
-            }
-
-            var playerBuffSize = _pluginConfiguration.PlayerBuffSize;
-            if (ImGui.DragInt("Player Buff Size", ref playerBuffSize, .1f, 1, 1000))
-            {
-                _pluginConfiguration.PlayerBuffSize = playerBuffSize;
-                _pluginConfiguration.Save();
-            }
-
-            var playerBuffPositionX = _pluginConfiguration.PlayerBuffPositionX;
-            if (ImGui.DragInt("Player Buffs X Offset", ref playerBuffPositionX, .1f, -_xOffsetLimit, _xOffsetLimit))
-            {
-                _pluginConfiguration.PlayerBuffPositionX = playerBuffPositionX;
-                _pluginConfiguration.Save();
-            }
-
-            var playerBuffPositionY = _pluginConfiguration.PlayerBuffPositionY;
-            if (ImGui.DragInt("Player Buffs Y Offset", ref playerBuffPositionY, .1f, -_yOffsetLimit, _yOffsetLimit))
-            {
-                _pluginConfiguration.PlayerBuffPositionY = playerBuffPositionY;
-                _pluginConfiguration.Save();
-            }
-            
-            var playerBuffPadding = _pluginConfiguration.PlayerBuffPadding;
-            if (ImGui.DragInt("Player Buff Padding", ref playerBuffPadding, .1f, 1, 1000))
-            {
-                _pluginConfiguration.PlayerBuffPadding = playerBuffPadding;
-                _pluginConfiguration.Save();
-            }
-
-            _changed |= ImGui.Checkbox("Grow Player Buffs To The Right", ref _pluginConfiguration.PlayerBuffGrowRight);
-            _changed |= ImGui.Checkbox("Grow Player Buffs Down", ref _pluginConfiguration.PlayerBuffGrowDown);
-            _changed |= ImGui.Checkbox("Hide Permanent Player Buffs", ref _pluginConfiguration.PlayerHidePermaBuffs);
-
-            _changed |= ImGui.Checkbox("Show Player Debuffs", ref _pluginConfiguration.PlayerDebuffsEnabled);
-
-            var playerDebuffColumns = _pluginConfiguration.PlayerDebuffColumns;
-            if (ImGui.DragInt("Player Debuff Columns Per Row", ref playerDebuffColumns, .1f, 1, 1000))
-            {
-                _pluginConfiguration.PlayerDebuffColumns = playerDebuffColumns;
-                _pluginConfiguration.Save();
-            }
-
-            var playerDebuffSize = _pluginConfiguration.PlayerDebuffSize;
-            if (ImGui.DragInt("Player Debuff Size", ref playerDebuffSize, .1f, 1, 1000))
-            {
-                _pluginConfiguration.PlayerDebuffSize = playerDebuffSize;
-                _pluginConfiguration.Save();
-            }
-
-            var playerDebuffPositionX = _pluginConfiguration.PlayerDebuffPositionX;
-            if (ImGui.DragInt("Player Debuffs X Offset", ref playerDebuffPositionX, .1f, -_xOffsetLimit, _xOffsetLimit))
-            {
-                _pluginConfiguration.PlayerDebuffPositionX = playerDebuffPositionX;
-                _pluginConfiguration.Save();
-            }
-
-            var playerDebuffPositionY = _pluginConfiguration.PlayerDebuffPositionY;
-            if (ImGui.DragInt("Player Debuffs Y Offset", ref playerDebuffPositionY, .1f, -_yOffsetLimit, _yOffsetLimit))
-            {
-                _pluginConfiguration.PlayerDebuffPositionY = playerDebuffPositionY;
-                _pluginConfiguration.Save();
-            }
-            
-            var playerDebuffPadding = _pluginConfiguration.PlayerDebuffPadding;
-            if (ImGui.DragInt("Player Debuff Padding", ref playerDebuffPadding, .1f, 1, 1000))
-            {
-                _pluginConfiguration.PlayerDebuffPadding = playerDebuffPadding;
-                _pluginConfiguration.Save();
-            }
-
-            _changed |= ImGui.Checkbox("Grow Player Debuffs To The Right", ref _pluginConfiguration.PlayerDebuffGrowRight);
-            _changed |= ImGui.Checkbox("Grow Player Debuffs Down", ref _pluginConfiguration.PlayerDebuffGrowDown);
+            DrawStatusEffectListConfig(ref _pluginConfiguration.PlayerBuffListConfig);
         }
-        
-        private void DrawStatusTargetConfig()
+
+        private void DrawPlayerDebuffsConfig()
         {
-            _changed |= ImGui.Checkbox("Show Target Buffs", ref _pluginConfiguration.TargetBuffsEnabled);
-
-            var targetBuffColumns = _pluginConfiguration.TargetBuffColumns;
-            if (ImGui.DragInt("Target Buff Columns Per Row", ref targetBuffColumns, .1f, 1, 1000))
-            {
-                _pluginConfiguration.TargetBuffColumns = targetBuffColumns;
-                _pluginConfiguration.Save();
-            }
-
-            var targetBuffSize = _pluginConfiguration.TargetBuffSize;
-            if (ImGui.DragInt("Target Buff Size", ref targetBuffSize, .1f, 1, 1000))
-            {
-                _pluginConfiguration.TargetBuffSize = targetBuffSize;
-                _pluginConfiguration.Save();
-            }
-
-            var targetBuffPositionX = _pluginConfiguration.TargetBuffPositionX;
-            if (ImGui.DragInt("Target Buffs X Offset", ref targetBuffPositionX, .1f, -_xOffsetLimit, _xOffsetLimit))
-            {
-                _pluginConfiguration.TargetBuffPositionX = targetBuffPositionX;
-                _pluginConfiguration.Save();
-            }
-
-            var targetBuffPositionY = _pluginConfiguration.TargetBuffPositionY;
-            if (ImGui.DragInt("Target Buffs Y Offset", ref targetBuffPositionY, .1f, -_yOffsetLimit, _yOffsetLimit))
-            {
-                _pluginConfiguration.TargetBuffPositionY = targetBuffPositionY;
-                _pluginConfiguration.Save();
-            }
-            
-            var targetBuffPadding = _pluginConfiguration.TargetBuffPadding;
-            if (ImGui.DragInt("Target Buff Padding", ref targetBuffPadding, .1f, 1, 1000))
-            {
-                _pluginConfiguration.TargetBuffPadding = targetBuffPadding;
-                _pluginConfiguration.Save();
-            }
-
-            _changed |= ImGui.Checkbox("Grow Target Buffs To The Right", ref _pluginConfiguration.TargetBuffGrowRight);
-            _changed |= ImGui.Checkbox("Grow Target Buffs Down", ref _pluginConfiguration.TargetBuffGrowDown);
-
-            _changed |= ImGui.Checkbox("Show Target Debuffs", ref _pluginConfiguration.TargetDebuffsEnabled);
-
-            var targetDebuffColumns = _pluginConfiguration.TargetDebuffColumns;
-            if (ImGui.DragInt("Target Debuff Columns Per Row", ref targetDebuffColumns, .1f, 1, 1000))
-            {
-                _pluginConfiguration.TargetDebuffColumns = targetDebuffColumns;
-                _pluginConfiguration.Save();
-            }
-
-            var targetDebuffSize = _pluginConfiguration.TargetDebuffSize;
-            if (ImGui.DragInt("Target Debuff Size", ref targetDebuffSize, .1f, 1, 1000))
-            {
-                _pluginConfiguration.TargetDebuffSize = targetDebuffSize;
-                _pluginConfiguration.Save();
-            }
-
-            var targetDebuffPositionX = _pluginConfiguration.TargetDebuffPositionX;
-            if (ImGui.DragInt("Target Debuffs X Offset", ref targetDebuffPositionX, .1f, -_xOffsetLimit, _xOffsetLimit))
-            {
-                _pluginConfiguration.TargetDebuffPositionX = targetDebuffPositionX;
-                _pluginConfiguration.Save();
-            }
-
-            var targetDebuffPositionY = _pluginConfiguration.TargetDebuffPositionY;
-            if (ImGui.DragInt("Target Debuffs Y Offset", ref targetDebuffPositionY, .1f, -_yOffsetLimit, _yOffsetLimit))
-            {
-                _pluginConfiguration.TargetDebuffPositionY = targetDebuffPositionY;
-                _pluginConfiguration.Save();
-            }
-            
-            var targetDebuffPadding = _pluginConfiguration.TargetDebuffPadding;
-            if (ImGui.DragInt("Target Debuff Padding", ref targetDebuffPadding, .1f, 1, 1000))
-            {
-                _pluginConfiguration.TargetDebuffPadding = targetDebuffPadding;
-                _pluginConfiguration.Save();
-            }
-
-            _changed |= ImGui.Checkbox("Grow Target Debuffs To The Right", ref _pluginConfiguration.TargetDebuffGrowRight);
-            _changed |= ImGui.Checkbox("Grow Target Debuffs Down", ref _pluginConfiguration.TargetDebuffGrowDown);
+            DrawStatusEffectListConfig(ref _pluginConfiguration.PlayerDebuffListConfig);
         }
-        
+
+        private void DrawTargetBuffsConfig()
+        {
+            DrawStatusEffectListConfig(ref _pluginConfiguration.TargetBuffListConfig);
+        }
+
+        private void DrawTargetDebuffsConfig()
+        {
+            DrawStatusEffectListConfig(ref _pluginConfiguration.TargetDebuffListConfig);
+        }
+
+        private void DrawStatusEffectListConfig(ref StatusEffectsListConfig config)
+        { 
+            _changed |= ImGui.Checkbox("Enabled", ref config.Enabled);
+
+            ImGui.Text("Layout");
+            ImGui.BeginGroup();
+            {
+                int posX = (int)config.Position.X;
+                if (ImGui.DragInt("Position X", ref posX, 1, -_xOffsetLimit, _xOffsetLimit))
+                {
+                    config.Position.X = posX;
+                    _pluginConfiguration.Save();
+                }
+                int posY = (int)config.Position.Y;
+                if (ImGui.DragInt("Position Y", ref posY, 1, -_yOffsetLimit, _yOffsetLimit))
+                {
+                    config.Position.Y = posY;
+                    _pluginConfiguration.Save();
+                }
+
+                int areaWidth = (int)config.MaxSize.X;
+                if (ImGui.DragInt("Area Width", ref areaWidth, 1, -2000, 2000))
+                {
+                    config.MaxSize.X = areaWidth;
+                    _pluginConfiguration.Save();
+                }
+                int areaHeight = (int)config.MaxSize.Y;
+                if (ImGui.DragInt("Area Height", ref areaHeight, 1, -2000, 2000))
+                {
+                    config.MaxSize.Y = areaHeight;
+                    _pluginConfiguration.Save();
+                }
+
+                int paddingX = (int)config.IconPadding.X;
+                if (ImGui.DragInt("Horizontal Padding", ref paddingX, 1, -200, 200))
+                {
+                    config.IconPadding.X = paddingX;
+                    _pluginConfiguration.Save();
+                }
+                int paddingY = (int)config.IconPadding.Y;
+                if (ImGui.DragInt("Vertical Padding", ref paddingY, 1, -200, 200))
+                {
+                    config.IconPadding.Y = paddingY;
+                    _pluginConfiguration.Save();
+                }
+
+                List<GrowthDirections> directions = new List<GrowthDirections>()
+                {
+                    GrowthDirections.RIGHT | GrowthDirections.DOWN,
+                    GrowthDirections.RIGHT | GrowthDirections.UP,
+                    GrowthDirections.LEFT | GrowthDirections.DOWN,
+                    GrowthDirections.LEFT | GrowthDirections.UP
+                };
+                int selection = Math.Max(0, directions.IndexOf((GrowthDirections)config.GrowthDirections));
+                string[] directionsStrings = new string[]
+                {
+                    "Right and Down",
+                    "Right and Up",
+                    "Left and Down",
+                    "Left and Up"
+                };
+                if (ImGui.Combo("Icons Growth Direction", ref selection, directionsStrings, directionsStrings.Length))
+                {
+                    config.GrowthDirections = (short)directions[selection];
+                    _pluginConfiguration.Save();
+                }
+
+                _changed |= ImGui.Checkbox("Show Area", ref config.ShowArea);
+                _changed |= ImGui.Checkbox("Fill Rows First", ref config.FillRowsFirst);
+                _changed |= ImGui.DragInt("Limit (-1 means no limit)", ref config.Limit, .1f, -1, 100);
+            }
+            ImGui.EndGroup();
+
+            ImGui.Text("Icons");
+            ImGui.BeginGroup();
+            {
+                int iconWidth = (int)config.IconConfig.Size.X;
+                if (ImGui.DragInt("Icons Width", ref iconWidth, 1, 1, 200))
+                {
+                    config.IconConfig.Size.X = iconWidth;
+                    _pluginConfiguration.Save();
+                }
+                int iconHeight = (int)config.IconConfig.Size.Y;
+                if (ImGui.DragInt("Icons Height", ref iconHeight, 1, 1, 200))
+                {
+                    config.IconConfig.Size.Y = iconHeight;
+                    _pluginConfiguration.Save();
+                }
+
+                _changed |= ImGui.Checkbox("Show Duration", ref config.IconConfig.ShowDurationText);
+                _changed |= ImGui.Checkbox("Show Stacks", ref config.IconConfig.ShowStacksText);
+                _changed |= ImGui.Checkbox("Show Permanent Effects", ref config.ShowPermanentEffects);
+
+                _changed |= ImGui.Checkbox("Show Border", ref config.IconConfig.ShowBorder);
+                _changed |= ImGui.DragInt("Border Thickness", ref config.IconConfig.BorderThickness, .1f, 1, 5);
+                _changed |= ImGui.ColorEdit4("Border Color", ref config.IconConfig.BorderColor);
+
+                _changed |= ImGui.Checkbox("Show Dispellable Border", ref config.IconConfig.ShowDispellableBorder);
+                _changed |= ImGui.DragInt("Dispellable Border Thickness", ref config.IconConfig.DispellableBorderThickness, .1f, 1, 5);
+                _changed |= ImGui.ColorEdit4("Dispellable order Color", ref config.IconConfig.DispellableBorderColor);
+            }
+            ImGui.EndGroup();
+        }
+
         private void DrawJobsGeneralConfig()
         {
             var primaryResourceHeight = _pluginConfiguration.PrimaryResourceBarHeight;

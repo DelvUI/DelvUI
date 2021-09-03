@@ -4,6 +4,7 @@ using System.IO;
 using System.Numerics;
 using Dalamud.Configuration;
 using Dalamud.Plugin;
+using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
 using ImGuiScene;
 using Newtonsoft.Json;
@@ -89,40 +90,18 @@ namespace DelvUI {
         public int GCDIndicatorYOffset { get; set; } = 480;
         public bool GCDIndicatorShowBorder = false;
 
-        public bool PlayerBuffsEnabled = true;
-        public bool PlayerDebuffsEnabled = true;
-        public int PlayerBuffColumns { get; set; } = 8;
-        public int PlayerDebuffColumns { get; set; } = 8;
-        public int PlayerBuffPositionX { get; set; } = 1650;
-        public int PlayerBuffPositionY { get; set; } = 60;
-        public int PlayerDebuffPositionX { get; set; } = 1650;
-        public int PlayerDebuffPositionY { get; set; } = 160;
-        public int PlayerBuffSize { get; set; } = 40;
-        public int PlayerDebuffSize { get; set; } = 40;
-        public int PlayerBuffPadding { get; set; } = 2;
-        public int PlayerDebuffPadding { get; set; } = 2;
-        public bool PlayerBuffGrowRight = false;
-        public bool PlayerDebuffGrowRight = false;
-        public bool PlayerBuffGrowDown = true;
-        public bool PlayerDebuffGrowDown = true;
-        public bool PlayerHidePermaBuffs = false;
-        
-        public bool TargetBuffsEnabled = true;
-        public bool TargetDebuffsEnabled = true;
-        public int TargetBuffColumns { get; set; } = 8;
-        public int TargetDebuffColumns { get; set; } = 8;
-        public int TargetBuffPositionX { get; set; } = 160;
-        public int TargetBuffPositionY { get; set; } = 415;
-        public int TargetDebuffPositionX { get; set; } = 160;
-        public int TargetDebuffPositionY { get; set; } = 505;
-        public int TargetBuffSize { get; set; } = 40;
-        public int TargetDebuffSize { get; set; } = 40;
-        public int TargetBuffPadding { get; set; } = 2;
-        public int TargetDebuffPadding { get; set; } = 2;
-        public bool TargetBuffGrowRight = true;
-        public bool TargetDebuffGrowRight = true;
-        public bool TargetBuffGrowDown = true;
-        public bool TargetDebuffGrowDown = true;
+        public StatusEffectsListConfig PlayerBuffListConfig = new StatusEffectsListConfig(
+            new Vector2(750, -480), true, false, true, GrowthDirections.LEFT | GrowthDirections.DOWN
+        );
+        public StatusEffectsListConfig PlayerDebuffListConfig = new StatusEffectsListConfig(
+            new Vector2(750, -380), false, true, true, GrowthDirections.LEFT | GrowthDirections.DOWN
+        );
+        public StatusEffectsListConfig TargetBuffListConfig = new StatusEffectsListConfig(
+            new Vector2(160, 415), true, false, true, GrowthDirections.RIGHT | GrowthDirections.UP
+        );
+        public StatusEffectsListConfig TargetDebuffListConfig = new StatusEffectsListConfig(
+            new Vector2(160, 315), false, true, true, GrowthDirections.RIGHT | GrowthDirections.UP
+        );
 
         public int CastBarHeight { get; set; } = 25;
         public int CastBarWidth { get; set; } = 254;
