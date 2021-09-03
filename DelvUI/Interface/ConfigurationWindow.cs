@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Interface;
@@ -1860,6 +1860,18 @@ namespace DelvUI.Interface
                 
                 if (ImGui.BeginTabItem("Warrior"))
                 {
+                    var warBaseXOffset = _pluginConfiguration.WARBaseXOffset;
+                    if (ImGui.DragInt("Base X Offset", ref warBaseXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
+                        _pluginConfiguration.WARBaseXOffset = warBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var warBaseYOffset = _pluginConfiguration.WARBaseYOffset;
+                    if (ImGui.DragInt("Base Y Offset", ref warBaseYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
+                        _pluginConfiguration.WARBaseYOffset = warBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
                     var stormsEyeEnabled = _pluginConfiguration.WARStormsEyeEnabled;
                     if (ImGui.Checkbox("Storm's Eye Enabled", ref stormsEyeEnabled))
                     {
@@ -1975,6 +1987,18 @@ namespace DelvUI.Interface
                 }
                 if (ImGui.BeginTabItem("Paladin"))
                 {
+                    var pldBaseXOffset = _pluginConfiguration.PLDBaseXOffset;
+                    if (ImGui.DragInt("Base X Offset", ref pldBaseXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
+                        _pluginConfiguration.PLDBaseXOffset = pldBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var pldBaseYOffset = _pluginConfiguration.PLDBaseYOffset;
+                    if (ImGui.DragInt("Base Y Offset", ref pldBaseYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
+                        _pluginConfiguration.PLDBaseYOffset = pldBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
                     bool pldManaEnabled = _pluginConfiguration.PLDManaEnabled;
                     if (ImGui.Checkbox("Mana Enabled", ref pldManaEnabled))
                     {
@@ -2433,6 +2457,17 @@ namespace DelvUI.Interface
             {
                 if (ImGui.BeginTabItem("Scholar"))
                 {
+                    var schBaseXOffset = _pluginConfiguration.SCHBaseXOffset;
+                    if (ImGui.DragInt("Base X Offset", ref schBaseXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
+                        _pluginConfiguration.SCHBaseXOffset = schBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var schBaseYOffset = _pluginConfiguration.SCHBaseYOffset;
+                    if (ImGui.DragInt("Base Y Offset", ref schBaseYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
+                        _pluginConfiguration.SCHBaseYOffset = schBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
 
                     var fairyBarHeight = _pluginConfiguration.FairyBarHeight;
                     if (ImGui.DragInt("Fairy Gauge Height", ref fairyBarHeight, .1f, 1, 1000))
@@ -2539,6 +2574,17 @@ namespace DelvUI.Interface
 
                 if (ImGui.BeginTabItem("White Mage"))
                 {
+                    var whmBaseXOffset = _pluginConfiguration.WHMBaseXOffset;
+                    if (ImGui.DragInt("Base X Offset", ref whmBaseXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
+                        _pluginConfiguration.WHMBaseXOffset = whmBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var whmBaseYOffset = _pluginConfiguration.WHMBaseYOffset;
+                    if (ImGui.DragInt("Base Y Offset", ref whmBaseYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
+                        _pluginConfiguration.WHMBaseYOffset = whmBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
 
                     var lillyBarHeight = _pluginConfiguration.LillyBarHeight;
                     if (ImGui.DragInt("Lilly Gauge Height", ref lillyBarHeight, .1f, 1, 1000))
@@ -2654,6 +2700,17 @@ namespace DelvUI.Interface
 
                 if (ImGui.BeginTabItem("Astrologian"))
                 {
+                    var astBaseXOffset = _pluginConfiguration.ASTBaseXOffset;
+                    if (ImGui.DragInt("Base X Offset", ref astBaseXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
+                        _pluginConfiguration.ASTBaseXOffset = astBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var astBaseYOffset = _pluginConfiguration.ASTBaseYOffset;
+                    if (ImGui.DragInt("Base Y Offset", ref astBaseYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
+                        _pluginConfiguration.ASTBaseYOffset = astBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
 
                     var astDrawBarHeight = _pluginConfiguration.ASTDrawBarHeight;
                     if (ImGui.DragInt("Draw Gauge Height", ref astDrawBarHeight, .1f, 1, 1000))
@@ -2841,6 +2898,17 @@ namespace DelvUI.Interface
             {
             if (ImGui.BeginTabItem("Samurai"))
                 {
+                    var samBaseXOffset = _pluginConfiguration.SAMBaseXOffset;
+                    if (ImGui.DragInt("Base X Offset", ref samBaseXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
+                        _pluginConfiguration.SAMBaseXOffset = samBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var samBaseYOffset = _pluginConfiguration.SAMBaseYOffset;
+                    if (ImGui.DragInt("Base Y Offset", ref samBaseYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
+                        _pluginConfiguration.SAMBaseYOffset = samBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
 
                     var samHiganbanaBarX = _pluginConfiguration.SamHiganbanaBarX;
                     if (ImGui.DragInt("Higanbana X Offset", ref samHiganbanaBarX, .1f, -1000, 1000))
@@ -3073,14 +3141,14 @@ namespace DelvUI.Interface
             if (ImGui.BeginTabItem("Ninja"))
                 {
                     var ninBaseXOffset = _pluginConfiguration.NINBaseXOffset;
-                    if (ImGui.DragInt("NIN Base X Offset", ref ninBaseXOffset, .1f, -2000, 2000))
+                    if (ImGui.DragInt("Base X Offset", ref ninBaseXOffset, .1f, -2000, 2000))
                     {
                         _pluginConfiguration.NINBaseXOffset = ninBaseXOffset;
                         _pluginConfiguration.Save();
                     }
 
                     var ninBaseYOffset = _pluginConfiguration.NINBaseYOffset;
-                    if (ImGui.DragInt("NIN Base Y Offset", ref ninBaseYOffset, .1f, -2000, 2000))
+                    if (ImGui.DragInt("Base Y Offset", ref ninBaseYOffset, .1f, -2000, 2000))
                     {
                         _pluginConfiguration.NINBaseYOffset = ninBaseYOffset;
                         _pluginConfiguration.Save();
@@ -3886,6 +3954,18 @@ namespace DelvUI.Interface
                 }
                 if (ImGui.BeginTabItem("Machinist"))
                 {
+                    var mchBaseXOffset = _pluginConfiguration.MCHBaseXOffset;
+                    if (ImGui.DragInt("Base X Offset", ref mchBaseXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
+                        _pluginConfiguration.MCHBaseXOffset = mchBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var mchBaseYOffset = _pluginConfiguration.MCHBaseYOffset;
+                    if (ImGui.DragInt("Base Y Offset", ref mchBaseYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
+                        _pluginConfiguration.MCHBaseYOffset = mchBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
                     var overheatEnabled = _pluginConfiguration.MCHOverheatEnable;
                     if (ImGui.Checkbox("Overheat Bar Enabled", ref overheatEnabled))
                     {
@@ -4101,6 +4181,18 @@ namespace DelvUI.Interface
                 
                 if (ImGui.BeginTabItem("Dancer"))
                 {
+                    var dncBaseXOffset = _pluginConfiguration.DNCBaseXOffset;
+                    if (ImGui.DragInt("Base X Offset", ref dncBaseXOffset, .1f, -_xOffsetLimit, _xOffsetLimit)) {
+                        _pluginConfiguration.DNCBaseXOffset = dncBaseXOffset;
+                        _pluginConfiguration.Save();
+                    }
+
+                    var dncBaseYOffset = _pluginConfiguration.DNCBaseYOffset;
+                    if (ImGui.DragInt("Base Y Offset", ref dncBaseYOffset, .1f, -_yOffsetLimit, _yOffsetLimit)) {
+                        _pluginConfiguration.DNCBaseYOffset = dncBaseYOffset;
+                        _pluginConfiguration.Save();
+                    }
+
                     var espritEnabled = _pluginConfiguration.DNCEspritEnabled;
                     if (ImGui.Checkbox("Esprit Bar Enabled", ref espritEnabled))
                     {

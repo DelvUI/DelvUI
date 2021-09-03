@@ -224,6 +224,9 @@ namespace DelvUI {
         
         #region WAR Configuration
 
+        public int WARBaseXOffset { get; set; }
+        public int WARBaseYOffset { get; set; }
+
         public bool WARStormsEyeEnabled { get; set; } = true;
         public bool WARStormsEyeText { get; set; } = true;
         public float WARStormsEyeTextScale { get; set; } = 1.0f;
@@ -247,6 +250,9 @@ namespace DelvUI {
         #endregion
 
         #region SCH Configuration
+
+        public int SCHBaseXOffset { get; set; }
+        public int SCHBaseYOffset { get; set; }
 
         public int FairyBarHeight { get; set; } = 20;
         public int FairyBarWidth { get; set; } = 254;
@@ -274,6 +280,10 @@ namespace DelvUI {
         #endregion
 
         #region WHM Configuration
+
+        public int WHMBaseXOffset { get; set; }
+        public int WHMBaseYOffset { get; set; }
+
         public int LillyBarHeight { get; set; } = 20;
         public int LillyBarWidth { get; set; } = 254;
         public int LillyBarX { get; set; } = 127;
@@ -302,6 +312,9 @@ namespace DelvUI {
         #endregion
 
         #region AST Configuration
+
+        public int ASTBaseXOffset { get; set; }
+        public int ASTBaseYOffset { get; set; }
 
         public int ASTDrawBarHeight { get; set; } = 20;
         public int ASTDrawBarWidth { get; set; } = 254;
@@ -394,6 +407,9 @@ namespace DelvUI {
 
         #region SAM Configuration
 
+        public int SAMBaseXOffset { get; set; }
+        public int SAMBaseYOffset { get; set; }
+
         public bool SAMGaugeEnabled { get; set; } = true;
         public bool SAMSenEnabled { get; set; } = true;
         public bool SAMMeditationEnabled { get; set; } = true;
@@ -432,7 +448,6 @@ namespace DelvUI {
         public int SAMMeditationPadding { get; set; } = 2;
         public int SAMBuffsPadding { get; set; } = 2;
 
-
         public Vector4 SamHiganbanaColor = new Vector4(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f);
         public Vector4 SamShifuColor = new Vector4(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f);
         public Vector4 SamJinpuColor = new Vector4(136f / 255f, 146f / 255f, 219f / 255f, 100f / 100f);
@@ -449,6 +464,9 @@ namespace DelvUI {
         #endregion
 
         #region MCH Configuration
+
+        public int MCHBaseXOffset { get; set; }
+        public int MCHBaseYOffset { get; set; }
 
         public bool MCHOverheatEnable { get; set; } = true;
         public bool MCHOverheatText { get; set; } = true;
@@ -552,6 +570,9 @@ namespace DelvUI {
         #endregion
 
         #region PLD Configuration
+
+        public int PLDBaseXOffset { get; set; }
+        public int PLDBaseYOffset { get; set; }
 
         public bool PLDManaEnabled { get; set; } = true;
         public bool PLDManaChunked { get; set; } = true;
@@ -807,6 +828,9 @@ namespace DelvUI {
         #endregion
 
         #region DNC Configuration
+
+        public int DNCBaseXOffset { get; set; }
+        public int DNCBaseYOffset { get; set; }
 
         public bool DNCEspritEnabled { get; set; } = true;
         public bool DNCEspritText { get; set; } = true;
