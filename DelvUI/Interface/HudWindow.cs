@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Dalamud.Configuration;
 using Dalamud.Data.LuminaExtensions;
 using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
@@ -108,6 +109,12 @@ namespace DelvUI.Interface {
 
         protected uint UnitFrameEmptyColor => ImGui.ColorConvertFloat4ToU32(PluginConfiguration.UnitFrameEmptyColor);
 
+        protected uint PlayerUnitFrameColor => ImGui.ColorConvertFloat4ToU32(
+                PluginConfiguration.CustomHealthBarBackgroundColorEnabled ?
+                    PluginConfiguration.CustomHealthBarBackgroundColor :
+                    PluginConfiguration.UnitFrameEmptyColor
+            );
+        
         #endregion
         
         protected Vector2 BarSize { get; private set; }
@@ -177,7 +184,12 @@ namespace DelvUI.Interface {
             PluginConfiguration.JobColorMap.TryGetValue(PluginInterface.ClientState.LocalPlayer.ClassJob.Id, out var colors);
             colors ??= PluginConfiguration.NPCColorMap["friendly"];
 
-            if (PluginConfiguration.CustomHealthBarColorEnabled) colors = PluginConfiguration.MiscColorMap["customhealth"];
+            if (PluginConfiguration.CustomHealthBarColorEnabled)
+            {
+                var jobColors = colors;
+                colors = PluginConfiguration.MiscColorMap["customhealth"];
+                colors["invuln"] = jobColors["invuln"];
+            }
 
             var drawList = ImGui.GetWindowDrawList();
 
@@ -193,9 +205,14 @@ namespace DelvUI.Interface {
 
             ImGui.Begin("health_bar", windowFlags);
             if (ImGui.BeginChild("health_bar", BarSize)) {
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, UnitFrameEmptyColor);
-                if (HasTankInvuln(actor) == 1) drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["invuln"]);
-                    drawList.AddRectFilledMultiColor(
+                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, PlayerUnitFrameColor);
+               
+                if (HasTankInvuln(actor) == 1)
+                {
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["invuln"]);
+                }
+                
+                drawList.AddRectFilledMultiColor(
                     cursorPos, cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight),
                     colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]
                 );
@@ -892,20 +909,16 @@ namespace DelvUI.Interface {
 
         private int HasTankInvuln(Actor actor)
         {
-
             var tankInvulnBuff = actor.StatusEffects.Where(o =>
                     o.EffectId == 810 || // Living Dead
                     o.EffectId == 1302 || // Hollow Ground
                     o.EffectId == 409 || // Holmgang
                     o.EffectId == 1836   // Bolide
-
             );
 
             return tankInvulnBuff.Count();
-
-
-
         }
+        
         protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor) {
             var colors = PluginConfiguration.NPCColorMap["neutral"];
 
