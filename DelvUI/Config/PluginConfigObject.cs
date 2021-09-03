@@ -10,9 +10,6 @@ namespace DelvUI.Config
     [Serializable]
     public abstract class PluginConfigObject
     {
-        [JsonIgnore] protected int _xOffsetLimit => (int) ImGui.GetMainViewport().Size.X / 2;
-        [JsonIgnore] protected int _yOffsetLimit => (int) ImGui.GetMainViewport().Size.Y / 2;
-
         protected bool ColorEdit4(string label, ref PluginConfigColor color)
         {
             var vector = color.Vector;
