@@ -207,12 +207,6 @@ namespace DelvUI.Interface.StatusEffects
     public class StatusEffectsListConfig
     {
         public bool Enabled = true;
-        //public int PositionX;
-        //public int PositionY;
-        //public int MaxSizeWidth = 340;
-        //public int MaxSizeHeight = 100;
-        //public int IconPaddingHorizontal = 2;
-        //public int IconPaddingVertical = 2;
         public Vector2 Position;
         public Vector2 MaxSize = new Vector2(340, 100);
         public Vector2 IconPadding = new Vector2(2, 2);
