@@ -1547,28 +1547,28 @@ namespace DelvUI {
                 },
                 [Jobs.MNK * 1000 + 5] = new Dictionary<string, uint> // Riddle Of Earth
                 {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKRiddleOfEarthColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
                 },
                 [Jobs.MNK * 1000 + 6] = new Dictionary<string, uint> // Perfect Balance
                 {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKRiddleOfEarthColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
                 },
                 [Jobs.MNK * 1000 + 7] = new Dictionary<string, uint> // True North
                 {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKTrueNorthColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
                 },
                 [Jobs.MNK * 1000 + 8] = new Dictionary<string, uint> // Forms
                 {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKFormsColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
