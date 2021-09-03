@@ -99,6 +99,8 @@ namespace DelvUI.Interface
 
         private Dictionary<string, uint> DoTColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 6];
 
+        private Dictionary<string, uint> OathNotFullColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 7];
+
         public PaladinHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) {}
 
         protected override void Draw(bool _)
@@ -162,7 +164,7 @@ namespace DelvUI.Interface
                 .SetChunks(2)
                 .SetChunkPadding(OathGaugeBarPadding)
                 .SetBackgroundColor(EmptyColor["background"])
-                .AddInnerBar(gauge.GaugeAmount, 100, OathGaugeColor, EmptyColor);
+                .AddInnerBar(gauge.GaugeAmount, 100, OathGaugeColor, OathNotFullColor);
 
             if (OathGaugeText)
             {
