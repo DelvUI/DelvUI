@@ -577,167 +577,186 @@ namespace DelvUI.Interface
 
         }
 
-        private void DrawIndividualUnitFramesPlayerConfig(){
-                
+        private void DrawIndividualUnitFramesPlayerConfig()
+        {
             bool disabled = true;
             ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
             {
                 ImGui.Text("Bar Size & Position");
-                ImGui.BeginChild("hppane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
-                    ImGui.BeginChild("hpsizepane", new Vector2(0,ImGui.GetWindowHeight()/2),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                ImGui.BeginChild("hppane", new Vector2(0, ImGui.GetWindowHeight() / 4), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                ImGui.BeginChild("hpsizepane", new Vector2(0, ImGui.GetWindowHeight()), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                {
+                    ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth() / 2, 0), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                     {
-                        ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        ImGui.Text("");//SPACING
+
+                        ImGui.Text("Height");
+                        var healthBarHeight = _pluginConfiguration.HealthBarHeight;
+                        if (ImGui.DragInt("##HealthBarHeight", ref healthBarHeight, .1f, 1, 1000))
                         {
-                            ImGui.Text("");//SPACING
-
-                            ImGui.Text("Height");
-                            var healthBarHeight = _pluginConfiguration.HealthBarHeight;
-                            if (ImGui.DragInt("##HealthBarHeight", ref healthBarHeight, .1f, 1, 1000))
-                            {
-                                _pluginConfiguration.HealthBarHeight = healthBarHeight;
-                                _pluginConfiguration.Save();
-                            }
-                            ImGui.Text("");//SPACING
-
-                            ImGui.Text("X Offset");
-                            var healthBarXOffset = _pluginConfiguration.HealthBarXOffset;
-                            if (ImGui.DragInt("##HealthBarXOffset", ref healthBarXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
-                            {
-                                _pluginConfiguration.HealthBarXOffset = healthBarXOffset;
-                                _pluginConfiguration.Save();
-                            }
+                            _pluginConfiguration.HealthBarHeight = healthBarHeight;
+                            _pluginConfiguration.Save();
                         }
-                        ImGui.EndChild();
-                        
-                        ImGui.SameLine();
-                        
-                        ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        ImGui.Text("");//SPACING
+
+                        ImGui.Text("X Offset");
+                        var healthBarXOffset = _pluginConfiguration.HealthBarXOffset;
+                        if (ImGui.DragInt("##HealthBarXOffset", ref healthBarXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
-                            ImGui.Text("");//SPACING
-
-                            ImGui.Text("Width");
-                            var healthBarWidth = _pluginConfiguration.HealthBarWidth;
-                            if (ImGui.DragInt("##HealthBarWidth", ref healthBarWidth, .1f, 1, 1000))
-                            {
-                                _pluginConfiguration.HealthBarWidth = healthBarWidth;
-                                _pluginConfiguration.Save();
-                            }
-                            ImGui.Text("");//SPACING
-
-                            ImGui.Text("Y Offset");
-                            var healthBarYOffset = _pluginConfiguration.HealthBarYOffset;
-                            if (ImGui.DragInt("##HealthBarYOffset", ref healthBarYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
-                            {
-                                _pluginConfiguration.HealthBarYOffset = healthBarYOffset;
-                                _pluginConfiguration.Save();
-                            }
+                            _pluginConfiguration.HealthBarXOffset = healthBarXOffset;
+                            _pluginConfiguration.Save();
                         }
-                        ImGui.EndChild();
-                        
                     }
                     ImGui.EndChild();
-                    ImGui.Text("");//SPACING
 
-                    ImGui.BeginChild("castbarcolor", new Vector2(0,ImGui.GetWindowHeight()/3),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    ImGui.SameLine();
+
+                    ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth() / 2, 0), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                     {
-                        _changed |= ImGui.Checkbox("Custom Color", ref _pluginConfiguration.CustomHealthBarColorEnabled);
-                        _changed |= ImGui.ColorEdit4("##CustomHealthbarColor", ref _pluginConfiguration.CustomHealthBarColor);
+                        ImGui.Text("");//SPACING
+
+                        ImGui.Text("Width");
+                        var healthBarWidth = _pluginConfiguration.HealthBarWidth;
+                        if (ImGui.DragInt("##HealthBarWidth", ref healthBarWidth, .1f, 1, 1000))
+                        {
+                            _pluginConfiguration.HealthBarWidth = healthBarWidth;
+                            _pluginConfiguration.Save();
+                        }
+                        ImGui.Text("");//SPACING
+
+                        ImGui.Text("Y Offset");
+                        var healthBarYOffset = _pluginConfiguration.HealthBarYOffset;
+                        if (ImGui.DragInt("##HealthBarYOffset", ref healthBarYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
+                        {
+                            _pluginConfiguration.HealthBarYOffset = healthBarYOffset;
+                            _pluginConfiguration.Save();
+                        }
                     }
                     ImGui.EndChild();
+
+                }
+                ImGui.EndChild();
                 ImGui.EndChild();
 
             }
             ImGui.EndGroup();
-            ImGui.EndGroup();   
-            
+            ImGui.EndGroup();
+
+            ImGui.Text("");//SPACING
+
+            ImGui.BeginGroup();
+            ImGui.BeginGroup();
+            {
+                ImGui.Text("Colors");
+                ImGui.BeginChild("hppane2", new Vector2(0, ImGui.GetWindowHeight() / 4), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+                ImGui.BeginChild("hpcolorpane", new Vector2(0, ImGui.GetWindowHeight()), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                {
+                    ImGui.BeginChild("healthbarcolors", new Vector2(0, 0), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        _changed |= ImGui.Checkbox("Custom Foreground Color", ref _pluginConfiguration.CustomHealthBarColorEnabled);
+                        _changed |= ImGui.ColorEdit4("##CustomHealthBarColor", ref _pluginConfiguration.CustomHealthBarColor);
+
+                        ImGui.Text("");//SPACING
+
+                        _changed |= ImGui.Checkbox("Custom Background Color", ref _pluginConfiguration.CustomHealthBarBackgroundColorEnabled);
+                        _changed |= ImGui.ColorEdit4("##CustomHealthBarBackgroundColor", ref _pluginConfiguration.CustomHealthBarBackgroundColor);
+                    }
+                    ImGui.EndChild();
+                }
+                ImGui.EndChild();
+                ImGui.EndChild();
+
+            }
+            ImGui.EndGroup();
+            ImGui.EndGroup();
+
             ImGui.Text("");//SPACING
 
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
             {
                 ImGui.Text("Text Format");
-                ImGui.BeginChild("hptxtpane", new Vector2(0,ImGui.GetWindowHeight()/2), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-                    ImGui.BeginChild("hptxtformatpane", new Vector2(0,ImGui.GetWindowHeight()),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                ImGui.BeginChild("hptxtpane", new Vector2(0, ImGui.GetWindowHeight() / 2), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                ImGui.BeginChild("hptxtformatpane", new Vector2(0, ImGui.GetWindowHeight()), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                {
+                    ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth() / 2, 0), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                     {
-                        ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        ImGui.Text("");//SPACING
+
+                        ImGui.Text("Left Text Format");
+                        var healthBarTextLeft = _pluginConfiguration.HealthBarTextLeft;
+                        if (ImGui.InputText("##HealthBarTextLeft", ref healthBarTextLeft, 999))
                         {
-                            ImGui.Text("");//SPACING
-
-                            ImGui.Text("Left Text Format");
-                            var healthBarTextLeft = _pluginConfiguration.HealthBarTextLeft;
-                            if (ImGui.InputText("##HealthBarTextLeft", ref healthBarTextLeft, 999))
-                            {
-                                _pluginConfiguration.HealthBarTextLeft = healthBarTextLeft;
-                                _pluginConfiguration.Save();
-                            }
-                            ImGui.Text("");//SPACING
-
-                            ImGui.Text("Left Text X Offset");
-                            var healthBarTextLeftXOffset = _pluginConfiguration.HealthBarTextLeftXOffset;
-                            if (ImGui.DragInt("##HealthBarTextLeftXOffset", ref healthBarTextLeftXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
-                            {
-                                _pluginConfiguration.HealthBarTextLeftXOffset = healthBarTextLeftXOffset;
-                                _pluginConfiguration.Save();
-                            }
-                            ImGui.Text("");//SPACING
-
-                            ImGui.Text("Left Text Y Offset");
-                            var healthBarTextLeftYOffset = _pluginConfiguration.HealthBarTextLeftYOffset;
-                            if (ImGui.DragInt("##HealthBarTextLeftYOffset", ref healthBarTextLeftYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
-                            {
-                                _pluginConfiguration.HealthBarTextLeftYOffset = healthBarTextLeftYOffset;
-                                _pluginConfiguration.Save();
-                            }
+                            _pluginConfiguration.HealthBarTextLeft = healthBarTextLeft;
+                            _pluginConfiguration.Save();
                         }
-                        ImGui.EndChild();
-                        
-                        ImGui.SameLine();
-                        
-                        ImGui.BeginChild("hptxtformatrightpane", new Vector2(ImGui.GetWindowWidth()/2, 0),false,ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                        ImGui.Text("");//SPACING
+
+                        ImGui.Text("Left Text X Offset");
+                        var healthBarTextLeftXOffset = _pluginConfiguration.HealthBarTextLeftXOffset;
+                        if (ImGui.DragInt("##HealthBarTextLeftXOffset", ref healthBarTextLeftXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
-                            ImGui.Text("");//SPACING
-
-                            ImGui.Text("Right Text Format");
-                            var healthBarTextRight = _pluginConfiguration.HealthBarTextRight;
-                            if (ImGui.InputText("##HealthBarTextRight", ref healthBarTextRight, 999))
-                            {
-                                _pluginConfiguration.HealthBarTextRight = healthBarTextRight;
-                                _pluginConfiguration.Save();
-                            }
-                            ImGui.Text("");//SPACING
-
-                            ImGui.Text("Right Text X Offset");
-                            var healthBarTextRightXOffset = _pluginConfiguration.HealthBarTextRightXOffset;
-                            if (ImGui.DragInt("##HealthBarTextRightXOffset", ref healthBarTextRightXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
-                            {
-                                _pluginConfiguration.HealthBarTextRightXOffset = healthBarTextRightXOffset;
-                                _pluginConfiguration.Save();
-                            }
-                            ImGui.Text("");//SPACING
-
-                            ImGui.Text("Right Text Y Offset");
-                            var healthBarTextRightYOffset = _pluginConfiguration.HealthBarTextRightYOffset;
-                            if (ImGui.DragInt("##HealthBarTextRightYOffset", ref healthBarTextRightYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
-                            {
-                                _pluginConfiguration.HealthBarTextRightYOffset = healthBarTextRightYOffset;
-                                _pluginConfiguration.Save();
-                            }
+                            _pluginConfiguration.HealthBarTextLeftXOffset = healthBarTextLeftXOffset;
+                            _pluginConfiguration.Save();
                         }
-                        ImGui.EndChild();
-                        
+                        ImGui.Text("");//SPACING
+
+                        ImGui.Text("Left Text Y Offset");
+                        var healthBarTextLeftYOffset = _pluginConfiguration.HealthBarTextLeftYOffset;
+                        if (ImGui.DragInt("##HealthBarTextLeftYOffset", ref healthBarTextLeftYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
+                        {
+                            _pluginConfiguration.HealthBarTextLeftYOffset = healthBarTextLeftYOffset;
+                            _pluginConfiguration.Save();
+                        }
                     }
                     ImGui.EndChild();
-                    
 
+                    ImGui.SameLine();
+
+                    ImGui.BeginChild("hptxtformatrightpane", new Vector2(ImGui.GetWindowWidth() / 2, 0), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                    {
+                        ImGui.Text("");//SPACING
+
+                        ImGui.Text("Right Text Format");
+                        var healthBarTextRight = _pluginConfiguration.HealthBarTextRight;
+                        if (ImGui.InputText("##HealthBarTextRight", ref healthBarTextRight, 999))
+                        {
+                            _pluginConfiguration.HealthBarTextRight = healthBarTextRight;
+                            _pluginConfiguration.Save();
+                        }
+                        ImGui.Text("");//SPACING
+
+                        ImGui.Text("Right Text X Offset");
+                        var healthBarTextRightXOffset = _pluginConfiguration.HealthBarTextRightXOffset;
+                        if (ImGui.DragInt("##HealthBarTextRightXOffset", ref healthBarTextRightXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
+                        {
+                            _pluginConfiguration.HealthBarTextRightXOffset = healthBarTextRightXOffset;
+                            _pluginConfiguration.Save();
+                        }
+                        ImGui.Text("");//SPACING
+
+                        ImGui.Text("Right Text Y Offset");
+                        var healthBarTextRightYOffset = _pluginConfiguration.HealthBarTextRightYOffset;
+                        if (ImGui.DragInt("##HealthBarTextRightYOffset", ref healthBarTextRightYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
+                        {
+                            _pluginConfiguration.HealthBarTextRightYOffset = healthBarTextRightYOffset;
+                            _pluginConfiguration.Save();
+                        }
+                    }
+                    ImGui.EndChild();
+
+                }
+                ImGui.EndChild();
                 ImGui.EndChild();
 
             }
             ImGui.EndGroup();
             ImGui.EndGroup();
 
-        } 
+        }
+
         private void DrawIndividualUnitFramesTargetConfig(){
                 
             bool disabled = true;
