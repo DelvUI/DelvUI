@@ -87,8 +87,9 @@ namespace DelvUI.Config
 
         public void Draw()
         {
-            if (DrawConfigWindow)
+            if (DrawConfigWindow) {
                 ConfigBaseNode.Draw();
+            }
         }
 
         public void LoadConfigurations()
