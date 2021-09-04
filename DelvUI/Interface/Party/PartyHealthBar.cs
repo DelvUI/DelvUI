@@ -28,12 +28,10 @@ namespace DelvUI.Interface.Party {
         public PartyHealthBar(PluginConfiguration pluginConfiguration, PartyHudConfig config) {
             _pluginConfiguration = pluginConfiguration;
             _config = config;
-
-            color = pluginConfiguration.NPCColorMap["friendly"];
         }
 
         public void UpdateColor() {
-            color = _pluginConfiguration.NPCColorMap["friendly"];
+            color = _config.SortConfig.GenericRoleColor.Map;
             if (Member == null) {
                 return;
             }

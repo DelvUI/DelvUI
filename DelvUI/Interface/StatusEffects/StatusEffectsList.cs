@@ -82,8 +82,7 @@ namespace DelvUI.Interface.StatusEffects {
                 Config.MaxSize,
                 Config.IconConfig.Size,
                 count,
-                (int)Config.IconPadding.X,
-                (int)Config.IconPadding.Y,
+                Config.IconPadding,
                 Config.FillRowsFirst,
                 out _rowCount,
                 out _colCount

@@ -1,41 +1,35 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.Internal;
 using Dalamud.Plugin;
-using DelvUI.Config;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using PartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
-
 
 namespace DelvUI.Interface.Party {
     public unsafe class PartyManager {
         #region Singleton
         private static PartyManager _instance = null;
         private DalamudPluginInterface _pluginInterface;
-        private PluginConfiguration _pluginConfiguration;
         private PartyHudConfig _config;
 
-        private PartyManager(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration, PartyHudConfig config) {
+        private PartyManager(DalamudPluginInterface pluginInterface, PartyHudConfig config) {
             _pluginInterface = pluginInterface;
             _pluginInterface.Framework.OnUpdateEvent += FrameworkOnOnUpdateEvent;
 
-            _pluginConfiguration = pluginConfiguration;
-            _pluginConfiguration.ConfigChangedEvent += OnConfigChanged;
-
             _config = config;
-
-            _lastSortingMode = config.SortConfig.Mode;
-            UpdatePreview(true);
+            _config.PropertyChanged += OnConfigPropertyChanged;
+            _config.SortConfig.PropertyChanged += OnSortConfigPropertyChanged;
         }
 
         ~PartyManager() {
             _pluginInterface.Framework.OnUpdateEvent -= FrameworkOnOnUpdateEvent;
-            _pluginConfiguration.ConfigChangedEvent -= OnConfigChanged;
+            _config.PropertyChanged -= OnConfigPropertyChanged;
         }
 
-        public static void Initialize(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration, PartyHudConfig config) {
-            _instance = new PartyManager(pluginInterface, pluginConfiguration, config);
+        public static void Initialize(DalamudPluginInterface pluginInterface, PartyHudConfig config) {
+            _instance = new PartyManager(pluginInterface, config);
         }
 
         public static PartyManager Instance => _instance;
@@ -46,9 +40,6 @@ namespace DelvUI.Interface.Party {
         public uint MemberCount => (uint)_groupMembers.Count;
 
         public event EventHandler<EventArgs> MembersChangedEvent;
-
-        private bool _lastPreview;
-        private PartySortingMode _lastSortingMode;
 
         public bool isInParty {
             get {
@@ -95,17 +86,18 @@ namespace DelvUI.Interface.Party {
             }
         }
 
-        private void OnConfigChanged(object sender, EventArgs args) {
-            UpdatePreview(false);
-            UpdateSortingMode();
+        private void OnConfigPropertyChanged(object sender, PropertyChangedEventArgs args) {
+            if (args.PropertyName == "Preview") {
+                UpdatePreview();
+            }
         }
 
-        private void UpdatePreview(bool forced) {
-            if (!forced && _lastPreview == _config.Preview) {
+        private void UpdatePreview() {
+            if (!_config.Preview) {
                 return;
             }
-            _lastPreview = _config.Preview;
 
+            // fill list with fake members for UI testing
             _groupMembers.Clear();
 
             if (_config.Preview) {
@@ -120,12 +112,14 @@ namespace DelvUI.Interface.Party {
                 MembersChangedEvent(this, null);
             }
         }
-        private void UpdateSortingMode() {
-            if (_lastSortingMode == _config.SortConfig.Mode) {
-                return;
-            }
-            _lastSortingMode = _config.SortConfig.Mode;
 
+        private void OnSortConfigPropertyChanged(object sender, PropertyChangedEventArgs args) {
+            if (args.PropertyName == "Mode") {
+                UpdateSortingMode();
+            }
+        }
+
+        private void UpdateSortingMode() {
             PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortConfig.Mode);
 
             if (MembersChangedEvent != null) {

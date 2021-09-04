@@ -92,7 +92,7 @@ namespace DelvUI.Interface.Party {
             var statusEffectCount = FakeGroupMember.RNG.Next(1, 5);
             StatusEffects = new StatusEffect[statusEffectCount];
 
-            for (int i = 0; i < statusEffectCount, i++) {
+            for (int i = 0; i < statusEffectCount; i++) {
                 var fakeEffect = new StatusEffect();
                 fakeEffect.Duration = FakeGroupMember.RNG.Next(1, 30);
                 fakeEffect.EffectId = (short)FakeGroupMember.RNG.Next(1, 200);

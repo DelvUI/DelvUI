@@ -8,6 +8,19 @@ namespace DelvUI.Helpers {
             Vector2 maxSize,
             Vector2 itemSize,
             uint count,
+            Vector2 padding,
+            bool fillRowsFirst,
+            out uint rowCount,
+            out uint colCount
+        ) {
+
+            CalculateLayout(maxSize, itemSize, count, (int)padding.X, (int)padding.Y, fillRowsFirst, out rowCount, out colCount);
+        }
+
+        public static void CalculateLayout(
+            Vector2 maxSize,
+            Vector2 itemSize,
+            uint count,
             int horizontalPadding,
             int verticalPadding,
             bool fillRowsFirst,

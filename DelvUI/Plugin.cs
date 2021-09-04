@@ -67,7 +67,7 @@ namespace DelvUI {
                 }
             );
 
-            PartyManager.Initialize(pluginInterface, _pluginConfiguration, _pluginConfiguration.PartyHudConfig);
+            PartyManager.Initialize(pluginInterface, _pluginConfiguration.PartyHudConfig);
             TexturesCache.Initialize(pluginInterface);
             Resolver.Initialize();
                         

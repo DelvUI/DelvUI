@@ -1,14 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using ImGuiNET;
+﻿using ImGuiNET;
 using Newtonsoft.Json;
-
-
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace DelvUI.Config {
     [Serializable]
-    public abstract class PluginConfigObject {
+    public abstract class PluginConfigObject : INotifyPropertyChanged {
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "") {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
         protected bool ColorEdit4(string label, ref PluginConfigColor color) {
             var vector = color.Vector;
 
@@ -25,7 +31,6 @@ namespace DelvUI.Config {
     [Serializable]
     public class PluginConfigColor {
         [JsonIgnore] private float[] _colorMapRatios = { -.8f, -.1f, .1f };
-
         [JsonIgnore] private Vector4 _vector;
 
         public PluginConfigColor(Vector4 vector, float[] colorMapRatios = null) {
@@ -46,19 +51,14 @@ namespace DelvUI.Config {
                 }
 
                 _vector = value;
-
                 Update();
             }
         }
 
         [JsonIgnore] public uint Base { get; private set; }
-
         [JsonIgnore] public uint Background { get; private set; }
-
         [JsonIgnore] public uint LeftGradient { get; private set; }
-
         [JsonIgnore] public uint RightGradient { get; private set; }
-
         [JsonIgnore] public Dictionary<string, uint> Map { get; private set; }
 
         private void Update() {
