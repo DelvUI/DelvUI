@@ -15,14 +15,16 @@ namespace DelvUI.Config.Tree
 
         public virtual void Save(string path)
         {
-            foreach (var child in children)
+            foreach (var child in children) {
                 child.Save(ConfigurationManager.GetInstance().ConfigDirectory);
+            }
         }
 
         public virtual void Load(string path)
         {
-            foreach (var child in children)
+            foreach (var child in children) {
                 child.Load(ConfigurationManager.GetInstance().ConfigDirectory);
+            }
         }
     }
 
@@ -42,16 +44,19 @@ namespace DelvUI.Config.Tree
             ImGui.SetNextWindowSize(new Vector2(1050, 750), ImGuiCond.Appearing);
 
 
-            if (!ImGui.Begin("titlebarnew", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
+            if (!ImGui.Begin("titlebarnew", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse)) {
                 return;
-            
+            }
+
             ImGui.BeginGroup(); // Middle section
             {
                 ImGui.BeginGroup(); // Left
                 {
                     var delvUiBanner = ConfigurationManager.GetInstance().BannerImage;
-                    if (delvUiBanner != null)
+                    if (delvUiBanner != null) {
                         ImGui.Image(delvUiBanner.ImGuiHandle, new Vector2(delvUiBanner.Width, delvUiBanner.Height));
+                    }
+
                     ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
                     
                     foreach (var selectionNode in children)
@@ -59,8 +64,9 @@ namespace DelvUI.Config.Tree
                         if (ImGui.Selectable(selectionNode.Name, selectionNode.Selected))
                         {
                             selectionNode.Selected = true;
-                            foreach (var otherNode in children.FindAll(x => x != selectionNode))
+                            foreach (var otherNode in children.FindAll(x => x != selectionNode)) {
                                 otherNode.Selected = false;
+                            }
                         }
                     }
                     
@@ -123,14 +129,16 @@ namespace DelvUI.Config.Tree
 
         public override void Load(string path)
         {
-            foreach (var child in children)
+            foreach (var child in children) {
                 child.Load(path);
+            }
         }
 
         public override void Save(string path)
         {
-            foreach (var child in children)
+            foreach (var child in children) {
                 child.Save(path);
+            }
         }
 
         public ConfigPageNode GetOrAddConfig(PluginConfigObject configObject)
@@ -173,8 +181,9 @@ namespace DelvUI.Config.Tree
 
         public void Draw(ref bool changed)
         {
-            if (!Selected)
+            if (!Selected) {
                 return;
+            }
 
             ImGui.BeginChild("item view",new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
             {
@@ -182,7 +191,10 @@ namespace DelvUI.Config.Tree
                 {
                     foreach (var subSectionNode in children)
                     {
-                        if (!ImGui.BeginTabItem(subSectionNode.Name)) continue;
+                        if (!ImGui.BeginTabItem(subSectionNode.Name)) {
+                            continue;
+                        }
+
                         ImGui.BeginChild("subconfig value", new Vector2(0, 0), true);
                         subSectionNode.Draw(ref changed);
                         ImGui.EndChild();
@@ -271,7 +283,10 @@ namespace DelvUI.Config.Tree
                     {
                         if (subSectionNode is NestedSubSectionNode)
                         {
-                            if (!ImGui.BeginTabItem(subSectionNode.Name)) continue;
+                            if (!ImGui.BeginTabItem(subSectionNode.Name)) {
+                                continue;
+                            }
+
                             ImGui.BeginChild("subconfig" + Depth + " value", new Vector2(0, 0), true);
                             subSectionNode.Draw(ref changed);
                             ImGui.EndChild();
@@ -311,9 +326,10 @@ namespace DelvUI.Config.Tree
             {
                 if (attribute is SubSectionAttribute subSectionAttribute)
                 {
-                    if (subSectionAttribute.Depth != Depth + 1)
+                    if (subSectionAttribute.Depth != Depth + 1) {
                         continue;
-                    
+                    }
+
                     foreach (var subSectionNode in children)
                     {
                         if (subSectionNode.Name == subSectionAttribute.SubSectionName)
@@ -332,8 +348,9 @@ namespace DelvUI.Config.Tree
             
             foreach (var subSectionNode in children)
             {
-                if (subSectionNode.Name == configObject.GetType().FullName && subSectionNode is ConfigPageNode node)
+                if (subSectionNode.Name == configObject.GetType().FullName && subSectionNode is ConfigPageNode node) {
                     return node;
+                }
             }
             ConfigPageNode configPageNode = new ConfigPageNode();
             configPageNode.ConfigObject = configObject;
