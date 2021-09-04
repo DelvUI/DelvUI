@@ -864,13 +864,12 @@ namespace DelvUI.Interface {
 
                     break;
 
-                case ObjectKind.BattleNpc: {
+                case ObjectKind.BattleNpc:
                     if (!Utils.IsHostileMemory((BattleNpc)actor)) {
                         colors = PluginConfiguration.NPCColorMap["friendly"];
                     }
 
                     break;
-                }
             }
 
             return colors;
