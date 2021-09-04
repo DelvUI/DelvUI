@@ -98,7 +98,9 @@ namespace DelvUI.Interface {
             PluginConfiguration.JobColorMap.TryGetValue(PluginInterface.ClientState.LocalPlayer.ClassJob.Id, out var colors);
             colors ??= PluginConfiguration.NPCColorMap["friendly"];
 
-            if (PluginConfiguration.CustomHealthBarColorEnabled) colors = PluginConfiguration.MiscColorMap["customhealth"];
+            if (PluginConfiguration.CustomHealthBarColorEnabled) {
+                colors = PluginConfiguration.MiscColorMap["customhealth"];
+            }
 
 
             var drawList = ImGui.GetWindowDrawList();

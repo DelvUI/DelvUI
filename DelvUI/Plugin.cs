@@ -170,7 +170,7 @@ namespace DelvUI {
                 //Tanks
                 Jobs.DRK => new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.GNB => new GunbreakerHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.WAR => new WarriorHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.WAR => new WarriorHudWindow(_pluginInterface, _pluginConfiguration, _pluginConfiguration.WARConfig),
                 Jobs.PLD => new PaladinHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //Healers
