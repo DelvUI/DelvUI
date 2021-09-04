@@ -4,7 +4,7 @@
 csharp_prefer_braces = true:error
 
 # Microsoft .NET properties
-csharp_new_line_before_open_brace = anonymous_types,control_blocks,object_collection_array_initalizers
+csharp_new_line_before_open_brace = anonymous_types,object_collection_array_initalizers
 csharp_preferred_modifier_order = public, private, protected, internal, new, abstract, virtual, sealed, override, static, readonly, extern, unsafe, volatile, async:warning
 csharp_style_var_elsewhere = true:warning
 csharp_style_var_for_built_in_types = true:warning
