@@ -32,6 +32,8 @@ namespace DelvUI
         {
             _pluginInterface = pluginInterface;
 
+            ConfigurationManager.Initialize(pluginInterface);
+
             // load a configuration with default parameters and write it to file
             _pluginConfiguration = new PluginConfiguration();
             PluginConfiguration.WriteConfig("default", _pluginInterface, _pluginConfiguration);
@@ -69,6 +71,9 @@ namespace DelvUI
                     ShowInHelp = true
                 }
             );
+
+            _pluginInterface.CommandManager.AddHandler("/pdelvuinewconfig", new CommandInfo(NewConfigMenuCommand));
+            _pluginInterface.CommandManager.AddHandler("/pdelvuireloadconfig", new CommandInfo(ReloadConfigCommand));
 
             TexturesCache.Initialize(pluginInterface);
             Resolver.Initialize();
@@ -154,6 +159,16 @@ namespace DelvUI
             }
         }
 
+        private void NewConfigMenuCommand(string command, string arguments)
+        {
+            ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
+        }
+
+        private void ReloadConfigCommand(string command, string arguments)
+        {
+            ConfigurationManager.GetInstance().LoadConfigurations();
+        }
+
         private void Draw()
         {
             var hudState = _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene]
@@ -165,6 +180,8 @@ namespace DelvUI
 
             _pluginInterface.UiBuilder.OverrideGameCursor = false;
             _configurationWindow.Draw();
+
+            ConfigurationManager.GetInstance().Draw();
 
             if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id)
             {
@@ -216,7 +233,7 @@ namespace DelvUI
                 //Caster DPS
                 Jobs.RDM => new RedMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SMN => new SummonerHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.BLM => new BlackMageHudWindow(_pluginInterface, _pluginConfiguration, _pluginConfiguration.BLMConfig),
+                Jobs.BLM => new BlackMageHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //Low jobs
                 Jobs.MRD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
@@ -261,12 +278,17 @@ namespace DelvUI
 
             _configurationWindow.IsVisible = false;
 
+            ConfigurationManager.GetInstance().DrawConfigWindow = false;
+            ConfigurationManager.GetInstance().Dispose();
+
             if (_hudWindow != null)
             {
                 _hudWindow.IsVisible = false;
             }
 
             _pluginInterface.CommandManager.RemoveHandler("/pdelvui");
+            _pluginInterface.CommandManager.RemoveHandler("/pdelvuinewconfig");
+            _pluginInterface.CommandManager.RemoveHandler("/pdelvuireloadconfig");
             _pluginInterface.UiBuilder.OnBuildUi -= Draw;
             _pluginInterface.UiBuilder.OnBuildFonts -= BuildFont;
             _pluginInterface.UiBuilder.OnOpenConfigUi -= OpenConfigUi;
