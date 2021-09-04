@@ -5,13 +5,15 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
+using DelvUI.Config;
 using DelvUI.GameStructs;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
-using DelvUI.Config;
 
 namespace DelvUI.Interface {
     public class DancerHudWindow : HudWindow {
+        public DancerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
+
         public override uint JobId => 38;
 
         private int BaseXOffset => PluginConfiguration.DNCBaseXOffset;
@@ -32,16 +34,16 @@ namespace DelvUI.Interface {
         private int FeatherYOffset => PluginConfiguration.DNCFeatherYOffset;
         private int FeatherPadding => PluginConfiguration.DNCFeatherPadding;
         private bool BuffEnabled => PluginConfiguration.DNCBuffEnabled;
-        private bool TechnicalBarEnabled  => PluginConfiguration.DNCTechnicalBarEnabled;
-        private bool TechnicalTextEnabled  => PluginConfiguration.DNCTechnicalTextEnabled;
-        private bool DevilmentBarEnabled  => PluginConfiguration.DNCDevilmentBarEnabled;
-        private bool DevilmentTextEnabled  => PluginConfiguration.DNCDevilmentTextEnabled;
+        private bool TechnicalBarEnabled => PluginConfiguration.DNCTechnicalBarEnabled;
+        private bool TechnicalTextEnabled => PluginConfiguration.DNCTechnicalTextEnabled;
+        private bool DevilmentBarEnabled => PluginConfiguration.DNCDevilmentBarEnabled;
+        private bool DevilmentTextEnabled => PluginConfiguration.DNCDevilmentTextEnabled;
         private int BuffHeight => PluginConfiguration.DNCBuffHeight;
         private int BuffWidth => PluginConfiguration.DNCBuffWidth;
         private int BuffXOffset => PluginConfiguration.DNCBuffXOffset;
         private int BuffYOffset => PluginConfiguration.DNCBuffYOffset;
-        private bool StandardBarEnabled  => PluginConfiguration.DNCStandardEnabled;
-        private bool StandardTextEnabled  => PluginConfiguration.DNCStandardText;
+        private bool StandardBarEnabled => PluginConfiguration.DNCStandardEnabled;
+        private bool StandardTextEnabled => PluginConfiguration.DNCStandardText;
         private int StandardHeight => PluginConfiguration.DNCStandardHeight;
         private int StandardWidth => PluginConfiguration.DNCStandardWidth;
         private int StandardXOffset => PluginConfiguration.DNCStandardXOffset;
@@ -62,16 +64,16 @@ namespace DelvUI.Interface {
         private int ProcXOffset => PluginConfiguration.DNCProcXOffset;
         private int ProcYOffset => PluginConfiguration.DNCProcYOffset;
 
-        private Dictionary<string, uint> EspritColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000]; 
-        private Dictionary<string, uint> FeatherColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 1]; 
-        private Dictionary<string, uint> FlourishingProcColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 2]; 
-        private Dictionary<string, uint> StandardFinishColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 3]; 
-        private Dictionary<string, uint> TechnicalFinishColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 4]; 
-        private Dictionary<string, uint> CurrentStepColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 5]; 
-        private Dictionary<string, uint> StepEmboiteColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 6]; 
-        private Dictionary<string, uint> StepEntrechatColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 7]; 
-        private Dictionary<string, uint> StepJeteColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 8]; 
-        private Dictionary<string, uint> StepPirouetteColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 9]; 
+        private Dictionary<string, uint> EspritColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000];
+        private Dictionary<string, uint> FeatherColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 1];
+        private Dictionary<string, uint> FlourishingProcColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 2];
+        private Dictionary<string, uint> StandardFinishColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 3];
+        private Dictionary<string, uint> TechnicalFinishColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 4];
+        private Dictionary<string, uint> CurrentStepColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 5];
+        private Dictionary<string, uint> StepEmboiteColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 6];
+        private Dictionary<string, uint> StepEntrechatColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 7];
+        private Dictionary<string, uint> StepJeteColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 8];
+        private Dictionary<string, uint> StepPirouetteColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 9];
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 10];
         private Dictionary<string, uint> DanceReadyColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 11];
         private Dictionary<string, uint> DevilmentColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 12];
@@ -80,65 +82,70 @@ namespace DelvUI.Interface {
         private Dictionary<string, uint> FlourishingWindmillColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 15];
         private Dictionary<string, uint> FlourishingShowerColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 16];
 
-        public DancerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
-
         protected override void Draw(bool _) {
-            if (EspritEnabled)
+            if (EspritEnabled) {
                 DrawEspritBar();
-            if (ProcEnabled)
+            }
+
+            if (ProcEnabled) {
                 DrawProcBar();
-            if (FeatherEnabled)
+            }
+
+            if (FeatherEnabled) {
                 DrawFeathersBar();
-            if (BuffEnabled)
+            }
+
+            if (BuffEnabled) {
                 DrawBuffBar();
-            if (StepEnabled)
+            }
+
+            if (StepEnabled) {
                 DrawStepBar();
-            if (StandardBarEnabled)
+            }
+
+            if (StandardBarEnabled) {
                 DrawStandardBar();
+            }
         }
 
-        protected override void DrawPrimaryResourceBar() 
-        {
-        }
+        protected override void DrawPrimaryResourceBar() { }
 
         private void DrawEspritBar() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
-            
+
             var xPos = CenterX + BaseXOffset - EspritXOffset;
             var yPos = CenterY + BaseYOffset + EspritYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, EspritHeight, EspritWidth)
-                .SetChunks(2)
-                .SetChunkPadding(EspritPadding)
-                .SetBackgroundColor(EmptyColor["background"])
-                .AddInnerBar(gauge.Esprit, 100, EspritColor, EmptyColor);
+                                    .SetChunks(2)
+                                    .SetChunkPadding(EspritPadding)
+                                    .SetBackgroundColor(EmptyColor["background"])
+                                    .AddInnerBar(gauge.Esprit, 100, EspritColor, EmptyColor);
 
-            if (EspritText)
-            {
+            if (EspritText) {
                 builder.SetTextMode(BarTextMode.EachChunk)
-                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
-        
+
         private void DrawFeathersBar() {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var flourishingBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1820 or 2021);
             var gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
-            
+
             var xPos = CenterX + BaseXOffset - FeatherXOffset;
             var yPos = CenterY + BaseYOffset + FeatherYOffset;
-            
-            var builder = BarBuilder.Create(xPos, yPos, FeatherHeight, FeatherWidth)
-                .SetChunks(4)
-                .SetBackgroundColor(EmptyColor["background"])
-                .SetChunkPadding(FeatherPadding)
-                .AddInnerBar(gauge.NumFeathers, 4, FeatherColor);
 
-            if (FlourishingGlowEnabled && flourishingBuff.Any())
-            {
+            var builder = BarBuilder.Create(xPos, yPos, FeatherHeight, FeatherWidth)
+                                    .SetChunks(4)
+                                    .SetBackgroundColor(EmptyColor["background"])
+                                    .SetChunkPadding(FeatherPadding)
+                                    .AddInnerBar(gauge.NumFeathers, 4, FeatherColor);
+
+            if (FlourishingGlowEnabled && flourishingBuff.Any()) {
                 builder.SetGlowColor(FlourishingProcColor["base"]);
             }
 
@@ -146,50 +153,56 @@ namespace DelvUI.Interface {
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private unsafe void DrawStepBar()
-        {
+        private unsafe void DrawStepBar() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
-            DNCGauge* gaugePtr = &gauge;
-            OpenDNCGauge openGauge = *(OpenDNCGauge*) gaugePtr;
-            
-            if (!openGauge.IsDancing())
+            var gaugePtr = &gauge;
+            var openGauge = *(OpenDNCGauge*)gaugePtr;
+
+            if (!openGauge.IsDancing()) {
                 return;
+            }
 
             byte chunkCount = 0;
-            List<Dictionary<string, uint>> chunkColors = new List<Dictionary<string, uint>>();
-            List<bool> glowChunks = new List<bool>();
+            var chunkColors = new List<Dictionary<string, uint>>();
+            var glowChunks = new List<bool>();
             var danceReady = true;
 
-            for (var i = 0; i < 4; i++)
-            {
-                DNCStep step = (DNCStep) openGauge.stepOrder[i];
-                if (step == DNCStep.None)
+            for (var i = 0; i < 4; i++) {
+                var step = (DNCStep)openGauge.stepOrder[i];
+
+                if (step == DNCStep.None) {
                     break;
+                }
 
                 chunkCount++;
-                if (openGauge.NumCompleteSteps == i)
-                {
+
+                if (openGauge.NumCompleteSteps == i) {
                     glowChunks.Add(true);
                     danceReady = false;
                 }
-                else
-                {
+                else {
                     glowChunks.Add(false);
                 }
 
-                switch (step)
-                {
+                switch (step) {
                     case DNCStep.Emboite:
                         chunkColors.Add(StepEmboiteColor);
+
                         break;
+
                     case DNCStep.Entrechat:
                         chunkColors.Add(StepEntrechatColor);
+
                         break;
+
                     case DNCStep.Jete:
                         chunkColors.Add(StepJeteColor);
+
                         break;
+
                     case DNCStep.Pirouette:
                         chunkColors.Add(StepPirouetteColor);
+
                         break;
                 }
             }
@@ -198,27 +211,24 @@ namespace DelvUI.Interface {
             var yPos = CenterY + BaseYOffset + StepYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, StepHeight, StepWidth)
-                .SetChunks(chunkCount)
-                .SetChunkPadding(StepPadding)
-                .SetBackgroundColor(EmptyColor["background"])
-                .AddInnerBar(chunkCount, chunkCount, chunkColors.ToArray());
+                                    .SetChunks(chunkCount)
+                                    .SetChunkPadding(StepPadding)
+                                    .SetBackgroundColor(EmptyColor["background"])
+                                    .AddInnerBar(chunkCount, chunkCount, chunkColors.ToArray());
 
-            if (danceReady && DanceReadyGlow)
-            {
+            if (danceReady && DanceReadyGlow) {
                 builder.SetGlowColor(DanceReadyColor["base"]);
             }
-            else if (StepGlow)
-            {
+            else if (StepGlow) {
                 builder.SetGlowChunks(glowChunks.ToArray())
-                    .SetGlowColor(CurrentStepColor["base"]);
+                       .SetGlowColor(CurrentStepColor["base"]);
             }
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawBuffBar()
-        {
+        private void DrawBuffBar() {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var devilmentBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1825);
             var technicalFinishBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1822 or 2050);
@@ -228,48 +238,47 @@ namespace DelvUI.Interface {
 
             var builder = BarBuilder.Create(xPos, yPos, BuffHeight, BuffWidth).SetBackgroundColor(EmptyColor["background"]);
 
-            if (technicalFinishBuff.Any() && TechnicalBarEnabled)
-            {
+            if (technicalFinishBuff.Any() && TechnicalBarEnabled) {
                 builder.AddInnerBar(Math.Abs(technicalFinishBuff.First().Duration), 20, TechnicalFinishColor);
-                if (TechnicalTextEnabled)
-                {
-                    BarTextPosition position = DevilmentTextEnabled && DevilmentBarEnabled ? BarTextPosition.CenterLeft : BarTextPosition.CenterMiddle;
+
+                if (TechnicalTextEnabled) {
+                    var position = DevilmentTextEnabled && DevilmentBarEnabled ? BarTextPosition.CenterLeft : BarTextPosition.CenterMiddle;
+
                     builder.SetTextMode(BarTextMode.EachChunk)
-                        .SetText(position, BarTextType.Current, PluginConfiguration.DNCTechnicalFinishColor, Vector4.UnitW, null);
+                           .SetText(position, BarTextType.Current, PluginConfiguration.DNCTechnicalFinishColor, Vector4.UnitW, null);
                 }
             }
-            if (devilmentBuff.Any() && DevilmentBarEnabled)
-            {
+
+            if (devilmentBuff.Any() && DevilmentBarEnabled) {
                 builder.AddInnerBar(Math.Abs(devilmentBuff.First().Duration), 20, DevilmentColor);
-                if (DevilmentTextEnabled)
-                {
-                    BarTextPosition position = TechnicalTextEnabled && TechnicalBarEnabled ? BarTextPosition.CenterRight : BarTextPosition.CenterMiddle;
+
+                if (DevilmentTextEnabled) {
+                    var position = TechnicalTextEnabled && TechnicalBarEnabled ? BarTextPosition.CenterRight : BarTextPosition.CenterMiddle;
+
                     builder.SetTextMode(BarTextMode.EachChunk)
-                        .SetText(position, BarTextType.Current, PluginConfiguration.DNCDevilmentColor, Vector4.UnitW, null);
+                           .SetText(position, BarTextType.Current, PluginConfiguration.DNCDevilmentColor, Vector4.UnitW, null);
                 }
             }
-            
+
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawStandardBar()
-        {
+        private void DrawStandardBar() {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var standardFinishBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1821 or 2024 or 2105 or 2113);
-            
+
             var xPos = CenterX + BaseXOffset - StandardXOffset;
             var yPos = CenterY + BaseYOffset + StandardYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, StandardHeight, StandardWidth);
 
-            if (standardFinishBuff.Any())
-            {
+            if (standardFinishBuff.Any()) {
                 builder.AddInnerBar(standardFinishBuff.First().Duration, 60, StandardFinishColor);
-                if (StandardTextEnabled)
-                {
+
+                if (StandardTextEnabled) {
                     builder.SetTextMode(BarTextMode.EachChunk)
-                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                           .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
                 }
             }
 
@@ -277,8 +286,7 @@ namespace DelvUI.Interface {
             builder.SetBackgroundColor(EmptyColor["background"]).Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawProcBar()
-        {
+        private void DrawProcBar() {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var flourishingCascadeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1814);
             var flourishingFountainBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1815);
@@ -293,31 +301,31 @@ namespace DelvUI.Interface {
             var windmillBuilder = BarBuilder.Create(xPos + 2 * ProcWidth + 2 * ProcPadding, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
             var showerBuilder = BarBuilder.Create(xPos + 3 * ProcWidth + 3 * ProcPadding, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
 
-            if (flourishingCascadeBuff.Any() && ProcEnabled)
-            {
+            if (flourishingCascadeBuff.Any() && ProcEnabled) {
                 var cascadeStart = ProcTimersEnabled ? Math.Abs(flourishingCascadeBuff.First().Duration) : 20;
                 cascadeBuilder.AddInnerBar(cascadeStart, 20, FlourishingCascadeColor);
             }
-            if (flourishingFountainBuff.Any() && ProcEnabled)
-            {
+
+            if (flourishingFountainBuff.Any() && ProcEnabled) {
                 var fountainStart = ProcTimersEnabled ? Math.Abs(flourishingFountainBuff.First().Duration) : 20;
                 fountainBuilder.AddInnerBar(fountainStart, 20, FlourishingFountainColor);
             }
-            if (flourishingWindmillBuff.Any() && ProcEnabled)
-            {
+
+            if (flourishingWindmillBuff.Any() && ProcEnabled) {
                 var windmillStart = ProcTimersEnabled ? Math.Abs(flourishingWindmillBuff.First().Duration) : 20;
                 windmillBuilder.AddInnerBar(windmillStart, 20, FlourishingWindmillColor);
             }
-            if (flourishingShowerBuff.Any() && ProcEnabled)
-            {
+
+            if (flourishingShowerBuff.Any() && ProcEnabled) {
                 var showerStart = ProcTimersEnabled ? Math.Abs(flourishingShowerBuff.First().Duration) : 20;
                 showerBuilder.AddInnerBar(showerStart, 20, FlourishingShowerColor);
             }
+
             var drawList = ImGui.GetWindowDrawList();
             cascadeBuilder.Build().Draw(drawList, PluginConfiguration);
             fountainBuilder.Build().Draw(drawList, PluginConfiguration);
             windmillBuilder.Build().Draw(drawList, PluginConfiguration);
             showerBuilder.Build().Draw(drawList, PluginConfiguration);
         }
-}
+    }
 }

@@ -1,7 +1,5 @@
-﻿namespace DelvUI.Enums
-{
-    public enum DamageType
-    {
+﻿namespace DelvUI.Enums {
+    public enum DamageType {
         Unknown = 0,
         Slashing = 1,
         Piercing = 2,
@@ -9,6 +7,6 @@
         Magic = 5,
         Darkness = 6,
         Physical = 7,
-        LimitBreak = 8,
+        LimitBreak = 8
     }
 }
