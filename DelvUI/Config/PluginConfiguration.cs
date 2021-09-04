@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 namespace DelvUI.Config {
     public class PluginConfiguration : IPluginConfiguration {
         public readonly BlackMageHudConfig BLMConfig = new();
+        public readonly AstrologianHudConfig ASTConfig = new();
 
         public readonly StatusEffectsListConfig PlayerBuffListConfig = new(
             new Vector2(750, -480),
@@ -655,105 +656,8 @@ namespace DelvUI.Config {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorAST.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorAST.AdjustColor(.1f))
                 },
-                [Jobs.AST * 1000] = new() // Empty Bar Color
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
-                [Jobs.AST * 1000 + 1] = new() // Seal Color [Sun]
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTSealSunColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTSealSunColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTSealSunColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTSealSunColor.AdjustColor(.1f))
-                },
-                [Jobs.AST * 1000 + 2] = new() // Seal Color [Lunar]
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTSealLunarColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTSealLunarColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTSealLunarColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTSealLunarColor.AdjustColor(.1f))
-                },
-                [Jobs.AST * 1000 + 3] = new() // Seal Color [Celestial]
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTSealCelestialColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTSealCelestialColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTSealCelestialColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTSealCelestialColor.AdjustColor(.1f))
-                },
-                [Jobs.AST * 1000 + 4] = new() // Star
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTStarEarthlyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTStarEarthlyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTStarEarthlyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTStarEarthlyColor.AdjustColor(.1f))
-                },
-                [Jobs.AST * 1000 + 5] = new() // Star
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTStarGiantColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTStarGiantColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTStarGiantColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTStarGiantColor.AdjustColor(.1f))
-                },
-                [Jobs.AST * 1000 + 6] = new() // LightSpeed
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTLightspeedColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTLightspeedColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTLightspeedColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTLightspeedColor.AdjustColor(.1f))
-                },
-                [Jobs.AST * 1000 + 7] = new() // Dots
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTDotColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTDotColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTDotColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTDotColor.AdjustColor(.1f))
-                },
-                [Jobs.AST * 1000 + 8] = new() // Star Glow
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTStarGlowColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTStarGlowColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTStarGlowColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTStarGlowColor.AdjustColor(.1f))
-                },
-                [Jobs.AST * 1000 + 9] = new() // Divination Glow
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTDivinationGlowColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTDivinationGlowColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTDivinationGlowColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTDivinationGlowColor.AdjustColor(.1f))
-                },
-                [Jobs.AST * 1000 + 10] = new() // Draw Melee Glow
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTDrawMeleeGlowColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTDrawMeleeGlowColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTDrawMeleeGlowColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTDrawMeleeGlowColor.AdjustColor(.1f))
-                },
-                [Jobs.AST * 1000 + 11] = new() // Draw Ranged Glow
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTDrawRangedGlowColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTDrawRangedGlowColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTDrawRangedGlowColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTDrawRangedGlowColor.AdjustColor(.1f))
-                },
-                [Jobs.AST * 1000 + 12] = new() // Draw CD
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDColor.AdjustColor(.1f))
-                },
-                [Jobs.AST * 1000 + 13] = new() // Draw CD Ready
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDReadyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDReadyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDReadyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(ASTDrawCDReadyColor.AdjustColor(.1f))
-                },
-                [Jobs.MNK] = new()
+
+                [Jobs.MNK] = new Dictionary<string, uint>
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorMNK),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorMNK.AdjustColor(-10f)),
