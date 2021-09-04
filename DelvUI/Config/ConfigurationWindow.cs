@@ -9,12 +9,12 @@ namespace DelvUI.Config
 {
     public class ConfigurationWindow
     {
-        private readonly string[] _configColorMap = { "Tanks", "Healers", "Melee", "Ranged", "Casters", "NPC" };
+        private readonly string[] _configColorMap = {"Tanks", "Healers", "Melee", "Ranged", "Casters", "NPC"};
         private readonly Dictionary<string, Array> _configMap = new();
         private readonly PluginConfiguration _pluginConfiguration;
         private readonly DalamudPluginInterface _pluginInterface;
-        private readonly int _viewportHeight = (int)ImGui.GetMainViewport().Size.Y;
-        private readonly int _viewportWidth = (int)ImGui.GetMainViewport().Size.X;
+        private readonly int _viewportHeight = (int) ImGui.GetMainViewport().Size.Y;
+        private readonly int _viewportWidth = (int) ImGui.GetMainViewport().Size.X;
         private bool _changed;
         private string _exportString = "";
         private string _importString = "";
@@ -30,26 +30,26 @@ namespace DelvUI.Config
 
             _pluginConfiguration = pluginConfiguration;
             _pluginInterface = pluginInterface;
-            _configMap.Add("General", new[] { "General" });
+            _configMap.Add("General", new[] {"General"});
 
             _configMap.Add(
                 "Individual Unitframes",
-                new[] { "General", "Player", "Focus", "Target", "Target of Target" }
+                new[] {"General", "Player", "Focus", "Target", "Target of Target"}
             );
 
             //configMap.Add("Group Unitframes", new [] {"General", "Party", "8man", "24man", "Enemies"});
             _configMap.Add(
                 "Castbars",
-                new[] { "Player", "Target" }
+                new[] {"Player", "Target"}
             );
 
             _configMap.Add(
                 "Buffs and Debuffs",
-                new[] { "Player Buffs", "Player Debuffs", "Target Buffs", "Target Debuffs", "Raid/Job Buffs" }
+                new[] {"Player Buffs", "Player Debuffs", "Target Buffs", "Target Debuffs", "Raid/Job Buffs"}
             );
 
-            _configMap.Add("Job Specific Bars", new[] { "General", "Tank", "Healer", "Melee", "Ranged", "Caster" });
-            _configMap.Add("Import/Export", new[] { "General" });
+            _configMap.Add("Job Specific Bars", new[] {"General", "Tank", "Healer", "Melee", "Ranged", "Caster"});
+            _configMap.Add("Import/Export", new[] {"General"});
         }
 
         public void ToggleHud()
@@ -328,8 +328,10 @@ namespace DelvUI.Config
                             _changed |= _pluginConfiguration.TargetDebuffListConfig.Draw();
 
                             break;
+
                         case "Raid/Job Buffs":
                             DrawRaidJobBuffsConfig();
+
                             break;
                     }
 
