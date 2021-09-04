@@ -8,6 +8,7 @@ using System.Runtime.InteropServices;
 using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
+using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.Internal.Gui.Addon;
 using Dalamud.Interface;
 using Dalamud.Plugin;
@@ -20,6 +21,7 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
+using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface {
     public abstract class HudWindow {
@@ -558,7 +560,7 @@ namespace DelvUI.Interface {
                 return;
             }
 
-            if (actor is not Chara) {
+            if (actor is not Chara || actor.ObjectKind == ObjectKind.Companion) {
                 return;
             }
 
