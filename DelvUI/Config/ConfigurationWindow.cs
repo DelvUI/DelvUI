@@ -1,11 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using ImGuiNET;
 using DelvUI.Interface.StatusEffects;
 using DelvUI.Interface.Party;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
 
 namespace DelvUI.Config {
     public class ConfigurationWindow {
@@ -44,7 +44,7 @@ namespace DelvUI.Config {
 
             _configMap.Add(
                 "Buffs and Debuffs",
-                new[] { "Player Buffs", "Player Debuffs", "Target Buffs", "Target Debuffs" }
+                new[] { "Player Buffs", "Player Debuffs", "Target Buffs", "Target Debuffs", "Raid/Job Buffs" }
             );
 
             _configMap.Add("Job Specific Bars", new[] { "General", "Tank", "Healer", "Melee", "Ranged", "Caster" });
@@ -310,6 +310,9 @@ namespace DelvUI.Config {
                         case "Target Debuffs":
                             _changed |= _pluginConfiguration.TargetDebuffListConfig.Draw();
 
+                            break;
+                        case "Raid/Job Buffs":
+                            DrawRaidJobBuffsConfig();
                             break;
                     }
 
@@ -1738,6 +1741,12 @@ namespace DelvUI.Config {
             _changed |= ImGui.Checkbox("Show Target Action Name", ref _pluginConfiguration.ShowTargetActionName);
             _changed |= ImGui.Checkbox("Show Target Cast Time", ref _pluginConfiguration.ShowTargetCastTime);
             _changed |= ImGui.Checkbox("Show Interruptable Casts", ref _pluginConfiguration.ShowTargetInterrupt);
+        }
+
+        private void DrawRaidJobBuffsConfig() {
+            _changed |= ImGui.Checkbox("Show Raid wide buff icons", ref _pluginConfiguration.ShowRaidWideBuffIcons);
+            _changed |= ImGui.Checkbox("Show Job specific buff icons", ref _pluginConfiguration.ShowJobSpecificBuffIcons);
+            _changed |= _pluginConfiguration.RaidJobBuffListConfig.Draw();
         }
 
         private void DrawJobsGeneralConfig() {

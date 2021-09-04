@@ -1,18 +1,18 @@
-﻿using System;
+﻿using Dalamud.Configuration;
+using Dalamud.Plugin;
+using DelvUI.Interface;
+using DelvUI.Interface.StatusEffects;
+using DelvUI.Interface.Party;
+using DelvUI.Helpers;
+using ImGuiNET;
+using ImGuiScene;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Numerics;
 using System.Text;
-using Dalamud.Configuration;
-using Dalamud.Plugin;
-using DelvUI.Interface;
-using DelvUI.Interface.StatusEffects;
-using ImGuiNET;
-using ImGuiScene;
-using Newtonsoft.Json;
-using DelvUI.Interface.Party;
-using DelvUI.Helpers;
 
 namespace DelvUI.Config {
     public class PluginConfiguration : IPluginConfiguration {
@@ -48,6 +48,11 @@ namespace DelvUI.Config {
             true,
             true,
             GrowthDirections.Right | GrowthDirections.Up
+        );
+
+        public StatusEffectsListConfig RaidJobBuffListConfig = new(
+            new Vector2(0, 300), true, false, false, GrowthDirections.Out | GrowthDirections.Right,
+            new StatusEffectIconConfig(new Vector2(35, 35), true, true, false, false)
         );
 
         public PartyHudConfig PartyHudConfig = new PartyHudConfig();
@@ -204,6 +209,9 @@ namespace DelvUI.Config {
         public int TargetCastBarWidth { get; set; } = 254;
         public int TargetCastBarXOffset { get; set; }
         public int TargetCastBarYOffset { get; set; } = 320;
+
+        public bool ShowRaidWideBuffIcons = true;
+        public bool ShowJobSpecificBuffIcons = true;
 
         public int Version { get; set; }
 

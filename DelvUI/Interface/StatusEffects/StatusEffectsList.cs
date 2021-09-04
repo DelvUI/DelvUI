@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using Dalamud.Game.ClientState.Structs;
+﻿using Dalamud.Game.ClientState.Structs;
 using Dalamud.Plugin;
 using DelvUI.Helpers;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface.StatusEffects {
@@ -24,7 +24,8 @@ namespace DelvUI.Interface.StatusEffects {
         Up = 1,
         Down = 2,
         Left = 4,
-        Right = 8
+        Right = 8,
+        Out = 16,
     }
 
     public class StatusEffectsList {
@@ -49,7 +50,7 @@ namespace DelvUI.Interface.StatusEffects {
                 return GrowthDirections.Right | GrowthDirections.Down;
             }
 
-            // validate RIGHT & LEFT
+            // validate Right & Left
             if ((directions & GrowthDirections.Right) == 0 && (directions & GrowthDirections.Left) == 0) {
                 return directions | GrowthDirections.Right;
             }
@@ -58,13 +59,21 @@ namespace DelvUI.Interface.StatusEffects {
                 return directions & ~GrowthDirections.Left;
             }
 
-            // validate DOWN & UP
+            // validate Down & Up
             if ((directions & GrowthDirections.Down) == 0 && (directions & GrowthDirections.Up) == 0) {
                 return directions | GrowthDirections.Down;
             }
 
             if ((directions & GrowthDirections.Down) != 0 && (directions & GrowthDirections.Up) != 0) {
                 return directions & ~GrowthDirections.Up;
+            }
+
+            // validate Out
+            if ((directions & GrowthDirections.Out) != 0 && (directions & GrowthDirections.Left) != 0) {
+                return GrowthDirections.Out | GrowthDirections.Right;
+            }
+            if ((directions & GrowthDirections.Out) != 0 && (directions & GrowthDirections.Up) != 0) {
+                return GrowthDirections.Out | GrowthDirections.Down;
             }
 
             return directions;
@@ -91,7 +100,7 @@ namespace DelvUI.Interface.StatusEffects {
             return count;
         }
 
-        private List<StatusEffectData> StatusEffectsData() {
+        private List<StatusEffectData> StatusEffectsData(List<uint> filterBuffs) {
             var list = new List<StatusEffectData>();
 
             if (Actor == null) {
@@ -138,16 +147,32 @@ namespace DelvUI.Interface.StatusEffects {
                 list.Add(new StatusEffectData(status, row));
             }
 
-            return list;
+            if (filterBuffs.Count == 0) {
+                return list;
+            }
+
+            // Always adhere to the priority of buffs set by filterBuffs.
+            var toReturn = new List<StatusEffectData>();
+            foreach (var buffId in filterBuffs) {
+                var idx = list.FindIndex(s => (uint)s.StatusEffect.EffectId == buffId);
+                if (idx >= 0) {
+                    toReturn.Add(list[idx]);
+                }
+            }
+            return toReturn;
         }
 
         public void Draw() {
+            Draw(new List<uint>());
+        }
+
+        public void Draw(List<uint> filterBuffs) {
             if (!Config.Enabled || Actor == null) {
                 return;
             }
 
             // calculate layout
-            var list = StatusEffectsData();
+            var list = StatusEffectsData(filterBuffs);
             var count = CalculateLayout(list);
 
             // validate growth directions
@@ -182,12 +207,22 @@ namespace DelvUI.Interface.StatusEffects {
 
             for (var i = 0; i < count; i++) {
                 var statusEffectData = list[i];
-
-                // calculate icon position
-                var directionX = (directions & GrowthDirections.Right) != 0 ? 1 : -1;
-                var directionY = (directions & GrowthDirections.Down) != 0 ? 1 : -1;
-                var offsetX = directionX == 1 ? 0 : -Config.IconConfig.Size.X;
-                var offsetY = directionY == 1 ? 0 : -Config.IconConfig.Size.Y;
+                int directionX;
+                int directionY;
+                float offsetX;
+                float offsetY;
+                if ((directions & GrowthDirections.Out) != 0) {
+                    directionX = 1;
+                    directionY = 1;
+                    offsetX = (directions & GrowthDirections.Right) != 0 ? -1 * (Config.IconConfig.Size.X + Config.IconPadding.X) * list.Count / 2 : 0;
+                    offsetY = (directions & GrowthDirections.Down) != 0 ? -1 * (Config.IconConfig.Size.Y + Config.IconPadding.Y) * list.Count / 2 : 0;
+                }
+                else {
+                    directionX = (directions & GrowthDirections.Right) != 0 ? 1 : -1;
+                    directionY = (directions & GrowthDirections.Down) != 0 ? 1 : -1;
+                    offsetX = directionX == 1 ? 0 : -Config.IconConfig.Size.X;
+                    offsetY = directionY == 1 ? 0 : -Config.IconConfig.Size.Y;
+                }
 
                 var pos = new Vector2(
                     origin.X + offsetX + Config.IconConfig.Size.X * col * directionX + Config.IconPadding.X * col * directionX,
@@ -199,19 +234,17 @@ namespace DelvUI.Interface.StatusEffects {
 
                 // rows / columns
                 if (Config.FillRowsFirst) {
-                    col = col + 1;
-
+                    col += 1;
                     if (col >= _colCount) {
                         col = 0;
-                        row = row + 1;
+                        row += 1;
                     }
                 }
                 else {
-                    row = row + 1;
-
+                    row += 1;
                     if (row >= _rowCount) {
                         row = 0;
-                        col = col + 1;
+                        col += 1;
                     }
                 }
             }
