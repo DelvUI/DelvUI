@@ -141,15 +141,11 @@ namespace DelvUI {
             }
         }
 
-        private void NewConfigMenuCommand(string command, string arguments)
-        {
+        private void NewConfigMenuCommand(string command, string arguments) {
             ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
         }
 
-        private void ReloadConfigCommand(string command, string arguments)
-        {
-            ConfigurationManager.GetInstance().LoadConfigurations();
-        }
+        private void ReloadConfigCommand(string command, string arguments) { ConfigurationManager.GetInstance().LoadConfigurations(); }
 
         private void Draw() {
             var hudState = _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene]
