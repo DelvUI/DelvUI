@@ -147,7 +147,7 @@ namespace DelvUI.Interface {
                 changed |= ImGui.Checkbox("Show##bestGauge", ref ShowBeastGauge);
                 changed |= ImGui.Checkbox("Show Text ##bestGauge", ref ShowBeastGaugeText);
                 changed |= ImGui.DragFloat2("Position (X, Y) ##bestGauge", ref BeastGaugePosition, 1f, -4000, 4000);
-                changed |= ImGui.DragFloat2("Size (Width, Height) ##bestGauge", ref BeastGaugeSize, 1f, 42, 4000);
+                changed |= ImGui.DragFloat2("Size (Width, Height) ##bestGauge", ref BeastGaugeSize, 1f, 20, 4000);
                 changed |= ImGui.DragFloat("Chunk Padding ##bestGauge", ref BeastGaugePadding, 1f, 0, 4000);
 
                 changed |= ColorEdit4("Beast Gauge Fill Color ##color", ref BeastGaugeFillColor);
