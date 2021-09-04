@@ -1770,7 +1770,8 @@ namespace DelvUI.Config {
                 }
             }
 
-            _changed |= ImGui.ColorEdit4("Bar Not Full Color", ref _pluginConfiguration.EmptyColor);
+            _changed |= ImGui.ColorEdit4("Bar Background Color", ref _pluginConfiguration.EmptyColor);
+            _changed |= ImGui.ColorEdit4("Bar Partial Fill Color", ref _pluginConfiguration.PartialFillColor);
         }
 
         private void DrawJobsTankConfig() {
@@ -2261,7 +2262,6 @@ namespace DelvUI.Config {
 
                     _changed |= ImGui.ColorEdit4("Mana Bar Color", ref _pluginConfiguration.PLDManaColor);
                     _changed |= ImGui.ColorEdit4("Oath Gauge Color", ref _pluginConfiguration.PLDOathGaugeColor);
-                    _changed |= ImGui.ColorEdit4("Oath Gauge Not Full Chunk Color", ref _pluginConfiguration.PLDOathNotFullColor);
 
                     _changed |= ImGui.ColorEdit4(
                         "Fight or Flight Color",
@@ -3301,10 +3301,6 @@ namespace DelvUI.Config {
                         }
 
                         _changed |= ImGui.ColorEdit4("Ninki Bar Color", ref _pluginConfiguration.NINNinkiColor);
-
-                        if (_pluginConfiguration.NINNinkiChunked) {
-                            _changed |= ImGui.ColorEdit4("Ninki Bar Not Filled Chunk Color", ref _pluginConfiguration.NINNinkiNotFullColor);
-                        }
                     }
 
                     _changed |= ImGui.Checkbox("Enable Trick Bar", ref _pluginConfiguration.NINTrickBarEnabled);
