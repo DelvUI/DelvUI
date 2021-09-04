@@ -1,7 +1,7 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
@@ -9,11 +9,11 @@ using Dalamud.Plugin;
 using ImGuiNET;
 using DelvUI.Interface.Bars;
 using DelvUI.Config;
+using ImGuiNET;
 
-namespace DelvUI.Interface
-{
-    public class SamuraiHudWindow : HudWindow
-    {
+namespace DelvUI.Interface {
+    public class SamuraiHudWindow : HudWindow {
+        public SamuraiHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => 34;
 
@@ -23,38 +23,38 @@ namespace DelvUI.Interface
         private int SamBuffsBarHeight => PluginConfiguration.SamBuffsBarHeight;
         private int SamBuffsBarWidth => PluginConfiguration.SamBuffsBarWidth;
         private int SamBuffsBarX => PluginConfiguration.SamBuffsBarX;
-        private int SamBuffsBarY => PluginConfiguration.SamBuffsBarY;		
-		
+        private int SamBuffsBarY => PluginConfiguration.SamBuffsBarY;
+
         private int SamHiganbanaBarHeight => PluginConfiguration.SamHiganbanaBarHeight;
         private int SamHiganbanaBarWidth => PluginConfiguration.SamHiganbanaBarWidth;
         private int SamHiganbanaBarX => PluginConfiguration.SamHiganbanaBarX;
         private int SamHiganbanaBarY => PluginConfiguration.SamHiganbanaBarY;
-		
-		private int SamKenkiBarHeight => PluginConfiguration.SamKenkiBarHeight;
+
+        private int SamKenkiBarHeight => PluginConfiguration.SamKenkiBarHeight;
         private int SamKenkiBarWidth => PluginConfiguration.SamKenkiBarWidth;
         private int SamKenkiBarX => PluginConfiguration.SamKenkiBarX;
         private int SamKenkiBarY => PluginConfiguration.SamKenkiBarY;
-		
-		private int SamMeditationBarHeight => PluginConfiguration.SamMeditationBarHeight;
+
+        private int SamMeditationBarHeight => PluginConfiguration.SamMeditationBarHeight;
         private int SamMeditationBarWidth => PluginConfiguration.SamMeditationBarWidth;
         private int SamMeditationBarX => PluginConfiguration.SamMeditationBarX;
         private int SamMeditationBarY => PluginConfiguration.SamMeditationBarY;
-		
+
         private int SamSenBarHeight => PluginConfiguration.SamSenBarHeight;
         private int SamSenBarWidth => PluginConfiguration.SamSenBarWidth;
         private int SamSenBarX => PluginConfiguration.SamSenBarX;
         private int SamSenBarY => PluginConfiguration.SamSenBarY;
-		
+
         private int SamTimeJinpuXOffset => PluginConfiguration.SamTimeJinpuXOffset;
         private int SamTimeJinpuYOffset => PluginConfiguration.SamTimeJinpuYOffset;
 
         private int SamTimeShifuXOffset => PluginConfiguration.SamTimeShifuXOffset;
         private int SamTimeShifuYOffset => PluginConfiguration.SamTimeShifuYOffset;
-		
+
         private int BuffsPadding => PluginConfiguration.SAMBuffsPadding;
         private int MeditationPadding => PluginConfiguration.SAMMeditationPadding;
         private int SenPadding => PluginConfiguration.SAMSenPadding;
-		
+
         private bool BuffsEnabled => PluginConfiguration.SAMBuffsEnabled;
         private bool ShowBuffTime => PluginConfiguration.ShowBuffTime;
         private bool GaugeEnabled => PluginConfiguration.SAMGaugeEnabled;
@@ -74,36 +74,34 @@ namespace DelvUI.Interface
         private Dictionary<string, uint> SamKaColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 5];
         private Dictionary<string, uint> SamMeditationColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 6];
         private Dictionary<string, uint> SamKenkiColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 7];
-        private Dictionary<string, uint> SamEmptyColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 8]; 
+        private Dictionary<string, uint> SamEmptyColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 8];
         private Dictionary<string, uint> SamExpiryColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 9];
 
-
-
-
-        public SamuraiHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
-
-        protected override void Draw(bool _)
-        {
+        protected override void Draw(bool _) {
             if (GaugeEnabled) {
                 DrawKenkiBar();
             }
+
             if (SenEnabled) {
                 DrawSenResourceBar();
             }
+
             if (MeditationEnabled) {
                 DrawMeditationResourceBar();
             }
+
             if (HiganbanaEnabled) {
                 DrawHiganbanaBar();
             }
+
             if (BuffsEnabled) {
                 DrawActiveBuffs();
             }
         }
-        protected override void DrawPrimaryResourceBar() {
-        }
-        private void DrawKenkiBar()
-        {
+
+        protected override void DrawPrimaryResourceBar() { }
+
+        private void DrawKenkiBar() {
             if (!GaugeEnabled) {
                 return;
             }
@@ -114,6 +112,7 @@ namespace DelvUI.Interface
             var yPos = CenterY + BaseYOffset + SamKenkiBarY;
 
             // Kenki Gauge
+
             var kenkiBuilder = BarBuilder.Create(xPos, yPos, SamKenkiBarHeight, SamKenkiBarWidth).SetBackgroundColor(SamEmptyColor["background"]);
             kenkiBuilder.AddInnerBar(gauge.Kenki, 100, SamKenkiColor);
 
@@ -123,8 +122,7 @@ namespace DelvUI.Interface
             kenkiBuilder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawHiganbanaBar()
-        {
+        private void DrawHiganbanaBar() {
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
             if (target is not Chara) {
@@ -146,15 +144,15 @@ namespace DelvUI.Interface
             var higanbanaBuilder = BarBuilder.Create(xOffset, yOffset, SamHiganbanaBarHeight, SamHiganbanaBarWidth).SetBackgroundColor(SamEmptyColor["background"]);
             higanbanaBuilder.AddInnerBar(higanbanaDuration, 60f, higanbanaColor).SetFlipDrainDirection(false);
 
-            if (HiganbanaText) {
+            if (HiganbanaText) 
+            {
                 higanbanaBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
             var drawList = ImGui.GetWindowDrawList();
             higanbanaBuilder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawActiveBuffs()
-        {
+        private void DrawActiveBuffs() {
             var target = PluginInterface.ClientState.LocalPlayer;
 
             var buffsBarWidth = (SamBuffsBarWidth / 2);
@@ -179,6 +177,7 @@ namespace DelvUI.Interface
             {
                 shifuBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
                 jinpuBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+
             }
 
             var drawList = ImGui.GetWindowDrawList();
@@ -187,8 +186,7 @@ namespace DelvUI.Interface
         }
 
         private void DrawSenResourceBar() {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
-            
+            var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();           
             var senBarWidth = (int)Math.Floor((SamSenBarWidth - SenPadding * 2) / 3f);
             var senBarSize = new Vector2(senBarWidth, SamSenBarHeight);
             var xPos = CenterX + BaseXOffset - SamSenBarX;
@@ -212,9 +210,7 @@ namespace DelvUI.Interface
             setsuBuilder.Build().Draw(drawList, PluginConfiguration);
         }
 
-
-        private void DrawMeditationResourceBar()
-        {
+        private void DrawMeditationResourceBar() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
 
             var meditationBarWidth = (int)Math.Floor((SamMeditationBarWidth - MeditationPadding * 2) / 3f);

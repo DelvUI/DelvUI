@@ -2,16 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
+using DelvUI.Config;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
-using DelvUI.Config;
 
-namespace DelvUI.Interface
-{
-    public class NinjaHudWindow : HudWindow
-    {
+namespace DelvUI.Interface {
+    public class NinjaHudWindow : HudWindow {
+        public NinjaHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
+
         public override uint JobId => 30;
 
         private new int XOffset => PluginConfiguration.NINBaseXOffset;
@@ -47,74 +48,73 @@ namespace DelvUI.Interface
         private Dictionary<string, uint> TrickColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 4];
         private Dictionary<string, uint> SuitonColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 5];
 
-        public NinjaHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
-
-        protected override void Draw(bool _)
-        {
-            if (HutonGaugeEnabled)
+        protected override void Draw(bool _) {
+            if (HutonGaugeEnabled) {
                 DrawHutonGauge();
-            if (NinkiGaugeEnabled)
+            }
+
+            if (NinkiGaugeEnabled) {
                 DrawNinkiGauge();
-            if (TrickBarEnabled)
+            }
+
+            if (TrickBarEnabled) {
                 DrawTrickAndSuitonGauge();
+            }
         }
 
-        protected override void DrawPrimaryResourceBar()
-        {
-        }
+        protected override void DrawPrimaryResourceBar() { }
 
-        private void DrawHutonGauge()
-        {
+        private void DrawHutonGauge() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
-            var hutonDurationLeft = (int)Math.Ceiling((float) (gauge.HutonTimeLeft / (double)1000));
+            var hutonDurationLeft = (int)Math.Ceiling((float)(gauge.HutonTimeLeft / (double)1000));
 
             var xPos = CenterX - XOffset + HutonGaugeXOffset;
             var yPos = CenterY + YOffset + HutonGaugeYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, HutonGaugeHeight, HutonGaugeWidth);
-            float maximum = 70f;
+            var maximum = 70f;
 
-            Bar bar = builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, HutonColor)
-                .SetTextMode(BarTextMode.Single)
-                .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                .SetBackgroundColor(EmptyColor["background"])
-                .Build();
+            var bar = builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, HutonColor)
+                             .SetTextMode(BarTextMode.Single)
+                             .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                             .SetBackgroundColor(EmptyColor["background"])
+                             .Build();
 
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawNinkiGauge()
-        {
+        private void DrawNinkiGauge() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
 
             var xPos = CenterX - XOffset + NinkiGaugeXOffset;
             var yPos = CenterY + YOffset + NinkiGaugeYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, NinkiGaugeHeight, NinkiGaugeWidth);
-            if(NinkiChunked)
-            {
+
+            if (NinkiChunked) {
                 builder.SetChunks(2)
-                .SetChunkPadding(NinkiGaugePadding)
-                .AddInnerBar(gauge.Ninki, 100, NinkiColor, NinkiNotFilledColor);
-            } else
-            {
+                       .SetChunkPadding(NinkiGaugePadding)
+                       .AddInnerBar(gauge.Ninki, 100, NinkiColor, NinkiNotFilledColor);
+            }
+            else {
                 builder.AddInnerBar(gauge.Ninki, 100, NinkiColor);
             }
+
             builder.SetBackgroundColor(EmptyColor["background"]);
-            if(NinkiGaugeText)
-            {
+
+            if (NinkiGaugeText) {
                 builder.SetTextMode(BarTextMode.Single)
                        .SetText(NinkiChunked ? BarTextPosition.CenterLeft : BarTextPosition.CenterMiddle, BarTextType.Current);
             }
+
             var bar = builder.Build();
 
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawTrickAndSuitonGauge()
-        {
+        private void DrawTrickAndSuitonGauge() {
             var xPos = CenterX - XOffset + TrickBarXOffset;
             var yPos = CenterY + YOffset + TrickBarYOffset;
 
@@ -122,34 +122,33 @@ namespace DelvUI.Interface
             var trickDuration = 0f;
             const float trickMaxDuration = 15f;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, TrickBarHeight, TrickBarWidth);
-            if (target is Dalamud.Game.ClientState.Actors.Types.Chara)
-            {
+            var builder = BarBuilder.Create(xPos, yPos, TrickBarHeight, TrickBarWidth);
+
+            if (target is Chara) {
                 var trickStatus = target.StatusEffects.FirstOrDefault(o => o.EffectId == 638 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
                 trickDuration = Math.Max(trickStatus.Duration, 0);
             }
 
             builder.AddInnerBar(trickDuration, trickMaxDuration, TrickColor);
 
-            if (trickDuration != 0 && TrickBarText)
-            {
+            if (trickDuration != 0 && TrickBarText) {
                 builder.SetTextMode(BarTextMode.Single)
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
             var suitonBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 507);
-            if (suitonBuff.Any())
-            {
+
+            if (suitonBuff.Any()) {
                 var suitonDuration = Math.Abs(suitonBuff.First().Duration);
                 builder.AddInnerBar(suitonDuration, 20, SuitonColor);
-                if(SuitonBarText)
-                {
+
+                if (SuitonBarText) {
                     builder.SetTextMode(BarTextMode.Single)
                            .SetText(BarTextPosition.CenterRight, BarTextType.Current, PluginConfiguration.NINSuitonColor, Vector4.UnitW, null);
                 }
             }
 
-            Bar bar = builder.Build();
+            var bar = builder.Build();
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
