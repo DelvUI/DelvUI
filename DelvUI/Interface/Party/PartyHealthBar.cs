@@ -3,7 +3,7 @@ using ImGuiNET;
 using System.Numerics;
 using DelvUI.Helpers;
 using System;
-using Lumina.Excel.GeneratedSheets;
+using DelvUI.Config;
 
 
 namespace DelvUI.Interface.Party
@@ -39,7 +39,9 @@ namespace DelvUI.Interface.Party
         public void UpdateColor()
         {
             color = _pluginConfiguration.NPCColorMap["friendly"];
-            if (Member == null) return;
+            if (Member == null) {
+                return;
+            }
 
             if (_config.SortConfig.UseRoleColors)
             {
@@ -56,22 +58,24 @@ namespace DelvUI.Interface.Party
             var role = JobsHelper.RoleForJob(jodId);
 
             switch (role) {
-                case JobRoles.Tank: return _pluginConfiguration.PartyListColorMap["tank"];
-                case JobRoles.DPS: return _pluginConfiguration.PartyListColorMap["dps"];
-                case JobRoles.Healer: return _pluginConfiguration.PartyListColorMap["healer"];
+                case JobRoles.Tank: return _config.SortConfig.TankRoleColor.Map;
+                case JobRoles.DPS: return _config.SortConfig.DPSRoleColor.Map;
+                case JobRoles.Healer: return _config.SortConfig.HealerRoleColor.Map;
             }
 
-            return _pluginConfiguration.PartyListColorMap["generic_role"];
+            return _config.SortConfig.GenericRoleColor.Map;
         }
 
         public void Draw(ImDrawListPtr drawList, Vector2 origin)
         {
-            if (!Visible) return;
+            if (!Visible) {
+                return;
+            }
 
             // bg
             var isClose = Member.MaxHP > 0;
-            var bgColorMap = _pluginConfiguration.PartyListColorMap["background"];
-            drawList.AddRectFilled(Position, Position + Size, isClose ? (uint)bgColorMap["default"] : (uint)bgColorMap["outOfRange"]);
+            var bgColorMap = isClose ? _config.HealthBarsConfig.BackgroundColor.Base : _config.HealthBarsConfig.UnreachableColor.Base;
+            drawList.AddRectFilled(Position, Position + Size, bgColorMap);
 
             // hp
             if (isClose)
@@ -98,13 +102,13 @@ namespace DelvUI.Interface.Party
                 {
                     DrawHelper.DrawShield(Member.Shield, (float)Member.HP / Member.MaxHP, Position, Size,
                         _config.HealthBarsConfig.ShieldsConfig.Height, !_config.HealthBarsConfig.ShieldsConfig.HeightInPixels,
-                        _pluginConfiguration.PartyListColorMap["shield"]);
+                        _config.HealthBarsConfig.ShieldsConfig.Color.Map);
                 }
                 else
                 {
                     DrawHelper.DrawShield(Member.Shield, Position, Size,
                         _config.HealthBarsConfig.ShieldsConfig.Height, !_config.HealthBarsConfig.ShieldsConfig.HeightInPixels,
-                        _pluginConfiguration.PartyListColorMap["shield"]);
+                        _config.HealthBarsConfig.ShieldsConfig.Color.Map);
                 }
             }
 

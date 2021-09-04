@@ -4,14 +4,15 @@ using System.Diagnostics;
 using System.Linq;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
+using DelvUI.Config;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
 using DelvUI.Helpers;
 
-namespace DelvUI.Interface
-{
-    public class WarriorHudWindow : HudWindow
-    {
+namespace DelvUI.Interface {
+    public class WarriorHudWindow : HudWindow {
+        public WarriorHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
+
         public override uint JobId => 21;
 
         private int BaseXOffset => PluginConfiguration.WARBaseXOffset;
@@ -41,17 +42,17 @@ namespace DelvUI.Interface
         private Dictionary<string, uint> NascentChaosColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 3];
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 4];
 
-        public WarriorHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
-
         protected override void Draw(bool _) {
-            if (StormsEyeEnabled)
+            if (StormsEyeEnabled) {
                 DrawStormsEyeBar();
-            if (BeastGaugeEnabled)
+            }
+
+            if (BeastGaugeEnabled) {
                 DrawBeastGauge();
+            }
         }
 
-        protected override void DrawPrimaryResourceBar() {
-        }
+        protected override void DrawPrimaryResourceBar() { }
 
         private void DrawStormsEyeBar() {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
@@ -66,13 +67,12 @@ namespace DelvUI.Interface
             var duration = 0f;
             var maximum = 10f;
             var color = EmptyColor;
-            if (innerReleaseBuff.Any())
-            {
+
+            if (innerReleaseBuff.Any()) {
                 duration = Math.Abs(innerReleaseBuff.First().Duration);
                 color = InnerReleaseColor;
             }
-            else if (stormsEyeBuff.Any())
-            {
+            else if (stormsEyeBuff.Any()) {
                 duration = Math.Abs(stormsEyeBuff.First().Duration);
                 maximum = 60f;
                 color = StormsEyeColor;
@@ -80,10 +80,9 @@ namespace DelvUI.Interface
 
             builder.AddInnerBar(duration, maximum, color);
 
-            if (StormsEyeText)
-            {
+            if (StormsEyeText) {
                 builder.SetTextMode(BarTextMode.EachChunk)
-                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current, StormsEyeTextScale);
+                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current, StormsEyeTextScale);
             }
 
             var drawList = ImGui.GetWindowDrawList();
@@ -98,15 +97,18 @@ namespace DelvUI.Interface
             var yPos = CenterY + BaseYOffset + BeastGaugeYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, BeastGaugeHeight, BeastGaugeWidth)
-                .SetChunks(2)
-                .AddInnerBar(gauge.BeastGaugeAmount, 100, FellCleaveColor).SetBackgroundColor(EmptyColor["background"])
-                .SetChunkPadding(BeastGaugePadding);
-            if (nascentChaosBuff.Any())
+                                    .SetChunks(2)
+                                    .AddInnerBar(gauge.BeastGaugeAmount, 100, FellCleaveColor)
+                                    .SetBackgroundColor(EmptyColor["background"])
+                                    .SetChunkPadding(BeastGaugePadding);
+
+            if (nascentChaosBuff.Any()) {
                 builder.SetChunksColors(NascentChaosColor);
-            if (BeastGaugeText)
-            {
+            }
+
+            if (BeastGaugeText) {
                 builder.SetTextMode(BarTextMode.EachChunk)
-                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current, BeastGaugeTextScale);
+                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current, BeastGaugeTextScale);
             }
 
             var drawList = ImGui.GetWindowDrawList();

@@ -4,6 +4,8 @@ using System.Linq;
 using ImGuiNET;
 using System.Numerics;
 using DelvUI.Helpers;
+using DelvUI.Config;
+
 
 namespace DelvUI.Interface.Party
 {

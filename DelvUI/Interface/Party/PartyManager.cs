@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Immutable;
+using DelvUI.Config;
 using Dalamud.Plugin;
 using Dalamud.Game.Internal;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;

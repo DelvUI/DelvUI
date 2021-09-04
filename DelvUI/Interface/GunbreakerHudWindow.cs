@@ -1,18 +1,17 @@
-﻿using System.Numerics;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Collections.Generic;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
+using DelvUI.Config;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
 using DelvUI.Helpers;
 
 namespace DelvUI.Interface {
     public class GunbreakerHudWindow : HudWindow {
-        public override uint JobId => 37;
+        public GunbreakerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
-        private static int BarHeight => 13;
-        private static int BarWidth => 254;
+        public override uint JobId => 37;
 
         private new int XOffset => PluginConfiguration.GNBBaseXOffset;
         private new int YOffset => PluginConfiguration.GNBBaseYOffset;
@@ -32,17 +31,17 @@ namespace DelvUI.Interface {
         private int NoMercyBarYOffset => PluginConfiguration.GNBNoMercyBarYOffset;
         private Dictionary<string, uint> NoMercyColor => PluginConfiguration.JobColorMap[Jobs.GNB * 1000 + 1];
 
-        public GunbreakerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
-
         protected override void Draw(bool _) {
-            if (PowderGaugeEnabled)
+            if (PowderGaugeEnabled) {
                 DrawPowderGauge();
-            if (NoMercyBarEnabled)
+            }
+
+            if (NoMercyBarEnabled) {
                 DrawNoMercyBar();
+            }
         }
-        protected override void DrawPrimaryResourceBar()
-        {
-        }
+
+        protected override void DrawPrimaryResourceBar() { }
 
         private void DrawPowderGauge() {
             var gauge = PluginInterface.ClientState.JobGauges.Get<GNBGauge>();
@@ -51,10 +50,11 @@ namespace DelvUI.Interface {
             var yPos = CenterY + YOffset + PowderGaugeYOffset;
 
             var builder = BarBuilder.Create(xPos, yPos, PowderGaugeHeight, PowderGaugeWidth);
+
             builder.SetChunks(2)
-                .SetChunkPadding(PowderGaugePadding)
-                .AddInnerBar(gauge.NumAmmo, 2, GunPowderColor, null)
-                .SetBackgroundColor(EmptyColor["background"]);
+                   .SetChunkPadding(PowderGaugePadding)
+                   .AddInnerBar(gauge.NumAmmo, 2, GunPowderColor, null)
+                   .SetBackgroundColor(EmptyColor["background"]);
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
@@ -68,13 +68,12 @@ namespace DelvUI.Interface {
 
             var builder = BarBuilder.Create(xPos, yPos, NoMercyBarHeight, NoMercyBarWidth).SetBackgroundColor(EmptyColor["background"]);
 
-            if (noMercyBuff.Any())
-            {
+            if (noMercyBuff.Any()) {
                 var duration = noMercyBuff.First().Duration;
+
                 builder.AddInnerBar(duration, 20, NoMercyColor, null)
-                    .SetTextMode(BarTextMode.EachChunk)
-                    
-                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                       .SetTextMode(BarTextMode.EachChunk)
+                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
             var drawList = ImGui.GetWindowDrawList();

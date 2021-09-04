@@ -1,10 +1,12 @@
-﻿using System;
+﻿using DelvUI.Config;
 using System.Numerics;
 using ImGuiNET;
+using System;
 
 namespace DelvUI.Interface.Party
 {
-    public class PartyHudConfig
+    [Serializable]
+    public class PartyHudConfig : PluginConfigObject
     {
         public Vector2 Position = new Vector2(200, 200);
         public Vector2 Size = new Vector2(650, 150);
@@ -37,14 +39,15 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    public class PartyHudSortConfig
+    [Serializable]
+    public class PartyHudSortConfig: PluginConfigObject
     {
         public PartySortingMode Mode = PartySortingMode.Tank_Healer_DPS;
         public bool UseRoleColors = false;
-        public Vector4 TankRoleColor = new Vector4(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f);
-        public Vector4 DPSRoleColor = new Vector4(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f);
-        public Vector4 HealerRoleColor = new Vector4(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f);
-        public Vector4 GenericRoleColor = new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f);
+        public PluginConfigColor TankRoleColor = new PluginConfigColor(new Vector4(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f));
+        public PluginConfigColor DPSRoleColor = new PluginConfigColor(new Vector4(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f));
+        public PluginConfigColor HealerRoleColor = new PluginConfigColor(new Vector4(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f));
+        public PluginConfigColor GenericRoleColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
         public bool Draw()
         {
@@ -53,7 +56,7 @@ namespace DelvUI.Interface.Party
             ImGui.Text("Sorting");
             ImGui.BeginGroup();
             {
-                int selection = (int)Mode;
+                var selection = (int)Mode;
                 var names = PartySortingHelper.SortingModesNames;
                 if (ImGui.Combo("Sorting priority", ref selection, PartySortingHelper.SortingModesNames, names.Length))
                 {
@@ -62,10 +65,10 @@ namespace DelvUI.Interface.Party
                 }
 
                 changed |= ImGui.Checkbox("Use Role Colors", ref UseRoleColors);
-                changed |= ImGui.ColorEdit4("Tank Color", ref TankRoleColor);
-                changed |= ImGui.ColorEdit4("DPS Color", ref DPSRoleColor);
-                changed |= ImGui.ColorEdit4("Healer Color", ref HealerRoleColor);
-                changed |= ImGui.ColorEdit4("Generic Color", ref GenericRoleColor);
+                changed |= ColorEdit4("Tank Color", ref TankRoleColor);
+                changed |= ColorEdit4("DPS Color", ref DPSRoleColor);
+                changed |= ColorEdit4("Healer Color", ref HealerRoleColor);
+                changed |= ColorEdit4("Generic Color", ref GenericRoleColor);
             }
             ImGui.EndGroup();
 
@@ -73,12 +76,14 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    public class PartyHudHealthBarsConfig
+    [Serializable]
+    public class PartyHudHealthBarsConfig: PluginConfigObject
     {
         public string TextFormat = "[name:initials]";
         public Vector2 Size = new Vector2(150, 50);
         public Vector2 Padding = new Vector2(1, 1);
-        public Vector4 BackgroundColor = new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 70f / 100f);
+        public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 70f / 100f));
+        public PluginConfigColor UnreachableColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 30f / 100f));
 
         public PartyHudShieldsConfig ShieldsConfig = new PartyHudShieldsConfig();
 
@@ -90,34 +95,10 @@ namespace DelvUI.Interface.Party
             ImGui.BeginGroup();
             {
                 changed |= ImGui.InputTextWithHint("Text Fromat", "Example: [name:initials]", ref TextFormat, 64);
-
-                int width = (int)Size.X;
-                if (ImGui.DragInt("Width", ref width, 1, 1, 1000))
-                {
-                    Size.X = width;
-                    changed = true;
-                }
-                int height = (int)Size.Y;
-                if (ImGui.DragInt("Height", ref height, 1, 1, 1000))
-                {
-                    Size.Y = height;
-                    changed = true;
-                }
-
-                int paddingX = (int)Padding.X;
-                if (ImGui.DragInt("Horizontal Padding", ref paddingX, 1, -200, 200))
-                {
-                    Padding.X = paddingX;
-                    changed = true;
-                }
-                int paddingY = (int)Padding.Y;
-                if (ImGui.DragInt("Vertical Padding", ref paddingY, 1, -200, 200))
-                {
-                    Padding.Y = paddingY;
-                    changed = true;
-                }
-
-                changed |= ImGui.ColorEdit4("Background Color", ref BackgroundColor);
+                changed |= ImGui.DragFloat2("Size", ref Size, 1, 1, 1000);
+                changed |= ImGui.DragFloat2("Padding", ref Padding, 1, -200, 200);
+                changed |= ColorEdit4("Background Color", ref BackgroundColor);
+                changed |= ColorEdit4("Member Unreachable Color", ref UnreachableColor);
             }
 
             changed |= ShieldsConfig.Draw();
@@ -126,13 +107,14 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    public class PartyHudShieldsConfig
+    [Serializable]
+    public class PartyHudShieldsConfig: PluginConfigObject
     {
         public bool Enabled = true;
         public int Height = 10;
         public bool HeightInPixels = false;
         public bool FillHealthFirst = true;
-        public Vector4 Color = new Vector4(198f / 255f, 210f / 255f, 255f / 255f, 70f / 100f);
+        public PluginConfigColor Color = new PluginConfigColor(new Vector4(198f / 255f, 210f / 255f, 255f / 255f, 70f / 100f));
 
         public bool Draw()
         {
@@ -145,7 +127,7 @@ namespace DelvUI.Interface.Party
                 changed |= ImGui.DragInt("Shield Size", ref Height, .1f, 1, 1000);
                 changed |= ImGui.Checkbox("Size in pixels", ref HeightInPixels);
                 changed |= ImGui.Checkbox("Fill Health First", ref FillHealthFirst);
-                changed |= ImGui.ColorEdit4("Shield Color", ref Color);
+                changed |= ColorEdit4("Shield Color", ref Color);
             }
 
             return changed;
