@@ -202,46 +202,4 @@ namespace DelvUI.Interface.StatusEffects
             }
         }
     }
-
-    [Serializable]
-    public class StatusEffectsListConfig
-    {
-        public bool Enabled = true;
-        public Vector2 Position;
-        public Vector2 MaxSize = new Vector2(340, 100);
-        public Vector2 IconPadding = new Vector2(2, 2);
-        public bool ShowArea = false;
-        public StatusEffectIconConfig IconConfig = new StatusEffectIconConfig();
-        public bool ShowBuffs;
-        public bool ShowDebuffs;
-        public bool ShowPermanentEffects;
-        public bool FillRowsFirst = true;
-        public int Limit = -1;
-        public short GrowthDirections;
-
-        public StatusEffectsListConfig(Vector2 position, bool showBuffs, bool showDebuffs, bool showPermanentEffects, GrowthDirections growthDirections)
-        {
-            Position = position;
-            ShowBuffs = showBuffs;
-            ShowDebuffs = showDebuffs;
-            ShowPermanentEffects = showPermanentEffects;
-            GrowthDirections = (short)growthDirections;
-        }
-    }
-
-    [Serializable]
-    public class StatusEffectIconConfig
-    {
-        public Vector2 Size = new Vector2(40, 40);
-        public bool ShowDurationText = true;
-        public bool ShowStacksText = true;
-
-        public bool ShowBorder = true;
-        public int BorderThickness = 1;
-        public Vector4 BorderColor = new Vector4(0f / 255f, 0 / 255f, 0 / 255f, 100f / 100f);
-
-        public bool ShowDispellableBorder = true;
-        public int DispellableBorderThickness = 2;
-        public Vector4 DispellableBorderColor = new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f);
-    }
 }

@@ -1,4 +1,5 @@
 ﻿using Dalamud.Plugin;
+using DelvUI.Config;
 
 namespace DelvUI.Interface {
     public class UnitFrameOnlyHudWindow : HudWindow

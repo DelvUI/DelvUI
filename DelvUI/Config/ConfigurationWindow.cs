@@ -4,9 +4,9 @@ using System.Numerics;
 using Dalamud.Interface;
 using ImGuiNET;
 using Dalamud.Plugin;
-using DelvUI.Interface.StatusEffects;
 
-namespace DelvUI.Interface
+
+namespace DelvUI.Config
 {
     public class ConfigurationWindow
     {
@@ -250,16 +250,16 @@ namespace DelvUI.Interface
                     switch (subConfig)
                     {
                         case "Player Buffs":
-                            DrawPlayerBuffsConfig();
+                            _changed |= _pluginConfiguration.PlayerBuffListConfig.Draw();
                             break;
                         case "Player Debuffs":
-                            DrawPlayerDebuffsConfig();
+                            _changed |= _pluginConfiguration.PlayerDebuffListConfig.Draw();
                             break;
                         case "Target Buffs":
-                            DrawTargetBuffsConfig();
+                            _changed |= _pluginConfiguration.TargetBuffListConfig.Draw();
                             break;
                         case "Target Debuffs":
-                            DrawTargetDebuffsConfig();
+                            _changed |= _pluginConfiguration.TargetDebuffListConfig.Draw();
                             break;
                     }
                     break;
@@ -1584,130 +1584,6 @@ namespace DelvUI.Interface
                     _changed |= ImGui.Checkbox("Show Target Cast Time", ref _pluginConfiguration.ShowTargetCastTime);
                     _changed |= ImGui.Checkbox("Show Interruptable Casts", ref _pluginConfiguration.ShowTargetInterrupt);
 
-        }
-
-        private void DrawPlayerBuffsConfig()
-        {
-            DrawStatusEffectListConfig(ref _pluginConfiguration.PlayerBuffListConfig);
-        }
-
-        private void DrawPlayerDebuffsConfig()
-        {
-            DrawStatusEffectListConfig(ref _pluginConfiguration.PlayerDebuffListConfig);
-        }
-
-        private void DrawTargetBuffsConfig()
-        {
-            DrawStatusEffectListConfig(ref _pluginConfiguration.TargetBuffListConfig);
-        }
-
-        private void DrawTargetDebuffsConfig()
-        {
-            DrawStatusEffectListConfig(ref _pluginConfiguration.TargetDebuffListConfig);
-        }
-
-        private void DrawStatusEffectListConfig(ref StatusEffectsListConfig config)
-        { 
-            _changed |= ImGui.Checkbox("Enabled", ref config.Enabled);
-
-            ImGui.Text("Layout");
-            ImGui.BeginGroup();
-            {
-                int posX = (int)config.Position.X;
-                if (ImGui.DragInt("Position X", ref posX, 1, -_xOffsetLimit, _xOffsetLimit))
-                {
-                    config.Position.X = posX;
-                    _pluginConfiguration.Save();
-                }
-                int posY = (int)config.Position.Y;
-                if (ImGui.DragInt("Position Y", ref posY, 1, -_yOffsetLimit, _yOffsetLimit))
-                {
-                    config.Position.Y = posY;
-                    _pluginConfiguration.Save();
-                }
-
-                int areaWidth = (int)config.MaxSize.X;
-                if (ImGui.DragInt("Area Width", ref areaWidth, 1, -2000, 2000))
-                {
-                    config.MaxSize.X = areaWidth;
-                    _pluginConfiguration.Save();
-                }
-                int areaHeight = (int)config.MaxSize.Y;
-                if (ImGui.DragInt("Area Height", ref areaHeight, 1, -2000, 2000))
-                {
-                    config.MaxSize.Y = areaHeight;
-                    _pluginConfiguration.Save();
-                }
-
-                int paddingX = (int)config.IconPadding.X;
-                if (ImGui.DragInt("Horizontal Padding", ref paddingX, 1, -200, 200))
-                {
-                    config.IconPadding.X = paddingX;
-                    _pluginConfiguration.Save();
-                }
-                int paddingY = (int)config.IconPadding.Y;
-                if (ImGui.DragInt("Vertical Padding", ref paddingY, 1, -200, 200))
-                {
-                    config.IconPadding.Y = paddingY;
-                    _pluginConfiguration.Save();
-                }
-
-                List<GrowthDirections> directions = new List<GrowthDirections>()
-                {
-                    GrowthDirections.RIGHT | GrowthDirections.DOWN,
-                    GrowthDirections.RIGHT | GrowthDirections.UP,
-                    GrowthDirections.LEFT | GrowthDirections.DOWN,
-                    GrowthDirections.LEFT | GrowthDirections.UP
-                };
-                int selection = Math.Max(0, directions.IndexOf((GrowthDirections)config.GrowthDirections));
-                string[] directionsStrings = new string[]
-                {
-                    "Right and Down",
-                    "Right and Up",
-                    "Left and Down",
-                    "Left and Up"
-                };
-                if (ImGui.Combo("Icons Growth Direction", ref selection, directionsStrings, directionsStrings.Length))
-                {
-                    config.GrowthDirections = (short)directions[selection];
-                    _pluginConfiguration.Save();
-                }
-
-                _changed |= ImGui.Checkbox("Show Area", ref config.ShowArea);
-                _changed |= ImGui.Checkbox("Fill Rows First", ref config.FillRowsFirst);
-                _changed |= ImGui.DragInt("Limit (-1 means no limit)", ref config.Limit, .1f, -1, 100);
-            }
-            ImGui.EndGroup();
-
-            ImGui.Text("Icons");
-            ImGui.BeginGroup();
-            {
-                int iconWidth = (int)config.IconConfig.Size.X;
-                if (ImGui.DragInt("Icons Width", ref iconWidth, 1, 1, 200))
-                {
-                    config.IconConfig.Size.X = iconWidth;
-                    _pluginConfiguration.Save();
-                }
-                int iconHeight = (int)config.IconConfig.Size.Y;
-                if (ImGui.DragInt("Icons Height", ref iconHeight, 1, 1, 200))
-                {
-                    config.IconConfig.Size.Y = iconHeight;
-                    _pluginConfiguration.Save();
-                }
-
-                _changed |= ImGui.Checkbox("Show Duration", ref config.IconConfig.ShowDurationText);
-                _changed |= ImGui.Checkbox("Show Stacks", ref config.IconConfig.ShowStacksText);
-                _changed |= ImGui.Checkbox("Show Permanent Effects", ref config.ShowPermanentEffects);
-
-                _changed |= ImGui.Checkbox("Show Border", ref config.IconConfig.ShowBorder);
-                _changed |= ImGui.DragInt("Border Thickness", ref config.IconConfig.BorderThickness, .1f, 1, 5);
-                _changed |= ImGui.ColorEdit4("Border Color", ref config.IconConfig.BorderColor);
-
-                _changed |= ImGui.Checkbox("Show Dispellable Border", ref config.IconConfig.ShowDispellableBorder);
-                _changed |= ImGui.DragInt("Dispellable Border Thickness", ref config.IconConfig.DispellableBorderThickness, .1f, 1, 5);
-                _changed |= ImGui.ColorEdit4("Dispellable order Color", ref config.IconConfig.DispellableBorderColor);
-            }
-            ImGui.EndGroup();
         }
 
         private void DrawJobsGeneralConfig()
@@ -5017,138 +4893,7 @@ namespace DelvUI.Interface
 
                 if (ImGui.BeginTabItem("Black Mage"))
                 {
-                    var blmVerticalOffset = _pluginConfiguration.BLMVerticalOffset;
-                    if (ImGui.DragInt("Vertical Offset", ref blmVerticalOffset, 1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.BLMVerticalOffset = blmVerticalOffset;
-                        _pluginConfiguration.Save();
-                    }                    
-                    
-                    var blmHorizontalOffset = _pluginConfiguration.BLMHorizontalOffset;
-                    if (ImGui.DragInt("Horizontal Offset", ref blmHorizontalOffset, 1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.BLMHorizontalOffset = blmHorizontalOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var blmVerticalSpaceBetweenBars = _pluginConfiguration.BLMVerticalSpaceBetweenBars;
-                    if (ImGui.DragInt("Vertical Padding", ref blmVerticalSpaceBetweenBars, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BLMVerticalSpaceBetweenBars = blmVerticalSpaceBetweenBars;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var blmHorizontalSpaceBetweenBars = _pluginConfiguration.BLMHorizontalSpaceBetweenBars;
-                    if (ImGui.DragInt("Horizontal Padding", ref blmHorizontalSpaceBetweenBars, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BLMHorizontalSpaceBetweenBars = blmHorizontalSpaceBetweenBars;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var blmManaBarHeight = _pluginConfiguration.BLMManaBarHeight;
-                    if (ImGui.DragInt("Mana Bar Height", ref blmManaBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BLMManaBarHeight = blmManaBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var blmManaBarWidth = _pluginConfiguration.BLMManaBarWidth;
-                    if (ImGui.DragInt("Mana Bar Width", ref blmManaBarWidth, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.BLMManaBarWidth = blmManaBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var blmUmbralHeartHeight = _pluginConfiguration.BLMUmbralHeartHeight;
-                    if (ImGui.DragInt("Umbral Heart Height", ref blmUmbralHeartHeight, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.BLMUmbralHeartHeight = blmUmbralHeartHeight;
-                        _pluginConfiguration.Save();
-                    }                    
-                    
-                    var blmUmbralHeartWidth = _pluginConfiguration.BLMUmbralHeartWidth;
-                    if (ImGui.DragInt("Umbral Heart Width", ref blmUmbralHeartWidth, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.BLMUmbralHeartWidth = blmUmbralHeartWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var blmPolyglotHeight = _pluginConfiguration.BLMPolyglotHeight;
-                    if (ImGui.DragInt("Polyglot Height", ref blmPolyglotHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BLMPolyglotHeight = blmPolyglotHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var blmPolyglotWidth = _pluginConfiguration.BLMPolyglotWidth;
-                    if (ImGui.DragInt("Polyglot Width", ref blmPolyglotWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BLMPolyglotWidth = blmPolyglotWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    _changed |= ImGui.Checkbox("Show Mana Value", ref _pluginConfiguration.BLMShowManaValue);
-                    _changed |= ImGui.Checkbox("Show Mana Threshold Marker During Astral Fire",
-                        ref _pluginConfiguration.BLMShowManaThresholdMarker);
-
-                    var blmManaThresholdValue = _pluginConfiguration.BLMManaThresholdValue;
-                    if (ImGui.DragInt("Mana Threshold Marker Value", ref blmManaThresholdValue, 1f, 1, 10000))
-                    {
-                        _pluginConfiguration.BLMManaThresholdValue = blmManaThresholdValue;
-                        _pluginConfiguration.Save();
-                    }
-
-                    _changed |= ImGui.Checkbox("Show Triplecast", ref _pluginConfiguration.BLMShowTripleCast);
-
-                    var blmTripleCastHeight = _pluginConfiguration.BLMTripleCastHeight;
-                    if (ImGui.DragInt("Triplecast Bar Height", ref blmTripleCastHeight, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.BLMTripleCastHeight = blmTripleCastHeight;
-                        _pluginConfiguration.Save();
-                    }   
-                    
-                    var blmTripleCastWidth = _pluginConfiguration.BLMTripleCastWidth;
-                    if (ImGui.DragInt("Triplecast Bar Width", ref blmTripleCastWidth, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.BLMTripleCastWidth = blmTripleCastWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    _changed |= ImGui.Checkbox("Show Firestarter Procs",
-                        ref _pluginConfiguration.BLMShowFirestarterProcs);
-                    _changed |= ImGui.Checkbox("Show Thundercloud Procs",
-                        ref _pluginConfiguration.BLMShowThundercloudProcs);
-
-                    var blmProcsHeight = _pluginConfiguration.BLMProcsHeight;
-                    if (ImGui.DragInt("Procs Height", ref blmProcsHeight, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.BLMProcsHeight = blmProcsHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    _changed |= ImGui.Checkbox("Show DoT Timer", ref _pluginConfiguration.BLMShowDotTimer);
-
-                    var blmDotTimerHeight = _pluginConfiguration.BLMDotTimerHeight;
-                    if (ImGui.DragInt("DoT Timer Height", ref blmDotTimerHeight, .1f, -2000, 2000))
-                    {
-                        _pluginConfiguration.BLMDotTimerHeight = blmDotTimerHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    _changed |= ImGui.ColorEdit4("Mana Bar Color",
-                        ref _pluginConfiguration.BLMManaBarNoElementColor);
-                    _changed |= ImGui.ColorEdit4("Mana Bar Ice Color", ref _pluginConfiguration.BLMManaBarIceColor);
-                    _changed |= ImGui.ColorEdit4("Mana Bar Fire Color",
-                        ref _pluginConfiguration.BLMManaBarFireColor);
-                    _changed |= ImGui.ColorEdit4("Umbral Heart Color", ref _pluginConfiguration.BLMUmbralHeartColor);
-                    _changed |= ImGui.ColorEdit4("Polyglot Color", ref _pluginConfiguration.BLMPolyglotColor);
-                    _changed |= ImGui.ColorEdit4("Triplecast Color", ref _pluginConfiguration.BLMTriplecastColor);
-                    _changed |= ImGui.ColorEdit4("Firestarter Proc Color",
-                        ref _pluginConfiguration.BLMFirestarterColor);
-                    _changed |= ImGui.ColorEdit4("Thundercloud Proc Color",
-                        ref _pluginConfiguration.BLMThundercloudColor);
-                    _changed |= ImGui.ColorEdit4("DoT Timer Color", ref _pluginConfiguration.BLMDotColor);
-                    
+                    _changed |= _pluginConfiguration.BLMConfig.Draw();
                     ImGui.EndTabItem();
                 }
             }

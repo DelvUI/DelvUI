@@ -6,6 +6,7 @@ using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Plugin;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
+using DelvUI.Config;
 
 namespace DelvUI.Interface
 {

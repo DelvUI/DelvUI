@@ -7,7 +7,8 @@ using Dalamud.Plugin;
 using ImGuiNET;
 using DelvUI.Interface;
 using FFXIVClientStructs;
-using DelvUI.Helpers; 
+using DelvUI.Helpers;
+using DelvUI.Config;
 
 namespace DelvUI {
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -179,7 +180,7 @@ namespace DelvUI {
                 //Caster DPS
                 Jobs.RDM => new RedMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SMN => new SummonerHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.BLM => new BlackMageHudWindow(_pluginInterface, _pluginConfiguration),
+                Jobs.BLM => new BlackMageHudWindow(_pluginInterface, _pluginConfiguration, _pluginConfiguration.BLMConfig),
 
                 //Low jobs
                 Jobs.MRD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),

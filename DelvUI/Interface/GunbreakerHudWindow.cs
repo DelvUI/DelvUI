@@ -1,10 +1,10 @@
-﻿using System.Numerics;
-using System.Linq;
+﻿using System.Linq;
 using System.Collections.Generic;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
+using DelvUI.Config;
 
 namespace DelvUI.Interface {
     public class GunbreakerHudWindow : HudWindow {

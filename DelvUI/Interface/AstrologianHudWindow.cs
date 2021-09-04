@@ -11,6 +11,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
+using DelvUI.Config;
 
 namespace DelvUI.Interface
 {
