@@ -5,7 +5,6 @@ namespace DelvUI.Interface {
     public class UnitFrameOnlyHudWindow : HudWindow {
         public UnitFrameOnlyHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) :
             base(pluginInterface, pluginConfiguration) {
-            
             // To prevent SwapJobs() from being spammed in Plugin.cs Draw()
             JobId = pluginInterface.ClientState.LocalPlayer.ClassJob.Id;
         }

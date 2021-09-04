@@ -29,15 +29,15 @@ namespace DelvUI.Interface.StatusEffects {
 
     public class StatusEffectsList {
         private readonly DalamudPluginInterface _pluginInterface;
+        public readonly StatusEffectsListConfig Config;
+        private uint _colCount;
         private GrowthDirections _lastGrowthDirections;
         private GrowthDirections _lastValidGrowthDirections = GrowthDirections.Left | GrowthDirections.Down;
 
+        private uint _rowCount;
+
         public Actor Actor = null;
         public Vector2 Center = Vector2.Zero;
-        private uint _colCount;
-        public readonly StatusEffectsListConfig Config;
-
-        private uint _rowCount;
 
         public StatusEffectsList(DalamudPluginInterface pluginInterface, StatusEffectsListConfig config) {
             _pluginInterface = pluginInterface;
