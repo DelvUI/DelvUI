@@ -220,7 +220,7 @@ namespace DelvUI.Interface.Party {
                 changed |= ImGui.InputTextWithHint("Text Fromat", "Example: [name:initials]", ref TextFormat, 64);
 
                 var size = _size;
-                if (ImGui.DragFloat2("Size", ref _size, 1, 1, 1000)) {
+                if (ImGui.DragFloat2("Size", ref size, 1, 1, 1000)) {
                     Size = size;
                     changed = true;
                 }

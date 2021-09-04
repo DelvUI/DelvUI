@@ -151,7 +151,7 @@ namespace DelvUI.Interface.Party {
             var origin = windowPos + new Vector2(margin, 0);
             var maxSize = windowSize - new Vector2(margin + 5, 0);
 
-            if (_layoutDirty) {
+            if (_layoutDirty || _size != maxSize || _memberCount != count) {
                 LayoutHelper.CalculateLayout(
                     maxSize,
                     _config.HealthBarsConfig.Size,
@@ -171,6 +171,7 @@ namespace DelvUI.Interface.Party {
             _layoutDirty = false;
             _origin = origin;
             _memberCount = count;
+            _size = maxSize;
 
             // draw
             var drawList = ImGui.GetWindowDrawList();
