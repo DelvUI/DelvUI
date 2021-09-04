@@ -2,8 +2,7 @@
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
-namespace DelvUI.GameStructs
-{
+namespace DelvUI.GameStructs {
     [StructLayout(LayoutKind.Explicit, Size = 1280)]
     public struct AddonCastBar {
         [FieldOffset(0x000)] public AtkUnitBase AtkUnitBase;
