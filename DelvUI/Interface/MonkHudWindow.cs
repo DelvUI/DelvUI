@@ -5,6 +5,7 @@ using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using ImGuiNET;
 using DelvUI.Interface.Bars;
+using DelvUI.Config;
 
 namespace DelvUI.Interface
 {

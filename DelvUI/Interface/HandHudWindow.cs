@@ -1,12 +1,8 @@
 ﻿using Dalamud.Plugin;
 using ImGuiNET;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
+using DelvUI.Config;
 
 namespace DelvUI.Interface
 {
