@@ -1,16 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game.ClientState.Actors.Types;
+﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Numerics;
 
-namespace DelvUI.Interface {
-    public class SamuraiHudWindow : HudWindow {
+namespace DelvUI.Interface
+{
+    public class SamuraiHudWindow : HudWindow
+    {
         public SamuraiHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => 34;
@@ -75,32 +77,40 @@ namespace DelvUI.Interface {
         private Dictionary<string, uint> SamEmptyColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 8];
         private Dictionary<string, uint> SamExpiryColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 9];
 
-        protected override void Draw(bool _) {
-            if (GaugeEnabled) {
+        protected override void Draw(bool _)
+        {
+            if (GaugeEnabled)
+            {
                 DrawKenkiBar();
             }
 
-            if (SenEnabled) {
+            if (SenEnabled)
+            {
                 DrawSenResourceBar();
             }
 
-            if (MeditationEnabled) {
+            if (MeditationEnabled)
+            {
                 DrawMeditationResourceBar();
             }
 
-            if (HiganbanaEnabled) {
+            if (HiganbanaEnabled)
+            {
                 DrawHiganbanaBar();
             }
 
-            if (BuffsEnabled) {
+            if (BuffsEnabled)
+            {
                 DrawActiveBuffs();
             }
         }
 
         protected override void DrawPrimaryResourceBar() { }
 
-        private void DrawKenkiBar() {
-            if (!GaugeEnabled) {
+        private void DrawKenkiBar()
+        {
+            if (!GaugeEnabled)
+            {
                 return;
             }
 
@@ -130,15 +140,18 @@ namespace DelvUI.Interface {
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             var textSize = ImGui.CalcTextSize(gauge.Kenki.ToString());
 
-            if (KenkiText) {
+            if (KenkiText)
+            {
                 DrawOutlinedText(gauge.Kenki.ToString(), new Vector2(cursorPos.X + SamKenkiBarWidth / 2f - textSize.X / 2f, cursorPos.Y + barSize.Y / 2 - 12));
             }
         }
 
-        private void DrawHiganbanaBar() {
+        private void DrawHiganbanaBar()
+        {
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (target is not Chara) {
+            if (target is not Chara)
+            {
                 return;
             }
 
@@ -162,7 +175,8 @@ namespace DelvUI.Interface {
 
             var textSize = ImGui.CalcTextSize(Math.Round(higanbanaDuration).ToString(CultureInfo.InvariantCulture));
 
-            if (HiganbanaText) {
+            if (HiganbanaText)
+            {
                 DrawOutlinedText(
                     Math.Round(higanbanaDuration).ToString(CultureInfo.InvariantCulture),
                     new Vector2(cursorPos.X + SamHiganbanaBarWidth / 2f - textSize.X / 2f, cursorPos.Y + barSize.Y / 2 - 12)
@@ -170,7 +184,8 @@ namespace DelvUI.Interface {
             }
         }
 
-        private void DrawActiveBuffs() {
+        private void DrawActiveBuffs()
+        {
             var target = PluginInterface.ClientState.LocalPlayer;
 
             var buffsBarWidth = SamBuffsBarWidth / 2 - 1;
@@ -202,7 +217,8 @@ namespace DelvUI.Interface {
                 SamShifuColor["gradientLeft"]
             );
 
-            if (!PluginConfiguration.ShowBuffTime) {
+            if (!PluginConfiguration.ShowBuffTime)
+            {
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
                 cursorPos = new Vector2(cursorPos.X + buffsBarWidth + BuffsPadding, cursorPos.Y);
@@ -220,10 +236,12 @@ namespace DelvUI.Interface {
 
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
             }
-            else {
+            else
+            {
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-                if (BuffText) {
+                if (BuffText)
+                {
                     DrawOutlinedText(
                         Math.Round(shifuDuration).ToString(CultureInfo.InvariantCulture),
                         new Vector2(cursorPos.X + buffsBarWidth / 2f - shifuTextSize.X / 2f, cursorPos.Y + barSize.Y / 2 - 12)
@@ -247,7 +265,8 @@ namespace DelvUI.Interface {
 
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-                if (BuffText) {
+                if (BuffText)
+                {
                     DrawOutlinedText(
                         Math.Round(jinpuDuration).ToString(CultureInfo.InvariantCulture),
                         new Vector2(cursorPos.X + buffsBarWidth / 2f - jinpuTextSize.X / 2f, cursorPos.Y + barSize.Y / 2 - 12)
@@ -256,7 +275,8 @@ namespace DelvUI.Interface {
             }
         }
 
-        private void DrawSenResourceBar() {
+        private void DrawSenResourceBar()
+        {
             var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
 
             var senBarWidth = (SamSenBarWidth - SenPadding * 2) / 3f;
@@ -283,7 +303,8 @@ namespace DelvUI.Interface {
             drawList.AddRect(cursorPos, cursorPos + senBarSize, 0xFF000000);
         }
 
-        private void DrawMeditationResourceBar() {
+        private void DrawMeditationResourceBar()
+        {
             var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
 
             var meditationBarWidth = (SamMeditationBarWidth - MeditationPadding * 2) / 3f;
@@ -295,7 +316,8 @@ namespace DelvUI.Interface {
             var drawList = ImGui.GetWindowDrawList();
 
             // Meditation Stacks
-            for (var i = 1; i < 4; i++) {
+            for (var i = 1; i < 4; i++)
+            {
                 cursorPos = new Vector2(cursorPos.X + MeditationPadding + meditationBarWidth, cursorPos.Y);
 
                 drawList.AddRectFilled(cursorPos, cursorPos + meditationBarSize, gauge.MeditationStacks >= i ? SamMeditationColor["base"] : SamEmptyColor["background"]);

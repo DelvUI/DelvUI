@@ -1,16 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game.ClientState.Actors.Types;
+﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
 
-namespace DelvUI.Interface {
-    public class DragoonHudWindow : HudWindow {
+namespace DelvUI.Interface
+{
+    public class DragoonHudWindow : HudWindow
+    {
+
         public DragoonHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => Jobs.DRG;
@@ -46,36 +49,64 @@ namespace DelvUI.Interface {
         private Dictionary<string, uint> DisembowelColor => PluginConfiguration.JobColorMap[Jobs.DRG * 1000 + 3];
         private Dictionary<string, uint> ChaosThrustColor => PluginConfiguration.JobColorMap[Jobs.DRG * 1000 + 4];
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.DRG * 1000 + 5];
+        protected override List<uint> GetJobSpecificBuffs()
+        {
+            uint[] ids = { 
+                // Dive Ready
+                1243,
+                // Life Surge
+                116,
+                2175,
+                // Lance Charge
+                1864,
+                // Right Eye
+                1183,
+                1453,
+                1910,
+                // Disembowel
+                121,
+                1914,
+            };
+            return new List<uint>(ids);
+        }
 
-        protected override void Draw(bool _) {
-            if (ShowChaosThrustTimer) {
+        protected override void Draw(bool _)
+        {
+            if (ShowChaosThrustTimer)
+            {
                 DrawChaosThrustBar();
             }
 
-            if (ShowDisembowelTimer) {
+            if (ShowDisembowelTimer)
+            {
                 DrawDisembowelBar();
             }
 
-            if (ShowEyeOfTheDragon) {
+            if (ShowEyeOfTheDragon)
+            {
                 DrawEyeOfTheDragonBars();
             }
 
-            if (ShowBloodBar) {
+            if (ShowBloodBar)
+            {
                 DrawBloodOfTheDragonBar();
             }
         }
 
-        protected override void DrawPrimaryResourceBar() {
+        protected override void DrawPrimaryResourceBar()
+        {
             // Never draw the mana bar for Dragoons as it's useless.
         }
 
-        private void DrawChaosThrustBar() {
+        private void DrawChaosThrustBar()
+        {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             var scale = 0f;
             var duration = 0;
 
-            if (target is Chara) {
+            if (target is Chara)
+            {
                 var chaosThrust = target.StatusEffects.FirstOrDefault(
                     o => (o.EffectId == 1312 || o.EffectId == 118) && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                 );
@@ -83,7 +114,8 @@ namespace DelvUI.Interface {
                 scale = chaosThrust.Duration / 24f;
                 duration = (int)Math.Round(chaosThrust.Duration);
 
-                if (scale < 0f) {
+                if (scale < 0f)
+                {
                     scale = 0f;
                     duration = 0;
                 }
@@ -106,7 +138,8 @@ namespace DelvUI.Interface {
                 ChaosThrustColor["gradientLeft"]
             );
 
-            if (ShowChaosThrustText && duration > 0f) {
+            if (ShowChaosThrustText && duration > 0f)
+            {
                 var durationText = duration.ToString();
                 var textSize = ImGui.CalcTextSize(durationText);
                 DrawOutlinedText(duration.ToString(), new Vector2(cursorPos.X + 5f, cursorPos.Y + ChaosThrustBarHeight / 2f - textSize.Y / 2f));
@@ -115,7 +148,8 @@ namespace DelvUI.Interface {
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
 
-        private void DrawEyeOfTheDragonBars() {
+        private void DrawEyeOfTheDragonBars()
+        {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
 
             var barSize = new Vector2(EyeOfTheDragonBarWidth, EyeOfTheDragonBarHeight);
@@ -125,10 +159,12 @@ namespace DelvUI.Interface {
             var eyeCount = gauge.EyeCount;
             var drawList = ImGui.GetWindowDrawList();
 
-            for (byte i = 0; i < 2; i++) {
+            for (byte i = 0; i < 2; i++)
+            {
                 cursorPos = new Vector2(cursorPos.X + (EyeOfTheDragonBarWidth + EyeOfTheDragonPadding) * i, cursorPos.Y);
 
-                if (eyeCount >= i + 1) {
+                if (eyeCount >= i + 1)
+                {
                     drawList.AddRectFilledMultiColor(
                         cursorPos,
                         cursorPos + barSize,
@@ -138,7 +174,8 @@ namespace DelvUI.Interface {
                         EyeOfTheDragonColor["gradientLeft"]
                     );
                 }
-                else {
+                else
+                {
                     drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
                 }
 
@@ -146,7 +183,8 @@ namespace DelvUI.Interface {
             }
         }
 
-        private void DrawBloodOfTheDragonBar() {
+        private void DrawBloodOfTheDragonBar()
+        {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
 
             var xPos = CenterX - XOffset + BloodBarXOffset;
@@ -160,7 +198,8 @@ namespace DelvUI.Interface {
             var maxTimerMs = 30 * 1000;
             var currTimerMs = gauge.BOTDTimer;
 
-            if (currTimerMs == 0) {
+            if (currTimerMs == 0)
+            {
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
                 return;
@@ -169,7 +208,8 @@ namespace DelvUI.Interface {
             var scale = (float)currTimerMs / maxTimerMs;
             var botdBarSize = new Vector2(BloodBarWidth * scale, BloodBarHeight);
 
-            if (gauge.BOTDState == BOTDState.LOTD) {
+            if (gauge.BOTDState == BOTDState.LOTD)
+            {
                 drawList.AddRectFilledMultiColor(
                     cursorPos,
                     cursorPos + botdBarSize,
@@ -179,7 +219,8 @@ namespace DelvUI.Interface {
                     LifeOfTheDragonColor["gradientLeft"]
                 );
             }
-            else {
+            else
+            {
                 drawList.AddRectFilledMultiColor(
                     cursorPos,
                     cursorPos + botdBarSize,
@@ -190,7 +231,8 @@ namespace DelvUI.Interface {
                 );
             }
 
-            if (ShowBloodText) {
+            if (ShowBloodText)
+            {
                 var durationText = ((int)(currTimerMs / 1000f)).ToString();
                 var textSize = ImGui.CalcTextSize(durationText);
                 DrawOutlinedText(durationText, new Vector2(cursorPos.X + 5f, cursorPos.Y + BloodBarHeight / 2f - textSize.Y / 2f));
@@ -199,7 +241,8 @@ namespace DelvUI.Interface {
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
 
-        private void DrawDisembowelBar() {
+        private void DrawDisembowelBar()
+        {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var xPos = CenterX - XOffset + DisembowelXOffset;
             var yPos = CenterY + YOffset + DisembowelYOffset;
@@ -209,7 +252,8 @@ namespace DelvUI.Interface {
             var disembowelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1914 || o.EffectId == 121);
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
 
-            if (disembowelBuff.Count() == 0) {
+            if (disembowelBuff.Count() == 0)
+            {
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
                 return;
@@ -217,7 +261,8 @@ namespace DelvUI.Interface {
 
             var buff = disembowelBuff.First();
 
-            if (buff.Duration <= 0) {
+            if (buff.Duration <= 0)
+            {
                 drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
                 return;
@@ -235,7 +280,8 @@ namespace DelvUI.Interface {
                 DisembowelColor["gradientLeft"]
             );
 
-            if (ShowDisembowelText) {
+            if (ShowDisembowelText)
+            {
                 var durationText = ((int)buff.Duration).ToString();
                 var textSize = ImGui.CalcTextSize(durationText);
                 DrawOutlinedText(durationText, new Vector2(cursorPos.X + 5f, cursorPos.Y + BloodBarHeight / 2f - textSize.Y / 2f));
