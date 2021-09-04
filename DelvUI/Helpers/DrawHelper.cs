@@ -1,8 +1,7 @@
 ﻿using System.Numerics;
 using ImGuiNET;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
+using DelvUI.Config;
 
 namespace DelvUI.Helpers
 {

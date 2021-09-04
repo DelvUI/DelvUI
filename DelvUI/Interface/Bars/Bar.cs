@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using DelvUI.Helpers;
 using ImGuiNET;
+using DelvUI.Config;
 
 namespace DelvUI.Interface.Bars
 {
