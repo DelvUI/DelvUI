@@ -14,11 +14,43 @@ using Newtonsoft.Json;
 
 namespace DelvUI.Config {
     public class PluginConfiguration : IPluginConfiguration {
+        public readonly BlackMageHudConfig BLMConfig = new();
+
+        public readonly StatusEffectsListConfig PlayerBuffListConfig = new(
+            new Vector2(750, -480),
+            true,
+            false,
+            true,
+            GrowthDirections.Left | GrowthDirections.Down
+        );
+
+        public readonly StatusEffectsListConfig PlayerDebuffListConfig = new(
+            new Vector2(750, -380),
+            false,
+            true,
+            true,
+            GrowthDirections.Left | GrowthDirections.Down
+        );
+
+        public readonly StatusEffectsListConfig TargetBuffListConfig = new(
+            new Vector2(160, 415),
+            true,
+            false,
+            true,
+            GrowthDirections.Right | GrowthDirections.Up
+        );
+
+        public readonly StatusEffectsListConfig TargetDebuffListConfig = new(
+            new Vector2(160, 315),
+            false,
+            true,
+            true,
+            GrowthDirections.Right | GrowthDirections.Up
+        );
+
         [JsonIgnore] private DalamudPluginInterface _pluginInterface;
         [JsonIgnore] public TextureWrap BannerImage = null;
         [JsonIgnore] public ImFontPtr BigNoodleTooFont = null;
-
-        public readonly BlackMageHudConfig BLMConfig = new();
         public Vector4 CastBarColor = new(255f / 255f, 158f / 255f, 208f / 255f, 100f / 100f);
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> CastBarColorMap;
         public bool ColorCastBarByDamageType = false;
@@ -77,22 +109,6 @@ namespace DelvUI.Config {
         [JsonIgnore] public Dictionary<string, Dictionary<string, uint>> NPCColorMap;
         public Vector4 NPCColorNeutral = new(214f / 255f, 145f / 255f, 64f / 255f, 100f / 100f);
 
-        public readonly StatusEffectsListConfig PlayerBuffListConfig = new(
-            new Vector2(750, -480),
-            true,
-            false,
-            true,
-            GrowthDirections.Left | GrowthDirections.Down
-        );
-
-        public readonly StatusEffectsListConfig PlayerDebuffListConfig = new(
-            new Vector2(750, -380),
-            false,
-            true,
-            true,
-            GrowthDirections.Left | GrowthDirections.Down
-        );
-
         public Vector4 ShieldColor = new(255f / 255f, 255f / 255f, 0f / 255f, 100f / 100f);
 
         public bool ShieldEnabled = true;
@@ -119,27 +135,11 @@ namespace DelvUI.Config {
         public string TargetBarTextLeft = "[health:max-short] | [health:percent]";
         public string TargetBarTextRight = "[name:abbreviate]";
 
-        public readonly StatusEffectsListConfig TargetBuffListConfig = new(
-            new Vector2(160, 415),
-            true,
-            false,
-            true,
-            GrowthDirections.Right | GrowthDirections.Up
-        );
-
         public Vector4 TargetCastBarColor = new(255f / 255f, 158f / 255f, 208f / 255f, 100f / 100f);
         public Vector4 TargetCastBarDarknessColor = new(255f / 255f, 0 / 255f, 255f / 255f, 100f / 100f);
         public Vector4 TargetCastBarInterruptColor = new(255f / 255f, 0 / 255f, 255f / 255f, 100f / 100f);
         public Vector4 TargetCastBarMagicalColor = new(0f / 255f, 0 / 255f, 255f / 255f, 100f / 100f);
         public Vector4 TargetCastBarPhysicalColor = new(255f / 255f, 0 / 255f, 0f / 255f, 100f / 100f);
-
-        public readonly StatusEffectsListConfig TargetDebuffListConfig = new(
-            new Vector2(160, 315),
-            false,
-            true,
-            true,
-            GrowthDirections.Right | GrowthDirections.Up
-        );
 
         public string ToTBarText = "[name:abbreviate]";
         public Vector4 UnitFrameEmptyColor = new(0f / 255f, 0f / 255f, 0f / 255f, 95f / 100f);

@@ -843,9 +843,7 @@ namespace DelvUI.Interface {
         }
 
         private int HasTankInvuln(Actor actor) {
-            var tankInvulnBuff = actor.StatusEffects.Where(
-                o => o.EffectId is 810 or 1302 or 409 or 1836
-            );
+            var tankInvulnBuff = actor.StatusEffects.Where(o => o.EffectId is 810 or 1302 or 409 or 1836);
 
             return tankInvulnBuff.Count();
         }
