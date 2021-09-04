@@ -8,24 +8,22 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using DelvUI.Interface.Bars;
 using DelvUI.Config;
+using DelvUI.Config.Attributes;
 
 namespace DelvUI.Interface
 {
     public class BlackMageHudWindow : HudWindow
     {
         public override uint JobId => Jobs.BLM;
-        private BlackMageHudConfig _config;
+        private BlackMageHudConfig _config => (BlackMageHudConfig) ConfigurationManager.GetInstance().GetConfiguration(new BlackMageHudConfig());
 
         private float OriginX => CenterX + _config.Position.X;
         private float OriginY => CenterY + YOffset + _config.Position.Y;
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
 
-        public BlackMageHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration, BlackMageHudConfig config) 
+        public BlackMageHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) 
             : base(pluginInterface, pluginConfiguration) 
-        {
-
-            _config = config;
-        }
+        {}
 
         protected override void Draw(bool _)
         {
@@ -280,73 +278,76 @@ namespace DelvUI.Interface
     }
 
     [Serializable]
+    [Section("Job Specific Bars")]
+    [SubSection("Caster", 0)]
+    [SubSection("Black Mage", 1)]
     public class BlackMageHudConfig: PluginConfigObject
     {
-        public Vector2 Position = new Vector2(0, -2);
-        public Vector2 Padding = new Vector2(2, 2);
-        public Vector2 ManaBarSize = new Vector2(253, 20);
-        public Vector2 UmbralHeartSize = new Vector2(83, 16);
-        public Vector2 PolyglotSize = new Vector2(18, 18);
+        [DragFloat2("Base Offset", min = -4000f, max = 4000f)] public Vector2 Position = new Vector2(0, -2);
+        [DragFloat2("Padding", min = -100f, max = 100f)] public Vector2 Padding = new Vector2(2, 2);
+        [DragFloat2("Mana Bar Size", max = 2000f)] public Vector2 ManaBarSize = new Vector2(253, 20);
+        [DragFloat2("Umbra Heart Size", max = 2000f)] public Vector2 UmbralHeartSize = new Vector2(83, 16);
+        [DragFloat2("Polyglot Size", max = 2000f)] public Vector2 PolyglotSize = new Vector2(18, 18);
         
-        public bool ShowManaValue = false;
-        public bool ShowManaThresholdMarker = true;
-        public int ManaThresholdValue = 2600;
+        [Checkbox("Show Mana Value")] public bool ShowManaValue = false;
+        [Checkbox("Show Mana Threshold Marker During Astral Fire")] public bool ShowManaThresholdMarker = true;
+        [DragInt("Mana Threshold Marker Value", max = 10000)] public int ManaThresholdValue = 2600;
 
-        public bool ShowTripleCast = true;
-        public Vector2 TripleCastSize = new Vector2(83, 16);
+        [Checkbox("Show Triplecast")] public bool ShowTripleCast = true;
+        [DragFloat2("Triplecast Size", max = 2000)] public Vector2 TripleCastSize = new Vector2(83, 16);
         
-        public bool ShowFirestarterProcs = true;
-        public bool ShowThundercloudProcs = true;
-        public int ProcsHeight = 7;
-        public bool ShowDotTimer = true;
-        public int DotTimerHeight = 10;
+        [Checkbox("Show Firestarter Procs")] public bool ShowFirestarterProcs = true;
+        [Checkbox("Show Thundercloud Procs")] public bool ShowThundercloudProcs = true;
+        [DragInt("Procs Height", max = 2000)] public int ProcsHeight = 7;
+        [Checkbox("Show DoT Timer")] public bool ShowDotTimer = true;
+        [DragInt("DoT Timer Height", max = 2000)]public int DotTimerHeight = 10;
 
-        public PluginConfigColor ManaBarNoElementColor = new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
-        public PluginConfigColor ManaBarIceColor = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
-        public PluginConfigColor ManaBarFireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
-        public PluginConfigColor UmbralHeartColor = new PluginConfigColor(new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f));
-        public PluginConfigColor PolyglotColor = new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
-        public PluginConfigColor TriplecastColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
-        public PluginConfigColor FirestarterColor = new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f));
-        public PluginConfigColor ThundercloudColor = new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f));
-        public PluginConfigColor DotColor = new PluginConfigColor(new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f));
+        [ColorEdit4("Mana Bar Color")] public PluginConfigColor ManaBarNoElementColor = new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
+        [ColorEdit4("Mana Bar Ice Color")] public PluginConfigColor ManaBarIceColor = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
+        [ColorEdit4("Mana Bar Fire Color")] public PluginConfigColor ManaBarFireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
+        [ColorEdit4("Umbral Heart Color")] public PluginConfigColor UmbralHeartColor = new PluginConfigColor(new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f));
+        [ColorEdit4("Polyglot Color Color")] public PluginConfigColor PolyglotColor = new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
+        [ColorEdit4("Triplecast Color")]  public PluginConfigColor TriplecastColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        [ColorEdit4("Firestarter Proc Color")] public PluginConfigColor FirestarterColor = new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f));
+        [ColorEdit4("Thundercloud Proc Color")] public PluginConfigColor ThundercloudColor = new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f));
+        [ColorEdit4("DoT Timer Color")] public PluginConfigColor DotColor = new PluginConfigColor(new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f));
 
-        public bool Draw()
-        {
-            var changed = false;
-
-            changed |= ImGui.DragFloat2("Base Offset", ref Position, 1f, -4000, 4000);
-            changed |= ImGui.DragFloat2("Padding", ref Padding, 1f, -100, 100);
-            changed |= ImGui.DragFloat2("Mana Bar Size", ref ManaBarSize, 1f, 1, 2000);
-            changed |= ImGui.DragFloat2("Umbral Heart Size", ref UmbralHeartSize, 1f, 1, 2000);
-            changed |= ImGui.DragFloat2("Polyglot Size", ref PolyglotSize, 1f, 1, 2000);
-
-            changed |= ImGui.Checkbox("Show Mana Value", ref ShowManaValue);
-            changed |= ImGui.Checkbox("Show Mana Threshold Marker During Astral Fire", ref ShowManaThresholdMarker);
-            changed |= ImGui.DragInt("Mana Threshold Marker Value", ref ManaThresholdValue, 1f, 1, 10000);
-            
-            changed |= ImGui.Checkbox("Show Triplecast", ref ShowTripleCast);
-            changed |= ImGui.DragFloat2("Triplecast Size", ref TripleCastSize, 1f, 1, 2000);
-            
-            changed |= ImGui.Checkbox("Show Firestarter Procs", ref ShowFirestarterProcs);
-            changed |= ImGui.Checkbox("Show Thundercloud Procs", ref ShowThundercloudProcs);
-
-            changed |= ImGui.DragInt("Procs Height", ref ProcsHeight, .1f, 1, 2000);
-
-            changed |= ImGui.Checkbox("Show DoT Timer", ref ShowDotTimer);
-            changed |= ImGui.DragInt("DoT Timer Height", ref DotTimerHeight, .1f, 1, 2000);
-
-            changed |= ColorEdit4("Mana Bar Color", ref ManaBarNoElementColor);
-            changed |= ColorEdit4("Mana Bar Ice Color", ref ManaBarIceColor);
-            changed |= ColorEdit4("Mana Bar Fire Color", ref ManaBarFireColor);
-            changed |= ColorEdit4("Umbral Heart Color", ref UmbralHeartColor);
-            changed |= ColorEdit4("Polyglot Color", ref PolyglotColor);
-            changed |= ColorEdit4("Triplecast Color", ref TriplecastColor);
-            changed |= ColorEdit4("Firestarter Proc Color", ref FirestarterColor);
-            changed |= ColorEdit4("Thundercloud Proc Color", ref ThundercloudColor);
-            changed |= ColorEdit4("DoT Timer Color", ref DotColor);
-
-            return changed;
-        }
+        // public bool Draw()
+        // {
+        //     var changed = false;
+        //
+        //     changed |= ImGui.DragFloat2("Base Offset", ref Position, 1f, -4000, 4000);
+        //     changed |= ImGui.DragFloat2("Padding", ref Padding, 1f, -100, 100);
+        //     changed |= ImGui.DragFloat2("Mana Bar Size", ref ManaBarSize, 1f, 1, 2000);
+        //     changed |= ImGui.DragFloat2("Umbral Heart Size", ref UmbralHeartSize, 1f, 1, 2000);
+        //     changed |= ImGui.DragFloat2("Polyglot Size", ref PolyglotSize, 1f, 1, 2000);
+        //
+        //     changed |= ImGui.Checkbox("Show Mana Value", ref ShowManaValue);
+        //     changed |= ImGui.Checkbox("Show Mana Threshold Marker During Astral Fire", ref ShowManaThresholdMarker);
+        //     changed |= ImGui.DragInt("Mana Threshold Marker Value", ref ManaThresholdValue, 1f, 1, 10000);
+        //     
+        //     changed |= ImGui.Checkbox("Show Triplecast", ref ShowTripleCast);
+        //     changed |= ImGui.DragFloat2("Triplecast Size", ref TripleCastSize, 1f, 1, 2000);
+        //     
+        //     changed |= ImGui.Checkbox("Show Firestarter Procs", ref ShowFirestarterProcs);
+        //     changed |= ImGui.Checkbox("Show Thundercloud Procs", ref ShowThundercloudProcs);
+        //
+        //     changed |= ImGui.DragInt("Procs Height", ref ProcsHeight, .1f, 1, 2000);
+        //
+        //     changed |= ImGui.Checkbox("Show DoT Timer", ref ShowDotTimer);
+        //     changed |= ImGui.DragInt("DoT Timer Height", ref DotTimerHeight, .1f, 1, 2000);
+        //
+        //     changed |= ColorEdit4("Mana Bar Color", ref ManaBarNoElementColor);
+        //     changed |= ColorEdit4("Mana Bar Ice Color", ref ManaBarIceColor);
+        //     changed |= ColorEdit4("Mana Bar Fire Color", ref ManaBarFireColor);
+        //     changed |= ColorEdit4("Umbral Heart Color", ref UmbralHeartColor);
+        //     changed |= ColorEdit4("Polyglot Color", ref PolyglotColor);
+        //     changed |= ColorEdit4("Triplecast Color", ref TriplecastColor);
+        //     changed |= ColorEdit4("Firestarter Proc Color", ref FirestarterColor);
+        //     changed |= ColorEdit4("Thundercloud Proc Color", ref ThundercloudColor);
+        //     changed |= ColorEdit4("DoT Timer Color", ref DotColor);
+        //
+        //     return changed;
+        // }
     }
 }

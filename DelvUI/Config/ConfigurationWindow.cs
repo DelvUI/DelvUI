@@ -4891,11 +4891,11 @@ namespace DelvUI.Config
                     ImGui.EndTabItem();
                 }
 
-                if (ImGui.BeginTabItem("Black Mage"))
-                {
-                    _changed |= _pluginConfiguration.BLMConfig.Draw();
-                    ImGui.EndTabItem();
-                }
+                // if (ImGui.BeginTabItem("Black Mage"))
+                // {
+                //     _changed |= _pluginConfiguration.BLMConfig.Draw();
+                //     ImGui.EndTabItem();
+                // }
             }
             ImGui.EndTabBar();
         }
