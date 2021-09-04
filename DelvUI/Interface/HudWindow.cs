@@ -180,12 +180,7 @@ namespace DelvUI.Interface {
             PluginConfiguration.JobColorMap.TryGetValue(PluginInterface.ClientState.LocalPlayer.ClassJob.Id, out var colors);
             colors ??= PluginConfiguration.NPCColorMap["friendly"];
 
-            if (PluginConfiguration.CustomHealthBarColorEnabled)
-            {
-                var jobColors = colors;
-                colors = PluginConfiguration.MiscColorMap["customhealth"];
-                colors["invuln"] = jobColors["invuln"];
-            }
+            if (PluginConfiguration.CustomHealthBarColorEnabled) colors = PluginConfiguration.MiscColorMap["customhealth"];
 
             var drawList = ImGui.GetWindowDrawList();
 
@@ -205,7 +200,8 @@ namespace DelvUI.Interface {
                
                 if (HasTankInvuln(actor) == 1)
                 {
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["invuln"]);
+                    var jobColors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, jobColors["invuln"]);
                 }
                 
                 drawList.AddRectFilledMultiColor(
