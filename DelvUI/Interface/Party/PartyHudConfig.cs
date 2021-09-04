@@ -1,13 +1,11 @@
 ﻿using DelvUI.Config;
-using System.Numerics;
 using ImGuiNET;
 using System;
+using System.Numerics;
 
-namespace DelvUI.Interface.Party
-{
+namespace DelvUI.Interface.Party {
     [Serializable]
-    public class PartyHudConfig : PluginConfigObject
-    {
+    public class PartyHudConfig : PluginConfigObject {
         public Vector2 Position = new Vector2(200, 200);
         public Vector2 Size = new Vector2(650, 150);
 
@@ -19,8 +17,7 @@ namespace DelvUI.Interface.Party
         public PartyHudSortConfig SortConfig = new PartyHudSortConfig();
         public PartyHudHealthBarsConfig HealthBarsConfig = new PartyHudHealthBarsConfig();
 
-        public bool Draw()
-        {
+        public bool Draw() {
             var changed = false;
 
             ImGui.Text("General settings");
@@ -40,8 +37,7 @@ namespace DelvUI.Interface.Party
     }
 
     [Serializable]
-    public class PartyHudSortConfig: PluginConfigObject
-    {
+    public class PartyHudSortConfig : PluginConfigObject {
         public PartySortingMode Mode = PartySortingMode.Tank_Healer_DPS;
         public bool UseRoleColors = false;
         public PluginConfigColor TankRoleColor = new PluginConfigColor(new Vector4(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f));
@@ -49,8 +45,7 @@ namespace DelvUI.Interface.Party
         public PluginConfigColor HealerRoleColor = new PluginConfigColor(new Vector4(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f));
         public PluginConfigColor GenericRoleColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
-        public bool Draw()
-        {
+        public bool Draw() {
             var changed = false;
 
             ImGui.Text("Sorting");
@@ -58,8 +53,7 @@ namespace DelvUI.Interface.Party
             {
                 var selection = (int)Mode;
                 var names = PartySortingHelper.SortingModesNames;
-                if (ImGui.Combo("Sorting priority", ref selection, PartySortingHelper.SortingModesNames, names.Length))
-                {
+                if (ImGui.Combo("Sorting priority", ref selection, PartySortingHelper.SortingModesNames, names.Length)) {
                     Mode = (PartySortingMode)selection;
                     changed = true;
                 }
@@ -77,8 +71,7 @@ namespace DelvUI.Interface.Party
     }
 
     [Serializable]
-    public class PartyHudHealthBarsConfig: PluginConfigObject
-    {
+    public class PartyHudHealthBarsConfig : PluginConfigObject {
         public string TextFormat = "[name:initials]";
         public Vector2 Size = new Vector2(150, 50);
         public Vector2 Padding = new Vector2(1, 1);
@@ -87,8 +80,7 @@ namespace DelvUI.Interface.Party
 
         public PartyHudShieldsConfig ShieldsConfig = new PartyHudShieldsConfig();
 
-        public bool Draw()
-        {
+        public bool Draw() {
             var changed = false;
 
             ImGui.Text("Bars");
@@ -108,16 +100,14 @@ namespace DelvUI.Interface.Party
     }
 
     [Serializable]
-    public class PartyHudShieldsConfig: PluginConfigObject
-    {
+    public class PartyHudShieldsConfig : PluginConfigObject {
         public bool Enabled = true;
         public int Height = 10;
         public bool HeightInPixels = false;
         public bool FillHealthFirst = true;
         public PluginConfigColor Color = new PluginConfigColor(new Vector4(198f / 255f, 210f / 255f, 255f / 255f, 70f / 100f));
 
-        public bool Draw()
-        {
+        public bool Draw() {
             var changed = false;
 
             ImGui.Text("Shields");

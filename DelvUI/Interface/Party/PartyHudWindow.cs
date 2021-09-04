@@ -1,16 +1,14 @@
-﻿using System;
+﻿using DelvUI.Config;
+using DelvUI.Helpers;
+using ImGuiNET;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using ImGuiNET;
 using System.Numerics;
-using DelvUI.Helpers;
-using DelvUI.Config;
 
 
-namespace DelvUI.Interface.Party
-{
-    public class PartyHudWindow
-    {
+namespace DelvUI.Interface.Party {
+    public class PartyHudWindow {
         private PluginConfiguration _pluginConfiguration;
         private PartyHudConfig _config;
 
@@ -20,7 +18,7 @@ namespace DelvUI.Interface.Party
                                                         ImGuiWindowFlags.NoNav |
                                                         ImGuiWindowFlags.NoInputs;
         private const string _mainWindowName = "Party List";
-        
+
         // layout
         private Vector2 lastSize;
         private uint lastRowCount = 0;
@@ -36,8 +34,7 @@ namespace DelvUI.Interface.Party
         private List<PartyHealthBar> bars;
 
 
-        public PartyHudWindow(PluginConfiguration pluginConfiguration, PartyHudConfig config)
-        {
+        public PartyHudWindow(PluginConfiguration pluginConfiguration, PartyHudConfig config) {
             _pluginConfiguration = pluginConfiguration;
             pluginConfiguration.ConfigChangedEvent += OnConfigChanged;
 
@@ -51,16 +48,14 @@ namespace DelvUI.Interface.Party
             lastUseRoleColors = _config.SortConfig.UseRoleColors;
 
             bars = new List<PartyHealthBar>(8);
-            for (int i = 0; i < bars.Capacity; i++)
-            {
+            for (int i = 0; i < bars.Capacity; i++) {
                 bars.Add(new PartyHealthBar(pluginConfiguration, config));
             }
 
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
         }
 
-        ~PartyHudWindow()
-        {
+        ~PartyHudWindow() {
             _pluginConfiguration.ConfigChangedEvent -= OnConfigChanged;
             _pluginConfiguration = null;
             bars.Clear();
@@ -68,22 +63,18 @@ namespace DelvUI.Interface.Party
             PartyManager.Instance.MembersChangedEvent -= OnMembersChanged;
         }
 
-        private void OnMembersChanged(object sender, EventArgs args)
-        {
+        private void OnMembersChanged(object sender, EventArgs args) {
             UpdateBars(lastOrigin, _config.HealthBarsConfig.Size, lastRowCount, lastColCount, lastHorizontalPadding, lastVerticalPadding, lastFillRowsFirst);
         }
 
-        public void UpdateBars(Vector2 origin, Vector2 barSize, uint rowCount, uint colCount, int horizontalPadding, int verticalPadding, bool fillRowsFirst)
-        {
+        public void UpdateBars(Vector2 origin, Vector2 barSize, uint rowCount, uint colCount, int horizontalPadding, int verticalPadding, bool fillRowsFirst) {
             var memberCount = PartyManager.Instance.MemberCount;
             int row = 0;
             int col = 0;
 
-            for (int i = 0; i < bars.Count; i++)
-            {
+            for (int i = 0; i < bars.Count; i++) {
                 PartyHealthBar bar = bars[i];
-                if (i >= memberCount)
-                {
+                if (i >= memberCount) {
                     bar.Visible = false;
                     continue;
                 }
@@ -99,20 +90,16 @@ namespace DelvUI.Interface.Party
                 bar.Visible = true;
 
                 // layout
-                if (fillRowsFirst)
-                {
+                if (fillRowsFirst) {
                     col = col + 1;
-                    if (col >= colCount)
-                    {
+                    if (col >= colCount) {
                         col = 0;
                         row = row + 1;
                     }
                 }
-                else
-                {
+                else {
                     row = row + 1;
-                    if (row >= rowCount)
-                    {
+                    if (row >= rowCount) {
                         row = 0;
                         col = col + 1;
                     }
@@ -120,24 +107,25 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        private void UpdateBarsPosition(Vector2 delta)
-        {
-            foreach (var bar in bars)
-            {
+        private void UpdateBarsPosition(Vector2 delta) {
+            foreach (var bar in bars) {
                 bar.Position = bar.Position + delta;
             }
         }
 
-        public void Draw()
-        {
-            if (!_config.Enabled) return;
+        public void Draw() {
+            if (!_config.Enabled) {
+                return;
+            }
 
             // size and position
             ImGui.SetNextWindowPos(_config.Position, ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSize(_config.Size, ImGuiCond.FirstUseEver);
 
             var windowFlags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoTitleBar;
-            if (_config.Lock) windowFlags |= _lockedBarFlags;
+            if (_config.Lock) {
+                windowFlags |= _lockedBarFlags;
+            }
 
             ImGui.Begin(_mainWindowName, windowFlags);
             var windowPos = ImGui.GetWindowPos();
@@ -145,8 +133,10 @@ namespace DelvUI.Interface.Party
             UpdateConfig(windowPos, windowSize);
 
             var count = PartyManager.Instance.MemberCount;
-            if (count < 1) return;
-            
+            if (count < 1) {
+                return;
+            }
+
             // recalculate layout on settings or size change
             var margin = ImGui.GetWindowContentRegionMin().X;
             var origin = windowPos + new Vector2(margin, 0);
@@ -160,8 +150,7 @@ namespace DelvUI.Interface.Party
 
             if (lastSize != windowSize || lastBarSize != barSize || lastMemberCount < count ||
                 lastHorizontalPadding != horizontalPadding || lastVerticalPadding != verticalPadding ||
-                lastFillRowsFirst != fillRowsFirst)
-            {
+                lastFillRowsFirst != fillRowsFirst) {
                 LayoutHelper.CalculateLayout(
                     maxSize,
                     barSize,
@@ -175,12 +164,10 @@ namespace DelvUI.Interface.Party
 
                 UpdateBars(lastOrigin, barSize, rowCount, colCount, horizontalPadding, verticalPadding, fillRowsFirst);
             }
-            else if (rowCount != lastRowCount || colCount != lastColCount)
-            {
+            else if (rowCount != lastRowCount || colCount != lastColCount) {
                 UpdateBars(lastOrigin, barSize, rowCount, colCount, horizontalPadding, verticalPadding, fillRowsFirst);
             }
-            else if (lastOrigin != origin)
-            {
+            else if (lastOrigin != origin) {
                 UpdateBarsPosition(origin - lastOrigin);
             }
 
@@ -197,17 +184,14 @@ namespace DelvUI.Interface.Party
 
             // draw
             var drawList = ImGui.GetWindowDrawList();
-            for (int i = 0; i < bars.Count; i++)
-            {
+            for (int i = 0; i < bars.Count; i++) {
                 bars[i].Draw(drawList, lastOrigin);
             }
 
             ImGui.End();
         }
-        private void UpdateConfig(Vector2 position, Vector2 size)
-        {
-            if (position == _config.Position && size == _config.Size)
-            {
+        private void UpdateConfig(Vector2 position, Vector2 size) {
+            if (position == _config.Position && size == _config.Size) {
                 return;
             }
 
@@ -215,13 +199,13 @@ namespace DelvUI.Interface.Party
             _config.Size = size;
         }
 
-        private void OnConfigChanged(object sender, EventArgs args)
-        {
-            if (lastUseRoleColors == _config.SortConfig.UseRoleColors) return;
+        private void OnConfigChanged(object sender, EventArgs args) {
+            if (lastUseRoleColors == _config.SortConfig.UseRoleColors) {
+                return;
+            }
             lastUseRoleColors = _config.SortConfig.UseRoleColors;
 
-            foreach (PartyHealthBar bar in bars) 
-            {
+            foreach (PartyHealthBar bar in bars) {
                 bar.UpdateColor();
             }
         }

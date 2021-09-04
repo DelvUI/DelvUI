@@ -1,28 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using DelvUI.Config;
-using Dalamud.Plugin;
+﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.Internal;
+using Dalamud.Plugin;
+using DelvUI.Config;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
+using System;
+using System.Collections.Generic;
 using PartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
-using Dalamud.Game.ClientState.Actors.Types;
 
 
-namespace DelvUI.Interface.Party
-{
-    public unsafe class PartyManager
-    {
+namespace DelvUI.Interface.Party {
+    public unsafe class PartyManager {
         #region Singleton
         private static PartyManager _instance = null;
         private DalamudPluginInterface _pluginInterface;
         private PluginConfiguration _pluginConfiguration;
         private PartyHudConfig _config;
 
-        private PartyManager(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration, PartyHudConfig config)
-        {
+        private PartyManager(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration, PartyHudConfig config) {
             _pluginInterface = pluginInterface;
             _pluginInterface.Framework.OnUpdateEvent += FrameworkOnOnUpdateEvent;
-            
+
             _pluginConfiguration = pluginConfiguration;
             _pluginConfiguration.ConfigChangedEvent += OnConfigChanged;
 
@@ -32,14 +29,12 @@ namespace DelvUI.Interface.Party
             UpdatePreview(true);
         }
 
-        ~PartyManager()
-        {
+        ~PartyManager() {
             _pluginInterface.Framework.OnUpdateEvent -= FrameworkOnOnUpdateEvent;
             _pluginConfiguration.ConfigChangedEvent -= OnConfigChanged;
         }
 
-        public static void Initialize(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration, PartyHudConfig config)
-        {
+        public static void Initialize(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration, PartyHudConfig config) {
             _instance = new PartyManager(pluginInterface, pluginConfiguration, config);
         }
 
@@ -54,88 +49,86 @@ namespace DelvUI.Interface.Party
 
         private bool _lastPreview;
         private PartySortingMode _lastSortingMode;
-        
-        public bool isInParty
-        {
-            get
-            {
-                if (_config.Preview) return true;
+
+        public bool isInParty {
+            get {
+                if (_config.Preview) {
+                    return true;
+                }
 
                 var manager = GroupManager.Instance();
                 return manager->MemberCount > 0;
             }
         }
 
-        private void FrameworkOnOnUpdateEvent(Framework framework)
-        {
-            if (_config.Preview) return;
+        private void FrameworkOnOnUpdateEvent(Framework framework) {
+            if (_config.Preview) {
+                return;
+            }
 
             var player = _pluginInterface.ClientState.LocalPlayer;
-            if (player is null || player is not PlayerCharacter) return;
+            if (player is null || player is not PlayerCharacter) {
+                return;
+            }
 
             var manager = GroupManager.Instance();
-            if (_groupMembers.Count == manager->MemberCount) return;
+            if (_groupMembers.Count == manager->MemberCount) {
+                return;
+            }
 
-            try
-            {
+            try {
                 _groupMembers.Clear();
 
-                for (int i = 0; i < manager->MemberCount; i++)
-                {
+                for (int i = 0; i < manager->MemberCount; i++) {
                     PartyMember* partyMember = (PartyMember*)(new IntPtr(manager->PartyMembers) + 0x230 * i);
                     _groupMembers.Add(new GroupMember(partyMember, _pluginInterface));
                 }
 
                 PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortConfig.Mode);
             }
-            catch
-            {
+            catch {
                 _groupMembers.Clear();
             }
 
-            if (MembersChangedEvent != null)
-            {
+            if (MembersChangedEvent != null) {
                 MembersChangedEvent(this, null);
             }
         }
 
-        private void OnConfigChanged(object sender, EventArgs args)
-        {
+        private void OnConfigChanged(object sender, EventArgs args) {
             UpdatePreview(false);
             UpdateSortingMode();
         }
 
-        private void UpdatePreview(bool forced)
-        {
-            if (!forced && _lastPreview == _config.Preview) return;
+        private void UpdatePreview(bool forced) {
+            if (!forced && _lastPreview == _config.Preview) {
+                return;
+            }
             _lastPreview = _config.Preview;
 
             _groupMembers.Clear();
 
-            if (_config.Preview)
-            {
-                for (int i = 0; i < 8; i++)
-                {
+            if (_config.Preview) {
+                for (int i = 0; i < 8; i++) {
                     _groupMembers.Add(new FakeGroupMember());
                 }
 
                 PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortConfig.Mode);
             }
 
-            if (MembersChangedEvent != null)
-            {
+            if (MembersChangedEvent != null) {
                 MembersChangedEvent(this, null);
             }
         }
-        private void UpdateSortingMode()
-        {
-            if (_lastSortingMode == _config.SortConfig.Mode) return;
+        private void UpdateSortingMode() {
+            if (_lastSortingMode == _config.SortConfig.Mode) {
+                return;
+            }
             _lastSortingMode = _config.SortConfig.Mode;
 
             PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortConfig.Mode);
 
-            if (MembersChangedEvent != null)
-            {
+            if (MembersChangedEvent != null) {
                 MembersChangedEvent(this, null);
             }
         }
