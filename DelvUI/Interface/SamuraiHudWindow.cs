@@ -124,8 +124,10 @@ namespace DelvUI.Interface
             var kenkiBuilder = BarBuilder.Create(xPos, yPos, SamKenkiBarHeight, SamKenkiBarWidth).SetBackgroundColor(SamEmptyColor["background"]);
             kenkiBuilder.AddInnerBar(gauge.Kenki, 100, SamKenkiColor);
 
-            if (KenkiText)
+            if (KenkiText) {
                 kenkiBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+            }
+
             var drawList = ImGui.GetWindowDrawList();
             kenkiBuilder.Build().Draw(drawList, PluginConfiguration);
         }
