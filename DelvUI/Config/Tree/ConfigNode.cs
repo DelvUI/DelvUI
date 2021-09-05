@@ -1,10 +1,13 @@
-﻿using DelvUI.Config.Attributes;
+using DelvUI.Config.Attributes;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using DelvUI.Config.Attributes;
+using ImGuiNET;
+using Newtonsoft.Json;
 
 namespace DelvUI.Config.Tree
 {
