@@ -8,7 +8,7 @@ using DelvUI.Interface;
 using ImGuiScene;
 
 namespace DelvUI.Config {
-    public class ConfigurationManager : IDisposable {
+    public class ConfigurationManager {
         private static ConfigurationManager _instance;
 
         public TextureWrap BannerImage;
@@ -16,7 +16,6 @@ namespace DelvUI.Config {
         public string ConfigDirectory;
 
         public BaseNode ConfigBaseNode;
-
         public bool DrawConfigWindow;
 
         public ConfigurationManager(TextureWrap bannerImage, string configDirectory, BaseNode configBaseNode) {
@@ -25,19 +24,6 @@ namespace DelvUI.Config {
             ConfigBaseNode = configBaseNode;
             _instance = this;
             LoadConfigurations();
-        }
-
-        public void Dispose() {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        public virtual void Dispose(bool disposing) {
-            if (!disposing) {
-                return;
-            }
-
-            _instance = null;
         }
 
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface) {

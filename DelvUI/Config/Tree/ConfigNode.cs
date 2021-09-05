@@ -362,6 +362,7 @@ namespace DelvUI.Config.Tree {
 
                         if (ImGui.DragFloat2(dragInt2Attribute.friendlyName, ref intVal, dragInt2Attribute.velocity, dragInt2Attribute.min, dragInt2Attribute.max)) {
                             field.SetValue(ConfigObject, intVal);
+                            changed = true;
                         }
                     }
                     else if (attribute is InputTextAttribute inputTextAttribute) {
@@ -369,6 +370,7 @@ namespace DelvUI.Config.Tree {
 
                         if (ImGui.InputText(inputTextAttribute.friendlyName, ref stringVal, inputTextAttribute.maxLength)) {
                             field.SetValue(ConfigObject, stringVal);
+                            changed = true;
                         }
                     }
                     else if (attribute is ColorEdit4Attribute colorEdit4Attribute) {
@@ -378,6 +380,7 @@ namespace DelvUI.Config.Tree {
                         if (ImGui.ColorEdit4(colorEdit4Attribute.friendlyName, ref vector)) {
                             colorVal.Vector = vector;
                             field.SetValue(ConfigObject, colorVal);
+                            changed = true;
                         }
                     }
                 }

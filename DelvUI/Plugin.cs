@@ -275,7 +275,6 @@ namespace DelvUI
             _configurationWindow.IsVisible = false;
 
             ConfigurationManager.GetInstance().DrawConfigWindow = false;
-            ConfigurationManager.GetInstance().Dispose();
 
             if (_hudWindow != null)
             {
