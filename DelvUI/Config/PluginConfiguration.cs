@@ -67,6 +67,7 @@ namespace DelvUI.Config {
         public Vector4 CustomHealthBarColor = new(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f);
         public bool CustomHealthBarColorEnabled = false;
         public Vector4 EmptyColor = new(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f);
+        public Vector4 PartialFillColor = new(180f / 255f, 180f / 255f, 180f / 255f, 100f / 100f);
         public string FocusBarText = "[name:abbreviate]";
         public bool GCDAlwaysShow = false;
         public Vector4 GCDIndicatorColor = new(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f);
@@ -387,13 +388,6 @@ namespace DelvUI.Config {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor.AdjustColor(.1f))
-                },
-                [Jobs.PLD * 1000 + 7] = new() // DoT
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDOathNotFullColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDOathNotFullColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDOathNotFullColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDOathNotFullColor.AdjustColor(.1f))
                 },
                 [Jobs.WAR] = new()
                 {
@@ -889,21 +883,14 @@ namespace DelvUI.Config {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(NINNinkiColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NINNinkiColor.AdjustColor(.1f))
                 },
-                [Jobs.NIN * 1000 + 3] = new() // Ninki gauge partially filled
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(NINNinkiNotFullColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(NINNinkiNotFullColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(NINNinkiNotFullColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NINNinkiNotFullColor.AdjustColor(.1f))
-                },
-                [Jobs.NIN * 1000 + 4] = new() // Trick bar
+                [Jobs.NIN * 1000 + 3] = new() // Trick bar
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(NINTrickColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(NINTrickColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(NINTrickColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(NINTrickColor.AdjustColor(.1f))
                 },
-                [Jobs.NIN * 1000 + 5] = new() // Suiton bar
+                [Jobs.NIN * 1000 + 4] = new() // Suiton bar
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(NINSuitonColor),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(NINSuitonColor.AdjustColor(-.8f)),
@@ -1343,6 +1330,13 @@ namespace DelvUI.Config {
                     ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
+                },
+                ["partial"] = new()
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(PartialFillColor),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(PartialFillColor),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PartialFillColor),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PartialFillColor)
                 }
             };
 
@@ -1770,7 +1764,6 @@ namespace DelvUI.Config {
 
         public Vector4 NINHutonColor = new(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f);
         public Vector4 NINNinkiColor = new(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f);
-        public Vector4 NINNinkiNotFullColor = new(186 / 255f, 177f / 255f, 183f / 255f, 100f / 100f);
         public Vector4 NINTrickColor = new(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f);
         public Vector4 NINSuitonColor = new(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f);
 
@@ -1861,7 +1854,6 @@ namespace DelvUI.Config {
         public Vector4 PLDRequiescatColor = new(61f / 255f, 61f / 255f, 255f / 255f, 100f / 100f);
         public Vector4 PLDAtonementColor = new(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f);
         public Vector4 PLDDoTColor = new(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f);
-        public Vector4 PLDOathNotFullColor = new(186 / 255f, 177f / 255f, 183f / 255f, 100f / 100f);
 
         #endregion
 

@@ -65,7 +65,7 @@ namespace DelvUI.Interface {
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 4];
         private Dictionary<string, uint> AtonementColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 5];
         private Dictionary<string, uint> DoTColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 6];
-        private Dictionary<string, uint> OathNotFullColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 7];
+        private Dictionary<string, uint> OathNotFullColor => PluginConfiguration.MiscColorMap["partial"];
 
         protected override void Draw(bool _) {
             if (ManaEnabled) {
