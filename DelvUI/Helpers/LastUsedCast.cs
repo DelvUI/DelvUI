@@ -7,8 +7,10 @@ using ImGuiScene;
 using Lumina.Excel.GeneratedSheets;
 using Companion = Lumina.Excel.GeneratedSheets.Companion;
 
-namespace DelvUI.Helpers {
-    public class LastUsedCast {
+namespace DelvUI.Helpers
+{
+    public class LastUsedCast
+    {
         private readonly BattleChara.CastInfo _castInfo;
         private readonly DalamudPluginInterface _pluginInterface;
         public readonly ActionType ActionType;
@@ -19,7 +21,8 @@ namespace DelvUI.Helpers {
         public TextureWrap IconTexture;
         public bool Interruptable;
 
-        public LastUsedCast(uint castId, ActionType actionType, BattleChara.CastInfo castInfo, DalamudPluginInterface pluginInterface) {
+        public LastUsedCast(uint castId, ActionType actionType, BattleChara.CastInfo castInfo, DalamudPluginInterface pluginInterface)
+        {
             CastId = castId;
             ActionType = actionType;
             _castInfo = castInfo;
@@ -28,11 +31,13 @@ namespace DelvUI.Helpers {
             PluginLog.Log("Loaded new icon");
         }
 
-        private void SetCastProperties() {
+        private void SetCastProperties()
+        {
             var target = _pluginInterface.ClientState.Targets.SoftTarget ?? _pluginInterface.ClientState.Targets.CurrentTarget;
             var targetKind = target?.ObjectKind;
 
-            switch (targetKind) {
+            switch (targetKind)
+            {
                 case null:
                     break;
 
@@ -53,7 +58,8 @@ namespace DelvUI.Helpers {
             _lastUsedAction = null;
             Interruptable = _castInfo.Interruptible > 0;
 
-            if (CastId == 1 && ActionType != ActionType.Mount) {
+            if (CastId == 1 && ActionType != ActionType.Mount)
+            {
                 ActionText = "Interacting...";
 
                 return;
@@ -61,7 +67,8 @@ namespace DelvUI.Helpers {
 
             ActionText = "Casting";
 
-            switch (ActionType) {
+            switch (ActionType)
+            {
                 case ActionType.PetAction:
                 case ActionType.Spell:
                 case ActionType.SquadronAction:
@@ -128,10 +135,12 @@ namespace DelvUI.Helpers {
             }
         }
 
-        private static DamageType GetDamageType(Action action) {
+        private static DamageType GetDamageType(Action action)
+        {
             var damageType = (DamageType)action.AttackType.Row;
 
-            if (damageType != DamageType.Magic && damageType != DamageType.Darkness && damageType != DamageType.Unknown) {
+            if (damageType != DamageType.Magic && damageType != DamageType.Darkness && damageType != DamageType.Unknown)
+            {
                 damageType = DamageType.Physical;
             }
 

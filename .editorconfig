@@ -4,11 +4,11 @@
 csharp_prefer_braces = true:error
 
 # Microsoft .NET properties
-csharp_new_line_before_open_brace = anonymous_types,object_collection_array_initalizers
+csharp_new_line_before_open_brace = all
 csharp_preferred_modifier_order = public, private, protected, internal, new, abstract, virtual, sealed, override, static, readonly, extern, unsafe, volatile, async:warning
 csharp_style_var_elsewhere = true:warning
 csharp_style_var_for_built_in_types = true:warning
-csharp_style_var_when_type_is_apparent = true:warning
+csharp_style_var_when_type_is_apparent = false
 dotnet_naming_rule.unity_serialized_field_rule.import_to_resharper = True
 dotnet_naming_rule.unity_serialized_field_rule.resharper_description = Unity serialized field
 dotnet_naming_rule.unity_serialized_field_rule.resharper_guid = 5f0fdb63-c892-4d2c-9324-15c80b22a7ef
