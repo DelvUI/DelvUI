@@ -43,12 +43,12 @@ namespace DelvUI.Interface
         private int TrickBarXOffset => PluginConfiguration.NINTrickBarXOffset;
         private int TrickBarYOffset => PluginConfiguration.NINTrickBarYOffset;
 
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000];
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
         private Dictionary<string, uint> HutonColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 1];
         private Dictionary<string, uint> NinkiColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 2];
-        private Dictionary<string, uint> NinkiNotFilledColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 3];
-        private Dictionary<string, uint> TrickColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 4];
-        private Dictionary<string, uint> SuitonColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 5];
+        private Dictionary<string, uint> TrickColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 3];
+        private Dictionary<string, uint> SuitonColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 4];
+        private Dictionary<string, uint> NinkiNotFilledColor => PluginConfiguration.MiscColorMap["partial"];
 
         protected override void Draw(bool _)
         {

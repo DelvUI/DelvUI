@@ -58,7 +58,8 @@ namespace DelvUI.Interface
         private Dictionary<string, uint> BloodWeaponColor => PluginConfiguration.JobColorMap[Jobs.DRK * 1000 + 4];
         private Dictionary<string, uint> DeliriumColor => PluginConfiguration.JobColorMap[Jobs.DRK * 1000 + 5];
         private Dictionary<string, uint> LivingShadowColor => PluginConfiguration.JobColorMap[Jobs.DRK * 1000 + 6];
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.DRK * 1000 + 7];
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
+        private Dictionary<string, uint> PartialFillColor => PluginConfiguration.MiscColorMap["partial"];
 
         protected override void Draw(bool _)
         {
@@ -247,10 +248,10 @@ namespace DelvUI.Interface
                     drawList.AddRectFilledMultiColor(
                         cursorPos,
                         cursorPos + new Vector2(barWidth * scale, BloodGaugeHeight),
-                        EmptyColor["gradientLeft"],
-                        EmptyColor["gradientRight"],
-                        EmptyColor["gradientRight"],
-                        EmptyColor["gradientLeft"]
+                        PartialFillColor["gradientLeft"],
+                        PartialFillColor["gradientRight"],
+                        PartialFillColor["gradientRight"],
+                        PartialFillColor["gradientLeft"]
                     );
                 }
 
