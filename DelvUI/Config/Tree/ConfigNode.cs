@@ -1,4 +1,4 @@
-﻿using DelvUI.Config.Attributes;
+using DelvUI.Config.Attributes;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;

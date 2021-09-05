@@ -1,4 +1,4 @@
-﻿using Dalamud.Plugin;
+using Dalamud.Plugin;
 using DelvUI.Config.Tree;
 using DelvUI.Interface;
 using ImGuiScene;
@@ -31,8 +31,9 @@ namespace DelvUI.Config
             BardHudConfig brdConfig = new BardHudConfig();
             BlackMageHudConfig blmConfig = new BlackMageHudConfig();
             NinjaHudConfig ninConfig = new NinjaHudConfig();
+            WarriorHudConfig warConfig = new WarriorHudConfig();
 
-            return Initialize(pluginInterface, astConfig, blmConfig, brdConfig, ninConfig);
+            return Initialize(pluginInterface, astConfig, blmConfig, brdConfig, ninConfig, warConfig);
         }
 
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface, params PluginConfigObject[] configObjects)
