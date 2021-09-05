@@ -836,7 +836,7 @@ namespace DelvUI.Interface
 
             var shieldColor = PluginConfiguration.MiscColorMap["shield"];
             var shield = Utils.ActorShieldValue(actor);
-            
+
             // Account for border and draw shield inside the border of the HudElement
             cursorPos = new Vector2(cursorPos.X + 1, cursorPos.Y + 1);
 
