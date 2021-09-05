@@ -1,16 +1,18 @@
-﻿using System;
+﻿using Dalamud.Game.ClientState.Structs.JobGauge;
+using Dalamud.Plugin;
+using DelvUI.Config;
+using ImGuiNET;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
-using DelvUI.Config;
-using ImGuiNET;
 
-namespace DelvUI.Interface {
-    public class DarkKnightHudWindow : HudWindow {
+namespace DelvUI.Interface
+{
+    public class DarkKnightHudWindow : HudWindow
+    {
         public DarkKnightHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => 32;
@@ -59,27 +61,33 @@ namespace DelvUI.Interface {
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
         private Dictionary<string, uint> PartialFillColor => PluginConfiguration.MiscColorMap["partial"];
 
-        protected override void Draw(bool _) {
-            if (ManaBarEnabled) {
+        protected override void Draw(bool _)
+        {
+            if (ManaBarEnabled)
+            {
                 DrawManaBar();
             }
 
-            if (BloodGaugeEnabled) {
+            if (BloodGaugeEnabled)
+            {
                 DrawBloodGauge();
             }
 
-            if (BuffBarEnabled) {
+            if (BuffBarEnabled)
+            {
                 DrawBuffBar();
             }
 
-            if (LivingShadowBarEnabled) {
+            if (LivingShadowBarEnabled)
+            {
                 DrawLivingShadowBar();
             }
         }
 
         protected override void DrawPrimaryResourceBar() { }
 
-        private void DrawManaBar() {
+        private void DrawManaBar()
+        {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
 
             var darkArtsBuff = PluginInterface.ClientState.JobGauges.Get<DRKGauge>().HasDarkArts();
@@ -94,25 +102,31 @@ namespace DelvUI.Interface {
 
             var drawList = ImGui.GetWindowDrawList();
 
-            void DrawManaChunks(int index = 1) {
-                if (index > 3) {
+            void DrawManaChunks(int index = 1)
+            {
+                if (index > 3)
+                {
                     return;
                 }
 
                 var mana = Math.Min(actor.CurrentMp, chunkSize * index);
 
-                if (index == 2) {
+                if (index == 2)
+                {
                     mana = Math.Max(mana - chunkSize, 0);
                 }
-                else if (index == 3) {
+                else if (index == 3)
+                {
                     mana = Math.Max(mana - chunkSize * 2, 0);
                 }
 
-                if (index > 1) {
+                if (index > 1)
+                {
                     cursorPos = new Vector2(cursorPos.X + barWidth + ManaBarPadding, cursorPos.Y);
                 }
 
-                if (darkArtsBuff) {
+                if (darkArtsBuff)
+                {
                     var glowPosition = new Vector2(cursorPos.X - 1, cursorPos.Y - 1);
                     var glowSize = new Vector2(barSize.X + 2, barSize.Y + 2);
                     var glowColor = ImGui.ColorConvertFloat4ToU32(PluginConfiguration.DRKDarkArtsColor.AdjustColor(+0.2f));
@@ -129,7 +143,8 @@ namespace DelvUI.Interface {
                         DarkArtsColor["gradientLeft"]
                     );
                 }
-                else {
+                else
+                {
                     drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
 
                     drawList.AddRectFilledMultiColor(
@@ -149,7 +164,8 @@ namespace DelvUI.Interface {
 
             DrawManaChunks();
 
-            if (ManaBarOverflowEnabled && actor.CurrentMp > 9000) {
+            if (ManaBarOverflowEnabled && actor.CurrentMp > 9000)
+            {
                 var over9000 = 9000 - actor.CurrentMp;
                 cursorPos = new Vector2(cursorPos.X + barWidth - 1, cursorPos.Y);
                 var inverseOffset = cursorPos + new Vector2(barSize.X / 10 * over9000 / ManaBarWidth, barSize.Y);
@@ -167,7 +183,8 @@ namespace DelvUI.Interface {
             }
         }
 
-        private void DrawBloodGauge() {
+        private void DrawBloodGauge()
+        {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DRKGauge>();
 
             var padding = BloodGaugeSplit ? BloodGaugePadding : 0;
@@ -185,12 +202,15 @@ namespace DelvUI.Interface {
 
             var drawList = ImGui.GetWindowDrawList();
 
-            if (!BloodGaugeSplit) {
+            if (!BloodGaugeSplit)
+            {
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
             }
 
-            void DrawBloodChunks(int index = 1) {
-                if (index > 2) {
+            void DrawBloodChunks(int index = 1)
+            {
+                if (index > 2)
+                {
                     return;
                 }
 
@@ -200,17 +220,20 @@ namespace DelvUI.Interface {
                 var gradientLeft = index == 1 ? BloodColorLeft["gradientLeft"] : BloodColorRight["gradientLeft"];
                 var gradientRight = index == 1 ? BloodColorLeft["gradientRight"] : BloodColorRight["gradientRight"];
 
-                if (index == 2) {
+                if (index == 2)
+                {
                     blood = Math.Max(blood - chunkSize, 0);
                     scale = (float)blood / chunkSize;
                     cursorPos = new Vector2(cursorPos.X + barWidth + padding, cursorPos.Y);
                 }
 
-                if (BloodGaugeSplit) {
+                if (BloodGaugeSplit)
+                {
                     drawList.AddRectFilled(cursorPos, cursorPos + barSplitSize, EmptyColor["background"]);
                 }
 
-                if (scale >= 1.0f) {
+                if (scale >= 1.0f)
+                {
                     drawList.AddRectFilledMultiColor(
                         cursorPos,
                         cursorPos + new Vector2(barWidth * scale, BloodGaugeHeight),
@@ -220,7 +243,8 @@ namespace DelvUI.Interface {
                         gradientLeft
                     );
                 }
-                else {
+                else
+                {
                     drawList.AddRectFilledMultiColor(
                         cursorPos,
                         cursorPos + new Vector2(barWidth * scale, BloodGaugeHeight),
@@ -231,7 +255,8 @@ namespace DelvUI.Interface {
                     );
                 }
 
-                if (BloodGaugeSplit) {
+                if (BloodGaugeSplit)
+                {
                     drawList.AddRect(cursorPos, cursorPos + barSplitSize, 0xFF000000);
                 }
 
@@ -240,17 +265,20 @@ namespace DelvUI.Interface {
 
             DrawBloodChunks();
 
-            if (!BloodGaugeSplit) {
+            if (!BloodGaugeSplit)
+            {
                 var cursor = new Vector2(xPos, yPos);
                 drawList.AddRect(cursor, cursor + barSize, 0xFF000000);
 
-                if (BloodGaugeThreshold) {
+                if (BloodGaugeThreshold)
+                {
                     drawList.AddLine(thresholdCursorPos, new Vector2(thresholdCursorPos.X, thresholdCursorPos.Y + BloodGaugeHeight), 0x88000000);
                 }
             }
         }
 
-        private void DrawBuffBar() {
+        private void DrawBuffBar()
+        {
             var bloodWeaponBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 742);
             var deliriumBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1972);
 
@@ -265,7 +293,8 @@ namespace DelvUI.Interface {
 
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
 
-            if (bloodWeaponBuff.Any() && deliriumBuff.Any()) {
+            if (bloodWeaponBuff.Any() && deliriumBuff.Any())
+            {
                 var innerBarHeight = buffBarBarHeight / 2;
                 barSize = new Vector2(buffBarBarWidth, innerBarHeight);
 
@@ -298,7 +327,8 @@ namespace DelvUI.Interface {
 
                 barSize = new Vector2(buffBarBarWidth, buffBarBarHeight);
             }
-            else if (bloodWeaponBuff.Any()) {
+            else if (bloodWeaponBuff.Any())
+            {
                 var bloodWeaponDuration = Math.Abs(bloodWeaponBuff.First().Duration);
 
                 drawList.AddRectFilledMultiColor(
@@ -313,7 +343,8 @@ namespace DelvUI.Interface {
                 var bloodWeaponDurationText = bloodWeaponDuration == 0 ? "" : Math.Ceiling(bloodWeaponDuration).ToString();
                 DrawOutlinedText(bloodWeaponDurationText, new Vector2(cursorPos.X + 5f, cursorPos.Y - 2f), PluginConfiguration.DRKBloodWeaponColor, new Vector4(0f, 0f, 0f, 1f));
             }
-            else if (deliriumBuff.Any()) {
+            else if (deliriumBuff.Any())
+            {
                 var deliriumDuration = Math.Abs(deliriumBuff.First().Duration);
 
                 drawList.AddRectFilledMultiColor(
@@ -332,7 +363,8 @@ namespace DelvUI.Interface {
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
 
-        private void DrawLivingShadowBar() {
+        private void DrawLivingShadowBar()
+        {
             var actor = PluginInterface.ClientState.LocalPlayer;
             var shadowTimeRemaining = PluginInterface.ClientState.JobGauges.Get<DRKGauge>().ShadowTimeRemaining / 100; // ms
             var livingShadow = actor.Level >= 80 && shadowTimeRemaining is > 0 and <= 24;
@@ -348,7 +380,8 @@ namespace DelvUI.Interface {
             float duration = 0;
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
 
-            if (livingShadow) {
+            if (livingShadow)
+            {
                 duration = Math.Abs(shadowTimeRemaining);
 
                 drawList.AddRectFilledMultiColor(

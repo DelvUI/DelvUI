@@ -1,18 +1,20 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game.ClientState.Actors.Types;
+﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
 
-namespace DelvUI.Interface {
-    public class PaladinHudWindow : HudWindow {
+namespace DelvUI.Interface
+{
+    public class PaladinHudWindow : HudWindow
+    {
         public PaladinHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => 19;
@@ -67,31 +69,38 @@ namespace DelvUI.Interface {
         private Dictionary<string, uint> DoTColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 6];
         private Dictionary<string, uint> OathNotFullColor => PluginConfiguration.MiscColorMap["partial"];
 
-        protected override void Draw(bool _) {
-            if (ManaEnabled) {
+        protected override void Draw(bool _)
+        {
+            if (ManaEnabled)
+            {
                 DrawManaBar();
             }
 
-            if (OathGaugeEnabled) {
+            if (OathGaugeEnabled)
+            {
                 DrawOathGauge();
             }
 
-            if (BuffBarEnabled) {
+            if (BuffBarEnabled)
+            {
                 DrawBuffBar();
             }
 
-            if (AtonementEnabled) {
+            if (AtonementEnabled)
+            {
                 DrawAtonementBar();
             }
 
-            if (DoTBarEnabled) {
+            if (DoTBarEnabled)
+            {
                 DrawDoTBar();
             }
         }
 
         protected override void DrawPrimaryResourceBar() { }
 
-        private void DrawManaBar() {
+        private void DrawManaBar()
+        {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var actor = PluginInterface.ClientState.LocalPlayer;
 
@@ -101,16 +110,19 @@ namespace DelvUI.Interface {
             var builder = BarBuilder.Create(posX, posY, ManaBarHeight, ManaBarWidth)
                                     .SetBackgroundColor(EmptyColor["background"]);
 
-            if (ManaChunked) {
+            if (ManaChunked)
+            {
                 builder.SetChunks(5)
                        .SetChunkPadding(ManaBarPadding)
                        .AddInnerBar(actor.CurrentMp, actor.MaxMp, ManaColor, EmptyColor);
             }
-            else {
+            else
+            {
                 builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, ManaColor);
             }
 
-            if (ManaBarText) {
+            if (ManaBarText)
+            {
                 var formattedManaText = TextTags.GenerateFormattedTextFromTags(actor, "[mana:current-short]");
 
                 builder.SetTextMode(BarTextMode.Single)
@@ -121,7 +133,8 @@ namespace DelvUI.Interface {
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawOathGauge() {
+        private void DrawOathGauge()
+        {
             var gauge = PluginInterface.ClientState.JobGauges.Get<PLDGauge>();
 
             var xPos = CenterX + BaseXOffset - OathGaugeXOffset;
@@ -133,7 +146,8 @@ namespace DelvUI.Interface {
                                     .SetBackgroundColor(EmptyColor["background"])
                                     .AddInnerBar(gauge.GaugeAmount, 100, OathGaugeColor, OathNotFullColor);
 
-            if (OathGaugeText) {
+            if (OathGaugeText)
+            {
                 builder.SetTextMode(BarTextMode.EachChunk)
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
@@ -142,7 +156,8 @@ namespace DelvUI.Interface {
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawBuffBar() {
+        private void DrawBuffBar()
+        {
             var fightOrFlightBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 76);
             var requiescatBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1368);
 
@@ -152,21 +167,25 @@ namespace DelvUI.Interface {
             var builder = BarBuilder.Create(xPos, yPos, BuffBarHeight, BuffBarWidth)
                                     .SetBackgroundColor(EmptyColor["background"]);
 
-            if (fightOrFlightBuff.Any()) {
+            if (fightOrFlightBuff.Any())
+            {
                 var fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().Duration);
                 builder.AddInnerBar(fightOrFlightDuration, 25, FightOrFlightColor);
 
-                if (BuffBarText) {
+                if (BuffBarText)
+                {
                     builder.SetTextMode(BarTextMode.EachChunk)
                            .SetText(BarTextPosition.CenterLeft, BarTextType.Current, PluginConfiguration.PLDFightOrFlightColor, Vector4.UnitW, null);
                 }
             }
 
-            if (requiescatBuff.Any()) {
+            if (requiescatBuff.Any())
+            {
                 var requiescatDuration = Math.Abs(requiescatBuff.First().Duration);
                 builder.AddInnerBar(requiescatDuration, 12, RequiescatColor);
 
-                if (BuffBarText) {
+                if (BuffBarText)
+                {
                     builder.SetTextMode(BarTextMode.EachChunk)
                            .SetText(BarTextPosition.CenterRight, BarTextType.Current, PluginConfiguration.PLDRequiescatColor, Vector4.UnitW, null);
                 }
@@ -176,7 +195,8 @@ namespace DelvUI.Interface {
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawAtonementBar() {
+        private void DrawAtonementBar()
+        {
             var atonementBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1902);
             var stackCount = atonementBuff.Any() ? atonementBuff.First().StackCount : 0;
 
@@ -193,10 +213,12 @@ namespace DelvUI.Interface {
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawDoTBar() {
+        private void DrawDoTBar()
+        {
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (target is not Chara) {
+            if (target is not Chara)
+            {
                 return;
             }
 
@@ -214,7 +236,8 @@ namespace DelvUI.Interface {
                                     .AddInnerBar(duration, 21, DoTColor)
                                     .SetBackgroundColor(EmptyColor["background"]);
 
-            if (DoTBarText) {
+            if (DoTBarText)
+            {
                 builder.SetTextMode(BarTextMode.EachChunk)
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }

@@ -1,13 +1,16 @@
-﻿using System.Diagnostics;
-using System.Numerics;
-using Dalamud.Plugin;
+﻿using Dalamud.Plugin;
 using DelvUI.Config;
 using ImGuiNET;
+using System.Diagnostics;
+using System.Numerics;
 
-namespace DelvUI.Interface {
-    public class HandHudWindow : HudWindow {
+namespace DelvUI.Interface
+{
+    public class HandHudWindow : HudWindow
+    {
         public HandHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) :
-            base(pluginInterface, pluginConfiguration) {
+            base(pluginInterface, pluginConfiguration)
+        {
             JobId = pluginInterface.ClientState.LocalPlayer.ClassJob.Id;
         }
 
@@ -15,7 +18,8 @@ namespace DelvUI.Interface {
 
         protected override void Draw(bool _) { }
 
-        protected override void DrawPrimaryResourceBar() {
+        protected override void DrawPrimaryResourceBar()
+        {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var barSize = new Vector2(PrimaryResourceBarWidth, PrimaryResourceBarHeight);
             var actor = PluginInterface.ClientState.LocalPlayer;
@@ -36,14 +40,16 @@ namespace DelvUI.Interface {
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-            if (ShowPrimaryResourceBarThresholdMarker) {
+            if (ShowPrimaryResourceBarThresholdMarker)
+            {
                 // threshold
                 var position = new Vector2(cursorPos.X + PrimaryResourceBarThresholdValue / 10000f * barSize.X - 3, cursorPos.Y);
                 var size = new Vector2(2, barSize.Y);
                 drawList.AddRect(position, position + size, 0xFF000000);
             }
 
-            if (!ShowPrimaryResourceBarValue) {
+            if (!ShowPrimaryResourceBarValue)
+            {
                 return;
             }
 
