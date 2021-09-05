@@ -14,7 +14,9 @@ namespace DelvUI.Interface {
     public class WarriorHudWindow : HudWindow {
         public override uint JobId => Jobs.WAR;
 
-        private readonly WarriorHudConfig _config = (WarriorHudConfig) ConfigurationManager.GetInstance().GetConfiguration(new WarriorHudConfig());  
+        private readonly WarriorHudConfig _config = (WarriorHudConfig) ConfigurationManager.GetInstance().GetConfiguration(new WarriorHudConfig());
+
+        private Vector2 Origin => new Vector2(CenterX + _config.Position.X, CenterY + _config.Position.Y);
 
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
 
@@ -34,15 +36,18 @@ namespace DelvUI.Interface {
         protected override void DrawPrimaryResourceBar() {
         }
 
+        private Vector2 GetPositionForField(Vector2 position, Vector2 size) {
+            return Origin + position - size / 2f;
+        }
+
         private void DrawStormsEyeBar() {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var innerReleaseBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1177);
             var stormsEyeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
 
-            var xPos = (CenterX - _config.StormsEyeSize.X/2f) + _config.Position.X + _config.StormsEyePosition.X;
-            var yPos = (CenterY - _config.StormsEyeSize.Y/2f) + _config.Position.Y + _config.StormsEyePosition.Y;
-
-            var builder = BarBuilder.Create(xPos, yPos, _config.StormsEyeSize.Y, _config.StormsEyeSize.X).SetBackgroundColor(EmptyColor["background"]);
+            var position = GetPositionForField(_config.StormsEyePosition, _config.StormsEyeSize);
+            var builder = BarBuilder.Create(position, _config.StormsEyeSize)
+                .SetBackgroundColor(EmptyColor["background"]);
 
             var duration = 0f;
             var maximum = 10f;
@@ -72,12 +77,11 @@ namespace DelvUI.Interface {
             var gauge = PluginInterface.ClientState.JobGauges.Get<WARGauge>();
             var nascentChaosBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1897);
 
-            var xPos = (CenterX - _config.BeastGaugeSize.X / 2f) + _config.Position.X + _config.BeastGaugePosition.X;
-            var yPos = (CenterY - _config.BeastGaugeSize.Y / 2f) + _config.Position.Y + _config.BeastGaugePosition.Y;
-
-            var builder = BarBuilder.Create(xPos, yPos, _config.BeastGaugeSize.Y, _config.BeastGaugeSize.X)
+            var position = GetPositionForField(_config.BeastGaugePosition, _config.BeastGaugeSize);
+            var builder = BarBuilder.Create(position, _config.BeastGaugeSize)
                 .SetChunks(2)
-                .AddInnerBar(gauge.BeastGaugeAmount, 100, _config.BeastGaugeFillColor.Map).SetBackgroundColor(EmptyColor["background"])
+                .AddInnerBar(gauge.BeastGaugeAmount, 100, _config.BeastGaugeFillColor.Map)
+                .SetBackgroundColor(EmptyColor["background"])
                 .SetChunkPadding(_config.BeastGaugePadding);
 
             if (nascentChaosBuff.Any()) {
@@ -101,7 +105,7 @@ namespace DelvUI.Interface {
     [SubSection("Warrior", 1)]
     public class WarriorHudConfig : PluginConfigObject {
         [DragFloat2("Base offset", min = -4000f, max = 4000f)]
-        public Vector2 Position = new(0, 0);
+        public Vector2 Position = new Vector2(0, 454);
 
         /* Storm's Eye */
         [Checkbox("Show Storm's Eye")]
@@ -111,7 +115,7 @@ namespace DelvUI.Interface {
         public bool ShowStormsEyeText = true;
 
         [DragFloat2("Storm's Eye Position", min = -4000f, max = 4000f)]
-        public Vector2 StormsEyePosition = new(0, 417);
+        public Vector2 StormsEyePosition = new(0, 0 /*417*/);
 
         [DragFloat2("Storm's Eye Size", min = 1f, max = 4000f)]
         public Vector2 StormsEyeSize = new(254, 20);
@@ -127,7 +131,7 @@ namespace DelvUI.Interface {
         public bool ShowBeastGaugeText = false;
 
         [DragFloat2("Beast Gauge Position", min = -4000f, max = 4000f)]
-        public Vector2 BeastGaugePosition = new(0, 439);
+        public Vector2 BeastGaugePosition = new(0, 22 /*439*/);
         
         [DragFloat2("Beast Gauge Size", min = 1f, max = 4000f)]
         public Vector2 BeastGaugeSize = new(254, 20);
@@ -181,5 +185,7 @@ namespace DelvUI.Interface {
         //}
 
     }
+
+    
 
 }
