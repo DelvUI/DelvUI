@@ -66,7 +66,7 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(120, 20);
             var pos = new Vector2(
                 UnitFrameConstants.BaseUnitFrameOffsetX + TargetUnitFrameConfig.DefaultSize.X + 6 + size.X / 2f,
-                HUDConstants.BaseHUDOffsetY - TargetUnitFrameConfig.DefaultSize.Y + size.Y / 2f
+                HUDConstants.BaseHUDOffsetY - 15
             );
 
             var leftLabelConfig = new EditableLabelConfig(new Vector2(0, -size.Y / 2f + 2), "[name:abbreviate]", LabelTextAnchor.Bottom);
@@ -90,7 +90,7 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(120, 20);
             var pos = new Vector2(
                 -UnitFrameConstants.BaseUnitFrameOffsetX - TargetUnitFrameConfig.DefaultSize.X - 6 - size.X / 2f,
-                HUDConstants.BaseHUDOffsetY - TargetUnitFrameConfig.DefaultSize.Y + size.Y / 2f
+                HUDConstants.BaseHUDOffsetY - 15
             );
 
             var leftLabelConfig = new EditableLabelConfig(new Vector2(0, -size.Y / 2f + 2), "[name:abbreviate]", LabelTextAnchor.Bottom);
