@@ -6,19 +6,24 @@ using System.ComponentModel;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 
-namespace DelvUI.Config {
+namespace DelvUI.Config
+{
     [Serializable]
-    public abstract class PluginConfigObject : INotifyPropertyChanged {
+    public abstract class PluginConfigObject : INotifyPropertyChanged
+    {
 
         public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "") {
+        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
+        {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        protected bool ColorEdit4(string label, ref PluginConfigColor color) {
+        protected bool ColorEdit4(string label, ref PluginConfigColor color)
+        {
             var vector = color.Vector;
 
-            if (ImGui.ColorEdit4(label, ref vector)) {
+            if (ImGui.ColorEdit4(label, ref vector))
+            {
                 color.Vector = vector;
 
                 return true;
@@ -29,24 +34,30 @@ namespace DelvUI.Config {
     }
 
     [Serializable]
-    public class PluginConfigColor {
+    public class PluginConfigColor
+    {
         [JsonIgnore] private float[] _colorMapRatios = { -.8f, -.1f, .1f };
         [JsonIgnore] private Vector4 _vector;
 
-        public PluginConfigColor(Vector4 vector, float[] colorMapRatios = null) {
+        public PluginConfigColor(Vector4 vector, float[] colorMapRatios = null)
+        {
             _vector = vector;
 
-            if (colorMapRatios is { Length: >= 3 }) {
+            if (colorMapRatios is { Length: >= 3 })
+            {
                 _colorMapRatios = colorMapRatios;
             }
 
             Update();
         }
 
-        public Vector4 Vector {
+        public Vector4 Vector
+        {
             get => _vector;
-            set {
-                if (_vector == value) {
+            set
+            {
+                if (_vector == value)
+                {
                     return;
                 }
 
@@ -61,7 +72,8 @@ namespace DelvUI.Config {
         [JsonIgnore] public uint RightGradient { get; private set; }
         [JsonIgnore] public Dictionary<string, uint> Map { get; private set; }
 
-        private void Update() {
+        private void Update()
+        {
             Base = ImGui.ColorConvertFloat4ToU32(_vector);
             Background = ImGui.ColorConvertFloat4ToU32(_vector.AdjustColor(_colorMapRatios[0]));
             LeftGradient = ImGui.ColorConvertFloat4ToU32(_vector.AdjustColor(_colorMapRatios[1]));

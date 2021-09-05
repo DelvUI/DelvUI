@@ -11,8 +11,10 @@ using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 using PartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
 
 
-namespace DelvUI.Interface.Party {
-    public unsafe class GroupMember : IGroupMember {
+namespace DelvUI.Interface.Party
+{
+    public unsafe class GroupMember : IGroupMember
+    {
         private DalamudPluginInterface pluginInterface = null;
         protected PartyMember* partyMember = null;
 
@@ -26,10 +28,13 @@ namespace DelvUI.Interface.Party {
         public uint MP => partyMember != null ? partyMember->CurrentMP : BattleCharacter->Character.Mana;
         public uint MaxMP => partyMember != null ? partyMember->MaxMP : BattleCharacter->Character.MaxMana;
         public float Shield => Utils.ActorShieldValue(GetActor());
-        public StatusEffect[] StatusEffects {
-            get {
+        public StatusEffect[] StatusEffects
+        {
+            get
+            {
                 var actor = GetActor();
-                if (actor == null) {
+                if (actor == null)
+                {
                     return new StatusEffect[0];
                 }
 
@@ -41,7 +46,8 @@ namespace DelvUI.Interface.Party {
         private BattleChara* BattleCharacter => (BattleChara*)GetActor().Address;
 
 
-        public GroupMember(PartyMember* partyMember, DalamudPluginInterface pluginInterface) {
+        public GroupMember(PartyMember* partyMember, DalamudPluginInterface pluginInterface)
+        {
             this.pluginInterface = pluginInterface;
             this.partyMember = partyMember;
 
@@ -49,23 +55,27 @@ namespace DelvUI.Interface.Party {
             byte[] nameBytes = new byte[64];
             Marshal.Copy((IntPtr)partyMember->Name, nameBytes, 0, 64);
             var text = System.Text.Encoding.Default.GetString(nameBytes);
-            if (text != null) {
+            if (text != null)
+            {
                 _name = Regex.Replace(text, "[^a-zA-Z0-9_. ]+", "", RegexOptions.Compiled);
             }
         }
 
-        public GroupMember(Actor actor, DalamudPluginInterface pluginInterface) {
+        public GroupMember(Actor actor, DalamudPluginInterface pluginInterface)
+        {
             this.pluginInterface = pluginInterface;
             Actor = actor;
             _name = Actor.Name;
         }
 
-        public Actor GetActor() {
+        public Actor GetActor()
+        {
             return Actor ?? pluginInterface.ClientState.Actors.FirstOrDefault(o => o.ActorId == ActorID);
         }
     }
 
-    public class FakeGroupMember : IGroupMember {
+    public class FakeGroupMember : IGroupMember
+    {
         private static Random RNG = new Random((int)ImGui.GetTime());
 
         public int ActorID => -1;
@@ -80,7 +90,8 @@ namespace DelvUI.Interface.Party {
         public float Shield { get; private set; }
         public StatusEffect[] StatusEffects { get; private set; }
 
-        public FakeGroupMember() {
+        public FakeGroupMember()
+        {
             Level = (uint)FakeGroupMember.RNG.Next(1, 80);
             JobId = (uint)FakeGroupMember.RNG.Next(19, 38);
             MaxHP = (uint)FakeGroupMember.RNG.Next(90000, 150000);
@@ -92,7 +103,8 @@ namespace DelvUI.Interface.Party {
             var statusEffectCount = FakeGroupMember.RNG.Next(1, 5);
             StatusEffects = new StatusEffect[statusEffectCount];
 
-            for (int i = 0; i < statusEffectCount; i++) {
+            for (int i = 0; i < statusEffectCount; i++)
+            {
                 var fakeEffect = new StatusEffect();
                 fakeEffect.Duration = FakeGroupMember.RNG.Next(1, 30);
                 fakeEffect.EffectId = (short)FakeGroupMember.RNG.Next(1, 200);
@@ -102,12 +114,14 @@ namespace DelvUI.Interface.Party {
             }
         }
 
-        public Actor GetActor() {
+        public Actor GetActor()
+        {
             return null;
         }
     }
 
-    public interface IGroupMember {
+    public interface IGroupMember
+    {
         public int ActorID { get; }
         public string Name { get; }
         public uint Level { get; }

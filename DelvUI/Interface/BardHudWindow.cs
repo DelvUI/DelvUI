@@ -1,16 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Dalamud.Game.ClientState.Actors.Types;
+﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
+using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
-using DelvUI.Helpers;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace DelvUI.Interface {
-    public class BardHudWindow : HudWindow {
+namespace DelvUI.Interface
+{
+    public class BardHudWindow : HudWindow
+    {
         public BardHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => 23;
@@ -58,7 +60,8 @@ namespace DelvUI.Interface {
         private Dictionary<string, uint> CBColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 9];
         private Dictionary<string, uint> SVColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 10];
 
-        protected override void Draw(bool _) {
+        protected override void Draw(bool _)
+        {
             DrawActiveDots();
             HandleCurrentSong();
             DrawSoulVoiceBar();
@@ -66,14 +69,17 @@ namespace DelvUI.Interface {
 
         protected override void DrawPrimaryResourceBar() { }
 
-        private void DrawActiveDots() {
-            if (!BRDShowCB && !BRDShowSB) {
+        private void DrawActiveDots()
+        {
+            if (!BRDShowCB && !BRDShowSB)
+            {
                 return;
             }
 
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (target is not Chara) {
+            if (target is not Chara)
+            {
                 return;
             }
 
@@ -82,7 +88,8 @@ namespace DelvUI.Interface {
 
             var barDrawList = new List<Bar>();
 
-            if (BRDShowCB) {
+            if (BRDShowCB)
+            {
                 var cb = target.StatusEffects.FirstOrDefault(
                     o =>
                         o.EffectId == 1200 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
@@ -106,7 +113,8 @@ namespace DelvUI.Interface {
             xPos = CenterX - XOffset + BRDSBXOffset;
             yPos = CenterY + YOffset + BRDSBYOffset;
 
-            if (BRDShowSB) {
+            if (BRDShowSB)
+            {
                 var sb = target.StatusEffects.FirstOrDefault(
                     o =>
                         o.EffectId == 1201 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
@@ -127,26 +135,31 @@ namespace DelvUI.Interface {
                 barDrawList.Add(sbBar);
             }
 
-            if (barDrawList.Count <= 0) {
+            if (barDrawList.Count <= 0)
+            {
                 return;
             }
 
             var drawList = ImGui.GetWindowDrawList();
 
-            foreach (var bar in barDrawList) {
+            foreach (var bar in barDrawList)
+            {
                 bar.Draw(drawList, PluginConfiguration);
             }
         }
 
-        private void HandleCurrentSong() {
+        private void HandleCurrentSong()
+        {
             var gauge = PluginInterface.ClientState.JobGauges.Get<BRDGauge>();
             var songStacks = gauge.NumSongStacks;
             var song = gauge.ActiveSong;
             var songTimer = gauge.SongTimer;
 
-            switch (song) {
+            switch (song)
+            {
                 case CurrentSong.WANDERER:
-                    if (BRDShowWMStacks) {
+                    if (BRDShowWMStacks)
+                    {
                         DrawStacks(songStacks, 3, WMStackColor);
                     }
 
@@ -155,7 +168,8 @@ namespace DelvUI.Interface {
                     break;
 
                 case CurrentSong.MAGE:
-                    if (BRDShowMBProc) {
+                    if (BRDShowMBProc)
+                    {
                         DrawBloodletterReady(MBStackColor);
                     }
 
@@ -164,7 +178,8 @@ namespace DelvUI.Interface {
                     break;
 
                 case CurrentSong.ARMY:
-                    if (BRDShowAPStacks) {
+                    if (BRDShowAPStacks)
+                    {
                         DrawStacks(songStacks, 4, APStackColor);
                     }
 
@@ -184,13 +199,16 @@ namespace DelvUI.Interface {
             }
         }
 
-        private void DrawBloodletterReady(Dictionary<string, uint> color) {
+        private void DrawBloodletterReady(Dictionary<string, uint> color)
+        {
             // I want to draw Bloodletter procs here (just color entire bar red to indicate cooldown is ready).
             // But can't find a way yet to accomplish this.
         }
 
-        private void DrawSongTimer(short songTimer, Dictionary<string, uint> songColor) {
-            if (!BRDShowSongGauge) {
+        private void DrawSongTimer(short songTimer, Dictionary<string, uint> songColor)
+        {
+            if (!BRDShowSongGauge)
+            {
                 return;
             }
 
@@ -211,8 +229,10 @@ namespace DelvUI.Interface {
             bar.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawSoulVoiceBar() {
-            if (!BRDShowSoulGauge) {
+        private void DrawSoulVoiceBar()
+        {
+            if (!BRDShowSoulGauge)
+            {
                 return;
             }
 
@@ -231,7 +251,8 @@ namespace DelvUI.Interface {
             bar.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawStacks(int amount, int max, Dictionary<string, uint> stackColor) {
+        private void DrawStacks(int amount, int max, Dictionary<string, uint> stackColor)
+        {
             var xPos = CenterX - XOffset + BRDStackXOffset;
             var yPos = CenterY + YOffset + BRDStackYOffset;
 

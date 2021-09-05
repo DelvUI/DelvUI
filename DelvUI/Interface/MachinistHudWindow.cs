@@ -1,15 +1,17 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+﻿using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
+using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
-using DelvUI.Helpers;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 
-namespace DelvUI.Interface {
-    public class MachinistHudWindow : HudWindow {
+namespace DelvUI.Interface
+{
+    public class MachinistHudWindow : HudWindow
+    {
         private readonly float[] _robotDuration = { 12.450f, 13.950f, 15.450f, 16.950f, 18.450f, 19.950f };
 
         public MachinistHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
@@ -60,27 +62,33 @@ namespace DelvUI.Interface {
 
         private Dictionary<string, uint> WildfireColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 5];
 
-        protected override void Draw(bool _) {
-            if (OverheatEnabled) {
+        protected override void Draw(bool _)
+        {
+            if (OverheatEnabled)
+            {
                 DrawOverheatBar();
             }
 
-            if (HeatGaugeEnabled) {
+            if (HeatGaugeEnabled)
+            {
                 DrawHeatGauge();
             }
 
-            if (BatteryGaugeEnabled) {
+            if (BatteryGaugeEnabled)
+            {
                 DrawBatteryGauge();
             }
 
-            if (WildfireEnabled) {
+            if (WildfireEnabled)
+            {
                 DrawWildfireBar();
             }
         }
 
         protected override void DrawPrimaryResourceBar() { }
 
-        private void DrawHeatGauge() {
+        private void DrawHeatGauge()
+        {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
 
             var xPos = CenterX + BaseXOffset - HeatGaugeXOffset;
@@ -91,7 +99,8 @@ namespace DelvUI.Interface {
                                     .SetChunkPadding(HeatGaugePadding)
                                     .AddInnerBar(gauge.Heat, 100, HeatColor, EmptyColor);
 
-            if (HeatGaugeText) {
+            if (HeatGaugeText)
+            {
                 builder.SetTextMode(BarTextMode.EachChunk)
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                        .SetBackgroundColor(EmptyColor["background"]);
@@ -101,7 +110,8 @@ namespace DelvUI.Interface {
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawBatteryGauge() {
+        private void DrawBatteryGauge()
+        {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
 
             var xPos = CenterX + BaseXOffset - BatteryGaugeXOffset;
@@ -112,19 +122,23 @@ namespace DelvUI.Interface {
                                     .SetChunkPadding(BatteryGaugePadding)
                                     .SetBackgroundColor(EmptyColor["background"]);
 
-            if (BatteryGaugeShowBattery) {
+            if (BatteryGaugeShowBattery)
+            {
                 builder.AddInnerBar(gauge.Battery, 100, BatteryColor, EmptyColor);
 
-                if (BatteryGaugeBatteryText) {
+                if (BatteryGaugeBatteryText)
+                {
                     builder.SetTextMode(BarTextMode.Single)
                            .SetText(BarTextPosition.CenterLeft, BarTextType.Current, PluginConfiguration.MCHBatteryColor, Vector4.UnitW, null);
                 }
             }
 
-            if (gauge.IsRobotActive() && BatteryGaugeShowRobotDuration) {
+            if (gauge.IsRobotActive() && BatteryGaugeShowRobotDuration)
+            {
                 builder.AddInnerBar(gauge.RobotTimeRemaining / 1000f, _robotDuration[gauge.LastRobotBatteryPower / 10 - 5], RobotColor, null);
 
-                if (BatteryGaugeRobotDurationText) {
+                if (BatteryGaugeRobotDurationText)
+                {
                     builder.SetTextMode(BarTextMode.Single)
                            .SetText(BarTextPosition.CenterRight, BarTextType.Current, PluginConfiguration.MCHRobotColor, Vector4.UnitW, null);
                 }
@@ -135,7 +149,8 @@ namespace DelvUI.Interface {
             bar.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawOverheatBar() {
+        private void DrawOverheatBar()
+        {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
 
             var xPos = CenterX + BaseXOffset - OverheatXOffset;
@@ -143,10 +158,12 @@ namespace DelvUI.Interface {
 
             var builder = BarBuilder.Create(xPos, yPos, OverheatHeight, OverheatWidth).SetBackgroundColor(EmptyColor["background"]);
 
-            if (gauge.IsOverheated()) {
+            if (gauge.IsOverheated())
+            {
                 builder.AddInnerBar(gauge.OverheatTimeRemaining / 1000f, 8, OverheatColor, null);
 
-                if (OverheatText) {
+                if (OverheatText)
+                {
                     builder.SetTextMode(BarTextMode.EachChunk)
                            .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
                 }
@@ -156,7 +173,8 @@ namespace DelvUI.Interface {
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawWildfireBar() {
+        private void DrawWildfireBar()
+        {
             var wildfireBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1946);
 
             var xPos = CenterX + BaseXOffset - WildfireXOffset;
@@ -164,11 +182,13 @@ namespace DelvUI.Interface {
 
             var builder = BarBuilder.Create(xPos, yPos, WildfireHeight, WildfireWidth);
 
-            if (wildfireBuff.Any()) {
+            if (wildfireBuff.Any())
+            {
                 var duration = wildfireBuff.First().Duration;
                 builder.AddInnerBar(duration, 10, WildfireColor, null);
 
-                if (WildfireText) {
+                if (WildfireText)
+                {
                     builder.SetTextMode(BarTextMode.EachChunk)
                            .SetBackgroundColor(EmptyColor["background"])
                            .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);

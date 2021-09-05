@@ -6,15 +6,19 @@ using System.Collections.Generic;
 using System.Numerics;
 
 
-namespace DelvUI.Interface.Party {
-    public class PartyHealthBar {
+namespace DelvUI.Interface.Party
+{
+    public class PartyHealthBar
+    {
         private PluginConfiguration _pluginConfiguration;
         private PartyHudConfig _config;
 
         private IGroupMember _member = null;
-        public IGroupMember Member {
+        public IGroupMember Member
+        {
             get { return _member; }
-            set {
+            set
+            {
                 _member = value;
                 UpdateColor();
             }
@@ -25,29 +29,36 @@ namespace DelvUI.Interface.Party {
         public Vector2 Size;
         private Dictionary<string, uint> color;
 
-        public PartyHealthBar(PluginConfiguration pluginConfiguration, PartyHudConfig config) {
+        public PartyHealthBar(PluginConfiguration pluginConfiguration, PartyHudConfig config)
+        {
             _pluginConfiguration = pluginConfiguration;
             _config = config;
         }
 
-        public void UpdateColor() {
+        public void UpdateColor()
+        {
             color = _config.SortConfig.GenericRoleColor.Map;
-            if (Member == null) {
+            if (Member == null)
+            {
                 return;
             }
 
-            if (_config.SortConfig.UseRoleColors) {
+            if (_config.SortConfig.UseRoleColors)
+            {
                 color = ColorForJob(Member.JobId);
             }
-            else {
+            else
+            {
                 _pluginConfiguration.JobColorMap.TryGetValue(Member.JobId, out color);
             }
         }
 
-        private Dictionary<string, uint> ColorForJob(uint jodId) {
+        private Dictionary<string, uint> ColorForJob(uint jodId)
+        {
             var role = JobsHelper.RoleForJob(jodId);
 
-            switch (role) {
+            switch (role)
+            {
                 case JobRoles.Tank: return _config.SortConfig.TankRoleColor.Map;
                 case JobRoles.DPS: return _config.SortConfig.DPSRoleColor.Map;
                 case JobRoles.Healer: return _config.SortConfig.HealerRoleColor.Map;
@@ -56,8 +67,10 @@ namespace DelvUI.Interface.Party {
             return _config.SortConfig.GenericRoleColor.Map;
         }
 
-        public void Draw(ImDrawListPtr drawList, Vector2 origin) {
-            if (!Visible) {
+        public void Draw(ImDrawListPtr drawList, Vector2 origin)
+        {
+            if (!Visible)
+            {
                 return;
             }
 
@@ -67,7 +80,8 @@ namespace DelvUI.Interface.Party {
             drawList.AddRectFilled(Position, Position + Size, bgColorMap);
 
             // hp
-            if (isClose) {
+            if (isClose)
+            {
                 var scale = Member.MaxHP > 0 ? (float)Member.HP / (float)Member.MaxHP : 1;
                 var fillPos = Position;
                 var fillSize = new Vector2(Math.Max(1, Size.X * scale), Size.Y / 2f);
@@ -84,13 +98,16 @@ namespace DelvUI.Interface.Party {
             }
 
             // shield
-            if (_config.HealthBarsConfig.ShieldsConfig.Enabled) {
-                if (_config.HealthBarsConfig.ShieldsConfig.FillHealthFirst && Member.MaxHP > 0) {
+            if (_config.HealthBarsConfig.ShieldsConfig.Enabled)
+            {
+                if (_config.HealthBarsConfig.ShieldsConfig.FillHealthFirst && Member.MaxHP > 0)
+                {
                     DrawHelper.DrawShield(Member.Shield, (float)Member.HP / Member.MaxHP, Position, Size,
                         _config.HealthBarsConfig.ShieldsConfig.Height, !_config.HealthBarsConfig.ShieldsConfig.HeightInPixels,
                         _config.HealthBarsConfig.ShieldsConfig.Color.Map);
                 }
-                else {
+                else
+                {
                     DrawHelper.DrawShield(Member.Shield, Position, Size,
                         _config.HealthBarsConfig.ShieldsConfig.Height, !_config.HealthBarsConfig.ShieldsConfig.HeightInPixels,
                         _config.HealthBarsConfig.ShieldsConfig.Color.Map);
@@ -120,7 +137,8 @@ namespace DelvUI.Interface.Party {
             var actor = Member.GetActor();
             var name = Member.Name.Abbreviate() ?? "";
 
-            if (actor != null) {
+            if (actor != null)
+            {
                 name = TextTags.GenerateFormattedTextFromTags(actor, _config.HealthBarsConfig.TextFormat);
             }
 

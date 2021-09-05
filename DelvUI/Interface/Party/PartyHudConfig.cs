@@ -4,20 +4,26 @@ using Newtonsoft.Json;
 using System;
 using System.Numerics;
 
-namespace DelvUI.Interface.Party {
+namespace DelvUI.Interface.Party
+{
     [Serializable]
-    public class PartyHudConfig : PluginConfigObject {
+    public class PartyHudConfig : PluginConfigObject
+    {
 
         public bool Enabled = true;
         public bool Lock = true;
 
         [JsonIgnore] private Vector2 _position = new Vector2(200, 200);
-        public Vector2 Position {
-            get {
+        public Vector2 Position
+        {
+            get
+            {
                 return _position;
             }
-            set {
-                if (_position == value) {
+            set
+            {
+                if (_position == value)
+                {
                     return;
                 }
                 _position = value;
@@ -27,12 +33,16 @@ namespace DelvUI.Interface.Party {
         }
 
         [JsonIgnore] private Vector2 _size = new Vector2(650, 150);
-        public Vector2 Size {
-            get {
+        public Vector2 Size
+        {
+            get
+            {
                 return _size;
             }
-            set {
-                if (_size == value) {
+            set
+            {
+                if (_size == value)
+                {
                     return;
                 }
                 _size = value;
@@ -42,12 +52,16 @@ namespace DelvUI.Interface.Party {
         }
 
         [JsonIgnore] public bool _preview = false;
-        public bool Preview {
-            get {
+        public bool Preview
+        {
+            get
+            {
                 return _preview;
             }
-            set {
-                if (_preview == value) {
+            set
+            {
+                if (_preview == value)
+                {
                     return;
                 }
                 _preview = value;
@@ -57,12 +71,16 @@ namespace DelvUI.Interface.Party {
         }
 
         [JsonIgnore] private bool _fillRowsFirst = true;
-        public bool FillRowsFirst {
-            get {
+        public bool FillRowsFirst
+        {
+            get
+            {
                 return _fillRowsFirst;
             }
-            set {
-                if (_fillRowsFirst == value) {
+            set
+            {
+                if (_fillRowsFirst == value)
+                {
                     return;
                 }
                 _fillRowsFirst = value;
@@ -74,7 +92,8 @@ namespace DelvUI.Interface.Party {
         public PartyHudSortConfig SortConfig = new PartyHudSortConfig();
         public PartyHudHealthBarsConfig HealthBarsConfig = new PartyHudHealthBarsConfig();
 
-        public bool Draw() {
+        public bool Draw()
+        {
             var changed = false;
 
             ImGui.Text("General settings");
@@ -84,13 +103,15 @@ namespace DelvUI.Interface.Party {
                 changed |= ImGui.Checkbox("Lock", ref Lock);
 
                 var preview = _preview;
-                if (ImGui.Checkbox("Preview", ref preview)) {
+                if (ImGui.Checkbox("Preview", ref preview))
+                {
                     Preview = preview;
                     changed = true;
                 }
 
                 var fillRowsFirst = _fillRowsFirst;
-                if (ImGui.Checkbox("Fill Rows First", ref fillRowsFirst)) {
+                if (ImGui.Checkbox("Fill Rows First", ref fillRowsFirst))
+                {
                     FillRowsFirst = fillRowsFirst;
                     changed = true;
                 }
@@ -104,15 +125,20 @@ namespace DelvUI.Interface.Party {
     }
 
     [Serializable]
-    public class PartyHudSortConfig : PluginConfigObject {
+    public class PartyHudSortConfig : PluginConfigObject
+    {
 
         private PartySortingMode _mode = PartySortingMode.Tank_Healer_DPS;
-        public PartySortingMode Mode {
-            get {
+        public PartySortingMode Mode
+        {
+            get
+            {
                 return _mode;
             }
-            set {
-                if (_mode == value) {
+            set
+            {
+                if (_mode == value)
+                {
                     return;
                 }
                 _mode = value;
@@ -122,12 +148,16 @@ namespace DelvUI.Interface.Party {
         }
 
         private bool _useRoleColors = false;
-        public bool UseRoleColors {
-            get {
+        public bool UseRoleColors
+        {
+            get
+            {
                 return _useRoleColors;
             }
-            set {
-                if (_useRoleColors == value) {
+            set
+            {
+                if (_useRoleColors == value)
+                {
                     return;
                 }
                 _useRoleColors = value;
@@ -141,7 +171,8 @@ namespace DelvUI.Interface.Party {
         public PluginConfigColor HealerRoleColor = new PluginConfigColor(new Vector4(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f));
         public PluginConfigColor GenericRoleColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
-        public bool Draw() {
+        public bool Draw()
+        {
             var changed = false;
 
             ImGui.Text("Sorting");
@@ -149,13 +180,15 @@ namespace DelvUI.Interface.Party {
             {
                 var selection = (int)Mode;
                 var names = PartySortingHelper.SortingModesNames;
-                if (ImGui.Combo("Sorting priority", ref selection, PartySortingHelper.SortingModesNames, names.Length)) {
+                if (ImGui.Combo("Sorting priority", ref selection, PartySortingHelper.SortingModesNames, names.Length))
+                {
                     Mode = (PartySortingMode)selection;
                     changed = true;
                 }
 
                 var useRoleColors = _useRoleColors;
-                if (ImGui.Checkbox("Use Role Colors", ref useRoleColors)) {
+                if (ImGui.Checkbox("Use Role Colors", ref useRoleColors))
+                {
                     UseRoleColors = useRoleColors;
                     changed = true;
                 }
@@ -172,15 +205,20 @@ namespace DelvUI.Interface.Party {
     }
 
     [Serializable]
-    public class PartyHudHealthBarsConfig : PluginConfigObject {
+    public class PartyHudHealthBarsConfig : PluginConfigObject
+    {
 
         public Vector2 _size = new Vector2(150, 50);
-        public Vector2 Size {
-            get {
+        public Vector2 Size
+        {
+            get
+            {
                 return _size;
             }
-            set {
-                if (_size == value) {
+            set
+            {
+                if (_size == value)
+                {
                     return;
                 }
                 _size = value;
@@ -190,12 +228,16 @@ namespace DelvUI.Interface.Party {
         }
 
         public Vector2 _padding = new Vector2(1, 1);
-        public Vector2 Padding {
-            get {
+        public Vector2 Padding
+        {
+            get
+            {
                 return _padding;
             }
-            set {
-                if (_padding == value) {
+            set
+            {
+                if (_padding == value)
+                {
                     return;
                 }
                 _padding = value;
@@ -211,7 +253,8 @@ namespace DelvUI.Interface.Party {
 
         public PartyHudShieldsConfig ShieldsConfig = new PartyHudShieldsConfig();
 
-        public bool Draw() {
+        public bool Draw()
+        {
             var changed = false;
 
             ImGui.Text("Bars");
@@ -220,13 +263,15 @@ namespace DelvUI.Interface.Party {
                 changed |= ImGui.InputTextWithHint("Text Fromat", "Example: [name:initials]", ref TextFormat, 64);
 
                 var size = _size;
-                if (ImGui.DragFloat2("Size", ref size, 1, 1, 1000)) {
+                if (ImGui.DragFloat2("Size", ref size, 1, 1, 1000))
+                {
                     Size = size;
                     changed = true;
                 }
 
                 var padding = _padding;
-                if (ImGui.DragFloat2("Padding", ref padding, 1, -200, 200)) {
+                if (ImGui.DragFloat2("Padding", ref padding, 1, -200, 200))
+                {
                     Padding = padding;
                     changed = true;
                 }
@@ -242,14 +287,16 @@ namespace DelvUI.Interface.Party {
     }
 
     [Serializable]
-    public class PartyHudShieldsConfig : PluginConfigObject {
+    public class PartyHudShieldsConfig : PluginConfigObject
+    {
         public bool Enabled = true;
         public int Height = 10;
         public bool HeightInPixels = false;
         public bool FillHealthFirst = true;
         public PluginConfigColor Color = new PluginConfigColor(new Vector4(198f / 255f, 210f / 255f, 255f / 255f, 70f / 100f));
 
-        public bool Draw() {
+        public bool Draw()
+        {
             var changed = false;
 
             ImGui.Text("Shields");

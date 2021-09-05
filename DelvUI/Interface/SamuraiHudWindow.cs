@@ -1,19 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game.ClientState.Actors.Types;
+﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
-using ImGuiNET;
-using DelvUI.Interface.Bars;
 using DelvUI.Config;
-using ImGuiNET;
 using DelvUI.Helpers;
+using DelvUI.Interface.Bars;
+using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 
-namespace DelvUI.Interface {
-    public class SamuraiHudWindow : HudWindow {
+namespace DelvUI.Interface
+{
+    public class SamuraiHudWindow : HudWindow
+    {
         public SamuraiHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => 34;
@@ -78,32 +78,40 @@ namespace DelvUI.Interface {
         private Dictionary<string, uint> SamEmptyColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 8];
         private Dictionary<string, uint> SamExpiryColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 9];
 
-        protected override void Draw(bool _) {
-            if (GaugeEnabled) {
+        protected override void Draw(bool _)
+        {
+            if (GaugeEnabled)
+            {
                 DrawKenkiBar();
             }
 
-            if (SenEnabled) {
+            if (SenEnabled)
+            {
                 DrawSenResourceBar();
             }
 
-            if (MeditationEnabled) {
+            if (MeditationEnabled)
+            {
                 DrawMeditationResourceBar();
             }
 
-            if (HiganbanaEnabled) {
+            if (HiganbanaEnabled)
+            {
                 DrawHiganbanaBar();
             }
 
-            if (BuffsEnabled) {
+            if (BuffsEnabled)
+            {
                 DrawActiveBuffs();
             }
         }
 
         protected override void DrawPrimaryResourceBar() { }
 
-        private void DrawKenkiBar() {
-            if (!GaugeEnabled) {
+        private void DrawKenkiBar()
+        {
+            if (!GaugeEnabled)
+            {
                 return;
             }
 
@@ -117,16 +125,18 @@ namespace DelvUI.Interface {
             var kenkiBuilder = BarBuilder.Create(xPos, yPos, SamKenkiBarHeight, SamKenkiBarWidth).SetBackgroundColor(SamEmptyColor["background"]);
             kenkiBuilder.AddInnerBar(gauge.Kenki, 100, SamKenkiColor);
 
-            if(KenkiText)
+            if (KenkiText)
                 kenkiBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             var drawList = ImGui.GetWindowDrawList();
             kenkiBuilder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawHiganbanaBar() {
+        private void DrawHiganbanaBar()
+        {
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (target is not Chara) {
+            if (target is not Chara)
+            {
                 return;
             }
 
@@ -139,13 +149,14 @@ namespace DelvUI.Interface {
             var xOffset = CenterX + BaseXOffset - SamHiganbanaBarX;
             var yOffset = CenterY + BaseYOffset + SamHiganbanaBarY;
 
-            if (higanbanaDuration == 0){
+            if (higanbanaDuration == 0)
+            {
                 return;
             }
             var higanbanaBuilder = BarBuilder.Create(xOffset, yOffset, SamHiganbanaBarHeight, SamHiganbanaBarWidth).SetBackgroundColor(SamEmptyColor["background"]);
             higanbanaBuilder.AddInnerBar(higanbanaDuration, 60f, higanbanaColor).SetFlipDrainDirection(false);
 
-            if (HiganbanaText) 
+            if (HiganbanaText)
             {
                 higanbanaBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
@@ -153,7 +164,8 @@ namespace DelvUI.Interface {
             higanbanaBuilder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawActiveBuffs() {
+        private void DrawActiveBuffs()
+        {
             var target = PluginInterface.ClientState.LocalPlayer;
 
             var buffsBarWidth = (SamBuffsBarWidth / 2);
@@ -186,23 +198,24 @@ namespace DelvUI.Interface {
             jinpuBuilder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawSenResourceBar() {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();           
+        private void DrawSenResourceBar()
+        {
+            var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
             var senBarWidth = (int)Math.Floor((SamSenBarWidth - SenPadding * 2) / 3f);
             var senBarSize = new Vector2(senBarWidth, SamSenBarHeight);
             var xPos = CenterX + BaseXOffset - SamSenBarX;
             var yPos = CenterY + BaseYOffset + SamSenBarY;
             var cursorPos = new Vector2(xPos - SenPadding - senBarWidth, yPos);
 
-            int[] order = new int[3] {0, 1, 2};  // Setsu, Getsu, Ka
-            
+            int[] order = new int[3] { 0, 1, 2 };  // Setsu, Getsu, Ka
+
             var setsuBuilder = BarBuilder.Create(xPos + order[0] * (SenPadding + senBarWidth), cursorPos.Y, SamSenBarHeight, senBarWidth);
             var getsuBuilder = BarBuilder.Create(xPos + order[1] * (SenPadding + senBarWidth), cursorPos.Y, SamSenBarHeight, senBarWidth);
             var kaBuilder = BarBuilder.Create(xPos + order[2] * (SenPadding + senBarWidth), yPos, SamSenBarHeight, senBarWidth);
 
-            kaBuilder.AddInnerBar(gauge.HasKa()? 1 : 0, 1, SamKaColor);
-            getsuBuilder.AddInnerBar(gauge.HasGetsu()? 1 : 0, 1, SamGetsuColor);
-            setsuBuilder.AddInnerBar(gauge.HasSetsu()? 1 : 0, 1, SamSetsuColor);
+            kaBuilder.AddInnerBar(gauge.HasKa() ? 1 : 0, 1, SamKaColor);
+            getsuBuilder.AddInnerBar(gauge.HasGetsu() ? 1 : 0, 1, SamGetsuColor);
+            setsuBuilder.AddInnerBar(gauge.HasSetsu() ? 1 : 0, 1, SamSetsuColor);
 
             var drawList = ImGui.GetWindowDrawList();
 
@@ -211,7 +224,8 @@ namespace DelvUI.Interface {
             setsuBuilder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawMeditationResourceBar() {
+        private void DrawMeditationResourceBar()
+        {
             var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
 
             var meditationBarWidth = (int)Math.Floor((SamMeditationBarWidth - MeditationPadding * 2) / 3f);

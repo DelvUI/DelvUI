@@ -3,9 +3,12 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using static DelvUI.Extensions;
 
-namespace DelvUI.Helpers {
-    public static class TextTags {
-        private static string ReplaceTagWithString(string tag, dynamic actor) {
+namespace DelvUI.Helpers
+{
+    public static class TextTags
+    {
+        private static string ReplaceTagWithString(string tag, dynamic actor)
+        {
             return tag switch
             {
                 // Health
@@ -67,7 +70,7 @@ namespace DelvUI.Helpers {
                 "[name]" when IsPropertyExist(actor, "Name") => actor.Name.ToString(),
                 "[name:initials]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Initials(),
                 "[name:abbreviate]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Abbreviate(),
-                "[name:veryshort]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Truncate(5),
+                "[name:veryshort]" when Extensions.IsPropertyExist(actor, "Name") => ((string)actor.Name).Truncate(5),
                 "[name:short]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Truncate(10),
                 "[name:medium]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Truncate(15),
                 "[name:long]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Truncate(20),
@@ -80,7 +83,8 @@ namespace DelvUI.Helpers {
             };
         }
 
-        public static string GenerateFormattedTextFromTags(dynamic actor, string text) {
+        public static string GenerateFormattedTextFromTags(dynamic actor, string text)
+        {
             text = text.Replace("%", "%%"); // Fixes rendering for % in ImGui
             var matches = Regex.Matches(text, @"\[(.*?)\]");
 

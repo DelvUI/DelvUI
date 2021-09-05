@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 
 namespace DelvUI.Helpers
 {
@@ -42,7 +38,7 @@ namespace DelvUI.Helpers
         {
             return IsJobARole(jobId, JobRoles.Tank);
         }
-        
+
         public static bool IsJobHealer(uint jobId)
         {
             return IsJobARole(jobId, JobRoles.Healer);
@@ -66,33 +62,56 @@ namespace DelvUI.Helpers
         public static Dictionary<uint, JobRoles> JobRolesMap = new Dictionary<uint, JobRoles>()
         {
             // tanks
-            [Jobs.GLD] = JobRoles.Tank, [Jobs.MRD] = JobRoles.Tank, [Jobs.PLD] = JobRoles.Tank, 
-            [Jobs.WAR] = JobRoles.Tank, [Jobs.DRK] = JobRoles.Tank, [Jobs.GNB] = JobRoles.Tank,
+            [Jobs.GLD] = JobRoles.Tank,
+            [Jobs.MRD] = JobRoles.Tank,
+            [Jobs.PLD] = JobRoles.Tank,
+            [Jobs.WAR] = JobRoles.Tank,
+            [Jobs.DRK] = JobRoles.Tank,
+            [Jobs.GNB] = JobRoles.Tank,
 
             // melee dps
-            [Jobs.PGL] = JobRoles.DPS, [Jobs.LNC] = JobRoles.DPS, [Jobs.ROG] = JobRoles.DPS, [Jobs.MNK] = JobRoles.DPS,
-            [Jobs.DRG] = JobRoles.DPS, [Jobs.NIN] = JobRoles.DPS, [Jobs.SAM] = JobRoles.DPS,
+            [Jobs.PGL] = JobRoles.DPS,
+            [Jobs.LNC] = JobRoles.DPS,
+            [Jobs.ROG] = JobRoles.DPS,
+            [Jobs.MNK] = JobRoles.DPS,
+            [Jobs.DRG] = JobRoles.DPS,
+            [Jobs.NIN] = JobRoles.DPS,
+            [Jobs.SAM] = JobRoles.DPS,
 
             // ranged phys dps
-            [Jobs.ARC] = JobRoles.DPS, [Jobs.BRD] = JobRoles.DPS,
-            [Jobs.MCH] = JobRoles.DPS, [Jobs.DNC] = JobRoles.DPS,
+            [Jobs.ARC] = JobRoles.DPS,
+            [Jobs.BRD] = JobRoles.DPS,
+            [Jobs.MCH] = JobRoles.DPS,
+            [Jobs.DNC] = JobRoles.DPS,
 
             // ranged magic dps
-            [Jobs.THM] = JobRoles.DPS, [Jobs.ACN] = JobRoles.DPS, [Jobs.BLM] = JobRoles.DPS,
-            [Jobs.SMN] = JobRoles.DPS, [Jobs.RDM] = JobRoles.DPS, [Jobs.BLU] = JobRoles.DPS,
+            [Jobs.THM] = JobRoles.DPS,
+            [Jobs.ACN] = JobRoles.DPS,
+            [Jobs.BLM] = JobRoles.DPS,
+            [Jobs.SMN] = JobRoles.DPS,
+            [Jobs.RDM] = JobRoles.DPS,
+            [Jobs.BLU] = JobRoles.DPS,
 
             // healers
-            [Jobs.CNJ] = JobRoles.Healer, [Jobs.WHM] = JobRoles.Healer,
-            [Jobs.SCH] = JobRoles.Healer, [Jobs.AST] = JobRoles.Healer,
+            [Jobs.CNJ] = JobRoles.Healer,
+            [Jobs.WHM] = JobRoles.Healer,
+            [Jobs.SCH] = JobRoles.Healer,
+            [Jobs.AST] = JobRoles.Healer,
 
             // crafters
-            [Jobs.CRP] = JobRoles.Crafter, [Jobs.BSM] = JobRoles.Crafter,
-            [Jobs.ARM] = JobRoles.Crafter, [Jobs.GSM] = JobRoles.Crafter,
-            [Jobs.LTW] = JobRoles.Crafter, [Jobs.WVR] = JobRoles.Crafter,
-            [Jobs.ALC] = JobRoles.Crafter, [Jobs.CUL] = JobRoles.Crafter,
+            [Jobs.CRP] = JobRoles.Crafter,
+            [Jobs.BSM] = JobRoles.Crafter,
+            [Jobs.ARM] = JobRoles.Crafter,
+            [Jobs.GSM] = JobRoles.Crafter,
+            [Jobs.LTW] = JobRoles.Crafter,
+            [Jobs.WVR] = JobRoles.Crafter,
+            [Jobs.ALC] = JobRoles.Crafter,
+            [Jobs.CUL] = JobRoles.Crafter,
 
             // gatherers
-            [Jobs.MIN] = JobRoles.Gatherer, [Jobs.BOT] = JobRoles.Gatherer, [Jobs.FSH] = JobRoles.Gatherer,
+            [Jobs.MIN] = JobRoles.Gatherer,
+            [Jobs.BOT] = JobRoles.Gatherer,
+            [Jobs.FSH] = JobRoles.Gatherer,
         };
     }
 
