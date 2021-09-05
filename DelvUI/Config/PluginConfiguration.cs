@@ -12,13 +12,8 @@ using System.IO.Compression;
 using System.Numerics;
 using System.Text;
 
-namespace DelvUI.Config
-{
-    public class PluginConfiguration : IPluginConfiguration
-    {
-        public readonly BlackMageHudConfig BLMConfig = new();
-        public readonly AstrologianHudConfig ASTConfig = new();
-
+namespace DelvUI.Config {
+    public class PluginConfiguration : IPluginConfiguration {
         public readonly StatusEffectsListConfig PlayerBuffListConfig = new(
             new Vector2(750, -480),
             true,

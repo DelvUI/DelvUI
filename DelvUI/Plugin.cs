@@ -214,7 +214,7 @@ namespace DelvUI
                 //Healers
                 Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SCH => new ScholarHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.AST => new AstrologianHudWindow(_pluginInterface, _pluginConfiguration, _pluginConfiguration.ASTConfig),
+                Jobs.AST => new AstrologianHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //Melee DPS
                 Jobs.DRG => new DragoonHudWindow(_pluginInterface, _pluginConfiguration),
