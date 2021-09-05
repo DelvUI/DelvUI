@@ -5,6 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using DelvUI.Config.Attributes;
+using ImGuiNET;
+using Newtonsoft.Json;
 
 namespace DelvUI.Config.Tree
 {
@@ -109,7 +112,10 @@ namespace DelvUI.Config.Tree
 
                 ImGui.SameLine();
 
-                if (ImGui.Button("Reset HUD")) { }
+                if (ImGui.Button("Reset HUD"))
+                { 
+
+                }
 
                 ImGui.SameLine();
 
@@ -492,11 +498,10 @@ namespace DelvUI.Config.Tree
             // While in general use this is important as the conversion from the superclass 'PluginConfigObject' to a specific subclass (e.g. 'BlackMageHudConfig') would
             // be handled by Json.NET, when the plugin is reloaded with a different assembly (as is the case when using LivePluginLoader, or updating the plugin in-game)
             // it fails. In order to fix this we need to specify the specific subclass, in order to do this during runtime we must use reflection to set the generic.
-            if (ConfigObject.GetType().GetInterface(typeof(PluginConfigObject).FullName) != null)
-            {
+            if (ConfigObject.GetType().BaseType == typeof(PluginConfigObject)) {
                 var methodInfo = GetType().GetMethod("LoadForType");
                 var function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
-                ConfigObject = (PluginConfigObject)function.Invoke(this, new object[] { finalPath });
+                ConfigObject = (PluginConfigObject)function.Invoke(this, new object[] { finalPath.FullName });
             }
         }
 
