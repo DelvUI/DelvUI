@@ -3036,13 +3036,6 @@ namespace DelvUI.Config
 
                     ImGui.EndTabItem();
                 }
-
-                if (ImGui.BeginTabItem("Astrologian"))
-                {
-                    _changed |= _pluginConfiguration.ASTConfig.Draw();
-                    ImGui.EndTabItem();
-                }
-
             }
 
             ImGui.EndTabBar();
