@@ -1676,6 +1676,8 @@ namespace DelvUI.Config {
         public int SamMeditationBarWidth { get; set; } = 254;
         public int SAMMeditationPadding { get; set; } = 2;
         public int SAMBuffsPadding { get; set; } = 2;
+        public int[] SamBuffOrder { get; set; } = new int[] {0, 1};
+        public int[] SamSenOrder { get; set; } = new int[] {0, 1, 2};
 
         public Vector4 SamHiganbanaColor = new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f);
         public Vector4 SamShifuColor = new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f);

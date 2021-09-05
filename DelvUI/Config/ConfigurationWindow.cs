@@ -2859,6 +2859,78 @@ namespace DelvUI.Config {
                         _pluginConfiguration.Save();
                     }
 
+                    // Shifu/Jinpu swapping
+                    var buffOrder = _pluginConfiguration.SamBuffOrder;
+                    var buffColors = new List<Vector4>(){_pluginConfiguration.SamShifuColor, _pluginConfiguration.SamJinpuColor};
+                    var buffNames = new List<String>(){"Shifu", "Jinpu"};
+
+                    ImGui.Text("Shifu/Jinpu Order");
+                    for(int i = 0; i <= 1; i++){
+                        ImGui.PushID(buffNames[buffOrder[i]]);
+                        ImGui.PushStyleColor(ImGuiCol.Button, buffColors[buffOrder[i]]);
+                        ImGui.PushStyleColor(ImGuiCol.ButtonHovered, buffColors[buffOrder[i]]);
+                        ImGui.PushStyleColor(ImGuiCol.ButtonActive, buffColors[buffOrder[i]]);
+                        ImGui.Button(buffNames[buffOrder[i]], new Vector2(100, 25));
+                        ImGui.PopStyleColor(3);
+                        if (ImGui.IsItemActive()){
+                            float drag_dx = ImGui.GetMouseDragDelta(0).X;
+                            if ((drag_dx > 65.0f && i == 0) || (drag_dx < -65.0f && i == 1))
+                            {
+                                // Swap
+                                var _curr0 = _pluginConfiguration.SamBuffOrder[0];
+                                _pluginConfiguration.SamBuffOrder[0] = _pluginConfiguration.SamBuffOrder[1];
+                                _pluginConfiguration.SamBuffOrder[1] = _curr0;
+                                
+                                ImGui.ResetMouseDragDelta();
+                            }
+                        }
+                        ImGui.PopID();
+                        if (i == 0) 
+                            ImGui.SameLine();
+                    }
+
+                    // Sen Order swapping
+                    var senOrder = _pluginConfiguration.SamSenOrder;
+                    var senColors = new List<Vector4>(){_pluginConfiguration.SamSetsuColor, _pluginConfiguration.SamGetsuColor, _pluginConfiguration.SamKaColor};
+                    var senNames = new List<String>(){"Setsu", "Getsu", "Ka"};
+                    ImGui.Text("Sen Order");
+                    for(int i = 0; i <= 2; i++){
+                        ImGui.PushID(senNames[senOrder[i]]);
+                        ImGui.PushStyleColor(ImGuiCol.Button, senColors[senOrder[i]]);
+                        ImGui.PushStyleColor(ImGuiCol.ButtonHovered, senColors[senOrder[i]]);
+                        ImGui.PushStyleColor(ImGuiCol.ButtonActive, senColors[senOrder[i]]);
+                        ImGui.Button(senNames[senOrder[i]], new Vector2(100, 25));
+                        ImGui.PopStyleColor(3);
+                        if (ImGui.IsItemActive()){
+                            float drag_dx = ImGui.GetMouseDragDelta(0).X;
+                            if ((drag_dx > 65.0f && i < 2))
+                            {
+                                // Swap
+                                var _curri = _pluginConfiguration.SamSenOrder[i];
+                                _pluginConfiguration.SamSenOrder[i] = _pluginConfiguration.SamSenOrder[i+1];
+                                _pluginConfiguration.SamSenOrder[i+1] = _curri;
+                                
+                                ImGui.ResetMouseDragDelta();
+                            }
+                            else if ((drag_dx < -65.0f && i > 0))
+                            {
+                                // Swap
+                                var _curri = _pluginConfiguration.SamSenOrder[i];
+                                _pluginConfiguration.SamSenOrder[i] = _pluginConfiguration.SamSenOrder[i-1];
+                                _pluginConfiguration.SamSenOrder[i-1] = _curri;
+                                
+                                ImGui.ResetMouseDragDelta();
+                            }
+                        }
+                        ImGui.PopID();
+                        if (i < 2) 
+                            ImGui.SameLine();
+                    }
+
+                    ImGui.Text(senOrder[0].ToString());
+                    ImGui.Text(senOrder[1].ToString());
+                    ImGui.Text(senOrder[2].ToString());
+
                     var samKenkiBarX = _pluginConfiguration.SamKenkiBarX;
 
                     if (ImGui.DragInt("Kenki X Offset", ref samKenkiBarX, .1f, -1000, 1000)) {

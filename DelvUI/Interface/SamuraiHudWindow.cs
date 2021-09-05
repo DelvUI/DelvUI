@@ -51,6 +51,9 @@ namespace DelvUI.Interface {
         private int SamTimeShifuXOffset => PluginConfiguration.SamTimeShifuXOffset;
         private int SamTimeShifuYOffset => PluginConfiguration.SamTimeShifuYOffset;
 
+        private int[] SamBuffOrder => PluginConfiguration.SamBuffOrder;
+        private int[] SamSenOrder => PluginConfiguration.SamSenOrder;
+
         private int BuffsPadding => PluginConfiguration.SAMBuffsPadding;
         private int MeditationPadding => PluginConfiguration.SAMMeditationPadding;
         private int SenPadding => PluginConfiguration.SAMSenPadding;
@@ -162,9 +165,10 @@ namespace DelvUI.Interface {
             var shifuDuration = shifu.Duration;
             var jinpuDuration = jinpu.Duration;
 
+            // interal state of shifu: 0, jinpu: 1
             var xOffset = CenterX + BaseXOffset - SamBuffsBarX;
-            var shifuXOffset = xOffset;
-            var jinpuXOffset = xOffset + buffsBarWidth;
+            var shifuXOffset = xOffset + SamBuffOrder[0] * buffsBarWidth;
+            var jinpuXOffset = xOffset + SamBuffOrder[1] * buffsBarWidth;
             var yOffset = CenterY + BaseYOffset + SamBuffsBarY;
 
             var shifuBuilder = BarBuilder.Create(shifuXOffset, yOffset, SamBuffsBarHeight, buffsBarWidth).SetBackgroundColor(SamEmptyColor["background"]);
@@ -193,11 +197,14 @@ namespace DelvUI.Interface {
             var yPos = CenterY + BaseYOffset + SamSenBarY;
             var cursorPos = new Vector2(xPos - SenPadding - senBarWidth, yPos);
 
-            int[] order = new int[3] {0, 1, 2};  // Setsu, Getsu, Ka
+            // Internal order is Setsu: 0, Getsu: 1, Ka: 2
+            var setsuPosX = xPos + Array.IndexOf(SamSenOrder, 0) * (SenPadding + senBarWidth);
+            var getsuPosX = xPos + Array.IndexOf(SamSenOrder, 1) * (SenPadding + senBarWidth);
+            var kaPosX = xPos + Array.IndexOf(SamSenOrder, 2) * (SenPadding + senBarWidth);
             
-            var setsuBuilder = BarBuilder.Create(xPos + order[0] * (SenPadding + senBarWidth), cursorPos.Y, SamSenBarHeight, senBarWidth);
-            var getsuBuilder = BarBuilder.Create(xPos + order[1] * (SenPadding + senBarWidth), cursorPos.Y, SamSenBarHeight, senBarWidth);
-            var kaBuilder = BarBuilder.Create(xPos + order[2] * (SenPadding + senBarWidth), yPos, SamSenBarHeight, senBarWidth);
+            var setsuBuilder = BarBuilder.Create(setsuPosX, cursorPos.Y, SamSenBarHeight, senBarWidth);
+            var getsuBuilder = BarBuilder.Create(getsuPosX, cursorPos.Y, SamSenBarHeight, senBarWidth);
+            var kaBuilder = BarBuilder.Create(kaPosX, yPos, SamSenBarHeight, senBarWidth);
 
             kaBuilder.AddInnerBar(gauge.HasKa()? 1 : 0, 1, SamKaColor);
             getsuBuilder.AddInnerBar(gauge.HasGetsu()? 1 : 0, 1, SamGetsuColor);
