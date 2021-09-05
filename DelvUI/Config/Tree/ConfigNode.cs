@@ -1,40 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Numerics;
-using DelvUI.Config.Attributes;
+﻿using DelvUI.Config.Attributes;
 using ImGuiNET;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Numerics;
 
-namespace DelvUI.Config.Tree {
-    public abstract class Node {
+namespace DelvUI.Config.Tree
+{
+    public abstract class Node
+    {
         public List<Node> children;
 
-        public virtual void Save(string path) {
-            foreach (var child in children) {
+        public virtual void Save(string path)
+        {
+            foreach (var child in children)
+            {
                 child.Save(ConfigurationManager.GetInstance().ConfigDirectory);
             }
         }
 
-        public virtual void Load(string path) {
-            foreach (var child in children) {
+        public virtual void Load(string path)
+        {
+            foreach (var child in children)
+            {
                 child.Load(ConfigurationManager.GetInstance().ConfigDirectory);
             }
         }
     }
 
-    public class BaseNode : Node {
+    public class BaseNode : Node
+    {
         public new List<SectionNode> children;
 
         public BaseNode() { children = new List<SectionNode>(); }
 
-        public void Draw() {
+        public void Draw()
+        {
             var changed = false;
 
             ImGui.SetNextWindowSize(new Vector2(1050, 750), ImGuiCond.Appearing);
 
-            if (!ImGui.Begin("titlebarnew", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse)) {
+            if (!ImGui.Begin("titlebarnew", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
+            {
                 return;
             }
 
@@ -46,17 +54,21 @@ namespace DelvUI.Config.Tree {
                 {
                     var delvUiBanner = ConfigurationManager.GetInstance().BannerImage;
 
-                    if (delvUiBanner != null) {
+                    if (delvUiBanner != null)
+                    {
                         ImGui.Image(delvUiBanner.ImGuiHandle, new Vector2(delvUiBanner.Width, delvUiBanner.Height));
                     }
 
                     ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
 
-                    foreach (var selectionNode in children) {
-                        if (ImGui.Selectable(selectionNode.Name, selectionNode.Selected)) {
+                    foreach (var selectionNode in children)
+                    {
+                        if (ImGui.Selectable(selectionNode.Name, selectionNode.Selected))
+                        {
                             selectionNode.Selected = true;
 
-                            foreach (var otherNode in children.FindAll(x => x != selectionNode)) {
+                            foreach (var otherNode in children.FindAll(x => x != selectionNode))
+                            {
                                 otherNode.Selected = false;
                             }
                         }
@@ -72,7 +84,8 @@ namespace DelvUI.Config.Tree {
                 ImGui.BeginGroup(); // Right
 
                 {
-                    foreach (var selectionNode in children) {
+                    foreach (var selectionNode in children)
+                    {
                         selectionNode.Draw(ref changed);
                     }
                 }
@@ -107,30 +120,40 @@ namespace DelvUI.Config.Tree {
 
             ImGui.End();
 
-            if (changed) {
+            if (changed)
+            {
                 ConfigurationManager.GetInstance().SaveConfigurations();
             }
         }
 
-        public override void Load(string path) {
-            foreach (var child in children) {
+        public override void Load(string path)
+        {
+            foreach (var child in children)
+            {
                 child.Load(path);
             }
         }
 
-        public override void Save(string path) {
-            foreach (var child in children) {
+        public override void Save(string path)
+        {
+            foreach (var child in children)
+            {
                 child.Save(path);
             }
         }
 
-        public ConfigPageNode GetOrAddConfig(PluginConfigObject configObject) {
+        public ConfigPageNode GetOrAddConfig(PluginConfigObject configObject)
+        {
             var attributes = configObject.GetType().GetCustomAttributes(false);
 
-            foreach (var attribute in attributes) {
-                if (attribute is SectionAttribute sectionAttribute) {
-                    foreach (var sectionNode in children) {
-                        if (sectionNode.Name == sectionAttribute.SectionName) {
+            foreach (var attribute in attributes)
+            {
+                if (attribute is SectionAttribute sectionAttribute)
+                {
+                    foreach (var sectionNode in children)
+                    {
+                        if (sectionNode.Name == sectionAttribute.SectionName)
+                        {
                             return sectionNode.GetOrAddConfig(configObject);
                         }
                     }
@@ -147,7 +170,8 @@ namespace DelvUI.Config.Tree {
         }
     }
 
-    public class SectionNode : Node {
+    public class SectionNode : Node
+    {
         public new List<SubSectionNode> children;
 
         public bool Selected;
@@ -155,17 +179,22 @@ namespace DelvUI.Config.Tree {
 
         public SectionNode() { children = new List<SubSectionNode>(); }
 
-        public void Draw(ref bool changed) {
-            if (!Selected) {
+        public void Draw(ref bool changed)
+        {
+            if (!Selected)
+            {
                 return;
             }
 
             ImGui.BeginChild("item view", new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 
             {
-                if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None)) {
-                    foreach (var subSectionNode in children) {
-                        if (!ImGui.BeginTabItem(subSectionNode.Name)) {
+                if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
+                {
+                    foreach (var subSectionNode in children)
+                    {
+                        if (!ImGui.BeginTabItem(subSectionNode.Name))
+                        {
                             continue;
                         }
 
@@ -184,30 +213,40 @@ namespace DelvUI.Config.Tree {
             ImGui.EndChild();
         }
 
-        public override void Save(string path) {
-            foreach (var child in children) {
+        public override void Save(string path)
+        {
+            foreach (var child in children)
+            {
                 child.Save(Path.Combine(path, Name));
             }
         }
 
-        public override void Load(string path) {
-            foreach (var child in children) {
+        public override void Load(string path)
+        {
+            foreach (var child in children)
+            {
                 child.Load(Path.Combine(path, Name));
             }
         }
 
-        public ConfigPageNode GetOrAddConfig(PluginConfigObject configObject) {
+        public ConfigPageNode GetOrAddConfig(PluginConfigObject configObject)
+        {
             var attributes = configObject.GetType().GetCustomAttributes(false);
 
-            foreach (var attribute in attributes) {
-                if (attribute is SubSectionAttribute subSectionAttribute) {
-                    foreach (var subSectionNode in children) {
-                        if (subSectionNode.Name == subSectionAttribute.SubSectionName) {
+            foreach (var attribute in attributes)
+            {
+                if (attribute is SubSectionAttribute subSectionAttribute)
+                {
+                    foreach (var subSectionNode in children)
+                    {
+                        if (subSectionNode.Name == subSectionAttribute.SubSectionName)
+                        {
                             return subSectionNode.GetOrAddConfig(configObject);
                         }
                     }
 
-                    if (subSectionAttribute.Depth == 0) {
+                    if (subSectionAttribute.Depth == 0)
+                    {
                         NestedSubSectionNode newNode = new NestedSubSectionNode();
                         newNode.Name = subSectionAttribute.SubSectionName;
                         newNode.Depth = 0;
@@ -222,7 +261,8 @@ namespace DelvUI.Config.Tree {
         }
     }
 
-    public abstract class SubSectionNode : Node {
+    public abstract class SubSectionNode : Node
+    {
         public string Name;
         public int Depth;
 
@@ -231,19 +271,25 @@ namespace DelvUI.Config.Tree {
         public abstract ConfigPageNode GetOrAddConfig(PluginConfigObject configObject);
     }
 
-    public class NestedSubSectionNode : SubSectionNode {
+    public class NestedSubSectionNode : SubSectionNode
+    {
         public new List<SubSectionNode> children;
 
         public NestedSubSectionNode() { children = new List<SubSectionNode>(); }
 
-        public override void Draw(ref bool changed) {
+        public override void Draw(ref bool changed)
+        {
             ImGui.BeginChild("item" + Depth + " view", new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
 
             {
-                if (ImGui.BeginTabBar("##tabs" + Depth, ImGuiTabBarFlags.None)) {
-                    foreach (var subSectionNode in children) {
-                        if (subSectionNode is NestedSubSectionNode) {
-                            if (!ImGui.BeginTabItem(subSectionNode.Name)) {
+                if (ImGui.BeginTabBar("##tabs" + Depth, ImGuiTabBarFlags.None))
+                {
+                    foreach (var subSectionNode in children)
+                    {
+                        if (subSectionNode is NestedSubSectionNode)
+                        {
+                            if (!ImGui.BeginTabItem(subSectionNode.Name))
+                            {
                                 continue;
                             }
 
@@ -252,7 +298,8 @@ namespace DelvUI.Config.Tree {
                             ImGui.EndChild();
                             ImGui.EndTabItem();
                         }
-                        else {
+                        else
+                        {
                             subSectionNode.Draw(ref changed);
                         }
                     }
@@ -264,29 +311,39 @@ namespace DelvUI.Config.Tree {
             ImGui.EndChild();
         }
 
-        public override void Save(string path) {
-            foreach (var child in children) {
+        public override void Save(string path)
+        {
+            foreach (var child in children)
+            {
                 child.Save(Path.Combine(path, Name));
             }
         }
 
-        public override void Load(string path) {
-            foreach (var child in children) {
+        public override void Load(string path)
+        {
+            foreach (var child in children)
+            {
                 child.Load(Path.Combine(path, Name));
             }
         }
 
-        public override ConfigPageNode GetOrAddConfig(PluginConfigObject configObject) {
+        public override ConfigPageNode GetOrAddConfig(PluginConfigObject configObject)
+        {
             var attributes = configObject.GetType().GetCustomAttributes(false);
 
-            foreach (var attribute in attributes) {
-                if (attribute is SubSectionAttribute subSectionAttribute) {
-                    if (subSectionAttribute.Depth != Depth + 1) {
+            foreach (var attribute in attributes)
+            {
+                if (attribute is SubSectionAttribute subSectionAttribute)
+                {
+                    if (subSectionAttribute.Depth != Depth + 1)
+                    {
                         continue;
                     }
 
-                    foreach (var subSectionNode in children) {
-                        if (subSectionNode.Name == subSectionAttribute.SubSectionName) {
+                    foreach (var subSectionNode in children)
+                    {
+                        if (subSectionNode.Name == subSectionAttribute.SubSectionName)
+                        {
                             return subSectionNode.GetOrAddConfig(configObject);
                         }
                     }
@@ -300,8 +357,10 @@ namespace DelvUI.Config.Tree {
                 }
             }
 
-            foreach (var subSectionNode in children) {
-                if (subSectionNode.Name == configObject.GetType().FullName && subSectionNode is ConfigPageNode node) {
+            foreach (var subSectionNode in children)
+            {
+                if (subSectionNode.Name == configObject.GetType().FullName && subSectionNode is ConfigPageNode node)
+                {
                     return node;
                 }
             }
@@ -315,69 +374,87 @@ namespace DelvUI.Config.Tree {
         }
     }
 
-    public class ConfigPageNode : SubSectionNode {
+    public class ConfigPageNode : SubSectionNode
+    {
         public PluginConfigObject ConfigObject;
 
-        public override void Draw(ref bool changed) {
+        public override void Draw(ref bool changed)
+        {
             var fields = ConfigObject.GetType().GetFields();
 
-            foreach (var field in fields) {
+            foreach (var field in fields)
+            {
                 object fieldVal = field.GetValue(ConfigObject);
 
-                foreach (var attribute in field.GetCustomAttributes(true)) {
-                    if (attribute is CheckboxAttribute checkboxAttribute) {
-                        bool boolVal = (bool) fieldVal;
+                foreach (var attribute in field.GetCustomAttributes(true))
+                {
+                    if (attribute is CheckboxAttribute checkboxAttribute)
+                    {
+                        bool boolVal = (bool)fieldVal;
 
-                        if (ImGui.Checkbox(checkboxAttribute.friendlyName, ref boolVal)) {
+                        if (ImGui.Checkbox(checkboxAttribute.friendlyName, ref boolVal))
+                        {
                             field.SetValue(ConfigObject, boolVal);
                             changed = true;
                         }
                     }
-                    else if (attribute is DragFloatAttribute dragFloatAttribute) {
-                        float floatVal = (float) fieldVal;
+                    else if (attribute is DragFloatAttribute dragFloatAttribute)
+                    {
+                        float floatVal = (float)fieldVal;
 
-                        if (ImGui.DragFloat(dragFloatAttribute.friendlyName, ref floatVal, dragFloatAttribute.velocity, dragFloatAttribute.min, dragFloatAttribute.max)) {
+                        if (ImGui.DragFloat(dragFloatAttribute.friendlyName, ref floatVal, dragFloatAttribute.velocity, dragFloatAttribute.min, dragFloatAttribute.max))
+                        {
                             field.SetValue(ConfigObject, floatVal);
                             changed = true;
                         }
                     }
-                    else if (attribute is DragIntAttribute dragIntAttribute) {
-                        int intVal = (int) fieldVal;
+                    else if (attribute is DragIntAttribute dragIntAttribute)
+                    {
+                        int intVal = (int)fieldVal;
 
-                        if (ImGui.DragInt(dragIntAttribute.friendlyName, ref intVal, dragIntAttribute.velocity, dragIntAttribute.min, dragIntAttribute.max)) {
+                        if (ImGui.DragInt(dragIntAttribute.friendlyName, ref intVal, dragIntAttribute.velocity, dragIntAttribute.min, dragIntAttribute.max))
+                        {
                             field.SetValue(ConfigObject, intVal);
                             changed = true;
                         }
                     }
-                    else if (attribute is DragFloat2Attribute dragFloat2Attribute) {
-                        Vector2 floatVal = (Vector2) fieldVal;
+                    else if (attribute is DragFloat2Attribute dragFloat2Attribute)
+                    {
+                        Vector2 floatVal = (Vector2)fieldVal;
 
-                        if (ImGui.DragFloat2(dragFloat2Attribute.friendlyName, ref floatVal, dragFloat2Attribute.velocity, dragFloat2Attribute.min, dragFloat2Attribute.max)) {
+                        if (ImGui.DragFloat2(dragFloat2Attribute.friendlyName, ref floatVal, dragFloat2Attribute.velocity, dragFloat2Attribute.min, dragFloat2Attribute.max))
+                        {
                             field.SetValue(ConfigObject, floatVal);
                             changed = true;
                         }
                     }
-                    else if (attribute is DragInt2Attribute dragInt2Attribute) {
-                        Vector2 intVal = (Vector2) fieldVal;
+                    else if (attribute is DragInt2Attribute dragInt2Attribute)
+                    {
+                        Vector2 intVal = (Vector2)fieldVal;
 
-                        if (ImGui.DragFloat2(dragInt2Attribute.friendlyName, ref intVal, dragInt2Attribute.velocity, dragInt2Attribute.min, dragInt2Attribute.max)) {
+                        if (ImGui.DragFloat2(dragInt2Attribute.friendlyName, ref intVal, dragInt2Attribute.velocity, dragInt2Attribute.min, dragInt2Attribute.max))
+                        {
                             field.SetValue(ConfigObject, intVal);
                             changed = true;
                         }
                     }
-                    else if (attribute is InputTextAttribute inputTextAttribute) {
-                        string stringVal = (string) fieldVal;
+                    else if (attribute is InputTextAttribute inputTextAttribute)
+                    {
+                        string stringVal = (string)fieldVal;
 
-                        if (ImGui.InputText(inputTextAttribute.friendlyName, ref stringVal, inputTextAttribute.maxLength)) {
+                        if (ImGui.InputText(inputTextAttribute.friendlyName, ref stringVal, inputTextAttribute.maxLength))
+                        {
                             field.SetValue(ConfigObject, stringVal);
                             changed = true;
                         }
                     }
-                    else if (attribute is ColorEdit4Attribute colorEdit4Attribute) {
-                        PluginConfigColor colorVal = (PluginConfigColor) fieldVal;
+                    else if (attribute is ColorEdit4Attribute colorEdit4Attribute)
+                    {
+                        PluginConfigColor colorVal = (PluginConfigColor)fieldVal;
                         var vector = colorVal.Vector;
 
-                        if (ImGui.ColorEdit4(colorEdit4Attribute.friendlyName, ref vector)) {
+                        if (ImGui.ColorEdit4(colorEdit4Attribute.friendlyName, ref vector))
+                        {
                             colorVal.Vector = vector;
                             field.SetValue(ConfigObject, colorVal);
                             changed = true;
@@ -387,7 +464,8 @@ namespace DelvUI.Config.Tree {
             }
         }
 
-        public override void Save(string path) {
+        public override void Save(string path)
+        {
             Directory.CreateDirectory(path);
             string finalPath = path + ".json";
 
@@ -396,15 +474,17 @@ namespace DelvUI.Config.Tree {
                 JsonConvert.SerializeObject(
                     ConfigObject,
                     Formatting.Indented,
-                    new JsonSerializerSettings {TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects}
+                    new JsonSerializerSettings { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects }
                 )
             );
         }
 
-        public override void Load(string path) {
+        public override void Load(string path)
+        {
             var finalPath = new FileInfo(path + ".json");
 
-            if (!finalPath.Exists) {
+            if (!finalPath.Exists)
+            {
                 return;
             }
 
@@ -412,14 +492,16 @@ namespace DelvUI.Config.Tree {
             // While in general use this is important as the conversion from the superclass 'PluginConfigObject' to a specific subclass (e.g. 'BlackMageHudConfig') would
             // be handled by Json.NET, when the plugin is reloaded with a different assembly (as is the case when using LivePluginLoader, or updating the plugin in-game)
             // it fails. In order to fix this we need to specify the specific subclass, in order to do this during runtime we must use reflection to set the generic.
-            if (ConfigObject.GetType().GetInterface(typeof(PluginConfigObject).FullName) != null) {
+            if (ConfigObject.GetType().GetInterface(typeof(PluginConfigObject).FullName) != null)
+            {
                 var methodInfo = GetType().GetMethod("LoadForType");
                 var function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
-                ConfigObject = (PluginConfigObject) function.Invoke(this, new object[] {finalPath});
+                ConfigObject = (PluginConfigObject)function.Invoke(this, new object[] { finalPath });
             }
         }
 
-        public T LoadForType<T>(string path) where T : PluginConfigObject {
+        public T LoadForType<T>(string path) where T : PluginConfigObject
+        {
             var file = new FileInfo(path);
 
             return JsonConvert.DeserializeObject<T>(File.ReadAllText(file.FullName));
