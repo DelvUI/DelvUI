@@ -16,7 +16,7 @@ namespace DelvUI.Interface {
 
         public override uint JobId => 23;
         private BardHudConfig _config => (BardHudConfig) ConfigurationManager.GetInstance().GetConfiguration(new BardHudConfig());
-        private Vector2 Origin => new Vector2(CenterX + _config.Position.X, CenterY + YOffset + _config.Position.Y);
+        private Vector2 Origin => new Vector2(CenterX + _config.Position.X, CenterY + _config.Position.Y);
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
 
         protected override void Draw(bool _) {
@@ -214,7 +214,7 @@ namespace DelvUI.Interface {
     [SubSection("Bard", 1)]
     public class BardHudConfig : PluginConfigObject {
         [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
-        public Vector2 Position = new Vector2(0, 0);
+        public Vector2 Position = new Vector2(0, 454);
         
         [Checkbox("Song Gauge Enabled")] public bool ShowSongGauge = true;
 
@@ -222,7 +222,7 @@ namespace DelvUI.Interface {
         public Vector2 SongGaugeSize = new Vector2(254, 20);
 
         [DragFloat2("Song Gauge Position", min = -4000f, max = 4000f)]
-        public Vector2 SongGaugePosition = new Vector2(0, -23);
+        public Vector2 SongGaugePosition = new Vector2(0, -17);
 
         [ColorEdit4("Wanderer's Minuet Color")] public PluginConfigColor WMColor = new PluginConfigColor(new Vector4(158f / 255f, 157f / 255f, 36f / 255f, 100f / 100f));
         [ColorEdit4("Mage's Ballad Color")] public PluginConfigColor MBColor = new PluginConfigColor(new Vector4(143f / 255f, 90f / 255f, 143f / 255f, 100f / 100f));
@@ -234,7 +234,7 @@ namespace DelvUI.Interface {
         public Vector2 SoulGaugeSize = new Vector2(254, 10);
 
         [DragFloat2("Soul Gauge Position", min = -4000f, max = 4000f)]
-        public Vector2 SoulGaugePosition = new Vector2(0, -6);
+        public Vector2 SoulGaugePosition = new Vector2(0, 0);
 
         [ColorEdit4("Soul Gauge Color")] public PluginConfigColor SoulGaugeColor = new PluginConfigColor(new Vector4(248f / 255f, 227f / 255f, 0f / 255f, 100f / 100f));
   
@@ -246,7 +246,7 @@ namespace DelvUI.Interface {
         public Vector2 StackSize = new Vector2(254, 10);
 
         [DragFloat2("Stack Position", min = -4000f, max = 4000f)]
-        public Vector2 StackPosition = new Vector2(0, -40);
+        public Vector2 StackPosition = new Vector2(0, -34);
         
         [DragInt("Stack Padding", max = 1000)]
         public int StackPadding = 2;
@@ -262,7 +262,7 @@ namespace DelvUI.Interface {
         public Vector2 CBSize = new Vector2(126, 10);
 
         [DragFloat2("Caustic Bite Position", min = -4000f, max = 4000f)]
-        public Vector2 CBPosition = new Vector2(-64, -52);
+        public Vector2 CBPosition = new Vector2(-64, -46);
         
         [ColorEdit4("Caustic Bite Color")] public PluginConfigColor CBColor = new PluginConfigColor(new Vector4(182f / 255f, 68f / 255f, 235f / 255f, 100f / 100f));
         
@@ -273,7 +273,7 @@ namespace DelvUI.Interface {
         public Vector2 SBSize = new Vector2(126, 10);
 
         [DragFloat2("Stormbite Position", min = -4000f, max = 4000f)]
-        public Vector2 SBPosition = new Vector2(64, -52);
+        public Vector2 SBPosition = new Vector2(64, -46);
         
         [ColorEdit4("Stormbite Color")] public PluginConfigColor SBColor = new PluginConfigColor(new Vector4(72f / 255f, 117f / 255f, 202f / 255f, 100f / 100f));
 
