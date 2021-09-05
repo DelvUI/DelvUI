@@ -68,7 +68,7 @@ namespace DelvUI.Interface.GeneralElements
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY / 2f - size.Y /2);
 
             var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(size.X - 5, 0), "", LabelTextAnchor.Right);
+            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
 
             return new TargetCastbarConfig(pos, size, castNameConfig, castTimeConfig, "Target Castbar");
         }
