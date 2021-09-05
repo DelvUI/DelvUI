@@ -491,27 +491,6 @@ namespace DelvUI.Config {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorGNB.AdjustColor(.1f)),
                     ["invuln"] = ImGui.ColorConvertFloat4ToU32(JobColorGNB.AdjustColor(-.8f))
                 },
-                [Jobs.GNB * 1000] = new() // Bar not ready
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(GNBGunPowderColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(GNBGunPowderColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(GNBGunPowderColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(GNBGunPowderColor.AdjustColor(.1f))
-                },
-                [Jobs.GNB * 1000 + 1] = new() // Bar not ready
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(GNBNoMercyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(GNBNoMercyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(GNBNoMercyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(GNBNoMercyColor.AdjustColor(.1f))
-                },
-                [Jobs.GNB * 1000 + 2] = new() // Bar not ready
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
                 [Jobs.WHM] = new()
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorWHM),
@@ -1767,28 +1746,6 @@ namespace DelvUI.Config {
         public Vector4 DRGLifeOfTheDragonColor = new(139f / 255f, 24f / 255f, 24f / 255f, 100f / 100f);
         public Vector4 DRGDisembowelColor = new(244f / 255f, 206f / 255f, 191f / 255f, 100f / 100f);
         public Vector4 DRGChaosThrustColor = new(106f / 255f, 82f / 255f, 148f / 255f, 100f / 100f);
-
-        #endregion
-
-        #region GNB Configuration
-
-        public int GNBBaseXOffset { get; set; } = 127;
-        public int GNBBaseYOffset { get; set; } = 417;
-
-        public bool GNBPowderGaugeEnabled = true;
-        public int GNBPowderGaugeHeight { get; set; } = 20;
-        public int GNBPowderGaugeWidth { get; set; } = 254;
-        public int GNBPowderGaugeXOffset { get; set; }
-        public int GNBPowderGaugeYOffset { get; set; }
-        public int GNBPowderGaugePadding { get; set; } = 2;
-        public Vector4 GNBGunPowderColor = new(46f / 255f, 179f / 255f, 255f / 255f, 1f);
-
-        public bool GNBNoMercyBarEnabled = true;
-        public int GNBNoMercyBarHeight { get; set; } = 20;
-        public int GNBNoMercyBarWidth { get; set; } = 254;
-        public int GNBNoMercyBarXOffset { get; set; }
-        public int GNBNoMercyBarYOffset { get; set; } = 22;
-        public Vector4 GNBNoMercyColor = new(252f / 255f, 204f / 255f, 255f / 255f, 1f);
 
         #endregion
 
