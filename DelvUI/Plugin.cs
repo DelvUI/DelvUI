@@ -159,7 +159,8 @@ namespace DelvUI
             }
         }
 
-        private void NewConfigMenuCommand(string command, string arguments) {
+        private void NewConfigMenuCommand(string command, string arguments) 
+        {
             ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
         }
 
