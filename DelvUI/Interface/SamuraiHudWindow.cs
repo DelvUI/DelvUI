@@ -66,6 +66,10 @@ namespace DelvUI.Interface
         private bool KenkiText => PluginConfiguration.SAMKenkiText;
         private bool BuffText => PluginConfiguration.SAMBuffText;
 
+        private bool BuffOrder => PluginConfiguration.SAMBuffOrder;
+        private string SenOrder => PluginConfiguration.SAMSenOrder;
+        private Dictionary<string, int[]> SenOrderDict => PluginConfiguration.SAMSenOrderDict;
+
         private Dictionary<string, uint> SamHiganbanaColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000];
         private Dictionary<string, uint> SamShifuColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 1];
         private Dictionary<string, uint> SamJinpuColor => PluginConfiguration.JobColorMap[Jobs.SAM * 1000 + 2];
@@ -125,7 +129,9 @@ namespace DelvUI.Interface
             kenkiBuilder.AddInnerBar(gauge.Kenki, 100, SamKenkiColor);
 
             if (KenkiText)
+            {
                 kenkiBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+            }
             var drawList = ImGui.GetWindowDrawList();
             kenkiBuilder.Build().Draw(drawList, PluginConfiguration);
         }
@@ -175,8 +181,13 @@ namespace DelvUI.Interface
             var jinpuDuration = jinpu.Duration;
 
             var xOffset = CenterX + BaseXOffset - SamBuffsBarX;
-            var shifuXOffset = xOffset;
-            var jinpuXOffset = xOffset + buffsBarWidth;
+            var jinpuXOffset = xOffset;
+            var shifuXOffset = xOffset + buffsBarWidth;
+            if (!BuffOrder)
+            {
+                jinpuXOffset = xOffset + buffsBarWidth;
+                shifuXOffset = xOffset;
+            }
             var yOffset = CenterY + BaseYOffset + SamBuffsBarY;
 
             var shifuBuilder = BarBuilder.Create(shifuXOffset, yOffset, SamBuffsBarHeight, buffsBarWidth).SetBackgroundColor(SamEmptyColor["background"]);
@@ -206,7 +217,7 @@ namespace DelvUI.Interface
             var yPos = CenterY + BaseYOffset + SamSenBarY;
             var cursorPos = new Vector2(xPos - SenPadding - senBarWidth, yPos);
 
-            int[] order = new int[3] { 0, 1, 2 };  // Setsu, Getsu, Ka
+            var order = SenOrderDict[SenOrder]; // Setsu, Getsu, Ka
 
             var setsuBuilder = BarBuilder.Create(xPos + order[0] * (SenPadding + senBarWidth), cursorPos.Y, SamSenBarHeight, senBarWidth);
             var getsuBuilder = BarBuilder.Create(xPos + order[1] * (SenPadding + senBarWidth), cursorPos.Y, SamSenBarHeight, senBarWidth);

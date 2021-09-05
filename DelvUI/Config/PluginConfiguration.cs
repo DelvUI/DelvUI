@@ -1703,8 +1703,19 @@ namespace DelvUI.Config
         public int SAMMeditationPadding { get; set; } = 2;
         public int SAMBuffsPadding { get; set; } = 2;
 
+        public Dictionary<string, int[]> SAMSenOrderDict = new Dictionary<string, int[]>() {
+            { "Setsu Getsu Ka", new int[3] { 0, 1, 2 }},
+            { "Setsu Ka Getsu", new int[3] { 0, 2, 1 }},
+            { "Getsu Setsu Ka", new int[3] { 1, 0, 2 }},
+            { "Getsu Ka Setsu", new int[3] { 1, 0, 2 }},
+            { "Ka Setsu Getsu", new int[3] { 1, 2, 0 }},
+            { "Ka Getsu Setsu", new int[3] { 2, 1, 0 }},
+        };
+        public string SAMSenOrder { get; set; } = "Setsu Getsu Ka";
+        public bool SAMBuffOrder { get; set; } = true;
+
         public Vector4 SamHiganbanaColor = new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f);
-        public Vector4 SamShifuColor = new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f);
+        public Vector4 SamShifuColor = new(239f / 255f, 99f / 255f, 61f / 255f, 100f / 100f);
         public Vector4 SamJinpuColor = new(136f / 255f, 146f / 255f, 219f / 255f, 100f / 100f);
 
         public Vector4 SamSetsuColor = new(89f / 255f, 234f / 255f, 247f / 255f, 100f / 100f);
