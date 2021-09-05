@@ -405,6 +405,10 @@ namespace DelvUI.Config.Tree {
                 return;
             }
 
+            // Use reflection to call the LoadForType method, this allows us to specify a type at runtime.
+            // While in general use this is important as the conversion from the superclass 'PluginConfigObject' to a specific subclass (e.g. 'BlackMageHudConfig') would
+            // be handled by Json.NET, when the plugin is reloaded with a different assembly (as is the case when using LivePluginLoader, or updating the plugin in-game)
+            // it fails. In order to fix this we need to specify the specific subclass, in order to do this during runtime we must use reflection to set the generic.
             if (ConfigObject.GetType().GetInterface(typeof(PluginConfigObject).FullName) != null) {
                 var methodInfo = GetType().GetMethod("LoadForType");
                 var function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
