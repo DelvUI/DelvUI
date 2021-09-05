@@ -1,197 +1,404 @@
-using System;
-using System.Linq;
-using System.Collections.Generic;
-using System.Numerics;
-using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
+using DelvUI.Config;
+using DelvUI.Interface.Bars;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DelvUI.Interface
 {
     public class MonkHudWindow : HudWindow
     {
-        public override uint JobId => 20;
-
-
-        protected int DemolishHeight => PluginConfiguration.MNKDemolishHeight;
-        protected int DemolishWidth => PluginConfiguration.MNKDemolishWidth;
-        protected int DemolishXOffset => PluginConfiguration.MNKDemolishXOffset;
-        protected int DemolishYOffset => PluginConfiguration.MNKDemolishYOffset;
-        protected int ChakraHeight => PluginConfiguration.MNKChakraHeight;
-        protected int ChakraWidth => PluginConfiguration.MNKChakraWidth;
-        protected int ChakraXOffset => PluginConfiguration.MNKChakraXOffset;
-        protected int ChakraYOffset => PluginConfiguration.MNKChakraYOffset;
-        protected int BuffHeight => PluginConfiguration.MNKBuffHeight;
-        protected int BuffWidth => PluginConfiguration.MNKBuffWidth;
-        protected int BuffXOffset => PluginConfiguration.MNKBuffXOffset;
-        protected int BuffYOffset => PluginConfiguration.MNKBuffYOffset;
-        protected int TimeTwinXOffset => PluginConfiguration.MNKTimeTwinXOffset;
-        protected int TimeTwinYOffset => PluginConfiguration.MNKTimeTwinYOffset;
-        protected  int TimeLeadenXOffset => PluginConfiguration.MNKTimeLeadenXOffset;
-        protected int TimeLeadenYOffset => PluginConfiguration.MNKTimeLeadenYOffset;
-        protected int TimeDemoXOffset => PluginConfiguration.MNKTimeDemoXOffset;
-        protected int TimeDemoYOffset => PluginConfiguration.MNKTimeDemoYOffset;
-
-        protected Dictionary<string, uint> DemolishColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000];
-        protected Dictionary<string, uint> ChakraColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 1];
-        protected Dictionary<string, uint> LeadenFistColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 2];
-        protected Dictionary<string, uint> TwinSnakesColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 3];
-
         public MonkHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
+
+        public override uint JobId => 20;
 
         protected override void Draw(bool _)
         {
-            DrawHealthBar();
-            DrawTargetBar();
-            ChakraBar();
-            Demolish();
-            ActiveBuffs();
-            DrawFocusBar();
-            DrawCastBar();
+            if (FormsEnabled)
+            {
+                DrawFormsBar();
+            }
+
+            if (RiddleOfEarthEnabled)
+            {
+                DrawRiddleOfEarthBar();
+            }
+
+            if (PerfectBalanceEnabled)
+            {
+                DrawPerfectBalanceBar();
+            }
+
+            if (TrueNorthEnabled)
+            {
+                DrawTrueNorthBar();
+            }
+
+            if (ChakraEnabled)
+            {
+                DrawChakraGauge();
+            }
+
+            if (LeadenFistEnabled)
+            {
+                DrawLeadenFistBar();
+            }
+
+            if (TwinSnakesEnabled)
+            {
+                DrawTwinSnakesBar();
+            }
+
+            if (DemolishEnabled)
+            {
+                DrawDemolishBar();
+            }
         }
 
-        private void ActiveBuffs()
+        protected override void DrawPrimaryResourceBar() { }
+
+        private void DrawFormsBar()
         {
             var target = PluginInterface.ClientState.LocalPlayer;
+            var opoOpoForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 107);
+            var raptorForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 108);
+            var coeurlForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 109);
+            var formlessFist = target.StatusEffects.FirstOrDefault(o => o.EffectId == 2513);
 
-            if (!(target is Chara))
+            var opoOpoFormDuration = opoOpoForm.Duration;
+            var raptorFormDuration = raptorForm.Duration;
+            var coeurlFormDuration = coeurlForm.Duration;
+            var formlessFistDuration = formlessFist.Duration;
+
+            var xPos = CenterX - XOffset + FormsXOffset + 33;
+            var yPos = CenterY + YOffset - FormsYOffset - 87;
+
+            var builder = BarBuilder.Create(xPos, yPos, FormsHeight, FormsWidth);
+            var maximum = 15f;
+
+            if (opoOpoFormDuration > 0)
             {
-                return;
+                var bar = builder.AddInnerBar(Math.Abs(opoOpoFormDuration), maximum, FormsColor)
+                                 .SetTextMode(BarTextMode.EachChunk)
+                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Opo-Opo Form")
+                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .Build();
+
+                var drawList = ImGui.GetWindowDrawList();
+                bar.Draw(drawList, PluginConfiguration);
             }
 
-            const int xPadding = 1;
-            var barWidth = (BuffWidth / 2) - 1;
-            var twinSnakes = target.StatusEffects.FirstOrDefault(o => o.EffectId == 101);
-            var leadenFist = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1861);
-
-            var twinSnakesDuration = twinSnakes.Duration;
-            var leadenFistDuration = leadenFist.Duration;
-
-            var xOffset = CenterX - BuffXOffset;
-            var cursorPos = new Vector2(CenterX - BuffXOffset, CenterY + BuffYOffset - 8);
-            var barSize = new Vector2(barWidth, BuffHeight);
-            var drawList = ImGui.GetWindowDrawList();
-            var twinXOffset = TimeTwinXOffset;
-            var twinYOffset = TimeTwinYOffset;
-
-            var buffStart = new Vector2(xOffset + barWidth - (barSize.X / 15) * twinSnakesDuration, CenterY + BuffYOffset - 8);
-
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-            drawList.AddRectFilledMultiColor(
-                    buffStart, cursorPos + new Vector2(barSize.X, barSize.Y),
-                    TwinSnakesColor["gradientLeft"], TwinSnakesColor["gradientRight"], TwinSnakesColor["gradientRight"], TwinSnakesColor["gradientLeft"]
-                );
-
-            if (!PluginConfiguration.ShowBuffTime)
+            if (raptorFormDuration > 0)
             {
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+                var bar = builder.AddInnerBar(Math.Abs(raptorFormDuration), maximum, FormsColor)
+                                 .SetTextMode(BarTextMode.EachChunk)
+                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Raptor Form")
+                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .Build();
 
-                cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
+                var drawList = ImGui.GetWindowDrawList();
+                bar.Draw(drawList, PluginConfiguration);
+            }
 
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2((barSize.X / 30) * leadenFistDuration, barSize.Y),
-                    leadenFistDuration > 0 ? LeadenFistColor["gradientLeft"] : 0x00202E3,
-                    leadenFistDuration > 0 ? LeadenFistColor["gradientRight"] : 0x00202E3,
-                    leadenFistDuration > 0 ? LeadenFistColor["gradientRight"] : 0x00202E3,
-                    leadenFistDuration > 0 ? LeadenFistColor["gradientLeft"] : 0x00202E3
-                );
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            if (coeurlFormDuration > 0)
+            {
+                var bar = builder.AddInnerBar(Math.Abs(coeurlFormDuration), maximum, FormsColor)
+                                 .SetTextMode(BarTextMode.EachChunk)
+                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Coeurl Form")
+                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .Build();
+
+                var drawList = ImGui.GetWindowDrawList();
+                bar.Draw(drawList, PluginConfiguration);
+            }
+
+            if (formlessFist.Duration > 0)
+            {
+                var bar = builder.AddInnerBar(Math.Abs(formlessFist.Duration), maximum, FormsColor)
+                                 .SetTextMode(BarTextMode.EachChunk)
+                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Formless Fist")
+                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .Build();
+
+                var drawList = ImGui.GetWindowDrawList();
+                bar.Draw(drawList, PluginConfiguration);
             }
             else
             {
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-                DrawOutlinedText(Math.Round(twinSnakesDuration).ToString(), new Vector2(twinXOffset, twinYOffset));
+                var bar = builder.AddInnerBar(0, maximum, FormsColor)
+                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .Build();
 
-                cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
-                var leadenXOffset = TimeLeadenXOffset;
-                var leadenYOffset = TimeLeadenYOffset;
-
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2((barSize.X / 30) * leadenFistDuration, barSize.Y),
-                    leadenFistDuration > 0 ? LeadenFistColor["gradientLeft"] : 0x00202E3,
-                    leadenFistDuration > 0 ? LeadenFistColor["gradientRight"] : 0x00202E3,
-                    leadenFistDuration > 0 ? LeadenFistColor["gradientRight"] : 0x00202E3,
-                    leadenFistDuration > 0 ? LeadenFistColor["gradientLeft"] : 0x00202E3
-                );
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-                if (leadenFistDuration <= 0)
-                    DrawOutlinedText("0", new Vector2(leadenXOffset, leadenYOffset));
-                else
-                    DrawOutlinedText(Math.Round(leadenFistDuration).ToString(), new Vector2(leadenXOffset, leadenYOffset));
+                var drawList = ImGui.GetWindowDrawList();
+                bar.Draw(drawList, PluginConfiguration);
             }
         }
 
-        private void Demolish()
+        private void DrawTrueNorthBar()
         {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            var target = PluginInterface.ClientState.LocalPlayer;
+            var trueNorth = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1250);
+            var trueNorthDuration = trueNorth.Duration;
 
-            if (!(target is Chara))
+            var xPos = CenterX - XOffset + TrueNorthXOffset + 172;
+            var yPos = CenterY + YOffset - TrueNorthYOffset - 65;
+
+            var builder = BarBuilder.Create(xPos, yPos, TrueNorthHeight, TrueNorthWidth);
+            var maximum = 10f;
+
+            if (trueNorthDuration > 0)
             {
-                return;
+                var bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, TrueNorthColor)
+                                 .SetTextMode(BarTextMode.EachChunk)
+                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .Build();
+
+                var drawList = ImGui.GetWindowDrawList();
+                bar.Draw(drawList, PluginConfiguration);
             }
-
-            const int xPadding = 2;
-            var barWidth = (DemolishWidth) - 1;
-            var demolish = target.StatusEffects.FirstOrDefault(o => o.EffectId == 246 || o.EffectId == 1309);
-
-            var demolishDuration = demolish.Duration;
-            var demolishColor = DemolishColor;
-
-            var xOffset = CenterX - DemolishXOffset;
-            var cursorPos = new Vector2(CenterX - DemolishXOffset - 255, CenterY + DemolishYOffset - 52);
-            var barSize = new Vector2(barWidth, DemolishHeight);
-            var drawList = ImGui.GetWindowDrawList();
-
-            var demoXOffset = TimeDemoXOffset;
-            var demoYOffset = TimeDemoYOffset;
-
-            cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
-
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-            drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2((barSize.X / 18) * demolishDuration, barSize.Y),
-                    demolishColor["gradientLeft"], demolishColor["gradientRight"], demolishColor["gradientRight"], demolishColor["gradientLeft"]
-                );
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-            if (!PluginConfiguration.ShowDemolishTime)
-                return;
             else
-                DrawOutlinedText(Math.Round(demolishDuration).ToString(), new Vector2(demoXOffset, demoYOffset));
+            {
+                var bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, TrueNorthColor)
+                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .Build();
 
+                var drawList = ImGui.GetWindowDrawList();
+                bar.Draw(drawList, PluginConfiguration);
+            }
         }
 
-        private void ChakraBar()
+        private void DrawPerfectBalanceBar()
+        {
+            var target = PluginInterface.ClientState.LocalPlayer;
+            var perfectBalance = target.StatusEffects.FirstOrDefault(o => o.EffectId == 110);
+            var perfectBalanceDuration = perfectBalance.StackCount;
+
+            var xPos = CenterX - XOffset + PerfectBalanceXOffset + 150;
+            var yPos = CenterY + YOffset - PerfectBalanceYOffset - 65;
+
+            var builder = BarBuilder.Create(xPos, yPos, PerfectBalanceHeight, PerfectBalanceWidth);
+            var maximum = 6f;
+
+            if (perfectBalanceDuration > 0)
+            {
+                var bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, PerfectBalanceColor)
+                                 .SetVertical(true)
+                                 .SetFlipDrainDirection(PerfectBalanceBarFlipped)
+                                 .SetTextMode(BarTextMode.EachChunk)
+                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .Build();
+
+                var drawList = ImGui.GetWindowDrawList();
+                bar.Draw(drawList, PluginConfiguration);
+            }
+            else
+            {
+                var bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, PerfectBalanceColor)
+                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .Build();
+
+                var drawList = ImGui.GetWindowDrawList();
+                bar.Draw(drawList, PluginConfiguration);
+            }
+        }
+
+        private void DrawRiddleOfEarthBar()
+        {
+            var target = PluginInterface.ClientState.LocalPlayer;
+            var riddleOfEarth = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1179);
+            var riddleOfEarthDuration = riddleOfEarth.StackCount;
+
+            var xPos = CenterX - XOffset + RiddleOfEarthXOffset + 33;
+            var yPos = CenterY + YOffset - RiddleOfEarthYOffset - 65;
+
+            var builder = BarBuilder.Create(xPos, yPos, RiddleOfEarthHeight, RiddleOfEarthWidth);
+            var maximum = 3f;
+
+            if (riddleOfEarthDuration > 0)
+            {
+                var bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, RiddleOfEarthColor)
+                                 .SetTextMode(BarTextMode.EachChunk)
+                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .SetFlipDrainDirection(RiddleOfEarthBarFlipped)
+                                 .Build();
+
+                var drawList = ImGui.GetWindowDrawList();
+                bar.Draw(drawList, PluginConfiguration);
+            }
+            else
+            {
+                var bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, RiddleOfEarthColor)
+                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .SetFlipDrainDirection(RiddleOfEarthBarFlipped == false)
+                                 .Build();
+
+                var drawList = ImGui.GetWindowDrawList();
+                bar.Draw(drawList, PluginConfiguration);
+            }
+        }
+
+        private void DrawChakraGauge()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<MNKGauge>();
 
-            const int xPadding = 2;
-            var barWidth = (ChakraWidth - xPadding * 3) / 5;
-            var barSize = new Vector2(barWidth, ChakraHeight);
-            var xPos = CenterX - ChakraXOffset;
-            var yPos = CenterY + ChakraYOffset - 30;
-            var cursorPos = new Vector2(xPos, yPos);
+            var xPos = CenterX - XOffset + ChakraXOffset + 33;
+            var yPos = CenterY + YOffset - ChakraYOffset - 43;
+
+            var bar = BarBuilder.Create(xPos, yPos, ChakraHeight, ChakraWidth)
+                                .SetChunks(5)
+                                .SetChunkPadding(2)
+                                .AddInnerBar(gauge.NumChakra, 5, ChakraColor, EmptyColor)
+                                .SetBackgroundColor(EmptyColor["background"])
+                                .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            for (var i = 0; i <= 5 - 1; i++)
-            {
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-                if (gauge.NumChakra > i)
-                {
-                    drawList.AddRectFilledMultiColor(
-                            cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y),
-                            ChakraColor["gradientLeft"], ChakraColor["gradientRight"], ChakraColor["gradientRight"], ChakraColor["gradientLeft"]
-                        );
-                }
-                else
-                {
+            bar.Draw(drawList, PluginConfiguration);
+        }
 
-                }
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-                cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
+        private void DrawTwinSnakesBar()
+        {
+            var target = PluginInterface.ClientState.LocalPlayer;
+            var twinSnakes = target.StatusEffects.FirstOrDefault(o => o.EffectId == 101);
+            var twinSnakesDuration = twinSnakes.Duration;
+
+            var xPos = CenterX - XOffset + TwinSnakesXOffset + 33;
+            var yPos = CenterY + YOffset - TwinSnakesYOffset - 21;
+
+            var builder = BarBuilder.Create(xPos, yPos, TwinSnakesHeight, TwinSnakesWidth);
+            var maximum = 15f;
+
+            var bar = builder.AddInnerBar(Math.Abs(twinSnakesDuration), maximum, TwinSnakesColor)
+                             .SetTextMode(BarTextMode.EachChunk)
+                             .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                             .SetBackgroundColor(EmptyColor["background"])
+                             .SetFlipDrainDirection(TwinSnakesBarFlipped)
+                             .Build();
+
+            var drawList = ImGui.GetWindowDrawList();
+            bar.Draw(drawList, PluginConfiguration);
+        }
+
+        private void DrawLeadenFistBar()
+        {
+            var target = PluginInterface.ClientState.LocalPlayer;
+            var leadenFist = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1861);
+            var leadenFistDuration = leadenFist.Duration;
+
+            var xPos = CenterX - XOffset + LeadenFistXOffset + 146;
+            var yPos = CenterY + YOffset - LeadenFistYOffset - 21;
+
+            var builder = BarBuilder.Create(xPos, yPos, LeadenFistHeight, LeadenFistWidth);
+            var maximum = 30f;
+
+            if (leadenFistDuration > 0)
+            {
+                var bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, LeadenFistColor)
+                                 .SetVertical(true)
+                                 .SetTextMode(BarTextMode.EachChunk)
+                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .Build();
+
+                var drawList = ImGui.GetWindowDrawList();
+                bar.Draw(drawList, PluginConfiguration);
+            }
+            else
+            {
+                var bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, LeadenFistColor)
+                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .Build();
+
+                var drawList = ImGui.GetWindowDrawList();
+                bar.Draw(drawList, PluginConfiguration);
             }
         }
+
+        private void DrawDemolishBar()
+        {
+            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget ?? PluginInterface.ClientState.LocalPlayer;
+            var demolish = target.StatusEffects.FirstOrDefault(o => o.EffectId == 246 || o.EffectId == 1309);
+            var demolishDuration = demolish.Duration;
+
+            var xPos = CenterX - XOffset + DemolishXOffset + 176;
+            var yPos = CenterY + YOffset - DemolishYOffset - 21;
+
+            var builder = BarBuilder.Create(xPos, yPos, DemolishHeight, DemolishWidth);
+            var maximum = 18f;
+
+            var bar = builder.AddInnerBar(Math.Abs(demolishDuration), maximum, DemolishColor)
+                             .SetTextMode(BarTextMode.EachChunk)
+                             .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                             .SetBackgroundColor(EmptyColor["background"])
+                             .Build();
+
+            var drawList = ImGui.GetWindowDrawList();
+            bar.Draw(drawList, PluginConfiguration);
+        }
+
+        #region MNK Integration's
+
+        private new int XOffset => PluginConfiguration.MNKBaseXOffset;
+        private new int YOffset => PluginConfiguration.MNKBaseYOffset;
+        private bool TwinSnakesBarFlipped => PluginConfiguration.TwinSnakesBarFlipped;
+        private bool RiddleOfEarthBarFlipped => PluginConfiguration.TwinSnakesBarFlipped;
+        private bool PerfectBalanceBarFlipped => PluginConfiguration.PerfectBalanceBarFlipped;
+        private bool DemolishEnabled => PluginConfiguration.DemolishEnabled;
+        private bool ChakraEnabled => PluginConfiguration.ChakraEnabled;
+        private bool LeadenFistEnabled => PluginConfiguration.LeadenFistEnabled;
+        private bool TwinSnakesEnabled => PluginConfiguration.TwinSnakesEnabled;
+        private bool RiddleOfEarthEnabled => PluginConfiguration.RiddleOfEarthEnabled;
+        private bool PerfectBalanceEnabled => PluginConfiguration.PerfectBalanceEnabled;
+        private bool TrueNorthEnabled => PluginConfiguration.TrueNorthEnabled;
+        private bool FormsEnabled => PluginConfiguration.FormsEnabled;
+        private int DemolishHeight => PluginConfiguration.MNKDemolishHeight;
+        private int DemolishWidth => PluginConfiguration.MNKDemolishWidth;
+        private int DemolishXOffset => PluginConfiguration.MNKDemolishXOffset;
+        private int DemolishYOffset => PluginConfiguration.MNKDemolishYOffset;
+        private int ChakraHeight => PluginConfiguration.MNKChakraHeight;
+        private int ChakraWidth => PluginConfiguration.MNKChakraWidth;
+        private int ChakraXOffset => PluginConfiguration.MNKChakraXOffset;
+        private int ChakraYOffset => PluginConfiguration.MNKChakraYOffset;
+        private int LeadenFistHeight => PluginConfiguration.MNKLeadenFistHeight;
+        private int LeadenFistWidth => PluginConfiguration.MNKLeadenFistWidth;
+        private int LeadenFistXOffset => PluginConfiguration.MNKLeadenFistXOffset;
+        private int LeadenFistYOffset => PluginConfiguration.MNKLeadenFistYOffset;
+        private int TwinSnakesHeight => PluginConfiguration.MNKTwinSnakesHeight;
+        private int TwinSnakesWidth => PluginConfiguration.MNKTwinSnakesWidth;
+        private int TwinSnakesXOffset => PluginConfiguration.MNKTwinSnakesXOffset;
+        private int TwinSnakesYOffset => PluginConfiguration.MNKTwinSnakesYOffset;
+        private int RiddleOfEarthHeight => PluginConfiguration.MNKRiddleOfEarthHeight;
+        private int RiddleOfEarthWidth => PluginConfiguration.MNKRiddleOfEarthWidth;
+        private int RiddleOfEarthXOffset => PluginConfiguration.MNKRiddleOfEarthXOffset;
+        private int RiddleOfEarthYOffset => PluginConfiguration.MNKRiddleOfEarthYOffset;
+        private int PerfectBalanceHeight => PluginConfiguration.MNKPerfectBalanceHeight;
+        private int PerfectBalanceWidth => PluginConfiguration.MNKPerfectBalanceWidth;
+        private int PerfectBalanceXOffset => PluginConfiguration.MNKPerfectBalanceXOffset;
+        private int PerfectBalanceYOffset => PluginConfiguration.MNKPerfectBalanceYOffset;
+        private int TrueNorthHeight => PluginConfiguration.MNKTrueNorthHeight;
+        private int TrueNorthWidth => PluginConfiguration.MNKTrueNorthWidth;
+        private int TrueNorthXOffset => PluginConfiguration.MNKTrueNorthXOffset;
+        private int TrueNorthYOffset => PluginConfiguration.MNKTrueNorthYOffset;
+        private int FormsHeight => PluginConfiguration.MNKFormsHeight;
+        private int FormsWidth => PluginConfiguration.MNKFormsWidth;
+        private int FormsXOffset => PluginConfiguration.MNKFormsXOffset;
+        private int FormsYOffset => PluginConfiguration.MNKFormsYOffset;
+
+        private Dictionary<string, uint> DemolishColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000];
+        private Dictionary<string, uint> ChakraColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 1];
+        private Dictionary<string, uint> LeadenFistColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 2];
+        private Dictionary<string, uint> TwinSnakesColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 3];
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 4];
+        private Dictionary<string, uint> RiddleOfEarthColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 5];
+        private Dictionary<string, uint> PerfectBalanceColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 6];
+        private Dictionary<string, uint> TrueNorthColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 7];
+        private Dictionary<string, uint> FormsColor => PluginConfiguration.JobColorMap[Jobs.MNK * 1000 + 8];
+
+        #endregion
     }
 }

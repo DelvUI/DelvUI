@@ -1,178 +1,269 @@
-﻿using System.Linq;
-using System.Numerics;
-using Dalamud.Game.ClientState.Actors.Types;
+﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
+using DelvUI.Config;
+using DelvUI.Interface.Bars;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace DelvUI.Interface {
-    public class BardHudWindow : HudWindow {
-        public override uint JobId => 23;
-
-        private static int BarHeight => 20;
-        private static int SmallBarHeight => 10;
-        private static int BarWidth => 250;
-        private new static int XOffset => 127;
-        private new static int YOffset => 440;
-        
+namespace DelvUI.Interface
+{
+    public class BardHudWindow : HudWindow
+    {
         public BardHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
-        protected override void Draw(bool _) {
-            DrawHealthBar();
-            DrawFocusBar();
-            DrawCastBar();
-            DrawTargetBar();
-            
+        public override uint JobId => 23;
+        private new int XOffset => PluginConfiguration.BRDBaseXOffset;
+        private new int YOffset => PluginConfiguration.BRDBaseYOffset;
+        private int BRDSongGaugeWidth => PluginConfiguration.BRDSongGaugeWidth;
+        private int BRDSongGaugeHeight => PluginConfiguration.BRDSongGaugeHeight;
+        private int BRDSongGaugeXOffset => PluginConfiguration.BRDSongGaugeXOffset;
+        private int BRDSongGaugeYOffset => PluginConfiguration.BRDSongGaugeYOffset;
+        private int BRDSoulGaugeWidth => PluginConfiguration.BRDSoulGaugeWidth;
+        private int BRDSoulGaugeHeight => PluginConfiguration.BRDSoulGaugeHeight;
+        private int BRDSoulGaugeXOffset => PluginConfiguration.BRDSoulGaugeXOffset;
+        private int BRDSoulGaugeYOffset => PluginConfiguration.BRDSoulGaugeYOffset;
+        private int BRDStackWidth => PluginConfiguration.BRDStackWidth;
+        private int BRDStackHeight => PluginConfiguration.BRDStackHeight;
+        private int BRDStackXOffset => PluginConfiguration.BRDStackXOffset;
+        private int BRDStackYOffset => PluginConfiguration.BRDStackYOffset;
+        private int BRDCBWidth => PluginConfiguration.BRDCBWidth;
+        private int BRDCBHeight => PluginConfiguration.BRDCBHeight;
+        private int BRDCBXOffset => PluginConfiguration.BRDCBXOffset;
+        private int BRDCBYOffset => PluginConfiguration.BRDCBYOffset;
+        private int BRDSBWidth => PluginConfiguration.BRDSBWidth;
+        private int BRDSBHeight => PluginConfiguration.BRDSBHeight;
+        private int BRDSBXOffset => PluginConfiguration.BRDSBXOffset;
+        private int BRDSBYOffset => PluginConfiguration.BRDSBYOffset;
+        private int BRDStackPadding => PluginConfiguration.BRDStackPadding;
+        private bool BRDShowSongGauge => PluginConfiguration.BRDShowSongGauge;
+        private bool BRDShowSoulGauge => PluginConfiguration.BRDShowSoulGauge;
+        private bool BRDShowWMStacks => PluginConfiguration.BRDShowWMStacks;
+        private bool BRDShowMBProc => PluginConfiguration.BRDShowMBProc;
+        private bool BRDShowAPStacks => PluginConfiguration.BRDShowAPStacks;
+        private bool BRDShowCB => PluginConfiguration.BRDShowCB;
+        private bool BRDShowSB => PluginConfiguration.BRDShowSB;
+        private bool BRDCBInverted => PluginConfiguration.BRDCBInverted;
+        private bool BRDSBInverted => PluginConfiguration.BRDSBInverted;
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000];
+        private Dictionary<string, uint> ExpireColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 1];
+        private Dictionary<string, uint> WMColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 2];
+        private Dictionary<string, uint> MBColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 3];
+        private Dictionary<string, uint> APColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 4];
+        private Dictionary<string, uint> WMStackColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 5];
+        private Dictionary<string, uint> MBStackColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 6];
+        private Dictionary<string, uint> APStackColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 7];
+        private Dictionary<string, uint> SBColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 8];
+        private Dictionary<string, uint> CBColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 9];
+        private Dictionary<string, uint> SVColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 10];
+
+        protected override void Draw(bool _)
+        {
             DrawActiveDots();
             HandleCurrentSong();
             DrawSoulVoiceBar();
         }
 
+        protected override void DrawPrimaryResourceBar() { }
+
         private void DrawActiveDots()
         {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
-
-            if (!(target is Chara)) {
+            if (!BRDShowCB && !BRDShowSB)
+            {
                 return;
             }
-            
-            var expiryColor = 0xFF2E2EC7;
-            var xPadding = 2;
-            var barWidth = (BarWidth / 2) - 1;
-            var cb = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1200 || o.EffectId == 124);
-            var sb = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1201 || o.EffectId == 129);
-            
-            var cbDuration = cb.Duration;
-            var sbDuration = sb.Duration;
 
-            var cbColor = cbDuration > 5 ? 0xFFEB44B6 : expiryColor;
-            var sbColor = sbDuration > 5 ? 0xFFCA7548 : expiryColor;
-            
-            var xOffset = CenterX - 127;
-            var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 34);
-            var barSize = new Vector2(barWidth, SmallBarHeight);
+            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+
+            if (target is not Chara)
+            {
+                return;
+            }
+
+            var xPos = CenterX - XOffset + BRDCBXOffset;
+            var yPos = CenterY + YOffset + BRDCBYOffset;
+
+            var barDrawList = new List<Bar>();
+
+            if (BRDShowCB)
+            {
+                var cb = target.StatusEffects.FirstOrDefault(
+                    o =>
+                        o.EffectId == 1200 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                     || o.EffectId == 124 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                );
+
+                var duration = Math.Abs(cb.Duration);
+
+                var color = duration <= 5 ? ExpireColor : CBColor;
+
+                var builder = BarBuilder.Create(xPos, yPos, BRDCBHeight, BRDCBWidth);
+
+                var cbBar = builder.AddInnerBar(duration, 30f, color)
+                                   .SetFlipDrainDirection(BRDCBInverted)
+                                   .SetBackgroundColor(EmptyColor["background"])
+                                   .Build();
+
+                barDrawList.Add(cbBar);
+            }
+
+            xPos = CenterX - XOffset + BRDSBXOffset;
+            yPos = CenterY + YOffset + BRDSBYOffset;
+
+            if (BRDShowSB)
+            {
+                var sb = target.StatusEffects.FirstOrDefault(
+                    o =>
+                        o.EffectId == 1201 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                     || o.EffectId == 129 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                );
+
+                var duration = Math.Abs(sb.Duration);
+
+                var color = duration <= 5 ? ExpireColor : SBColor;
+
+                var builder = BarBuilder.Create(xPos, yPos, BRDSBHeight, BRDSBWidth);
+
+                var sbBar = builder.AddInnerBar(duration, 30f, color)
+                                   .SetFlipDrainDirection(BRDSBInverted)
+                                   .SetBackgroundColor(EmptyColor["background"])
+                                   .Build();
+
+                barDrawList.Add(sbBar);
+            }
+
+            if (barDrawList.Count <= 0)
+            {
+                return;
+            }
+
             var drawList = ImGui.GetWindowDrawList();
 
-            var dotStart = new Vector2(xOffset + barWidth - (barSize.X / 30) * cbDuration, CenterY + YOffset - 34);
-            
-            // Caustic Bite
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-            drawList.AddRectFilledMultiColor(
-                dotStart, cursorPos + new Vector2(barSize.X, barSize.Y),
-                cbColor, cbColor, cbColor, cbColor
-            );
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-            
-            cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
-            
-            // Stormbite
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-            drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + new Vector2((barSize.X / 30) * sbDuration, barSize.Y),
-                sbColor, sbColor, sbColor, sbColor
-            );
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-            
+            foreach (var bar in barDrawList)
+            {
+                bar.Draw(drawList, PluginConfiguration);
+            }
         }
 
-        private void HandleCurrentSong() {
+        private void HandleCurrentSong()
+        {
             var gauge = PluginInterface.ClientState.JobGauges.Get<BRDGauge>();
             var songStacks = gauge.NumSongStacks;
             var song = gauge.ActiveSong;
             var songTimer = gauge.SongTimer;
-            
+
             switch (song)
             {
                 case CurrentSong.WANDERER:
-                    DrawStacks(songStacks, 3, 0xFFE8D796);
-                    DrawSongTimer(songTimer, 0xFF5CD15C);
+                    if (BRDShowWMStacks)
+                    {
+                        DrawStacks(songStacks, 3, WMStackColor);
+                    }
+
+                    DrawSongTimer(songTimer, WMColor);
+
                     break;
+
                 case CurrentSong.MAGE:
-                    DrawSongTimer(songTimer, 0xFF8F5A8F);
-                    DrawBloodletterReady();
+                    if (BRDShowMBProc)
+                    {
+                        DrawBloodletterReady(MBStackColor);
+                    }
+
+                    DrawSongTimer(songTimer, MBColor);
+
                     break;
+
                 case CurrentSong.ARMY:
-                    DrawStacks(songStacks, 4, 0xFFB1DE00);
-                    DrawSongTimer(songTimer, 0xFF34CDCF);
+                    if (BRDShowAPStacks)
+                    {
+                        DrawStacks(songStacks, 4, APStackColor);
+                    }
+
+                    DrawSongTimer(songTimer, APColor);
+
                     break;
+
                 case CurrentSong.NONE:
-                    DrawSongTimer(0, 0x88000000);
+                    DrawSongTimer(0, EmptyColor);
+
                     break;
+
                 default:
-                    DrawSongTimer(0, 0x88000000);
+                    DrawSongTimer(0, EmptyColor);
+
                     break;
             }
         }
 
-        private void DrawBloodletterReady()
+        private void DrawBloodletterReady(Dictionary<string, uint> color)
         {
             // I want to draw Bloodletter procs here (just color entire bar red to indicate cooldown is ready).
             // But can't find a way yet to accomplish this.
         }
 
-        private void DrawSongTimer(short songTimer, uint songColor)
+        private void DrawSongTimer(short songTimer, Dictionary<string, uint> songColor)
         {
-            var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset);
-            var barSize = new Vector2(BarWidth, BarHeight);
-            var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + new Vector2(barSize.X , barSize.Y), 0x88000000);
-            drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + new Vector2(barSize.X * songTimer/30000, barSize.Y), 
-                songColor, songColor, songColor, songColor
-            ); 
-            drawList.AddRect(cursorPos, cursorPos + new Vector2(barSize.X , barSize.Y), 0xFF000000);
-            
-            var songTimerAbbreviated = songTimer != 0 ? (songTimer / 1000).ToString() : "";
-            var textSize = ImGui.CalcTextSize(songTimerAbbreviated);
-            DrawOutlinedText(songTimerAbbreviated, new Vector2(cursorPos.X + BarWidth / 2f - textSize.X / 2f, cursorPos.Y-2));
-        }
-
-        private void DrawSoulVoiceBar() {
-            var soulVoice = PluginInterface.ClientState.JobGauges.Get<BRDGauge>().SoulVoiceValue;
-            const uint soulVoiceColor = 0xFF00E3F8;
-
-            var barSize = new Vector2(BarWidth, BarHeight);
-            var cursorPos = new Vector2(CenterX - 127, CenterY + YOffset - 22);
-            
-            var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-            drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + new Vector2(barSize.X * soulVoice/100, barSize.Y), 
-                soulVoiceColor, soulVoiceColor, soulVoiceColor, soulVoiceColor
-            );
-            
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-            var textSize = ImGui.CalcTextSize(soulVoice.ToString());
-            DrawOutlinedText(soulVoice.ToString(), new Vector2(cursorPos.X + BarWidth / 2f - textSize.X / 2f, cursorPos.Y-2));
-        }
-
-        private void DrawStacks(int amount, int max, uint stackColor)
-        {
-            const int xPadding = 2;
-            var barWidth = (BarWidth - xPadding * (max - 1)) / max;
-            var barSize = new Vector2(barWidth, SmallBarHeight);
-            var xPos = CenterX - XOffset;
-            var yPos = CenterY + YOffset - 46;
-            var cursorPos = new Vector2(xPos, yPos);
-
-            var drawList = ImGui.GetWindowDrawList();
-            for(var i = 0; i <= max - 1; i++)
+            if (!BRDShowSongGauge)
             {
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-                if(amount > i)
-                {
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + new Vector2(barSize.X, barSize.Y),
-                        stackColor, stackColor, stackColor, stackColor
-                    );
-                }
-                else
-                {
-                    
-                }
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-                cursorPos = new Vector2(cursorPos.X + barWidth + xPadding, cursorPos.Y);
+                return;
             }
+
+            var xPos = CenterX - XOffset + BRDSongGaugeXOffset;
+            var yPos = CenterY + YOffset + BRDSongGaugeYOffset;
+
+            var builder = BarBuilder.Create(xPos, yPos, BRDSongGaugeHeight, BRDSongGaugeWidth);
+
+            var duration = Math.Abs(songTimer);
+
+            var bar = builder.AddInnerBar(duration / 1000f, 30f, songColor)
+                             .SetTextMode(BarTextMode.EachChunk)
+                             .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                             .SetBackgroundColor(EmptyColor["background"])
+                             .Build();
+
+            var drawList = ImGui.GetWindowDrawList();
+            bar.Draw(drawList, PluginConfiguration);
+        }
+
+        private void DrawSoulVoiceBar()
+        {
+            if (!BRDShowSoulGauge)
+            {
+                return;
+            }
+
+            var soulVoice = PluginInterface.ClientState.JobGauges.Get<BRDGauge>().SoulVoiceValue;
+
+            var xPos = CenterX - XOffset + BRDSoulGaugeXOffset;
+            var yPos = CenterY + YOffset + BRDSoulGaugeYOffset;
+
+            var builder = BarBuilder.Create(xPos, yPos, BRDSoulGaugeHeight, BRDSoulGaugeWidth);
+
+            var bar = builder.AddInnerBar(soulVoice, 100f, SVColor)
+                             .SetBackgroundColor(EmptyColor["background"])
+                             .Build();
+
+            var drawList = ImGui.GetWindowDrawList();
+            bar.Draw(drawList, PluginConfiguration);
+        }
+
+        private void DrawStacks(int amount, int max, Dictionary<string, uint> stackColor)
+        {
+            var xPos = CenterX - XOffset + BRDStackXOffset;
+            var yPos = CenterY + YOffset + BRDStackYOffset;
+
+            var bar = BarBuilder.Create(xPos, yPos, BRDStackHeight, BRDStackWidth)
+                                .SetChunks(max)
+                                .SetChunkPadding(BRDStackPadding)
+                                .AddInnerBar(amount, max, stackColor)
+                                .SetBackgroundColor(EmptyColor["background"])
+                                .Build();
+
+            var drawList = ImGui.GetWindowDrawList();
+            bar.Draw(drawList, PluginConfiguration);
         }
     }
 }

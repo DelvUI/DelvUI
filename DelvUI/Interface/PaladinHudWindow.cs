@@ -1,270 +1,249 @@
-﻿using System;
+﻿using Dalamud.Game.ClientState.Actors.Types;
+using Dalamud.Game.ClientState.Structs.JobGauge;
+using Dalamud.Plugin;
+using DelvUI.Config;
+using DelvUI.Helpers;
+using DelvUI.Interface.Bars;
+using ImGuiNET;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
-using ImGuiNET;
 
 namespace DelvUI.Interface
 {
     public class PaladinHudWindow : HudWindow
     {
+        public PaladinHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
+
         public override uint JobId => 19;
 
+        private int BaseXOffset => PluginConfiguration.PLDBaseXOffset;
+        private int BaseYOffset => PluginConfiguration.PLDBaseYOffset;
+
+        private bool ManaEnabled => PluginConfiguration.PLDManaEnabled;
+        private bool ManaChunked => PluginConfiguration.PLDManaChunked;
+        private bool ManaBarText => PluginConfiguration.PLDManaBarText;
         private int ManaBarHeight => PluginConfiguration.PLDManaHeight;
-        
         private int ManaBarWidth => PluginConfiguration.PLDManaWidth;
-        
         private int ManaBarPadding => PluginConfiguration.PLDManaPadding;
-        
-        private new int XOffset => PluginConfiguration.PLDBaseXOffset;
-        
-        private new int YOffset => PluginConfiguration.PLDBaseYOffset;
-        
+        private int ManaXOffset => PluginConfiguration.PLDManaXOffset;
+        private int ManaYOffset => PluginConfiguration.PLDManaYOffset;
+
+        private bool OathGaugeEnabled => PluginConfiguration.PLDOathGaugeEnabled;
         private int OathGaugeBarHeight => PluginConfiguration.PLDOathGaugeHeight;
-        
         private int OathGaugeBarWidth => PluginConfiguration.PLDOathGaugeWidth;
-        
         private int OathGaugeBarPadding => PluginConfiguration.PLDOathGaugePadding;
-        
         private int OathGaugeXOffset => PluginConfiguration.PLDOathGaugeXOffset;
-        
         private int OathGaugeYOffset => PluginConfiguration.PLDOathGaugeYOffset;
-        
         private bool OathGaugeText => PluginConfiguration.PLDOathGaugeText;
-        
+
+        private bool BuffBarEnabled => PluginConfiguration.PLDBuffBarEnabled;
+        private bool BuffBarText => PluginConfiguration.PLDBuffBarText;
         private int BuffBarHeight => PluginConfiguration.PLDBuffBarHeight;
-        
         private int BuffBarWidth => PluginConfiguration.PLDBuffBarWidth;
-        
         private int BuffBarXOffset => PluginConfiguration.PLDBuffBarXOffset;
-        
         private int BuffBarYOffset => PluginConfiguration.PLDBuffBarYOffset;
-        
+
+        private bool AtonementEnabled => PluginConfiguration.PLDAtonementBarEnabled;
         private int AtonementBarHeight => PluginConfiguration.PLDAtonementBarHeight;
-        
         private int AtonementBarWidth => PluginConfiguration.PLDAtonementBarWidth;
-        
         private int AtonementBarPadding => PluginConfiguration.PLDAtonementBarPadding;
-        
         private int AtonementBarXOffset => PluginConfiguration.PLDAtonementBarXOffset;
-        
         private int AtonementBarYOffset => PluginConfiguration.PLDAtonementBarYOffset;
-        
-        private int InterBarOffset => PluginConfiguration.PLDInterBarOffset;
-        
+
+        private bool DoTBarEnabled => PluginConfiguration.PLDDoTBarEnabled;
+        private int DoTBarHeight => PluginConfiguration.PLDDoTBarHeight;
+        private int DoTBarWidth => PluginConfiguration.PLDDoTBarWidth;
+        private int DoTBarXOffset => PluginConfiguration.PLDDoTBarXOffset;
+        private int DoTBarYOffset => PluginConfiguration.PLDDoTBarYOffset;
+        private bool DoTBarText => PluginConfiguration.PLDDoTBarText;
+
         private Dictionary<string, uint> ManaColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000];
-        
         private Dictionary<string, uint> OathGaugeColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 1];
-        
         private Dictionary<string, uint> FightOrFlightColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 2];
-        
         private Dictionary<string, uint> RequiescatColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 3];
-        
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 4];
-        
         private Dictionary<string, uint> AtonementColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 5];
-        
-        public PaladinHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) {}
+        private Dictionary<string, uint> DoTColor => PluginConfiguration.JobColorMap[Jobs.PLD * 1000 + 6];
+        private Dictionary<string, uint> OathNotFullColor => PluginConfiguration.MiscColorMap["partial"];
 
         protected override void Draw(bool _)
         {
-            DrawHealthBar();
-            var nextHeight = DrawManaBar(0);
-            nextHeight = DrawOathGauge(nextHeight);
-            nextHeight = DrawBuffBar(nextHeight);
-            DrawAtonementBar(nextHeight);
-            DrawTargetBar();
-            DrawFocusBar();
-            DrawCastBar();
+            if (ManaEnabled)
+            {
+                DrawManaBar();
+            }
+
+            if (OathGaugeEnabled)
+            {
+                DrawOathGauge();
+            }
+
+            if (BuffBarEnabled)
+            {
+                DrawBuffBar();
+            }
+
+            if (AtonementEnabled)
+            {
+                DrawAtonementBar();
+            }
+
+            if (DoTBarEnabled)
+            {
+                DrawDoTBar();
+            }
         }
 
-        private int DrawManaBar(int initialHeight)
+        protected override void DrawPrimaryResourceBar() { }
+
+        private void DrawManaBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var actor = PluginInterface.ClientState.LocalPlayer;
 
-            var barWidth = (ManaBarWidth - ManaBarPadding * 4f) / 5f;
-            var posX = CenterX - XOffset;
-            var posY = CenterY + YOffset;
-            var cursorPos = new Vector2(posX + barWidth * 4 + ManaBarPadding * 4, posY);
-            const int chunkSize = 2000;
-            var barSize = new Vector2(barWidth, ManaBarHeight);
+            var posX = CenterX + BaseXOffset - ManaXOffset;
+            var posY = CenterY + BaseYOffset + ManaYOffset;
 
-            var drawList = ImGui.GetWindowDrawList();
+            var builder = BarBuilder.Create(posX, posY, ManaBarHeight, ManaBarWidth)
+                                    .SetBackgroundColor(EmptyColor["background"]);
 
-            for (var i = 5; i >= 1; --i)
+            if (ManaChunked)
             {
-                var scale = Math.Max(Math.Min(actor.CurrentMp, chunkSize * i) - chunkSize * (i - 1), 0f) / chunkSize;
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-                if (scale >= 1.0)
-                    drawList.AddRectFilledMultiColor(cursorPos,
-                        cursorPos + new Vector2(barWidth * scale, ManaBarHeight),
-                        ManaColor["gradientLeft"], ManaColor["gradientRight"], ManaColor["gradientRight"], ManaColor["gradientLeft"]
-                    );
-                else
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + new Vector2(barWidth * scale, ManaBarHeight),
-                        EmptyColor["gradientLeft"], EmptyColor["gradientRight"], EmptyColor["gradientRight"], EmptyColor["gradientLeft"]
-                    );
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-                cursorPos = new Vector2(cursorPos.X - barWidth - ManaBarPadding, cursorPos.Y);
+                builder.SetChunks(5)
+                       .SetChunkPadding(ManaBarPadding)
+                       .AddInnerBar(actor.CurrentMp, actor.MaxMp, ManaColor, EmptyColor);
+            }
+            else
+            {
+                builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, ManaColor);
             }
 
-            return ManaBarHeight + initialHeight + InterBarOffset;
+            if (ManaBarText)
+            {
+                var formattedManaText = TextTags.GenerateFormattedTextFromTags(actor, "[mana:current-short]");
+
+                builder.SetTextMode(BarTextMode.Single)
+                       .SetText(BarTextPosition.CenterLeft, BarTextType.Custom, formattedManaText);
+            }
+
+            var drawList = ImGui.GetWindowDrawList();
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private int DrawOathGauge(int initialHeight)
+        private void DrawOathGauge()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<PLDGauge>();
 
-            var barWidth = (OathGaugeBarWidth - OathGaugeBarPadding) / 2f;
-            var xPos = CenterX - XOffset + OathGaugeXOffset;
-            var yPos = CenterY + YOffset + initialHeight + OathGaugeYOffset;
-            var cursorPos = new Vector2(xPos + barWidth + OathGaugeBarPadding, yPos);
-            const int chunkSize = 50;
-            var barSize = new Vector2(barWidth, OathGaugeBarHeight);
+            var xPos = CenterX + BaseXOffset - OathGaugeXOffset;
+            var yPos = CenterY + BaseYOffset + OathGaugeYOffset;
 
-            var drawList = ImGui.GetWindowDrawList();
-            for (var i = 2; i >= 1; --i)
+            var builder = BarBuilder.Create(xPos, yPos, OathGaugeBarHeight, OathGaugeBarWidth)
+                                    .SetChunks(2)
+                                    .SetChunkPadding(OathGaugeBarPadding)
+                                    .SetBackgroundColor(EmptyColor["background"])
+                                    .AddInnerBar(gauge.GaugeAmount, 100, OathGaugeColor, OathNotFullColor);
+
+            if (OathGaugeText)
             {
-                var scale = Math.Max(Math.Min(gauge.GaugeAmount, chunkSize * i) - chunkSize * (i - 1), 0f) / chunkSize;
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-                if (scale >= 1.0)
-                {
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + new Vector2(barWidth * scale, OathGaugeBarHeight),
-                        OathGaugeColor["gradientLeft"], OathGaugeColor["gradientRight"], OathGaugeColor["gradientRight"], OathGaugeColor["gradientLeft"]
-                    );
-                    
-                    if (OathGaugeText)
-                    {
-                        var text = (scale * chunkSize).ToString();
-                        var textSize = ImGui.CalcTextSize(text);
-                        DrawOutlinedText(text, new Vector2(cursorPos.X + barWidth / 2f - textSize.X / 2f, cursorPos.Y-2));                        
-                    }
-                }
-                else
-                {
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + new Vector2(barWidth * scale, OathGaugeBarHeight),
-                        EmptyColor["gradientLeft"], EmptyColor["gradientRight"], EmptyColor["gradientRight"], EmptyColor["gradientLeft"]
-                    );
-                    
-                    if (OathGaugeText)
-                    {
-                        var text = (scale * chunkSize).ToString();
-                        var textSize = ImGui.CalcTextSize(text);
-                        DrawOutlinedText(text, new Vector2(cursorPos.X + barWidth / 2f - textSize.X / 2f, cursorPos.Y-2));                        
-                    }
-                }
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-
-                cursorPos = new Vector2(cursorPos.X - barWidth - OathGaugeBarPadding, cursorPos.Y);
+                builder.SetTextMode(BarTextMode.EachChunk)
+                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
-            return OathGaugeBarHeight + initialHeight + InterBarOffset;
+            var drawList = ImGui.GetWindowDrawList();
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private int DrawBuffBar(int initialHeight)
+        private void DrawBuffBar()
         {
             var fightOrFlightBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 76);
             var requiescatBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1368);
-            
-            var buffBarBarWidth = BuffBarWidth;
-            var xPos = CenterX - XOffset + BuffBarXOffset;
-            var yPos = CenterY + YOffset + initialHeight + BuffBarYOffset;
-            var cursorPos = new Vector2(xPos, yPos);
-            var buffBarBarHeight = BuffBarHeight;
-            var barSize = new Vector2(buffBarBarWidth, buffBarBarHeight);
-            
-            var drawList = ImGui.GetWindowDrawList();
-            
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-            if (fightOrFlightBuff.Any() && requiescatBuff.Any())
-            {
-                var innerBarHeight = buffBarBarHeight / 2;
-                barSize = new Vector2(buffBarBarWidth, innerBarHeight);
-                
-                var fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().Duration);
-                var requiescatDuration = Math.Abs(requiescatBuff.First().Duration);
-                
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(barSize.X / 25f * fightOrFlightDuration, barSize.Y), 
-                    FightOrFlightColor["gradientLeft"], FightOrFlightColor["gradientRight"], FightOrFlightColor["gradientRight"], FightOrFlightColor["gradientLeft"]
-                );
-                drawList.AddRectFilledMultiColor(
-                    cursorPos + new Vector2(0.0f, innerBarHeight), cursorPos + new Vector2(barSize.X / 12f * requiescatDuration, barSize.Y * 2f),
-                    RequiescatColor["gradientLeft"], RequiescatColor["gradientRight"], RequiescatColor["gradientRight"], RequiescatColor["gradientLeft"]
-                );
-                
-                var fightOrFlightDurationText = fightOrFlightDuration == 0 ? "" : Math.Round(fightOrFlightDuration).ToString();
-                DrawOutlinedText(fightOrFlightDurationText, new Vector2(cursorPos.X + 5f, cursorPos.Y - 2f), PluginConfiguration.PLDFightOrFlightColor, new Vector4(0f, 0f, 0f, 1f));
-                
-                var requiescatDurationText = requiescatDuration == 0 ? "" : Math.Round(requiescatDuration).ToString();
-                DrawOutlinedText(requiescatDurationText, new Vector2(cursorPos.X + 27f, cursorPos.Y - 2f), PluginConfiguration.PLDRequiescatColor, new Vector4(0f, 0f, 0f, 1f));
-                
-                barSize = new Vector2(buffBarBarWidth, buffBarBarHeight);
-            }
-            else if (fightOrFlightBuff.Any())
+
+            var xPos = CenterX + BaseXOffset - BuffBarXOffset;
+            var yPos = CenterY + BaseYOffset + BuffBarYOffset;
+
+            var builder = BarBuilder.Create(xPos, yPos, BuffBarHeight, BuffBarWidth)
+                                    .SetBackgroundColor(EmptyColor["background"]);
+
+            if (fightOrFlightBuff.Any())
             {
                 var fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().Duration);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(barSize.X / 25f * fightOrFlightDuration, barSize.Y), 
-                    FightOrFlightColor["gradientLeft"], FightOrFlightColor["gradientRight"], FightOrFlightColor["gradientRight"], FightOrFlightColor["gradientLeft"]
-                );
-                
-                var fightOrFlightDurationText = fightOrFlightDuration == 0 ? "" : Math.Round(fightOrFlightDuration).ToString();
-                DrawOutlinedText(fightOrFlightDurationText, new Vector2(cursorPos.X + 5f, cursorPos.Y - 2f), PluginConfiguration.PLDFightOrFlightColor, new Vector4(0f, 0f, 0f, 1f));
-            }
-            else if (requiescatBuff.Any())
-            {
-                var requiescatDuration = Math.Abs(requiescatBuff.First().Duration);
-                drawList.AddRectFilledMultiColor(
-                    cursorPos, cursorPos + new Vector2(barSize.X / 12f * requiescatDuration, barSize.Y), 
-                    RequiescatColor["gradientLeft"], RequiescatColor["gradientRight"], RequiescatColor["gradientRight"], RequiescatColor["gradientLeft"]
-                );
-                
-                var requiescatDurationText = requiescatDuration == 0 ? "" : Math.Round(requiescatDuration).ToString();
-                DrawOutlinedText(requiescatDurationText, new Vector2(cursorPos.X + 5f, cursorPos.Y - 2f), PluginConfiguration.PLDRequiescatColor, new Vector4(0f, 0f, 0f, 1f));
+                builder.AddInnerBar(fightOrFlightDuration, 25, FightOrFlightColor);
+
+                if (BuffBarText)
+                {
+                    builder.SetTextMode(BarTextMode.EachChunk)
+                           .SetText(BarTextPosition.CenterLeft, BarTextType.Current, PluginConfiguration.PLDFightOrFlightColor, Vector4.UnitW, null);
+                }
             }
 
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-            return BuffBarHeight + initialHeight + InterBarOffset;
+            if (requiescatBuff.Any())
+            {
+                var requiescatDuration = Math.Abs(requiescatBuff.First().Duration);
+                builder.AddInnerBar(requiescatDuration, 12, RequiescatColor);
+
+                if (BuffBarText)
+                {
+                    builder.SetTextMode(BarTextMode.EachChunk)
+                           .SetText(BarTextPosition.CenterRight, BarTextType.Current, PluginConfiguration.PLDRequiescatColor, Vector4.UnitW, null);
+                }
+            }
+
+            var drawList = ImGui.GetWindowDrawList();
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private int DrawAtonementBar(int initialHeight)
+        private void DrawAtonementBar()
         {
             var atonementBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1902);
             var stackCount = atonementBuff.Any() ? atonementBuff.First().StackCount : 0;
-            
-            var barWidth = (AtonementBarWidth - AtonementBarPadding * 2) / 3f;
-            var xPos = CenterX - XOffset + AtonementBarXOffset;
-            var yPos = CenterY + YOffset + initialHeight + AtonementBarYOffset;
-            var cursorPos = new Vector2(xPos, yPos);
-            var barSize = new Vector2(barWidth, AtonementBarHeight);
-            
+
+            var xPos = CenterX + BaseXOffset - AtonementBarXOffset;
+            var yPos = CenterY + BaseYOffset + AtonementBarYOffset;
+
+            var builder = BarBuilder.Create(xPos, yPos, AtonementBarHeight, AtonementBarWidth)
+                                    .SetChunks(3)
+                                    .SetChunkPadding(AtonementBarPadding)
+                                    .SetBackgroundColor(EmptyColor["background"])
+                                    .AddInnerBar(stackCount, 3, AtonementColor, null);
+
             var drawList = ImGui.GetWindowDrawList();
+            builder.Build().Draw(drawList, PluginConfiguration);
+        }
 
-            for (var i = 0; i <= 2; i++)
+        private void DrawDoTBar()
+        {
+            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+
+            if (target is not Chara)
             {
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-                if (stackCount > 0)
-                {
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos, cursorPos + new Vector2(barWidth, AtonementBarHeight),
-                        AtonementColor["gradientLeft"], AtonementColor["gradientRight"], AtonementColor["gradientRight"], AtonementColor["gradientLeft"]
-                    );
-                    stackCount--;
-                }
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-
-                cursorPos += new Vector2(barWidth + AtonementBarPadding, 0);
+                return;
             }
 
-            return AtonementBarHeight + initialHeight + InterBarOffset;
+            var goringBlade = target.StatusEffects.FirstOrDefault(
+                o =>
+                    o.EffectId == 725 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+            );
+
+            var duration = Math.Abs(goringBlade.Duration);
+
+            var xPos = CenterX + BaseXOffset - DoTBarXOffset;
+            var yPos = CenterY + BaseYOffset + DoTBarYOffset;
+
+            var builder = BarBuilder.Create(xPos, yPos, DoTBarHeight, DoTBarWidth)
+                                    .AddInnerBar(duration, 21, DoTColor)
+                                    .SetBackgroundColor(EmptyColor["background"]);
+
+            if (DoTBarText)
+            {
+                builder.SetTextMode(BarTextMode.EachChunk)
+                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+            }
+
+            var drawList = ImGui.GetWindowDrawList();
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
     }
 }
