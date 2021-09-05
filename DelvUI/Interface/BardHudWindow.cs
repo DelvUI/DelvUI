@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
+using DelvUI.Config.Attributes;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
 
@@ -13,49 +15,9 @@ namespace DelvUI.Interface {
         public BardHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => 23;
-        private new int XOffset => PluginConfiguration.BRDBaseXOffset;
-        private new int YOffset => PluginConfiguration.BRDBaseYOffset;
-        private int BRDSongGaugeWidth => PluginConfiguration.BRDSongGaugeWidth;
-        private int BRDSongGaugeHeight => PluginConfiguration.BRDSongGaugeHeight;
-        private int BRDSongGaugeXOffset => PluginConfiguration.BRDSongGaugeXOffset;
-        private int BRDSongGaugeYOffset => PluginConfiguration.BRDSongGaugeYOffset;
-        private int BRDSoulGaugeWidth => PluginConfiguration.BRDSoulGaugeWidth;
-        private int BRDSoulGaugeHeight => PluginConfiguration.BRDSoulGaugeHeight;
-        private int BRDSoulGaugeXOffset => PluginConfiguration.BRDSoulGaugeXOffset;
-        private int BRDSoulGaugeYOffset => PluginConfiguration.BRDSoulGaugeYOffset;
-        private int BRDStackWidth => PluginConfiguration.BRDStackWidth;
-        private int BRDStackHeight => PluginConfiguration.BRDStackHeight;
-        private int BRDStackXOffset => PluginConfiguration.BRDStackXOffset;
-        private int BRDStackYOffset => PluginConfiguration.BRDStackYOffset;
-        private int BRDCBWidth => PluginConfiguration.BRDCBWidth;
-        private int BRDCBHeight => PluginConfiguration.BRDCBHeight;
-        private int BRDCBXOffset => PluginConfiguration.BRDCBXOffset;
-        private int BRDCBYOffset => PluginConfiguration.BRDCBYOffset;
-        private int BRDSBWidth => PluginConfiguration.BRDSBWidth;
-        private int BRDSBHeight => PluginConfiguration.BRDSBHeight;
-        private int BRDSBXOffset => PluginConfiguration.BRDSBXOffset;
-        private int BRDSBYOffset => PluginConfiguration.BRDSBYOffset;
-        private int BRDStackPadding => PluginConfiguration.BRDStackPadding;
-        private bool BRDShowSongGauge => PluginConfiguration.BRDShowSongGauge;
-        private bool BRDShowSoulGauge => PluginConfiguration.BRDShowSoulGauge;
-        private bool BRDShowWMStacks => PluginConfiguration.BRDShowWMStacks;
-        private bool BRDShowMBProc => PluginConfiguration.BRDShowMBProc;
-        private bool BRDShowAPStacks => PluginConfiguration.BRDShowAPStacks;
-        private bool BRDShowCB => PluginConfiguration.BRDShowCB;
-        private bool BRDShowSB => PluginConfiguration.BRDShowSB;
-        private bool BRDCBInverted => PluginConfiguration.BRDCBInverted;
-        private bool BRDSBInverted => PluginConfiguration.BRDSBInverted;
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000];
-        private Dictionary<string, uint> ExpireColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 1];
-        private Dictionary<string, uint> WMColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 2];
-        private Dictionary<string, uint> MBColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 3];
-        private Dictionary<string, uint> APColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 4];
-        private Dictionary<string, uint> WMStackColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 5];
-        private Dictionary<string, uint> MBStackColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 6];
-        private Dictionary<string, uint> APStackColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 7];
-        private Dictionary<string, uint> SBColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 8];
-        private Dictionary<string, uint> CBColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 9];
-        private Dictionary<string, uint> SVColor => PluginConfiguration.JobColorMap[Jobs.BRD * 1000 + 10];
+        private BardHudConfig _config => (BardHudConfig) ConfigurationManager.GetInstance().GetConfiguration(new BardHudConfig());
+        private Vector2 Origin => new Vector2(CenterX + _config.Position.X, CenterY + YOffset + _config.Position.Y);
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
 
         protected override void Draw(bool _) {
             DrawActiveDots();
@@ -66,7 +28,7 @@ namespace DelvUI.Interface {
         protected override void DrawPrimaryResourceBar() { }
 
         private void DrawActiveDots() {
-            if (!BRDShowCB && !BRDShowSB) {
+            if (!_config.ShowCB && !_config.ShowSB) {
                 return;
             }
 
@@ -76,12 +38,12 @@ namespace DelvUI.Interface {
                 return;
             }
 
-            var xPos = CenterX - XOffset + BRDCBXOffset;
-            var yPos = CenterY + YOffset + BRDCBYOffset;
+            var barSize = _config.CBSize;
+            var position = Origin + _config.CBPosition - barSize / 2f;
 
             var barDrawList = new List<Bar>();
 
-            if (BRDShowCB) {
+            if (_config.ShowCB) {
                 var cb = target.StatusEffects.FirstOrDefault(
                     o =>
                         o.EffectId == 1200 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
@@ -90,22 +52,22 @@ namespace DelvUI.Interface {
 
                 var duration = Math.Abs(cb.Duration);
 
-                var color = duration <= 5 ? ExpireColor : CBColor;
+                var color = duration <= 5 ? _config.ExpireColor : _config.CBColor;
 
-                var builder = BarBuilder.Create(xPos, yPos, BRDCBHeight, BRDCBWidth);
+                var builder = BarBuilder.Create(position, barSize);
 
-                var cbBar = builder.AddInnerBar(duration, 30f, color)
-                                   .SetFlipDrainDirection(BRDCBInverted)
+                var cbBar = builder.AddInnerBar(duration, 30f, color.Map)
+                                   .SetFlipDrainDirection(_config.CBInverted)
                                    .SetBackgroundColor(EmptyColor["background"])
                                    .Build();
 
                 barDrawList.Add(cbBar);
             }
+            
+            barSize = _config.SBSize;
+            position = Origin + _config.SBPosition - barSize / 2f;
 
-            xPos = CenterX - XOffset + BRDSBXOffset;
-            yPos = CenterY + YOffset + BRDSBYOffset;
-
-            if (BRDShowSB) {
+            if (_config.ShowSB) {
                 var sb = target.StatusEffects.FirstOrDefault(
                     o =>
                         o.EffectId == 1201 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
@@ -114,12 +76,12 @@ namespace DelvUI.Interface {
 
                 var duration = Math.Abs(sb.Duration);
 
-                var color = duration <= 5 ? ExpireColor : SBColor;
+                var color = duration <= 5 ? _config.ExpireColor : _config.SBColor;
 
-                var builder = BarBuilder.Create(xPos, yPos, BRDSBHeight, BRDSBWidth);
+                var builder = BarBuilder.Create(position, barSize);
 
-                var sbBar = builder.AddInnerBar(duration, 30f, color)
-                                   .SetFlipDrainDirection(BRDSBInverted)
+                var sbBar = builder.AddInnerBar(duration, 30f, color.Map)
+                                   .SetFlipDrainDirection(_config.SBInverted)
                                    .SetBackgroundColor(EmptyColor["background"])
                                    .Build();
 
@@ -145,29 +107,29 @@ namespace DelvUI.Interface {
 
             switch (song) {
                 case CurrentSong.WANDERER:
-                    if (BRDShowWMStacks) {
-                        DrawStacks(songStacks, 3, WMStackColor);
+                    if (_config.ShowWMStacks) {
+                        DrawStacks(songStacks, 3, _config.WMStackColor.Map);
                     }
 
-                    DrawSongTimer(songTimer, WMColor);
+                    DrawSongTimer(songTimer, _config.WMColor.Map);
 
                     break;
 
                 case CurrentSong.MAGE:
-                    if (BRDShowMBProc) {
-                        DrawBloodletterReady(MBStackColor);
+                    if (_config.ShowMBProc) {
+                        DrawBloodletterReady(_config.MBProcColor.Map);
                     }
 
-                    DrawSongTimer(songTimer, MBColor);
+                    DrawSongTimer(songTimer, _config.MBColor.Map);
 
                     break;
 
                 case CurrentSong.ARMY:
-                    if (BRDShowAPStacks) {
-                        DrawStacks(songStacks, 4, APStackColor);
+                    if (_config.ShowAPStacks) {
+                        DrawStacks(songStacks, 4, _config.APStackColor.Map);
                     }
 
-                    DrawSongTimer(songTimer, APColor);
+                    DrawSongTimer(songTimer, _config.APColor.Map);
 
                     break;
 
@@ -189,14 +151,14 @@ namespace DelvUI.Interface {
         }
 
         private void DrawSongTimer(short songTimer, Dictionary<string, uint> songColor) {
-            if (!BRDShowSongGauge) {
+            if (!_config.ShowSongGauge) {
                 return;
             }
 
-            var xPos = CenterX - XOffset + BRDSongGaugeXOffset;
-            var yPos = CenterY + YOffset + BRDSongGaugeYOffset;
-
-            var builder = BarBuilder.Create(xPos, yPos, BRDSongGaugeHeight, BRDSongGaugeWidth);
+            var barSize = _config.SongGaugeSize;
+            var position = Origin + _config.SongGaugePosition - barSize / 2f;
+            
+            var builder = BarBuilder.Create(position, barSize);
 
             var duration = Math.Abs(songTimer);
 
@@ -211,18 +173,18 @@ namespace DelvUI.Interface {
         }
 
         private void DrawSoulVoiceBar() {
-            if (!BRDShowSoulGauge) {
+            if (!_config.ShowSoulGauge) {
                 return;
             }
 
             var soulVoice = PluginInterface.ClientState.JobGauges.Get<BRDGauge>().SoulVoiceValue;
 
-            var xPos = CenterX - XOffset + BRDSoulGaugeXOffset;
-            var yPos = CenterY + YOffset + BRDSoulGaugeYOffset;
+            var barSize = _config.SoulGaugeSize;
+            var position = Origin + _config.SoulGaugePosition - barSize / 2f;
 
-            var builder = BarBuilder.Create(xPos, yPos, BRDSoulGaugeHeight, BRDSoulGaugeWidth);
+            var builder = BarBuilder.Create(position, barSize);
 
-            var bar = builder.AddInnerBar(soulVoice, 100f, SVColor)
+            var bar = builder.AddInnerBar(soulVoice, 100f, _config.SoulGaugeColor.Map)
                              .SetBackgroundColor(EmptyColor["background"])
                              .Build();
 
@@ -231,12 +193,12 @@ namespace DelvUI.Interface {
         }
 
         private void DrawStacks(int amount, int max, Dictionary<string, uint> stackColor) {
-            var xPos = CenterX - XOffset + BRDStackXOffset;
-            var yPos = CenterY + YOffset + BRDStackYOffset;
+            var barSize = _config.StackSize;
+            var position = Origin + _config.StackPosition - barSize / 2f;
 
-            var bar = BarBuilder.Create(xPos, yPos, BRDStackHeight, BRDStackWidth)
+            var bar = BarBuilder.Create(position, barSize)
                                 .SetChunks(max)
-                                .SetChunkPadding(BRDStackPadding)
+                                .SetChunkPadding(_config.StackPadding)
                                 .AddInnerBar(amount, max, stackColor)
                                 .SetBackgroundColor(EmptyColor["background"])
                                 .Build();
@@ -244,5 +206,77 @@ namespace DelvUI.Interface {
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
+    }
+    
+    [Serializable]
+    [Section("Job Specific Bars")]
+    [SubSection("Ranged", 0)]
+    [SubSection("Bard", 1)]
+    public class BardHudConfig : PluginConfigObject {
+        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        public Vector2 Position = new Vector2(0, 0);
+        
+        [Checkbox("Song Gauge Enabled")] public bool ShowSongGauge = true;
+
+        [DragFloat2("Song Gauge Size", min = 1f, max = 2000f)]
+        public Vector2 SongGaugeSize = new Vector2(254, 20);
+
+        [DragFloat2("Song Gauge Position", min = -4000f, max = 4000f)]
+        public Vector2 SongGaugePosition = new Vector2(0, -23);
+
+        [ColorEdit4("Wanderer's Minuet Color")] public PluginConfigColor WMColor = new PluginConfigColor(new Vector4(158f / 255f, 157f / 255f, 36f / 255f, 100f / 100f));
+        [ColorEdit4("Mage's Ballad Color")] public PluginConfigColor MBColor = new PluginConfigColor(new Vector4(143f / 255f, 90f / 255f, 143f / 255f, 100f / 100f));
+        [ColorEdit4("Army's Paeon Color")] public PluginConfigColor APColor = new PluginConfigColor(new Vector4(207f / 255f, 205f / 255f, 52f / 255f, 100f / 100f));
+        
+        [Checkbox("Soul Gauge Enabled")] public bool ShowSoulGauge = true;
+
+        [DragFloat2("Soul Gauge Size", min = 1f, max = 2000f)]
+        public Vector2 SoulGaugeSize = new Vector2(254, 10);
+
+        [DragFloat2("Soul Gauge Position", min = -4000f, max = 4000f)]
+        public Vector2 SoulGaugePosition = new Vector2(0, -6);
+
+        [ColorEdit4("Soul Gauge Color")] public PluginConfigColor SoulGaugeColor = new PluginConfigColor(new Vector4(248f / 255f, 227f / 255f, 0f / 255f, 100f / 100f));
+  
+        [Checkbox("Wanderer's Minuet Stacks Enabled")] public bool ShowWMStacks = true;
+        [Checkbox("Mage's Ballad Proc Enabled (n/a yet)")] public bool ShowMBProc = true;
+        [Checkbox("Army's Paeon Stacks Enabled")] public bool ShowAPStacks = true;
+
+        [DragFloat2("Stack Size", min = 1f, max = 2000f)]
+        public Vector2 StackSize = new Vector2(254, 10);
+
+        [DragFloat2("Stack Position", min = -4000f, max = 4000f)]
+        public Vector2 StackPosition = new Vector2(0, -40);
+        
+        [DragInt("Stack Padding", max = 1000)]
+        public int StackPadding = 2;
+        
+        [ColorEdit4("Wanderer's Minuet Stack Color")] public PluginConfigColor WMStackColor = new PluginConfigColor(new Vector4(150f / 255f, 215f / 255f, 232f / 255f, 100f / 100f));
+        [ColorEdit4("Mage's Ballad Proc Color")] public PluginConfigColor MBProcColor = new PluginConfigColor(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
+        [ColorEdit4("Army's Paeon Stack Color")] public PluginConfigColor APStackColor = new PluginConfigColor(new Vector4(0f / 255f, 222f / 255f, 177f / 255f, 100f / 100f));
+
+        [Checkbox("Caustic Bite Enabled")] public bool ShowCB = true;
+        [Checkbox("Caustic Bite Inverted")] public bool CBInverted = true;
+
+        [DragFloat2("Caustic Bite Size", max = 2000f)]
+        public Vector2 CBSize = new Vector2(126, 10);
+
+        [DragFloat2("Caustic Bite Position", min = -4000f, max = 4000f)]
+        public Vector2 CBPosition = new Vector2(-64, -52);
+        
+        [ColorEdit4("Caustic Bite Color")] public PluginConfigColor CBColor = new PluginConfigColor(new Vector4(182f / 255f, 68f / 255f, 235f / 255f, 100f / 100f));
+        
+        [Checkbox("Stormbite Enabled")] public bool ShowSB = true;
+        [Checkbox("Stormbite Inverted")] public bool SBInverted = false;
+
+        [DragFloat2("Stormbite Size", max = 2000f)]
+        public Vector2 SBSize = new Vector2(126, 10);
+
+        [DragFloat2("Stormbite Position", min = -4000f, max = 4000f)]
+        public Vector2 SBPosition = new Vector2(64, -52);
+        
+        [ColorEdit4("Stormbite Color")] public PluginConfigColor SBColor = new PluginConfigColor(new Vector4(72f / 255f, 117f / 255f, 202f / 255f, 100f / 100f));
+
+        [ColorEdit4("DoT Expire Color")] public PluginConfigColor ExpireColor = new PluginConfigColor(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
     }
 }
