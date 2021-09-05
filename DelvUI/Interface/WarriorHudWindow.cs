@@ -1,15 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+﻿using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
-namespace DelvUI.Interface {
-    public class WarriorHudWindow : HudWindow {
+namespace DelvUI.Interface
+{
+    public class WarriorHudWindow : HudWindow
+    {
         public WarriorHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => 21;
@@ -41,19 +43,23 @@ namespace DelvUI.Interface {
         private Dictionary<string, uint> NascentChaosColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 3];
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 4];
 
-        protected override void Draw(bool _) {
-            if (StormsEyeEnabled) {
+        protected override void Draw(bool _)
+        {
+            if (StormsEyeEnabled)
+            {
                 DrawStormsEyeBar();
             }
 
-            if (BeastGaugeEnabled) {
+            if (BeastGaugeEnabled)
+            {
                 DrawBeastGauge();
             }
         }
 
         protected override void DrawPrimaryResourceBar() { }
 
-        private void DrawStormsEyeBar() {
+        private void DrawStormsEyeBar()
+        {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var innerReleaseBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1177);
             var stormsEyeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
@@ -67,11 +73,13 @@ namespace DelvUI.Interface {
             var maximum = 10f;
             var color = EmptyColor;
 
-            if (innerReleaseBuff.Any()) {
+            if (innerReleaseBuff.Any())
+            {
                 duration = Math.Abs(innerReleaseBuff.First().Duration);
                 color = InnerReleaseColor;
             }
-            else if (stormsEyeBuff.Any()) {
+            else if (stormsEyeBuff.Any())
+            {
                 duration = Math.Abs(stormsEyeBuff.First().Duration);
                 maximum = 60f;
                 color = StormsEyeColor;
@@ -79,7 +87,8 @@ namespace DelvUI.Interface {
 
             builder.AddInnerBar(duration, maximum, color);
 
-            if (StormsEyeText) {
+            if (StormsEyeText)
+            {
                 builder.SetTextMode(BarTextMode.EachChunk)
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current, StormsEyeTextScale);
             }
@@ -88,7 +97,8 @@ namespace DelvUI.Interface {
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawBeastGauge() {
+        private void DrawBeastGauge()
+        {
             var gauge = PluginInterface.ClientState.JobGauges.Get<WARGauge>();
             var nascentChaosBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1897);
 
@@ -101,11 +111,13 @@ namespace DelvUI.Interface {
                                     .SetBackgroundColor(EmptyColor["background"])
                                     .SetChunkPadding(BeastGaugePadding);
 
-            if (nascentChaosBuff.Any()) {
+            if (nascentChaosBuff.Any())
+            {
                 builder.SetChunksColors(NascentChaosColor);
             }
 
-            if (BeastGaugeText) {
+            if (BeastGaugeText)
+            {
                 builder.SetTextMode(BarTextMode.EachChunk)
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current, BeastGaugeTextScale);
             }

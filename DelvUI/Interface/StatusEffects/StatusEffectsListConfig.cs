@@ -4,9 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 
-namespace DelvUI.Interface.StatusEffects {
+namespace DelvUI.Interface.StatusEffects
+{
     [Serializable]
-    public class StatusEffectsListConfig : PluginConfigObject {
+    public class StatusEffectsListConfig : PluginConfigObject
+    {
         public bool Enabled = true;
         public bool FillRowsFirst = true;
         public GrowthDirections GrowthDirections;
@@ -20,14 +22,16 @@ namespace DelvUI.Interface.StatusEffects {
         public bool ShowDebuffs;
         public bool ShowPermanentEffects;
 
-        public StatusEffectsListConfig(Vector2 position, bool showBuffs, bool showDebuffs, bool showPermanentEffects, GrowthDirections growthDirections) {
+        public StatusEffectsListConfig(Vector2 position, bool showBuffs, bool showDebuffs, bool showPermanentEffects, GrowthDirections growthDirections)
+        {
             Position = position;
             ShowBuffs = showBuffs;
             ShowDebuffs = showDebuffs;
             ShowPermanentEffects = showPermanentEffects;
             GrowthDirections = growthDirections;
         }
-        public StatusEffectsListConfig(Vector2 position, bool showBuffs, bool showDebuffs, bool showPermanentEffects, GrowthDirections growthDirections, StatusEffectIconConfig iconConfig) {
+        public StatusEffectsListConfig(Vector2 position, bool showBuffs, bool showDebuffs, bool showPermanentEffects, GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
+        {
             Position = position;
             ShowBuffs = showBuffs;
             ShowDebuffs = showDebuffs;
@@ -36,7 +40,8 @@ namespace DelvUI.Interface.StatusEffects {
             IconConfig = iconConfig;
         }
 
-        public bool Draw() {
+        public bool Draw()
+        {
             var changed = false;
 
             changed |= ImGui.Checkbox("Enabled", ref Enabled);
@@ -62,7 +67,8 @@ namespace DelvUI.Interface.StatusEffects {
                 var selection = Math.Max(0, directions.IndexOf(GrowthDirections));
                 string[] directionsStrings = { "Right and Down", "Right and Up", "Left and Down", "Left and Up", "Out from Middle and Right", "Out from Middle and Down" };
 
-                if (ImGui.Combo("Icons Growth Direction", ref selection, directionsStrings, directionsStrings.Length)) {
+                if (ImGui.Combo("Icons Growth Direction", ref selection, directionsStrings, directionsStrings.Length))
+                {
                     GrowthDirections = directions[selection];
                     changed = true;
                 }
@@ -82,7 +88,8 @@ namespace DelvUI.Interface.StatusEffects {
     }
 
     [Serializable]
-    public class StatusEffectIconConfig : PluginConfigObject {
+    public class StatusEffectIconConfig : PluginConfigObject
+    {
         public PluginConfigColor BorderColor = new(new Vector4(0f / 255f, 0 / 255f, 0 / 255f, 100f / 100f));
         public int BorderThickness = 1;
         public PluginConfigColor DispellableBorderColor = new(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
@@ -95,11 +102,13 @@ namespace DelvUI.Interface.StatusEffects {
         public bool ShowStacksText = true;
         public Vector2 Size = new(40, 40);
 
-        public StatusEffectIconConfig() {
+        public StatusEffectIconConfig()
+        {
 
         }
 
-        public StatusEffectIconConfig(Vector2 size, bool showDurationText, bool showStacksText, bool showBorder, bool showDispellableBorder) {
+        public StatusEffectIconConfig(Vector2 size, bool showDurationText, bool showStacksText, bool showBorder, bool showDispellableBorder)
+        {
             Size = size;
             ShowDurationText = showDurationText;
             ShowStacksText = showStacksText;
@@ -107,7 +116,8 @@ namespace DelvUI.Interface.StatusEffects {
             ShowDispellableBorder = showDispellableBorder;
         }
 
-        public bool Draw() {
+        public bool Draw()
+        {
             var changed = false;
 
             ImGui.Text("Icons");

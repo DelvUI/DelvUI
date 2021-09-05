@@ -12,8 +12,10 @@ using System.IO.Compression;
 using System.Numerics;
 using System.Text;
 
-namespace DelvUI.Config {
-    public class PluginConfiguration : IPluginConfiguration {
+namespace DelvUI.Config
+{
+    public class PluginConfiguration : IPluginConfiguration
+    {
         public readonly BlackMageHudConfig BLMConfig = new();
         public readonly AstrologianHudConfig ASTConfig = new();
 
@@ -214,64 +216,78 @@ namespace DelvUI.Config {
 
         public event EventHandler<EventArgs> ConfigChangedEvent;
 
-        public void Init(DalamudPluginInterface pluginInterface) {
+        public void Init(DalamudPluginInterface pluginInterface)
+        {
             _pluginInterface = pluginInterface;
             BuildColorMap();
         }
 
-        public static void WriteConfig(string filename, DalamudPluginInterface pluginInterface, PluginConfiguration config) {
-            if (pluginInterface == null) {
+        public static void WriteConfig(string filename, DalamudPluginInterface pluginInterface, PluginConfiguration config)
+        {
+            if (pluginInterface == null)
+            {
                 return;
             }
 
             var configDirectory = pluginInterface.GetPluginConfigDirectory();
             var configFile = Path.Combine(configDirectory, filename + ".json");
 
-            try {
+            try
+            {
                 var jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
                 File.WriteAllText(configFile, jsonString);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 PluginLog.Log($"Failed to write configuration {configFile} to JSON");
                 PluginLog.Log(ex.StackTrace);
             }
         }
 
-        public static string GenerateExportString(PluginConfiguration config) {
+        public static string GenerateExportString(PluginConfiguration config)
+        {
             var jsonString = JsonConvert.SerializeObject(config, Formatting.Indented);
 
             return CompressAndBase64Encode(jsonString);
         }
 
-        public static PluginConfiguration LoadImportString(string importString) {
-            try {
+        public static PluginConfiguration LoadImportString(string importString)
+        {
+            try
+            {
                 var jsonString = Base64DecodeAndDecompress(importString);
 
                 return JsonConvert.DeserializeObject<PluginConfiguration>(jsonString);
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 PluginLog.Log(ex.StackTrace);
 
                 return null;
             }
         }
 
-        public static PluginConfiguration ReadConfig(string filename, DalamudPluginInterface pluginInterface) {
-            if (pluginInterface == null) {
+        public static PluginConfiguration ReadConfig(string filename, DalamudPluginInterface pluginInterface)
+        {
+            if (pluginInterface == null)
+            {
                 return null;
             }
 
             var configDirectory = pluginInterface.GetPluginConfigDirectory();
             var configFile = Path.Combine(configDirectory, filename + ".json");
 
-            try {
-                if (File.Exists(configFile)) {
+            try
+            {
+                if (File.Exists(configFile))
+                {
                     var jsonString = File.ReadAllText(configFile);
 
                     return JsonConvert.DeserializeObject<PluginConfiguration>(jsonString);
                 }
             }
-            catch (Exception ex) {
+            catch (Exception ex)
+            {
                 PluginLog.Log($"Failed to load configuration file: {configFile}");
                 PluginLog.Log(ex.StackTrace);
             }
@@ -279,10 +295,12 @@ namespace DelvUI.Config {
             return null;
         }
 
-        public static string CompressAndBase64Encode(string jsonString) {
+        public static string CompressAndBase64Encode(string jsonString)
+        {
             using MemoryStream output = new();
 
-            using (DeflateStream gzip = new(output, CompressionLevel.Fastest)) {
+            using (DeflateStream gzip = new(output, CompressionLevel.Fastest))
+            {
                 using StreamWriter writer = new(gzip, Encoding.UTF8);
                 writer.Write(jsonString);
             }
@@ -290,7 +308,8 @@ namespace DelvUI.Config {
             return Convert.ToBase64String(output.ToArray());
         }
 
-        public static string Base64DecodeAndDecompress(string base64String) {
+        public static string Base64DecodeAndDecompress(string base64String)
+        {
             var base64EncodedBytes = Convert.FromBase64String(base64String);
 
             using MemoryStream inputStream = new(base64EncodedBytes);
@@ -301,10 +320,13 @@ namespace DelvUI.Config {
             return decodedString;
         }
 
-        public void TransferConfig(PluginConfiguration fromOtherConfig) {
+        public void TransferConfig(PluginConfiguration fromOtherConfig)
+        {
             // write fields
-            foreach (var item in typeof(PluginConfiguration).GetFields()) {
-                if (item.GetCustomAttributes(typeof(JsonIgnoreAttribute), false).Length > 0) {
+            foreach (var item in typeof(PluginConfiguration).GetFields())
+            {
+                if (item.GetCustomAttributes(typeof(JsonIgnoreAttribute), false).Length > 0)
+                {
                     continue;
                 }
 
@@ -312,8 +334,10 @@ namespace DelvUI.Config {
             }
 
             // write properties
-            foreach (var item in typeof(PluginConfiguration).GetProperties()) {
-                if (item.GetCustomAttributes(typeof(JsonIgnoreAttribute), false).Length > 0) {
+            foreach (var item in typeof(PluginConfiguration).GetProperties())
+            {
+                if (item.GetCustomAttributes(typeof(JsonIgnoreAttribute), false).Length > 0)
+                {
                     continue;
                 }
 
@@ -321,7 +345,8 @@ namespace DelvUI.Config {
             }
         }
 
-        public void Save() {
+        public void Save()
+        {
             // TODO should not use the name explicitly here
             WriteConfig("DelvUI", _pluginInterface, this);
 
@@ -329,7 +354,8 @@ namespace DelvUI.Config {
             ConfigChangedEvent?.Invoke(this, null);
         }
 
-        public void BuildColorMap() {
+        public void BuildColorMap()
+        {
             JobColorMap = new Dictionary<uint, Dictionary<string, uint>>
             {
                 [Jobs.PLD] = new()
@@ -2098,7 +2124,8 @@ namespace DelvUI.Config {
         #endregion
     }
 
-    public static class Jobs {
+    public static class Jobs
+    {
         public const uint GLD = 1;
         public const uint MRD = 3;
         public const uint PLD = 19;
