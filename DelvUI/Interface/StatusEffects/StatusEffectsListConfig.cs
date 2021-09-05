@@ -1,8 +1,8 @@
-﻿using System;
+﻿using DelvUI.Config;
+using ImGuiNET;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
-using DelvUI.Config;
-using ImGuiNET;
 
 namespace DelvUI.Interface.StatusEffects {
     [Serializable]
@@ -27,6 +27,14 @@ namespace DelvUI.Interface.StatusEffects {
             ShowPermanentEffects = showPermanentEffects;
             GrowthDirections = growthDirections;
         }
+        public StatusEffectsListConfig(Vector2 position, bool showBuffs, bool showDebuffs, bool showPermanentEffects, GrowthDirections growthDirections, StatusEffectIconConfig iconConfig) {
+            Position = position;
+            ShowBuffs = showBuffs;
+            ShowDebuffs = showDebuffs;
+            ShowPermanentEffects = showPermanentEffects;
+            GrowthDirections = growthDirections;
+            IconConfig = iconConfig;
+        }
 
         public bool Draw() {
             var changed = false;
@@ -46,11 +54,13 @@ namespace DelvUI.Interface.StatusEffects {
                     GrowthDirections.Right | GrowthDirections.Down,
                     GrowthDirections.Right | GrowthDirections.Up,
                     GrowthDirections.Left | GrowthDirections.Down,
-                    GrowthDirections.Left | GrowthDirections.Up
+                    GrowthDirections.Left | GrowthDirections.Up,
+                    GrowthDirections.Out | GrowthDirections.Right,
+                    GrowthDirections.Out | GrowthDirections.Down,
                 };
 
                 var selection = Math.Max(0, directions.IndexOf(GrowthDirections));
-                string[] directionsStrings = { "Right and Down", "Right and Up", "Left and Down", "Left and Up" };
+                string[] directionsStrings = { "Right and Down", "Right and Up", "Left and Down", "Left and Up", "Out from Middle and Right", "Out from Middle and Down" };
 
                 if (ImGui.Combo("Icons Growth Direction", ref selection, directionsStrings, directionsStrings.Length)) {
                     GrowthDirections = directions[selection];
@@ -84,6 +94,18 @@ namespace DelvUI.Interface.StatusEffects {
         public bool ShowDurationText = true;
         public bool ShowStacksText = true;
         public Vector2 Size = new(40, 40);
+
+        public StatusEffectIconConfig() {
+
+        }
+
+        public StatusEffectIconConfig(Vector2 size, bool showDurationText, bool showStacksText, bool showBorder, bool showDispellableBorder) {
+            Size = size;
+            ShowDurationText = showDurationText;
+            ShowStacksText = showStacksText;
+            ShowBorder = showBorder;
+            ShowDispellableBorder = showDispellableBorder;
+        }
 
         public bool Draw() {
             var changed = false;

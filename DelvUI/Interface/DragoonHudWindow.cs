@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game.ClientState.Actors.Types;
+﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
 
 namespace DelvUI.Interface {
     public class DragoonHudWindow : HudWindow {
+
         public DragoonHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => Jobs.DRG;
@@ -46,6 +47,25 @@ namespace DelvUI.Interface {
         private Dictionary<string, uint> DisembowelColor => PluginConfiguration.JobColorMap[Jobs.DRG * 1000 + 3];
         private Dictionary<string, uint> ChaosThrustColor => PluginConfiguration.JobColorMap[Jobs.DRG * 1000 + 4];
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.DRG * 1000 + 5];
+        protected override List<uint> GetJobSpecificBuffs() {
+            uint[] ids = { 
+                // Dive Ready
+                1243,
+                // Life Surge
+                116,
+                2175,
+                // Lance Charge
+                1864,
+                // Right Eye
+                1183,
+                1453,
+                1910,
+                // Disembowel
+                121,
+                1914,
+            };
+            return new List<uint>(ids);
+        }
 
         protected override void Draw(bool _) {
             if (ShowChaosThrustTimer) {

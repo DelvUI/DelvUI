@@ -1,14 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.InteropServices;
 using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
-using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.Internal.Gui.Addon;
 using Dalamud.Interface;
 using Dalamud.Plugin;
@@ -21,6 +13,13 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Numerics;
+using System.Runtime.InteropServices;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface {
@@ -31,10 +30,81 @@ namespace DelvUI.Interface {
         private readonly StatusEffectsList _playerDebuffList;
         private readonly StatusEffectsList _targetBuffList;
         private readonly StatusEffectsList _targetDebuffList;
+        private readonly StatusEffectsList _raidJobsBuffList;
         protected readonly PluginConfiguration PluginConfiguration;
         protected readonly DalamudPluginInterface PluginInterface;
 
         private ImGuiWindowFlags _childFlags = 0;
+
+        protected uint[] _raidWideBuffs = {
+            // See https://external-preview.redd.it/bKacLk4PKav7vdP1ilT66gAtB1t7BTJjxsMrImRHr1k.png?auto=webp&s=cbe6880c34b45e2db20c247c8ab9eef543538e96
+            // Left Eye
+            1184,
+            1454,
+            // Battle Litany
+            786,
+            1414,
+            // Brotherhood
+            1185,
+            2174,
+            // Battle Voice
+            141,
+            // Devilment
+            1825,
+            // Technical Finish
+            1822,
+            2050,
+            // Standard Finish
+            1821,
+            2024,
+            2105,
+            2113,
+            // Embolden
+            1239,
+            1297,
+            2282,
+            // Devotion
+            1213,
+            // ------ AST Card Buffs -------
+            // The Balance
+            829,
+            1338,
+            1882,
+            // The Bole
+            830,
+            1339,
+            1883,
+            // The Arrow
+            831,
+            1884,
+            // The Spear
+            832,
+            1885,
+            // The Ewer
+            833,
+            1340,
+            1886,
+            // The Spire
+            834,
+            1341,
+            1887,
+            // Lord of Crowns
+            1451,
+            1876,
+            // Lady of Crowns
+            1452,
+            1877,
+            // Divination
+            1878,
+            2034,
+            // Chain Stratagem
+            1221,
+            1406,
+        };
+        protected List<uint> RaidWideBuffs;
+        private List<uint> JobSpecificBuffs;
+        protected bool ShowRaidWideBuffIcons => PluginConfiguration.ShowRaidWideBuffIcons;
+        protected bool ShowJobSpecificBuffIcons => PluginConfiguration.ShowJobSpecificBuffIcons;
 
         private LastUsedCast _lastPlayerUsedCast;
         private LastUsedCast _lastTargetUsedCast;
@@ -55,6 +125,8 @@ namespace DelvUI.Interface {
             _openContextMenuFromTarget =
                 Marshal.GetDelegateForFunctionPointer<OpenContextMenuFromTarget>(PluginInterface.TargetModuleScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
 
+            RaidWideBuffs = new List<uint>(_raidWideBuffs);
+            JobSpecificBuffs = GetJobSpecificBuffs();
             PluginConfiguration.ConfigChangedEvent += OnConfigChanged;
 
             var center = new Vector2(CenterX, CenterY);
@@ -65,6 +137,7 @@ namespace DelvUI.Interface {
             _targetBuffList = new StatusEffectsList(pluginInterface, pluginConfiguration.TargetDebuffListConfig) { Center = center };
 
             _targetDebuffList = new StatusEffectsList(pluginInterface, pluginConfiguration.TargetBuffListConfig) { Center = center };
+            _raidJobsBuffList = new StatusEffectsList(pluginInterface, pluginConfiguration.RaidJobBuffListConfig) { Center = center };
         }
 
         public abstract uint JobId { get; }
@@ -119,9 +192,8 @@ namespace DelvUI.Interface {
 
             if (ImGui.BeginChild("health_bar", BarSize)) {
                 drawList.AddRectFilled(cursorPos, cursorPos + BarSize, PlayerUnitFrameColor);
-               
-                if (HasTankInvuln(actor) == 1)
-                {
+
+                if (HasTankInvuln(actor) == 1) {
                     var jobColors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
                     drawList.AddRectFilled(cursorPos, cursorPos + BarSize, jobColors["invuln"]);
                 }
@@ -851,6 +923,25 @@ namespace DelvUI.Interface {
             return tankInvulnBuff.Count();
         }
 
+        protected virtual List<uint> GetJobSpecificBuffs() {
+            return new List<uint>();
+        }
+
+        private void DrawRaidJobBuffs() {
+            if (!(ShowRaidWideBuffIcons || ShowJobSpecificBuffIcons)) {
+                return;
+            }
+            List<uint> buffIds = new();
+            if (ShowJobSpecificBuffIcons) {
+                buffIds.AddRange(JobSpecificBuffs);
+            }
+            if (ShowRaidWideBuffIcons) {
+                buffIds.AddRange(RaidWideBuffs);
+            }
+            _raidJobsBuffList.Actor = PluginInterface.ClientState.LocalPlayer;
+            _raidJobsBuffList.Draw(buffIds);
+        }
+
         protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor) {
             var colors = PluginConfiguration.NPCColorMap["neutral"];
 
@@ -982,6 +1073,7 @@ namespace DelvUI.Interface {
 
             DrawPlayerStatusEffects();
             DrawTargetStatusEffects();
+            DrawRaidJobBuffs();
         }
 
         protected abstract void Draw(bool _);
