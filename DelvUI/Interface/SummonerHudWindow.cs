@@ -1,15 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
 
-namespace DelvUI.Interface {
-    public class SummonerHudWindow : HudWindow {
+namespace DelvUI.Interface
+{
+    public class SummonerHudWindow : HudWindow
+    {
         public SummonerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => 27;
@@ -46,7 +48,8 @@ namespace DelvUI.Interface {
         private Dictionary<string, uint> SmnBioColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 4];
         private Dictionary<string, uint> SmnExpiryColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 5];
 
-        protected override void Draw(bool _) {
+        protected override void Draw(bool _)
+        {
             DrawActiveDots();
             DrawRuinBar();
             DrawAetherBar();
@@ -54,14 +57,17 @@ namespace DelvUI.Interface {
 
         protected override void DrawPrimaryResourceBar() { }
 
-        private void DrawActiveDots() {
+        private void DrawActiveDots()
+        {
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (!ShowBioBar && !ShowMiasmaBar) {
+            if (!ShowBioBar && !ShowMiasmaBar)
+            {
                 return;
             }
 
-            if (target is not Chara) {
+            if (target is not Chara)
+            {
                 return;
             }
 
@@ -69,7 +75,8 @@ namespace DelvUI.Interface {
             var yPos = CenterY + YOffset + MiasmaBarYOffset;
             var barDrawList = new List<Bar>();
 
-            if (ShowMiasmaBar) {
+            if (ShowMiasmaBar)
+            {
                 var miasma = target.StatusEffects.FirstOrDefault(
                     o => o.EffectId == 1215 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                       || o.EffectId == 180 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
@@ -86,7 +93,8 @@ namespace DelvUI.Interface {
                 barDrawList.Add(miasmaBar);
             }
 
-            if (ShowBioBar) {
+            if (ShowBioBar)
+            {
                 var bio = target.StatusEffects.FirstOrDefault(
                     o => o.EffectId == 1214 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                       || o.EffectId == 179 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
@@ -106,21 +114,25 @@ namespace DelvUI.Interface {
                 barDrawList.Add(bioBar);
             }
 
-            if (barDrawList.Count > 0) {
+            if (barDrawList.Count > 0)
+            {
                 var drawList = ImGui.GetWindowDrawList();
 
-                foreach (var bar in barDrawList) {
+                foreach (var bar in barDrawList)
+                {
                     bar.Draw(drawList, PluginConfiguration);
                 }
             }
         }
 
-        private void DrawRuinBar() {
+        private void DrawRuinBar()
+        {
             var ruinBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1212);
             var xPos = CenterX - XOffset + RuinBarXOffset;
             var yPos = CenterY + YOffset + RuinBarYOffset;
 
-            if (!ShowRuinBar) {
+            if (!ShowRuinBar)
+            {
                 return;
             }
 
@@ -135,13 +147,15 @@ namespace DelvUI.Interface {
             bar.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawAetherBar() {
+        private void DrawAetherBar()
+        {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var aetherFlowBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
             var xPos = CenterX - XOffset + AetherBarXOffset;
             var yPos = CenterY + YOffset + AetherBarYOffset;
 
-            if (!ShowAetherBar) {
+            if (!ShowAetherBar)
+            {
                 return;
             }
 

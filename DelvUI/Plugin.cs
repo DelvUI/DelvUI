@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using Dalamud.Game.ClientState;
+﻿using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using DelvUI.Config;
@@ -9,9 +6,14 @@ using DelvUI.Helpers;
 using DelvUI.Interface;
 using FFXIVClientStructs;
 using ImGuiNET;
+using System;
+using System.IO;
+using System.Reflection;
 
-namespace DelvUI {
-    public class Plugin : IDalamudPlugin {
+namespace DelvUI
+{
+    public class Plugin : IDalamudPlugin
+    {
         private ConfigurationWindow _configurationWindow;
 
         private bool _fontBuilt;
@@ -26,7 +28,8 @@ namespace DelvUI {
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
         public string Name => "DelvUI";
 
-        public void Initialize(DalamudPluginInterface pluginInterface) {
+        public void Initialize(DalamudPluginInterface pluginInterface)
+        {
             _pluginInterface = pluginInterface;
 
             // load a configuration with default parameters and write it to file
@@ -36,7 +39,8 @@ namespace DelvUI {
             // if a previously used configuration exists, use it instead
             var oldConfiguration = PluginConfiguration.ReadConfig(Name, _pluginInterface);
 
-            if (oldConfiguration != null) {
+            if (oldConfiguration != null)
+            {
                 _pluginConfiguration = oldConfiguration;
             }
 
@@ -49,7 +53,8 @@ namespace DelvUI {
             _pluginInterface.UiBuilder.OnBuildFonts += BuildFont;
             _pluginInterface.UiBuilder.OnOpenConfigUi += OpenConfigUi;
 
-            if (!_fontBuilt && !_fontLoadFailed) {
+            if (!_fontBuilt && !_fontLoadFailed)
+            {
                 _pluginInterface.UiBuilder.RebuildFonts();
             }
 
@@ -69,51 +74,64 @@ namespace DelvUI {
             Resolver.Initialize();
         }
 
-        public void Dispose() {
+        public void Dispose()
+        {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        private void BuildFont() {
+        private void BuildFont()
+        {
             var fontFile = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Fonts", "big-noodle-too.ttf");
             _fontBuilt = false;
 
-            if (File.Exists(fontFile)) {
-                try {
+            if (File.Exists(fontFile))
+            {
+                try
+                {
                     _pluginConfiguration.BigNoodleTooFont = ImGui.GetIO().Fonts.AddFontFromFileTTF(fontFile, 24);
                     _fontBuilt = true;
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
                     PluginLog.Log($"Font failed to load. {fontFile}");
                     PluginLog.Log(ex.ToString());
                     _fontLoadFailed = true;
                 }
             }
-            else {
+            else
+            {
                 PluginLog.Log($"Font doesn't exist. {fontFile}");
                 _fontLoadFailed = true;
             }
         }
 
-        private void BuildBanner() {
+        private void BuildBanner()
+        {
             var bannerImage = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
 
-            if (File.Exists(bannerImage)) {
-                try {
+            if (File.Exists(bannerImage))
+            {
+                try
+                {
                     _pluginConfiguration.BannerImage = _pluginInterface.UiBuilder.LoadImage(bannerImage);
                 }
-                catch (Exception ex) {
+                catch (Exception ex)
+                {
                     PluginLog.Log($"Image failed to load. {bannerImage}");
                     PluginLog.Log(ex.ToString());
                 }
             }
-            else {
+            else
+            {
                 PluginLog.Log($"Image doesn't exist. {bannerImage}");
             }
         }
 
-        private void PluginCommand(string command, string arguments) {
-            switch (arguments) {
+        private void PluginCommand(string command, string arguments)
+        {
+            switch (arguments)
+            {
                 case "toggle":
                     _configurationWindow.ToggleHud();
 
@@ -136,7 +154,8 @@ namespace DelvUI {
             }
         }
 
-        private void Draw() {
+        private void Draw()
+        {
             var hudState = _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene]
                         || _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene78]
                         || _pluginInterface.ClientState.Condition[ConditionFlag.OccupiedInCutSceneEvent]
@@ -147,24 +166,29 @@ namespace DelvUI {
             _pluginInterface.UiBuilder.OverrideGameCursor = false;
             _configurationWindow.Draw();
 
-            if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id) {
+            if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id)
+            {
                 SwapJobs();
             }
 
-            if (_fontBuilt) {
+            if (_fontBuilt)
+            {
                 ImGui.PushFont(_pluginConfiguration.BigNoodleTooFont);
             }
 
-            if (!hudState) {
+            if (!hudState)
+            {
                 _hudWindow?.Draw();
             }
 
-            if (_fontBuilt) {
+            if (_fontBuilt)
+            {
                 ImGui.PopFont();
             }
         }
 
-        private void SwapJobs() {
+        private void SwapJobs()
+        {
             _hudWindow = _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id switch
             {
                 //Tanks
@@ -228,14 +252,17 @@ namespace DelvUI {
 
         private void OpenConfigUi(object sender, EventArgs e) { _configurationWindow.IsVisible = !_configurationWindow.IsVisible; }
 
-        protected virtual void Dispose(bool disposing) {
-            if (!disposing) {
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
                 return;
             }
 
             _configurationWindow.IsVisible = false;
 
-            if (_hudWindow != null) {
+            if (_hudWindow != null)
+            {
                 _hudWindow.IsVisible = false;
             }
 
