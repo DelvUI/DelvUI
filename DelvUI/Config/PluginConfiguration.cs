@@ -397,41 +397,7 @@ namespace DelvUI.Config {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(.1f)),
                     ["invuln"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(-.8f))
                 },
-                [Jobs.WAR * 1000] = new() // Inner Release
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(WARInnerReleaseColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(WARInnerReleaseColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WARInnerReleaseColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WARInnerReleaseColor.AdjustColor(.1f))
-                },
-                [Jobs.WAR * 1000 + 1] = new() // Storm's Eye
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(WARStormsEyeColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(WARStormsEyeColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WARStormsEyeColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WARStormsEyeColor.AdjustColor(.1f))
-                },
-                [Jobs.WAR * 1000 + 2] = new() // Fell Cleave
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(WARFellCleaveColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(WARFellCleaveColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WARFellCleaveColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WARFellCleaveColor.AdjustColor(.1f))
-                },
-                [Jobs.WAR * 1000 + 3] = new() // Nascent Chaos
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(WARNascentChaosColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(WARNascentChaosColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WARNascentChaosColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WARNascentChaosColor.AdjustColor(.1f))
-                },
-                [Jobs.WAR * 1000 + 4] = new() // WAR Empty
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
+                                
                 [Jobs.DRK] = new()
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK),
@@ -1447,34 +1413,7 @@ namespace DelvUI.Config {
         public Vector4 BRDSVColor = new(248f / 255f, 227f / 255f, 0f / 255f, 100f / 100f);
 
         #endregion
-
-        #region WAR Configuration
-
-        public int WARBaseXOffset { get; set; }
-        public int WARBaseYOffset { get; set; }
-
-        public bool WARStormsEyeEnabled { get; set; } = true;
-        public bool WARStormsEyeText { get; set; } = true;
-        public float WARStormsEyeTextScale { get; set; } = 1.0f;
-        public int WARStormsEyeHeight { get; set; } = 20;
-        public int WARStormsEyeWidth { get; set; } = 254;
-        public int WARStormsEyeXOffset { get; set; } = 127;
-        public int WARStormsEyeYOffset { get; set; } = 417;
-        public bool WARBeastGaugeEnabled { get; set; } = true;
-        public bool WARBeastGaugeText { get; set; }
-        public float WARBeastGaugeTextScale { get; set; } = 1.0f;
-        public int WARBeastGaugeHeight { get; set; } = 20;
-        public int WARBeastGaugeWidth { get; set; } = 254;
-        public int WARBeastGaugePadding { get; set; } = 2;
-        public int WARBeastGaugeXOffset { get; set; } = 127;
-        public int WARBeastGaugeYOffset { get; set; } = 439;
-        public Vector4 WARInnerReleaseColor = new(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f);
-        public Vector4 WARStormsEyeColor = new(255f / 255f, 136f / 255f, 146f / 255f, 100f / 100f);
-        public Vector4 WARFellCleaveColor = new(201f / 255f, 13f / 255f, 13f / 255f, 100f / 100f);
-        public Vector4 WARNascentChaosColor = new(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f);
-
-        #endregion
-
+ 
         #region SCH Configuration
 
         public int SCHBaseXOffset { get; set; }
