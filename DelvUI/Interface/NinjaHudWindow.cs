@@ -2,6 +2,7 @@
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
+using DelvUI.Config.Attributes;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
 using System;
@@ -9,61 +10,30 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-namespace DelvUI.Interface
-{
-    public class NinjaHudWindow : HudWindow
-    {
-        public NinjaHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
+namespace DelvUI.Interface {
+    public class NinjaHudWindow : HudWindow {
 
-        public override uint JobId => 30;
+        public override uint JobId => Jobs.NIN;
 
-        private new int XOffset => PluginConfiguration.NINBaseXOffset;
-        private new int YOffset => PluginConfiguration.NINBaseYOffset;
-
-        private bool HutonGaugeEnabled => PluginConfiguration.NINHutonGaugeEnabled;
-        private int HutonGaugeHeight => PluginConfiguration.NINHutonGaugeHeight;
-        private int HutonGaugeWidth => PluginConfiguration.NINHutonGaugeWidth;
-        private int HutonGaugeXOffset => PluginConfiguration.NINHutonGaugeXOffset;
-        private int HutonGaugeYOffset => PluginConfiguration.NINHutonGaugeYOffset;
-
-        private bool NinkiGaugeEnabled => PluginConfiguration.NINNinkiGaugeEnabled;
-        private bool NinkiGaugeText => PluginConfiguration.NINNinkiGaugeText;
-        private bool NinkiChunked => PluginConfiguration.NINNinkiChunked;
-        private int NinkiGaugeHeight => PluginConfiguration.NINNinkiGaugeHeight;
-        private int NinkiGaugeWidth => PluginConfiguration.NINNinkiGaugeWidth;
-        private int NinkiGaugePadding => PluginConfiguration.NINNinkiGaugePadding;
-        private int NinkiGaugeXOffset => PluginConfiguration.NINNinkiGaugeXOffset;
-        private int NinkiGaugeYOffset => PluginConfiguration.NINNinkiGaugeYOffset;
-
-        private bool TrickBarEnabled => PluginConfiguration.NINTrickBarEnabled;
-        private bool TrickBarText => PluginConfiguration.NINTrickBarText;
-        private bool SuitonBarText => PluginConfiguration.NINSuitonBarText;
-        private int TrickBarHeight => PluginConfiguration.NINTrickBarHeight;
-        private int TrickBarWidth => PluginConfiguration.NINTrickBarWidth;
-        private int TrickBarXOffset => PluginConfiguration.NINTrickBarXOffset;
-        private int TrickBarYOffset => PluginConfiguration.NINTrickBarYOffset;
+        private NinjaHudConfig _config => (NinjaHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new NinjaHudConfig());
 
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
-        private Dictionary<string, uint> HutonColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 1];
-        private Dictionary<string, uint> NinkiColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 2];
-        private Dictionary<string, uint> TrickColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 3];
-        private Dictionary<string, uint> SuitonColor => PluginConfiguration.JobColorMap[Jobs.NIN * 1000 + 4];
+       
         private Dictionary<string, uint> NinkiNotFilledColor => PluginConfiguration.MiscColorMap["partial"];
 
-        protected override void Draw(bool _)
-        {
-            if (HutonGaugeEnabled)
-            {
+        public NinjaHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration)
+            : base(pluginInterface, pluginConfiguration) { }
+
+        protected override void Draw(bool _) {
+            if (_config.ShowHutonGauge) {
                 DrawHutonGauge();
             }
 
-            if (NinkiGaugeEnabled)
-            {
+            if (_config.ShowNinkiGauge) {
                 DrawNinkiGauge();
             }
 
-            if (TrickBarEnabled)
-            {
+            if (_config.ShowTrickBar) {
                 DrawTrickAndSuitonGauge();
             }
         }
@@ -75,13 +45,13 @@ namespace DelvUI.Interface
             var gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
             var hutonDurationLeft = (int)Math.Ceiling((float)(gauge.HutonTimeLeft / (double)1000));
 
-            var xPos = CenterX - XOffset + HutonGaugeXOffset;
-            var yPos = CenterY + YOffset + HutonGaugeYOffset;
+            var xPos = CenterX - _config.Position.X + _config.HutonGaugeOffset.X;
+            var yPos = CenterY + _config.Position.Y + _config.HutonGaugeOffset.Y;
 
-            var builder = BarBuilder.Create(xPos, yPos, HutonGaugeHeight, HutonGaugeWidth);
+            var builder = BarBuilder.Create(xPos, yPos, _config.HutonGaugeSize.Y, _config.HutonGaugeSize.X);
             var maximum = 70f;
 
-            var bar = builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, HutonColor)
+            var bar = builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, _config.HutonGaugeColor.Map)
                              .SetTextMode(BarTextMode.Single)
                              .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                              .SetBackgroundColor(EmptyColor["background"])
@@ -95,28 +65,25 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
 
-            var xPos = CenterX - XOffset + NinkiGaugeXOffset;
-            var yPos = CenterY + YOffset + NinkiGaugeYOffset;
+            var xPos = CenterX - _config.Position.X + _config.NinkiGaugeOffset.X;
+            var yPos = CenterY + _config.Position.Y + _config.NinkiGaugeOffset.Y;
 
-            var builder = BarBuilder.Create(xPos, yPos, NinkiGaugeHeight, NinkiGaugeWidth);
+            var builder = BarBuilder.Create(xPos, yPos, _config.NinkiGaugeSize.Y, _config.NinkiGaugeSize.X);
 
-            if (NinkiChunked)
-            {
+            if (_config.ChunkNinkiGauge) {
                 builder.SetChunks(2)
-                       .SetChunkPadding(NinkiGaugePadding)
-                       .AddInnerBar(gauge.Ninki, 100, NinkiColor, NinkiNotFilledColor);
+                       .SetChunkPadding(_config.NinkiGaugeChunkPadding)
+                       .AddInnerBar(gauge.Ninki, 100, _config.NinkiGaugeColor.Map, NinkiNotFilledColor);
             }
-            else
-            {
-                builder.AddInnerBar(gauge.Ninki, 100, NinkiColor);
+            else {
+                builder.AddInnerBar(gauge.Ninki, 100, _config.NinkiGaugeColor.Map);
             }
 
             builder.SetBackgroundColor(EmptyColor["background"]);
 
-            if (NinkiGaugeText)
-            {
-                builder.SetTextMode(BarTextMode.Single)
-                       .SetText(NinkiChunked ? BarTextPosition.CenterLeft : BarTextPosition.CenterMiddle, BarTextType.Current);
+            if (_config.ShowNinkiGaugeText) {
+                builder.SetTextMode(BarTextMode.EachChunk)
+                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
             var bar = builder.Build();
@@ -125,16 +92,15 @@ namespace DelvUI.Interface
             bar.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawTrickAndSuitonGauge()
-        {
-            var xPos = CenterX - XOffset + TrickBarXOffset;
-            var yPos = CenterY + YOffset + TrickBarYOffset;
+        private void DrawTrickAndSuitonGauge() {
+            var xPos = CenterX - _config.Position.X + _config.TrickBarOffset.X;
+            var yPos = CenterY + _config.Position.Y + _config.TrickBarOffset.Y;
 
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             var trickDuration = 0f;
             const float trickMaxDuration = 15f;
 
-            var builder = BarBuilder.Create(xPos, yPos, TrickBarHeight, TrickBarWidth);
+            var builder = BarBuilder.Create(xPos, yPos, _config.TrickBarSize.Y, _config.TrickBarSize.X);
 
             if (target is Chara)
             {
@@ -142,25 +108,22 @@ namespace DelvUI.Interface
                 trickDuration = Math.Max(trickStatus.Duration, 0);
             }
 
-            builder.AddInnerBar(trickDuration, trickMaxDuration, TrickColor);
+            builder.AddInnerBar(trickDuration, trickMaxDuration, _config.TrickBarColor.Map);
 
-            if (trickDuration != 0 && TrickBarText)
-            {
+            if (trickDuration != 0 && _config.ShowTrickBarText) {
                 builder.SetTextMode(BarTextMode.Single)
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
             var suitonBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 507);
 
-            if (suitonBuff.Any())
-            {
+            if (suitonBuff.Any() && _config.ShowSuitonBar) {
                 var suitonDuration = Math.Abs(suitonBuff.First().Duration);
-                builder.AddInnerBar(suitonDuration, 20, SuitonColor);
+                builder.AddInnerBar(suitonDuration, 20, _config.SuitonBarColor.Map);
 
-                if (SuitonBarText)
-                {
+                if (_config.ShowSuitonBarText) {
                     builder.SetTextMode(BarTextMode.Single)
-                           .SetText(BarTextPosition.CenterRight, BarTextType.Current, PluginConfiguration.NINSuitonColor, Vector4.UnitW, null);
+                           .SetText(BarTextPosition.CenterRight, BarTextType.Current, _config.SuitonBarColor.Vector, Vector4.UnitW, null);
                 }
             }
 
@@ -168,5 +131,73 @@ namespace DelvUI.Interface
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
+    }
+
+    [Serializable]
+    [Section("Job Specific Bars")]
+    [SubSection("Melee", 0)]
+    [SubSection("Ninja", 1)]
+    public class NinjaHudConfig : PluginConfigObject {
+        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        public Vector2 Position = new Vector2(127, 417);
+
+        [Checkbox("Show Huton Gauge")]
+        public bool ShowHutonGauge = true;
+
+        [DragFloat2("Huton Gauge Size", max = 2000f)]
+        public Vector2 HutonGaugeSize = new Vector2(254, 20);
+
+        [DragFloat2("Huton Gauge Offset", min = -4000f, max = 4000f)]
+        public Vector2 HutonGaugeOffset = new Vector2(0, 0);
+
+        [Checkbox("Show Ninki Gauge")]
+        public bool ShowNinkiGauge = true;
+
+        [Checkbox("Show Ninki Gauge Text")]
+        public bool ShowNinkiGaugeText = true;
+
+        [Checkbox("Chunk Ninki Gauge")]
+        public bool ChunkNinkiGauge = true;
+
+        [DragFloat2("Ninki Gauge Size", max = 2000f)]
+        public Vector2 NinkiGaugeSize = new Vector2(254, 20);
+
+        [DragFloat2("Ninki Gauge Offset", min = -4000f, max = 4000f)]
+        public Vector2 NinkiGaugeOffset = new Vector2(0, 22);
+
+        [DragFloat("Ninki Gauge Chunk Padding", min = -4000f, max = 4000f)]
+        public float NinkiGaugeChunkPadding = 2;
+
+        [Checkbox("Show Trick Bar")]
+        public bool ShowTrickBar = false;
+
+        [Checkbox("Show Trick Bar Text")]
+        public bool ShowTrickBarText = true;
+
+        [Checkbox("Show Suiton Bar")]
+        public bool ShowSuitonBar = true;
+
+        [Checkbox("Show Suiton Bar Text")]
+        public bool ShowSuitonBarText = true;
+
+        [DragFloat2("Trick/Suiton Bar Size", max = 2000f)]
+        public Vector2 TrickBarSize = new Vector2(254, 20);
+
+        [DragFloat2("Trick/Suiton Bar Offset", min = -4000f, max = 4000f)]
+        public Vector2 TrickBarOffset = new Vector2(0, 44);
+
+
+        [ColorEdit4("Huton Gauge Color")]
+        public PluginConfigColor HutonGaugeColor = new PluginConfigColor(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f));
+
+        [ColorEdit4("Ninki Gauge Color")]
+        public PluginConfigColor NinkiGaugeColor = new PluginConfigColor(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f));
+
+        [ColorEdit4("Trick Bar Color")]
+        public PluginConfigColor TrickBarColor = new PluginConfigColor(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Suiton Bar Color")]
+        public PluginConfigColor SuitonBarColor = new PluginConfigColor(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f));
+
     }
 }
