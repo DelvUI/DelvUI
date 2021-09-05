@@ -27,10 +27,11 @@ namespace DelvUI.Config
 
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface)
         {
-            BlackMageHudConfig blmConfig = new BlackMageHudConfig();
             AstrologianHudConfig astConfig = new AstrologianHudConfig();
+            NinjaHudConfig ninConfig = new NinjaHudConfig();
+            BlackMageHudConfig blmConfig = new BlackMageHudConfig();
 
-            return Initialize(pluginInterface, astConfig, blmConfig);
+            return Initialize(pluginInterface, astConfig, ninConfig, blmConfig);
         }
 
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface, params PluginConfigObject[] configObjects)
