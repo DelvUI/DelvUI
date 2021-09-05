@@ -19,6 +19,7 @@ namespace DelvUI
         private bool _fontBuilt;
         private bool _fontLoadFailed;
         private HudWindow _hudWindow;
+        private HudManager _hudManager;
         private PluginConfiguration _pluginConfiguration;
 
         private DalamudPluginInterface _pluginInterface;
@@ -72,6 +73,8 @@ namespace DelvUI
 
             TexturesCache.Initialize(pluginInterface);
             Resolver.Initialize();
+
+            _hudManager = new HudManager(_pluginInterface, _pluginConfiguration);
         }
 
         public void Dispose()
@@ -179,6 +182,7 @@ namespace DelvUI
             if (!hudState)
             {
                 _hudWindow?.Draw();
+                _hudManager?.Draw();
             }
 
             if (_fontBuilt)

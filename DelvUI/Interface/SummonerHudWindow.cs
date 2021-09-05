@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using DelvUI.Helpers;
 
 namespace DelvUI.Interface
 {

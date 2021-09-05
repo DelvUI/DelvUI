@@ -9,7 +9,6 @@ namespace DelvUI.Interface.StatusEffects
     [Serializable]
     public class StatusEffectsListConfig : PluginConfigObject
     {
-        public bool Enabled = true;
         public bool FillRowsFirst = true;
         public GrowthDirections GrowthDirections;
         public StatusEffectIconConfig IconConfig = new();
@@ -40,7 +39,7 @@ namespace DelvUI.Interface.StatusEffects
             IconConfig = iconConfig;
         }
 
-        public bool Draw()
+        public new bool Draw()
         {
             var changed = false;
 
@@ -116,7 +115,7 @@ namespace DelvUI.Interface.StatusEffects
             ShowDispellableBorder = showDispellableBorder;
         }
 
-        public bool Draw()
+        public new bool Draw()
         {
             var changed = false;
 

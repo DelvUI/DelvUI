@@ -2,6 +2,7 @@
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
+using DelvUI.Helpers;
 using ImGuiNET;
 using System.Collections.Generic;
 using System.Globalization;

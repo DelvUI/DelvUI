@@ -514,7 +514,7 @@ namespace DelvUI.Interface
             new(new Vector4(137f / 255f, 26f / 255f, 42f / 255f, 100f / 100f));
 
 
-        public bool Draw()
+        public new bool Draw()
         {
             var changed = false;
 

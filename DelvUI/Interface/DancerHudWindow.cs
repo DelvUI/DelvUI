@@ -3,6 +3,7 @@ using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.GameStructs;
 using DelvUI.Interface.Bars;
+using DelvUI.Helpers;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,8 @@
 ﻿using DelvUI.Config;
 using ImGuiNET;
 using Lumina.Excel;
+using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace DelvUI.Helpers
@@ -80,6 +82,61 @@ namespace DelvUI.Helpers
                 var drawList = ImGui.GetWindowDrawList();
                 drawList.AddRect(position, position + size, 0xFF000000);
             }
+        }
+
+        public static void DrawOvershield(float shield, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, Dictionary<string, uint> color)
+        {
+            if (shield == 0)
+            {
+                return;
+            }
+
+            var h = useRatioForHeight ? barSize.Y / 100 * height : height;
+
+            var drawList = ImGui.GetWindowDrawList();
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + new Vector2(Math.Max(1, barSize.X * shield), h),
+                color["gradientLeft"], color["gradientRight"], color["gradientRight"], color["gradientLeft"]
+            );
+        }
+
+        public static void DrawShield(float shield, float hp, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, Dictionary<string, uint> color)
+        {
+            if (shield == 0)
+            {
+                return;
+            }
+
+            // on full hp just draw overshield
+            if (hp == 1)
+            {
+                DrawOvershield(shield, cursorPos, barSize, height, useRatioForHeight, color);
+                return;
+            }
+
+            var h = useRatioForHeight ? barSize.Y / 100 * Math.Min(100, height) : height;
+            var drawList = ImGui.GetWindowDrawList();
+
+            // hp portion
+            var missingHPRatio = 1 - hp;
+            var s = Math.Min(shield, missingHPRatio);
+            var shieldStartPos = cursorPos + new Vector2(Math.Max(1, barSize.X * hp), 0);
+            drawList.AddRectFilledMultiColor(
+                shieldStartPos, shieldStartPos + new Vector2(Math.Max(1, barSize.X * s), barSize.Y),
+                color["gradientLeft"], color["gradientRight"], color["gradientRight"], color["gradientLeft"]
+            );
+
+            // overshield
+            shield = shield - s;
+            if (shield <= 0)
+            {
+                return;
+            }
+
+            drawList.AddRectFilledMultiColor(
+                cursorPos, cursorPos + new Vector2(Math.Max(1, barSize.X * shield), h),
+                color["gradientLeft"], color["gradientRight"], color["gradientRight"], color["gradientLeft"]
+            );
         }
     }
 }

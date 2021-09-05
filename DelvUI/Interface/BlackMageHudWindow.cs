@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using DelvUI.Helpers;
 
 namespace DelvUI.Interface
 {
@@ -342,7 +343,7 @@ namespace DelvUI.Interface
         public PluginConfigColor UmbralHeartColor = new(new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f));
         public Vector2 UmbralHeartSize = new(83, 16);
 
-        public bool Draw()
+        public new bool Draw()
         {
             var changed = false;
 
