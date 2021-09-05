@@ -8,7 +8,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public unsafe class UnitFrameHud : HudElement
+    public unsafe class UnitFrameHud : HudElement, IHudElementWithActor
     {
         private PluginConfiguration _pluginConfiguration;
 
@@ -16,7 +16,7 @@ namespace DelvUI.Interface.GeneralElements
         private LabelHud _leftLabel;
         private LabelHud _rightLabel;
 
-        public Actor Actor = null;
+        public Actor Actor { get; set; } = null;
 
         public UnitFrameHud(UnitFrameConfig config, PluginConfiguration pluginConfiguration) : base(config)
         {

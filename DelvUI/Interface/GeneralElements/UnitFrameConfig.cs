@@ -6,16 +6,24 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
+    internal static class UnitFrameConstants
+    {
+        internal static int BaseUnitFrameOffsetX = 160;
+    }
+
     [Serializable]
     public class PlayerUnitFrameConfig : UnitFrameConfig
     {
+        public static Vector2 DefaultSize => new Vector2(270, 50);
         public static PlayerUnitFrameConfig DefaultUnitFrame()
         {
-            var size = new Vector2(270, 50);
-            var leftLabelConfig = new LabelConfig(new Vector2(-size.X / 2f + 5, -size.Y / 2f + 2), "[name:abbreviate]", LabelTextAnchor.BottomLeft);
-            var rightLabelConfig = new LabelConfig(new Vector2(size.X / 2 + 10, -size.Y / 2f + 2), "[health:current-short] | [health:percent]%", LabelTextAnchor.BottomRight);
+            var size = DefaultSize;
+            var pos = new Vector2(-UnitFrameConstants.BaseUnitFrameOffsetX - size.X / 2f, HUDConstants.BaseHUDOffsetY);
 
-            var config = new PlayerUnitFrameConfig(new Vector2(-160 - size.X / 2f, 345 - 100 - size.Y / 2f), size, leftLabelConfig, rightLabelConfig, "Player Unit Frame");
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(-size.X / 2f + 5, -size.Y / 2f + 2), "[name:abbreviate]", LabelTextAnchor.BottomLeft);
+            var rightLabelConfig = new EditableLabelConfig(new Vector2(size.X / 2 + 10, -size.Y / 2f + 2), "[health:current-short] | [health:percent]%", LabelTextAnchor.BottomRight);
+
+            var config = new PlayerUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig, "Player Unit Frame");
             config.TankStanceIndicatorConfig = new TankStanceIndicatorConfig();
 
             return config;
@@ -31,13 +39,16 @@ namespace DelvUI.Interface.GeneralElements
     [Serializable]
     public class TargetUnitFrameConfig : UnitFrameConfig
     {
+        public static Vector2 DefaultSize => new Vector2(270, 50);
         public static TargetUnitFrameConfig DefaultUnitFrame()
         {
-            var size = new Vector2(270, 50);
-            var leftLabelConfig = new LabelConfig(new Vector2(-size.X / 2f + 5, -size.Y / 2f + 2), "[health:current-short] | [health:percent]%", LabelTextAnchor.BottomLeft);
-            var rightLabelConfig = new LabelConfig(new Vector2(size.X / 2 - 5, -size.Y / 2 + 2), "[name:abbreviate]", LabelTextAnchor.BottomRight);
+            var size = DefaultSize;
+            var pos = new Vector2(UnitFrameConstants.BaseUnitFrameOffsetX + size.X / 2f, HUDConstants.BaseHUDOffsetY);
 
-            return new TargetUnitFrameConfig(new Vector2(160 + size.X / 2f, 345 - 100 - size.Y / 2f), size, leftLabelConfig, rightLabelConfig, "Target Unit Frame");
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(-size.X / 2f + 5, -size.Y / 2f + 2), "[health:current-short] | [health:percent]%", LabelTextAnchor.BottomLeft);
+            var rightLabelConfig = new EditableLabelConfig(new Vector2(size.X / 2 - 5, -size.Y / 2 + 2), "[name:abbreviate]", LabelTextAnchor.BottomRight);
+
+            return new TargetUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig, "Target Unit Frame");
         }
 
         public TargetUnitFrameConfig(Vector2 position, Vector2 size, LabelConfig leftLabelConfig, LabelConfig rightLabelConfig, string title = null)
@@ -53,10 +64,15 @@ namespace DelvUI.Interface.GeneralElements
         public static TargetOfTargetUnitFrameConfig DefaultUnitFrame()
         {
             var size = new Vector2(120, 20);
-            var leftLabelConfig = new LabelConfig(new Vector2(0, -size.Y / 2f + 2), "[name:abbreviate]", LabelTextAnchor.Bottom);
-            var rightLabelConfig = new LabelConfig(new Vector2(0, size.Y / 2f), "", LabelTextAnchor.Top);
+            var pos = new Vector2(
+                UnitFrameConstants.BaseUnitFrameOffsetX + TargetUnitFrameConfig.DefaultSize.X + 6 + size.X / 2f,
+                HUDConstants.BaseHUDOffsetY - TargetUnitFrameConfig.DefaultSize.Y + size.Y / 2f
+            );
 
-            return new TargetOfTargetUnitFrameConfig(new Vector2(436 + size.X / 2f, 295 - 100 + size.Y / 2f), size, leftLabelConfig, rightLabelConfig, "Target of Target Unit Frame");
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(0, -size.Y / 2f + 2), "[name:abbreviate]", LabelTextAnchor.Bottom);
+            var rightLabelConfig = new EditableLabelConfig(new Vector2(0, size.Y / 2f), "", LabelTextAnchor.Top);
+
+            return new TargetOfTargetUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig, "Target of Target Unit Frame");
         }
 
         public TargetOfTargetUnitFrameConfig(Vector2 position, Vector2 size, LabelConfig leftLabelConfig, LabelConfig rightLabelConfig, string title = null)
@@ -72,10 +88,15 @@ namespace DelvUI.Interface.GeneralElements
         public static FocusTargetUnitFrameConfig DefaultUnitFrame()
         {
             var size = new Vector2(120, 20);
-            var leftLabelConfig = new LabelConfig(new Vector2(0, -size.Y / 2f + 2), "[name:abbreviate]", LabelTextAnchor.Bottom);
-            var rightLabelConfig = new LabelConfig(new Vector2(0, size.Y / 2f), "", LabelTextAnchor.Top);
+            var pos = new Vector2(
+                -UnitFrameConstants.BaseUnitFrameOffsetX - TargetUnitFrameConfig.DefaultSize.X - 6 - size.X / 2f,
+                HUDConstants.BaseHUDOffsetY - TargetUnitFrameConfig.DefaultSize.Y + size.Y / 2f
+            );
 
-            return new FocusTargetUnitFrameConfig(new Vector2(-436 - size.X / 2f, 295 - 100 + size.Y / 2f), size, leftLabelConfig, rightLabelConfig, "Focus Target Unit Frame");
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(0, -size.Y / 2f + 2), "[name:abbreviate]", LabelTextAnchor.Bottom);
+            var rightLabelConfig = new EditableLabelConfig(new Vector2(0, size.Y / 2f), "", LabelTextAnchor.Top);
+
+            return new FocusTargetUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig, "Focus Target Unit Frame");
         }
 
         public FocusTargetUnitFrameConfig(Vector2 position, Vector2 size, LabelConfig leftLabelConfig, LabelConfig rightLabelConfig, string title = null)
@@ -180,7 +201,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         public int Thickness = 2;
         public Vector4 ActiveColor = new Vector4(0f / 255f, 205f / 255f, 230f / 255f, 100f / 100f);
-        public Vector4 UnactiveColor = new Vector4(255f / 255f, 0f / 255f, 32f / 255f, 100f / 100f); 
+        public Vector4 UnactiveColor = new Vector4(255f / 255f, 0f / 255f, 32f / 255f, 100f / 100f);
 
         public new bool Draw()
         {

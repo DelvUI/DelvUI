@@ -14,6 +14,8 @@ namespace DelvUI
 {
     public class Plugin : IDalamudPlugin
     {
+        public static DalamudPluginInterface InterfaceInstance { get; private set; }
+        
         private ConfigurationWindow _configurationWindow;
 
         private bool _fontBuilt;
@@ -32,6 +34,7 @@ namespace DelvUI
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
             _pluginInterface = pluginInterface;
+            Plugin.InterfaceInstance = _pluginInterface;
 
             // load a configuration with default parameters and write it to file
             _pluginConfiguration = new PluginConfiguration();

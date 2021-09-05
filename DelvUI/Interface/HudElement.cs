@@ -1,4 +1,5 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Game.ClientState.Actors.Types;
+using DelvUI.Config;
 using System.Numerics;
 
 namespace DelvUI.Interface
@@ -13,5 +14,10 @@ namespace DelvUI.Interface
         }
 
         public abstract void Draw(Vector2 origin);
+    }
+
+    public interface IHudElementWithActor
+    {
+        public Actor Actor { get; set; }
     }
 }

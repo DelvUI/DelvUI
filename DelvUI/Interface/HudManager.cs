@@ -1,5 +1,4 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Interface;
+﻿using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Helpers;
@@ -11,6 +10,11 @@ using System.Numerics;
 
 namespace DelvUI.Interface
 {
+    internal static class HUDConstants
+    {
+        internal static int BaseHUDOffsetY = (int)(ImGui.GetMainViewport().Size.Y * 0.3f);
+    }
+
     public class HudManager
     {
         private DalamudPluginInterface _pluginInterface;
@@ -18,10 +22,16 @@ namespace DelvUI.Interface
         private Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
 
         private List<HudElement> _hudElements;
+        private List<IHudElementWithActor> _hudElementsUsingPlayer;
+        private List<IHudElementWithActor> _hudElementsUsingTarget;
+
         private UnitFrameHud _playerUnitFrame;
         private UnitFrameHud _targetUnitFrame;
         private UnitFrameHud _targetOfTargetUnitFrame;
         private UnitFrameHud _focusTargetUnitFrame;
+
+        private CastbarHud _playerCastbar;
+        private CastbarHud _targetCastbar;
 
         public HudManager(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration)
         {
@@ -29,14 +39,19 @@ namespace DelvUI.Interface
             _pluginConfiguration = pluginConfiguration;
 
             _hudElements = new List<HudElement>();
+            _hudElementsUsingPlayer = new List<IHudElementWithActor>();
+            _hudElementsUsingTarget = new List<IHudElementWithActor>();
 
+            // unit frames
             var playerUnitFrameConfig = PlayerUnitFrameConfig.DefaultUnitFrame();
             _playerUnitFrame = new UnitFrameHud(playerUnitFrameConfig, pluginConfiguration);
             _hudElements.Add(_playerUnitFrame);
+            _hudElementsUsingPlayer.Add(_playerUnitFrame);
 
             var targetUnitFrameConfig = TargetUnitFrameConfig.DefaultUnitFrame();
             _targetUnitFrame = new UnitFrameHud(targetUnitFrameConfig, pluginConfiguration);
             _hudElements.Add(_targetUnitFrame);
+            _hudElementsUsingTarget.Add(_targetUnitFrame);
 
             var targetOfTargetUnitFrameConfig = TargetOfTargetUnitFrameConfig.DefaultUnitFrame();
             _targetOfTargetUnitFrame = new UnitFrameHud(targetOfTargetUnitFrameConfig, pluginConfiguration);
@@ -45,6 +60,24 @@ namespace DelvUI.Interface
             var focusTargetUnitFrameConfig = FocusTargetUnitFrameConfig.DefaultUnitFrame();
             _focusTargetUnitFrame = new UnitFrameHud(focusTargetUnitFrameConfig, pluginConfiguration);
             _hudElements.Add(_focusTargetUnitFrame);
+
+            // cast bars
+            var playerCastbarConfig = PlayerCastbarConfig.DefaultCastbar();
+            _playerCastbar = new PlayerCastbarHud(playerCastbarConfig, pluginConfiguration);
+            _hudElements.Add(_playerCastbar);
+            _hudElementsUsingPlayer.Add(_playerCastbar);
+
+            var targetCastbarConfig = TargetCastbarConfig.DefaultCastbar();
+            _targetCastbar = new TargetCastbarHud(targetCastbarConfig, pluginConfiguration);
+            _hudElements.Add(_targetCastbar);
+            _hudElementsUsingTarget.Add(_targetCastbar);
+        }
+
+        ~HudManager()
+        {
+            _hudElements.Clear();
+            _hudElementsUsingTarget.Clear();
+            _hudElementsUsingTarget.Clear();
         }
 
         public void Draw()
@@ -100,11 +133,17 @@ namespace DelvUI.Interface
         {
             // player
             var player = _pluginInterface.ClientState.LocalPlayer;
-            _playerUnitFrame.Actor = player;
+            foreach (var element in _hudElementsUsingPlayer)
+            {
+                element.Actor = player;
+            }
 
             // target
             var target = _pluginInterface.ClientState.Targets.SoftTarget ?? _pluginInterface.ClientState.Targets.CurrentTarget;
-            _targetUnitFrame.Actor = _pluginInterface.ClientState.Targets.SoftTarget ?? _pluginInterface.ClientState.Targets.CurrentTarget;
+            foreach (var element in _hudElementsUsingTarget)
+            {
+                element.Actor = target;
+            }
 
             // target of target
             _targetOfTargetUnitFrame.Actor = Utils.FindTargetOfTarget(target, player, _pluginInterface.ClientState.Actors);
