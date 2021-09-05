@@ -393,7 +393,7 @@ namespace DelvUI.Config.Tree {
                 JsonConvert.SerializeObject(
                     ConfigObject,
                     Formatting.Indented,
-                    new JsonSerializerSettings {TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects,}
+                    new JsonSerializerSettings {TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects}
                 )
             );
         }
@@ -401,14 +401,21 @@ namespace DelvUI.Config.Tree {
         public override void Load(string path) {
             var finalPath = new FileInfo(path + ".json");
 
-            var configObject = !finalPath.Exists
-                ? ConfigObject
-                : JsonConvert.DeserializeObject<PluginConfigObject>(
-                    File.ReadAllText(finalPath.FullName),
-                    new JsonSerializerSettings {TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects,}
-                );
+            if (!finalPath.Exists) {
+                return;
+            }
 
-            ConfigObject = configObject;
+            if (ConfigObject.GetType().GetInterface(typeof(PluginConfigObject).FullName) != null) {
+                var methodInfo = GetType().GetMethod("LoadForType");
+                var function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
+                ConfigObject = (PluginConfigObject) function.Invoke(this, new object[] {finalPath});
+            }
+        }
+
+        public T LoadForType<T>(string path) where T : PluginConfigObject {
+            var file = new FileInfo(path);
+
+            return JsonConvert.DeserializeObject<T>(File.ReadAllText(file.FullName));
         }
 
         public override ConfigPageNode GetOrAddConfig(PluginConfigObject configObject) { return this; }
