@@ -3200,10 +3200,6 @@ namespace DelvUI.Config
                             ImGui.SameLine();
                     }
 
-                    ImGui.Text(senOrder[0].ToString());
-                    ImGui.Text(senOrder[1].ToString());
-                    ImGui.Text(senOrder[2].ToString());
-
                     var samKenkiBarX = _pluginConfiguration.SamKenkiBarX;
 
                     if (ImGui.DragInt("Kenki X Offset", ref samKenkiBarX, .1f, -1000, 1000))
