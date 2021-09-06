@@ -61,19 +61,18 @@ namespace DelvUI
             }
 
             _pluginInterface.CommandManager.AddHandler(
-                "/pdelvui",
+                "/delvui",
                 new CommandInfo(PluginCommand)
                 {
                     HelpMessage = "Opens the DelvUI configuration window.\n"
-                                + "/pdelvui toggle → Toggles HUD visibility.\n"
-                                + "/pdelvui show → Shows HUD.\n"
-                                + "/pdelvui hide → Hides HUD.",
+                                + "/delvui toggle → Toggles HUD visibility.\n"
+                                + "/delvui show → Shows HUD.\n"
+                                + "/delvui hide → Hides HUD.",
                     ShowInHelp = true
                 }
             );
 
-            _pluginInterface.CommandManager.AddHandler("/pdelvuinewconfig", new CommandInfo(NewConfigMenuCommand));
-            _pluginInterface.CommandManager.AddHandler("/pdelvuireloadconfig", new CommandInfo(ReloadConfigCommand));
+            _pluginInterface.CommandManager.AddHandler("/delvuireloadconfig", new CommandInfo(ReloadConfigCommand));
 
             TexturesCache.Initialize(pluginInterface);
             Resolver.Initialize();
@@ -154,14 +153,10 @@ namespace DelvUI
 
                 default:
                     _configurationWindow.IsVisible = !_configurationWindow.IsVisible;
+                    ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
 
                     break;
             }
-        }
-
-        private void NewConfigMenuCommand(string command, string arguments)
-        {
-            ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
         }
 
         private void ReloadConfigCommand(string command, string arguments) { ConfigurationManager.GetInstance().LoadConfigurations(); }
@@ -282,9 +277,8 @@ namespace DelvUI
                 _hudWindow.IsVisible = false;
             }
 
-            _pluginInterface.CommandManager.RemoveHandler("/pdelvui");
-            _pluginInterface.CommandManager.RemoveHandler("/pdelvuinewconfig");
-            _pluginInterface.CommandManager.RemoveHandler("/pdelvuireloadconfig");
+            _pluginInterface.CommandManager.RemoveHandler("/delvui");
+            _pluginInterface.CommandManager.RemoveHandler("/delvuireloadconfig");
             _pluginInterface.UiBuilder.OnBuildUi -= Draw;
             _pluginInterface.UiBuilder.OnBuildFonts -= BuildFont;
             _pluginInterface.UiBuilder.OnOpenConfigUi -= OpenConfigUi;
