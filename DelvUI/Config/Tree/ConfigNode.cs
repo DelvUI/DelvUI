@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using Dalamud.Interface;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
 using Newtonsoft.Json;
@@ -119,7 +120,9 @@ namespace DelvUI.Config.Tree
 
                 ImGui.SameLine();
 
-                if (ImGui.Button("Donate!")) { }
+                if (ImGui.Button("Donate!")) {
+                    System.Diagnostics.Process.Start("https://ko-fi.com/DelvUI");
+                }
             }
 
             ImGui.EndGroup(); // Bottom Bar
@@ -213,6 +216,18 @@ namespace DelvUI.Config.Tree
                     ImGui.EndTabBar();
 
                     // TODO: Close Button - Maybe better suited elsewhere
+                    /* Current close button code
+                    Vector2 pos = ImGui.GetCursorPos();
+                    ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 20, 0));
+                    ImGui.PushFont(UiBuilder.IconFont);
+
+                    if (ImGui.Button(FontAwesomeIcon.Times.ToIconString())) {
+                        //hide config window
+                    }
+
+                    ImGui.PopFont();
+                    ImGui.SetCursorPos(pos);
+                    */
                 }
             }
 
