@@ -38,7 +38,7 @@ namespace DelvUI.Config
                 new GunbreakerHudConfig(),
                 new NinjaHudConfig(),
                 new PaladinHudConfig(),
-                new RedMageHudConfig()
+                new RedMageHudConfig(),
                 new SummonerHudConfig(),
                 new WarriorHudConfig(),
                 new WhiteMageHudConfig(),
