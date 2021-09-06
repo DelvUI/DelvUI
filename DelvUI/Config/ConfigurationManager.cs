@@ -27,37 +27,36 @@ namespace DelvUI.Config
 
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface)
         {
-            AstrologianHudConfig astConfig = new AstrologianHudConfig();  
-            BardHudConfig brdConfig = new BardHudConfig();  
-            BlackMageHudConfig blmConfig = new BlackMageHudConfig();
-            DancerHudConfig dncConfig = new DancerHudConfig();  
-            GunbreakerHudConfig gnbConfig = new GunbreakerHudConfig();
-            NinjaHudConfig ninConfig = new NinjaHudConfig();
-            PaladinHudConfig pldConfig = new PaladinHudConfig();
-            WarriorHudConfig warConfig = new WarriorHudConfig();
-            DarkKnightHudConfig drkConfig = new DarkKnightHudConfig();
+            AstrologianHudConfig astConfig = new();
+            BardHudConfig brdConfig = new();
+            BlackMageHudConfig blmConfig = new();
+            DancerHudConfig dncConfig = new();
+            GunbreakerHudConfig gnbConfig = new();
+            NinjaHudConfig ninConfig = new();
+            PaladinHudConfig pldConfig = new();
+            WarriorHudConfig warConfig = new();
+            DarkKnightHudConfig drkConfig = new();
 
             return Initialize(pluginInterface, astConfig, brdConfig, blmConfig, dncConfig, gnbConfig, ninConfig, pldConfig, warConfig, drkConfig);
         }
 
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface, params PluginConfigObject[] configObjects)
         {
-            var node = new BaseNode();
+            BaseNode node = new BaseNode();
 
-            foreach (var configObject in configObjects)
+            foreach (PluginConfigObject configObject in configObjects)
             {
                 node.GetOrAddConfig(configObject);
             }
 
-            var banner = BuildBanner(pluginInterface);
+            TextureWrap banner = BuildBanner(pluginInterface);
 
             return new ConfigurationManager(banner, pluginInterface.GetPluginConfigDirectory(), node);
         }
 
-        public static ConfigurationManager GetInstance() { return _instance; }
+        public static ConfigurationManager GetInstance() => _instance;
 
-        private static TextureWrap BuildBanner(DalamudPluginInterface pluginInterface)
-        {
+        private static TextureWrap BuildBanner(DalamudPluginInterface pluginInterface) =>
             // var bannerImage = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "Media", "Images", "banner_short_x150.png");
             //
             // if (File.Exists(bannerImage)) {
@@ -70,9 +69,7 @@ namespace DelvUI.Config
             // } else {
             //     PluginLog.Log($"Image doesn't exist. {bannerImage}");
             // }
-
-            return null;
-        }
+            null;
 
         public void Draw()
         {
@@ -86,6 +83,6 @@ namespace DelvUI.Config
 
         public void SaveConfigurations() { ConfigBaseNode.Save(ConfigDirectory); }
 
-        public PluginConfigObject GetConfiguration(PluginConfigObject configObject) { return ConfigBaseNode.GetOrAddConfig(configObject).ConfigObject; }
+        public PluginConfigObject GetConfiguration(PluginConfigObject configObject) => ConfigBaseNode.GetOrAddConfig(configObject).ConfigObject;
     }
 }
