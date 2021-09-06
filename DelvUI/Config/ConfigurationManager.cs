@@ -32,13 +32,14 @@ namespace DelvUI.Config
             BlackMageHudConfig blmConfig = new();
             DancerHudConfig dncConfig = new();
             DarkKnightHudConfig drkConfig = new();
+            DragoonHudConfig drgConfig = new();
             GunbreakerHudConfig gnbConfig = new();
             NinjaHudConfig ninConfig = new();
             PaladinHudConfig pldConfig = new();
             WarriorHudConfig warConfig = new();
             WhiteMageHudConfig whmConfig = new();
 
-            return Initialize(pluginInterface, astConfig, brdConfig, blmConfig, dncConfig, drkConfig, gnbConfig, ninConfig, pldConfig, warConfig, whmConfig);
+            return Initialize(pluginInterface, astConfig, brdConfig, blmConfig, dncConfig, drgConfig, drkConfig, gnbConfig, ninConfig, pldConfig, warConfig, whmConfig);
         }
 
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface, params PluginConfigObject[] configObjects)
