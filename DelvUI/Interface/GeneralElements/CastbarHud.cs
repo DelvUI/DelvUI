@@ -35,7 +35,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public override unsafe void Draw(Vector2 origin)
         {
-            if (Actor == null || Actor is not Chara)
+            if (!Config.Enabled || Actor == null || Actor is not Chara)
             {
                 return;
             }
