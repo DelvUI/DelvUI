@@ -1,4 +1,7 @@
-﻿using Dalamud.Game.ClientState;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using DelvUI.Config;
@@ -6,9 +9,6 @@ using DelvUI.Helpers;
 using DelvUI.Interface;
 using FFXIVClientStructs;
 using ImGuiNET;
-using System;
-using System.IO;
-using System.Reflection;
 
 namespace DelvUI
 {
@@ -39,7 +39,7 @@ namespace DelvUI
             PluginConfiguration.WriteConfig("default", _pluginInterface, _pluginConfiguration);
 
             // if a previously used configuration exists, use it instead
-            var oldConfiguration = PluginConfiguration.ReadConfig(Name, _pluginInterface);
+            PluginConfiguration oldConfiguration = PluginConfiguration.ReadConfig(Name, _pluginInterface);
 
             if (oldConfiguration != null)
             {
@@ -86,7 +86,7 @@ namespace DelvUI
 
         private void BuildFont()
         {
-            var fontFile = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Fonts", "big-noodle-too.ttf");
+            string fontFile = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Fonts", "big-noodle-too.ttf");
             _fontBuilt = false;
 
             if (File.Exists(fontFile))
@@ -112,7 +112,7 @@ namespace DelvUI
 
         private void BuildBanner()
         {
-            var bannerImage = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
+            string bannerImage = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
 
             if (File.Exists(bannerImage))
             {
@@ -163,12 +163,12 @@ namespace DelvUI
 
         private void Draw()
         {
-            var hudState = _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene]
-                        || _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene78]
-                        || _pluginInterface.ClientState.Condition[ConditionFlag.OccupiedInCutSceneEvent]
-                        || _pluginInterface.ClientState.Condition[ConditionFlag.CreatingCharacter]
-                        || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas]
-                        || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas51];
+            bool hudState = _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene]
+                         || _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene78]
+                         || _pluginInterface.ClientState.Condition[ConditionFlag.OccupiedInCutSceneEvent]
+                         || _pluginInterface.ClientState.Condition[ConditionFlag.CreatingCharacter]
+                         || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas]
+                         || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas51];
 
             _pluginInterface.UiBuilder.OverrideGameCursor = false;
             _configurationWindow.Draw();
