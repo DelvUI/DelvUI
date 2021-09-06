@@ -22,7 +22,7 @@ namespace DelvUI
         private PluginConfiguration _pluginConfiguration;
         private SystemMenuHook _menuHook;
 
-        private DalamudPluginInterface _pluginInterface;
+        private static DalamudPluginInterface _pluginInterface;
 
         public static ImGuiScene.TextureWrap bannerTexture;
 
@@ -32,6 +32,8 @@ namespace DelvUI
         public string Name => "DelvUI";
         public static string Version = "";
 
+        public static DalamudPluginInterface GetPluginInterface() => _pluginInterface;
+
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
             _pluginInterface = pluginInterface;
@@ -40,14 +42,15 @@ namespace DelvUI
 
             LoadBanner();
 
-            ConfigurationManager.Initialize(pluginInterface);
+            // initialize a not-necessarily-defaults configuration
+            ConfigurationManager.Initialize(false);
 
             // load a configuration with default parameters and write it to file
             _pluginConfiguration = new PluginConfiguration();
-            PluginConfiguration.WriteConfig("default", _pluginInterface, _pluginConfiguration);
+            PluginConfiguration.WriteConfig("default", _pluginConfiguration);
 
             // if a previously used configuration exists, use it instead
-            PluginConfiguration oldConfiguration = PluginConfiguration.ReadConfig(Name, _pluginInterface);
+            var oldConfiguration = PluginConfiguration.ReadConfig(Name);
 
             if (oldConfiguration != null)
             {
@@ -56,8 +59,8 @@ namespace DelvUI
 
             _pluginConfiguration.BannerImage = bannerTexture;
 
-            _pluginConfiguration.Init(_pluginInterface);
-            _configurationWindow = new ConfigurationWindow(_pluginConfiguration, _pluginInterface);
+            _pluginConfiguration.Init();
+            _configurationWindow = new ConfigurationWindow(_pluginConfiguration);
             ConfigurationManager.GetInstance().ConfigurationWindow = _configurationWindow;
 
 

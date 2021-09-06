@@ -16,18 +16,21 @@ namespace DelvUI.Config
         public string ConfigDirectory;
         public bool DrawConfigWindow;
 
-        public ConfigurationManager(TextureWrap bannerImage, string configDirectory, BaseNode configBaseNode)
+        public ConfigurationManager(bool defaultConfig, TextureWrap bannerImage, string configDirectory, BaseNode configBaseNode)
         {
             BannerImage = bannerImage;
             ConfigDirectory = configDirectory;
             ConfigBaseNode = configBaseNode;
             _instance = this;
-            LoadConfigurations();
+            if (!defaultConfig)
+            {
+                LoadConfigurations();
+            }
         }
 
         public ConfigurationWindow ConfigurationWindow { get; set; }
 
-        public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface)
+        public static ConfigurationManager Initialize(bool defaultConfig)
         {
             PluginConfigObject[] configObjects =
             {
@@ -36,10 +39,10 @@ namespace DelvUI.Config
                 new BardHudConfig(), new MachinistHudConfig(), new DancerHudConfig(), new BlackMageHudConfig(), new SummonerHudConfig(), new RedMageHudConfig()
             };
 
-            return Initialize(pluginInterface, configObjects);
+            return Initialize(defaultConfig, configObjects);
         }
 
-        public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface, params PluginConfigObject[] configObjects)
+        public static ConfigurationManager Initialize(bool defaultConfig, params PluginConfigObject[] configObjects)
         {
             BaseNode node = new();
 
@@ -50,7 +53,7 @@ namespace DelvUI.Config
 
             TextureWrap banner = Plugin.bannerTexture;
 
-            return new ConfigurationManager(banner, pluginInterface.GetPluginConfigDirectory(), node);
+            return new ConfigurationManager(defaultConfig, banner, Plugin.GetPluginInterface().GetPluginConfigDirectory(), node);
         }
 
         public static ConfigurationManager GetInstance() => _instance;

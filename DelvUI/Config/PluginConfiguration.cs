@@ -34,9 +34,6 @@ namespace DelvUI.Config
         );
 
         [JsonIgnore]
-        private DalamudPluginInterface _pluginInterface;
-
-        [JsonIgnore]
         public TextureWrap BannerImage = null;
 
         [JsonIgnore]
@@ -211,20 +208,19 @@ namespace DelvUI.Config
 
         public event EventHandler<EventArgs> ConfigChangedEvent;
 
-        public void Init(DalamudPluginInterface pluginInterface)
+        public void Init()
         {
-            _pluginInterface = pluginInterface;
             BuildColorMap();
         }
 
-        public static void WriteConfig(string filename, DalamudPluginInterface pluginInterface, PluginConfiguration config)
+        public static void WriteConfig(string filename, PluginConfiguration config)
         {
-            if (pluginInterface == null)
+            if (Plugin.GetPluginInterface() == null)
             {
                 return;
             }
 
-            var configDirectory = pluginInterface.GetPluginConfigDirectory();
+            var configDirectory = Plugin.GetPluginInterface().GetPluginConfigDirectory();
             var configFile = Path.Combine(configDirectory, filename + ".json");
 
             try
@@ -262,14 +258,14 @@ namespace DelvUI.Config
             }
         }
 
-        public static PluginConfiguration ReadConfig(string filename, DalamudPluginInterface pluginInterface)
+        public static PluginConfiguration ReadConfig(string filename)
         {
-            if (pluginInterface == null)
+            if (Plugin.GetPluginInterface() == null)
             {
                 return null;
             }
 
-            var configDirectory = pluginInterface.GetPluginConfigDirectory();
+            var configDirectory = Plugin.GetPluginInterface().GetPluginConfigDirectory();
             var configFile = Path.Combine(configDirectory, filename + ".json");
 
             try
@@ -343,7 +339,7 @@ namespace DelvUI.Config
         public void Save()
         {
             // TODO should not use the name explicitly here
-            WriteConfig("DelvUI", _pluginInterface, this);
+            WriteConfig("DelvUI", this);
 
             // call event when the config changes
             ConfigChangedEvent?.Invoke(this, null);
