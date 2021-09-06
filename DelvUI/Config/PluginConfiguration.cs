@@ -437,48 +437,6 @@ namespace DelvUI.Config
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorSMN.AdjustColor(.1f))
                 },
-                [Jobs.SMN * 1000] = new() // Aether Bar
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnAetherColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnAetherColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnAetherColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnAetherColor.AdjustColor(.1f))
-                },
-                [Jobs.SMN * 1000 + 1] = new() // Ruin Bar
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnRuinColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnRuinColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnRuinColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnRuinColor.AdjustColor(.1f))
-                },
-                [Jobs.SMN * 1000 + 2] = new() // Empty Bar
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
-                [Jobs.SMN * 1000 + 3] = new() // Miasma Bar
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnMiasmaColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnMiasmaColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnMiasmaColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnMiasmaColor.AdjustColor(.1f))
-                },
-                [Jobs.SMN * 1000 + 4] = new() // Bio Bar
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnBioColor.AdjustColor(.1f))
-                },
-                [Jobs.SMN * 1000 + 5] = new() // Dot Expiry
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(SmnExpiryColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(SmnExpiryColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SmnExpiryColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SmnExpiryColor.AdjustColor(.1f))
-                },
                 [Jobs.AST] = new()
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorAST),
@@ -877,47 +835,6 @@ namespace DelvUI.Config
         public Vector4 SchAetherColor = new(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f);
         public Vector4 SchFairyColor = new(94f / 255f, 250f / 255f, 154f / 255f, 100f / 100f);
         public Vector4 SCHBioColor = new(50f / 255f, 93f / 255f, 37f / 255f, 1f);
-
-        #endregion
-
-        #region SMN Configuration
-
-        public int SmnBaseXOffset { get; set; } = 127;
-        public int SmnBaseYOffset { get; set; } = 395;
-        public bool SmnMiasmaBarEnabled { get; set; } = true;
-        public int SmnMiasmaBarWidth { get; set; } = 126;
-        public int SmnMiasmaBarHeight { get; set; } = 20;
-        public int SmnMiasmaBarXOffset { get; set; } = 0;
-        public int SmnMiasmaBarYOffset { get; set; }
-        public bool SmnMiasmaBarFlipped { get; set; }
-        public bool SmnBioBarEnabled { get; set; } = true;
-        public int SmnBioBarWidth { get; set; } = 126;
-        public int SmnBioBarHeight { get; set; } = 20;
-        public int SmnBioBarXOffset { get; set; } = 128;
-        public int SmnBioBarYOffset { get; set; }
-        public bool SmnBioBarFlipped { get; set; } = true;
-        public int SmnInterBarOffset { get; set; } = 2;
-        public bool SmnRuinBarEnabled { get; set; } = true;
-        public int SmnRuinBarXOffset { get; set; }
-        public int SmnRuinBarYOffset { get; set; } = 22;
-        public int SmnRuinBarHeight { get; set; } = 20;
-        public int SmnRuinBarWidth { get; set; } = 254;
-        public int SmnRuinBarPadding { get; set; } = 2;
-        public bool SmnAetherBarEnabled { get; set; } = true;
-        public int SmnAetherBarHeight { get; set; } = 20;
-        public int SmnAetherBarWidth { get; set; } = 254;
-        public int SmnAetherBarPadding { get; set; } = 2;
-        public int SmnAetherBarXOffset { get; set; }
-        public int SmnAetherBarYOffset { get; set; } = 44;
-
-        // public int SmnTranceBarHeight { get; set; } = 10;
-
-        public Vector4 SmnAetherColor = new(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f);
-        public Vector4 SmnRuinColor = new(94f / 255f, 250f / 255f, 154f / 255f, 100f / 100f);
-
-        public Vector4 SmnMiasmaColor = new(106f / 255f, 237f / 255f, 241f / 255f, 100f / 100f);
-        public Vector4 SmnBioColor = new(50f / 255f, 93f / 255f, 37f / 255f, 100f / 100f);
-        public Vector4 SmnExpiryColor = new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f);
 
         #endregion
 
