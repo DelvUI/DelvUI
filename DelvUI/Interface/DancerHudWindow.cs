@@ -48,6 +48,10 @@ namespace DelvUI.Interface
 
             if (_config.StepBarEnabled)
             {
+                DrawProcBar();
+            }
+            if (_config.StepBarEnabled)
+            {
                 DrawStepBar();
             }
 
