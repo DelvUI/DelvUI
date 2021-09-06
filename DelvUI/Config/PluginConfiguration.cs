@@ -395,41 +395,6 @@ namespace DelvUI.Config
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorWHM.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorWHM.AdjustColor(.1f))
                 },
-                [Jobs.WHM * 1000] = new() // White mage Lilly Bar Color
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(WhmLillyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(WhmLillyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WhmLillyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WhmLillyColor.AdjustColor(.1f))
-                },
-                [Jobs.WHM * 1000 + 1] = new() // White mage Blood Lilly Bar Color
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(WhmBloodLillyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(WhmBloodLillyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WhmBloodLillyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WhmBloodLillyColor.AdjustColor(.1f))
-                },
-                [Jobs.WHM * 1000 + 2] = new() // White mage Empty Bar Color
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
-                [Jobs.WHM * 1000 + 3] = new() // White mage Lilly gauge charging color
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(WhmLillyChargingColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(WhmLillyChargingColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WhmLillyChargingColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WhmLillyChargingColor.AdjustColor(.1f))
-                },
-                [Jobs.WHM * 1000 + 4] = new() // White mage Dia bar color
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(WhmDiaColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(WhmDiaColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(WhmDiaColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(WhmDiaColor.AdjustColor(.1f))
-                },
                 [Jobs.SCH] = new() // Scholar job color
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorSCH),
@@ -1017,94 +982,6 @@ namespace DelvUI.Config
         public Vector4 SchAetherColor = new(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f);
         public Vector4 SchFairyColor = new(94f / 255f, 250f / 255f, 154f / 255f, 100f / 100f);
         public Vector4 SCHBioColor = new(50f / 255f, 93f / 255f, 37f / 255f, 1f);
-
-        #endregion
-
-        #region WHM Configuration
-
-        public int WHMBaseXOffset { get; set; }
-        public int WHMBaseYOffset { get; set; }
-
-        public int LillyBarHeight { get; set; } = 20;
-        public int LillyBarWidth { get; set; } = 254;
-        public int LillyBarX { get; set; } = 127;
-        public int LillyBarY { get; set; } = 415;
-        public int LillyBarPad { get; set; } = 2;
-        public int BloodLillyBarHeight { get; set; } = 20;
-        public int BloodLillyBarWidth { get; set; } = 254;
-        public int BloodLillyBarX { get; set; } = 42;
-        public int BloodLillyBarY { get; set; } = 415;
-        public int BloodLillyBarPad { get; set; } = 2;
-        public int DiaBarHeight { get; set; } = 20;
-        public int DiaBarWidth { get; set; } = 254;
-        public int DiaBarX { get; set; } = 127;
-        public int DiaBarY { get; set; } = 417;
-
-        public bool WHMShowDiaBar = true;
-
-        public bool WHMShowLillyBar = true;
-
-        //public bool WHMShowBloodLillyBar = true;
-        public bool WHMShowPrimaryResourceBar = true;
-
-        public Vector4 WhmLillyColor = new(0f / 255f, 64f / 255f, 1f, 1f);
-        public Vector4 WhmBloodLillyColor = new(199f / 255f, 40f / 255f, 9f / 255f, 1f);
-        public Vector4 WhmLillyChargingColor = new(141f / 255f, 141f / 255f, 141f / 255f, 1f);
-        public Vector4 WhmDiaColor = new(0f / 255f, 64f / 255f, 1f, 1f);
-
-        #endregion
-
-        #region AST Configuration
-
-        public int ASTBaseXOffset { get; set; }
-        public int ASTBaseYOffset { get; set; }
-
-        public int ASTDrawBarHeight { get; set; } = 20;
-        public int ASTDrawBarWidth { get; set; } = 254;
-        public int ASTDrawBarX { get; set; } = 33;
-        public int ASTDrawBarY { get; set; } = -43;
-        public int ASTDivinationHeight { get; set; } = 10;
-        public int ASTDivinationWidth { get; set; } = 254;
-        public int ASTDivinationBarX { get; set; } = 33;
-        public int ASTDivinationBarY { get; set; } = -77;
-        public int ASTDivinationBarPad { get; set; } = 1;
-        public int ASTDotBarHeight { get; set; } = 20;
-        public int ASTDotBarWidth { get; set; } = 84;
-        public int ASTDotBarX { get; set; } = 118;
-        public int ASTDotBarY { get; set; } = -65;
-        public int ASTStarBarHeight { get; set; } = 20;
-        public int ASTStarBarWidth { get; set; } = 84;
-        public int ASTStarBarX { get; set; } = 33;
-        public int ASTStarBarY { get; set; } = -65;
-        public int ASTLightspeedBarHeight { get; set; } = 20;
-        public int ASTLightspeedBarWidth { get; set; } = 84;
-        public int ASTLightspeedBarX { get; set; } = 203;
-        public int ASTLightspeedBarY { get; set; } = -65;
-        public bool ASTShowDivinationBar = true;
-        public bool ASTShowDrawBar = true;
-        public bool ASTShowDotBar = true;
-        public bool ASTShowStarBar = true;
-        public bool ASTShowLightspeedBar = true;
-        public bool ASTShowStarGlowBar = true;
-        public bool ASTShowDivinationGlowBar = true;
-        public bool ASTShowDivinationTextBar = false;
-        public bool ASTShowDrawGlowBar = false;
-        public bool ASTShowDrawTextBar = true;
-        public bool ASTShowRedrawBar = true;
-        public bool ASTShowPrimaryResourceBar = true;
-        public Vector4 ASTSealSunColor = new(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f);
-        public Vector4 ASTSealLunarColor = new(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f);
-        public Vector4 ASTSealCelestialColor = new(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f);
-        public Vector4 ASTDotColor = new(20f / 255f, 80f / 255f, 168f / 255f, 100f / 100f);
-        public Vector4 ASTStarEarthlyColor = new(37f / 255f, 181f / 255f, 177f / 255f, 100f / 100f);
-        public Vector4 ASTStarGiantColor = new(198f / 255f, 154f / 255f, 199f / 255f, 100f / 100f);
-        public Vector4 ASTLightspeedColor = new(255f / 255f, 255f / 255f, 173f / 255f, 100f / 100f);
-        public Vector4 ASTStarGlowColor = new(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f);
-        public Vector4 ASTDivinationGlowColor = new(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f);
-        public Vector4 ASTDrawMeleeGlowColor = new(83f / 255f, 34f / 255f, 120f / 255f, 100f / 100f);
-        public Vector4 ASTDrawRangedGlowColor = new(124f / 255f, 34f / 255f, 120f / 255f, 100f / 100f);
-        public Vector4 ASTDrawCDColor = new(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f);
-        public Vector4 ASTDrawCDReadyColor = new(137f / 255f, 26f / 255f, 42f / 255f, 100f / 100f);
 
         #endregion
 

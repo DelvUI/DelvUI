@@ -530,10 +530,6 @@ namespace DelvUI.Config
                             case "Healers":
 
                                 ImGui.Text(""); //SPACING
-                                ImGui.Text("White Mage");
-                                _changed |= ImGui.ColorEdit4("##JobColorWHM", ref _pluginConfiguration.JobColorWHM);
-
-                                ImGui.Text(""); //SPACING
                                 ImGui.Text("Scholar");
                                 _changed |= ImGui.ColorEdit4("##JobColorSCH", ref _pluginConfiguration.JobColorSCH);
 
@@ -2052,151 +2048,6 @@ namespace DelvUI.Config
 
                     ImGui.EndTabItem();
                 }
-
-                if (ImGui.BeginTabItem("White Mage"))
-                {
-                    var whmBaseXOffset = _pluginConfiguration.WHMBaseXOffset;
-
-                    if (ImGui.DragInt("Base X Offset", ref whmBaseXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
-                    {
-                        _pluginConfiguration.WHMBaseXOffset = whmBaseXOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var whmBaseYOffset = _pluginConfiguration.WHMBaseYOffset;
-
-                    if (ImGui.DragInt("Base Y Offset", ref whmBaseYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
-                    {
-                        _pluginConfiguration.WHMBaseYOffset = whmBaseYOffset;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var lillyBarHeight = _pluginConfiguration.LillyBarHeight;
-
-                    if (ImGui.DragInt("Lilly Gauge Height", ref lillyBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.LillyBarHeight = lillyBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var lillyBarWidth = _pluginConfiguration.LillyBarWidth;
-
-                    if (ImGui.DragInt("Lilly Gauge Width", ref lillyBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.LillyBarWidth = lillyBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var lillyBarX = _pluginConfiguration.LillyBarX;
-
-                    if (ImGui.DragInt("Lilly Gauge X Offset", ref lillyBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.LillyBarX = lillyBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var lillyBarY = _pluginConfiguration.LillyBarY;
-
-                    if (ImGui.DragInt("Lilly Gauge Y Offset", ref lillyBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.LillyBarY = lillyBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var lillyBarPad = _pluginConfiguration.LillyBarPad;
-
-                    if (ImGui.DragInt("Lilly Gauge Padding", ref lillyBarPad, .1f, -100, 1000))
-                    {
-                        _pluginConfiguration.LillyBarPad = lillyBarPad;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var bloodLillyBarHeight = _pluginConfiguration.BloodLillyBarHeight;
-
-                    if (ImGui.DragInt("Blood Lilly Gauge Height", ref bloodLillyBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BloodLillyBarHeight = bloodLillyBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var bloodLillyBarWidth = _pluginConfiguration.BloodLillyBarWidth;
-
-                    if (ImGui.DragInt("Blood Lilly Gauge Width", ref bloodLillyBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.BloodLillyBarWidth = bloodLillyBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var bloodLillyBarX = _pluginConfiguration.BloodLillyBarX;
-
-                    if (ImGui.DragInt("Blood Lilly Gauge X Offset", ref bloodLillyBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.BloodLillyBarX = bloodLillyBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var bloodLillyBarY = _pluginConfiguration.BloodLillyBarY;
-
-                    if (ImGui.DragInt("Blood Lilly Gauge Y Offset", ref bloodLillyBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.BloodLillyBarY = bloodLillyBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var bloodLillyBarPad = _pluginConfiguration.BloodLillyBarPad;
-
-                    if (ImGui.DragInt("Blood Lilly Gauge Padding", ref bloodLillyBarPad, .1f, -100, 1000))
-                    {
-                        _pluginConfiguration.BloodLillyBarPad = bloodLillyBarPad;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var diaBarHeight = _pluginConfiguration.DiaBarHeight;
-
-                    if (ImGui.DragInt("Dia Bar Height", ref diaBarHeight, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.DiaBarHeight = diaBarHeight;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var diaBarWidth = _pluginConfiguration.DiaBarWidth;
-
-                    if (ImGui.DragInt("Dia Bar Width", ref diaBarWidth, .1f, 1, 1000))
-                    {
-                        _pluginConfiguration.DiaBarWidth = diaBarWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var diaBarX = _pluginConfiguration.DiaBarX;
-
-                    if (ImGui.DragInt("Dia Bar X Offset", ref diaBarX, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.DiaBarX = diaBarX;
-                        _pluginConfiguration.Save();
-                    }
-
-                    var diaBarY = _pluginConfiguration.DiaBarY;
-
-                    if (ImGui.DragInt("Dia Bar Y Offset", ref diaBarY, .1f, -1000, 1000))
-                    {
-                        _pluginConfiguration.DiaBarY = diaBarY;
-                        _pluginConfiguration.Save();
-                    }
-
-                    _changed |= ImGui.Checkbox("Show Lilly Bar", ref _pluginConfiguration.WHMShowLillyBar);
-                    _changed |= ImGui.Checkbox("Show Dia Bar", ref _pluginConfiguration.WHMShowDiaBar);
-
-                    _changed |= ImGui.Checkbox("Show Primary Resource Bar", ref _pluginConfiguration.WHMShowPrimaryResourceBar);
-
-                    _changed |= ImGui.ColorEdit4("Lilly Bar Color", ref _pluginConfiguration.WhmLillyColor);
-
-                    _changed |= ImGui.ColorEdit4("Lilly Charging Bar Color", ref _pluginConfiguration.WhmLillyChargingColor);
-
-                    _changed |= ImGui.ColorEdit4("Blood Lilly Bar Color", ref _pluginConfiguration.WhmBloodLillyColor);
-                    _changed |= ImGui.ColorEdit4("Dia Bar Color", ref _pluginConfiguration.WhmDiaColor);
-
-                    ImGui.EndTabItem();
-                }
             }
 
             ImGui.EndTabBar();
@@ -3538,12 +3389,6 @@ namespace DelvUI.Config
 
                     ImGui.EndTabItem();
                 }
-
-                // if (ImGui.BeginTabItem("Black Mage"))
-                // {
-                //     _changed |= _pluginConfiguration.BLMConfig.Draw();
-                //     ImGui.EndTabItem();
-                // }
             }
 
             ImGui.EndTabBar();
