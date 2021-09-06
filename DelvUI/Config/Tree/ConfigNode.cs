@@ -119,7 +119,9 @@ namespace DelvUI.Config.Tree
 
                 ImGui.SameLine();
 
-                if (ImGui.Button("Donate!")) { }
+                if (ImGui.Button("Donate!")) {
+                    System.Diagnostics.Process.Start("https://ko-fi.com/DelvUI");
+                }
             }
 
             ImGui.EndGroup(); // Bottom Bar
