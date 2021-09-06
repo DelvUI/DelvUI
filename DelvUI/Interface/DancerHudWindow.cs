@@ -77,7 +77,8 @@ namespace DelvUI.Interface
         private Dictionary<string, uint> StepEntrechatColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 7];
         private Dictionary<string, uint> StepJeteColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 8];
         private Dictionary<string, uint> StepPirouetteColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 9];
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 10];
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
+        private Dictionary<string, uint> PartialFillColor => PluginConfiguration.MiscColorMap["partial"];
         private Dictionary<string, uint> DanceReadyColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 11];
         private Dictionary<string, uint> DevilmentColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 12];
         private Dictionary<string, uint> FlourishingCascadeColor => PluginConfiguration.JobColorMap[Jobs.DNC * 1000 + 13];
@@ -131,7 +132,7 @@ namespace DelvUI.Interface
                                     .SetChunks(2)
                                     .SetChunkPadding(EspritPadding)
                                     .SetBackgroundColor(EmptyColor["background"])
-                                    .AddInnerBar(gauge.Esprit, 100, EspritColor, EmptyColor);
+                                    .AddInnerBar(gauge.Esprit, 100, EspritColor, PartialFillColor);
 
             if (EspritText)
             {
