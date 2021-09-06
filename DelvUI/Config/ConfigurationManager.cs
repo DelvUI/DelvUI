@@ -27,21 +27,24 @@ namespace DelvUI.Config
 
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface)
         {
-            AstrologianHudConfig astConfig = new();
-            BardHudConfig brdConfig = new();
-            BlackMageHudConfig blmConfig = new();
-            DancerHudConfig dncConfig = new();
-            DarkKnightHudConfig drkConfig = new();
-            DragoonHudConfig drgConfig = new();
-            GunbreakerHudConfig gnbConfig = new();
-            MachinistHudConfig mchConfig = new();
-            NinjaHudConfig ninConfig = new();
-            PaladinHudConfig pldConfig = new();
-            SummonerHudConfig smnConfig = new();
-            WarriorHudConfig warConfig = new();
-            WhiteMageHudConfig whmConfig = new();
+            var configObjects = new PluginConfigObject[]
+            {
+                new AstrologianHudConfig(),
+                new BardHudConfig(),
+                new BlackMageHudConfig(),
+                new DancerHudConfig(),
+                new DarkKnightHudConfig(),
+                new DragoonHudConfig(),
+                new GunbreakerHudConfig(),
+                new NinjaHudConfig(),
+                new PaladinHudConfig(),
+                new RedMageHudConfig()
+                new SummonerHudConfig(),
+                new WarriorHudConfig(),
+                new WhiteMageHudConfig(),
+            };
 
-            return Initialize(pluginInterface, astConfig, brdConfig, blmConfig, dncConfig, drgConfig, drkConfig, gnbConfig, mchConfig, ninConfig, pldConfig, smnConfig, warConfig, whmConfig);
+            return Initialize(pluginInterface, configObjects);
         }
 
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface, params PluginConfigObject[] configObjects)
