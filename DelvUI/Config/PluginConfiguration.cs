@@ -768,69 +768,6 @@ namespace DelvUI.Config
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorRDM.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorRDM.AdjustColor(.1f))
                 },
-                [Jobs.RDM * 1000] = new() // Mana Bar
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarColor.AdjustColor(.1f))
-                },
-                [Jobs.RDM * 1000 + 1] = new() // Mana bar threshold
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarBelowThresholdColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarBelowThresholdColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarBelowThresholdColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMManaBarBelowThresholdColor.AdjustColor(.1f))
-                },
-                [Jobs.RDM * 1000 + 2] = new() // White mana bar
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMWhiteManaBarColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMWhiteManaBarColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMWhiteManaBarColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMWhiteManaBarColor.AdjustColor(.1f))
-                },
-                [Jobs.RDM * 1000 + 3] = new() // Black mana bar
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMBlackManaBarColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMBlackManaBarColor.AdjustColor(-.5f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMBlackManaBarColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMBlackManaBarColor.AdjustColor(.1f))
-                },
-                [Jobs.RDM * 1000 + 4] = new() // Balance
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMBalanceBarColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMBalanceBarColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMBalanceBarColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMBalanceBarColor.AdjustColor(.1f))
-                },
-                [Jobs.RDM * 1000 + 5] = new() // Acceleration
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMAccelerationBarColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMAccelerationBarColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMAccelerationBarColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMAccelerationBarColor.AdjustColor(.1f))
-                },
-                [Jobs.RDM * 1000 + 6] = new() // Dualcast
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMDualcastBarColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMDualcastBarColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMDualcastBarColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMDualcastBarColor.AdjustColor(.1f))
-                },
-                [Jobs.RDM * 1000 + 7] = new() // Verstone
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMVerstoneBarColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMVerstoneBarColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMVerstoneBarColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMVerstoneBarColor.AdjustColor(.1f))
-                },
-                [Jobs.RDM * 1000 + 8] = new() // Verfire
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(RDMVerfireBarColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(RDMVerfireBarColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(RDMVerfireBarColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(RDMVerfireBarColor.AdjustColor(.1f))
-                },
                 [Jobs.BLU] = new()
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorBLU),
@@ -1237,59 +1174,6 @@ namespace DelvUI.Config
         public Vector4 MNKPerfectBalanceColor = new(150f / 255f, 255f, 255f, 100f);
         public Vector4 MNKTrueNorthColor = new(255f, 225f / 255f, 189f / 255f, 100f);
         public Vector4 MNKFormsColor = new(36f / 255f, 131f / 255f, 255f, 100f);
-
-        #endregion
-
-        #region RDM Configuration
-
-        public int RDMVerticalOffset { get; set; } = -2;
-        public int RDMHorizontalOffset { get; set; }
-        public int RDMHorizontalSpaceBetweenBars { get; set; } = 2;
-        public int RDMManaBarHeight { get; set; } = 18;
-        public int RDMManaBarWidth { get; set; } = 253;
-        public int RDMManaBarXOffset { get; set; }
-        public int RDMManaBarYOffset { get; set; }
-        public int RDMWhiteManaBarHeight { get; set; } = 20;
-        public int RDMWhiteManaBarWidth { get; set; } = 114;
-        public int RDMWhiteManaBarXOffset { get; set; } = -13;
-        public int RDMWhiteManaBarYOffset { get; set; } = -40;
-        public bool RDMWhiteManaBarInversed = true;
-        public bool RDMShowWhiteManaValue = true;
-        public int RDMBlackManaBarHeight { get; set; } = 20;
-        public int RDMBlackManaBarWidth { get; set; } = 114;
-        public int RDMBlackManaBarXOffset { get; set; } = 13;
-        public int RDMBlackManaBarYOffset { get; set; } = -40;
-        public bool RDMBlackManaBarInversed = false;
-        public bool RDMShowBlackManaValue = true;
-        public int RDMBalanceBarHeight { get; set; } = 20;
-        public int RDMBalanceBarWidth { get; set; } = 21;
-        public int RDMBalanceBarXOffset { get; set; }
-        public int RDMBalanceBarYOffset { get; set; } = -40;
-        public int RDMAccelerationBarHeight { get; set; } = 12;
-        public int RDMAccelerationBarWidth { get; set; } = 83;
-        public int RDMAccelerationBarXOffset { get; set; }
-        public int RDMAccelerationBarYOffset { get; set; } = -54;
-        public bool RDMShowManaValue = true;
-        public bool RDMShowManaThresholdMarker = true;
-        public int RDMManaThresholdValue { get; set; } = 2600;
-        public bool RDMShowDualCast = true;
-        public int RDMDualCastHeight { get; set; } = 16;
-        public int RDMDualCastWidth { get; set; } = 16;
-        public int RDMDualCastXOffset { get; set; }
-        public int RDMDualCastYOffset { get; set; } = -72;
-        public bool RDMShowVerstoneProcs = true;
-        public bool RDMShowVerfireProcs = true;
-        public int RDMProcsHeight { get; set; } = 7;
-
-        public Vector4 RDMManaBarColor = new(0f / 255f, 142f / 255f, 254f / 255f, 100f / 100f);
-        public Vector4 RDMManaBarBelowThresholdColor = new(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f);
-        public Vector4 RDMWhiteManaBarColor = new(221f / 255f, 212f / 255f, 212f / 255f, 100f / 100f);
-        public Vector4 RDMBlackManaBarColor = new(60f / 255f, 81f / 255f, 197f / 255f, 100f / 100f);
-        public Vector4 RDMBalanceBarColor = new(195f / 255f, 35f / 255f, 35f / 255f, 100f / 100f);
-        public Vector4 RDMAccelerationBarColor = new(194f / 255f, 74f / 255f, 74f / 255f, 100f / 100f);
-        public Vector4 RDMDualcastBarColor = new(204f / 255f, 17f / 255f, 255f / 95f, 100f / 100f);
-        public Vector4 RDMVerstoneBarColor = new(228f / 255f, 188f / 255f, 145 / 255f, 90f / 100f);
-        public Vector4 RDMVerfireBarColor = new(238f / 255f, 119f / 255f, 17 / 255f, 90f / 100f);
 
         #endregion
 
