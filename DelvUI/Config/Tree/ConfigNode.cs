@@ -1,13 +1,13 @@
+using DelvUI.Config.Attributes;
+using ImGuiNET;
+using ImGuiScene;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
-using DelvUI.Config.Attributes;
-using ImGuiNET;
-using ImGuiScene;
-using Newtonsoft.Json;
 
 namespace DelvUI.Config.Tree
 {
@@ -400,94 +400,69 @@ namespace DelvUI.Config.Tree
 
         public override void Draw(ref bool changed)
         {
-            FieldInfo[] fields = ConfigObject.GetType().GetFields();
+            var fields = ConfigObject.GetType().GetFields();
+            var drawList = new List<KeyValuePair<int, CategoryField>>();
+            var collapseWithList = new List<FieldInfo>();
 
             foreach (FieldInfo field in fields)
             {
-                var fieldVal = field.GetValue(ConfigObject);
-
+                var hasOrderAttribute = false;
                 foreach (var attribute in field.GetCustomAttributes(true))
                 {
-                    if (attribute is CheckboxAttribute checkboxAttribute)
+                    if (attribute is OrderAttribute orderAttribute)
                     {
-                        var boolVal = (bool)fieldVal;
-
-                        if (ImGui.Checkbox(checkboxAttribute.friendlyName, ref boolVal))
-                        {
-                            field.SetValue(ConfigObject, boolVal);
-                            changed = true;
-                        }
+                        drawList.Add(new KeyValuePair<int, CategoryField>(orderAttribute.pos, new CategoryField(field, ConfigObject)));
+                        hasOrderAttribute = true;
                     }
-                    else if (attribute is DragFloatAttribute dragFloatAttribute)
+                    else if (attribute is CollapseControlAttribute collapseControlAtrribute)
                     {
-                        var floatVal = (float)fieldVal;
-
-                        if (ImGui.DragFloat(dragFloatAttribute.friendlyName, ref floatVal, dragFloatAttribute.velocity, dragFloatAttribute.min, dragFloatAttribute.max))
-                        {
-                            field.SetValue(ConfigObject, floatVal);
-                            changed = true;
-                        }
+                        CategoryField categoryField = new CategoryField(field, ConfigObject);
+                        categoryField.CategoryId = collapseControlAtrribute.id;
+                        drawList.Add(new KeyValuePair<int, CategoryField>(collapseControlAtrribute.pos, categoryField));
+                        hasOrderAttribute = true;
                     }
-                    else if (attribute is DragIntAttribute dragIntAttribute)
+                    else if (attribute is CollapseWithAttribute collapseWithAttribute)
                     {
-                        var intVal = (int)fieldVal;
-
-                        if (ImGui.DragInt(dragIntAttribute.friendlyName, ref intVal, dragIntAttribute.velocity, dragIntAttribute.min, dragIntAttribute.max))
-                        {
-                            field.SetValue(ConfigObject, intVal);
-                            changed = true;
-                        }
-                    }
-                    else if (attribute is DragFloat2Attribute dragFloat2Attribute)
-                    {
-                        Vector2 floatVal = (Vector2)fieldVal;
-
-                        if (ImGui.DragFloat2(dragFloat2Attribute.friendlyName, ref floatVal, dragFloat2Attribute.velocity, dragFloat2Attribute.min, dragFloat2Attribute.max))
-                        {
-                            field.SetValue(ConfigObject, floatVal);
-                            changed = true;
-                        }
-                    }
-                    else if (attribute is DragInt2Attribute dragInt2Attribute)
-                    {
-                        Vector2 intVal = (Vector2)fieldVal;
-
-                        if (ImGui.DragFloat2(dragInt2Attribute.friendlyName, ref intVal, dragInt2Attribute.velocity, dragInt2Attribute.min, dragInt2Attribute.max))
-                        {
-                            field.SetValue(ConfigObject, intVal);
-                            changed = true;
-                        }
-                    }
-                    else if (attribute is InputTextAttribute inputTextAttribute)
-                    {
-                        var stringVal = (string)fieldVal;
-
-                        if (ImGui.InputText(inputTextAttribute.friendlyName, ref stringVal, inputTextAttribute.maxLength))
-                        {
-                            field.SetValue(ConfigObject, stringVal);
-                            changed = true;
-                        }
-                    }
-                    else if (attribute is ColorEdit4Attribute colorEdit4Attribute)
-                    {
-                        PluginConfigColor colorVal = (PluginConfigColor)fieldVal;
-                        Vector4 vector = colorVal.Vector;
-
-                        if (ImGui.ColorEdit4(colorEdit4Attribute.friendlyName, ref vector))
-                        {
-                            colorVal.Vector = vector;
-                            field.SetValue(ConfigObject, colorVal);
-                            changed = true;
-                        }
+                        collapseWithList.Add(field);
+                        hasOrderAttribute = true;
                     }
                 }
+                if (!hasOrderAttribute)
+                {
+                    drawList.Add(new KeyValuePair<int, CategoryField>(int.MaxValue, new CategoryField(field, ConfigObject)));
+                }
+            }
+
+            foreach (var field in collapseWithList)
+            {
+                foreach (var attribute in field.GetCustomAttributes(true))
+                {
+                    if (attribute is CollapseWithAttribute collapseWithAttribute)
+                    {
+                        foreach (var categoryField in drawList)
+                        {
+                            if (categoryField.Value.CategoryId == collapseWithAttribute.id)
+                            {
+                                categoryField.Value.AddChild(collapseWithAttribute.pos, field);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+
+            drawList.Sort((x, y) => x.Key - y.Key);
+            foreach (var pair in drawList)
+            {
+                pair.Value.Draw(ref changed);
             }
         }
 
         public override void Save(string path)
         {
             Directory.CreateDirectory(path);
-            var finalPath = path + ".json";
+            string finalPath = path + ".json";
 
             File.WriteAllText(
                 finalPath,
@@ -501,7 +476,7 @@ namespace DelvUI.Config.Tree
 
         public override void Load(string path)
         {
-            FileInfo finalPath = new FileInfo(path + ".json");
+            var finalPath = new FileInfo(path + ".json");
 
             if (!finalPath.Exists)
             {
@@ -514,19 +489,139 @@ namespace DelvUI.Config.Tree
             // it fails. In order to fix this we need to specify the specific subclass, in order to do this during runtime we must use reflection to set the generic.
             if (ConfigObject.GetType().BaseType == typeof(PluginConfigObject))
             {
-                MethodInfo methodInfo = GetType().GetMethod("LoadForType");
-                MethodInfo function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
+                var methodInfo = GetType().GetMethod("LoadForType");
+                var function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
                 ConfigObject = (PluginConfigObject)function.Invoke(this, new object[] { finalPath.FullName });
             }
         }
 
         public T LoadForType<T>(string path) where T : PluginConfigObject
         {
-            FileInfo file = new FileInfo(path);
+            var file = new FileInfo(path);
 
             return JsonConvert.DeserializeObject<T>(File.ReadAllText(file.FullName));
         }
 
         public override ConfigPageNode GetOrAddConfig(PluginConfigObject configObject) => this;
+    }
+
+    public class CategoryField
+    {
+        public SortedDictionary<int, FieldInfo> Children;
+        public FieldInfo MainField;
+        public PluginConfigObject ConfigObject;
+        public int CategoryId;
+
+        public CategoryField(FieldInfo mainField, PluginConfigObject configObject)
+        {
+            MainField = mainField;
+            ConfigObject = configObject;
+            CategoryId = -1;
+            Children = new SortedDictionary<int, FieldInfo>();
+        }
+
+        public void AddChild(int position, FieldInfo field)
+        {
+            Children.Add(position, field);
+        }
+
+        public void Draw(ref bool changed)
+        {
+            Draw(ref changed, MainField, 0);
+            if (CategoryId != -1 && (bool)MainField.GetValue(ConfigObject))
+            {
+                ImGui.BeginGroup();
+                ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 2));
+                foreach (var child in Children.Values)
+                {
+                    Draw(ref changed, child, 4);
+                }
+                ImGui.EndGroup();
+                ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin() + new Vector2(0, -2), ImGui.GetItemRectMax() + new Vector2(ImGui.GetContentRegionAvail().X - ImGui.GetItemRectMax().X + ImGui.GetItemRectMin().X - 4, 4), 0xFF4A4141);
+                ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 2));
+            }
+        }
+
+        public void Draw(ref bool changed, FieldInfo field, int xOffset)
+        {
+            ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(xOffset, 0));
+            object fieldVal = field.GetValue(ConfigObject);
+
+            foreach (var attribute in field.GetCustomAttributes(true))
+            {
+                if (attribute is CheckboxAttribute checkboxAttribute)
+                {
+                    bool boolVal = (bool)fieldVal;
+
+                    if (ImGui.Checkbox(checkboxAttribute.friendlyName, ref boolVal))
+                    {
+                        field.SetValue(ConfigObject, boolVal);
+                        changed = true;
+                    }
+                }
+                else if (attribute is DragFloatAttribute dragFloatAttribute)
+                {
+                    float floatVal = (float)fieldVal;
+
+                    if (ImGui.DragFloat(dragFloatAttribute.friendlyName, ref floatVal, dragFloatAttribute.velocity, dragFloatAttribute.min, dragFloatAttribute.max))
+                    {
+                        field.SetValue(ConfigObject, floatVal);
+                        changed = true;
+                    }
+                }
+                else if (attribute is DragIntAttribute dragIntAttribute)
+                {
+                    int intVal = (int)fieldVal;
+
+                    if (ImGui.DragInt(dragIntAttribute.friendlyName, ref intVal, dragIntAttribute.velocity, dragIntAttribute.min, dragIntAttribute.max))
+                    {
+                        field.SetValue(ConfigObject, intVal);
+                        changed = true;
+                    }
+                }
+                else if (attribute is DragFloat2Attribute dragFloat2Attribute)
+                {
+                    Vector2 floatVal = (Vector2)fieldVal;
+
+                    if (ImGui.DragFloat2(dragFloat2Attribute.friendlyName, ref floatVal, dragFloat2Attribute.velocity, dragFloat2Attribute.min, dragFloat2Attribute.max))
+                    {
+                        field.SetValue(ConfigObject, floatVal);
+                        changed = true;
+                    }
+                }
+                else if (attribute is DragInt2Attribute dragInt2Attribute)
+                {
+                    Vector2 intVal = (Vector2)fieldVal;
+
+                    if (ImGui.DragFloat2(dragInt2Attribute.friendlyName, ref intVal, dragInt2Attribute.velocity, dragInt2Attribute.min, dragInt2Attribute.max))
+                    {
+                        field.SetValue(ConfigObject, intVal);
+                        changed = true;
+                    }
+                }
+                else if (attribute is InputTextAttribute inputTextAttribute)
+                {
+                    string stringVal = (string)fieldVal;
+
+                    if (ImGui.InputText(inputTextAttribute.friendlyName, ref stringVal, inputTextAttribute.maxLength))
+                    {
+                        field.SetValue(ConfigObject, stringVal);
+                        changed = true;
+                    }
+                }
+                else if (attribute is ColorEdit4Attribute colorEdit4Attribute)
+                {
+                    PluginConfigColor colorVal = (PluginConfigColor)fieldVal;
+                    var vector = colorVal.Vector;
+
+                    if (ImGui.ColorEdit4(colorEdit4Attribute.friendlyName, ref vector))
+                    {
+                        colorVal.Vector = vector;
+                        field.SetValue(ConfigObject, colorVal);
+                        changed = true;
+                    }
+                }
+            }
+        }
     }
 }

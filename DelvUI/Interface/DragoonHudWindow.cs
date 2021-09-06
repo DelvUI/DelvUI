@@ -1,113 +1,82 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
-using DelvUI.Config;
-using ImGuiNET;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.Actors.Types;
+using Dalamud.Game.ClientState.Structs;
+using Dalamud.Game.ClientState.Structs.JobGauge;
+using Dalamud.Plugin;
+using DelvUI.Config;
+using DelvUI.Config.Attributes;
+using ImGuiNET;
+using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface
 {
     public class DragoonHudWindow : HudWindow
     {
-
         public DragoonHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => Jobs.DRG;
-        private new int XOffset => PluginConfiguration.DRGBaseXOffset;
-        private new int YOffset => PluginConfiguration.DRGBaseYOffset;
-        private int ChaosThrustBarWidth => PluginConfiguration.DRGChaosThrustBarWidth;
-        private int ChaosThrustBarHeight => PluginConfiguration.DRGChaosThrustBarHeight;
-        private int ChaosThrustXOffset => PluginConfiguration.DRGChaosThrustXOffset;
-        private int ChaosThrustYOffset => PluginConfiguration.DRGChaosThrustYOffset;
-        private int DisembowelBarWidth => PluginConfiguration.DRGDisembowelBarWidth;
-        private int DisembowelBarHeight => PluginConfiguration.DRGDisembowelBarHeight;
-        private int DisembowelXOffset => PluginConfiguration.DRGDisembowelBarXOffset;
-        private int DisembowelYOffset => PluginConfiguration.DRGDisembowelBarYOffset;
-        private int EyeOfTheDragonBarHeight => PluginConfiguration.DRGEyeOfTheDragonHeight;
-        private int EyeOfTheDragonBarWidth => PluginConfiguration.DRGEyeOfTheDragonBarWidth;
-        private int EyeOfTheDragonPadding => PluginConfiguration.DRGEyeOfTheDragonPadding;
-        private int EyeOfTheDragonXOffset => PluginConfiguration.DRGEyeOfTheDragonXOffset;
-        private int EyeOfTheDragonYOffset => PluginConfiguration.DRGEyeOfTheDragonYOffset;
-        private int BloodBarWidth => PluginConfiguration.DRGBloodBarWidth;
-        private int BloodBarHeight => PluginConfiguration.DRGBloodBarHeight;
-        private int BloodBarXOffset => PluginConfiguration.DRGBloodBarXOffset;
-        private int BloodBarYOffset => PluginConfiguration.DRGBloodBarYOffset;
-        private bool ShowChaosThrustTimer => PluginConfiguration.DRGShowChaosThrustTimer;
-        private bool ShowDisembowelTimer => PluginConfiguration.DRGShowDisembowelBuffTimer;
-        private bool ShowEyeOfTheDragon => PluginConfiguration.DRGShowEyeOfTheDragon;
-        private bool ShowBloodBar => PluginConfiguration.DRGShowBloodBar;
-        private bool ShowChaosThrustText => PluginConfiguration.DRGShowChaosThrustText;
-        private bool ShowBloodText => PluginConfiguration.DRGShowBloodText;
-        private bool ShowDisembowelText => PluginConfiguration.DRGShowDisembowelText;
-        private Dictionary<string, uint> EyeOfTheDragonColor => PluginConfiguration.JobColorMap[Jobs.DRG * 1000];
-        private Dictionary<string, uint> BloodOfTheDragonColor => PluginConfiguration.JobColorMap[Jobs.DRG * 1000 + 1];
-        private Dictionary<string, uint> LifeOfTheDragonColor => PluginConfiguration.JobColorMap[Jobs.DRG * 1000 + 2];
-        private Dictionary<string, uint> DisembowelColor => PluginConfiguration.JobColorMap[Jobs.DRG * 1000 + 3];
-        private Dictionary<string, uint> ChaosThrustColor => PluginConfiguration.JobColorMap[Jobs.DRG * 1000 + 4];
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.DRG * 1000 + 5];
+        private readonly DragoonHudConfig _config = (DragoonHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new DragoonHudConfig());
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
+
         protected override List<uint> GetJobSpecificBuffs()
         {
-            uint[] ids = { 
+            uint[] ids =
+            {
                 // Dive Ready
                 1243,
                 // Life Surge
-                116,
-                2175,
+                116, 2175,
                 // Lance Charge
                 1864,
                 // Right Eye
-                1183,
-                1453,
-                1910,
+                1183, 1453, 1910,
                 // Disembowel
-                121,
-                1914,
+                121, 1914
             };
+
             return new List<uint>(ids);
         }
 
         protected override void Draw(bool _)
         {
-            if (ShowChaosThrustTimer)
+            if (_config.ShowChaosThrustBar)
             {
                 DrawChaosThrustBar();
             }
 
-            if (ShowDisembowelTimer)
+            if (_config.ShowDisembowelBar)
             {
                 DrawDisembowelBar();
             }
 
-            if (ShowEyeOfTheDragon)
+            if (_config.ShowEyeOfTheDragonBar)
             {
                 DrawEyeOfTheDragonBars();
             }
 
-            if (ShowBloodBar)
+            if (_config.ShowBloodBar)
             {
                 DrawBloodOfTheDragonBar();
             }
         }
 
-        protected override void DrawPrimaryResourceBar()
-        {
-            // Never draw the mana bar for Dragoons as it's useless.
-        }
+        // Never draw the mana bar for Dragoons as it's useless.
+        protected override void DrawPrimaryResourceBar() { }
 
         private void DrawChaosThrustBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             var scale = 0f;
             var duration = 0;
 
             if (target is Chara)
             {
-                var chaosThrust = target.StatusEffects.FirstOrDefault(
+                StatusEffect chaosThrust = target.StatusEffects.FirstOrDefault(
                     o => (o.EffectId == 1312 || o.EffectId == 118) && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                 );
 
@@ -121,102 +90,99 @@ namespace DelvUI.Interface
                 }
             }
 
-            var barSize = new Vector2(ChaosThrustBarWidth, ChaosThrustBarHeight);
-            var xPos = CenterX - XOffset + ChaosThrustXOffset;
-            var yPos = CenterY + YOffset + ChaosThrustYOffset;
-            var cursorPos = new Vector2(xPos, yPos);
-            var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
-            var chaosThrustBarSize = new Vector2(ChaosThrustBarWidth * scale, ChaosThrustBarHeight);
+            var xPos = CenterX - XOffset + _config.BaseOffset.X;
+            var yPos = CenterY + YOffset + _config.BaseOffset.Y;
+            Vector2 cursorPos = new(xPos, yPos);
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            drawList.AddRectFilled(cursorPos, cursorPos + _config.ChaosThrustBarSize, EmptyColor["background"]);
+            Vector2 chaosThrustBarSize = new(_config.ChaosThrustBarSize.X * scale, _config.ChaosThrustBarSize.Y);
 
             drawList.AddRectFilledMultiColor(
                 cursorPos,
                 cursorPos + chaosThrustBarSize,
-                ChaosThrustColor["gradientLeft"],
-                ChaosThrustColor["gradientRight"],
-                ChaosThrustColor["gradientRight"],
-                ChaosThrustColor["gradientLeft"]
+                _config.ChaosThrustBarColor.Map["gradientLeft"],
+                _config.ChaosThrustBarColor.Map["gradientRight"],
+                _config.ChaosThrustBarColor.Map["gradientRight"],
+                _config.ChaosThrustBarColor.Map["gradientLeft"]
             );
 
-            if (ShowChaosThrustText && duration > 0f)
+            if (_config.ShowChaosThrustBarText && duration > 0f)
             {
                 var durationText = duration.ToString();
-                var textSize = ImGui.CalcTextSize(durationText);
-                DrawOutlinedText(duration.ToString(), new Vector2(cursorPos.X + 5f, cursorPos.Y + ChaosThrustBarHeight / 2f - textSize.Y / 2f));
+                Vector2 textSize = ImGui.CalcTextSize(durationText);
+                DrawOutlinedText(duration.ToString(), new Vector2(cursorPos.X + 5f, cursorPos.Y + _config.ChaosThrustBarSize.Y / 2f - textSize.Y / 2f));
             }
 
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            drawList.AddRect(cursorPos, cursorPos + _config.ChaosThrustBarSize, 0xFF000000);
         }
 
         private void DrawEyeOfTheDragonBars()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
+            DRGGauge gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
 
-            var barSize = new Vector2(EyeOfTheDragonBarWidth, EyeOfTheDragonBarHeight);
-            var xPos = CenterX - XOffset + EyeOfTheDragonXOffset;
-            var yPos = CenterY + YOffset + EyeOfTheDragonYOffset;
-            var cursorPos = new Vector2(xPos, yPos);
+            var xPos = CenterX - XOffset + _config.EyeOfTheDragonBarPosition.X;
+            var yPos = CenterY + YOffset + _config.EyeOfTheDragonBarPosition.Y;
+            Vector2 cursorPos = new(xPos, yPos);
             var eyeCount = gauge.EyeCount;
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
             for (byte i = 0; i < 2; i++)
             {
-                cursorPos = new Vector2(cursorPos.X + (EyeOfTheDragonBarWidth + EyeOfTheDragonPadding) * i, cursorPos.Y);
+                cursorPos = new Vector2(cursorPos.X + (_config.EyeOfTheDragonBarSize.X + _config.EyeOfTheDragonBarPadding) * i, cursorPos.Y);
 
                 if (eyeCount >= i + 1)
                 {
                     drawList.AddRectFilledMultiColor(
                         cursorPos,
-                        cursorPos + barSize,
-                        EyeOfTheDragonColor["gradientLeft"],
-                        EyeOfTheDragonColor["gradientRight"],
-                        EyeOfTheDragonColor["gradientRight"],
-                        EyeOfTheDragonColor["gradientLeft"]
+                        cursorPos + _config.EyeOfTheDragonBarSize,
+                        _config.EyeOfTheDragonColor.Map["gradientLeft"],
+                        _config.EyeOfTheDragonColor.Map["gradientRight"],
+                        _config.EyeOfTheDragonColor.Map["gradientRight"],
+                        _config.EyeOfTheDragonColor.Map["gradientLeft"]
                     );
                 }
                 else
                 {
-                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
+                    drawList.AddRectFilled(cursorPos, cursorPos + _config.EyeOfTheDragonBarSize, EmptyColor["background"]);
                 }
 
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+                drawList.AddRect(cursorPos, cursorPos + _config.EyeOfTheDragonBarSize, 0xFF000000);
             }
         }
 
         private void DrawBloodOfTheDragonBar()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
+            DRGGauge gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
 
-            var xPos = CenterX - XOffset + BloodBarXOffset;
-            var yPos = CenterY + YOffset + BloodBarYOffset;
-            var cursorPos = new Vector2(xPos, yPos);
-            var barSize = new Vector2(BloodBarWidth, BloodBarHeight);
+            var xPos = CenterX - XOffset + _config.BaseOffset.X;
+            var yPos = CenterY + YOffset + _config.BaseOffset.Y;
+            Vector2 cursorPos = new(xPos, yPos);
 
-            var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            drawList.AddRectFilled(cursorPos, cursorPos + _config.BloodBarSize, EmptyColor["background"]);
 
             var maxTimerMs = 30 * 1000;
             var currTimerMs = gauge.BOTDTimer;
 
             if (currTimerMs == 0)
             {
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+                drawList.AddRect(cursorPos, cursorPos + _config.BloodBarSize, 0xFF000000);
 
                 return;
             }
 
             var scale = (float)currTimerMs / maxTimerMs;
-            var botdBarSize = new Vector2(BloodBarWidth * scale, BloodBarHeight);
+            Vector2 botdBarSize = new(_config.BloodBarSize.X * scale, _config.BloodBarSize.Y);
 
             if (gauge.BOTDState == BOTDState.LOTD)
             {
                 drawList.AddRectFilledMultiColor(
                     cursorPos,
                     cursorPos + botdBarSize,
-                    LifeOfTheDragonColor["gradientLeft"],
-                    LifeOfTheDragonColor["gradientRight"],
-                    LifeOfTheDragonColor["gradientRight"],
-                    LifeOfTheDragonColor["gradientLeft"]
+                    _config.LifeOfTheDragonColor.Map["gradientLeft"],
+                    _config.LifeOfTheDragonColor.Map["gradientRight"],
+                    _config.LifeOfTheDragonColor.Map["gradientRight"],
+                    _config.LifeOfTheDragonColor.Map["gradientLeft"]
                 );
             }
             else
@@ -224,70 +190,158 @@ namespace DelvUI.Interface
                 drawList.AddRectFilledMultiColor(
                     cursorPos,
                     cursorPos + botdBarSize,
-                    BloodOfTheDragonColor["gradientLeft"],
-                    BloodOfTheDragonColor["gradientRight"],
-                    BloodOfTheDragonColor["gradientRight"],
-                    BloodOfTheDragonColor["gradientLeft"]
+                    _config.BloodOfTheDragonColor.Map["gradientLeft"],
+                    _config.BloodOfTheDragonColor.Map["gradientRight"],
+                    _config.BloodOfTheDragonColor.Map["gradientRight"],
+                    _config.BloodOfTheDragonColor.Map["gradientLeft"]
                 );
             }
 
-            if (ShowBloodText)
+            if (_config.ShowBloodBarText)
             {
                 var durationText = ((int)(currTimerMs / 1000f)).ToString();
-                var textSize = ImGui.CalcTextSize(durationText);
-                DrawOutlinedText(durationText, new Vector2(cursorPos.X + 5f, cursorPos.Y + BloodBarHeight / 2f - textSize.Y / 2f));
+                Vector2 textSize = ImGui.CalcTextSize(durationText);
+                DrawOutlinedText(durationText, new Vector2(cursorPos.X + 5f, cursorPos.Y + _config.BloodBarSize.Y / 2f - textSize.Y / 2f));
             }
 
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            drawList.AddRect(cursorPos, cursorPos + _config.BloodBarSize, 0xFF000000);
         }
 
         private void DrawDisembowelBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            var xPos = CenterX - XOffset + DisembowelXOffset;
-            var yPos = CenterY + YOffset + DisembowelYOffset;
-            var barSize = new Vector2(DisembowelBarWidth, DisembowelBarHeight);
-            var cursorPos = new Vector2(xPos, yPos);
-            var drawList = ImGui.GetWindowDrawList();
-            var disembowelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1914 || o.EffectId == 121);
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
+            var xPos = CenterX - XOffset + _config.DisembowelBarPosition.X;
+            var yPos = CenterY + YOffset + _config.DisembowelBarPosition.Y;
+            Vector2 cursorPos = new(xPos, yPos);
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            IEnumerable<StatusEffect> disembowelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1914 or 121);
+            drawList.AddRectFilled(cursorPos, cursorPos + _config.DisembowelBarSize, EmptyColor["background"]);
 
-            if (disembowelBuff.Count() == 0)
+            if (!disembowelBuff.Any())
             {
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+                drawList.AddRect(cursorPos, cursorPos + _config.DisembowelBarSize, 0xFF000000);
 
                 return;
             }
 
-            var buff = disembowelBuff.First();
+            StatusEffect buff = disembowelBuff.First();
 
             if (buff.Duration <= 0)
             {
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+                drawList.AddRect(cursorPos, cursorPos + _config.DisembowelBarSize, 0xFF000000);
 
                 return;
             }
 
             var scale = buff.Duration / 30f;
-            var disembowelBarSize = new Vector2(DisembowelBarWidth * scale, DisembowelBarHeight);
+            Vector2 disembowelBarSize = new(_config.DisembowelBarSize.X * scale, _config.DisembowelBarSize.Y);
 
             drawList.AddRectFilledMultiColor(
                 cursorPos,
                 cursorPos + disembowelBarSize,
-                DisembowelColor["gradientLeft"],
-                DisembowelColor["gradientRight"],
-                DisembowelColor["gradientRight"],
-                DisembowelColor["gradientLeft"]
+                _config.DisembowelBarColor.Map["gradientLeft"],
+                _config.DisembowelBarColor.Map["gradientRight"],
+                _config.DisembowelBarColor.Map["gradientRight"],
+                _config.DisembowelBarColor.Map["gradientLeft"]
             );
 
-            if (ShowDisembowelText)
+            if (_config.ShowDisembowelBarText)
             {
                 var durationText = ((int)buff.Duration).ToString();
-                var textSize = ImGui.CalcTextSize(durationText);
-                DrawOutlinedText(durationText, new Vector2(cursorPos.X + 5f, cursorPos.Y + BloodBarHeight / 2f - textSize.Y / 2f));
+                Vector2 textSize = ImGui.CalcTextSize(durationText);
+                DrawOutlinedText(durationText, new Vector2(cursorPos.X + 5f, cursorPos.Y + _config.DisembowelBarSize.Y / 2f - textSize.Y / 2f));
             }
 
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            drawList.AddRect(cursorPos, cursorPos + _config.DisembowelBarSize, 0xFF000000);
         }
+    }
+
+    [Serializable]
+    [Section("Job Specific Bars")]
+    [SubSection("Melee", 0)]
+    [SubSection("Dragoon", 1)]
+    public class DragoonHudConfig : PluginConfigObject
+    {
+        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        public Vector2 BaseOffset = new(127, 373);
+
+        #region Chaos Thrust Bar
+
+        [Checkbox("Show Chaos Thrust Bar")]
+        public bool ShowChaosThrustBar = true;
+
+        [DragFloat2("Chaos Thrust Bar Size", max = 2000f)]
+        public Vector2 ChaosThrustBarSize = new(254, 20);
+
+        [DragFloat2("Chaos Thrust Bar Position", min = -4000f, max = 4000f)]
+        public Vector2 ChasThrustBarPosition = new(0, 0);
+
+        [Checkbox("Show Chaos Bar Thrust Text")]
+        public bool ShowChaosThrustBarText = true;
+
+        [ColorEdit4("Chaos Thrust Bar Color")]
+        public PluginConfigColor ChaosThrustBarColor = new(new Vector4(106f / 255f, 82f / 255f, 148f / 255f, 100f / 100f));
+
+        #endregion
+
+        #region Disembowel Bar
+
+        [Checkbox("Show Disembowel Bar")]
+        public bool ShowDisembowelBar = true;
+
+        [DragFloat2("Disembowel Bar Size", max = 2000f)]
+        public Vector2 DisembowelBarSize = new(254, 20);
+
+        [DragFloat2("Disembowel Bar Position", min = -4000f, max = 4000f)]
+        public Vector2 DisembowelBarPosition = new(0, 21);
+
+        [Checkbox("Show Disembowel Bar Text")]
+        public bool ShowDisembowelBarText = true;
+
+        [ColorEdit4("Disembowel Bar Color")]
+        public PluginConfigColor DisembowelBarColor = new(new Vector4(244f / 255f, 206f / 255f, 191f / 255f, 100f / 100f));
+
+        #endregion
+
+        #region Eye Of The Dragon Bar
+
+        [Checkbox("Show Eye Of The Dragon Bar")]
+        public bool ShowEyeOfTheDragonBar = true;
+
+        [DragFloat2("Eye Of The Dragon Bar Size", max = 2000f)]
+        public Vector2 EyeOfTheDragonBarSize = new(126, 20);
+
+        [DragFloat2("Eye Of The Dragon Bar Position", min = -4000f, max = 4000f)]
+        public Vector2 EyeOfTheDragonBarPosition = new(0, 42);
+
+        [DragInt("Eye Of The Dragon Bar Padding")]
+        public int EyeOfTheDragonBarPadding = 2;
+
+        [ColorEdit4("Eye Of The Dragon Bar Color")]
+        public PluginConfigColor EyeOfTheDragonColor = new(new Vector4(1f, 182f / 255f, 194f / 255f, 100f / 100f));
+
+        #endregion
+
+        #region Blood Bar
+
+        [Checkbox("Show Blood Bar")]
+        public bool ShowBloodBar = true;
+
+        [DragFloat2("Blood Bar Size", max = 2000f)]
+        public Vector2 BloodBarSize = new(254, 20);
+
+        [DragFloat2("Blood Bar Position", min = -4000f, max = 4000f)]
+        public Vector2 BloodBarPosition = new(0, 63);
+
+        [Checkbox("Show Blood Bar Text")]
+        public bool ShowBloodBarText = true;
+
+        [ColorEdit4("Blood Of The Dragon Bar Color")]
+        public PluginConfigColor BloodOfTheDragonColor = new(new Vector4(78f / 255f, 198f / 255f, 238f / 255f, 100f / 100f));
+
+        [ColorEdit4("Life Of The Dragon Bar Color")]
+        public PluginConfigColor LifeOfTheDragonColor = new(new Vector4(139f / 255f, 24f / 255f, 24f / 255f, 100f / 100f));
+
+        #endregion
     }
 }

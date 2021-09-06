@@ -1,3 +1,9 @@
+using Dalamud.Configuration;
+using Dalamud.Plugin;
+using DelvUI.Interface.StatusEffects;
+using ImGuiNET;
+using ImGuiScene;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -5,12 +11,6 @@ using System.IO.Compression;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
-using Dalamud.Configuration;
-using Dalamud.Plugin;
-using DelvUI.Interface.StatusEffects;
-using ImGuiNET;
-using ImGuiScene;
-using Newtonsoft.Json;
 
 namespace DelvUI.Config
 {
@@ -563,48 +563,6 @@ namespace DelvUI.Config
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorDRG.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorDRG.AdjustColor(.1f))
                 },
-                [Jobs.DRG * 1000] = new() // Eye of the Dragon
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(DRGEyeOfTheDragonColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(DRGEyeOfTheDragonColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DRGEyeOfTheDragonColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DRGEyeOfTheDragonColor.AdjustColor(.1f))
-                },
-                [Jobs.DRG * 1000 + 1] = new() // Blood of the Dragon
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(DRGBloodOfTheDragonColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(DRGBloodOfTheDragonColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DRGBloodOfTheDragonColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DRGBloodOfTheDragonColor.AdjustColor(.1f))
-                },
-                [Jobs.DRG * 1000 + 2] = new() // Life of the Dragon
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(DRGLifeOfTheDragonColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(DRGLifeOfTheDragonColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DRGLifeOfTheDragonColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DRGLifeOfTheDragonColor.AdjustColor(.1f))
-                },
-                [Jobs.DRG * 1000 + 3] = new() // DRG Disembowel
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(DRGDisembowelColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(DRGDisembowelColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DRGDisembowelColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DRGDisembowelColor.AdjustColor(.1f))
-                },
-                [Jobs.DRG * 1000 + 4] = new() // DRG Disembowel
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(DRGChaosThrustColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(DRGChaosThrustColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DRGChaosThrustColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DRGChaosThrustColor.AdjustColor(.1f))
-                },
-                [Jobs.DRG * 1000 + 5] = new() // DRG Empty
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
                 [Jobs.SAM] = new()
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorSAM),
@@ -704,56 +662,13 @@ namespace DelvUI.Config
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorMCH.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorMCH.AdjustColor(.1f))
                 },
-                [Jobs.MCH * 1000] = new() // Heat gauge ready
+                [Jobs.DNC] = new()
                 {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor.AdjustColor(.1f))
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC.AdjustColor(-10f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC.AdjustColor(.1f))
                 },
-                [Jobs.MCH * 1000 + 1] = new() // Battery gauge ready
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor.AdjustColor(.1f))
-                },
-                [Jobs.MCH * 1000 + 2] = new() // Robot summoned
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor.AdjustColor(.1f))
-                },
-                [Jobs.MCH * 1000 + 3] = new() // Overheated
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor.AdjustColor(.1f))
-                },
-                [Jobs.MCH * 1000 + 4] = new() // Bar not ready
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
-                [Jobs.MCH * 1000 + 5] = new() // Wildfire Active
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHWildfireColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHWildfireColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHWildfireColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHWildfireColor.AdjustColor(.1f))
-                },
-                [Jobs.DNC] =
-                    new()
-                    {
-                        ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC),
-                        ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC.AdjustColor(-10f)),
-                        ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC.AdjustColor(-.1f)),
-                        ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC.AdjustColor(.1f))
-                    },
                 [Jobs.BLM] = new()
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorBLM),
@@ -1064,48 +979,6 @@ namespace DelvUI.Config
 
         #endregion
 
-        #region MCH Configuration
-
-        public int MCHBaseXOffset { get; set; }
-        public int MCHBaseYOffset { get; set; }
-
-        public bool MCHOverheatEnable { get; set; } = true;
-        public bool MCHOverheatText { get; set; } = true;
-        public int MCHOverheatHeight { get; set; } = 20;
-        public int MCHOverheatWidth { get; set; } = 254;
-        public int MCHOverheatXOffset { get; set; } = 127;
-        public int MCHOverheatYOffset { get; set; } = 395;
-        public bool MCHHeatGaugeEnable { get; set; } = true;
-        public bool MCHHeatGaugeText { get; set; } = true;
-        public int MCHHeatGaugeHeight { get; set; } = 20;
-        public int MCHHeatGaugeWidth { get; set; } = 254;
-        public int MCHHeatGaugePadding { get; set; } = 2;
-        public int MCHHeatGaugeXOffset { get; set; } = 127;
-        public int MCHHeatGaugeYOffset { get; set; } = 417;
-        public bool MCHBatteryGaugeEnable { get; set; } = true;
-        public bool MCHBatteryGaugeShowBattery { get; set; } = true;
-        public bool MCHBatteryGaugeBatteryText { get; set; }
-        public bool MCHBatteryGaugeShowRobotDuration { get; set; } = true;
-        public bool MCHBatteryGaugeRobotDurationText { get; set; } = true;
-        public int MCHBatteryGaugeHeight { get; set; } = 20;
-        public int MCHBatteryGaugeWidth { get; set; } = 254;
-        public int MCHBatteryGaugePadding { get; set; } = 2;
-        public int MCHBatteryGaugeXOffset { get; set; } = 127;
-        public int MCHBatteryGaugeYOffset { get; set; } = 439;
-        public bool MCHWildfireEnabled { get; set; }
-        public bool MCHWildfireText { get; set; } = true;
-        public int MCHWildfireHeight { get; set; } = 20;
-        public int MCHWildfireWidth { get; set; } = 254;
-        public int MCHWildfireXOffset { get; set; } = 127;
-        public int MCHWildfireYOffset { get; set; } = 373;
-        public Vector4 MCHHeatColor = new(201f / 255f, 13f / 255f, 13f / 255f, 100f / 100f);
-        public Vector4 MCHBatteryColor = new(106f / 255f, 255f / 255f, 255f / 255f, 100f / 100f);
-        public Vector4 MCHRobotColor = new(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f);
-        public Vector4 MCHOverheatColor = new(255f / 255f, 239f / 255f, 14f / 255f, 100f / 100f);
-        public Vector4 MCHWildfireColor = new(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f);
-
-        #endregion
-
         #region PLD Configuration
 
         public bool PLDDoTBarText { get; set; }
@@ -1174,43 +1047,6 @@ namespace DelvUI.Config
         public Vector4 MNKPerfectBalanceColor = new(150f / 255f, 255f, 255f, 100f);
         public Vector4 MNKTrueNorthColor = new(255f, 225f / 255f, 189f / 255f, 100f);
         public Vector4 MNKFormsColor = new(36f / 255f, 131f / 255f, 255f, 100f);
-
-        #endregion
-
-        #region DRG Configuration
-
-        public int DRGBaseXOffset { get; set; } = 127;
-        public int DRGBaseYOffset { get; set; } = 373;
-        public int DRGChaosThrustBarWidth { get; set; } = 254;
-        public int DRGChaosThrustBarHeight { get; set; } = 20;
-        public int DRGChaosThrustXOffset { get; set; }
-        public int DRGChaosThrustYOffset { get; set; }
-        public int DRGDisembowelBarWidth { get; set; } = 254;
-        public int DRGDisembowelBarHeight { get; set; } = 20;
-        public int DRGDisembowelBarXOffset { get; set; }
-        public int DRGDisembowelBarYOffset { get; set; } = 21;
-        public int DRGEyeOfTheDragonHeight { get; set; } = 20;
-        public int DRGEyeOfTheDragonBarWidth { get; set; } = 126;
-        public int DRGEyeOfTheDragonPadding { get; set; } = 2;
-        public int DRGEyeOfTheDragonXOffset { get; set; }
-        public int DRGEyeOfTheDragonYOffset { get; set; } = 42;
-        public int DRGBloodBarWidth { get; set; } = 254;
-        public int DRGBloodBarHeight { get; set; } = 20;
-        public int DRGBloodBarXOffset { get; set; }
-        public int DRGBloodBarYOffset { get; set; } = 63;
-        public bool DRGShowEyeOfTheDragon = true;
-        public bool DRGShowBloodBar = true;
-        public bool DRGShowChaosThrustTimer = true;
-        public bool DRGShowDisembowelBuffTimer = true;
-        public bool DRGShowChaosThrustText = true;
-        public bool DRGShowBloodText = true;
-        public bool DRGShowDisembowelText = true;
-
-        public Vector4 DRGEyeOfTheDragonColor = new(1f, 182f / 255f, 194f / 255f, 100f / 100f);
-        public Vector4 DRGBloodOfTheDragonColor = new(78f / 255f, 198f / 255f, 238f / 255f, 100f / 100f);
-        public Vector4 DRGLifeOfTheDragonColor = new(139f / 255f, 24f / 255f, 24f / 255f, 100f / 100f);
-        public Vector4 DRGDisembowelColor = new(244f / 255f, 206f / 255f, 191f / 255f, 100f / 100f);
-        public Vector4 DRGChaosThrustColor = new(106f / 255f, 82f / 255f, 148f / 255f, 100f / 100f);
 
         #endregion
     }

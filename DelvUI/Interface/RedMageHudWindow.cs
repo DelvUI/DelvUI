@@ -4,8 +4,6 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
 using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -51,7 +49,7 @@ namespace DelvUI.Interface
             var actor = PluginInterface.ClientState.LocalPlayer;
             var scale = (float)actor.CurrentMp / actor.MaxMp;
             var cursorPos = new Vector2(
-                OriginX - _config.ManaBarSize.X / 2 + _config.ManaBarOffset.X, 
+                OriginX - _config.ManaBarSize.X / 2 + _config.ManaBarOffset.X,
                 OriginY - _config.ManaBarSize.Y + _config.ManaBarOffset.Y
             );
 
@@ -96,7 +94,7 @@ namespace DelvUI.Interface
             var mana = PluginInterface.ClientState.LocalPlayer.CurrentMp;
             var text = $"{mana,0}";
             var textSize = ImGui.CalcTextSize(text);
-            DrawOutlinedText(text, new Vector2(cursorPos.X + 2, OriginY + _config.Position.Y  - _config.ManaBarSize.Y / 2f - textSize.Y / 2f + 2));
+            DrawOutlinedText(text, new Vector2(cursorPos.X + 2, OriginY + _config.Position.Y - _config.ManaBarSize.Y / 2f - textSize.Y / 2f + 2));
         }
 
         private void DrawBalanceBar()

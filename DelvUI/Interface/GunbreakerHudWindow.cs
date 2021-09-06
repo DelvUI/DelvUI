@@ -90,35 +90,45 @@ namespace DelvUI.Interface
     public class GunbreakerHudConfig : PluginConfigObject
     {
         [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [Order(0)]
         public Vector2 Position = new Vector2(0, 0);
 
         /* Powder Gauge Bar */
         [Checkbox("Show Powder Gauge")]
+        [CollapseControl(5, 0)]
         public bool ShowPowderGauge = true;
 
         [DragFloat2("Powder Gauge Position", min = -4000f, max = 4000f)]
+        [CollapseWith(0, 0)]
         public Vector2 PowderGaugeBarPosition = new(0, 428);
 
         [DragFloat2("Powder Gauge Size", min = 1f, max = 4000f)]
+        [CollapseWith(5, 0)]
         public Vector2 PowderGaugeBarSize = new(254, 20);
 
         [DragFloat("Powder Gauge Spacing", min = 0)]
+        [CollapseWith(10, 0)]
         public float PowderGaugeSpacing = 2.0f;
 
         [ColorEdit4("Powder Gauge Fill Color")]
+        [CollapseWith(15, 0)]
         public PluginConfigColor PowderGaugeFillColor = new(new Vector4(46f / 255f, 179f / 255f, 255f / 255f, 1f));
 
         /* No Mercy Bar*/
         [Checkbox("Show No Mercy Bar")]
+        [CollapseControl(10, 1)]
         public bool ShowNoMercyBar = true;
 
         [DragFloat2("No Mercy Bar Position", min = -4000f, max = 4000f)]
+        [CollapseWith(0, 1)]
         public Vector2 NoMercyBarPosition = new(0, 449);
 
         [DragFloat2("No Mercy Bar Size", min = 1f, max = 4000f)]
+        [CollapseWith(5, 1)]
         public Vector2 NoMercyBarSize = new(254, 20);
 
         [ColorEdit4("No Mercy Fill Color")]
+        [CollapseWith(10, 1)]
         public PluginConfigColor NoMercyFillColor = new(new Vector4(252f / 255f, 204f / 255f, 255f / 255f, 1f));
     }
 }

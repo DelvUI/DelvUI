@@ -39,6 +39,7 @@ namespace DelvUI.Config
                 new PaladinHudConfig(),
                 new WarriorHudConfig(),
                 new WhiteMageHudConfig(),
+                new DragoonHudConfig(),
                 new RedMageHudConfig()
             };
 
