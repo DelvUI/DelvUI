@@ -1,13 +1,12 @@
-using DelvUI.Config.Attributes;
-using ImGuiNET;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Numerics;
-using Dalamud.Interface;
+using System.Reflection;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
+using ImGuiScene;
 using Newtonsoft.Json;
 
 namespace DelvUI.Config.Tree
@@ -18,7 +17,7 @@ namespace DelvUI.Config.Tree
 
         public virtual void Save(string path)
         {
-            foreach (var child in children)
+            foreach (Node child in children)
             {
                 child.Save(ConfigurationManager.GetInstance().ConfigDirectory);
             }
@@ -26,7 +25,7 @@ namespace DelvUI.Config.Tree
 
         public virtual void Load(string path)
         {
-            foreach (var child in children)
+            foreach (Node child in children)
             {
                 child.Load(ConfigurationManager.GetInstance().ConfigDirectory);
             }
@@ -56,7 +55,7 @@ namespace DelvUI.Config.Tree
                 ImGui.BeginGroup(); // Left
 
                 {
-                    var delvUiBanner = ConfigurationManager.GetInstance().BannerImage;
+                    TextureWrap delvUiBanner = ConfigurationManager.GetInstance().BannerImage;
 
                     if (delvUiBanner != null)
                     {
@@ -65,13 +64,13 @@ namespace DelvUI.Config.Tree
 
                     ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
 
-                    foreach (var selectionNode in children)
+                    foreach (SectionNode selectionNode in children)
                     {
                         if (ImGui.Selectable(selectionNode.Name, selectionNode.Selected))
                         {
                             selectionNode.Selected = true;
 
-                            foreach (var otherNode in children.FindAll(x => x != selectionNode))
+                            foreach (SectionNode otherNode in children.FindAll(x => x != selectionNode))
                             {
                                 otherNode.Selected = false;
                             }
@@ -88,7 +87,7 @@ namespace DelvUI.Config.Tree
                 ImGui.BeginGroup(); // Right
 
                 {
-                    foreach (var selectionNode in children)
+                    foreach (SectionNode selectionNode in children)
                     {
                         selectionNode.Draw(ref changed);
                     }
@@ -109,19 +108,19 @@ namespace DelvUI.Config.Tree
 
                 ImGui.SameLine();
 
-                if (ImGui.Button("Hide/Show HUD")) { }
+                if (ImGui.Button("Hide/Show HUD"))
+                { }
 
                 ImGui.SameLine();
 
                 if (ImGui.Button("Reset HUD"))
-                { 
-
-                }
+                { }
 
                 ImGui.SameLine();
 
-                if (ImGui.Button("Donate!")) {
-                    System.Diagnostics.Process.Start("https://ko-fi.com/DelvUI");
+                if (ImGui.Button("Donate!"))
+                {
+                    Process.Start("https://ko-fi.com/DelvUI");
                 }
             }
 
@@ -137,7 +136,7 @@ namespace DelvUI.Config.Tree
 
         public override void Load(string path)
         {
-            foreach (var child in children)
+            foreach (SectionNode child in children)
             {
                 child.Load(path);
             }
@@ -145,7 +144,7 @@ namespace DelvUI.Config.Tree
 
         public override void Save(string path)
         {
-            foreach (var child in children)
+            foreach (SectionNode child in children)
             {
                 child.Save(path);
             }
@@ -159,7 +158,7 @@ namespace DelvUI.Config.Tree
             {
                 if (attribute is SectionAttribute sectionAttribute)
                 {
-                    foreach (var sectionNode in children)
+                    foreach (SectionNode sectionNode in children)
                     {
                         if (sectionNode.Name == sectionAttribute.SectionName)
                         {
@@ -167,7 +166,7 @@ namespace DelvUI.Config.Tree
                         }
                     }
 
-                    SectionNode newNode = new SectionNode();
+                    SectionNode newNode = new();
                     newNode.Name = sectionAttribute.SectionName;
                     children.Add(newNode);
 
@@ -200,7 +199,7 @@ namespace DelvUI.Config.Tree
             {
                 if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
                 {
-                    foreach (var subSectionNode in children)
+                    foreach (SubSectionNode subSectionNode in children)
                     {
                         if (!ImGui.BeginTabItem(subSectionNode.Name))
                         {
@@ -236,7 +235,7 @@ namespace DelvUI.Config.Tree
 
         public override void Save(string path)
         {
-            foreach (var child in children)
+            foreach (SubSectionNode child in children)
             {
                 child.Save(Path.Combine(path, Name));
             }
@@ -244,7 +243,7 @@ namespace DelvUI.Config.Tree
 
         public override void Load(string path)
         {
-            foreach (var child in children)
+            foreach (SubSectionNode child in children)
             {
                 child.Load(Path.Combine(path, Name));
             }
@@ -258,7 +257,7 @@ namespace DelvUI.Config.Tree
             {
                 if (attribute is SubSectionAttribute subSectionAttribute)
                 {
-                    foreach (var subSectionNode in children)
+                    foreach (SubSectionNode subSectionNode in children)
                     {
                         if (subSectionNode.Name == subSectionAttribute.SubSectionName)
                         {
@@ -268,7 +267,7 @@ namespace DelvUI.Config.Tree
 
                     if (subSectionAttribute.Depth == 0)
                     {
-                        NestedSubSectionNode newNode = new NestedSubSectionNode();
+                        NestedSubSectionNode newNode = new();
                         newNode.Name = subSectionAttribute.SubSectionName;
                         newNode.Depth = 0;
                         children.Add(newNode);
@@ -305,7 +304,7 @@ namespace DelvUI.Config.Tree
             {
                 if (ImGui.BeginTabBar("##tabs" + Depth, ImGuiTabBarFlags.None))
                 {
-                    foreach (var subSectionNode in children)
+                    foreach (SubSectionNode subSectionNode in children)
                     {
                         if (subSectionNode is NestedSubSectionNode)
                         {
@@ -334,7 +333,7 @@ namespace DelvUI.Config.Tree
 
         public override void Save(string path)
         {
-            foreach (var child in children)
+            foreach (SubSectionNode child in children)
             {
                 child.Save(Path.Combine(path, Name));
             }
@@ -342,7 +341,7 @@ namespace DelvUI.Config.Tree
 
         public override void Load(string path)
         {
-            foreach (var child in children)
+            foreach (SubSectionNode child in children)
             {
                 child.Load(Path.Combine(path, Name));
             }
@@ -361,7 +360,7 @@ namespace DelvUI.Config.Tree
                         continue;
                     }
 
-                    foreach (var subSectionNode in children)
+                    foreach (SubSectionNode subSectionNode in children)
                     {
                         if (subSectionNode.Name == subSectionAttribute.SubSectionName)
                         {
@@ -369,7 +368,7 @@ namespace DelvUI.Config.Tree
                         }
                     }
 
-                    NestedSubSectionNode nestedSubSectionNode = new NestedSubSectionNode();
+                    NestedSubSectionNode nestedSubSectionNode = new();
                     nestedSubSectionNode.Name = subSectionAttribute.SubSectionName;
                     nestedSubSectionNode.Depth = Depth + 1;
                     children.Add(nestedSubSectionNode);
@@ -378,7 +377,7 @@ namespace DelvUI.Config.Tree
                 }
             }
 
-            foreach (var subSectionNode in children)
+            foreach (SubSectionNode subSectionNode in children)
             {
                 if (subSectionNode.Name == configObject.GetType().FullName && subSectionNode is ConfigPageNode node)
                 {
@@ -386,7 +385,7 @@ namespace DelvUI.Config.Tree
                 }
             }
 
-            ConfigPageNode configPageNode = new ConfigPageNode();
+            ConfigPageNode configPageNode = new();
             configPageNode.ConfigObject = configObject;
             configPageNode.Name = configObject.GetType().FullName;
             children.Add(configPageNode);
@@ -401,17 +400,17 @@ namespace DelvUI.Config.Tree
 
         public override void Draw(ref bool changed)
         {
-            var fields = ConfigObject.GetType().GetFields();
+            FieldInfo[] fields = ConfigObject.GetType().GetFields();
 
-            foreach (var field in fields)
+            foreach (FieldInfo field in fields)
             {
-                object fieldVal = field.GetValue(ConfigObject);
+                var fieldVal = field.GetValue(ConfigObject);
 
                 foreach (var attribute in field.GetCustomAttributes(true))
                 {
                     if (attribute is CheckboxAttribute checkboxAttribute)
                     {
-                        bool boolVal = (bool)fieldVal;
+                        var boolVal = (bool)fieldVal;
 
                         if (ImGui.Checkbox(checkboxAttribute.friendlyName, ref boolVal))
                         {
@@ -421,7 +420,7 @@ namespace DelvUI.Config.Tree
                     }
                     else if (attribute is DragFloatAttribute dragFloatAttribute)
                     {
-                        float floatVal = (float)fieldVal;
+                        var floatVal = (float)fieldVal;
 
                         if (ImGui.DragFloat(dragFloatAttribute.friendlyName, ref floatVal, dragFloatAttribute.velocity, dragFloatAttribute.min, dragFloatAttribute.max))
                         {
@@ -431,7 +430,7 @@ namespace DelvUI.Config.Tree
                     }
                     else if (attribute is DragIntAttribute dragIntAttribute)
                     {
-                        int intVal = (int)fieldVal;
+                        var intVal = (int)fieldVal;
 
                         if (ImGui.DragInt(dragIntAttribute.friendlyName, ref intVal, dragIntAttribute.velocity, dragIntAttribute.min, dragIntAttribute.max))
                         {
@@ -461,7 +460,7 @@ namespace DelvUI.Config.Tree
                     }
                     else if (attribute is InputTextAttribute inputTextAttribute)
                     {
-                        string stringVal = (string)fieldVal;
+                        var stringVal = (string)fieldVal;
 
                         if (ImGui.InputText(inputTextAttribute.friendlyName, ref stringVal, inputTextAttribute.maxLength))
                         {
@@ -472,7 +471,7 @@ namespace DelvUI.Config.Tree
                     else if (attribute is ColorEdit4Attribute colorEdit4Attribute)
                     {
                         PluginConfigColor colorVal = (PluginConfigColor)fieldVal;
-                        var vector = colorVal.Vector;
+                        Vector4 vector = colorVal.Vector;
 
                         if (ImGui.ColorEdit4(colorEdit4Attribute.friendlyName, ref vector))
                         {
@@ -488,7 +487,7 @@ namespace DelvUI.Config.Tree
         public override void Save(string path)
         {
             Directory.CreateDirectory(path);
-            string finalPath = path + ".json";
+            var finalPath = path + ".json";
 
             File.WriteAllText(
                 finalPath,
@@ -502,7 +501,7 @@ namespace DelvUI.Config.Tree
 
         public override void Load(string path)
         {
-            var finalPath = new FileInfo(path + ".json");
+            FileInfo finalPath = new FileInfo(path + ".json");
 
             if (!finalPath.Exists)
             {
@@ -513,20 +512,21 @@ namespace DelvUI.Config.Tree
             // While in general use this is important as the conversion from the superclass 'PluginConfigObject' to a specific subclass (e.g. 'BlackMageHudConfig') would
             // be handled by Json.NET, when the plugin is reloaded with a different assembly (as is the case when using LivePluginLoader, or updating the plugin in-game)
             // it fails. In order to fix this we need to specify the specific subclass, in order to do this during runtime we must use reflection to set the generic.
-            if (ConfigObject.GetType().BaseType == typeof(PluginConfigObject)) {
-                var methodInfo = GetType().GetMethod("LoadForType");
-                var function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
+            if (ConfigObject.GetType().BaseType == typeof(PluginConfigObject))
+            {
+                MethodInfo methodInfo = GetType().GetMethod("LoadForType");
+                MethodInfo function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
                 ConfigObject = (PluginConfigObject)function.Invoke(this, new object[] { finalPath.FullName });
             }
         }
 
         public T LoadForType<T>(string path) where T : PluginConfigObject
         {
-            var file = new FileInfo(path);
+            FileInfo file = new FileInfo(path);
 
             return JsonConvert.DeserializeObject<T>(File.ReadAllText(file.FullName));
         }
 
-        public override ConfigPageNode GetOrAddConfig(PluginConfigObject configObject) { return this; }
+        public override ConfigPageNode GetOrAddConfig(PluginConfigObject configObject) => this;
     }
 }

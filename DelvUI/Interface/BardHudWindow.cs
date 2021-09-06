@@ -34,13 +34,15 @@ namespace DelvUI.Interface
 
         private void DrawActiveDots()
         {
-            if (!_config.ShowCB && !_config.ShowSB) {
+            if (!_config.ShowCB && !_config.ShowSB)
+            {
                 return;
             }
 
             Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (target is not Chara) {
+            if (target is not Chara)
+            {
                 return;
             }
 
@@ -49,7 +51,8 @@ namespace DelvUI.Interface
 
             List<Bar> barDrawList = new();
 
-            if (_config.ShowCB) {
+            if (_config.ShowCB)
+            {
                 StatusEffect cb = target.StatusEffects.FirstOrDefault(
                     o => o.EffectId == 1200 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                       || o.EffectId == 124 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
@@ -69,7 +72,8 @@ namespace DelvUI.Interface
             barSize = _config.SBSize;
             position = Origin + _config.SBPosition - barSize / 2f;
 
-            if (_config.ShowSB) {
+            if (_config.ShowSB)
+            {
                 StatusEffect sb = target.StatusEffects.FirstOrDefault(
                     o => o.EffectId == 1201 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                       || o.EffectId == 129 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
@@ -86,13 +90,15 @@ namespace DelvUI.Interface
                 barDrawList.Add(sbBar);
             }
 
-            if (barDrawList.Count <= 0) {
+            if (barDrawList.Count <= 0)
+            {
                 return;
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
-            foreach (Bar bar in barDrawList) {
+            foreach (Bar bar in barDrawList)
+            {
                 bar.Draw(drawList, PluginConfiguration);
             }
         }
@@ -104,9 +110,11 @@ namespace DelvUI.Interface
             CurrentSong song = gauge.ActiveSong;
             var songTimer = gauge.SongTimer;
 
-            switch (song) {
+            switch (song)
+            {
                 case CurrentSong.WANDERER:
-                    if (_config.ShowWMStacks) {
+                    if (_config.ShowWMStacks)
+                    {
                         DrawStacks(songStacks, 3, _config.WMStackColor.Map);
                     }
 
@@ -115,7 +123,8 @@ namespace DelvUI.Interface
                     break;
 
                 case CurrentSong.MAGE:
-                    if (_config.ShowMBProc) {
+                    if (_config.ShowMBProc)
+                    {
                         DrawBloodletterReady(_config.MBProcColor.Map);
                     }
 
@@ -124,7 +133,8 @@ namespace DelvUI.Interface
                     break;
 
                 case CurrentSong.ARMY:
-                    if (_config.ShowAPStacks) {
+                    if (_config.ShowAPStacks)
+                    {
                         DrawStacks(songStacks, 4, _config.APStackColor.Map);
                     }
 
@@ -152,7 +162,8 @@ namespace DelvUI.Interface
 
         private void DrawSongTimer(short songTimer, Dictionary<string, uint> songColor)
         {
-            if (!_config.ShowSongGauge) {
+            if (!_config.ShowSongGauge)
+            {
                 return;
             }
 
@@ -175,7 +186,8 @@ namespace DelvUI.Interface
 
         private void DrawSoulVoiceBar()
         {
-            if (!_config.ShowSoulGauge) {
+            if (!_config.ShowSoulGauge)
+            {
                 return;
             }
 
@@ -218,7 +230,8 @@ namespace DelvUI.Interface
         [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
         public Vector2 Position = new(0, 0);
 
-        [Checkbox("Song Gauge Enabled")] public bool ShowSongGauge = true;
+        [Checkbox("Song Gauge Enabled")]
+        public bool ShowSongGauge = true;
 
         [DragFloat2("Song Gauge Size", min = 1f, max = 2000f)]
         public Vector2 SongGaugeSize = new(254, 20);
@@ -229,10 +242,14 @@ namespace DelvUI.Interface
         [ColorEdit4("Wanderer's Minuet Color")]
         public PluginConfigColor WMColor = new(new Vector4(158f / 255f, 157f / 255f, 36f / 255f, 100f / 100f));
 
-        [ColorEdit4("Mage's Ballad Color")] public PluginConfigColor MBColor = new(new Vector4(143f / 255f, 90f / 255f, 143f / 255f, 100f / 100f));
-        [ColorEdit4("Army's Paeon Color")] public PluginConfigColor APColor = new(new Vector4(207f / 255f, 205f / 255f, 52f / 255f, 100f / 100f));
+        [ColorEdit4("Mage's Ballad Color")]
+        public PluginConfigColor MBColor = new(new Vector4(143f / 255f, 90f / 255f, 143f / 255f, 100f / 100f));
 
-        [Checkbox("Soul Gauge Enabled")] public bool ShowSoulGauge = true;
+        [ColorEdit4("Army's Paeon Color")]
+        public PluginConfigColor APColor = new(new Vector4(207f / 255f, 205f / 255f, 52f / 255f, 100f / 100f));
+
+        [Checkbox("Soul Gauge Enabled")]
+        public bool ShowSoulGauge = true;
 
         [DragFloat2("Soul Gauge Size", min = 1f, max = 2000f)]
         public Vector2 SoulGaugeSize = new(254, 10);
@@ -240,7 +257,8 @@ namespace DelvUI.Interface
         [DragFloat2("Soul Gauge Position", min = -4000f, max = 4000f)]
         public Vector2 SoulGaugePosition = new(0, -6);
 
-        [ColorEdit4("Soul Gauge Color")] public PluginConfigColor SoulGaugeColor = new(new Vector4(248f / 255f, 227f / 255f, 0f / 255f, 100f / 100f));
+        [ColorEdit4("Soul Gauge Color")]
+        public PluginConfigColor SoulGaugeColor = new(new Vector4(248f / 255f, 227f / 255f, 0f / 255f, 100f / 100f));
 
         [Checkbox("Wanderer's Minuet Stacks Enabled")]
         public bool ShowWMStacks = true;
@@ -257,7 +275,8 @@ namespace DelvUI.Interface
         [DragFloat2("Stack Position", min = -4000f, max = 4000f)]
         public Vector2 StackPosition = new(0, -40);
 
-        [DragInt("Stack Padding", max = 1000)] public int StackPadding = 2;
+        [DragInt("Stack Padding", max = 1000)]
+        public int StackPadding = 2;
 
         [ColorEdit4("Wanderer's Minuet Stack Color")]
         public PluginConfigColor WMStackColor = new(new Vector4(150f / 255f, 215f / 255f, 232f / 255f, 100f / 100f));
@@ -268,8 +287,11 @@ namespace DelvUI.Interface
         [ColorEdit4("Army's Paeon Stack Color")]
         public PluginConfigColor APStackColor = new(new Vector4(0f / 255f, 222f / 255f, 177f / 255f, 100f / 100f));
 
-        [Checkbox("Caustic Bite Enabled")] public bool ShowCB = true;
-        [Checkbox("Caustic Bite Inverted")] public bool CBInverted = true;
+        [Checkbox("Caustic Bite Enabled")]
+        public bool ShowCB = true;
+
+        [Checkbox("Caustic Bite Inverted")]
+        public bool CBInverted = true;
 
         [DragFloat2("Caustic Bite Size", max = 2000f)]
         public Vector2 CBSize = new(126, 10);
@@ -277,10 +299,14 @@ namespace DelvUI.Interface
         [DragFloat2("Caustic Bite Position", min = -4000f, max = 4000f)]
         public Vector2 CBPosition = new(-64, -52);
 
-        [ColorEdit4("Caustic Bite Color")] public PluginConfigColor CBColor = new(new Vector4(182f / 255f, 68f / 255f, 235f / 255f, 100f / 100f));
+        [ColorEdit4("Caustic Bite Color")]
+        public PluginConfigColor CBColor = new(new Vector4(182f / 255f, 68f / 255f, 235f / 255f, 100f / 100f));
 
-        [Checkbox("Stormbite Enabled")] public bool ShowSB = true;
-        [Checkbox("Stormbite Inverted")] public bool SBInverted = false;
+        [Checkbox("Stormbite Enabled")]
+        public bool ShowSB = true;
+
+        [Checkbox("Stormbite Inverted")]
+        public bool SBInverted = false;
 
         [DragFloat2("Stormbite Size", max = 2000f)]
         public Vector2 SBSize = new(126, 10);
@@ -288,8 +314,10 @@ namespace DelvUI.Interface
         [DragFloat2("Stormbite Position", min = -4000f, max = 4000f)]
         public Vector2 SBPosition = new(64, -52);
 
-        [ColorEdit4("Stormbite Color")] public PluginConfigColor SBColor = new(new Vector4(72f / 255f, 117f / 255f, 202f / 255f, 100f / 100f));
+        [ColorEdit4("Stormbite Color")]
+        public PluginConfigColor SBColor = new(new Vector4(72f / 255f, 117f / 255f, 202f / 255f, 100f / 100f));
 
-        [ColorEdit4("DoT Expire Color")] public PluginConfigColor ExpireColor = new(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
+        [ColorEdit4("DoT Expire Color")]
+        public PluginConfigColor ExpireColor = new(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
     }
 }
