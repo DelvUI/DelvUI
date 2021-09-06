@@ -317,163 +317,205 @@ namespace DelvUI.Interface
     public class DancerHudConfig : PluginConfigObject
     {
         [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [Order(0)]
         public Vector2 Position = new(0, 0);
 
         // Esprit Guage
         [Checkbox("Show Esprit Guage")]
+        [CollapseControl(5, 0)]
         public bool EspritGuageEnabled = true;
 
         [Checkbox("Show Esprit Guage Text")]
+        [CollapseWith(0, 0)]
         public bool EspritTextEnabled = true;
 
         [DragFloat2("Esprit Gauge Size", max = 2000f)]
+        [CollapseWith(5, 0)]
         public Vector2 EspritGaugeSize = new(254, 20);
 
         [DragFloat2("Esprit Gauge Offset", min = -4000f, max = 4000f)]
+        [CollapseWith(10, 0)]
         public Vector2 EspritGaugeOffset = new(127, 395);
 
         [DragFloat("Esprit Gauge Chunk Padding", min = -4000f, max = 4000f)]
+        [CollapseWith(15, 0)]
         public float EspritGaugeChunkPadding = 2;
 
-        // Feathers Guage
-        [Checkbox("Show Feather Guage")]
-        public bool FeatherGuageEnabled = true;
-
-        [Checkbox("Enable Flourishing Finish Glow")]
-        public bool FlourishingGlowEnabled = true;
-
-        [DragFloat2("Feather Guage Size")]
-        public Vector2 FeatherGaugeSize = new(254, 13);
-
-        [DragFloat2("Feather Gauge Offset", min = -4000f, max = 4000f)]
-        public Vector2 FeatherGaugeOffset = new(127, 380);
-
-        [DragFloat("Feather Gauge Chunk Padding", min = -4000f, max = 4000f)]
-        public float FeatherGaugeChunkPadding = 2;
-
-        // Buff Bars
-        [Checkbox("Show Buff Bar")]
-        public bool BuffBarEnabled = true;
-
-        [Checkbox("Show Technical Finish Bar")]
-        public bool TechnicalBarEnabled = true;
-
-        [Checkbox("Show Technical Finish Bar Text")]
-        public bool TechnicalTextEnabled = true;
-
-        [Checkbox("Show Devilment Bar")]
-        public bool DevilmentBarEnabled = true;
-
-        [Checkbox("Show Devilment Bar Text")]
-        public bool DevilmentTextEnabled = true;
-
-        [DragFloat2("Buff Bars Size")]
-        public Vector2 BuffBarSize = new(254, 20);
-
-        [DragFloat2("Buff Bars Offset")]
-        public Vector2 BuffBarOffset = new(127, 417);
-
-        // Standard Finish Bar
-        [Checkbox("Show Standard Finish Bar")]
-        public bool StandardBarEnabled = true;
-
-        [Checkbox("Show Standard Finish Bar Text")]
-        public bool StandardTextEnabled = true;
-
-        [DragFloat2("Standard Finish Bar Size")]
-        public Vector2 StandardBarSize = new(254, 20);
-
-        [DragFloat2("Standard Finish Bar Offset")]
-        public Vector2 StandardBarOffset = new(127, 439);
-
-        // Step Bars
-        [Checkbox("Show Step Bars")]
-        public bool StepBarEnabled = true;
-
-        [Checkbox("Show Step Glow")]
-        public bool StepGlowEnabled = true;
-
-        [Checkbox("Show Dance Ready Glow")]
-        public bool DanceReadyGlowEnabled = true;
-
-        [DragFloat2("Step Bars Size")]
-        public Vector2 StepBarSize = new(254, 13);
-
-        [DragFloat2("Step Bars Offset")]
-        public Vector2 StepBarOffset = new(127, 365);
-
-        [DragFloat("Step Bar Chunk Padding")]
-        public float StepBarChunkPadding = 2;
-
-        // Proc Bars
-        [Checkbox("Show Proc Bars")]
-        public bool ProcBarEnabled = true;
-
-        [Checkbox("Use Static Proc Bars")]
-        public bool StaticProcBarsEnabled = true;
-
-        [DragFloat2("Proc Bars Size")]
-        public Vector2 ProcBarSize = new(254, 13);
-
-        [DragFloat2("Proc Bars Offset")]
-        public Vector2 ProcBarOffset = new(127, 365);
-
-        [DragFloat("Proc Bar Chunk Padding")]
-        public float ProcBarChunkPadding = 2;
-
-        // ---Colors---
-        // Esprit Guage
         [ColorEdit4("Esprit Guage Color")]
+        [CollapseWith(20, 0)]
         public PluginConfigColor EspritGaugeColor = new(new Vector4(72f / 255f, 20f / 255f, 99f / 255f, 100f / 100f));
 
         // Feathers Guage
+        [Checkbox("Show Feather Guage")]
+        [CollapseControl(10, 1)]
+        public bool FeatherGuageEnabled = true;
+
+        [Checkbox("Enable Flourishing Finish Glow")]
+        [CollapseWith(0, 1)]
+        public bool FlourishingGlowEnabled = true;
+
+        [DragFloat2("Feather Guage Size")]
+        [CollapseWith(5, 1)]
+        public Vector2 FeatherGaugeSize = new(254, 13);
+
+        [DragFloat2("Feather Gauge Offset", min = -4000f, max = 4000f)]
+        [CollapseWith(10, 1)]
+        public Vector2 FeatherGaugeOffset = new(127, 380);
+
+        [DragFloat("Feather Gauge Chunk Padding", min = -4000f, max = 4000f)]
+        [CollapseWith(15, 1)]
+        public float FeatherGaugeChunkPadding = 2;
+
         [ColorEdit4("Feather Guage Color")]
+        [CollapseWith(20, 1)]
         public PluginConfigColor FeatherGaugeColor = new(new Vector4(175f / 255f, 229f / 255f, 29f / 255f, 100f / 100f));
 
         [ColorEdit4("Flourishing Finish Glow Color")]
+        [CollapseWith(25, 1)]
         public PluginConfigColor FlourishingProcColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
 
         // Buff Bars
+        [Checkbox("Show Buff Bar")]
+        [CollapseControl(15, 2)]
+        public bool BuffBarEnabled = true;
+
+        [Checkbox("Show Technical Finish Bar")]
+        [CollapseWith(0, 2)]
+        public bool TechnicalBarEnabled = true;
+
+        [Checkbox("Show Technical Finish Bar Text")]
+        [CollapseWith(5, 2)]
+        public bool TechnicalTextEnabled = true;
+
+        [Checkbox("Show Devilment Bar")]
+        [CollapseWith(10, 2)]
+        public bool DevilmentBarEnabled = true;
+
+        [Checkbox("Show Devilment Bar Text")]
+        [CollapseWith(15, 2)]
+        public bool DevilmentTextEnabled = true;
+
+        [DragFloat2("Buff Bars Size")]
+        [CollapseWith(20, 2)]
+        public Vector2 BuffBarSize = new(254, 20);
+
+        [DragFloat2("Buff Bars Offset")]
+        [CollapseWith(25, 2)]
+        public Vector2 BuffBarOffset = new(127, 417);
+
         [ColorEdit4("Technical Finish Bar Color")]
+        [CollapseWith(30, 2)]
         public PluginConfigColor TechnicalFinishBarColor = new(new Vector4(255f / 255f, 9f / 255f, 102f / 255f, 100f / 100f));
 
         [ColorEdit4("Devilment Bar Color")]
+        [CollapseWith(35, 2)]
         public PluginConfigColor DevilmentBarColor = new(new Vector4(52f / 255f, 78f / 255f, 29f / 255f, 100f / 100f));
 
-        //Standard Finish Bar
+        // Standard Finish Bar
+        [Checkbox("Show Standard Finish Bar")]
+        [CollapseControl(20, 3)]
+        public bool StandardBarEnabled = true;
+
+        [Checkbox("Show Standard Finish Bar Text")]
+        [CollapseWith(0, 3)]
+        public bool StandardTextEnabled = true;
+
+        [DragFloat2("Standard Finish Bar Size")]
+        [CollapseWith(5, 3)]
+        public Vector2 StandardBarSize = new(254, 20);
+
+        [DragFloat2("Standard Finish Bar Offset")]
+        [CollapseWith(10, 3)]
+        public Vector2 StandardBarOffset = new(127, 439);
+
         [ColorEdit4("Standard Finish Bar Color")]
+        [CollapseWith(15, 3)]
         public PluginConfigColor StandardFinishBarColor = new(new Vector4(0f / 255f, 193f / 255f, 95f / 255f, 100f / 100f));
 
         // Step Bars
+        [Checkbox("Show Step Bars")]
+        [CollapseControl(25, 4)]
+        public bool StepBarEnabled = true;
+
+        [Checkbox("Show Step Glow")]
+        [CollapseWith(0, 4)]
+        public bool StepGlowEnabled = true;
+
+        [Checkbox("Show Dance Ready Glow")]
+        [CollapseWith(5, 4)]
+        public bool DanceReadyGlowEnabled = true;
+
+        [DragFloat2("Step Bars Size")]
+        [CollapseWith(10, 4)]
+        public Vector2 StepBarSize = new(254, 13);
+
+        [DragFloat2("Step Bars Offset")]
+        [CollapseWith(15, 4)]
+        public Vector2 StepBarOffset = new(127, 365);
+
+        [DragFloat("Step Bar Chunk Padding")]
+        [CollapseWith(20, 4)]
+        public float StepBarChunkPadding = 2;
+
         [ColorEdit4("Current Step Glow Color")]
+        [CollapseWith(25, 4)]
         public PluginConfigColor CurrentStepGlowColor = new(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [ColorEdit4("Emboite Color")]
+        [CollapseWith(30, 4)]
         public PluginConfigColor EmboiteColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Entrechat Color")]
+        [CollapseWith(35, 4)]
         public PluginConfigColor EntrechatColor = new(new Vector4(0f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
 
         [ColorEdit4("Jete Color")]
+        [CollapseWith(40, 4)]
         public PluginConfigColor JeteColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Pirouette Color")]
+        [CollapseWith(45, 4)]
         public PluginConfigColor PirouetteColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Dance Ready Color")]
+        [CollapseWith(50, 4)]
         public PluginConfigColor DanceReadyColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
 
         // Proc Bars
+        [Checkbox("Show Proc Bars")]
+        [CollapseControl(30, 5)]
+        public bool ProcBarEnabled = true;
+
+        [Checkbox("Use Static Proc Bars")]
+        [CollapseWith(0, 5)]
+        public bool StaticProcBarsEnabled = true;
+
+        [DragFloat2("Proc Bars Size")]
+        [CollapseWith(10, 5)]
+        public Vector2 ProcBarSize = new(254, 13);
+
+        [DragFloat2("Proc Bars Offset")]
+        [CollapseWith(15, 5)]
+        public Vector2 ProcBarOffset = new(127, 365);
+
+        [DragFloat("Proc Bar Chunk Padding")]
+        [CollapseWith(20, 5)]
+        public float ProcBarChunkPadding = 2;
+
         [ColorEdit4("Flourishing Cascade Color")]
+        [CollapseWith(25, 5)]
         public PluginConfigColor FlourishingCascadeColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Flourishing Fountain Color")]
+        [CollapseWith(30, 5)]
         public PluginConfigColor FlourishingFountainColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Flourishing Windmill Color")]
+        [CollapseWith(35, 5)]
         public PluginConfigColor FlourishingWindmillColor = new(new Vector4(0f / 255f, 215f / 255f, 215f / 255f, 100f / 100f));
 
         [ColorEdit4("Flourishing Shower Color")]
+        [CollapseWith(40, 5)]
         public PluginConfigColor FlourishingShowerColor = new(new Vector4(255f / 255f, 100f / 255f, 0f / 255f, 100f / 100f));
     }
 }
