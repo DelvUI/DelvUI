@@ -1,3 +1,9 @@
+using Dalamud.Configuration;
+using Dalamud.Plugin;
+using DelvUI.Interface.StatusEffects;
+using ImGuiNET;
+using ImGuiScene;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -5,12 +11,6 @@ using System.IO.Compression;
 using System.Numerics;
 using System.Reflection;
 using System.Text;
-using Dalamud.Configuration;
-using Dalamud.Plugin;
-using DelvUI.Interface.StatusEffects;
-using ImGuiNET;
-using ImGuiScene;
-using Newtonsoft.Json;
 
 namespace DelvUI.Config
 {

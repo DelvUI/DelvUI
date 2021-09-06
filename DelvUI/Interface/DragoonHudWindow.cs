@@ -1,16 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs;
+﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
 
 namespace DelvUI.Interface
 {
@@ -20,6 +18,7 @@ namespace DelvUI.Interface
 
         public override uint JobId => Jobs.DRG;
         private readonly DragoonHudConfig _config = (DragoonHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new DragoonHudConfig());
+        private Vector2 Origin => new(CenterX + _config.BaseOffset.X, CenterY + YOffset + _config.BaseOffset.Y);
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
 
         protected override List<uint> GetJobSpecificBuffs()
@@ -70,13 +69,13 @@ namespace DelvUI.Interface
         private void DrawChaosThrustBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             var scale = 0f;
             var duration = 0;
 
             if (target is Chara)
             {
-                StatusEffect chaosThrust = target.StatusEffects.FirstOrDefault(
+                var chaosThrust = target.StatusEffects.FirstOrDefault(
                     o => (o.EffectId == 1312 || o.EffectId == 118) && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                 );
 
@@ -90,10 +89,8 @@ namespace DelvUI.Interface
                 }
             }
 
-            var xPos = CenterX - XOffset + _config.BaseOffset.X;
-            var yPos = CenterY + YOffset + _config.BaseOffset.Y;
-            Vector2 cursorPos = new(xPos, yPos);
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            var cursorPos = Origin + new Vector2(_config.ChaosThrustBarPosition.X, _config.ChaosThrustBarPosition.Y);
+            var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + _config.ChaosThrustBarSize, EmptyColor["background"]);
             Vector2 chaosThrustBarSize = new(_config.ChaosThrustBarSize.X * scale, _config.ChaosThrustBarSize.Y);
 
@@ -109,7 +106,7 @@ namespace DelvUI.Interface
             if (_config.ShowChaosThrustBarText && duration > 0f)
             {
                 var durationText = duration.ToString();
-                Vector2 textSize = ImGui.CalcTextSize(durationText);
+                var textSize = ImGui.CalcTextSize(durationText);
                 DrawOutlinedText(duration.ToString(), new Vector2(cursorPos.X + 5f, cursorPos.Y + _config.ChaosThrustBarSize.Y / 2f - textSize.Y / 2f));
             }
 
@@ -118,13 +115,11 @@ namespace DelvUI.Interface
 
         private void DrawEyeOfTheDragonBars()
         {
-            DRGGauge gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
+            var gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
 
-            var xPos = CenterX - XOffset + _config.EyeOfTheDragonBarPosition.X;
-            var yPos = CenterY + YOffset + _config.EyeOfTheDragonBarPosition.Y;
-            Vector2 cursorPos = new(xPos, yPos);
+            var cursorPos = Origin + new Vector2(_config.EyeOfTheDragonBarPosition.X, _config.EyeOfTheDragonBarPosition.Y);
             var eyeCount = gauge.EyeCount;
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            var drawList = ImGui.GetWindowDrawList();
 
             for (byte i = 0; i < 2; i++)
             {
@@ -152,13 +147,11 @@ namespace DelvUI.Interface
 
         private void DrawBloodOfTheDragonBar()
         {
-            DRGGauge gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
+            var gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
 
-            var xPos = CenterX - XOffset + _config.BaseOffset.X;
-            var yPos = CenterY + YOffset + _config.BaseOffset.Y;
-            Vector2 cursorPos = new(xPos, yPos);
+            var cursorPos = Origin + new Vector2(_config.BloodBarPosition.X, _config.BloodBarPosition.Y);
 
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + _config.BloodBarSize, EmptyColor["background"]);
 
             var maxTimerMs = 30 * 1000;
@@ -200,7 +193,7 @@ namespace DelvUI.Interface
             if (_config.ShowBloodBarText)
             {
                 var durationText = ((int)(currTimerMs / 1000f)).ToString();
-                Vector2 textSize = ImGui.CalcTextSize(durationText);
+                var textSize = ImGui.CalcTextSize(durationText);
                 DrawOutlinedText(durationText, new Vector2(cursorPos.X + 5f, cursorPos.Y + _config.BloodBarSize.Y / 2f - textSize.Y / 2f));
             }
 
@@ -210,11 +203,9 @@ namespace DelvUI.Interface
         private void DrawDisembowelBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            var xPos = CenterX - XOffset + _config.DisembowelBarPosition.X;
-            var yPos = CenterY + YOffset + _config.DisembowelBarPosition.Y;
-            Vector2 cursorPos = new(xPos, yPos);
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            IEnumerable<StatusEffect> disembowelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1914 or 121);
+            var cursorPos = Origin + new Vector2(_config.DisembowelBarPosition.X, _config.DisembowelBarPosition.Y);
+            var drawList = ImGui.GetWindowDrawList();
+            var disembowelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1914 or 121);
             drawList.AddRectFilled(cursorPos, cursorPos + _config.DisembowelBarSize, EmptyColor["background"]);
 
             if (!disembowelBuff.Any())
@@ -224,7 +215,7 @@ namespace DelvUI.Interface
                 return;
             }
 
-            StatusEffect buff = disembowelBuff.First();
+            var buff = disembowelBuff.First();
 
             if (buff.Duration <= 0)
             {
@@ -248,7 +239,7 @@ namespace DelvUI.Interface
             if (_config.ShowDisembowelBarText)
             {
                 var durationText = ((int)buff.Duration).ToString();
-                Vector2 textSize = ImGui.CalcTextSize(durationText);
+                var textSize = ImGui.CalcTextSize(durationText);
                 DrawOutlinedText(durationText, new Vector2(cursorPos.X + 5f, cursorPos.Y + _config.DisembowelBarSize.Y / 2f - textSize.Y / 2f));
             }
 
@@ -263,7 +254,7 @@ namespace DelvUI.Interface
     public class DragoonHudConfig : PluginConfigObject
     {
         [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
-        public Vector2 BaseOffset = new(127, 373);
+        public Vector2 BaseOffset = new(0, 0);
 
         #region Chaos Thrust Bar
 
@@ -274,7 +265,7 @@ namespace DelvUI.Interface
         public Vector2 ChaosThrustBarSize = new(254, 20);
 
         [DragFloat2("Chaos Thrust Bar Position", min = -4000f, max = 4000f)]
-        public Vector2 ChasThrustBarPosition = new(0, 0);
+        public Vector2 ChaosThrustBarPosition = new(0, 0);
 
         [Checkbox("Show Chaos Bar Thrust Text")]
         public bool ShowChaosThrustBarText = true;
