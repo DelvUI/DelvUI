@@ -201,93 +201,123 @@ namespace DelvUI.Interface
     public class PaladinHudConfig : PluginConfigObject
     {
         [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [Order(0)]
         public Vector2 Position = new(0, 0);
 
         [Checkbox("Show Mana Bar")]
+        [CollapseControl(5, 0)]
         public bool ShowManaBar = true;
 
         [Checkbox("Show Mana Bar Text")]
+        [CollapseWith(0, 0)]
         public bool ShowManaBarText = true;
 
         [Checkbox("Chunk Mana Bar")]
+        [CollapseWith(5, 0)]
         public bool ChunkManaBar = true;
 
         [DragFloat2("Mana Bar Size", max = 2000f)]
+        [CollapseWith(10, 0)]
         public Vector2 ManaBarSize = new(254, 20);
 
         [DragInt("Mana Bar Padding", max = 100)]
+        [CollapseWith(15, 0)]
         public int ManaBarPadding = 2;
 
         [DragFloat2("Mana Bar Offset", min = -4000f, max = 4000f)]
+        [CollapseWith(20, 0)]
         public Vector2 ManaBarOffset = new(127, 373);
 
+        [ColorEdit4("Mana Bar Color")]
+        [CollapseWith(25, 0)]
+        public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 203f / 255f, 230f / 255f, 100f / 100f));
+
         [Checkbox("Show Oath Gauge")]
+        [CollapseControl(10, 1)]
         public bool ShowOathGauge = true;
 
         [Checkbox("Show Oath Gauge Text")]
+        [CollapseWith(0, 1)]
         public bool ShowOathGaugeText = true;
 
         [DragFloat2("Oath Gauge Size", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 1)]
         public Vector2 OathGaugeSize = new(254, 20);
 
         [DragInt("Oath Gauge Padding", max = 100)]
+        [CollapseWith(10, 1)]
         public int OathGaugePadding = 2;
 
         [DragFloat2("Oath Gauge Offset", min = -4000f, max = 4000f)]
+        [CollapseWith(15, 1)]
         public Vector2 OathGaugeOffset = new(127, 395);
 
+        [ColorEdit4("Oath Gauge Color")]
+        [CollapseWith(20, 1)]
+        public PluginConfigColor OathGaugeColor = new(new Vector4(24f / 255f, 80f / 255f, 175f / 255f, 100f / 100f));
+
         [Checkbox("Show Buff Bar")]
+        [CollapseControl(15, 2)]
         public bool ShowBuffBar = true;
 
         [Checkbox("Show Buff Bar Text")]
+        [CollapseWith(0, 2)]
         public bool ShowBuffBarText = true;
 
         [DragFloat2("Buff Bar Size", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 2)]
         public Vector2 BuffBarSize = new(254, 20);
 
         [DragFloat2("Buff Bar Offset", min = -4000f, max = 4000f)]
+        [CollapseWith(10, 2)]
         public Vector2 BuffBarOffset = new(127, 417);
 
-        [Checkbox("Show Atonement Bar")]
-        public bool ShowAtonementBar = true;
-
-        [DragFloat2("Atonement Bar Size", min = -4000f, max = 4000f)]
-        public Vector2 AtonementBarSize = new(254, 20);
-
-        [DragInt("Atonement Bar Padding", max = 100)]
-        public int AtonementBarPadding = 2;
-
-        [DragFloat2("Atonement Bar Offset", min = -4000f, max = 4000f)]
-        public Vector2 AtonementBarOffset = new(127, 439);
-
-        [Checkbox("Show Goring Blade Bar")]
-        public bool ShowGoringBladeBar = true;
-
-        [Checkbox("Show Goring Blade Bar Text")]
-        public bool ShowGoringBladeBarText = true;
-
-        [DragFloat2("Goring Blade Bar Size", min = -4000f, max = 4000f)]
-        public Vector2 GoringBladeBarSize = new(254, 20);
-
-        [DragFloat2("Goring Blade Bar Offset", min = -4000f, max = 4000f)]
-        public Vector2 GoringBladeBarOffset = new(127, 351);
-
-        [ColorEdit4("Mana Bar Color")]
-        public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 203f / 255f, 230f / 255f, 100f / 100f));
-
-        [ColorEdit4("Oath Gauge Color")]
-        public PluginConfigColor OathGaugeColor = new(new Vector4(24f / 255f, 80f / 255f, 175f / 255f, 100f / 100f));
-
         [ColorEdit4("Fight or Flight Bar Color")]
+        [CollapseWith(15, 2)]
         public PluginConfigColor FightOrFlightColor = new(new Vector4(240f / 255f, 50f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Requiescat Bar Color")]
+        [CollapseWith(20, 2)]
         public PluginConfigColor RequiescatColor = new(new Vector4(61f / 255f, 61f / 255f, 255f / 255f, 100f / 100f));
 
+        [Checkbox("Show Atonement Bar")]
+        [CollapseControl(20, 3)]
+        public bool ShowAtonementBar = true;
+
+        [DragFloat2("Atonement Bar Size", min = -4000f, max = 4000f)]
+        [CollapseWith(0, 3)]
+        public Vector2 AtonementBarSize = new(254, 20);
+
+        [DragInt("Atonement Bar Padding", max = 100)]
+        [CollapseWith(5, 3)]
+        public int AtonementBarPadding = 2;
+
+        [DragFloat2("Atonement Bar Offset", min = -4000f, max = 4000f)]
+        [CollapseWith(10, 3)]
+        public Vector2 AtonementBarOffset = new(127, 439);
+
         [ColorEdit4("Atonement Bar Color")]
+        [CollapseWith(15, 3)]
         public PluginConfigColor AtonementColor = new(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f));
 
+        [Checkbox("Show Goring Blade Bar")]
+        [CollapseControl(25, 4)]
+        public bool ShowGoringBladeBar = true;
+
+        [Checkbox("Show Goring Blade Bar Text")]
+        [CollapseWith(0, 4)]
+        public bool ShowGoringBladeBarText = true;
+
+        [DragFloat2("Goring Blade Bar Size", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 4)]
+        public Vector2 GoringBladeBarSize = new(254, 20);
+
+        [DragFloat2("Goring Blade Bar Offset", min = -4000f, max = 4000f)]
+        [CollapseWith(10, 4)]
+        public Vector2 GoringBladeBarOffset = new(127, 351);
+
         [ColorEdit4("Goring Blade Color")]
+        [CollapseWith(15, 4)]
         public PluginConfigColor GoringBladeColor = new(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f));
     }
 }

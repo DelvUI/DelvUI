@@ -381,83 +381,115 @@ namespace DelvUI.Interface
     public class DarkKnightHudConfig : PluginConfigObject
     {
         [DragFloat2("Base offset", min = -4000f, max = 4000f)]
+        [Order(0)]
         public Vector2 Position = new Vector2(0, 415);
 
         /* Mana Bar */
         [Checkbox("Show Mana Bar")]
+        [CollapseControl(5, 0)]
         public bool ShowManaBar = true;
 
         [Checkbox("Show Mana Bar Overflow")]
+        [CollapseWith(0, 0)]
         public bool ShowManaBarOverflow = false;
 
         [DragFloat2("Mana Bar Position", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 0)]
         public Vector2 ManaBarPosition = new Vector2(0, 0);
 
         [DragFloat2("Mana Bar Size", min = 0, max = 4000f)]
+        [CollapseWith(10, 0)]
         public Vector2 ManaBarSize = new Vector2(254, 10);
 
         [DragInt("Mana Bar Padding", min = 0)]
+        [CollapseWith(15, 0)]
         public int ManaBarSpacing = 1;
 
-        [ColorEdit4("Mana Color")] public PluginConfigColor ManaColor = new(new Vector4(0f / 255f, 142f / 255f, 254f / 255f, 100f / 100f));
+        [ColorEdit4("Mana Color")]
+        [CollapseWith(20, 0)]
+        public PluginConfigColor ManaColor = new(new Vector4(0f / 255f, 142f / 255f, 254f / 255f, 100f / 100f));
 
-        [ColorEdit4("Dark Arts Buff Color")] public PluginConfigColor DarkArtsColor = new(new Vector4(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
-
+        [ColorEdit4("Dark Arts Buff Color")]
+        [CollapseWith(25, 0)]
+        public PluginConfigColor DarkArtsColor = new(new Vector4(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
 
         /* Blood Gauge */
         [Checkbox("Show Blood Gauge")]
+        [CollapseControl(10, 1)]
         public bool ShowBloodGauge = true;
 
         [Checkbox("Split Blood Gauge")]
+        [CollapseWith(0, 1)]
         public bool BloodGaugeSplit = false;
 
         [Checkbox("Draw Blood Gauge Threshold")]
+        [CollapseWith(5, 1)]
         public bool DrawBloodGaugeThreshold = false;
 
         [DragFloat2("Blood Gauge Position", min = -4000f, max = 4000f)]
+        [CollapseWith(10, 1)]
         public Vector2 BloodGaugePosition = new Vector2(0, 12);
 
         [DragFloat2("Blood Gauge Size", min = 0, max = 4000f)]
+        [CollapseWith(15, 1)]
         public Vector2 BloodGaugeSize = new Vector2(254, 10);
 
         [DragInt("Blood Gauge Padding", min = 0)]
+        [CollapseWith(20, 1)]
         public int BloodGaugePadding = 2;
 
-        [ColorEdit4("Blood Color Left")] public PluginConfigColor BloodColorLeft = new(new Vector4(196f / 255f, 20f / 255f, 122f / 255f, 100f / 100f));
+        [ColorEdit4("Blood Color Left")]
+        [CollapseWith(25, 1)]
+        public PluginConfigColor BloodColorLeft = new(new Vector4(196f / 255f, 20f / 255f, 122f / 255f, 100f / 100f));
 
-        [ColorEdit4("Blood Color Right")] public PluginConfigColor BloodColorRight = new(new Vector4(216f / 255f, 0f / 255f, 73f / 255f, 100f / 100f));
-
+        [ColorEdit4("Blood Color Right")]
+        [CollapseWith(30, 1)]
+        public PluginConfigColor BloodColorRight = new(new Vector4(216f / 255f, 0f / 255f, 73f / 255f, 100f / 100f));
 
         /* Buff Bar */
         [Checkbox("Show Buff Bar")]
+        [CollapseControl(15, 2)]
         public bool ShowBuffBar = true;
 
         [DragFloat2("Buff Bar Position", min = -4000f, max = 4000f)]
+        [CollapseWith(0, 2)]
         public Vector2 BuffBarPosition = new Vector2(0, 24);
 
         [DragFloat2("Buff Bar Size", min = 0, max = 4000f)]
+        [CollapseWith(5, 2)]
         public Vector2 BuffBarSize = new Vector2(254, 20);
 
         [DragInt("Buff Bar Padding", min = 0)]
+        [CollapseWith(10, 2)]
         public int BuffBarPadding = 2;
 
-        [ColorEdit4("Blood Weapon Color")] public PluginConfigColor BloodWeaponColor = new(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+        [ColorEdit4("Blood Weapon Color")]
+        [CollapseWith(15, 2)]
+        public PluginConfigColor BloodWeaponColor = new(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [ColorEdit4("Delirium Color")] public PluginConfigColor DeliriumColor = new(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        [ColorEdit4("Delirium Color")]
+        [CollapseWith(20, 2)]
+        public PluginConfigColor DeliriumColor = new(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         /* Living Shadow */
         [Checkbox("Show Living Shadow Bar")]
+        [CollapseControl(20, 3)]
         public bool ShowLivingShadowBar = true;
 
         [DragFloat2("Living Shadow Position", min = -4000f, max = 4000f)]
+        [CollapseWith(0, 3)]
         public Vector2 LivingShadowPosition = new Vector2(0, 46);
 
         [DragFloat2("Living Shadow Size", min = 0, max = 4000f)]
+        [CollapseWith(5, 3)]
         public Vector2 LivingShadowSize = new Vector2(254, 20);
 
         [DragInt("Living Shadow Padding", min = 0)]
+        [CollapseWith(10, 3)]
         public int LivingShadowPadding = 2;
 
-        [ColorEdit4("Living Shadow Color")] public PluginConfigColor LivingShadowColor = new(new Vector4(225f / 255f, 105f / 255f, 205f / 255f, 100f / 100f));
+        [ColorEdit4("Living Shadow Color")]
+        [CollapseWith(15, 3)]
+        public PluginConfigColor LivingShadowColor = new(new Vector4(225f / 255f, 105f / 255f, 205f / 255f, 100f / 100f));
     }
 }

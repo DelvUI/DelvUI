@@ -110,47 +110,61 @@ namespace DelvUI.Interface
     public class WarriorHudConfig : PluginConfigObject
     {
         [DragFloat2("Base offset", min = -4000f, max = 4000f)]
+        [Order(0)]
         public Vector2 Position = new(0, 0);
 
         /* Storm's Eye */
         [Checkbox("Show Storm's Eye")]
+        [CollapseControl(5, 0)]
         public bool ShowStormsEye = true;
 
         [Checkbox("Show Storm's Eye Text")]
+        [CollapseWith(0, 0)]
         public bool ShowStormsEyeText = true;
 
         [DragFloat2("Storm's Eye Position", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 0)]
         public Vector2 StormsEyePosition = new(0, 428);
 
         [DragFloat2("Storm's Eye Size", min = 1f, max = 4000f)]
+        [CollapseWith(10, 0)]
         public Vector2 StormsEyeSize = new(254, 20);
 
         [ColorEdit4("Inner Release Color")]
+        [CollapseWith(15, 0)]
         public PluginConfigColor InnerReleaseColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Storm's Eye Color")]
+        [CollapseWith(20, 0)]
         public PluginConfigColor StormsEyeColor = new(new Vector4(255f / 255f, 136f / 255f, 146f / 255f, 100f / 100f));
 
         /* Beast Gauge*/
         [Checkbox("Show Beast Gauge")]
+        [CollapseControl(10, 1)]
         public bool ShowBeastGauge = true;
 
         [Checkbox("Show Beast Gauge Text")]
+        [CollapseWith(0, 1)]
         public bool ShowBeastGaugeText = false;
 
         [DragFloat2("Beast Gauge Position", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 1)]
         public Vector2 BeastGaugePosition = new(0, 449);
 
         [DragFloat2("Beast Gauge Size", min = 1f, max = 4000f)]
+        [CollapseWith(10, 1)]
         public Vector2 BeastGaugeSize = new(254, 20);
 
         [DragFloat("Beast Gauge Spacing")]
+        [CollapseWith(15, 1)]
         public float BeastGaugePadding = 2.0f;
 
         [ColorEdit4("Beast Gauge Fill Color")]
+        [CollapseWith(20, 1)]
         public PluginConfigColor BeastGaugeFillColor = new(new Vector4(201f / 255f, 13f / 255f, 13f / 255f, 100f / 100f));
 
         [ColorEdit4("Nascent Chaos Color")]
+        [CollapseWith(25, 1)]
         public PluginConfigColor NascentChaosColor = new(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f));
     }
 }
