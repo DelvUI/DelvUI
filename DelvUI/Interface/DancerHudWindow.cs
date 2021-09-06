@@ -21,6 +21,7 @@ namespace DelvUI.Interface
         private readonly DancerHudConfig _config = (DancerHudConfig) ConfigurationManager.GetInstance().GetConfiguration(new DancerHudConfig());
         private Vector2 Origin => new Vector2(CenterX + _config.Position.X, CenterY + _config.Position.Y);
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
+        private Dictionary<string, uint> PartialBarColor => PluginConfiguration.MiscColorMap["partial"];
 
 
         protected override void Draw(bool _)
@@ -64,7 +65,7 @@ namespace DelvUI.Interface
                                     .SetChunks(2)
                                     .SetChunkPadding(_config.EspritGaugeChunkPadding)
                                     .SetBackgroundColor(EmptyColor["background"])
-                                    .AddInnerBar(gauge.Esprit, 100, _config.EspritGaugeColor.Map, EmptyColor);
+                                    .AddInnerBar(gauge.Esprit, 100, _config.EspritGaugeColor.Map, PartialBarColor);
 
             if (_config.EspritTextEnabled)
             {
