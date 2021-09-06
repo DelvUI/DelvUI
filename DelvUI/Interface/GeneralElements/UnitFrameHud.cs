@@ -155,9 +155,6 @@ namespace DelvUI.Interface.GeneralElements
                 color["gradientLeft"]
             );
 
-            // border
-            drawList.AddRect(startPos, endPos, 0xFF000000);
-
             // shield
             if (Config.ShieldConfig.Enabled)
             {
@@ -165,15 +162,18 @@ namespace DelvUI.Interface.GeneralElements
 
                 if (Config.ShieldConfig.FillHealthFirst)
                 {
-                    DrawHelper.DrawShield(shield, scale, startPos, endPos, 
+                    DrawHelper.DrawShield(shield, scale, startPos, Config.Size, 
                         Config.ShieldConfig.Height, Config.ShieldConfig.HeightInPixels, Config.ShieldConfig.Color.Map, drawList);
                 }
                 else
                 {
-                    DrawHelper.DrawOvershield(shield, startPos, endPos, 
+                    DrawHelper.DrawOvershield(shield, startPos, Config.Size, 
                         Config.ShieldConfig.Height, Config.ShieldConfig.HeightInPixels, Config.ShieldConfig.Color.Map, drawList);
                 }
             }
+
+            // border
+            drawList.AddRect(startPos, endPos, 0xFF000000);
         }
 
         private void DrawFriendlyNPC(ImDrawListPtr drawList, Vector2 startPos, Vector2 endPos)
