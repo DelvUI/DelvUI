@@ -148,63 +148,83 @@ namespace DelvUI.Interface
     public class NinjaHudConfig : PluginConfigObject
     {
         [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [Order(0)]
         public Vector2 Position = new(127, 417);
 
         [Checkbox("Show Huton Gauge")]
+        [CollapseControl(5, 0)]
         public bool ShowHutonGauge = true;
 
         [DragFloat2("Huton Gauge Size", max = 2000f)]
+        [CollapseWith(0, 0)]
         public Vector2 HutonGaugeSize = new(254, 20);
 
         [DragFloat2("Huton Gauge Offset", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 0)]
         public Vector2 HutonGaugeOffset = new(0, 0);
 
+        [ColorEdit4("Huton Gauge Color")]
+        [CollapseWith(10, 0)]
+        public PluginConfigColor HutonGaugeColor = new(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f));
+
         [Checkbox("Show Ninki Gauge")]
+        [CollapseControl(10, 1)]
         public bool ShowNinkiGauge = true;
 
         [Checkbox("Show Ninki Gauge Text")]
+        [CollapseWith(0, 1)]
         public bool ShowNinkiGaugeText = true;
 
         [Checkbox("Chunk Ninki Gauge")]
+        [CollapseWith(5, 1)]
         public bool ChunkNinkiGauge = true;
 
         [DragFloat2("Ninki Gauge Size", max = 2000f)]
+        [CollapseWith(10, 1)]
         public Vector2 NinkiGaugeSize = new(254, 20);
 
         [DragFloat2("Ninki Gauge Offset", min = -4000f, max = 4000f)]
+        [CollapseWith(15, 1)]
         public Vector2 NinkiGaugeOffset = new(0, 22);
 
         [DragFloat("Ninki Gauge Chunk Padding", min = -4000f, max = 4000f)]
+        [CollapseWith(20, 1)]
         public float NinkiGaugeChunkPadding = 2;
 
+        [ColorEdit4("Ninki Gauge Color")]
+        [CollapseWith(25, 1)]
+        public PluginConfigColor NinkiGaugeColor = new(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f));
+
         [Checkbox("Show Trick Bar")]
+        [CollapseControl(15, 2)]
         public bool ShowTrickBar = false;
 
         [Checkbox("Show Trick Bar Text")]
+        [CollapseWith(0, 2)]
         public bool ShowTrickBarText = true;
 
+        [ColorEdit4("Trick Bar Color")]
+        [CollapseWith(5, 2)]
+        public PluginConfigColor TrickBarColor = new(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f));
+
         [Checkbox("Show Suiton Bar")]
+        [CollapseControl(20, 3)]
         public bool ShowSuitonBar = true;
 
         [Checkbox("Show Suiton Bar Text")]
+        [CollapseWith(0, 3)]
         public bool ShowSuitonBarText = true;
 
+        [ColorEdit4("Suiton Bar Color")]
+        [CollapseWith(5, 3)]
+        public PluginConfigColor SuitonBarColor = new(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f));
+
         [DragFloat2("Trick/Suiton Bar Size", max = 2000f)]
+        [Order(25)]
         public Vector2 TrickBarSize = new(254, 20);
 
         [DragFloat2("Trick/Suiton Bar Offset", min = -4000f, max = 4000f)]
+        [Order(30)]
         public Vector2 TrickBarOffset = new(0, 44);
-
-        [ColorEdit4("Huton Gauge Color")]
-        public PluginConfigColor HutonGaugeColor = new(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f));
-
-        [ColorEdit4("Ninki Gauge Color")]
-        public PluginConfigColor NinkiGaugeColor = new(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f));
-
-        [ColorEdit4("Trick Bar Color")]
-        public PluginConfigColor TrickBarColor = new(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f));
-
-        [ColorEdit4("Suiton Bar Color")]
-        public PluginConfigColor SuitonBarColor = new(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f));
     }
 }
