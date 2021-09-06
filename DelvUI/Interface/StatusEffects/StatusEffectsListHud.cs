@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.ClientState.Structs;
+﻿using Dalamud.Game.ClientState.Actors;
+using Dalamud.Game.ClientState.Structs;
 using Dalamud.Plugin;
 using DelvUI.Helpers;
 using ImGuiNET;
@@ -127,6 +128,11 @@ namespace DelvUI.Interface.StatusEffects
         public void Draw(Vector2 origin, List<uint> filterStatusEffects)
         {
             if (!Config.Enabled || Actor == null)
+            {
+                return;
+            }
+
+            if (Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc)
             {
                 return;
             }
