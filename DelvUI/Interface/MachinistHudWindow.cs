@@ -2,8 +2,10 @@
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Interface.Bars;
+using DelvUI.Config.Attributes;
 using ImGuiNET;
-using System.Collections.Generic;
+using System;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -12,157 +14,122 @@ namespace DelvUI.Interface
     public class MachinistHudWindow : HudWindow
     {
         private readonly float[] _robotDuration = { 12.450f, 13.950f, 15.450f, 16.950f, 18.450f, 19.950f };
+        private readonly MachinistHudConfig _config = (MachinistHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new MachinistHudConfig());
 
-        public MachinistHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
+        public override uint JobId => Jobs.MCH;
+        private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
+        private readonly PluginConfigColor EmptyColor;
+        private readonly PluginConfigColor PartialFillColor;
 
-        public override uint JobId => 31;
-
-        private int BaseXOffset => PluginConfiguration.MCHBaseXOffset;
-        private int BaseYOffset => PluginConfiguration.MCHBaseYOffset;
-
-        private bool OverheatEnabled => PluginConfiguration.MCHOverheatEnable;
-        private bool OverheatText => PluginConfiguration.MCHOverheatText;
-        private int OverheatHeight => PluginConfiguration.MCHOverheatHeight;
-        private int OverheatWidth => PluginConfiguration.MCHOverheatWidth;
-        private int OverheatXOffset => PluginConfiguration.MCHOverheatXOffset;
-        private int OverheatYOffset => PluginConfiguration.MCHOverheatYOffset;
-
-        private bool HeatGaugeEnabled => PluginConfiguration.MCHHeatGaugeEnable;
-        private bool HeatGaugeText => PluginConfiguration.MCHHeatGaugeText;
-        private int HeatGaugeHeight => PluginConfiguration.MCHHeatGaugeHeight;
-        private int HeatGaugeWidth => PluginConfiguration.MCHHeatGaugeWidth;
-        private int HeatGaugePadding => PluginConfiguration.MCHHeatGaugePadding;
-        private int HeatGaugeXOffset => PluginConfiguration.MCHHeatGaugeXOffset;
-        private int HeatGaugeYOffset => PluginConfiguration.MCHHeatGaugeYOffset;
-
-        private bool BatteryGaugeEnabled => PluginConfiguration.MCHBatteryGaugeEnable;
-        private bool BatteryGaugeShowBattery => PluginConfiguration.MCHBatteryGaugeShowBattery;
-        private bool BatteryGaugeBatteryText => PluginConfiguration.MCHBatteryGaugeBatteryText;
-        private bool BatteryGaugeShowRobotDuration => PluginConfiguration.MCHBatteryGaugeShowRobotDuration;
-        private bool BatteryGaugeRobotDurationText => PluginConfiguration.MCHBatteryGaugeRobotDurationText;
-        private int BatteryGaugeHeight => PluginConfiguration.MCHBatteryGaugeHeight;
-        private int BatteryGaugeWidth => PluginConfiguration.MCHBatteryGaugeWidth;
-        private int BatteryGaugePadding => PluginConfiguration.MCHBatteryGaugePadding;
-        private int BatteryGaugeXOffset => PluginConfiguration.MCHBatteryGaugeXOffset;
-        private int BatteryGaugeYOffset => PluginConfiguration.MCHBatteryGaugeYOffset;
-
-        private bool WildfireEnabled => PluginConfiguration.MCHWildfireEnabled;
-        private bool WildfireText => PluginConfiguration.MCHWildfireText;
-        private int WildfireHeight => PluginConfiguration.MCHWildfireHeight;
-        private int WildfireWidth => PluginConfiguration.MCHWildfireWidth;
-        private int WildfireXOffset => PluginConfiguration.MCHWildfireXOffset;
-        private int WildfireYOffset => PluginConfiguration.MCHWildfireYOffset;
-
-        private Dictionary<string, uint> HeatColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000];
-        private Dictionary<string, uint> BatteryColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 1];
-        private Dictionary<string, uint> RobotColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 2];
-        private Dictionary<string, uint> OverheatColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 3];
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
-        private Dictionary<string, uint> PartialFillColor => PluginConfiguration.MiscColorMap["partial"];
-
-        private Dictionary<string, uint> WildfireColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 5];
+        public MachinistHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration)
+        {
+            EmptyColor = new(PluginConfiguration.EmptyColor);
+            PartialFillColor = new(PluginConfiguration.PartialFillColor);
+        }
 
         protected override void Draw(bool _)
         {
-            if (OverheatEnabled)
+            if (_config.ShowOverheat)
             {
                 DrawOverheatBar();
             }
 
-            if (HeatGaugeEnabled)
+            if (_config.ShowHeatGauge)
             {
                 DrawHeatGauge();
             }
 
-            if (BatteryGaugeEnabled)
+            if (_config.ShowBatteryGauge)
             {
                 DrawBatteryGauge();
             }
 
-            if (WildfireEnabled)
+            if (_config.ShowWildfire)
             {
                 DrawWildfireBar();
             }
         }
 
         protected override void DrawPrimaryResourceBar() { }
+        private Vector2 CalculatePosition(Vector2 position, Vector2 size) => Origin + position - size / 2f;
 
         private void DrawHeatGauge()
         {
+            Debug.Assert(PluginInterface.ClientState.JobGauges != null, "PluginInterface.ClientState.JobGauges != null");
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
 
-            var xPos = CenterX + BaseXOffset - HeatGaugeXOffset;
-            var yPos = CenterY + BaseYOffset + HeatGaugeYOffset;
+            Vector2 position = CalculatePosition(_config.HeatGaugePosition, _config.HeatGaugeSize);
 
-            var builder = BarBuilder.Create(xPos, yPos, HeatGaugeHeight, HeatGaugeWidth)
+            var builder = BarBuilder.Create(position, _config.HeatGaugeSize)
                                     .SetChunks(2)
-                                    .SetChunkPadding(HeatGaugePadding)
-                                    .AddInnerBar(gauge.Heat, 100, HeatColor, PartialFillColor);
+                                    .SetChunkPadding(_config.HeatGaugePadding)
+                                    .AddInnerBar(gauge.Heat, 100, _config.HeatGaugeFillColor.Map, PartialFillColor.Map);
 
-            if (HeatGaugeText)
+            if (_config.ShowHeatGaugeText)
             {
                 builder.SetTextMode(BarTextMode.EachChunk)
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                       .SetBackgroundColor(EmptyColor["background"]);
+                       .SetBackgroundColor(EmptyColor.Background);
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawBatteryGauge()
         {
+            Debug.Assert(PluginInterface.ClientState.JobGauges != null, "PluginInterface.ClientState.JobGauges != null");
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
 
-            var xPos = CenterX + BaseXOffset - BatteryGaugeXOffset;
-            var yPos = CenterY + BaseYOffset + BatteryGaugeYOffset;
+            Vector2 position = CalculatePosition(_config.BatteryGaugePosition, _config.BatteryGaugeSize);
 
-            var builder = BarBuilder.Create(xPos, yPos, BatteryGaugeHeight, BatteryGaugeWidth)
+            var builder = BarBuilder.Create(position, _config.BatteryGaugeSize)
                                     .SetChunks(new[] { .5f, .1f, .1f, .1f, .1f, .1f })
-                                    .SetChunkPadding(BatteryGaugePadding)
-                                    .SetBackgroundColor(EmptyColor["background"]);
+                                    .SetChunkPadding(_config.BatteryGaugePadding)
+                                    .SetBackgroundColor(EmptyColor.Background);
 
-            if (BatteryGaugeShowBattery)
+            if (_config.ShowBatteryGaugeBattery)
             {
-                builder.AddInnerBar(gauge.Battery, 100, BatteryColor, PartialFillColor);
+                builder.AddInnerBar(gauge.Battery, 100, _config.BatteryFillColor.Map, PartialFillColor.Map);
 
-                if (BatteryGaugeBatteryText)
+                if (_config.ShowBatteryGaugeBatteryText)
                 {
                     builder.SetTextMode(BarTextMode.Single)
-                           .SetText(BarTextPosition.CenterLeft, BarTextType.Current, PluginConfiguration.MCHBatteryColor, Vector4.UnitW, null);
+                           .SetText(BarTextPosition.CenterLeft, BarTextType.Current, _config.BatteryFillColor.Vector, Vector4.UnitW, null);
                 }
             }
 
-            if (gauge.IsRobotActive() && BatteryGaugeShowRobotDuration)
+            if (gauge.IsRobotActive() && _config.ShowBatteryGaugeRobotDuration)
             {
-                builder.AddInnerBar(gauge.RobotTimeRemaining / 1000f, _robotDuration[gauge.LastRobotBatteryPower / 10 - 5], RobotColor, null);
+                builder.AddInnerBar(gauge.RobotTimeRemaining / 1000f, _robotDuration[gauge.LastRobotBatteryPower / 10 - 5], _config.RobotFillColor.Map, null);
 
-                if (BatteryGaugeRobotDurationText)
+                if (_config.ShowBatteryGaugeRobotDurationText)
                 {
                     builder.SetTextMode(BarTextMode.Single)
-                           .SetText(BarTextPosition.CenterRight, BarTextType.Current, PluginConfiguration.MCHRobotColor, Vector4.UnitW, null);
+                           .SetText(BarTextPosition.CenterRight, BarTextType.Current, _config.RobotFillColor.Vector, Vector4.UnitW, null);
                 }
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             var bar = builder.Build();
             bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawOverheatBar()
         {
+            Debug.Assert(PluginInterface.ClientState.JobGauges != null, "PluginInterface.ClientState.JobGauges != null");
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
 
-            var xPos = CenterX + BaseXOffset - OverheatXOffset;
-            var yPos = CenterY + BaseYOffset + OverheatYOffset;
+            Vector2 position = CalculatePosition(_config.OverheatPosition, _config.OverheatSize);
 
-            var builder = BarBuilder.Create(xPos, yPos, OverheatHeight, OverheatWidth).SetBackgroundColor(EmptyColor["background"]);
+            var builder = BarBuilder.Create(position, _config.OverheatSize)
+                .SetBackgroundColor(EmptyColor.Background);
 
             if (gauge.IsOverheated())
             {
-                builder.AddInnerBar(gauge.OverheatTimeRemaining / 1000f, 8, OverheatColor, null);
+                builder.AddInnerBar(gauge.OverheatTimeRemaining / 1000f, 8, _config.OverheatFillColor.Map, null);
 
-                if (OverheatText)
+                if (_config.ShowOverheatText)
                 {
                     builder.SetTextMode(BarTextMode.EachChunk)
                            .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
@@ -175,28 +142,120 @@ namespace DelvUI.Interface
 
         private void DrawWildfireBar()
         {
+            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var wildfireBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1946);
 
-            var xPos = CenterX + BaseXOffset - WildfireXOffset;
-            var yPos = CenterY + BaseYOffset + WildfireYOffset;
+            Vector2 position = CalculatePosition(_config.WildfirePosition, _config.WildfireSize);
 
-            var builder = BarBuilder.Create(xPos, yPos, WildfireHeight, WildfireWidth);
+            var builder = BarBuilder.Create(position, _config.WildfireSize);
 
             if (wildfireBuff.Any())
             {
                 var duration = wildfireBuff.First().Duration;
-                builder.AddInnerBar(duration, 10, WildfireColor, null);
+                builder.AddInnerBar(duration, 10, _config.WildfireFillColor.Map, null);
 
-                if (WildfireText)
+                if (_config.ShowWildfireText)
                 {
                     builder.SetTextMode(BarTextMode.EachChunk)
-                           .SetBackgroundColor(EmptyColor["background"])
+                           .SetBackgroundColor(EmptyColor.Background)
                            .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
                 }
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
+    }
+
+    [Serializable]
+    [Section("Job Specific Bars")]
+    [SubSection("Ranged", 0)]
+    [SubSection("Machinist", 1)]
+    public class MachinistHudConfig : PluginConfigObject
+    {
+        [DragFloat2("Base offset", min = -4000f, max = 4000f)]
+        public Vector2 Position = new(0, 0);
+
+        /* Overheat */
+        [Checkbox("Show Overheat Bar")]
+        public bool ShowOverheat = true;
+
+        [Checkbox("Show Overheat Bar Text")]
+        public bool ShowOverheatText = true;
+
+        [DragFloat2("Overheat Bar Position", min = -4000f, max = 4000f)]
+        public Vector2 OverheatPosition = new(0, 395);
+
+        [DragFloat2("Overheat Bar Size", min = 0, max = 4000f)]
+        public Vector2 OverheatSize = new(254, 20);
+
+        [ColorEdit4("Overheat Fill Color")]
+        public PluginConfigColor OverheatFillColor = new(new Vector4(255f / 255f, 239f / 255f, 14f / 255f, 100f / 100f));
+
+        /* Heat Gauge */
+        [Checkbox("Show Heat Gauge")]
+        public bool ShowHeatGauge = true;
+
+        [Checkbox("Show Heat Gauge Text")]
+        public bool ShowHeatGaugeText = true;
+
+        [DragFloat2("Heat Gauge Position", min = -4000f, max = 4000f)]
+        public Vector2 HeatGaugePosition = new(0, 417);
+
+        [DragFloat2("Heat Gauge Size", min = 0, max = 4000f)]
+        public Vector2 HeatGaugeSize = new(254, 20);
+
+        [DragInt("Heat Gauge Padding", min = 0)]
+        public int HeatGaugePadding = 2;
+
+        [ColorEdit4("Heat Gauge Fill Color")]
+        public PluginConfigColor HeatGaugeFillColor = new(new Vector4(201f / 255f, 13f / 255f, 13f / 255f, 100f / 100f));
+
+        /* Battery Gauge */
+        [Checkbox("Show Battery Gauge")]
+        public bool ShowBatteryGauge = true;
+
+        [Checkbox("Battery Gauge Show Battery")]
+        public bool ShowBatteryGaugeBattery = true;
+
+        [Checkbox("Battery Gauge Show Battery Text")]
+        public bool ShowBatteryGaugeBatteryText = false;
+
+        [Checkbox("Show Battery Gauge Robot Duration")]
+        public bool ShowBatteryGaugeRobotDuration = true;
+
+        [Checkbox("Show Battery Gauge Robot Duration Text")]
+        public bool ShowBatteryGaugeRobotDurationText = true;
+
+        [DragFloat2("Battery Gauge Position", min = -4000f, max = 4000f)]
+        public Vector2 BatteryGaugePosition = new(0, 439);
+
+        [DragFloat2("Battery Gauge Size", min = 0, max = 4000f)]
+        public Vector2 BatteryGaugeSize = new(254, 20);
+
+        [DragInt("Battery Gauge Padding", min = 0)]
+        public int BatteryGaugePadding = 2;
+
+        [ColorEdit4("Battery Fill Color")]
+        public PluginConfigColor BatteryFillColor = new(new Vector4(106f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+
+        [ColorEdit4("Robot Fill Color")]
+        public PluginConfigColor RobotFillColor = new(new Vector4(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
+
+        /* Wildfire */
+        [Checkbox("Show Wildfire")]
+        public bool ShowWildfire = false;
+
+        [Checkbox("Show Wildfire Text")]
+        public bool ShowWildfireText = true;
+
+        [DragFloat2("Wildfire Position", min = -4000f, max = 4000f)]
+        public Vector2 WildfirePosition = new(0, 373);
+
+        [DragFloat2("Wildfire Size", min = 0, max = 4000f)]
+        public Vector2 WildfireSize = new(254, 20);
+
+        [ColorEdit4("Wildfire Color")]
+        public PluginConfigColor WildfireFillColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
     }
 }

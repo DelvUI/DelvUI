@@ -36,8 +36,9 @@ namespace DelvUI.Config
             PaladinHudConfig pldConfig = new();
             WarriorHudConfig warConfig = new();
             DarkKnightHudConfig drkConfig = new();
+            MachinistHudConfig mchConfig = new();
 
-            return Initialize(pluginInterface, astConfig, brdConfig, blmConfig, dncConfig, gnbConfig, ninConfig, pldConfig, warConfig, drkConfig);
+            return Initialize(pluginInterface, astConfig, brdConfig, blmConfig, dncConfig, gnbConfig, ninConfig, pldConfig, warConfig, drkConfig, mchConfig);
         }
 
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface, params PluginConfigObject[] configObjects)

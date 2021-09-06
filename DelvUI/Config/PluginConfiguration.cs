@@ -739,56 +739,13 @@ namespace DelvUI.Config
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorMCH.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorMCH.AdjustColor(.1f))
                 },
-                [Jobs.MCH * 1000] = new() // Heat gauge ready
+                [Jobs.DNC] = new()
                 {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHHeatColor.AdjustColor(.1f))
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC.AdjustColor(-10f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC.AdjustColor(.1f))
                 },
-                [Jobs.MCH * 1000 + 1] = new() // Battery gauge ready
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHBatteryColor.AdjustColor(.1f))
-                },
-                [Jobs.MCH * 1000 + 2] = new() // Robot summoned
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHRobotColor.AdjustColor(.1f))
-                },
-                [Jobs.MCH * 1000 + 3] = new() // Overheated
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHOverheatColor.AdjustColor(.1f))
-                },
-                [Jobs.MCH * 1000 + 4] = new() // Bar not ready
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
-                [Jobs.MCH * 1000 + 5] = new() // Wildfire Active
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MCHWildfireColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MCHWildfireColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MCHWildfireColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MCHWildfireColor.AdjustColor(.1f))
-                },
-                [Jobs.DNC] =
-                    new()
-                    {
-                        ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC),
-                        ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC.AdjustColor(-10f)),
-                        ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC.AdjustColor(-.1f)),
-                        ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorDNC.AdjustColor(.1f))
-                    },
                 [Jobs.BLM] = new()
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorBLM),
@@ -1247,48 +1204,6 @@ namespace DelvUI.Config
         public Vector4 SamKenkiColor = new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f);
 
         public Vector4 SamExpiryColor = new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f);
-
-        #endregion
-
-        #region MCH Configuration
-
-        public int MCHBaseXOffset { get; set; }
-        public int MCHBaseYOffset { get; set; }
-
-        public bool MCHOverheatEnable { get; set; } = true;
-        public bool MCHOverheatText { get; set; } = true;
-        public int MCHOverheatHeight { get; set; } = 20;
-        public int MCHOverheatWidth { get; set; } = 254;
-        public int MCHOverheatXOffset { get; set; } = 127;
-        public int MCHOverheatYOffset { get; set; } = 395;
-        public bool MCHHeatGaugeEnable { get; set; } = true;
-        public bool MCHHeatGaugeText { get; set; } = true;
-        public int MCHHeatGaugeHeight { get; set; } = 20;
-        public int MCHHeatGaugeWidth { get; set; } = 254;
-        public int MCHHeatGaugePadding { get; set; } = 2;
-        public int MCHHeatGaugeXOffset { get; set; } = 127;
-        public int MCHHeatGaugeYOffset { get; set; } = 417;
-        public bool MCHBatteryGaugeEnable { get; set; } = true;
-        public bool MCHBatteryGaugeShowBattery { get; set; } = true;
-        public bool MCHBatteryGaugeBatteryText { get; set; }
-        public bool MCHBatteryGaugeShowRobotDuration { get; set; } = true;
-        public bool MCHBatteryGaugeRobotDurationText { get; set; } = true;
-        public int MCHBatteryGaugeHeight { get; set; } = 20;
-        public int MCHBatteryGaugeWidth { get; set; } = 254;
-        public int MCHBatteryGaugePadding { get; set; } = 2;
-        public int MCHBatteryGaugeXOffset { get; set; } = 127;
-        public int MCHBatteryGaugeYOffset { get; set; } = 439;
-        public bool MCHWildfireEnabled { get; set; }
-        public bool MCHWildfireText { get; set; } = true;
-        public int MCHWildfireHeight { get; set; } = 20;
-        public int MCHWildfireWidth { get; set; } = 254;
-        public int MCHWildfireXOffset { get; set; } = 127;
-        public int MCHWildfireYOffset { get; set; } = 373;
-        public Vector4 MCHHeatColor = new(201f / 255f, 13f / 255f, 13f / 255f, 100f / 100f);
-        public Vector4 MCHBatteryColor = new(106f / 255f, 255f / 255f, 255f / 255f, 100f / 100f);
-        public Vector4 MCHRobotColor = new(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f);
-        public Vector4 MCHOverheatColor = new(255f / 255f, 239f / 255f, 14f / 255f, 100f / 100f);
-        public Vector4 MCHWildfireColor = new(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f);
 
         #endregion
 
