@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using ImGuiNET;
 using ImGuiScene;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
 
 namespace DelvUI.Config
 {
@@ -40,7 +40,7 @@ namespace DelvUI.Config
 
             _configMap.Add("Buffs and Debuffs", new[] { "Player Buffs", "Player Debuffs", "Target Buffs", "Target Debuffs", "Raid/Job Buffs" });
 
-            _configMap.Add("Job Specific Bars", new[] { "General", "Tank", "Healer", "Melee", "Ranged"});
+            _configMap.Add("Job Specific Bars", new[] { "General", "Tank", "Healer", "Melee", "Ranged" });
             _configMap.Add("Import/Export", new[] { "General" });
         }
 
