@@ -418,7 +418,6 @@ namespace DelvUI.Config {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(.1f)),
                     ["invuln"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(-.8f))
                 },
-                                
                 [Jobs.DRK] = new()
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK),
@@ -426,62 +425,6 @@ namespace DelvUI.Config {
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK.AdjustColor(.1f)),
                     ["invuln"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK.AdjustColor(-.8f))
-                },
-                [Jobs.DRK * 1000] = new() // Mana
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(DRKManaColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(DRKManaColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DRKManaColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DRKManaColor.AdjustColor(.1f))
-                },
-                [Jobs.DRK * 1000 + 1] = new() // Blood Left
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(DRKBloodColorLeft),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(DRKBloodColorLeft.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DRKBloodColorLeft.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DRKBloodColorLeft.AdjustColor(.1f))
-                },
-                [Jobs.DRK * 1000 + 2] = new() // Blood Right
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(DRKBloodColorRight),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(DRKBloodColorRight.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DRKBloodColorRight.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DRKBloodColorRight.AdjustColor(.1f))
-                },
-                [Jobs.DRK * 1000 + 3] = new() // Dark Arts
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(DRKDarkArtsColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(DRKDarkArtsColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DRKDarkArtsColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DRKDarkArtsColor.AdjustColor(.1f))
-                },
-                [Jobs.DRK * 1000 + 4] = new() // Blood Weapon
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(DRKBloodWeaponColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(DRKBloodWeaponColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DRKBloodWeaponColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DRKBloodWeaponColor.AdjustColor(.1f))
-                },
-                [Jobs.DRK * 1000 + 5] = new() // Delirium
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(DRKDeliriumColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(DRKDeliriumColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DRKDeliriumColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DRKDeliriumColor.AdjustColor(.1f))
-                },
-                [Jobs.DRK * 1000 + 6] = new() // Living Shadow
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(DRKDeliriumColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(DRKDeliriumColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(DRKDeliriumColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(DRKDeliriumColor.AdjustColor(.1f))
-                },
-                [Jobs.DRK * 1000 + 7] = new() // Bar not ready
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
                 },
                 [Jobs.GNB] = new()
                 {
@@ -1509,47 +1452,6 @@ namespace DelvUI.Config {
         public Vector4 MCHRobotColor = new(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f);
         public Vector4 MCHOverheatColor = new(255f / 255f, 239f / 255f, 14f / 255f, 100f / 100f);
         public Vector4 MCHWildfireColor = new(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f);
-
-        #endregion
-
-        #region DRK Configuration
-
-        public int DRKBaseXOffset { get; set; } = 127;
-        public int DRKBaseYOffset { get; set; } = 415;
-        public bool DRKManaBarEnabled { get; set; } = true;
-        public bool DRKManaBarOverflowEnabled { get; set; }
-        public int DRKManaBarHeight { get; set; } = 10;
-        public int DRKManaBarWidth { get; set; } = 254;
-        public int DRKManaBarPadding { get; set; } = 1;
-        public int DRKManaBarXOffset { get; set; }
-        public int DRKManaBarYOffset { get; set; }
-        public bool DRKBloodGaugeEnabled { get; set; } = true;
-        public bool DRKBloodGaugeSplit { get; set; }
-        public bool DRKBloodGaugeThreshold { get; set; }
-        public int DRKBloodGaugeHeight { get; set; } = 10;
-        public int DRKBloodGaugeWidth { get; set; } = 254;
-        public int DRKBloodGaugePadding { get; set; } = 2;
-        public int DRKBloodGaugeXOffset { get; set; }
-        public int DRKBloodGaugeYOffset { get; set; } = 12;
-        public bool DRKBuffBarEnabled { get; set; } = true;
-        public int DRKBuffBarHeight { get; set; } = 20;
-        public int DRKBuffBarWidth { get; set; } = 254;
-        public int DRKBuffBarPadding { get; set; } = 2;
-        public int DRKBuffBarXOffset { get; set; }
-        public int DRKBuffBarYOffset { get; set; } = 24;
-        public bool DRKLivingShadowBarEnabled { get; set; }
-        public int DRKLivingShadowBarHeight { get; set; } = 20;
-        public int DRKLivingShadowBarWidth { get; set; } = 254;
-        public int DRKLivingShadowBarPadding { get; set; } = 2;
-        public int DRKLivingShadowBarXOffset { get; set; }
-        public int DRKLivingShadowBarYOffset { get; set; }
-        public Vector4 DRKManaColor = new(0f / 255f, 142f / 255f, 254f / 255f, 100f / 100f);
-        public Vector4 DRKBloodColorLeft = new(196f / 255f, 20f / 255f, 122f / 255f, 100f / 100f);
-        public Vector4 DRKBloodColorRight = new(216f / 255f, 0f / 255f, 73f / 255f, 100f / 100f);
-        public Vector4 DRKDarkArtsColor = new(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f);
-        public Vector4 DRKBloodWeaponColor = new(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f);
-        public Vector4 DRKDeliriumColor = new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f);
-        public Vector4 DRKLivingShadowColor = new(225f / 255f, 105f / 255f, 205f / 255f, 100f / 100f);
 
         #endregion
 
