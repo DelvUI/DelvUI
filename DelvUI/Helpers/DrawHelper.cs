@@ -85,7 +85,7 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static void DrawOvershield(float shield, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, Dictionary<string, uint> color)
+        public static void DrawOvershield(float shield, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, Dictionary<string, uint> color, ImDrawListPtr drawList)
         {
             if (shield == 0)
             {
@@ -94,14 +94,13 @@ namespace DelvUI.Helpers
 
             var h = useRatioForHeight ? barSize.Y / 100 * height : height;
 
-            var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(Math.Max(1, barSize.X * shield), h),
                 color["gradientLeft"], color["gradientRight"], color["gradientRight"], color["gradientLeft"]
             );
         }
 
-        public static void DrawShield(float shield, float hp, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, Dictionary<string, uint> color)
+        public static void DrawShield(float shield, float hp, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, Dictionary<string, uint> color, ImDrawListPtr drawList)
         {
             if (shield == 0)
             {
@@ -111,14 +110,13 @@ namespace DelvUI.Helpers
             // on full hp just draw overshield
             if (hp == 1)
             {
-                DrawOvershield(shield, cursorPos, barSize, height, useRatioForHeight, color);
+                DrawOvershield(shield, cursorPos, barSize, height, useRatioForHeight, color, drawList);
                 return;
             }
 
-            var h = useRatioForHeight ? barSize.Y / 100 * Math.Min(100, height) : height;
-            var drawList = ImGui.GetWindowDrawList();
 
             // hp portion
+            var h = useRatioForHeight ? barSize.Y / 100 * Math.Min(100, height) : height;
             var missingHPRatio = 1 - hp;
             var s = Math.Min(shield, missingHPRatio);
             var shieldStartPos = cursorPos + new Vector2(Math.Max(1, barSize.X * hp), 0);

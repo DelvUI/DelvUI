@@ -76,13 +76,14 @@ namespace DelvUI.Interface.GeneralElements
 
                 if (ImGui.BeginChild(windowName, Config.Size, default, _childFlags))
                 {
+                    // health bar
                     if (Actor is not Chara)
                     {
-                        DrawFriendlyNPC(startPos, endPos);
+                        DrawFriendlyNPC(drawListPtr, startPos, endPos);
                     }
                     else
                     {
-                        DrawChara(origin, (Chara)Actor);
+                        DrawChara(drawListPtr, origin, (Chara)Actor);
                     }
 
                     // Check if mouse is hovering over the box properly
@@ -104,7 +105,7 @@ namespace DelvUI.Interface.GeneralElements
                 ImGui.End();
             });
 
-
+            // labels
             _leftLabel.DrawWithActor(origin + Config.Position, Actor);
             _rightLabel.DrawWithActor(origin + Config.Position, Actor);
         }
@@ -128,7 +129,7 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
-        private void DrawChara(Vector2 origin, Chara chara)
+        private void DrawChara(ImDrawListPtr drawList, Vector2 origin, Chara chara)
         {
             if (Config.TankStanceIndicatorConfig != null && Config.TankStanceIndicatorConfig.Enabled && JobsHelper.IsJobTank(chara.ClassJob.Id))
             {
@@ -141,52 +142,21 @@ namespace DelvUI.Interface.GeneralElements
             var color = Config.UseCustomColor ? Config.CustomColor.Map : Utils.ColorForActor(_pluginConfiguration, chara);
             var bgColor = BackgroundColor(chara);
 
-            var drawList = ImGui.GetWindowDrawList();
+            // background
+            drawList.AddRectFilled(startPos, endPos, bgColor);
 
-            // Basically make an invisible box for BeginChild to work properly.
-            //ImGuiWindowFlags windowFlags = 0;
-            //windowFlags |= ImGuiWindowFlags.NoBackground;
-            //windowFlags |= ImGuiWindowFlags.NoTitleBar;
-            //windowFlags |= ImGuiWindowFlags.NoMove;
-            //windowFlags |= ImGuiWindowFlags.NoDecoration;
-            //windowFlags |= ImGuiWindowFlags.NoInputs;
+            // health
+            drawList.AddRectFilledMultiColor(
+                startPos,
+                startPos + new Vector2(Config.Size.X * scale, Config.Size.Y),
+                color["gradientLeft"],
+                color["gradientRight"],
+                color["gradientRight"],
+                color["gradientLeft"]
+            );
 
-
-            //ImGui.SetNextWindowPos(startPos);
-            //ImGui.SetNextWindowSize(Config.Size);
-
-            //ImGui.Begin(ID, windowFlags);
-
-            //if (ImGui.BeginChild(ID + "child", Config.Size))
-            {
-                // background
-                drawList.AddRectFilled(startPos, endPos, bgColor);
-
-                // health
-                drawList.AddRectFilledMultiColor(
-                    startPos,
-                    startPos + new Vector2(Config.Size.X * scale, Config.Size.Y),
-                    color["gradientLeft"],
-                    color["gradientRight"],
-                    color["gradientRight"],
-                    color["gradientLeft"]
-                );
-
-                // border
-                drawList.AddRect(startPos, endPos, 0xFF000000);
-
-                // Check if mouse is hovering over the box properly
-                //if (ImGui.GetIO().MouseClicked[0] && ImGui.IsMouseHoveringRect(startPos, endPos))
-                //{
-                //    Plugin.InterfaceInstance.ClientState.Targets.SetCurrentTarget(Actor);
-                //}
-            }
-
-            //ImGui.EndChild();
-            //ImGui.End();
-
-
-
+            // border
+            drawList.AddRect(startPos, endPos, 0xFF000000);
 
             // shield
             if (Config.ShieldConfig.Enabled)
@@ -195,20 +165,21 @@ namespace DelvUI.Interface.GeneralElements
 
                 if (Config.ShieldConfig.FillHealthFirst)
                 {
-                    DrawHelper.DrawShield(shield, scale, startPos, endPos, Config.ShieldConfig.Height, Config.ShieldConfig.HeightInPixels, Config.ShieldConfig.Color.Map);
+                    DrawHelper.DrawShield(shield, scale, startPos, endPos, 
+                        Config.ShieldConfig.Height, Config.ShieldConfig.HeightInPixels, Config.ShieldConfig.Color.Map, drawList);
                 }
                 else
                 {
-                    DrawHelper.DrawOvershield(shield, startPos, endPos, Config.ShieldConfig.Height, Config.ShieldConfig.HeightInPixels, Config.ShieldConfig.Color.Map);
+                    DrawHelper.DrawOvershield(shield, startPos, endPos, 
+                        Config.ShieldConfig.Height, Config.ShieldConfig.HeightInPixels, Config.ShieldConfig.Color.Map, drawList);
                 }
             }
         }
 
-        private void DrawFriendlyNPC(Vector2 startPos, Vector2 endPos)
+        private void DrawFriendlyNPC(ImDrawListPtr drawList, Vector2 startPos, Vector2 endPos)
         {
             var color = _pluginConfiguration.NPCColorMap["friendly"];
 
-            var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(startPos, endPos, ImGui.ColorConvertFloat4ToU32(_pluginConfiguration.UnitFrameEmptyColor));
 
             drawList.AddRectFilledMultiColor(

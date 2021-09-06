@@ -37,7 +37,6 @@ namespace DelvUI.Interface.GeneralElements
             var size = ImGui.CalcTextSize(text);
             var offset = OffsetForSize(size);
 
-            var drawList = ImGui.GetWindowDrawList();
             DrawHelper.DrawOutlinedText(text, origin + Config.Position + offset, Config.Color, Config.OutlineColor);
         }
 
