@@ -22,6 +22,7 @@ namespace DelvUI.Config
 
         public readonly StatusEffectsListConfig PlayerBuffListConfig = new(
             new Vector2(750, -480),
+            new Vector2(340, 100),
             true,
             false,
             true,
@@ -30,6 +31,7 @@ namespace DelvUI.Config
 
         public readonly StatusEffectsListConfig PlayerDebuffListConfig = new(
             new Vector2(750, -380),
+            new Vector2(340, 100),
             false,
             true,
             true,
@@ -38,6 +40,7 @@ namespace DelvUI.Config
 
         public readonly StatusEffectsListConfig TargetBuffListConfig = new(
             new Vector2(160, 415),
+            new Vector2(340, 100),
             true,
             false,
             true,
@@ -46,6 +49,7 @@ namespace DelvUI.Config
 
         public readonly StatusEffectsListConfig TargetDebuffListConfig = new(
             new Vector2(160, 315),
+            new Vector2(340, 100),
             false,
             true,
             true,
@@ -53,7 +57,12 @@ namespace DelvUI.Config
         );
 
         public StatusEffectsListConfig RaidJobBuffListConfig = new(
-            new Vector2(0, 300), true, false, false, GrowthDirections.Out | GrowthDirections.Right,
+            new Vector2(0, 300),
+            new Vector2(340, 100),
+            true, 
+            false, 
+            false, 
+            GrowthDirections.Out | GrowthDirections.Right,
             new StatusEffectIconConfig(new Vector2(35, 35), true, true, false, false)
         );
 

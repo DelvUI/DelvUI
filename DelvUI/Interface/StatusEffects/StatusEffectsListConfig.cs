@@ -6,51 +6,82 @@ using System.Numerics;
 
 namespace DelvUI.Interface.StatusEffects
 {
+    public static class DefaultStatusEffectsLists
+    {
+        internal static Vector2 DefaultSize = new Vector2(292, 82);
+
+        public static StatusEffectsListConfig PlayerBuffsList()
+        {
+            var screenSize = ImGui.GetMainViewport().Size;
+            var pos = new Vector2(screenSize.X * 0.38f, -screenSize.Y * 0.45f);
+
+            return new StatusEffectsListConfig(pos, DefaultSize, true, false, true, GrowthDirections.Left | GrowthDirections.Down);
+        }
+
+        public static StatusEffectsListConfig PlayerDebuffsList()
+        {
+            var screenSize = ImGui.GetMainViewport().Size;
+            var pos = new Vector2(screenSize.X * 0.38f, -screenSize.Y * 0.45f + DefaultSize.Y);
+
+            return new StatusEffectsListConfig(pos, DefaultSize, false, true, true, GrowthDirections.Left | GrowthDirections.Down);
+        }
+
+        public static StatusEffectsListConfig TargetBuffsList()
+        {
+            var pos = new Vector2(HUDConstants.UnitFramesOffsetX, HUDConstants.BaseHUDOffsetY - 50);
+
+            return new StatusEffectsListConfig(pos, DefaultSize, true, false, true, GrowthDirections.Right | GrowthDirections.Up);
+        }
+
+        public static StatusEffectsListConfig TargetDebuffsList()
+        {
+            var pos = new Vector2(HUDConstants.UnitFramesOffsetX, HUDConstants.BaseHUDOffsetY - 50 - DefaultSize.Y);
+
+            return new StatusEffectsListConfig(pos, DefaultSize, false, true, true, GrowthDirections.Right | GrowthDirections.Up);
+        }
+    }
+
     [Serializable]
-    public class StatusEffectsListConfig : PluginConfigObject
+    public class StatusEffectsListConfig : MovablePluginConfigObject
     {
         public bool FillRowsFirst = true;
         public GrowthDirections GrowthDirections;
-        public StatusEffectIconConfig IconConfig = new();
+        public StatusEffectIconConfig IconConfig = new StatusEffectIconConfig();
         public Vector2 IconPadding = new(2, 2);
         public int Limit = -1;
-        public Vector2 MaxSize = new(340, 100);
-        public Vector2 Position;
         public bool ShowArea;
         public bool ShowBuffs;
         public bool ShowDebuffs;
         public bool ShowPermanentEffects;
 
-        public StatusEffectsListConfig(Vector2 position, bool showBuffs, bool showDebuffs, bool showPermanentEffects, GrowthDirections growthDirections)
+        public StatusEffectsListConfig(
+            Vector2 position,
+            Vector2 size,
+            bool showBuffs,
+            bool showDebuffs,
+            bool showPermanentEffects,
+            GrowthDirections growthDirections,
+            StatusEffectIconConfig iconConfig = null) : base(position, size)
         {
-            Position = position;
             ShowBuffs = showBuffs;
             ShowDebuffs = showDebuffs;
             ShowPermanentEffects = showPermanentEffects;
             GrowthDirections = growthDirections;
-        }
-        public StatusEffectsListConfig(Vector2 position, bool showBuffs, bool showDebuffs, bool showPermanentEffects, GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
-        {
-            Position = position;
-            ShowBuffs = showBuffs;
-            ShowDebuffs = showDebuffs;
-            ShowPermanentEffects = showPermanentEffects;
-            GrowthDirections = growthDirections;
-            IconConfig = iconConfig;
+
+            if (iconConfig != null)
+            {
+                IconConfig = iconConfig;
+            }
         }
 
         public new bool Draw()
         {
             var changed = false;
 
-            changed |= ImGui.Checkbox("Enabled", ref Enabled);
-
             ImGui.Text("Layout");
             ImGui.BeginGroup();
-
             {
-                changed |= ImGui.DragFloat2("Base Offset", ref Position, 1f, -4000, 4000);
-                changed |= ImGui.DragFloat2("Area Size", ref MaxSize, 1f, 1, 2000);
+                changed |= base.Draw();
                 changed |= ImGui.DragFloat2("Padding", ref IconPadding, 1f, -200, 200);
 
                 var directions = new List<GrowthDirections>
@@ -121,7 +152,6 @@ namespace DelvUI.Interface.StatusEffects
 
             ImGui.Text("Icons");
             ImGui.BeginGroup();
-
             {
                 changed |= ImGui.DragFloat2("Size", ref Size, 1f, 1, 200);
 

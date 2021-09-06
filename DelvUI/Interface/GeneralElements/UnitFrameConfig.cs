@@ -6,11 +6,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    internal static class UnitFrameConstants
-    {
-        internal static int BaseUnitFrameOffsetX = 160;
-    }
-
     [Serializable]
     public class PlayerUnitFrameConfig : UnitFrameConfig
     {
@@ -18,7 +13,7 @@ namespace DelvUI.Interface.GeneralElements
         public static PlayerUnitFrameConfig DefaultUnitFrame()
         {
             var size = DefaultSize;
-            var pos = new Vector2(-UnitFrameConstants.BaseUnitFrameOffsetX - size.X / 2f, HUDConstants.BaseHUDOffsetY);
+            var pos = new Vector2(-HUDConstants.UnitFramesOffsetX - size.X / 2f, HUDConstants.BaseHUDOffsetY);
 
             var leftLabelConfig = new EditableLabelConfig(new Vector2(-size.X / 2f + 5, -size.Y / 2f + 2), "[name:abbreviate]", LabelTextAnchor.BottomLeft);
             var rightLabelConfig = new EditableLabelConfig(new Vector2(size.X / 2 + 10, -size.Y / 2f + 2), "[health:current-short] | [health:percent]%", LabelTextAnchor.BottomRight);
@@ -43,7 +38,7 @@ namespace DelvUI.Interface.GeneralElements
         public static TargetUnitFrameConfig DefaultUnitFrame()
         {
             var size = DefaultSize;
-            var pos = new Vector2(UnitFrameConstants.BaseUnitFrameOffsetX + size.X / 2f, HUDConstants.BaseHUDOffsetY);
+            var pos = new Vector2(HUDConstants.UnitFramesOffsetX + size.X / 2f, HUDConstants.BaseHUDOffsetY);
 
             var leftLabelConfig = new EditableLabelConfig(new Vector2(-size.X / 2f + 5, -size.Y / 2f + 2), "[health:current-short] | [health:percent]%", LabelTextAnchor.BottomLeft);
             var rightLabelConfig = new EditableLabelConfig(new Vector2(size.X / 2 - 5, -size.Y / 2 + 2), "[name:abbreviate]", LabelTextAnchor.BottomRight);
@@ -65,7 +60,7 @@ namespace DelvUI.Interface.GeneralElements
         {
             var size = new Vector2(120, 20);
             var pos = new Vector2(
-                UnitFrameConstants.BaseUnitFrameOffsetX + TargetUnitFrameConfig.DefaultSize.X + 6 + size.X / 2f,
+                HUDConstants.UnitFramesOffsetX + TargetUnitFrameConfig.DefaultSize.X + 6 + size.X / 2f,
                 HUDConstants.BaseHUDOffsetY - 15
             );
 
@@ -89,7 +84,7 @@ namespace DelvUI.Interface.GeneralElements
         {
             var size = new Vector2(120, 20);
             var pos = new Vector2(
-                -UnitFrameConstants.BaseUnitFrameOffsetX - TargetUnitFrameConfig.DefaultSize.X - 6 - size.X / 2f,
+                -HUDConstants.UnitFramesOffsetX - TargetUnitFrameConfig.DefaultSize.X - 6 - size.X / 2f,
                 HUDConstants.BaseHUDOffsetY - 15
             );
 

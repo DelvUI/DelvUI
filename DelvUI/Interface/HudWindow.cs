@@ -28,11 +28,11 @@ namespace DelvUI.Interface
     {
         private readonly OpenContextMenuFromTarget _openContextMenuFromTarget;
 
-        private readonly StatusEffectsList _playerBuffList;
-        private readonly StatusEffectsList _playerDebuffList;
-        private readonly StatusEffectsList _targetBuffList;
-        private readonly StatusEffectsList _targetDebuffList;
-        private readonly StatusEffectsList _raidJobsBuffList;
+        private readonly StatusEffectsListHud _playerBuffList;
+        private readonly StatusEffectsListHud _playerDebuffList;
+        private readonly StatusEffectsListHud _targetBuffList;
+        private readonly StatusEffectsListHud _targetDebuffList;
+        private readonly StatusEffectsListHud _raidJobsBuffList;
         protected readonly PluginConfiguration PluginConfiguration;
         protected readonly DalamudPluginInterface PluginInterface;
 
@@ -132,15 +132,11 @@ namespace DelvUI.Interface
             JobSpecificBuffs = GetJobSpecificBuffs();
             PluginConfiguration.ConfigChangedEvent += OnConfigChanged;
 
-            var center = new Vector2(CenterX, CenterY);
-            _playerBuffList = new StatusEffectsList(pluginInterface, pluginConfiguration.PlayerBuffListConfig) { Center = center };
-
-            _playerDebuffList = new StatusEffectsList(pluginInterface, pluginConfiguration.PlayerDebuffListConfig) { Center = center };
-
-            _targetBuffList = new StatusEffectsList(pluginInterface, pluginConfiguration.TargetDebuffListConfig) { Center = center };
-
-            _targetDebuffList = new StatusEffectsList(pluginInterface, pluginConfiguration.TargetBuffListConfig) { Center = center };
-            _raidJobsBuffList = new StatusEffectsList(pluginInterface, pluginConfiguration.RaidJobBuffListConfig) { Center = center };
+            _playerBuffList = new StatusEffectsListHud("tmp1", pluginConfiguration.PlayerBuffListConfig);
+            _playerDebuffList = new StatusEffectsListHud("tmp2", pluginConfiguration.PlayerDebuffListConfig);
+            _targetBuffList = new StatusEffectsListHud("tmp3", pluginConfiguration.TargetDebuffListConfig);
+            _targetDebuffList = new StatusEffectsListHud("tmp4", pluginConfiguration.TargetBuffListConfig);
+            _raidJobsBuffList = new StatusEffectsListHud("tmp5", pluginConfiguration.RaidJobBuffListConfig);
         }
 
         public abstract uint JobId { get; }
@@ -987,10 +983,12 @@ namespace DelvUI.Interface
 
         private void DrawPlayerStatusEffects()
         {
+            var center = new Vector2(CenterX, CenterY);
+
             _playerBuffList.Actor = PluginInterface.ClientState.LocalPlayer;
-            _playerBuffList.Draw();
+            _playerBuffList.Draw(center);
             _playerDebuffList.Actor = PluginInterface.ClientState.LocalPlayer;
-            _playerDebuffList.Draw();
+            _playerDebuffList.Draw(center);
         }
 
         private void DrawTargetStatusEffects()
@@ -1007,10 +1005,12 @@ namespace DelvUI.Interface
                 return;
             }
 
+            var center = new Vector2(CenterX, CenterY);
+
             _targetBuffList.Actor = target;
-            _targetBuffList.Draw();
+            _targetBuffList.Draw(center);
             _targetDebuffList.Actor = target;
-            _targetDebuffList.Draw();
+            _targetDebuffList.Draw(center);
         }
 
         private int HasTankInvuln(Actor actor)
@@ -1040,8 +1040,11 @@ namespace DelvUI.Interface
             {
                 buffIds.AddRange(RaidWideBuffs);
             }
+
+            var center = new Vector2(CenterX, CenterY);
+
             _raidJobsBuffList.Actor = PluginInterface.ClientState.LocalPlayer;
-            _raidJobsBuffList.Draw(buffIds);
+            _raidJobsBuffList.Draw(center, buffIds);
         }
 
         protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor)
