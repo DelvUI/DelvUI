@@ -98,4 +98,41 @@ namespace DelvUI.Config.Attributes
 
         public ColorEdit4Attribute(string friendlyName) { this.friendlyName = friendlyName; }
     }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public class OrderAttribute : Attribute
+    {
+        public int pos;
+
+        public OrderAttribute(int pos)
+        {
+            this.pos = pos;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public class CollapseControlAttribute : Attribute
+    {
+        public int pos;
+        public int id;
+
+        public CollapseControlAttribute(int pos, int id)
+        {
+            this.pos = pos;
+            this.id = id;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public class CollapseWithAttribute : Attribute
+    {
+        public int pos;
+        public int id;
+
+        public CollapseWithAttribute(int pos, int id)
+        {
+            this.pos = pos;
+            this.id = id;
+        }
+    }
 }
