@@ -357,7 +357,7 @@ namespace DelvUI.Interface
         [Order(45)]
         public PluginConfigColor ManaBarFireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
 
-        [Checkbox("Show Triplecast")] 
+        [Checkbox("Show Triplecast")]
         [CollapseControl(50, 1)]
         public bool ShowTripleCast = true;
 

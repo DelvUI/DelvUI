@@ -1,13 +1,12 @@
+using DelvUI.Config.Attributes;
+using ImGuiNET;
+using ImGuiScene;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
-using System.Reflection;
-using DelvUI.Config.Attributes;
-using ImGuiNET;
-using ImGuiScene;
-using Newtonsoft.Json;
 using System.Reflection;
 
 namespace DelvUI.Config.Tree
@@ -488,7 +487,8 @@ namespace DelvUI.Config.Tree
             // While in general use this is important as the conversion from the superclass 'PluginConfigObject' to a specific subclass (e.g. 'BlackMageHudConfig') would
             // be handled by Json.NET, when the plugin is reloaded with a different assembly (as is the case when using LivePluginLoader, or updating the plugin in-game)
             // it fails. In order to fix this we need to specify the specific subclass, in order to do this during runtime we must use reflection to set the generic.
-            if (ConfigObject.GetType().BaseType == typeof(PluginConfigObject)) {
+            if (ConfigObject.GetType().BaseType == typeof(PluginConfigObject))
+            {
                 var methodInfo = GetType().GetMethod("LoadForType");
                 var function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
                 ConfigObject = (PluginConfigObject)function.Invoke(this, new object[] { finalPath.FullName });
@@ -528,7 +528,7 @@ namespace DelvUI.Config.Tree
         public void Draw(ref bool changed)
         {
             Draw(ref changed, MainField, 0);
-            if (CategoryId != -1 && (bool) MainField.GetValue(ConfigObject))
+            if (CategoryId != -1 && (bool)MainField.GetValue(ConfigObject))
             {
                 ImGui.BeginGroup();
                 ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 2));

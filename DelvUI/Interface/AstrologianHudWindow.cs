@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using Dalamud.Game.ClientState.Actors.Types;
+﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
@@ -13,6 +7,12 @@ using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Reflection;
+using System.Runtime.InteropServices;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface
@@ -592,7 +592,7 @@ namespace DelvUI.Interface
         [CollapseWith(20, 1)]
         public PluginConfigColor SealLunarColor = new(new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f));
 
-        [ColorEdit4("Seal Celestial Color")] 
+        [ColorEdit4("Seal Celestial Color")]
         [CollapseWith(25, 1)]
         public PluginConfigColor SealCelestialColor = new(new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f));
 
