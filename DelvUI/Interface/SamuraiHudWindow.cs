@@ -204,107 +204,138 @@ namespace DelvUI.Interface
     public class SamuraiHudConfig : PluginConfigObject
     {
         [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [Order(0)]
         public Vector2 Position = new(0, 0);
 
         #region Kenki
         [Checkbox("Show Kenki Bar")]
+        [CollapseControl(5, 0)]
         public bool ShowKenkiBar = true;
 
-        [Checkbox("Show Kenki Text")]
-        public bool ShowKenkiText = true;
-
         [DragFloat2("Kenki Bar Size", max = 2000f)]
+        [CollapseWith(0, 0)]
         public Vector2 KenkiBarSize = new Vector2(253, 20);
 
         [DragFloat2("Kenki Bar Offset", min = -2000f, max = 2000f)]
+        [CollapseWith(5, 0)]
         public Vector2 KenkiBarOffset = new Vector2(0, 414);
+
+        [Checkbox("Show Kenki Text")]
+        [CollapseWith(10, 0)]
+        public bool ShowKenkiText = true;
         #endregion
 
         #region Sen
         [Checkbox("Show Sen Bar")]
+        [CollapseControl(10, 1)]
         public bool ShowSenBar = true;
 
         [DragInt("Sen Bar Padding", max = 1000)]
+        [CollapseWith(0, 1)]
         public int SenBarPadding = 2;
 
         [DragFloat2("Sen Bar Size", max = 2000f)]
+        [CollapseWith(5, 1)]
         public Vector2 SenBarSize = new Vector2(253, 10);
 
         [DragFloat2("Sen Bar Offset", min = -2000f, max = 2000f)]
+        [CollapseWith(10, 1)]
         public Vector2 SenBarOffset = new Vector2(0, 436);
         #endregion
 
         #region Meditation
         [Checkbox("Show Meditation Bar")]
+        [CollapseControl(15, 2)]
         public bool ShowMeditationBar = true;
 
         [DragInt("Meditation Bar Padding", max = 1000)]
+        [CollapseWith(0, 2)]
         public int MeditationBarPadding = 2;
 
         [DragFloat2("Meditation Bar Size", max = 2000f)]
+        [CollapseWith(5, 2)]
         public Vector2 MeditationBarSize = new Vector2(253, 10);
 
         [DragFloat2("Meditation Bar Offset", min = -2000f, max = 2000f)]
+        [CollapseWith(10, 2)]
         public Vector2 MeditationBarOffset = new Vector2(0, 448);
         #endregion
 
         #region Buffs
         [Checkbox("Show Buffs Bar")]
+        [CollapseControl(20, 3)]
         public bool ShowBuffsBar = true;
 
-        [Checkbox("Show Buffs Bar Text")]
-        public bool ShowBuffsText = true;
-
         [DragInt("Buffs Bar Padding", max = 1000)]
+        [CollapseWith(0, 3)]
         public int BuffsPadding = 1;
 
         [DragFloat2("Buffs Bar Size", max = 2000f)]
+        [CollapseWith(5, 3)]
         public Vector2 BuffsBarSize = new Vector2(253, 20);
 
         [DragFloat2("Buffs Bar Offset", min = -2000f, max = 2000f)]
+        [CollapseWith(10, 3)]
         public Vector2 BuffsBarOffset = new Vector2(0, 392);
+
+        [Checkbox("Show Buffs Bar Text")]
+        [CollapseWith(15, 3)]
+        public bool ShowBuffsText = true;
         #endregion
 
         #region Higanbana
         [Checkbox("Show Higanbana Bar")]
+        [CollapseControl(25, 4)]
         public bool ShowHiganbanaBar = true;
 
-        [Checkbox("Show Higanbana Text")]
-        public bool ShowHiganbanaText = true;
-
         [DragFloat2("Higanbana Bar Size", max = 2000f)]
+        [CollapseWith(0, 4)]
         public Vector2 HiganbanaBarSize = new Vector2(253, 20);
 
         [DragFloat2("Higanbana Bar Offset", min = -2000f, max = 2000f)]
+        [CollapseWith(5, 4)]
         public Vector2 HiganbanaBarOffset = new Vector2(0, 370);
+
+        [Checkbox("Show Higanbana Text")]
+        [CollapseWith(10, 4)]
+        public bool ShowHiganbanaText = true;
         #endregion
 
         #region colors
         [ColorEdit4("Kenki Bar Color")]
+        [Order(30)]
         public PluginConfigColor KenkiColor = new PluginConfigColor(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f));
 
         [ColorEdit4("Setsu Color")]
+        [Order(35)]
         public PluginConfigColor SetsuColor = new PluginConfigColor(new(89f / 255f, 234f / 255f, 247f / 255f, 100f / 100f));
 
         [ColorEdit4("Getsu Color")]
+        [Order(40)]
         public PluginConfigColor GetsuColor = new PluginConfigColor(new(89f / 255f, 126f / 255f, 247f / 255f, 100f / 100f));
 
         [ColorEdit4("Ka Color")]
+        [Order(45)]
         public PluginConfigColor KaColor = new PluginConfigColor(new(247f / 255f, 89f / 255f, 89f / 255f, 100f / 100f));
 
         [ColorEdit4("Meditation Color")]
+        [Order(50)]
         public PluginConfigColor MeditationColor = new PluginConfigColor(new(247f / 255f, 163f / 255f, 89f / 255f, 100f / 100f));
 
         [ColorEdit4("Shifu Color")]
+        [Order(55)]
         public PluginConfigColor ShifuColor = new PluginConfigColor(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f));
 
         [ColorEdit4("Jinpu Color")]
+        [Order(60)]
         public PluginConfigColor JinpuColor = new PluginConfigColor(new(136f / 255f, 146f / 255f, 219f / 255f, 100f / 100f));
 
         [ColorEdit4("Higanbana Color")]
+        [Order(65)]
         public PluginConfigColor HiganbanaColor = new PluginConfigColor(new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f));
 
         [ColorEdit4("Higanbana Expiry Color")]
+        [Order(70)]
         public PluginConfigColor HiganbanaExpiryColor = new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
         #endregion
     }
