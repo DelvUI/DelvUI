@@ -2,11 +2,7 @@
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -65,7 +61,7 @@ namespace DelvUI.Interface.GeneralElements
         public static TargetCastbarConfig DefaultCastbar()
         {
             var size = DefaultSize;
-            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY / 2f - size.Y /2);
+            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY / 2f - size.Y / 2);
 
             var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left);
             var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);

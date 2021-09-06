@@ -44,31 +44,31 @@ namespace DelvUI.Interface
 
             // unit frames
             var playerUnitFrameConfig = PlayerUnitFrameConfig.DefaultUnitFrame();
-            _playerUnitFrame = new UnitFrameHud(playerUnitFrameConfig, pluginConfiguration);
+            _playerUnitFrame = new UnitFrameHud("playerUnitFrame", playerUnitFrameConfig, pluginConfiguration);
             _hudElements.Add(_playerUnitFrame);
             _hudElementsUsingPlayer.Add(_playerUnitFrame);
 
             var targetUnitFrameConfig = TargetUnitFrameConfig.DefaultUnitFrame();
-            _targetUnitFrame = new UnitFrameHud(targetUnitFrameConfig, pluginConfiguration);
+            _targetUnitFrame = new UnitFrameHud("targetUnitFrame", targetUnitFrameConfig, pluginConfiguration);
             _hudElements.Add(_targetUnitFrame);
             _hudElementsUsingTarget.Add(_targetUnitFrame);
 
             var targetOfTargetUnitFrameConfig = TargetOfTargetUnitFrameConfig.DefaultUnitFrame();
-            _targetOfTargetUnitFrame = new UnitFrameHud(targetOfTargetUnitFrameConfig, pluginConfiguration);
+            _targetOfTargetUnitFrame = new UnitFrameHud("targetOfTargetUnitFrame", targetOfTargetUnitFrameConfig, pluginConfiguration);
             _hudElements.Add(_targetOfTargetUnitFrame);
 
             var focusTargetUnitFrameConfig = FocusTargetUnitFrameConfig.DefaultUnitFrame();
-            _focusTargetUnitFrame = new UnitFrameHud(focusTargetUnitFrameConfig, pluginConfiguration);
+            _focusTargetUnitFrame = new UnitFrameHud("focusTargetUnitFrame", focusTargetUnitFrameConfig, pluginConfiguration);
             _hudElements.Add(_focusTargetUnitFrame);
 
             // cast bars
             var playerCastbarConfig = PlayerCastbarConfig.DefaultCastbar();
-            _playerCastbar = new PlayerCastbarHud(playerCastbarConfig, pluginConfiguration);
+            _playerCastbar = new PlayerCastbarHud("playerCastbar", playerCastbarConfig, pluginConfiguration);
             _hudElements.Add(_playerCastbar);
             _hudElementsUsingPlayer.Add(_playerCastbar);
 
             var targetCastbarConfig = TargetCastbarConfig.DefaultCastbar();
-            _targetCastbar = new TargetCastbarHud(targetCastbarConfig, pluginConfiguration);
+            _targetCastbar = new TargetCastbarHud("targetCastbar", targetCastbarConfig, pluginConfiguration);
             _hudElements.Add(_targetCastbar);
             _hudElementsUsingTarget.Add(_targetCastbar);
         }

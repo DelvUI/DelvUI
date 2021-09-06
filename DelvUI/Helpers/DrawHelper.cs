@@ -1,4 +1,5 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Game.Internal.Gui.Addon;
+using DelvUI.Config;
 using ImGuiNET;
 using Lumina.Excel;
 using System;
@@ -137,6 +138,70 @@ namespace DelvUI.Helpers
                 cursorPos, cursorPos + new Vector2(Math.Max(1, barSize.X * shield), h),
                 color["gradientLeft"], color["gradientRight"], color["gradientRight"], color["gradientLeft"]
             );
+        }
+
+        public static void ClipAround(Addon addon, string windowName, ImDrawListPtr drawList, Action<ImDrawListPtr, string> drawAction)
+        {
+            if (addon is { Visible: true })
+            {
+                ClipAround(new Vector2(addon.X + 5, addon.Y + 5), new Vector2(addon.X + addon.Width - 5, addon.Y + addon.Height - 5), windowName, drawList, drawAction);
+            }
+            else
+            {
+                drawAction(drawList, windowName);
+            }
+        }
+
+        public static void ClipAround(Vector2 min, Vector2 max, string windowName, ImDrawListPtr drawList, Action<ImDrawListPtr, string> drawAction)
+        {
+            var maxX = ImGui.GetMainViewport().Size.X;
+            var maxY = ImGui.GetMainViewport().Size.Y;
+            var aboveMin = new Vector2(0, 0);
+            var aboveMax = new Vector2(maxX, min.Y);
+            var leftMin = new Vector2(0, min.Y);
+            var leftMax = new Vector2(min.X, maxY);
+
+            var rightMin = new Vector2(max.X, min.Y);
+            var rightMax = new Vector2(maxX, max.Y);
+            var belowMin = new Vector2(min.X, max.Y);
+            var belowMax = new Vector2(maxX, maxY);
+
+            for (var i = 0; i < 4; i++)
+            {
+                Vector2 clipMin;
+                Vector2 clipMax;
+
+                switch (i)
+                {
+                    default:
+                        clipMin = aboveMin;
+                        clipMax = aboveMax;
+
+                        break;
+
+                    case 1:
+                        clipMin = leftMin;
+                        clipMax = leftMax;
+
+                        break;
+
+                    case 2:
+                        clipMin = rightMin;
+                        clipMax = rightMax;
+
+                        break;
+
+                    case 3:
+                        clipMin = belowMin;
+                        clipMax = belowMax;
+
+                        break;
+                }
+
+                ImGui.PushClipRect(clipMin, clipMax, false);
+                drawAction(drawList, windowName + "_" + i);
+                ImGui.PopClipRect();
+            }
         }
     }
 }

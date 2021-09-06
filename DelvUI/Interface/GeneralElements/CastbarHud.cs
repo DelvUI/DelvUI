@@ -23,14 +23,14 @@ namespace DelvUI.Interface.GeneralElements
 
         public Actor Actor { get; set; } = null;
 
-        public CastbarHud(CastbarConfig config, PluginConfiguration pluginConfiguration) : base(config)
+        public CastbarHud(string id, CastbarConfig config, PluginConfiguration pluginConfiguration) : base(id, config)
         {
             // NOTE: Temporary. Have to do this for now for job colors.
             // Ideally hud elements shouldna't need a reference to PluginConfiguration
             _pluginConfiguration = pluginConfiguration;
 
-            _castNameLabel = new LabelHud(config.CastNameConfig);
-            _castTimeLabel = new LabelHud(config.CastTimeConfig);
+            _castNameLabel = new LabelHud(id + "_castNameLabel", config.CastNameConfig);
+            _castTimeLabel = new LabelHud(id + "_castTimeLabel", config.CastTimeConfig);
         }
 
         public override unsafe void Draw(Vector2 origin)
@@ -127,7 +127,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private PlayerCastbarConfig Config => (PlayerCastbarConfig)_config;
 
-        public PlayerCastbarHud(PlayerCastbarConfig config, PluginConfiguration pluginConfiguration) : base(config, pluginConfiguration)
+        public PlayerCastbarHud(string id, PlayerCastbarConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
         {
 
         }
@@ -173,7 +173,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private TargetCastbarConfig Config => (TargetCastbarConfig)_config;
 
-        public TargetCastbarHud(TargetCastbarConfig config, PluginConfiguration pluginConfiguration) : base(config, pluginConfiguration)
+        public TargetCastbarHud(string id, TargetCastbarConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
         {
 
         }

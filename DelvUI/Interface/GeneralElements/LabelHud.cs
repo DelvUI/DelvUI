@@ -9,7 +9,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private LabelConfig Config => (LabelConfig)_config;
 
-        public LabelHud(LabelConfig config) : base(config)
+        public LabelHud(string id, LabelConfig config) : base(id, config)
         {
 
         }

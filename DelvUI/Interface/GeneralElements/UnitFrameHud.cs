@@ -1,10 +1,13 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
+using Dalamud.Game.Internal.Gui.Addon;
 using DelvUI.Config;
 using DelvUI.Helpers;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
 using System;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -16,16 +19,30 @@ namespace DelvUI.Interface.GeneralElements
         private LabelHud _leftLabel;
         private LabelHud _rightLabel;
 
+        private ImGuiWindowFlags _childFlags = 0;
+        private readonly OpenContextMenuFromTarget _openContextMenuFromTarget;
+
         public Actor Actor { get; set; } = null;
 
-        public UnitFrameHud(UnitFrameConfig config, PluginConfiguration pluginConfiguration) : base(config)
+        public UnitFrameHud(string id, UnitFrameConfig config, PluginConfiguration pluginConfiguration) : base(id, config)
         {
             // NOTE: Temporary. Have to do this for now for job colors.
             // Ideally hud elements shouldna't need a reference to PluginConfiguration
             _pluginConfiguration = pluginConfiguration;
 
-            _leftLabel = new LabelHud(Config.LeftLabelConfig);
-            _rightLabel = new LabelHud(Config.RightLabelConfig);
+            // labels
+            _leftLabel = new LabelHud(id + "_leftLabel", Config.LeftLabelConfig);
+            _rightLabel = new LabelHud(id + "_rightLabel", Config.RightLabelConfig);
+
+            // interaction stuff
+            _openContextMenuFromTarget =
+                Marshal.GetDelegateForFunctionPointer<OpenContextMenuFromTarget>(Plugin.InterfaceInstance.TargetModuleScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
+
+            _childFlags |= ImGuiWindowFlags.NoTitleBar;
+            _childFlags |= ImGuiWindowFlags.NoScrollbar;
+            _childFlags |= ImGuiWindowFlags.AlwaysAutoResize;
+            _childFlags |= ImGuiWindowFlags.NoBackground;
+            _childFlags |= ImGuiWindowFlags.NoBringToFrontOnFocus;
         }
 
         public override void Draw(Vector2 origin)
@@ -35,23 +52,84 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            if (Actor is not Chara)
+            ImGuiWindowFlags windowFlags = 0;
+            windowFlags |= ImGuiWindowFlags.NoBackground;
+            windowFlags |= ImGuiWindowFlags.NoTitleBar;
+            windowFlags |= ImGuiWindowFlags.NoMove;
+            windowFlags |= ImGuiWindowFlags.NoDecoration;
+            windowFlags |= ImGuiWindowFlags.NoInputs;
+
+            var startPos = new Vector2(origin.X + Config.Position.X - Config.Size.X / 2f, origin.Y + Config.Position.Y - Config.Size.Y / 2f);
+            var endPos = startPos + Config.Size;
+
+            var drawList = ImGui.GetWindowDrawList();
+            var addon = Plugin.InterfaceInstance.Framework.Gui.GetAddonByName("ContextMenu", 1);
+
+            DrawHelper.ClipAround(addon, ID, drawList, (drawListPtr, windowName) =>
             {
-                DrawFriendlyNPC(origin);
-            }
-            else
-            {
-                DrawChara(origin, (Chara)Actor);
-            }
+                ImGui.SetNextWindowPos(startPos);
+                ImGui.SetNextWindowSize(Config.Size);
+
+                ImGui.Begin(windowName, windowFlags);
+
+                UpdateChildFlags(addon);
+
+                if (ImGui.BeginChild(windowName, Config.Size, default, _childFlags))
+                {
+                    if (Actor is not Chara)
+                    {
+                        DrawFriendlyNPC(startPos, endPos);
+                    }
+                    else
+                    {
+                        DrawChara(origin, (Chara)Actor);
+                    }
+
+                    // Check if mouse is hovering over the box properly
+                    if (ImGui.IsMouseHoveringRect(startPos, endPos))
+                    {
+                        if (ImGui.GetIO().MouseClicked[0])
+                        {
+                            Plugin.InterfaceInstance.ClientState.Targets.SetCurrentTarget(Actor);
+                        }
+                        else if (ImGui.GetIO().MouseClicked[1])
+                        {
+                            var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
+                            _openContextMenuFromTarget(agentHud, Actor.Address);
+                        }
+                    }
+                }
+
+                ImGui.EndChild();
+                ImGui.End();
+            });
+
 
             _leftLabel.DrawWithActor(origin + Config.Position, Actor);
             _rightLabel.DrawWithActor(origin + Config.Position, Actor);
         }
 
+        private void UpdateChildFlags(Addon addon)
+        {
+            if (addon is not { Visible: true })
+            {
+                _childFlags &= ~ImGuiWindowFlags.NoInputs;
+            }
+            else
+            {
+                if (ImGui.IsMouseHoveringRect(new Vector2(addon.X, addon.Y), new Vector2(addon.X + addon.Width, addon.Y + addon.Height)))
+                {
+                    _childFlags |= ImGuiWindowFlags.NoInputs;
+                }
+                else
+                {
+                    _childFlags &= ~ImGuiWindowFlags.NoInputs;
+                }
+            }
+        }
+
         private void DrawChara(Vector2 origin, Chara chara)
         {
-            var scale = (float)chara.CurrentHp / Math.Max(1, chara.MaxHp);
-
             if (Config.TankStanceIndicatorConfig != null && Config.TankStanceIndicatorConfig.Enabled && JobsHelper.IsJobTank(chara.ClassJob.Id))
             {
                 DrawTankStanceIndicator(origin);
@@ -59,24 +137,27 @@ namespace DelvUI.Interface.GeneralElements
 
             var startPos = new Vector2(origin.X + Config.Position.X - Config.Size.X / 2f, origin.Y + Config.Position.Y - Config.Size.Y / 2f);
             var endPos = startPos + Config.Size;
+            var scale = (float)chara.CurrentHp / Math.Max(1, chara.MaxHp);
             var color = Config.UseCustomColor ? Config.CustomColor.Map : Utils.ColorForActor(_pluginConfiguration, chara);
             var bgColor = BackgroundColor(chara);
 
             var drawList = ImGui.GetWindowDrawList();
 
             // Basically make an invisible box for BeginChild to work properly.
-            ImGuiWindowFlags windowFlags = 0;
-            windowFlags |= ImGuiWindowFlags.NoBackground;
-            windowFlags |= ImGuiWindowFlags.NoTitleBar;
-            windowFlags |= ImGuiWindowFlags.NoMove;
-            windowFlags |= ImGuiWindowFlags.NoDecoration;
+            //ImGuiWindowFlags windowFlags = 0;
+            //windowFlags |= ImGuiWindowFlags.NoBackground;
+            //windowFlags |= ImGuiWindowFlags.NoTitleBar;
+            //windowFlags |= ImGuiWindowFlags.NoMove;
+            //windowFlags |= ImGuiWindowFlags.NoDecoration;
+            //windowFlags |= ImGuiWindowFlags.NoInputs;
 
-            ImGui.SetNextWindowPos(startPos);
-            ImGui.SetNextWindowSize(Config.Size);
 
-            ImGui.Begin("health_bar", windowFlags);
+            //ImGui.SetNextWindowPos(startPos);
+            //ImGui.SetNextWindowSize(Config.Size);
 
-            if (ImGui.BeginChild("health_bar", Config.Size))
+            //ImGui.Begin(ID, windowFlags);
+
+            //if (ImGui.BeginChild(ID + "child", Config.Size))
             {
                 // background
                 drawList.AddRectFilled(startPos, endPos, bgColor);
@@ -84,7 +165,7 @@ namespace DelvUI.Interface.GeneralElements
                 // health
                 drawList.AddRectFilledMultiColor(
                     startPos,
-                    endPos,
+                    startPos + new Vector2(Config.Size.X * scale, Config.Size.Y),
                     color["gradientLeft"],
                     color["gradientRight"],
                     color["gradientRight"],
@@ -95,14 +176,16 @@ namespace DelvUI.Interface.GeneralElements
                 drawList.AddRect(startPos, endPos, 0xFF000000);
 
                 // Check if mouse is hovering over the box properly
-                if (ImGui.GetIO().MouseClicked[0] && ImGui.IsMouseHoveringRect(startPos, endPos))
-                {
-                    //PluginInterface.ClientState.Targets.SetCurrentTarget(actor);
-                }
+                //if (ImGui.GetIO().MouseClicked[0] && ImGui.IsMouseHoveringRect(startPos, endPos))
+                //{
+                //    Plugin.InterfaceInstance.ClientState.Targets.SetCurrentTarget(Actor);
+                //}
             }
 
-            ImGui.EndChild();
-            ImGui.End();
+            //ImGui.EndChild();
+            //ImGui.End();
+
+
 
 
             // shield
@@ -121,10 +204,8 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
-        private void DrawFriendlyNPC(Vector2 origin)
+        private void DrawFriendlyNPC(Vector2 startPos, Vector2 endPos)
         {
-            var startPos = new Vector2(origin.X + Config.Position.X - Config.Size.X / 2f, origin.Y + Config.Position.Y - Config.Size.Y / 2f);
-            var endPos = startPos + Config.Size;
             var color = _pluginConfiguration.NPCColorMap["friendly"];
 
             var drawList = ImGui.GetWindowDrawList();
@@ -158,7 +239,7 @@ namespace DelvUI.Interface.GeneralElements
             var thickness = Config.TankStanceIndicatorConfig.Thickness + 1;
             var barSize = new Vector2(Config.Size.Y > Config.Size.X ? Config.Size.X : Config.Size.Y, Config.Size.Y);
             var cursorPos = new Vector2(
-                origin.X + Config.Position.X - Config.Size.X / 2f - thickness, 
+                origin.X + Config.Position.X - Config.Size.X / 2f - thickness,
                 origin.Y + Config.Position.Y - Config.Size.Y / 2f + thickness
             );
 
@@ -184,5 +265,7 @@ namespace DelvUI.Interface.GeneralElements
 
             return ImGui.ColorConvertFloat4ToU32(_pluginConfiguration.UnitFrameEmptyColor);
         }
+
+        private delegate void OpenContextMenuFromTarget(IntPtr agentHud, IntPtr gameObject);
     }
 }
