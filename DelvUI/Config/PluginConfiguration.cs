@@ -361,55 +361,7 @@ namespace DelvUI.Config {
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD.AdjustColor(.1f)),
                     ["invuln"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD.AdjustColor(-.8f))
                 },
-                [Jobs.PLD * 1000] = new() // PLD Mana
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDManaColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDManaColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDManaColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDManaColor.AdjustColor(.1f))
-                },
-                [Jobs.PLD * 1000 + 1] = new() // Oath Gauge
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDOathGaugeColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDOathGaugeColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDOathGaugeColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDOathGaugeColor.AdjustColor(.1f))
-                },
-                [Jobs.PLD * 1000 + 2] = new() // Fight Or Flight
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDFightOrFlightColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDFightOrFlightColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDFightOrFlightColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDFightOrFlightColor.AdjustColor(.1f))
-                },
-                [Jobs.PLD * 1000 + 3] = new() // Requiescat
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDRequiescatColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDRequiescatColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDRequiescatColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDRequiescatColor.AdjustColor(.1f))
-                },
-                [Jobs.PLD * 1000 + 4] = new() // PLD Empty
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
-                [Jobs.PLD * 1000 + 5] = new() // Atonement
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDAtonementColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDAtonementColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDAtonementColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDAtonementColor.AdjustColor(.1f))
-                },
-                [Jobs.PLD * 1000 + 6] = new() // DoT
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(PLDDoTColor.AdjustColor(.1f))
-                },
+
                 [Jobs.WAR] = new()
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR),
@@ -1555,41 +1507,8 @@ namespace DelvUI.Config {
 
         #region PLD Configuration
 
-        public int PLDBaseXOffset { get; set; }
-        public int PLDBaseYOffset { get; set; }
 
-        public bool PLDManaEnabled { get; set; } = true;
-        public bool PLDManaChunked { get; set; } = true;
-        public bool PLDManaBarText { get; set; }
-        public int PLDManaHeight { get; set; } = 20;
-        public int PLDManaWidth { get; set; } = 254;
-        public int PLDManaPadding { get; set; } = 2;
-        public int PLDManaXOffset { get; set; } = 127;
-        public int PLDManaYOffset { get; set; } = 373;
-        public bool PLDOathGaugeEnabled { get; set; } = true;
-        public int PLDOathGaugeHeight { get; set; } = 20;
-        public int PLDOathGaugeWidth { get; set; } = 254;
-        public int PLDOathGaugePadding { get; set; } = 2;
-        public int PLDOathGaugeXOffset { get; set; } = 127;
-        public int PLDOathGaugeYOffset { get; set; } = 395;
-        public bool PLDOathGaugeText { get; set; }
-        public bool PLDBuffBarEnabled { get; set; } = true;
-        public bool PLDBuffBarText { get; set; } = true;
-        public int PLDBuffBarHeight { get; set; } = 20;
-        public int PLDBuffBarWidth { get; set; } = 254;
-        public int PLDBuffBarXOffset { get; set; } = 127;
-        public int PLDBuffBarYOffset { get; set; } = 417;
-        public bool PLDAtonementBarEnabled { get; set; } = true;
-        public int PLDAtonementBarHeight { get; set; } = 20;
-        public int PLDAtonementBarWidth { get; set; } = 254;
-        public int PLDAtonementBarPadding { get; set; } = 2;
-        public int PLDAtonementBarXOffset { get; set; } = 127;
-        public int PLDAtonementBarYOffset { get; set; } = 439;
-        public bool PLDDoTBarEnabled { get; set; } = true;
-        public int PLDDoTBarHeight { get; set; } = 20;
-        public int PLDDoTBarWidth { get; set; } = 254;
-        public int PLDDoTBarXOffset { get; set; } = 127;
-        public int PLDDoTBarYOffset { get; set; } = 351;
+
         public bool PLDDoTBarText { get; set; }
         public Vector4 PLDManaColor = new(0f / 255f, 203f / 255f, 230f / 255f, 100f / 100f);
         public Vector4 PLDOathGaugeColor = new(24f / 255f, 80f / 255f, 175f / 255f, 100f / 100f);
