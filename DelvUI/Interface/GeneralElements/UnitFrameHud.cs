@@ -103,11 +103,11 @@ namespace DelvUI.Interface.GeneralElements
 
                 ImGui.EndChild();
                 ImGui.End();
-            });
 
-            // labels
-            _leftLabel.DrawWithActor(origin + Config.Position, Actor);
-            _rightLabel.DrawWithActor(origin + Config.Position, Actor);
+                // labels
+                _leftLabel.DrawWithActor(origin + Config.Position, Actor);
+                _rightLabel.DrawWithActor(origin + Config.Position, Actor);
+            });
         }
 
         private void UpdateChildFlags(Addon addon)
