@@ -57,7 +57,8 @@ namespace DelvUI.Interface
         private Dictionary<string, uint> BatteryColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 1];
         private Dictionary<string, uint> RobotColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 2];
         private Dictionary<string, uint> OverheatColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 3];
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 4];
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
+        private Dictionary<string, uint> PartialFillColor => PluginConfiguration.MiscColorMap["partial"];
 
         private Dictionary<string, uint> WildfireColor => PluginConfiguration.JobColorMap[Jobs.MCH * 1000 + 5];
 
@@ -96,7 +97,7 @@ namespace DelvUI.Interface
             var builder = BarBuilder.Create(xPos, yPos, HeatGaugeHeight, HeatGaugeWidth)
                                     .SetChunks(2)
                                     .SetChunkPadding(HeatGaugePadding)
-                                    .AddInnerBar(gauge.Heat, 100, HeatColor, EmptyColor);
+                                    .AddInnerBar(gauge.Heat, 100, HeatColor, PartialFillColor);
 
             if (HeatGaugeText)
             {
@@ -123,7 +124,7 @@ namespace DelvUI.Interface
 
             if (BatteryGaugeShowBattery)
             {
-                builder.AddInnerBar(gauge.Battery, 100, BatteryColor, EmptyColor);
+                builder.AddInnerBar(gauge.Battery, 100, BatteryColor, PartialFillColor);
 
                 if (BatteryGaugeBatteryText)
                 {
