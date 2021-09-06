@@ -7,6 +7,8 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
+using DelvUI.Config.Attributes;
 
 namespace DelvUI.Interface
 {
@@ -15,38 +17,9 @@ namespace DelvUI.Interface
         public SummonerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => 27;
-        private new int XOffset => PluginConfiguration.SmnBaseXOffset;
-        private new int YOffset => PluginConfiguration.SmnBaseYOffset;
-        private int MiasmaBarWidth => PluginConfiguration.SmnMiasmaBarWidth;
-        private int MiasmaBarHeight => PluginConfiguration.SmnMiasmaBarHeight;
-        private int MiasmaBarXOffset => PluginConfiguration.SmnMiasmaBarXOffset;
-        private int MiasmaBarYOffset => PluginConfiguration.SmnMiasmaBarYOffset;
-        private bool MiasmaBarInverted => PluginConfiguration.SmnMiasmaBarFlipped;
-        private int BioBarWidth => PluginConfiguration.SmnBioBarWidth;
-        private int BioBarHeight => PluginConfiguration.SmnBioBarHeight;
-        private int BioBarXOffset => PluginConfiguration.SmnBioBarXOffset;
-        private int BioBarYOffset => PluginConfiguration.SmnBioBarYOffset;
-        private bool ShowMiasmaBar => PluginConfiguration.SmnMiasmaBarEnabled;
-        private bool ShowBioBar => PluginConfiguration.SmnBioBarEnabled;
-        private bool BioBarInverted => PluginConfiguration.SmnBioBarFlipped;
-        private bool ShowRuinBar => PluginConfiguration.SmnRuinBarEnabled;
-        private int RuinBarXOffset => PluginConfiguration.SmnRuinBarXOffset;
-        private int RuinBarYOffset => PluginConfiguration.SmnRuinBarYOffset;
-        private int RuinBarHeight => PluginConfiguration.SmnRuinBarHeight;
-        private int RuinBarWidth => PluginConfiguration.SmnRuinBarWidth;
-        private int RuinBarPadding => PluginConfiguration.SmnRuinBarPadding;
-        private bool ShowAetherBar => PluginConfiguration.SmnAetherBarEnabled;
-        private int AetherBarXOffset => PluginConfiguration.SmnAetherBarXOffset;
-        private int AetherBarYOffset => PluginConfiguration.SmnAetherBarYOffset;
-        private int AetherBarHeight => PluginConfiguration.SmnAetherBarHeight;
-        private int AetherBarWidth => PluginConfiguration.SmnAetherBarWidth;
-        private int AetherBarPadding => PluginConfiguration.SmnAetherBarPadding;
-        private Dictionary<string, uint> SmnAetherColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000];
-        private Dictionary<string, uint> SmnRuinColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 1];
-        private Dictionary<string, uint> SmnEmptyColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 2];
-        private Dictionary<string, uint> SmnMiasmaColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 3];
-        private Dictionary<string, uint> SmnBioColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 4];
-        private Dictionary<string, uint> SmnExpiryColor => PluginConfiguration.JobColorMap[Jobs.SMN * 1000 + 5];
+        private SummonerHudConfig _config => (SummonerHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new SummonerHudConfig());
+        private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + YOffset + _config.Position.Y);
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
 
         protected override void Draw(bool _)
         {
@@ -61,7 +34,7 @@ namespace DelvUI.Interface
         {
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (!ShowBioBar && !ShowMiasmaBar)
+            if (!_config.ShowBio && !_config.ShowMiasma)
             {
                 return;
             }
@@ -70,12 +43,13 @@ namespace DelvUI.Interface
             {
                 return;
             }
+            
+            Vector2 barSize = _config.MiasmaSize;
+            Vector2 position = Origin + _config.MiasmaPosition - barSize / 2f;
 
-            var xPos = CenterX - XOffset + MiasmaBarXOffset;
-            var yPos = CenterY + YOffset + MiasmaBarYOffset;
             var barDrawList = new List<Bar>();
 
-            if (ShowMiasmaBar)
+            if (_config.ShowMiasma)
             {
                 var miasma = target.StatusEffects.FirstOrDefault(
                     o => o.EffectId == 1215 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
@@ -83,17 +57,17 @@ namespace DelvUI.Interface
                 );
 
                 var miasmaDuration = Math.Abs(miasma.Duration);
-                var miasmaColor = miasmaDuration > 5 ? SmnMiasmaColor : SmnExpiryColor;
-                var builder = BarBuilder.Create(xPos, yPos, MiasmaBarHeight, MiasmaBarWidth);
+                var miasmaColor = miasmaDuration > 5 ? _config.MiasmaColor : _config.ExpireColor;
+                var builder = BarBuilder.Create(position, barSize);
 
-                var miasmaBar = builder.AddInnerBar(miasmaDuration, 30f, miasmaColor)
-                                       .SetFlipDrainDirection(MiasmaBarInverted)
+                var miasmaBar = builder.AddInnerBar(miasmaDuration, 30f, miasmaColor.Map)
+                                       .SetFlipDrainDirection(_config.MiasmaInverted)
                                        .Build();
 
                 barDrawList.Add(miasmaBar);
             }
 
-            if (ShowBioBar)
+            if (_config.ShowBio)
             {
                 var bio = target.StatusEffects.FirstOrDefault(
                     o => o.EffectId == 1214 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
@@ -102,13 +76,15 @@ namespace DelvUI.Interface
                 );
 
                 var bioDuration = Math.Abs(bio.Duration);
-                var bioColor = bioDuration > 5 ? SmnBioColor : SmnExpiryColor;
-                xPos = CenterX - XOffset + BioBarXOffset;
-                yPos = CenterY + YOffset + BioBarYOffset;
-                var builder = BarBuilder.Create(xPos, yPos, BioBarHeight, BioBarWidth);
+                var bioColor = bioDuration > 5 ? _config.BioColor : _config.ExpireColor;
+                
+                barSize = _config.BioSize;
+                position = Origin + _config.BioPosition - barSize / 2f;
+                
+                var builder = BarBuilder.Create(position, barSize);
 
-                var bioBar = builder.AddInnerBar(bioDuration, 30f, bioColor)
-                                    .SetFlipDrainDirection(BioBarInverted)
+                var bioBar = builder.AddInnerBar(bioDuration, 30f, bioColor.Map)
+                                    .SetFlipDrainDirection(_config.BioInverted)
                                     .Build();
 
                 barDrawList.Add(bioBar);
@@ -128,19 +104,19 @@ namespace DelvUI.Interface
         private void DrawRuinBar()
         {
             var ruinBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1212);
-            var xPos = CenterX - XOffset + RuinBarXOffset;
-            var yPos = CenterY + YOffset + RuinBarYOffset;
+            var barSize = _config.RuinSize;
+            var position = Origin + _config.RuinPosition - barSize / 2f;
 
-            if (!ShowRuinBar)
+            if (!_config.ShowRuin)
             {
                 return;
             }
 
-            var bar = BarBuilder.Create(xPos, yPos, RuinBarHeight, RuinBarWidth)
+            var bar = BarBuilder.Create(position, barSize)
                                 .SetChunks(4)
-                                .SetChunkPadding(RuinBarPadding)
-                                .AddInnerBar(ruinBuff.StackCount, 4, SmnRuinColor)
-                                .SetBackgroundColor(SmnEmptyColor["background"])
+                                .SetChunkPadding(_config.RuinPadding)
+                                .AddInnerBar(ruinBuff.StackCount, 4, _config.RuinColor.Map)
+                                .SetBackgroundColor(EmptyColor["background"])
                                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
@@ -151,23 +127,118 @@ namespace DelvUI.Interface
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var aetherFlowBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
-            var xPos = CenterX - XOffset + AetherBarXOffset;
-            var yPos = CenterY + YOffset + AetherBarYOffset;
+            var barSize = _config.AetherSize;
+            var position = Origin + _config.AetherPosition - barSize / 2f;
 
-            if (!ShowAetherBar)
+            if (!_config.ShowAether)
             {
                 return;
             }
 
-            var bar = BarBuilder.Create(xPos, yPos, AetherBarHeight, AetherBarWidth)
+            var bar = BarBuilder.Create(position, barSize)
                                 .SetChunks(2)
-                                .SetChunkPadding(AetherBarPadding)
-                                .AddInnerBar(aetherFlowBuff.StackCount, 2, SmnAetherColor)
-                                .SetBackgroundColor(SmnEmptyColor["background"])
+                                .SetChunkPadding(_config.AetherPadding)
+                                .AddInnerBar(aetherFlowBuff.StackCount, 2, _config.AetherColor.Map)
+                                .SetBackgroundColor(EmptyColor["background"])
                                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
+    }
+    
+    [Serializable]
+    [Section("Job Specific Bars")]
+    [SubSection("Caster", 0)]
+    [SubSection("Summoner", 1)]
+    public class SummonerHudConfig : PluginConfigObject
+    {
+        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [Order(0)]
+        public Vector2 Position = new(0, 0);
+
+        [Checkbox("Aether Tracker Enabled")]
+        [CollapseControl(10, 1)]
+        public bool ShowAether = true;
+
+        [DragFloat2("Aether Tracker Size", min = 1f, max = 2000f)]
+        [CollapseWith(0, 1)]
+        public Vector2 AetherSize = new(254, 20);
+
+        [DragFloat2("Aether Tracker Position", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 1)]
+        public Vector2 AetherPosition = new(0, -11);
+        
+        [DragInt("Aether Padding", max = 1000)]
+        [Order(40)]
+        public int AetherPadding = 2;
+
+        [ColorEdit4("Aether Tracker Color")]
+        [CollapseWith(10, 1)]
+        public PluginConfigColor AetherColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+
+        [Checkbox("Ruin Enabled")]
+        [CollapseControl(15, 2)]
+        public bool ShowRuin = true;
+
+        [DragFloat2("Ruin Size", min = 1f, max = 2000f)]
+        [CollapseWith(30, 2)]
+        public Vector2 RuinSize = new(254, 20);
+
+        [DragFloat2("Ruin Position", min = -4000f, max = 4000f)]
+        [CollapseWith(35, 2)]
+        public Vector2 RuinPosition = new(0, -33);
+
+        [DragInt("Ruin Padding", max = 1000)]
+        [CollapseWith(40, 2)]
+        public int RuinPadding = 2;
+
+        [ColorEdit4(" Ruin Color")]
+        [CollapseWith(45, 2)]
+        public PluginConfigColor RuinColor = new(new Vector4(94f / 255f, 250f / 255f, 154f / 255f, 100f / 100f));
+
+        [Checkbox("Miasma Enabled")]
+        [CollapseControl(60, 3)]
+        public bool ShowMiasma = true;
+
+        [Checkbox("Miasma Inverted")]
+        [CollapseWith(0, 3)]
+        public bool MiasmaInverted = true;
+
+        [DragFloat2("Miasma Size", max = 2000f)]
+        [CollapseWith(5, 3)]
+        public Vector2 MiasmaSize = new(126, 20);
+
+        [DragFloat2("Miasma Position", min = -4000f, max = 4000f)]
+        [CollapseWith(10, 3)]
+        public Vector2 MiasmaPosition = new(-64, -55);
+
+        [ColorEdit4("Miasma Color")]
+        [CollapseWith(15, 3)]
+        public PluginConfigColor MiasmaColor = new(new Vector4(106f / 255f, 237f / 255f, 241f / 255f, 100f / 100f));
+
+        [Checkbox("Bio Enabled")]
+        [CollapseControl(65, 4)]
+        public bool ShowBio = true;
+
+        [Checkbox("Bio Inverted")]
+        [CollapseWith(0, 4)]
+        public bool BioInverted = false;
+
+        [DragFloat2("Bio Size", max = 2000f)]
+        [CollapseWith(5, 4)]
+        public Vector2 BioSize = new(126, 20);
+
+        [DragFloat2("Bio Position", min = -4000f, max = 4000f)]
+        [CollapseWith(10, 4)]
+        public Vector2 BioPosition = new(64, -55);
+
+        [ColorEdit4("Bio Color")]
+        [CollapseWith(15, 4)]
+        public PluginConfigColor BioColor = new(new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 100f / 100f));
+
+        [ColorEdit4("DoT Expire Color")]
+        [Order(70)]
+        public PluginConfigColor ExpireColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
     }
 }
