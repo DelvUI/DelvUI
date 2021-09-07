@@ -38,7 +38,7 @@ namespace DelvUI.Config
             //configMap.Add("Group Unitframes", new [] {"General", "Party", "8man", "24man", "Enemies"});
             _configMap.Add("Castbars", new[] { "Player", "Target" });
 
-            _configMap.Add("Buffs and Debuffs", new[] { "Player Buffs", "Player Debuffs", "Target Buffs", "Target Debuffs", "Raid/Job Buffs" });
+            // _configMap.Add("Buffs and Debuffs", new[] { "Player Buffs", "Player Debuffs", "Target Buffs", "Target Debuffs", "Raid/Job Buffs" });
 
             _configMap.Add("Job Specific Bars", new[] { "General" });
             _configMap.Add("Import/Export", new[] { "General" });
