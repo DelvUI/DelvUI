@@ -118,10 +118,16 @@ namespace DelvUI.Config.Tree
 
                 ImGui.SameLine();
 
+                var pos = ImGui.GetCursorPos();
+                ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 60, ImGui.GetCursorPos().Y));
                 if (ImGui.Button("Donate!"))
                 {
                     Process.Start("https://ko-fi.com/DelvUI");
                 }
+                ImGui.SetCursorPos(pos);
+
+                // show current version
+                ImGui.Text($"v{Plugin.Version}");
             }
 
             ImGui.EndGroup(); // Bottom Bar

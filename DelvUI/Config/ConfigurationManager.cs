@@ -27,8 +27,10 @@ namespace DelvUI.Config
 
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface)
         {
-            var configObjects = new PluginConfigObject[]
-            {
+            PluginConfigObject[] configObjects = {
+                new GeneralConfig(),
+                
+                // Jobs
                 new AstrologianHudConfig(),
                 new BardHudConfig(),
                 new BlackMageHudConfig(),

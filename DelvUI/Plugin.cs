@@ -27,10 +27,13 @@ namespace DelvUI
         // ReSharper disable once MemberCanBePrivate.Global
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
         public string Name => "DelvUI";
+        public static string Version = "";
 
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
             _pluginInterface = pluginInterface;
+
+            Version = Assembly.GetExecutingAssembly()?.GetName().Version.ToString() ?? "";
 
             ConfigurationManager.Initialize(pluginInterface);
 
@@ -172,7 +175,6 @@ namespace DelvUI
 
             _pluginInterface.UiBuilder.OverrideGameCursor = false;
             _configurationWindow.Draw();
-
             ConfigurationManager.GetInstance().Draw();
 
             if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id)
