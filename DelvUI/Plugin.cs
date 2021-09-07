@@ -20,6 +20,7 @@ namespace DelvUI
         private bool _fontLoadFailed;
         private HudWindow _hudWindow;
         private PluginConfiguration _pluginConfiguration;
+        private SystemMenuHook _menuHook;
 
         private DalamudPluginInterface _pluginInterface;
 
@@ -81,6 +82,8 @@ namespace DelvUI
                 }
             );
 
+            _menuHook = new SystemMenuHook(_pluginInterface);
+
             _pluginInterface.CommandManager.AddHandler("/delvuireloadconfig", new CommandInfo(ReloadConfigCommand));
 
             TexturesCache.Initialize(pluginInterface);
@@ -89,6 +92,7 @@ namespace DelvUI
 
         public void Dispose()
         {
+            _menuHook.Dispose();
             Dispose(true);
             GC.SuppressFinalize(this);
         }
