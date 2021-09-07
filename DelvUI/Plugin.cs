@@ -23,6 +23,8 @@ namespace DelvUI
 
         private DalamudPluginInterface _pluginInterface;
 
+        public static ImGuiScene.TextureWrap bannerTexture;
+
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         // ReSharper disable once MemberCanBePrivate.Global
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
@@ -34,6 +36,8 @@ namespace DelvUI
             _pluginInterface = pluginInterface;
 
             Version = Assembly.GetExecutingAssembly()?.GetName().Version.ToString() ?? "";
+
+            LoadBanner();
 
             ConfigurationManager.Initialize(pluginInterface);
 
@@ -49,11 +53,12 @@ namespace DelvUI
                 _pluginConfiguration = oldConfiguration;
             }
 
+            _pluginConfiguration.BannerImage = bannerTexture;
+
             _pluginConfiguration.Init(_pluginInterface);
             _configurationWindow = new ConfigurationWindow(_pluginConfiguration, _pluginInterface);
             ConfigurationManager.GetInstance().ConfigurationWindow = _configurationWindow;
 
-            BuildBanner();
 
             _pluginInterface.UiBuilder.OnBuildUi += Draw;
             _pluginInterface.UiBuilder.OnBuildFonts += BuildFont;
@@ -114,7 +119,7 @@ namespace DelvUI
             }
         }
 
-        private void BuildBanner()
+        private void LoadBanner()
         {
             string bannerImage = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
 
@@ -122,7 +127,7 @@ namespace DelvUI
             {
                 try
                 {
-                    _pluginConfiguration.BannerImage = _pluginInterface.UiBuilder.LoadImage(bannerImage);
+                    bannerTexture = _pluginInterface.UiBuilder.LoadImage(bannerImage);
                 }
                 catch (Exception ex)
                 {

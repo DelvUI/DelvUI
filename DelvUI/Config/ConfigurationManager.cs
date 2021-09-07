@@ -61,7 +61,8 @@ namespace DelvUI.Config
                 node.GetOrAddConfig(configObject);
             }
 
-            TextureWrap banner = BuildBanner(pluginInterface);
+            //TextureWrap banner = BuildBanner(pluginInterface);
+            TextureWrap banner = Plugin.bannerTexture;
 
             return new ConfigurationManager(banner, pluginInterface.GetPluginConfigDirectory(), node);
         }
