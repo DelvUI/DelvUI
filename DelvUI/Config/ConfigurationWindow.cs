@@ -50,6 +50,12 @@ namespace DelvUI.Config
             _changed = true;
         }
 
+        public void ToggleJobPacks()
+        {
+            IsVisible = !IsVisible;
+            ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
+        }
+
         public void ShowHud()
         {
             _pluginConfiguration.HideHud = false;
@@ -161,6 +167,13 @@ namespace DelvUI.Config
 
             ImGui.BeginGroup();
 
+            if (ImGui.Button("Job Packs"))
+            {
+                ToggleJobPacks();
+            }
+            
+            ImGui.SameLine();
+            
             if (ImGui.Button("Lock HUD"))
             {
                 _changed |= ImGui.Checkbox("Lock HUD", ref _pluginConfiguration.LockHud);

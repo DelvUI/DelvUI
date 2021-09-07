@@ -38,6 +38,12 @@ namespace DelvUI.Config.Tree
 
         public BaseNode() { children = new List<SectionNode>(); }
 
+        private void ToggleJobPacks()
+        {
+            ConfigurationManager.GetInstance().ConfigurationWindow.IsVisible = !ConfigurationManager.GetInstance().ConfigurationWindow.IsVisible; 
+            ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
+        }
+        
         public void Draw()
         {
             var changed = false;
@@ -103,6 +109,13 @@ namespace DelvUI.Config.Tree
             ImGui.BeginGroup(); // Bottom Bar
 
             {
+                if (ImGui.Button("Job Packs"))
+                {
+                    ToggleJobPacks();
+                }
+                
+                ImGui.SameLine();
+                
                 if (ImGui.Button("Lock HUD")) // TODO: Functioning buttons
                 { }
 

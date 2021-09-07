@@ -51,7 +51,8 @@ namespace DelvUI
 
             _pluginConfiguration.Init(_pluginInterface);
             _configurationWindow = new ConfigurationWindow(_pluginConfiguration, _pluginInterface);
-
+            ConfigurationManager.GetInstance().ConfigurationWindow = _configurationWindow;
+            
             BuildBanner();
 
             _pluginInterface.UiBuilder.OnBuildUi += Draw;
@@ -156,7 +157,7 @@ namespace DelvUI
 
                 default:
                     _configurationWindow.IsVisible = !_configurationWindow.IsVisible;
-                    ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
+                    ConfigurationManager.GetInstance().DrawConfigWindow = false;
 
                     break;
             }
