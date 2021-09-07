@@ -1,56 +1,34 @@
-﻿using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
-using DelvUI.Config;
-using DelvUI.Interface.Bars;
-using ImGuiNET;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Numerics;
+using Dalamud.Game.ClientState.Structs;
+using Dalamud.Game.ClientState.Structs.JobGauge;
+using Dalamud.Plugin;
+using DelvUI.Config;
+using DelvUI.Config.Attributes;
+using DelvUI.Interface.Bars;
+using ImGuiNET;
 
 namespace DelvUI.Interface
 {
     public class WarriorHudWindow : HudWindow
     {
+        public override uint JobId => Jobs.WAR;
+        private WarriorHudConfig _config => (WarriorHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new WarriorHudConfig());
+        private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
         public WarriorHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
-
-        public override uint JobId => 21;
-
-        private int BaseXOffset => PluginConfiguration.WARBaseXOffset;
-        private int BaseYOffset => PluginConfiguration.WARBaseYOffset;
-
-        private bool StormsEyeEnabled => PluginConfiguration.WARStormsEyeEnabled;
-        private bool StormsEyeText => PluginConfiguration.WARStormsEyeText;
-        private float StormsEyeTextScale => PluginConfiguration.WARStormsEyeTextScale;
-        private int StormsEyeHeight => PluginConfiguration.WARStormsEyeHeight;
-        private int StormsEyeWidth => PluginConfiguration.WARStormsEyeWidth;
-
-        private int StormsEyeXOffset => PluginConfiguration.WARStormsEyeXOffset;
-        private int StormsEyeYOffset => PluginConfiguration.WARStormsEyeYOffset;
-
-        private bool BeastGaugeEnabled => PluginConfiguration.WARBeastGaugeEnabled;
-        private bool BeastGaugeText => PluginConfiguration.WARBeastGaugeText;
-        private float BeastGaugeTextScale => PluginConfiguration.WARBeastGaugeTextScale;
-        private int BeastGaugeHeight => PluginConfiguration.WARBeastGaugeHeight;
-        private int BeastGaugeWidth => PluginConfiguration.WARBeastGaugeWidth;
-        private int BeastGaugePadding => PluginConfiguration.WARBeastGaugePadding;
-        private int BeastGaugeXOffset => PluginConfiguration.WARBeastGaugeXOffset;
-        private int BeastGaugeYOffset => PluginConfiguration.WARBeastGaugeYOffset;
-
-        private Dictionary<string, uint> InnerReleaseColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000];
-        private Dictionary<string, uint> StormsEyeColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 1];
-        private Dictionary<string, uint> FellCleaveColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 2];
-        private Dictionary<string, uint> NascentChaosColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 3];
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.WAR * 1000 + 4];
 
         protected override void Draw(bool _)
         {
-            if (StormsEyeEnabled)
+            if (_config.ShowStormsEye)
             {
                 DrawStormsEyeBar();
             }
 
-            if (BeastGaugeEnabled)
+            if (_config.ShowBeastGauge)
             {
                 DrawBeastGauge();
             }
@@ -58,72 +36,135 @@ namespace DelvUI.Interface
 
         protected override void DrawPrimaryResourceBar() { }
 
+        private Vector2 CalculatePosition(Vector2 position, Vector2 size) => Origin + position - size / 2f;
+
         private void DrawStormsEyeBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            var innerReleaseBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1177);
-            var stormsEyeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
+            IEnumerable<StatusEffect> innerReleaseBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1177);
+            IEnumerable<StatusEffect> stormsEyeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
 
-            var xPos = CenterX + BaseXOffset - StormsEyeXOffset;
-            var yPos = CenterY + BaseYOffset + StormsEyeYOffset;
+            Vector2 position = CalculatePosition(_config.StormsEyePosition, _config.StormsEyeSize);
 
-            var builder = BarBuilder.Create(xPos, yPos, StormsEyeHeight, StormsEyeWidth).SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder builder = BarBuilder.Create(position, _config.StormsEyeSize).SetBackgroundColor(EmptyColor["background"]);
 
             var duration = 0f;
             var maximum = 10f;
-            var color = EmptyColor;
+            Dictionary<string, uint> color = EmptyColor;
 
             if (innerReleaseBuff.Any())
             {
                 duration = Math.Abs(innerReleaseBuff.First().Duration);
-                color = InnerReleaseColor;
+                color = _config.InnerReleaseColor.Map;
             }
             else if (stormsEyeBuff.Any())
             {
                 duration = Math.Abs(stormsEyeBuff.First().Duration);
                 maximum = 60f;
-                color = StormsEyeColor;
+                color = _config.StormsEyeColor.Map;
             }
 
             builder.AddInnerBar(duration, maximum, color);
 
-            if (StormsEyeText)
+            if (_config.ShowStormsEyeText)
             {
-                builder.SetTextMode(BarTextMode.EachChunk)
-                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current, StormsEyeTextScale);
+                builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawBeastGauge()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<WARGauge>();
-            var nascentChaosBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1897);
+            WARGauge gauge = PluginInterface.ClientState.JobGauges.Get<WARGauge>();
+            IEnumerable<StatusEffect> nascentChaosBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1897);
 
-            var xPos = CenterX + BaseXOffset - BeastGaugeXOffset;
-            var yPos = CenterY + BaseYOffset + BeastGaugeYOffset;
+            Vector2 position = CalculatePosition(_config.BeastGaugePosition, _config.BeastGaugeSize);
 
-            var builder = BarBuilder.Create(xPos, yPos, BeastGaugeHeight, BeastGaugeWidth)
-                                    .SetChunks(2)
-                                    .AddInnerBar(gauge.BeastGaugeAmount, 100, FellCleaveColor)
-                                    .SetBackgroundColor(EmptyColor["background"])
-                                    .SetChunkPadding(BeastGaugePadding);
+            BarBuilder builder = BarBuilder.Create(position, _config.BeastGaugeSize)
+                                           .SetChunks(2)
+                                           .AddInnerBar(gauge.BeastGaugeAmount, 100, _config.BeastGaugeFillColor.Map)
+                                           .SetBackgroundColor(EmptyColor["background"])
+                                           .SetChunkPadding(_config.BeastGaugePadding);
 
             if (nascentChaosBuff.Any())
             {
-                builder.SetChunksColors(NascentChaosColor);
+                builder.SetChunksColors(_config.NascentChaosColor.Map);
             }
 
-            if (BeastGaugeText)
+            if (_config.ShowBeastGaugeText)
             {
-                builder.SetTextMode(BarTextMode.EachChunk)
-                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current, BeastGaugeTextScale);
+                builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
+    }
+
+    [Serializable]
+    [Section("Job Specific Bars")]
+    [SubSection("Tank", 0)]
+    [SubSection("Warrior", 1)]
+    public class WarriorHudConfig : PluginConfigObject
+    {
+        [DragFloat2("Base offset", min = -4000f, max = 4000f)]
+        [Order(0)]
+        public Vector2 Position = new(0, 0);
+
+        /* Storm's Eye */
+        [Checkbox("Show Storm's Eye")]
+        [CollapseControl(5, 0)]
+        public bool ShowStormsEye = true;
+
+        [Checkbox("Show Storm's Eye Text")]
+        [CollapseWith(0, 0)]
+        public bool ShowStormsEyeText = true;
+
+        [DragFloat2("Storm's Eye Position", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 0)]
+        public Vector2 StormsEyePosition = new(0, 428);
+
+        [DragFloat2("Storm's Eye Size", min = 1f, max = 4000f)]
+        [CollapseWith(10, 0)]
+        public Vector2 StormsEyeSize = new(254, 20);
+
+        [ColorEdit4("Inner Release Color")]
+        [CollapseWith(15, 0)]
+        public PluginConfigColor InnerReleaseColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Storm's Eye Color")]
+        [CollapseWith(20, 0)]
+        public PluginConfigColor StormsEyeColor = new(new Vector4(255f / 255f, 136f / 255f, 146f / 255f, 100f / 100f));
+
+        /* Beast Gauge*/
+        [Checkbox("Show Beast Gauge")]
+        [CollapseControl(10, 1)]
+        public bool ShowBeastGauge = true;
+
+        [Checkbox("Show Beast Gauge Text")]
+        [CollapseWith(0, 1)]
+        public bool ShowBeastGaugeText = false;
+
+        [DragFloat2("Beast Gauge Position", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 1)]
+        public Vector2 BeastGaugePosition = new(0, 449);
+
+        [DragFloat2("Beast Gauge Size", min = 1f, max = 4000f)]
+        [CollapseWith(10, 1)]
+        public Vector2 BeastGaugeSize = new(254, 20);
+
+        [DragFloat("Beast Gauge Spacing")]
+        [CollapseWith(15, 1)]
+        public float BeastGaugePadding = 2.0f;
+
+        [ColorEdit4("Beast Gauge Fill Color")]
+        [CollapseWith(20, 1)]
+        public PluginConfigColor BeastGaugeFillColor = new(new Vector4(201f / 255f, 13f / 255f, 13f / 255f, 100f / 100f));
+
+        [ColorEdit4("Nascent Chaos Color")]
+        [CollapseWith(25, 1)]
+        public PluginConfigColor NascentChaosColor = new(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f));
     }
 }

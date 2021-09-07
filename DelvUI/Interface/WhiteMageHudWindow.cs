@@ -1,12 +1,16 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
-using DelvUI.Config;
-using ImGuiNET;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.Actors.Types;
+using Dalamud.Game.ClientState.Structs;
+using Dalamud.Game.ClientState.Structs.JobGauge;
+using Dalamud.Plugin;
+using DelvUI.Config;
+using DelvUI.Config.Attributes;
+using ImGuiNET;
+using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface
 {
@@ -15,48 +19,17 @@ namespace DelvUI.Interface
         public WhiteMageHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => 24;
-
-        private int BaseXOffset => PluginConfiguration.WHMBaseXOffset;
-        private int BaseYOffset => PluginConfiguration.WHMBaseYOffset;
-
-        private int LillyBarHeight => PluginConfiguration.LillyBarHeight;
-        private int LillyBarWidth => PluginConfiguration.LillyBarWidth;
-        private int LillyBarX => PluginConfiguration.LillyBarX;
-        private int LillyBarY => PluginConfiguration.LillyBarY;
-        private int LillyBarPad => PluginConfiguration.LillyBarPad;
-
-        private int BloodLillyBarHeight => PluginConfiguration.BloodLillyBarHeight;
-        private int BloodLillyBarWidth => PluginConfiguration.BloodLillyBarWidth;
-        private int BloodLillyBarX => PluginConfiguration.BloodLillyBarX;
-        private int BloodLillyBarY => PluginConfiguration.BloodLillyBarY;
-        private int BloodLillyBarPad => PluginConfiguration.BloodLillyBarPad;
-
-        private int DiaBarHeight => PluginConfiguration.DiaBarHeight;
-        private int DiaBarWidth => PluginConfiguration.DiaBarWidth;
-        private int DiaBarX => PluginConfiguration.DiaBarX;
-        private int DiaBarY => PluginConfiguration.DiaBarY;
-
-        private bool ShowDiaBar => PluginConfiguration.WHMShowDiaBar;
-        private bool ShowLillyBar => PluginConfiguration.WHMShowLillyBar;
-        private bool ShowPrimaryResourceBar => PluginConfiguration.WHMShowPrimaryResourceBar;
-
-        private Dictionary<string, uint> LillyColor => PluginConfiguration.JobColorMap[Jobs.WHM * 1000];
-        private Dictionary<string, uint> LillyChargingColor => PluginConfiguration.JobColorMap[Jobs.WHM * 1000 + 3];
-        private Dictionary<string, uint> BloodLillyColor => PluginConfiguration.JobColorMap[Jobs.WHM * 1000 + 1];
-        private Dictionary<string, uint> WhmDiaColor => PluginConfiguration.JobColorMap[Jobs.WHM * 1000 + 4];
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.JobColorMap[Jobs.WHM * 1000 + 2];
-
-        private new Vector2 BarSize { get; set; }
-        private Vector2 BarCoords { get; set; }
+        private WhiteMageHudConfig _config => (WhiteMageHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new WhiteMageHudConfig());
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
 
         protected override void Draw(bool _)
         {
-            if (ShowLillyBar)
+            if (_config.ShowLilyBar)
             {
                 DrawSecondaryResourceBar();
             }
 
-            if (ShowDiaBar)
+            if (_config.ShowDiaBar)
             {
                 DrawDiaBar();
             }
@@ -64,7 +37,7 @@ namespace DelvUI.Interface
 
         protected override void DrawPrimaryResourceBar()
         {
-            if (!ShowPrimaryResourceBar)
+            if (!_config.ShowPrimaryResourceBar)
             {
                 return;
             }
@@ -74,25 +47,21 @@ namespace DelvUI.Interface
 
         private void DrawDiaBar()
         {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
-            //var cursorPos = new Vector2(CenterX - 127, CenterY + 424);
-            BarSize = new Vector2(DiaBarWidth, DiaBarHeight);
-            BarCoords = new Vector2(DiaBarX + BaseXOffset, DiaBarY + BaseYOffset);
-            var cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y);
+            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            Vector2 barCoords = _config.BaseOffset + _config.DiaBarOffset;
+            Vector2 cursorPos = new Vector2(CenterX - barCoords.X, CenterY + barCoords.Y);
 
-            //var barWidth = 253;
-            var drawList = ImGui.GetWindowDrawList();
-            //var barSize = new Vector2(barWidth, 20);
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
-            if (!(target is Chara))
+            if (target is not Chara)
             {
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["background"]);
-                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+                drawList.AddRectFilled(cursorPos, cursorPos + _config.DiaBarSize, EmptyColor["background"]);
+                drawList.AddRect(cursorPos, cursorPos + _config.DiaBarSize, 0xFF000000);
 
                 return;
             }
 
-            var dia = target.StatusEffects.FirstOrDefault(
+            StatusEffect dia = target.StatusEffects.FirstOrDefault(
                 o => o.EffectId == 1871 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                   || o.EffectId == 144 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                   || o.EffectId == 143 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
@@ -101,82 +70,83 @@ namespace DelvUI.Interface
             var diaCooldown = dia.EffectId == 1871 ? 30f : 18f;
             var diaDuration = dia.Duration;
 
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["background"]);
-            drawList.AddRectFilled(cursorPos, cursorPos + new Vector2(BarSize.X / diaCooldown * diaDuration, BarSize.Y), WhmDiaColor["gradientRight"]);
-            drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+            drawList.AddRectFilled(cursorPos, cursorPos + _config.DiaBarSize, EmptyColor["background"]);
+
+            drawList.AddRectFilled(
+                cursorPos,
+                cursorPos + new Vector2(_config.DiaBarSize.X / diaCooldown * diaDuration, _config.DiaBarSize.Y),
+                _config.DiaColor.Map["gradientRight"]
+            );
+
+            drawList.AddRect(cursorPos, cursorPos + _config.DiaBarSize, 0xFF000000);
 
             DrawOutlinedText(
                 string.Format(CultureInfo.InvariantCulture, "{0,2:N0}", diaDuration), // keeps 10 -> 9 from jumping
                 new Vector2(
                     // smooths transition of counter to the right of the emptying bar
                     cursorPos.X
-                  + BarSize.X * diaDuration / diaCooldown
-                  - (diaDuration == diaCooldown
+                  + _config.DiaBarSize.X * diaDuration / diaCooldown
+                  - (Math.Abs(diaDuration - diaCooldown) < float.Epsilon
                         ? diaCooldown
                         : diaDuration > 3
                             ? 20
                             : diaDuration * (20f / 3f)),
-                    cursorPos.Y + BarSize.Y / 2 - 12
+                    cursorPos.Y + _config.DiaBarSize.Y / 2 - 12
                 )
             );
         }
 
         private void DrawSecondaryResourceBar()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<WHMGauge>();
+            WHMGauge gauge = PluginInterface.ClientState.JobGauges.Get<WHMGauge>();
 
-            BarSize = new Vector2(LillyBarWidth, LillyBarHeight);
-            BarCoords = new Vector2(LillyBarX + BaseXOffset, LillyBarY + BaseYOffset);
-
-            var xPadding = LillyBarPad;
             const int numChunks = 6;
+            var barWidth = (_config.LilyBarSize.X - _config.LilyBarPad * (numChunks - 1)) / numChunks;
+            Vector2 barSize = new Vector2(barWidth, _config.LilyBarSize.Y);
 
-            var barWidth = (BarSize.X - xPadding * (numChunks - 1)) / numChunks;
-            var barSize = new Vector2(barWidth, BarSize.Y);
-            var xPos = CenterX - BarCoords.X;
-            var yPos = CenterY + BarCoords.Y - 20;
+            Vector2 barCoords = _config.BaseOffset + _config.LilyBarOffset;
+            var xPos = CenterX - barCoords.X;
+            var yPos = CenterY + barCoords.Y - 20;
 
             const float lilyCooldown = 30000f;
-
-            var cursorPos = new Vector2(xPos, yPos);
-            var drawList = ImGui.GetWindowDrawList();
-
             var scale = gauge.NumLilies == 0 ? gauge.LilyTimer / lilyCooldown : 1;
+            Vector2 cursorPos = new Vector2(xPos, yPos);
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
 
             if (gauge.NumLilies >= 1)
             {
                 drawList.AddRectFilledMultiColor(
                     cursorPos,
-                    cursorPos + new Vector2(barWidth * scale, LillyBarHeight),
-                    LillyColor["gradientLeft"],
-                    LillyColor["gradientRight"],
-                    LillyColor["gradientRight"],
-                    LillyColor["gradientLeft"]
+                    cursorPos + new Vector2(barWidth * scale, _config.LilyBarSize.Y),
+                    _config.LilyColor.Map["gradientLeft"],
+                    _config.LilyColor.Map["gradientRight"],
+                    _config.LilyColor.Map["gradientRight"],
+                    _config.LilyColor.Map["gradientLeft"]
                 );
             }
             else
             {
                 drawList.AddRectFilledMultiColor(
                     cursorPos,
-                    cursorPos + new Vector2(barWidth * scale, LillyBarHeight),
-                    LillyChargingColor["gradientLeft"],
-                    LillyChargingColor["gradientRight"],
-                    LillyChargingColor["gradientRight"],
-                    LillyChargingColor["gradientLeft"]
+                    cursorPos + new Vector2(barWidth * scale, _config.LilyBarSize.Y),
+                    _config.LilyChargingColor.Map["gradientLeft"],
+                    _config.LilyChargingColor.Map["gradientRight"],
+                    _config.LilyChargingColor.Map["gradientRight"],
+                    _config.LilyChargingColor.Map["gradientLeft"]
                 );
             }
 
             if (scale < 1)
             {
                 var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
-                var size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
+                Vector2 size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
                 DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y - 23));
             }
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-            cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
+            cursorPos = new Vector2(cursorPos.X + _config.LilyBarPad + barWidth, cursorPos.Y);
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
 
             if (gauge.NumLilies > 0)
@@ -187,36 +157,36 @@ namespace DelvUI.Interface
                 {
                     drawList.AddRectFilledMultiColor(
                         cursorPos,
-                        cursorPos + new Vector2(barWidth * scale, LillyBarHeight),
-                        LillyColor["gradientLeft"],
-                        LillyColor["gradientRight"],
-                        LillyColor["gradientRight"],
-                        LillyColor["gradientLeft"]
+                        cursorPos + new Vector2(barWidth * scale, _config.LilyBarSize.Y),
+                        _config.LilyColor.Map["gradientLeft"],
+                        _config.LilyColor.Map["gradientRight"],
+                        _config.LilyColor.Map["gradientRight"],
+                        _config.LilyColor.Map["gradientLeft"]
                     );
                 }
                 else
                 {
                     drawList.AddRectFilledMultiColor(
                         cursorPos,
-                        cursorPos + new Vector2(barWidth * scale, LillyBarHeight),
-                        LillyChargingColor["gradientLeft"],
-                        LillyChargingColor["gradientRight"],
-                        LillyChargingColor["gradientRight"],
-                        LillyChargingColor["gradientLeft"]
+                        cursorPos + new Vector2(barWidth * scale, _config.LilyBarSize.Y),
+                        _config.LilyChargingColor.Map["gradientLeft"],
+                        _config.LilyChargingColor.Map["gradientRight"],
+                        _config.LilyChargingColor.Map["gradientRight"],
+                        _config.LilyChargingColor.Map["gradientLeft"]
                     );
                 }
 
                 if (scale < 1)
                 {
                     var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
-                    var size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
+                    Vector2 size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
                     DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y - 23));
                 }
             }
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-            cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
+            cursorPos = new Vector2(cursorPos.X + _config.LilyBarPad + barWidth, cursorPos.Y);
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
 
             if (gauge.NumLilies > 1)
@@ -227,29 +197,29 @@ namespace DelvUI.Interface
                 {
                     drawList.AddRectFilledMultiColor(
                         cursorPos,
-                        cursorPos + new Vector2(barWidth * scale, LillyBarHeight),
-                        LillyColor["gradientLeft"],
-                        LillyColor["gradientRight"],
-                        LillyColor["gradientRight"],
-                        LillyColor["gradientLeft"]
+                        cursorPos + new Vector2(barWidth * scale, _config.LilyBarSize.Y),
+                        _config.LilyColor.Map["gradientLeft"],
+                        _config.LilyColor.Map["gradientRight"],
+                        _config.LilyColor.Map["gradientRight"],
+                        _config.LilyColor.Map["gradientLeft"]
                     );
                 }
                 else
                 {
                     drawList.AddRectFilledMultiColor(
                         cursorPos,
-                        cursorPos + new Vector2(barWidth * scale, LillyBarHeight),
-                        LillyChargingColor["gradientLeft"],
-                        LillyChargingColor["gradientRight"],
-                        LillyChargingColor["gradientRight"],
-                        LillyChargingColor["gradientLeft"]
+                        cursorPos + new Vector2(barWidth * scale, _config.LilyBarSize.Y),
+                        _config.LilyChargingColor.Map["gradientLeft"],
+                        _config.LilyChargingColor.Map["gradientRight"],
+                        _config.LilyChargingColor.Map["gradientRight"],
+                        _config.LilyChargingColor.Map["gradientLeft"]
                     );
                 }
 
                 if (scale < 1)
                 {
                     var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
-                    var size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
+                    Vector2 size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
                     DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y - 23));
                 }
             }
@@ -258,59 +228,123 @@ namespace DelvUI.Interface
 
             // Blood Lilies
 
-            BarSize = new Vector2(BloodLillyBarWidth, BloodLillyBarHeight);
-            BarCoords = new Vector2(BloodLillyBarX + BaseXOffset, BloodLillyBarY + BaseYOffset);
+            barCoords = _config.BaseOffset + _config.BloodLilyBarOffset;
+            barWidth = (_config.BloodLilyBarSize.X - _config.BloodLilyBarPad * (numChunks - 1)) / numChunks;
+            barSize = new Vector2(barWidth, _config.BloodLilyBarSize.Y);
+            xPos = CenterX - barCoords.X;
+            yPos = CenterY + barCoords.Y - 20;
 
-            barWidth = (BarSize.X - xPadding * (numChunks - 1)) / numChunks;
-            barSize = new Vector2(barWidth, BarSize.Y);
-            xPos = CenterX - BarCoords.X;
-            yPos = CenterY + BarCoords.Y - 20;
-            xPadding = BloodLillyBarPad;
-
-            cursorPos = new Vector2(xPos + xPadding + barWidth, yPos);
+            cursorPos = new Vector2(xPos + _config.BloodLilyBarPad + barWidth, yPos);
             scale = gauge.NumBloodLily > 0 ? 1 : 0;
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
 
             drawList.AddRectFilledMultiColor(
                 cursorPos,
                 cursorPos + new Vector2(barSize.X * scale, barSize.Y),
-                BloodLillyColor["gradientLeft"],
-                BloodLillyColor["gradientRight"],
-                BloodLillyColor["gradientRight"],
-                BloodLillyColor["gradientLeft"]
+                _config.BloodLilyColor.Map["gradientLeft"],
+                _config.BloodLilyColor.Map["gradientRight"],
+                _config.BloodLilyColor.Map["gradientRight"],
+                _config.BloodLilyColor.Map["gradientLeft"]
             );
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-            cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
+            cursorPos = new Vector2(cursorPos.X + _config.BloodLilyBarPad + barWidth, cursorPos.Y);
             scale = gauge.NumBloodLily > 1 ? 1 : 0;
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
 
             drawList.AddRectFilledMultiColor(
                 cursorPos,
                 cursorPos + new Vector2(barSize.X * scale, barSize.Y),
-                BloodLillyColor["gradientLeft"],
-                BloodLillyColor["gradientRight"],
-                BloodLillyColor["gradientRight"],
-                BloodLillyColor["gradientLeft"]
+                _config.BloodLilyColor.Map["gradientLeft"],
+                _config.BloodLilyColor.Map["gradientRight"],
+                _config.BloodLilyColor.Map["gradientRight"],
+                _config.BloodLilyColor.Map["gradientLeft"]
             );
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
-            cursorPos = new Vector2(cursorPos.X + xPadding + barWidth, cursorPos.Y);
+            cursorPos = new Vector2(cursorPos.X + _config.BloodLilyBarPad + barWidth, cursorPos.Y);
             scale = gauge.NumBloodLily > 2 ? 1 : 0;
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
 
             drawList.AddRectFilledMultiColor(
                 cursorPos,
                 cursorPos + new Vector2(barSize.X * scale, barSize.Y),
-                BloodLillyColor["gradientLeft"],
-                BloodLillyColor["gradientRight"],
-                BloodLillyColor["gradientRight"],
-                BloodLillyColor["gradientLeft"]
+                _config.BloodLilyColor.Map["gradientLeft"],
+                _config.BloodLilyColor.Map["gradientRight"],
+                _config.BloodLilyColor.Map["gradientRight"],
+                _config.BloodLilyColor.Map["gradientLeft"]
             );
 
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
+    }
+
+    [Serializable]
+    [Section("Job Specific Bars")]
+    [SubSection("Healer", 0)]
+    [SubSection("White Mage", 1)]
+    public class WhiteMageHudConfig : PluginConfigObject
+    {
+        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        public Vector2 BaseOffset = new(0, 0);
+
+        [Checkbox("Show Primary Resource Bar")]
+        public bool ShowPrimaryResourceBar = true;
+
+        #region Lily Bar
+
+        [Checkbox("Show Lily Bar")]
+        public bool ShowLilyBar = true;
+
+        [DragFloat2("Lily Bar Size", max = 2000f)]
+        public Vector2 LilyBarSize = new(254, 20);
+
+        [DragFloat2("Lily Bar Offset", min = -4000f, max = 4000f)]
+        public Vector2 LilyBarOffset = new(127, 415);
+
+        [DragInt("Lily Bar Padding", min = -100, max = 1000)]
+        public int LilyBarPad = 2;
+
+        [ColorEdit4("Lily Bar Color")]
+        public PluginConfigColor LilyColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
+
+        [ColorEdit4("Lily Bar Charging Color")]
+        public PluginConfigColor LilyChargingColor = new(new Vector4(141f / 255f, 141f / 255f, 141f / 255f, 1f));
+
+        #endregion
+
+        #region Blood Lily Bar
+
+        [DragFloat2("Blood Lily Bar Size", max = 2000f)]
+        public Vector2 BloodLilyBarSize = new(254, 20);
+
+        [DragFloat2("Blood Lily Bar Offset", min = -4000f, max = 4000f)]
+        public Vector2 BloodLilyBarOffset = new(42, 415);
+
+        [DragInt("Blood Lily Bar Padding", min = -100, max = 1000)]
+        public int BloodLilyBarPad = 2;
+
+        [ColorEdit4("Blood Lily Bar Color")]
+        public PluginConfigColor BloodLilyColor = new(new Vector4(199f / 255f, 40f / 255f, 9f / 255f, 1f));
+
+        #endregion
+
+        #region Dia Bar
+
+        [Checkbox("Show Dia Bar")]
+        public bool ShowDiaBar = true;
+
+        [DragFloat2("Dia Bar Size", max = 2000f)]
+        public Vector2 DiaBarSize = new(254, 20);
+
+        [DragFloat2("Dia Bar Offset", min = -4000f, max = 4000f)]
+        public Vector2 DiaBarOffset = new(127, 417);
+
+        [ColorEdit4("Dia Bar Color")]
+        public PluginConfigColor DiaColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
+
+        #endregion
     }
 }

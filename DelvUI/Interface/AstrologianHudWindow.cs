@@ -1,32 +1,35 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
-using DelvUI.Config;
-using DelvUI.Helpers;
-using DelvUI.Interface.Bars;
-using ImGuiNET;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using Dalamud.Game.ClientState.Actors.Types;
+using Dalamud.Game.ClientState.Structs;
+using Dalamud.Game.ClientState.Structs.JobGauge;
+using Dalamud.Plugin;
+using DelvUI.Config;
+using DelvUI.Config.Attributes;
+using DelvUI.Helpers;
+using DelvUI.Interface.Bars;
+using ImGuiNET;
+using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface
 {
     public class AstrologianHudWindow : HudWindow
     {
-        public override uint JobId => Jobs.AST;
-        private readonly AstrologianHudConfig _config;
         private readonly SpellHelper _spellHelper = new();
+
+        public override uint JobId => Jobs.AST;
+        private AstrologianHudConfig _config => (AstrologianHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new AstrologianHudConfig());
+
+        private float OriginX => CenterX + _config.Position.X;
+        private float OriginY => CenterY + _config.Position.Y;
+
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
 
-        public AstrologianHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration,
-            AstrologianHudConfig config) :
-            base(pluginInterface, pluginConfiguration)
-        {
-            _config = config;
-        }
+        public AstrologianHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _)
         {
@@ -84,12 +87,14 @@ namespace DelvUI.Interface
                 {
                     return "30";
                 }
+
                 redrawCastInfo %= 30;
             }
 
             if (_config.ShowRedrawCooldownTextBar)
             {
-                var format = _config.EnableDecimalRedrawBar ? "N1" : "N0";
+                string format = _config.EnableDecimalRedrawBar ? "N1" : "N0";
+
                 return _config.ShowRedrawTextBar ? redrawCastInfo.ToString(format) + " [" + redrawStacks + "]" : redrawCastInfo.ToString(format);
             }
 
@@ -98,42 +103,45 @@ namespace DelvUI.Interface
 
         private void DrawDivinationBar()
         {
-            var chunkColors = new List<Dictionary<string, uint>>();
+            List<Dictionary<string, uint>> chunkColors = new();
 
             unsafe
             {
-                var gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
+                ASTGauge gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
 
-                var field = typeof(ASTGauge).GetField(
-                    "seals",
-                    BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance
-                );
+                FieldInfo field = typeof(ASTGauge).GetField("seals", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance);
 
-                var textSealReady = "";
-                var sealNumbers = 0;
-                var result = field?.GetValue(gauge);
-                var hdl = GCHandle.Alloc(result, GCHandleType.Pinned);
-                var p = (byte*)hdl.AddrOfPinnedObject();
-                for (var ix = 0; ix < 3; ++ix)
+                string textSealReady = "";
+                int sealNumbers = 0;
+                object result = field?.GetValue(gauge);
+                GCHandle hdl = GCHandle.Alloc(result, GCHandleType.Pinned);
+                byte* p = (byte*)hdl.AddrOfPinnedObject();
+
+                for (int ix = 0; ix < 3; ++ix)
                 {
-                    var seal = *(p + ix);
-                    var type = (SealType)seal;
+                    byte seal = *(p + ix);
+                    SealType type = (SealType)seal;
+
                     switch (type)
                     {
                         case SealType.NONE:
                             chunkColors.Add(EmptyColor);
+
                             break;
 
                         case SealType.MOON:
                             chunkColors.Add(_config.SealLunarColor.Map);
+
                             break;
 
                         case SealType.SUN:
                             chunkColors.Add(_config.SealSunColor.Map);
+
                             break;
 
                         case SealType.CELESTIAL:
                             chunkColors.Add(_config.SealCelestialColor.Map);
+
                             break;
                     }
 
@@ -144,24 +152,35 @@ namespace DelvUI.Interface
 
                     sealNumbers = 0;
 
-                    if (gauge.ContainsSeal(SealType.SUN)) { sealNumbers++; }
-                    if (gauge.ContainsSeal(SealType.MOON)) { sealNumbers++; }
-                    if (gauge.ContainsSeal(SealType.CELESTIAL)) { sealNumbers++; }
+                    if (gauge.ContainsSeal(SealType.SUN))
+                    {
+                        sealNumbers++;
+                    }
+
+                    if (gauge.ContainsSeal(SealType.MOON))
+                    {
+                        sealNumbers++;
+                    }
+
+                    if (gauge.ContainsSeal(SealType.CELESTIAL))
+                    {
+                        sealNumbers++;
+                    }
 
                     textSealReady = sealNumbers.ToString();
                 }
 
                 hdl.Free();
-                var xPos = CenterX - XOffset + _config.BaseOffset.X + _config.DivinationBarPosition.X;
-                var yPos = CenterY + YOffset + _config.BaseOffset.Y + _config.DivinationBarPosition.Y;
+                float xPos = OriginX + _config.DivinationBarPosition.X - _config.DivinationBarSize.X / 2f;
+                float yPos = OriginY + _config.DivinationBarPosition.Y - _config.DivinationBarSize.Y / 2f;
 
-                var bar = BarBuilder.Create(xPos, yPos, _config.DivinationBarSize.X, _config.DivinationBarSize.Y)
-                    .SetBackgroundColor(EmptyColor["background"])
-                    .SetChunks(3)
-                    .SetChunkPadding(_config.DivinationBarPad)
-                    .AddInnerBar(chunkColors.Count(n => n != EmptyColor), 3, chunkColors.ToArray())
-                    .SetTextMode(BarTextMode.Single)
-                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, textSealReady);
+                BarBuilder bar = BarBuilder.Create(xPos, yPos, _config.DivinationBarSize.Y, _config.DivinationBarSize.X)
+                                           .SetBackgroundColor(EmptyColor["background"])
+                                           .SetChunks(3)
+                                           .SetChunkPadding(_config.DivinationBarPad)
+                                           .AddInnerBar(chunkColors.Count(n => n != EmptyColor), 3, chunkColors.ToArray())
+                                           .SetTextMode(BarTextMode.Single)
+                                           .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, textSealReady);
 
                 if (!_config.ShowDivinationTextBar)
                 {
@@ -172,9 +191,9 @@ namespace DelvUI.Interface
 
                 if (_config.ShowDivinationGlowBar)
                 {
-                    var chucksToGlow = new bool[3];
+                    bool[] chucksToGlow = new bool[3];
 
-                    for (var i = 0; i < sealNumbers; i++)
+                    for (int i = 0; i < sealNumbers; i++)
                     {
                         chucksToGlow[i] = true;
                     }
@@ -183,62 +202,67 @@ namespace DelvUI.Interface
                     bar.SetGlowColor(_config.DivinationGlowColor.Map["base"]);
                 }
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 bar.Build().Draw(drawList, PluginConfiguration);
             }
         }
 
         private void DrawDraw()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
+            ASTGauge gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
 
-            var xPos = CenterX - XOffset + _config.BaseOffset.X + _config.DrawBarPosition.X;
-            var yPos = CenterY + YOffset + _config.BaseOffset.Y + _config.DrawBarPosition.Y;
+            float xPos = OriginX + _config.DrawBarPosition.X - _config.DrawBarSize.X / 2f;
+            float yPos = OriginY + _config.DrawBarPosition.Y - _config.DrawBarSize.Y / 2f;
 
-            var cardJob = "";
-            var cardColor = EmptyColor;
-            var builder = BarBuilder.Create(xPos, yPos, _config.DrawBarSize.X, _config.DrawBarSize.Y);
+            string cardJob = "";
+            Dictionary<string, uint> cardColor = EmptyColor;
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.DrawBarSize.Y, _config.DrawBarSize.X);
 
             switch (gauge.DrawnCard())
             {
                 case CardType.BALANCE:
                     cardColor = _config.SealSunColor.Map;
                     cardJob = "MELEE";
+
                     break;
 
                 case CardType.BOLE:
                     cardColor = _config.SealSunColor.Map;
                     cardJob = "RANGED";
+
                     break;
 
                 case CardType.ARROW:
                     cardColor = _config.SealLunarColor.Map;
                     cardJob = "MELEE";
+
                     break;
 
                 case CardType.EWER:
                     cardColor = _config.SealLunarColor.Map;
                     cardJob = "RANGED";
+
                     break;
 
                 case CardType.SPEAR:
                     cardColor = _config.SealCelestialColor.Map;
                     cardJob = "MELEE";
+
                     break;
 
                 case CardType.SPIRE:
                     cardColor = _config.SealCelestialColor.Map;
                     cardJob = "RANGED";
-                    break;
 
+                    break;
             }
 
             float cardPresent;
             float cardMax;
-            var drawList = ImGui.GetWindowDrawList();
-            var drawCastInfo = _spellHelper.GetSpellCooldown(3590);
-            var redrawCastInfo = _spellHelper.GetSpellCooldown(3593);
-            var redrawStacks = _spellHelper.GetStackCount(3, 3593);
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            float drawCastInfo = _spellHelper.GetSpellCooldown(3590);
+            float redrawCastInfo = _spellHelper.GetSpellCooldown(3593);
+            int redrawStacks = _spellHelper.GetStackCount(3, 3593);
 
             if (cardJob != "")
             {
@@ -248,18 +272,17 @@ namespace DelvUI.Interface
             else
             {
                 cardPresent = drawCastInfo > 0 ? drawCastInfo : 1f;
-                cardJob = drawCastInfo > 0
-                    ? Math.Abs(drawCastInfo).ToString(_config.EnableDecimalDrawBar ? "N1" : "N0")
-                    : "READY";
+
+                cardJob = drawCastInfo > 0 ? Math.Abs(drawCastInfo).ToString(_config.EnableDecimalDrawBar ? "N1" : "N0") : "READY";
+
                 cardColor = drawCastInfo > 0 ? _config.DrawCdColor.Map : _config.DrawCdReadyColor.Map;
                 cardMax = drawCastInfo > 0 ? 30f : 1f;
             }
 
-            var bar = builder.AddInnerBar(Math.Abs(cardPresent), cardMax, cardColor)
-                .SetBackgroundColor(EmptyColor["background"])
-                .SetTextMode(BarTextMode.Single)
-                .SetText(BarTextPosition.CenterLeft, BarTextType.Custom,
-                    _config.ShowDrawCooldownTextBar ? Math.Abs(cardPresent).ToString("G") : "");
+            BarBuilder bar = builder.AddInnerBar(Math.Abs(cardPresent), cardMax, cardColor)
+                                    .SetBackgroundColor(EmptyColor["background"])
+                                    .SetTextMode(BarTextMode.Single)
+                                    .SetText(BarTextPosition.CenterLeft, BarTextType.Custom, _config.ShowDrawCooldownTextBar ? Math.Abs(cardPresent).ToString("G") : "");
 
             if (_config.ShowDrawGlowBar)
             {
@@ -267,10 +290,12 @@ namespace DelvUI.Interface
                 {
                     case "RANGED":
                         bar.SetGlowColor(_config.DrawRangedGlowColor.Map["base"]);
+
                         break;
 
                     case "MELEE":
                         bar.SetGlowColor(_config.DrawMeleeGlowColor.Map["base"]);
+
                         break;
                 }
             }
@@ -287,25 +312,28 @@ namespace DelvUI.Interface
             {
                 case "RANGED":
                     bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, cardJob);
+
                     break;
 
                 case "MELEE":
                     bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, cardJob);
+
                     break;
 
                 case "READY":
                     bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, cardJob);
+
                     break;
 
                 default:
-                    bar.SetText(BarTextPosition.CenterLeft, BarTextType.Custom,
-                        _config.ShowDrawCooldownTextBar ? cardJob : "");
+                    bar.SetText(BarTextPosition.CenterLeft, BarTextType.Custom, _config.ShowDrawCooldownTextBar ? cardJob : "");
+
                     break;
             }
 
             if (_config.ShowRedrawBar)
             {
-                var redrawText = RedrawText(redrawCastInfo, redrawStacks);
+                string redrawText = RedrawText(redrawCastInfo, redrawStacks);
                 bar.AddPrimaryText(new BarText(BarTextPosition.CenterRight, BarTextType.Custom, redrawText));
             }
 
@@ -314,91 +342,106 @@ namespace DelvUI.Interface
 
         private void DrawDot()
         {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ??
-                         PluginInterface.ClientState.Targets.CurrentTarget;
-            var xPos = CenterX - XOffset + _config.BaseOffset.X + _config.DotBarPosition.X;
-            var yPos = CenterY + YOffset + _config.BaseOffset.Y + _config.DotBarPosition.Y;
-            var drawList = ImGui.GetWindowDrawList();
-            var builder = BarBuilder.Create(xPos, yPos, _config.DotBarSize.X, _config.DotBarSize.Y);
+            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            float xPos = OriginX + _config.DotBarPosition.X - _config.DotBarSize.X / 2f;
+            float yPos = OriginY + _config.DotBarPosition.Y - _config.DotBarSize.Y / 2f;
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.DotBarSize.Y, _config.DotBarSize.X);
 
             if (target is not Chara)
             {
-                var barNoTarget = builder.AddInnerBar(0, 30f, _config.DotColor.Map)
-                    .SetBackgroundColor(EmptyColor["background"])
-                    .SetTextMode(BarTextMode.Single)
-                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, _config.ShowDotTextBar ? !_config.EnableDecimalDotBar ? "0" : "0.0" : "")
-                    .Build();
+                Bar barNoTarget = builder.AddInnerBar(0, 30f, _config.DotColor.Map)
+                                         .SetBackgroundColor(EmptyColor["background"])
+                                         .SetTextMode(BarTextMode.Single)
+                                         .SetText(
+                                             BarTextPosition.CenterMiddle,
+                                             BarTextType.Custom,
+                                             _config.ShowDotTextBar
+                                                 ? !_config.EnableDecimalDotBar
+                                                     ? "0"
+                                                     : "0.0"
+                                                 : ""
+                                         )
+                                         .Build();
+
                 barNoTarget.Draw(drawList, PluginConfiguration);
 
                 return;
             }
 
+            StatusEffect dot = target.StatusEffects.FirstOrDefault(
+                o => o.EffectId == 1881 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                  || o.EffectId == 843 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                  || o.EffectId == 838 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+            );
 
-            var dot = target.StatusEffects.FirstOrDefault(o =>
-                o.EffectId == 1881 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
-                o.EffectId == 843 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId ||
-                o.EffectId == 838 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
-            var dotCooldown = dot.EffectId == 838 ? 18f : 30f;
-            var dotDuration = _config.EnableDecimalDotBar ? dot.Duration : Math.Abs(dot.Duration);
+            float dotCooldown = dot.EffectId == 838 ? 18f : 30f;
+            float dotDuration = _config.EnableDecimalDotBar ? dot.Duration : Math.Abs(dot.Duration);
 
-            var bar = builder.AddInnerBar(dotDuration, dotCooldown, _config.DotColor.Map)
-                .SetBackgroundColor(EmptyColor["background"])
-                .SetTextMode(BarTextMode.Single)
-                .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom,
-                    _config.ShowDotTextBar
-                        ? !_config.EnableDecimalDotBar
-                            ? dot.Duration.ToString("N0")
-                            : Math.Abs(dot.Duration).ToString("N1")
-                        : "")
-                .Build();
+            Bar bar = builder.AddInnerBar(dotDuration, dotCooldown, _config.DotColor.Map)
+                             .SetBackgroundColor(EmptyColor["background"])
+                             .SetTextMode(BarTextMode.Single)
+                             .SetText(
+                                 BarTextPosition.CenterMiddle,
+                                 BarTextType.Custom,
+                                 _config.ShowDotTextBar
+                                     ? !_config.EnableDecimalDotBar
+                                         ? dot.Duration.ToString("N0")
+                                         : Math.Abs(dot.Duration).ToString("N1")
+                                     : ""
+                             )
+                             .Build();
 
             bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawLightspeed()
         {
-            var lightspeedBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 841).ToList();
-            var lightspeedDuration = 0f;
+            List<StatusEffect> lightspeedBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 841).ToList();
+            float lightspeedDuration = 0f;
             const float lightspeedMaxDuration = 15f;
 
-            var xPos = CenterX - XOffset + _config.BaseOffset.X + _config.LightspeedBarPosition.X;
-            var yPos = CenterY + YOffset + _config.BaseOffset.Y + _config.LightspeedBarPosition.Y;
+            float xPos = OriginX + _config.LightspeedBarPosition.X - _config.LightspeedBarSize.X / 2f;
+            float yPos = OriginY + _config.LightspeedBarPosition.Y - _config.LightspeedBarSize.Y / 2f;
 
             if (lightspeedBuff.Any())
             {
                 lightspeedDuration = Math.Abs(lightspeedBuff.First().Duration);
             }
 
-            var builder = BarBuilder.Create(xPos, yPos, _config.LightspeedBarSize.X, _config.LightspeedBarSize.Y);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.LightspeedBarSize.Y, _config.LightspeedBarSize.X);
 
-            var bar = builder.AddInnerBar(lightspeedDuration, lightspeedMaxDuration, EmptyColor, _config.LightspeedColor.Map)
-                .SetTextMode(BarTextMode.Single)
-                .SetBackgroundColor(EmptyColor["background"])
-                .SetFlipDrainDirection(true)
-                .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom,
-                    _config.ShowLightspeedTextBar
-                        ? !_config.EnableDecimalLightspeedBar
-                            ? lightspeedDuration.ToString("N0")
-                            : Math.Abs(lightspeedDuration).ToString("N1")
-                        : "")
-                .Build();
+            Bar bar = builder.AddInnerBar(lightspeedDuration, lightspeedMaxDuration, EmptyColor, _config.LightspeedColor.Map)
+                             .SetTextMode(BarTextMode.Single)
+                             .SetBackgroundColor(EmptyColor["background"])
+                             .SetFlipDrainDirection(true)
+                             .SetText(
+                                 BarTextPosition.CenterMiddle,
+                                 BarTextType.Custom,
+                                 _config.ShowLightspeedTextBar
+                                     ? !_config.EnableDecimalLightspeedBar
+                                         ? lightspeedDuration.ToString("N0")
+                                         : Math.Abs(lightspeedDuration).ToString("N1")
+                                     : ""
+                             )
+                             .Build();
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawStar()
         {
-            var starPreCookingBuff =
-                PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1224).ToList();
-            var starPostCookingBuff =
-                PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1248).ToList();
-            var starDuration = 0f;
+            List<StatusEffect> starPreCookingBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1224).ToList();
+
+            List<StatusEffect> starPostCookingBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1248).ToList();
+
+            float starDuration = 0f;
             const float starMaxDuration = 10f;
 
-            var xPos = CenterX - XOffset + _config.BaseOffset.X + _config.StarBarPosition.X;
-            var yPos = CenterY + YOffset + _config.BaseOffset.Y + _config.StarBarPosition.Y;
-            var starColorSelector = EmptyColor;
+            float xPos = OriginX + _config.StarBarPosition.X - _config.StarBarSize.X / 2f;
+            float yPos = OriginY + _config.StarBarPosition.Y - _config.StarBarSize.Y / 2f;
+            Dictionary<string, uint> starColorSelector = EmptyColor;
 
             if (starPreCookingBuff.Any())
             {
@@ -412,224 +455,259 @@ namespace DelvUI.Interface
                 starColorSelector = _config.StarGiantColor.Map;
             }
 
-            var builder = BarBuilder.Create(xPos, yPos, _config.StarBarSize.X, _config.StarBarSize.Y);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.StarBarSize.Y, _config.StarBarSize.X);
 
-            var bar = builder.AddInnerBar(starDuration, starMaxDuration, EmptyColor, starColorSelector)
-                .SetTextMode(BarTextMode.Single)
-                .SetBackgroundColor(EmptyColor["background"])
-                .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom,
-                    _config.ShowStarTextBar
-                        ? !_config.EnableDecimalStarBar
-                            ? starDuration.ToString("N0")
-                            : Math.Abs(starDuration).ToString("N1")
-                        : "");
+            BarBuilder bar = builder.AddInnerBar(starDuration, starMaxDuration, EmptyColor, starColorSelector)
+                                    .SetTextMode(BarTextMode.Single)
+                                    .SetBackgroundColor(EmptyColor["background"])
+                                    .SetText(
+                                        BarTextPosition.CenterMiddle,
+                                        BarTextType.Custom,
+                                        _config.ShowStarTextBar
+                                            ? !_config.EnableDecimalStarBar
+                                                ? starDuration.ToString("N0")
+                                                : Math.Abs(starDuration).ToString("N1")
+                                            : ""
+                                    );
 
             if (starColorSelector == _config.StarGiantColor.Map && _config.ShowStarGlowBar)
             {
                 bar.SetGlowColor(_config.StarGlowColor.Map["base"]);
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Build().Draw(drawList, PluginConfiguration);
         }
     }
 
     [Serializable]
+    [Section("Job Specific Bars")]
+    [SubSection("Healer", 0)]
+    [SubSection("Astrologian", 1)]
     public class AstrologianHudConfig : PluginConfigObject
     {
-        public Vector2 BaseOffset = new(0, 0);
-        public Vector2 DrawBarSize = new(20, 254);
-        public Vector2 DrawBarPosition = new(33, -43);
-        public Vector2 DivinationBarSize = new(10, 254);
-        public Vector2 DivinationBarPosition = new(33, -77);
-        public Vector2 DotBarSize = new(20, 84);
-        public Vector2 DotBarPosition = new(118, -65);
-        public Vector2 StarBarSize = new(20, 84);
-        public Vector2 StarBarPosition = new(33, -65);
-        public Vector2 LightspeedBarSize = new(20, 84);
-        public Vector2 LightspeedBarPosition = new(203, -65);
-        public int DivinationBarPad = 1;
-        public bool ShowDivinationBar = true;
-        public bool ShowDrawBar = true;
-        public bool ShowDotBar = true;
-        public bool ShowStarBar = true;
-        public bool ShowLightspeedBar = true;
-        public bool ShowRedrawBar = true;
+        #region Base Position
+
+        [DragFloat2("Base Position", min = -2000f, max = 2000f)]
+        [Order(0)]
+        public Vector2 Position = new(0, 0);
+
+        #endregion
+
+        #region Primary Resource Bar
+
+        [Checkbox("Show Primary Resource Bar")]
+        [Order(5)]
         public bool ShowPrimaryResourceBar = true;
-        public bool ShowStarGlowBar = true;
-        public bool ShowDivinationGlowBar = true;
+
+        #endregion
+
+        #region Draw Bar
+
+        [Checkbox("Show Draw Bar")]
+        [CollapseControl(10, 0)]
+        public bool ShowDrawBar = true;
+
+        [DragFloat2("Draw Bar Size", min = 1f, max = 2000f)]
+        [CollapseWith(0, 0)]
+        public Vector2 DrawBarSize = new(254, 20);
+
+        [DragFloat2("Draw Bar Position", min = -2000f, max = 2000f)]
+        [CollapseWith(5, 0)]
+        public Vector2 DrawBarPosition = new(0, 427);
+
+        [ColorEdit4("Draw on CD Color")]
+        [CollapseWith(10, 0)]
+        public PluginConfigColor DrawCdColor = new(new Vector4(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f));
+
+        [ColorEdit4("Draw Ready Color")]
+        [CollapseWith(15, 0)]
+        public PluginConfigColor DrawCdReadyColor = new(new Vector4(137f / 255f, 26f / 255f, 42f / 255f, 100f / 100f));
+
+        [ColorEdit4("Draw Melee Glow Color")]
+        [CollapseWith(20, 0)]
+        public PluginConfigColor DrawMeleeGlowColor = new(new Vector4(83f / 255f, 34f / 255f, 120f / 255f, 100f / 100f));
+
+        [ColorEdit4("Draw Ranged Glow Color")]
+        [CollapseWith(25, 0)]
+        public PluginConfigColor DrawRangedGlowColor = new(new Vector4(124f / 255f, 34f / 255f, 120f / 255f, 100f / 100f));
+
+        [Checkbox("Show card preferred target with glow")]
+        [CollapseWith(30, 0)]
         public bool ShowDrawGlowBar;
-        public bool EnableRedrawCooldownCumulated;
-        public bool EnableDecimalDrawBar;
-        public bool EnableDecimalRedrawBar;
-        public bool EnableDecimalDotBar;
-        public bool EnableDecimalStarBar;
-        public bool EnableDecimalLightspeedBar;
-        public bool ShowDivinationTextBar;
+
+        [Checkbox("Show card preferred target with text")]
+        [CollapseWith(35, 0)]
         public bool ShowDrawTextBar = true;
+
+        [Checkbox("Show Draw Timer")]
+        [CollapseWith(40, 0)]
         public bool ShowDrawCooldownTextBar = true;
-        public bool ShowRedrawTextBar = true;
+
+        [Checkbox("Enable Redraw Stacks & Cooldown")]
+        [CollapseWith(45, 0)]
+        public bool ShowRedrawBar = true;
+
+        [Checkbox("Show Redraw Timer")]
+        [CollapseWith(50, 0)]
         public bool ShowRedrawCooldownTextBar = true;
+
+        [Checkbox("Show Redraw Stacks")]
+        [CollapseWith(55, 0)]
+        public bool ShowRedrawTextBar = true;
+
+        [Checkbox("Change next Redraw cooldown to total Redraw cooldown")]
+        [CollapseWith(60, 0)]
+        public bool EnableRedrawCooldownCumulated;
+
+        [Checkbox("Change Draw timer to decimal")]
+        [CollapseWith(65, 0)]
+        public bool EnableDecimalDrawBar;
+
+        [Checkbox("Change Redraw timer to decimal")]
+        [CollapseWith(70, 0)]
+        public bool EnableDecimalRedrawBar;
+
+        #endregion
+
+        #region Divination Bar
+
+        [Checkbox("Show Divination Bar")]
+        [CollapseControl(15, 1)]
+        public bool ShowDivinationBar = true;
+
+        [DragFloat2("Divination Bar Size", min = 1f, max = 2000f)]
+        [CollapseWith(0, 1)]
+        public Vector2 DivinationBarSize = new(254, 10);
+
+        [DragFloat2("Divination Bar Position", min = -2000f, max = 2000f)]
+        [CollapseWith(5, 1)]
+        public Vector2 DivinationBarPosition = new(0, 388);
+
+        [DragInt("Divination Bar Padding", min = -1000, max = 1000)]
+        [CollapseWith(10, 1)]
+        public int DivinationBarPad = 2;
+
+        [ColorEdit4("Seal Sun Color")]
+        [CollapseWith(15, 1)]
+        public PluginConfigColor SealSunColor = new(new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f));
+
+        [ColorEdit4("Seal Lunar Color")]
+        [CollapseWith(20, 1)]
+        public PluginConfigColor SealLunarColor = new(new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f));
+
+        [ColorEdit4("Seal Celestial Color")]
+        [CollapseWith(25, 1)]
+        public PluginConfigColor SealCelestialColor = new(new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f));
+
+        [ColorEdit4("Divination Glow Color")]
+        [CollapseWith(30, 1)]
+        public PluginConfigColor DivinationGlowColor = new(new Vector4(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f));
+
+        [Checkbox("Show numbers of different seals for Divination with glow")]
+        [CollapseWith(35, 1)]
+        public bool ShowDivinationGlowBar = true;
+
+        [Checkbox("Show numbers of different seals for Divination with text")]
+        [CollapseWith(40, 1)]
+        public bool ShowDivinationTextBar;
+
+        #endregion
+
+        #region Dot Bar
+
+        [Checkbox("Show Dot Bar")]
+        [CollapseControl(20, 2)]
+        public bool ShowDotBar = true;
+
+        [DragFloat2("Dot Bar Size", min = 1f, max = 2000f)]
+        [CollapseWith(0, 2)]
+        public Vector2 DotBarSize = new(84, 20);
+
+        [DragFloat2("Dot Bar Position", min = -2000f, max = 2000f)]
+        [CollapseWith(5, 2)]
+        public Vector2 DotBarPosition = new(-85, 405);
+
+        [ColorEdit4("Dot Color")]
+        [CollapseWith(10, 2)]
+        public PluginConfigColor DotColor = new(new Vector4(20f / 255f, 80f / 255f, 168f / 255f, 100f / 100f));
+
+        [Checkbox("Show Dot timer")]
+        [CollapseWith(15, 2)]
         public bool ShowDotTextBar = true;
+
+        [Checkbox("Change Dot timer to decimal")]
+        [CollapseWith(20, 2)]
+        public bool EnableDecimalDotBar;
+
+        #endregion
+
+        #region Star Bar
+
+        [Checkbox("Show Star Bar")]
+        [CollapseControl(25, 3)]
+        public bool ShowStarBar = true;
+
+        [DragFloat2("Star Bar Size", min = 1f, max = 2000f)]
+        [CollapseWith(0, 3)]
+        public Vector2 StarBarSize = new(84, 20);
+
+        [DragFloat2("Star Bar Position", min = -2000f, max = 2000f)]
+        [CollapseWith(5, 3)]
+        public Vector2 StarBarPosition = new(0, 405);
+
+        [ColorEdit4("Star Earthly Color")]
+        [CollapseWith(10, 3)]
+        public PluginConfigColor StarEarthlyColor = new(new Vector4(37f / 255f, 181f / 255f, 177f / 255f, 100f / 100f));
+
+        [ColorEdit4("Star Giant Color")]
+        [CollapseWith(15, 3)]
+        public PluginConfigColor StarGiantColor = new(new Vector4(198f / 255f, 154f / 255f, 199f / 255f, 100f / 100f));
+
+        [ColorEdit4("Star Glow Color")]
+        [CollapseWith(20, 3)]
+        public PluginConfigColor StarGlowColor = new(new Vector4(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f));
+
+        [Checkbox("Show Star timer")]
+        [CollapseWith(25, 3)]
         public bool ShowStarTextBar = true;
+
+        [Checkbox("Change Star timer to decimal")]
+        [CollapseWith(30, 3)]
+        public bool EnableDecimalStarBar;
+
+        [Checkbox("Enable Star bar glow when Giant Dominance is ready")]
+        [CollapseWith(35, 3)]
+        public bool ShowStarGlowBar = true;
+
+        #endregion
+
+        #region Lightspeed Bar
+
+        [Checkbox("Show Lightspeed Bar")]
+        [CollapseControl(30, 4)]
+        public bool ShowLightspeedBar = true;
+
+        [DragFloat2("Lightspeed Bar Size", min = 1f, max = 2000f)]
+        [CollapseWith(0, 4)]
+        public Vector2 LightspeedBarSize = new(84, 20);
+
+        [DragFloat2("Lightspeed Bar Position", min = -2000f, max = 2000f)]
+        [CollapseWith(5, 4)]
+        public Vector2 LightspeedBarPosition = new(85, 405);
+
+        [ColorEdit4("Lightspeed Color")]
+        [CollapseWith(10, 4)]
+        public PluginConfigColor LightspeedColor = new(new Vector4(255f / 255f, 255f / 255f, 173f / 255f, 100f / 100f));
+
+        [Checkbox("Show Lightspeed timer")]
+        [CollapseWith(15, 4)]
         public bool ShowLightspeedTextBar = true;
 
-        public PluginConfigColor SealSunColor =
-            new(new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f));
+        [Checkbox("Change Lightspeed timer to decimal")]
+        [CollapseWith(20, 4)]
+        public bool EnableDecimalLightspeedBar;
 
-        public PluginConfigColor SealLunarColor =
-            new(new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f));
-
-        public PluginConfigColor SealCelestialColor =
-            new(new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f));
-
-        public PluginConfigColor DotColor =
-            new(new Vector4(20f / 255f, 80f / 255f, 168f / 255f, 100f / 100f));
-
-        public PluginConfigColor StarEarthlyColor =
-            new(new Vector4(37f / 255f, 181f / 255f, 177f / 255f, 100f / 100f));
-
-        public PluginConfigColor StarGiantColor =
-            new(new Vector4(198f / 255f, 154f / 255f, 199f / 255f, 100f / 100f));
-
-        public PluginConfigColor LightspeedColor =
-            new(new Vector4(255f / 255f, 255f / 255f, 173f / 255f, 100f / 100f));
-
-        public PluginConfigColor StarGlowColor =
-            new(new Vector4(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f));
-
-        public PluginConfigColor DivinationGlowColor =
-            new(new Vector4(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f));
-
-        public PluginConfigColor DrawMeleeGlowColor =
-            new(new Vector4(83f / 255f, 34f / 255f, 120f / 255f, 100f / 100f));
-
-        public PluginConfigColor DrawRangedGlowColor =
-            new(new Vector4(124f / 255f, 34f / 255f, 120f / 255f, 100f / 100f));
-
-        public PluginConfigColor DrawCdColor =
-            new(new Vector4(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f));
-
-        public PluginConfigColor DrawCdReadyColor =
-            new(new Vector4(137f / 255f, 26f / 255f, 42f / 255f, 100f / 100f));
-
-
-        public bool Draw()
-        {
-            var changed = false;
-
-            if (ImGui.CollapsingHeader("Base Offset", ImGuiTreeNodeFlags.DefaultOpen))
-            {
-                if (ImGui.IsItemHovered())
-                {
-                    ImGui.SetTooltip("Move the entire job bars pack");
-                }
-                changed |= ImGui.DragFloat2("Base Offset Position", ref BaseOffset, 1f, -2000, 2000, "%.f");
-            }
-
-            if (ImGui.CollapsingHeader("Draw Bar"))
-            {
-                changed |= ImGui.Checkbox("Show Draw Bar", ref ShowDrawBar);
-                changed |= ImGui.DragFloat2("Draw Bar Size", ref DrawBarSize, 1f, 1, 2000, "%.f");
-                changed |= ImGui.DragFloat2("Draw Bar Position", ref DrawBarPosition, 1f, -2000, 2000, "%.f");
-                ImGui.Text("Color");
-                changed |= ColorEdit4("Draw on CD Color", ref DrawCdColor);
-                changed |= ColorEdit4("Draw Ready Color", ref DrawCdReadyColor);
-                changed |= ColorEdit4("Draw Melee Glow Color", ref DrawMeleeGlowColor);
-                changed |= ColorEdit4("Draw Ranged Glow Color", ref DrawRangedGlowColor);
-                ImGui.Text("Options");
-                changed |= ImGui.Checkbox("Show card preferred target with glow", ref ShowDrawGlowBar);
-                changed |= ImGui.Checkbox("Show card preferred target with text", ref ShowDrawTextBar);
-                changed |= ImGui.Checkbox("Show Draw Timer", ref ShowDrawCooldownTextBar);
-                changed |= ImGui.Checkbox("Enable Redraw Stacks & Cooldown", ref ShowRedrawBar);
-                if (ShowRedrawBar)
-                {
-                    changed |= ImGui.Checkbox("Show Redraw Timer", ref ShowRedrawCooldownTextBar);
-                    changed |= ImGui.Checkbox("Show Redraw Stacks", ref ShowRedrawTextBar);
-                }
-                changed |= ImGui.Checkbox("Change next Redraw cooldown to total Redraw cooldown", ref EnableRedrawCooldownCumulated);
-                changed |= ImGui.Checkbox("Change Draw timer to decimal", ref EnableDecimalDrawBar);
-                changed |= ImGui.Checkbox("Change Redraw timer to decimal", ref EnableDecimalRedrawBar);
-            }
-
-            if (ImGui.CollapsingHeader("Divination Bar"))
-            {
-                changed |= ImGui.Checkbox("Show Divination Bar", ref ShowDivinationBar);
-
-                changed |= ImGui.DragFloat2("Divination Bar Size", ref DivinationBarSize, 1f, 1, 2000, "%.f");
-                changed |= ImGui.DragFloat2("Divination Bar Position", ref DivinationBarPosition, 1f, -2000, 2000, "%.f");
-                changed |= ImGui.DragInt("Divination Bar Padding Offset", ref DivinationBarPad, .1f, -1000, 1000);
-
-                ImGui.Text("Color");
-                changed |= ColorEdit4("Seal Sun Color", ref SealSunColor);
-                changed |= ColorEdit4("Seal Lunar Color", ref SealLunarColor);
-                changed |= ColorEdit4("Seal Celestial Color", ref SealCelestialColor);
-                changed |= ColorEdit4("Divination Glow Color", ref DivinationGlowColor);
-
-                ImGui.Text("Options");
-                changed |= ImGui.Checkbox("Show numbers of different seals for Divination with glow", ref ShowDivinationGlowBar);
-                changed |= ImGui.Checkbox("Show numbers of different seals for Divination with text", ref ShowDivinationTextBar);
-
-            }
-
-            if (ImGui.CollapsingHeader("Dot Bar"))
-            {
-                changed |= ImGui.Checkbox("Show Dot Bar", ref ShowDotBar);
-
-                changed |= ImGui.DragFloat2("Dot Bar Size", ref DotBarSize, 1f, 1, 2000, "%.f");
-                changed |= ImGui.DragFloat2("Dot Bar Position", ref DotBarPosition, 1f, -2000, 2000, "%.f");
-
-                ImGui.Text("Color");
-                changed |= ColorEdit4("Dot Color", ref DotColor);
-
-                ImGui.Text("Options");
-                changed |= ImGui.Checkbox("Show Dot timer", ref ShowDotTextBar);
-                changed |= ImGui.Checkbox("Change Dot timer to decimal", ref EnableDecimalDotBar);
-
-            }
-
-            if (ImGui.CollapsingHeader("Star Bar"))
-            {
-                changed |= ImGui.Checkbox("Show Star Bar", ref ShowStarBar);
-                changed |= ImGui.DragFloat2("Star Bar Size", ref StarBarSize, 1f, 1, 2000, "%.f");
-                changed |= ImGui.DragFloat2("Star Bar Position", ref StarBarPosition, 1f, -2000, 2000, "%.f");
-
-
-                ImGui.Text("Color");
-                changed |= ColorEdit4("Star Earthly Color", ref StarEarthlyColor);
-                changed |= ColorEdit4("Star Giant Color", ref StarGiantColor);
-                changed |= ColorEdit4("Star Glow Color", ref StarGlowColor);
-
-                ImGui.Text("Options");
-                changed |= ImGui.Checkbox("Show Star timer", ref ShowStarTextBar);
-                changed |= ImGui.Checkbox("Change Star timer to decimal", ref EnableDecimalStarBar);
-                changed |= ImGui.Checkbox("Enable Star bar glow when Giant Dominance is ready", ref ShowStarGlowBar);
-
-            }
-
-            if (ImGui.CollapsingHeader("Lightspeed Bar"))
-            {
-                changed |= ImGui.Checkbox("Show Lightspeed Bar", ref ShowLightspeedBar);
-
-                changed |= ImGui.DragFloat2("Lightspeed Bar Size", ref LightspeedBarSize, 1f, 1, 2000, "%.f");
-                changed |= ImGui.DragFloat2("Lightspeed Bar Position", ref LightspeedBarPosition, 1f, -2000, 2000, "%.f");
-
-                ImGui.Text("Color");
-                changed |= ColorEdit4("Lightspeed Color", ref LightspeedColor);
-
-                ImGui.Text("Options");
-                changed |= ImGui.Checkbox("Show Lightspeed timer", ref ShowLightspeedTextBar);
-                changed |= ImGui.Checkbox("Change Lightspeed timer to decimal", ref EnableDecimalLightspeedBar);
-
-            }
-
-            if (ImGui.CollapsingHeader("Others Options"))
-            {
-                changed |= ImGui.Checkbox("Show Primary Resource Bar", ref ShowPrimaryResourceBar);
-                //changed |= ColorEdit4("Bar Empty Color", ref EmptyColor);
-            }
-
-            return changed;
-        }
+        #endregion
     }
 }

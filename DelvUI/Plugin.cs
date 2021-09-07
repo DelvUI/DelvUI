@@ -1,4 +1,7 @@
-﻿using Dalamud.Game.ClientState;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using DelvUI.Config;
@@ -6,9 +9,6 @@ using DelvUI.Helpers;
 using DelvUI.Interface;
 using FFXIVClientStructs;
 using ImGuiNET;
-using System;
-using System.IO;
-using System.Reflection;
 
 namespace DelvUI
 {
@@ -20,34 +20,49 @@ namespace DelvUI
         private bool _fontLoadFailed;
         private HudWindow _hudWindow;
         private PluginConfiguration _pluginConfiguration;
+        private SystemMenuHook _menuHook;
 
-        private DalamudPluginInterface _pluginInterface;
+        private static DalamudPluginInterface _pluginInterface;
+
+        public static ImGuiScene.TextureWrap bannerTexture;
 
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         // ReSharper disable once MemberCanBePrivate.Global
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
         public string Name => "DelvUI";
+        public static string Version = "";
+
+        public static DalamudPluginInterface GetPluginInterface() => _pluginInterface;
 
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
             _pluginInterface = pluginInterface;
 
+            Version = Assembly.GetExecutingAssembly()?.GetName().Version.ToString() ?? "";
+
+            LoadBanner();
+
+            // initialize a not-necessarily-defaults configuration
+            ConfigurationManager.Initialize(false);
+
             // load a configuration with default parameters and write it to file
             _pluginConfiguration = new PluginConfiguration();
-            PluginConfiguration.WriteConfig("default", _pluginInterface, _pluginConfiguration);
+            PluginConfiguration.WriteConfig("default", _pluginConfiguration);
 
             // if a previously used configuration exists, use it instead
-            var oldConfiguration = PluginConfiguration.ReadConfig(Name, _pluginInterface);
+            var oldConfiguration = PluginConfiguration.ReadConfig(Name);
 
             if (oldConfiguration != null)
             {
                 _pluginConfiguration = oldConfiguration;
             }
 
-            _pluginConfiguration.Init(_pluginInterface);
-            _configurationWindow = new ConfigurationWindow(_pluginConfiguration, _pluginInterface);
+            _pluginConfiguration.BannerImage = bannerTexture;
 
-            BuildBanner();
+            _pluginConfiguration.Init();
+            _configurationWindow = new ConfigurationWindow(_pluginConfiguration);
+            ConfigurationManager.GetInstance().ConfigurationWindow = _configurationWindow;
+
 
             _pluginInterface.UiBuilder.OnBuildUi += Draw;
             _pluginInterface.UiBuilder.OnBuildFonts += BuildFont;
@@ -59,16 +74,20 @@ namespace DelvUI
             }
 
             _pluginInterface.CommandManager.AddHandler(
-                "/pdelvui",
+                "/delvui",
                 new CommandInfo(PluginCommand)
                 {
                     HelpMessage = "Opens the DelvUI configuration window.\n"
-                                + "/pdelvui toggle → Toggles HUD visibility.\n"
-                                + "/pdelvui show → Shows HUD.\n"
-                                + "/pdelvui hide → Hides HUD.",
+                                + "/delvui toggle → Toggles HUD visibility.\n"
+                                + "/delvui show → Shows HUD.\n"
+                                + "/delvui hide → Hides HUD.",
                     ShowInHelp = true
                 }
             );
+
+            _menuHook = new SystemMenuHook(_pluginInterface);
+
+            _pluginInterface.CommandManager.AddHandler("/delvuireloadconfig", new CommandInfo(ReloadConfigCommand));
 
             TexturesCache.Initialize(pluginInterface);
             Resolver.Initialize();
@@ -76,13 +95,14 @@ namespace DelvUI
 
         public void Dispose()
         {
+            _menuHook.Dispose();
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
         private void BuildFont()
         {
-            var fontFile = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Fonts", "big-noodle-too.ttf");
+            string fontFile = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Fonts", "big-noodle-too.ttf");
             _fontBuilt = false;
 
             if (File.Exists(fontFile))
@@ -106,15 +126,15 @@ namespace DelvUI
             }
         }
 
-        private void BuildBanner()
+        private void LoadBanner()
         {
-            var bannerImage = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
+            string bannerImage = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Images", "banner_short_x150.png");
 
             if (File.Exists(bannerImage))
             {
                 try
                 {
-                    _pluginConfiguration.BannerImage = _pluginInterface.UiBuilder.LoadImage(bannerImage);
+                    bannerTexture = _pluginInterface.UiBuilder.LoadImage(bannerImage);
                 }
                 catch (Exception ex)
                 {
@@ -149,22 +169,27 @@ namespace DelvUI
 
                 default:
                     _configurationWindow.IsVisible = !_configurationWindow.IsVisible;
+                    ConfigurationManager.GetInstance().DrawConfigWindow = false;
 
                     break;
             }
         }
 
+        private void ReloadConfigCommand(string command, string arguments) { ConfigurationManager.GetInstance().LoadConfigurations(); }
+
         private void Draw()
         {
-            var hudState = _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene]
-                        || _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene78]
-                        || _pluginInterface.ClientState.Condition[ConditionFlag.OccupiedInCutSceneEvent]
-                        || _pluginInterface.ClientState.Condition[ConditionFlag.CreatingCharacter]
-                        || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas]
-                        || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas51];
+            bool hudState = _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene]
+                         || _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene78]
+                         || _pluginInterface.ClientState.Condition[ConditionFlag.OccupiedInCutSceneEvent]
+                         || _pluginInterface.ClientState.Condition[ConditionFlag.CreatingCharacter]
+                         || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas]
+                         || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas51];
 
             _pluginInterface.UiBuilder.OverrideGameCursor = false;
             _configurationWindow.Draw();
+
+            ConfigurationManager.GetInstance().Draw();
 
             if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id)
             {
@@ -200,7 +225,7 @@ namespace DelvUI
                 //Healers
                 Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SCH => new ScholarHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.AST => new AstrologianHudWindow(_pluginInterface, _pluginConfiguration, _pluginConfiguration.ASTConfig),
+                Jobs.AST => new AstrologianHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //Melee DPS
                 Jobs.DRG => new DragoonHudWindow(_pluginInterface, _pluginConfiguration),
@@ -216,7 +241,7 @@ namespace DelvUI
                 //Caster DPS
                 Jobs.RDM => new RedMageHudWindow(_pluginInterface, _pluginConfiguration),
                 Jobs.SMN => new SummonerHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.BLM => new BlackMageHudWindow(_pluginInterface, _pluginConfiguration, _pluginConfiguration.BLMConfig),
+                Jobs.BLM => new BlackMageHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //Low jobs
                 Jobs.MRD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
@@ -261,12 +286,15 @@ namespace DelvUI
 
             _configurationWindow.IsVisible = false;
 
+            ConfigurationManager.GetInstance().DrawConfigWindow = false;
+
             if (_hudWindow != null)
             {
                 _hudWindow.IsVisible = false;
             }
 
-            _pluginInterface.CommandManager.RemoveHandler("/pdelvui");
+            _pluginInterface.CommandManager.RemoveHandler("/delvui");
+            _pluginInterface.CommandManager.RemoveHandler("/delvuireloadconfig");
             _pluginInterface.UiBuilder.OnBuildUi -= Draw;
             _pluginInterface.UiBuilder.OnBuildFonts -= BuildFont;
             _pluginInterface.UiBuilder.OnOpenConfigUi -= OpenConfigUi;

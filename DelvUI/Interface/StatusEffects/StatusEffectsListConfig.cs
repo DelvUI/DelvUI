@@ -9,7 +9,7 @@ namespace DelvUI.Interface.StatusEffects
     [Serializable]
     public class StatusEffectsListConfig : PluginConfigObject
     {
-        public bool Enabled = true;
+        public bool Enabled = false;
         public bool FillRowsFirst = true;
         public GrowthDirections GrowthDirections;
         public StatusEffectIconConfig IconConfig = new();

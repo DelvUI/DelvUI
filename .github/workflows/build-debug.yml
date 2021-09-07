@@ -15,6 +15,12 @@ jobs:
         with:
           submodules: recursive
 
+      - name: Install .NET 6
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "6.0.x"
+          include-prerelease: true
+
       - name: CSProj Cache
         id: cache-csproj
         uses: actions/cache@v2
@@ -22,7 +28,7 @@ jobs:
           path: |
             ./dalamud
             ~/.nuget/packages
-          key: ${{ runner.os }}-csproj-${{ hashFiles('**/*.csproj') }}
+          key: ${{ runner.os }}-csproj-v1-${{ hashFiles('**/*.csproj') }}
 
       - name: Setup Dalamud
         if: steps.cache-csproj.outputs.cache-hit != 'true'
@@ -34,6 +40,9 @@ jobs:
 
       - name: Restore project dependencies
         run: dotnet restore --verbosity normal
+
+      - name: Run dotnet-format
+        run: dotnet format DelvUI --no-restore --verify-no-changes --verbosity minimal
 
       - name: Build Debug
         run: dotnet build --no-restore --verbosity normal --configuration Debug
