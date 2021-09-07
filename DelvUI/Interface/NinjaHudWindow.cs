@@ -49,19 +49,25 @@ namespace DelvUI.Interface
         private void DrawHutonGauge()
         {
             NINGauge gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
-            var hutonDurationLeft = (int)Math.Ceiling((float)(gauge.HutonTimeLeft / (double)1000));
+            int hutonDurationLeft = (int)Math.Ceiling((float)(gauge.HutonTimeLeft / (double)1000));
 
-            var xPos = CenterX + _config.Position.X + _config.HutonGaugePosition.X - _config.HutonGaugeSize.X / 2f;
-            var yPos = CenterY + _config.Position.Y + _config.HutonGaugePosition.Y - _config.HutonGaugeSize.Y / 2f;
+            float xPos = CenterX + _config.Position.X + _config.HutonGaugePosition.X - _config.HutonGaugeSize.X / 2f;
+            float yPos = CenterY + _config.Position.Y + _config.HutonGaugePosition.Y - _config.HutonGaugeSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.HutonGaugeSize.Y, _config.HutonGaugeSize.X);
-            var maximum = 70f;
+            float maximum = 70f;
 
-            Bar bar = builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, _config.HutonGaugeColor.Map)
-                             .SetTextMode(BarTextMode.Single)
-                             .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                             .SetBackgroundColor(EmptyColor["background"])
-                             .Build();
+            builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, _config.HutonGaugeColor.Map)
+                   .SetTextMode(BarTextMode.Single)
+                   .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                   .SetBackgroundColor(EmptyColor["background"]);
+
+            if (!_config.ShowHutonGaugeBorder)
+            {
+                builder.SetDrawBorder(false);
+            }
+
+            Bar bar = builder.Build();
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
@@ -71,8 +77,8 @@ namespace DelvUI.Interface
         {
             NINGauge gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
 
-            var xPos = CenterX + _config.Position.X + _config.NinkiGaugePosition.X - _config.NinkiGaugeSize.X / 2f;
-            var yPos = CenterY + _config.Position.Y + _config.NinkiGaugePosition.Y - _config.NinkiGaugeSize.Y / 2f;
+            float xPos = CenterX + _config.Position.X + _config.NinkiGaugePosition.X - _config.NinkiGaugeSize.X / 2f;
+            float yPos = CenterY + _config.Position.Y + _config.NinkiGaugePosition.Y - _config.NinkiGaugeSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.NinkiGaugeSize.Y, _config.NinkiGaugeSize.X);
 
@@ -92,6 +98,11 @@ namespace DelvUI.Interface
                 builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
+            if (!_config.ShowNinkiGaugeBorder)
+            {
+                builder.SetDrawBorder(false);
+            }
+
             Bar bar = builder.Build();
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -100,11 +111,11 @@ namespace DelvUI.Interface
 
         private void DrawTrickAndSuitonGauge()
         {
-            var xPos = CenterX + _config.Position.X + _config.TrickBarPosition.X - _config.TrickBarSize.X / 2f;
-            var yPos = CenterY + _config.Position.Y + _config.TrickBarPosition.Y - _config.TrickBarSize.Y / 2f;
+            float xPos = CenterX + _config.Position.X + _config.TrickBarPosition.X - _config.TrickBarSize.X / 2f;
+            float yPos = CenterY + _config.Position.Y + _config.TrickBarPosition.Y - _config.TrickBarSize.Y / 2f;
 
             Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
-            var trickDuration = 0f;
+            float trickDuration = 0f;
             const float trickMaxDuration = 15f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.TrickBarSize.Y, _config.TrickBarSize.X);
@@ -129,7 +140,7 @@ namespace DelvUI.Interface
 
             if (suitonBuff.Any() && _config.ShowSuitonBar)
             {
-                var suitonDuration = Math.Abs(suitonBuff.First().Duration);
+                float suitonDuration = Math.Abs(suitonBuff.First().Duration);
                 builder.AddInnerBar(suitonDuration, 20, _config.SuitonBarColor.Map);
 
                 if (_config.ShowSuitonBarText)
@@ -170,6 +181,10 @@ namespace DelvUI.Interface
         [CollapseWith(10, 0)]
         public PluginConfigColor HutonGaugeColor = new(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f));
 
+        [Checkbox("Show Huton Gauge Border")]
+        [CollapseWith(15, 0)]
+        public bool ShowHutonGaugeBorder = false;
+
         [Checkbox("Show Ninki Gauge")]
         [CollapseControl(10, 1)]
         public bool ShowNinkiGauge = true;
@@ -197,6 +212,10 @@ namespace DelvUI.Interface
         [ColorEdit4("Ninki Gauge Color")]
         [CollapseWith(25, 1)]
         public PluginConfigColor NinkiGaugeColor = new(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f));
+
+        [Checkbox("Show Ninki Gauge Border")]
+        [CollapseWith(30, 1)]
+        public bool ShowNinkiGaugeBorder = false;
 
         [Checkbox("Show Trick Bar")]
         [CollapseControl(15, 2)]
