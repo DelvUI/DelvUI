@@ -27,10 +27,13 @@ namespace DelvUI
         // ReSharper disable once MemberCanBePrivate.Global
         public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
         public string Name => "DelvUI";
+        public static string Version = "";
 
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
             _pluginInterface = pluginInterface;
+
+            Version = Assembly.GetExecutingAssembly()?.GetName().Version.ToString() ?? "";
 
             ConfigurationManager.Initialize(pluginInterface);
 
