@@ -121,7 +121,7 @@ namespace DelvUI.Interface.GeneralElements
             return new StatusEffectsListConfig(pos, DefaultStatusEffectsListSize, false, true, true, GrowthDirections.Right | GrowthDirections.Up);
         }
 
-        // GCD Indicator
+        // gcd Indicator
         public static GCDIndicatorConfig GCDIndicator()
         {
             var size = new Vector2(254, 4);
@@ -130,13 +130,24 @@ namespace DelvUI.Interface.GeneralElements
             return new GCDIndicatorConfig(pos, size);
         }
 
-        // MP Ticker
+        // mp Ticker
         public static MPTickerConfig MPTicker()
         {
             var size = new Vector2(254, 4);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY + DefaultCastbarSize.Y + 2);
 
             return new MPTickerConfig(pos, size);
+        }
+
+        // primary resource bar
+        public static PrimaryResourceConfig PrimaryResource()
+        {
+            var size = new Vector2(254, 20);
+            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY + 15);
+
+            var labelConfig = new LabelConfig(Vector2.Zero, "", LabelTextAnchor.Center, "Value Label");
+
+            return new PrimaryResourceConfig(pos, size, labelConfig);
         }
     }
 }

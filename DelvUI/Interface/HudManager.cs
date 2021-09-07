@@ -115,7 +115,7 @@ namespace DelvUI.Interface
 
         private void CaretMiscElements()
         {
-            //gcd indicator
+            // gcd indicator
             var gcdIndicatorConfig = DefaultHudElements.GCDIndicator();
             var gcdIndicator = new GCDIndicatorHud("gcdIndicator", gcdIndicatorConfig, _pluginConfiguration);
             _hudElements.Add(gcdIndicator);
@@ -126,6 +126,12 @@ namespace DelvUI.Interface
             var mpTicker = new MPTickerHud("mpTicker", mpTickerConfig);
             _hudElements.Add(mpTicker);
             _hudElementsUsingPlayer.Add(mpTicker);
+
+            // primary resource
+            var primaryResourceConfig = DefaultHudElements.PrimaryResource();
+            var primaryResource = new PrimaryResourceHud("primaryResource", primaryResourceConfig);
+            _hudElements.Add(primaryResource);
+            _hudElementsUsingPlayer.Add(primaryResource);
         }
 
         public void Draw()
