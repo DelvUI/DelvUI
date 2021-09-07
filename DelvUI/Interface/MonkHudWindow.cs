@@ -363,11 +363,11 @@ namespace DelvUI.Interface
 
         [DragFloat2("Demolish Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(0, 0)]
-        public Vector2 DemolishBarPosition = new(176, 21);
+        public Vector2 DemolishBarPosition = new(-89, -11);
 
         [DragFloat2("Demolish Bar Size", min = 0, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 DemolishBarSize = new(111, 10);
+        public Vector2 DemolishBarSize = new(111, 20);
 
         [ColorEdit4("Demolish Bar Fill Color")]
         [CollapseWith(10, 0)]
@@ -381,7 +381,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Chakbra Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(0, 1)]
-        public Vector2 ChakraBarPosition = new(33, 43);
+        public Vector2 ChakraBarPosition = new(-160, -33);
 
         [DragFloat2("Chakra Bar Size", min = 0, max = 4000f)]
         [CollapseWith(5, 1)]
@@ -399,7 +399,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Leaden Fist Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(0, 2)]
-        public Vector2 LeadenFistBarPosition = new(146, 21);
+        public Vector2 LeadenFistBarPosition = new(-160, -11);
 
         [DragFloat2("Leaden Fist Bar Size", min = 0, max = 4000f)]
         [CollapseWith(5, 2)]
@@ -417,7 +417,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Twin Snakes Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(0, 3)]
-        public Vector2 TwinSnakesBarPosition = new(33, 21);
+        public Vector2 TwinSnakesBarPosition = new(-231, -11);
 
         [DragFloat2("Twin Snakes Bar Size", min = 0, max = 4000f)]
         [CollapseWith(5, 3)]
@@ -439,7 +439,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Riddle of Earth Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(0, 4)]
-        public Vector2 RiddleofEarthBarPosition = new(33, 65);
+        public Vector2 RiddleofEarthBarPosition = new(-229, -55);
 
         [DragFloat2("Riddle of Earth Bar Size", min = 0, max = 4000f)]
         [CollapseWith(5, 4)]
@@ -461,7 +461,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Perfect Balance Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(0, 5)]
-        public Vector2 PerfectBalanceBarPosition = new(150, 65);
+        public Vector2 PerfectBalanceBarPosition = new(-160, -55);
 
         [DragFloat2("Perfect Balance Bar Size", min = 0, max = 4000f)]
         [CollapseWith(5, 5)]
@@ -483,7 +483,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("True North Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(0, 6)]
-        public Vector2 TrueNorthBarPosition = new(172, 65);
+        public Vector2 TrueNorthBarPosition = new(-91, -55);
 
         [DragFloat2("True North Bar Size", min = 0, max = 4000f)]
         [CollapseWith(5, 6)]
@@ -501,11 +501,11 @@ namespace DelvUI.Interface
 
         [DragFloat2("Forms Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(0, 7)]
-        public Vector2 FormsBarPosition = new(33, 87);
+        public Vector2 FormsBarPosition = new(-160, -77);
 
         [DragFloat2("Forms Bar Size", min = 0, max = 4000f)]
         [CollapseWith(5, 7)]
-        public Vector2 FormsBarSize = new(20, 20);
+        public Vector2 FormsBarSize = new(254, 20);
 
         [ColorEdit4("Forms Bar Fill Color")]
         [CollapseWith(10, 7)]
