@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using ImGuiNET;
 using ImGuiScene;
-using System;
-using System.Collections.Generic;
-using System.Numerics;
 
 namespace DelvUI.Config
 {
@@ -40,7 +40,7 @@ namespace DelvUI.Config
 
             _configMap.Add("Buffs and Debuffs", new[] { "Player Buffs", "Player Debuffs", "Target Buffs", "Target Debuffs", "Raid/Job Buffs" });
 
-            _configMap.Add("Job Specific Bars", new[] { "General", "Tank", "Healer", "Melee", "Ranged" });
+            _configMap.Add("Job Specific Bars", new[] { "General" });
             _configMap.Add("Import/Export", new[] { "General" });
         }
 
@@ -348,16 +348,6 @@ namespace DelvUI.Config
                     {
                         case "General":
                             DrawJobsGeneralConfig();
-
-                            break;
-
-                        case "Tank":
-                            DrawJobsTankConfig();
-
-                            break;
-
-                        case "Healer":
-                            DrawJobsHealerConfig();
 
                             break;
                     }
@@ -1884,38 +1874,6 @@ namespace DelvUI.Config
 
             _changed |= ImGui.ColorEdit4("Bar Background Color", ref _pluginConfiguration.EmptyColor);
             _changed |= ImGui.ColorEdit4("Bar Partial Fill Color", ref _pluginConfiguration.PartialFillColor);
-        }
-
-        private void DrawJobsTankConfig()
-        {
-            if (ImGui.BeginTabBar("##tanks-tabs"))
-            {
-                if (ImGui.BeginTabItem("General"))
-                {
-                    _changed |= ImGui.Checkbox("Tank Stance Indicator Enabled", ref _pluginConfiguration.TankStanceIndicatorEnabled);
-
-                    int tankStanceIndicatorWidth = _pluginConfiguration.TankStanceIndicatorWidth;
-
-                    if (ImGui.DragInt("Tank Stance Indicator Width", ref tankStanceIndicatorWidth, .1f, 1, 6))
-                    {
-                        _pluginConfiguration.TankStanceIndicatorWidth = tankStanceIndicatorWidth;
-                        _pluginConfiguration.Save();
-                    }
-
-                    ImGui.EndTabItem();
-                }
-            }
-
-            ImGui.EndTabBar();
-        }
-
-        private void DrawJobsHealerConfig()
-        {
-            if (ImGui.BeginTabBar("##HEALERS-tabs"))
-            {
-            }
-
-            ImGui.EndTabBar();
         }
     }
 }

@@ -9,7 +9,7 @@ namespace DelvUI.Config
     {
         private static ConfigurationManager _instance;
 
-        public TextureWrap BannerImage;
+        public readonly TextureWrap BannerImage;
 
         public BaseNode ConfigBaseNode;
 
@@ -29,11 +29,11 @@ namespace DelvUI.Config
 
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface)
         {
-            PluginConfigObject[] configObjects = new PluginConfigObject[]
+            PluginConfigObject[] configObjects =
             {
-                new AstrologianHudConfig(), new BardHudConfig(), new BlackMageHudConfig(), new DancerHudConfig(), new DarkKnightHudConfig(), new DragoonHudConfig(),
-                new GunbreakerHudConfig(), new MachinistHudConfig(), new MonkHudConfig(), new NinjaHudConfig(), new PaladinHudConfig(), new RedMageHudConfig(),
-                new SamuraiHudConfig(), new ScholarHudConfig(), new SummonerHudConfig(), new WarriorHudConfig(), new WhiteMageHudConfig()
+                new TankHudConfig(), new PaladinHudConfig(), new WarriorHudConfig(), new DarkKnightHudConfig(), new GunbreakerHudConfig(), new WhiteMageHudConfig(),
+                new ScholarHudConfig(), new AstrologianHudConfig(), new MonkHudConfig(), new DragoonHudConfig(), new NinjaHudConfig(), new SamuraiHudConfig(),
+                new BardHudConfig(), new MachinistHudConfig(), new DancerHudConfig(), new BlackMageHudConfig(), new SummonerHudConfig(), new RedMageHudConfig()
             };
 
             return Initialize(pluginInterface, configObjects);
@@ -48,28 +48,12 @@ namespace DelvUI.Config
                 node.GetOrAddConfig(configObject);
             }
 
-            //TextureWrap banner = BuildBanner(pluginInterface);
             TextureWrap banner = Plugin.bannerTexture;
 
             return new ConfigurationManager(banner, pluginInterface.GetPluginConfigDirectory(), node);
         }
 
         public static ConfigurationManager GetInstance() => _instance;
-
-        private static TextureWrap BuildBanner(DalamudPluginInterface pluginInterface) =>
-            // var bannerImage = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? "", "Media", "Images", "banner_short_x150.png");
-            //
-            // if (File.Exists(bannerImage)) {
-            //     try {
-            //         return pluginInterface.UiBuilder.LoadImage(bannerImage);
-            //     } catch (Exception ex) {
-            //         PluginLog.Log($"Image failed to load. {bannerImage}");
-            //         PluginLog.Log(ex.ToString());
-            //     }
-            // } else {
-            //     PluginLog.Log($"Image doesn't exist. {bannerImage}");
-            // }
-            null;
 
         public void Draw()
         {
