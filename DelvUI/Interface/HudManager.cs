@@ -26,19 +26,8 @@ namespace DelvUI.Interface
         private List<HudElement> _hudElements;
         private List<IHudElementWithActor> _hudElementsUsingPlayer;
         private List<IHudElementWithActor> _hudElementsUsingTarget;
-
-        private UnitFrameHud _playerUnitFrame;
-        private UnitFrameHud _targetUnitFrame;
-        private UnitFrameHud _targetOfTargetUnitFrame;
-        private UnitFrameHud _focusTargetUnitFrame;
-
-        private CastbarHud _playerCastbar;
-        private CastbarHud _targetCastbar;
-
-        private StatusEffectsListHud _playerBuffs;
-        private StatusEffectsListHud _playerDebuffs;
-        private StatusEffectsListHud _targetBuffs;
-        private StatusEffectsListHud _targetDebuffs;
+        private List<IHudElementWithActor> _hudElementsUsingTargetOfTarget;
+        private List<IHudElementWithActor> _hudElementsUsingFocusTarget;
 
         public HudManager(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration)
         {
@@ -48,74 +37,89 @@ namespace DelvUI.Interface
             _hudElements = new List<HudElement>();
             _hudElementsUsingPlayer = new List<IHudElementWithActor>();
             _hudElementsUsingTarget = new List<IHudElementWithActor>();
+            _hudElementsUsingTargetOfTarget = new List<IHudElementWithActor>();
+            _hudElementsUsingFocusTarget = new List<IHudElementWithActor>();
 
             CreateUnitFrames();
             CreateCastbars();
             CreateStatusEffectsLists();
+            CaretMiscElements();
         }
         ~HudManager()
         {
             _hudElements.Clear();
+            _hudElementsUsingPlayer.Clear();
             _hudElementsUsingTarget.Clear();
-            _hudElementsUsingTarget.Clear();
+            _hudElementsUsingTargetOfTarget.Clear();
+            _hudElementsUsingFocusTarget.Clear();
         }
 
         private void CreateUnitFrames()
         {
-            var playerUnitFrameConfig = DefaultUnitFrames.PlayerUnitFrame();
-            _playerUnitFrame = new UnitFrameHud("playerUnitFrame", playerUnitFrameConfig, _pluginConfiguration);
-            _hudElements.Add(_playerUnitFrame);
-            _hudElementsUsingPlayer.Add(_playerUnitFrame);
+            var playerUnitFrameConfig = DefaultHudElements.PlayerUnitFrame();
+            var playerUnitFrame = new UnitFrameHud("playerUnitFrame", playerUnitFrameConfig, _pluginConfiguration);
+            _hudElements.Add(playerUnitFrame);
+            _hudElementsUsingPlayer.Add(playerUnitFrame);
 
-            var targetUnitFrameConfig = DefaultUnitFrames.TargetUnitFrame();
-            _targetUnitFrame = new UnitFrameHud("targetUnitFrame", targetUnitFrameConfig, _pluginConfiguration);
-            _hudElements.Add(_targetUnitFrame);
-            _hudElementsUsingTarget.Add(_targetUnitFrame);
+            var targetUnitFrameConfig = DefaultHudElements.TargetUnitFrame();
+            var targetUnitFrame = new UnitFrameHud("targetUnitFrame", targetUnitFrameConfig, _pluginConfiguration);
+            _hudElements.Add(targetUnitFrame);
+            _hudElementsUsingTarget.Add(targetUnitFrame);
 
-            var targetOfTargetUnitFrameConfig = DefaultUnitFrames.TargetOfTargetUnitFrame();
-            _targetOfTargetUnitFrame = new UnitFrameHud("targetOfTargetUnitFrame", targetOfTargetUnitFrameConfig, _pluginConfiguration);
-            _hudElements.Add(_targetOfTargetUnitFrame);
+            var targetOfTargetUnitFrameConfig = DefaultHudElements.TargetOfTargetUnitFrame();
+            var targetOfTargetUnitFrame = new UnitFrameHud("targetOfTargetUnitFrame", targetOfTargetUnitFrameConfig, _pluginConfiguration);
+            _hudElements.Add(targetOfTargetUnitFrame);
+            _hudElementsUsingTargetOfTarget.Add(targetOfTargetUnitFrame);
 
-            var focusTargetUnitFrameConfig = DefaultUnitFrames.FocusTargetUnitFrame();
-            _focusTargetUnitFrame = new UnitFrameHud("focusTargetUnitFrame", focusTargetUnitFrameConfig, _pluginConfiguration);
-            _hudElements.Add(_focusTargetUnitFrame);
+            var focusTargetUnitFrameConfig = DefaultHudElements.FocusTargetUnitFrame();
+            var focusTargetUnitFrame = new UnitFrameHud("focusTargetUnitFrame", focusTargetUnitFrameConfig, _pluginConfiguration);
+            _hudElements.Add(focusTargetUnitFrame);
+            _hudElementsUsingFocusTarget.Add(focusTargetUnitFrame);
         }
 
         private void CreateCastbars()
         {
-            var playerCastbarConfig = PlayerCastbarConfig.DefaultCastbar();
-            _playerCastbar = new PlayerCastbarHud("playerCastbar", playerCastbarConfig, _pluginConfiguration);
-            _hudElements.Add(_playerCastbar);
-            _hudElementsUsingPlayer.Add(_playerCastbar);
+            var playerCastbarConfig = DefaultHudElements.PlayerCastbar();
+            var playerCastbar = new PlayerCastbarHud("playerCastbar", playerCastbarConfig, _pluginConfiguration);
+            _hudElements.Add(playerCastbar);
+            _hudElementsUsingPlayer.Add(playerCastbar);
 
-            var targetCastbarConfig = TargetCastbarConfig.DefaultCastbar();
-            targetCastbarConfig.Enabled = false;
-            _targetCastbar = new TargetCastbarHud("targetCastbar", targetCastbarConfig, _pluginConfiguration);
-            _hudElements.Add(_targetCastbar);
-            _hudElementsUsingTarget.Add(_targetCastbar);
+            var targetCastbarConfig = DefaultHudElements.TargetCastbar();
+            var targetCastbar = new TargetCastbarHud("targetCastbar", targetCastbarConfig, _pluginConfiguration);
+            _hudElements.Add(targetCastbar);
+            _hudElementsUsingTarget.Add(targetCastbar);
         }
 
         private void CreateStatusEffectsLists()
         {
-            var playerBuffsConfig = DefaultStatusEffectsLists.PlayerBuffsList();
-            _playerBuffs = new StatusEffectsListHud("playerBuffs", playerBuffsConfig);
-            _hudElements.Add(_playerBuffs);
-            _hudElementsUsingPlayer.Add(_playerBuffs);
+            var playerBuffsConfig = DefaultHudElements.PlayerBuffsList();
+            var playerBuffs = new StatusEffectsListHud("playerBuffs", playerBuffsConfig);
+            _hudElements.Add(playerBuffs);
+            _hudElementsUsingPlayer.Add(playerBuffs);
 
-            var playerDebuffsConfig = DefaultStatusEffectsLists.PlayerDebuffsList();
-            _playerDebuffs = new StatusEffectsListHud("playerDebuffs", playerDebuffsConfig);
-            _hudElements.Add(_playerDebuffs);
-            _hudElementsUsingPlayer.Add(_playerDebuffs);
+            var playerDebuffsConfig = DefaultHudElements.PlayerDebuffsList();
+            var playerDebuffs = new StatusEffectsListHud("playerDebuffs", playerDebuffsConfig);
+            _hudElements.Add(playerDebuffs);
+            _hudElementsUsingPlayer.Add(playerDebuffs);
 
-            var targetBuffsConfig = DefaultStatusEffectsLists.TargetBuffsList();
-            _targetBuffs = new StatusEffectsListHud("targetBuffs", targetBuffsConfig);
-            _hudElements.Add(_targetBuffs);
-            _hudElementsUsingTarget.Add(_targetBuffs);
+            var targetBuffsConfig = DefaultHudElements.TargetBuffsList();
+            var targetBuffs = new StatusEffectsListHud("targetBuffs", targetBuffsConfig);
+            _hudElements.Add(targetBuffs);
+            _hudElementsUsingTarget.Add(targetBuffs);
 
-            var targetDebuffsConfig = DefaultStatusEffectsLists.TargetDebuffsList();
-            _targetDebuffs = new StatusEffectsListHud("targetDebuffs", targetDebuffsConfig);
-            _hudElements.Add(_targetDebuffs);
-            _hudElementsUsingTarget.Add(_targetDebuffs);
+            var targetDebuffsConfig = DefaultHudElements.TargetDebuffsList();
+            var targetDebuffs = new StatusEffectsListHud("targetDebuffs", targetDebuffsConfig);
+            _hudElements.Add(targetDebuffs);
+            _hudElementsUsingTarget.Add(targetDebuffs);
+        }
+
+        private void CaretMiscElements()
+        {
+            // gcd indicator
+            var gcdIndicatorConfig = DefaultHudElements.GCDIndicator();
+            var gcdIndicator = new GCDIndicatorHud("gcdIndicator", gcdIndicatorConfig, _pluginConfiguration);
+            _hudElements.Add(gcdIndicator);
+            _hudElementsUsingPlayer.Add(gcdIndicator);
         }
 
         public void Draw()
@@ -184,10 +188,18 @@ namespace DelvUI.Interface
             }
 
             // target of target
-            _targetOfTargetUnitFrame.Actor = Utils.FindTargetOfTarget(target, player, _pluginInterface.ClientState.Actors);
+            var targetOfTarget = Utils.FindTargetOfTarget(target, player, _pluginInterface.ClientState.Actors);
+            foreach (var element in _hudElementsUsingTargetOfTarget)
+            {
+                element.Actor = targetOfTarget;
+            }
 
             // focus
-            _focusTargetUnitFrame.Actor = _pluginInterface.ClientState.Targets.FocusTarget;
+            var focusTarget = _pluginInterface.ClientState.Targets.FocusTarget;
+            foreach (var element in _hudElementsUsingFocusTarget)
+            {
+                element.Actor = focusTarget;
+            }
         }
     }
 }

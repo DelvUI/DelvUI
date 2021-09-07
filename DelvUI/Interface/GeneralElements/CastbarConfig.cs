@@ -15,18 +15,6 @@ namespace DelvUI.Interface.GeneralElements
         public int SlideCastTime = 200;
         public PluginConfigColor SlideCastColor = new PluginConfigColor(new(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        public static Vector2 DefaultSize => new Vector2(254, 25);
-        public static PlayerCastbarConfig DefaultCastbar()
-        {
-            var size = DefaultSize;
-            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY - size.Y / 2f);
-
-            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
-
-            return new PlayerCastbarConfig(pos, size, castNameConfig, castTimeConfig, "Player Castbar");
-        }
-
         public PlayerCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig, string title = "")
             : base(position, size, castNameConfig, castTimeConfig, title)
         {
@@ -56,18 +44,6 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor PhysicalDamangeColor = new PluginConfigColor(new(255f / 255f, 0 / 255f, 0f / 255f, 100f / 100f));
         public PluginConfigColor MagicalDamageColor = new PluginConfigColor(new(0f / 255f, 0 / 255f, 255f / 255f, 100f / 100f));
         public PluginConfigColor DarknessDamageColor = new PluginConfigColor(new(255f / 255f, 0 / 255f, 255f / 255f, 100f / 100f));
-
-        public static Vector2 DefaultSize => new Vector2(254, 25);
-        public static TargetCastbarConfig DefaultCastbar()
-        {
-            var size = DefaultSize;
-            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY / 2f - size.Y / 2);
-
-            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
-
-            return new TargetCastbarConfig(pos, size, castNameConfig, castTimeConfig, "Target Castbar");
-        }
 
         public TargetCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig, string title = "")
             : base(position, size, castNameConfig, castTimeConfig, title)

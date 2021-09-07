@@ -61,7 +61,7 @@ namespace DelvUI.Interface.GeneralElements
 
             var castPercent = 100f / totalCastTime * currentCastTime;
             var castScale = castPercent / 100f;
-            var startPos = new Vector2(origin.X + Config.Position.X - Config.Size.X / 2f, origin.Y + Config.Position.Y - Config.Size.Y / 2f);
+            var startPos = origin + Config.Position - Config.Size / 2f;
             var endPos = startPos + Config.Size;
 
             var drawList = ImGui.GetWindowDrawList();

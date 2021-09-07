@@ -162,12 +162,12 @@ namespace DelvUI.Interface.GeneralElements
 
                 if (Config.ShieldConfig.FillHealthFirst)
                 {
-                    DrawHelper.DrawShield(shield, scale, startPos, Config.Size, 
+                    DrawHelper.DrawShield(shield, scale, startPos, Config.Size,
                         Config.ShieldConfig.Height, Config.ShieldConfig.HeightInPixels, Config.ShieldConfig.Color.Map, drawList);
                 }
                 else
                 {
-                    DrawHelper.DrawOvershield(shield, startPos, Config.Size, 
+                    DrawHelper.DrawOvershield(shield, startPos, Config.Size,
                         Config.ShieldConfig.Height, Config.ShieldConfig.HeightInPixels, Config.ShieldConfig.Color.Map, drawList);
                 }
             }

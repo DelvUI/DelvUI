@@ -6,41 +6,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.StatusEffects
 {
-    public static class DefaultStatusEffectsLists
-    {
-        internal static Vector2 DefaultSize = new Vector2(292, 82);
-
-        public static StatusEffectsListConfig PlayerBuffsList()
-        {
-            var screenSize = ImGui.GetMainViewport().Size;
-            var pos = new Vector2(screenSize.X * 0.38f, -screenSize.Y * 0.45f);
-
-            return new StatusEffectsListConfig(pos, DefaultSize, true, false, true, GrowthDirections.Left | GrowthDirections.Down);
-        }
-
-        public static StatusEffectsListConfig PlayerDebuffsList()
-        {
-            var screenSize = ImGui.GetMainViewport().Size;
-            var pos = new Vector2(screenSize.X * 0.38f, -screenSize.Y * 0.45f + DefaultSize.Y);
-
-            return new StatusEffectsListConfig(pos, DefaultSize, false, true, true, GrowthDirections.Left | GrowthDirections.Down);
-        }
-
-        public static StatusEffectsListConfig TargetBuffsList()
-        {
-            var pos = new Vector2(HUDConstants.UnitFramesOffsetX, HUDConstants.BaseHUDOffsetY - 50);
-
-            return new StatusEffectsListConfig(pos, DefaultSize, true, false, true, GrowthDirections.Right | GrowthDirections.Up);
-        }
-
-        public static StatusEffectsListConfig TargetDebuffsList()
-        {
-            var pos = new Vector2(HUDConstants.UnitFramesOffsetX, HUDConstants.BaseHUDOffsetY - 50 - DefaultSize.Y);
-
-            return new StatusEffectsListConfig(pos, DefaultSize, false, true, true, GrowthDirections.Right | GrowthDirections.Up);
-        }
-    }
-
     [Serializable]
     public class StatusEffectsListConfig : MovablePluginConfigObject
     {

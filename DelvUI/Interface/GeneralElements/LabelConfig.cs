@@ -66,6 +66,7 @@ namespace DelvUI.Interface.GeneralElements
             return false;
         }
     }
+
     public enum LabelTextAnchor
     {
         Center = 0,
