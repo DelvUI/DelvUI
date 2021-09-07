@@ -38,7 +38,7 @@ namespace DelvUI.Interface
                 DrawNinkiGauge();
             }
 
-            if (_config.ShowTrickBar)
+            if (_config.ShowTrickBar || _config.ShowSuitonBar)
             {
                 DrawTrickAndSuitonGauge();
             }
@@ -51,8 +51,8 @@ namespace DelvUI.Interface
             NINGauge gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
             var hutonDurationLeft = (int)Math.Ceiling((float)(gauge.HutonTimeLeft / (double)1000));
 
-            var xPos = CenterX - _config.Position.X + _config.HutonGaugeOffset.X;
-            var yPos = CenterY + _config.Position.Y + _config.HutonGaugeOffset.Y;
+            var xPos = CenterX + _config.Position.X + _config.HutonGaugePosition.X - _config.HutonGaugeSize.X / 2f;
+            var yPos = CenterY + _config.Position.Y + _config.HutonGaugePosition.Y - _config.HutonGaugeSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.HutonGaugeSize.Y, _config.HutonGaugeSize.X);
             var maximum = 70f;
@@ -71,8 +71,8 @@ namespace DelvUI.Interface
         {
             NINGauge gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
 
-            var xPos = CenterX - _config.Position.X + _config.NinkiGaugeOffset.X;
-            var yPos = CenterY + _config.Position.Y + _config.NinkiGaugeOffset.Y;
+            var xPos = CenterX + _config.Position.X + _config.NinkiGaugePosition.X - _config.NinkiGaugeSize.X / 2f;
+            var yPos = CenterY + _config.Position.Y + _config.NinkiGaugePosition.Y - _config.NinkiGaugeSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.NinkiGaugeSize.Y, _config.NinkiGaugeSize.X);
 
@@ -100,8 +100,8 @@ namespace DelvUI.Interface
 
         private void DrawTrickAndSuitonGauge()
         {
-            var xPos = CenterX - _config.Position.X + _config.TrickBarOffset.X;
-            var yPos = CenterY + _config.Position.Y + _config.TrickBarOffset.Y;
+            var xPos = CenterX + _config.Position.X + _config.TrickBarPosition.X - _config.TrickBarSize.X / 2f;
+            var yPos = CenterY + _config.Position.Y + _config.TrickBarPosition.Y - _config.TrickBarSize.Y / 2f;
 
             Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             var trickDuration = 0f;
@@ -115,11 +115,14 @@ namespace DelvUI.Interface
                 trickDuration = Math.Max(trickStatus.Duration, 0);
             }
 
-            builder.AddInnerBar(trickDuration, trickMaxDuration, _config.TrickBarColor.Map);
-
-            if (trickDuration != 0 && _config.ShowTrickBarText)
+            if (trickDuration != 0)
             {
-                builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                builder.AddInnerBar(trickDuration, trickMaxDuration, _config.TrickBarColor.Map);
+
+                if (_config.ShowTrickBarText)
+                {
+                    builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
             }
 
             IEnumerable<StatusEffect> suitonBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 507);
@@ -147,9 +150,9 @@ namespace DelvUI.Interface
     [SubSection("Ninja", 1)]
     public class NinjaHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Position", min = -4000f, max = 4000f)]
         [Order(0)]
-        public Vector2 Position = new(127, 417);
+        public Vector2 Position = new(0, 0);
 
         [Checkbox("Show Huton Gauge")]
         [CollapseControl(5, 0)]
@@ -159,9 +162,9 @@ namespace DelvUI.Interface
         [CollapseWith(0, 0)]
         public Vector2 HutonGaugeSize = new(254, 20);
 
-        [DragFloat2("Huton Gauge Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Huton Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 HutonGaugeOffset = new(0, 0);
+        public Vector2 HutonGaugePosition = new(0, 426);
 
         [ColorEdit4("Huton Gauge Color")]
         [CollapseWith(10, 0)]
@@ -183,9 +186,9 @@ namespace DelvUI.Interface
         [CollapseWith(10, 1)]
         public Vector2 NinkiGaugeSize = new(254, 20);
 
-        [DragFloat2("Ninki Gauge Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Ninki Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(15, 1)]
-        public Vector2 NinkiGaugeOffset = new(0, 22);
+        public Vector2 NinkiGaugePosition = new(0, 448);
 
         [DragFloat("Ninki Gauge Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(20, 1)]
@@ -223,8 +226,8 @@ namespace DelvUI.Interface
         [Order(25)]
         public Vector2 TrickBarSize = new(254, 20);
 
-        [DragFloat2("Trick/Suiton Bar Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Trick/Suiton Bar Position", min = -4000f, max = 4000f)]
         [Order(30)]
-        public Vector2 TrickBarOffset = new(0, 44);
+        public Vector2 TrickBarPosition = new(0, 470);
     }
 }

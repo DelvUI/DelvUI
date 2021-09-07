@@ -60,8 +60,8 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
             var pos = new Vector2(
-                OriginX + _config.KenkiBarOffset.X - _config.KenkiBarSize.X / 2f,
-                OriginY + _config.KenkiBarOffset.Y
+                OriginX + _config.KenkiBarPosition.X - _config.KenkiBarSize.X / 2f,
+                OriginY + _config.KenkiBarPosition.Y - _config.KenkiBarSize.Y / 2f
             );
 
             var kenkiBuilder = BarBuilder.Create(pos, _config.KenkiBarSize)
@@ -95,8 +95,8 @@ namespace DelvUI.Interface
 
             var higanbanaColor = higanbanaDuration > 5 ? _config.HiganbanaColor.Map : _config.HiganbanaExpiryColor.Map;
             var pos = new Vector2(
-                OriginX + _config.HiganbanaBarOffset.X - _config.HiganbanaBarSize.X / 2f,
-                OriginY + _config.HiganbanaBarOffset.Y
+                OriginX + _config.HiganbanaBarPosition.X - _config.HiganbanaBarSize.X / 2f,
+                OriginY + _config.HiganbanaBarPosition.Y - _config.HiganbanaBarSize.Y / 2f
             );
 
             var higanbanaBuilder = BarBuilder.Create(pos, _config.HiganbanaBarSize)
@@ -114,14 +114,14 @@ namespace DelvUI.Interface
         private void DrawActiveBuffs()
         {
             var target = PluginInterface.ClientState.LocalPlayer;
-            var buffsSize = new Vector2(_config.BuffsBarSize.X / 2f - _config.BuffsPadding, _config.BuffsBarSize.Y);
+            var buffsSize = new Vector2(_config.BuffsBarSize.X / 2f - _config.BuffsPadding / 2f, _config.BuffsBarSize.Y);
 
             // shifu
             var shifu = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1299);
             var shifuDuration = shifu.Duration;
             var shifuPos = new Vector2(
-                OriginX + _config.BuffsBarOffset.X - _config.BuffsBarSize.X / 2f,
-                OriginY + _config.BuffsBarOffset.Y
+                OriginX + _config.BuffsBarPosition.X - _config.BuffsBarSize.X / 2f,
+                OriginY + _config.BuffsBarPosition.Y - _config.BuffsBarSize.Y / 2f
             );
             var shifuBuilder = BarBuilder.Create(shifuPos, buffsSize)
                 .SetBackgroundColor(EmptyColor["background"])
@@ -132,8 +132,8 @@ namespace DelvUI.Interface
             var jinpu = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1298);
             var jinpuDuration = jinpu.Duration;
             var jinpuPos = new Vector2(
-                OriginX + _config.BuffsBarOffset.X + _config.BuffsBarSize.X / 2f - buffsSize.X,
-                OriginY + _config.BuffsBarOffset.Y
+                OriginX + _config.BuffsBarPosition.X + _config.BuffsBarSize.X / 2f - buffsSize.X,
+                OriginY + _config.BuffsBarPosition.Y - _config.BuffsBarSize.Y / 2f
             );
             var jinpuBuilder = BarBuilder.Create(jinpuPos, buffsSize)
                 .SetBackgroundColor(EmptyColor["background"])
@@ -154,12 +154,12 @@ namespace DelvUI.Interface
         private void DrawSenResourceBar()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
-            var senBarWidth = (int)((_config.SenBarSize.X - _config.SenBarPadding * 2) / 3f);
+            var senBarWidth = (_config.SenBarSize.X - _config.SenBarPadding * 2) / 3f;
             var senBarSize = new Vector2(senBarWidth, _config.SenBarSize.Y);
 
             var cursorPos = new Vector2(
-                OriginX + _config.SenBarOffset.X - _config.SenBarSize.X / 2f,
-                OriginY + _config.SenBarOffset.Y
+                OriginX + _config.SenBarPosition.X - _config.SenBarSize.X / 2f,
+                OriginY + _config.SenBarPosition.Y - _config.SenBarSize.Y / 2f
             );
             var drawList = ImGui.GetWindowDrawList();
 
@@ -182,8 +182,8 @@ namespace DelvUI.Interface
             var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
 
             var pos = new Vector2(
-                OriginX + _config.MeditationBarOffset.X - _config.MeditationBarSize.X / 2f,
-                OriginY + _config.MeditationBarOffset.Y
+                OriginX + _config.MeditationBarPosition.X - _config.MeditationBarSize.X / 2f,
+                OriginY + _config.MeditationBarPosition.Y - _config.MeditationBarSize.Y / 2f
             );
 
             var meditationBuilder = BarBuilder.Create(pos, _config.MeditationBarSize)
@@ -203,7 +203,7 @@ namespace DelvUI.Interface
     [SubSection("Samurai", 1)]
     public class SamuraiHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Position", min = -4000f, max = 4000f)]
         [Order(0)]
         public Vector2 Position = new(0, 0);
 
@@ -214,11 +214,11 @@ namespace DelvUI.Interface
 
         [DragFloat2("Kenki Bar Size", max = 2000f)]
         [CollapseWith(0, 0)]
-        public Vector2 KenkiBarSize = new Vector2(253, 20);
+        public Vector2 KenkiBarSize = new Vector2(254, 20);
 
-        [DragFloat2("Kenki Bar Offset", min = -2000f, max = 2000f)]
+        [DragFloat2("Kenki Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(5, 0)]
-        public Vector2 KenkiBarOffset = new Vector2(0, 414);
+        public Vector2 KenkiBarPosition = new Vector2(0, 425);
 
         [Checkbox("Show Kenki Text")]
         [CollapseWith(10, 0)]
@@ -236,11 +236,11 @@ namespace DelvUI.Interface
 
         [DragFloat2("Sen Bar Size", max = 2000f)]
         [CollapseWith(5, 1)]
-        public Vector2 SenBarSize = new Vector2(253, 10);
+        public Vector2 SenBarSize = new Vector2(254, 10);
 
-        [DragFloat2("Sen Bar Offset", min = -2000f, max = 2000f)]
+        [DragFloat2("Sen Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(10, 1)]
-        public Vector2 SenBarOffset = new Vector2(0, 436);
+        public Vector2 SenBarPosition = new Vector2(0, 442);
         #endregion
 
         #region Meditation
@@ -254,11 +254,11 @@ namespace DelvUI.Interface
 
         [DragFloat2("Meditation Bar Size", max = 2000f)]
         [CollapseWith(5, 2)]
-        public Vector2 MeditationBarSize = new Vector2(253, 10);
+        public Vector2 MeditationBarSize = new Vector2(254, 10);
 
-        [DragFloat2("Meditation Bar Offset", min = -2000f, max = 2000f)]
+        [DragFloat2("Meditation Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(10, 2)]
-        public Vector2 MeditationBarOffset = new Vector2(0, 448);
+        public Vector2 MeditationBarPosition = new Vector2(0, 454);
         #endregion
 
         #region Buffs
@@ -268,15 +268,15 @@ namespace DelvUI.Interface
 
         [DragInt("Buffs Bar Padding", max = 1000)]
         [CollapseWith(0, 3)]
-        public int BuffsPadding = 1;
+        public int BuffsPadding = 2;
 
         [DragFloat2("Buffs Bar Size", max = 2000f)]
         [CollapseWith(5, 3)]
-        public Vector2 BuffsBarSize = new Vector2(253, 20);
+        public Vector2 BuffsBarSize = new Vector2(254, 20);
 
-        [DragFloat2("Buffs Bar Offset", min = -2000f, max = 2000f)]
+        [DragFloat2("Buffs Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(10, 3)]
-        public Vector2 BuffsBarOffset = new Vector2(0, 392);
+        public Vector2 BuffsBarPosition = new Vector2(0, 403);
 
         [Checkbox("Show Buffs Bar Text")]
         [CollapseWith(15, 3)]
@@ -290,11 +290,11 @@ namespace DelvUI.Interface
 
         [DragFloat2("Higanbana Bar Size", max = 2000f)]
         [CollapseWith(0, 4)]
-        public Vector2 HiganbanaBarSize = new Vector2(253, 20);
+        public Vector2 HiganbanaBarSize = new Vector2(254, 20);
 
-        [DragFloat2("Higanbana Bar Offset", min = -2000f, max = 2000f)]
+        [DragFloat2("Higanbana Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(5, 4)]
-        public Vector2 HiganbanaBarOffset = new Vector2(0, 370);
+        public Vector2 HiganbanaBarPosition = new Vector2(0, 381);
 
         [Checkbox("Show Higanbana Text")]
         [CollapseWith(10, 4)]
