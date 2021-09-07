@@ -199,7 +199,7 @@ namespace DelvUI.Interface
             var thundercloudTimer = _config.ShowThundercloudProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 164).Duration) : 0;
 
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.ProcsBarOffset.X - _config.ProcsBarSize.X,
+                CenterX + _config.Position.X + _config.ProcsBarOffset.X,
                 CenterY + _config.Position.Y + _config.ProcsBarOffset.Y - _config.ProcsBarSize.Y / 2f
             );
 
@@ -382,7 +382,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Procs Bar Offset", min = -2000, max = 2000f)]
         [CollapseWith(10, 2)]
-        public Vector2 ProcsBarOffset = new Vector2(-21, 391);
+        public Vector2 ProcsBarOffset = new Vector2(-127, 391);
 
         [DragFloat2("Procs Bar Size", max = 2000f)]
         [CollapseWith(15, 2)]
