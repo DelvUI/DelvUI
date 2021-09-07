@@ -49,7 +49,7 @@ namespace DelvUI.Interface
             Vector2 barSize = _config.MiasmaSize;
             Vector2 position = Origin + _config.MiasmaPosition - barSize / 2f;
 
-            List<Bar> barDrawList = new List<Bar>();
+            List<Bar> barDrawList = new();
 
             if (_config.ShowMiasma)
             {
@@ -58,7 +58,7 @@ namespace DelvUI.Interface
                       || o.EffectId == 180 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                 );
 
-                var miasmaDuration = Math.Abs(miasma.Duration);
+                float miasmaDuration = Math.Abs(miasma.Duration);
                 PluginConfigColor miasmaColor = miasmaDuration > 5 ? _config.MiasmaColor : _config.ExpireColor;
                 BarBuilder builder = BarBuilder.Create(position, barSize);
 
@@ -77,7 +77,7 @@ namespace DelvUI.Interface
                       || o.EffectId == 189 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                 );
 
-                var bioDuration = Math.Abs(bio.Duration);
+                float bioDuration = Math.Abs(bio.Duration);
                 PluginConfigColor bioColor = bioDuration > 5 ? _config.BioColor : _config.ExpireColor;
 
                 barSize = _config.BioSize;
@@ -156,11 +156,11 @@ namespace DelvUI.Interface
     public class SummonerHudConfig : PluginConfigObject
     {
         [ColorEdit4("Aether Tracker Color")]
-        [CollapseWith(10, 1)]
+        [CollapseWith(15, 1)]
         public PluginConfigColor AetherColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
         [DragInt("Aether Padding", max = 1000)]
-        [Order(40)]
+        [CollapseWith(10, 1)]
         public int AetherPadding = 2;
 
         [DragFloat2("Aether Tracker Position", min = -4000f, max = 4000f)]
