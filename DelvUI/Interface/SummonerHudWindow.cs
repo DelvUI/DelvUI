@@ -5,6 +5,7 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs;
+using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
@@ -16,6 +17,8 @@ namespace DelvUI.Interface
 {
     public class SummonerHudWindow : HudWindow
     {
+        private bool _bahamutFinished = true;
+
         public SummonerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => 27;
@@ -28,6 +31,65 @@ namespace DelvUI.Interface
             DrawActiveDots();
             DrawRuinBar();
             DrawAetherBar();
+            DrawTranceBar();
+        }
+
+        private void DrawTranceBar()
+        {
+            if (!_config.ShowTrance)
+            {
+                return;
+            }
+
+            SMNGauge gauge = PluginInterface.ClientState.JobGauges.Get<SMNGauge>();
+
+            PluginConfigColor tranceColor;
+            float maxDuration;
+            float tranceDuration = gauge.TimerRemaining;
+
+            if (!_bahamutFinished && tranceDuration < 1)
+            {
+                _bahamutFinished = true;
+            }
+
+            switch (gauge.NumStacks)
+            {
+                case >= 16:
+                    tranceColor = _config.PhoenixColor;
+                    maxDuration = 20000f;
+
+                    break;
+
+                case >= 8:
+                    tranceColor = _config.BahamutColor;
+                    maxDuration = 20000f;
+                    _bahamutFinished = false;
+
+                    break;
+
+                default:
+                    // This is needed because as soon as you summon Bahamut the flag goes back to 0-2
+                    tranceColor = _bahamutFinished ? _config.DreadwyrmColor : _config.BahamutColor;
+                    maxDuration = _bahamutFinished ? 15000f : 20000f;
+
+                    break;
+            }
+
+            Vector2 barSize = _config.TranceSize;
+            Vector2 position = Origin + _config.TrancePosition - barSize / 2f;
+
+            BarBuilder builder = BarBuilder.Create(position, barSize);
+
+            Bar bar = builder.AddInnerBar(tranceDuration / 1000f, maxDuration / 1000f, tranceColor.Map).SetBackgroundColor(EmptyColor["background"]).Build();
+
+            if (_config.ShowTranceText)
+            {
+                builder.SetTextMode(BarTextMode.Single)
+                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+            }
+
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         protected override void DrawPrimaryResourceBar() { }
@@ -171,6 +233,10 @@ namespace DelvUI.Interface
         [CollapseWith(0, 1)]
         public Vector2 AetherSize = new(254, 20);
 
+        [ColorEdit4("Trance Bahamut Color")]
+        [CollapseWith(45, 5)]
+        public PluginConfigColor BahamutColor = new(new Vector4(128f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+
         [ColorEdit4("Bio Color")]
         [CollapseWith(15, 4)]
         public PluginConfigColor BioColor = new(new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 100f / 100f));
@@ -181,11 +247,15 @@ namespace DelvUI.Interface
 
         [DragFloat2("Bio Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 4)]
-        public Vector2 BioPosition = new(64, -55);
+        public Vector2 BioPosition = new(64, -77);
 
         [DragFloat2("Bio Size", max = 2000f)]
         [CollapseWith(5, 4)]
         public Vector2 BioSize = new(126, 20);
+
+        [ColorEdit4("Trance Dreadwyrm Color")]
+        [CollapseWith(40, 5)]
+        public PluginConfigColor DreadwyrmColor = new(new Vector4(255f / 255f, 255f / 255f, 147f / 255f, 100f / 100f));
 
         [ColorEdit4("DoT Expire Color")]
         [Order(70)]
@@ -201,11 +271,15 @@ namespace DelvUI.Interface
 
         [DragFloat2("Miasma Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 3)]
-        public Vector2 MiasmaPosition = new(-64, -55);
+        public Vector2 MiasmaPosition = new(-64, -77);
 
         [DragFloat2("Miasma Size", max = 2000f)]
         [CollapseWith(5, 3)]
         public Vector2 MiasmaSize = new(126, 20);
+
+        [ColorEdit4("Trance Phoenix Color")]
+        [CollapseWith(50, 5)]
+        public PluginConfigColor PhoenixColor = new(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f));
 
         [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
         [Order(0)]
@@ -242,5 +316,21 @@ namespace DelvUI.Interface
         [Checkbox("Ruin Enabled")]
         [CollapseControl(15, 2)]
         public bool ShowRuin = true;
+
+        [Checkbox("Trance Enabled")]
+        [CollapseControl(20, 5)]
+        public bool ShowTrance = true;
+
+        [Checkbox("Trance Gauge Text")]
+        [CollapseWith(25, 5)]
+        public bool ShowTranceText = true;
+
+        [DragFloat2("Trance Gauge Position", min = -4000f, max = 4000f)]
+        [CollapseWith(35, 5)]
+        public Vector2 TrancePosition = new(0, -55);
+
+        [DragFloat2("Trance Gauge Size", min = 1f, max = 2000f)]
+        [CollapseWith(30, 5)]
+        public Vector2 TranceSize = new(254, 20);
     }
 }
