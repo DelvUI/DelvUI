@@ -11,9 +11,9 @@ namespace DelvUI.Config
 
         public TextureWrap BannerImage;
 
-        public string ConfigDirectory;
-
         public BaseNode ConfigBaseNode;
+
+        public string ConfigDirectory;
         public bool DrawConfigWindow;
 
         public ConfigurationManager(TextureWrap bannerImage, string configDirectory, BaseNode configBaseNode)
@@ -29,24 +29,11 @@ namespace DelvUI.Config
 
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface)
         {
-            var configObjects = new PluginConfigObject[]
+            PluginConfigObject[] configObjects = new PluginConfigObject[]
             {
-                new AstrologianHudConfig(),
-                new BardHudConfig(),
-                new BlackMageHudConfig(),
-                new DancerHudConfig(),
-                new DarkKnightHudConfig(),
-                new DragoonHudConfig(),
-                new GunbreakerHudConfig(),
-                new MachinistHudConfig(),
-                new MonkHudConfig(),
-                new NinjaHudConfig(),
-                new PaladinHudConfig(),
-                new RedMageHudConfig(),
-                new SamuraiHudConfig(),
-                new SummonerHudConfig(),
-                new WarriorHudConfig(),
-                new WhiteMageHudConfig(),
+                new AstrologianHudConfig(), new BardHudConfig(), new BlackMageHudConfig(), new DancerHudConfig(), new DarkKnightHudConfig(), new DragoonHudConfig(),
+                new GunbreakerHudConfig(), new MachinistHudConfig(), new MonkHudConfig(), new NinjaHudConfig(), new PaladinHudConfig(), new RedMageHudConfig(),
+                new SamuraiHudConfig(), new ScholarHudConfig(), new SummonerHudConfig(), new WarriorHudConfig(), new WhiteMageHudConfig()
             };
 
             return Initialize(pluginInterface, configObjects);
@@ -54,7 +41,7 @@ namespace DelvUI.Config
 
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface, params PluginConfigObject[] configObjects)
         {
-            BaseNode node = new BaseNode();
+            BaseNode node = new();
 
             foreach (PluginConfigObject configObject in configObjects)
             {

@@ -395,40 +395,12 @@ namespace DelvUI.Config
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorWHM.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorWHM.AdjustColor(.1f))
                 },
-                [Jobs.SCH] = new() // Scholar job color
+                [Jobs.SCH] = new()
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorSCH),
                     ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorSCH.AdjustColor(-10f)),
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorSCH.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorSCH.AdjustColor(.1f))
-                },
-                [Jobs.SCH * 1000] = new() // Scholar Aether Bar Color
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(SchAetherColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(SchAetherColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SchAetherColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SchAetherColor.AdjustColor(.1f))
-                },
-                [Jobs.SCH * 1000 + 1] = new() // Scholar Fairy Bar Color
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(SchFairyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(SchFairyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SchFairyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SchFairyColor.AdjustColor(.1f))
-                },
-                [Jobs.SCH * 1000 + 2] = new() // Scholar Empty Bar Color
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
-                [Jobs.SCH * 1000 + 3] = new() // Scholar Biolysis Color
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(SCHBioColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(SCHBioColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(SCHBioColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(SCHBioColor.AdjustColor(.1f))
                 },
                 [Jobs.SMN] = new()
                 {
@@ -674,36 +646,6 @@ namespace DelvUI.Config
                 }
             };
         }
-
-        #region SCH Configuration
-
-        public int SCHBaseXOffset { get; set; }
-        public int SCHBaseYOffset { get; set; }
-
-        public int FairyBarHeight { get; set; } = 20;
-        public int FairyBarWidth { get; set; } = 254;
-        public int FairyBarX { get; set; } = 127;
-        public int FairyBarY { get; set; } = 444;
-        public int SchAetherBarHeight { get; set; } = 20;
-        public int SchAetherBarWidth { get; set; } = 250;
-        public int SchAetherBarX { get; set; } = -42;
-        public int SchAetherBarY { get; set; } = 444;
-        public int SchAetherBarPad { get; set; } = 2;
-        public int SCHBioBarHeight { get; set; } = 20;
-        public int SCHBioBarWidth { get; set; } = 254;
-        public int SCHBioBarX { get; set; } = 127;
-        public int SCHBioBarY { get; set; } = 417;
-
-        public bool SCHShowBioBar = true;
-        public bool SCHShowAetherBar = true;
-        public bool SCHShowFairyBar = true;
-        public bool SCHShowPrimaryResourceBar = true;
-
-        public Vector4 SchAetherColor = new(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f);
-        public Vector4 SchFairyColor = new(94f / 255f, 250f / 255f, 154f / 255f, 100f / 100f);
-        public Vector4 SCHBioColor = new(50f / 255f, 93f / 255f, 37f / 255f, 1f);
-
-        #endregion
 
         #region PLD Configuration
 
