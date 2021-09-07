@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
+using Dalamud.Interface;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
 using ImGuiScene;
@@ -99,6 +100,19 @@ namespace DelvUI.Config.Tree
                     }
                 }
 
+                // close button
+                Vector2 pos = ImGui.GetCursorPos();
+                ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 30, 0));
+                ImGui.PushFont(UiBuilder.IconFont);
+
+                if (ImGui.Button(FontAwesomeIcon.Times.ToIconString()))
+                {
+                    ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
+                }
+
+                ImGui.PopFont();
+                ImGui.SetCursorPos(pos);
+
                 ImGui.EndGroup(); // Right
             }
 
@@ -109,7 +123,7 @@ namespace DelvUI.Config.Tree
             ImGui.BeginGroup(); // Bottom Bar
 
             {
-                if (ImGui.Button("Job Packs"))
+                if (ImGui.Button("General"))
                 {
                     ToggleJobPacks();
                 }
@@ -121,7 +135,7 @@ namespace DelvUI.Config.Tree
 
                 ImGui.SameLine();
 
-                if (ImGui.Button("Hide/Show HUD"))
+                if (ImGui.Button("Toggle HUD"))
                 { }
 
                 ImGui.SameLine();
@@ -235,19 +249,6 @@ namespace DelvUI.Config.Tree
 
                     ImGui.EndTabBar();
 
-                    // TODO: Close Button - Maybe better suited elsewhere
-                    /* Current close button code
-                    Vector2 pos = ImGui.GetCursorPos();
-                    ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 20, 0));
-                    ImGui.PushFont(UiBuilder.IconFont);
-
-                    if (ImGui.Button(FontAwesomeIcon.Times.ToIconString())) {
-                        //hide config window
-                    }
-
-                    ImGui.PopFont();
-                    ImGui.SetCursorPos(pos);
-                    */
                 }
             }
 
