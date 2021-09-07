@@ -1,10 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using ImGuiNET;
 using ImGuiScene;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
 
 namespace DelvUI.Config
 {
