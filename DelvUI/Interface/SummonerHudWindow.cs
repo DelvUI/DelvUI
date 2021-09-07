@@ -156,11 +156,11 @@ namespace DelvUI.Interface
     public class SummonerHudConfig : PluginConfigObject
     {
         [ColorEdit4("Aether Tracker Color")]
-        [CollapseWith(10, 1)]
+        [CollapseWith(15, 1)]
         public PluginConfigColor AetherColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
         [DragInt("Aether Padding", max = 1000)]
-        [Order(40)]
+        [CollapseWith(10, 1)]
         public int AetherPadding = 2;
 
         [DragFloat2("Aether Tracker Position", min = -4000f, max = 4000f)]
