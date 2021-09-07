@@ -144,8 +144,11 @@ namespace DelvUI.Config.Tree
 
                 if (ImGui.Button("Reset HUD"))
                 {
+                    // save the old configuration window for use in the new ConfigurationManager
+                    ConfigurationWindow configurationWindow = ConfigurationManager.GetInstance().ConfigurationWindow;
                     // make a new configuration from defaults
                     ConfigurationManager.Initialize(true);
+                    ConfigurationManager.GetInstance().ConfigurationWindow = configurationWindow;
                     // save the defaults to file
                     ConfigurationManager.GetInstance().SaveConfigurations();
                     // prevent the config window from closing

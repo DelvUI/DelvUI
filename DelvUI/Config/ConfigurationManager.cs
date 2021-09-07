@@ -16,6 +16,8 @@ namespace DelvUI.Config
         public string ConfigDirectory;
         public bool DrawConfigWindow;
 
+        public ConfigurationWindow ConfigurationWindow { get; set; }
+
         public ConfigurationManager(bool defaultConfig, TextureWrap bannerImage, string configDirectory, BaseNode configBaseNode)
         {
             BannerImage = bannerImage;
@@ -28,15 +30,16 @@ namespace DelvUI.Config
             }
         }
 
-        public ConfigurationWindow ConfigurationWindow { get; set; }
 
         public static ConfigurationManager Initialize(bool defaultConfig)
         {
             PluginConfigObject[] configObjects =
             {
-                new TankHudConfig(), new PaladinHudConfig(), new WarriorHudConfig(), new DarkKnightHudConfig(), new GunbreakerHudConfig(), new WhiteMageHudConfig(),
-                new ScholarHudConfig(), new AstrologianHudConfig(), new MonkHudConfig(), new DragoonHudConfig(), new NinjaHudConfig(), new SamuraiHudConfig(),
-                new BardHudConfig(), new MachinistHudConfig(), new DancerHudConfig(), new BlackMageHudConfig(), new SummonerHudConfig(), new RedMageHudConfig()
+                new TankHudConfig(), new PaladinHudConfig(), new WarriorHudConfig(), new DarkKnightHudConfig(), new GunbreakerHudConfig(),
+                new WhiteMageHudConfig(), new ScholarHudConfig(), new AstrologianHudConfig(),
+                new MonkHudConfig(), new DragoonHudConfig(), new NinjaHudConfig(), new SamuraiHudConfig(),
+                new BardHudConfig(), new MachinistHudConfig(), new DancerHudConfig(),
+                new BlackMageHudConfig(), new SummonerHudConfig(), new RedMageHudConfig()
             };
 
             return Initialize(defaultConfig, configObjects);
