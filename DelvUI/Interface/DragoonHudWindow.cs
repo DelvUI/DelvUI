@@ -18,7 +18,7 @@ namespace DelvUI.Interface
 
         public override uint JobId => Jobs.DRG;
         private readonly DragoonHudConfig _config = (DragoonHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new DragoonHudConfig());
-        private Vector2 Origin => new(CenterX + _config.BaseOffset.X, CenterY + YOffset + _config.BaseOffset.Y);
+        private Vector2 Origin => new(CenterX + _config.BasePosition.X, CenterY + _config.BasePosition.Y);
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
 
         protected override List<uint> GetJobSpecificBuffs()
@@ -89,7 +89,7 @@ namespace DelvUI.Interface
                 }
             }
 
-            var cursorPos = Origin + new Vector2(_config.ChaosThrustBarPosition.X, _config.ChaosThrustBarPosition.Y);
+            var cursorPos = Origin + new Vector2(_config.ChaosThrustBarPosition.X - _config.ChaosThrustBarSize.X / 2f, _config.ChaosThrustBarPosition.Y - _config.ChaosThrustBarSize.Y / 2f);
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + _config.ChaosThrustBarSize, EmptyColor["background"]);
             Vector2 chaosThrustBarSize = new(_config.ChaosThrustBarSize.X * scale, _config.ChaosThrustBarSize.Y);
@@ -117,19 +117,22 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
 
-            var cursorPos = Origin + new Vector2(_config.EyeOfTheDragonBarPosition.X, _config.EyeOfTheDragonBarPosition.Y);
+            var cursorPos = Origin + new Vector2(_config.EyeOfTheDragonBarPosition.X - _config.EyeOfTheDragonBarSize.X, _config.EyeOfTheDragonBarPosition.Y - _config.EyeOfTheDragonBarSize.Y / 2f);
             var eyeCount = gauge.EyeCount;
             var drawList = ImGui.GetWindowDrawList();
 
             for (byte i = 0; i < 2; i++)
             {
-                cursorPos = new Vector2(cursorPos.X + (_config.EyeOfTheDragonBarSize.X + _config.EyeOfTheDragonBarPadding) * i, cursorPos.Y);
+                var size = _config.EyeOfTheDragonBarSize;
+                size.X = size.X - _config.EyeOfTheDragonBarPadding / 2f;
+
+                cursorPos = new Vector2(cursorPos.X + (size.X + _config.EyeOfTheDragonBarPadding * i) * i, cursorPos.Y);
 
                 if (eyeCount >= i + 1)
                 {
                     drawList.AddRectFilledMultiColor(
                         cursorPos,
-                        cursorPos + _config.EyeOfTheDragonBarSize,
+                        cursorPos + size,
                         _config.EyeOfTheDragonColor.Map["gradientLeft"],
                         _config.EyeOfTheDragonColor.Map["gradientRight"],
                         _config.EyeOfTheDragonColor.Map["gradientRight"],
@@ -138,10 +141,10 @@ namespace DelvUI.Interface
                 }
                 else
                 {
-                    drawList.AddRectFilled(cursorPos, cursorPos + _config.EyeOfTheDragonBarSize, EmptyColor["background"]);
+                    drawList.AddRectFilled(cursorPos, cursorPos + size, EmptyColor["background"]);
                 }
 
-                drawList.AddRect(cursorPos, cursorPos + _config.EyeOfTheDragonBarSize, 0xFF000000);
+                drawList.AddRect(cursorPos, cursorPos + size, 0xFF000000);
             }
         }
 
@@ -149,7 +152,7 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
 
-            var cursorPos = Origin + new Vector2(_config.BloodBarPosition.X, _config.BloodBarPosition.Y);
+            var cursorPos = Origin + new Vector2(_config.BloodBarPosition.X - _config.BloodBarSize.X / 2f, _config.BloodBarPosition.Y - _config.BloodBarSize.Y / 2f);
 
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + _config.BloodBarSize, EmptyColor["background"]);
@@ -203,7 +206,7 @@ namespace DelvUI.Interface
         private void DrawDisembowelBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            var cursorPos = Origin + new Vector2(_config.DisembowelBarPosition.X, _config.DisembowelBarPosition.Y);
+            var cursorPos = Origin + new Vector2(_config.DisembowelBarPosition.X - _config.DisembowelBarSize.X / 2f, _config.DisembowelBarPosition.Y - _config.DisembowelBarSize.Y / 2f);
             var drawList = ImGui.GetWindowDrawList();
             var disembowelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1914 or 121);
             drawList.AddRectFilled(cursorPos, cursorPos + _config.DisembowelBarSize, EmptyColor["background"]);
@@ -253,8 +256,8 @@ namespace DelvUI.Interface
     [SubSection("Dragoon", 1)]
     public class DragoonHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
-        public Vector2 BaseOffset = new(0, 0);
+        [DragFloat2("Base Position", min = -4000f, max = 4000f)]
+        public Vector2 BasePosition = new(0, 0);
 
         #region Chaos Thrust Bar
 
@@ -265,7 +268,7 @@ namespace DelvUI.Interface
         public Vector2 ChaosThrustBarSize = new(254, 20);
 
         [DragFloat2("Chaos Thrust Bar Position", min = -4000f, max = 4000f)]
-        public Vector2 ChaosThrustBarPosition = new(0, 0);
+        public Vector2 ChaosThrustBarPosition = new(0, 383);
 
         [Checkbox("Show Chaos Bar Thrust Text")]
         public bool ShowChaosThrustBarText = true;
@@ -284,7 +287,7 @@ namespace DelvUI.Interface
         public Vector2 DisembowelBarSize = new(254, 20);
 
         [DragFloat2("Disembowel Bar Position", min = -4000f, max = 4000f)]
-        public Vector2 DisembowelBarPosition = new(0, 21);
+        public Vector2 DisembowelBarPosition = new(0, 405);
 
         [Checkbox("Show Disembowel Bar Text")]
         public bool ShowDisembowelBarText = true;
@@ -303,7 +306,7 @@ namespace DelvUI.Interface
         public Vector2 EyeOfTheDragonBarSize = new(126, 20);
 
         [DragFloat2("Eye Of The Dragon Bar Position", min = -4000f, max = 4000f)]
-        public Vector2 EyeOfTheDragonBarPosition = new(0, 42);
+        public Vector2 EyeOfTheDragonBarPosition = new(0, 427);
 
         [DragInt("Eye Of The Dragon Bar Padding")]
         public int EyeOfTheDragonBarPadding = 2;
@@ -322,7 +325,7 @@ namespace DelvUI.Interface
         public Vector2 BloodBarSize = new(254, 20);
 
         [DragFloat2("Blood Bar Position", min = -4000f, max = 4000f)]
-        public Vector2 BloodBarPosition = new(0, 63);
+        public Vector2 BloodBarPosition = new(0, 449);
 
         [Checkbox("Show Blood Bar Text")]
         public bool ShowBloodBarText = true;
