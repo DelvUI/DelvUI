@@ -15,7 +15,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public GCDIndicatorHud(string ID, GCDIndicatorConfig config, PluginConfiguration pluginConfiguration) : base(ID, config)
         {
-            // NOTE: Temporary. Have to do this for now for job colors.
+            // NOTE: Temporary. Have to do this for now to use the bar builder.
             // Ideally hud elements shouldna't need a reference to PluginConfiguration
             _pluginConfiguration = pluginConfiguration;
         }

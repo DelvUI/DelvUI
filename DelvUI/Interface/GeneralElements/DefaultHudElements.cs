@@ -125,9 +125,18 @@ namespace DelvUI.Interface.GeneralElements
         public static GCDIndicatorConfig GCDIndicator()
         {
             var size = new Vector2(254, 4);
-            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY + DefaultCastbarSize.Y / 2f + 2);
+            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY + 2);
 
             return new GCDIndicatorConfig(pos, size);
+        }
+
+        // MP Ticker
+        public static MPTickerConfig MPTicker()
+        {
+            var size = new Vector2(254, 4);
+            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY + DefaultCastbarSize.Y + 2);
+
+            return new MPTickerConfig(pos, size);
         }
     }
 }

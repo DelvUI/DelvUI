@@ -111,7 +111,7 @@ namespace DelvUI.Interface
         private LastUsedCast _lastPlayerUsedCast;
         private LastUsedCast _lastTargetUsedCast;
 
-        private MpTickHelper _mpTickHelper;
+        private MPTickHelper _mpTickHelper;
         public bool IsVisible = true;
 
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration)
@@ -920,10 +920,10 @@ namespace DelvUI.Interface
                 }
             }
 
-            _mpTickHelper ??= new MpTickHelper(PluginInterface);
+            _mpTickHelper ??= new MPTickHelper();
 
             var now = ImGui.GetTime();
-            var scale = (float)((now - _mpTickHelper.LastTick) / MpTickHelper.ServerTickRate);
+            var scale = (float)((now - _mpTickHelper.LastTick) / MPTickHelper.ServerTickRate);
 
             if (scale <= 0)
             {
