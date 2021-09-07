@@ -451,69 +451,6 @@ namespace DelvUI.Config
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorMNK.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorMNK.AdjustColor(.1f))
                 },
-                [Jobs.MNK * 1000] = new() // Demolish
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKDemolishColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MNKDemolishColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MNKDemolishColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MNKDemolishColor.AdjustColor(.1f))
-                },
-                [Jobs.MNK * 1000 + 1] = new() // Chakra
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKChakraColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MNKChakraColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MNKChakraColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MNKChakraColor.AdjustColor(.1f))
-                },
-                [Jobs.MNK * 1000 + 2] = new() // Leaden Fist
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKLeadenFistColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MNKLeadenFistColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MNKLeadenFistColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MNKLeadenFistColor.AdjustColor(.1f))
-                },
-                [Jobs.MNK * 1000 + 3] = new() // Twin Snakes
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(MNKTwinSnakesColor.AdjustColor(.1f))
-                },
-                [Jobs.MNK * 1000 + 4] = new() // Empty
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(EmptyColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
-                [Jobs.MNK * 1000 + 5] = new() // Riddle Of Earth
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKRiddleOfEarthColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
-                [Jobs.MNK * 1000 + 6] = new() // Perfect Balance
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKRiddleOfEarthColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
-                [Jobs.MNK * 1000 + 7] = new() // True North
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKTrueNorthColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
-                [Jobs.MNK * 1000 + 8] = new() // Forms
-                {
-                    ["base"] = ImGui.ColorConvertFloat4ToU32(MNKFormsColor),
-                    ["background"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.8f)),
-                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(-.1f)),
-                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(EmptyColor.AdjustColor(.1f))
-                },
                 [Jobs.DRG] = new()
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorDRG),
@@ -905,65 +842,6 @@ namespace DelvUI.Config
         public Vector4 PLDRequiescatColor = new(61f / 255f, 61f / 255f, 255f / 255f, 100f / 100f);
         public Vector4 PLDAtonementColor = new(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f);
         public Vector4 PLDDoTColor = new(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f);
-
-        #endregion
-
-        #region MNK Configuration
-
-        public int MNKBaseXOffset { get; set; } = 160;
-        public int MNKBaseYOffset { get; set; } = 460;
-        public bool TwinSnakesBarFlipped { get; set; } = true;
-        public bool RiddleOfEarthBarFlipped { get; set; } = true;
-        public bool PerfectBalanceBarFlipped { get; set; } = true;
-        public bool DemolishEnabled { get; set; } = true;
-        public bool ChakraEnabled { get; set; } = true;
-        public bool LeadenFistEnabled { get; set; } = true;
-        public bool TwinSnakesEnabled { get; set; } = true;
-        public bool RiddleOfEarthEnabled { get; set; } = true;
-        public bool PerfectBalanceEnabled { get; set; } = true;
-        public bool TrueNorthEnabled { get; set; } = true;
-        public bool FormsEnabled { get; set; }
-        public int MNKDemolishHeight { get; set; } = 20;
-        public int MNKDemolishWidth { get; set; } = 111;
-        public int MNKDemolishXOffset { get; set; }
-        public int MNKDemolishYOffset { get; set; }
-        public int MNKChakraHeight { get; set; } = 20;
-        public int MNKChakraWidth { get; set; } = 254;
-        public int MNKChakraXOffset { get; set; }
-        public int MNKChakraYOffset { get; set; }
-        public int MNKLeadenFistHeight { get; set; } = 20;
-        public int MNKLeadenFistWidth { get; set; } = 28;
-        public int MNKLeadenFistXOffset { get; set; }
-        public int MNKLeadenFistYOffset { get; set; }
-        public int MNKTwinSnakesHeight { get; set; } = 20;
-        public int MNKTwinSnakesWidth { get; set; } = 111;
-        public int MNKTwinSnakesXOffset { get; set; }
-        public int MNKTwinSnakesYOffset { get; set; }
-        public int MNKRiddleOfEarthHeight { get; set; } = 20;
-        public int MNKRiddleOfEarthWidth { get; set; } = 115;
-        public int MNKRiddleOfEarthXOffset { get; set; }
-        public int MNKRiddleOfEarthYOffset { get; set; }
-        public int MNKPerfectBalanceHeight { get; set; } = 20;
-        public int MNKPerfectBalanceWidth { get; set; } = 20;
-        public int MNKPerfectBalanceXOffset { get; set; }
-        public int MNKPerfectBalanceYOffset { get; set; }
-        public int MNKTrueNorthHeight { get; set; } = 20;
-        public int MNKTrueNorthWidth { get; set; } = 115;
-        public int MNKTrueNorthXOffset { get; set; }
-        public int MNKTrueNorthYOffset { get; set; }
-        public int MNKFormsHeight { get; set; } = 20;
-        public int MNKFormsWidth { get; set; } = 254;
-        public int MNKFormsXOffset { get; set; }
-        public int MNKFormsYOffset { get; set; }
-
-        public Vector4 MNKDemolishColor = new(246f / 255f, 169f / 255f, 255f / 255f, 100f);
-        public Vector4 MNKChakraColor = new(204f / 255f, 115f / 255f, 0f, 100f);
-        public Vector4 MNKLeadenFistColor = new(255f / 255f, 0f, 0f, 100f);
-        public Vector4 MNKTwinSnakesColor = new(227f / 255f, 255f, 64f / 255f, 100f);
-        public Vector4 MNKRiddleOfEarthColor = new(157f / 255f, 59f / 255f, 255f, 100f);
-        public Vector4 MNKPerfectBalanceColor = new(150f / 255f, 255f, 255f, 100f);
-        public Vector4 MNKTrueNorthColor = new(255f, 225f / 255f, 189f / 255f, 100f);
-        public Vector4 MNKFormsColor = new(36f / 255f, 131f / 255f, 255f, 100f);
 
         #endregion
     }
