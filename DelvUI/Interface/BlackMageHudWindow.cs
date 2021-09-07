@@ -58,7 +58,7 @@ namespace DelvUI.Interface
 
             var color = gauge.InAstralFire() ? _config.ManaBarFireColor.Map : gauge.InUmbralIce() ? _config.ManaBarIceColor.Map : _config.ManaBarNoElementColor.Map;
 
-            var builder = BarBuilder.Create(position, _config.ManaBarSize)      
+            var builder = BarBuilder.Create(position, _config.ManaBarSize)
                 .AddInnerBar(actor.CurrentMp, actor.MaxMp, color)
                 .SetBackgroundColor(EmptyColor["background"]);
 
@@ -84,7 +84,7 @@ namespace DelvUI.Interface
             if (_config.ShowManaThresholdMarker && gauge.InAstralFire())
             {
                 var pos = new Vector2(
-                    position.X + _config.ManaThresholdValue / 10000f * _config.ManaBarSize.X, 
+                    position.X + _config.ManaThresholdValue / 10000f * _config.ManaBarSize.X,
                     position.Y + _config.ManaBarSize.Y
                 );
                 var size = new Vector2(3, _config.ManaBarSize.Y);
@@ -102,7 +102,7 @@ namespace DelvUI.Interface
             // mana
             if (_config.ShowManaValue)
             {
-                var text = $"{actor.CurrentMp, 0}";
+                var text = $"{actor.CurrentMp,0}";
                 var textSize = ImGui.CalcTextSize(text);
                 var textPos = new Vector2(
                     position.X + 2,
