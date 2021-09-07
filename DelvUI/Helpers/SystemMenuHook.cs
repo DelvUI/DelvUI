@@ -55,7 +55,7 @@ namespace DelvUI.Helpers
             // the max size (hardcoded) is 0xE/15, but the system menu currently uses 0xC/12
             // this is a just in case that doesnt really matter
             // see if we can add 3 entries
-            if (menuSize >= 0xE)
+            if (menuSize > 12)
             {
                 _hookAgentHudOpenSystemMenu.Original(thisPtr, atkValueArgs, menuSize);
 
@@ -71,11 +71,13 @@ namespace DelvUI.Helpers
             // Yeet DelvUI settings button in first
             _atkValueChangeType(&atkValueArgs[menuSize + 5], ValueType.Int); // currently this value has no type, set it to int
             _atkValueChangeType(&atkValueArgs[menuSize + 5 + 1], ValueType.Int);
+            _atkValueChangeType(&atkValueArgs[menuSize + 5 + 2], ValueType.Int);
 
             for (uint i = menuSize + 3; i > 1; i--)
             {
                 AtkValue* curEntry = &atkValueArgs[i + 5 - 3];
                 AtkValue* nextEntry = &atkValueArgs[i + 5];
+                PluginLog.Log($"{curEntry->Int} {nextEntry->Int}");
 
                 nextEntry->Int = curEntry->Int;
             }
@@ -105,12 +107,12 @@ namespace DelvUI.Helpers
             byte* bytes2 = stackalloc byte[strPlugins.Length + 1];
             byte* bytes3 = stackalloc byte[strSettings.Length + 1];
 
-            Marshal.Copy(strDelvSettings, 0, new IntPtr(bytes), 15);
-            bytes[15] = 0x0;
-            Marshal.Copy(strPlugins, 0, new IntPtr(bytes2), 15);
-            bytes2[15] = 0x0;
-            Marshal.Copy(strSettings, 0, new IntPtr(bytes3), 15);
-            bytes3[15] = 0x0;
+            Marshal.Copy(strDelvSettings, 0, new IntPtr(bytes), strDelvSettings.Length);
+            bytes[strDelvSettings.Length] = 0x0;
+            Marshal.Copy(strPlugins, 0, new IntPtr(bytes2), strPlugins.Length);
+            bytes2[strPlugins.Length] = 0x0;
+            Marshal.Copy(strSettings, 0, new IntPtr(bytes3), strSettings.Length);
+            bytes3[strSettings.Length] = 0x0;
 
             _atkValueSetString(firstStringEntry, bytes); // this allocs the string properly using the game's allocators and copies it, so we dont have to worry about memory fuckups
 
