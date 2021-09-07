@@ -19,7 +19,7 @@ namespace DelvUI.Interface
         public WhiteMageHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         public override uint JobId => 24;
-        private readonly WhiteMageHudConfig _config = (WhiteMageHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new WhiteMageHudConfig());
+        private WhiteMageHudConfig _config => (WhiteMageHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new WhiteMageHudConfig());
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
 
         protected override void Draw(bool _)

@@ -25,12 +25,12 @@ namespace DelvUI.Config
         private int _yOffsetLimit;
         public bool IsVisible;
 
-        public ConfigurationWindow(PluginConfiguration pluginConfiguration, DalamudPluginInterface pluginInterface)
+        public ConfigurationWindow(PluginConfiguration pluginConfiguration)
         {
             //TODO ADD PRIMARYRESOURCEBAR TO CONFIGMAP jobs general
 
             _pluginConfiguration = pluginConfiguration;
-            _pluginInterface = pluginInterface;
+            _pluginInterface = Plugin.GetPluginInterface();
             _configMap.Add("General", new[] { "General" });
 
             _configMap.Add("Individual Unitframes", new[] { "General", "Player", "Focus", "Target", "Target of Target" });
@@ -190,7 +190,7 @@ namespace DelvUI.Config
 
             if (ImGui.Button("Reset HUD"))
             {
-                _pluginConfiguration.TransferConfig(PluginConfiguration.ReadConfig("default", _pluginInterface));
+                _pluginConfiguration.TransferConfig(PluginConfiguration.ReadConfig("default"));
                 _changed = true;
             }
 

@@ -16,7 +16,7 @@ namespace DelvUI.Interface
     public class WarriorHudWindow : HudWindow
     {
         public override uint JobId => Jobs.WAR;
-        private readonly WarriorHudConfig _config = (WarriorHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new WarriorHudConfig());
+        private WarriorHudConfig _config => (WarriorHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new WarriorHudConfig());
         private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
         public WarriorHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }

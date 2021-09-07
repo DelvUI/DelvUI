@@ -14,7 +14,7 @@ namespace DelvUI.Interface
     public class MachinistHudWindow : HudWindow
     {
         private readonly float[] _robotDuration = { 12.450f, 13.950f, 15.450f, 16.950f, 18.450f, 19.950f };
-        private readonly MachinistHudConfig _config = (MachinistHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new MachinistHudConfig());
+        private MachinistHudConfig _config => (MachinistHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new MachinistHudConfig());
 
         public override uint JobId => Jobs.MCH;
         private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);

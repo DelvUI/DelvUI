@@ -17,7 +17,7 @@ namespace DelvUI.Interface
 
         public override uint JobId => Jobs.DRK;
 
-        private readonly DarkKnightHudConfig _config = (DarkKnightHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new DarkKnightHudConfig());
+        private DarkKnightHudConfig _config => (DarkKnightHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new DarkKnightHudConfig());
         private Vector2 Origin => new Vector2(CenterX + _config.Position.X, CenterY + _config.Position.Y);
 
         private PluginConfigColor EmptyColor;

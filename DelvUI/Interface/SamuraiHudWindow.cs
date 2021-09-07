@@ -14,11 +14,11 @@ namespace DelvUI.Interface
 {
     public class SamuraiHudWindow : HudWindow
     {
-        private readonly SamuraiHudConfig _config = (SamuraiHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new SamuraiHudConfig());
+        private SamuraiHudConfig _config => (SamuraiHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new SamuraiHudConfig());
 
         public SamuraiHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
-        public override uint JobId => 34;
+        public override uint JobId => Jobs.SAM;
 
         private int OriginX => (int)(CenterX + _config.Position.X);
         private int OriginY => (int)(CenterY + _config.Position.Y);
