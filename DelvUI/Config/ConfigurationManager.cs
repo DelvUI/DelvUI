@@ -25,6 +25,8 @@ namespace DelvUI.Config
             LoadConfigurations();
         }
 
+        public ConfigurationWindow ConfigurationWindow { get; set; }
+
         public static ConfigurationManager Initialize(DalamudPluginInterface pluginInterface)
         {
             var configObjects = new PluginConfigObject[]

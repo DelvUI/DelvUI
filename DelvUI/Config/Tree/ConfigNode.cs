@@ -1,13 +1,13 @@
-using DelvUI.Config.Attributes;
-using ImGuiNET;
-using ImGuiScene;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
+using DelvUI.Config.Attributes;
+using ImGuiNET;
+using ImGuiScene;
+using Newtonsoft.Json;
 
 namespace DelvUI.Config.Tree
 {
@@ -38,9 +38,15 @@ namespace DelvUI.Config.Tree
 
         public BaseNode() { children = new List<SectionNode>(); }
 
+        private void ToggleJobPacks()
+        {
+            ConfigurationManager.GetInstance().ConfigurationWindow.IsVisible = !ConfigurationManager.GetInstance().ConfigurationWindow.IsVisible;
+            ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
+        }
+
         public void Draw()
         {
-            var changed = false;
+            bool changed = false;
 
             ImGui.SetNextWindowSize(new Vector2(1050, 750), ImGuiCond.Appearing);
 
@@ -103,6 +109,13 @@ namespace DelvUI.Config.Tree
             ImGui.BeginGroup(); // Bottom Bar
 
             {
+                if (ImGui.Button("Job Packs"))
+                {
+                    ToggleJobPacks();
+                }
+
+                ImGui.SameLine();
+
                 if (ImGui.Button("Lock HUD")) // TODO: Functioning buttons
                 { }
 
@@ -118,12 +131,14 @@ namespace DelvUI.Config.Tree
 
                 ImGui.SameLine();
 
-                var pos = ImGui.GetCursorPos();
+                Vector2 pos = ImGui.GetCursorPos();
                 ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 60, ImGui.GetCursorPos().Y));
+
                 if (ImGui.Button("Donate!"))
                 {
                     Process.Start("https://ko-fi.com/DelvUI");
                 }
+
                 ImGui.SetCursorPos(pos);
 
                 // show current version
@@ -158,9 +173,9 @@ namespace DelvUI.Config.Tree
 
         public ConfigPageNode GetOrAddConfig(PluginConfigObject configObject)
         {
-            var attributes = configObject.GetType().GetCustomAttributes(false);
+            object[] attributes = configObject.GetType().GetCustomAttributes(false);
 
-            foreach (var attribute in attributes)
+            foreach (object attribute in attributes)
             {
                 if (attribute is SectionAttribute sectionAttribute)
                 {
@@ -257,9 +272,9 @@ namespace DelvUI.Config.Tree
 
         public ConfigPageNode GetOrAddConfig(PluginConfigObject configObject)
         {
-            var attributes = configObject.GetType().GetCustomAttributes(false);
+            object[] attributes = configObject.GetType().GetCustomAttributes(false);
 
-            foreach (var attribute in attributes)
+            foreach (object attribute in attributes)
             {
                 if (attribute is SubSectionAttribute subSectionAttribute)
                 {
@@ -355,9 +370,9 @@ namespace DelvUI.Config.Tree
 
         public override ConfigPageNode GetOrAddConfig(PluginConfigObject configObject)
         {
-            var attributes = configObject.GetType().GetCustomAttributes(false);
+            object[] attributes = configObject.GetType().GetCustomAttributes(false);
 
-            foreach (var attribute in attributes)
+            foreach (object attribute in attributes)
             {
                 if (attribute is SubSectionAttribute subSectionAttribute)
                 {
@@ -406,14 +421,15 @@ namespace DelvUI.Config.Tree
 
         public override void Draw(ref bool changed)
         {
-            var fields = ConfigObject.GetType().GetFields();
-            var drawList = new List<KeyValuePair<int, CategoryField>>();
-            var collapseWithList = new List<FieldInfo>();
+            FieldInfo[] fields = ConfigObject.GetType().GetFields();
+            List<KeyValuePair<int, CategoryField>> drawList = new List<KeyValuePair<int, CategoryField>>();
+            List<FieldInfo> collapseWithList = new List<FieldInfo>();
 
             foreach (FieldInfo field in fields)
             {
-                var hasOrderAttribute = false;
-                foreach (var attribute in field.GetCustomAttributes(true))
+                bool hasOrderAttribute = false;
+
+                foreach (object attribute in field.GetCustomAttributes(true))
                 {
                     if (attribute is OrderAttribute orderAttribute)
                     {
@@ -422,7 +438,7 @@ namespace DelvUI.Config.Tree
                     }
                     else if (attribute is CollapseControlAttribute collapseControlAtrribute)
                     {
-                        CategoryField categoryField = new CategoryField(field, ConfigObject);
+                        CategoryField categoryField = new(field, ConfigObject);
                         categoryField.CategoryId = collapseControlAtrribute.id;
                         drawList.Add(new KeyValuePair<int, CategoryField>(collapseControlAtrribute.pos, categoryField));
                         hasOrderAttribute = true;
@@ -433,33 +449,37 @@ namespace DelvUI.Config.Tree
                         hasOrderAttribute = true;
                     }
                 }
+
                 if (!hasOrderAttribute)
                 {
                     drawList.Add(new KeyValuePair<int, CategoryField>(int.MaxValue, new CategoryField(field, ConfigObject)));
                 }
             }
 
-            foreach (var field in collapseWithList)
+            foreach (FieldInfo field in collapseWithList)
             {
-                foreach (var attribute in field.GetCustomAttributes(true))
+                foreach (object attribute in field.GetCustomAttributes(true))
                 {
                     if (attribute is CollapseWithAttribute collapseWithAttribute)
                     {
-                        foreach (var categoryField in drawList)
+                        foreach (KeyValuePair<int, CategoryField> categoryField in drawList)
                         {
                             if (categoryField.Value.CategoryId == collapseWithAttribute.id)
                             {
                                 categoryField.Value.AddChild(collapseWithAttribute.pos, field);
+
                                 break;
                             }
                         }
+
                         break;
                     }
                 }
             }
 
             drawList.Sort((x, y) => x.Key - y.Key);
-            foreach (var pair in drawList)
+
+            foreach (KeyValuePair<int, CategoryField> pair in drawList)
             {
                 pair.Value.Draw(ref changed);
             }
@@ -482,7 +502,7 @@ namespace DelvUI.Config.Tree
 
         public override void Load(string path)
         {
-            var finalPath = new FileInfo(path + ".json");
+            FileInfo finalPath = new FileInfo(path + ".json");
 
             if (!finalPath.Exists)
             {
@@ -495,15 +515,15 @@ namespace DelvUI.Config.Tree
             // it fails. In order to fix this we need to specify the specific subclass, in order to do this during runtime we must use reflection to set the generic.
             if (ConfigObject.GetType().BaseType == typeof(PluginConfigObject))
             {
-                var methodInfo = GetType().GetMethod("LoadForType");
-                var function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
+                MethodInfo methodInfo = GetType().GetMethod("LoadForType");
+                MethodInfo function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
                 ConfigObject = (PluginConfigObject)function.Invoke(this, new object[] { finalPath.FullName });
             }
         }
 
         public T LoadForType<T>(string path) where T : PluginConfigObject
         {
-            var file = new FileInfo(path);
+            FileInfo file = new FileInfo(path);
 
             return JsonConvert.DeserializeObject<T>(File.ReadAllText(file.FullName));
         }
@@ -526,24 +546,31 @@ namespace DelvUI.Config.Tree
             Children = new SortedDictionary<int, FieldInfo>();
         }
 
-        public void AddChild(int position, FieldInfo field)
-        {
-            Children.Add(position, field);
-        }
+        public void AddChild(int position, FieldInfo field) { Children.Add(position, field); }
 
         public void Draw(ref bool changed)
         {
             Draw(ref changed, MainField, 0);
+
             if (CategoryId != -1 && (bool)MainField.GetValue(ConfigObject))
             {
                 ImGui.BeginGroup();
                 ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 2));
-                foreach (var child in Children.Values)
+
+                foreach (FieldInfo child in Children.Values)
                 {
                     Draw(ref changed, child, 4);
                 }
+
                 ImGui.EndGroup();
-                ImGui.GetWindowDrawList().AddRect(ImGui.GetItemRectMin() + new Vector2(0, -2), ImGui.GetItemRectMax() + new Vector2(ImGui.GetContentRegionAvail().X - ImGui.GetItemRectMax().X + ImGui.GetItemRectMin().X - 4, 4), 0xFF4A4141);
+
+                ImGui.GetWindowDrawList()
+                     .AddRect(
+                         ImGui.GetItemRectMin() + new Vector2(0, -2),
+                         ImGui.GetItemRectMax() + new Vector2(ImGui.GetContentRegionAvail().X - ImGui.GetItemRectMax().X + ImGui.GetItemRectMin().X - 4, 4),
+                         0xFF4A4141
+                     );
+
                 ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 2));
             }
         }
@@ -553,7 +580,7 @@ namespace DelvUI.Config.Tree
             ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(xOffset, 0));
             object fieldVal = field.GetValue(ConfigObject);
 
-            foreach (var attribute in field.GetCustomAttributes(true))
+            foreach (object attribute in field.GetCustomAttributes(true))
             {
                 if (attribute is CheckboxAttribute checkboxAttribute)
                 {
@@ -618,7 +645,7 @@ namespace DelvUI.Config.Tree
                 else if (attribute is ColorEdit4Attribute colorEdit4Attribute)
                 {
                     PluginConfigColor colorVal = (PluginConfigColor)fieldVal;
-                    var vector = colorVal.Vector;
+                    Vector4 vector = colorVal.Vector;
 
                     if (ImGui.ColorEdit4(colorEdit4Attribute.friendlyName, ref vector))
                     {

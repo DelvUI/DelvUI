@@ -1,10 +1,10 @@
+using System;
+using System.Collections.Generic;
+using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using ImGuiNET;
 using ImGuiScene;
-using System;
-using System.Collections.Generic;
-using System.Numerics;
 
 namespace DelvUI.Config
 {
@@ -48,6 +48,12 @@ namespace DelvUI.Config
         {
             _pluginConfiguration.HideHud = !_pluginConfiguration.HideHud;
             _changed = true;
+        }
+
+        public void ToggleJobPacks()
+        {
+            IsVisible = !IsVisible;
+            ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
         }
 
         public void ShowHud()
@@ -97,7 +103,7 @@ namespace DelvUI.Config
                     ImGui.Image(delvUiBanner.ImGuiHandle, new Vector2(delvUiBanner.Width, delvUiBanner.Height));
                     ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
 
-                    foreach (var config in _configMap.Keys)
+                    foreach (string config in _configMap.Keys)
                     {
                         if (ImGui.Selectable(config, _selected == config))
                         {
@@ -160,6 +166,13 @@ namespace DelvUI.Config
             ImGui.Separator();
 
             ImGui.BeginGroup();
+
+            if (ImGui.Button("Job Packs"))
+            {
+                ToggleJobPacks();
+            }
+
+            ImGui.SameLine();
 
             if (ImGui.Button("Lock HUD"))
             {
@@ -368,7 +381,7 @@ namespace DelvUI.Config
         {
             _changed |= ImGui.Checkbox("Show MP Ticker", ref _pluginConfiguration.MPTickerEnabled);
 
-            var mpTickerHeight = _pluginConfiguration.MPTickerHeight;
+            int mpTickerHeight = _pluginConfiguration.MPTickerHeight;
 
             if (ImGui.DragInt("MP Ticker Height", ref mpTickerHeight, .1f, 1, 1000))
             {
@@ -376,7 +389,7 @@ namespace DelvUI.Config
                 _pluginConfiguration.Save();
             }
 
-            var mpTickerWidth = _pluginConfiguration.MPTickerWidth;
+            int mpTickerWidth = _pluginConfiguration.MPTickerWidth;
 
             if (ImGui.DragInt("MP Ticker Width", ref mpTickerWidth, .1f, 1, 1000))
             {
@@ -384,7 +397,7 @@ namespace DelvUI.Config
                 _pluginConfiguration.Save();
             }
 
-            var mpTickerXOffset = _pluginConfiguration.MPTickerXOffset;
+            int mpTickerXOffset = _pluginConfiguration.MPTickerXOffset;
 
             if (ImGui.DragInt("MP Ticker X Offset", ref mpTickerXOffset, 1f, -2000, 2000))
             {
@@ -392,7 +405,7 @@ namespace DelvUI.Config
                 _pluginConfiguration.Save();
             }
 
-            var mpTickerYOffset = _pluginConfiguration.MPTickerYOffset;
+            int mpTickerYOffset = _pluginConfiguration.MPTickerYOffset;
 
             if (ImGui.DragInt("MP Ticker Y Offset", ref mpTickerYOffset, 1f, -2000, 2000))
             {
@@ -410,12 +423,12 @@ namespace DelvUI.Config
 
             if (ImGui.Checkbox("Vertical GCD Indicator", ref _pluginConfiguration.GCDIndicatorVertical))
             {
-                var __temp = _pluginConfiguration.GCDIndicatorWidth;
+                int __temp = _pluginConfiguration.GCDIndicatorWidth;
                 _pluginConfiguration.GCDIndicatorWidth = _pluginConfiguration.GCDIndicatorHeight;
                 _pluginConfiguration.GCDIndicatorHeight = __temp;
             }
 
-            var gcdIndicatorHeight = _pluginConfiguration.GCDIndicatorHeight;
+            int gcdIndicatorHeight = _pluginConfiguration.GCDIndicatorHeight;
 
             if (ImGui.DragInt("GCD Indicator Height", ref gcdIndicatorHeight, .1f, 1, 1000))
             {
@@ -423,7 +436,7 @@ namespace DelvUI.Config
                 _pluginConfiguration.Save();
             }
 
-            var gcdIndicatorWidth = _pluginConfiguration.GCDIndicatorWidth;
+            int gcdIndicatorWidth = _pluginConfiguration.GCDIndicatorWidth;
 
             if (ImGui.DragInt("GCD Indicator Width", ref gcdIndicatorWidth, .1f, 1, 1000))
             {
@@ -431,7 +444,7 @@ namespace DelvUI.Config
                 _pluginConfiguration.Save();
             }
 
-            var gcdIndicatorXOffset = _pluginConfiguration.GCDIndicatorXOffset;
+            int gcdIndicatorXOffset = _pluginConfiguration.GCDIndicatorXOffset;
 
             if (ImGui.DragInt("GCD Indicator X Offset", ref gcdIndicatorXOffset, 1f, -2000, 2000))
             {
@@ -439,7 +452,7 @@ namespace DelvUI.Config
                 _pluginConfiguration.Save();
             }
 
-            var gcdIndicatorYOffset = _pluginConfiguration.GCDIndicatorYOffset;
+            int gcdIndicatorYOffset = _pluginConfiguration.GCDIndicatorYOffset;
 
             if (ImGui.DragInt("GCD Indicator Y Offset", ref gcdIndicatorYOffset, 1f, -2000, 2000))
             {
@@ -462,7 +475,7 @@ namespace DelvUI.Config
                 {
                     ImGui.BeginChild("leftpane", new Vector2(150, ImGui.GetWindowHeight() / 4), true);
 
-                    foreach (var colorType in _configColorMap)
+                    foreach (string colorType in _configColorMap)
                     {
                         if (ImGui.Selectable(colorType, _selectedColorType == colorType))
                         {
@@ -617,7 +630,7 @@ namespace DelvUI.Config
                 ImGui.BeginChild("itemvi2213ew2", new Vector2(ImGui.GetWindowWidth() / 2, 0));
 
                 {
-                    var shieldHeight = _pluginConfiguration.ShieldHeight;
+                    int shieldHeight = _pluginConfiguration.ShieldHeight;
                     ImGui.Text(""); //SPACING
                     ImGui.Text("Height");
 
@@ -651,7 +664,7 @@ namespace DelvUI.Config
 
         private void DrawIndividualUnitFramesPlayerConfig()
         {
-            var disabled = true;
+            bool disabled = true;
             ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
@@ -668,7 +681,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Height");
-                        var healthBarHeight = _pluginConfiguration.HealthBarHeight;
+                        int healthBarHeight = _pluginConfiguration.HealthBarHeight;
 
                         if (ImGui.DragInt("##HealthBarHeight", ref healthBarHeight, .1f, 1, 1000))
                         {
@@ -679,7 +692,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("X Offset");
-                        var healthBarXOffset = _pluginConfiguration.HealthBarXOffset;
+                        int healthBarXOffset = _pluginConfiguration.HealthBarXOffset;
 
                         if (ImGui.DragInt("##HealthBarXOffset", ref healthBarXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
@@ -698,7 +711,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Width");
-                        var healthBarWidth = _pluginConfiguration.HealthBarWidth;
+                        int healthBarWidth = _pluginConfiguration.HealthBarWidth;
 
                         if (ImGui.DragInt("##HealthBarWidth", ref healthBarWidth, .1f, 1, 1000))
                         {
@@ -709,7 +722,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Y Offset");
-                        var healthBarYOffset = _pluginConfiguration.HealthBarYOffset;
+                        int healthBarYOffset = _pluginConfiguration.HealthBarYOffset;
 
                         if (ImGui.DragInt("##HealthBarYOffset", ref healthBarYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                         {
@@ -778,7 +791,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Left Text Format");
-                        var healthBarTextLeft = _pluginConfiguration.HealthBarTextLeft;
+                        string healthBarTextLeft = _pluginConfiguration.HealthBarTextLeft;
 
                         if (ImGui.InputText("##HealthBarTextLeft", ref healthBarTextLeft, 999))
                         {
@@ -789,7 +802,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Left Text X Offset");
-                        var healthBarTextLeftXOffset = _pluginConfiguration.HealthBarTextLeftXOffset;
+                        int healthBarTextLeftXOffset = _pluginConfiguration.HealthBarTextLeftXOffset;
 
                         if (ImGui.DragInt("##HealthBarTextLeftXOffset", ref healthBarTextLeftXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
@@ -800,7 +813,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Left Text Y Offset");
-                        var healthBarTextLeftYOffset = _pluginConfiguration.HealthBarTextLeftYOffset;
+                        int healthBarTextLeftYOffset = _pluginConfiguration.HealthBarTextLeftYOffset;
 
                         if (ImGui.DragInt("##HealthBarTextLeftYOffset", ref healthBarTextLeftYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                         {
@@ -819,7 +832,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Right Text Format");
-                        var healthBarTextRight = _pluginConfiguration.HealthBarTextRight;
+                        string healthBarTextRight = _pluginConfiguration.HealthBarTextRight;
 
                         if (ImGui.InputText("##HealthBarTextRight", ref healthBarTextRight, 999))
                         {
@@ -830,7 +843,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Right Text X Offset");
-                        var healthBarTextRightXOffset = _pluginConfiguration.HealthBarTextRightXOffset;
+                        int healthBarTextRightXOffset = _pluginConfiguration.HealthBarTextRightXOffset;
 
                         if (ImGui.DragInt("##HealthBarTextRightXOffset", ref healthBarTextRightXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
@@ -841,7 +854,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Right Text Y Offset");
-                        var healthBarTextRightYOffset = _pluginConfiguration.HealthBarTextRightYOffset;
+                        int healthBarTextRightYOffset = _pluginConfiguration.HealthBarTextRightYOffset;
 
                         if (ImGui.DragInt("##HealthBarTextRightYOffset", ref healthBarTextRightYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                         {
@@ -863,7 +876,7 @@ namespace DelvUI.Config
 
         private void DrawIndividualUnitFramesTargetConfig()
         {
-            var disabled = true;
+            bool disabled = true;
             ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
@@ -880,7 +893,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Height");
-                        var targetBarHeight = _pluginConfiguration.TargetBarHeight;
+                        int targetBarHeight = _pluginConfiguration.TargetBarHeight;
 
                         if (ImGui.DragInt("##TargetBarHeight", ref targetBarHeight, .1f, 1, 1000))
                         {
@@ -891,7 +904,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("X Offset");
-                        var targetBarXOffset = _pluginConfiguration.TargetBarXOffset;
+                        int targetBarXOffset = _pluginConfiguration.TargetBarXOffset;
 
                         if (ImGui.DragInt("##TargetBarXOffset", ref targetBarXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
@@ -910,7 +923,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Width");
-                        var targetBarWidth = _pluginConfiguration.TargetBarWidth;
+                        int targetBarWidth = _pluginConfiguration.TargetBarWidth;
 
                         if (ImGui.DragInt("##TargetBarWidth", ref targetBarWidth, .1f, 1, 1000))
                         {
@@ -921,7 +934,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Y Offset");
-                        var targetBarYOffset = _pluginConfiguration.TargetBarYOffset;
+                        int targetBarYOffset = _pluginConfiguration.TargetBarYOffset;
 
                         if (ImGui.DragInt("##TargetBarYOffset", ref targetBarYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                         {
@@ -957,7 +970,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Left Text Format");
-                        var targetBarTextLeft = _pluginConfiguration.TargetBarTextLeft;
+                        string targetBarTextLeft = _pluginConfiguration.TargetBarTextLeft;
 
                         if (ImGui.InputText("##TargetBarTextLeft", ref targetBarTextLeft, 999))
                         {
@@ -968,7 +981,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Left Text X Offset");
-                        var targetBarTextLeftXOffset = _pluginConfiguration.TargetBarTextLeftXOffset;
+                        int targetBarTextLeftXOffset = _pluginConfiguration.TargetBarTextLeftXOffset;
 
                         if (ImGui.DragInt("##TargetBarTextLeftXOffset", ref targetBarTextLeftXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
@@ -979,7 +992,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Left Text Y Offset");
-                        var targetBarTextLeftYOffset = _pluginConfiguration.TargetBarTextLeftYOffset;
+                        int targetBarTextLeftYOffset = _pluginConfiguration.TargetBarTextLeftYOffset;
 
                         if (ImGui.DragInt("##TargetBarTextLeftYOffset", ref targetBarTextLeftYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                         {
@@ -998,7 +1011,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Right Text Format");
-                        var targetBarTextRight = _pluginConfiguration.TargetBarTextRight;
+                        string targetBarTextRight = _pluginConfiguration.TargetBarTextRight;
 
                         if (ImGui.InputText("##TargetBarTextRight", ref targetBarTextRight, 999))
                         {
@@ -1009,7 +1022,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Right Text X Offset");
-                        var targetBarTextRightXOffset = _pluginConfiguration.TargetBarTextRightXOffset;
+                        int targetBarTextRightXOffset = _pluginConfiguration.TargetBarTextRightXOffset;
 
                         if (ImGui.DragInt("##TargetBarTextRightXOffset", ref targetBarTextRightXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
@@ -1020,7 +1033,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Right Text Y Offset");
-                        var targetBarTextRightYOffset = _pluginConfiguration.TargetBarTextRightYOffset;
+                        int targetBarTextRightYOffset = _pluginConfiguration.TargetBarTextRightYOffset;
 
                         if (ImGui.DragInt("##TargetBarTextRightYOffset", ref targetBarTextRightYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                         {
@@ -1043,7 +1056,7 @@ namespace DelvUI.Config
 
         private void DrawIndividualUnitFramesToTConfig()
         {
-            var disabled = true;
+            bool disabled = true;
             ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
@@ -1060,7 +1073,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Height");
-                        var toTBarHeight = _pluginConfiguration.ToTBarHeight;
+                        int toTBarHeight = _pluginConfiguration.ToTBarHeight;
 
                         if (ImGui.DragInt("##ToTBarHeight", ref toTBarHeight, .1f, 1, 1000))
                         {
@@ -1071,7 +1084,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("X Offset");
-                        var toTBarXOffset = _pluginConfiguration.ToTBarXOffset;
+                        int toTBarXOffset = _pluginConfiguration.ToTBarXOffset;
 
                         if (ImGui.DragInt("##ToTBarXOffset", ref toTBarXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
@@ -1090,7 +1103,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Width");
-                        var toTBarWidth = _pluginConfiguration.ToTBarWidth;
+                        int toTBarWidth = _pluginConfiguration.ToTBarWidth;
 
                         if (ImGui.DragInt("##ToTBarWidth", ref toTBarWidth, .1f, 1, 1000))
                         {
@@ -1101,7 +1114,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Y Offset");
-                        var toTBarYOffset = _pluginConfiguration.ToTBarYOffset;
+                        int toTBarYOffset = _pluginConfiguration.ToTBarYOffset;
 
                         if (ImGui.DragInt("##ToTBarYOffset", ref toTBarYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                         {
@@ -1132,7 +1145,7 @@ namespace DelvUI.Config
                 {
                     ImGui.Text(""); //SPACING
                     ImGui.Text("Text Format");
-                    var toTBarText = _pluginConfiguration.ToTBarText;
+                    string toTBarText = _pluginConfiguration.ToTBarText;
 
                     if (ImGui.InputText("##ToTBarText", ref toTBarText, 999))
                     {
@@ -1152,7 +1165,7 @@ namespace DelvUI.Config
                     {
                         ImGui.Text(""); //SPACING
                         ImGui.Text("X Offset");
-                        var toTBarTextXOffset = _pluginConfiguration.ToTBarTextXOffset;
+                        int toTBarTextXOffset = _pluginConfiguration.ToTBarTextXOffset;
 
                         if (ImGui.DragInt("##ToTBarTextXOffset", ref toTBarTextXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
@@ -1171,7 +1184,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Text Y Offset");
-                        var toTBarTextYOffset = _pluginConfiguration.ToTBarTextYOffset;
+                        int toTBarTextYOffset = _pluginConfiguration.ToTBarTextYOffset;
 
                         if (ImGui.DragInt("##ToTBarTextYOffset", ref toTBarTextYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                         {
@@ -1194,7 +1207,7 @@ namespace DelvUI.Config
 
         private void DrawIndividualUnitFramesFocusConfig()
         {
-            var disabled = true;
+            bool disabled = true;
             ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
@@ -1211,7 +1224,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Height");
-                        var focusBarHeight = _pluginConfiguration.FocusBarHeight;
+                        int focusBarHeight = _pluginConfiguration.FocusBarHeight;
 
                         if (ImGui.DragInt("##FocusBarHeight", ref focusBarHeight, .1f, 1, 1000))
                         {
@@ -1222,7 +1235,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("X Offset");
-                        var focusBarXOffset = _pluginConfiguration.FocusBarXOffset;
+                        int focusBarXOffset = _pluginConfiguration.FocusBarXOffset;
 
                         if (ImGui.DragInt("##FocusBarXOffset", ref focusBarXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
@@ -1241,7 +1254,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Width");
-                        var focusBarWidth = _pluginConfiguration.FocusBarWidth;
+                        int focusBarWidth = _pluginConfiguration.FocusBarWidth;
 
                         if (ImGui.DragInt("##FocusBarWidth", ref focusBarWidth, .1f, 1, 1000))
                         {
@@ -1252,7 +1265,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Y Offset");
-                        var focusBarYOffset = _pluginConfiguration.FocusBarYOffset;
+                        int focusBarYOffset = _pluginConfiguration.FocusBarYOffset;
 
                         if (ImGui.DragInt("##FocusBarYOffset", ref focusBarYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                         {
@@ -1283,7 +1296,7 @@ namespace DelvUI.Config
                 {
                     ImGui.Text(""); //SPACING
                     ImGui.Text("Text Format");
-                    var focusBarText = _pluginConfiguration.FocusBarText;
+                    string focusBarText = _pluginConfiguration.FocusBarText;
 
                     if (ImGui.InputText("##FocusBarText", ref focusBarText, 999))
                     {
@@ -1303,7 +1316,7 @@ namespace DelvUI.Config
                     {
                         ImGui.Text(""); //SPACING
                         ImGui.Text("X Offset");
-                        var focusBarTextXOffset = _pluginConfiguration.FocusBarTextXOffset;
+                        int focusBarTextXOffset = _pluginConfiguration.FocusBarTextXOffset;
 
                         if (ImGui.DragInt("##FocusBarTextXOffset", ref focusBarTextXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
@@ -1322,7 +1335,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Text Y Offset");
-                        var focusBarTextYOffset = _pluginConfiguration.FocusBarTextYOffset;
+                        int focusBarTextYOffset = _pluginConfiguration.FocusBarTextYOffset;
 
                         if (ImGui.DragInt("##FocusBarTextYOffset", ref focusBarTextYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                         {
@@ -1345,7 +1358,7 @@ namespace DelvUI.Config
 
         private void DrawIndividualUnitFramesFocusConfigss()
         {
-            var disabled = true;
+            bool disabled = true;
             ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
@@ -1360,7 +1373,7 @@ namespace DelvUI.Config
 
                     {
                         ImGui.Text("Height");
-                        var focusBarHeight = _pluginConfiguration.FocusBarHeight;
+                        int focusBarHeight = _pluginConfiguration.FocusBarHeight;
 
                         if (ImGui.DragInt("##FocusBarHeight", ref focusBarHeight, .1f, 1, 1000))
                         {
@@ -1377,7 +1390,7 @@ namespace DelvUI.Config
 
                     {
                         ImGui.Text("Width");
-                        var focusBarWidth = _pluginConfiguration.FocusBarWidth;
+                        int focusBarWidth = _pluginConfiguration.FocusBarWidth;
 
                         if (ImGui.DragInt("##FocusBarWidth", ref focusBarWidth, .1f, 1, 1000))
                         {
@@ -1398,7 +1411,7 @@ namespace DelvUI.Config
 
                     {
                         ImGui.Text("X Offset");
-                        var focusBarXOffset = _pluginConfiguration.FocusBarXOffset;
+                        int focusBarXOffset = _pluginConfiguration.FocusBarXOffset;
 
                         if (ImGui.DragInt("##FocusBarXOffset", ref focusBarXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
@@ -1415,7 +1428,7 @@ namespace DelvUI.Config
 
                     {
                         ImGui.Text("Y Offset");
-                        var focusBarYOffset = _pluginConfiguration.FocusBarYOffset;
+                        int focusBarYOffset = _pluginConfiguration.FocusBarYOffset;
 
                         if (ImGui.DragInt("##FocusBarYOffset", ref focusBarYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                         {
@@ -1448,7 +1461,7 @@ namespace DelvUI.Config
 
                     {
                         ImGui.Text("Text Format");
-                        var focusBarText = _pluginConfiguration.FocusBarText;
+                        string focusBarText = _pluginConfiguration.FocusBarText;
 
                         if (ImGui.InputText("##FocusBarText", ref focusBarText, 999))
                         {
@@ -1469,7 +1482,7 @@ namespace DelvUI.Config
 
                     {
                         ImGui.Text("Text X Offset");
-                        var focusBarTextXOffset = _pluginConfiguration.FocusBarTextXOffset;
+                        int focusBarTextXOffset = _pluginConfiguration.FocusBarTextXOffset;
 
                         if (ImGui.DragInt("##FocusBarTextXOffset", ref focusBarTextXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
@@ -1486,7 +1499,7 @@ namespace DelvUI.Config
 
                     {
                         ImGui.Text("Text Y Offset");
-                        var focusBarTextYOffset = _pluginConfiguration.FocusBarTextYOffset;
+                        int focusBarTextYOffset = _pluginConfiguration.FocusBarTextYOffset;
 
                         if (ImGui.DragInt("##FocusBarTextYOffset", ref focusBarTextYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                         {
@@ -1526,7 +1539,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Height");
-                        var castBarHeight = _pluginConfiguration.CastBarHeight;
+                        int castBarHeight = _pluginConfiguration.CastBarHeight;
 
                         if (ImGui.DragInt("##CastBarHeight", ref castBarHeight, .1f, 1, 1000))
                         {
@@ -1537,7 +1550,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("X Offset");
-                        var castBarXOffset = _pluginConfiguration.CastBarXOffset;
+                        int castBarXOffset = _pluginConfiguration.CastBarXOffset;
 
                         if (ImGui.DragInt("##CastBarXOffset", ref castBarXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                         {
@@ -1556,7 +1569,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Width");
-                        var castBarWidth = _pluginConfiguration.CastBarWidth;
+                        int castBarWidth = _pluginConfiguration.CastBarWidth;
 
                         if (ImGui.DragInt("##CastBarWidth", ref castBarWidth, .1f, 1, 1000))
                         {
@@ -1567,7 +1580,7 @@ namespace DelvUI.Config
                         ImGui.Text(""); //SPACING
 
                         ImGui.Text("Y Offset");
-                        var castBarYOffset = _pluginConfiguration.CastBarYOffset;
+                        int castBarYOffset = _pluginConfiguration.CastBarYOffset;
 
                         if (ImGui.DragInt("##CastBarYOffset", ref castBarYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                         {
@@ -1650,7 +1663,7 @@ namespace DelvUI.Config
                     {
                         ImGui.Text(""); //SPACING
                         ImGui.Text("Offset");
-                        var slideCastTime = _pluginConfiguration.SlideCastTime;
+                        float slideCastTime = _pluginConfiguration.SlideCastTime;
 
                         if (ImGui.DragFloat("##SlideCastTime", ref slideCastTime, 1, 1, 1000))
                         {
@@ -1748,7 +1761,7 @@ namespace DelvUI.Config
         {
             _changed |= ImGui.Checkbox("Show Target Cast Bar", ref _pluginConfiguration.ShowTargetCastBar);
 
-            var targetCastBarHeight = _pluginConfiguration.TargetCastBarHeight;
+            int targetCastBarHeight = _pluginConfiguration.TargetCastBarHeight;
 
             if (ImGui.DragInt("Target Castbar Height", ref targetCastBarHeight, .1f, 1, 1000))
             {
@@ -1756,7 +1769,7 @@ namespace DelvUI.Config
                 _pluginConfiguration.Save();
             }
 
-            var targetCastBarWidth = _pluginConfiguration.TargetCastBarWidth;
+            int targetCastBarWidth = _pluginConfiguration.TargetCastBarWidth;
 
             if (ImGui.DragInt("Target Castbar Width", ref targetCastBarWidth, .1f, 1, 1000))
             {
@@ -1764,7 +1777,7 @@ namespace DelvUI.Config
                 _pluginConfiguration.Save();
             }
 
-            var targetCastBarXOffset = _pluginConfiguration.TargetCastBarXOffset;
+            int targetCastBarXOffset = _pluginConfiguration.TargetCastBarXOffset;
 
             if (ImGui.DragInt("Target Castbar X Offset", ref targetCastBarXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
             {
@@ -1772,7 +1785,7 @@ namespace DelvUI.Config
                 _pluginConfiguration.Save();
             }
 
-            var targetCastBarYOffset = _pluginConfiguration.TargetCastBarYOffset;
+            int targetCastBarYOffset = _pluginConfiguration.TargetCastBarYOffset;
 
             if (ImGui.DragInt("Target Castbar Y Offset", ref targetCastBarYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
             {
@@ -1803,7 +1816,7 @@ namespace DelvUI.Config
 
         private void DrawJobsGeneralConfig()
         {
-            var primaryResourceHeight = _pluginConfiguration.PrimaryResourceBarHeight;
+            int primaryResourceHeight = _pluginConfiguration.PrimaryResourceBarHeight;
 
             if (ImGui.DragInt("Primary Resource Height", ref primaryResourceHeight, .1f, 1, 1000))
             {
@@ -1811,7 +1824,7 @@ namespace DelvUI.Config
                 _pluginConfiguration.Save();
             }
 
-            var primaryResourceWidth = _pluginConfiguration.PrimaryResourceBarWidth;
+            int primaryResourceWidth = _pluginConfiguration.PrimaryResourceBarWidth;
 
             if (ImGui.DragInt("Primary Resource Width", ref primaryResourceWidth, .1f, 1, 1000))
             {
@@ -1819,7 +1832,7 @@ namespace DelvUI.Config
                 _pluginConfiguration.Save();
             }
 
-            var primaryResourceBarXOffset = _pluginConfiguration.PrimaryResourceBarXOffset;
+            int primaryResourceBarXOffset = _pluginConfiguration.PrimaryResourceBarXOffset;
 
             if (ImGui.DragInt("Primary Resource X Offset", ref primaryResourceBarXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
             {
@@ -1827,7 +1840,7 @@ namespace DelvUI.Config
                 _pluginConfiguration.Save();
             }
 
-            var primaryResourceBarYOffset = _pluginConfiguration.PrimaryResourceBarYOffset;
+            int primaryResourceBarYOffset = _pluginConfiguration.PrimaryResourceBarYOffset;
 
             if (ImGui.DragInt("Primary Resource Y Offset", ref primaryResourceBarYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
             {
@@ -1839,7 +1852,7 @@ namespace DelvUI.Config
 
             if (_pluginConfiguration.ShowPrimaryResourceBarValue)
             {
-                var primaryResourceBarTextXOffset = _pluginConfiguration.PrimaryResourceBarTextXOffset;
+                int primaryResourceBarTextXOffset = _pluginConfiguration.PrimaryResourceBarTextXOffset;
 
                 if (ImGui.DragInt("Primary Resource Text X Offset", ref primaryResourceBarTextXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                 {
@@ -1847,7 +1860,7 @@ namespace DelvUI.Config
                     _pluginConfiguration.Save();
                 }
 
-                var primaryResourceBarTextYOffset = _pluginConfiguration.PrimaryResourceBarTextYOffset;
+                int primaryResourceBarTextYOffset = _pluginConfiguration.PrimaryResourceBarTextYOffset;
 
                 if (ImGui.DragInt("Primary Resource Text Y Offset", ref primaryResourceBarTextYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                 {
@@ -1860,7 +1873,7 @@ namespace DelvUI.Config
 
             if (_pluginConfiguration.ShowPrimaryResourceBarThresholdMarker)
             {
-                var primaryResourceBarThresholdValue = _pluginConfiguration.PrimaryResourceBarThresholdValue;
+                int primaryResourceBarThresholdValue = _pluginConfiguration.PrimaryResourceBarThresholdValue;
 
                 if (ImGui.DragInt("Primary Resource Bar Threshold Marker Value", ref primaryResourceBarThresholdValue, 1f, 1, 10000))
                 {
@@ -1881,7 +1894,7 @@ namespace DelvUI.Config
                 {
                     _changed |= ImGui.Checkbox("Tank Stance Indicator Enabled", ref _pluginConfiguration.TankStanceIndicatorEnabled);
 
-                    var tankStanceIndicatorWidth = _pluginConfiguration.TankStanceIndicatorWidth;
+                    int tankStanceIndicatorWidth = _pluginConfiguration.TankStanceIndicatorWidth;
 
                     if (ImGui.DragInt("Tank Stance Indicator Width", ref tankStanceIndicatorWidth, .1f, 1, 6))
                     {
@@ -1902,7 +1915,7 @@ namespace DelvUI.Config
             {
                 if (ImGui.BeginTabItem("Scholar"))
                 {
-                    var schBaseXOffset = _pluginConfiguration.SCHBaseXOffset;
+                    int schBaseXOffset = _pluginConfiguration.SCHBaseXOffset;
 
                     if (ImGui.DragInt("Base X Offset", ref schBaseXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
                     {
@@ -1910,7 +1923,7 @@ namespace DelvUI.Config
                         _pluginConfiguration.Save();
                     }
 
-                    var schBaseYOffset = _pluginConfiguration.SCHBaseYOffset;
+                    int schBaseYOffset = _pluginConfiguration.SCHBaseYOffset;
 
                     if (ImGui.DragInt("Base Y Offset", ref schBaseYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
                     {
@@ -1918,7 +1931,7 @@ namespace DelvUI.Config
                         _pluginConfiguration.Save();
                     }
 
-                    var fairyBarHeight = _pluginConfiguration.FairyBarHeight;
+                    int fairyBarHeight = _pluginConfiguration.FairyBarHeight;
 
                     if (ImGui.DragInt("Fairy Gauge Height", ref fairyBarHeight, .1f, 1, 1000))
                     {
@@ -1926,7 +1939,7 @@ namespace DelvUI.Config
                         _pluginConfiguration.Save();
                     }
 
-                    var fairyBarWidth = _pluginConfiguration.FairyBarWidth;
+                    int fairyBarWidth = _pluginConfiguration.FairyBarWidth;
 
                     if (ImGui.DragInt("Fairy Gauge Width", ref fairyBarWidth, .1f, 1, 1000))
                     {
@@ -1934,7 +1947,7 @@ namespace DelvUI.Config
                         _pluginConfiguration.Save();
                     }
 
-                    var fairyBarX = _pluginConfiguration.FairyBarX;
+                    int fairyBarX = _pluginConfiguration.FairyBarX;
 
                     if (ImGui.DragInt("Fairy Gauge X Offset", ref fairyBarX, .1f, -1000, 1000))
                     {
@@ -1942,7 +1955,7 @@ namespace DelvUI.Config
                         _pluginConfiguration.Save();
                     }
 
-                    var fairyBarY = _pluginConfiguration.FairyBarY;
+                    int fairyBarY = _pluginConfiguration.FairyBarY;
 
                     if (ImGui.DragInt("Fairy Gauge Y Offset", ref fairyBarY, .1f, -1000, 1000))
                     {
@@ -1950,7 +1963,7 @@ namespace DelvUI.Config
                         _pluginConfiguration.Save();
                     }
 
-                    var schAetherBarHeight = _pluginConfiguration.SchAetherBarHeight;
+                    int schAetherBarHeight = _pluginConfiguration.SchAetherBarHeight;
 
                     if (ImGui.DragInt("Aether Gauge Height", ref schAetherBarHeight, .1f, 1, 1000))
                     {
@@ -1958,7 +1971,7 @@ namespace DelvUI.Config
                         _pluginConfiguration.Save();
                     }
 
-                    var schAetherBarWidth = _pluginConfiguration.SchAetherBarWidth;
+                    int schAetherBarWidth = _pluginConfiguration.SchAetherBarWidth;
 
                     if (ImGui.DragInt("Aether Gauge Width", ref schAetherBarWidth, .1f, 1, 1000))
                     {
@@ -1966,7 +1979,7 @@ namespace DelvUI.Config
                         _pluginConfiguration.Save();
                     }
 
-                    var schAetherBarX = _pluginConfiguration.SchAetherBarX;
+                    int schAetherBarX = _pluginConfiguration.SchAetherBarX;
 
                     if (ImGui.DragInt("Aether Gauge X Offset", ref schAetherBarX, .1f, -1000, 1000))
                     {
@@ -1974,7 +1987,7 @@ namespace DelvUI.Config
                         _pluginConfiguration.Save();
                     }
 
-                    var schAetherBarY = _pluginConfiguration.SchAetherBarY;
+                    int schAetherBarY = _pluginConfiguration.SchAetherBarY;
 
                     if (ImGui.DragInt("Aether Gauge Y Offset", ref schAetherBarY, .1f, -1000, 1000))
                     {
@@ -1982,7 +1995,7 @@ namespace DelvUI.Config
                         _pluginConfiguration.Save();
                     }
 
-                    var schAetherBarPad = _pluginConfiguration.SchAetherBarPad;
+                    int schAetherBarPad = _pluginConfiguration.SchAetherBarPad;
 
                     if (ImGui.DragInt("Aether Padding", ref schAetherBarPad, .1f, -100, 1000))
                     {
@@ -1990,7 +2003,7 @@ namespace DelvUI.Config
                         _pluginConfiguration.Save();
                     }
 
-                    var schBioBarHeight = _pluginConfiguration.SCHBioBarHeight;
+                    int schBioBarHeight = _pluginConfiguration.SCHBioBarHeight;
 
                     if (ImGui.DragInt("Bio Bar Height", ref schBioBarHeight, .1f, 1, 1000))
                     {
@@ -1998,7 +2011,7 @@ namespace DelvUI.Config
                         _pluginConfiguration.Save();
                     }
 
-                    var schBioBarWidth = _pluginConfiguration.SCHBioBarWidth;
+                    int schBioBarWidth = _pluginConfiguration.SCHBioBarWidth;
 
                     if (ImGui.DragInt("Bio Bar Width", ref schBioBarWidth, .1f, 1, 1000))
                     {
@@ -2006,7 +2019,7 @@ namespace DelvUI.Config
                         _pluginConfiguration.Save();
                     }
 
-                    var schBioBarX = _pluginConfiguration.SCHBioBarX;
+                    int schBioBarX = _pluginConfiguration.SCHBioBarX;
 
                     if (ImGui.DragInt("Bio Bar X Offset", ref schBioBarX, .1f, -1000, 1000))
                     {
@@ -2014,7 +2027,7 @@ namespace DelvUI.Config
                         _pluginConfiguration.Save();
                     }
 
-                    var schBioBarY = _pluginConfiguration.SCHBioBarY;
+                    int schBioBarY = _pluginConfiguration.SCHBioBarY;
 
                     if (ImGui.DragInt("Bio Bar Y Offset", ref schBioBarY, .1f, -1000, 1000))
                     {
