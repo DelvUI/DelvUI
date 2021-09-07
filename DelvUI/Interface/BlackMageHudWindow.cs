@@ -214,7 +214,7 @@ namespace DelvUI.Interface
             }
 
             // thundercloud
-            if (_config.ShowFirestarterProcs)
+            if (_config.ShowThundercloudProcs)
             {
                 var scale = thundercloudTimer / 18f;
                 builder.AddInnerBar(thundercloudTimer, 18f, _config.ThundercloudColor.Map);
