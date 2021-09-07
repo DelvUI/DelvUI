@@ -337,98 +337,145 @@ namespace DelvUI.Interface
     public class RedMageHudConfig : PluginConfigObject
     {
         [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [Order(0)]
         public Vector2 Position = new Vector2(0, -2);
 
         [DragInt("Horizontal Padding", max = 1000)]
+        [Order(5)]
         public int HorizontalPadding = 2;
 
         [DragFloat2("Mana Bar Size", max = 2000f)]
+        [Order(10)]
         public Vector2 ManaBarSize = new Vector2(253, 20);
 
         [DragFloat2("Mana Bar Offset", min = -2000f, max = 2000f)]
+        [Order(15)]
         public Vector2 ManaBarOffset = new Vector2(0, 0);
 
-        [Checkbox("Show Mana Value")] public bool ShowManaValue = true;
+        [Checkbox("Show Mana Value")]
+        [Order(20)]
+        public bool ShowManaValue = true;
+
+        [CollapseControl(25, 0)]
         [Checkbox("Show Mana Threshold Marker")] public bool ShowManaThresholdMarker = true;
 
         [DragInt("Mana Threshold Marker Value", max = 10000)]
+        [CollapseWith(0, 0)]
         public int ManaThresholdValue = 2600;
 
 
         [DragFloat2("Balance Bar Offset", min = -2000f, max = 2000f)]
+        [Order(30)]
         public Vector2 BalanceBarOffset = new Vector2(0, -42);
 
         [DragFloat2("Balance Bar Size", max = 2000f)]
+        [Order(35)]
         public Vector2 BalanceBarSize = new Vector2(21, 20);
 
 
         [DragFloat2("White Mana Bar Offset", min = -2000f, max = 2000f)]
+        [Order(40)]
         public Vector2 WhiteManaBarOffset = new Vector2(-13, -42);
 
         [DragFloat2("White Mana Bar Size", max = 2000f)]
+        [Order(45)]
         public Vector2 WhiteManaBarSize = new Vector2(114, 20);
 
-        [Checkbox("Show White Mana Value")] public bool ShowWhiteManaValue = true;
-        [Checkbox("Invert White Mana Bar")] public bool WhiteManaBarInverted = true;
+        [Checkbox("Show White Mana Value")]
+        [CollapseControl(50, 1)]
+        public bool ShowWhiteManaValue = true;
+
+        [Checkbox("Invert White Mana Bar")]
+        [CollapseWith(0, 1)]
+        public bool WhiteManaBarInverted = true;
 
 
         [DragFloat2("Black Mana Bar Offset", min = -2000f, max = 2000f)]
+        [Order(55)]
         public Vector2 BlackManaBarOffset = new Vector2(13, -42);
 
         [DragFloat2("Black Mana Bar Size", max = 2000f)]
+        [Order(60)]
         public Vector2 BlackManaBarSize = new Vector2(114, 20);
 
-        [Checkbox("Show Black Mana Value")] public bool ShowBlackManaValue = true;
-        [Checkbox("Invert Black Mana Bar")] public bool BlackManaBarInverted = false;
+        [Checkbox("Show Black Mana Value")]
+        [CollapseControl(65, 2)]
+        public bool ShowBlackManaValue = true;
+
+        [Checkbox("Invert Black Mana Bar")]
+        [CollapseWith(0, 2)]
+        public bool BlackManaBarInverted = false;
 
 
         [DragFloat2("Acceleration Bar Offset", min = -2000f, max = 2000f)]
+        [Order(70)]
         public Vector2 AccelerationBarOffset = new Vector2(0, -56);
 
         [DragFloat2("Acceleration Size", max = 2000f)]
+        [Order(75)]
         public Vector2 AccelerationBarSize = new Vector2(83, 12);
 
 
-        [Checkbox("Show Dualcast")] public bool ShowDualCast = true;
+        [Checkbox("Show Dualcast")]
+        [CollapseControl(80, 3)]
+        public bool ShowDualCast = true;
+
         [DragFloat2("Dualcast Offset", min = -2000f, max = 2000f)]
+        [CollapseWith(0, 3)]
         public Vector2 DualCastOffset = new Vector2(0, -74);
 
         [DragFloat2("Dualcast Size", max = 2000f)]
+        [CollapseWith(5, 3)]
         public Vector2 DualCastSize = new Vector2(16, 16);
 
 
-        [Checkbox("Show Verstone Procs")] public bool ShowVerstoneProcs = true;
-        [Checkbox("Show Verfire Procs")] public bool ShowVerfireProcs = true;
+        [Checkbox("Show Verstone Procs")]
+        [Order(85)]
+        public bool ShowVerstoneProcs = true;
+
+        [Checkbox("Show Verfire Procs")]
+        [Order(90)]
+        public bool ShowVerfireProcs = true;
 
         [DragInt("Procs Height", max = 1000)]
+        [Order(95)]
         public int ProcsHeight = 7;
 
 
         [ColorEdit4("Mana Bar Color")]
+        [Order(100)]
         public PluginConfigColor ManaBarColor = new PluginConfigColor(new(0f / 255f, 142f / 255f, 254f / 255f, 100f / 100f));
 
         [ColorEdit4("Mana Bar Below Threshold Color")]
+        [Order(105)]
         public PluginConfigColor ManaBarBelowThresholdColor = new PluginConfigColor(new(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
 
         [ColorEdit4("White Mana Bar Color")]
+        [Order(110)]
         public PluginConfigColor WhiteManaBarColor = new PluginConfigColor(new(221f / 255f, 212f / 255f, 212f / 255f, 100f / 100f));
 
         [ColorEdit4("Black Mana Bar Color")]
+        [Order(115)]
         public PluginConfigColor BlackManaBarColor = new PluginConfigColor(new(60f / 255f, 81f / 255f, 197f / 255f, 100f / 100f));
 
         [ColorEdit4("Balance Bar Color")]
+        [Order(120)]
         public PluginConfigColor BalanceBarColor = new PluginConfigColor(new(195f / 255f, 35f / 255f, 35f / 255f, 100f / 100f));
 
         [ColorEdit4("Acceleration Bar Color")]
+        [Order(125)]
         public PluginConfigColor AccelerationBarColor = new PluginConfigColor(new(194f / 255f, 74f / 255f, 74f / 255f, 100f / 100f));
 
         [ColorEdit4("Dualcast Color")]
+        [Order(130)]
         public PluginConfigColor DualCastColor = new PluginConfigColor(new(204f / 255f, 17f / 255f, 255f / 95f, 100f / 100f));
 
         [ColorEdit4("Verstone Color")]
+        [Order(135)]
         public PluginConfigColor VerstoneColor = new PluginConfigColor(new(228f / 255f, 188f / 255f, 145 / 255f, 90f / 100f));
 
         [ColorEdit4("Verfire Color")]
+        [Order(140)]
         public PluginConfigColor VerfireColor = new PluginConfigColor(new(238f / 255f, 119f / 255f, 17 / 255f, 90f / 100f));
     }
 }

@@ -42,6 +42,7 @@ namespace DelvUI.Config
                 new SummonerHudConfig(),
                 new WarriorHudConfig(),
                 new WhiteMageHudConfig(),
+                new SamuraiHudConfig()
             };
 
             return Initialize(pluginInterface, configObjects);
