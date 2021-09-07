@@ -175,7 +175,6 @@ namespace DelvUI
 
             _pluginInterface.UiBuilder.OverrideGameCursor = false;
             _configurationWindow.Draw();
-
             ConfigurationManager.GetInstance().Draw();
 
             if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id)

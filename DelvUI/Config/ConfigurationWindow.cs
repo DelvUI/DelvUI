@@ -205,17 +205,6 @@ namespace DelvUI.Config
         {
             switch (config)
             {
-                case "General":
-                    switch (subConfig)
-                    {
-                        case "General":
-                            DrawGeneralGeneralConfig();
-
-                            break;
-                    }
-
-                    break;
-
                 case "Individual Unitframes":
                     switch (subConfig)
                     {
@@ -347,11 +336,6 @@ namespace DelvUI.Config
                             DrawJobsHealerConfig();
 
                             break;
-
-                        case "Ranged":
-                            DrawJobsRangedConfig();
-
-                            break;
                     }
 
                     break;
@@ -367,93 +351,6 @@ namespace DelvUI.Config
 
                     break;
             }
-        }
-
-        private void DrawGeneralGeneralConfig()
-        {
-            _changed |= ImGui.Checkbox("Show MP Ticker", ref _pluginConfiguration.MPTickerEnabled);
-
-            var mpTickerHeight = _pluginConfiguration.MPTickerHeight;
-
-            if (ImGui.DragInt("MP Ticker Height", ref mpTickerHeight, .1f, 1, 1000))
-            {
-                _pluginConfiguration.MPTickerHeight = mpTickerHeight;
-                _pluginConfiguration.Save();
-            }
-
-            var mpTickerWidth = _pluginConfiguration.MPTickerWidth;
-
-            if (ImGui.DragInt("MP Ticker Width", ref mpTickerWidth, .1f, 1, 1000))
-            {
-                _pluginConfiguration.MPTickerWidth = mpTickerWidth;
-                _pluginConfiguration.Save();
-            }
-
-            var mpTickerXOffset = _pluginConfiguration.MPTickerXOffset;
-
-            if (ImGui.DragInt("MP Ticker X Offset", ref mpTickerXOffset, 1f, -2000, 2000))
-            {
-                _pluginConfiguration.MPTickerXOffset = mpTickerXOffset;
-                _pluginConfiguration.Save();
-            }
-
-            var mpTickerYOffset = _pluginConfiguration.MPTickerYOffset;
-
-            if (ImGui.DragInt("MP Ticker Y Offset", ref mpTickerYOffset, 1f, -2000, 2000))
-            {
-                _pluginConfiguration.MPTickerYOffset = mpTickerYOffset;
-                _pluginConfiguration.Save();
-            }
-
-            _changed |= ImGui.Checkbox("Show MP Ticker border", ref _pluginConfiguration.MPTickerShowBorder);
-            _changed |= ImGui.Checkbox("Hide MP Ticker on full mp", ref _pluginConfiguration.MPTickerHideOnFullMp);
-            _changed |= ImGui.ColorEdit4("MP Ticker Color", ref _pluginConfiguration.MPTickerColor);
-
-            // gcd indicator
-            _changed |= ImGui.Checkbox("Show GCD Indicator", ref _pluginConfiguration.GCDIndicatorEnabled);
-            _changed |= ImGui.Checkbox("Always Show GCD Indicator", ref _pluginConfiguration.GCDAlwaysShow);
-
-            if (ImGui.Checkbox("Vertical GCD Indicator", ref _pluginConfiguration.GCDIndicatorVertical))
-            {
-                var __temp = _pluginConfiguration.GCDIndicatorWidth;
-                _pluginConfiguration.GCDIndicatorWidth = _pluginConfiguration.GCDIndicatorHeight;
-                _pluginConfiguration.GCDIndicatorHeight = __temp;
-            }
-
-            var gcdIndicatorHeight = _pluginConfiguration.GCDIndicatorHeight;
-
-            if (ImGui.DragInt("GCD Indicator Height", ref gcdIndicatorHeight, .1f, 1, 1000))
-            {
-                _pluginConfiguration.GCDIndicatorHeight = gcdIndicatorHeight;
-                _pluginConfiguration.Save();
-            }
-
-            var gcdIndicatorWidth = _pluginConfiguration.GCDIndicatorWidth;
-
-            if (ImGui.DragInt("GCD Indicator Width", ref gcdIndicatorWidth, .1f, 1, 1000))
-            {
-                _pluginConfiguration.GCDIndicatorWidth = gcdIndicatorWidth;
-                _pluginConfiguration.Save();
-            }
-
-            var gcdIndicatorXOffset = _pluginConfiguration.GCDIndicatorXOffset;
-
-            if (ImGui.DragInt("GCD Indicator X Offset", ref gcdIndicatorXOffset, 1f, -2000, 2000))
-            {
-                _pluginConfiguration.GCDIndicatorXOffset = gcdIndicatorXOffset;
-                _pluginConfiguration.Save();
-            }
-
-            var gcdIndicatorYOffset = _pluginConfiguration.GCDIndicatorYOffset;
-
-            if (ImGui.DragInt("GCD Indicator Y Offset", ref gcdIndicatorYOffset, 1f, -2000, 2000))
-            {
-                _pluginConfiguration.GCDIndicatorYOffset = gcdIndicatorYOffset;
-                _pluginConfiguration.Save();
-            }
-
-            _changed |= ImGui.Checkbox("Show GCD Indicator border", ref _pluginConfiguration.GCDIndicatorShowBorder);
-            _changed |= ImGui.ColorEdit4("GCD Indicator Color", ref _pluginConfiguration.GCDIndicatorColor);
         }
 
         private void DrawIndividualUnitFramesGeneralConfig()
@@ -2427,15 +2324,6 @@ namespace DelvUI.Config
 
                     ImGui.EndTabItem();
                 }
-            }
-
-            ImGui.EndTabBar();
-        }
-
-        private void DrawJobsRangedConfig()
-        {
-            if (ImGui.BeginTabBar("##ranged-tabs"))
-            {
             }
 
             ImGui.EndTabBar();
