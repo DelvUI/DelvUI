@@ -77,7 +77,6 @@ namespace DelvUI.Helpers
             {
                 AtkValue* curEntry = &atkValueArgs[i + 5 - 3];
                 AtkValue* nextEntry = &atkValueArgs[i + 5];
-                PluginLog.Log($"{curEntry->Int} {nextEntry->Int}");
 
                 nextEntry->Int = curEntry->Int;
             }
