@@ -62,21 +62,21 @@ namespace DelvUI.Interface
 
         private void CreateUnitFrames()
         {
-            var playerUnitFrameConfig = PlayerUnitFrameConfig.DefaultUnitFrame();
+            var playerUnitFrameConfig = DefaultUnitFrames.PlayerUnitFrame();
             _playerUnitFrame = new UnitFrameHud("playerUnitFrame", playerUnitFrameConfig, _pluginConfiguration);
             _hudElements.Add(_playerUnitFrame);
             _hudElementsUsingPlayer.Add(_playerUnitFrame);
 
-            var targetUnitFrameConfig = TargetUnitFrameConfig.DefaultUnitFrame();
+            var targetUnitFrameConfig = DefaultUnitFrames.TargetUnitFrame();
             _targetUnitFrame = new UnitFrameHud("targetUnitFrame", targetUnitFrameConfig, _pluginConfiguration);
             _hudElements.Add(_targetUnitFrame);
             _hudElementsUsingTarget.Add(_targetUnitFrame);
 
-            var targetOfTargetUnitFrameConfig = TargetOfTargetUnitFrameConfig.DefaultUnitFrame();
+            var targetOfTargetUnitFrameConfig = DefaultUnitFrames.TargetOfTargetUnitFrame();
             _targetOfTargetUnitFrame = new UnitFrameHud("targetOfTargetUnitFrame", targetOfTargetUnitFrameConfig, _pluginConfiguration);
             _hudElements.Add(_targetOfTargetUnitFrame);
 
-            var focusTargetUnitFrameConfig = FocusTargetUnitFrameConfig.DefaultUnitFrame();
+            var focusTargetUnitFrameConfig = DefaultUnitFrames.FocusTargetUnitFrame();
             _focusTargetUnitFrame = new UnitFrameHud("focusTargetUnitFrame", focusTargetUnitFrameConfig, _pluginConfiguration);
             _hudElements.Add(_focusTargetUnitFrame);
         }

@@ -6,98 +6,63 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Serializable]
-    public class PlayerUnitFrameConfig : UnitFrameConfig
+
+    public static class DefaultUnitFrames
     {
-        public static Vector2 DefaultSize => new Vector2(270, 50);
-        public static PlayerUnitFrameConfig DefaultUnitFrame()
+        internal static Vector2 DefaultBigSize = new Vector2(270, 50);
+        internal static Vector2 DefaultSmallSize = new Vector2(120, 20);
+
+        public static UnitFrameConfig PlayerUnitFrame()
         {
-            var size = DefaultSize;
+            var size = DefaultBigSize;
             var pos = new Vector2(-HUDConstants.UnitFramesOffsetX - size.X / 2f, HUDConstants.BaseHUDOffsetY);
 
             var leftLabelConfig = new EditableLabelConfig(new Vector2(-size.X / 2f + 5, -size.Y / 2f + 2), "[name:abbreviate]", LabelTextAnchor.BottomLeft);
             var rightLabelConfig = new EditableLabelConfig(new Vector2(size.X / 2 + 10, -size.Y / 2f + 2), "[health:current-short] | [health:percent]%", LabelTextAnchor.BottomRight);
 
-            var config = new PlayerUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig, "Player Unit Frame");
+            var config = new UnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig, "Player Unit Frame");
             config.TankStanceIndicatorConfig = new TankStanceIndicatorConfig();
 
             return config;
         }
 
-        public PlayerUnitFrameConfig(Vector2 position, Vector2 size, LabelConfig leftLabelConfig, LabelConfig rightLabelConfig, string title = null)
-            : base(position, size, leftLabelConfig, rightLabelConfig, title)
+        public static UnitFrameConfig TargetUnitFrame()
         {
-
-        }
-    }
-
-    [Serializable]
-    public class TargetUnitFrameConfig : UnitFrameConfig
-    {
-        public static Vector2 DefaultSize => new Vector2(270, 50);
-        public static TargetUnitFrameConfig DefaultUnitFrame()
-        {
-            var size = DefaultSize;
+            var size = DefaultBigSize;
             var pos = new Vector2(HUDConstants.UnitFramesOffsetX + size.X / 2f, HUDConstants.BaseHUDOffsetY);
 
             var leftLabelConfig = new EditableLabelConfig(new Vector2(-size.X / 2f + 5, -size.Y / 2f + 2), "[health:current-short] | [health:percent]%", LabelTextAnchor.BottomLeft);
             var rightLabelConfig = new EditableLabelConfig(new Vector2(size.X / 2 - 5, -size.Y / 2 + 2), "[name:abbreviate]", LabelTextAnchor.BottomRight);
 
-            return new TargetUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig, "Target Unit Frame");
+            return new UnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig, "Target Unit Frame");
         }
 
-        public TargetUnitFrameConfig(Vector2 position, Vector2 size, LabelConfig leftLabelConfig, LabelConfig rightLabelConfig, string title = null)
-            : base(position, size, leftLabelConfig, rightLabelConfig, title)
+        public static UnitFrameConfig TargetOfTargetUnitFrame()
         {
-
-        }
-    }
-
-    [Serializable]
-    public class TargetOfTargetUnitFrameConfig : UnitFrameConfig
-    {
-        public static TargetOfTargetUnitFrameConfig DefaultUnitFrame()
-        {
-            var size = new Vector2(120, 20);
+            var size = DefaultSmallSize;
             var pos = new Vector2(
-                HUDConstants.UnitFramesOffsetX + TargetUnitFrameConfig.DefaultSize.X + 6 + size.X / 2f,
+                HUDConstants.UnitFramesOffsetX + DefaultBigSize.X + 6 + size.X / 2f,
                 HUDConstants.BaseHUDOffsetY - 15
             );
 
             var leftLabelConfig = new EditableLabelConfig(new Vector2(0, -size.Y / 2f + 2), "[name:abbreviate]", LabelTextAnchor.Bottom);
             var rightLabelConfig = new EditableLabelConfig(new Vector2(0, size.Y / 2f), "", LabelTextAnchor.Top);
 
-            return new TargetOfTargetUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig, "Target of Target Unit Frame");
+            return new UnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig, "Target of Target Unit Frame");
         }
 
-        public TargetOfTargetUnitFrameConfig(Vector2 position, Vector2 size, LabelConfig leftLabelConfig, LabelConfig rightLabelConfig, string title = null)
-            : base(position, size, leftLabelConfig, rightLabelConfig, title)
+        public static UnitFrameConfig FocusTargetUnitFrame()
         {
-
-        }
-    }
-
-    [Serializable]
-    public class FocusTargetUnitFrameConfig : UnitFrameConfig
-    {
-        public static FocusTargetUnitFrameConfig DefaultUnitFrame()
-        {
-            var size = new Vector2(120, 20);
+            var size = DefaultSmallSize;
             var pos = new Vector2(
-                -HUDConstants.UnitFramesOffsetX - TargetUnitFrameConfig.DefaultSize.X - 6 - size.X / 2f,
+                -HUDConstants.UnitFramesOffsetX - DefaultBigSize.X - 6 - size.X / 2f,
                 HUDConstants.BaseHUDOffsetY - 15
             );
 
             var leftLabelConfig = new EditableLabelConfig(new Vector2(0, -size.Y / 2f + 2), "[name:abbreviate]", LabelTextAnchor.Bottom);
             var rightLabelConfig = new EditableLabelConfig(new Vector2(0, size.Y / 2f), "", LabelTextAnchor.Top);
 
-            return new FocusTargetUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig, "Focus Target Unit Frame");
-        }
-
-        public FocusTargetUnitFrameConfig(Vector2 position, Vector2 size, LabelConfig leftLabelConfig, LabelConfig rightLabelConfig, string title = null)
-            : base(position, size, leftLabelConfig, rightLabelConfig, title)
-        {
-
+            return new UnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig, "Focus Target Unit Frame");
         }
     }
 
