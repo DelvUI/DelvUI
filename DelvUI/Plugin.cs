@@ -52,7 +52,7 @@ namespace DelvUI
             _pluginConfiguration.Init(_pluginInterface);
             _configurationWindow = new ConfigurationWindow(_pluginConfiguration, _pluginInterface);
             ConfigurationManager.GetInstance().ConfigurationWindow = _configurationWindow;
-            
+
             BuildBanner();
 
             _pluginInterface.UiBuilder.OnBuildUi += Draw;
