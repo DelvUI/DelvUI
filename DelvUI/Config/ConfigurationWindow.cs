@@ -40,7 +40,7 @@ namespace DelvUI.Config
 
             // _configMap.Add("Buffs and Debuffs", new[] { "Player Buffs", "Player Debuffs", "Target Buffs", "Target Debuffs", "Raid/Job Buffs" });
 
-            _configMap.Add("Job Specific Bars", new[] { "General" });
+            //_configMap.Add("Job Specific Bars", new[] { "General" });
             _configMap.Add("Import/Export", new[] { "General" });
         }
 
@@ -342,18 +342,6 @@ namespace DelvUI.Config
                     }
 
                     break;
-
-                case "Job Specific Bars":
-                    switch (subConfig)
-                    {
-                        case "General":
-                            DrawJobsGeneralConfig();
-
-                            break;
-                    }
-
-                    break;
-
                 case "Import/Export":
                     switch (subConfig)
                     {
@@ -1346,170 +1334,6 @@ namespace DelvUI.Config
             ImGui.EndGroup();
         }
 
-        private void DrawIndividualUnitFramesFocusConfigss()
-        {
-            bool disabled = true;
-            ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
-            ImGui.BeginGroup();
-            ImGui.BeginGroup(); // Left
-
-            {
-                ImGui.Text("Bar Size & Position");
-                ImGui.BeginChild("hppane", new Vector2(0, ImGui.GetWindowHeight() / 2), true, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
-                ImGui.BeginChild("hpsizepane", new Vector2(0, ImGui.GetWindowHeight() / 2), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-
-                {
-                    ImGui.BeginChild("hpheightpane", new Vector2(ImGui.GetWindowWidth() / 2, 0), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-
-                    {
-                        ImGui.Text("Height");
-                        int focusBarHeight = _pluginConfiguration.FocusBarHeight;
-
-                        if (ImGui.DragInt("##FocusBarHeight", ref focusBarHeight, .1f, 1, 1000))
-                        {
-                            _pluginConfiguration.FocusBarHeight = focusBarHeight;
-                            _pluginConfiguration.Save();
-                        }
-                    }
-
-                    ImGui.EndChild();
-
-                    ImGui.SameLine();
-
-                    ImGui.BeginChild("hpwidthpane", new Vector2(ImGui.GetWindowWidth() / 2, 0), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-
-                    {
-                        ImGui.Text("Width");
-                        int focusBarWidth = _pluginConfiguration.FocusBarWidth;
-
-                        if (ImGui.DragInt("##FocusBarWidth", ref focusBarWidth, .1f, 1, 1000))
-                        {
-                            _pluginConfiguration.FocusBarWidth = focusBarWidth;
-                            _pluginConfiguration.Save();
-                        }
-                    }
-
-                    ImGui.EndChild();
-                }
-
-                ImGui.EndChild();
-                ImGui.Separator();
-                ImGui.BeginChild("hpoffsetpane", new Vector2(0, ImGui.GetWindowHeight() / 2), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-
-                {
-                    ImGui.BeginChild("hpxpane", new Vector2(ImGui.GetWindowWidth() / 2, 0), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-
-                    {
-                        ImGui.Text("X Offset");
-                        int focusBarXOffset = _pluginConfiguration.FocusBarXOffset;
-
-                        if (ImGui.DragInt("##FocusBarXOffset", ref focusBarXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
-                        {
-                            _pluginConfiguration.FocusBarXOffset = focusBarXOffset;
-                            _pluginConfiguration.Save();
-                        }
-                    }
-
-                    ImGui.EndChild();
-
-                    ImGui.SameLine();
-
-                    ImGui.BeginChild("hpypane", new Vector2(ImGui.GetWindowWidth() / 2, 0), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-
-                    {
-                        ImGui.Text("Y Offset");
-                        int focusBarYOffset = _pluginConfiguration.FocusBarYOffset;
-
-                        if (ImGui.DragInt("##FocusBarYOffset", ref focusBarYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
-                        {
-                            _pluginConfiguration.FocusBarYOffset = focusBarYOffset;
-                            _pluginConfiguration.Save();
-                        }
-                    }
-
-                    ImGui.EndChild();
-                }
-
-                ImGui.EndChild();
-
-                ImGui.EndChild();
-            }
-
-            ImGui.EndGroup();
-            ImGui.EndGroup();
-
-            ImGui.BeginGroup();
-            ImGui.BeginGroup(); // Left
-
-            {
-                ImGui.Text("Text Format");
-                ImGui.BeginChild("hptxtpane", new Vector2(0, ImGui.GetWindowHeight() / 2), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-                ImGui.BeginChild("hptxtformatpane", new Vector2(0, ImGui.GetWindowHeight() / 2), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-
-                {
-                    ImGui.BeginChild("hptxtformatleftpane", new Vector2(ImGui.GetWindowWidth() / 2, 0), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-
-                    {
-                        ImGui.Text("Text Format");
-                        string focusBarText = _pluginConfiguration.FocusBarText;
-
-                        if (ImGui.InputText("##FocusBarText", ref focusBarText, 999))
-                        {
-                            _pluginConfiguration.FocusBarText = focusBarText;
-                            _pluginConfiguration.Save();
-                        }
-                    }
-
-                    ImGui.EndChild();
-                }
-
-                ImGui.EndChild();
-                ImGui.Separator();
-                ImGui.BeginChild("hptxtoffsetpane", new Vector2(0, ImGui.GetWindowHeight() / 2), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-
-                {
-                    ImGui.BeginChild("hptxtleftxpane", new Vector2(ImGui.GetWindowWidth() / 2, 0), false, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-
-                    {
-                        ImGui.Text("Text X Offset");
-                        int focusBarTextXOffset = _pluginConfiguration.FocusBarTextXOffset;
-
-                        if (ImGui.DragInt("##FocusBarTextXOffset", ref focusBarTextXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
-                        {
-                            _pluginConfiguration.FocusBarTextXOffset = focusBarTextXOffset;
-                            _pluginConfiguration.Save();
-                        }
-                    }
-
-                    ImGui.EndChild();
-
-                    ImGui.SameLine();
-
-                    ImGui.BeginChild("hptxtleftypane", new Vector2(ImGui.GetWindowWidth() / 2, 0));
-
-                    {
-                        ImGui.Text("Text Y Offset");
-                        int focusBarTextYOffset = _pluginConfiguration.FocusBarTextYOffset;
-
-                        if (ImGui.DragInt("##FocusBarTextYOffset", ref focusBarTextYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
-                        {
-                            _pluginConfiguration.ToTBarTextYOffset = focusBarTextYOffset;
-                            _pluginConfiguration.Save();
-                        }
-                    }
-
-                    ImGui.EndChild();
-                }
-
-                ImGui.EndChild();
-
-                ImGui.EndChild();
-            }
-
-            ImGui.EndGroup();
-            ImGui.EndGroup();
-        }
-
         private void DrawCastbarsPlayerConfig()
         {
             _changed |= ImGui.Checkbox("Enabled", ref _pluginConfiguration.ShowCastBar);
@@ -1802,78 +1626,6 @@ namespace DelvUI.Config
             _changed |= ImGui.Checkbox("Show Raid wide buff icons", ref _pluginConfiguration.ShowRaidWideBuffIcons);
             _changed |= ImGui.Checkbox("Show Job specific buff icons", ref _pluginConfiguration.ShowJobSpecificBuffIcons);
             _changed |= _pluginConfiguration.RaidJobBuffListConfig.Draw();
-        }
-
-        private void DrawJobsGeneralConfig()
-        {
-            int primaryResourceHeight = _pluginConfiguration.PrimaryResourceBarHeight;
-
-            if (ImGui.DragInt("Primary Resource Height", ref primaryResourceHeight, .1f, 1, 1000))
-            {
-                _pluginConfiguration.PrimaryResourceBarHeight = primaryResourceHeight;
-                _pluginConfiguration.Save();
-            }
-
-            int primaryResourceWidth = _pluginConfiguration.PrimaryResourceBarWidth;
-
-            if (ImGui.DragInt("Primary Resource Width", ref primaryResourceWidth, .1f, 1, 1000))
-            {
-                _pluginConfiguration.PrimaryResourceBarWidth = primaryResourceWidth;
-                _pluginConfiguration.Save();
-            }
-
-            int primaryResourceBarXOffset = _pluginConfiguration.PrimaryResourceBarXOffset;
-
-            if (ImGui.DragInt("Primary Resource X Offset", ref primaryResourceBarXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
-            {
-                _pluginConfiguration.PrimaryResourceBarXOffset = primaryResourceBarXOffset;
-                _pluginConfiguration.Save();
-            }
-
-            int primaryResourceBarYOffset = _pluginConfiguration.PrimaryResourceBarYOffset;
-
-            if (ImGui.DragInt("Primary Resource Y Offset", ref primaryResourceBarYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
-            {
-                _pluginConfiguration.PrimaryResourceBarYOffset = primaryResourceBarYOffset;
-                _pluginConfiguration.Save();
-            }
-
-            _changed |= ImGui.Checkbox("Show Primary Resource Value", ref _pluginConfiguration.ShowPrimaryResourceBarValue);
-
-            if (_pluginConfiguration.ShowPrimaryResourceBarValue)
-            {
-                int primaryResourceBarTextXOffset = _pluginConfiguration.PrimaryResourceBarTextXOffset;
-
-                if (ImGui.DragInt("Primary Resource Text X Offset", ref primaryResourceBarTextXOffset, .1f, -_xOffsetLimit, _xOffsetLimit))
-                {
-                    _pluginConfiguration.PrimaryResourceBarTextXOffset = primaryResourceBarTextXOffset;
-                    _pluginConfiguration.Save();
-                }
-
-                int primaryResourceBarTextYOffset = _pluginConfiguration.PrimaryResourceBarTextYOffset;
-
-                if (ImGui.DragInt("Primary Resource Text Y Offset", ref primaryResourceBarTextYOffset, .1f, -_yOffsetLimit, _yOffsetLimit))
-                {
-                    _pluginConfiguration.PrimaryResourceBarTextYOffset = primaryResourceBarTextYOffset;
-                    _pluginConfiguration.Save();
-                }
-            }
-
-            _changed |= ImGui.Checkbox("Show Primary Resource Threshold Marker", ref _pluginConfiguration.ShowPrimaryResourceBarThresholdMarker);
-
-            if (_pluginConfiguration.ShowPrimaryResourceBarThresholdMarker)
-            {
-                int primaryResourceBarThresholdValue = _pluginConfiguration.PrimaryResourceBarThresholdValue;
-
-                if (ImGui.DragInt("Primary Resource Bar Threshold Marker Value", ref primaryResourceBarThresholdValue, 1f, 1, 10000))
-                {
-                    _pluginConfiguration.PrimaryResourceBarThresholdValue = primaryResourceBarThresholdValue;
-                    _pluginConfiguration.Save();
-                }
-            }
-
-            _changed |= ImGui.ColorEdit4("Bar Background Color", ref _pluginConfiguration.EmptyColor);
-            _changed |= ImGui.ColorEdit4("Bar Partial Fill Color", ref _pluginConfiguration.PartialFillColor);
         }
     }
 }
