@@ -136,7 +136,9 @@ namespace DelvUI.Config.Tree
                 ImGui.SameLine();
 
                 if (ImGui.Button("Toggle HUD"))
-                { }
+                {
+                    ConfigurationManager.GetInstance().ConfigurationWindow.ToggleHud();
+                }
 
                 ImGui.SameLine();
 
