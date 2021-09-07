@@ -8,6 +8,7 @@ using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
@@ -26,8 +27,16 @@ namespace DelvUI.Interface
 
         public NinjaHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
+        private readonly SpellHelper _spellHelper = new();
+        private float _oldMudraCooldownInfo;
+
         protected override void Draw(bool _)
         {
+            if (_config.ShowMudraCooldown)
+            {
+                DrawMudraBars();
+            }
+
             if (_config.ShowHutonGauge)
             {
                 DrawHutonGauge();
@@ -45,6 +54,43 @@ namespace DelvUI.Interface
         }
 
         protected override void DrawPrimaryResourceBar() { }
+
+        private void DrawMudraBars()
+        {
+            var xPos = CenterX - _config.Position.X + _config.MudraBarOffset.X;
+            var yPos = CenterY + _config.Position.Y + _config.MudraBarOffset.Y;
+
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.MudraBarSize.Y, _config.MudraBarSize.X);
+            
+            float maximum = 40f;
+            float mudraCooldownInfo = _spellHelper.GetSpellCooldown(2259);
+
+            // if a ninjutsu is mid-cast, use old data
+            // because otherwise the cooldown will jump to 0.5s when hitting a mudra
+            IEnumerable<StatusEffect> ninjutsuBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 496);
+            if(ninjutsuBuff.Any())
+            {
+                mudraCooldownInfo = _oldMudraCooldownInfo;
+            } else
+            {
+                _oldMudraCooldownInfo = mudraCooldownInfo;
+            }
+
+            builder.SetChunks(2)
+                   .SetChunkPadding(_config.MudraBarChunkPadding)
+                   .AddInnerBar(maximum - mudraCooldownInfo, maximum, _config.MudraBarColor.Map);
+            
+            if(_config.ShowMudraBarText)
+            {
+                builder.SetTextMode(BarTextMode.EachChunk)
+                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+            }
+            Bar bar = builder.SetBackgroundColor(EmptyColor["background"])
+                             .Build();
+
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            bar.Draw(drawList, PluginConfiguration);
+        }
 
         private void DrawHutonGauge()
         {
@@ -226,5 +272,29 @@ namespace DelvUI.Interface
         [DragFloat2("Trick/Suiton Bar Offset", min = -4000f, max = 4000f)]
         [Order(30)]
         public Vector2 TrickBarOffset = new(0, 44);
+
+        [Checkbox("Show Mudra Bars")]
+        [CollapseControl(35, 4)]
+        public bool ShowMudraCooldown = true;
+
+        [Checkbox("Show Mudra Bar Text")]
+        [CollapseWith(0, 4)]
+        public bool ShowMudraBarText = true;
+
+        [DragFloat2("Mudra Bar Size", max = 2000f)]
+        [CollapseWith(5, 4)]
+        public Vector2 MudraBarSize = new(254, 20);
+
+        [DragFloat2("Mudra Bar Offset", max = 2000f)]
+        [CollapseWith(10, 4)]
+        public Vector2 MudraBarOffset = new(0, -22);
+
+        [DragFloat("Mudra Bar Chunk Padding", min = -4000f, max = 4000f)]
+        [CollapseWith(15, 4)]
+        public float MudraBarChunkPadding = 2;
+
+        [ColorEdit4("Mudra Bar Color")]
+        [CollapseWith(20, 4)]
+        public PluginConfigColor MudraBarColor = new(new Vector4(211 / 255f, 166 / 255f, 75 / 242f, 100f / 100f));
     }
 }
