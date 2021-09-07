@@ -36,13 +36,15 @@ namespace DelvUI.Config
                 new DarkKnightHudConfig(),
                 new DragoonHudConfig(),
                 new GunbreakerHudConfig(),
+                new MachinistHudConfig(),
+                new MonkHudConfig(),
                 new NinjaHudConfig(),
                 new PaladinHudConfig(),
                 new RedMageHudConfig(),
+                new SamuraiHudConfig(),
                 new SummonerHudConfig(),
                 new WarriorHudConfig(),
                 new WhiteMageHudConfig(),
-                new SamuraiHudConfig()
             };
 
             return Initialize(pluginInterface, configObjects);
