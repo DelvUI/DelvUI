@@ -249,7 +249,7 @@ namespace DelvUI.Interface.Bars
             else
             {
                 var xPos = Parent.Vertical ? Parent.XPosition - (float)ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition + barWidth;
-                var yPos = Parent.Vertical ? Parent.YPosition + barHeight : Parent.YPosition - (float)ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
+                var yPos = Parent.Vertical ? Parent.YPosition + barHeight : Parent.YPosition + (float)ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
                 var cursorPos = new Vector2(xPos, yPos);
 
                 foreach (var chunkSize in Parent.ChunkSizes.AsEnumerable().Reverse().ToList())
