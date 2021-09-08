@@ -135,4 +135,15 @@ namespace DelvUI.Config.Attributes
             this.id = id;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class PortableAttribute : Attribute
+    {
+        public bool portable;
+
+        public PortableAttribute(bool portable)
+        {
+            this.portable = portable;
+        }
+    }
 }

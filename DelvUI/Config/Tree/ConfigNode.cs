@@ -516,7 +516,10 @@ namespace DelvUI.Config.Tree
                 pair.Value.Draw(ref changed);
             }
 
-            if (ConfigObject.portable)
+            // if the config object is not marked with [Portable(false)], or is marked with [Portable(true)],
+            // draw the import/export UI
+            PortableAttribute portableAttribute = (PortableAttribute) ConfigObject.GetType().GetCustomAttribute((typeof(PortableAttribute)), false);
+            if (portableAttribute == null || portableAttribute.portable)
             {
                 DrawImportExportGeneralConfig();
             }

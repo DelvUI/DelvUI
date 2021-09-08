@@ -9,7 +9,6 @@ namespace DelvUI.Config
     [Serializable]
     public abstract class PluginConfigObject
     {
-        public bool portable { get; set; } = true;
 
         protected bool ColorEdit4(string label, ref PluginConfigColor color)
         {

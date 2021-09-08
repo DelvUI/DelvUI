@@ -1303,16 +1303,12 @@ namespace DelvUI.Interface
     }
 
     [Serializable]
+    [Portable(false)]
     [Section("Job Specific Bars")]
     [SubSection("Tank", 0)]
     [SubSection("General##Tank", 1)]
     public class TankHudConfig : PluginConfigObject
     {
-        public TankHudConfig()
-        {
-            portable = false;
-        }
-
         [Checkbox("Tank Stance Indicator Enabled")]
         public bool TankStanceIndicatorEnabled = true;
 
