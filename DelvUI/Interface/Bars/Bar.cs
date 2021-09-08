@@ -556,6 +556,7 @@ namespace DelvUI.Interface.Bars
 
         // TODO: Proper text tags
         public BarTextPosition Position { get; set; }
+        public Vector2 TextOffset = Vector2.Zero;
         public BarTextType Type { get; set; }
         public Vector4 Color { get; set; }
         public Vector4 OutlineColor { get; set; }
@@ -700,7 +701,7 @@ namespace DelvUI.Interface.Bars
                     break;
             }
 
-            return new Vector2(textXPos, textYPos);
+            return new Vector2(textXPos, textYPos) + TextOffset;
         }
     }
 
