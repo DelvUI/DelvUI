@@ -126,6 +126,7 @@ namespace DelvUI.Config
 
         public bool ShowTargetCastBar = true;
         public bool ShowTargetCastTime = true;
+        public bool ShowTargetTestCastBar = false;
         public bool ShowTargetInterrupt = true;
         public bool SlideCast = false;
         public Vector4 SlideCastColor = new(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f);

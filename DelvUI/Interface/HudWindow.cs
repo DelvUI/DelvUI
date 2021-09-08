@@ -713,31 +713,51 @@ namespace DelvUI.Interface
         {
             Actor actor = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (!PluginConfiguration.ShowTargetCastBar || actor is null)
+            BattleChara* battleChara;
+            BattleChara.CastInfo castInfo;
+            uint currentCastId;
+            ActionType currentCastType;
+            float currentCastTime;
+            float totalCastTime;
+
+            if (!PluginConfiguration.ShowTargetTestCastBar)
             {
-                return;
-            }
+                if (actor is null)
+                {
+                    return;
+                }
+                
+                if (actor is not Chara || actor.ObjectKind == ObjectKind.Companion)
+                {
+                    return;
+                }
 
-            if (actor is not Chara || actor.ObjectKind == ObjectKind.Companion)
+                battleChara = (BattleChara*)actor.Address;
+                castInfo = battleChara->SpellCastInfo;
+
+                bool isCasting = castInfo.IsCasting > 0;
+
+                if (!isCasting)
+                {
+                    return;
+                }
+
+                currentCastId = castInfo.ActionID;
+                currentCastType = castInfo.ActionType;
+                currentCastTime = castInfo.CurrentCastTime;
+                totalCastTime = castInfo.TotalCastTime;
+            }
+            else
             {
-                return;
+                PlayerCharacter temp = PluginInterface.ClientState.LocalPlayer;
+                battleChara = (BattleChara*)temp.Address;
+                castInfo = battleChara->SpellCastInfo;
+                currentCastId = 5;
+                currentCastType = ActionType.Spell;
+                currentCastTime = 2;
+                totalCastTime = 5;
             }
-
-            BattleChara* battleChara = (BattleChara*)actor.Address;
-            BattleChara.CastInfo castInfo = battleChara->SpellCastInfo;
-
-            bool isCasting = castInfo.IsCasting > 0;
-
-            if (!isCasting)
-            {
-                return;
-            }
-
-            uint currentCastId = castInfo.ActionID;
-            ActionType currentCastType = castInfo.ActionType;
-            float currentCastTime = castInfo.CurrentCastTime;
-            float totalCastTime = castInfo.TotalCastTime;
-
+            
             if (_lastTargetUsedCast != null)
             {
                 if (!(_lastTargetUsedCast.CastId == currentCastId && _lastTargetUsedCast.ActionType == currentCastType))

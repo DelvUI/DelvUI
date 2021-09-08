@@ -1350,8 +1350,8 @@ namespace DelvUI.Config
 
         private void DrawCastbarsPlayerConfig()
         {
-            _changed |= ImGui.Checkbox("Enabled", ref _pluginConfiguration.ShowCastBar);
-            _changed |= ImGui.Checkbox("Test Castbar", ref _pluginConfiguration.ShowTestCastBar);
+            _changed |= ImGui.Checkbox("Enable Player Castbar", ref _pluginConfiguration.ShowCastBar);
+            _changed |= ImGui.Checkbox("Sample Player Castbar", ref _pluginConfiguration.ShowTestCastBar);
 
             if (!_pluginConfiguration.ShowCastBar)
             {
@@ -1593,7 +1593,13 @@ namespace DelvUI.Config
 
         private void DrawCastbarsTargetConfig()
         {
-            _changed |= ImGui.Checkbox("Show Target Cast Bar", ref _pluginConfiguration.ShowTargetCastBar);
+            _changed |= ImGui.Checkbox("Enable Target Castbar", ref _pluginConfiguration.ShowTargetCastBar);
+            _changed |= ImGui.Checkbox("Sample Target Castbar", ref _pluginConfiguration.ShowTargetTestCastBar);
+
+            if (!_pluginConfiguration.ShowTargetTestCastBar)
+            {
+                _pluginConfiguration.ShowTargetTestCastBar = false;
+            }
 
             int targetCastBarHeight = _pluginConfiguration.TargetCastBarHeight;
 

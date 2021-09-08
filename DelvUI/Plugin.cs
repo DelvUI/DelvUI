@@ -191,9 +191,10 @@ namespace DelvUI
 
             ConfigurationManager.GetInstance().Draw();
 
-            if (!_configurationWindow.IsVisible && _pluginConfiguration.ShowTestCastBar)
+            if (!_configurationWindow.IsVisible && (_pluginConfiguration.ShowTestCastBar || _pluginConfiguration.ShowTargetTestCastBar))
             {
                 _pluginConfiguration.ShowTestCastBar = false;
+                _pluginConfiguration.ShowTargetTestCastBar = false;
             }
 
             if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id)
