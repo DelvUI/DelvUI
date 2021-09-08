@@ -32,6 +32,7 @@ namespace DelvUI.Interface
             DrawRuinBar();
             DrawAetherBar();
             DrawTranceBar();
+            DrawDreadWyrmAether();
         }
 
         private void DrawTranceBar()
@@ -90,6 +91,80 @@ namespace DelvUI.Interface
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
+        }
+        public void DrawDreadWyrmAether()
+        {
+            if (!_config.ShowDreadwyrmAether)
+            {
+                return;
+            }
+
+            SMNGauge gauge = PluginInterface.ClientState.JobGauges.Get<SMNGauge>();
+            var stacks = gauge.NumStacks;
+            List<Bar> barDrawList = new();
+
+            if (_config.ShowDemiIndicator)
+            {
+                Vector2 barSize = _config.IndicatorSize;
+                Vector2 position = Origin + _config.IndicatorPosition - barSize / 2f;
+
+                BarBuilder builder = BarBuilder.Create(position, barSize);
+
+                if(stacks >= 8 && stacks < 16)
+                {
+                    Bar indicatorBar = builder.AddInnerBar(1, 1, _config.BahamutReadyColor.Map)
+                                              .SetBackgroundColor(EmptyColor["background"])
+                                              .Build();
+                    barDrawList.Add(indicatorBar);
+                }
+                if(stacks >= 16)
+                {
+                    Bar indicatorBar = builder.AddInnerBar(1, 1, _config.PhoenixReadyColor.Map)
+                                              .SetBackgroundColor(EmptyColor["background"])
+                                              .Build();
+                    barDrawList.Add(indicatorBar);
+                }
+                if(stacks < 8)
+                {
+                    Bar indicatorBar = builder.SetBackgroundColor(EmptyColor["background"])
+                                              .Build();
+                    barDrawList.Add(indicatorBar);
+                }
+            }
+
+            if (_config.ShowDreadwyrmAetherBars)
+            {
+                Vector2 barSize = _config.DreadwyrmAetherBarSize;
+                Vector2 position = Origin + _config.DreadwyrmAetherBarPosition - barSize / 2f;
+                var filledChunkCount = 0;
+
+                if(stacks >= 4 && stacks < 8)
+                {
+                    filledChunkCount = 1;
+                }
+                else if(stacks >= 8 && stacks < 16)
+                {
+                    filledChunkCount = 2;
+                }
+
+                Bar DreadwyrmAetherBars = BarBuilder.Create(position, barSize)
+                                                    .SetChunks(2)
+                                                    .SetChunkPadding(_config.DreadwyrmAetherBarPadding)
+                                                    .AddInnerBar(filledChunkCount, 2, _config.DreadwyrmAetherBarColor.Map)
+                                                    .SetBackgroundColor(EmptyColor["background"])
+                                                    .Build();
+                barDrawList.Add(DreadwyrmAetherBars);
+            }
+
+            if (barDrawList.Count > 0)
+            {
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+
+                foreach (Bar bar in barDrawList)
+                {
+                    bar.Draw(drawList, PluginConfiguration);
+                }
+            }
         }
 
         protected override void DrawPrimaryResourceBar() { }
@@ -227,11 +302,11 @@ namespace DelvUI.Interface
 
         [DragFloat2("Aether Tracker Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 AetherPosition = new(0, -11);
+        public Vector2 AetherPosition = new(-67, -16);
 
         [DragFloat2("Aether Tracker Size", min = 1f, max = 2000f)]
         [CollapseWith(0, 1)]
-        public Vector2 AetherSize = new(254, 20);
+        public Vector2 AetherSize = new(120, 10);
 
         [ColorEdit4("Trance Bahamut Color")]
         [CollapseWith(45, 5)]
@@ -332,5 +407,50 @@ namespace DelvUI.Interface
         [DragFloat2("Trance Gauge Size", min = 1f, max = 2000f)]
         [CollapseWith(30, 5)]
         public Vector2 TranceSize = new(254, 20);
+
+        [Checkbox("Dreadwyrm Trance Tracker Enabled")]
+        [CollapseControl(25, 6)]
+        public bool ShowDreadwyrmAether = true;
+
+        [Checkbox("Demi Status Indicator Enabled")]
+        [CollapseWith(0, 6)]
+        public bool ShowDemiIndicator = true;
+
+        [DragFloat2("Demi Status Indicator Position", min = -4000f, max = -4000f)]
+        [CollapseWith(5, 6)]
+        public Vector2 IndicatorPosition = new(0, -16);
+        
+        [DragFloat2("Demi Status Indicator Size", min = 1f, max = 2000f)]
+        [CollapseWith(10, 6)]
+        public Vector2 IndicatorSize = new(10, 10);
+        
+        [ColorEdit4("Demi Status Indicator Bahamut Color")]
+        [CollapseWith(15, 6)]
+        public PluginConfigColor BahamutReadyColor = new(new Vector4(128f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        
+        [ColorEdit4("Demi Status Indicator Phoenix Color")]
+        [CollapseWith(20, 6)]
+        public PluginConfigColor PhoenixReadyColor = new(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f));
+
+        [Checkbox("Dreadwyrm Aether Bars Enabled")]
+        [CollapseWith(25, 6)]
+        public bool ShowDreadwyrmAetherBars = true;
+
+        [DragFloat2("Dreadwyrm Aether Bars Position", min = -4000f, max = -4000f)]
+        [CollapseWith(30, 6)]
+        public Vector2 DreadwyrmAetherBarPosition = new(67, -16);
+        
+        [DragFloat2("Dreadwyrm Aether Bars Size", min = 1f, max = 2000f)]
+        [CollapseWith(35, 6)]
+        public Vector2 DreadwyrmAetherBarSize = new(120, 10);
+
+        [DragInt("Dreadwyrm Aether Bar Padding", max = 1000)]
+        [CollapseWith(40, 6)]
+        public int DreadwyrmAetherBarPadding = 2;
+
+        [ColorEdit4("Dreadwyrm Aether Bars Color")]
+        [CollapseWith(45, 6)]
+        public PluginConfigColor DreadwyrmAetherBarColor = new(new Vector4(128f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+
     }
 }
