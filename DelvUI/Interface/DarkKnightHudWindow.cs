@@ -197,16 +197,16 @@ namespace DelvUI.Interface
     [SubSection("Dark Knight", 1)]
     public class DarkKnightHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Offset" + "##DarkKnight", min = -4000f, max = 4000f)]
         [Order(0)]
         public Vector2 Position = new Vector2(0, 0);
 
-        /* Mana Bar */
+        #region Mana Bar
         [Checkbox("Show Mana Bar")]
         [CollapseControl(5, 0)]
         public bool ShowManaBar = true;
 
-        [Checkbox("Show Mana Bar Text")]
+        [Checkbox("Show Text" + "##DRKManaBar")]
         [CollapseWith(0, 0)]
         public bool ShowManaBarText = false;
 
@@ -214,27 +214,28 @@ namespace DelvUI.Interface
         [CollapseWith(5, 0)]
         public bool ChunkManaBar = true;
 
-        [DragFloat2("Mana Bar Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##DRKManaBar", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
         public Vector2 ManaBarPosition = new Vector2(0, 420);
 
-        [DragFloat2("Mana Bar Size", min = 0, max = 4000f)]
+        [DragFloat2("Size" + "##DRKManaBar", min = 0, max = 4000f)]
         [CollapseWith(15, 0)]
         public Vector2 ManaBarSize = new Vector2(254, 10);
 
-        [DragInt("Mana Bar Padding", min = 0)]
+        [DragInt("Padding" + "##DRKManaBar", min = 0)]
         [CollapseWith(20, 0)]
         public int ManaBarPadding = 1;
 
         [CollapseWith(25, 0)]
-        [ColorEdit4("Mana Color")]
+        [ColorEdit4("Mana Color" + "##DRKManaBar")]
         public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 142f / 255f, 254f / 255f, 100f / 100f));
 
-        [ColorEdit4("Dark Arts Buff Color")]
+        [ColorEdit4("Dark Arts Buff Color" + "##DRKManaBar")]
         [CollapseWith(30, 0)]
         public PluginConfigColor DarkArtsColor = new(new Vector4(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
+        #endregion
 
-        /* Blood Gauge */
+        #region Blood Gauge
         [Checkbox("Show Blood Gauge")]
         [CollapseControl(10, 1)]
         public bool ShowBloodGauge = true;
@@ -243,78 +244,81 @@ namespace DelvUI.Interface
         [CollapseWith(0, 1)]
         public bool ChunkBloodGauge = true;
 
-        [DragFloat2("Blood Gauge Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##DRKBloodGauge", min = -4000f, max = 4000f)]
         [CollapseWith(10, 1)]
         public Vector2 BloodGaugePosition = new Vector2(0, 432);
 
-        [DragFloat2("Blood Gauge Size", min = 0, max = 4000f)]
+        [DragFloat2("Size" + "##DRKBloodGauge", min = 0, max = 4000f)]
         [CollapseWith(15, 1)]
         public Vector2 BloodGaugeSize = new Vector2(254, 10);
 
-        [DragInt("Blood Gauge Padding", min = 0)]
+        [DragInt("Padding" + "##DRKBloodGauge", min = 0)]
         [CollapseWith(20, 1)]
         public int BloodGaugePadding = 2;
 
-        [ColorEdit4("Blood Color Left")]
+        [ColorEdit4("Blood Color Left" + "##DRKBloodGauge")]
         [CollapseWith(25, 1)]
         public PluginConfigColor BloodColor = new(new Vector4(196f / 255f, 20f / 255f, 122f / 255f, 100f / 100f));
 
-        [ColorEdit4("Blood Color Full")]
+        [ColorEdit4("Blood Color Full" + "##DRKBloodGauge")]
         [CollapseWith(30, 1)]
         public PluginConfigColor BloodColorFull = new(new Vector4(216f / 255f, 0f / 255f, 73f / 255f, 100f / 100f));
+        #endregion
 
-        /* Buff Bar */
+        #region Buff Bar
         [Checkbox("Show Buff Bar")]
         [CollapseControl(15, 2)]
         public bool ShowBuffBar = true;
 
-        [Checkbox("Show Buff Bar Text")]
+        [Checkbox("Show Text" + "##DRKBuffBar")]
         [CollapseWith(0, 2)]
         public bool ShowBuffBarText = true;
 
-        [DragFloat2("Buff Bar Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##DRKBuffBar", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]
         public Vector2 BuffBarPosition = new Vector2(0, 449);
 
-        [DragFloat2("Buff Bar Size", min = 0, max = 4000f)]
+        [DragFloat2("Size" + "##DRKBuffBar", min = 0, max = 4000f)]
         [CollapseWith(10, 2)]
         public Vector2 BuffBarSize = new Vector2(254, 20);
 
-        [DragInt("Buff Bar Padding", min = 0)]
+        [DragInt("Padding" + "##DRKBuffBar", min = 0)]
         [CollapseWith(15, 2)]
         public int BuffBarPadding = 2;
 
-        [ColorEdit4("Blood Weapon Color")]
+        [ColorEdit4("Blood Weapon Color" + "##DRKBuffBar")]
         [CollapseWith(20, 2)]
         public PluginConfigColor BloodWeaponColor = new(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [ColorEdit4("Delirium Color")]
+        [ColorEdit4("Delirium Color" + "##DRKBuffBar")]
         [CollapseWith(25, 2)]
         public PluginConfigColor DeliriumColor = new(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        #endregion
 
-        /* Living Shadow */
+        #region Living Shadow
         [Checkbox("Show Living Shadow Bar")]
         [CollapseControl(20, 3)]
         public bool ShowLivingShadowBar = true;
 
-        [Checkbox("Show Living Shadow Bar Text")]
+        [Checkbox("Show Text" + "##DRKLivingShadow")]
         [CollapseWith(0, 3)]
         public bool ShowLivingShadowBarText = true;
 
-        [DragFloat2("Living Shadow Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##DRKLivingShadow", min = -4000f, max = 4000f)]
         [CollapseWith(5, 3)]
         public Vector2 LivingShadowBarPosition = new Vector2(0, 470);
 
-        [DragFloat2("Living Shadow Size", min = 0, max = 4000f)]
+        [DragFloat2("Size" + "##DRKLivingShadow", min = 0, max = 4000f)]
         [CollapseWith(10, 3)]
         public Vector2 LivingShadowBarSize = new Vector2(254, 20);
 
-        [DragInt("Living Shadow Padding", min = 0)]
+        [DragInt("Padding" + "##DRKLivingShadow", min = 0)]
         [CollapseWith(15, 3)]
         public int LivingShadowPadding = 2;
 
-        [ColorEdit4("Living Shadow Color")]
+        [ColorEdit4("Color" + "##DRKLivingShadow")]
         [CollapseWith(20, 3)]
         public PluginConfigColor LivingShadowColor = new(new Vector4(225f / 255f, 105f / 255f, 205f / 255f, 100f / 100f));
+        #endregion
     }
 }
