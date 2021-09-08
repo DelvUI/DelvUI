@@ -6,10 +6,12 @@ using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using Dalamud.Interface;
+using Dalamud.Plugin;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
 using ImGuiScene;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace DelvUI.Config.Tree
 {
@@ -446,6 +448,8 @@ namespace DelvUI.Config.Tree
     public class ConfigPageNode : SubSectionNode
     {
         public PluginConfigObject ConfigObject;
+        private string _importString = "";
+        private string _exportString = "";
 
         public override void Draw(ref bool changed)
         {
@@ -511,6 +515,94 @@ namespace DelvUI.Config.Tree
             {
                 pair.Value.Draw(ref changed);
             }
+
+            DrawImportExportGeneralConfig();
+        }
+
+        private void DrawImportExportGeneralConfig()
+        {
+            uint maxLength = 40000;
+            ImGui.BeginChild("importpane", new Vector2(0, ImGui.GetWindowHeight() / 6), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+            {
+                ImGui.Text("Import string:");
+                ImGui.InputText("", ref _importString, maxLength);
+
+                if (ImGui.Button("Import configuration"))
+                {
+                    // get type from json
+                    string jsonString = ConfigurationManager.Base64DecodeAndDecompress(_importString);
+                    Type importedType = Type.GetType((string)JObject.Parse(jsonString)["$type"]);
+                    // abort import if the import string is for the wrong type
+                    if (ConfigObject.GetType().FullName == importedType.FullName)
+                    {
+                        // see comments on ConfigPageNode's Load
+                        MethodInfo methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
+                        MethodInfo function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
+                        PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(ConfigurationManager.GetInstance(), new object[] { _importString });
+                        if (importedConfigObject != null)
+                        {
+                            PluginLog.Log($"Importing {importedConfigObject.GetType()}");
+                            ConfigObject = importedConfigObject;
+                            ConfigurationManager.GetInstance().SaveConfigurations();
+                        }
+                        else
+                        {
+                            PluginLog.Log($"Could not load from import string (of type {importedConfigObject.GetType()})");
+                        }
+                    }
+                    else
+                    {
+                        PluginLog.Log($"Could not convert {importedType} to {ConfigObject.GetType()}! Aborting import.");
+                    }
+                }
+
+                ImGui.SameLine();
+
+                if (ImGui.Button("Paste from clipboard"))
+                {
+                    try
+                    {
+                        _importString = ImGui.GetClipboardText();
+                    }
+                    catch (Exception ex)
+                    {
+                        PluginLog.Log("Could not get clipboard text:\n" + ex.StackTrace);
+                    }
+
+                }
+            }
+
+            ImGui.EndChild();
+
+            ImGui.BeginChild("exportpane", new Vector2(0, ImGui.GetWindowHeight() / 6), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+
+            {
+                ImGui.Text("Export string:");
+                ImGui.InputText("", ref _exportString, maxLength, ImGuiInputTextFlags.ReadOnly);
+
+                if (ImGui.Button("Export configuration"))
+                {
+                    _exportString = ConfigurationManager.GenerateExportString(ConfigObject);
+                    PluginLog.Log($"Exported type {ConfigObject.GetType()}");
+                }
+
+                ImGui.SameLine();
+
+                if (ImGui.Button("Copy to clipboard") && _exportString != "")
+                {
+                    try
+                    {
+                        ImGui.SetClipboardText(_exportString);
+                    }
+                    catch (Exception ex)
+                    {
+                        PluginLog.Log("Could not set clipboard text:\n" + ex.StackTrace);
+                    }
+
+                }
+            }
+
+            ImGui.EndChild();
         }
 
         public override void Save(string path)

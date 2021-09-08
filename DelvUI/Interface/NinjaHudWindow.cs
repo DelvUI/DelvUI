@@ -339,7 +339,7 @@ namespace DelvUI.Interface
 
         [Checkbox("Show Suiton Bar")]
         [CollapseControl(20, 3)]
-        public bool ShowSuitonBar = true;
+        public bool ShowSuitonBar = false;
 
         [Checkbox("Show Suiton Bar Text")]
         [CollapseWith(0, 3)]
