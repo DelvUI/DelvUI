@@ -2,8 +2,10 @@
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Interface.Bars;
 using ImGuiNET;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
@@ -17,8 +19,7 @@ namespace DelvUI.Interface
 
         public override uint JobId => Jobs.RDM;
 
-        private float OriginX => CenterX + _config.Position.X;
-        private float OriginY => CenterY + YOffset + _config.Position.Y;
+        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
 
 
         protected override void Draw(bool _)
@@ -26,7 +27,11 @@ namespace DelvUI.Interface
             DrawBalanceBar();
             DrawWhiteManaBar();
             DrawBlackManaBar();
-            DrawAccelerationBar();
+
+            if (_config.ShowAcceleration)
+            {
+                DrawAccelerationBar();
+            }
 
             if (_config.ShowDualCast)
             {
@@ -47,54 +52,44 @@ namespace DelvUI.Interface
         protected override void DrawPrimaryResourceBar()
         {
             var actor = PluginInterface.ClientState.LocalPlayer;
-            var scale = (float)actor.CurrentMp / actor.MaxMp;
-            var cursorPos = new Vector2(
-                OriginX - _config.ManaBarSize.X / 2 + _config.ManaBarOffset.X,
-                OriginY - _config.ManaBarSize.Y + _config.ManaBarOffset.Y
+
+            var position = new Vector2(
+                CenterX + _config.Position.X + _config.ManaBarOffset.X - _config.ManaBarSize.X / 2f,
+                CenterY + _config.Position.Y + _config.ManaBarOffset.Y - _config.ManaBarSize.Y / 2f
             );
 
-            var color = _config.ManaBarColor;
-            if (_config.ShowManaThresholdMarker && actor.CurrentMp < _config.ManaThresholdValue)
-            {
-                color = _config.ManaBarBelowThresholdColor;
-            }
-
-            // bar
             var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + _config.ManaBarSize, color.Background);
-
-            if (scale > 0)
-            {
-                drawList.AddRectFilledMultiColor(
-                    cursorPos,
-                    cursorPos + new Vector2(Math.Max(1, _config.ManaBarSize.X * scale), _config.ManaBarSize.Y),
-                    color.LeftGradient,
-                    color.RightGradient,
-                    color.RightGradient,
-                    color.LeftGradient
-                );
-            }
-
-            drawList.AddRect(cursorPos, cursorPos + _config.ManaBarSize, 0xFF000000);
-
-            // threshold
-            if (_config.ShowManaThresholdMarker)
-            {
-                var position = new Vector2(cursorPos.X + _config.ManaThresholdValue / 10000f * _config.ManaBarSize.X - 3, cursorPos.Y);
-                var size = new Vector2(2, _config.ManaBarSize.Y);
-                drawList.AddRect(position, position + size, 0xFF000000);
-            }
+            var builder = BarBuilder.Create(position, _config.ManaBarSize)
+                .AddInnerBar(actor.CurrentMp, actor.MaxMp, _config.ManaBarColor.Map)
+                .SetBackgroundColor(EmptyColor["background"]);
 
             // text
-            if (!_config.ShowManaValue)
+            if (_config.ShowManaValue)
             {
-                return;
+                builder.SetTextMode(BarTextMode.Single);
+                builder.SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
-            var mana = PluginInterface.ClientState.LocalPlayer.CurrentMp;
-            var text = $"{mana,0}";
-            var textSize = ImGui.CalcTextSize(text);
-            DrawOutlinedText(text, new Vector2(cursorPos.X + 2, OriginY + _config.Position.Y - _config.ManaBarSize.Y / 2f - textSize.Y / 2f + 2));
+            builder.Build().Draw(drawList, PluginConfiguration);
+
+            // threshold marker
+            if (_config.ShowManaThresholdMarker)
+            {
+                var pos = new Vector2(
+                    position.X + _config.ManaThresholdValue / 10000f * _config.ManaBarSize.X,
+                    position.Y + _config.ManaBarSize.Y
+                );
+                var size = new Vector2(3, _config.ManaBarSize.Y);
+
+                drawList.AddRectFilledMultiColor(
+                    pos,
+                    pos - size,
+                    0xFF000000,
+                    0x00000000,
+                    0x00000000,
+                    0xFF000000
+                );
+            }
         }
 
         private void DrawBalanceBar()
@@ -104,227 +99,167 @@ namespace DelvUI.Interface
             var blackGauge = (float)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().BlackGauge;
             var scale = gauge.WhiteGauge - gauge.BlackGauge;
 
-            var cursorPos = new Vector2(
-                OriginX - _config.BalanceBarSize.X / 2f + _config.BalanceBarOffset.X,
-                OriginY + _config.BalanceBarOffset.Y
+            var position = new Vector2(
+                CenterX + _config.Position.X + _config.BalanceBarOffset.X - _config.BalanceBarSize.X / 2f,
+                CenterY + _config.Position.Y + _config.BalanceBarOffset.Y - _config.BalanceBarSize.Y / 2f
             );
 
-            var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + _config.BalanceBarSize, 0x88000000);
-
-            PluginConfigColor color = null;
+            PluginConfigColor color = _config.BalanceBarColor;
+            var value = 0;
 
             if (whiteGauge >= 80 && blackGauge >= 80)
             {
-                color = _config.BalanceBarColor;
+                value = 1;
             }
             else if (scale >= 30)
             {
                 color = _config.WhiteManaBarColor;
+                value = 1;
             }
             else if (scale <= -30)
             {
                 color = _config.BlackManaBarColor;
+                value = 1;
             }
 
-            if (color != null)
-            {
-                drawList.AddRectFilledMultiColor(
-                    cursorPos,
-                    cursorPos + _config.BalanceBarSize,
-                    color.LeftGradient,
-                    color.RightGradient,
-                    color.RightGradient,
-                    color.LeftGradient
-                );
-            }
+            var drawList = ImGui.GetWindowDrawList();
+            var builder = BarBuilder.Create(position, _config.BalanceBarSize)
+                .AddInnerBar(value, 1, color.Map)
+                .SetBackgroundColor(EmptyColor["background"]);
 
-            drawList.AddRect(cursorPos, cursorPos + _config.BalanceBarSize, 0xFF000000);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawWhiteManaBar()
         {
             var gauge = (int)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().WhiteGauge;
-            var scale = gauge / 100f;
+            var thresholdRatio = _config.WhiteManaBarInverted ? 0.2f : 0.8f;
 
             var position = new Vector2(
-                OriginX + _config.WhiteManaBarOffset.X,
-                OriginY + _config.WhiteManaBarOffset.Y
+                CenterX + _config.Position.X + _config.WhiteManaBarOffset.X,
+                CenterY + _config.Position.Y + _config.WhiteManaBarOffset.Y - _config.WhiteManaBarSize.Y / 2f
             );
 
-            DrawManaBar(position, _config.WhiteManaBarSize, _config.WhiteManaBarColor, gauge, scale, _config.WhiteManaBarInverted, _config.ShowWhiteManaValue);
+            DrawCustomBar(position, _config.WhiteManaBarSize, _config.WhiteManaBarColor, gauge, 100, thresholdRatio, _config.WhiteManaBarInverted, _config.ShowWhiteManaValue);
         }
 
         private void DrawBlackManaBar()
         {
             var gauge = (int)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().BlackGauge;
-            var scale = gauge / 100f;
+            var thresholdRatio = _config.BlackManaBarInverted ? 0.2f : 0.8f;
 
             var position = new Vector2(
-                OriginX + _config.BlackManaBarOffset.X,
-                OriginY + _config.BlackManaBarOffset.Y
+                CenterX + _config.Position.X + _config.BlackManaBarOffset.X,
+                CenterY + _config.Position.Y + _config.BlackManaBarOffset.Y - _config.BlackManaBarSize.Y / 2f
             );
 
-            DrawManaBar(position, _config.WhiteManaBarSize, _config.BlackManaBarColor, gauge, scale, _config.BlackManaBarInverted, _config.ShowBlackManaValue);
-        }
-
-        private void DrawManaBar(Vector2 position, Vector2 size, PluginConfigColor color, int value, float scale, bool inverted, bool showText)
-        {
-            var origin = inverted ? new Vector2(position.X - size.X, position.Y) : position;
-
-            // bar
-            var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(origin, origin + size, color.Background);
-
-            // fill
-            if (scale > 0)
-            {
-                var barStartPos = inverted ? new Vector2(origin.X + size.X * (1 - scale), origin.Y) : origin;
-
-                drawList.AddRectFilledMultiColor(
-                    barStartPos,
-                    barStartPos + new Vector2(Math.Max(1, size.X * scale), size.Y),
-                    color.LeftGradient,
-                    color.RightGradient,
-                    color.RightGradient,
-                    color.LeftGradient
-                );
-            }
-
-            // border
-            drawList.AddRect(origin, origin + size, 0xFF000000);
-
-            // threshold
-            var thresholdRatio = inverted ? 0.2f : 0.8f;
-            var thresholdPos = new Vector2(origin.X + size.X * thresholdRatio, origin.Y);
-            drawList.AddRect(thresholdPos, thresholdPos + new Vector2(2, size.Y), 0xFF000000);
-
-            // text
-            if (!showText)
-            {
-                return;
-            }
-
-            var text = $"{value}";
-            var textSize = ImGui.CalcTextSize(text);
-            var textPos = inverted ? new Vector2(origin.X + size.X - 10 - textSize.X, origin.Y - 2) : new Vector2(origin.X + 10, origin.Y - 2);
-            DrawOutlinedText(text, textPos);
+            DrawCustomBar(position, _config.BlackManaBarSize, _config.BlackManaBarColor, gauge, 100, thresholdRatio, _config.BlackManaBarInverted, _config.ShowBlackManaValue);
         }
 
         private void DrawAccelerationBar()
         {
-            var totalWidth = _config.AccelerationBarSize.X * 3 + _config.HorizontalPadding * 2;
-            var cursorPos = new Vector2(
-                OriginX - totalWidth / 2 + _config.AccelerationBarOffset.X,
-                OriginY + _config.AccelerationBarOffset.Y
-            );
-
             var accelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1238);
 
+            var position = new Vector2(
+                CenterX + _config.Position.X + _config.AccelerationBarOffset.X - _config.AccelerationBarSize.X / 2f,
+                CenterY + _config.Position.Y + _config.AccelerationBarOffset.Y - _config.AccelerationBarSize.Y / 2f
+            );
+
+            var bar = BarBuilder.Create(position, _config.AccelerationBarSize)
+                                .SetChunks(3)
+                                .SetChunkPadding(_config.AccelerationBarPadding)
+                                .AddInnerBar(accelBuff.StackCount, 3, _config.AccelerationBarColor.Map, EmptyColor)
+                                .SetBackgroundColor(EmptyColor["background"])
+                                .Build();
+
             var drawList = ImGui.GetWindowDrawList();
-
-            for (var i = 1; i <= 3; i++)
-            {
-                drawList.AddRectFilled(cursorPos, cursorPos + _config.AccelerationBarSize, _config.AccelerationBarColor.Background);
-
-                if (accelBuff.StackCount >= i)
-                {
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos,
-                        cursorPos + _config.AccelerationBarSize,
-                        _config.AccelerationBarColor.LeftGradient,
-                        _config.AccelerationBarColor.RightGradient,
-                        _config.AccelerationBarColor.RightGradient,
-                        _config.AccelerationBarColor.LeftGradient
-                    );
-                }
-
-                drawList.AddRect(cursorPos, cursorPos + _config.AccelerationBarSize, 0xFF000000);
-
-                cursorPos.X = cursorPos.X + _config.AccelerationBarSize.X + _config.HorizontalPadding;
-            }
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawDualCastBar()
         {
-            var cursorPos = new Vector2(
-                OriginX - _config.DualCastSize.X / 2f + _config.DualCastOffset.X,
-                OriginY + _config.DualCastOffset.Y
+            var dualCastBuff = Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1249).Duration);
+            var value = dualCastBuff > 0 ? 1 : 0;
+
+            var position = new Vector2(
+                CenterX + _config.Position.X + _config.DualCastOffset.X - _config.DualCastSize.X / 2f,
+                CenterY + _config.Position.Y + _config.DualCastOffset.Y - _config.DualCastSize.Y / 2f
             );
 
-            var dualCastBuff = Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1249).Duration);
-
             var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + _config.DualCastSize, _config.DualCastColor.Background);
+            var builder = BarBuilder.Create(position, _config.DualCastSize)
+                .AddInnerBar(value, 1, _config.DualCastColor.Map)
+                .SetBackgroundColor(EmptyColor["background"]);
 
-            if (dualCastBuff > 0)
-            {
-                drawList.AddRectFilledMultiColor(
-                    cursorPos,
-                    cursorPos + _config.DualCastSize,
-                        _config.AccelerationBarColor.LeftGradient,
-                        _config.AccelerationBarColor.RightGradient,
-                        _config.AccelerationBarColor.RightGradient,
-                        _config.AccelerationBarColor.LeftGradient
-                );
-            }
-
-            drawList.AddRect(cursorPos, cursorPos + _config.DualCastSize, 0xFF000000);
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawVerstoneProc()
         {
-            var duration = Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1235).Duration);
-
-            if (duration == 0)
-            {
-                return;
-            }
+            var duration = (int)Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1235).Duration);
 
             var position = new Vector2(
-                OriginX - _config.HorizontalPadding - _config.DualCastSize.X,
-                OriginY + _config.DualCastOffset.Y + _config.DualCastSize.Y / 2f + _config.ProcsHeight / 2f
+                CenterX + _config.Position.X + _config.VerstoneBarOffset.X,
+                CenterY + _config.Position.Y + _config.VerstoneBarOffset.Y - _config.VerstoneBarSize.Y / 2f
             );
 
-            var scale = duration / 30f;
-            DrawTimerBar(position, scale, _config.ProcsHeight, _config.VerstoneColor, true);
+            DrawCustomBar(position, _config.VerstoneBarSize, _config.VerstoneColor, duration, 30, 0, _config.InvertVerstoneBar, _config.ShowVerstoneText);
         }
 
         private void DrawVerfireProc()
         {
-            var duration = Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1234).Duration);
+            var duration = (int)Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1234).Duration);
 
-            if (duration == 0)
+            var position = new Vector2(
+                CenterX + _config.Position.X + _config.VerfireBarOffset.X,
+                CenterY + _config.Position.Y + _config.VerfireBarOffset.Y - _config.VerfireBarSize.Y / 2f
+            );
+
+            DrawCustomBar(position, _config.VerfireBarSize, _config.VerfireColor, duration, 30, 0, _config.InvertVerfireBar, _config.ShowVerfireText);
+        }
+
+        private void DrawCustomBar(
+            Vector2 position,
+            Vector2 size,
+            PluginConfigColor color,
+            int value,
+            int max,
+            float thresholdRatio,
+            bool inverted,
+            bool showText)
+        {
+            var builder = BarBuilder.Create(position, size)
+                .AddInnerBar(value, max, color.Map)
+                .SetFlipDrainDirection(inverted);
+
+            if (showText)
+            {
+                var textPos = inverted ? BarTextPosition.CenterRight : BarTextPosition.CenterLeft;
+                builder.SetTextMode(BarTextMode.Single);
+                builder.SetText(textPos, BarTextType.Current);
+            }
+
+            var drawList = ImGui.GetWindowDrawList();
+            builder.Build().Draw(drawList, PluginConfiguration);
+
+            // threshold marker
+            if (thresholdRatio <= 0)
             {
                 return;
             }
 
-            var position = new Vector2(
-                OriginX + _config.HorizontalPadding + _config.DualCastSize.X,
-                OriginY + _config.DualCastOffset.Y + _config.DualCastSize.Y / 2f - _config.ProcsHeight / 2f
+            var pos = new Vector2(
+                position.X + size.X * thresholdRatio,
+                position.Y + size.Y
             );
 
-            var scale = duration / 30f;
-            DrawTimerBar(position, scale, _config.ProcsHeight, _config.VerfireColor, false);
-        }
-
-        private void DrawTimerBar(Vector2 position, float scale, float height, PluginConfigColor color, bool inverted)
-        {
-            var drawList = ImGui.GetWindowDrawList();
-            var size = new Vector2((_config.ManaBarSize.X / 2f - _config.DualCastSize.X - _config.HorizontalPadding * 2f) * scale, height);
-            size.X = Math.Max(1, size.X);
-
-            var startPoint = inverted ? position - size : position;
-            var leftColor = inverted ? color.RightGradient : color.LeftGradient;
-            var rightColor = inverted ? color.LeftGradient : color.RightGradient;
-
             drawList.AddRectFilledMultiColor(
-                startPoint,
-                startPoint + size,
-                leftColor,
-                rightColor,
-                rightColor,
-                leftColor
+                pos,
+                pos - new Vector2(3, size.Y),
+                0xFF000000,
+                0x00000000,
+                0x00000000,
+                0xFF000000
             );
         }
     }
@@ -338,144 +273,181 @@ namespace DelvUI.Interface
     {
         [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
         [Order(0)]
-        public Vector2 Position = new Vector2(0, -2);
+        public Vector2 Position = new Vector2(0, 0);
 
-        [DragInt("Horizontal Padding", max = 1000)]
-        [Order(5)]
-        public int HorizontalPadding = 2;
-
+        #region mana bar
         [DragFloat2("Mana Bar Size", max = 2000f)]
-        [Order(10)]
-        public Vector2 ManaBarSize = new Vector2(253, 20);
+        [Order(5)]
+        public Vector2 ManaBarSize = new Vector2(254, 20);
 
         [DragFloat2("Mana Bar Offset", min = -2000f, max = 2000f)]
-        [Order(15)]
-        public Vector2 ManaBarOffset = new Vector2(0, 0);
+        [Order(10)]
+        public Vector2 ManaBarOffset = new Vector2(0, 448);
 
         [Checkbox("Show Mana Value")]
-        [Order(20)]
+        [Order(15)]
         public bool ShowManaValue = true;
 
-        [CollapseControl(25, 0)]
+        [CollapseControl(20, 0)]
         [Checkbox("Show Mana Threshold Marker")] public bool ShowManaThresholdMarker = true;
 
         [DragInt("Mana Threshold Marker Value", max = 10000)]
         [CollapseWith(0, 0)]
         public int ManaThresholdValue = 2600;
 
+        [ColorEdit4("Mana Bar Color")]
+        [Order(20)]
+        public PluginConfigColor ManaBarColor = new PluginConfigColor(new(0f / 255f, 142f / 255f, 254f / 255f, 100f / 100f));
+        #endregion
 
+        #region balance bar
         [DragFloat2("Balance Bar Offset", min = -2000f, max = 2000f)]
-        [Order(30)]
-        public Vector2 BalanceBarOffset = new Vector2(0, -42);
+        [Order(25)]
+        public Vector2 BalanceBarOffset = new Vector2(0, 426);
 
         [DragFloat2("Balance Bar Size", max = 2000f)]
+        [Order(30)]
+        public Vector2 BalanceBarSize = new Vector2(22, 20);
+
+        [ColorEdit4("Balance Bar Color")]
         [Order(35)]
-        public Vector2 BalanceBarSize = new Vector2(21, 20);
+        public PluginConfigColor BalanceBarColor = new PluginConfigColor(new(195f / 255f, 35f / 255f, 35f / 255f, 100f / 100f));
+        #endregion
 
-
+        #region white mana bar
         [DragFloat2("White Mana Bar Offset", min = -2000f, max = 2000f)]
         [Order(40)]
-        public Vector2 WhiteManaBarOffset = new Vector2(-13, -42);
+        public Vector2 WhiteManaBarOffset = new Vector2(-127, 426);
 
         [DragFloat2("White Mana Bar Size", max = 2000f)]
         [Order(45)]
         public Vector2 WhiteManaBarSize = new Vector2(114, 20);
 
         [Checkbox("Show White Mana Value")]
-        [CollapseControl(50, 1)]
+        [Order(50)]
         public bool ShowWhiteManaValue = true;
 
         [Checkbox("Invert White Mana Bar")]
-        [CollapseWith(0, 1)]
+        [Order(55)]
         public bool WhiteManaBarInverted = true;
 
+        [ColorEdit4("White Mana Bar Color")]
+        [Order(60)]
+        public PluginConfigColor WhiteManaBarColor = new PluginConfigColor(new(221f / 255f, 212f / 255f, 212f / 255f, 100f / 100f));
+        #endregion
 
+        #region black mana bar
         [DragFloat2("Black Mana Bar Offset", min = -2000f, max = 2000f)]
-        [Order(55)]
-        public Vector2 BlackManaBarOffset = new Vector2(13, -42);
+        [Order(65)]
+        public Vector2 BlackManaBarOffset = new Vector2(13, 426);
 
         [DragFloat2("Black Mana Bar Size", max = 2000f)]
-        [Order(60)]
+        [Order(70)]
         public Vector2 BlackManaBarSize = new Vector2(114, 20);
 
         [Checkbox("Show Black Mana Value")]
-        [CollapseControl(65, 2)]
+        [Order(75)]
         public bool ShowBlackManaValue = true;
 
         [Checkbox("Invert Black Mana Bar")]
-        [CollapseWith(0, 2)]
+        [Order(80)]
         public bool BlackManaBarInverted = false;
 
+        [ColorEdit4("Black Mana Bar Color")]
+        [Order(85)]
+        public PluginConfigColor BlackManaBarColor = new PluginConfigColor(new(60f / 255f, 81f / 255f, 197f / 255f, 100f / 100f));
+        #endregion
+
+        #region acceleration
+        [Checkbox("Show Acceleration Bar")]
+        [CollapseControl(90, 1)]
+        public bool ShowAcceleration = true;
 
         [DragFloat2("Acceleration Bar Offset", min = -2000f, max = 2000f)]
-        [Order(70)]
-        public Vector2 AccelerationBarOffset = new Vector2(0, -56);
+        [CollapseWith(0, 1)]
+        public Vector2 AccelerationBarOffset = new Vector2(0, 408);
 
         [DragFloat2("Acceleration Size", max = 2000f)]
-        [Order(75)]
-        public Vector2 AccelerationBarSize = new Vector2(83, 12);
+        [CollapseWith(5, 1)]
+        public Vector2 AccelerationBarSize = new Vector2(254, 12);
 
+        [DragInt("Acceleration Padding", max = 1000)]
+        [CollapseWith(10, 1)]
+        public int AccelerationBarPadding = 2;
 
+        [ColorEdit4("Acceleration Bar Color")]
+        [CollapseWith(15, 1)]
+        public PluginConfigColor AccelerationBarColor = new PluginConfigColor(new(194f / 255f, 74f / 255f, 74f / 255f, 100f / 100f));
+        #endregion
+
+        #region dualcast
         [Checkbox("Show Dualcast")]
-        [CollapseControl(80, 3)]
+        [CollapseControl(95, 2)]
         public bool ShowDualCast = true;
 
         [DragFloat2("Dualcast Offset", min = -2000f, max = 2000f)]
-        [CollapseWith(0, 3)]
-        public Vector2 DualCastOffset = new Vector2(0, -74);
+        [CollapseWith(0, 2)]
+        public Vector2 DualCastOffset = new Vector2(0, 392);
 
         [DragFloat2("Dualcast Size", max = 2000f)]
-        [CollapseWith(5, 3)]
+        [CollapseWith(5, 2)]
         public Vector2 DualCastSize = new Vector2(16, 16);
 
+        [ColorEdit4("Dualcast Color")]
+        [CollapseWith(10, 2)]
+        public PluginConfigColor DualCastColor = new PluginConfigColor(new(204f / 255f, 17f / 255f, 255f / 95f, 100f / 100f));
+        #endregion
 
+        #region verstone
         [Checkbox("Show Verstone Procs")]
-        [Order(85)]
+        [CollapseControl(100, 3)]
         public bool ShowVerstoneProcs = true;
 
-        [Checkbox("Show Verfire Procs")]
-        [Order(90)]
-        public bool ShowVerfireProcs = true;
+        [Checkbox("Show Verstone Text")]
+        [CollapseWith(0, 3)]
+        public bool ShowVerstoneText = true;
 
-        [DragInt("Procs Height", max = 1000)]
-        [Order(95)]
-        public int ProcsHeight = 7;
+        [Checkbox("Invert Verstone Bar")]
+        [CollapseWith(5, 3)]
+        public bool InvertVerstoneBar = true;
 
+        [DragFloat2("Verstone Bar Offset", min = -2000, max = 2000f)]
+        [CollapseWith(10, 3)]
+        public Vector2 VerstoneBarOffset = new Vector2(-127, 392);
 
-        [ColorEdit4("Mana Bar Color")]
-        [Order(100)]
-        public PluginConfigColor ManaBarColor = new PluginConfigColor(new(0f / 255f, 142f / 255f, 254f / 255f, 100f / 100f));
-
-        [ColorEdit4("Mana Bar Below Threshold Color")]
-        [Order(105)]
-        public PluginConfigColor ManaBarBelowThresholdColor = new PluginConfigColor(new(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
-
-        [ColorEdit4("White Mana Bar Color")]
-        [Order(110)]
-        public PluginConfigColor WhiteManaBarColor = new PluginConfigColor(new(221f / 255f, 212f / 255f, 212f / 255f, 100f / 100f));
-
-        [ColorEdit4("Black Mana Bar Color")]
-        [Order(115)]
-        public PluginConfigColor BlackManaBarColor = new PluginConfigColor(new(60f / 255f, 81f / 255f, 197f / 255f, 100f / 100f));
-
-        [ColorEdit4("Balance Bar Color")]
-        [Order(120)]
-        public PluginConfigColor BalanceBarColor = new PluginConfigColor(new(195f / 255f, 35f / 255f, 35f / 255f, 100f / 100f));
-
-        [ColorEdit4("Acceleration Bar Color")]
-        [Order(125)]
-        public PluginConfigColor AccelerationBarColor = new PluginConfigColor(new(194f / 255f, 74f / 255f, 74f / 255f, 100f / 100f));
-
-        [ColorEdit4("Dualcast Color")]
-        [Order(130)]
-        public PluginConfigColor DualCastColor = new PluginConfigColor(new(204f / 255f, 17f / 255f, 255f / 95f, 100f / 100f));
+        [DragFloat2("Verstone Bar Size", max = 2000f)]
+        [CollapseWith(15, 3)]
+        public Vector2 VerstoneBarSize = new Vector2(117, 16);
 
         [ColorEdit4("Verstone Color")]
-        [Order(135)]
+        [CollapseWith(20, 3)]
         public PluginConfigColor VerstoneColor = new PluginConfigColor(new(228f / 255f, 188f / 255f, 145 / 255f, 90f / 100f));
+        #endregion
+
+        #region verfire
+        [Checkbox("Show Verfire Procs")]
+        [CollapseControl(105, 4)]
+        public bool ShowVerfireProcs = true;
+
+        [Checkbox("Show Verfire Text")]
+        [CollapseWith(0, 4)]
+        public bool ShowVerfireText = true;
+
+        [Checkbox("Invert Verfire Bar")]
+        [CollapseWith(5, 4)]
+        public bool InvertVerfireBar = false;
+
+        [DragFloat2("Verfire Bar Offset", min = -2000, max = 2000f)]
+        [CollapseWith(10, 4)]
+        public Vector2 VerfireBarOffset = new Vector2(10, 392);
+
+        [DragFloat2("Verfire Bar Size", max = 2000f)]
+        [CollapseWith(15, 4)]
+        public Vector2 VerfireBarSize = new Vector2(117, 16);
 
         [ColorEdit4("Verfire Color")]
-        [Order(140)]
+        [CollapseWith(20, 4)]
         public PluginConfigColor VerfireColor = new PluginConfigColor(new(238f / 255f, 119f / 255f, 17 / 255f, 90f / 100f));
+        #endregion
     }
 }
