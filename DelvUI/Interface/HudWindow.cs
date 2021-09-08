@@ -605,7 +605,7 @@ namespace DelvUI.Interface
             BattleChara.CastInfo castInfo = battleChara->SpellCastInfo;
             bool isCasting = castInfo.IsCasting > 0;
 
-            if (!isCasting)
+            if (!isCasting && !PluginConfiguration.ShowTestCastBar)
             {
                 return;
             }
@@ -614,6 +614,14 @@ namespace DelvUI.Interface
             ActionType currentCastType = castInfo.ActionType;
             float currentCastTime = castInfo.CurrentCastTime;
             float totalCastTime = castInfo.TotalCastTime;
+
+            if (PluginConfiguration.ShowTestCastBar)
+            {
+                currentCastId = 5;
+                currentCastType = ActionType.Spell;
+                currentCastTime = 2;
+                totalCastTime = 5;
+            }
 
             if (_lastPlayerUsedCast != null)
             {
