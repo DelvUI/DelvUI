@@ -347,7 +347,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Miasma Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 3)]
-        public Vector2 MiasmaPosition = new(-64, 389);
+        public Vector2 MiasmaPosition = new(-64, 393);
 
         [DragFloat2("Miasma Size", max = 2000f)]
         [CollapseWith(5, 3)]
