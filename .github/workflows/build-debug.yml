@@ -41,8 +41,8 @@ jobs:
       - name: Restore project dependencies
         run: dotnet restore --verbosity normal
 
-      - name: Run dotnet-format
-        run: dotnet format DelvUI --no-restore --verify-no-changes --verbosity minimal
+      # - name: Run dotnet-format
+      #   run: dotnet format DelvUI --no-restore --verify-no-changes --verbosity minimal
 
       - name: Build Debug
         run: dotnet build --no-restore --verbosity normal --configuration Debug
