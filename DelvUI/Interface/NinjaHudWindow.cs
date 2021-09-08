@@ -81,7 +81,7 @@ namespace DelvUI.Interface
             // this ensures that if the cooldown suddenly drops to 0.5s because the player has casted a mudra
             // then the depicted cooldown freezes while the ninjutsu is being casted
             // unfortunately I can't quite get this to work for kassatsu
-            // this is really only a problem if we wish to keep showing chunking during ninjutsu casts
+            // this is really only a problem if we wish to keep showing chunked bars during ninjutsu casts
             if (inNinjutsu)
             {
                 mudraCooldownInfo = _oldMudraCooldownInfo;
@@ -89,10 +89,6 @@ namespace DelvUI.Interface
             else
             {
                 _oldMudraCooldownInfo = mudraCooldownInfo;
-            }
-            if (haveTCJBuff)
-            {
-                PluginLog.Log($"In TCJ: {tcjBuff.First().StackCount}");
             }
             // if we are casting ninjutsu then show ninjutsu info
             // if we are in kassatsu, simply show "kassatsu" unless we are casting ninjutsu
