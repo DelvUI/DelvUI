@@ -86,6 +86,6 @@ namespace DelvUI.Config
             return (PluginConfigObject)method.Invoke(this, null);
         }
 
-        public PluginConfigObject GetConfiguration<T>() where T : PluginConfigObject => ConfigBaseNode.GetOrAddConfig<T>().ConfigObject;
+        public PluginConfigObject GetConfiguration<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigObject<T>();
     }
 }
