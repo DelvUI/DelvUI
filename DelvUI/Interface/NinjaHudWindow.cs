@@ -57,8 +57,8 @@ namespace DelvUI.Interface
 
         private void DrawMudraBars()
         {
-            var xPos = CenterX - _config.Position.X + _config.MudraBarOffset.X;
-            var yPos = CenterY + _config.Position.Y + _config.MudraBarOffset.Y;
+            float xPos = CenterX + _config.Position.X + _config.MudraBarPosition.X - _config.MudraBarSize.X / 2f;
+            float yPos = CenterY + _config.Position.Y + _config.MudraBarPosition.Y - _config.MudraBarSize.Y / 2f;     
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.MudraBarSize.Y, _config.MudraBarSize.X);
             
@@ -294,7 +294,7 @@ namespace DelvUI.Interface
 
         [Checkbox("Show Huton Gauge Border")]
         [CollapseWith(15, 0)]
-        public bool ShowHutonGaugeBorder = false;
+        public bool ShowHutonGaugeBorder = true;
 
         [Checkbox("Show Ninki Gauge")]
         [CollapseControl(10, 1)]
@@ -326,7 +326,7 @@ namespace DelvUI.Interface
 
         [Checkbox("Show Ninki Gauge Border")]
         [CollapseWith(30, 1)]
-        public bool ShowNinkiGaugeBorder = false;
+        public bool ShowNinkiGaugeBorder = true;
 
         [Checkbox("Show Trick Bar")]
         [CollapseControl(15, 2)]
@@ -359,7 +359,6 @@ namespace DelvUI.Interface
         [DragFloat2("Trick/Suiton Bar Position", min = -4000f, max = 4000f)]
         [Order(30)]
         public Vector2 TrickBarPosition = new(0, 470);
-        public Vector2 TrickBarOffset = new(0, 44);
 
         [Checkbox("Show Mudra Bars")]
         [CollapseControl(35, 4)]
@@ -377,9 +376,9 @@ namespace DelvUI.Interface
         [CollapseWith(5, 4)]
         public Vector2 MudraBarSize = new(254, 10);
 
-        [DragFloat2("Mudra Bar Offset", max = 2000f)]
+        [DragFloat2("Mudra Bar Position", max = 2000f)]
         [CollapseWith(10, 4)]
-        public Vector2 MudraBarOffset = new(0, -15);
+        public Vector2 MudraBarPosition = new(0, 406);
 
         [DragFloat("Mudra Bar Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(15, 4)]
