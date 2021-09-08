@@ -523,7 +523,7 @@ namespace DelvUI.Config.Tree
                 JsonConvert.SerializeObject(
                     ConfigObject,
                     Formatting.Indented,
-                    new JsonSerializerSettings {TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects}
+                    new JsonSerializerSettings { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects }
                 )
             );
         }
@@ -545,7 +545,7 @@ namespace DelvUI.Config.Tree
             {
                 MethodInfo methodInfo = GetType().GetMethod("LoadForType");
                 MethodInfo function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
-                ConfigObject = (PluginConfigObject) function.Invoke(this, new object[] {finalPath.FullName});
+                ConfigObject = (PluginConfigObject)function.Invoke(this, new object[] { finalPath.FullName });
             }
         }
 
@@ -580,7 +580,7 @@ namespace DelvUI.Config.Tree
         {
             Draw(ref changed, MainField, 0);
 
-            if (CategoryId != -1 && (bool) MainField.GetValue(ConfigObject))
+            if (CategoryId != -1 && (bool)MainField.GetValue(ConfigObject))
             {
                 ImGui.BeginGroup();
                 ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 2));
@@ -612,7 +612,7 @@ namespace DelvUI.Config.Tree
             {
                 if (attribute is CheckboxAttribute checkboxAttribute)
                 {
-                    bool boolVal = (bool) fieldVal;
+                    bool boolVal = (bool)fieldVal;
 
                     if (ImGui.Checkbox(checkboxAttribute.friendlyName, ref boolVal))
                     {
@@ -622,7 +622,7 @@ namespace DelvUI.Config.Tree
                 }
                 else if (attribute is DragFloatAttribute dragFloatAttribute)
                 {
-                    float floatVal = (float) fieldVal;
+                    float floatVal = (float)fieldVal;
 
                     if (ImGui.DragFloat(dragFloatAttribute.friendlyName, ref floatVal, dragFloatAttribute.velocity, dragFloatAttribute.min, dragFloatAttribute.max))
                     {
@@ -632,7 +632,7 @@ namespace DelvUI.Config.Tree
                 }
                 else if (attribute is DragIntAttribute dragIntAttribute)
                 {
-                    int intVal = (int) fieldVal;
+                    int intVal = (int)fieldVal;
 
                     if (ImGui.DragInt(dragIntAttribute.friendlyName, ref intVal, dragIntAttribute.velocity, dragIntAttribute.min, dragIntAttribute.max))
                     {
@@ -642,7 +642,7 @@ namespace DelvUI.Config.Tree
                 }
                 else if (attribute is DragFloat2Attribute dragFloat2Attribute)
                 {
-                    Vector2 floatVal = (Vector2) fieldVal;
+                    Vector2 floatVal = (Vector2)fieldVal;
 
                     if (ImGui.DragFloat2(dragFloat2Attribute.friendlyName, ref floatVal, dragFloat2Attribute.velocity, dragFloat2Attribute.min, dragFloat2Attribute.max))
                     {
@@ -652,7 +652,7 @@ namespace DelvUI.Config.Tree
                 }
                 else if (attribute is DragInt2Attribute dragInt2Attribute)
                 {
-                    Vector2 intVal = (Vector2) fieldVal;
+                    Vector2 intVal = (Vector2)fieldVal;
 
                     if (ImGui.DragFloat2(dragInt2Attribute.friendlyName, ref intVal, dragInt2Attribute.velocity, dragInt2Attribute.min, dragInt2Attribute.max))
                     {
@@ -662,7 +662,7 @@ namespace DelvUI.Config.Tree
                 }
                 else if (attribute is InputTextAttribute inputTextAttribute)
                 {
-                    string stringVal = (string) fieldVal;
+                    string stringVal = (string)fieldVal;
 
                     if (ImGui.InputText(inputTextAttribute.friendlyName, ref stringVal, inputTextAttribute.maxLength))
                     {
@@ -672,7 +672,7 @@ namespace DelvUI.Config.Tree
                 }
                 else if (attribute is ColorEdit4Attribute colorEdit4Attribute)
                 {
-                    PluginConfigColor colorVal = (PluginConfigColor) fieldVal;
+                    PluginConfigColor colorVal = (PluginConfigColor)fieldVal;
                     Vector4 vector = colorVal.Vector;
 
                     if (ImGui.ColorEdit4(colorEdit4Attribute.friendlyName, ref vector))
