@@ -95,7 +95,7 @@ namespace DelvUI.Interface
 
         private MpTickHelper _mpTickHelper;
         public bool IsVisible = true;
-        private Vector2 Center = new Vector2(CenterX, CenterY);
+        private readonly Vector2 Center = new(CenterX, CenterY);
 
         protected TankHudConfig ConfigTank => (TankHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new TankHudConfig());
         protected GeneralHudConfig ConfigGeneral => (GeneralHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new GeneralHudConfig());
@@ -228,7 +228,6 @@ namespace DelvUI.Interface
 
         private Vector2 CalculatePosition(Vector2 position, Vector2 size) => Center + position - size / 2f;
 
-
         protected virtual void DrawPrimaryResourceBar() => DrawPrimaryResourceBar(PrimaryResourceType.MP);
 
         protected virtual void DrawPrimaryResourceBar(PrimaryResourceType type = PrimaryResourceType.MP, PluginConfigColor partialFillColor = null)
@@ -240,43 +239,48 @@ namespace DelvUI.Interface
 
             int current = 0;
             int max = 0;
+
             switch (type)
             {
                 case PrimaryResourceType.MP:
-                    {
-                        current = actor.CurrentMp;
-                        max = actor.MaxMp;
-                    }
-                    break;
-                case PrimaryResourceType.CP:
-                    {
-                        current = actor.CurrentCp;
-                        max = actor.MaxCp;
-                    }
-                    break;
-                case PrimaryResourceType.GP:
-                    {
-                        current = actor.CurrentGp;
-                        max = actor.MaxGp;
-                    }
+                {
+                    current = actor.CurrentMp;
+                    max = actor.MaxMp;
+                }
+
                     break;
 
+                case PrimaryResourceType.CP:
+                {
+                    current = actor.CurrentCp;
+                    max = actor.MaxCp;
+                }
+
+                    break;
+
+                case PrimaryResourceType.GP:
+                {
+                    current = actor.CurrentGp;
+                    max = actor.MaxGp;
+                }
+
+                    break;
             }
 
             BarSize = ConfigGeneral.PrimaryResourceSize;
             Vector2 position = CalculatePosition(ConfigGeneral.PrimaryResourcePosition, ConfigGeneral.PrimaryResourceSize);
+
             BarBuilder builder = BarBuilder.Create(position, BarSize)
                                            .AddInnerBar(current, max, partialFillColor.Map)
                                            .SetBackgroundColor(ConfigGeneral.BarBackgroundColor.Background)
                                            .SetTextMode(BarTextMode.Single)
                                            .SetText(
-                                                BarTextPosition.CenterLeft,
-                                                BarTextType.Custom,
-                                                ConfigGeneral.ShowPrimaryResourceBarValue
-                                                    ? current.ToString()
-                                                    : ""
-                                            );
-
+                                               BarTextPosition.CenterLeft,
+                                               BarTextType.Custom,
+                                               ConfigGeneral.ShowPrimaryResourceBarValue
+                                                   ? current.ToString()
+                                                   : ""
+                                           );
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
@@ -726,7 +730,7 @@ namespace DelvUI.Interface
                 {
                     return;
                 }
-                
+
                 if (actor is not Chara || actor.ObjectKind == ObjectKind.Companion)
                 {
                     return;
@@ -757,7 +761,7 @@ namespace DelvUI.Interface
                 currentCastTime = 2;
                 totalCastTime = 5;
             }
-            
+
             if (_lastTargetUsedCast != null)
             {
                 if (!(_lastTargetUsedCast.CastId == currentCastId && _lastTargetUsedCast.ActionType == currentCastType))
@@ -1365,6 +1369,7 @@ namespace DelvUI.Interface
         public Vector2 PrimaryResourceSize = new(254, 20);
 
         #region Primary Resource Value
+
         [Checkbox("Show Primary Resource Value")]
         [CollapseControl(10, 0)]
         public bool ShowPrimaryResourceBarValue = false;
@@ -1372,9 +1377,11 @@ namespace DelvUI.Interface
         [DragFloat2("Primary Resource Text Offset", min = -4000f, max = 4000f)]
         [CollapseWith(0, 0)]
         public Vector2 PrimaryResourceBarTextOffset = new(0, 0);
+
         #endregion
 
         #region Primary Resource Threshold
+
         [Checkbox("Show Primary Resource Threshold Market")]
         [CollapseControl(15, 1)]
         public bool ShowPrimaryResourceBarThresholdMarker = false;
@@ -1382,9 +1389,11 @@ namespace DelvUI.Interface
         [DragInt("Primary Resource Threshold Value", min = 0, max = 10000)]
         [CollapseWith(0, 1)]
         public int PrimaryResourceBarThresholdValue = 7000;
+
         #endregion
 
         #region Colors
+
         [ColorEdit4("Bar Background Color")]
         [Order(20)]
         public PluginConfigColor BarBackgroundColor = new(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
@@ -1392,6 +1401,7 @@ namespace DelvUI.Interface
         [ColorEdit4("Bar Partial Fill Color")]
         [Order(25)]
         public PluginConfigColor BarPartialFillColor = new(new Vector4(0f / 255f, 205f / 255f, 230f / 255f, 100f / 100f));
+
         #endregion
     }
 }
