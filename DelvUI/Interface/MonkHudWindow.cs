@@ -352,7 +352,7 @@ namespace DelvUI.Interface
     [SubSection("Monk", 1)]
     public class MonkHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Offset" + "##Monk", min = -4000f, max = 4000f)]
         [Order(0)]
         public Vector2 Position = new(160, 460);
 
@@ -361,15 +361,15 @@ namespace DelvUI.Interface
         [CollapseControl(5, 0)]
         public bool ShowDemolishBar = true;
 
-        [DragFloat2("Demolish Bar Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##Demolish", min = -4000f, max = 4000f)]
         [CollapseWith(0, 0)]
-        public Vector2 DemolishBarPosition = new(176, 21);
+        public Vector2 DemolishBarPosition = new(-89, -11);
 
-        [DragFloat2("Demolish Bar Size", min = 0, max = 4000f)]
+        [DragFloat2("Size" + "##Demolish", min = 0, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 DemolishBarSize = new(111, 10);
+        public Vector2 DemolishBarSize = new(111, 20);
 
-        [ColorEdit4("Demolish Bar Fill Color")]
+        [ColorEdit4("Color" + "##Demolish")]
         [CollapseWith(10, 0)]
         public PluginConfigColor DemolishBarFillColor = new(new Vector4(246f / 255f, 169f / 255f, 255f / 255f, 100f / 100f));
         #endregion
@@ -379,15 +379,15 @@ namespace DelvUI.Interface
         [CollapseControl(10, 1)]
         public bool ShowChakraBar = true;
 
-        [DragFloat2("Chakbra Bar Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##Chakbra", min = -4000f, max = 4000f)]
         [CollapseWith(0, 1)]
-        public Vector2 ChakraBarPosition = new(33, 43);
+        public Vector2 ChakraBarPosition = new(-160, -33);
 
-        [DragFloat2("Chakra Bar Size", min = 0, max = 4000f)]
+        [DragFloat2("Size" + "##Chakbra", min = 0, max = 4000f)]
         [CollapseWith(5, 1)]
         public Vector2 ChakraBarSize = new(254, 20);
 
-        [ColorEdit4("Chakra Bar Fill Color")]
+        [ColorEdit4("Color" + "##Chakbra")]
         [CollapseWith(10, 1)]
         public PluginConfigColor ChakraBarFillColor = new(new Vector4(204f / 255f, 115f / 255f, 0f, 100f / 100f));
         #endregion
@@ -397,15 +397,15 @@ namespace DelvUI.Interface
         [CollapseControl(15, 2)]
         public bool ShowLeadenFistBar = true;
 
-        [DragFloat2("Leaden Fist Bar Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##LeadenFist", min = -4000f, max = 4000f)]
         [CollapseWith(0, 2)]
-        public Vector2 LeadenFistBarPosition = new(146, 21);
+        public Vector2 LeadenFistBarPosition = new(-160, -11);
 
-        [DragFloat2("Leaden Fist Bar Size", min = 0, max = 4000f)]
+        [DragFloat2("Size" + "##LeadenFist", min = 0, max = 4000f)]
         [CollapseWith(5, 2)]
         public Vector2 LeadenFistBarSize = new(28, 20);
 
-        [ColorEdit4("Leaden Fist Bar Fill Color")]
+        [ColorEdit4("Color" + "##LeadenFist")]
         [CollapseWith(10, 2)]
         public PluginConfigColor LeadenFistBarFillColor = new(new Vector4(255f / 255f, 0f, 0f, 100f / 100f));
         #endregion
@@ -415,19 +415,19 @@ namespace DelvUI.Interface
         [CollapseControl(20, 3)]
         public bool ShowTwinSnakesBar = true;
 
-        [DragFloat2("Twin Snakes Bar Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##TwinSnakes", min = -4000f, max = 4000f)]
         [CollapseWith(0, 3)]
-        public Vector2 TwinSnakesBarPosition = new(33, 21);
+        public Vector2 TwinSnakesBarPosition = new(-231, -11);
 
-        [DragFloat2("Twin Snakes Bar Size", min = 0, max = 4000f)]
+        [DragFloat2("Size" + "##TwinSnakes", min = 0, max = 4000f)]
         [CollapseWith(5, 3)]
         public Vector2 TwinSnakesBarSize = new(111, 20);
 
-        [ColorEdit4("Twin Snakes Bar Fill Color")]
+        [ColorEdit4("Color" + "##TwinSnakes")]
         [CollapseWith(10, 3)]
         public PluginConfigColor TwinSnakesBarFillColor = new(new Vector4(227f / 255f, 255f / 255f, 64f / 255f, 100f / 100f));
 
-        [Checkbox("Twin Snakes Inverted")]
+        [Checkbox("Inverted" + "##TwinSnakes")]
         [CollapseWith(15, 3)]
         public bool TwinSnakesBarInverted = true;
         #endregion
@@ -437,19 +437,19 @@ namespace DelvUI.Interface
         [CollapseControl(25, 4)]
         public bool ShowRiddleofEarthBar = true;
 
-        [DragFloat2("Riddle of Earth Bar Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##RiddleofEarth", min = -4000f, max = 4000f)]
         [CollapseWith(0, 4)]
-        public Vector2 RiddleofEarthBarPosition = new(33, 65);
+        public Vector2 RiddleofEarthBarPosition = new(-229, -55);
 
-        [DragFloat2("Riddle of Earth Bar Size", min = 0, max = 4000f)]
+        [DragFloat2("Size" + "##RiddleofEarth", min = 0, max = 4000f)]
         [CollapseWith(5, 4)]
         public Vector2 RiddleofEarthBarSize = new(115, 20);
 
-        [ColorEdit4("Riddle of Earth Bar Fill Color")]
+        [ColorEdit4("Color" + "##RiddleofEarth")]
         [CollapseWith(10, 4)]
         public PluginConfigColor RiddleofEarthBarFillColor = new(new Vector4(157f / 255f, 59f / 255f, 255f / 255f, 100f / 100f));
 
-        [Checkbox("Riddle of Earth Inverted")]
+        [Checkbox("Inverted" + "##RiddleofEarth")]
         [CollapseWith(15, 4)]
         public bool RiddleofEarthInverted = true;
         #endregion
@@ -459,19 +459,19 @@ namespace DelvUI.Interface
         [CollapseControl(30, 5)]
         public bool ShowPerfectBalanceBar = true;
 
-        [DragFloat2("Perfect Balance Bar Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##PerfectBalance", min = -4000f, max = 4000f)]
         [CollapseWith(0, 5)]
-        public Vector2 PerfectBalanceBarPosition = new(150, 65);
+        public Vector2 PerfectBalanceBarPosition = new(-160, -55);
 
-        [DragFloat2("Perfect Balance Bar Size", min = 0, max = 4000f)]
+        [DragFloat2("Size" + "##PerfectBalance", min = 0, max = 4000f)]
         [CollapseWith(5, 5)]
         public Vector2 PerfectBalanceBarSize = new(20, 20);
 
-        [ColorEdit4("Perfect Balance Bar Fill Color")]
+        [ColorEdit4("Color" + "##PerfectBalance")]
         [CollapseWith(10, 5)]
         public PluginConfigColor PerfectBalanceBarFillColor = new(new Vector4(150f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
-        [Checkbox("Perfect Balance Inverted")]
+        [Checkbox("Inverted" + "##PerfectBalance")]
         [CollapseWith(15, 5)]
         public bool PerfectBalanceInverted = true;
         #endregion
@@ -481,33 +481,33 @@ namespace DelvUI.Interface
         [CollapseControl(35, 6)]
         public bool ShowTrueNorthBar = true;
 
-        [DragFloat2("True North Bar Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##TrueNorth", min = -4000f, max = 4000f)]
         [CollapseWith(0, 6)]
-        public Vector2 TrueNorthBarPosition = new(172, 65);
+        public Vector2 TrueNorthBarPosition = new(-91, -55);
 
-        [DragFloat2("True North Bar Size", min = 0, max = 4000f)]
+        [DragFloat2("Size" + "##TrueNorth", min = 0, max = 4000f)]
         [CollapseWith(5, 6)]
         public Vector2 TrueNorthBarSize = new(115, 20);
 
-        [ColorEdit4("True North Bar Fill Color")]
+        [ColorEdit4("Color" + "##TrueNorth")]
         [CollapseWith(10, 6)]
         public PluginConfigColor TrueNorthBarFillColor = new(new Vector4(255f / 255f, 225f / 255f, 189f / 255f, 100f / 100f));
         #endregion
 
         #region Forms
-        [Checkbox("Show Forms Bar")]
+        [Checkbox("Show Forms Bar" + "##Forms")]
         [CollapseControl(40, 7)]
         public bool ShowFormsBar = true;
 
-        [DragFloat2("Forms Bar Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##Forms", min = -4000f, max = 4000f)]
         [CollapseWith(0, 7)]
-        public Vector2 FormsBarPosition = new(33, 87);
+        public Vector2 FormsBarPosition = new(-160, -77);
 
-        [DragFloat2("Forms Bar Size", min = 0, max = 4000f)]
+        [DragFloat2("Size" + "##Forms", min = 0, max = 4000f)]
         [CollapseWith(5, 7)]
-        public Vector2 FormsBarSize = new(20, 20);
+        public Vector2 FormsBarSize = new(254, 20);
 
-        [ColorEdit4("Forms Bar Fill Color")]
+        [ColorEdit4("Color" + "##Forms")]
         [CollapseWith(10, 7)]
         public PluginConfigColor FormsBarFillColor = new(new Vector4(36f / 255f, 131f / 255f, 255f / 255f, 100f / 100f));
         #endregion

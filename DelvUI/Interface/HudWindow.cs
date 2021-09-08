@@ -95,8 +95,10 @@ namespace DelvUI.Interface
 
         private MpTickHelper _mpTickHelper;
         public bool IsVisible = true;
+        private Vector2 Center = new Vector2(CenterX, CenterY);
 
         protected TankHudConfig ConfigTank => (TankHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new TankHudConfig());
+        protected GeneralHudConfig ConfigGeneral => (GeneralHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new GeneralHudConfig());
 
         protected HudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration)
         {
@@ -224,36 +226,67 @@ namespace DelvUI.Interface
             DrawOutlinedText(text, new Vector2(cursorPos.X + HealthBarWidth - textSize.X - 5 + HealthBarTextRightXOffset, cursorPos.Y - 22 + HealthBarTextRightYOffset));
         }
 
-        protected virtual void DrawPrimaryResourceBar()
+        private Vector2 CalculatePosition(Vector2 position, Vector2 size) => Center + position - size / 2f;
+
+
+        protected virtual void DrawPrimaryResourceBar() => DrawPrimaryResourceBar(PrimaryResourceType.MP);
+
+        protected virtual void DrawPrimaryResourceBar(PrimaryResourceType type = PrimaryResourceType.MP, PluginConfigColor partialFillColor = null)
         {
+            partialFillColor ??= ConfigGeneral.BarPartialFillColor;
+
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            BarSize = new Vector2(PrimaryResourceBarWidth, PrimaryResourceBarHeight);
             PlayerCharacter actor = PluginInterface.ClientState.LocalPlayer;
-            float scale = (float)actor.CurrentMp / actor.MaxMp;
-            Vector2 cursorPos = new(CenterX - PrimaryResourceBarXOffset + 33, CenterY + PrimaryResourceBarYOffset - 16);
+
+            int current = 0;
+            int max = 0;
+            switch (type)
+            {
+                case PrimaryResourceType.MP:
+                    {
+                        current = actor.CurrentMp;
+                        max = actor.MaxMp;
+                    }
+                    break;
+                case PrimaryResourceType.CP:
+                    {
+                        current = actor.CurrentCp;
+                        max = actor.MaxCp;
+                    }
+                    break;
+                case PrimaryResourceType.GP:
+                    {
+                        current = actor.CurrentGp;
+                        max = actor.MaxGp;
+                    }
+                    break;
+
+            }
+
+            BarSize = ConfigGeneral.PrimaryResourceSize;
+            Vector2 position = CalculatePosition(ConfigGeneral.PrimaryResourcePosition, ConfigGeneral.PrimaryResourceSize);
+            BarBuilder builder = BarBuilder.Create(position, BarSize)
+                                           .AddInnerBar(current, max, partialFillColor.Map)
+                                           .SetBackgroundColor(ConfigGeneral.BarBackgroundColor.Background)
+                                           .SetTextMode(BarTextMode.Single)
+                                           .SetText(
+                                                BarTextPosition.CenterLeft,
+                                                BarTextType.Custom,
+                                                ConfigGeneral.ShowPrimaryResourceBarValue
+                                                    ? current.ToString()
+                                                    : ""
+                                            );
+
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + BarSize, 0x88000000);
-            drawList.AddRectFilledMultiColor(cursorPos, cursorPos + new Vector2(BarSize.X * scale, BarSize.Y), 0xFFE6CD00, 0xFFD8Df3C, 0xFFD8Df3C, 0xFFE6CD00);
-            drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
+            builder.Build().Draw(drawList, PluginConfiguration);
 
-            if (ShowPrimaryResourceBarThresholdMarker)
+            if (ConfigGeneral.ShowPrimaryResourceBarThresholdMarker)
             {
-                // threshold
-                Vector2 position = new(cursorPos.X + PrimaryResourceBarThresholdValue / 10000f * BarSize.X - 3, cursorPos.Y);
+                Vector2 pos = new(position.X + ConfigGeneral.PrimaryResourceBarThresholdValue / 10000f * BarSize.X - 3, position.Y);
                 Vector2 size = new(2, BarSize.Y);
-                drawList.AddRect(position, position + size, 0xFF000000);
+                drawList.AddRect(pos, pos + size, 0xFF000000);
             }
-
-            if (!ShowPrimaryResourceBarValue)
-            {
-                return;
-            }
-
-            // text
-            int mana = PluginInterface.ClientState.LocalPlayer.CurrentMp;
-            string text = $"{mana,0}";
-            DrawOutlinedText(text, new Vector2(cursorPos.X + 2 + PrimaryResourceBarTextXOffset, cursorPos.Y - 3 + PrimaryResourceBarTextYOffset));
         }
 
         protected virtual void DrawTargetBar()
@@ -1213,16 +1246,6 @@ namespace DelvUI.Interface
         protected int HealthBarTextRightXOffset => PluginConfiguration.HealthBarTextRightXOffset;
         protected int HealthBarTextRightYOffset => PluginConfiguration.HealthBarTextRightYOffset;
 
-        protected int PrimaryResourceBarHeight => PluginConfiguration.PrimaryResourceBarHeight;
-        protected int PrimaryResourceBarWidth => PluginConfiguration.PrimaryResourceBarWidth;
-        protected int PrimaryResourceBarXOffset => PluginConfiguration.PrimaryResourceBarXOffset;
-        protected int PrimaryResourceBarYOffset => PluginConfiguration.PrimaryResourceBarYOffset;
-        protected int PrimaryResourceBarTextXOffset => PluginConfiguration.PrimaryResourceBarTextXOffset;
-        protected int PrimaryResourceBarTextYOffset => PluginConfiguration.PrimaryResourceBarTextYOffset;
-        protected bool ShowPrimaryResourceBarValue => PluginConfiguration.ShowPrimaryResourceBarValue;
-        protected bool ShowPrimaryResourceBarThresholdMarker => PluginConfiguration.ShowPrimaryResourceBarThresholdMarker;
-        protected int PrimaryResourceBarThresholdValue => PluginConfiguration.PrimaryResourceBarThresholdValue;
-
         protected int TargetBarHeight => PluginConfiguration.TargetBarHeight;
         protected int TargetBarWidth => PluginConfiguration.TargetBarWidth;
         protected int TargetBarXOffset => PluginConfiguration.TargetBarXOffset;
@@ -1282,7 +1305,7 @@ namespace DelvUI.Interface
     [Serializable]
     [Section("Job Specific Bars")]
     [SubSection("Tank", 0)]
-    [SubSection("General", 1)]
+    [SubSection("General##Tank", 1)]
     public class TankHudConfig : PluginConfigObject
     {
         [Checkbox("Tank Stance Indicator Enabled")]
@@ -1290,5 +1313,57 @@ namespace DelvUI.Interface
 
         [DragInt("Tank Stance Indicator Width", min = 1, max = 6)]
         public int TankStanceIndicatorWidth = 2;
+    }
+
+    public enum PrimaryResourceType
+    {
+        MP,
+        CP,
+        GP,
+        None
+    }
+
+    [Section("Job Specific Bars")]
+    [SubSection("General", 0)]
+    [SubSection("General##General", 0)]
+    public class GeneralHudConfig : PluginConfigObject
+    {
+        [DragFloat2("Primary Resource Position", min = -4000f, max = 4000f)]
+        [Order(0)]
+        public Vector2 PrimaryResourcePosition = new(0, 448);
+
+        [DragFloat2("Primary Resource Bar Size", min = 0, max = 4000f)]
+        [Order(5)]
+        public Vector2 PrimaryResourceSize = new(254, 20);
+
+        #region Primary Resource Value
+        [Checkbox("Show Primary Resource Value")]
+        [CollapseControl(10, 0)]
+        public bool ShowPrimaryResourceBarValue = false;
+
+        [DragFloat2("Primary Resource Text Offset", min = -4000f, max = 4000f)]
+        [CollapseWith(0, 0)]
+        public Vector2 PrimaryResourceBarTextOffset = new(0, 0);
+        #endregion
+
+        #region Primary Resource Threshold
+        [Checkbox("Show Primary Resource Threshold Market")]
+        [CollapseControl(15, 1)]
+        public bool ShowPrimaryResourceBarThresholdMarker = false;
+
+        [DragInt("Primary Resource Threshold Value", min = 0, max = 10000)]
+        [CollapseWith(0, 1)]
+        public int PrimaryResourceBarThresholdValue = 7000;
+        #endregion
+
+        #region Colors
+        [ColorEdit4("Bar Background Color")]
+        [Order(20)]
+        public PluginConfigColor BarBackgroundColor = new(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
+
+        [ColorEdit4("Bar Partial Fill Color")]
+        [Order(25)]
+        public PluginConfigColor BarPartialFillColor = new(new Vector4(0f / 255f, 205f / 255f, 230f / 255f, 100f / 100f));
+        #endregion
     }
 }

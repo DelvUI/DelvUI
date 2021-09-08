@@ -34,9 +34,6 @@ namespace DelvUI.Config
         );
 
         [JsonIgnore]
-        private DalamudPluginInterface _pluginInterface;
-
-        [JsonIgnore]
         public TextureWrap BannerImage = null;
 
         [JsonIgnore]
@@ -123,8 +120,8 @@ namespace DelvUI.Config
 
         public bool ShowCastBar = true;
         public bool ShowCastTime = true;
-        public bool ShowPrimaryResourceBarThresholdMarker = false;
-        public bool ShowPrimaryResourceBarValue = false;
+        //public bool ShowPrimaryResourceBarThresholdMarker = false;
+        //public bool ShowPrimaryResourceBarValue = false;
         public bool ShowTargetActionIcon = true;
         public bool ShowTargetActionName = true;
 
@@ -151,13 +148,6 @@ namespace DelvUI.Config
         public int HealthBarWidth { get; set; } = 270;
         public int HealthBarXOffset { get; set; } = 160;
         public int HealthBarYOffset { get; set; } = 460;
-        public int PrimaryResourceBarHeight { get; set; } = 20;
-        public int PrimaryResourceBarWidth { get; set; } = 254;
-        public int PrimaryResourceBarXOffset { get; set; } = 160;
-        public int PrimaryResourceBarYOffset { get; set; } = 455;
-        public int PrimaryResourceBarTextXOffset { get; set; }
-        public int PrimaryResourceBarTextYOffset { get; set; }
-        public int PrimaryResourceBarThresholdValue { get; set; } = 7000;
         public int TargetBarHeight { get; set; } = 50;
         public int TargetBarWidth { get; set; } = 270;
         public int TargetBarXOffset { get; set; } = 160;
@@ -211,20 +201,19 @@ namespace DelvUI.Config
 
         public event EventHandler<EventArgs> ConfigChangedEvent;
 
-        public void Init(DalamudPluginInterface pluginInterface)
+        public void Init()
         {
-            _pluginInterface = pluginInterface;
             BuildColorMap();
         }
 
-        public static void WriteConfig(string filename, DalamudPluginInterface pluginInterface, PluginConfiguration config)
+        public static void WriteConfig(string filename, PluginConfiguration config)
         {
-            if (pluginInterface == null)
+            if (Plugin.GetPluginInterface() == null)
             {
                 return;
             }
 
-            var configDirectory = pluginInterface.GetPluginConfigDirectory();
+            var configDirectory = Plugin.GetPluginInterface().GetPluginConfigDirectory();
             var configFile = Path.Combine(configDirectory, filename + ".json");
 
             try
@@ -262,14 +251,14 @@ namespace DelvUI.Config
             }
         }
 
-        public static PluginConfiguration ReadConfig(string filename, DalamudPluginInterface pluginInterface)
+        public static PluginConfiguration ReadConfig(string filename)
         {
-            if (pluginInterface == null)
+            if (Plugin.GetPluginInterface() == null)
             {
                 return null;
             }
 
-            var configDirectory = pluginInterface.GetPluginConfigDirectory();
+            var configDirectory = Plugin.GetPluginInterface().GetPluginConfigDirectory();
             var configFile = Path.Combine(configDirectory, filename + ".json");
 
             try
@@ -343,7 +332,7 @@ namespace DelvUI.Config
         public void Save()
         {
             // TODO should not use the name explicitly here
-            WriteConfig("DelvUI", _pluginInterface, this);
+            WriteConfig("DelvUI", this);
 
             // call event when the config changes
             ConfigChangedEvent?.Invoke(this, null);
@@ -353,33 +342,30 @@ namespace DelvUI.Config
         {
             JobColorMap = new Dictionary<uint, Dictionary<string, uint>>
             {
-                [Jobs.PLD] =
-                    new()
-                    {
-                        ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD),
-                        ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD.AdjustColor(-10f)),
-                        ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD.AdjustColor(-.1f)),
-                        ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD.AdjustColor(.1f)),
-                        ["invuln"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD.AdjustColor(-.8f))
-                    },
-                [Jobs.WAR] =
-                    new()
-                    {
-                        ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR),
-                        ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(-10f)),
-                        ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(-.1f)),
-                        ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(.1f)),
-                        ["invuln"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(-.8f))
-                    },
-                [Jobs.DRK] =
-                    new()
-                    {
-                        ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK),
-                        ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK.AdjustColor(-10f)),
-                        ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK.AdjustColor(-.1f)),
-                        ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK.AdjustColor(.1f)),
-                        ["invuln"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK.AdjustColor(-.8f))
-                    },
+                [Jobs.PLD] = new()
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD.AdjustColor(-10f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD.AdjustColor(.1f)),
+                    ["invuln"] = ImGui.ColorConvertFloat4ToU32(JobColorPLD.AdjustColor(-.8f))
+                },
+                [Jobs.WAR] = new()
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(-10f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(.1f)),
+                    ["invuln"] = ImGui.ColorConvertFloat4ToU32(JobColorWAR.AdjustColor(-.8f))
+                },
+                [Jobs.DRK] = new()
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK.AdjustColor(-10f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK.AdjustColor(.1f)),
+                    ["invuln"] = ImGui.ColorConvertFloat4ToU32(JobColorDRK.AdjustColor(-.8f))
+                },
                 [Jobs.GNB] = new()
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorGNB),
@@ -437,14 +423,13 @@ namespace DelvUI.Config
                     ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorSAM.AdjustColor(-.1f)),
                     ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorSAM.AdjustColor(.1f))
                 },
-                [Jobs.NIN] =
-                    new()
-                    {
-                        ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN),
-                        ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN.AdjustColor(-10f)),
-                        ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN.AdjustColor(-.1f)),
-                        ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN.AdjustColor(.1f))
-                    },
+                [Jobs.NIN] = new()
+                {
+                    ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN),
+                    ["background"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN.AdjustColor(-10f)),
+                    ["gradientLeft"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN.AdjustColor(-.1f)),
+                    ["gradientRight"] = ImGui.ColorConvertFloat4ToU32(JobColorNIN.AdjustColor(.1f))
+                },
                 [Jobs.BRD] = new()
                 {
                     ["base"] = ImGui.ColorConvertFloat4ToU32(JobColorBRD),

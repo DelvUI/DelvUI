@@ -1,14 +1,15 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Numerics;
-using System.Reflection;
 using Dalamud.Interface;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
 using ImGuiScene;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Numerics;
+using System.Reflection;
 
 namespace DelvUI.Config.Tree
 {
@@ -71,10 +72,15 @@ namespace DelvUI.Config.Tree
 
                     ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
 
+                    bool selected = false;
+
                     foreach (SectionNode selectionNode in children)
                     {
+
                         if (ImGui.Selectable(selectionNode.Name, selectionNode.Selected))
                         {
+                            selected = true;
+
                             selectionNode.Selected = true;
 
                             foreach (SectionNode otherNode in children.FindAll(x => x != selectionNode))
@@ -82,8 +88,13 @@ namespace DelvUI.Config.Tree
                                 otherNode.Selected = false;
                             }
                         }
+
                     }
 
+                    if (!selected && children.Any())
+                    {
+                        children[0].Selected = true;
+                    }
                     ImGui.EndChild();
                 }
 
@@ -99,19 +110,6 @@ namespace DelvUI.Config.Tree
                         selectionNode.Draw(ref changed);
                     }
                 }
-
-                // close button
-                Vector2 pos = ImGui.GetCursorPos();
-                ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 30, 0));
-                ImGui.PushFont(UiBuilder.IconFont);
-
-                if (ImGui.Button(FontAwesomeIcon.Times.ToIconString()))
-                {
-                    ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
-                }
-
-                ImGui.PopFont();
-                ImGui.SetCursorPos(pos);
 
                 ImGui.EndGroup(); // Right
             }
@@ -143,7 +141,17 @@ namespace DelvUI.Config.Tree
                 ImGui.SameLine();
 
                 if (ImGui.Button("Reset HUD"))
-                { }
+                {
+                    // save the old configuration window for use in the new ConfigurationManager
+                    ConfigurationWindow configurationWindow = ConfigurationManager.GetInstance().ConfigurationWindow;
+                    // make a new configuration from defaults
+                    ConfigurationManager.Initialize(true);
+                    ConfigurationManager.GetInstance().ConfigurationWindow = configurationWindow;
+                    // save the defaults to file
+                    ConfigurationManager.GetInstance().SaveConfigurations();
+                    // prevent the config window from closing
+                    ConfigurationManager.GetInstance().DrawConfigWindow = true;
+                }
 
                 ImGui.SameLine();
 
@@ -231,7 +239,7 @@ namespace DelvUI.Config.Tree
                 return;
             }
 
-            ImGui.BeginChild("item view", new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+            ImGui.BeginChild("item view", new Vector2(0, -ImGui.GetFrameHeightWithSpacing()), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse); // Leave room for 1 line below us
 
             {
                 if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
@@ -250,7 +258,18 @@ namespace DelvUI.Config.Tree
                     }
 
                     ImGui.EndTabBar();
+                    // close button
+                    Vector2 pos = ImGui.GetCursorPos();
+                    ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 20, 0));
+                    ImGui.PushFont(UiBuilder.IconFont);
 
+                    if (ImGui.Button(FontAwesomeIcon.Times.ToIconString()))
+                    {
+                        ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
+                    }
+
+                    ImGui.PopFont();
+                    ImGui.SetCursorPos(pos);
                 }
             }
 

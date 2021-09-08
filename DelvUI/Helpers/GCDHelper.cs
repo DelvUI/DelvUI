@@ -11,21 +11,32 @@ namespace DelvUI.Helpers
         {
             [Jobs.GNB] = 16137, // Keen Edge
             [Jobs.WAR] = 31,    // Heavy Swing
+            [Jobs.MRD] = 31,    // Heavy Swing
             [Jobs.DRK] = 3617,  // Hard Slash
             [Jobs.PLD] = 9,     // Fast Blade
+            [Jobs.GLD] = 9,     // Fast Blade
+
             [Jobs.SCH] = 163,   // Ruin
             [Jobs.AST] = 3596,  // Malefic
             [Jobs.WHM] = 119,   // Stone
+            [Jobs.CNJ] = 119,   // Stone
+
             [Jobs.BRD] = 97,    // Heavy Shot
+            [Jobs.ARC] = 97,    // Heavy Shot
             [Jobs.DNC] = 15989, // Cascade
             [Jobs.MCH] = 2866,  // Split Shot
+
             [Jobs.SMN] = 163,   // Ruin
+            [Jobs.ACN] = 163,   // Ruin
             [Jobs.RDM] = 7504,  // Riposte
             [Jobs.BLM] = 142,   // Blizzard
+            [Jobs.THM] = 142,   // Blizzard
+
             [Jobs.SAM] = 7477,  // Hakaze
             [Jobs.NIN] = 2240,  // Spinning Edge
             [Jobs.MNK] = 53,    // Bootshine
             [Jobs.DRG] = 75,    // True Thrust
+
             [Jobs.BLU] = 11385  // Water Cannon
         };
 
