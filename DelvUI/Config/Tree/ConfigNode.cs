@@ -223,7 +223,7 @@ namespace DelvUI.Config.Tree
 
         public ConfigPageNode GetOrAddConfig<T>() where T : PluginConfigObject
         {
-            object[] attributes = typeof(T).GetCustomAttributes(false);
+            object[] attributes = typeof(T).GetCustomAttributes(true);
 
             PluginLog.Log("\n\nBASE NODE");
 
@@ -334,7 +334,7 @@ namespace DelvUI.Config.Tree
 
         public ConfigPageNode GetOrAddConfig<T>() where T : PluginConfigObject
         {
-            object[] attributes = typeof(T).GetCustomAttributes(false);
+            object[] attributes = typeof(T).GetCustomAttributes(true);
             PluginLog.Log("\n\nSECTION NODE");
 
 
@@ -441,7 +441,7 @@ namespace DelvUI.Config.Tree
         public override ConfigPageNode GetOrAddConfig<T>()
         {
             var type = typeof(T);
-            object[] attributes = type.GetCustomAttributes(false);
+            object[] attributes = type.GetCustomAttributes(true);
 
             foreach (object attribute in attributes)
             {

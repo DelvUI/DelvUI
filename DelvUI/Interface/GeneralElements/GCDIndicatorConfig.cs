@@ -12,19 +12,19 @@ namespace DelvUI.Interface.GeneralElements
     public class GCDIndicatorConfig : MovablePluginConfigObject
     {
         [Checkbox("Always Show")]
-        [Order(0)]
+        [Order(20)]
         public bool AlwaysShow = false;
 
         [Checkbox("Show Border")]
-        [Order(5)]
+        [Order(25)]
         public bool ShowBorder = false;
 
         [Checkbox("Vertical Mode")]
-        [Order(10)]
+        [Order(30)]
         public bool VerticalMode = false;
 
         [ColorEdit4("Color")]
-        [Order(15)]
+        [Order(35)]
         public PluginConfigColor Color = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f));
 
         public GCDIndicatorConfig(Vector2 position, Vector2 size)

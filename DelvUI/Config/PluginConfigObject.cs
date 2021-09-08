@@ -1,4 +1,5 @@
-﻿using ImGuiNET;
+﻿using DelvUI.Config.Attributes;
+using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,15 +10,11 @@ using System.Runtime.CompilerServices;
 namespace DelvUI.Config
 {
     [Serializable]
-    public abstract class PluginConfigObject : INotifyPropertyChanged
+    public abstract class PluginConfigObject
     {
+        [Checkbox("Enabled")]
+        [Order(0)]
         public bool Enabled = true;
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
 
         protected bool ColorEdit4(string label, ref PluginConfigColor color)
         {
@@ -50,37 +47,13 @@ namespace DelvUI.Config
     [Serializable]
     public abstract class MovablePluginConfigObject : PluginConfigObject
     {
-        [JsonIgnore] protected Vector2 _position = Vector2.Zero;
-        public Vector2 Position
-        {
-            get => _position;
-            set
-            {
-                if (_position == value)
-                {
-                    return;
-                }
+        [DragInt2("Position", min = -4000, max = 4000)]
+        [Order(5)]
+        public Vector2 Position = Vector2.Zero;
 
-                _position = value;
-                NotifyPropertyChanged();
-            }
-        }
-
-        [JsonIgnore] protected Vector2 _size = Vector2.Zero;
-        public Vector2 Size
-        {
-            get => _size;
-            set
-            {
-                if (_position == value)
-                {
-                    return;
-                }
-
-                _size = value;
-                NotifyPropertyChanged();
-            }
-        }
+        [DragInt2("Size", min = -4000, max = 4000)]
+        [Order(10)]
+        public Vector2 Size = Vector2.Zero;
     }
 
     [Serializable]
