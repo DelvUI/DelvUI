@@ -166,6 +166,11 @@ namespace DelvUI
             _pluginInterface.UiBuilder.OverrideGameCursor = false;
             _configurationWindow.Draw();
 
+            if (!_configurationWindow.IsVisible && _pluginConfiguration.ShowTestCastBar)
+            {
+                _pluginConfiguration.ShowTestCastBar = false;
+            }
+
             if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id)
             {
                 SwapJobs();
