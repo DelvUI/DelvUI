@@ -509,6 +509,10 @@ namespace DelvUI.Config
                                 ImGui.Text("Scholar");
                                 _changed |= ImGui.ColorEdit4("##JobColorSCH", ref _pluginConfiguration.JobColorSCH);
 
+                                ImGui.Text(""); //SPACING
+                                ImGui.Text("White Mage");
+                                _changed |= ImGui.ColorEdit4("##JobColorWHM", ref _pluginConfiguration.JobColorWHM);
+
                                 ImGui.EndChild();
                                 ImGui.SameLine();
                                 ImGui.BeginChild("leftpa2ne", new Vector2(ImGui.GetWindowWidth() / 2, 0), false);
@@ -542,6 +546,11 @@ namespace DelvUI.Config
                                 ImGui.Text(""); //SPACING
                                 ImGui.Text("Machinist");
                                 _changed |= ImGui.ColorEdit4("##JobColorMCH", ref _pluginConfiguration.JobColorMCH);
+
+                                ImGui.Text(""); //SPACING
+                                ImGui.Text("Bard");
+                                _changed |= ImGui.ColorEdit4("##JobColorBRD", ref _pluginConfiguration.JobColorBRD);
+
                                 ImGui.EndChild();
                                 ImGui.SameLine();
                                 ImGui.BeginChild("leftpa2ne", new Vector2(ImGui.GetWindowWidth() / 2, 0), false);
