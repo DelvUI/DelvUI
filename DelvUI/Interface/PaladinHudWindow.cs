@@ -64,8 +64,8 @@ namespace DelvUI.Interface
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             PlayerCharacter actor = PluginInterface.ClientState.LocalPlayer;
 
-            var posX = OriginX + _config.ManaBarPosition.X - _config.ManaBarSize.X / 2f;
-            var posY = OriginY + _config.ManaBarPosition.Y - _config.ManaBarSize.Y / 2f;
+            float posX = OriginX + _config.ManaBarPosition.X - _config.ManaBarSize.X / 2f;
+            float posY = OriginY + _config.ManaBarPosition.Y - _config.ManaBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(posX, posY, _config.ManaBarSize.Y, _config.ManaBarSize.X).SetBackgroundColor(EmptyColor["background"]);
 
@@ -80,7 +80,7 @@ namespace DelvUI.Interface
 
             if (_config.ShowManaBarText)
             {
-                var formattedManaText = TextTags.GenerateFormattedTextFromTags(actor, "[mana:current-short]");
+                string formattedManaText = TextTags.GenerateFormattedTextFromTags(actor, "[mana:current-short]");
 
                 builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterLeft, BarTextType.Custom, formattedManaText);
             }
@@ -93,8 +93,8 @@ namespace DelvUI.Interface
         {
             PLDGauge gauge = PluginInterface.ClientState.JobGauges.Get<PLDGauge>();
 
-            var xPos = OriginX + _config.OathGaugePosition.X - _config.OathGaugeSize.X / 2f;
-            var yPos = OriginY + _config.OathGaugePosition.Y - _config.OathGaugeSize.Y / 2f;
+            float xPos = OriginX + _config.OathGaugePosition.X - _config.OathGaugeSize.X / 2f;
+            float yPos = OriginY + _config.OathGaugePosition.Y - _config.OathGaugeSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.OathGaugeSize.Y, _config.OathGaugeSize.X)
                                            .SetChunks(2)
@@ -116,14 +116,14 @@ namespace DelvUI.Interface
             IEnumerable<StatusEffect> fightOrFlightBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 76);
             IEnumerable<StatusEffect> requiescatBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1368);
 
-            var xPos = OriginX + _config.BuffBarPosition.X - _config.BuffBarSize.X / 2f;
-            var yPos = OriginY + _config.BuffBarPosition.Y - _config.BuffBarSize.Y / 2f;
+            float xPos = OriginX + _config.BuffBarPosition.X - _config.BuffBarSize.X / 2f;
+            float yPos = OriginY + _config.BuffBarPosition.Y - _config.BuffBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.BuffBarSize.Y, _config.BuffBarSize.X).SetBackgroundColor(EmptyColor["background"]);
 
             if (fightOrFlightBuff.Any())
             {
-                var fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().Duration);
+                float fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().Duration);
                 builder.AddInnerBar(fightOrFlightDuration, 25, _config.FightOrFlightColor.Map);
 
                 if (_config.ShowBuffBarText)
@@ -134,7 +134,7 @@ namespace DelvUI.Interface
 
             if (requiescatBuff.Any())
             {
-                var requiescatDuration = Math.Abs(requiescatBuff.First().Duration);
+                float requiescatDuration = Math.Abs(requiescatBuff.First().Duration);
                 builder.AddInnerBar(requiescatDuration, 12, _config.RequiescatColor.Map);
 
                 if (_config.ShowBuffBarText)
@@ -150,10 +150,10 @@ namespace DelvUI.Interface
         private void DrawAtonementBar()
         {
             IEnumerable<StatusEffect> atonementBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1902);
-            var stackCount = atonementBuff.Any() ? atonementBuff.First().StackCount : 0;
+            int stackCount = atonementBuff.Any() ? atonementBuff.First().StackCount : 0;
 
-            var xPos = OriginX + _config.AtonementBarPosition.X - _config.AtonementBarSize.X / 2f;
-            var yPos = OriginY + _config.AtonementBarPosition.Y - _config.AtonementBarSize.Y / 2f;
+            float xPos = OriginX + _config.AtonementBarPosition.X - _config.AtonementBarSize.X / 2f;
+            float yPos = OriginY + _config.AtonementBarPosition.Y - _config.AtonementBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.AtonementBarSize.Y, _config.AtonementBarSize.X)
                                            .SetChunks(3)
@@ -176,10 +176,10 @@ namespace DelvUI.Interface
 
             StatusEffect goringBlade = target.StatusEffects.FirstOrDefault(o => o.EffectId == 725 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
 
-            var duration = Math.Abs(goringBlade.Duration);
+            float duration = Math.Abs(goringBlade.Duration);
 
-            var xPos = OriginX + _config.GoringBladeBarPosition.X - _config.GoringBladeBarSize.X / 2f;
-            var yPos = OriginY + _config.GoringBladeBarPosition.Y - _config.GoringBladeBarSize.Y / 2f;
+            float xPos = OriginX + _config.GoringBladeBarPosition.X - _config.GoringBladeBarSize.X / 2f;
+            float yPos = OriginY + _config.GoringBladeBarPosition.Y - _config.GoringBladeBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.GoringBladeBarSize.Y, _config.GoringBladeBarSize.X)
                                            .AddInnerBar(duration, 21, _config.GoringBladeColor.Map)
@@ -202,6 +202,7 @@ namespace DelvUI.Interface
     public class PaladinHudConfig : PluginConfigObject
     {
         [DragFloat2("Base Position", min = -4000f, max = 4000f)]
+        [Order(0)]
         public Vector2 Position = new(0, 0);
 
         [Checkbox("Show Mana Bar")]
