@@ -587,7 +587,7 @@ namespace DelvUI.Interface
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
 
             PlayerCharacter actor = PluginInterface.ClientState.LocalPlayer;
-            BattleChara* battleChara = (BattleChara*) actor.Address;
+            BattleChara* battleChara = (BattleChara*)actor.Address;
             BattleChara.CastInfo castInfo = battleChara->SpellCastInfo;
             var isCasting = castInfo.IsCasting > 0;
 
@@ -718,7 +718,7 @@ namespace DelvUI.Interface
                     return;
                 }
 
-                battleChara = (BattleChara*) actor.Address;
+                battleChara = (BattleChara*)actor.Address;
                 castInfo = battleChara->SpellCastInfo;
 
                 var isCasting = castInfo.IsCasting > 0;
@@ -736,7 +736,7 @@ namespace DelvUI.Interface
             else
             {
                 PlayerCharacter temp = PluginInterface.ClientState.LocalPlayer;
-                battleChara = (BattleChara*) temp.Address;
+                battleChara = (BattleChara*)temp.Address;
                 castInfo = battleChara->SpellCastInfo;
                 currentCastId = 5;
                 currentCastType = ActionType.Spell;
