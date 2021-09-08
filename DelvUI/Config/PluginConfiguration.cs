@@ -120,8 +120,8 @@ namespace DelvUI.Config
 
         public bool ShowCastBar = true;
         public bool ShowCastTime = true;
-        public bool ShowPrimaryResourceBarThresholdMarker = false;
-        public bool ShowPrimaryResourceBarValue = false;
+        //public bool ShowPrimaryResourceBarThresholdMarker = false;
+        //public bool ShowPrimaryResourceBarValue = false;
         public bool ShowTargetActionIcon = true;
         public bool ShowTargetActionName = true;
 
@@ -148,13 +148,6 @@ namespace DelvUI.Config
         public int HealthBarWidth { get; set; } = 270;
         public int HealthBarXOffset { get; set; } = 160;
         public int HealthBarYOffset { get; set; } = 460;
-        public int PrimaryResourceBarHeight { get; set; } = 20;
-        public int PrimaryResourceBarWidth { get; set; } = 254;
-        public int PrimaryResourceBarXOffset { get; set; } = 160;
-        public int PrimaryResourceBarYOffset { get; set; } = 455;
-        public int PrimaryResourceBarTextXOffset { get; set; }
-        public int PrimaryResourceBarTextYOffset { get; set; }
-        public int PrimaryResourceBarThresholdValue { get; set; } = 7000;
         public int TargetBarHeight { get; set; } = 50;
         public int TargetBarWidth { get; set; } = 270;
         public int TargetBarXOffset { get; set; } = 160;

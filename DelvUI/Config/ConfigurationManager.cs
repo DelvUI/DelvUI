@@ -35,6 +35,7 @@ namespace DelvUI.Config
         {
             PluginConfigObject[] configObjects =
             {
+                new GeneralHudConfig(),
                 new TankHudConfig(), new PaladinHudConfig(), new WarriorHudConfig(), new DarkKnightHudConfig(), new GunbreakerHudConfig(),
                 new WhiteMageHudConfig(), new ScholarHudConfig(), new AstrologianHudConfig(),
                 new MonkHudConfig(), new DragoonHudConfig(), new NinjaHudConfig(), new SamuraiHudConfig(),
