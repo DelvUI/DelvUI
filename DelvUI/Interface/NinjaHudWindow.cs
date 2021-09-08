@@ -62,34 +62,99 @@ namespace DelvUI.Interface
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.MudraBarSize.Y, _config.MudraBarSize.X);
             
+            // each of the 2 mudra charges has a cooldown of 20s
             float maximum = 40f;
+            // get the current cooldown and number of charges on mudras
             float mudraCooldownInfo = _spellHelper.GetSpellCooldown(2259);
+            int mudraStacks = _spellHelper.GetStackCount(2, 2259);
 
-            // if a ninjutsu is mid-cast, use old data
-            // because otherwise the cooldown will jump to 0.5s when hitting a mudra
+            // is the player casting ninjutsu or under kassatsu?
             IEnumerable<StatusEffect> ninjutsuBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 496);
-            if(ninjutsuBuff.Any())
+            IEnumerable<StatusEffect> kassatsuBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 497);
+            IEnumerable<StatusEffect> tcjBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1186);
+            bool haveMudraBuff = ninjutsuBuff.Any();
+            bool haveKassatsuBuff = kassatsuBuff.Any();
+            bool haveTCJBuff = tcjBuff.Any();
+            // for some reason (perhaps a slight delay), the mudras may be on cooldown before the "Mudra" buff is applied
+            // hence we check for either
+            bool inNinjutsu = mudraStacks == -2 || haveMudraBuff;
+            // this ensures that if the cooldown suddenly drops to 0.5s because the player has casted a mudra
+            // then the depicted cooldown freezes while the ninjutsu is being casted
+            // unfortunately I can't quite get this to work for kassatsu
+            // this is really only a problem if we wish to keep showing chunking during ninjutsu casts
+            if (inNinjutsu)
             {
                 mudraCooldownInfo = _oldMudraCooldownInfo;
-            } else
+            }
+            else
             {
                 _oldMudraCooldownInfo = mudraCooldownInfo;
             }
-
-            builder.SetChunks(2)
+            if(haveTCJBuff)
+            {
+                PluginLog.Log($"In TCJ: {tcjBuff.First().StackCount}");
+            }
+            // if we are casting ninjutsu then show ninjutsu info
+            // if we are in kassatsu, simply show "kassatsu" unless we are casting ninjutsu
+            // if we are in TCJ, simply show "ten chi jin" unless we are casting ninjutsu (this overrides kassatsu)
+            if (inNinjutsu || haveKassatsuBuff || haveTCJBuff)
+            {
+                string ninjutsuText = haveKassatsuBuff ? "KASSATSU" : "";
+                // determine which ninjutsu is being cast
+                // thanks to daemitus for pointing me in this direction
+                // NOTE: in ClientStructs it seems that StackCount and Param are switched
+                // if this ever breaks -- possibly due to a ClientStructs update -- try swapping them
+                if (ninjutsuBuff.Any())
+                {
+                    ninjutsuText = GenerateNinjutsuText(ninjutsuBuff.First().StackCount, haveKassatsuBuff, haveTCJBuff);
+                }
+                // notice that this approach will never display the third ninjutsu cast under TCJ
+                // as TCJ ends before the third ninjutsu is cast
+                if (haveTCJBuff)
+                {
+                    ninjutsuText = GenerateNinjutsuText(tcjBuff.First().StackCount, haveKassatsuBuff, haveTCJBuff);
+                }
+                PluginConfigColor barColor = haveTCJBuff ? _config.TCJBarColor : (haveKassatsuBuff ? _config.KassatsuBarColor : _config.MudraBarColor);
+                builder.AddInnerBar(maximum, maximum, barColor.Map);
+                if(_config.ShowNinjutsuText)
+                {
+                    builder.SetTextMode(BarTextMode.Single)
+                           .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, ninjutsuText);
+                }
+            } else
+            {
+                // if we are neither casting ninjutsu nor in kassatsu nor in TCJ, show the mudra charges and cooldowns
+                _oldMudraCooldownInfo = mudraCooldownInfo;
+                builder.SetChunks(2)
                    .SetChunkPadding(_config.MudraBarChunkPadding)
                    .AddInnerBar(maximum - mudraCooldownInfo, maximum, _config.MudraBarColor.Map);
-            
-            if(_config.ShowMudraBarText)
-            {
-                builder.SetTextMode(BarTextMode.EachChunk)
-                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                if (_config.ShowMudraBarText)
+                {
+                    builder.SetTextMode(BarTextMode.EachChunk)
+                           .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
             }
+
             Bar bar = builder.SetBackgroundColor(EmptyColor["background"])
                              .Build();
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
+        }
+
+        private string GenerateNinjutsuText(byte param, bool haveKassatsuBuff, bool haveTCJBuff)
+        {
+            return param switch
+                    {
+                        1 or 2 or 3 => "FUMA SHURIKEN",
+                        6 or 7 => haveKassatsuBuff ? "GOKA MEKKYAKU" : "KATON",
+                        9 or 11 => "RAITON",
+                        13 or 14 => haveKassatsuBuff ? "HYOSHO RANRYU" : "HYOTON",
+                        27 or 30 => "HUTON",
+                        39 or 45 => "DOTON",
+                        54 or 57 => "SUITON",
+                        _ => haveTCJBuff ? "TEN CHI JIN" : "NINJUTSU",
+                    };
         }
 
         private void DrawHutonGauge()
@@ -277,17 +342,21 @@ namespace DelvUI.Interface
         [CollapseControl(35, 4)]
         public bool ShowMudraCooldown = true;
 
-        [Checkbox("Show Mudra Bar Text")]
+        [Checkbox("Show Mudra Bar Timers")]
         [CollapseWith(0, 4)]
         public bool ShowMudraBarText = true;
 
+        [Checkbox("Show Ninjutsu Text")]
+        [CollapseWith(1, 4)]
+        public bool ShowNinjutsuText = true;
+
         [DragFloat2("Mudra Bar Size", max = 2000f)]
         [CollapseWith(5, 4)]
-        public Vector2 MudraBarSize = new(254, 20);
+        public Vector2 MudraBarSize = new(254, 10);
 
         [DragFloat2("Mudra Bar Offset", max = 2000f)]
         [CollapseWith(10, 4)]
-        public Vector2 MudraBarOffset = new(0, -22);
+        public Vector2 MudraBarOffset = new(0, -15);
 
         [DragFloat("Mudra Bar Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(15, 4)]
@@ -296,5 +365,13 @@ namespace DelvUI.Interface
         [ColorEdit4("Mudra Bar Color")]
         [CollapseWith(20, 4)]
         public PluginConfigColor MudraBarColor = new(new Vector4(211 / 255f, 166 / 255f, 75 / 242f, 100f / 100f));
+
+        [ColorEdit4("Kassatsu Bar Color")]
+        [CollapseWith(25, 4)]
+        public PluginConfigColor KassatsuBarColor = new(new Vector4(239 / 255f, 123 / 255f, 222 / 242f, 100f / 100f));
+
+        [ColorEdit4("TCJ Bar Color")]
+        [CollapseWith(30, 4)]
+        public PluginConfigColor TCJBarColor = new(new Vector4(181 / 255f, 33 / 255f, 41 / 242f, 100f / 100f));
     }
 }
