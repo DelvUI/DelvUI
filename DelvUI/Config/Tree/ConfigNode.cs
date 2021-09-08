@@ -1,8 +1,3 @@
-using Dalamud.Interface;
-using DelvUI.Config.Attributes;
-using ImGuiNET;
-using ImGuiScene;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,6 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using Dalamud.Interface;
+using DelvUI.Config.Attributes;
+using ImGuiNET;
+using ImGuiScene;
+using Newtonsoft.Json;
 
 namespace DelvUI.Config.Tree
 {
@@ -51,12 +51,14 @@ namespace DelvUI.Config.Tree
             bool changed = false;
 
             ImGui.SetNextWindowSize(new Vector2(1050, 750), ImGuiCond.Appearing);
+            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 0.85f));
 
             if (!ImGui.Begin("titlebarnew", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 return;
             }
 
+            ImGui.PopStyleColor();
             ImGui.BeginGroup(); // Middle section
 
             {
@@ -76,7 +78,6 @@ namespace DelvUI.Config.Tree
 
                     foreach (SectionNode selectionNode in children)
                     {
-
                         if (ImGui.Selectable(selectionNode.Name, selectionNode.Selected))
                         {
                             selected = true;
@@ -88,13 +89,13 @@ namespace DelvUI.Config.Tree
                                 otherNode.Selected = false;
                             }
                         }
-
                     }
 
                     if (!selected && children.Any())
                     {
                         children[0].Selected = true;
                     }
+
                     ImGui.EndChild();
                 }
 
@@ -239,7 +240,12 @@ namespace DelvUI.Config.Tree
                 return;
             }
 
-            ImGui.BeginChild("item view", new Vector2(0, -ImGui.GetFrameHeightWithSpacing()), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse); // Leave room for 1 line below us
+            ImGui.BeginChild(
+                "item view",
+                new Vector2(0, -ImGui.GetFrameHeightWithSpacing()),
+                false,
+                ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
+            ); // Leave room for 1 line below us
 
             {
                 if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
@@ -444,8 +450,8 @@ namespace DelvUI.Config.Tree
         public override void Draw(ref bool changed)
         {
             FieldInfo[] fields = ConfigObject.GetType().GetFields();
-            List<KeyValuePair<int, CategoryField>> drawList = new List<KeyValuePair<int, CategoryField>>();
-            List<FieldInfo> collapseWithList = new List<FieldInfo>();
+            List<KeyValuePair<int, CategoryField>> drawList = new();
+            List<FieldInfo> collapseWithList = new();
 
             foreach (FieldInfo field in fields)
             {
@@ -517,14 +523,14 @@ namespace DelvUI.Config.Tree
                 JsonConvert.SerializeObject(
                     ConfigObject,
                     Formatting.Indented,
-                    new JsonSerializerSettings { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects }
+                    new JsonSerializerSettings {TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects}
                 )
             );
         }
 
         public override void Load(string path)
         {
-            FileInfo finalPath = new FileInfo(path + ".json");
+            FileInfo finalPath = new(path + ".json");
 
             if (!finalPath.Exists)
             {
@@ -539,13 +545,13 @@ namespace DelvUI.Config.Tree
             {
                 MethodInfo methodInfo = GetType().GetMethod("LoadForType");
                 MethodInfo function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
-                ConfigObject = (PluginConfigObject)function.Invoke(this, new object[] { finalPath.FullName });
+                ConfigObject = (PluginConfigObject) function.Invoke(this, new object[] {finalPath.FullName});
             }
         }
 
         public T LoadForType<T>(string path) where T : PluginConfigObject
         {
-            FileInfo file = new FileInfo(path);
+            FileInfo file = new(path);
 
             return JsonConvert.DeserializeObject<T>(File.ReadAllText(file.FullName));
         }
@@ -574,7 +580,7 @@ namespace DelvUI.Config.Tree
         {
             Draw(ref changed, MainField, 0);
 
-            if (CategoryId != -1 && (bool)MainField.GetValue(ConfigObject))
+            if (CategoryId != -1 && (bool) MainField.GetValue(ConfigObject))
             {
                 ImGui.BeginGroup();
                 ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 2));
@@ -606,7 +612,7 @@ namespace DelvUI.Config.Tree
             {
                 if (attribute is CheckboxAttribute checkboxAttribute)
                 {
-                    bool boolVal = (bool)fieldVal;
+                    bool boolVal = (bool) fieldVal;
 
                     if (ImGui.Checkbox(checkboxAttribute.friendlyName, ref boolVal))
                     {
@@ -616,7 +622,7 @@ namespace DelvUI.Config.Tree
                 }
                 else if (attribute is DragFloatAttribute dragFloatAttribute)
                 {
-                    float floatVal = (float)fieldVal;
+                    float floatVal = (float) fieldVal;
 
                     if (ImGui.DragFloat(dragFloatAttribute.friendlyName, ref floatVal, dragFloatAttribute.velocity, dragFloatAttribute.min, dragFloatAttribute.max))
                     {
@@ -626,7 +632,7 @@ namespace DelvUI.Config.Tree
                 }
                 else if (attribute is DragIntAttribute dragIntAttribute)
                 {
-                    int intVal = (int)fieldVal;
+                    int intVal = (int) fieldVal;
 
                     if (ImGui.DragInt(dragIntAttribute.friendlyName, ref intVal, dragIntAttribute.velocity, dragIntAttribute.min, dragIntAttribute.max))
                     {
@@ -636,7 +642,7 @@ namespace DelvUI.Config.Tree
                 }
                 else if (attribute is DragFloat2Attribute dragFloat2Attribute)
                 {
-                    Vector2 floatVal = (Vector2)fieldVal;
+                    Vector2 floatVal = (Vector2) fieldVal;
 
                     if (ImGui.DragFloat2(dragFloat2Attribute.friendlyName, ref floatVal, dragFloat2Attribute.velocity, dragFloat2Attribute.min, dragFloat2Attribute.max))
                     {
@@ -646,7 +652,7 @@ namespace DelvUI.Config.Tree
                 }
                 else if (attribute is DragInt2Attribute dragInt2Attribute)
                 {
-                    Vector2 intVal = (Vector2)fieldVal;
+                    Vector2 intVal = (Vector2) fieldVal;
 
                     if (ImGui.DragFloat2(dragInt2Attribute.friendlyName, ref intVal, dragInt2Attribute.velocity, dragInt2Attribute.min, dragInt2Attribute.max))
                     {
@@ -656,7 +662,7 @@ namespace DelvUI.Config.Tree
                 }
                 else if (attribute is InputTextAttribute inputTextAttribute)
                 {
-                    string stringVal = (string)fieldVal;
+                    string stringVal = (string) fieldVal;
 
                     if (ImGui.InputText(inputTextAttribute.friendlyName, ref stringVal, inputTextAttribute.maxLength))
                     {
@@ -666,7 +672,7 @@ namespace DelvUI.Config.Tree
                 }
                 else if (attribute is ColorEdit4Attribute colorEdit4Attribute)
                 {
-                    PluginConfigColor colorVal = (PluginConfigColor)fieldVal;
+                    PluginConfigColor colorVal = (PluginConfigColor) fieldVal;
                     Vector4 vector = colorVal.Vector;
 
                     if (ImGui.ColorEdit4(colorEdit4Attribute.friendlyName, ref vector))

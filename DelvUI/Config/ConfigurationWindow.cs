@@ -10,12 +10,12 @@ namespace DelvUI.Config
 {
     public class ConfigurationWindow
     {
-        private readonly string[] _configColorMap = { "Tanks", "Healers", "Melee", "Ranged", "Casters", "NPC" };
+        private readonly string[] _configColorMap = {"Tanks", "Healers", "Melee", "Ranged", "Casters", "NPC"};
         private readonly Dictionary<string, Array> _configMap = new();
         private readonly PluginConfiguration _pluginConfiguration;
         private readonly DalamudPluginInterface _pluginInterface;
-        private readonly int _viewportHeight = (int)ImGui.GetMainViewport().Size.Y;
-        private readonly int _viewportWidth = (int)ImGui.GetMainViewport().Size.X;
+        private readonly int _viewportHeight = (int) ImGui.GetMainViewport().Size.Y;
+        private readonly int _viewportWidth = (int) ImGui.GetMainViewport().Size.X;
         private bool _changed;
         private string _exportString = "";
         private string _importString = "";
@@ -31,17 +31,17 @@ namespace DelvUI.Config
 
             _pluginConfiguration = pluginConfiguration;
             _pluginInterface = Plugin.GetPluginInterface();
-            _configMap.Add("General", new[] { "General" });
+            _configMap.Add("General", new[] {"General"});
 
-            _configMap.Add("Individual Unitframes", new[] { "General", "Player", "Focus", "Target", "Target of Target" });
+            _configMap.Add("Individual Unitframes", new[] {"General", "Player", "Focus", "Target", "Target of Target"});
 
             //configMap.Add("Group Unitframes", new [] {"General", "Party", "8man", "24man", "Enemies"});
-            _configMap.Add("Castbars", new[] { "Player", "Target" });
+            _configMap.Add("Castbars", new[] {"Player", "Target"});
 
             // _configMap.Add("Buffs and Debuffs", new[] { "Player Buffs", "Player Debuffs", "Target Buffs", "Target Debuffs", "Raid/Job Buffs" });
 
             //_configMap.Add("Job Specific Bars", new[] { "General" });
-            _configMap.Add("Import/Export", new[] { "General" });
+            _configMap.Add("Import/Export", new[] {"General"});
         }
 
         public void ToggleHud()
@@ -79,6 +79,8 @@ namespace DelvUI.Config
             //ImGui.GetIO().FontGlobalScale;
             ImGui.SetNextWindowSize(new Vector2(1050, 750), ImGuiCond.Appearing);
 
+            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 0.85f));
+
             if (!ImGui.Begin(
                 "titlebar",
                 ref IsVisible,
@@ -88,6 +90,7 @@ namespace DelvUI.Config
                 return;
             }
 
+            ImGui.PopStyleColor();
             _xOffsetLimit = _viewportWidth / 2;
             _yOffsetLimit = _viewportHeight / 2;
             _changed = false;
@@ -342,6 +345,7 @@ namespace DelvUI.Config
                     }
 
                     break;
+
                 case "Import/Export":
                     switch (subConfig)
                     {
