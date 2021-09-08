@@ -49,7 +49,7 @@ namespace DelvUI.Interface
         {
             Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             Vector2 barCoords = _config.BaseOffset + _config.DiaBarOffset;
-            Vector2 cursorPos = new Vector2(CenterX - barCoords.X, CenterY + barCoords.Y);
+            Vector2 cursorPos = new(CenterX - barCoords.X, CenterY + barCoords.Y);
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
@@ -67,8 +67,8 @@ namespace DelvUI.Interface
                   || o.EffectId == 143 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
             );
 
-            var diaCooldown = dia.EffectId == 1871 ? 30f : 18f;
-            var diaDuration = dia.Duration;
+            float diaCooldown = dia.EffectId == 1871 ? 30f : 18f;
+            float diaDuration = dia.Duration;
 
             drawList.AddRectFilled(cursorPos, cursorPos + _config.DiaBarSize, EmptyColor["background"]);
 
@@ -101,16 +101,16 @@ namespace DelvUI.Interface
             WHMGauge gauge = PluginInterface.ClientState.JobGauges.Get<WHMGauge>();
 
             const int numChunks = 6;
-            var barWidth = (_config.LilyBarSize.X - _config.LilyBarPad * (numChunks - 1)) / numChunks;
-            Vector2 barSize = new Vector2(barWidth, _config.LilyBarSize.Y);
+            float barWidth = (_config.LilyBarSize.X - _config.LilyBarPad * (numChunks - 1)) / numChunks;
+            Vector2 barSize = new(barWidth, _config.LilyBarSize.Y);
 
             Vector2 barCoords = _config.BaseOffset + _config.LilyBarOffset;
-            var xPos = CenterX - barCoords.X;
-            var yPos = CenterY + barCoords.Y - 20;
+            float xPos = CenterX - barCoords.X;
+            float yPos = CenterY + barCoords.Y - 20;
 
             const float lilyCooldown = 30000f;
-            var scale = gauge.NumLilies == 0 ? gauge.LilyTimer / lilyCooldown : 1;
-            Vector2 cursorPos = new Vector2(xPos, yPos);
+            float scale = gauge.NumLilies == 0 ? gauge.LilyTimer / lilyCooldown : 1;
+            Vector2 cursorPos = new(xPos, yPos);
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
 
@@ -139,7 +139,7 @@ namespace DelvUI.Interface
 
             if (scale < 1)
             {
-                var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
+                string timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
                 Vector2 size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
                 DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y - 23));
             }
@@ -178,7 +178,7 @@ namespace DelvUI.Interface
 
                 if (scale < 1)
                 {
-                    var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
+                    string timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
                     Vector2 size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
                     DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y - 23));
                 }
@@ -218,7 +218,7 @@ namespace DelvUI.Interface
 
                 if (scale < 1)
                 {
-                    var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
+                    string timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
                     Vector2 size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
                     DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y - 23));
                 }
@@ -324,7 +324,7 @@ namespace DelvUI.Interface
         #endregion
 
         #region Blood Lily Bar
-        
+
         [DragFloat2("Blood Lily Bar Size", max = 2000f)]
         [CollapseWith(25, 0)]
         public Vector2 BloodLilyBarSize = new(254, 20);
