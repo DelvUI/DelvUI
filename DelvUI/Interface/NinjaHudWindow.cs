@@ -58,10 +58,10 @@ namespace DelvUI.Interface
         private void DrawMudraBars()
         {
             float xPos = CenterX + _config.Position.X + _config.MudraBarPosition.X - _config.MudraBarSize.X / 2f;
-            float yPos = CenterY + _config.Position.Y + _config.MudraBarPosition.Y - _config.MudraBarSize.Y / 2f;     
+            float yPos = CenterY + _config.Position.Y + _config.MudraBarPosition.Y - _config.MudraBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.MudraBarSize.Y, _config.MudraBarSize.X);
-            
+
             // each of the 2 mudra charges has a cooldown of 20s
             float maximum = 40f;
             // get the current cooldown and number of charges on mudras
@@ -90,7 +90,7 @@ namespace DelvUI.Interface
             {
                 _oldMudraCooldownInfo = mudraCooldownInfo;
             }
-            if(haveTCJBuff)
+            if (haveTCJBuff)
             {
                 PluginLog.Log($"In TCJ: {tcjBuff.First().StackCount}");
             }
@@ -116,12 +116,13 @@ namespace DelvUI.Interface
                 }
                 PluginConfigColor barColor = haveTCJBuff ? _config.TCJBarColor : (haveKassatsuBuff ? _config.KassatsuBarColor : _config.MudraBarColor);
                 builder.AddInnerBar(maximum, maximum, barColor.Map);
-                if(_config.ShowNinjutsuText)
+                if (_config.ShowNinjutsuText)
                 {
                     builder.SetTextMode(BarTextMode.Single)
                            .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, ninjutsuText);
                 }
-            } else
+            }
+            else
             {
                 // if we are neither casting ninjutsu nor in kassatsu nor in TCJ, show the mudra charges and cooldowns
                 _oldMudraCooldownInfo = mudraCooldownInfo;
@@ -145,16 +146,16 @@ namespace DelvUI.Interface
         private string GenerateNinjutsuText(byte param, bool haveKassatsuBuff, bool haveTCJBuff)
         {
             return param switch
-                    {
-                        1 or 2 or 3 => "FUMA SHURIKEN",
-                        6 or 7 => haveKassatsuBuff ? "GOKA MEKKYAKU" : "KATON",
-                        9 or 11 => "RAITON",
-                        13 or 14 => haveKassatsuBuff ? "HYOSHO RANRYU" : "HYOTON",
-                        27 or 30 => "HUTON",
-                        39 or 45 => "DOTON",
-                        54 or 57 => "SUITON",
-                        _ => haveTCJBuff ? "TEN CHI JIN" : "NINJUTSU",
-                    };
+            {
+                1 or 2 or 3 => "FUMA SHURIKEN",
+                6 or 7 => haveKassatsuBuff ? "GOKA MEKKYAKU" : "KATON",
+                9 or 11 => "RAITON",
+                13 or 14 => haveKassatsuBuff ? "HYOSHO RANRYU" : "HYOTON",
+                27 or 30 => "HUTON",
+                39 or 45 => "DOTON",
+                54 or 57 => "SUITON",
+                _ => haveTCJBuff ? "TEN CHI JIN" : "NINJUTSU",
+            };
         }
 
         private void DrawHutonGauge()
