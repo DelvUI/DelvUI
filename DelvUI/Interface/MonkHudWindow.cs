@@ -6,6 +6,9 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dalamud.Game.ClientState.Actors.Types;
+using Dalamud.Game.ClientState.Structs;
+using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface
 {
@@ -62,11 +65,11 @@ namespace DelvUI.Interface
 
         private void DrawFormsBar()
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
-            var opoOpoForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 107);
-            var raptorForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 108);
-            var coeurlForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 109);
-            var formlessFist = target.StatusEffects.FirstOrDefault(o => o.EffectId == 2513);
+            PlayerCharacter target = PluginInterface.ClientState.LocalPlayer;
+            StatusEffect opoOpoForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 107);
+            StatusEffect raptorForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 108);
+            StatusEffect coeurlForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 109);
+            StatusEffect formlessFist = target.StatusEffects.FirstOrDefault(o => o.EffectId == 2513);
 
             var opoOpoFormDuration = opoOpoForm.Duration;
             var raptorFormDuration = raptorForm.Duration;
@@ -76,116 +79,116 @@ namespace DelvUI.Interface
             var xPos = CenterX - XOffset + FormsXOffset + 33;
             var yPos = CenterY + YOffset - FormsYOffset - 87;
 
-            var builder = BarBuilder.Create(xPos, yPos, FormsHeight, FormsWidth);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, FormsHeight, FormsWidth);
             var maximum = 15f;
 
             if (opoOpoFormDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(opoOpoFormDuration), maximum, FormsColor)
+                Bar bar = builder.AddInnerBar(Math.Abs(opoOpoFormDuration), maximum, FormsColor)
                                  .SetTextMode(BarTextMode.EachChunk)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Opo-Opo Form")
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
 
             if (raptorFormDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(raptorFormDuration), maximum, FormsColor)
+                Bar bar = builder.AddInnerBar(Math.Abs(raptorFormDuration), maximum, FormsColor)
                                  .SetTextMode(BarTextMode.EachChunk)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Raptor Form")
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
 
             if (coeurlFormDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(coeurlFormDuration), maximum, FormsColor)
+                Bar bar = builder.AddInnerBar(Math.Abs(coeurlFormDuration), maximum, FormsColor)
                                  .SetTextMode(BarTextMode.EachChunk)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Coeurl Form")
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
 
             if (formlessFist.Duration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(formlessFist.Duration), maximum, FormsColor)
+                Bar bar = builder.AddInnerBar(Math.Abs(formlessFist.Duration), maximum, FormsColor)
                                  .SetTextMode(BarTextMode.EachChunk)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Formless Fist")
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
             else
             {
-                var bar = builder.AddInnerBar(0, maximum, FormsColor)
+                Bar bar = builder.AddInnerBar(0, maximum, FormsColor)
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
         }
 
         private void DrawTrueNorthBar()
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
-            var trueNorth = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1250);
+            PlayerCharacter target = PluginInterface.ClientState.LocalPlayer;
+            StatusEffect trueNorth = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1250);
             var trueNorthDuration = trueNorth.Duration;
 
             var xPos = CenterX - XOffset + TrueNorthXOffset + 172;
             var yPos = CenterY + YOffset - TrueNorthYOffset - 65;
 
-            var builder = BarBuilder.Create(xPos, yPos, TrueNorthHeight, TrueNorthWidth);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, TrueNorthHeight, TrueNorthWidth);
             var maximum = 10f;
 
             if (trueNorthDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, TrueNorthColor)
+                Bar bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, TrueNorthColor)
                                  .SetTextMode(BarTextMode.EachChunk)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
             else
             {
-                var bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, TrueNorthColor)
+                Bar bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, TrueNorthColor)
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
         }
 
         private void DrawPerfectBalanceBar()
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
-            var perfectBalance = target.StatusEffects.FirstOrDefault(o => o.EffectId == 110);
+            PlayerCharacter target = PluginInterface.ClientState.LocalPlayer;
+            StatusEffect perfectBalance = target.StatusEffects.FirstOrDefault(o => o.EffectId == 110);
             var perfectBalanceDuration = perfectBalance.StackCount;
 
             var xPos = CenterX - XOffset + PerfectBalanceXOffset + 150;
             var yPos = CenterY + YOffset - PerfectBalanceYOffset - 65;
 
-            var builder = BarBuilder.Create(xPos, yPos, PerfectBalanceHeight, PerfectBalanceWidth);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, PerfectBalanceHeight, PerfectBalanceWidth);
             var maximum = 6f;
 
             if (perfectBalanceDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, PerfectBalanceColor)
+                Bar bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, PerfectBalanceColor)
                                  .SetVertical(true)
                                  .SetFlipDrainDirection(PerfectBalanceBarFlipped)
                                  .SetTextMode(BarTextMode.EachChunk)
@@ -193,151 +196,151 @@ namespace DelvUI.Interface
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
             else
             {
-                var bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, PerfectBalanceColor)
+                Bar bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, PerfectBalanceColor)
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
         }
 
         private void DrawRiddleOfEarthBar()
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
-            var riddleOfEarth = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1179);
+            PlayerCharacter target = PluginInterface.ClientState.LocalPlayer;
+            StatusEffect riddleOfEarth = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1179);
             var riddleOfEarthDuration = riddleOfEarth.StackCount;
 
             var xPos = CenterX - XOffset + RiddleOfEarthXOffset + 33;
             var yPos = CenterY + YOffset - RiddleOfEarthYOffset - 65;
 
-            var builder = BarBuilder.Create(xPos, yPos, RiddleOfEarthHeight, RiddleOfEarthWidth);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, RiddleOfEarthHeight, RiddleOfEarthWidth);
             var maximum = 3f;
 
             if (riddleOfEarthDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, RiddleOfEarthColor)
+                Bar bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, RiddleOfEarthColor)
                                  .SetTextMode(BarTextMode.EachChunk)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .SetFlipDrainDirection(RiddleOfEarthBarFlipped)
                                  .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
             else
             {
-                var bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, RiddleOfEarthColor)
+                Bar bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, RiddleOfEarthColor)
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .SetFlipDrainDirection(RiddleOfEarthBarFlipped == false)
                                  .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
         }
 
         private void DrawChakraGauge()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<MNKGauge>();
+            MNKGauge gauge = PluginInterface.ClientState.JobGauges.Get<MNKGauge>();
 
             var xPos = CenterX - XOffset + ChakraXOffset + 33;
             var yPos = CenterY + YOffset - ChakraYOffset - 43;
 
-            var bar = BarBuilder.Create(xPos, yPos, ChakraHeight, ChakraWidth)
+            Bar bar = BarBuilder.Create(xPos, yPos, ChakraHeight, ChakraWidth)
                                 .SetChunks(5)
                                 .SetChunkPadding(2)
                                 .AddInnerBar(gauge.NumChakra, 5, ChakraColor, EmptyColor)
                                 .SetBackgroundColor(EmptyColor["background"])
                                 .Build();
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawTwinSnakesBar()
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
-            var twinSnakes = target.StatusEffects.FirstOrDefault(o => o.EffectId == 101);
+            PlayerCharacter target = PluginInterface.ClientState.LocalPlayer;
+            StatusEffect twinSnakes = target.StatusEffects.FirstOrDefault(o => o.EffectId == 101);
             var twinSnakesDuration = twinSnakes.Duration;
 
             var xPos = CenterX - XOffset + TwinSnakesXOffset + 33;
             var yPos = CenterY + YOffset - TwinSnakesYOffset - 21;
 
-            var builder = BarBuilder.Create(xPos, yPos, TwinSnakesHeight, TwinSnakesWidth);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, TwinSnakesHeight, TwinSnakesWidth);
             var maximum = 15f;
 
-            var bar = builder.AddInnerBar(Math.Abs(twinSnakesDuration), maximum, TwinSnakesColor)
+            Bar bar = builder.AddInnerBar(Math.Abs(twinSnakesDuration), maximum, TwinSnakesColor)
                              .SetTextMode(BarTextMode.EachChunk)
                              .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                              .SetBackgroundColor(EmptyColor["background"])
                              .SetFlipDrainDirection(TwinSnakesBarFlipped)
                              .Build();
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawLeadenFistBar()
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
-            var leadenFist = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1861);
+            PlayerCharacter target = PluginInterface.ClientState.LocalPlayer;
+            StatusEffect leadenFist = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1861);
             var leadenFistDuration = leadenFist.Duration;
 
             var xPos = CenterX - XOffset + LeadenFistXOffset + 146;
             var yPos = CenterY + YOffset - LeadenFistYOffset - 21;
 
-            var builder = BarBuilder.Create(xPos, yPos, LeadenFistHeight, LeadenFistWidth);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, LeadenFistHeight, LeadenFistWidth);
             var maximum = 30f;
 
             if (leadenFistDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, LeadenFistColor)
+                Bar bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, LeadenFistColor)
                                  .SetVertical(true)
                                  .SetTextMode(BarTextMode.EachChunk)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
             else
             {
-                var bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, LeadenFistColor)
+                Bar bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, LeadenFistColor)
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 bar.Draw(drawList, PluginConfiguration);
             }
         }
 
         private void DrawDemolishBar()
         {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget ?? PluginInterface.ClientState.LocalPlayer;
-            var demolish = target.StatusEffects.FirstOrDefault(o => o.EffectId == 246 || o.EffectId == 1309);
+            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget ?? PluginInterface.ClientState.LocalPlayer;
+            StatusEffect demolish = target.StatusEffects.FirstOrDefault(o => o.EffectId == 246 || o.EffectId == 1309);
             var demolishDuration = demolish.Duration;
 
             var xPos = CenterX - XOffset + DemolishXOffset + 176;
             var yPos = CenterY + YOffset - DemolishYOffset - 21;
 
-            var builder = BarBuilder.Create(xPos, yPos, DemolishHeight, DemolishWidth);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, DemolishHeight, DemolishWidth);
             var maximum = 18f;
 
-            var bar = builder.AddInnerBar(Math.Abs(demolishDuration), maximum, DemolishColor)
+            Bar bar = builder.AddInnerBar(Math.Abs(demolishDuration), maximum, DemolishColor)
                              .SetTextMode(BarTextMode.EachChunk)
                              .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                              .SetBackgroundColor(EmptyColor["background"])
                              .Build();
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
 

@@ -12,18 +12,18 @@ namespace DelvUI.Interface.Bars
 
         private BarBuilder(Bar initialBar) { _bar = initialBar; }
 
-        public static BarBuilder Create(float xPosition, float yPosition, float height, float width) => Create(xPosition, yPosition, (int)height, (int)width);
+        public static BarBuilder Create(float xPosition, float yPosition, float height, float width) => Create(xPosition, yPosition, (int) height, (int) width);
 
         public static BarBuilder Create(float xPosition, float yPosition, int height, int width)
         {
-            var bar = new Bar(xPosition, yPosition, height, width);
+            Bar bar = new Bar(xPosition, yPosition, height, width);
 
             return new BarBuilder(bar);
         }
 
         public static BarBuilder Create(Vector2 position, Vector2 size)
         {
-            var bar = new Bar(position.X, position.Y, (int)size.Y, (int)size.X);
+            Bar bar = new Bar(position.X, position.Y, (int) size.Y, (int) size.X);
 
             return new BarBuilder(bar);
         }
@@ -58,7 +58,7 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
-        public BarBuilder SetChunkPadding(float padding) => SetChunkPadding((int)padding);
+        public BarBuilder SetChunkPadding(float padding) => SetChunkPadding((int) padding);
 
         public BarBuilder SetChunkPadding(int padding)
         {
@@ -74,7 +74,7 @@ namespace DelvUI.Interface.Bars
                 throw new InvalidOperationException("You cannot set the chunk count once an inner bar has been added");
             }
 
-            var size = (float)1 / count;
+            var size = (float) 1 / count;
             var sizes = new float[count];
 
             for (var i = 0; i < count; i++)
@@ -124,7 +124,7 @@ namespace DelvUI.Interface.Bars
 
         public BarBuilder AddInnerBar(float currentValue, float maximumValue, Dictionary<string, uint> color, Dictionary<string, uint> partialColor)
         {
-            var colors = new Dictionary<string, uint>[_bar.ChunkSizes.Length];
+            Dictionary<string, uint>[] colors = new Dictionary<string, uint>[_bar.ChunkSizes.Length];
 
             for (var i = 0; i < colors.Length; i++)
             {
@@ -148,7 +148,7 @@ namespace DelvUI.Interface.Bars
             BarText[] texts
         )
         {
-            var innerBar = new InnerBar();
+            InnerBar innerBar = new InnerBar();
             innerBar.CurrentValue = currentValue;
             innerBar.MaximumValue = maximumValue;
             innerBar.ChunkColors = chunkColors;
@@ -170,7 +170,7 @@ namespace DelvUI.Interface.Bars
 
         public BarBuilder AddInnerBooleanBar(bool[] values, Dictionary<string, uint> color, Dictionary<string, uint> partialColor)
         {
-            var colors = new Dictionary<string, uint>[_bar.ChunkSizes.Length];
+            Dictionary<string, uint>[] colors = new Dictionary<string, uint>[_bar.ChunkSizes.Length];
 
             for (var i = 0; i < colors.Length; i++)
             {
@@ -193,7 +193,7 @@ namespace DelvUI.Interface.Bars
             BarText[] texts
         )
         {
-            var innerBar = new BooleanInnerBar();
+            BooleanInnerBar innerBar = new BooleanInnerBar();
             innerBar.EnableArray = values;
             innerBar.ChunkColors = chunkColors;
             innerBar.PartialFillColor = partialFillColor;
@@ -253,7 +253,7 @@ namespace DelvUI.Interface.Bars
 
         public BarBuilder SetChunksColors(Dictionary<string, uint> color)
         {
-            var colors = new Dictionary<string, uint>[_bar.ChunkSizes.Length];
+            Dictionary<string, uint>[] colors = new Dictionary<string, uint>[_bar.ChunkSizes.Length];
 
             for (var i = 0; i < colors.Length; i++)
             {
@@ -325,7 +325,7 @@ namespace DelvUI.Interface.Bars
                 throw new InvalidOperationException("Operation requires defined inner bar");
             }
 
-            var texts = new BarText[_bar.ChunkSizes.Length];
+            BarText[] texts = new BarText[_bar.ChunkSizes.Length];
 
             for (var i = 0; i < texts.Length; i++)
             {

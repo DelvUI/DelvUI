@@ -6,12 +6,13 @@ using ImGuiNET;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.Structs;
 
 namespace DelvUI.Interface
 {
     public class MachinistHudWindow : HudWindow
     {
-        private readonly float[] _robotDuration = { 12.450f, 13.950f, 15.450f, 16.950f, 18.450f, 19.950f };
+        private readonly float[] _robotDuration = {12.450f, 13.950f, 15.450f, 16.950f, 18.450f, 19.950f};
 
         public MachinistHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
@@ -89,15 +90,15 @@ namespace DelvUI.Interface
 
         private void DrawHeatGauge()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
+            MCHGauge gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
 
             var xPos = CenterX + BaseXOffset - HeatGaugeXOffset;
             var yPos = CenterY + BaseYOffset + HeatGaugeYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, HeatGaugeHeight, HeatGaugeWidth)
-                                    .SetChunks(2)
-                                    .SetChunkPadding(HeatGaugePadding)
-                                    .AddInnerBar(gauge.Heat, 100, HeatColor, PartialFillColor);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, HeatGaugeHeight, HeatGaugeWidth)
+                                           .SetChunks(2)
+                                           .SetChunkPadding(HeatGaugePadding)
+                                           .AddInnerBar(gauge.Heat, 100, HeatColor, PartialFillColor);
 
             if (HeatGaugeText)
             {
@@ -106,21 +107,21 @@ namespace DelvUI.Interface
                        .SetBackgroundColor(EmptyColor["background"]);
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawBatteryGauge()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
+            MCHGauge gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
 
             var xPos = CenterX + BaseXOffset - BatteryGaugeXOffset;
             var yPos = CenterY + BaseYOffset + BatteryGaugeYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, BatteryGaugeHeight, BatteryGaugeWidth)
-                                    .SetChunks(new[] { .5f, .1f, .1f, .1f, .1f, .1f })
-                                    .SetChunkPadding(BatteryGaugePadding)
-                                    .SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, BatteryGaugeHeight, BatteryGaugeWidth)
+                                           .SetChunks(new[] {.5f, .1f, .1f, .1f, .1f, .1f})
+                                           .SetChunkPadding(BatteryGaugePadding)
+                                           .SetBackgroundColor(EmptyColor["background"]);
 
             if (BatteryGaugeShowBattery)
             {
@@ -144,19 +145,19 @@ namespace DelvUI.Interface
                 }
             }
 
-            var drawList = ImGui.GetWindowDrawList();
-            var bar = builder.Build();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            Bar bar = builder.Build();
             bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawOverheatBar()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
+            MCHGauge gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
 
             var xPos = CenterX + BaseXOffset - OverheatXOffset;
             var yPos = CenterY + BaseYOffset + OverheatYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, OverheatHeight, OverheatWidth).SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, OverheatHeight, OverheatWidth).SetBackgroundColor(EmptyColor["background"]);
 
             if (gauge.IsOverheated())
             {
@@ -169,18 +170,18 @@ namespace DelvUI.Interface
                 }
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawWildfireBar()
         {
-            var wildfireBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1946);
+            IEnumerable<StatusEffect> wildfireBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1946);
 
             var xPos = CenterX + BaseXOffset - WildfireXOffset;
             var yPos = CenterY + BaseYOffset + WildfireYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, WildfireHeight, WildfireWidth);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, WildfireHeight, WildfireWidth);
 
             if (wildfireBuff.Any())
             {
@@ -195,7 +196,7 @@ namespace DelvUI.Interface
                 }
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
     }

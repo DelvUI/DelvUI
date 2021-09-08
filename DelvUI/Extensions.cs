@@ -12,7 +12,7 @@ namespace DelvUI
     {
         public static string Abbreviate(this string str)
         {
-            var splits = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            var splits = str.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries);
 
             for (var i = 0; i < splits.Length - 1; i++)
             {
@@ -49,7 +49,7 @@ namespace DelvUI
         {
             if (settings is ExpandoObject)
             {
-                return ((IDictionary<string, object>)settings).ContainsKey(name);
+                return ((IDictionary<string, object>) settings).ContainsKey(name);
             }
 
             return settings.GetType().GetProperty(name) != null;
@@ -57,7 +57,7 @@ namespace DelvUI
 
         public static unsafe string GetString(this Utf8String utf8String)
         {
-            var s = utf8String.BufUsed > int.MaxValue ? int.MaxValue : (int)utf8String.BufUsed;
+            var s = utf8String.BufUsed > int.MaxValue ? int.MaxValue : (int) utf8String.BufUsed;
 
             try
             {

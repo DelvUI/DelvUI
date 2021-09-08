@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.Structs;
 
 namespace DelvUI.Interface
 {
@@ -122,16 +123,16 @@ namespace DelvUI.Interface
 
         private void DrawEspritBar()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
+            DNCGauge gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
 
             var xPos = CenterX + BaseXOffset - EspritXOffset;
             var yPos = CenterY + BaseYOffset + EspritYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, EspritHeight, EspritWidth)
-                                    .SetChunks(2)
-                                    .SetChunkPadding(EspritPadding)
-                                    .SetBackgroundColor(EmptyColor["background"])
-                                    .AddInnerBar(gauge.Esprit, 100, EspritColor, PartialFillColor);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, EspritHeight, EspritWidth)
+                                           .SetChunks(2)
+                                           .SetChunkPadding(EspritPadding)
+                                           .SetBackgroundColor(EmptyColor["background"])
+                                           .AddInnerBar(gauge.Esprit, 100, EspritColor, PartialFillColor);
 
             if (EspritText)
             {
@@ -139,39 +140,39 @@ namespace DelvUI.Interface
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawFeathersBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            var flourishingBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1820 or 2021);
-            var gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
+            IEnumerable<StatusEffect> flourishingBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1820 or 2021);
+            DNCGauge gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
 
             var xPos = CenterX + BaseXOffset - FeatherXOffset;
             var yPos = CenterY + BaseYOffset + FeatherYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, FeatherHeight, FeatherWidth)
-                                    .SetChunks(4)
-                                    .SetBackgroundColor(EmptyColor["background"])
-                                    .SetChunkPadding(FeatherPadding)
-                                    .AddInnerBar(gauge.NumFeathers, 4, FeatherColor);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, FeatherHeight, FeatherWidth)
+                                           .SetChunks(4)
+                                           .SetBackgroundColor(EmptyColor["background"])
+                                           .SetChunkPadding(FeatherPadding)
+                                           .AddInnerBar(gauge.NumFeathers, 4, FeatherColor);
 
             if (FlourishingGlowEnabled && flourishingBuff.Any())
             {
                 builder.SetGlowColor(FlourishingProcColor["base"]);
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private unsafe void DrawStepBar()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
-            var gaugePtr = &gauge;
-            var openGauge = *(OpenDNCGauge*)gaugePtr;
+            DNCGauge gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
+            DNCGauge* gaugePtr = &gauge;
+            OpenDNCGauge openGauge = *(OpenDNCGauge*) gaugePtr;
 
             if (!openGauge.IsDancing())
             {
@@ -179,13 +180,13 @@ namespace DelvUI.Interface
             }
 
             byte chunkCount = 0;
-            var chunkColors = new List<Dictionary<string, uint>>();
-            var glowChunks = new List<bool>();
+            List<Dictionary<string, uint>> chunkColors = new List<Dictionary<string, uint>>();
+            List<bool> glowChunks = new List<bool>();
             var danceReady = true;
 
             for (var i = 0; i < 4; i++)
             {
-                var step = (DNCStep)openGauge.stepOrder[i];
+                DNCStep step = (DNCStep) openGauge.stepOrder[i];
 
                 if (step == DNCStep.None)
                 {
@@ -231,11 +232,11 @@ namespace DelvUI.Interface
             var xPos = CenterX + BaseXOffset - StepXOffset;
             var yPos = CenterY + BaseYOffset + StepYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, StepHeight, StepWidth)
-                                    .SetChunks(chunkCount)
-                                    .SetChunkPadding(StepPadding)
-                                    .SetBackgroundColor(EmptyColor["background"])
-                                    .AddInnerBar(chunkCount, chunkCount, chunkColors.ToArray());
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, StepHeight, StepWidth)
+                                           .SetChunks(chunkCount)
+                                           .SetChunkPadding(StepPadding)
+                                           .SetBackgroundColor(EmptyColor["background"])
+                                           .AddInnerBar(chunkCount, chunkCount, chunkColors.ToArray());
 
             if (danceReady && DanceReadyGlow)
             {
@@ -247,20 +248,20 @@ namespace DelvUI.Interface
                        .SetGlowColor(CurrentStepColor["base"]);
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawBuffBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            var devilmentBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1825);
-            var technicalFinishBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1822 or 2050);
+            IEnumerable<StatusEffect> devilmentBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1825);
+            IEnumerable<StatusEffect> technicalFinishBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1822 or 2050);
 
             var xPos = CenterX + BaseXOffset - BuffXOffset;
             var yPos = CenterY + BaseYOffset + BuffYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, BuffHeight, BuffWidth).SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, BuffHeight, BuffWidth).SetBackgroundColor(EmptyColor["background"]);
 
             if (technicalFinishBuff.Any() && TechnicalBarEnabled)
             {
@@ -268,7 +269,7 @@ namespace DelvUI.Interface
 
                 if (TechnicalTextEnabled)
                 {
-                    var position = DevilmentTextEnabled && DevilmentBarEnabled ? BarTextPosition.CenterLeft : BarTextPosition.CenterMiddle;
+                    BarTextPosition position = DevilmentTextEnabled && DevilmentBarEnabled ? BarTextPosition.CenterLeft : BarTextPosition.CenterMiddle;
 
                     builder.SetTextMode(BarTextMode.EachChunk)
                            .SetText(position, BarTextType.Current, PluginConfiguration.DNCTechnicalFinishColor, Vector4.UnitW, null);
@@ -281,26 +282,26 @@ namespace DelvUI.Interface
 
                 if (DevilmentTextEnabled)
                 {
-                    var position = TechnicalTextEnabled && TechnicalBarEnabled ? BarTextPosition.CenterRight : BarTextPosition.CenterMiddle;
+                    BarTextPosition position = TechnicalTextEnabled && TechnicalBarEnabled ? BarTextPosition.CenterRight : BarTextPosition.CenterMiddle;
 
                     builder.SetTextMode(BarTextMode.EachChunk)
                            .SetText(position, BarTextType.Current, PluginConfiguration.DNCDevilmentColor, Vector4.UnitW, null);
                 }
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawStandardBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            var standardFinishBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1821 or 2024 or 2105 or 2113);
+            IEnumerable<StatusEffect> standardFinishBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1821 or 2024 or 2105 or 2113);
 
             var xPos = CenterX + BaseXOffset - StandardXOffset;
             var yPos = CenterY + BaseYOffset + StandardYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, StandardHeight, StandardWidth);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, StandardHeight, StandardWidth);
 
             if (standardFinishBuff.Any())
             {
@@ -313,25 +314,25 @@ namespace DelvUI.Interface
                 }
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.SetBackgroundColor(EmptyColor["background"]).Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawProcBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            var flourishingCascadeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1814);
-            var flourishingFountainBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1815);
-            var flourishingWindmillBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1816);
-            var flourishingShowerBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1817);
+            IEnumerable<StatusEffect> flourishingCascadeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1814);
+            IEnumerable<StatusEffect> flourishingFountainBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1815);
+            IEnumerable<StatusEffect> flourishingWindmillBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1816);
+            IEnumerable<StatusEffect> flourishingShowerBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1817);
 
             var xPos = CenterX + BaseXOffset - ProcXOffset;
             var yPos = CenterY + BaseYOffset + ProcYOffset;
 
-            var cascadeBuilder = BarBuilder.Create(xPos, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
-            var fountainBuilder = BarBuilder.Create(xPos + ProcWidth + ProcPadding, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
-            var windmillBuilder = BarBuilder.Create(xPos + 2 * ProcWidth + 2 * ProcPadding, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
-            var showerBuilder = BarBuilder.Create(xPos + 3 * ProcWidth + 3 * ProcPadding, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder cascadeBuilder = BarBuilder.Create(xPos, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder fountainBuilder = BarBuilder.Create(xPos + ProcWidth + ProcPadding, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder windmillBuilder = BarBuilder.Create(xPos + 2 * ProcWidth + 2 * ProcPadding, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder showerBuilder = BarBuilder.Create(xPos + 3 * ProcWidth + 3 * ProcPadding, yPos, ProcHeight, ProcWidth).SetBackgroundColor(EmptyColor["background"]);
 
             if (flourishingCascadeBuff.Any() && ProcEnabled)
             {
@@ -357,7 +358,7 @@ namespace DelvUI.Interface
                 showerBuilder.AddInnerBar(showerStart, 20, FlourishingShowerColor);
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             cascadeBuilder.Build().Draw(drawList, PluginConfiguration);
             fountainBuilder.Build().Draw(drawList, PluginConfiguration);
             windmillBuilder.Build().Draw(drawList, PluginConfiguration);

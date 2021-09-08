@@ -7,6 +7,8 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dalamud.Game.ClientState.Structs;
+using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface
 {
@@ -75,7 +77,7 @@ namespace DelvUI.Interface
                 return;
             }
 
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
             if (target is not Chara)
             {
@@ -85,11 +87,11 @@ namespace DelvUI.Interface
             var xPos = CenterX - XOffset + BRDCBXOffset;
             var yPos = CenterY + YOffset + BRDCBYOffset;
 
-            var barDrawList = new List<Bar>();
+            List<Bar> barDrawList = new List<Bar>();
 
             if (BRDShowCB)
             {
-                var cb = target.StatusEffects.FirstOrDefault(
+                StatusEffect cb = target.StatusEffects.FirstOrDefault(
                     o =>
                         o.EffectId == 1200 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                      || o.EffectId == 124 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
@@ -97,11 +99,11 @@ namespace DelvUI.Interface
 
                 var duration = Math.Abs(cb.Duration);
 
-                var color = duration <= 5 ? ExpireColor : CBColor;
+                Dictionary<string, uint> color = duration <= 5 ? ExpireColor : CBColor;
 
-                var builder = BarBuilder.Create(xPos, yPos, BRDCBHeight, BRDCBWidth);
+                BarBuilder builder = BarBuilder.Create(xPos, yPos, BRDCBHeight, BRDCBWidth);
 
-                var cbBar = builder.AddInnerBar(duration, 30f, color)
+                Bar cbBar = builder.AddInnerBar(duration, 30f, color)
                                    .SetFlipDrainDirection(BRDCBInverted)
                                    .SetBackgroundColor(EmptyColor["background"])
                                    .Build();
@@ -114,7 +116,7 @@ namespace DelvUI.Interface
 
             if (BRDShowSB)
             {
-                var sb = target.StatusEffects.FirstOrDefault(
+                StatusEffect sb = target.StatusEffects.FirstOrDefault(
                     o =>
                         o.EffectId == 1201 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                      || o.EffectId == 129 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
@@ -122,11 +124,11 @@ namespace DelvUI.Interface
 
                 var duration = Math.Abs(sb.Duration);
 
-                var color = duration <= 5 ? ExpireColor : SBColor;
+                Dictionary<string, uint> color = duration <= 5 ? ExpireColor : SBColor;
 
-                var builder = BarBuilder.Create(xPos, yPos, BRDSBHeight, BRDSBWidth);
+                BarBuilder builder = BarBuilder.Create(xPos, yPos, BRDSBHeight, BRDSBWidth);
 
-                var sbBar = builder.AddInnerBar(duration, 30f, color)
+                Bar sbBar = builder.AddInnerBar(duration, 30f, color)
                                    .SetFlipDrainDirection(BRDSBInverted)
                                    .SetBackgroundColor(EmptyColor["background"])
                                    .Build();
@@ -139,9 +141,9 @@ namespace DelvUI.Interface
                 return;
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
-            foreach (var bar in barDrawList)
+            foreach (Bar bar in barDrawList)
             {
                 bar.Draw(drawList, PluginConfiguration);
             }
@@ -149,9 +151,9 @@ namespace DelvUI.Interface
 
         private void HandleCurrentSong()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<BRDGauge>();
+            BRDGauge gauge = PluginInterface.ClientState.JobGauges.Get<BRDGauge>();
             var songStacks = gauge.NumSongStacks;
-            var song = gauge.ActiveSong;
+            CurrentSong song = gauge.ActiveSong;
             var songTimer = gauge.SongTimer;
 
             switch (song)
@@ -214,17 +216,17 @@ namespace DelvUI.Interface
             var xPos = CenterX - XOffset + BRDSongGaugeXOffset;
             var yPos = CenterY + YOffset + BRDSongGaugeYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, BRDSongGaugeHeight, BRDSongGaugeWidth);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, BRDSongGaugeHeight, BRDSongGaugeWidth);
 
             var duration = Math.Abs(songTimer);
 
-            var bar = builder.AddInnerBar(duration / 1000f, 30f, songColor)
+            Bar bar = builder.AddInnerBar(duration / 1000f, 30f, songColor)
                              .SetTextMode(BarTextMode.EachChunk)
                              .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                              .SetBackgroundColor(EmptyColor["background"])
                              .Build();
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
 
@@ -240,13 +242,13 @@ namespace DelvUI.Interface
             var xPos = CenterX - XOffset + BRDSoulGaugeXOffset;
             var yPos = CenterY + YOffset + BRDSoulGaugeYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, BRDSoulGaugeHeight, BRDSoulGaugeWidth);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, BRDSoulGaugeHeight, BRDSoulGaugeWidth);
 
-            var bar = builder.AddInnerBar(soulVoice, 100f, SVColor)
+            Bar bar = builder.AddInnerBar(soulVoice, 100f, SVColor)
                              .SetBackgroundColor(EmptyColor["background"])
                              .Build();
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
 
@@ -255,14 +257,14 @@ namespace DelvUI.Interface
             var xPos = CenterX - XOffset + BRDStackXOffset;
             var yPos = CenterY + YOffset + BRDStackYOffset;
 
-            var bar = BarBuilder.Create(xPos, yPos, BRDStackHeight, BRDStackWidth)
+            Bar bar = BarBuilder.Create(xPos, yPos, BRDStackHeight, BRDStackWidth)
                                 .SetChunks(max)
                                 .SetChunkPadding(BRDStackPadding)
                                 .AddInnerBar(amount, max, stackColor)
                                 .SetBackgroundColor(EmptyColor["background"])
                                 .Build();
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
     }

@@ -39,7 +39,7 @@ namespace DelvUI.Helpers
                 return false;
             }
 
-            var actionManager = ActionManager.Instance();
+            ActionManager* actionManager = ActionManager.Instance();
             var adjustedId = actionManager->GetAdjustedActionId(actionId);
             timeElapsed = actionManager->GetRecastTimeElapsed(actionType, adjustedId);
             timeTotal = actionManager->GetRecastTime(actionType, adjustedId);

@@ -8,6 +8,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.Structs;
+using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface
 {
@@ -72,33 +74,33 @@ namespace DelvUI.Interface
 
         private void DrawHutonGauge()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
-            var hutonDurationLeft = (int)Math.Ceiling((float)(gauge.HutonTimeLeft / (double)1000));
+            NINGauge gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
+            var hutonDurationLeft = (int) Math.Ceiling((float) (gauge.HutonTimeLeft / (double) 1000));
 
             var xPos = CenterX - XOffset + HutonGaugeXOffset;
             var yPos = CenterY + YOffset + HutonGaugeYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, HutonGaugeHeight, HutonGaugeWidth);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, HutonGaugeHeight, HutonGaugeWidth);
             var maximum = 70f;
 
-            var bar = builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, HutonColor)
+            Bar bar = builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, HutonColor)
                              .SetTextMode(BarTextMode.Single)
                              .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                              .SetBackgroundColor(EmptyColor["background"])
                              .Build();
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawNinkiGauge()
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
+            NINGauge gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
 
             var xPos = CenterX - XOffset + NinkiGaugeXOffset;
             var yPos = CenterY + YOffset + NinkiGaugeYOffset;
 
-            var builder = BarBuilder.Create(xPos, yPos, NinkiGaugeHeight, NinkiGaugeWidth);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, NinkiGaugeHeight, NinkiGaugeWidth);
 
             if (NinkiChunked)
             {
@@ -119,9 +121,9 @@ namespace DelvUI.Interface
                        .SetText(NinkiChunked ? BarTextPosition.CenterLeft : BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
-            var bar = builder.Build();
+            Bar bar = builder.Build();
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
 
@@ -130,15 +132,15 @@ namespace DelvUI.Interface
             var xPos = CenterX - XOffset + TrickBarXOffset;
             var yPos = CenterY + YOffset + TrickBarYOffset;
 
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             var trickDuration = 0f;
             const float trickMaxDuration = 15f;
 
-            var builder = BarBuilder.Create(xPos, yPos, TrickBarHeight, TrickBarWidth);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, TrickBarHeight, TrickBarWidth);
 
             if (target is Chara)
             {
-                var trickStatus = target.StatusEffects.FirstOrDefault(o => o.EffectId == 638 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
+                StatusEffect trickStatus = target.StatusEffects.FirstOrDefault(o => o.EffectId == 638 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
                 trickDuration = Math.Max(trickStatus.Duration, 0);
             }
 
@@ -150,7 +152,7 @@ namespace DelvUI.Interface
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
-            var suitonBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 507);
+            IEnumerable<StatusEffect> suitonBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 507);
 
             if (suitonBuff.Any())
             {
@@ -164,8 +166,8 @@ namespace DelvUI.Interface
                 }
             }
 
-            var bar = builder.Build();
-            var drawList = ImGui.GetWindowDrawList();
+            Bar bar = builder.Build();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
     }

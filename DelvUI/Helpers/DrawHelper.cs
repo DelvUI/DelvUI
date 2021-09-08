@@ -69,15 +69,15 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            var uv0 = new Vector2(4f / texture.Width, 14f / texture.Height);
-            var uv1 = new Vector2(1f - 4f / texture.Width, 1f - 12f / texture.Height);
+            Vector2 uv0 = new Vector2(4f / texture.Width, 14f / texture.Height);
+            Vector2 uv1 = new Vector2(1f - 4f / texture.Width, 1f - 12f / texture.Height);
 
             ImGui.SetCursorPos(position);
             ImGui.Image(texture.ImGuiHandle, size, uv0, uv1);
 
             if (drawBorder)
             {
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 drawList.AddRect(position, position + size, 0xFF000000);
             }
         }

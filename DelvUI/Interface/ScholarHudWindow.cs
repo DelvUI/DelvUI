@@ -8,6 +8,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.Structs;
+using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface
 {
@@ -82,11 +84,11 @@ namespace DelvUI.Interface
 
         private void DrawFairyBar()
         {
-            var gauge = (float)PluginInterface.ClientState.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
+            var gauge = (float) PluginInterface.ClientState.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
             BarSize = new Vector2(FairyBarWidth, FairyBarHeight);
             BarCoords = new Vector2(FairyBarX - BaseXOffset, FairyBarY + BaseYOffset);
-            var cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y - 49);
-            var drawList = ImGui.GetWindowDrawList();
+            Vector2 cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y - 49);
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["background"]);
 
             drawList.AddRectFilledMultiColor(
@@ -118,13 +120,13 @@ namespace DelvUI.Interface
         private void DrawAetherBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            var aetherFlowBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
+            StatusEffect aetherFlowBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
             var barWidth = SchAetherBarWidth / 3;
             BarSize = new Vector2(barWidth, SchAetherBarHeight);
             BarCoords = new Vector2(SchAetherBarX + BaseXOffset, SchAetherBarY + BaseYOffset);
-            var cursorPos = new Vector2(CenterX + BarCoords.X, CenterY + BarCoords.Y - 71);
+            Vector2 cursorPos = new Vector2(CenterX + BarCoords.X, CenterY + BarCoords.Y - 71);
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
             drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["background"]);
             drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
@@ -170,14 +172,14 @@ namespace DelvUI.Interface
 
         private void DrawBioBar()
         {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             BarSize = new Vector2(BioBarWidth, BioBarHeight);
             BarCoords = new Vector2(BioBarX, BioBarY);
             var xOffset = CenterX + BaseXOffset - BarCoords.X;
             var yOffset = CenterY + BaseYOffset + BarCoords.Y;
-            var cursorPos = new Vector2(xOffset, yOffset);
+            Vector2 cursorPos = new Vector2(xOffset, yOffset);
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
             if (!(target is Chara))
             {
@@ -187,13 +189,13 @@ namespace DelvUI.Interface
                 return;
             }
 
-            var bio = target.StatusEffects.FirstOrDefault(
+            StatusEffect bio = target.StatusEffects.FirstOrDefault(
                 o => o.EffectId == 179 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                   || o.EffectId == 189 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                   || o.EffectId == 1895 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
             );
 
-            var bioDuration = (int)bio.Duration;
+            var bioDuration = (int) bio.Duration;
 
             drawList.AddRectFilled(cursorPos, cursorPos + BarSize, EmptyColor["background"]);
             drawList.AddRectFilled(cursorPos, cursorPos + new Vector2(BarSize.X / 30 * bioDuration, BarSize.Y), SCHBioColor["gradientRight"]);

@@ -13,9 +13,9 @@ namespace DelvUI.Helpers
                 return false;
             }
 
-            return (npc.BattleNpcKind == BattleNpcSubKind.Enemy || (int)npc.BattleNpcKind == 1)
-                && *(byte*)(npc.Address + 0x1980) != 0
-                && *(byte*)(npc.Address + 0x193C) != 1;
+            return (npc.BattleNpcKind == BattleNpcSubKind.Enemy || (int) npc.BattleNpcKind == 1)
+                && *(byte*) (npc.Address + 0x1980) != 0
+                && *(byte*) (npc.Address + 0x193C) != 1;
         }
 
         public static unsafe float ActorShieldValue(Actor actor)
@@ -25,7 +25,7 @@ namespace DelvUI.Helpers
                 return 0f;
             }
 
-            return Math.Min(*(int*)(actor.Address + 0x1997), 100) / 100f;
+            return Math.Min(*(int*) (actor.Address + 0x1997), 100) / 100f;
         }
 
         public static string DurationToString(double duration)
@@ -35,7 +35,7 @@ namespace DelvUI.Helpers
                 return "";
             }
 
-            var t = TimeSpan.FromSeconds(duration);
+            TimeSpan t = TimeSpan.FromSeconds(duration);
 
             if (t.Hours > 1)
             {

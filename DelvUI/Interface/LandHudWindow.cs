@@ -3,6 +3,7 @@ using DelvUI.Config;
 using ImGuiNET;
 using System.Diagnostics;
 using System.Numerics;
+using Dalamud.Game.ClientState.Actors.Types;
 
 namespace DelvUI.Interface
 {
@@ -21,12 +22,12 @@ namespace DelvUI.Interface
         protected override void DrawPrimaryResourceBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            var barSize = new Vector2(PrimaryResourceBarWidth, PrimaryResourceBarHeight);
-            var actor = PluginInterface.ClientState.LocalPlayer;
-            var scale = (float)actor.CurrentGp / actor.MaxGp;
-            var cursorPos = new Vector2(CenterX - PrimaryResourceBarXOffset + 33, CenterY + PrimaryResourceBarYOffset - 16);
+            Vector2 barSize = new Vector2(PrimaryResourceBarWidth, PrimaryResourceBarHeight);
+            PlayerCharacter actor = PluginInterface.ClientState.LocalPlayer;
+            var scale = (float) actor.CurrentGp / actor.MaxGp;
+            Vector2 cursorPos = new Vector2(CenterX - PrimaryResourceBarXOffset + 33, CenterY + PrimaryResourceBarYOffset - 16);
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
 
             drawList.AddRectFilledMultiColor(
@@ -43,8 +44,8 @@ namespace DelvUI.Interface
             if (ShowPrimaryResourceBarThresholdMarker)
             {
                 // threshold
-                var position = new Vector2(cursorPos.X + PrimaryResourceBarThresholdValue / 10000f * barSize.X - 3, cursorPos.Y);
-                var size = new Vector2(2, barSize.Y);
+                Vector2 position = new Vector2(cursorPos.X + PrimaryResourceBarThresholdValue / 10000f * barSize.X - 3, cursorPos.Y);
+                Vector2 size = new Vector2(2, barSize.Y);
                 drawList.AddRect(position, position + size, 0xFF000000);
             }
 

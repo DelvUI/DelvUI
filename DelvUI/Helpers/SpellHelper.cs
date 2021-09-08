@@ -19,12 +19,12 @@ namespace DelvUI.Helpers
 
         public int GetSpellCooldownInt(uint actionId)
         {
-            if ((int)Math.Ceiling(GetSpellCooldown(actionId) % GetRecastTime(actionId)) <= 0)
+            if ((int) Math.Ceiling(GetSpellCooldown(actionId) % GetRecastTime(actionId)) <= 0)
             {
                 return 0;
             }
 
-            return (int)Math.Ceiling(GetSpellCooldown(actionId) % GetRecastTime(actionId));
+            return (int) Math.Ceiling(GetSpellCooldown(actionId) % GetRecastTime(actionId));
         }
 
         public int GetStackCount(int maxStacks, uint actionId)
@@ -34,7 +34,7 @@ namespace DelvUI.Helpers
                 return maxStacks;
             }
 
-            return maxStacks - (int)Math.Ceiling(GetSpellCooldownInt(actionId) / (GetRecastTime(actionId) / maxStacks));
+            return maxStacks - (int) Math.Ceiling(GetSpellCooldownInt(actionId) / (GetRecastTime(actionId) / maxStacks));
         }
 
         /*public unsafe uint CheckActionResources(uint ActionID)
