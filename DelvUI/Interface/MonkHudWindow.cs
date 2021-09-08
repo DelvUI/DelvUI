@@ -497,7 +497,7 @@ namespace DelvUI.Interface
         #region Forms
         [Checkbox("Show Forms Bar" + "##Forms")]
         [CollapseControl(40, 7)]
-        public bool ShowFormsBar = true;
+        public bool ShowFormsBar = false;
 
         [DragFloat2("Position" + "##Forms", min = -4000f, max = 4000f)]
         [CollapseWith(0, 7)]
