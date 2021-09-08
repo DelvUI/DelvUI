@@ -125,7 +125,7 @@ namespace DelvUI.Interface.GeneralElements
         public static GCDIndicatorConfig GCDIndicator()
         {
             var size = new Vector2(254, 4);
-            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY + 2);
+            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY + DefaultCastbarSize.Y - 4);
 
             return new GCDIndicatorConfig(pos, size);
         }
@@ -143,7 +143,7 @@ namespace DelvUI.Interface.GeneralElements
         public static PrimaryResourceConfig PrimaryResource()
         {
             var size = new Vector2(254, 20);
-            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY + 15);
+            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY - 37);
 
             var labelConfig = new LabelConfig(Vector2.Zero, "", LabelTextAnchor.Center, "Value Label");
 
