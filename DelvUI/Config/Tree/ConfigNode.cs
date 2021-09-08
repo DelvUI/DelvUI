@@ -516,7 +516,7 @@ namespace DelvUI.Config.Tree
                 pair.Value.Draw(ref changed);
             }
 
-            if(ConfigObject.portable)
+            if (ConfigObject.portable)
             {
                 DrawImportExportGeneralConfig();
             }

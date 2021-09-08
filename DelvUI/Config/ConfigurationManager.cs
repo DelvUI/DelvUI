@@ -109,7 +109,7 @@ namespace DelvUI.Config
         public static string GenerateExportString(PluginConfigObject configObject)
         {
             var jsonString = JsonConvert.SerializeObject(configObject, Formatting.Indented,
-                new JsonSerializerSettings { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,TypeNameHandling = TypeNameHandling.Objects });
+                new JsonSerializerSettings { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects });
 
             return CompressAndBase64Encode(jsonString);
         }
@@ -123,7 +123,7 @@ namespace DelvUI.Config
             }
             catch (Exception ex)
             {
-                PluginLog.Log(ex.Message + "\n" +ex.StackTrace);
+                PluginLog.Log(ex.Message + "\n" + ex.StackTrace);
 
                 return default;
             }
