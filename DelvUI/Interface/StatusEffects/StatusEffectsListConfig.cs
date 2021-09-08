@@ -30,15 +30,7 @@ namespace DelvUI.Interface.StatusEffects
             ShowPermanentEffects = showPermanentEffects;
             GrowthDirections = growthDirections;
         }
-
-        public StatusEffectsListConfig(
-            Vector2 position,
-            bool showBuffs,
-            bool showDebuffs,
-            bool showPermanentEffects,
-            GrowthDirections growthDirections,
-            StatusEffectIconConfig iconConfig
-        )
+        public StatusEffectsListConfig(Vector2 position, bool showBuffs, bool showDebuffs, bool showPermanentEffects, GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
         {
             Position = position;
             ShowBuffs = showBuffs;
@@ -62,18 +54,18 @@ namespace DelvUI.Interface.StatusEffects
                 changed |= ImGui.DragFloat2("Area Size", ref MaxSize, 1f, 1, 2000);
                 changed |= ImGui.DragFloat2("Padding", ref IconPadding, 1f, -200, 200);
 
-                List<GrowthDirections> directions = new List<GrowthDirections>
+                var directions = new List<GrowthDirections>
                 {
                     GrowthDirections.Right | GrowthDirections.Down,
                     GrowthDirections.Right | GrowthDirections.Up,
                     GrowthDirections.Left | GrowthDirections.Down,
                     GrowthDirections.Left | GrowthDirections.Up,
                     GrowthDirections.Out | GrowthDirections.Right,
-                    GrowthDirections.Out | GrowthDirections.Down
+                    GrowthDirections.Out | GrowthDirections.Down,
                 };
 
                 var selection = Math.Max(0, directions.IndexOf(GrowthDirections));
-                string[] directionsStrings = {"Right and Down", "Right and Up", "Left and Down", "Left and Up", "Out from Middle and Right", "Out from Middle and Down"};
+                string[] directionsStrings = { "Right and Down", "Right and Up", "Left and Down", "Left and Up", "Out from Middle and Right", "Out from Middle and Down" };
 
                 if (ImGui.Combo("Icons Growth Direction", ref selection, directionsStrings, directionsStrings.Length))
                 {
@@ -110,7 +102,10 @@ namespace DelvUI.Interface.StatusEffects
         public bool ShowStacksText = true;
         public Vector2 Size = new(40, 40);
 
-        public StatusEffectIconConfig() { }
+        public StatusEffectIconConfig()
+        {
+
+        }
 
         public StatusEffectIconConfig(Vector2 size, bool showDurationText, bool showStacksText, bool showBorder, bool showDispellableBorder)
         {

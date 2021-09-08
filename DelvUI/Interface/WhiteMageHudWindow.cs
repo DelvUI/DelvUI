@@ -7,8 +7,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.Structs;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface
 {
@@ -76,14 +74,14 @@ namespace DelvUI.Interface
 
         private void DrawDiaBar()
         {
-            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             //var cursorPos = new Vector2(CenterX - 127, CenterY + 424);
             BarSize = new Vector2(DiaBarWidth, DiaBarHeight);
             BarCoords = new Vector2(DiaBarX + BaseXOffset, DiaBarY + BaseYOffset);
-            Vector2 cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y);
+            var cursorPos = new Vector2(CenterX - BarCoords.X, CenterY + BarCoords.Y);
 
             //var barWidth = 253;
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            var drawList = ImGui.GetWindowDrawList();
             //var barSize = new Vector2(barWidth, 20);
 
             if (!(target is Chara))
@@ -94,7 +92,7 @@ namespace DelvUI.Interface
                 return;
             }
 
-            StatusEffect dia = target.StatusEffects.FirstOrDefault(
+            var dia = target.StatusEffects.FirstOrDefault(
                 o => o.EffectId == 1871 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                   || o.EffectId == 144 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                   || o.EffectId == 143 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
@@ -125,7 +123,7 @@ namespace DelvUI.Interface
 
         private void DrawSecondaryResourceBar()
         {
-            WHMGauge gauge = PluginInterface.ClientState.JobGauges.Get<WHMGauge>();
+            var gauge = PluginInterface.ClientState.JobGauges.Get<WHMGauge>();
 
             BarSize = new Vector2(LillyBarWidth, LillyBarHeight);
             BarCoords = new Vector2(LillyBarX + BaseXOffset, LillyBarY + BaseYOffset);
@@ -134,14 +132,14 @@ namespace DelvUI.Interface
             const int numChunks = 6;
 
             var barWidth = (BarSize.X - xPadding * (numChunks - 1)) / numChunks;
-            Vector2 barSize = new Vector2(barWidth, BarSize.Y);
+            var barSize = new Vector2(barWidth, BarSize.Y);
             var xPos = CenterX - BarCoords.X;
             var yPos = CenterY + BarCoords.Y - 20;
 
             const float lilyCooldown = 30000f;
 
-            Vector2 cursorPos = new Vector2(xPos, yPos);
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            var cursorPos = new Vector2(xPos, yPos);
+            var drawList = ImGui.GetWindowDrawList();
 
             var scale = gauge.NumLilies == 0 ? gauge.LilyTimer / lilyCooldown : 1;
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, EmptyColor["background"]);
@@ -172,7 +170,7 @@ namespace DelvUI.Interface
             if (scale < 1)
             {
                 var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
-                Vector2 size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
+                var size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
                 DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y - 23));
             }
 
@@ -211,7 +209,7 @@ namespace DelvUI.Interface
                 if (scale < 1)
                 {
                     var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
-                    Vector2 size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
+                    var size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
                     DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y - 23));
                 }
             }
@@ -251,7 +249,7 @@ namespace DelvUI.Interface
                 if (scale < 1)
                 {
                     var timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
-                    Vector2 size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
+                    var size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
                     DrawOutlinedText(timer, new Vector2(cursorPos.X + barWidth / 2f - size.X / 2f, cursorPos.Y - 23));
                 }
             }

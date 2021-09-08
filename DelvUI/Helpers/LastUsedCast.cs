@@ -1,5 +1,4 @@
 ﻿using Dalamud.Game.ClientState.Actors;
-using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Plugin;
 using DelvUI.Enums;
 using FFXIVClientStructs.FFXIV.Client.Game;
@@ -34,8 +33,8 @@ namespace DelvUI.Helpers
 
         private void SetCastProperties()
         {
-            Actor target = _pluginInterface.ClientState.Targets.SoftTarget ?? _pluginInterface.ClientState.Targets.CurrentTarget;
-            ObjectKind? targetKind = target?.ObjectKind;
+            var target = _pluginInterface.ClientState.Targets.SoftTarget ?? _pluginInterface.ClientState.Targets.CurrentTarget;
+            var targetKind = target?.ObjectKind;
 
             switch (targetKind)
             {
@@ -138,7 +137,7 @@ namespace DelvUI.Helpers
 
         private static DamageType GetDamageType(Action action)
         {
-            DamageType damageType = (DamageType) action.AttackType.Row;
+            var damageType = (DamageType)action.AttackType.Row;
 
             if (damageType != DamageType.Magic && damageType != DamageType.Darkness && damageType != DamageType.Unknown)
             {

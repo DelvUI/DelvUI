@@ -11,7 +11,7 @@ namespace DelvUI.Config
     {
         protected bool ColorEdit4(string label, ref PluginConfigColor color)
         {
-            Vector4 vector = color.Vector;
+            var vector = color.Vector;
 
             if (ImGui.ColorEdit4(label, ref vector))
             {
@@ -27,17 +27,15 @@ namespace DelvUI.Config
     [Serializable]
     public class PluginConfigColor
     {
-        [JsonIgnore]
-        private float[] _colorMapRatios = {-.8f, -.1f, .1f};
+        [JsonIgnore] private float[] _colorMapRatios = { -.8f, -.1f, .1f };
 
-        [JsonIgnore]
-        private Vector4 _vector;
+        [JsonIgnore] private Vector4 _vector;
 
         public PluginConfigColor(Vector4 vector, float[] colorMapRatios = null)
         {
             _vector = vector;
 
-            if (colorMapRatios is {Length: >= 3})
+            if (colorMapRatios is { Length: >= 3 })
             {
                 _colorMapRatios = colorMapRatios;
             }
@@ -77,7 +75,7 @@ namespace DelvUI.Config
             Background = ImGui.ColorConvertFloat4ToU32(_vector.AdjustColor(_colorMapRatios[0]));
             LeftGradient = ImGui.ColorConvertFloat4ToU32(_vector.AdjustColor(_colorMapRatios[1]));
             RightGradient = ImGui.ColorConvertFloat4ToU32(_vector.AdjustColor(_colorMapRatios[2]));
-            Map = new Dictionary<string, uint> {["base"] = Base, ["background"] = Background, ["gradientLeft"] = LeftGradient, ["gradientRight"] = RightGradient};
+            Map = new Dictionary<string, uint> { ["base"] = Base, ["background"] = Background, ["gradientLeft"] = LeftGradient, ["gradientRight"] = RightGradient };
         }
     }
 }

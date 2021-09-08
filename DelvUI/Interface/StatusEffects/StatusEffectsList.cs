@@ -6,7 +6,6 @@ using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Lumina.Excel;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface.StatusEffects
@@ -30,7 +29,7 @@ namespace DelvUI.Interface.StatusEffects
         Down = 2,
         Left = 4,
         Right = 8,
-        Out = 16
+        Out = 16,
     }
 
     public class StatusEffectsList
@@ -86,7 +85,6 @@ namespace DelvUI.Interface.StatusEffects
             {
                 return GrowthDirections.Out | GrowthDirections.Right;
             }
-
             if ((directions & GrowthDirections.Out) != 0 && (directions & GrowthDirections.Up) != 0)
             {
                 return GrowthDirections.Out | GrowthDirections.Down;
@@ -97,8 +95,8 @@ namespace DelvUI.Interface.StatusEffects
 
         private uint CalculateLayout(List<StatusEffectData> list)
         {
-            var effectCount = (uint) list.Count;
-            var count = Config.Limit >= 0 ? Math.Min((uint) Config.Limit, effectCount) : effectCount;
+            var effectCount = (uint)list.Count;
+            var count = Config.Limit >= 0 ? Math.Min((uint)Config.Limit, effectCount) : effectCount;
 
             if (Actor == null || count <= 0)
             {
@@ -109,8 +107,8 @@ namespace DelvUI.Interface.StatusEffects
                 Config.MaxSize,
                 Config.IconConfig.Size,
                 count,
-                (int) Config.IconPadding.X,
-                (int) Config.IconPadding.Y,
+                (int)Config.IconPadding.X,
+                (int)Config.IconPadding.Y,
                 Config.FillRowsFirst,
                 out _rowCount,
                 out _colCount
@@ -121,7 +119,7 @@ namespace DelvUI.Interface.StatusEffects
 
         private List<StatusEffectData> StatusEffectsData(List<uint> filterBuffs)
         {
-            List<StatusEffectData> list = new List<StatusEffectData>();
+            var list = new List<StatusEffectData>();
 
             if (Actor == null)
             {
@@ -135,7 +133,7 @@ namespace DelvUI.Interface.StatusEffects
                 return list;
             }
 
-            ExcelSheet<Status> sheet = _pluginInterface.Data.GetExcelSheet<Status>();
+            var sheet = _pluginInterface.Data.GetExcelSheet<Status>();
 
             if (sheet == null)
             {
@@ -144,14 +142,14 @@ namespace DelvUI.Interface.StatusEffects
 
             for (var i = 0; i < effectCount; i++)
             {
-                StatusEffect status = Actor.StatusEffects[i];
+                var status = Actor.StatusEffects[i];
 
                 if (status.EffectId <= 0)
                 {
                     continue;
                 }
 
-                Status row = sheet.GetRow((uint) status.EffectId);
+                var row = sheet.GetRow((uint)status.EffectId);
 
                 if (row == null)
                 {
@@ -182,22 +180,22 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             // Always adhere to the priority of buffs set by filterBuffs.
-            List<StatusEffectData> toReturn = new List<StatusEffectData>();
-
+            var toReturn = new List<StatusEffectData>();
             foreach (var buffId in filterBuffs)
             {
-                var idx = list.FindIndex(s => (uint) s.StatusEffect.EffectId == buffId);
-
+                var idx = list.FindIndex(s => (uint)s.StatusEffect.EffectId == buffId);
                 if (idx >= 0)
                 {
                     toReturn.Add(list[idx]);
                 }
             }
-
             return toReturn;
         }
 
-        public void Draw() { Draw(new List<uint>()); }
+        public void Draw()
+        {
+            Draw(new List<uint>());
+        }
 
         public void Draw(List<uint> filterBuffs)
         {
@@ -207,11 +205,11 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             // calculate layout
-            List<StatusEffectData> list = StatusEffectsData(filterBuffs);
+            var list = StatusEffectsData(filterBuffs);
             var count = CalculateLayout(list);
 
             // validate growth directions
-            GrowthDirections directions = Config.GrowthDirections;
+            var directions = Config.GrowthDirections;
 
             if (directions != _lastGrowthDirections)
             {
@@ -221,12 +219,12 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             // draw area
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            Vector2 origin = Center + Config.Position;
+            var drawList = ImGui.GetWindowDrawList();
+            var origin = Center + Config.Position;
 
             if (Config.ShowArea)
             {
-                Vector2 area = Config.MaxSize;
+                var area = Config.MaxSize;
 
                 if ((directions & GrowthDirections.Left) != 0)
                 {
@@ -246,12 +244,11 @@ namespace DelvUI.Interface.StatusEffects
 
             for (var i = 0; i < count; i++)
             {
-                StatusEffectData statusEffectData = list[i];
+                var statusEffectData = list[i];
                 int directionX;
                 int directionY;
                 float offsetX;
                 float offsetY;
-
                 if ((directions & GrowthDirections.Out) != 0)
                 {
                     directionX = 1;
@@ -267,7 +264,7 @@ namespace DelvUI.Interface.StatusEffects
                     offsetY = directionY == 1 ? 0 : -Config.IconConfig.Size.Y;
                 }
 
-                Vector2 pos = new Vector2(
+                var pos = new Vector2(
                     origin.X + offsetX + Config.IconConfig.Size.X * col * directionX + Config.IconPadding.X * col * directionX,
                     origin.Y + offsetY + Config.IconConfig.Size.Y * row * directionY + Config.IconPadding.Y * row * directionY
                 );
@@ -279,7 +276,6 @@ namespace DelvUI.Interface.StatusEffects
                 if (Config.FillRowsFirst)
                 {
                     col += 1;
-
                     if (col >= _colCount)
                     {
                         col = 0;
@@ -289,7 +285,6 @@ namespace DelvUI.Interface.StatusEffects
                 else
                 {
                     row += 1;
-
                     if (row >= _rowCount)
                     {
                         row = 0;

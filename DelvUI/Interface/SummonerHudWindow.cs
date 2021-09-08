@@ -7,8 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Dalamud.Game.ClientState.Structs;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface
 {
@@ -61,7 +59,7 @@ namespace DelvUI.Interface
 
         private void DrawActiveDots()
         {
-            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
             if (!ShowBioBar && !ShowMiasmaBar)
             {
@@ -75,20 +73,20 @@ namespace DelvUI.Interface
 
             var xPos = CenterX - XOffset + MiasmaBarXOffset;
             var yPos = CenterY + YOffset + MiasmaBarYOffset;
-            List<Bar> barDrawList = new List<Bar>();
+            var barDrawList = new List<Bar>();
 
             if (ShowMiasmaBar)
             {
-                StatusEffect miasma = target.StatusEffects.FirstOrDefault(
+                var miasma = target.StatusEffects.FirstOrDefault(
                     o => o.EffectId == 1215 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                       || o.EffectId == 180 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                 );
 
                 var miasmaDuration = Math.Abs(miasma.Duration);
-                Dictionary<string, uint> miasmaColor = miasmaDuration > 5 ? SmnMiasmaColor : SmnExpiryColor;
-                BarBuilder builder = BarBuilder.Create(xPos, yPos, MiasmaBarHeight, MiasmaBarWidth);
+                var miasmaColor = miasmaDuration > 5 ? SmnMiasmaColor : SmnExpiryColor;
+                var builder = BarBuilder.Create(xPos, yPos, MiasmaBarHeight, MiasmaBarWidth);
 
-                Bar miasmaBar = builder.AddInnerBar(miasmaDuration, 30f, miasmaColor)
+                var miasmaBar = builder.AddInnerBar(miasmaDuration, 30f, miasmaColor)
                                        .SetFlipDrainDirection(MiasmaBarInverted)
                                        .Build();
 
@@ -97,19 +95,19 @@ namespace DelvUI.Interface
 
             if (ShowBioBar)
             {
-                StatusEffect bio = target.StatusEffects.FirstOrDefault(
+                var bio = target.StatusEffects.FirstOrDefault(
                     o => o.EffectId == 1214 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                       || o.EffectId == 179 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                       || o.EffectId == 189 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                 );
 
                 var bioDuration = Math.Abs(bio.Duration);
-                Dictionary<string, uint> bioColor = bioDuration > 5 ? SmnBioColor : SmnExpiryColor;
+                var bioColor = bioDuration > 5 ? SmnBioColor : SmnExpiryColor;
                 xPos = CenterX - XOffset + BioBarXOffset;
                 yPos = CenterY + YOffset + BioBarYOffset;
-                BarBuilder builder = BarBuilder.Create(xPos, yPos, BioBarHeight, BioBarWidth);
+                var builder = BarBuilder.Create(xPos, yPos, BioBarHeight, BioBarWidth);
 
-                Bar bioBar = builder.AddInnerBar(bioDuration, 30f, bioColor)
+                var bioBar = builder.AddInnerBar(bioDuration, 30f, bioColor)
                                     .SetFlipDrainDirection(BioBarInverted)
                                     .Build();
 
@@ -118,9 +116,9 @@ namespace DelvUI.Interface
 
             if (barDrawList.Count > 0)
             {
-                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+                var drawList = ImGui.GetWindowDrawList();
 
-                foreach (Bar bar in barDrawList)
+                foreach (var bar in barDrawList)
                 {
                     bar.Draw(drawList, PluginConfiguration);
                 }
@@ -129,7 +127,7 @@ namespace DelvUI.Interface
 
         private void DrawRuinBar()
         {
-            StatusEffect ruinBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1212);
+            var ruinBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1212);
             var xPos = CenterX - XOffset + RuinBarXOffset;
             var yPos = CenterY + YOffset + RuinBarYOffset;
 
@@ -138,21 +136,21 @@ namespace DelvUI.Interface
                 return;
             }
 
-            Bar bar = BarBuilder.Create(xPos, yPos, RuinBarHeight, RuinBarWidth)
+            var bar = BarBuilder.Create(xPos, yPos, RuinBarHeight, RuinBarWidth)
                                 .SetChunks(4)
                                 .SetChunkPadding(RuinBarPadding)
                                 .AddInnerBar(ruinBuff.StackCount, 4, SmnRuinColor)
                                 .SetBackgroundColor(SmnEmptyColor["background"])
                                 .Build();
 
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawAetherBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            StatusEffect aetherFlowBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
+            var aetherFlowBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
             var xPos = CenterX - XOffset + AetherBarXOffset;
             var yPos = CenterY + YOffset + AetherBarYOffset;
 
@@ -161,14 +159,14 @@ namespace DelvUI.Interface
                 return;
             }
 
-            Bar bar = BarBuilder.Create(xPos, yPos, AetherBarHeight, AetherBarWidth)
+            var bar = BarBuilder.Create(xPos, yPos, AetherBarHeight, AetherBarWidth)
                                 .SetChunks(2)
                                 .SetChunkPadding(AetherBarPadding)
                                 .AddInnerBar(aetherFlowBuff.StackCount, 2, SmnAetherColor)
                                 .SetBackgroundColor(SmnEmptyColor["background"])
                                 .Build();
 
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            var drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList, PluginConfiguration);
         }
     }

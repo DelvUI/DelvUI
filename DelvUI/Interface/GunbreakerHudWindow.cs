@@ -5,7 +5,6 @@ using DelvUI.Interface.Bars;
 using ImGuiNET;
 using System.Collections.Generic;
 using System.Linq;
-using Dalamud.Game.ClientState.Structs;
 
 namespace DelvUI.Interface
 {
@@ -50,19 +49,19 @@ namespace DelvUI.Interface
 
         private void DrawPowderGauge()
         {
-            GNBGauge gauge = PluginInterface.ClientState.JobGauges.Get<GNBGauge>();
+            var gauge = PluginInterface.ClientState.JobGauges.Get<GNBGauge>();
 
             var xPos = CenterX - XOffset + PowderGaugeXOffset;
             var yPos = CenterY + YOffset + PowderGaugeYOffset;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, PowderGaugeHeight, PowderGaugeWidth);
+            var builder = BarBuilder.Create(xPos, yPos, PowderGaugeHeight, PowderGaugeWidth);
 
             builder.SetChunks(2)
                    .SetChunkPadding(PowderGaugePadding)
                    .AddInnerBar(gauge.NumAmmo, 2, GunPowderColor, null)
                    .SetBackgroundColor(EmptyColor["background"]);
 
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
@@ -71,9 +70,9 @@ namespace DelvUI.Interface
             var xPos = CenterX - XOffset + NoMercyBarXOffset;
             var yPos = CenterY + YOffset + NoMercyBarYOffset;
 
-            IEnumerable<StatusEffect> noMercyBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1831);
+            var noMercyBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1831);
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, NoMercyBarHeight, NoMercyBarWidth).SetBackgroundColor(EmptyColor["background"]);
+            var builder = BarBuilder.Create(xPos, yPos, NoMercyBarHeight, NoMercyBarWidth).SetBackgroundColor(EmptyColor["background"]);
 
             if (noMercyBuff.Any())
             {
@@ -84,7 +83,7 @@ namespace DelvUI.Interface
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
     }

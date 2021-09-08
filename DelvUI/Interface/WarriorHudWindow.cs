@@ -7,7 +7,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Dalamud.Game.ClientState.Structs;
 
 namespace DelvUI.Interface
 {
@@ -62,17 +61,17 @@ namespace DelvUI.Interface
         private void DrawStormsEyeBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            IEnumerable<StatusEffect> innerReleaseBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1177);
-            IEnumerable<StatusEffect> stormsEyeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
+            var innerReleaseBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1177);
+            var stormsEyeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
 
             var xPos = CenterX + BaseXOffset - StormsEyeXOffset;
             var yPos = CenterY + BaseYOffset + StormsEyeYOffset;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, StormsEyeHeight, StormsEyeWidth).SetBackgroundColor(EmptyColor["background"]);
+            var builder = BarBuilder.Create(xPos, yPos, StormsEyeHeight, StormsEyeWidth).SetBackgroundColor(EmptyColor["background"]);
 
             var duration = 0f;
             var maximum = 10f;
-            Dictionary<string, uint> color = EmptyColor;
+            var color = EmptyColor;
 
             if (innerReleaseBuff.Any())
             {
@@ -94,23 +93,23 @@ namespace DelvUI.Interface
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current, StormsEyeTextScale);
             }
 
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         private void DrawBeastGauge()
         {
-            WARGauge gauge = PluginInterface.ClientState.JobGauges.Get<WARGauge>();
-            IEnumerable<StatusEffect> nascentChaosBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1897);
+            var gauge = PluginInterface.ClientState.JobGauges.Get<WARGauge>();
+            var nascentChaosBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1897);
 
             var xPos = CenterX + BaseXOffset - BeastGaugeXOffset;
             var yPos = CenterY + BaseYOffset + BeastGaugeYOffset;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, BeastGaugeHeight, BeastGaugeWidth)
-                                           .SetChunks(2)
-                                           .AddInnerBar(gauge.BeastGaugeAmount, 100, FellCleaveColor)
-                                           .SetBackgroundColor(EmptyColor["background"])
-                                           .SetChunkPadding(BeastGaugePadding);
+            var builder = BarBuilder.Create(xPos, yPos, BeastGaugeHeight, BeastGaugeWidth)
+                                    .SetChunks(2)
+                                    .AddInnerBar(gauge.BeastGaugeAmount, 100, FellCleaveColor)
+                                    .SetBackgroundColor(EmptyColor["background"])
+                                    .SetChunkPadding(BeastGaugePadding);
 
             if (nascentChaosBuff.Any())
             {
@@ -123,7 +122,7 @@ namespace DelvUI.Interface
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current, BeastGaugeTextScale);
             }
 
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
     }

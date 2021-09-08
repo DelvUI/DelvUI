@@ -24,7 +24,7 @@ namespace DelvUI.Interface.Bars
             InnerBars = new List<InnerBar>();
             PrimaryTexts = new List<BarText>();
             ChunkPadding = 0;
-            ChunkSizes = new[] {1f};
+            ChunkSizes = new[] { 1f };
             DrawBorder = true;
         }
 
@@ -72,19 +72,19 @@ namespace DelvUI.Interface.Bars
         {
             var barWidth = BarWidth + ChunkPadding;   // For loop adds one extra padding more than is needed
             var barHeight = BarHeight + ChunkPadding; // For loop adds one extra padding more than is needed
-            Vector2 cursorPos = new Vector2(XPosition, YPosition);
+            var cursorPos = new Vector2(XPosition, YPosition);
             var backgroundColor = _backgroundColorSet ? BackgroundColor : 0x88000000;
 
             foreach (var chunkSize in ChunkSizes)
             {
-                Vector2 barSize = Vertical ? new Vector2(BarWidth, barHeight * chunkSize - ChunkPadding) : new Vector2(barWidth * chunkSize - ChunkPadding, BarHeight);
+                var barSize = Vertical ? new Vector2(BarWidth, barHeight * chunkSize - ChunkPadding) : new Vector2(barWidth * chunkSize - ChunkPadding, BarHeight);
 
                 drawList.AddRectFilled(cursorPos, cursorPos + barSize, backgroundColor);
 
                 cursorPos += Vertical ? new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
             }
 
-            foreach (InnerBar innerBar in InnerBars)
+            foreach (var innerBar in InnerBars)
             {
                 innerBar.Draw(drawList, configuration);
             }
@@ -95,7 +95,7 @@ namespace DelvUI.Interface.Bars
             {
                 foreach (var chunkSize in ChunkSizes)
                 {
-                    Vector2 barSize = Vertical ? new Vector2(BarWidth, barHeight * chunkSize - ChunkPadding) : new Vector2(barWidth * chunkSize - ChunkPadding, BarHeight);
+                    var barSize = Vertical ? new Vector2(BarWidth, barHeight * chunkSize - ChunkPadding) : new Vector2(barWidth * chunkSize - ChunkPadding, BarHeight);
 
                     drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
 
@@ -103,7 +103,7 @@ namespace DelvUI.Interface.Bars
                 }
             }
 
-            foreach (InnerBar innerBar in InnerBars)
+            foreach (var innerBar in InnerBars)
             {
                 innerBar.DrawText(drawList, configuration);
             }
@@ -113,9 +113,9 @@ namespace DelvUI.Interface.Bars
 
         public void DrawText(ImDrawListPtr drawList, PluginConfiguration configuration)
         {
-            foreach (BarText text in PrimaryTexts)
+            foreach (var text in PrimaryTexts)
             {
-                Vector2 cursorPos = new Vector2(XPosition, YPosition);
+                var cursorPos = new Vector2(XPosition, YPosition);
 
                 var strText = text.Type switch
                 {
@@ -126,7 +126,7 @@ namespace DelvUI.Interface.Bars
                     _ => "ERROR LOADING TEXT, INVALID TYPE"
                 };
 
-                Vector2 textPos = text.CalcTextPosition(cursorPos, strText, BarWidth, BarHeight);
+                var textPos = text.CalcTextPosition(cursorPos, strText, BarWidth, BarHeight);
 
                 DrawHelper.DrawOutlinedText(strText, textPos, text.Color, text.OutlineColor, text.Scale, configuration);
             }
@@ -173,24 +173,24 @@ namespace DelvUI.Interface.Bars
 
         public virtual void Draw(ImDrawListPtr drawList, PluginConfiguration configuration)
         {
-            var barWidth = Parent.Vertical ? (float) 1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
-            var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float) 1 / Parent.InnerBars.Count * Parent.BarHeight;
+            var barWidth = Parent.Vertical ? (float)1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
+            var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float)1 / Parent.InnerBars.Count * Parent.BarHeight;
             var currentFill = CurrentValue / MaximumValue;
             var i = 0;
 
             if (!FlipDrainDirection)
             {
-                var xPos = Parent.Vertical ? Parent.XPosition + (float) ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition;
-                var yPos = Parent.Vertical ? Parent.YPosition : Parent.YPosition + (float) ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
-                Vector2 cursorPos = new Vector2(xPos, yPos);
+                var xPos = Parent.Vertical ? Parent.XPosition + (float)ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition;
+                var yPos = Parent.Vertical ? Parent.YPosition : Parent.YPosition + (float)ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
+                var cursorPos = new Vector2(xPos, yPos);
 
                 foreach (var chunkSize in Parent.ChunkSizes)
                 {
-                    Vector2 barSize = Parent.Vertical
+                    var barSize = Parent.Vertical
                         ? new Vector2(barWidth, barHeight * chunkSize - Parent.ChunkPadding)
                         : new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
 
-                    var fillPercentage = (float) Math.Round(Math.Min(currentFill / chunkSize, 1f), 5); // Rounding due to floating point precision shenanigans
+                    var fillPercentage = (float)Math.Round(Math.Min(currentFill / chunkSize, 1f), 5); // Rounding due to floating point precision shenanigans
 
                     if (fillPercentage >= 1f)
                     {
@@ -208,7 +208,7 @@ namespace DelvUI.Interface.Bars
                     else
                     {
                         currentFill = 0f;
-                        Vector2 fillVector = Parent.Vertical ? new Vector2(barSize.X, barSize.Y * fillPercentage) : new Vector2(barSize.X * fillPercentage, barSize.Y);
+                        var fillVector = Parent.Vertical ? new Vector2(barSize.X, barSize.Y * fillPercentage) : new Vector2(barSize.X * fillPercentage, barSize.Y);
 
                         if (PartialFillColor != null)
                         {
@@ -236,8 +236,8 @@ namespace DelvUI.Interface.Bars
 
                     if (_glowColorSet && (!_glowChunksSet || GlowChunks[i]))
                     {
-                        Vector2 glowPosition = new Vector2(cursorPos.X - 1, cursorPos.Y - 1);
-                        Vector2 glowSize = new Vector2(barSize.X + 2, barSize.Y + 2);
+                        var glowPosition = new Vector2(cursorPos.X - 1, cursorPos.Y - 1);
+                        var glowSize = new Vector2(barSize.X + 2, barSize.Y + 2);
 
                         drawList.AddRect(glowPosition, glowPosition + glowSize, GlowColor, 0, ImDrawFlags.None, GlowSize);
                     }
@@ -248,19 +248,19 @@ namespace DelvUI.Interface.Bars
             }
             else
             {
-                var xPos = Parent.Vertical ? Parent.XPosition - (float) ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition + barWidth;
-                var yPos = Parent.Vertical ? Parent.YPosition + barHeight : Parent.YPosition - (float) ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
-                Vector2 cursorPos = new Vector2(xPos, yPos);
+                var xPos = Parent.Vertical ? Parent.XPosition - (float)ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition + barWidth;
+                var yPos = Parent.Vertical ? Parent.YPosition + barHeight : Parent.YPosition - (float)ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
+                var cursorPos = new Vector2(xPos, yPos);
 
                 foreach (var chunkSize in Parent.ChunkSizes.AsEnumerable().Reverse().ToList())
                 {
                     cursorPos -= Parent.Vertical ? new Vector2(0, barHeight * chunkSize) : new Vector2(barWidth * chunkSize, 0);
 
-                    Vector2 barSize = Parent.Vertical
+                    var barSize = Parent.Vertical
                         ? new Vector2(barWidth, barHeight * chunkSize - Parent.ChunkPadding)
                         : new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
 
-                    var fillPercentage = (float) Math.Round(Math.Min(currentFill / chunkSize, 1f), 5); // Rounding due to floating point precision shenanigans
+                    var fillPercentage = (float)Math.Round(Math.Min(currentFill / chunkSize, 1f), 5); // Rounding due to floating point precision shenanigans
 
                     if (fillPercentage >= 1f)
                     {
@@ -278,7 +278,7 @@ namespace DelvUI.Interface.Bars
                     else
                     {
                         currentFill = 0f;
-                        Vector2 fillVector = Parent.Vertical ? new Vector2(barSize.X, barSize.Y * fillPercentage) : new Vector2(barSize.X * fillPercentage, barSize.Y);
+                        var fillVector = Parent.Vertical ? new Vector2(barSize.X, barSize.Y * fillPercentage) : new Vector2(barSize.X * fillPercentage, barSize.Y);
 
                         if (PartialFillColor != null)
                         {
@@ -306,8 +306,8 @@ namespace DelvUI.Interface.Bars
 
                     if (_glowColorSet)
                     {
-                        Vector2 glowPosition = new Vector2(cursorPos.X - 1, cursorPos.Y - 1);
-                        Vector2 glowSize = new Vector2(barSize.X + 2, barSize.Y + 2);
+                        var glowPosition = new Vector2(cursorPos.X - 1, cursorPos.Y - 1);
+                        var glowSize = new Vector2(barSize.X + 2, barSize.Y + 2);
 
                         drawList.AddRect(glowPosition, glowPosition + glowSize, GlowColor);
                     }
@@ -319,13 +319,13 @@ namespace DelvUI.Interface.Bars
 
         public void DrawText(ImDrawListPtr drawList, PluginConfiguration configuration)
         {
-            var barWidth = Parent.Vertical ? (float) 1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
-            var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float) 1 / Parent.InnerBars.Count * Parent.BarHeight;
-            Vector2 cursorPos = new Vector2(Parent.XPosition, Parent.YPosition);
+            var barWidth = Parent.Vertical ? (float)1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
+            var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float)1 / Parent.InnerBars.Count * Parent.BarHeight;
+            var cursorPos = new Vector2(Parent.XPosition, Parent.YPosition);
 
             if (TextMode == BarTextMode.Single)
             {
-                BarText textObj = Texts[0];
+                var textObj = Texts[0];
 
                 var text = textObj.Type switch
                 {
@@ -336,7 +336,7 @@ namespace DelvUI.Interface.Bars
                     _ => "ERROR LOADING TEXT, INVALID TYPE"
                 };
 
-                Vector2 textPos = textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, Parent.BarHeight);
+                var textPos = textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, Parent.BarHeight);
 
                 DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale, configuration);
             }
@@ -353,7 +353,7 @@ namespace DelvUI.Interface.Bars
 
                     var fillPercentage = Math.Min(currentFill / chunkSize, 1f);
 
-                    Vector2 barSize = Parent.Vertical
+                    var barSize = Parent.Vertical
                         ? new Vector2(barWidth, barHeight * chunkSize - Parent.ChunkPadding)
                         : new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
 
@@ -368,7 +368,7 @@ namespace DelvUI.Interface.Bars
 
                     if (TextMode == BarTextMode.EachChunk)
                     {
-                        BarText textObj = Texts[i];
+                        var textObj = Texts[i];
 
                         var text = textObj.Type switch
                         {
@@ -379,7 +379,7 @@ namespace DelvUI.Interface.Bars
                             _ => "ERROR LOADING TEXT, INVALID TYPE"
                         };
 
-                        Vector2 textPos = Parent.Vertical
+                        var textPos = Parent.Vertical
                             ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y)
                             : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
 
@@ -405,7 +405,7 @@ namespace DelvUI.Interface.Bars
 
                     var fillPercentage = Math.Min(currentFill / chunkSize, 1f);
 
-                    Vector2 barSize = new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
+                    var barSize = new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
 
                     if (fillPercentage >= 1f)
                     {
@@ -418,7 +418,7 @@ namespace DelvUI.Interface.Bars
 
                     if (TextMode == BarTextMode.EachChunk)
                     {
-                        BarText textObj = Texts[i];
+                        var textObj = Texts[i];
 
                         var text = textObj.Type switch
                         {
@@ -429,7 +429,7 @@ namespace DelvUI.Interface.Bars
                             _ => "ERROR LOADING TEXT, INVALID TYPE"
                         };
 
-                        Vector2 textPos = Parent.Vertical
+                        var textPos = Parent.Vertical
                             ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y)
                             : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
 
@@ -466,17 +466,17 @@ namespace DelvUI.Interface.Bars
 
         public override void Draw(ImDrawListPtr drawList, PluginConfiguration configuration)
         {
-            var barWidth = Parent.Vertical ? (float) 1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
-            var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float) 1 / Parent.InnerBars.Count * Parent.BarHeight;
-            var xPos = Parent.Vertical ? Parent.XPosition + (float) ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition;
-            var yPos = Parent.Vertical ? Parent.YPosition : Parent.YPosition + (float) ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
-            Vector2 cursorPos = new Vector2(xPos, yPos);
+            var barWidth = Parent.Vertical ? (float)1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
+            var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float)1 / Parent.InnerBars.Count * Parent.BarHeight;
+            var xPos = Parent.Vertical ? Parent.XPosition + (float)ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition;
+            var yPos = Parent.Vertical ? Parent.YPosition : Parent.YPosition + (float)ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
+            var cursorPos = new Vector2(xPos, yPos);
 
             var i = 0;
 
             foreach (var chunkSize in Parent.ChunkSizes)
             {
-                Vector2 barSize = Parent.Vertical
+                var barSize = Parent.Vertical
                     ? new Vector2(barWidth, barHeight * chunkSize - Parent.ChunkPadding)
                     : new Vector2(barWidth * chunkSize - Parent.ChunkPadding, barHeight);
 
@@ -567,7 +567,7 @@ namespace DelvUI.Interface.Bars
             float textXPos;
             float textYPos;
 
-            Vector2 textSize = ImGui.CalcTextSize(text);
+            var textSize = ImGui.CalcTextSize(text);
             textSize *= Scale;
 
             switch (Position)

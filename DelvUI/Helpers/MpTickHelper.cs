@@ -3,7 +3,6 @@ using Dalamud.Plugin;
 using ImGuiNET;
 using System;
 using System.Linq;
-using Dalamud.Game.ClientState.Actors.Types;
 
 namespace DelvUI.Helpers
 {
@@ -26,7 +25,7 @@ namespace DelvUI.Helpers
 
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
-            PlayerCharacter player = PluginInterface.ClientState.LocalPlayer;
+            var player = PluginInterface.ClientState.LocalPlayer;
 
             if (player is null)
             {
