@@ -1335,6 +1335,7 @@ namespace DelvUI.Interface
     }
 
     [Serializable]
+    [Portable(false)]
     [Section("Job Specific Bars")]
     [SubSection("Tank", 0)]
     [SubSection("General##Tank", 1)]
