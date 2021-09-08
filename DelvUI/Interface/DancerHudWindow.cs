@@ -48,10 +48,6 @@ namespace DelvUI.Interface
 
             if (_config.StepBarEnabled)
             {
-                DrawProcBar();
-            }
-            if (_config.StepBarEnabled)
-            {
                 DrawStepBar();
             }
 
@@ -67,8 +63,8 @@ namespace DelvUI.Interface
         {
             DNCGauge gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
 
-            var xPos = Origin.X - _config.EspritGaugeOffset.X;
-            var yPos = Origin.Y + _config.EspritGaugeOffset.Y;
+            var xPos = Origin.X + _config.EspritGaugePosition.X - _config.EspritGaugeSize.X / 2f;
+            var yPos = Origin.Y + _config.EspritGaugePosition.Y - _config.EspritGaugeSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.EspritGaugeSize.Y, _config.EspritGaugeSize.X)
                                            .SetChunks(2)
@@ -91,8 +87,8 @@ namespace DelvUI.Interface
             IEnumerable<StatusEffect> flourishingBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1820 or 2021);
             DNCGauge gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
 
-            var xPos = Origin.X - _config.FeatherGaugeOffset.X;
-            var yPos = Origin.Y + _config.FeatherGaugeOffset.Y;
+            var xPos = Origin.X + _config.FeatherGaugePosition.X - _config.FeatherGaugeSize.X / 2f;
+            var yPos = Origin.Y + _config.FeatherGaugePosition.Y - _config.FeatherGaugeSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.FeatherGaugeSize.Y, _config.FeatherGaugeSize.X)
                                            .SetChunks(4)
@@ -170,8 +166,8 @@ namespace DelvUI.Interface
                 }
             }
 
-            var xPos = Origin.X - _config.StepBarOffset.X;
-            var yPos = Origin.Y + _config.StepBarOffset.Y;
+            var xPos = Origin.X + _config.StepBarPosition.X - _config.StepBarSize.X / 2f;
+            var yPos = Origin.Y + _config.StepBarPosition.Y - _config.StepBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.StepBarSize.Y, _config.StepBarSize.X)
                                            .SetChunks(chunkCount)
@@ -198,8 +194,8 @@ namespace DelvUI.Interface
             IEnumerable<StatusEffect> devilmentBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1825);
             IEnumerable<StatusEffect> technicalFinishBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1822 or 2050);
 
-            var xPos = Origin.X - _config.BuffBarOffset.X;
-            var yPos = Origin.Y + _config.BuffBarOffset.Y;
+            var xPos = Origin.X + _config.BuffBarPosition.X - _config.BuffBarSize.X / 2f;
+            var yPos = Origin.Y + _config.BuffBarPosition.Y - _config.BuffBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.BuffBarSize.Y, _config.BuffBarSize.X).SetBackgroundColor(EmptyColor["background"]);
 
@@ -236,8 +232,8 @@ namespace DelvUI.Interface
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             IEnumerable<StatusEffect> standardFinishBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1821 or 2024 or 2105 or 2113);
 
-            var xPos = Origin.X - _config.StandardBarOffset.X;
-            var yPos = Origin.Y + _config.StandardBarOffset.Y;
+            var xPos = Origin.X + _config.StandardBarPosition.X - _config.StandardBarSize.X / 2f;
+            var yPos = Origin.Y + _config.StandardBarPosition.Y - _config.StandardBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.StandardBarSize.Y, _config.StandardBarSize.X);
 
@@ -263,8 +259,8 @@ namespace DelvUI.Interface
             IEnumerable<StatusEffect> flourishingWindmillBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1816);
             IEnumerable<StatusEffect> flourishingShowerBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1817);
 
-            var xPos = Origin.X - _config.ProcBarOffset.X;
-            var yPos = Origin.Y + _config.ProcBarOffset.Y;
+            var xPos = Origin.X + _config.ProcBarPosition.X - _config.ProcBarSize.X / 2f;
+            var yPos = Origin.Y + _config.ProcBarPosition.Y - _config.ProcBarSize.Y / 2f;
             var procHeight = _config.ProcBarSize.Y;
             var procWidth = (int)Math.Floor((_config.ProcBarSize.X - 3 * _config.ProcBarChunkPadding) / 4);
 
@@ -316,7 +312,7 @@ namespace DelvUI.Interface
     [SubSection("Dancer", 1)]
     public class DancerHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Position", min = -4000f, max = 4000f)]
         [Order(0)]
         public Vector2 Position = new(0, 0);
 
@@ -333,9 +329,9 @@ namespace DelvUI.Interface
         [CollapseWith(5, 0)]
         public Vector2 EspritGaugeSize = new(254, 20);
 
-        [DragFloat2("Esprit Gauge Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Esprit Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
-        public Vector2 EspritGaugeOffset = new(127, 395);
+        public Vector2 EspritGaugePosition = new(0, 405);
 
         [DragFloat("Esprit Gauge Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(15, 0)]
@@ -356,11 +352,11 @@ namespace DelvUI.Interface
 
         [DragFloat2("Feather Guage Size")]
         [CollapseWith(5, 1)]
-        public Vector2 FeatherGaugeSize = new(254, 13);
+        public Vector2 FeatherGaugeSize = new(254, 10);
 
-        [DragFloat2("Feather Gauge Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Feather Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 1)]
-        public Vector2 FeatherGaugeOffset = new(127, 380);
+        public Vector2 FeatherGaugePosition = new(0, 388);
 
         [DragFloat("Feather Gauge Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(15, 1)]
@@ -399,9 +395,9 @@ namespace DelvUI.Interface
         [CollapseWith(20, 2)]
         public Vector2 BuffBarSize = new(254, 20);
 
-        [DragFloat2("Buff Bars Offset")]
+        [DragFloat2("Buff Bars Position")]
         [CollapseWith(25, 2)]
-        public Vector2 BuffBarOffset = new(127, 417);
+        public Vector2 BuffBarPosition = new(0, 427);
 
         [ColorEdit4("Technical Finish Bar Color")]
         [CollapseWith(30, 2)]
@@ -424,9 +420,9 @@ namespace DelvUI.Interface
         [CollapseWith(5, 3)]
         public Vector2 StandardBarSize = new(254, 20);
 
-        [DragFloat2("Standard Finish Bar Offset")]
+        [DragFloat2("Standard Finish Bar Position")]
         [CollapseWith(10, 3)]
-        public Vector2 StandardBarOffset = new(127, 439);
+        public Vector2 StandardBarPosition = new(0, 449);
 
         [ColorEdit4("Standard Finish Bar Color")]
         [CollapseWith(15, 3)]
@@ -447,11 +443,11 @@ namespace DelvUI.Interface
 
         [DragFloat2("Step Bars Size")]
         [CollapseWith(10, 4)]
-        public Vector2 StepBarSize = new(254, 13);
+        public Vector2 StepBarSize = new(254, 10);
 
-        [DragFloat2("Step Bars Offset")]
+        [DragFloat2("Step Bars Position")]
         [CollapseWith(15, 4)]
-        public Vector2 StepBarOffset = new(127, 365);
+        public Vector2 StepBarPosition = new(0, 376);
 
         [DragFloat("Step Bar Chunk Padding")]
         [CollapseWith(20, 4)]
@@ -492,11 +488,11 @@ namespace DelvUI.Interface
 
         [DragFloat2("Proc Bars Size")]
         [CollapseWith(10, 5)]
-        public Vector2 ProcBarSize = new(254, 13);
+        public Vector2 ProcBarSize = new(254, 10);
 
-        [DragFloat2("Proc Bars Offset")]
+        [DragFloat2("Proc Bars Position")]
         [CollapseWith(15, 5)]
-        public Vector2 ProcBarOffset = new(127, 365);
+        public Vector2 ProcBarPosition = new(0, 376);
 
         [DragFloat("Proc Bar Chunk Padding")]
         [CollapseWith(20, 5)]

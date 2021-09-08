@@ -158,7 +158,7 @@ namespace DelvUI.Interface
                 }
             }
 
-            BarBuilder builder = BarBuilder.Create(cursorPos, _config.BloodBarSize);
+            BarBuilder builder = BarBuilder.Create(cursorPos, _config.DisembowelBarSize);
             Bar bar = builder.AddInnerBar(duration, 30f, _config.DisembowelBarColor.Map)
                              .SetBackgroundColor(EmptyColor["background"])
                              .Build();
@@ -238,7 +238,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Eye Of The Dragon Bar Size", max = 2000f)]
         [CollapseWith(0, 2)]
-        public Vector2 EyeOfTheDragonBarSize = new(126, 20);
+        public Vector2 EyeOfTheDragonBarSize = new(254, 20);
 
         [DragFloat2("Eye Of The Dragon Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]
