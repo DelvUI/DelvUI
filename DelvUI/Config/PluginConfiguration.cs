@@ -30,7 +30,8 @@ namespace DelvUI.Config
             false,
             false,
             GrowthDirections.Out | GrowthDirections.Right,
-            new StatusEffectIconConfig(new Vector2(35, 35), true, true, false, false)
+            new StatusEffectIconConfig(new Vector2(35, 35), true, true, false, false),
+            new Vector2(1000, 0)
         );
 
         [JsonIgnore]

@@ -39,6 +39,16 @@ namespace DelvUI.Interface.StatusEffects
             GrowthDirections = growthDirections;
             IconConfig = iconConfig;
         }
+        public StatusEffectsListConfig(Vector2 position, bool showBuffs, bool showDebuffs, bool showPermanentEffects, GrowthDirections growthDirections, StatusEffectIconConfig iconConfig, Vector2 maxSize)
+        {
+            Position = position;
+            ShowBuffs = showBuffs;
+            ShowDebuffs = showDebuffs;
+            ShowPermanentEffects = showPermanentEffects;
+            GrowthDirections = growthDirections;
+            IconConfig = iconConfig;
+            MaxSize = maxSize;
+        }
 
         public bool Draw()
         {
