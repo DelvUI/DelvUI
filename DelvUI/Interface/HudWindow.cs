@@ -598,9 +598,8 @@ namespace DelvUI.Interface
             var currentCastType = castInfo.ActionType;
             var currentCastTime = castInfo.CurrentCastTime;
             var totalCastTime = castInfo.TotalCastTime;
-            
             if (PluginConfiguration.ShowTestCastBar)
-            { 
+            {
                 currentCastId = 5;
                 currentCastType = FFXIVClientStructs.FFXIV.Client.Game.ActionType.Spell;
                 currentCastTime = 2;
