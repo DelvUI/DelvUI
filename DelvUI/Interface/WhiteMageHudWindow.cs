@@ -288,45 +288,57 @@ namespace DelvUI.Interface
     public class WhiteMageHudConfig : PluginConfigObject
     {
         [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [Order(0)]
         public Vector2 BaseOffset = new(0, 0);
 
         [Checkbox("Show Primary Resource Bar")]
+        [Order(5)]
         public bool ShowPrimaryResourceBar = true;
 
         #region Lily Bar
 
         [Checkbox("Show Lily Bar")]
+        [CollapseControl(10, 0)]
         public bool ShowLilyBar = true;
 
         [DragFloat2("Lily Bar Size", max = 2000f)]
+        [CollapseWith(0, 0)]
         public Vector2 LilyBarSize = new(254, 20);
 
         [DragFloat2("Lily Bar Offset", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 0)]
         public Vector2 LilyBarOffset = new(127, 415);
 
         [DragInt("Lily Bar Padding", min = -100, max = 1000)]
+        [CollapseWith(10, 0)]
         public int LilyBarPad = 2;
 
         [ColorEdit4("Lily Bar Color")]
+        [CollapseWith(15, 0)]
         public PluginConfigColor LilyColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
 
         [ColorEdit4("Lily Bar Charging Color")]
+        [CollapseWith(20, 0)]
         public PluginConfigColor LilyChargingColor = new(new Vector4(141f / 255f, 141f / 255f, 141f / 255f, 1f));
 
         #endregion
 
         #region Blood Lily Bar
-
+        
         [DragFloat2("Blood Lily Bar Size", max = 2000f)]
+        [CollapseWith(25, 0)]
         public Vector2 BloodLilyBarSize = new(254, 20);
 
         [DragFloat2("Blood Lily Bar Offset", min = -4000f, max = 4000f)]
+        [CollapseWith(30, 0)]
         public Vector2 BloodLilyBarOffset = new(42, 415);
 
         [DragInt("Blood Lily Bar Padding", min = -100, max = 1000)]
+        [CollapseWith(35, 0)]
         public int BloodLilyBarPad = 2;
 
         [ColorEdit4("Blood Lily Bar Color")]
+        [CollapseWith(40, 0)]
         public PluginConfigColor BloodLilyColor = new(new Vector4(199f / 255f, 40f / 255f, 9f / 255f, 1f));
 
         #endregion
@@ -334,15 +346,19 @@ namespace DelvUI.Interface
         #region Dia Bar
 
         [Checkbox("Show Dia Bar")]
+        [CollapseControl(15, 1)]
         public bool ShowDiaBar = true;
 
         [DragFloat2("Dia Bar Size", max = 2000f)]
+        [CollapseWith(0, 1)]
         public Vector2 DiaBarSize = new(254, 20);
 
         [DragFloat2("Dia Bar Offset", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 1)]
         public Vector2 DiaBarOffset = new(127, 417);
 
         [ColorEdit4("Dia Bar Color")]
+        [CollapseWith(10, 1)]
         public PluginConfigColor DiaColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
 
         #endregion
