@@ -23,7 +23,7 @@ namespace DelvUI.Interface
 
         public override uint JobId => 23;
         private BardHudConfig _config => (BardHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new BardHudConfig());
-        private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + YOffset + _config.Position.Y);
+        private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
 
         protected override void Draw(bool _)
@@ -286,7 +286,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Caustic Bite Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 2)]
-        public Vector2 CBPosition = new(-64, -52);
+        public Vector2 CBPosition = new(-64, 408);
 
         [DragFloat2("Caustic Bite Size", max = 2000f)]
         [CollapseWith(5, 2)]
@@ -304,7 +304,7 @@ namespace DelvUI.Interface
         [Order(60)]
         public PluginConfigColor MBProcColor = new(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
 
-        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Position", min = -4000f, max = 4000f)]
         [Order(0)]
         public Vector2 Position = new(0, 0);
 
@@ -318,7 +318,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Stormbite Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 3)]
-        public Vector2 SBPosition = new(64, -52);
+        public Vector2 SBPosition = new(64, 408);
 
         [DragFloat2("Stormbite Size", max = 2000f)]
         [CollapseWith(5, 3)]
@@ -366,7 +366,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Song Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 SongGaugePosition = new(0, -23);
+        public Vector2 SongGaugePosition = new(0, 437);
 
         [DragFloat2("Song Gauge Size", min = 1f, max = 2000f)]
         [CollapseWith(0, 0)]
@@ -378,7 +378,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Soul Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 1)]
-        public Vector2 SoulGaugePosition = new(0, -6);
+        public Vector2 SoulGaugePosition = new(0, 454);
 
         [DragFloat2("Soul Gauge Size", min = 1f, max = 2000f)]
         [CollapseWith(5, 1)]
@@ -390,7 +390,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Stack Position", min = -4000f, max = 4000f)]
         [Order(45)]
-        public Vector2 StackPosition = new(0, -40);
+        public Vector2 StackPosition = new(0, 420);
 
         [DragFloat2("Stack Size", min = 1f, max = 2000f)]
         [Order(40)]

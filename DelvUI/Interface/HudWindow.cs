@@ -1330,7 +1330,7 @@ namespace DelvUI.Interface
     {
         [DragFloat2("Primary Resource Position", min = -4000f, max = 4000f)]
         [Order(0)]
-        public Vector2 PrimaryResourcePosition = new(0, 448);
+        public Vector2 PrimaryResourcePosition = new(0, 449);
 
         [DragFloat2("Primary Resource Bar Size", min = 0, max = 4000f)]
         [Order(5)]

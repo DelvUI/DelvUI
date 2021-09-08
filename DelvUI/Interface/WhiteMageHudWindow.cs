@@ -48,8 +48,8 @@ namespace DelvUI.Interface
         private void DrawDiaBar()
         {
             Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
-            Vector2 barCoords = _config.BaseOffset + _config.DiaBarOffset;
-            Vector2 cursorPos = new(CenterX - barCoords.X, CenterY + barCoords.Y);
+            Vector2 barCoords = _config.BasePosition + _config.DiaBarPosition - _config.DiaBarSize / 2f;
+            Vector2 cursorPos = new(CenterX + barCoords.X, CenterY + barCoords.Y);
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
@@ -100,13 +100,13 @@ namespace DelvUI.Interface
         {
             WHMGauge gauge = PluginInterface.ClientState.JobGauges.Get<WHMGauge>();
 
-            const int numChunks = 6;
-            float barWidth = (_config.LilyBarSize.X - _config.LilyBarPad * (numChunks - 1)) / numChunks;
+            const int numChunks = 3;
+            float barWidth = (_config.LilyBarSize.X - _config.LilyBarPad * numChunks) / numChunks;
             Vector2 barSize = new(barWidth, _config.LilyBarSize.Y);
 
-            Vector2 barCoords = _config.BaseOffset + _config.LilyBarOffset;
+            Vector2 barCoords = _config.BasePosition + _config.LilyBarPosition;
             float xPos = CenterX - barCoords.X;
-            float yPos = CenterY + barCoords.Y - 20;
+            float yPos = CenterY + barCoords.Y;
 
             const float lilyCooldown = 30000f;
             float scale = gauge.NumLilies == 0 ? gauge.LilyTimer / lilyCooldown : 1;
@@ -228,11 +228,11 @@ namespace DelvUI.Interface
 
             // Blood Lilies
 
-            barCoords = _config.BaseOffset + _config.BloodLilyBarOffset;
-            barWidth = (_config.BloodLilyBarSize.X - _config.BloodLilyBarPad * (numChunks - 1)) / numChunks;
+            barCoords = _config.BasePosition + _config.BloodLilyBarPosition;
+            barWidth = (_config.BloodLilyBarSize.X - _config.BloodLilyBarPad * numChunks) / numChunks;
             barSize = new Vector2(barWidth, _config.BloodLilyBarSize.Y);
             xPos = CenterX - barCoords.X;
-            yPos = CenterY + barCoords.Y - 20;
+            yPos = CenterY + barCoords.Y;
 
             cursorPos = new Vector2(xPos + _config.BloodLilyBarPad + barWidth, yPos);
             scale = gauge.NumBloodLily > 0 ? 1 : 0;
@@ -287,9 +287,9 @@ namespace DelvUI.Interface
     [SubSection("White Mage", 1)]
     public class WhiteMageHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Position", min = -4000f, max = 4000f)]
         [Order(0)]
-        public Vector2 BaseOffset = new(0, 0);
+        public Vector2 BasePosition = new(0, 0);
 
         [Checkbox("Show Primary Resource Bar")]
         [Order(5)]
@@ -297,19 +297,19 @@ namespace DelvUI.Interface
 
         #region Lily Bar
 
-        [Checkbox("Show Lily Bar")]
+        [Checkbox("Show Lily Bars")]
         [CollapseControl(10, 0)]
         public bool ShowLilyBar = true;
 
         [DragFloat2("Lily Bar Size", max = 2000f)]
         [CollapseWith(0, 0)]
-        public Vector2 LilyBarSize = new(254, 20);
+        public Vector2 LilyBarSize = new(127, 20);
 
-        [DragFloat2("Lily Bar Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Lily Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 LilyBarOffset = new(127, 415);
+        public Vector2 LilyBarPosition = new(127, 395);
 
-        [DragInt("Lily Bar Padding", min = -100, max = 1000)]
+        [DragInt("Lily Bar Padding", min = 0, max = 1000)]
         [CollapseWith(10, 0)]
         public int LilyBarPad = 2;
 
@@ -327,13 +327,13 @@ namespace DelvUI.Interface
 
         [DragFloat2("Blood Lily Bar Size", max = 2000f)]
         [CollapseWith(25, 0)]
-        public Vector2 BloodLilyBarSize = new(254, 20);
+        public Vector2 BloodLilyBarSize = new(127, 20);
 
-        [DragFloat2("Blood Lily Bar Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Blood Lily Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(30, 0)]
-        public Vector2 BloodLilyBarOffset = new(42, 415);
+        public Vector2 BloodLilyBarPosition = new(42, 395);
 
-        [DragInt("Blood Lily Bar Padding", min = -100, max = 1000)]
+        [DragInt("Blood Lily Bar Padding", min = 0, max = 1000)]
         [CollapseWith(35, 0)]
         public int BloodLilyBarPad = 2;
 
@@ -353,9 +353,9 @@ namespace DelvUI.Interface
         [CollapseWith(0, 1)]
         public Vector2 DiaBarSize = new(254, 20);
 
-        [DragFloat2("Dia Bar Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Dia Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 DiaBarOffset = new(127, 417);
+        public Vector2 DiaBarPosition = new(0, 427);
 
         [ColorEdit4("Dia Bar Color")]
         [CollapseWith(10, 1)]

@@ -197,7 +197,7 @@ namespace DelvUI.Interface
     [SubSection("Dark Knight", 1)]
     public class DarkKnightHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Offset" + "##DarkKnight", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Position" + "##DarkKnight", min = -4000f, max = 4000f)]
         [Order(0)]
         public Vector2 Position = new Vector2(0, 0);
 
@@ -216,7 +216,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##DRKManaBar", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
-        public Vector2 ManaBarPosition = new Vector2(0, 420);
+        public Vector2 ManaBarPosition = new Vector2(0, 442);
 
         [DragFloat2("Size" + "##DRKManaBar", min = 0, max = 4000f)]
         [CollapseWith(15, 0)]
@@ -246,7 +246,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##DRKBloodGauge", min = -4000f, max = 4000f)]
         [CollapseWith(10, 1)]
-        public Vector2 BloodGaugePosition = new Vector2(0, 432);
+        public Vector2 BloodGaugePosition = new Vector2(0, 454);
 
         [DragFloat2("Size" + "##DRKBloodGauge", min = 0, max = 4000f)]
         [CollapseWith(15, 1)]
@@ -268,7 +268,7 @@ namespace DelvUI.Interface
         #region Buff Bar
         [Checkbox("Show Buff Bar")]
         [CollapseControl(15, 2)]
-        public bool ShowBuffBar = true;
+        public bool ShowBuffBar = false;
 
         [Checkbox("Show Text" + "##DRKBuffBar")]
         [CollapseWith(0, 2)]
@@ -276,7 +276,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##DRKBuffBar", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]
-        public Vector2 BuffBarPosition = new Vector2(0, 449);
+        public Vector2 BuffBarPosition = new Vector2(0, 471);
 
         [DragFloat2("Size" + "##DRKBuffBar", min = 0, max = 4000f)]
         [CollapseWith(10, 2)]
@@ -298,7 +298,7 @@ namespace DelvUI.Interface
         #region Living Shadow
         [Checkbox("Show Living Shadow Bar")]
         [CollapseControl(20, 3)]
-        public bool ShowLivingShadowBar = true;
+        public bool ShowLivingShadowBar = false;
 
         [Checkbox("Show Text" + "##DRKLivingShadow")]
         [CollapseWith(0, 3)]
@@ -306,7 +306,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##DRKLivingShadow", min = -4000f, max = 4000f)]
         [CollapseWith(5, 3)]
-        public Vector2 LivingShadowBarPosition = new Vector2(0, 470);
+        public Vector2 LivingShadowBarPosition = new Vector2(0, 493);
 
         [DragFloat2("Size" + "##DRKLivingShadow", min = 0, max = 4000f)]
         [CollapseWith(10, 3)]

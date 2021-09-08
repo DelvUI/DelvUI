@@ -109,7 +109,7 @@ namespace DelvUI.Interface
     [SubSection("Warrior", 1)]
     public class WarriorHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Offset" + "##Warrior", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Position" + "##Warrior", min = -4000f, max = 4000f)]
         [Order(0)]
         public Vector2 Position = new(0, 0);
 
