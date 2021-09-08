@@ -1,3 +1,8 @@
+using Dalamud.Interface;
+using DelvUI.Config.Attributes;
+using ImGuiNET;
+using ImGuiScene;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -5,11 +10,6 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using Dalamud.Interface;
-using DelvUI.Config.Attributes;
-using ImGuiNET;
-using ImGuiScene;
-using Newtonsoft.Json;
 
 namespace DelvUI.Config.Tree
 {
@@ -71,16 +71,16 @@ namespace DelvUI.Config.Tree
                     }
 
                     ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
-                    
+
                     bool selected = false;
-                    
+
                     foreach (SectionNode selectionNode in children)
                     {
-                        
+
                         if (ImGui.Selectable(selectionNode.Name, selectionNode.Selected))
                         {
                             selected = true;
-                            
+
                             selectionNode.Selected = true;
 
                             foreach (SectionNode otherNode in children.FindAll(x => x != selectionNode))
