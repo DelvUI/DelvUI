@@ -116,7 +116,7 @@ namespace DelvUI.Interface
         private void CaretMiscElements()
         {
             // gcd indicator
-            var gcdIndicatorConfig = DefaultHudElements.GCDIndicator();
+            var gcdIndicatorConfig = ConfigurationManager.GetInstance().GetConfigObject<GCDIndicatorConfig>();
             var gcdIndicator = new GCDIndicatorHud("gcdIndicator", gcdIndicatorConfig, _pluginConfiguration);
             _hudElements.Add(gcdIndicator);
             _hudElementsUsingPlayer.Add(gcdIndicator);

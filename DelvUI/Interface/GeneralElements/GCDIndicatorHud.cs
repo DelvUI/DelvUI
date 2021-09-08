@@ -10,8 +10,8 @@ namespace DelvUI.Interface.GeneralElements
     public class GCDIndicatorHud : HudElement, IHudElementWithActor
     {
         private PluginConfiguration _pluginConfiguration;
-        //private GCDIndicatorConfig Config => (GCDIndicatorConfig)_config;
-        private GCDIndicatorConfig Config => (GCDIndicatorConfig)ConfigurationManager.GetInstance().GetConfiguration<GCDIndicatorConfig>();
+        private GCDIndicatorConfig Config => (GCDIndicatorConfig)_config;
+        //private GCDIndicatorConfig Config => (GCDIndicatorConfig)ConfigurationManager.GetInstance().GetConfiguration<GCDIndicatorConfig>();
 
 
         public Actor Actor { get; set; } = null;
