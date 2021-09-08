@@ -373,7 +373,7 @@ namespace DelvUI.Interface
         [CollapseWith(5, 4)]
         public Vector2 MudraBarSize = new(254, 10);
 
-        [DragFloat2("Mudra Bar Position", max = 2000f)]
+        [DragFloat2("Mudra Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 4)]
         public Vector2 MudraBarPosition = new(0, 407);
 
