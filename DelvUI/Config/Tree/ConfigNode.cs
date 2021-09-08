@@ -129,11 +129,12 @@ namespace DelvUI.Config.Tree
 
                 ImGui.SameLine();
 
-                if (ImGui.Button("Lock HUD")) // TODO: Functioning buttons
-                { }
-
+                /*
+                    if (ImGui.Button("Lock HUD")) // TODO: Functioning buttons
+                    { }
+                
                 ImGui.SameLine();
-
+                */
                 if (ImGui.Button("Toggle HUD"))
                 {
                     ConfigurationManager.GetInstance().ConfigurationWindow.ToggleHud();

@@ -177,13 +177,14 @@ namespace DelvUI.Config
 
             ImGui.SameLine();
 
+            /*
             if (ImGui.Button("Lock HUD"))
             {
                 _changed |= ImGui.Checkbox("Lock HUD", ref _pluginConfiguration.LockHud);
             }
 
             ImGui.SameLine();
-
+            */
             if (ImGui.Button(_pluginConfiguration.HideHud ? "Show HUD" : "Hide HUD"))
             {
                 ToggleHud();
