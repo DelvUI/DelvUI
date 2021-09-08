@@ -20,6 +20,8 @@ using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Dalamud.Game.ClientState.Structs;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface
@@ -584,9 +586,9 @@ namespace DelvUI.Interface
 
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
 
-            var actor = PluginInterface.ClientState.LocalPlayer;
-            var battleChara = (BattleChara*)actor.Address;
-            var castInfo = battleChara->SpellCastInfo;
+            PlayerCharacter actor = PluginInterface.ClientState.LocalPlayer;
+            BattleChara* battleChara = (BattleChara*) actor.Address;
+            BattleChara.CastInfo castInfo = battleChara->SpellCastInfo;
             var isCasting = castInfo.IsCasting > 0;
 
             if (!isCasting && !PluginConfiguration.ShowTestCastBar)
@@ -595,13 +597,14 @@ namespace DelvUI.Interface
             }
 
             var currentCastId = castInfo.ActionID;
-            var currentCastType = castInfo.ActionType;
+            ActionType currentCastType = castInfo.ActionType;
             var currentCastTime = castInfo.CurrentCastTime;
             var totalCastTime = castInfo.TotalCastTime;
+
             if (PluginConfiguration.ShowTestCastBar)
             {
                 currentCastId = 5;
-                currentCastType = FFXIVClientStructs.FFXIV.Client.Game.ActionType.Spell;
+                currentCastType = ActionType.Spell;
                 currentCastTime = 2;
                 totalCastTime = 5;
             }
@@ -694,32 +697,52 @@ namespace DelvUI.Interface
 
         protected virtual unsafe void DrawTargetCastBar()
         {
-            var actor = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            Actor actor = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (!PluginConfiguration.ShowTargetCastBar || actor is null)
+            BattleChara* battleChara;
+            BattleChara.CastInfo castInfo;
+            uint currentCastId;
+            ActionType currentCastType;
+            float currentCastTime;
+            float totalCastTime;
+
+            if (!PluginConfiguration.ShowTargetTestCastBar)
             {
-                return;
-            }
+                if (actor is null)
+                {
+                    return;
+                }
 
-            if (actor is not Chara || actor.ObjectKind == ObjectKind.Companion)
+                if (actor is not Chara || actor.ObjectKind == ObjectKind.Companion)
+                {
+                    return;
+                }
+
+                battleChara = (BattleChara*) actor.Address;
+                castInfo = battleChara->SpellCastInfo;
+
+                var isCasting = castInfo.IsCasting > 0;
+
+                if (!isCasting)
+                {
+                    return;
+                }
+
+                currentCastId = castInfo.ActionID;
+                currentCastType = castInfo.ActionType;
+                currentCastTime = castInfo.CurrentCastTime;
+                totalCastTime = castInfo.TotalCastTime;
+            }
+            else
             {
-                return;
+                PlayerCharacter temp = PluginInterface.ClientState.LocalPlayer;
+                battleChara = (BattleChara*) temp.Address;
+                castInfo = battleChara->SpellCastInfo;
+                currentCastId = 5;
+                currentCastType = ActionType.Spell;
+                currentCastTime = 2;
+                totalCastTime = 5;
             }
-
-            var battleChara = (BattleChara*)actor.Address;
-            var castInfo = battleChara->SpellCastInfo;
-
-            var isCasting = castInfo.IsCasting > 0;
-
-            if (!isCasting)
-            {
-                return;
-            }
-
-            var currentCastId = castInfo.ActionID;
-            var currentCastType = castInfo.ActionType;
-            var currentCastTime = castInfo.CurrentCastTime;
-            var totalCastTime = castInfo.TotalCastTime;
 
             if (_lastTargetUsedCast != null)
             {
