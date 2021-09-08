@@ -1537,6 +1537,12 @@ namespace DelvUI.Config
         private void DrawCastbarsPlayerConfig()
         {
             _changed |= ImGui.Checkbox("Enabled", ref _pluginConfiguration.ShowCastBar);
+            _changed |= ImGui.Checkbox("Test Castbar", ref _pluginConfiguration.ShowTestCastBar);
+
+            if (!_pluginConfiguration.ShowCastBar)
+            {
+                _pluginConfiguration.ShowTestCastBar = false;
+            }
 
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left

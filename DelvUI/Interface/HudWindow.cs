@@ -589,7 +589,7 @@ namespace DelvUI.Interface
             var castInfo = battleChara->SpellCastInfo;
             var isCasting = castInfo.IsCasting > 0;
 
-            if (!isCasting)
+            if (!isCasting && !PluginConfiguration.ShowTestCastBar)
             {
                 return;
             }
@@ -598,6 +598,13 @@ namespace DelvUI.Interface
             var currentCastType = castInfo.ActionType;
             var currentCastTime = castInfo.CurrentCastTime;
             var totalCastTime = castInfo.TotalCastTime;
+            if (PluginConfiguration.ShowTestCastBar)
+            {
+                currentCastId = 5;
+                currentCastType = FFXIVClientStructs.FFXIV.Client.Game.ActionType.Spell;
+                currentCastTime = 2;
+                totalCastTime = 5;
+            }
 
             if (_lastPlayerUsedCast != null)
             {

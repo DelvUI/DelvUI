@@ -128,6 +128,7 @@ namespace DelvUI.Config
 
         public bool ShowCastBar = true;
         public bool ShowCastTime = true;
+        public bool ShowTestCastBar = false;
         public bool ShowPrimaryResourceBarThresholdMarker = false;
         public bool ShowPrimaryResourceBarValue = false;
         public bool ShowTargetActionIcon = true;
