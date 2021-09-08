@@ -24,8 +24,10 @@ namespace DelvUI.Interface.GeneralElements
         [JsonIgnore] public string Title;
 
         public UnitFrameConfig(Vector2 position, Vector2 size, LabelConfig leftLabelConfig, LabelConfig rightLabelConfig, string title = null)
-            : base(position, size)
         {
+            Position = position;
+            Size = size;
+
             LeftLabelConfig = leftLabelConfig;
             LeftLabelConfig.Title = "Left Label Text Format";
 

@@ -17,9 +17,10 @@ namespace DelvUI.Interface.GeneralElements
 
         public PluginConfigColor Color = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f));
 
-        public MPTickerConfig(Vector2 position, Vector2 size) : base(position, size)
+        public MPTickerConfig(Vector2 position, Vector2 size)
         {
-
+            Position = position;
+            Size = size;
         }
 
         public new bool Draw()

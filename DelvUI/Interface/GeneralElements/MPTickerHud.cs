@@ -11,6 +11,7 @@ namespace DelvUI.Interface.GeneralElements
     public class MPTickerHud : HudElement, IHudElementWithActor
     {
         private MPTickerConfig Config => (MPTickerConfig)_config;
+
         private MPTickHelper _mpTickHelper;
         public Actor Actor { get; set; } = null;
 
@@ -56,8 +57,8 @@ namespace DelvUI.Interface.GeneralElements
             drawList.AddRectFilled(startPos, startPos + Config.Size, 0x88000000);
 
             drawList.AddRectFilledMultiColor(
-                startPos, 
-                startPos + barSize, 
+                startPos,
+                startPos + barSize,
                 Config.Color.LeftGradient,
                 Config.Color.RightGradient,
                 Config.Color.RightGradient,

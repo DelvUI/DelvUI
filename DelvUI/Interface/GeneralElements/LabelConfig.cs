@@ -30,8 +30,9 @@ namespace DelvUI.Interface.GeneralElements
 
         [JsonIgnore] public string Title;
 
-        public LabelConfig(Vector2 position, string text, LabelTextAnchor anchor, string title = "") : base(position)
+        public LabelConfig(Vector2 position, string text, LabelTextAnchor anchor, string title = "")
         {
+            Position = position;
             Text = text;
             Anchor = anchor;
             Position = position;

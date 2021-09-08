@@ -26,8 +26,10 @@ namespace DelvUI.Interface.StatusEffects
             bool showDebuffs,
             bool showPermanentEffects,
             GrowthDirections growthDirections,
-            StatusEffectIconConfig iconConfig = null) : base(position, size)
+            StatusEffectIconConfig iconConfig = null)
         {
+            Position = position;
+            Size = size;
             ShowBuffs = showBuffs;
             ShowDebuffs = showDebuffs;
             ShowPermanentEffects = showPermanentEffects;

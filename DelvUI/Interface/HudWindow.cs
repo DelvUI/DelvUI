@@ -1163,6 +1163,7 @@ namespace DelvUI.Interface
 
         public void Draw()
         {
+            return;
             if (!ShouldBeVisible() || PluginInterface.ClientState.LocalPlayer == null)
             {
                 return;

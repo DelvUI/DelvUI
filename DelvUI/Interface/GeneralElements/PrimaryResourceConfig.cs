@@ -19,8 +19,10 @@ namespace DelvUI.Interface.GeneralElements
 
         public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 205f / 255f, 230f / 255f, 100f / 100f));
 
-        public PrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig) : base(position, size)
+        public PrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
         {
+            Position = position;
+            Size = size;
             ValueLabelConfig = valueLabelConfig;
         }
     }

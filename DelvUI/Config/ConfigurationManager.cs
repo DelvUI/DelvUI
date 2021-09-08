@@ -1,7 +1,9 @@
 using Dalamud.Plugin;
 using DelvUI.Config.Tree;
 using DelvUI.Interface;
+using DelvUI.Interface.GeneralElements;
 using ImGuiScene;
+using System;
 
 namespace DelvUI.Config
 {
@@ -33,26 +35,29 @@ namespace DelvUI.Config
 
         public static ConfigurationManager Initialize(bool defaultConfig)
         {
-            PluginConfigObject[] configObjects =
+            Type[] configObjects =
             {
-                new GeneralHudConfig(),
-                new TankHudConfig(), new PaladinHudConfig(), new WarriorHudConfig(), new DarkKnightHudConfig(), new GunbreakerHudConfig(),
-                new WhiteMageHudConfig(), new ScholarHudConfig(), new AstrologianHudConfig(),
-                new MonkHudConfig(), new DragoonHudConfig(), new NinjaHudConfig(), new SamuraiHudConfig(),
-                new BardHudConfig(), new MachinistHudConfig(), new DancerHudConfig(),
-                new BlackMageHudConfig(), new SummonerHudConfig(), new RedMageHudConfig()
+                //typeof(MPTickerConfig)
+                typeof(GCDIndicatorConfig)
+                //new TankHudConfig(), new PaladinHudConfig(), new WarriorHudConfig(), new DarkKnightHudConfig(), new GunbreakerHudConfig(),
+                //new WhiteMageHudConfig(), new ScholarHudConfig(), new AstrologianHudConfig(),
+                //new MonkHudConfig(), new DragoonHudConfig(), new NinjaHudConfig(), new SamuraiHudConfig(),
+                //new BardHudConfig(), new MachinistHudConfig(), new DancerHudConfig(),
+                //new BlackMageHudConfig(), new SummonerHudConfig(), new RedMageHudConfig()
             };
 
             return Initialize(defaultConfig, configObjects);
         }
 
-        public static ConfigurationManager Initialize(bool defaultConfig, params PluginConfigObject[] configObjects)
+        public static ConfigurationManager Initialize(bool defaultConfig, params Type[] configObjectTypes)
         {
             BaseNode node = new();
 
-            foreach (PluginConfigObject configObject in configObjects)
+            foreach (Type type in configObjectTypes)
             {
-                node.GetOrAddConfig(configObject);
+                var genericMethod = node.GetType().GetMethod("GetOrAddConfig");
+                var method = genericMethod.MakeGenericMethod(type);
+                method.Invoke(node, null);
             }
 
             TextureWrap banner = Plugin.bannerTexture;
@@ -74,6 +79,13 @@ namespace DelvUI.Config
 
         public void SaveConfigurations() { ConfigBaseNode.Save(ConfigDirectory); }
 
-        public PluginConfigObject GetConfiguration(PluginConfigObject configObject) => ConfigBaseNode.GetOrAddConfig(configObject).ConfigObject;
+        public PluginConfigObject GetConfiguration(PluginConfigObject configObject)
+        {
+            var genericMethod = GetType().GetMethod("GetConfiguration");
+            var method = genericMethod.MakeGenericMethod(configObject.GetType());
+            return (PluginConfigObject)method.Invoke(this, null);
+        }
+
+        public PluginConfigObject GetConfiguration<T>() where T : PluginConfigObject => ConfigBaseNode.GetOrAddConfig<T>().ConfigObject;
     }
 }

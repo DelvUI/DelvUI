@@ -82,8 +82,9 @@ namespace DelvUI.Interface.GeneralElements
         [JsonIgnore] public string Title;
 
         public CastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig, string title = "")
-            : base(position, size)
         {
+            Position = position;
+            Size = size;
             CastNameConfig = castNameConfig;
             CastTimeConfig = castTimeConfig;
         }

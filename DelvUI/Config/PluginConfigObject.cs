@@ -40,6 +40,11 @@ namespace DelvUI.Config
 
             return changed;
         }
+
+        public static PluginConfigObject DefaultConfig()
+        {
+            return null;
+        }
     }
 
     [Serializable]
@@ -76,17 +81,6 @@ namespace DelvUI.Config
                 NotifyPropertyChanged();
             }
         }
-
-        public MovablePluginConfigObject(Vector2 position, Vector2 size)
-        {
-            Position = position;
-            Size = size;
-        }
-
-        public MovablePluginConfigObject(Vector2 position)
-        {
-            Position = position;
-        }
     }
 
     [Serializable]
@@ -95,7 +89,7 @@ namespace DelvUI.Config
         [JsonIgnore] private float[] _colorMapRatios = { -.8f, -.1f, .1f };
 
         [JsonIgnore] private Vector4 _vector;
-        
+
         public PluginConfigColor(Vector4 vector, float[] colorMapRatios = null)
         {
             _vector = vector;
