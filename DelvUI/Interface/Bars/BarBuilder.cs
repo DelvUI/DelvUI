@@ -210,6 +210,18 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
+        public BarBuilder SetPartialFillColor(Dictionary<string, uint> partialFillColor)
+        {
+            if (_currentInnerBar == -1)
+            {
+                throw new InvalidOperationException("Operation requires defined inner bar");
+            }
+
+            _bar.InnerBars[_currentInnerBar].PartialFillColor = partialFillColor;
+
+            return this;
+        }
+
         public BarBuilder SetGlowColor(uint glowColor)
         {
             if (_currentInnerBar == -1)

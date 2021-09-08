@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
+using DelvUI.Config.Attributes;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
 using System;
@@ -13,19 +14,14 @@ namespace DelvUI.Interface
 {
     public class BlackMageHudWindow : HudWindow
     {
-        private readonly BlackMageHudConfig _config;
-
-        public BlackMageHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration, BlackMageHudConfig config)
-            : base(pluginInterface, pluginConfiguration)
-        {
-            _config = config;
-        }
-
         public override uint JobId => Jobs.BLM;
 
-        private float OriginX => CenterX + _config.Position.X;
-        private float OriginY => CenterY + YOffset + _config.Position.Y;
+        private BlackMageHudConfig _config => (BlackMageHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new BlackMageHudConfig());
+
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
+
+        public BlackMageHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration)
+            : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _)
         {
@@ -43,7 +39,7 @@ namespace DelvUI.Interface
                 DrawProcs();
             }
 
-            if (_config.ShowDotTimer)
+            if (_config.ShowDotBar)
             {
                 DrawDotTimer();
             }
@@ -54,20 +50,18 @@ namespace DelvUI.Interface
         protected virtual void DrawManaBar()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
-
             var actor = PluginInterface.ClientState.LocalPlayer;
-            var barSize = _config.ManaBarSize;
-            var cursorPos = new Vector2(OriginX - barSize.X / 2, OriginY - barSize.Y);
 
-            var color = gauge.InAstralFire()
-                ? _config.ManaBarFireColor.Map
-                : gauge.InUmbralIce()
-                    ? _config.ManaBarIceColor.Map
-                    : _config.ManaBarNoElementColor.Map;
+            var position = new Vector2(
+                CenterX + _config.Position.X + _config.ManaBarOffset.X - _config.ManaBarSize.X / 2f,
+                CenterY + _config.Position.Y + _config.ManaBarOffset.Y - _config.ManaBarSize.Y / 2f
+            );
 
-            var builder = BarBuilder.Create(OriginX - barSize.X / 2, OriginY - barSize.Y, (int)barSize.Y, (int)barSize.X);
+            var color = gauge.InAstralFire() ? _config.ManaBarFireColor.Map : gauge.InUmbralIce() ? _config.ManaBarIceColor.Map : _config.ManaBarNoElementColor.Map;
 
-            builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, color).SetBackgroundColor(EmptyColor["background"]);
+            var builder = BarBuilder.Create(position, _config.ManaBarSize)
+                .AddInnerBar(actor.CurrentMp, actor.MaxMp, color)
+                .SetBackgroundColor(EmptyColor["background"]);
 
             // element timer
             if (gauge.InAstralFire() || gauge.InUmbralIce())
@@ -90,12 +84,15 @@ namespace DelvUI.Interface
             // threshold marker
             if (_config.ShowManaThresholdMarker && gauge.InAstralFire())
             {
-                var position = new Vector2(OriginX - barSize.X / 2 + _config.ManaThresholdValue / 10000f * barSize.X, cursorPos.Y + barSize.Y);
-                var size = new Vector2(3, barSize.Y);
+                var pos = new Vector2(
+                    position.X + _config.ManaThresholdValue / 10000f * _config.ManaBarSize.X,
+                    position.Y + _config.ManaBarSize.Y
+                );
+                var size = new Vector2(3, _config.ManaBarSize.Y);
 
                 drawList.AddRectFilledMultiColor(
-                    position,
-                    position - size,
+                    pos,
+                    pos - size,
                     0xFF000000,
                     0x00000000,
                     0x00000000,
@@ -106,23 +103,27 @@ namespace DelvUI.Interface
             // mana
             if (_config.ShowManaValue)
             {
-                var mana = PluginInterface.ClientState.LocalPlayer.CurrentMp;
-                var text = $"{mana,0}";
+                var text = $"{actor.CurrentMp,0}";
                 var textSize = ImGui.CalcTextSize(text);
-                DrawOutlinedText(text, new Vector2(OriginX - barSize.X / 2f + 2, OriginY - _config.ManaBarSize.Y / 2f - textSize.Y / 2f));
+                var textPos = new Vector2(
+                    position.X + 2,
+                    position.Y + _config.ManaBarSize.Y / 2f - textSize.Y / 2f
+                );
+                DrawOutlinedText(text, textPos);
             }
         }
 
         protected virtual void DrawUmbralHeartStacks()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
+            var position = new Vector2(
+                CenterX + _config.Position.X + _config.UmbralHeartOffset.X - _config.UmbralHeartSize.X / 2f,
+                CenterY + _config.Position.Y + _config.UmbralHeartOffset.Y - _config.UmbralHeartSize.Y / 2f
+            );
 
-            var totalWidth = _config.UmbralHeartSize.X * 3 + _config.Padding.X * 2;
-            var cursorPos = new Vector2(OriginX - totalWidth / 2, OriginY - _config.ManaBarSize.Y - _config.Padding.Y - _config.UmbralHeartSize.Y);
-
-            var bar = BarBuilder.Create(cursorPos.X, cursorPos.Y, _config.UmbralHeartSize.Y, totalWidth)
+            var bar = BarBuilder.Create(position, _config.UmbralHeartSize)
                                 .SetChunks(3)
-                                .SetChunkPadding(_config.Padding.X)
+                                .SetChunkPadding(_config.UmbralHeartPadding)
                                 .AddInnerBar(gauge.NumUmbralHearts, 3, _config.UmbralHeartColor.Map, EmptyColor)
                                 .SetBackgroundColor(EmptyColor["background"])
                                 .Build();
@@ -134,19 +135,20 @@ namespace DelvUI.Interface
         protected virtual void DrawPolyglot()
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
-            var totalWidth = _config.PolyglotSize.X * 2 + _config.Padding.X;
-            var y = OriginY - _config.ManaBarSize.Y - _config.Padding.Y - _config.UmbralHeartSize.Y - _config.Padding.Y - _config.PolyglotSize.Y;
 
-            if (_config.ShowTripleCast)
-            {
-                y = y - _config.Padding.Y - _config.TripleCastSize.Y;
-            }
+            var position = new Vector2(
+                CenterX + _config.Position.X + _config.PolyglotOffset.X - _config.PolyglotSize.X / 2f,
+                CenterY + _config.Position.Y + _config.PolyglotOffset.Y - _config.PolyglotSize.Y / 2f
+            );
+
+            var barWidth = (int)(_config.PolyglotSize.X - _config.PolyglotPadding) / 2;
+            var barSize = new Vector2(barWidth, _config.PolyglotSize.Y);
 
             var scale = 1 - (gauge.IsEnoActive() ? gauge.TimeUntilNextPolyglot / 30000f : 1);
             var drawList = ImGui.GetWindowDrawList();
 
             // 1
-            var builder = BarBuilder.Create(OriginX - totalWidth / 2, y, _config.PolyglotSize.Y, _config.PolyglotSize.X)
+            var builder = BarBuilder.Create(position, barSize)
                                     .AddInnerBar(gauge.NumPolyglotStacks < 1 ? scale : 1, 1, _config.PolyglotColor.Map)
                                     .SetBackgroundColor(EmptyColor["background"]);
 
@@ -158,16 +160,9 @@ namespace DelvUI.Interface
             builder.Build().Draw(drawList, PluginConfiguration);
 
             // 2
-            builder = BarBuilder.Create(OriginX - totalWidth / 2 + _config.PolyglotSize.X + _config.Padding.X, y, _config.PolyglotSize.Y, _config.PolyglotSize.X)
-                                .AddInnerBar(
-                                    gauge.NumPolyglotStacks == 1
-                                        ? scale
-                                        : gauge.NumPolyglotStacks == 0
-                                            ? 0
-                                            : 1,
-                                    1,
-                                    _config.PolyglotColor.Map
-                                )
+            position.X += barWidth + _config.PolyglotPadding;
+            builder = BarBuilder.Create(position, barSize)
+                                .AddInnerBar(gauge.NumPolyglotStacks == 1 ? scale : gauge.NumPolyglotStacks == 0 ? 0 : 1, 1, _config.PolyglotColor.Map)
                                 .SetBackgroundColor(EmptyColor["background"]);
 
             if (gauge.NumPolyglotStacks == 2)
@@ -182,16 +177,14 @@ namespace DelvUI.Interface
         {
             var tripleStackBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1211);
 
-            var totalWidth = _config.TripleCastSize.X * 3 + _config.Padding.X * 2;
-
-            var cursorPos = new Vector2(
-                OriginX - totalWidth / 2,
-                OriginY - _config.ManaBarSize.Y - _config.Padding.Y - _config.UmbralHeartSize.Y - _config.Padding.Y - _config.TripleCastSize.Y
+            var position = new Vector2(
+                CenterX + _config.Position.X + _config.TriplecastOffset.X - _config.TripleCastSize.X / 2f,
+                CenterY + _config.Position.Y + _config.TriplecastOffset.Y - _config.TripleCastSize.Y / 2f
             );
 
-            var bar = BarBuilder.Create(cursorPos.X, cursorPos.Y, _config.TripleCastSize.Y, totalWidth)
+            var bar = BarBuilder.Create(position, _config.TripleCastSize)
                                 .SetChunks(3)
-                                .SetChunkPadding(_config.Padding.X)
+                                .SetChunkPadding(_config.TriplecastPadding)
                                 .AddInnerBar(tripleStackBuff.StackCount, 3, _config.TriplecastColor.Map, EmptyColor)
                                 .SetBackgroundColor(EmptyColor["background"])
                                 .Build();
@@ -202,183 +195,229 @@ namespace DelvUI.Interface
 
         protected virtual void DrawProcs()
         {
-            var firestarterTimer = _config.ShowFirestarterProcs
-                ? Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 165).Duration)
-                : 0;
+            var statusEffects = PluginInterface.ClientState.LocalPlayer.StatusEffects;
+            var firestarterTimer = _config.ShowFirestarterProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 165).Duration) : 0;
+            var thundercloudTimer = _config.ShowThundercloudProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 164).Duration) : 0;
 
-            var thundercloudTimer = _config.ShowThundercloudProcs
-                ? Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 164).Duration)
-                : 0;
+            var position = new Vector2(
+                CenterX + _config.Position.X + _config.ProcsBarOffset.X,
+                CenterY + _config.Position.Y + _config.ProcsBarOffset.Y - _config.ProcsBarSize.Y / 2f
+            );
 
-            if (firestarterTimer == 0 && thundercloudTimer == 0)
-            {
-                return;
-            }
-
-            var totalHeight = firestarterTimer > 0 && thundercloudTimer > 0 ? _config.ProcsHeight * 2 + _config.Padding.Y : _config.ProcsHeight;
-            var x = OriginX - _config.Padding.X * 2f - _config.PolyglotSize.X;
-            var y = OriginY - _config.ManaBarSize.Y - _config.Padding.Y - _config.UmbralHeartSize.Y - _config.Padding.Y - _config.PolyglotSize.Y / 2f + _config.ProcsHeight;
-
-            if (_config.ShowTripleCast)
-            {
-                y = y - _config.Padding.Y - _config.TripleCastSize.Y;
-            }
+            var builder = BarBuilder.Create(position, _config.ProcsBarSize);
 
             // fire starter
-            if (firestarterTimer > 0)
+            if (_config.ShowFirestarterProcs)
             {
-                var position = new Vector2(x, y - totalHeight / 2f);
                 var scale = firestarterTimer / 18f;
-
-                DrawTimerBar(position, scale, _config.ProcsHeight, _config.FirestarterColor.Map, true);
+                builder.AddInnerBar(firestarterTimer, 18f, _config.FirestarterColor.Map);
+                builder.SetFlipDrainDirection(_config.InvertProcsBar);
             }
 
             // thundercloud
-            if (thundercloudTimer > 0)
+            if (_config.ShowThundercloudProcs)
             {
-                var position = new Vector2(x, firestarterTimer == 0 ? y - totalHeight / 2f : y + _config.Padding.Y / 2f);
                 var scale = thundercloudTimer / 18f;
-
-                DrawTimerBar(position, scale, _config.ProcsHeight, _config.ThundercloudColor.Map, true);
+                builder.AddInnerBar(thundercloudTimer, 18f, _config.ThundercloudColor.Map);
+                builder.SetFlipDrainDirection(_config.InvertProcsBar);
             }
+
+            var drawList = ImGui.GetWindowDrawList();
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
 
         protected virtual void DrawDotTimer()
         {
             var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
-
-            if (target is null)
-            {
-                return;
-            }
-
-            // thunder 1 to 4
-            int[] dotIDs = { 161, 162, 163, 1210 };
-            float[] dotDurations = { 12, 18, 24, 18 };
-
             float timer = 0;
             float maxDuration = 1;
 
-            for (var i = 0; i < 4; i++)
+            if (target != null)
             {
-                timer = target.StatusEffects.FirstOrDefault(o => o.EffectId == dotIDs[i] && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId).Duration;
+                // thunder 1 to 4
+                int[] dotIDs = { 161, 162, 163, 1210 };
+                float[] dotDurations = { 12, 18, 24, 18 };
+                var player = PluginInterface.ClientState.LocalPlayer;
 
-                if (timer > 0)
+                for (var i = 0; i < 4; i++)
                 {
-                    maxDuration = dotDurations[i];
+                    timer = target.StatusEffects.FirstOrDefault(o => o.EffectId == dotIDs[i] && o.OwnerId == player.ActorId).Duration;
 
-                    break;
+                    if (timer > 0)
+                    {
+                        maxDuration = dotDurations[i];
+
+                        break;
+                    }
                 }
             }
 
-            if (timer == 0)
-            {
-                return;
-            }
-
-            var x = OriginX + _config.Padding.X * 2f + _config.PolyglotSize.X;
-            var y = OriginY - _config.ManaBarSize.Y - _config.Padding.Y - _config.UmbralHeartSize.Y - _config.Padding.Y - _config.PolyglotSize.Y / 2f - _config.DotTimerHeight;
-
-            if (_config.ShowTripleCast)
-            {
-                y = y - _config.Padding.Y - _config.TripleCastSize.Y;
-            }
-
-            var position = new Vector2(x, y + _config.DotTimerHeight / 2f);
-            var scale = timer / maxDuration;
-
-            DrawTimerBar(position, scale, _config.DotTimerHeight, _config.DotColor.Map, false);
-        }
-
-        private void DrawTimerBar(Vector2 position, float scale, float height, Dictionary<string, uint> colorMap, bool inverted)
-        {
-            var drawList = ImGui.GetWindowDrawList();
-            var size = new Vector2((_config.ManaBarSize.X / 2f - _config.PolyglotSize.X - _config.Padding.X * 2f) * scale, height);
-            size.X = Math.Max(1, size.X);
-
-            var startPoint = inverted ? position - size : position;
-            var leftColor = inverted ? colorMap["gradientRight"] : colorMap["gradientLeft"];
-            var rightColor = inverted ? colorMap["gradientLeft"] : colorMap["gradientRight"];
-
-            drawList.AddRectFilledMultiColor(
-                startPoint,
-                startPoint + size,
-                leftColor,
-                rightColor,
-                rightColor,
-                leftColor
+            var position = new Vector2(
+                CenterX + _config.Position.X + _config.DoTBarOffset.X,
+                CenterY + _config.Position.Y + _config.DoTBarOffset.Y - _config.ProcsBarSize.Y / 2f
             );
+
+            var builder = BarBuilder.Create(position, _config.DoTBarSize)
+                .AddInnerBar(timer, maxDuration, _config.DotColor.Map)
+                .SetFlipDrainDirection(_config.InvertDoTBar);
+
+            var drawList = ImGui.GetWindowDrawList();
+            builder.Build().Draw(drawList, PluginConfiguration);
         }
     }
 
     [Serializable]
+    [Section("Job Specific Bars")]
+    [SubSection("Caster", 0)]
+    [SubSection("Black Mage", 1)]
     public class BlackMageHudConfig : PluginConfigObject
     {
-        public PluginConfigColor DotColor = new(new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f));
-        public int DotTimerHeight = 10;
-        public PluginConfigColor FirestarterColor = new(new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f));
-        public PluginConfigColor ManaBarFireColor = new(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
-        public PluginConfigColor ManaBarIceColor = new(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
+        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [Order(0)]
+        public Vector2 Position = new Vector2(0, 0);
 
-        public PluginConfigColor ManaBarNoElementColor = new(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
-        public Vector2 ManaBarSize = new(253, 20);
-        public int ManaThresholdValue = 2600;
-        public Vector2 Padding = new(2, 2);
-        public PluginConfigColor PolyglotColor = new(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
-        public Vector2 PolyglotSize = new(18, 18);
-        public Vector2 Position = new(0, -2);
-        public int ProcsHeight = 7;
-        public bool ShowDotTimer = true;
+        #region mana bar
+        [DragFloat2("Mana Bar Offset", min = -2000, max = 2000f)]
+        [Order(5)]
+        public Vector2 ManaBarOffset = new Vector2(0, 448);
 
-        public bool ShowFirestarterProcs = true;
+        [DragFloat2("Mana Bar Size", max = 2000f)]
+        [Order(10)]
+        public Vector2 ManaBarSize = new Vector2(254, 20);
+
+        [Checkbox("Show Mana Value")]
+        [Order(15)]
+        public bool ShowManaValue = false;
+
+        [Checkbox("Show Mana Threshold Marker During Astral Fire")]
+        [CollapseControl(20, 0)]
         public bool ShowManaThresholdMarker = true;
 
-        public bool ShowManaValue;
+        [DragInt("Mana Threshold Marker Value", max = 10000)]
+        [CollapseWith(0, 0)]
+        public int ManaThresholdValue = 2400;
+
+        [ColorEdit4("Mana Bar Color")]
+        [Order(25)]
+        public PluginConfigColor ManaBarNoElementColor = new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
+
+        [ColorEdit4("Mana Bar Ice Color")]
+        [Order(30)]
+        public PluginConfigColor ManaBarIceColor = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
+
+        [ColorEdit4("Mana Bar Fire Color")]
+        [Order(35)]
+        public PluginConfigColor ManaBarFireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
+        #endregion
+
+        #region umbral heart
+        [DragFloat2("Umbral Heart Bar Offset", min = -2000, max = 2000f)]
+        [Order(40)]
+        public Vector2 UmbralHeartOffset = new Vector2(0, 428);
+
+        [DragFloat2("Umbral Heart Bar Size", max = 2000f)]
+        [Order(45)]
+        public Vector2 UmbralHeartSize = new Vector2(254, 16);
+
+        [DragInt("Umbral Heart Padding", min = -100, max = 100)]
+        [Order(50)]
+        public int UmbralHeartPadding = 2;
+
+        [ColorEdit4("Umbral Heart Color")]
+        [Order(55)]
+        public PluginConfigColor UmbralHeartColor = new PluginConfigColor(new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f));
+        #endregion
+
+        #region triple cast
+        [Checkbox("Show Triplecast")]
+        [CollapseControl(60, 1)]
+        public bool ShowTripleCast = true;
+
+        [DragFloat2("Triplecast Offset", min = -2000, max = 2000f)]
+        [CollapseWith(0, 1)]
+        public Vector2 TriplecastOffset = new Vector2(0, 410);
+
+        [DragFloat2("Triplecast Size", max = 2000)]
+        [CollapseWith(5, 1)]
+        public Vector2 TripleCastSize = new Vector2(254, 16);
+
+        [DragInt("Trioplecast Padding", min = -100, max = 100)]
+        [CollapseWith(10, 1)]
+        public int TriplecastPadding = 2;
+
+        [ColorEdit4("Triplecast Color")]
+        [CollapseWith(15, 1)]
+        public PluginConfigColor TriplecastColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        #endregion
+
+        #region polyglot
+        [DragFloat2("Polyglot Offset", min = -2000, max = 2000f)]
+        [Order(65)]
+        public Vector2 PolyglotOffset = new Vector2(0, 391);
+
+        [DragFloat2("Polyglot Size", max = 2000f)]
+        [Order(70)]
+        public Vector2 PolyglotSize = new Vector2(38, 18);
+
+        [DragInt("Polyglot Padding", min = -100, max = 100)]
+        [Order(75)]
+        public int PolyglotPadding = 2;
+
+        [ColorEdit4("Polyglot Color")]
+        [Order(80)]
+        public PluginConfigColor PolyglotColor = new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
+        #endregion
+
+        #region procs
+        [Checkbox("Show Firestarter Procs")]
+        [CollapseControl(85, 2)]
+        public bool ShowFirestarterProcs = true;
+
+        [Checkbox("Show Thundercloud Procs")]
+        [CollapseWith(0, 2)]
         public bool ShowThundercloudProcs = true;
 
-        public bool ShowTripleCast = true;
-        public PluginConfigColor ThundercloudColor = new(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f));
-        public PluginConfigColor TriplecastColor = new(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
-        public Vector2 TripleCastSize = new(83, 16);
-        public PluginConfigColor UmbralHeartColor = new(new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f));
-        public Vector2 UmbralHeartSize = new(83, 16);
+        [Checkbox("Invert Procs Bar")]
+        [CollapseWith(5, 2)]
+        public bool InvertProcsBar = true;
 
-        public new bool Draw()
-        {
-            var changed = false;
+        [DragFloat2("Procs Bar Offset", min = -2000, max = 2000f)]
+        [CollapseWith(10, 2)]
+        public Vector2 ProcsBarOffset = new Vector2(-127, 391);
 
-            changed |= ImGui.DragFloat2("Base Offset", ref Position, 1f, -4000, 4000);
-            changed |= ImGui.DragFloat2("Padding", ref Padding, 1f, -100, 100);
-            changed |= ImGui.DragFloat2("Mana Bar Size", ref ManaBarSize, 1f, 1, 2000);
-            changed |= ImGui.DragFloat2("Umbral Heart Size", ref UmbralHeartSize, 1f, 1, 2000);
-            changed |= ImGui.DragFloat2("Polyglot Size", ref PolyglotSize, 1f, 1, 2000);
+        [DragFloat2("Procs Bar Size", max = 2000f)]
+        [CollapseWith(15, 2)]
+        public Vector2 ProcsBarSize = new Vector2(106, 18);
 
-            changed |= ImGui.Checkbox("Show Mana Value", ref ShowManaValue);
-            changed |= ImGui.Checkbox("Show Mana Threshold Marker During Astral Fire", ref ShowManaThresholdMarker);
-            changed |= ImGui.DragInt("Mana Threshold Marker Value", ref ManaThresholdValue, 1f, 1, 10000);
+        [ColorEdit4("Firestarter Color")]
+        [CollapseWith(20, 2)]
+        public PluginConfigColor FirestarterColor = new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f));
 
-            changed |= ImGui.Checkbox("Show Triplecast", ref ShowTripleCast);
-            changed |= ImGui.DragFloat2("Triplecast Size", ref TripleCastSize, 1f, 1, 2000);
+        [ColorEdit4("Thundercloud Color")]
+        [CollapseWith(25, 2)]
+        public PluginConfigColor ThundercloudColor = new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f));
+        #endregion
 
-            changed |= ImGui.Checkbox("Show Firestarter Procs", ref ShowFirestarterProcs);
-            changed |= ImGui.Checkbox("Show Thundercloud Procs", ref ShowThundercloudProcs);
+        #region thunder dots
+        [Checkbox("Show DoT Bar")]
+        [CollapseControl(90, 4)]
+        public bool ShowDotBar = true;
 
-            changed |= ImGui.DragInt("Procs Height", ref ProcsHeight, .1f, 1, 2000);
+        [Checkbox("Invert DoT Bar")]
+        [CollapseWith(0, 4)]
+        public bool InvertDoTBar = false;
 
-            changed |= ImGui.Checkbox("Show DoT Timer", ref ShowDotTimer);
-            changed |= ImGui.DragInt("DoT Timer Height", ref DotTimerHeight, .1f, 1, 2000);
+        [DragFloat2("DoT Bar Offset", min = -2000, max = 2000f)]
+        [CollapseWith(5, 4)]
+        public Vector2 DoTBarOffset = new Vector2(21, 391);
 
-            changed |= ColorEdit4("Mana Bar Color", ref ManaBarNoElementColor);
-            changed |= ColorEdit4("Mana Bar Ice Color", ref ManaBarIceColor);
-            changed |= ColorEdit4("Mana Bar Fire Color", ref ManaBarFireColor);
-            changed |= ColorEdit4("Umbral Heart Color", ref UmbralHeartColor);
-            changed |= ColorEdit4("Polyglot Color", ref PolyglotColor);
-            changed |= ColorEdit4("Triplecast Color", ref TriplecastColor);
-            changed |= ColorEdit4("Firestarter Proc Color", ref FirestarterColor);
-            changed |= ColorEdit4("Thundercloud Proc Color", ref ThundercloudColor);
-            changed |= ColorEdit4("DoT Timer Color", ref DotColor);
+        [DragFloat2("DoT Bar Size", max = 2000f)]
+        [CollapseWith(10, 4)]
+        public Vector2 DoTBarSize = new Vector2(106, 18);
 
-            return changed;
-        }
+        [ColorEdit4("DoT Color")]
+        [CollapseWith(15, 4)]
+        public PluginConfigColor DotColor = new PluginConfigColor(new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f));
+        #endregion
     }
 }
