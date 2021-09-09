@@ -40,10 +40,16 @@ namespace DelvUI.Config
         {
             Type[] configObjects =
             {
-                typeof(GCDIndicatorConfig),
-                typeof(MPTickerConfig),
+                typeof(PlayerUnitFrameConfig),
+                typeof(TargetUnitFrameConfig),
+                typeof(TargetOfTargetUnitFrameConfig),
+                typeof(FocusTargetUnitFrameConfig),
+
                 typeof(PlayerCastbarConfig),
                 typeof(TargetCastbarConfig),
+
+                typeof(GCDIndicatorConfig),
+                typeof(MPTickerConfig)
                 
                 //typeof(PlayerCastbarConfig)
                 //new TankHudConfig(), new PaladinHudConfig(), new WarriorHudConfig(), new DarkKnightHudConfig(), new GunbreakerHudConfig(),

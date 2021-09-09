@@ -214,11 +214,10 @@ namespace DelvUI.Interface.GeneralElements
                 origin.Y + Config.Position.Y - Config.Size.Y / 2f + thickness
             );
 
-            var vectorColor = tankStanceBuff.Count() <= 0 ? Config.TankStanceIndicatorConfig.UnactiveColor : Config.TankStanceIndicatorConfig.ActiveColor;
-            var color = ImGui.ColorConvertFloat4ToU32(vectorColor);
+            var color = tankStanceBuff.Count() <= 0 ? Config.TankStanceIndicatorConfig.UnactiveColor : Config.TankStanceIndicatorConfig.ActiveColor;
 
             var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, color);
+            drawList.AddRectFilled(cursorPos, cursorPos + barSize, color.Base);
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
 

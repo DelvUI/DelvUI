@@ -41,7 +41,7 @@ namespace DelvUI.Config
         [Order(5)]
         public Vector2 Position = Vector2.Zero;
 
-        [DragInt2("Size", min = -4000, max = 4000)]
+        [DragInt2("Size", min = 1, max = 4000)]
         [Order(10)]
         public Vector2 Size = Vector2.Zero;
     }

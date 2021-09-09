@@ -818,6 +818,7 @@ namespace DelvUI.Config.Tree
                 }
                 else if (pair.Value is ConfigPageNode node)
                 {
+                    ImGui.Spacing(); ImGui.Spacing(); ImGui.Spacing();
                     ImGui.BeginGroup();
                     ImGui.Text(node.Name);
                     node.DrawWithID(ref changed, node.Name);
@@ -830,6 +831,7 @@ namespace DelvUI.Config.Tree
                         0xFF4A4141
                     );
 
+                    ImGui.Spacing(); ImGui.Spacing(); ImGui.Spacing();
                     ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 5));
                 }
             }
@@ -1031,6 +1033,7 @@ namespace DelvUI.Config.Tree
                          0xFF4A4141
                      );
 
+                ImGui.Spacing();
                 ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 5));
             }
         }

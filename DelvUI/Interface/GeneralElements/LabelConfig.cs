@@ -16,6 +16,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public EditableLabelConfig(Vector2 position, string text, LabelTextAnchor anchor) : base(position, text, anchor)
         {
+            Text = text;
         }
 
     }

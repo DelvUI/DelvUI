@@ -15,6 +15,8 @@ namespace DelvUI.Interface
     {
         internal static int BaseHUDOffsetY = (int)(ImGui.GetMainViewport().Size.Y * 0.3f);
         internal static int UnitFramesOffsetX = 160;
+        internal static Vector2 DefaultBigUnitFrameSize = new Vector2(270, 50);
+        internal static Vector2 DefaultSmallUnitFrameSize = new Vector2(120, 20);
     }
 
     public class HudManager
@@ -56,22 +58,22 @@ namespace DelvUI.Interface
 
         private void CreateUnitFrames()
         {
-            var playerUnitFrameConfig = DefaultHudElements.PlayerUnitFrame();
+            var playerUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerUnitFrameConfig>();
             var playerUnitFrame = new UnitFrameHud("playerUnitFrame", playerUnitFrameConfig, _pluginConfiguration);
             _hudElements.Add(playerUnitFrame);
             _hudElementsUsingPlayer.Add(playerUnitFrame);
 
-            var targetUnitFrameConfig = DefaultHudElements.TargetUnitFrame();
+            var targetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetUnitFrameConfig>();
             var targetUnitFrame = new UnitFrameHud("targetUnitFrame", targetUnitFrameConfig, _pluginConfiguration);
             _hudElements.Add(targetUnitFrame);
             _hudElementsUsingTarget.Add(targetUnitFrame);
 
-            var targetOfTargetUnitFrameConfig = DefaultHudElements.TargetOfTargetUnitFrame();
+            var targetOfTargetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetOfTargetUnitFrameConfig>();
             var targetOfTargetUnitFrame = new UnitFrameHud("targetOfTargetUnitFrame", targetOfTargetUnitFrameConfig, _pluginConfiguration);
             _hudElements.Add(targetOfTargetUnitFrame);
             _hudElementsUsingTargetOfTarget.Add(targetOfTargetUnitFrame);
 
-            var focusTargetUnitFrameConfig = DefaultHudElements.FocusTargetUnitFrame();
+            var focusTargetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<FocusTargetUnitFrameConfig>();
             var focusTargetUnitFrame = new UnitFrameHud("focusTargetUnitFrame", focusTargetUnitFrameConfig, _pluginConfiguration);
             _hudElements.Add(focusTargetUnitFrame);
             _hudElementsUsingFocusTarget.Add(focusTargetUnitFrame);
