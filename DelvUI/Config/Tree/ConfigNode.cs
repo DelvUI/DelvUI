@@ -860,6 +860,9 @@ namespace DelvUI.Config.Tree
 
         private void DrawImportExportGeneralConfig()
         {
+            ImGui.Spacing(); ImGui.Spacing(); ImGui.Spacing();
+            ImGui.Spacing(); ImGui.Spacing(); ImGui.Spacing();
+
             uint maxLength = 40000;
             ImGui.BeginChild("importpane", new Vector2(0, ImGui.GetWindowHeight() / 6), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
 

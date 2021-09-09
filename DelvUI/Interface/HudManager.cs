@@ -117,6 +117,12 @@ namespace DelvUI.Interface
 
         private void CaretMiscElements()
         {
+            // primary resource bar
+            var primaryResourceConfig = ConfigurationManager.GetInstance().GetConfigObject<PrimaryResourceConfig>();
+            var primaryResource = new PrimaryResourceHud("primaryResource", primaryResourceConfig);
+            _hudElements.Add(primaryResource);
+            _hudElementsUsingPlayer.Add(primaryResource);
+
             // gcd indicator
             var gcdIndicatorConfig = ConfigurationManager.GetInstance().GetConfigObject<GCDIndicatorConfig>();
             var gcdIndicator = new GCDIndicatorHud("gcdIndicator", gcdIndicatorConfig, _pluginConfiguration);
@@ -128,12 +134,6 @@ namespace DelvUI.Interface
             var mpTicker = new MPTickerHud("mpTicker", mpTickerConfig);
             _hudElements.Add(mpTicker);
             _hudElementsUsingPlayer.Add(mpTicker);
-
-            // primary resource
-            var primaryResourceConfig = DefaultHudElements.PrimaryResource();
-            var primaryResource = new PrimaryResourceHud("primaryResource", primaryResourceConfig);
-            _hudElements.Add(primaryResource);
-            _hudElementsUsingPlayer.Add(primaryResource);
         }
 
         public void Draw()

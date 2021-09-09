@@ -37,7 +37,10 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(254, 4);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY + 21);
 
-            return new GCDIndicatorConfig(pos, size);
+            var config = new GCDIndicatorConfig(pos, size);
+            config.Enabled = false;
+
+            return config;
         }
     }
 }

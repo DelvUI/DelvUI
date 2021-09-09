@@ -48,6 +48,7 @@ namespace DelvUI.Config
                 typeof(PlayerCastbarConfig),
                 typeof(TargetCastbarConfig),
 
+                typeof(PrimaryResourceConfig),
                 typeof(GCDIndicatorConfig),
                 typeof(MPTickerConfig)
                 

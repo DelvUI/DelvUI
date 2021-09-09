@@ -33,7 +33,10 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(254, 4);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY + 27);
 
-            return new MPTickerConfig(pos, size);
+            var config = new MPTickerConfig(pos, size);
+            config.Enabled = false;
+
+            return config;
         }
     }
 }
