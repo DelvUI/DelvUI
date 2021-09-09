@@ -318,25 +318,25 @@ namespace DelvUI.Config
                 case "Buffs and Debuffs":
                     switch (subConfig)
                     {
-                        case "Player Buffs":
-                            _changed |= _pluginConfiguration.PlayerBuffListConfig.Draw();
+                        //case "Player Buffs":
+                        //    _changed |= _pluginConfiguration.PlayerBuffListConfig.Draw();
 
-                            break;
+                        //    break;
 
-                        case "Player Debuffs":
-                            _changed |= _pluginConfiguration.PlayerDebuffListConfig.Draw();
+                        //case "Player Debuffs":
+                        //    _changed |= _pluginConfiguration.PlayerDebuffListConfig.Draw();
 
-                            break;
+                        //    break;
 
-                        case "Target Buffs":
-                            _changed |= _pluginConfiguration.TargetBuffListConfig.Draw();
+                        //case "Target Buffs":
+                        //    _changed |= _pluginConfiguration.TargetBuffListConfig.Draw();
 
-                            break;
+                        //    break;
 
-                        case "Target Debuffs":
-                            _changed |= _pluginConfiguration.TargetDebuffListConfig.Draw();
+                        //case "Target Debuffs":
+                        //    _changed |= _pluginConfiguration.TargetDebuffListConfig.Draw();
 
-                            break;
+                        //    break;
 
                         case "Raid/Job Buffs":
                             DrawRaidJobBuffsConfig();
@@ -1638,7 +1638,7 @@ namespace DelvUI.Config
         {
             _changed |= ImGui.Checkbox("Show Raid wide buff icons", ref _pluginConfiguration.ShowRaidWideBuffIcons);
             _changed |= ImGui.Checkbox("Show Job specific buff icons", ref _pluginConfiguration.ShowJobSpecificBuffIcons);
-            _changed |= _pluginConfiguration.RaidJobBuffListConfig.Draw();
+            //_changed |= _pluginConfiguration.RaidJobBuffListConfig.Draw();
         }
     }
 }

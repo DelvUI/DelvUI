@@ -63,31 +63,6 @@ namespace DelvUI.Interface.GeneralElements
             return new UnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig, "Focus Target Unit Frame");
         }
 
-        // cast bars
-        internal static Vector2 DefaultCastbarSize => new Vector2(254, 25);
-
-        public static PlayerCastbarConfig PlayerCastbar()
-        {
-            var size = DefaultCastbarSize;
-            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY - size.Y / 2f);
-
-            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
-
-            return new PlayerCastbarConfig(pos, size, castNameConfig, castTimeConfig, "Player Castbar");
-        }
-
-        public static TargetCastbarConfig TargetCastbar()
-        {
-            var size = DefaultCastbarSize;
-            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY / 2f - size.Y / 2);
-
-            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
-
-            return new TargetCastbarConfig(pos, size, castNameConfig, castTimeConfig, "Target Castbar");
-        }
-
         // status effects list
         internal static Vector2 DefaultStatusEffectsListSize = new Vector2(292, 82);
 
@@ -121,31 +96,13 @@ namespace DelvUI.Interface.GeneralElements
             return new StatusEffectsListConfig(pos, DefaultStatusEffectsListSize, false, true, true, GrowthDirections.Right | GrowthDirections.Up);
         }
 
-        // gcd Indicator
-        public static GCDIndicatorConfig GCDIndicator()
-        {
-            var size = new Vector2(254, 4);
-            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY + DefaultCastbarSize.Y - 4);
-
-            return new GCDIndicatorConfig(pos, size);
-        }
-
-        // mp Ticker
-        public static MPTickerConfig MPTicker()
-        {
-            var size = new Vector2(254, 4);
-            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY + DefaultCastbarSize.Y + 2);
-
-            return new MPTickerConfig(pos, size);
-        }
-
         // primary resource bar
         public static PrimaryResourceConfig PrimaryResource()
         {
             var size = new Vector2(254, 20);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY - 37);
 
-            var labelConfig = new LabelConfig(Vector2.Zero, "", LabelTextAnchor.Center, "Value Label");
+            var labelConfig = new LabelConfig(Vector2.Zero, "", LabelTextAnchor.Center);
 
             return new PrimaryResourceConfig(pos, size, labelConfig);
         }

@@ -79,12 +79,12 @@ namespace DelvUI.Interface
 
         private void CreateCastbars()
         {
-            var playerCastbarConfig = DefaultHudElements.PlayerCastbar();
+            var playerCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerCastbarConfig>();
             var playerCastbar = new PlayerCastbarHud("playerCastbar", playerCastbarConfig, _pluginConfiguration);
             _hudElements.Add(playerCastbar);
             _hudElementsUsingPlayer.Add(playerCastbar);
 
-            var targetCastbarConfig = DefaultHudElements.TargetCastbar();
+            var targetCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetCastbarConfig>();
             var targetCastbar = new TargetCastbarHud("targetCastbar", targetCastbarConfig, _pluginConfiguration);
             _hudElements.Add(targetCastbar);
             _hudElementsUsingTarget.Add(targetCastbar);

@@ -40,22 +40,5 @@ namespace DelvUI.Interface.GeneralElements
 
             return new MPTickerConfig(pos, size);
         }
-
-        public new bool Draw()
-        {
-            var changed = false;
-
-            ImGui.Text("MP Ticker");
-            ImGui.BeginGroup();
-            {
-                changed |= base.Draw();
-
-                changed |= ImGui.Checkbox("Hide on Full Mana", ref HideOnFullMP);
-                changed |= ImGui.Checkbox("Show Border", ref ShowBorder);
-                changed |= ColorEdit4("Color", ref Color);
-            }
-
-            return changed;
-        }
     }
 }

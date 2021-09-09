@@ -97,19 +97,12 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             // cast name
-            if (Config.ShowCastName)
-            {
-                Config.CastNameConfig.Text = _lastUsedCast.ActionText;
-                Config.CastNameConfig.Position = new Vector2(-Config.Size.X / 2f + iconSize.X + 5, 0);
-                _castNameLabel.Draw(origin + Config.Position);
-            }
+            Config.CastNameConfig.Text = _lastUsedCast.ActionText;
+            _castNameLabel.Draw(origin + Config.Position);
 
             // cast time
-            if (Config.ShowCastTime)
-            {
-                Config.CastTimeConfig.Text = Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
-                _castTimeLabel.Draw(origin + Config.Position);
-            }
+            Config.CastTimeConfig.Text = Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
+            _castTimeLabel.Draw(origin + Config.Position);
         }
 
         public virtual void DrawExtras(Vector2 origin, float totalCastTime)
@@ -196,7 +189,7 @@ namespace DelvUI.Interface.GeneralElements
                 case DamageType.Blunt:
                 case DamageType.Slashing:
                 case DamageType.Piercing:
-                    return Config.PhysicalDamangeColor.Map;
+                    return Config.PhysicalDamageColor.Map;
 
                 case DamageType.Magic:
                     return Config.MagicalDamageColor.Map;

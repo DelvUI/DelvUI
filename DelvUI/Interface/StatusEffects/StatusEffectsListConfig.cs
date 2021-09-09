@@ -40,48 +40,6 @@ namespace DelvUI.Interface.StatusEffects
                 IconConfig = iconConfig;
             }
         }
-
-        public new bool Draw()
-        {
-            var changed = false;
-
-            ImGui.Text("Layout");
-            ImGui.BeginGroup();
-            {
-                changed |= base.Draw();
-                changed |= ImGui.DragFloat2("Padding", ref IconPadding, 1f, -200, 200);
-
-                var directions = new List<GrowthDirections>
-                {
-                    GrowthDirections.Right | GrowthDirections.Down,
-                    GrowthDirections.Right | GrowthDirections.Up,
-                    GrowthDirections.Left | GrowthDirections.Down,
-                    GrowthDirections.Left | GrowthDirections.Up,
-                    GrowthDirections.Out | GrowthDirections.Right,
-                    GrowthDirections.Out | GrowthDirections.Down,
-                };
-
-                var selection = Math.Max(0, directions.IndexOf(GrowthDirections));
-                string[] directionsStrings = { "Right and Down", "Right and Up", "Left and Down", "Left and Up", "Out from Middle and Right", "Out from Middle and Down" };
-
-                if (ImGui.Combo("Icons Growth Direction", ref selection, directionsStrings, directionsStrings.Length))
-                {
-                    GrowthDirections = directions[selection];
-                    changed = true;
-                }
-
-                changed |= ImGui.Checkbox("Show Area", ref ShowArea);
-                changed |= ImGui.Checkbox("Fill Rows First", ref FillRowsFirst);
-                changed |= ImGui.Checkbox("Show Permanent Effects", ref ShowPermanentEffects);
-                changed |= ImGui.DragInt("Limit (-1 means no limit)", ref Limit, .1f, -1, 100);
-            }
-
-            ImGui.EndGroup();
-
-            changed = IconConfig.Draw();
-
-            return changed;
-        }
     }
 
     [Serializable]
@@ -111,32 +69,6 @@ namespace DelvUI.Interface.StatusEffects
             ShowStacksText = showStacksText;
             ShowBorder = showBorder;
             ShowDispellableBorder = showDispellableBorder;
-        }
-
-        public new bool Draw()
-        {
-            var changed = false;
-
-            ImGui.Text("Icons");
-            ImGui.BeginGroup();
-            {
-                changed |= ImGui.DragFloat2("Size", ref Size, 1f, 1, 200);
-
-                changed |= ImGui.Checkbox("Show Duration", ref ShowDurationText);
-                changed |= ImGui.Checkbox("Show Stacks", ref ShowStacksText);
-
-                changed |= ImGui.Checkbox("Show Border", ref ShowBorder);
-                changed |= ImGui.DragInt("Border Thickness", ref BorderThickness, .1f, 1, 5);
-                changed |= ColorEdit4("Border Color", ref BorderColor);
-
-                changed |= ImGui.Checkbox("Show Dispellable Border", ref ShowDispellableBorder);
-                changed |= ImGui.DragInt("Dispellable Border Thickness", ref DispellableBorderThickness, .1f, 1, 5);
-                changed |= ColorEdit4("Dispellable order Color", ref DispellableBorderColor);
-            }
-
-            ImGui.EndGroup();
-
-            return changed;
         }
     }
 }

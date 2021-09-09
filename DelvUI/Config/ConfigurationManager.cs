@@ -37,8 +37,12 @@ namespace DelvUI.Config
         {
             Type[] configObjects =
             {
-                //typeof(MPTickerConfig)
-                typeof(GCDIndicatorConfig)
+                typeof(GCDIndicatorConfig),
+                typeof(MPTickerConfig),
+                typeof(PlayerCastbarConfig),
+                typeof(TargetCastbarConfig),
+                
+                //typeof(PlayerCastbarConfig)
                 //new TankHudConfig(), new PaladinHudConfig(), new WarriorHudConfig(), new DarkKnightHudConfig(), new GunbreakerHudConfig(),
                 //new WhiteMageHudConfig(), new ScholarHudConfig(), new AstrologianHudConfig(),
                 //new MonkHudConfig(), new DragoonHudConfig(), new NinjaHudConfig(), new SamuraiHudConfig(),

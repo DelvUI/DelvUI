@@ -103,10 +103,10 @@ namespace DelvUI.Config.Tree
 
                     foreach (SectionNode selectionNode in children)
                     {
+                        selected |= selectionNode.Selected;
+
                         if (ImGui.Selectable(selectionNode.Name, selectionNode.Selected))
                         {
-                            selected = true;
-
                             selectionNode.Selected = true;
 
                             foreach (SectionNode otherNode in children.FindAll(x => x != selectionNode))
@@ -116,7 +116,7 @@ namespace DelvUI.Config.Tree
                         }
                     }
 
-                    if (!selected && children.Any())
+                    if (!selected && children.Count > 0)
                     {
                         children[0].Selected = true;
                     }
@@ -489,12 +489,59 @@ namespace DelvUI.Config.Tree
 
     public class ConfigPageNode : SubSectionNode
     {
-        public PluginConfigObject ConfigObject;
+        private PluginConfigObject _configObject;
+
+        public PluginConfigObject ConfigObject
+        {
+            get => _configObject;
+            set
+            {
+                _configObject = value;
+                GenerateNestedConfigPageNodes();
+            }
+        }
+
+        private Dictionary<string, ConfigPageNode> _nestedConfigPageNodes;
+
+        private void GenerateNestedConfigPageNodes()
+        {
+            _nestedConfigPageNodes = new Dictionary<string, ConfigPageNode>();
+
+            FieldInfo[] fields = _configObject.GetType().GetFields();
+
+            foreach (var field in fields)
+            {
+                foreach (var attribute in field.GetCustomAttributes(true))
+                {
+                    if (attribute is not NestedConfigAttribute nestedConfigAttribute)
+                    {
+                        continue;
+                    }
+
+                    var value = field.GetValue(_configObject);
+                    if (value is not PluginConfigObject nestedConfig)
+                    {
+                        continue;
+                    }
+
+                    ConfigPageNode configPageNode = new();
+                    configPageNode.ConfigObject = nestedConfig;
+                    configPageNode.Name = nestedConfigAttribute.friendlyName;
+
+                    _nestedConfigPageNodes.Add(field.Name, configPageNode);
+                }
+            }
+        }
 
         public override void Draw(ref bool changed)
         {
+            DrawWithID(ref changed);
+        }
+
+        private void DrawWithID(ref bool changed, string ID = null)
+        {
             FieldInfo[] fields = ConfigObject.GetType().GetFields();
-            List<KeyValuePair<int, CategoryField>> drawList = new();
+            List<KeyValuePair<int, object>> drawList = new();
             List<FieldInfo> collapseWithList = new();
 
             foreach (FieldInfo field in fields)
@@ -505,14 +552,14 @@ namespace DelvUI.Config.Tree
                 {
                     if (attribute is OrderAttribute orderAttribute)
                     {
-                        drawList.Add(new KeyValuePair<int, CategoryField>(orderAttribute.pos, new CategoryField(field, ConfigObject)));
+                        drawList.Add(new KeyValuePair<int, object>(orderAttribute.pos, new CategoryField(field, ConfigObject, ID)));
                         hasOrderAttribute = true;
                     }
                     else if (attribute is CollapseControlAttribute collapseControlAtrribute)
                     {
-                        CategoryField categoryField = new(field, ConfigObject);
+                        CategoryField categoryField = new(field, ConfigObject, ID);
                         categoryField.CategoryId = collapseControlAtrribute.id;
-                        drawList.Add(new KeyValuePair<int, CategoryField>(collapseControlAtrribute.pos, categoryField));
+                        drawList.Add(new KeyValuePair<int, object>(collapseControlAtrribute.pos, categoryField));
                         hasOrderAttribute = true;
                     }
                     else if (attribute is CollapseWithAttribute collapseWithAttribute)
@@ -520,11 +567,19 @@ namespace DelvUI.Config.Tree
                         collapseWithList.Add(field);
                         hasOrderAttribute = true;
                     }
+                    else if (attribute is NestedConfigAttribute nestedConfigAttribute &&
+                    _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode node))
+                    {
+                        CategoryField categoryField = new(field, ConfigObject);
+                        drawList.Add(new KeyValuePair<int, object>(nestedConfigAttribute.pos, node));
+                        hasOrderAttribute = true;
+
+                    }
                 }
 
                 if (!hasOrderAttribute)
                 {
-                    drawList.Add(new KeyValuePair<int, CategoryField>(int.MaxValue, new CategoryField(field, ConfigObject)));
+                    drawList.Add(new KeyValuePair<int, object>(int.MaxValue, new CategoryField(field, ConfigObject, ID)));
                 }
             }
 
@@ -534,11 +589,16 @@ namespace DelvUI.Config.Tree
                 {
                     if (attribute is CollapseWithAttribute collapseWithAttribute)
                     {
-                        foreach (KeyValuePair<int, CategoryField> categoryField in drawList)
+                        foreach (KeyValuePair<int, object> item in drawList)
                         {
-                            if (categoryField.Value.CategoryId == collapseWithAttribute.id)
+                            if (item.Value is not CategoryField categoryField)
                             {
-                                categoryField.Value.AddChild(collapseWithAttribute.pos, field);
+                                continue;
+                            }
+
+                            if (categoryField.CategoryId == collapseWithAttribute.id)
+                            {
+                                categoryField.AddChild(collapseWithAttribute.pos, field);
 
                                 break;
                             }
@@ -551,9 +611,28 @@ namespace DelvUI.Config.Tree
 
             drawList.Sort((x, y) => x.Key - y.Key);
 
-            foreach (KeyValuePair<int, CategoryField> pair in drawList)
+            foreach (KeyValuePair<int, object> pair in drawList)
             {
-                pair.Value.Draw(ref changed);
+                if (pair.Value is CategoryField categoryField)
+                {
+                    categoryField.Draw(ref changed);
+                }
+                else if (pair.Value is ConfigPageNode node)
+                {
+                    ImGui.BeginGroup();
+                    ImGui.Text(node.Name);
+                    node.DrawWithID(ref changed, node.Name);
+                    ImGui.EndGroup();
+
+                    ImGui.GetWindowDrawList()
+                    .AddRect(
+                        ImGui.GetItemRectMin() + new Vector2(0, -2),
+                        ImGui.GetItemRectMax() + new Vector2(ImGui.GetContentRegionAvail().X - ImGui.GetItemRectMax().X + ImGui.GetItemRectMin().X - 4, 4),
+                        0xFF4A4141
+                    );
+
+                    ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 5));
+                }
             }
         }
 
@@ -609,13 +688,15 @@ namespace DelvUI.Config.Tree
         public FieldInfo MainField;
         public PluginConfigObject ConfigObject;
         public int CategoryId;
+        public string ID;
 
-        public CategoryField(FieldInfo mainField, PluginConfigObject configObject)
+        public CategoryField(FieldInfo mainField, PluginConfigObject configObject, string id = null)
         {
             MainField = mainField;
             ConfigObject = configObject;
             CategoryId = -1;
             Children = new SortedDictionary<int, FieldInfo>();
+            ID = id;
         }
 
         public void AddChild(int position, FieldInfo field) { Children.Add(position, field); }
@@ -627,7 +708,7 @@ namespace DelvUI.Config.Tree
             if (CategoryId != -1 && (bool)MainField.GetValue(ConfigObject))
             {
                 ImGui.BeginGroup();
-                ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 2));
+                ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 5));
 
                 foreach (FieldInfo child in Children.Values)
                 {
@@ -643,7 +724,7 @@ namespace DelvUI.Config.Tree
                          0xFF4A4141
                      );
 
-                ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 2));
+                ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 5));
             }
         }
 
@@ -651,6 +732,7 @@ namespace DelvUI.Config.Tree
         {
             ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(xOffset, 0));
             object fieldVal = field.GetValue(ConfigObject);
+            var idText = ID != null ? " ##" + ID : "";
 
             foreach (object attribute in field.GetCustomAttributes(true))
             {
@@ -658,7 +740,7 @@ namespace DelvUI.Config.Tree
                 {
                     bool boolVal = (bool)fieldVal;
 
-                    if (ImGui.Checkbox(checkboxAttribute.friendlyName, ref boolVal))
+                    if (ImGui.Checkbox(checkboxAttribute.friendlyName + idText, ref boolVal))
                     {
                         field.SetValue(ConfigObject, boolVal);
                         changed = true;
@@ -668,7 +750,7 @@ namespace DelvUI.Config.Tree
                 {
                     float floatVal = (float)fieldVal;
 
-                    if (ImGui.DragFloat(dragFloatAttribute.friendlyName, ref floatVal, dragFloatAttribute.velocity, dragFloatAttribute.min, dragFloatAttribute.max))
+                    if (ImGui.DragFloat(dragFloatAttribute.friendlyName + idText, ref floatVal, dragFloatAttribute.velocity, dragFloatAttribute.min, dragFloatAttribute.max))
                     {
                         field.SetValue(ConfigObject, floatVal);
                         changed = true;
@@ -678,7 +760,7 @@ namespace DelvUI.Config.Tree
                 {
                     int intVal = (int)fieldVal;
 
-                    if (ImGui.DragInt(dragIntAttribute.friendlyName, ref intVal, dragIntAttribute.velocity, dragIntAttribute.min, dragIntAttribute.max))
+                    if (ImGui.DragInt(dragIntAttribute.friendlyName + idText, ref intVal, dragIntAttribute.velocity, dragIntAttribute.min, dragIntAttribute.max))
                     {
                         field.SetValue(ConfigObject, intVal);
                         changed = true;
@@ -688,7 +770,7 @@ namespace DelvUI.Config.Tree
                 {
                     Vector2 floatVal = (Vector2)fieldVal;
 
-                    if (ImGui.DragFloat2(dragFloat2Attribute.friendlyName, ref floatVal, dragFloat2Attribute.velocity, dragFloat2Attribute.min, dragFloat2Attribute.max))
+                    if (ImGui.DragFloat2(dragFloat2Attribute.friendlyName + idText, ref floatVal, dragFloat2Attribute.velocity, dragFloat2Attribute.min, dragFloat2Attribute.max))
                     {
                         field.SetValue(ConfigObject, floatVal);
                         changed = true;
@@ -698,7 +780,7 @@ namespace DelvUI.Config.Tree
                 {
                     Vector2 intVal = (Vector2)fieldVal;
 
-                    if (ImGui.DragFloat2(dragInt2Attribute.friendlyName, ref intVal, dragInt2Attribute.velocity, dragInt2Attribute.min, dragInt2Attribute.max))
+                    if (ImGui.DragFloat2(dragInt2Attribute.friendlyName + idText, ref intVal, dragInt2Attribute.velocity, dragInt2Attribute.min, dragInt2Attribute.max))
                     {
                         field.SetValue(ConfigObject, intVal);
                         changed = true;
@@ -708,7 +790,7 @@ namespace DelvUI.Config.Tree
                 {
                     string stringVal = (string)fieldVal;
 
-                    if (ImGui.InputText(inputTextAttribute.friendlyName, ref stringVal, inputTextAttribute.maxLength))
+                    if (ImGui.InputText(inputTextAttribute.friendlyName + idText, ref stringVal, inputTextAttribute.maxLength))
                     {
                         field.SetValue(ConfigObject, stringVal);
                         changed = true;
@@ -719,10 +801,20 @@ namespace DelvUI.Config.Tree
                     PluginConfigColor colorVal = (PluginConfigColor)fieldVal;
                     Vector4 vector = colorVal.Vector;
 
-                    if (ImGui.ColorEdit4(colorEdit4Attribute.friendlyName, ref vector))
+                    if (ImGui.ColorEdit4(colorEdit4Attribute.friendlyName + idText, ref vector))
                     {
                         colorVal.Vector = vector;
                         field.SetValue(ConfigObject, colorVal);
+                        changed = true;
+                    }
+                }
+                else if (attribute is ComboAttribute comboAttribute)
+                {
+                    int intVal = (int)fieldVal;
+
+                    if (ImGui.Combo(comboAttribute.friendlyName + idText, ref intVal, comboAttribute.options, comboAttribute.options.Length, 4))
+                    {
+                        field.SetValue(ConfigObject, intVal);
                         changed = true;
                     }
                 }

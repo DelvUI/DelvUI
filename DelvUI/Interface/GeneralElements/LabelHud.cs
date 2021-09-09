@@ -23,7 +23,16 @@ namespace DelvUI.Interface.GeneralElements
 
             var size = ImGui.CalcTextSize(Config.Text);
             var offset = OffsetForSize(size);
-            DrawHelper.DrawOutlinedText(Config.Text, origin + Config.Position + offset, Config.Color, Config.OutlineColor);
+
+            if (Config.ShowOutline)
+            {
+                DrawHelper.DrawOutlinedText(Config.Text, origin + Config.Position + offset, Config.Color.Vector, Config.OutlineColor.Vector);
+            }
+            else
+            {
+                ImGui.SetCursorPos(origin + Config.Position + offset);
+                ImGui.TextColored(Config.Color.Vector, Config.Text);
+            }
         }
 
         public void DrawWithActor(Vector2 origin, Actor actor)
@@ -37,7 +46,15 @@ namespace DelvUI.Interface.GeneralElements
             var size = ImGui.CalcTextSize(text);
             var offset = OffsetForSize(size);
 
-            DrawHelper.DrawOutlinedText(text, origin + Config.Position + offset, Config.Color, Config.OutlineColor);
+            if (Config.ShowOutline)
+            {
+                DrawHelper.DrawOutlinedText(text, origin + Config.Position + offset, Config.Color.Vector, Config.OutlineColor.Vector);
+            }
+            else
+            {
+                ImGui.SetCursorPos(origin + Config.Position + offset);
+                ImGui.TextColored(Config.Color.Vector, text);
+            }
         }
 
         private Vector2 OffsetForSize(Vector2 size)

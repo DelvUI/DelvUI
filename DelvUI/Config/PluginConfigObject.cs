@@ -30,14 +30,6 @@ namespace DelvUI.Config
             return false;
         }
 
-        protected bool Draw()
-        {
-            var changed = ImGui.Checkbox("Enabled", ref Enabled);
-            ImGui.Spacing();
-
-            return changed;
-        }
-
         public static PluginConfigObject DefaultConfig()
         {
             return null;

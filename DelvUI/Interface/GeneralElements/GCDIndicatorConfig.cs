@@ -40,23 +40,5 @@ namespace DelvUI.Interface.GeneralElements
 
             return new GCDIndicatorConfig(pos, size);
         }
-
-        public new bool Draw()
-        {
-            var changed = false;
-
-            ImGui.Text("GCD Indicator");
-            ImGui.BeginGroup();
-            {
-                changed |= base.Draw();
-
-                changed |= ImGui.Checkbox("Always Show", ref AlwaysShow);
-                changed |= ImGui.Checkbox("Show Border", ref ShowBorder);
-                changed |= ImGui.Checkbox("Vertical Mode", ref VerticalMode);
-                changed |= ColorEdit4("Color", ref Color);
-            }
-
-            return changed;
-        }
     }
 }
