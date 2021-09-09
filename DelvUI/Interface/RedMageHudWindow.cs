@@ -178,7 +178,7 @@ namespace DelvUI.Interface
 
         private void DrawDualCastBar()
         {
-            var dualCastBuff = Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1249).Duration);
+            var dualCastBuff = Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId is 1249 or 1393).Duration);
             var value = dualCastBuff > 0 ? 1 : 0;
 
             var position = new Vector2(
