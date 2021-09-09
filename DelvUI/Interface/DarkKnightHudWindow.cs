@@ -17,7 +17,7 @@ namespace DelvUI.Interface
 {
     public class DarkKnightHudWindow : HudWindow
     {
-        public override uint JobId => Jobs.DRK;
+        public override uint JobId => JobIDs.DRK;
 
         private DarkKnightHudConfig _config => (DarkKnightHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new DarkKnightHudConfig());
         private Vector2 Origin => new Vector2(CenterX + _config.Position.X, CenterY + _config.Position.Y);

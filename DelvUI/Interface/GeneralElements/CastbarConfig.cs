@@ -35,7 +35,7 @@ namespace DelvUI.Interface.GeneralElements
         public new static PlayerCastbarConfig DefaultConfig()
         {
             var size = new Vector2(254, 25);
-            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY - size.Y / 2f);
+            var pos = new Vector2(0, HUDConstants.PlayerCastbarY);
 
             var castNameConfig = new LabelConfig(new Vector2(-size.X / 2f + size.Y + 5, 0), "", LabelTextAnchor.Left);
             var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);

@@ -17,7 +17,7 @@ namespace DelvUI.Interface
 {
     public class WarriorHudWindow : HudWindow
     {
-        public override uint JobId => Jobs.WAR;
+        public override uint JobId => JobIDs.WAR;
         private WarriorHudConfig _config => (WarriorHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new WarriorHudConfig());
         private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;

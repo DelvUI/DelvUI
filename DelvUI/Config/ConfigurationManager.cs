@@ -1,6 +1,7 @@
 using Dalamud.Plugin;
 using DelvUI.Config.Tree;
 using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.Jobs;
 using DelvUI.Interface.StatusEffects;
 using ImGuiScene;
 using Newtonsoft.Json;
@@ -55,6 +56,8 @@ namespace DelvUI.Config
                 typeof(TargetBuffsListConfig),
                 typeof(TargetDebuffsListConfig),
 
+                typeof(BlackMageConfig),
+
                 typeof(TanksColorConfig),
                 typeof(HealersColorConfig),
                 typeof(MeleeColorConfig),
@@ -65,13 +68,7 @@ namespace DelvUI.Config
                 typeof(PrimaryResourceConfig),
                 typeof(GCDIndicatorConfig),
                 typeof(MPTickerConfig)
-                
-                //typeof(PlayerCastbarConfig)
-                //new TankHudConfig(), new PaladinHudConfig(), new WarriorHudConfig(), new DarkKnightHudConfig(), new GunbreakerHudConfig(),
-                //new WhiteMageHudConfig(), new ScholarHudConfig(), new AstrologianHudConfig(),
-                //new MonkHudConfig(), new DragoonHudConfig(), new NinjaHudConfig(), new SamuraiHudConfig(),
-                //new BardHudConfig(), new MachinistHudConfig(), new DancerHudConfig(),
-                //new BlackMageHudConfig(), new SummonerHudConfig(), new RedMageHudConfig()
+
             };
 
             return Initialize(defaultConfig, configObjects);
@@ -109,11 +106,14 @@ namespace DelvUI.Config
 
         public PluginConfigObject GetConfiguration(PluginConfigObject configObject)
         {
+            return GetConfigObjectForType(configObject.GetType());
+        }
+        public PluginConfigObject GetConfigObjectForType(Type type)
+        {
             var genericMethod = GetType().GetMethod("GetConfigObject");
-            var method = genericMethod.MakeGenericMethod(configObject.GetType());
+            var method = genericMethod.MakeGenericMethod(type);
             return (PluginConfigObject)method.Invoke(this, null);
         }
-
         public T GetConfigObject<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigObject<T>();
 
         public static string CompressAndBase64Encode(string jsonString)

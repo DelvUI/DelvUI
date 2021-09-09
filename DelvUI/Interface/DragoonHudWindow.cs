@@ -21,7 +21,7 @@ namespace DelvUI.Interface
     {
         public DragoonHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
-        public override uint JobId => Jobs.DRG;
+        public override uint JobId => JobIDs.DRG;
         private readonly DragoonHudConfig _config = (DragoonHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new DragoonHudConfig());
         private Vector2 Origin => new(CenterX + _config.BasePosition.X, CenterY + _config.BasePosition.Y);
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;

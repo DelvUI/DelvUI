@@ -19,7 +19,7 @@ namespace DelvUI.Interface
 
         public RedMageHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
-        public override uint JobId => Jobs.RDM;
+        public override uint JobId => JobIDs.RDM;
 
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 

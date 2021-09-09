@@ -3,6 +3,7 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace DelvUI.Config
@@ -30,6 +31,7 @@ namespace DelvUI.Config
 
         public static PluginConfigObject DefaultConfig()
         {
+            Debug.Assert(false, "Static method 'DefaultConfig' not found !!!");
             return null;
         }
     }

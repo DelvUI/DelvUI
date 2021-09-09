@@ -30,7 +30,7 @@ namespace DelvUI.Interface.GeneralElements
 
             // interaction stuff
             _openContextMenuFromTarget =
-                Marshal.GetDelegateForFunctionPointer<OpenContextMenuFromTarget>(Plugin.InterfaceInstance.TargetModuleScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
+                Marshal.GetDelegateForFunctionPointer<OpenContextMenuFromTarget>(Plugin.GetPluginInterface().TargetModuleScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
 
             _childFlags |= ImGuiWindowFlags.NoTitleBar;
             _childFlags |= ImGuiWindowFlags.NoScrollbar;
@@ -57,7 +57,7 @@ namespace DelvUI.Interface.GeneralElements
             var endPos = startPos + Config.Size;
 
             var drawList = ImGui.GetWindowDrawList();
-            var addon = Plugin.InterfaceInstance.Framework.Gui.GetAddonByName("ContextMenu", 1);
+            var addon = Plugin.GetPluginInterface().Framework.Gui.GetAddonByName("ContextMenu", 1);
 
             DrawHelper.ClipAround(addon, ID, drawList, (drawListPtr, windowName) =>
             {
@@ -85,7 +85,7 @@ namespace DelvUI.Interface.GeneralElements
                     {
                         if (ImGui.GetIO().MouseClicked[0])
                         {
-                            Plugin.InterfaceInstance.ClientState.Targets.SetCurrentTarget(Actor);
+                            Plugin.GetPluginInterface().ClientState.Targets.SetCurrentTarget(Actor);
                         }
                         else if (ImGui.GetIO().MouseClicked[1])
                         {

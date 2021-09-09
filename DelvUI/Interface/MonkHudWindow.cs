@@ -15,7 +15,7 @@ namespace DelvUI.Interface
 {
     public class MonkHudWindow : HudWindow
     {
-        public override uint JobId => Jobs.MNK;
+        public override uint JobId => JobIDs.MNK;
 
         private MonkHudConfig _config => (MonkHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new MonkHudConfig());
 

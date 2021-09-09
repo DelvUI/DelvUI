@@ -3,9 +3,11 @@ using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.Jobs;
 using DelvUI.Interface.StatusEffects;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -23,6 +25,10 @@ namespace DelvUI.Interface
         private List<IHudElementWithActor> _hudElementsUsingTargetOfTarget;
         private List<IHudElementWithActor> _hudElementsUsingFocusTarget;
 
+        private PrimaryResourceHud _primaryResourceHud;
+        private JobHud _jobHud = null;
+        private Dictionary<uint, JobHudTypes> _jobsMap;
+
         public HudManager(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration)
         {
             _pluginInterface = pluginInterface;
@@ -34,6 +40,7 @@ namespace DelvUI.Interface
             _hudElementsUsingTargetOfTarget = new List<IHudElementWithActor>();
             _hudElementsUsingFocusTarget = new List<IHudElementWithActor>();
 
+            CreateJobsMap();
             CreateUnitFrames();
             CreateCastbars();
             CreateStatusEffectsLists();
@@ -111,9 +118,9 @@ namespace DelvUI.Interface
         {
             // primary resource bar
             var primaryResourceConfig = ConfigurationManager.GetInstance().GetConfigObject<PrimaryResourceConfig>();
-            var primaryResource = new PrimaryResourceHud("primaryResource", primaryResourceConfig);
-            _hudElements.Add(primaryResource);
-            _hudElementsUsingPlayer.Add(primaryResource);
+            _primaryResourceHud = new PrimaryResourceHud("primaryResource", primaryResourceConfig);
+            _hudElements.Add(_primaryResourceHud);
+            _hudElementsUsingPlayer.Add(_primaryResourceHud);
 
             // gcd indicator
             var gcdIndicatorConfig = ConfigurationManager.GetInstance().GetConfigObject<GCDIndicatorConfig>();
@@ -154,11 +161,17 @@ namespace DelvUI.Interface
                 return;
             }
 
+            UpdateJob();
             AssignActors();
 
             foreach (var element in _hudElements)
             {
                 element.Draw(_origin);
+            }
+
+            if (_jobHud != null)
+            {
+                _jobHud.Draw(_origin);
             }
 
             ImGui.End();
@@ -177,13 +190,37 @@ namespace DelvUI.Interface
             return parameterWidget->IsVisible && !fadeMiddleWidget->IsVisible;
         }
 
-        protected void AssignActors()
+        private void UpdateJob()
+        {
+            var newJobId = _pluginInterface.ClientState.LocalPlayer.ClassJob.Id;
+            if (_jobHud != null && _jobHud.Config.JobId == newJobId)
+            {
+                return;
+            }
+
+            if (!_jobsMap.TryGetValue(newJobId, out var types))
+            {
+                return;
+            }
+
+            var config = (JobConfig)ConfigurationManager.GetInstance().GetConfigObjectForType(types.ConfigType);
+            _jobHud = (JobHud)Activator.CreateInstance(types.HudType, types.HudType.FullName, config, _pluginConfiguration);
+
+            _primaryResourceHud.ResourceType = config.PrimaryResourceType;
+        }
+
+        private void AssignActors()
         {
             // player
             var player = _pluginInterface.ClientState.LocalPlayer;
             foreach (var element in _hudElementsUsingPlayer)
             {
                 element.Actor = player;
+
+                if (_jobHud != null)
+                {
+                    _jobHud.Actor = player;
+                }
             }
 
             // target
@@ -207,12 +244,34 @@ namespace DelvUI.Interface
                 element.Actor = focusTarget;
             }
         }
+
+        protected void CreateJobsMap()
+        {
+            _jobsMap = new Dictionary<uint, JobHudTypes>()
+            {
+                [JobIDs.BLM] = new JobHudTypes(typeof(BlackMageHud), typeof(BlackMageConfig))
+            };
+        }
+    }
+
+    internal struct JobHudTypes
+    {
+        public Type HudType;
+        public Type ConfigType;
+
+        public JobHudTypes(Type hudType, Type configType)
+        {
+            HudType = hudType;
+            ConfigType = configType;
+        }
     }
 
     internal static class HUDConstants
     {
         internal static int BaseHUDOffsetY = (int)(ImGui.GetMainViewport().Size.Y * 0.3f);
         internal static int UnitFramesOffsetX = 160;
+        internal static int PlayerCastbarY = BaseHUDOffsetY - 12;
+        internal static int JobHudsBaseY = PlayerCastbarY - 15;
         internal static Vector2 DefaultBigUnitFrameSize = new Vector2(270, 50);
         internal static Vector2 DefaultSmallUnitFrameSize = new Vector2(120, 20);
         internal static Vector2 DefaultStatusEffectsListSize = new Vector2(292, 82);

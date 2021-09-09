@@ -19,7 +19,7 @@ namespace DelvUI.Interface
 {
     public class PaladinHudWindow : HudWindow
     {
-        public override uint JobId => Jobs.PLD;
+        public override uint JobId => JobIDs.PLD;
 
         private PaladinHudConfig _config => (PaladinHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new PaladinHudConfig());
         private float OriginX => CenterX + _config.Position.X;

@@ -20,7 +20,7 @@ namespace DelvUI.Interface
 
         public SamuraiHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
-        public override uint JobId => Jobs.SAM;
+        public override uint JobId => JobIDs.SAM;
 
         private int OriginX => (int)(CenterX + _config.Position.X);
         private int OriginY => (int)(CenterY + _config.Position.Y);

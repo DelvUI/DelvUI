@@ -31,56 +31,56 @@ namespace DelvUI.Interface.GeneralElements
             ColorMap = new Dictionary<uint, PluginConfigColor>()
             {
                 // tanks
-                [Jobs.GLD] = tanksColorConfig.GLDColor,
-                [Jobs.MRD] = tanksColorConfig.MRDColor,
-                [Jobs.PLD] = tanksColorConfig.PLDColor,
-                [Jobs.WAR] = tanksColorConfig.WARColor,
-                [Jobs.DRK] = tanksColorConfig.DRKColor,
-                [Jobs.GNB] = tanksColorConfig.GNBColor,
+                [JobIDs.GLD] = tanksColorConfig.GLDColor,
+                [JobIDs.MRD] = tanksColorConfig.MRDColor,
+                [JobIDs.PLD] = tanksColorConfig.PLDColor,
+                [JobIDs.WAR] = tanksColorConfig.WARColor,
+                [JobIDs.DRK] = tanksColorConfig.DRKColor,
+                [JobIDs.GNB] = tanksColorConfig.GNBColor,
 
                 // healers
-                [Jobs.CNJ] = healersColorConfig.CNJColor,
-                [Jobs.WHM] = healersColorConfig.WHMColor,
-                [Jobs.SCH] = healersColorConfig.SCHColor,
-                [Jobs.AST] = healersColorConfig.ASTColor,
+                [JobIDs.CNJ] = healersColorConfig.CNJColor,
+                [JobIDs.WHM] = healersColorConfig.WHMColor,
+                [JobIDs.SCH] = healersColorConfig.SCHColor,
+                [JobIDs.AST] = healersColorConfig.ASTColor,
 
                 // melee
-                [Jobs.PGL] = meleeColorConfig.PGLColor,
-                [Jobs.LNC] = meleeColorConfig.LNCColor,
-                [Jobs.ROG] = meleeColorConfig.ROGColor,
-                [Jobs.MNK] = meleeColorConfig.MNKColor,
-                [Jobs.DRG] = meleeColorConfig.DRGColor,
-                [Jobs.NIN] = meleeColorConfig.NINColor,
-                [Jobs.SAM] = meleeColorConfig.SAMColor,
+                [JobIDs.PGL] = meleeColorConfig.PGLColor,
+                [JobIDs.LNC] = meleeColorConfig.LNCColor,
+                [JobIDs.ROG] = meleeColorConfig.ROGColor,
+                [JobIDs.MNK] = meleeColorConfig.MNKColor,
+                [JobIDs.DRG] = meleeColorConfig.DRGColor,
+                [JobIDs.NIN] = meleeColorConfig.NINColor,
+                [JobIDs.SAM] = meleeColorConfig.SAMColor,
 
                 // ranged 
-                [Jobs.ARC] = rangedColorConfig.ARCColor,
-                [Jobs.BRD] = rangedColorConfig.BRDColor,
-                [Jobs.MCH] = rangedColorConfig.MCHColor,
-                [Jobs.DNC] = rangedColorConfig.DNCColor,
+                [JobIDs.ARC] = rangedColorConfig.ARCColor,
+                [JobIDs.BRD] = rangedColorConfig.BRDColor,
+                [JobIDs.MCH] = rangedColorConfig.MCHColor,
+                [JobIDs.DNC] = rangedColorConfig.DNCColor,
 
                 // casters
-                [Jobs.THM] = castersColorConfig.THMColor,
-                [Jobs.ACN] = castersColorConfig.ACNColor,
-                [Jobs.BLM] = castersColorConfig.BLMColor,
-                [Jobs.SMN] = castersColorConfig.SMNColor,
-                [Jobs.RDM] = castersColorConfig.RDMColor,
-                [Jobs.BLU] = castersColorConfig.BLUColor,
+                [JobIDs.THM] = castersColorConfig.THMColor,
+                [JobIDs.ACN] = castersColorConfig.ACNColor,
+                [JobIDs.BLM] = castersColorConfig.BLMColor,
+                [JobIDs.SMN] = castersColorConfig.SMNColor,
+                [JobIDs.RDM] = castersColorConfig.RDMColor,
+                [JobIDs.BLU] = castersColorConfig.BLUColor,
 
                 // crafters
-                [Jobs.CRP] = _miscColorConfig.HANDColor,
-                [Jobs.BSM] = _miscColorConfig.HANDColor,
-                [Jobs.ARM] = _miscColorConfig.HANDColor,
-                [Jobs.GSM] = _miscColorConfig.HANDColor,
-                [Jobs.LTW] = _miscColorConfig.HANDColor,
-                [Jobs.WVR] = _miscColorConfig.HANDColor,
-                [Jobs.ALC] = _miscColorConfig.HANDColor,
-                [Jobs.CUL] = _miscColorConfig.HANDColor,
+                [JobIDs.CRP] = _miscColorConfig.HANDColor,
+                [JobIDs.BSM] = _miscColorConfig.HANDColor,
+                [JobIDs.ARM] = _miscColorConfig.HANDColor,
+                [JobIDs.GSM] = _miscColorConfig.HANDColor,
+                [JobIDs.LTW] = _miscColorConfig.HANDColor,
+                [JobIDs.WVR] = _miscColorConfig.HANDColor,
+                [JobIDs.ALC] = _miscColorConfig.HANDColor,
+                [JobIDs.CUL] = _miscColorConfig.HANDColor,
 
                 // gatherers
-                [Jobs.MIN] = _miscColorConfig.LANDColor,
-                [Jobs.BOT] = _miscColorConfig.LANDColor,
-                [Jobs.FSH] = _miscColorConfig.LANDColor
+                [JobIDs.MIN] = _miscColorConfig.LANDColor,
+                [JobIDs.BOT] = _miscColorConfig.LANDColor,
+                [JobIDs.FSH] = _miscColorConfig.LANDColor
             };
         }
 

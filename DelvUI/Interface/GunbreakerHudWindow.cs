@@ -19,7 +19,7 @@ namespace DelvUI.Interface
 
         private GunbreakerHudConfig _config => (GunbreakerHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new GunbreakerHudConfig());
 
-        public override uint JobId => Jobs.GNB;
+        public override uint JobId => JobIDs.GNB;
 
         private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
 

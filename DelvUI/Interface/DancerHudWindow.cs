@@ -20,7 +20,7 @@ namespace DelvUI.Interface
     {
         public DancerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
-        public override uint JobId => Jobs.DNC;
+        public override uint JobId => JobIDs.DNC;
         private DancerHudConfig _config => (DancerHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new DancerHudConfig());
         private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;

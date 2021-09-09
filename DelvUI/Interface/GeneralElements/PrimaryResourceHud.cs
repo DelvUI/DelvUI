@@ -1,24 +1,17 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
+using DelvUI.Helpers;
 using ImGuiNET;
 using System;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public enum PrimaryResourceType
-    {
-        MP,
-        CP,
-        GP,
-        None
-    }
-
     public class PrimaryResourceHud : HudElement, IHudElementWithActor
     {
         private PrimaryResourceConfig Config => (PrimaryResourceConfig)_config;
         private LabelHud _valueLabel;
         public Actor Actor { get; set; } = null;
-        private PrimaryResourceType _resourceType = PrimaryResourceType.MP;
+        public PrimaryResourceTypes ResourceType = PrimaryResourceTypes.MP;
 
         public PrimaryResourceHud(string ID, PrimaryResourceConfig config) : base(ID, config)
         {
@@ -27,7 +20,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void Draw(Vector2 origin)
         {
-            if (!Config.Enabled || _resourceType == PrimaryResourceType.None || Actor == null || Actor is not Chara)
+            if (!Config.Enabled || ResourceType == PrimaryResourceTypes.None || Actor == null || Actor is not Chara)
             {
                 return;
             }
@@ -74,9 +67,9 @@ namespace DelvUI.Interface.GeneralElements
 
         private void GetResources(ref int current, ref int max, Chara actor)
         {
-            switch (_resourceType)
+            switch (ResourceType)
             {
-                case PrimaryResourceType.MP:
+                case PrimaryResourceTypes.MP:
                     {
                         current = actor.CurrentMp;
                         max = actor.MaxMp;
@@ -84,7 +77,7 @@ namespace DelvUI.Interface.GeneralElements
 
                     break;
 
-                case PrimaryResourceType.CP:
+                case PrimaryResourceTypes.CP:
                     {
                         current = actor.CurrentCp;
                         max = actor.MaxCp;
@@ -92,7 +85,7 @@ namespace DelvUI.Interface.GeneralElements
 
                     break;
 
-                case PrimaryResourceType.GP:
+                case PrimaryResourceTypes.GP:
                     {
                         current = actor.CurrentGp;
                         max = actor.MaxGp;

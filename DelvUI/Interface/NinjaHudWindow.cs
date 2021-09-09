@@ -18,7 +18,7 @@ namespace DelvUI.Interface
 {
     public class NinjaHudWindow : HudWindow
     {
-        public override uint JobId => Jobs.NIN;
+        public override uint JobId => JobIDs.NIN;
 
         private NinjaHudConfig _config => (NinjaHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new NinjaHudConfig());
 

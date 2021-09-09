@@ -22,7 +22,7 @@ namespace DelvUI.Interface
     {
         private readonly SpellHelper _spellHelper = new();
 
-        public override uint JobId => Jobs.AST;
+        public override uint JobId => JobIDs.AST;
         private AstrologianHudConfig _config => (AstrologianHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new AstrologianHudConfig());
 
         private float OriginX => CenterX + _config.Position.X;

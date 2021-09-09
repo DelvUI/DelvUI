@@ -15,8 +15,6 @@ namespace DelvUI
 {
     public class Plugin : IDalamudPlugin
     {
-        public static DalamudPluginInterface InterfaceInstance { get; private set; }
-
         private bool _fontBuilt;
         private bool _fontLoadFailed;
         private HudWindow _hudWindow;
@@ -39,7 +37,6 @@ namespace DelvUI
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
             _pluginInterface = pluginInterface;
-            Plugin.InterfaceInstance = _pluginInterface;
 
             Version = Assembly.GetExecutingAssembly()?.GetName().Version.ToString() ?? "";
 
@@ -152,7 +149,7 @@ namespace DelvUI
 
         private void PluginCommand(string command, string arguments)
         {
-            ConfigurationManager.GetInstance().DrawConfigWindow = false;
+            ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
 
             //switch (arguments)
             //{
@@ -172,7 +169,6 @@ namespace DelvUI
             //        break;
 
             //    default:
-            //        _configurationWindow.IsVisible = !_configurationWindow.IsVisible;
             //        ConfigurationManager.GetInstance().DrawConfigWindow = false;
 
             //        break;
@@ -221,60 +217,60 @@ namespace DelvUI
             _hudWindow = _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id switch
             {
                 //Tanks
-                Jobs.DRK => new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.GNB => new GunbreakerHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.WAR => new WarriorHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.PLD => new PaladinHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.DRK => new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.GNB => new GunbreakerHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.WAR => new WarriorHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.PLD => new PaladinHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //Healers
-                Jobs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.SCH => new ScholarHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.AST => new AstrologianHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.SCH => new ScholarHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.AST => new AstrologianHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //Melee DPS
-                Jobs.DRG => new DragoonHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.MNK => new MonkHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.NIN => new NinjaHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.DRG => new DragoonHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.MNK => new MonkHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.NIN => new NinjaHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //Ranged DPS
-                Jobs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.DNC => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.MCH => new MachinistHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.DNC => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.MCH => new MachinistHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //Caster DPS
-                Jobs.RDM => new RedMageHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.SMN => new SummonerHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.BLM => new BlackMageHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.RDM => new RedMageHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.SMN => new SummonerHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.BLM => new BlackMageHud(_pluginInterface, _pluginConfiguration),
 
                 //Low jobs
-                Jobs.MRD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.GLD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.CNJ => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.PGL => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.LNC => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.ROG => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.ARC => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.THM => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.ACN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.MRD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.GLD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.CNJ => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.PGL => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.LNC => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.ROG => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.ARC => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.THM => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.ACN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //Hand
-                Jobs.CRP => new HandHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.BSM => new HandHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.ARM => new HandHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.GSM => new HandHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.LTW => new HandHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.WVR => new HandHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.ALC => new HandHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.CUL => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.CRP => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.BSM => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.ARM => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.GSM => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.LTW => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.WVR => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.ALC => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.CUL => new HandHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //Land
-                Jobs.MIN => new LandHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.BOT => new LandHudWindow(_pluginInterface, _pluginConfiguration),
-                Jobs.FSH => new LandHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.MIN => new LandHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.BOT => new LandHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.FSH => new LandHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //dont have packs yet
-                Jobs.BLU => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                JobIDs.BLU => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 _ => _hudWindow
             };
         }

@@ -50,7 +50,7 @@ namespace DelvUI.Interface.GeneralElements
 
             if (_lastUsedCast == null || _lastUsedCast.CastId != currentCastId || _lastUsedCast.ActionType != currentCastType)
             {
-                _lastUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, Plugin.InterfaceInstance);
+                _lastUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo);
             }
 
             var castPercent = 100f / totalCastTime * currentCastTime;

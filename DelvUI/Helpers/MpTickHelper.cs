@@ -15,14 +15,14 @@ namespace DelvUI.Helpers
 
         public MPTickHelper()
         {
-            Plugin.InterfaceInstance.Framework.OnUpdateEvent += FrameworkOnOnUpdateEvent;
+            Plugin.GetPluginInterface().Framework.OnUpdateEvent += FrameworkOnOnUpdateEvent;
         }
 
         public double LastTick => LastTickTime;
 
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
-            var player = Plugin.InterfaceInstance.ClientState.LocalPlayer;
+            var player = Plugin.GetPluginInterface().ClientState.LocalPlayer;
             if (player is null)
             {
                 return;
@@ -60,7 +60,7 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            Plugin.InterfaceInstance.Framework.OnUpdateEvent -= FrameworkOnOnUpdateEvent;
+            Plugin.GetPluginInterface().Framework.OnUpdateEvent -= FrameworkOnOnUpdateEvent;
         }
 
         public void Dispose()

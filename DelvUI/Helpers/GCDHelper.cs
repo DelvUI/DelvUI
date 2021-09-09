@@ -8,35 +8,35 @@ namespace DelvUI.Helpers
     {
         private static readonly Dictionary<uint, uint> JobActionIDs = new()
         {
-            [Jobs.GNB] = 16137, // Keen Edge
-            [Jobs.WAR] = 31,    // Heavy Swing
-            [Jobs.MRD] = 31,    // Heavy Swing
-            [Jobs.DRK] = 3617,  // Hard Slash
-            [Jobs.PLD] = 9,     // Fast Blade
-            [Jobs.GLD] = 9,     // Fast Blade
+            [JobIDs.GNB] = 16137, // Keen Edge
+            [JobIDs.WAR] = 31,    // Heavy Swing
+            [JobIDs.MRD] = 31,    // Heavy Swing
+            [JobIDs.DRK] = 3617,  // Hard Slash
+            [JobIDs.PLD] = 9,     // Fast Blade
+            [JobIDs.GLD] = 9,     // Fast Blade
 
-            [Jobs.SCH] = 163,   // Ruin
-            [Jobs.AST] = 3596,  // Malefic
-            [Jobs.WHM] = 119,   // Stone
-            [Jobs.CNJ] = 119,   // Stone
+            [JobIDs.SCH] = 163,   // Ruin
+            [JobIDs.AST] = 3596,  // Malefic
+            [JobIDs.WHM] = 119,   // Stone
+            [JobIDs.CNJ] = 119,   // Stone
 
-            [Jobs.BRD] = 97,    // Heavy Shot
-            [Jobs.ARC] = 97,    // Heavy Shot
-            [Jobs.DNC] = 15989, // Cascade
-            [Jobs.MCH] = 2866,  // Split Shot
+            [JobIDs.BRD] = 97,    // Heavy Shot
+            [JobIDs.ARC] = 97,    // Heavy Shot
+            [JobIDs.DNC] = 15989, // Cascade
+            [JobIDs.MCH] = 2866,  // Split Shot
 
-            [Jobs.SMN] = 163,   // Ruin
-            [Jobs.ACN] = 163,   // Ruin
-            [Jobs.RDM] = 7504,  // Riposte
-            [Jobs.BLM] = 142,   // Blizzard
-            [Jobs.THM] = 142,   // Blizzard
+            [JobIDs.SMN] = 163,   // Ruin
+            [JobIDs.ACN] = 163,   // Ruin
+            [JobIDs.RDM] = 7504,  // Riposte
+            [JobIDs.BLM] = 142,   // Blizzard
+            [JobIDs.THM] = 142,   // Blizzard
 
-            [Jobs.SAM] = 7477,  // Hakaze
-            [Jobs.NIN] = 2240,  // Spinning Edge
-            [Jobs.MNK] = 53,    // Bootshine
-            [Jobs.DRG] = 75,    // True Thrust
+            [JobIDs.SAM] = 7477,  // Hakaze
+            [JobIDs.NIN] = 2240,  // Spinning Edge
+            [JobIDs.MNK] = 53,    // Bootshine
+            [JobIDs.DRG] = 75,    // True Thrust
 
-            [Jobs.BLU] = 11385  // Water Cannon
+            [JobIDs.BLU] = 11385  // Water Cannon
         };
 
         public static unsafe bool GetGCDInfo(PlayerCharacter player, out float timeElapsed, out float timeTotal, ActionType actionType = ActionType.Spell)
