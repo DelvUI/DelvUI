@@ -39,7 +39,7 @@ body:
     id: logs
     attributes:
       label: Logs
-      description: If you have any errors in the log please put them here
+      description: If you have any errors in the log (run /xllog in the FF chat) please put them here
       render: shell
   - type: checkboxes
     id: terms
