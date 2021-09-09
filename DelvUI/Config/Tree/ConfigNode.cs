@@ -619,12 +619,19 @@ namespace DelvUI.Config.Tree
             // if type matches, load it
             foreach (string importString in importStrings)
             {
-                // get type from json
-                string jsonString = ConfigurationManager.Base64DecodeAndDecompress(importString);
-                Type importedType = Type.GetType((string)JObject.Parse(jsonString)["$type"]);
-
+                Type importedType = null;
+                try
+                {
+                    // get type from json
+                    string jsonString = ConfigurationManager.Base64DecodeAndDecompress(importString);
+                    importedType = Type.GetType((string)JObject.Parse(jsonString)["$type"]);
+                }
+                catch (Exception ex)
+                {
+                    PluginLog.Log($"Error parsing import string!\n{ex.StackTrace}");
+                }
                 // abort import if the import string is for the wrong type
-                if (ConfigObject.GetType().FullName == importedType.FullName)
+                if (importedType != null && ConfigObject.GetType().FullName == importedType.FullName)
                 {
                     // see comments on ConfigPageNode's Load
                     MethodInfo methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
@@ -744,11 +751,19 @@ namespace DelvUI.Config.Tree
                 if (ImGui.Button("Import configuration"))
                 {
                     // get type from json
-                    string jsonString = ConfigurationManager.Base64DecodeAndDecompress(_importString);
-                    Type importedType = Type.GetType((string)JObject.Parse(jsonString)["$type"]);
+                    Type importedType = null;
+                    try
+                    {
+                        string jsonString = ConfigurationManager.Base64DecodeAndDecompress(_importString);
+                        importedType = Type.GetType((string)JObject.Parse(jsonString)["$type"]);
+                    }
+                    catch (Exception ex)
+                    {
+                        PluginLog.Log($"Error parsing import string!\n{ex.StackTrace}");
+                    }
 
                     // abort import if the import string is for the wrong type
-                    if (ConfigObject.GetType().FullName == importedType.FullName)
+                    if (importedType != null && ConfigObject.GetType().FullName == importedType.FullName)
                     {
                         // see comments on ConfigPageNode's Load
                         MethodInfo methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
@@ -768,7 +783,7 @@ namespace DelvUI.Config.Tree
                     }
                     else
                     {
-                        PluginLog.Log($"Could not convert {importedType} to {ConfigObject.GetType()}! Aborting import.");
+                        PluginLog.Log($"Could not convert {(importedType == null ? "null" : importedType)} to {ConfigObject.GetType()}! Aborting import.");
                     }
                 }
 
