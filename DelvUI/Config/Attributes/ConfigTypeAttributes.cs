@@ -146,4 +146,8 @@ namespace DelvUI.Config.Attributes
             this.portable = portable;
         }
     }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ManualDrawAttribute : Attribute
+    { }
 }

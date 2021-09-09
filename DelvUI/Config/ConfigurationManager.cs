@@ -3,6 +3,7 @@ using DelvUI.Config.Tree;
 using DelvUI.Interface;
 using ImGuiScene;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -45,7 +46,8 @@ namespace DelvUI.Config
                 new WhiteMageHudConfig(), new ScholarHudConfig(), new AstrologianHudConfig(),
                 new MonkHudConfig(), new DragoonHudConfig(), new NinjaHudConfig(), new SamuraiHudConfig(),
                 new BardHudConfig(), new MachinistHudConfig(), new DancerHudConfig(),
-                new BlackMageHudConfig(), new SummonerHudConfig(), new RedMageHudConfig()
+                new BlackMageHudConfig(), new SummonerHudConfig(), new RedMageHudConfig(),
+                new ImportExportHudConfig()
             };
 
             return Initialize(defaultConfig, configObjects);
