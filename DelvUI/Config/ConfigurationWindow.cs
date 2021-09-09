@@ -28,8 +28,6 @@ namespace DelvUI.Config
 
         public ConfigurationWindow(PluginConfiguration pluginConfiguration)
         {
-            //TODO ADD PRIMARYRESOURCEBAR TO CONFIGMAP jobs general
-
             _pluginConfiguration = pluginConfiguration;
             _pluginInterface = Plugin.GetPluginInterface();
             _configMap.Add("General", new[] { "General" });
@@ -49,6 +47,12 @@ namespace DelvUI.Config
         {
             _pluginConfiguration.HideHud = !_pluginConfiguration.HideHud;
             _changed = true;
+            
+        }        
+        public bool GetToggleHudState()
+        {
+            return _pluginConfiguration.HideHud;
+
         }
 
         public void ToggleJobPacks()
@@ -80,7 +84,7 @@ namespace DelvUI.Config
             //ImGui.GetIO().FontGlobalScale;
             ImGui.SetNextWindowSize(new Vector2(1050, 750), ImGuiCond.Appearing);
 
-            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 0.85f));
+            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
 
             if (!ImGui.Begin(
                 "titlebar",
@@ -97,7 +101,7 @@ namespace DelvUI.Config
             _changed = false;
             Vector2 pos = ImGui.GetCursorPos();
 
-            ImGui.BeginGroup();
+            ImGui.BeginGroup(); //Main Group
 
             {
                 ImGui.BeginGroup(); // Left
@@ -105,7 +109,7 @@ namespace DelvUI.Config
                 {
                     TextureWrap delvUiBanner = _pluginConfiguration.BannerImage;
                     ImGui.Image(delvUiBanner.ImGuiHandle, new Vector2(delvUiBanner.Width, delvUiBanner.Height));
-                    ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
+                    ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing() - 32), true);
 
                     foreach (string config in _configMap.Keys)
                     {
@@ -128,7 +132,7 @@ namespace DelvUI.Config
                 {
                     Array subConfigs = _configMap[_selected];
 
-                    ImGui.BeginChild("item view", new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
+                    ImGui.BeginChild("item view", new Vector2(0, -ImGui.GetFrameHeightWithSpacing() - 32)); // Leave room for 1 line below us
 
                     {
                         if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
@@ -166,57 +170,69 @@ namespace DelvUI.Config
                 ImGui.EndGroup();
             }
 
-            ImGui.EndGroup();
-            ImGui.Separator();
+            ImGui.EndGroup(); // Main Group
 
             ImGui.BeginGroup();
 
-            if (ImGui.Button("Job Packs"))
+            if (ImGui.Button("Switch to Job Packs Configuration", new Vector2(ImGui.GetWindowContentRegionWidth(), 0)))
             {
                 ToggleJobPacks();
             }
 
-            ImGui.SameLine();
+            ImGui.Separator();
 
-            /*
-            if (ImGui.Button("Lock HUD"))
-            {
-                _changed |= ImGui.Checkbox("Lock HUD", ref _pluginConfiguration.LockHud);
-            }
+            ImGui.EndGroup();
 
-            ImGui.SameLine();
-            */
-            if (ImGui.Button(_pluginConfiguration.HideHud ? "Show HUD" : "Hide HUD"))
+            ImGui.BeginGroup();
+
+            if (ImGui.Button(GetToggleHudState()?"Show HUD":"Hide HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
                 ToggleHud();
             }
 
             ImGui.SameLine();
 
-            if (ImGui.Button("Reset HUD"))
+            if (ImGui.Button("Reset to Default", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
+
             {
                 _pluginConfiguration.TransferConfig(PluginConfiguration.ReadConfig("default"));
                 _changed = true;
             }
 
             ImGui.SameLine();
+            
+            ImGui.BeginChild("versionleft", new Vector2(ImGui.GetWindowWidth() / 7+10, 0));
+            ImGui.EndChild(); 
+            
+            ImGui.SameLine();
 
-            pos = ImGui.GetCursorPos();
-            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 120, ImGui.GetCursorPos().Y));
-
-            if (ImGui.Button("Support"))
+            ImGui.BeginChild("versioncenter", new Vector2(ImGui.GetWindowWidth() / 7+85, 0));
+            ImGui.Text($"v{Plugin.Version}");
+            ImGui.EndChild();
+            
+            
+            ImGui.SameLine();
+            
+            ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(114f/255f,137f/255f,218f/255f,1f));
+            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(124f/255f,147f/255f,228f/255f,1f));
+            if (ImGui.Button("Help!", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
                 Process.Start("https://discord.gg/delvui");
             }
-
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
+            
             ImGui.SameLine();
-
-            if (ImGui.Button("Donate!"))
+            
+            ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(255f/255f,94f/255f,91f/255f,1f));
+            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(255f/255f,104f/255f,101f/255f,1f));
+            if (ImGui.Button("Donate!", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
                 Process.Start("https://ko-fi.com/DelvUI");
             }
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
 
-            ImGui.SetCursorPos(pos);
             ImGui.EndGroup();
 
             if (_changed)
