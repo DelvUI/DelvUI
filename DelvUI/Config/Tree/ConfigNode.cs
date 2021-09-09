@@ -217,7 +217,14 @@ namespace DelvUI.Config.Tree
                 ImGui.SameLine();
 
                 Vector2 pos = ImGui.GetCursorPos();
-                ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 60, ImGui.GetCursorPos().Y));
+                ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 120, ImGui.GetCursorPos().Y));
+
+                if (ImGui.Button("Support"))
+                {
+                    Process.Start("https://discord.gg/delvui");
+                }
+
+                ImGui.SameLine();
 
                 if (ImGui.Button("Donate!"))
                 {
