@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Plugin;
@@ -201,10 +202,19 @@ namespace DelvUI.Config
             ImGui.SameLine();
 
             pos = ImGui.GetCursorPos();
-            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 60, ImGui.GetCursorPos().Y));
+            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 120, ImGui.GetCursorPos().Y));
+
+            if (ImGui.Button("Support"))
+            {
+                Process.Start("https://discord.gg/delvui");
+            }
+
+            ImGui.SameLine();
 
             if (ImGui.Button("Donate!"))
-            { }
+            {
+                Process.Start("https://ko-fi.com/DelvUI");
+            }
 
             ImGui.SetCursorPos(pos);
             ImGui.EndGroup();
