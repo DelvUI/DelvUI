@@ -18,7 +18,7 @@ namespace DelvUI.Interface.Jobs
         public bool UseDefaulyPrimaryResourceBar = false;
 
         [JsonIgnore]
-        public PrimaryResourceTypes PrimaryResourceType = PrimaryResourceTypes.None;
+        public PrimaryResourceTypes PrimaryResourceType = PrimaryResourceTypes.MP;
 
         public new static JobConfig DefaultConfig()
         {

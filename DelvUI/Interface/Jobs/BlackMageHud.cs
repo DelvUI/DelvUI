@@ -253,7 +253,7 @@ namespace DelvUI.Interface.Jobs
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.DoTBarPosition.X,
-                origin.Y + Config.Position.Y + Config.DoTBarPosition.Y - Config.ProcsBarSize.Y / 2f
+                origin.Y + Config.Position.Y + Config.DoTBarPosition.Y - Config.DoTBarSize.Y / 2f
             );
 
             var builder = BarBuilder.Create(position, Config.DoTBarSize)

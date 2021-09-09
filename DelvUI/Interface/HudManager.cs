@@ -169,7 +169,7 @@ namespace DelvUI.Interface
                 element.Draw(_origin);
             }
 
-            if (_jobHud != null)
+            if (_jobHud != null && _jobHud.Config.Enabled)
             {
                 _jobHud.Draw(_origin);
             }
@@ -206,7 +206,7 @@ namespace DelvUI.Interface
             var config = (JobConfig)ConfigurationManager.GetInstance().GetConfigObjectForType(types.ConfigType);
             _jobHud = (JobHud)Activator.CreateInstance(types.HudType, types.HudType.FullName, config, _pluginConfiguration);
 
-            _primaryResourceHud.ResourceType = config.PrimaryResourceType;
+            _primaryResourceHud.ResourceType = config.UseDefaulyPrimaryResourceBar ? config.PrimaryResourceType : PrimaryResourceTypes.None;
         }
 
         private void AssignActors()
