@@ -22,7 +22,8 @@ namespace DelvUI.Config
         public string ConfigDirectory;
         public bool DrawConfigWindow;
 
-        public ConfigurationWindow ConfigurationWindow { get; set; }
+        public bool LockHUD = true;
+        public bool ShowHUD = true;
 
         public ConfigurationManager(bool defaultConfig, TextureWrap bannerImage, string configDirectory, BaseNode configBaseNode)
         {

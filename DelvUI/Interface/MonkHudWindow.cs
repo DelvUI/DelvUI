@@ -4,6 +4,7 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Diagnostics;
@@ -20,11 +21,10 @@ namespace DelvUI.Interface
 
         private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
 
-        private readonly PluginConfigColor EmptyColor;
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public MonkHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration)
         {
-            EmptyColor = new(PluginConfiguration.EmptyColor);
         }
 
         private Vector2 CalculatePosition(Vector2 position, Vector2 size) => Origin + position - size / 2f;

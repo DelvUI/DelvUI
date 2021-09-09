@@ -235,3 +235,54 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 }
+
+
+
+// SAVING THESE FOR LATER
+/*
+ 
+        protected uint[] _raidWideBuffs =
+        {
+            // See https://external-preview.redd.it/bKacLk4PKav7vdP1ilT66gAtB1t7BTJjxsMrImRHr1k.png?auto=webp&s=cbe6880c34b45e2db20c247c8ab9eef543538e96
+            // Left Eye
+            1184, 1454,
+            // Battle Litany
+            786, 1414,
+            // Brotherhood
+            1185, 2174,
+            // Battle Voice
+            141,
+            // Devilment
+            1825,
+            // Technical Finish
+            1822, 2050,
+            // Standard Finish
+            1821, 2024, 2105, 2113,
+            // Embolden
+            1239, 1297, 2282,
+            // Devotion
+            1213,
+            // ------ AST Card Buffs -------
+            // The Balance
+            829, 1338, 1882,
+            // The Bole
+            830, 1339, 1883,
+            // The Arrow
+            831, 1884,
+            // The Spear
+            832, 1885,
+            // The Ewer
+            833, 1340, 1886,
+            // The Spire
+            834, 1341, 1887,
+            // Lord of Crowns
+            1451, 1876,
+            // Lady of Crowns
+            1452, 1877,
+            // Divination
+            1878, 2034,
+            // Chain Stratagem
+            1221, 1406
+        };
+
+*/

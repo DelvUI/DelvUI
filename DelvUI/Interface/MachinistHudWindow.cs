@@ -4,6 +4,7 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Diagnostics;
@@ -19,13 +20,13 @@ namespace DelvUI.Interface
 
         public override uint JobId => Jobs.MCH;
         private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
-        private readonly PluginConfigColor EmptyColor;
-        private readonly PluginConfigColor PartialFillColor;
+
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
+        private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
         public MachinistHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration)
         {
-            EmptyColor = new(PluginConfiguration.EmptyColor);
-            PartialFillColor = new(PluginConfiguration.PartialFillColor);
+
         }
 
         protected override void Draw(bool _)

@@ -136,12 +136,6 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        private void ToggleJobPacks()
-        {
-            ConfigurationManager.GetInstance().ConfigurationWindow.IsVisible = !ConfigurationManager.GetInstance().ConfigurationWindow.IsVisible;
-            ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
-        }
-
         public void Draw()
         {
             bool changed = false;
@@ -212,32 +206,17 @@ namespace DelvUI.Config.Tree
 
             ImGui.BeginGroup();
 
-            if (ImGui.Button("Switch to General Configuration", new Vector2(ImGui.GetWindowContentRegionWidth(), 0)))
+            if (ImGui.Button(ConfigurationManager.GetInstance().ShowHUD ? "Hide HUD" : "Show HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
-                ToggleJobPacks();
-            }
-
-            ImGui.Separator();
-
-            ImGui.EndGroup();
-
-            ImGui.BeginGroup();
-
-            if (ImGui.Button(ConfigurationManager.GetInstance().ConfigurationWindow.GetToggleHudState() ? "Show HUD" : "Hide HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
-            {
-                ConfigurationManager.GetInstance().ConfigurationWindow.ToggleHud();
+                ConfigurationManager.GetInstance().ShowHUD = !ConfigurationManager.GetInstance().ShowHUD;
             }
 
             ImGui.SameLine();
 
             if (ImGui.Button("Reset to Default", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
-
             {
-                // save the old configuration window for use in the new ConfigurationManager
-                ConfigurationWindow configurationWindow = ConfigurationManager.GetInstance().ConfigurationWindow;
                 // make a new configuration from defaults
                 ConfigurationManager.Initialize(true);
-                ConfigurationManager.GetInstance().ConfigurationWindow = configurationWindow;
                 // save the defaults to file
                 ConfigurationManager.GetInstance().SaveConfigurations();
                 // prevent the config window from closing

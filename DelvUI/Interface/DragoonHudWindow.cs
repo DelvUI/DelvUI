@@ -26,24 +26,24 @@ namespace DelvUI.Interface
         private Vector2 Origin => new(CenterX + _config.BasePosition.X, CenterY + _config.BasePosition.Y);
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        protected override List<uint> GetJobSpecificBuffs()
-        {
-            uint[] ids =
-            {
-                // Dive Ready
-                1243,
-                // Life Surge
-                116, 2175,
-                // Lance Charge
-                1864,
-                // Right Eye
-                1183, 1453, 1910,
-                // Disembowel
-                121, 1914
-            };
+        //protected List<uint> GetJobSpecificBuffs()
+        //{
+        //    uint[] ids =
+        //    {
+        //        // Dive Ready
+        //        1243,
+        //        // Life Surge
+        //        116, 2175,
+        //        // Lance Charge
+        //        1864,
+        //        // Right Eye
+        //        1183, 1453, 1910,
+        //        // Disembowel
+        //        121, 1914
+        //    };
 
-            return new List<uint>(ids);
-        }
+        //    return new List<uint>(ids);
+        //}
 
         protected override void Draw(bool _)
         {

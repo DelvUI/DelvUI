@@ -19,7 +19,7 @@ namespace DelvUI.Interface
         protected override void DrawPrimaryResourceBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            base.DrawPrimaryResourceBar(PrimaryResourceType.GP);
+            base.DrawPrimaryResourceBar();// PrimaryResourceType.GP);
         }
     }
 }

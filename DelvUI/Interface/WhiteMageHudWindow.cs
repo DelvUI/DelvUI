@@ -4,11 +4,11 @@ using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
@@ -85,7 +85,7 @@ namespace DelvUI.Interface
 
             drawList.AddRect(cursorPos, cursorPos + _config.DiaBarSize, 0xFF000000);
 
-            DrawOutlinedText(
+            DrawHelper.DrawOutlinedText(
                 string.Format(CultureInfo.InvariantCulture, "{0,2:N0}", diaDuration), // keeps 10 -> 9 from jumping
                 new Vector2(
                     // smooths transition of counter to the right of the emptying bar
@@ -130,7 +130,7 @@ namespace DelvUI.Interface
 
                 if (gauge.NumLilies < 3)
                 {
-                    DrawOutlinedText(timer, new Vector2(
+                    DrawHelper.DrawOutlinedText(timer, new Vector2(
                         posX + lilyChunkOffset - (lilyChunkSize / 2f) - (size.X / 2f),
                         posY - _config.LilyBarSize.Y - 4f));
                 }

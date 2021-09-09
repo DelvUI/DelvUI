@@ -166,7 +166,7 @@ namespace DelvUI.Interface
 
         protected unsafe bool ShouldBeVisible()
         {
-            if (_pluginConfiguration.HideHud || _pluginInterface.ClientState.LocalPlayer == null)
+            if (!ConfigurationManager.GetInstance().ShowHUD || _pluginInterface.ClientState.LocalPlayer == null)
             {
                 return false;
             }

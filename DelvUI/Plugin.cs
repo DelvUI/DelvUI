@@ -17,8 +17,6 @@ namespace DelvUI
     {
         public static DalamudPluginInterface InterfaceInstance { get; private set; }
 
-        private ConfigurationWindow _configurationWindow;
-
         private bool _fontBuilt;
         private bool _fontLoadFailed;
         private HudWindow _hudWindow;
@@ -63,11 +61,7 @@ namespace DelvUI
             }
 
             _pluginConfiguration.BannerImage = bannerTexture;
-
             _pluginConfiguration.Init();
-            _configurationWindow = new ConfigurationWindow(_pluginConfiguration);
-            ConfigurationManager.GetInstance().ConfigurationWindow = _configurationWindow;
-
 
             _pluginInterface.UiBuilder.OnBuildUi += Draw;
             _pluginInterface.UiBuilder.OnBuildFonts += BuildFont;
@@ -158,29 +152,31 @@ namespace DelvUI
 
         private void PluginCommand(string command, string arguments)
         {
-            switch (arguments)
-            {
-                case "toggle":
-                    _configurationWindow.ToggleHud();
+            ConfigurationManager.GetInstance().DrawConfigWindow = false;
 
-                    break;
+            //switch (arguments)
+            //{
+            //    case "toggle":
+            //        _configurationWindow.ToggleHud();
 
-                case "show":
-                    _configurationWindow.ShowHud();
+            //        break;
 
-                    break;
+            //    case "show":
+            //        _configurationWindow.ShowHud();
 
-                case "hide":
-                    _configurationWindow.HideHud();
+            //        break;
 
-                    break;
+            //    case "hide":
+            //        _configurationWindow.HideHud();
 
-                default:
-                    _configurationWindow.IsVisible = !_configurationWindow.IsVisible;
-                    ConfigurationManager.GetInstance().DrawConfigWindow = false;
+            //        break;
 
-                    break;
-            }
+            //    default:
+            //        _configurationWindow.IsVisible = !_configurationWindow.IsVisible;
+            //        ConfigurationManager.GetInstance().DrawConfigWindow = false;
+
+            //        break;
+            //}
         }
 
         private void ReloadConfigCommand(string command, string arguments) { ConfigurationManager.GetInstance().LoadConfigurations(); }
@@ -195,15 +191,8 @@ namespace DelvUI
                          || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas51];
 
             _pluginInterface.UiBuilder.OverrideGameCursor = false;
-            _configurationWindow.Draw();
 
             ConfigurationManager.GetInstance().Draw();
-
-            if (!_configurationWindow.IsVisible && (_pluginConfiguration.ShowTestCastBar || _pluginConfiguration.ShowTargetTestCastBar))
-            {
-                _pluginConfiguration.ShowTestCastBar = false;
-                _pluginConfiguration.ShowTargetTestCastBar = false;
-            }
 
             if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id)
             {
@@ -290,7 +279,10 @@ namespace DelvUI
             };
         }
 
-        private void OpenConfigUi(object sender, EventArgs e) { _configurationWindow.IsVisible = !_configurationWindow.IsVisible; }
+        private void OpenConfigUi(object sender, EventArgs e)
+        {
+            ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
+        }
 
         protected virtual void Dispose(bool disposing)
         {
@@ -298,8 +290,6 @@ namespace DelvUI
             {
                 return;
             }
-
-            _configurationWindow.IsVisible = false;
 
             ConfigurationManager.GetInstance().DrawConfigWindow = false;
 

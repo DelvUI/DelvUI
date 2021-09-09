@@ -5,6 +5,7 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -21,13 +22,12 @@ namespace DelvUI.Interface
         private DarkKnightHudConfig _config => (DarkKnightHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new DarkKnightHudConfig());
         private Vector2 Origin => new Vector2(CenterX + _config.Position.X, CenterY + _config.Position.Y);
 
-        private PluginConfigColor EmptyColor;
-        private PluginConfigColor PartialFillColor;
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
+        private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
         public DarkKnightHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration)
         {
-            EmptyColor = new PluginConfigColor(PluginConfiguration.EmptyColor);
-            PartialFillColor = new PluginConfigColor(PluginConfiguration.PartialFillColor);
+
         }
 
         protected override void Draw(bool _)

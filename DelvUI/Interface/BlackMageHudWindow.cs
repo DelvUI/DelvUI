@@ -110,7 +110,7 @@ namespace DelvUI.Interface
                     position.X + 2,
                     position.Y + _config.ManaBarSize.Y / 2f - textSize.Y / 2f
                 );
-                DrawOutlinedText(text, textPos);
+                DrawHelper.DrawOutlinedText(text, textPos);
             }
         }
 

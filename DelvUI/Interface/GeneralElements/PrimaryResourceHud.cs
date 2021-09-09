@@ -5,11 +5,20 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
+    public enum PrimaryResourceType
+    {
+        MP,
+        CP,
+        GP,
+        None
+    }
+
     public class PrimaryResourceHud : HudElement, IHudElementWithActor
     {
         private PrimaryResourceConfig Config => (PrimaryResourceConfig)_config;
         private LabelHud _valueLabel;
         public Actor Actor { get; set; } = null;
+        private PrimaryResourceType _resourceType = PrimaryResourceType.MP;
 
         public PrimaryResourceHud(string ID, PrimaryResourceConfig config) : base(ID, config)
         {
@@ -18,13 +27,18 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void Draw(Vector2 origin)
         {
-            if (!Config.Enabled || Actor == null || Actor is not Chara)
+            if (!Config.Enabled || _resourceType == PrimaryResourceType.None || Actor == null || Actor is not Chara)
             {
                 return;
             }
 
             var chara = (Chara)Actor;
-            var scale = (float)chara.CurrentMp / chara.MaxMp;
+            int current = 0;
+            int max = 0;
+
+            GetResources(ref current, ref max, chara);
+
+            var scale = (float)current / max;
             var startPos = origin + Config.Position - Config.Size / 2f;
 
             // bar
@@ -53,8 +67,38 @@ namespace DelvUI.Interface.GeneralElements
             // text
             if (Config.ShowValue)
             {
-                Config.ValueLabelConfig.Text = $"{chara.CurrentMp,0}";
+                Config.ValueLabelConfig.Text = $"{current,0}";
                 _valueLabel.Draw(origin + Config.Position);
+            }
+        }
+
+        private void GetResources(ref int current, ref int max, Chara actor)
+        {
+            switch (_resourceType)
+            {
+                case PrimaryResourceType.MP:
+                    {
+                        current = actor.CurrentMp;
+                        max = actor.MaxMp;
+                    }
+
+                    break;
+
+                case PrimaryResourceType.CP:
+                    {
+                        current = actor.CurrentCp;
+                        max = actor.MaxCp;
+                    }
+
+                    break;
+
+                case PrimaryResourceType.GP:
+                    {
+                        current = actor.CurrentGp;
+                        max = actor.MaxGp;
+                    }
+
+                    break;
             }
         }
     }
