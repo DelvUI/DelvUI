@@ -11,14 +11,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface
 {
-    internal static class HUDConstants
-    {
-        internal static int BaseHUDOffsetY = (int)(ImGui.GetMainViewport().Size.Y * 0.3f);
-        internal static int UnitFramesOffsetX = 160;
-        internal static Vector2 DefaultBigUnitFrameSize = new Vector2(270, 50);
-        internal static Vector2 DefaultSmallUnitFrameSize = new Vector2(120, 20);
-    }
-
     public class HudManager
     {
         private DalamudPluginInterface _pluginInterface;
@@ -94,22 +86,22 @@ namespace DelvUI.Interface
 
         private void CreateStatusEffectsLists()
         {
-            var playerBuffsConfig = DefaultHudElements.PlayerBuffsList();
+            var playerBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerBuffsListConfig>();
             var playerBuffs = new StatusEffectsListHud("playerBuffs", playerBuffsConfig);
             _hudElements.Add(playerBuffs);
             _hudElementsUsingPlayer.Add(playerBuffs);
 
-            var playerDebuffsConfig = DefaultHudElements.PlayerDebuffsList();
+            var playerDebuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerDebuffsListConfig>();
             var playerDebuffs = new StatusEffectsListHud("playerDebuffs", playerDebuffsConfig);
             _hudElements.Add(playerDebuffs);
             _hudElementsUsingPlayer.Add(playerDebuffs);
 
-            var targetBuffsConfig = DefaultHudElements.TargetBuffsList();
+            var targetBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetBuffsListConfig>();
             var targetBuffs = new StatusEffectsListHud("targetBuffs", targetBuffsConfig);
             _hudElements.Add(targetBuffs);
             _hudElementsUsingTarget.Add(targetBuffs);
 
-            var targetDebuffsConfig = DefaultHudElements.TargetDebuffsList();
+            var targetDebuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetDebuffsListConfig>();
             var targetDebuffs = new StatusEffectsListHud("targetDebuffs", targetDebuffsConfig);
             _hudElements.Add(targetDebuffs);
             _hudElementsUsingTarget.Add(targetDebuffs);
@@ -215,5 +207,14 @@ namespace DelvUI.Interface
                 element.Actor = focusTarget;
             }
         }
+    }
+
+    internal static class HUDConstants
+    {
+        internal static int BaseHUDOffsetY = (int)(ImGui.GetMainViewport().Size.Y * 0.3f);
+        internal static int UnitFramesOffsetX = 160;
+        internal static Vector2 DefaultBigUnitFrameSize = new Vector2(270, 50);
+        internal static Vector2 DefaultSmallUnitFrameSize = new Vector2(120, 20);
+        internal static Vector2 DefaultStatusEffectsListSize = new Vector2(292, 82);
     }
 }

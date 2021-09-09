@@ -141,7 +141,7 @@ namespace DelvUI.Interface.StatusEffects
             var count = CalculateLayout(list);
 
             // validate growth directions
-            var growthDirections = Config.GrowthDirections;
+            var growthDirections = Config.GetGrowthDirections();
             if (growthDirections != _lastGrowthDirections)
             {
                 growthDirections = ValidateGrowthDirections(growthDirections);

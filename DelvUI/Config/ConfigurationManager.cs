@@ -1,6 +1,7 @@
 using Dalamud.Plugin;
 using DelvUI.Config.Tree;
 using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.StatusEffects;
 using ImGuiScene;
 using Newtonsoft.Json;
 using System;
@@ -47,6 +48,11 @@ namespace DelvUI.Config
 
                 typeof(PlayerCastbarConfig),
                 typeof(TargetCastbarConfig),
+
+                typeof(PlayerBuffsListConfig),
+                typeof(PlayerDebuffsListConfig),
+                typeof(TargetBuffsListConfig),
+                typeof(TargetDebuffsListConfig),
 
                 typeof(PrimaryResourceConfig),
                 typeof(GCDIndicatorConfig),
