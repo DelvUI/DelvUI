@@ -5,6 +5,7 @@ using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -23,8 +24,8 @@ namespace DelvUI.Interface
         private WhiteMageHudConfig _config => (WhiteMageHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new WhiteMageHudConfig());
 
         private Vector2 Origin => new Vector2(CenterX + _config.BasePosition.X, CenterY + _config.BasePosition.Y);
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
-        private Dictionary<string, uint> PartialFillColor => PluginConfiguration.MiscColorMap["partial"];
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
+        private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
         protected override void Draw(bool _)
         {
@@ -59,7 +60,7 @@ namespace DelvUI.Interface
 
             if (target is not Chara)
             {
-                drawList.AddRectFilled(cursorPos, cursorPos + _config.DiaBarSize, EmptyColor["background"]);
+                drawList.AddRectFilled(cursorPos, cursorPos + _config.DiaBarSize, EmptyColor.Background);
                 drawList.AddRect(cursorPos, cursorPos + _config.DiaBarSize, 0xFF000000);
 
                 return;
@@ -74,7 +75,7 @@ namespace DelvUI.Interface
             float diaCooldown = dia.EffectId == 1871 ? 30f : 18f;
             float diaDuration = dia.Duration;
 
-            drawList.AddRectFilled(cursorPos, cursorPos + _config.DiaBarSize, EmptyColor["background"]);
+            drawList.AddRectFilled(cursorPos, cursorPos + _config.DiaBarSize, EmptyColor.Background);
 
             drawList.AddRectFilled(
                 cursorPos,
@@ -116,9 +117,9 @@ namespace DelvUI.Interface
             var posX = Origin.X + _config.LilyBarPosition.X - _config.LilyBarSize.X / 2f;
             var posY = Origin.Y + _config.LilyBarPosition.Y - _config.LilyBarSize.Y / 2f;
 
-            BarBuilder builder = BarBuilder.Create(posX, posY, _config.LilyBarSize.Y, _config.LilyBarSize.X).SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder builder = BarBuilder.Create(posX, posY, _config.LilyBarSize.Y, _config.LilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
-            builder.SetChunks(3).SetChunkPadding(_config.LilyBarPad).AddInnerBar(lilyScale, 3, _config.LilyColor.Map, PartialFillColor);
+            builder.SetChunks(3).SetChunkPadding(_config.LilyBarPad).AddInnerBar(lilyScale, 3, _config.LilyColor.Map, PartialFillColor.Map);
 
             if (_config.ShowLilyBarTimer)
             {
@@ -141,7 +142,7 @@ namespace DelvUI.Interface
             posX = Origin.X + _config.BloodLilyBarPosition.X - _config.BloodLilyBarSize.X / 2f;
             posY = Origin.Y + _config.BloodLilyBarPosition.Y - _config.BloodLilyBarSize.Y / 2f;
 
-            builder = BarBuilder.Create(posX, posY, _config.BloodLilyBarSize.Y, _config.BloodLilyBarSize.X).SetBackgroundColor(EmptyColor["background"]);
+            builder = BarBuilder.Create(posX, posY, _config.BloodLilyBarSize.Y, _config.BloodLilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
             builder.SetChunks(3).SetChunkPadding(_config.BloodLilyBarPad).AddInnerBar(gauge.NumBloodLily, 3, _config.BloodLilyColor.Map);
 

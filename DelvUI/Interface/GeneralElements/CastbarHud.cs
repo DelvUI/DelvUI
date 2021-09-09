@@ -13,8 +13,6 @@ namespace DelvUI.Interface.GeneralElements
 {
     public class CastbarHud : HudElement, IHudElementWithActor
     {
-        protected PluginConfiguration _pluginConfiguration;
-
         private CastbarConfig Config => (CastbarConfig)_config;
         private LabelHud _castNameLabel;
         private LabelHud _castTimeLabel;
@@ -23,12 +21,8 @@ namespace DelvUI.Interface.GeneralElements
 
         public Actor Actor { get; set; } = null;
 
-        public CastbarHud(string id, CastbarConfig config, PluginConfiguration pluginConfiguration) : base(id, config)
+        public CastbarHud(string id, CastbarConfig config) : base(id, config)
         {
-            // NOTE: Temporary. Have to do this for now for job colors.
-            // Ideally hud elements shouldna't need a reference to PluginConfiguration
-            _pluginConfiguration = pluginConfiguration;
-
             _castNameLabel = new LabelHud(id + "_castNameLabel", config.CastNameConfig);
             _castTimeLabel = new LabelHud(id + "_castTimeLabel", config.CastTimeConfig);
         }
@@ -120,7 +114,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private PlayerCastbarConfig Config => (PlayerCastbarConfig)_config;
 
-        public PlayerCastbarHud(string id, PlayerCastbarConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public PlayerCastbarHud(string id, PlayerCastbarConfig config) : base(id, config)
         {
 
         }
@@ -157,8 +151,8 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             var chara = (Chara)Actor;
-            _pluginConfiguration.JobColorMap.TryGetValue(chara.ClassJob.Id, out var color);
-            return color ?? Config.Color.Map;
+            var color = GlobalColors.Instance.ColorForJobId(chara.ClassJob.Id);
+            return color != null ? color.Map : Config.Color.Map;
         }
     }
 
@@ -166,7 +160,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private TargetCastbarConfig Config => (TargetCastbarConfig)_config;
 
-        public TargetCastbarHud(string id, TargetCastbarConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public TargetCastbarHud(string id, TargetCastbarConfig config) : base(id, config)
         {
 
         }

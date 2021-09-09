@@ -4,6 +4,7 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -18,7 +19,7 @@ namespace DelvUI.Interface
 
         private BlackMageHudConfig _config => (BlackMageHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new BlackMageHudConfig());
 
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
+        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
         public BlackMageHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration)
             : base(pluginInterface, pluginConfiguration) { }

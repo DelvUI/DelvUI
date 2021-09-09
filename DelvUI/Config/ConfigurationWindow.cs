@@ -236,7 +236,6 @@ namespace DelvUI.Config
 
             if (_changed)
             {
-                _pluginConfiguration.BuildColorMap();
                 _pluginConfiguration.Save();
             }
 

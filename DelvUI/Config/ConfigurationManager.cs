@@ -54,6 +54,13 @@ namespace DelvUI.Config
                 typeof(TargetBuffsListConfig),
                 typeof(TargetDebuffsListConfig),
 
+                typeof(TanksColorConfig),
+                typeof(HealersColorConfig),
+                typeof(MeleeColorConfig),
+                typeof(RangedColorConfig),
+                typeof(CastersColorConfig),
+                typeof(MiscColorConfig),
+
                 typeof(PrimaryResourceConfig),
                 typeof(GCDIndicatorConfig),
                 typeof(MPTickerConfig)

@@ -4,6 +4,7 @@ using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface;
+using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs;
 using ImGuiNET;
 using System;
@@ -94,6 +95,7 @@ namespace DelvUI
             _pluginInterface.CommandManager.AddHandler("/delvuireloadconfig", new CommandInfo(ReloadConfigCommand));
 
             TexturesCache.Initialize(pluginInterface);
+            GlobalColors.Initialize();
             Resolver.Initialize();
 
             _hudManager = new HudManager(_pluginInterface, _pluginConfiguration);

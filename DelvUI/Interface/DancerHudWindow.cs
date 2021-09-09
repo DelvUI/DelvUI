@@ -6,6 +6,7 @@ using DelvUI.Config.Attributes;
 using DelvUI.GameStructs;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -22,8 +23,8 @@ namespace DelvUI.Interface
         public override uint JobId => Jobs.DNC;
         private DancerHudConfig _config => (DancerHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new DancerHudConfig());
         private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
-        private Dictionary<string, uint> PartialFillColor => PluginConfiguration.MiscColorMap["partial"];
+        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
+        private Dictionary<string, uint> PartialFillColor => GlobalColors.Instance.PartialFillColor.Map;
 
         protected override void Draw(bool _)
         {

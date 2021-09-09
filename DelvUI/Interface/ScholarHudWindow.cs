@@ -5,6 +5,7 @@ using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace DelvUI.Interface
 
         private ScholarHudConfig _config => (ScholarHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new ScholarHudConfig());
         private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
+        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
         protected override void Draw(bool _)
         {

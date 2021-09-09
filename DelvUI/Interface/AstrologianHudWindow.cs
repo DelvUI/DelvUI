@@ -6,6 +6,7 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -27,7 +28,7 @@ namespace DelvUI.Interface
         private float OriginX => CenterX + _config.Position.X;
         private float OriginY => CenterY + _config.Position.Y;
 
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
+        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
         public AstrologianHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 

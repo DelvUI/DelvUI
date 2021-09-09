@@ -13,8 +13,6 @@ namespace DelvUI.Interface.GeneralElements
 {
     public unsafe class UnitFrameHud : HudElement, IHudElementWithActor
     {
-        private PluginConfiguration _pluginConfiguration;
-
         private UnitFrameConfig Config => (UnitFrameConfig)_config;
         private LabelHud _leftLabel;
         private LabelHud _rightLabel;
@@ -24,12 +22,8 @@ namespace DelvUI.Interface.GeneralElements
 
         public Actor Actor { get; set; } = null;
 
-        public UnitFrameHud(string id, UnitFrameConfig config, PluginConfiguration pluginConfiguration) : base(id, config)
+        public UnitFrameHud(string id, UnitFrameConfig config) : base(id, config)
         {
-            // NOTE: Temporary. Have to do this for now for job colors.
-            // Ideally hud elements shouldna't need a reference to PluginConfiguration
-            _pluginConfiguration = pluginConfiguration;
-
             // labels
             _leftLabel = new LabelHud(id + "_leftLabel", Config.LeftLabelConfig);
             _rightLabel = new LabelHud(id + "_rightLabel", Config.RightLabelConfig);
@@ -139,7 +133,7 @@ namespace DelvUI.Interface.GeneralElements
             var startPos = new Vector2(origin.X + Config.Position.X - Config.Size.X / 2f, origin.Y + Config.Position.Y - Config.Size.Y / 2f);
             var endPos = startPos + Config.Size;
             var scale = (float)chara.CurrentHp / Math.Max(1, chara.MaxHp);
-            var color = Config.UseCustomColor ? Config.CustomColor.Map : Utils.ColorForActor(_pluginConfiguration, chara);
+            var color = Config.UseCustomColor ? Config.CustomColor.Map : Utils.ColorForActor(chara);
             var bgColor = BackgroundColor(chara);
 
             // background
@@ -178,17 +172,17 @@ namespace DelvUI.Interface.GeneralElements
 
         private void DrawFriendlyNPC(ImDrawListPtr drawList, Vector2 startPos, Vector2 endPos)
         {
-            var color = _pluginConfiguration.NPCColorMap["friendly"];
+            var color = GlobalColors.Instance.NPCFriendlyColor;
 
-            drawList.AddRectFilled(startPos, endPos, ImGui.ColorConvertFloat4ToU32(_pluginConfiguration.UnitFrameEmptyColor));
+            drawList.AddRectFilled(startPos, endPos, GlobalColors.Instance.EmptyUnitFrameColor.Base);
 
             drawList.AddRectFilledMultiColor(
                 startPos,
                 endPos,
-                color["gradientLeft"],
-                color["gradientRight"],
-                color["gradientRight"],
-                color["gradientLeft"]
+                color.LeftGradient,
+                color.RightGradient,
+                color.RightGradient,
+                color.LeftGradient
             );
 
             drawList.AddRect(startPos, endPos, 0xFF000000);
@@ -225,7 +219,8 @@ namespace DelvUI.Interface.GeneralElements
         {
             if (Config.ShowTankInvulnerability && Utils.HasTankInvulnerability(chara))
             {
-                return _pluginConfiguration.JobColorMap[chara.ClassJob.Id]["invuln"];
+                var color = GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id);
+                return ImGui.ColorConvertFloat4ToU32(color.Vector.AdjustColor(-.8f));
             }
 
             if (Config.UseCustomBackgroundColor)
@@ -233,7 +228,7 @@ namespace DelvUI.Interface.GeneralElements
                 return Config.CustomBackgroundColor.Base;
             }
 
-            return ImGui.ColorConvertFloat4ToU32(_pluginConfiguration.UnitFrameEmptyColor);
+            return GlobalColors.Instance.EmptyUnitFrameColor.Base;
         }
 
         private delegate void OpenContextMenuFromTarget(IntPtr agentHud, IntPtr gameObject);

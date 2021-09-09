@@ -51,22 +51,22 @@ namespace DelvUI.Interface
         private void CreateUnitFrames()
         {
             var playerUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerUnitFrameConfig>();
-            var playerUnitFrame = new UnitFrameHud("playerUnitFrame", playerUnitFrameConfig, _pluginConfiguration);
+            var playerUnitFrame = new UnitFrameHud("playerUnitFrame", playerUnitFrameConfig);
             _hudElements.Add(playerUnitFrame);
             _hudElementsUsingPlayer.Add(playerUnitFrame);
 
             var targetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetUnitFrameConfig>();
-            var targetUnitFrame = new UnitFrameHud("targetUnitFrame", targetUnitFrameConfig, _pluginConfiguration);
+            var targetUnitFrame = new UnitFrameHud("targetUnitFrame", targetUnitFrameConfig);
             _hudElements.Add(targetUnitFrame);
             _hudElementsUsingTarget.Add(targetUnitFrame);
 
             var targetOfTargetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetOfTargetUnitFrameConfig>();
-            var targetOfTargetUnitFrame = new UnitFrameHud("targetOfTargetUnitFrame", targetOfTargetUnitFrameConfig, _pluginConfiguration);
+            var targetOfTargetUnitFrame = new UnitFrameHud("targetOfTargetUnitFrame", targetOfTargetUnitFrameConfig);
             _hudElements.Add(targetOfTargetUnitFrame);
             _hudElementsUsingTargetOfTarget.Add(targetOfTargetUnitFrame);
 
             var focusTargetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<FocusTargetUnitFrameConfig>();
-            var focusTargetUnitFrame = new UnitFrameHud("focusTargetUnitFrame", focusTargetUnitFrameConfig, _pluginConfiguration);
+            var focusTargetUnitFrame = new UnitFrameHud("focusTargetUnitFrame", focusTargetUnitFrameConfig);
             _hudElements.Add(focusTargetUnitFrame);
             _hudElementsUsingFocusTarget.Add(focusTargetUnitFrame);
         }
@@ -74,12 +74,12 @@ namespace DelvUI.Interface
         private void CreateCastbars()
         {
             var playerCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerCastbarConfig>();
-            var playerCastbar = new PlayerCastbarHud("playerCastbar", playerCastbarConfig, _pluginConfiguration);
+            var playerCastbar = new PlayerCastbarHud("playerCastbar", playerCastbarConfig);
             _hudElements.Add(playerCastbar);
             _hudElementsUsingPlayer.Add(playerCastbar);
 
             var targetCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetCastbarConfig>();
-            var targetCastbar = new TargetCastbarHud("targetCastbar", targetCastbarConfig, _pluginConfiguration);
+            var targetCastbar = new TargetCastbarHud("targetCastbar", targetCastbarConfig);
             _hudElements.Add(targetCastbar);
             _hudElementsUsingTarget.Add(targetCastbar);
         }

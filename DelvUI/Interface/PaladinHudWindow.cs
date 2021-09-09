@@ -6,6 +6,7 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -24,8 +25,8 @@ namespace DelvUI.Interface
         private float OriginX => CenterX + _config.Position.X;
         private float OriginY => CenterY + _config.Position.Y;
 
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
-        private Dictionary<string, uint> OathGaugeNotFilledColor => PluginConfiguration.MiscColorMap["partial"];
+        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
+        private Dictionary<string, uint> PartialFillColor => GlobalColors.Instance.PartialFillColor.Map;
 
         public PaladinHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
@@ -100,7 +101,7 @@ namespace DelvUI.Interface
                                            .SetChunks(2)
                                            .SetChunkPadding(_config.OathGaugePadding)
                                            .SetBackgroundColor(EmptyColor["background"])
-                                           .AddInnerBar(gauge.GaugeAmount, 100, _config.OathGaugeColor.Map, OathGaugeNotFilledColor);
+                                           .AddInnerBar(gauge.GaugeAmount, 100, _config.OathGaugeColor.Map, PartialFillColor);
 
             if (_config.ShowOathGaugeText)
             {

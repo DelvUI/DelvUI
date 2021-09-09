@@ -6,6 +6,7 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -23,7 +24,7 @@ namespace DelvUI.Interface
         public override uint JobId => Jobs.DRG;
         private readonly DragoonHudConfig _config = (DragoonHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new DragoonHudConfig());
         private Vector2 Origin => new(CenterX + _config.BasePosition.X, CenterY + _config.BasePosition.Y);
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
+        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
         protected override List<uint> GetJobSpecificBuffs()
         {

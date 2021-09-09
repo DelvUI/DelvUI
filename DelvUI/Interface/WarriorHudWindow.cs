@@ -5,6 +5,7 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace DelvUI.Interface
         public override uint JobId => Jobs.WAR;
         private WarriorHudConfig _config => (WarriorHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new WarriorHudConfig());
         private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
-        private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
+        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
         public WarriorHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
         protected override void Draw(bool _)

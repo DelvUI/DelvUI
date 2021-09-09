@@ -116,7 +116,7 @@ namespace DelvUI.Interface
 
             RaidWideBuffs = new List<uint>(_raidWideBuffs);
             JobSpecificBuffs = GetJobSpecificBuffs();
-            PluginConfiguration.ConfigChangedEvent += OnConfigChanged;
+            //PluginConfiguration.ConfigChangedEvent += OnConfigChanged;
 
             //_playerBuffList = new StatusEffectsListHud("tmp1", pluginConfiguration.PlayerBuffListConfig);
             //_playerDebuffList = new StatusEffectsListHud("tmp2", pluginConfiguration.PlayerDebuffListConfig);
@@ -144,82 +144,7 @@ namespace DelvUI.Interface
 
         protected virtual void DrawHealthBar()
         {
-            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            BarSize = new Vector2(HealthBarWidth, HealthBarHeight);
-            PlayerCharacter actor = PluginInterface.ClientState.LocalPlayer;
-            float scale = (float)actor.CurrentHp / actor.MaxHp;
 
-            if (ConfigTank.TankStanceIndicatorEnabled && actor.ClassJob.Id is 19 or 32 or 21 or 37)
-            {
-                DrawTankStanceIndicator();
-            }
-
-            Vector2 cursorPos = new(CenterX - HealthBarWidth - HealthBarXOffset, CenterY + HealthBarYOffset);
-            ImGui.SetCursorPos(cursorPos);
-
-            PluginConfiguration.JobColorMap.TryGetValue(PluginInterface.ClientState.LocalPlayer.ClassJob.Id, out Dictionary<string, uint> colors);
-            colors ??= PluginConfiguration.NPCColorMap["friendly"];
-
-            if (PluginConfiguration.CustomHealthBarColorEnabled)
-            {
-                colors = PluginConfiguration.MiscColorMap["customhealth"];
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-
-            // Basically make an invisible box for BeginChild to work properly.
-            ImGuiWindowFlags windowFlags = 0;
-            windowFlags |= ImGuiWindowFlags.NoBackground;
-            windowFlags |= ImGuiWindowFlags.NoTitleBar;
-            windowFlags |= ImGuiWindowFlags.NoMove;
-            windowFlags |= ImGuiWindowFlags.NoDecoration;
-
-            ImGui.SetNextWindowPos(cursorPos);
-            ImGui.SetNextWindowSize(BarSize);
-
-            ImGui.Begin("health_bar", windowFlags);
-
-            if (ImGui.BeginChild("health_bar", BarSize))
-            {
-                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, PlayerUnitFrameColor);
-
-                if (HasTankInvuln(actor) == 1)
-                {
-                    Dictionary<string, uint> jobColors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, jobColors["invuln"]);
-                }
-
-                drawList.AddRectFilledMultiColor(
-                    cursorPos,
-                    cursorPos + new Vector2(HealthBarWidth * scale, HealthBarHeight),
-                    colors["gradientLeft"],
-                    colors["gradientRight"],
-                    colors["gradientRight"],
-                    colors["gradientLeft"]
-                );
-
-                drawList.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-
-                // Check if mouse is hovering over the box properly
-                if (ImGui.GetIO().MouseClicked[0] && ImGui.IsMouseHoveringRect(cursorPos, cursorPos + BarSize))
-                {
-                    PluginInterface.ClientState.Targets.SetCurrentTarget(actor);
-                }
-            }
-
-            ImGui.EndChild();
-            ImGui.End();
-
-            DrawTargetShield(actor, cursorPos, BarSize);
-
-            DrawOutlinedText(
-                $"{TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextLeft)}",
-                new Vector2(cursorPos.X + 5 + HealthBarTextLeftXOffset, cursorPos.Y - 22 + HealthBarTextLeftYOffset)
-            );
-
-            string text = TextTags.GenerateFormattedTextFromTags(actor, PluginConfiguration.HealthBarTextRight);
-            Vector2 textSize = ImGui.CalcTextSize(text);
-            DrawOutlinedText(text, new Vector2(cursorPos.X + HealthBarWidth - textSize.X - 5 + HealthBarTextRightXOffset, cursorPos.Y - 22 + HealthBarTextRightYOffset));
         }
 
         private Vector2 CalculatePosition(Vector2 position, Vector2 size) => Center + position - size / 2f;
@@ -228,846 +153,62 @@ namespace DelvUI.Interface
 
         protected virtual void DrawPrimaryResourceBar(PrimaryResourceType type = PrimaryResourceType.MP, PluginConfigColor partialFillColor = null)
         {
-            partialFillColor ??= ConfigGeneral.BarPartialFillColor;
 
-            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-            PlayerCharacter actor = PluginInterface.ClientState.LocalPlayer;
-
-            int current = 0;
-            int max = 0;
-
-            switch (type)
-            {
-                case PrimaryResourceType.MP:
-                    {
-                        current = actor.CurrentMp;
-                        max = actor.MaxMp;
-                    }
-
-                    break;
-
-                case PrimaryResourceType.CP:
-                    {
-                        current = actor.CurrentCp;
-                        max = actor.MaxCp;
-                    }
-
-                    break;
-
-                case PrimaryResourceType.GP:
-                    {
-                        current = actor.CurrentGp;
-                        max = actor.MaxGp;
-                    }
-
-                    break;
-            }
-
-            BarSize = ConfigGeneral.PrimaryResourceSize;
-            Vector2 position = CalculatePosition(ConfigGeneral.PrimaryResourcePosition, ConfigGeneral.PrimaryResourceSize);
-
-            BarBuilder builder = BarBuilder.Create(position, BarSize)
-                                           .AddInnerBar(current, max, partialFillColor.Map)
-                                           .SetBackgroundColor(ConfigGeneral.BarBackgroundColor.Background)
-                                           .SetTextMode(BarTextMode.Single)
-                                           .SetText(
-                                               BarTextPosition.CenterLeft,
-                                               BarTextType.Custom,
-                                               ConfigGeneral.ShowPrimaryResourceBarValue
-                                                   ? current.ToString()
-                                                   : ""
-                                           );
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
-
-            if (ConfigGeneral.ShowPrimaryResourceBarThresholdMarker)
-            {
-                Vector2 pos = new(position.X + ConfigGeneral.PrimaryResourceBarThresholdValue / 10000f * BarSize.X - 3, position.Y);
-                Vector2 size = new(2, BarSize.Y);
-                drawList.AddRect(pos, pos + size, 0xFF000000);
-            }
         }
 
         protected virtual void DrawTargetBar()
         {
-            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (target is null)
-            {
-                return;
-            }
-
-            BarSize = new Vector2(TargetBarWidth, TargetBarHeight);
-
-            Vector2 cursorPos = new(CenterX + TargetBarXOffset, CenterY + TargetBarYOffset);
-            ImGui.SetCursorPos(cursorPos);
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            ImGuiWindowFlags windowFlags = 0;
-            windowFlags |= ImGuiWindowFlags.NoBackground;
-            windowFlags |= ImGuiWindowFlags.NoTitleBar;
-            windowFlags |= ImGuiWindowFlags.NoMove;
-            windowFlags |= ImGuiWindowFlags.NoDecoration;
-            windowFlags |= ImGuiWindowFlags.NoInputs;
-
-            Addon addon = PluginInterface.Framework.Gui.GetAddonByName("ContextMenu", 1);
-
-            ClipAround(
-                addon,
-                "target_bar",
-                drawList,
-                (drawListPtr, windowName) =>
-                {
-                    ImGui.SetNextWindowSize(BarSize);
-                    ImGui.SetNextWindowPos(cursorPos);
-
-                    ImGui.Begin(windowName, windowFlags);
-
-                    if (addon is not { Visible: true })
-                    {
-                        _childFlags &= ~ImGuiWindowFlags.NoInputs;
-                    }
-                    else
-                    {
-                        if (ImGui.IsMouseHoveringRect(new Vector2(addon.X, addon.Y), new Vector2(addon.X + addon.Width, addon.Y + addon.Height)))
-                        {
-                            _childFlags |= ImGuiWindowFlags.NoInputs;
-                        }
-                        else
-                        {
-                            _childFlags &= ~ImGuiWindowFlags.NoInputs;
-                        }
-                    }
-
-                    if (ImGui.BeginChild(windowName, BarSize, default, _childFlags))
-                    {
-                        if (target is not Chara actor)
-                        {
-                            Dictionary<string, uint> friendly = PluginConfiguration.NPCColorMap["friendly"];
-                            drawListPtr.AddRectFilled(cursorPos, cursorPos + BarSize, ImGui.ColorConvertFloat4ToU32(PluginConfiguration.UnitFrameEmptyColor));
-
-                            drawListPtr.AddRectFilledMultiColor(
-                                cursorPos,
-                                cursorPos + new Vector2(TargetBarWidth, TargetBarHeight),
-                                friendly["gradientLeft"],
-                                friendly["gradientRight"],
-                                friendly["gradientRight"],
-                                friendly["gradientLeft"]
-                            );
-
-                            drawListPtr.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                        }
-                        else
-                        {
-                            float scale = actor.MaxHp > 0f ? (float)actor.CurrentHp / actor.MaxHp : 0f;
-                            Dictionary<string, uint> colors = DetermineTargetPlateColors(actor);
-                            drawListPtr.AddRectFilled(cursorPos, cursorPos + BarSize, UnitFrameEmptyColor);
-
-                            if (HasTankInvuln(actor) == 1)
-                            {
-                                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["invuln"]);
-                            }
-
-                            drawListPtr.AddRectFilledMultiColor(
-                                cursorPos,
-                                cursorPos + new Vector2(TargetBarWidth * scale, TargetBarHeight),
-                                colors["gradientLeft"],
-                                colors["gradientRight"],
-                                colors["gradientRight"],
-                                colors["gradientLeft"]
-                            );
-
-                            drawListPtr.AddRect(cursorPos, cursorPos + BarSize, 0xFF000000);
-                        }
-
-                        if (ImGui.GetIO().MouseDown[1] && ImGui.IsMouseHoveringRect(cursorPos, cursorPos + BarSize))
-                        {
-                            unsafe
-                            {
-                                IntPtr agentHud = new(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
-                                _openContextMenuFromTarget(agentHud, target.Address);
-                            }
-                        }
-                    }
-
-                    ImGui.EndChild();
-                    ImGui.End();
-                }
-            );
-
-            DrawTargetShield(target, cursorPos, BarSize);
-
-            string textLeft = TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextLeft);
-            DrawOutlinedText(textLeft, new Vector2(cursorPos.X + 5 + TargetBarTextLeftXOffset, cursorPos.Y - 22 + TargetBarTextLeftYOffset));
-
-            string textRight = TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.TargetBarTextRight);
-            Vector2 textRightSize = ImGui.CalcTextSize(textRight);
-
-            DrawOutlinedText(textRight, new Vector2(cursorPos.X + TargetBarWidth - textRightSize.X - 5 + TargetBarTextRightXOffset, cursorPos.Y - 22 + TargetBarTextRightYOffset));
-
-            DrawTargetOfTargetBar(target.TargetActorID);
         }
 
         protected virtual void DrawFocusBar()
         {
-            Actor focus = PluginInterface.ClientState.Targets.FocusTarget;
-
-            if (focus is null)
-            {
-                return;
-            }
-
-            Vector2 barSize = new(FocusBarWidth, FocusBarHeight);
-
-            Vector2 cursorPos = new(CenterX - FocusBarXOffset - HealthBarWidth - FocusBarWidth - 2, CenterY + FocusBarYOffset);
-            ImGui.SetCursorPos(cursorPos);
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-
-            ImGuiWindowFlags windowFlags = 0;
-            windowFlags |= ImGuiWindowFlags.NoBackground;
-            windowFlags |= ImGuiWindowFlags.NoTitleBar;
-            windowFlags |= ImGuiWindowFlags.NoMove;
-            windowFlags |= ImGuiWindowFlags.NoDecoration;
-
-            ImGui.SetNextWindowPos(cursorPos);
-            ImGui.SetNextWindowSize(barSize);
-
-            ImGui.Begin("focus_bar", windowFlags);
-
-            if (ImGui.BeginChild("focus_bar", BarSize))
-            {
-                if (focus is not Chara actor)
-                {
-                    Dictionary<string, uint> friendly = PluginConfiguration.NPCColorMap["friendly"];
-                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, UnitFrameEmptyColor);
-
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos,
-                        cursorPos + new Vector2(FocusBarWidth, FocusBarHeight),
-                        friendly["gradientLeft"],
-                        friendly["gradientRight"],
-                        friendly["gradientRight"],
-                        friendly["gradientLeft"]
-                    );
-
-                    drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-                    DrawTargetShield(focus, cursorPos, barSize);
-                }
-                else
-                {
-                    Dictionary<string, uint> colors = DetermineTargetPlateColors(actor);
-                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, UnitFrameEmptyColor);
-
-                    if (HasTankInvuln(actor) == 1)
-                    {
-                        drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["invuln"]);
-                    }
-
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos,
-                        cursorPos + new Vector2((float)FocusBarWidth * actor.CurrentHp / actor.MaxHp, FocusBarHeight),
-                        colors["gradientLeft"],
-                        colors["gradientRight"],
-                        colors["gradientRight"],
-                        colors["gradientLeft"]
-                    );
-
-                    drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-                }
-
-                if (ImGui.GetIO().MouseClicked[1] && ImGui.IsMouseHoveringRect(cursorPos, cursorPos + BarSize))
-                {
-                    unsafe
-                    {
-                        //PluginLog.Information();
-                        IntPtr agentHud = new(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
-
-                        _openContextMenuFromTarget(agentHud, focus.Address);
-                    }
-                }
-            }
-
-            ImGui.EndChild();
-            ImGui.End();
-
-            DrawTargetShield(focus, cursorPos, barSize);
-
-            string text = TextTags.GenerateFormattedTextFromTags(focus, PluginConfiguration.FocusBarText);
-            Vector2 textSize = ImGui.CalcTextSize(text);
-            DrawOutlinedText(text, new Vector2(cursorPos.X + FocusBarWidth / 2f - textSize.X / 2f + FocusBarTextXOffset, cursorPos.Y - 22 + FocusBarTextYOffset));
         }
 
         protected virtual void DrawTargetOfTargetBar(int targetActorId)
         {
-            Actor target = null;
 
-            if (targetActorId == 0 && PluginInterface.ClientState.LocalPlayer.TargetActorID == 0)
-            {
-                target = PluginInterface.ClientState.LocalPlayer;
-            }
-            else
-            {
-                for (int i = 0; i < 200; i += 2)
-                {
-                    if (PluginInterface.ClientState.Actors[i]?.ActorId == targetActorId)
-                    {
-                        target = PluginInterface.ClientState.Actors[i];
-                    }
-                }
-            }
-
-            if (target is not Chara actor)
-            {
-                return;
-            }
-
-            Vector2 barSize = new(ToTBarWidth, ToTBarHeight);
-            Dictionary<string, uint> colors = DetermineTargetPlateColors(actor);
-            string text = TextTags.GenerateFormattedTextFromTags(target, PluginConfiguration.ToTBarText);
-            Vector2 textSize = ImGui.CalcTextSize(text);
-            Vector2 cursorPos = new(CenterX + ToTBarXOffset + TargetBarWidth + 2, CenterY + ToTBarYOffset);
-
-            ImGui.SetCursorPos(cursorPos);
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-
-            // Basically make an invisible box for BeginChild to work properly.
-            ImGuiWindowFlags windowFlags = 0;
-            windowFlags |= ImGuiWindowFlags.NoBackground;
-            windowFlags |= ImGuiWindowFlags.NoTitleBar;
-            windowFlags |= ImGuiWindowFlags.NoMove;
-            windowFlags |= ImGuiWindowFlags.NoDecoration;
-
-            ImGui.SetNextWindowPos(cursorPos);
-            ImGui.SetNextWindowSize(barSize);
-
-            ImGui.Begin("target_of_target_bar", windowFlags);
-
-            if (ImGui.BeginChild("target_of_target_bar", barSize))
-            {
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, UnitFrameEmptyColor);
-
-                if (HasTankInvuln(actor) == 1)
-                {
-                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["invuln"]);
-                }
-
-                drawList.AddRectFilledMultiColor(
-                    cursorPos,
-                    cursorPos + new Vector2((float)ToTBarWidth * actor.CurrentHp / actor.MaxHp, ToTBarHeight),
-                    colors["gradientLeft"],
-                    colors["gradientRight"],
-                    colors["gradientRight"],
-                    colors["gradientLeft"]
-                );
-
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-
-                if (ImGui.IsMouseHoveringRect(cursorPos, cursorPos + barSize))
-                {
-                    if (ImGui.GetIO().MouseClicked[0])
-                    {
-                        PluginInterface.ClientState.Targets.SetCurrentTarget(target);
-                    }
-
-                    if (ImGui.GetIO().MouseClicked[1])
-                    {
-                        unsafe
-                        {
-                            //PluginLog.Information();
-                            IntPtr agentHud = new(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
-                            _openContextMenuFromTarget(agentHud, target.Address);
-                        }
-                    }
-                }
-            }
-
-            ImGui.EndChild();
-            ImGui.End();
-
-            DrawTargetShield(target, cursorPos, barSize);
-            DrawOutlinedText(text, new Vector2(cursorPos.X + ToTBarWidth / 2f - textSize.X / 2f + ToTBarTextXOffset, cursorPos.Y - 22 + ToTBarTextYOffset));
         }
 
         protected virtual unsafe void DrawCastBar()
         {
-            if (!PluginConfiguration.ShowCastBar)
-            {
-                return;
-            }
 
-            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-
-            PlayerCharacter actor = PluginInterface.ClientState.LocalPlayer;
-            BattleChara* battleChara = (BattleChara*)actor.Address;
-            BattleChara.CastInfo castInfo = battleChara->SpellCastInfo;
-            bool isCasting = castInfo.IsCasting > 0;
-
-            if (!isCasting && !PluginConfiguration.ShowTestCastBar)
-            {
-                return;
-            }
-
-            uint currentCastId = castInfo.ActionID;
-            ActionType currentCastType = castInfo.ActionType;
-            float currentCastTime = castInfo.CurrentCastTime;
-            float totalCastTime = castInfo.TotalCastTime;
-
-            if (PluginConfiguration.ShowTestCastBar)
-            {
-                currentCastId = 5;
-                currentCastType = ActionType.Spell;
-                currentCastTime = 2;
-                totalCastTime = 5;
-            }
-
-            if (_lastPlayerUsedCast != null)
-            {
-                if (!(_lastPlayerUsedCast.CastId == currentCastId && _lastPlayerUsedCast.ActionType == currentCastType))
-                {
-                    _lastPlayerUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, PluginInterface);
-                }
-            }
-            else
-            {
-                _lastPlayerUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, PluginInterface);
-            }
-
-            string castText = _lastPlayerUsedCast.ActionText;
-
-            float castPercent = 100f / totalCastTime * currentCastTime;
-            float castScale = castPercent / 100f;
-
-            string castTime = Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
-            Vector2 barSize = new(CastBarWidth, CastBarHeight);
-            Vector2 cursorPos = new(CenterX + CastBarXOffset - CastBarWidth / 2f, CenterY + CastBarYOffset);
-
-            ImGui.SetCursorPos(cursorPos);
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-
-            if (PluginConfiguration.SlideCast)
-            {
-                Dictionary<string, uint> slideColor = PluginConfiguration.CastBarColorMap["slidecast"];
-                float slideCastScale = PluginConfiguration.SlideCastTime / 10f / totalCastTime / 100f;
-
-                drawList.AddRectFilledMultiColor(
-                    cursorPos + barSize - new Vector2(barSize.X * slideCastScale, barSize.Y),
-                    cursorPos + barSize,
-                    slideColor["gradientLeft"],
-                    slideColor["gradientRight"],
-                    slideColor["gradientRight"],
-                    slideColor["gradientLeft"]
-                );
-            }
-
-            Dictionary<string, uint> castColor = PluginConfiguration.CastBarColorMap["castbar"];
-
-            if (PluginConfiguration.ColorCastBarByJob)
-            {
-                PluginConfiguration.JobColorMap.TryGetValue(PluginInterface.ClientState.LocalPlayer.ClassJob.Id, out castColor);
-                castColor ??= PluginConfiguration.CastBarColorMap["castbar"];
-            }
-
-            drawList.AddRectFilledMultiColor(
-                cursorPos,
-                cursorPos + new Vector2(barSize.X * castScale, barSize.Y),
-                castColor["gradientLeft"],
-                castColor["gradientRight"],
-                castColor["gradientRight"],
-                castColor["gradientLeft"]
-            );
-
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-
-            if (PluginConfiguration.ShowActionIcon && _lastPlayerUsedCast.IconTexture != null)
-            {
-                ImGui.Image(_lastPlayerUsedCast.IconTexture.ImGuiHandle, new Vector2(CastBarHeight, CastBarHeight));
-                drawList.AddRect(cursorPos, cursorPos + new Vector2(CastBarHeight, CastBarHeight), 0xFF000000);
-            }
-
-            Vector2 castTextSize = ImGui.CalcTextSize(castText);
-            Vector2 castTimeTextSize = ImGui.CalcTextSize(castTime);
-
-            if (PluginConfiguration.ShowCastTime)
-            {
-                DrawOutlinedText(castTime, new Vector2(cursorPos.X + CastBarWidth - castTimeTextSize.X - 5, cursorPos.Y + CastBarHeight / 2f - castTimeTextSize.Y / 2f));
-            }
-
-            if (PluginConfiguration.ShowActionName)
-            {
-                DrawOutlinedText(
-                    castText,
-                    new Vector2(
-                        cursorPos.X + (PluginConfiguration.ShowActionIcon && _lastPlayerUsedCast.IconTexture != null ? CastBarHeight : 0) + 5,
-                        cursorPos.Y + CastBarHeight / 2f - castTextSize.Y / 2f
-                    )
-                );
-            }
         }
 
         protected virtual unsafe void DrawTargetCastBar()
         {
-            Actor actor = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            BattleChara* battleChara;
-            BattleChara.CastInfo castInfo;
-            uint currentCastId;
-            ActionType currentCastType;
-            float currentCastTime;
-            float totalCastTime;
-
-            if (!PluginConfiguration.ShowTargetTestCastBar)
-            {
-                if (actor is null)
-                {
-                    return;
-                }
-
-                if (actor is not Chara || actor.ObjectKind == ObjectKind.Companion)
-                {
-                    return;
-                }
-
-                battleChara = (BattleChara*)actor.Address;
-                castInfo = battleChara->SpellCastInfo;
-
-                bool isCasting = castInfo.IsCasting > 0;
-
-                if (!isCasting)
-                {
-                    return;
-                }
-
-                currentCastId = castInfo.ActionID;
-                currentCastType = castInfo.ActionType;
-                currentCastTime = castInfo.CurrentCastTime;
-                totalCastTime = castInfo.TotalCastTime;
-            }
-            else
-            {
-                PlayerCharacter temp = PluginInterface.ClientState.LocalPlayer;
-                battleChara = (BattleChara*)temp.Address;
-                castInfo = battleChara->SpellCastInfo;
-                currentCastId = 5;
-                currentCastType = ActionType.Spell;
-                currentCastTime = 2;
-                totalCastTime = 5;
-            }
-
-            if (_lastTargetUsedCast != null)
-            {
-                if (!(_lastTargetUsedCast.CastId == currentCastId && _lastTargetUsedCast.ActionType == currentCastType))
-                {
-                    _lastTargetUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, PluginInterface);
-                }
-            }
-            else
-            {
-                _lastTargetUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo, PluginInterface);
-            }
-
-            string castText = _lastTargetUsedCast.ActionText;
-
-            float castPercent = 100f / totalCastTime * currentCastTime;
-            float castScale = castPercent / 100f;
-
-            string castTime = Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
-            Vector2 barSize = new(TargetCastBarWidth, TargetCastBarHeight);
-            Vector2 cursorPos = new(CenterX + PluginConfiguration.TargetCastBarXOffset - TargetCastBarWidth / 2f, CenterY + PluginConfiguration.TargetCastBarYOffset);
-
-            ImGui.SetCursorPos(cursorPos);
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-
-            Dictionary<string, uint> castColor = PluginConfiguration.CastBarColorMap["targetcastbar"];
-
-            if (PluginConfiguration.ColorCastBarByDamageType)
-            {
-                switch (_lastTargetUsedCast.DamageType)
-                {
-                    case DamageType.Physical:
-                    case DamageType.Blunt:
-                    case DamageType.Slashing:
-                    case DamageType.Piercing:
-                        castColor = PluginConfiguration.CastBarColorMap["targetphysicalcastbar"];
-
-                        break;
-
-                    case DamageType.Magic:
-                        castColor = PluginConfiguration.CastBarColorMap["targetmagicalcastbar"];
-
-                        break;
-
-                    case DamageType.Darkness:
-                        castColor = PluginConfiguration.CastBarColorMap["targetdarknesscastbar"];
-
-                        break;
-
-                    case DamageType.Unknown:
-                    case DamageType.LimitBreak:
-                        castColor = PluginConfiguration.CastBarColorMap["targetcastbar"];
-
-                        break;
-
-                    default:
-                        castColor = PluginConfiguration.CastBarColorMap["targetcastbar"];
-
-                        break;
-                }
-            }
-
-            if (PluginConfiguration.ShowTargetInterrupt && _lastTargetUsedCast.Interruptable)
-            {
-                castColor = PluginConfiguration.CastBarColorMap["targetinterruptcastbar"];
-            }
-
-            drawList.AddRectFilledMultiColor(
-                cursorPos,
-                cursorPos + new Vector2(barSize.X * castScale, barSize.Y),
-                castColor["gradientLeft"],
-                castColor["gradientRight"],
-                castColor["gradientRight"],
-                castColor["gradientLeft"]
-            );
-
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-
-            if (PluginConfiguration.ShowTargetActionIcon && _lastTargetUsedCast.IconTexture != null)
-            {
-                ImGui.Image(_lastTargetUsedCast.IconTexture.ImGuiHandle, new Vector2(TargetCastBarHeight, TargetCastBarHeight));
-                drawList.AddRect(cursorPos, cursorPos + new Vector2(TargetCastBarHeight, TargetCastBarHeight), 0xFF000000);
-            }
-
-            Vector2 castTextSize = ImGui.CalcTextSize(castText);
-            Vector2 castTimeTextSize = ImGui.CalcTextSize(castTime);
-
-            if (PluginConfiguration.ShowTargetCastTime)
-            {
-                DrawOutlinedText(
-                    castTime,
-                    new Vector2(cursorPos.X + TargetCastBarWidth - castTimeTextSize.X - 5, cursorPos.Y + TargetCastBarHeight / 2f - castTimeTextSize.Y / 2f)
-                );
-            }
-
-            if (PluginConfiguration.ShowTargetActionName)
-            {
-                DrawOutlinedText(
-                    castText,
-                    new Vector2(
-                        cursorPos.X + (PluginConfiguration.ShowTargetActionIcon && _lastTargetUsedCast.IconTexture != null ? TargetCastBarHeight : 0) + 5,
-                        cursorPos.Y + TargetCastBarHeight / 2f - castTextSize.Y / 2f
-                    )
-                );
-            }
         }
 
         protected virtual void DrawTargetShield(Actor actor, Vector2 cursorPos, Vector2 targetBar)
         {
-            if (!PluginConfiguration.ShieldEnabled)
-            {
-                return;
-            }
 
-            if (actor.ObjectKind is not ObjectKind.Player)
-            {
-                return;
-            }
-
-            Dictionary<string, uint> shieldColor = PluginConfiguration.MiscColorMap["shield"];
-            float shield = Utils.ActorShieldValue(actor);
-
-            // Account for border and draw shield inside the border of the HudElement
-            cursorPos = new Vector2(cursorPos.X + 1, cursorPos.Y + 1);
-
-            if (Math.Abs(shield) < 0)
-            {
-                return;
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            float y = PluginConfiguration.ShieldHeightPixels ? PluginConfiguration.ShieldHeight : targetBar.Y / 100 * PluginConfiguration.ShieldHeight;
-
-            drawList.AddRectFilledMultiColor(
-                cursorPos,
-                cursorPos + new Vector2(targetBar.X * shield, y),
-                shieldColor["gradientLeft"],
-                shieldColor["gradientRight"],
-                shieldColor["gradientRight"],
-                shieldColor["gradientLeft"]
-            );
         }
 
         protected virtual void DrawTankStanceIndicator()
         {
-            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
 
-            IEnumerable<StatusEffect> tankStanceBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(
-                o => o.EffectId == 79
-                  || // IRON WILL
-                     o.EffectId == 91
-                  || // DEFIANCE
-                     o.EffectId == 392
-                  || // ROYAL GUARD
-                     o.EffectId == 393
-                  || // IRON WILL
-                     o.EffectId == 743
-                  || // GRIT
-                     o.EffectId == 1396
-                  || // DEFIANCE
-                     o.EffectId == 1397
-||                                      // GRIT
-                     o.EffectId == 1833 // ROYAL GUARD
-            );
-
-            int offset = ConfigTank.TankStanceIndicatorWidth + 1;
-
-            if (tankStanceBuff.Count() != 1)
-            {
-                Vector2 barSize = new(HealthBarHeight > HealthBarWidth ? HealthBarWidth : HealthBarHeight, HealthBarHeight);
-                Vector2 cursorPos = new(CenterX - HealthBarWidth - HealthBarXOffset - offset, CenterY + HealthBarYOffset + offset);
-                ImGui.SetCursorPos(cursorPos);
-
-                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-                drawList.AddRectFilledMultiColor(cursorPos, cursorPos + barSize, 0xFF2000FC, 0xFF2000FC, 0xFF2000FC, 0xFF2000FC);
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-            }
-            else
-            {
-                Vector2 barSize = new(HealthBarHeight > HealthBarWidth ? HealthBarWidth : HealthBarHeight, HealthBarHeight);
-                Vector2 cursorPos = new(CenterX - HealthBarWidth - HealthBarXOffset - offset, CenterY + HealthBarYOffset + offset);
-                ImGui.SetCursorPos(cursorPos);
-
-                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-                drawList.AddRectFilled(cursorPos, cursorPos + barSize, 0x88000000);
-                drawList.AddRectFilledMultiColor(cursorPos, cursorPos + barSize, 0xFFE6CD00, 0xFFE6CD00, 0xFFE6CD00, 0xFFE6CD00);
-                drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-            }
         }
 
         protected virtual void DrawMPTicker()
         {
-            if (!PluginConfiguration.MPTickerEnabled)
-            {
-                return;
-            }
 
-            if (MPTickerHideOnFullMp)
-            {
-                Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-                PlayerCharacter actor = PluginInterface.ClientState.LocalPlayer;
-
-                if (actor.CurrentMp >= actor.MaxMp)
-                {
-                    return;
-                }
-            }
-
-            _mpTickHelper ??= new MPTickHelper();
-
-            var now = ImGui.GetTime();
-            var scale = (float)((now - _mpTickHelper.LastTick) / MPTickHelper.ServerTickRate);
-
-            if (scale <= 0)
-            {
-                return;
-            }
-
-            if (scale > 1)
-            {
-                scale = 1;
-            }
-
-            Vector2 fullSize = new(MPTickerWidth, MPTickerHeight);
-            Vector2 barSize = new(Math.Max(1f, MPTickerWidth * scale), MPTickerHeight);
-            Vector2 position = new(CenterX + MPTickerXOffset - MPTickerWidth / 2f, CenterY + MPTickerYOffset);
-            Dictionary<string, uint> colors = PluginConfiguration.MiscColorMap["mpTicker"];
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(position, position + fullSize, 0x88000000);
-            drawList.AddRectFilledMultiColor(position, position + barSize, colors["gradientLeft"], colors["gradientRight"], colors["gradientRight"], colors["gradientLeft"]);
-
-            if (MPTickerShowBorder)
-            {
-                drawList.AddRect(position, position + fullSize, 0xFF000000);
-            }
         }
 
         protected virtual void DrawGCDIndicator()
         {
-            if (!PluginConfiguration.GCDIndicatorEnabled || PluginInterface.ClientState.LocalPlayer is null)
-            {
-                return;
-            }
 
-            GCDHelper.GetGCDInfo(PluginInterface.ClientState.LocalPlayer, out float elapsed, out float total);
-
-            if (total == 0 && !PluginConfiguration.GCDAlwaysShow)
-            {
-                return;
-            }
-
-            float scale = elapsed / total;
-
-            if (scale <= 0)
-            {
-                return;
-            }
-
-            (int height, int width) = GCDIndicatorVertical ? (-GCDIndicatorHeight, GCDIndicatorWidth) : (GCDIndicatorHeight, GCDIndicatorWidth);
-            Vector2 position = new(CenterX + GCDIndicatorXOffset - GCDIndicatorWidth / 2f, CenterY + GCDIndicatorYOffset);
-            Dictionary<string, uint> colors = PluginConfiguration.MiscColorMap["gcd"];
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            BarBuilder builder = BarBuilder.Create(position.X, position.Y, height, width);
-            Bar gcdBar = builder.AddInnerBar(elapsed, total, colors).SetDrawBorder(GCDIndicatorShowBorder).SetVertical(GCDIndicatorVertical).Build();
-            gcdBar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawPlayerStatusEffects()
         {
-            var center = new Vector2(CenterX, CenterY);
 
-            _playerBuffList.Actor = PluginInterface.ClientState.LocalPlayer;
-            _playerBuffList.Draw(center);
-            _playerDebuffList.Actor = PluginInterface.ClientState.LocalPlayer;
-            _playerDebuffList.Draw(center);
         }
 
         private void DrawTargetStatusEffects()
         {
-            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (target is null)
-            {
-                return;
-            }
-
-            if (target.ObjectKind != ObjectKind.Player && target.ObjectKind != ObjectKind.BattleNpc)
-            {
-                return;
-            }
-
-            var center = new Vector2(CenterX, CenterY);
-
-            _targetBuffList.Actor = target;
-            _targetBuffList.Draw(center);
-            _targetDebuffList.Actor = target;
-            _targetDebuffList.Draw(center);
         }
-
-        private int HasTankInvuln(Actor actor)
-        {
-            IEnumerable<StatusEffect> tankInvulnBuff = actor.StatusEffects.Where(o => o.EffectId is 810 or 1302 or 409 or 1836);
-
-            return tankInvulnBuff.Count();
-        }
-
         protected virtual List<uint> GetJobSpecificBuffs() => new();
 
         private void DrawRaidJobBuffs()
@@ -1097,32 +238,32 @@ namespace DelvUI.Interface
 
         protected Dictionary<string, uint> DetermineTargetPlateColors(Chara actor)
         {
-            Dictionary<string, uint> colors = PluginConfiguration.NPCColorMap["neutral"];
+            //Dictionary<string, uint> colors = PluginConfiguration.NPCColorMap["neutral"];
 
-            switch (actor.ObjectKind)
-            {
-                // Still need to figure out the "orange" state; aggroed but not yet attacked.
-                case ObjectKind.Player:
-                    PluginConfiguration.JobColorMap.TryGetValue(actor.ClassJob.Id, out colors);
-                    colors ??= PluginConfiguration.NPCColorMap["neutral"];
+            //switch (actor.ObjectKind)
+            //{
+            //    // Still need to figure out the "orange" state; aggroed but not yet attacked.
+            //    case ObjectKind.Player:
+            //        PluginConfiguration.JobColorMap.TryGetValue(actor.ClassJob.Id, out colors);
+            //        colors ??= PluginConfiguration.NPCColorMap["neutral"];
 
-                    break;
+            //        break;
 
-                case ObjectKind.BattleNpc when (actor.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat:
-                    colors = PluginConfiguration.NPCColorMap["hostile"];
+            //    case ObjectKind.BattleNpc when (actor.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat:
+            //        colors = PluginConfiguration.NPCColorMap["hostile"];
 
-                    break;
+            //        break;
 
-                case ObjectKind.BattleNpc:
-                    if (!Utils.IsHostileMemory((BattleNpc)actor))
-                    {
-                        colors = PluginConfiguration.NPCColorMap["friendly"];
-                    }
+            //    case ObjectKind.BattleNpc:
+            //        if (!Utils.IsHostileMemory((BattleNpc)actor))
+            //        {
+            //            colors = PluginConfiguration.NPCColorMap["friendly"];
+            //        }
 
-                    break;
-            }
+            //        break;
+            //}
 
-            return colors;
+            return null;
         }
 
         private void ClipAround(Addon addon, string windowName, ImDrawListPtr drawList, Action<ImDrawListPtr, string> drawAction)
@@ -1328,11 +469,6 @@ namespace DelvUI.Interface
         protected int TargetCastBarXOffset => PluginConfiguration.TargetCastBarXOffset;
         protected int TargetCastBarYOffset => PluginConfiguration.TargetCastBarYOffset;
 
-        protected uint UnitFrameEmptyColor => ImGui.ColorConvertFloat4ToU32(PluginConfiguration.UnitFrameEmptyColor);
-
-        protected uint PlayerUnitFrameColor => ImGui.ColorConvertFloat4ToU32(
-            PluginConfiguration.CustomHealthBarBackgroundColorEnabled ? PluginConfiguration.CustomHealthBarBackgroundColor : PluginConfiguration.UnitFrameEmptyColor
-        );
 
         #endregion
     }
