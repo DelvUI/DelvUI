@@ -1,17 +1,15 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using System.Text;
-using Dalamud.Hooking;
+﻿using Dalamud.Hooking;
 using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using System;
+using System.Runtime.InteropServices;
+using System.Text;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace DelvUI.Helpers
 {
     public sealed unsafe class SystemMenuHook
     {
-        private readonly DalamudPluginInterface _pluginInterface;
-
         private readonly AtkValueChangeType _atkValueChangeType;
 
         private readonly AtkValueSetString _atkValueSetString;
@@ -19,6 +17,7 @@ namespace DelvUI.Helpers
         private readonly Hook<AgentHudOpenSystemMenuPrototype> _hookAgentHudOpenSystemMenu;
 
         private readonly Hook<UiModuleRequestMainCommand> _hookUiModuleRequestMainCommand;
+        private readonly DalamudPluginInterface _pluginInterface;
 
         // This hook overrides Dalamuds one (or comes after so the Dalamud changes don't go through) change this for Dalamud 5 
         // https://github.com/goatcorp/Dalamud/blob/7ac46ed869a5f31ffb21c74eec30f43ca185ac46/Dalamud/Game/Internal/DalamudAtkTweaks.cs#L190
@@ -120,7 +119,10 @@ namespace DelvUI.Helpers
                 bytes2
             ); // this allocs the string properly using the game's allocators and copies it, so we dont have to worry about memory fuckups
 
-            _atkValueSetString(thirdStringEntry, bytes3); // this allocs the string properly using the game's allocators and copies it, so we dont have to worry about memory fuckups
+            _atkValueSetString(
+                thirdStringEntry,
+                bytes3
+            ); // this allocs the string properly using the game's allocators and copies it, so we dont have to worry about memory fuckups
 
             // open menu with new size
             AtkValue* sizeEntry = &atkValueArgs[4];
@@ -139,12 +141,12 @@ namespace DelvUI.Helpers
                     break;
 
                 case 69421:
-                    _pluginInterface.CommandManager.ProcessCommand("/xlsettings");
+                    _pluginInterface.CommandManager.ProcessCommand("/xlplugins");
 
                     break;
 
                 case 69422:
-                    _pluginInterface.CommandManager.ProcessCommand("/xlplugins");
+                    _pluginInterface.CommandManager.ProcessCommand("/xlsettings");
 
                     break;
 

@@ -1,6 +1,5 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Numerics;
@@ -8,6 +7,7 @@ using System.Numerics;
 namespace DelvUI.Interface.GeneralElements
 {
     [Serializable]
+    [Portable(false)]
     public class EditableLabelConfig : LabelConfig
     {
         [InputText("Text")]
@@ -21,6 +21,7 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Serializable]
+    [Portable(false)]
     public class LabelConfig : MovablePluginConfigObject
     {
         [JsonIgnore] public string Text; // hide text on immutable labels

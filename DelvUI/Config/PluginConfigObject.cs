@@ -3,9 +3,7 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace DelvUI.Config
 {

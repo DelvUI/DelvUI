@@ -1,10 +1,11 @@
-using System;
-using System.Collections.Generic;
-using System.Numerics;
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using ImGuiNET;
 using ImGuiScene;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Numerics;
 
 namespace DelvUI.Config
 {
@@ -177,13 +178,14 @@ namespace DelvUI.Config
 
             ImGui.SameLine();
 
+            /*
             if (ImGui.Button("Lock HUD"))
             {
                 _changed |= ImGui.Checkbox("Lock HUD", ref _pluginConfiguration.LockHud);
             }
 
             ImGui.SameLine();
-
+            */
             if (ImGui.Button(_pluginConfiguration.HideHud ? "Show HUD" : "Hide HUD"))
             {
                 ToggleHud();
@@ -200,10 +202,19 @@ namespace DelvUI.Config
             ImGui.SameLine();
 
             pos = ImGui.GetCursorPos();
-            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 60, ImGui.GetCursorPos().Y));
+            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 120, ImGui.GetCursorPos().Y));
+
+            if (ImGui.Button("Support"))
+            {
+                Process.Start("https://discord.gg/delvui");
+            }
+
+            ImGui.SameLine();
 
             if (ImGui.Button("Donate!"))
-            { }
+            {
+                Process.Start("https://ko-fi.com/DelvUI");
+            }
 
             ImGui.SetCursorPos(pos);
             ImGui.EndGroup();
@@ -1349,7 +1360,13 @@ namespace DelvUI.Config
 
         private void DrawCastbarsPlayerConfig()
         {
-            _changed |= ImGui.Checkbox("Enabled", ref _pluginConfiguration.ShowCastBar);
+            _changed |= ImGui.Checkbox("Enable Player Castbar", ref _pluginConfiguration.ShowCastBar);
+            _changed |= ImGui.Checkbox("Sample Player Castbar", ref _pluginConfiguration.ShowTestCastBar);
+
+            if (!_pluginConfiguration.ShowCastBar)
+            {
+                _pluginConfiguration.ShowTestCastBar = false;
+            }
 
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
@@ -1586,7 +1603,13 @@ namespace DelvUI.Config
 
         private void DrawCastbarsTargetConfig()
         {
-            _changed |= ImGui.Checkbox("Show Target Cast Bar", ref _pluginConfiguration.ShowTargetCastBar);
+            _changed |= ImGui.Checkbox("Enable Target Castbar", ref _pluginConfiguration.ShowTargetCastBar);
+            _changed |= ImGui.Checkbox("Sample Target Castbar", ref _pluginConfiguration.ShowTargetTestCastBar);
+
+            if (!_pluginConfiguration.ShowTargetTestCastBar)
+            {
+                _pluginConfiguration.ShowTargetTestCastBar = false;
+            }
 
             int targetCastBarHeight = _pluginConfiguration.TargetCastBarHeight;
 

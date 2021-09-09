@@ -1,7 +1,5 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using ImGuiNET;
-using Newtonsoft.Json;
 using System;
 using System.Numerics;
 

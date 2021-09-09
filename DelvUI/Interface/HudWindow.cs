@@ -1,10 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Globalization;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.InteropServices;
 using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
@@ -23,6 +16,13 @@ using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Numerics;
+using System.Runtime.InteropServices;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface
@@ -95,7 +95,7 @@ namespace DelvUI.Interface
 
         private MPTickHelper _mpTickHelper;
         public bool IsVisible = true;
-        private Vector2 Center = new Vector2(CenterX, CenterY);
+        private readonly Vector2 Center = new(CenterX, CenterY);
 
         protected TankHudConfig ConfigTank => (TankHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new TankHudConfig());
         protected GeneralHudConfig ConfigGeneral => (GeneralHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new GeneralHudConfig());
@@ -118,11 +118,11 @@ namespace DelvUI.Interface
             JobSpecificBuffs = GetJobSpecificBuffs();
             PluginConfiguration.ConfigChangedEvent += OnConfigChanged;
 
-            _playerBuffList = new StatusEffectsListHud("tmp1", pluginConfiguration.PlayerBuffListConfig);
-            _playerDebuffList = new StatusEffectsListHud("tmp2", pluginConfiguration.PlayerDebuffListConfig);
-            _targetBuffList = new StatusEffectsListHud("tmp3", pluginConfiguration.TargetDebuffListConfig);
-            _targetDebuffList = new StatusEffectsListHud("tmp4", pluginConfiguration.TargetBuffListConfig);
-            _raidJobsBuffList = new StatusEffectsListHud("tmp5", pluginConfiguration.RaidJobBuffListConfig);
+            //_playerBuffList = new StatusEffectsListHud("tmp1", pluginConfiguration.PlayerBuffListConfig);
+            //_playerDebuffList = new StatusEffectsListHud("tmp2", pluginConfiguration.PlayerDebuffListConfig);
+            //_targetBuffList = new StatusEffectsListHud("tmp3", pluginConfiguration.TargetDebuffListConfig);
+            //_targetDebuffList = new StatusEffectsListHud("tmp4", pluginConfiguration.TargetBuffListConfig);
+            //_raidJobsBuffList = new StatusEffectsListHud("tmp5", pluginConfiguration.RaidJobBuffListConfig);
         }
 
         public abstract uint JobId { get; }
@@ -224,7 +224,6 @@ namespace DelvUI.Interface
 
         private Vector2 CalculatePosition(Vector2 position, Vector2 size) => Center + position - size / 2f;
 
-
         protected virtual void DrawPrimaryResourceBar() => DrawPrimaryResourceBar(PrimaryResourceType.MP);
 
         protected virtual void DrawPrimaryResourceBar(PrimaryResourceType type = PrimaryResourceType.MP, PluginConfigColor partialFillColor = null)
@@ -236,6 +235,7 @@ namespace DelvUI.Interface
 
             int current = 0;
             int max = 0;
+
             switch (type)
             {
                 case PrimaryResourceType.MP:
@@ -243,36 +243,40 @@ namespace DelvUI.Interface
                         current = actor.CurrentMp;
                         max = actor.MaxMp;
                     }
+
                     break;
+
                 case PrimaryResourceType.CP:
                     {
                         current = actor.CurrentCp;
                         max = actor.MaxCp;
                     }
+
                     break;
+
                 case PrimaryResourceType.GP:
                     {
                         current = actor.CurrentGp;
                         max = actor.MaxGp;
                     }
-                    break;
 
+                    break;
             }
 
             BarSize = ConfigGeneral.PrimaryResourceSize;
             Vector2 position = CalculatePosition(ConfigGeneral.PrimaryResourcePosition, ConfigGeneral.PrimaryResourceSize);
+
             BarBuilder builder = BarBuilder.Create(position, BarSize)
                                            .AddInnerBar(current, max, partialFillColor.Map)
                                            .SetBackgroundColor(ConfigGeneral.BarBackgroundColor.Background)
                                            .SetTextMode(BarTextMode.Single)
                                            .SetText(
-                                                BarTextPosition.CenterLeft,
-                                                BarTextType.Custom,
-                                                ConfigGeneral.ShowPrimaryResourceBarValue
-                                                    ? current.ToString()
-                                                    : ""
-                                            );
-
+                                               BarTextPosition.CenterLeft,
+                                               BarTextType.Custom,
+                                               ConfigGeneral.ShowPrimaryResourceBarValue
+                                                   ? current.ToString()
+                                                   : ""
+                                           );
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
@@ -601,7 +605,7 @@ namespace DelvUI.Interface
             BattleChara.CastInfo castInfo = battleChara->SpellCastInfo;
             bool isCasting = castInfo.IsCasting > 0;
 
-            if (!isCasting)
+            if (!isCasting && !PluginConfiguration.ShowTestCastBar)
             {
                 return;
             }
@@ -610,6 +614,14 @@ namespace DelvUI.Interface
             ActionType currentCastType = castInfo.ActionType;
             float currentCastTime = castInfo.CurrentCastTime;
             float totalCastTime = castInfo.TotalCastTime;
+
+            if (PluginConfiguration.ShowTestCastBar)
+            {
+                currentCastId = 5;
+                currentCastType = ActionType.Spell;
+                currentCastTime = 2;
+                totalCastTime = 5;
+            }
 
             if (_lastPlayerUsedCast != null)
             {
@@ -701,30 +713,50 @@ namespace DelvUI.Interface
         {
             Actor actor = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
-            if (!PluginConfiguration.ShowTargetCastBar || actor is null)
+            BattleChara* battleChara;
+            BattleChara.CastInfo castInfo;
+            uint currentCastId;
+            ActionType currentCastType;
+            float currentCastTime;
+            float totalCastTime;
+
+            if (!PluginConfiguration.ShowTargetTestCastBar)
             {
-                return;
-            }
+                if (actor is null)
+                {
+                    return;
+                }
 
-            if (actor is not Chara || actor.ObjectKind == ObjectKind.Companion)
+                if (actor is not Chara || actor.ObjectKind == ObjectKind.Companion)
+                {
+                    return;
+                }
+
+                battleChara = (BattleChara*)actor.Address;
+                castInfo = battleChara->SpellCastInfo;
+
+                bool isCasting = castInfo.IsCasting > 0;
+
+                if (!isCasting)
+                {
+                    return;
+                }
+
+                currentCastId = castInfo.ActionID;
+                currentCastType = castInfo.ActionType;
+                currentCastTime = castInfo.CurrentCastTime;
+                totalCastTime = castInfo.TotalCastTime;
+            }
+            else
             {
-                return;
+                PlayerCharacter temp = PluginInterface.ClientState.LocalPlayer;
+                battleChara = (BattleChara*)temp.Address;
+                castInfo = battleChara->SpellCastInfo;
+                currentCastId = 5;
+                currentCastType = ActionType.Spell;
+                currentCastTime = 2;
+                totalCastTime = 5;
             }
-
-            BattleChara* battleChara = (BattleChara*)actor.Address;
-            BattleChara.CastInfo castInfo = battleChara->SpellCastInfo;
-
-            bool isCasting = castInfo.IsCasting > 0;
-
-            if (!isCasting)
-            {
-                return;
-            }
-
-            uint currentCastId = castInfo.ActionID;
-            ActionType currentCastType = castInfo.ActionType;
-            float currentCastTime = castInfo.CurrentCastTime;
-            float totalCastTime = castInfo.TotalCastTime;
 
             if (_lastTargetUsedCast != null)
             {
@@ -1306,6 +1338,7 @@ namespace DelvUI.Interface
     }
 
     [Serializable]
+    [Portable(false)]
     [Section("Job Specific Bars")]
     [SubSection("Tank", 0)]
     [SubSection("General##Tank", 1)]
@@ -1333,13 +1366,14 @@ namespace DelvUI.Interface
     {
         [DragFloat2("Primary Resource Position", min = -4000f, max = 4000f)]
         [Order(0)]
-        public Vector2 PrimaryResourcePosition = new(0, 448);
+        public Vector2 PrimaryResourcePosition = new(0, 449);
 
         [DragFloat2("Primary Resource Bar Size", min = 0, max = 4000f)]
         [Order(5)]
         public Vector2 PrimaryResourceSize = new(254, 20);
 
         #region Primary Resource Value
+
         [Checkbox("Show Primary Resource Value")]
         [CollapseControl(10, 0)]
         public bool ShowPrimaryResourceBarValue = false;
@@ -1347,9 +1381,11 @@ namespace DelvUI.Interface
         [DragFloat2("Primary Resource Text Offset", min = -4000f, max = 4000f)]
         [CollapseWith(0, 0)]
         public Vector2 PrimaryResourceBarTextOffset = new(0, 0);
+
         #endregion
 
         #region Primary Resource Threshold
+
         [Checkbox("Show Primary Resource Threshold Market")]
         [CollapseControl(15, 1)]
         public bool ShowPrimaryResourceBarThresholdMarker = false;
@@ -1357,9 +1393,11 @@ namespace DelvUI.Interface
         [DragInt("Primary Resource Threshold Value", min = 0, max = 10000)]
         [CollapseWith(0, 1)]
         public int PrimaryResourceBarThresholdValue = 7000;
+
         #endregion
 
         #region Colors
+
         [ColorEdit4("Bar Background Color")]
         [Order(20)]
         public PluginConfigColor BarBackgroundColor = new(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
@@ -1367,6 +1405,7 @@ namespace DelvUI.Interface
         [ColorEdit4("Bar Partial Fill Color")]
         [Order(25)]
         public PluginConfigColor BarPartialFillColor = new(new Vector4(0f / 255f, 205f / 255f, 230f / 255f, 100f / 100f));
+
         #endregion
     }
 }

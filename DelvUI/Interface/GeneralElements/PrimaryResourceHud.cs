@@ -1,7 +1,4 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
-using DelvUI.Config;
-using DelvUI.Helpers;
-using DelvUI.Interface.Bars;
 using ImGuiNET;
 using System;
 using System.Numerics;
@@ -35,8 +32,8 @@ namespace DelvUI.Interface.GeneralElements
             drawList.AddRectFilled(startPos, startPos + Config.Size, 0x88000000);
 
             drawList.AddRectFilledMultiColor(
-                startPos, 
-                startPos + new Vector2(Math.Max(1, Config.Size.X * scale), Config.Size.Y), 
+                startPos,
+                startPos + new Vector2(Math.Max(1, Config.Size.X * scale), Config.Size.Y),
                 Config.Color.LeftGradient,
                 Config.Color.RightGradient,
                 Config.Color.RightGradient,
@@ -56,7 +53,7 @@ namespace DelvUI.Interface.GeneralElements
             // text
             if (Config.ShowValue)
             {
-                Config.ValueLabelConfig.Text = $"{chara.CurrentMp, 0}";
+                Config.ValueLabelConfig.Text = $"{chara.CurrentMp,0}";
                 _valueLabel.Draw(origin + Config.Position);
             }
         }

@@ -149,6 +149,22 @@ namespace DelvUI.Config.Attributes
         }
     }
 
+    [AttributeUsage(AttributeTargets.Class)]
+    public class PortableAttribute : Attribute
+    {
+        public bool portable;
+
+        public PortableAttribute(bool portable)
+        {
+            this.portable = portable;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ManualDrawAttribute : Attribute
+    {
+    }
+
     [AttributeUsage(AttributeTargets.Field)]
     public class NestedConfigAttribute : Attribute
     {

@@ -1,7 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
-using DelvUI.Config;
 using DelvUI.Helpers;
-using DelvUI.Interface.Bars;
 using ImGuiNET;
 using System;
 using System.Numerics;

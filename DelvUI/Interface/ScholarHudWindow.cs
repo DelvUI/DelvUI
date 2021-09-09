@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game.ClientState.Actors.Types;
+﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
@@ -11,6 +6,11 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface
@@ -22,7 +22,7 @@ namespace DelvUI.Interface
         public override uint JobId => 28;
 
         private ScholarHudConfig _config => (ScholarHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new ScholarHudConfig());
-        private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + YOffset + _config.Position.Y);
+        private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
 
         protected override void Draw(bool _)
@@ -152,7 +152,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Aether Tracker Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 AetherPosition = new(0, -77);
+        public Vector2 AetherPosition = new(0, 383);
 
         [DragFloat2("Aether Tracker Size", min = 1f, max = 2000f)]
         [CollapseWith(0, 1)]
@@ -168,7 +168,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Bio Position", min = -4000f, max = 4000f)]
         [CollapseWith(20, 3)]
-        public Vector2 BioPosition = new(0, -33);
+        public Vector2 BioPosition = new(0, 427);
 
         [DragFloat2("Bio Size", max = 2000f)]
         [CollapseWith(10, 3)]
@@ -184,13 +184,13 @@ namespace DelvUI.Interface
 
         [DragFloat2("Fairy Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(35, 2)]
-        public Vector2 FairyPosition = new(0, -55);
+        public Vector2 FairyPosition = new(0, 405);
 
         [DragFloat2("Fairy Gauge Size", min = 1f, max = 2000f)]
         [CollapseWith(30, 2)]
         public Vector2 FairySize = new(254, 20);
 
-        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Position", min = -4000f, max = 4000f)]
         [Order(0)]
         public Vector2 Position = new(0, 0);
 

@@ -1,8 +1,6 @@
 ﻿using Dalamud.Plugin;
 using DelvUI.Config;
-using ImGuiNET;
 using System.Diagnostics;
-using System.Numerics;
 
 namespace DelvUI.Interface
 {

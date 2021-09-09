@@ -1,14 +1,14 @@
-﻿using System;
-using System.Numerics;
-using System.Collections.Generic;
-using System.Linq;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+﻿using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using DelvUI.Interface.Bars;
 using DelvUI.Helpers;
+using DelvUI.Interface.Bars;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 
 namespace DelvUI.Interface
 {
@@ -90,7 +90,7 @@ namespace DelvUI.Interface
     [SubSection("Gunbreaker", 1)]
     public class GunbreakerHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Offset" + "##Gunbreaker", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Position" + "##Gunbreaker", min = -4000f, max = 4000f)]
         [Order(0)]
         public Vector2 Position = new Vector2(0, 0);
 

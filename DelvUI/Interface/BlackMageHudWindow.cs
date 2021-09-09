@@ -2,13 +2,13 @@
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using DelvUI.Helpers;
 
 namespace DelvUI.Interface
 {
@@ -53,8 +53,8 @@ namespace DelvUI.Interface
             var actor = PluginInterface.ClientState.LocalPlayer;
 
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.ManaBarOffset.X - _config.ManaBarSize.X / 2f,
-                CenterY + _config.Position.Y + _config.ManaBarOffset.Y - _config.ManaBarSize.Y / 2f
+                CenterX + _config.Position.X + _config.ManaBarPosition.X - _config.ManaBarSize.X / 2f,
+                CenterY + _config.Position.Y + _config.ManaBarPosition.Y - _config.ManaBarSize.Y / 2f
             );
 
             var color = gauge.InAstralFire() ? _config.ManaBarFireColor.Map : gauge.InUmbralIce() ? _config.ManaBarIceColor.Map : _config.ManaBarNoElementColor.Map;
@@ -117,8 +117,8 @@ namespace DelvUI.Interface
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.UmbralHeartOffset.X - _config.UmbralHeartSize.X / 2f,
-                CenterY + _config.Position.Y + _config.UmbralHeartOffset.Y - _config.UmbralHeartSize.Y / 2f
+                CenterX + _config.Position.X + _config.UmbralHeartPosition.X - _config.UmbralHeartSize.X / 2f,
+                CenterY + _config.Position.Y + _config.UmbralHeartPosition.Y - _config.UmbralHeartSize.Y / 2f
             );
 
             var bar = BarBuilder.Create(position, _config.UmbralHeartSize)
@@ -137,8 +137,8 @@ namespace DelvUI.Interface
             var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
 
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.PolyglotOffset.X - _config.PolyglotSize.X / 2f,
-                CenterY + _config.Position.Y + _config.PolyglotOffset.Y - _config.PolyglotSize.Y / 2f
+                CenterX + _config.Position.X + _config.PolyglotPosition.X - _config.PolyglotSize.X / 2f,
+                CenterY + _config.Position.Y + _config.PolyglotPosition.Y - _config.PolyglotSize.Y / 2f
             );
 
             var barWidth = (int)(_config.PolyglotSize.X - _config.PolyglotPadding) / 2;
@@ -178,8 +178,8 @@ namespace DelvUI.Interface
             var tripleStackBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1211);
 
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.TriplecastOffset.X - _config.TripleCastSize.X / 2f,
-                CenterY + _config.Position.Y + _config.TriplecastOffset.Y - _config.TripleCastSize.Y / 2f
+                CenterX + _config.Position.X + _config.TriplecastPosition.X - _config.TripleCastSize.X / 2f,
+                CenterY + _config.Position.Y + _config.TriplecastPosition.Y - _config.TripleCastSize.Y / 2f
             );
 
             var bar = BarBuilder.Create(position, _config.TripleCastSize)
@@ -200,8 +200,8 @@ namespace DelvUI.Interface
             var thundercloudTimer = _config.ShowThundercloudProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 164).Duration) : 0;
 
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.ProcsBarOffset.X,
-                CenterY + _config.Position.Y + _config.ProcsBarOffset.Y - _config.ProcsBarSize.Y / 2f
+                CenterX + _config.Position.X + _config.ProcsBarPosition.X,
+                CenterY + _config.Position.Y + _config.ProcsBarPosition.Y - _config.ProcsBarSize.Y / 2f
             );
 
             var builder = BarBuilder.Create(position, _config.ProcsBarSize);
@@ -253,8 +253,8 @@ namespace DelvUI.Interface
             }
 
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.DoTBarOffset.X,
-                CenterY + _config.Position.Y + _config.DoTBarOffset.Y - _config.ProcsBarSize.Y / 2f
+                CenterX + _config.Position.X + _config.DoTBarPosition.X,
+                CenterY + _config.Position.Y + _config.DoTBarPosition.Y - _config.ProcsBarSize.Y / 2f
             );
 
             var builder = BarBuilder.Create(position, _config.DoTBarSize)
@@ -272,14 +272,14 @@ namespace DelvUI.Interface
     [SubSection("Black Mage", 1)]
     public class BlackMageHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Position", min = -4000f, max = 4000f)]
         [Order(0)]
         public Vector2 Position = new Vector2(0, 0);
 
         #region mana bar
-        [DragFloat2("Mana Bar Offset", min = -2000, max = 2000f)]
+        [DragFloat2("Mana Bar Position", min = -2000, max = 2000f)]
         [Order(5)]
-        public Vector2 ManaBarOffset = new Vector2(0, 448);
+        public Vector2 ManaBarPosition = new Vector2(0, 449);
 
         [DragFloat2("Mana Bar Size", max = 2000f)]
         [Order(10)]
@@ -311,9 +311,9 @@ namespace DelvUI.Interface
         #endregion
 
         #region umbral heart
-        [DragFloat2("Umbral Heart Bar Offset", min = -2000, max = 2000f)]
+        [DragFloat2("Umbral Heart Bar Position", min = -2000, max = 2000f)]
         [Order(40)]
-        public Vector2 UmbralHeartOffset = new Vector2(0, 428);
+        public Vector2 UmbralHeartPosition = new Vector2(0, 429);
 
         [DragFloat2("Umbral Heart Bar Size", max = 2000f)]
         [Order(45)]
@@ -333,9 +333,9 @@ namespace DelvUI.Interface
         [CollapseControl(60, 1)]
         public bool ShowTripleCast = true;
 
-        [DragFloat2("Triplecast Offset", min = -2000, max = 2000f)]
+        [DragFloat2("Triplecast Position", min = -2000, max = 2000f)]
         [CollapseWith(0, 1)]
-        public Vector2 TriplecastOffset = new Vector2(0, 410);
+        public Vector2 TriplecastPosition = new Vector2(0, 411);
 
         [DragFloat2("Triplecast Size", max = 2000)]
         [CollapseWith(5, 1)]
@@ -351,9 +351,9 @@ namespace DelvUI.Interface
         #endregion
 
         #region polyglot
-        [DragFloat2("Polyglot Offset", min = -2000, max = 2000f)]
+        [DragFloat2("Polyglot Position", min = -2000, max = 2000f)]
         [Order(65)]
-        public Vector2 PolyglotOffset = new Vector2(0, 391);
+        public Vector2 PolyglotPosition = new Vector2(0, 392);
 
         [DragFloat2("Polyglot Size", max = 2000f)]
         [Order(70)]
@@ -381,9 +381,9 @@ namespace DelvUI.Interface
         [CollapseWith(5, 2)]
         public bool InvertProcsBar = true;
 
-        [DragFloat2("Procs Bar Offset", min = -2000, max = 2000f)]
+        [DragFloat2("Procs Bar Position", min = -2000, max = 2000f)]
         [CollapseWith(10, 2)]
-        public Vector2 ProcsBarOffset = new Vector2(-127, 391);
+        public Vector2 ProcsBarPosition = new Vector2(-127, 392);
 
         [DragFloat2("Procs Bar Size", max = 2000f)]
         [CollapseWith(15, 2)]
@@ -407,9 +407,9 @@ namespace DelvUI.Interface
         [CollapseWith(0, 4)]
         public bool InvertDoTBar = false;
 
-        [DragFloat2("DoT Bar Offset", min = -2000, max = 2000f)]
+        [DragFloat2("DoT Bar Position", min = -2000, max = 2000f)]
         [CollapseWith(5, 4)]
-        public Vector2 DoTBarOffset = new Vector2(21, 391);
+        public Vector2 DoTBarPosition = new Vector2(21, 392);
 
         [DragFloat2("DoT Bar Size", max = 2000f)]
         [CollapseWith(10, 4)]

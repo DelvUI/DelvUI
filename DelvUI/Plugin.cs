@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using Dalamud.Game.ClientState;
+﻿using Dalamud.Game.ClientState;
 using Dalamud.Game.Command;
 using Dalamud.Plugin;
 using DelvUI.Config;
@@ -9,13 +6,16 @@ using DelvUI.Helpers;
 using DelvUI.Interface;
 using FFXIVClientStructs;
 using ImGuiNET;
+using System;
+using System.IO;
+using System.Reflection;
 
 namespace DelvUI
 {
     public class Plugin : IDalamudPlugin
     {
         public static DalamudPluginInterface InterfaceInstance { get; private set; }
-        
+
         private ConfigurationWindow _configurationWindow;
 
         private bool _fontBuilt;
@@ -196,6 +196,12 @@ namespace DelvUI
             _configurationWindow.Draw();
 
             ConfigurationManager.GetInstance().Draw();
+
+            if (!_configurationWindow.IsVisible && (_pluginConfiguration.ShowTestCastBar || _pluginConfiguration.ShowTargetTestCastBar))
+            {
+                _pluginConfiguration.ShowTestCastBar = false;
+                _pluginConfiguration.ShowTargetTestCastBar = false;
+            }
 
             if (_hudWindow?.JobId != _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id)
             {

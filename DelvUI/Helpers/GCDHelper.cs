@@ -1,5 +1,4 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
-using DelvUI.Config;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using System.Collections.Generic;
 

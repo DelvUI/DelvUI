@@ -55,8 +55,8 @@ namespace DelvUI.Interface
             var actor = PluginInterface.ClientState.LocalPlayer;
 
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.ManaBarOffset.X - _config.ManaBarSize.X / 2f,
-                CenterY + _config.Position.Y + _config.ManaBarOffset.Y - _config.ManaBarSize.Y / 2f
+                CenterX + _config.Position.X + _config.ManaBarPosition.X - _config.ManaBarSize.X / 2f,
+                CenterY + _config.Position.Y + _config.ManaBarPosition.Y - _config.ManaBarSize.Y / 2f
             );
 
             var drawList = ImGui.GetWindowDrawList();
@@ -101,8 +101,8 @@ namespace DelvUI.Interface
             var scale = gauge.WhiteGauge - gauge.BlackGauge;
 
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.BalanceBarOffset.X - _config.BalanceBarSize.X / 2f,
-                CenterY + _config.Position.Y + _config.BalanceBarOffset.Y - _config.BalanceBarSize.Y / 2f
+                CenterX + _config.Position.X + _config.BalanceBarPosition.X - _config.BalanceBarSize.X / 2f,
+                CenterY + _config.Position.Y + _config.BalanceBarPosition.Y - _config.BalanceBarSize.Y / 2f
             );
 
             PluginConfigColor color = _config.BalanceBarColor;
@@ -137,8 +137,8 @@ namespace DelvUI.Interface
             var thresholdRatio = _config.WhiteManaBarInverted ? 0.2f : 0.8f;
 
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.WhiteManaBarOffset.X,
-                CenterY + _config.Position.Y + _config.WhiteManaBarOffset.Y - _config.WhiteManaBarSize.Y / 2f
+                CenterX + _config.Position.X + _config.WhiteManaBarPosition.X - _config.BlackManaBarSize.X / 2f,
+                CenterY + _config.Position.Y + _config.WhiteManaBarPosition.Y - _config.WhiteManaBarSize.Y / 2f
             );
 
             DrawCustomBar(position, _config.WhiteManaBarSize, _config.WhiteManaBarColor, gauge, 100, thresholdRatio, _config.WhiteManaBarInverted, _config.ShowWhiteManaValue);
@@ -150,8 +150,8 @@ namespace DelvUI.Interface
             var thresholdRatio = _config.BlackManaBarInverted ? 0.2f : 0.8f;
 
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.BlackManaBarOffset.X,
-                CenterY + _config.Position.Y + _config.BlackManaBarOffset.Y - _config.BlackManaBarSize.Y / 2f
+                CenterX + _config.Position.X + _config.BlackManaBarPosition.X - _config.BlackManaBarSize.X / 2f,
+                CenterY + _config.Position.Y + _config.BlackManaBarPosition.Y - _config.BlackManaBarSize.Y / 2f
             );
 
             DrawCustomBar(position, _config.BlackManaBarSize, _config.BlackManaBarColor, gauge, 100, thresholdRatio, _config.BlackManaBarInverted, _config.ShowBlackManaValue);
@@ -162,8 +162,8 @@ namespace DelvUI.Interface
             var accelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1238);
 
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.AccelerationBarOffset.X - _config.AccelerationBarSize.X / 2f,
-                CenterY + _config.Position.Y + _config.AccelerationBarOffset.Y - _config.AccelerationBarSize.Y / 2f
+                CenterX + _config.Position.X + _config.AccelerationBarPosition.X - _config.AccelerationBarSize.X / 2f,
+                CenterY + _config.Position.Y + _config.AccelerationBarPosition.Y - _config.AccelerationBarSize.Y / 2f
             );
 
             var bar = BarBuilder.Create(position, _config.AccelerationBarSize)
@@ -183,8 +183,8 @@ namespace DelvUI.Interface
             var value = dualCastBuff > 0 ? 1 : 0;
 
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.DualCastOffset.X - _config.DualCastSize.X / 2f,
-                CenterY + _config.Position.Y + _config.DualCastOffset.Y - _config.DualCastSize.Y / 2f
+                CenterX + _config.Position.X + _config.DualCastPosition.X - _config.DualCastSize.X / 2f,
+                CenterY + _config.Position.Y + _config.DualCastPosition.Y - _config.DualCastSize.Y / 2f
             );
 
             var drawList = ImGui.GetWindowDrawList();
@@ -200,8 +200,8 @@ namespace DelvUI.Interface
             var duration = (int)Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1235).Duration);
 
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.VerstoneBarOffset.X,
-                CenterY + _config.Position.Y + _config.VerstoneBarOffset.Y - _config.VerstoneBarSize.Y / 2f
+                CenterX + _config.Position.X + _config.VerstoneBarPosition.X - _config.VerstoneBarSize.X / 2f,
+                CenterY + _config.Position.Y + _config.VerstoneBarPosition.Y - _config.VerstoneBarSize.Y / 2f
             );
 
             DrawCustomBar(position, _config.VerstoneBarSize, _config.VerstoneColor, duration, 30, 0, _config.InvertVerstoneBar, _config.ShowVerstoneText);
@@ -212,8 +212,8 @@ namespace DelvUI.Interface
             var duration = (int)Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1234).Duration);
 
             var position = new Vector2(
-                CenterX + _config.Position.X + _config.VerfireBarOffset.X,
-                CenterY + _config.Position.Y + _config.VerfireBarOffset.Y - _config.VerfireBarSize.Y / 2f
+                CenterX + _config.Position.X + _config.VerfireBarPosition.X - _config.VerfireBarSize.X / 2f,
+                CenterY + _config.Position.Y + _config.VerfireBarPosition.Y - _config.VerfireBarSize.Y / 2f
             );
 
             DrawCustomBar(position, _config.VerfireBarSize, _config.VerfireColor, duration, 30, 0, _config.InvertVerfireBar, _config.ShowVerfireText);
@@ -272,7 +272,7 @@ namespace DelvUI.Interface
     [SubSection("Red Mage", 1)]
     public class RedMageHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Offset", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Position", min = -4000f, max = 4000f)]
         [Order(0)]
         public Vector2 Position = new Vector2(0, 0);
 
@@ -281,9 +281,9 @@ namespace DelvUI.Interface
         [Order(5)]
         public Vector2 ManaBarSize = new Vector2(254, 20);
 
-        [DragFloat2("Mana Bar Offset", min = -2000f, max = 2000f)]
+        [DragFloat2("Mana Bar Position", min = -2000f, max = 2000f)]
         [Order(10)]
-        public Vector2 ManaBarOffset = new Vector2(0, 448);
+        public Vector2 ManaBarPosition = new Vector2(0, 448);
 
         [Checkbox("Show Mana Value")]
         [Order(15)]
@@ -302,9 +302,9 @@ namespace DelvUI.Interface
         #endregion
 
         #region balance bar
-        [DragFloat2("Balance Bar Offset", min = -2000f, max = 2000f)]
+        [DragFloat2("Balance Bar Position", min = -2000f, max = 2000f)]
         [Order(25)]
-        public Vector2 BalanceBarOffset = new Vector2(0, 426);
+        public Vector2 BalanceBarPosition = new Vector2(0, 426);
 
         [DragFloat2("Balance Bar Size", max = 2000f)]
         [Order(30)]
@@ -316,9 +316,9 @@ namespace DelvUI.Interface
         #endregion
 
         #region white mana bar
-        [DragFloat2("White Mana Bar Offset", min = -2000f, max = 2000f)]
+        [DragFloat2("White Mana Bar Position", min = -2000f, max = 2000f)]
         [Order(40)]
-        public Vector2 WhiteManaBarOffset = new Vector2(-127, 426);
+        public Vector2 WhiteManaBarPosition = new Vector2(-70, 426);
 
         [DragFloat2("White Mana Bar Size", max = 2000f)]
         [Order(45)]
@@ -338,9 +338,9 @@ namespace DelvUI.Interface
         #endregion
 
         #region black mana bar
-        [DragFloat2("Black Mana Bar Offset", min = -2000f, max = 2000f)]
+        [DragFloat2("Black Mana Bar Position", min = -2000f, max = 2000f)]
         [Order(65)]
-        public Vector2 BlackManaBarOffset = new Vector2(13, 426);
+        public Vector2 BlackManaBarPosition = new Vector2(70, 426);
 
         [DragFloat2("Black Mana Bar Size", max = 2000f)]
         [Order(70)]
@@ -364,9 +364,9 @@ namespace DelvUI.Interface
         [CollapseControl(90, 1)]
         public bool ShowAcceleration = true;
 
-        [DragFloat2("Acceleration Bar Offset", min = -2000f, max = 2000f)]
+        [DragFloat2("Acceleration Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(0, 1)]
-        public Vector2 AccelerationBarOffset = new Vector2(0, 408);
+        public Vector2 AccelerationBarPosition = new Vector2(0, 408);
 
         [DragFloat2("Acceleration Size", max = 2000f)]
         [CollapseWith(5, 1)]
@@ -386,13 +386,13 @@ namespace DelvUI.Interface
         [CollapseControl(95, 2)]
         public bool ShowDualCast = true;
 
-        [DragFloat2("Dualcast Offset", min = -2000f, max = 2000f)]
+        [DragFloat2("Dualcast Position", min = -2000f, max = 2000f)]
         [CollapseWith(0, 2)]
-        public Vector2 DualCastOffset = new Vector2(0, 392);
+        public Vector2 DualCastPosition = new Vector2(0, 392);
 
         [DragFloat2("Dualcast Size", max = 2000f)]
         [CollapseWith(5, 2)]
-        public Vector2 DualCastSize = new Vector2(16, 16);
+        public Vector2 DualCastSize = new Vector2(18, 16);
 
         [ColorEdit4("Dualcast Color")]
         [CollapseWith(10, 2)]
@@ -412,13 +412,13 @@ namespace DelvUI.Interface
         [CollapseWith(5, 3)]
         public bool InvertVerstoneBar = true;
 
-        [DragFloat2("Verstone Bar Offset", min = -2000, max = 2000f)]
+        [DragFloat2("Verstone Bar Position", min = -2000, max = 2000f)]
         [CollapseWith(10, 3)]
-        public Vector2 VerstoneBarOffset = new Vector2(-127, 392);
+        public Vector2 VerstoneBarPosition = new Vector2(-69, 392);
 
         [DragFloat2("Verstone Bar Size", max = 2000f)]
         [CollapseWith(15, 3)]
-        public Vector2 VerstoneBarSize = new Vector2(117, 16);
+        public Vector2 VerstoneBarSize = new Vector2(116, 16);
 
         [ColorEdit4("Verstone Color")]
         [CollapseWith(20, 3)]
@@ -438,13 +438,13 @@ namespace DelvUI.Interface
         [CollapseWith(5, 4)]
         public bool InvertVerfireBar = false;
 
-        [DragFloat2("Verfire Bar Offset", min = -2000, max = 2000f)]
+        [DragFloat2("Verfire Bar Position", min = -2000, max = 2000f)]
         [CollapseWith(10, 4)]
-        public Vector2 VerfireBarOffset = new Vector2(10, 392);
+        public Vector2 VerfireBarPosition = new Vector2(69, 392);
 
         [DragFloat2("Verfire Bar Size", max = 2000f)]
         [CollapseWith(15, 4)]
-        public Vector2 VerfireBarSize = new Vector2(117, 16);
+        public Vector2 VerfireBarSize = new Vector2(116, 16);
 
         [ColorEdit4("Verfire Color")]
         [CollapseWith(20, 4)]

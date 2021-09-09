@@ -18,51 +18,52 @@ namespace DelvUI.Config
     public class PluginConfiguration : IPluginConfiguration
     {
 
-        public readonly StatusEffectsListConfig PlayerBuffListConfig = new(
-            new Vector2(750, -480),
-            new Vector2(340, 100),
-            true,
-            false,
-            true,
-            GrowthDirections.Left | GrowthDirections.Down
-        );
+        //public readonly StatusEffectsListConfig PlayerBuffListConfig = new(
+        //    new Vector2(750, -480),
+        //    new Vector2(340, 100),
+        //    true,
+        //    false,
+        //    true,
+        //    GrowthDirections.Left | GrowthDirections.Down
+        //);
 
-        public readonly StatusEffectsListConfig PlayerDebuffListConfig = new(
-            new Vector2(750, -380),
-            new Vector2(340, 100),
-            false,
-            true,
-            true,
-            GrowthDirections.Left | GrowthDirections.Down
-        );
+        //public readonly StatusEffectsListConfig PlayerDebuffListConfig = new(
+        //    new Vector2(750, -380),
+        //    new Vector2(340, 100),
+        //    false,
+        //    true,
+        //    true,
+        //    GrowthDirections.Left | GrowthDirections.Down
+        //);
 
-        public readonly StatusEffectsListConfig TargetBuffListConfig = new(
-            new Vector2(160, 415),
-            new Vector2(340, 100),
-            true,
-            false,
-            true,
-            GrowthDirections.Right | GrowthDirections.Up
-        );
+        //public readonly StatusEffectsListConfig TargetBuffListConfig = new(
+        //    new Vector2(160, 415),
+        //    new Vector2(340, 100),
+        //    true,
+        //    false,
+        //    true,
+        //    GrowthDirections.Right | GrowthDirections.Up
+        //);
 
-        public readonly StatusEffectsListConfig TargetDebuffListConfig = new(
-            new Vector2(160, 315),
-            new Vector2(340, 100),
-            false,
-            true,
-            true,
-            GrowthDirections.Right | GrowthDirections.Up
-        );
+        //public readonly StatusEffectsListConfig TargetDebuffListConfig = new(
+        //    new Vector2(160, 315),
+        //    new Vector2(340, 100),
+        //    false,
+        //    true,
+        //    true,
+        //    GrowthDirections.Right | GrowthDirections.Up
+        //);
 
-        public StatusEffectsListConfig RaidJobBuffListConfig = new(
-            new Vector2(0, 300),
-            new Vector2(340, 100),
-            true,
-            false,
-            false,
-            GrowthDirections.Out | GrowthDirections.Right,
-            new StatusEffectIconConfig(new Vector2(35, 35), true, true, false, false)
-        );
+        //public StatusEffectsListConfig RaidJobBuffListConfig = new(
+        //    new Vector2(0, 300),
+        //    new Vector2(340, 100),
+        //    true,
+        //    false,
+        //    false,
+        //    GrowthDirections.Out | GrowthDirections.Right,
+        //    new StatusEffectIconConfig(new Vector2(35, 35), true, true, false, false),
+        //    new Vector2(1000, 0)
+        //);
 
         [JsonIgnore]
         public TextureWrap BannerImage = null;
@@ -151,13 +152,13 @@ namespace DelvUI.Config
 
         public bool ShowCastBar = true;
         public bool ShowCastTime = true;
-        //public bool ShowPrimaryResourceBarThresholdMarker = false;
-        //public bool ShowPrimaryResourceBarValue = false;
+        public bool ShowTestCastBar = false;
         public bool ShowTargetActionIcon = true;
         public bool ShowTargetActionName = true;
 
         public bool ShowTargetCastBar = true;
         public bool ShowTargetCastTime = true;
+        public bool ShowTargetTestCastBar = false;
         public bool ShowTargetInterrupt = true;
         public bool SlideCast = false;
         public Vector4 SlideCastColor = new(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f);

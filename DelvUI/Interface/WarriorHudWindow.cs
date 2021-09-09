@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game.ClientState.Structs;
+﻿using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using DelvUI.Interface.Bars;
 using DelvUI.Helpers;
+using DelvUI.Interface.Bars;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
 
 namespace DelvUI.Interface
 {
@@ -110,7 +110,7 @@ namespace DelvUI.Interface
     [SubSection("Warrior", 1)]
     public class WarriorHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Offset" + "##Warrior", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Position" + "##Warrior", min = -4000f, max = 4000f)]
         [Order(0)]
         public Vector2 Position = new(0, 0);
 

@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Numerics;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
@@ -11,6 +6,11 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface
@@ -23,7 +23,7 @@ namespace DelvUI.Interface
 
         public override uint JobId => 27;
         private SummonerHudConfig _config => (SummonerHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new SummonerHudConfig());
-        private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + YOffset + _config.Position.Y);
+        private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
         private Dictionary<string, uint> EmptyColor => PluginConfiguration.MiscColorMap["empty"];
 
         protected override void Draw(bool _)
@@ -303,7 +303,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Aether Tracker Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 AetherPosition = new(-67, -16);
+        public Vector2 AetherPosition = new(-67, 454);
 
         [DragFloat2("Aether Tracker Size", min = 1f, max = 2000f)]
         [CollapseWith(0, 1)]
@@ -323,7 +323,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Bio Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 4)]
-        public Vector2 BioPosition = new(64, -77);
+        public Vector2 BioPosition = new(64, 393);
 
         [DragFloat2("Bio Size", max = 2000f)]
         [CollapseWith(5, 4)]
@@ -347,7 +347,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Miasma Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 3)]
-        public Vector2 MiasmaPosition = new(-64, -77);
+        public Vector2 MiasmaPosition = new(-64, 393);
 
         [DragFloat2("Miasma Size", max = 2000f)]
         [CollapseWith(5, 3)]
@@ -371,7 +371,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Ruin Position", min = -4000f, max = 4000f)]
         [CollapseWith(35, 2)]
-        public Vector2 RuinPosition = new(0, -33);
+        public Vector2 RuinPosition = new(0, 437);
 
         [DragFloat2("Ruin Size", min = 1f, max = 2000f)]
         [CollapseWith(30, 2)]
@@ -403,7 +403,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Trance Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(35, 5)]
-        public Vector2 TrancePosition = new(0, -55);
+        public Vector2 TrancePosition = new(0, 415);
 
         [DragFloat2("Trance Gauge Size", min = 1f, max = 2000f)]
         [CollapseWith(30, 5)]
@@ -418,7 +418,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Demi Status Indicator Position", min = -4000f, max = -4000f)]
         [CollapseWith(5, 6)]
-        public Vector2 IndicatorPosition = new(0, -16);
+        public Vector2 IndicatorPosition = new(0, 454);
 
         [DragFloat2("Demi Status Indicator Size", min = 1f, max = 2000f)]
         [CollapseWith(10, 6)]
@@ -438,7 +438,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Dreadwyrm Aether Bars Position", min = -4000f, max = -4000f)]
         [CollapseWith(30, 6)]
-        public Vector2 DreadwyrmAetherBarPosition = new(67, -16);
+        public Vector2 DreadwyrmAetherBarPosition = new(67, 454);
 
         [DragFloat2("Dreadwyrm Aether Bars Size", min = 1f, max = 2000f)]
         [CollapseWith(35, 6)]

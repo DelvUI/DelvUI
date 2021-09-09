@@ -174,7 +174,7 @@ namespace DelvUI.Interface
     [SubSection("Machinist", 1)]
     public class MachinistHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Offset" + "##Machinist", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Position" + "##Machinist", min = -4000f, max = 4000f)]
         [Order(0)]
         public Vector2 Position = new(0, 0);
 
@@ -189,7 +189,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##Overheat", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 OverheatPosition = new(0, 395);
+        public Vector2 OverheatPosition = new(0, 405);
 
         [DragFloat2("Size" + "##Overheat", min = 0, max = 4000f)]
         [CollapseWith(10, 0)]
@@ -211,7 +211,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##HeatGauge", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 HeatGaugePosition = new(0, 417);
+        public Vector2 HeatGaugePosition = new(0, 427);
 
         [DragFloat2("Size" + "##HeatGauge", min = 0, max = 4000f)]
         [CollapseWith(10, 1)]
@@ -249,7 +249,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##BatteryGauge", min = -4000f, max = 4000f)]
         [CollapseWith(20, 2)]
-        public Vector2 BatteryGaugePosition = new(0, 439);
+        public Vector2 BatteryGaugePosition = new(0, 449);
 
         [DragFloat2("Size" + "##BatteryGauge", min = 0, max = 4000f)]
         [CollapseWith(25, 2)]
@@ -279,7 +279,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##Wildfire", min = -4000f, max = 4000f)]
         [CollapseWith(5, 3)]
-        public Vector2 WildfirePosition = new(0, 373);
+        public Vector2 WildfirePosition = new(0, 383);
 
         [DragFloat2("Size" + "##Wildfire", min = 0, max = 4000f)]
         [CollapseWith(10, 3)]

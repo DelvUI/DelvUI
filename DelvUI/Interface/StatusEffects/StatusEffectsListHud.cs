@@ -1,6 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Structs;
-using Dalamud.Plugin;
 using DelvUI.Helpers;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -11,7 +10,7 @@ using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface.StatusEffects
 {
-    public class StatusEffectsListHud: HudElement, IHudElementWithActor
+    public class StatusEffectsListHud : HudElement, IHudElementWithActor
     {
         private StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
 

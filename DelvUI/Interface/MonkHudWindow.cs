@@ -2,13 +2,13 @@ using Dalamud.Game.ClientState.Structs.JobGauge;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using DelvUI.Interface.Bars;
 using DelvUI.Helpers;
+using DelvUI.Interface.Bars;
 using ImGuiNET;
 using System;
-using System.Numerics;
-using System.Linq;
 using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
 
 namespace DelvUI.Interface
 {
@@ -353,9 +353,10 @@ namespace DelvUI.Interface
     [SubSection("Monk", 1)]
     public class MonkHudConfig : PluginConfigObject
     {
-        [DragFloat2("Base Offset" + "##Monk", min = -4000f, max = 4000f)]
+        [DragFloat2("Base Position" + "##Monk", min = -4000f, max = 4000f)]
         [Order(0)]
-        public Vector2 Position = new(160, 460);
+        public Vector2 Position = new(0, 0);
+        // public Vector2 Position = new(160, 460);
 
         #region Demolish Bar
         [Checkbox("Show Demolish Bar")]
@@ -364,7 +365,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##Demolish", min = -4000f, max = 4000f)]
         [CollapseWith(0, 0)]
-        public Vector2 DemolishBarPosition = new(-89, -11);
+        public Vector2 DemolishBarPosition = new(71, 449);
 
         [DragFloat2("Size" + "##Demolish", min = 0, max = 4000f)]
         [CollapseWith(5, 0)]
@@ -382,7 +383,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##Chakbra", min = -4000f, max = 4000f)]
         [CollapseWith(0, 1)]
-        public Vector2 ChakraBarPosition = new(-160, -33);
+        public Vector2 ChakraBarPosition = new(0, 427);
 
         [DragFloat2("Size" + "##Chakbra", min = 0, max = 4000f)]
         [CollapseWith(5, 1)]
@@ -400,7 +401,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##LeadenFist", min = -4000f, max = 4000f)]
         [CollapseWith(0, 2)]
-        public Vector2 LeadenFistBarPosition = new(-160, -11);
+        public Vector2 LeadenFistBarPosition = new(0, 449);
 
         [DragFloat2("Size" + "##LeadenFist", min = 0, max = 4000f)]
         [CollapseWith(5, 2)]
@@ -418,7 +419,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##TwinSnakes", min = -4000f, max = 4000f)]
         [CollapseWith(0, 3)]
-        public Vector2 TwinSnakesBarPosition = new(-231, -11);
+        public Vector2 TwinSnakesBarPosition = new(-71, 449);
 
         [DragFloat2("Size" + "##TwinSnakes", min = 0, max = 4000f)]
         [CollapseWith(5, 3)]
@@ -440,7 +441,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##RiddleofEarth", min = -4000f, max = 4000f)]
         [CollapseWith(0, 4)]
-        public Vector2 RiddleofEarthBarPosition = new(-229, -55);
+        public Vector2 RiddleofEarthBarPosition = new(-69, 405);
 
         [DragFloat2("Size" + "##RiddleofEarth", min = 0, max = 4000f)]
         [CollapseWith(5, 4)]
@@ -462,7 +463,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##PerfectBalance", min = -4000f, max = 4000f)]
         [CollapseWith(0, 5)]
-        public Vector2 PerfectBalanceBarPosition = new(-160, -55);
+        public Vector2 PerfectBalanceBarPosition = new(0, 405);
 
         [DragFloat2("Size" + "##PerfectBalance", min = 0, max = 4000f)]
         [CollapseWith(5, 5)]
@@ -484,7 +485,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##TrueNorth", min = -4000f, max = 4000f)]
         [CollapseWith(0, 6)]
-        public Vector2 TrueNorthBarPosition = new(-91, -55);
+        public Vector2 TrueNorthBarPosition = new(69, 405);
 
         [DragFloat2("Size" + "##TrueNorth", min = 0, max = 4000f)]
         [CollapseWith(5, 6)]
@@ -498,11 +499,11 @@ namespace DelvUI.Interface
         #region Forms
         [Checkbox("Show Forms Bar" + "##Forms")]
         [CollapseControl(40, 7)]
-        public bool ShowFormsBar = true;
+        public bool ShowFormsBar = false;
 
         [DragFloat2("Position" + "##Forms", min = -4000f, max = 4000f)]
         [CollapseWith(0, 7)]
-        public Vector2 FormsBarPosition = new(-160, -77);
+        public Vector2 FormsBarPosition = new(0, 383);
 
         [DragFloat2("Size" + "##Forms", min = 0, max = 4000f)]
         [CollapseWith(5, 7)]

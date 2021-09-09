@@ -5,6 +5,7 @@ using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
+using DelvUI.Interface.Bars;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -73,196 +74,102 @@ namespace DelvUI.Interface
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
-            float scale = 0f;
-            int duration = 0;
+            float duration = 0f;
 
             if (target is Chara)
             {
                 StatusEffect chaosThrust = target.StatusEffects.FirstOrDefault(
                     o => (o.EffectId == 1312 || o.EffectId == 118) && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
                 );
-
-                scale = chaosThrust.Duration / 24f;
-                duration = (int)Math.Round(chaosThrust.Duration);
-
-                if (scale < 0f)
-                {
-                    scale = 0f;
-                    duration = 0;
-                }
+                duration = Math.Max(0f, chaosThrust.Duration);
             }
 
-            Vector2 cursorPos = Origin
-                              + new Vector2(
-                                    _config.ChaosThrustBarPosition.X - _config.ChaosThrustBarSize.X / 2f,
-                                    _config.ChaosThrustBarPosition.Y - _config.ChaosThrustBarSize.Y / 2f
-                                );
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + _config.ChaosThrustBarSize, EmptyColor["background"]);
-            Vector2 chaosThrustBarSize = new(_config.ChaosThrustBarSize.X * scale, _config.ChaosThrustBarSize.Y);
-
-            drawList.AddRectFilledMultiColor(
-                cursorPos,
-                cursorPos + chaosThrustBarSize,
-                _config.ChaosThrustBarColor.Map["gradientLeft"],
-                _config.ChaosThrustBarColor.Map["gradientRight"],
-                _config.ChaosThrustBarColor.Map["gradientRight"],
-                _config.ChaosThrustBarColor.Map["gradientLeft"]
-            );
+            Vector2 cursorPos = Origin + _config.ChaosThrustBarPosition - _config.ChaosThrustBarSize / 2f;
+            BarBuilder builder = BarBuilder.Create(cursorPos, _config.ChaosThrustBarSize);
+            Bar bar = builder.AddInnerBar(duration, 24f, _config.ChaosThrustBarColor.Map)
+                             .SetBackgroundColor(EmptyColor["background"])
+                             .Build();
 
             if (_config.ShowChaosThrustBarText && duration > 0f)
             {
-                string durationText = duration.ToString();
-                Vector2 textSize = ImGui.CalcTextSize(durationText);
-                DrawOutlinedText(duration.ToString(), new Vector2(cursorPos.X + 5f, cursorPos.Y + _config.ChaosThrustBarSize.Y / 2f - textSize.Y / 2f));
+                builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
-
-            drawList.AddRect(cursorPos, cursorPos + _config.ChaosThrustBarSize, 0xFF000000);
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawEyeOfTheDragonBars()
         {
             DRGGauge gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
 
-            Vector2 cursorPos = Origin
-                              + new Vector2(
-                                    _config.EyeOfTheDragonBarPosition.X - _config.EyeOfTheDragonBarSize.X,
-                                    _config.EyeOfTheDragonBarPosition.Y - _config.EyeOfTheDragonBarSize.Y / 2f
-                                );
+            Vector2 cursorPos = Origin + _config.EyeOfTheDragonBarPosition - _config.EyeOfTheDragonBarSize / 2f;
 
             byte eyeCount = gauge.EyeCount;
+
+            BarBuilder builder = BarBuilder.Create(cursorPos, _config.EyeOfTheDragonBarSize);
+            Bar eyeBars = builder.SetChunks(2)
+                                 .SetChunkPadding(_config.EyeOfTheDragonBarPadding)
+                                 .AddInnerBar(eyeCount, 2, _config.EyeOfTheDragonColor.Map)
+                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .Build();
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-
-            for (byte i = 0; i < 2; i++)
-            {
-                Vector2 size = _config.EyeOfTheDragonBarSize;
-                size.X = size.X - _config.EyeOfTheDragonBarPadding / 2f;
-
-                cursorPos = new Vector2(cursorPos.X + (size.X + _config.EyeOfTheDragonBarPadding * i) * i, cursorPos.Y);
-
-                if (eyeCount >= i + 1)
-                {
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos,
-                        cursorPos + size,
-                        _config.EyeOfTheDragonColor.Map["gradientLeft"],
-                        _config.EyeOfTheDragonColor.Map["gradientRight"],
-                        _config.EyeOfTheDragonColor.Map["gradientRight"],
-                        _config.EyeOfTheDragonColor.Map["gradientLeft"]
-                    );
-                }
-                else
-                {
-                    drawList.AddRectFilled(cursorPos, cursorPos + size, EmptyColor["background"]);
-                }
-
-                drawList.AddRect(cursorPos, cursorPos + size, 0xFF000000);
-            }
+            eyeBars.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawBloodOfTheDragonBar()
         {
             DRGGauge gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
 
-            Vector2 cursorPos = Origin + new Vector2(_config.BloodBarPosition.X - _config.BloodBarSize.X / 2f, _config.BloodBarPosition.Y - _config.BloodBarSize.Y / 2f);
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(cursorPos, cursorPos + _config.BloodBarSize, EmptyColor["background"]);
+            Vector2 cursorPos = Origin + _config.BloodBarPosition - _config.BloodBarSize / 2f;
 
             int maxTimerMs = 30 * 1000;
             short currTimerMs = gauge.BOTDTimer;
-
-            if (currTimerMs == 0)
-            {
-                drawList.AddRect(cursorPos, cursorPos + _config.BloodBarSize, 0xFF000000);
-
-                return;
-            }
-
-            float scale = (float)currTimerMs / maxTimerMs;
-            Vector2 botdBarSize = new(_config.BloodBarSize.X * scale, _config.BloodBarSize.Y);
-
-            if (gauge.BOTDState == BOTDState.LOTD)
-            {
-                drawList.AddRectFilledMultiColor(
-                    cursorPos,
-                    cursorPos + botdBarSize,
-                    _config.LifeOfTheDragonColor.Map["gradientLeft"],
-                    _config.LifeOfTheDragonColor.Map["gradientRight"],
-                    _config.LifeOfTheDragonColor.Map["gradientRight"],
-                    _config.LifeOfTheDragonColor.Map["gradientLeft"]
-                );
-            }
-            else
-            {
-                drawList.AddRectFilledMultiColor(
-                    cursorPos,
-                    cursorPos + botdBarSize,
-                    _config.BloodOfTheDragonColor.Map["gradientLeft"],
-                    _config.BloodOfTheDragonColor.Map["gradientRight"],
-                    _config.BloodOfTheDragonColor.Map["gradientRight"],
-                    _config.BloodOfTheDragonColor.Map["gradientLeft"]
-                );
-            }
+            PluginConfigColor color = gauge.BOTDState == BOTDState.LOTD ? _config.LifeOfTheDragonColor : _config.BloodOfTheDragonColor;
+            BarBuilder builder = BarBuilder.Create(cursorPos, _config.BloodBarSize);
+            Bar bar = builder.AddInnerBar(currTimerMs / 1000f, maxTimerMs / 1000f, color.Map)
+                             .SetBackgroundColor(EmptyColor["background"])
+                             .Build();
 
             if (_config.ShowBloodBarText)
             {
-                string durationText = ((int)(currTimerMs / 1000f)).ToString();
-                Vector2 textSize = ImGui.CalcTextSize(durationText);
-                DrawOutlinedText(durationText, new Vector2(cursorPos.X + 5f, cursorPos.Y + _config.BloodBarSize.Y / 2f - textSize.Y / 2f));
+                builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
-
-            drawList.AddRect(cursorPos, cursorPos + _config.BloodBarSize, 0xFF000000);
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            bar.Draw(drawList, PluginConfiguration);
         }
 
         private void DrawDisembowelBar()
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
 
-            Vector2 cursorPos = Origin
-                              + new Vector2(_config.DisembowelBarPosition.X - _config.DisembowelBarSize.X / 2f, _config.DisembowelBarPosition.Y - _config.DisembowelBarSize.Y / 2f);
+            Vector2 cursorPos = Origin + _config.DisembowelBarPosition - _config.DisembowelBarSize / 2f;
 
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             IEnumerable<StatusEffect> disembowelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1914 or 121);
-            drawList.AddRectFilled(cursorPos, cursorPos + _config.DisembowelBarSize, EmptyColor["background"]);
-
-            if (!disembowelBuff.Any())
+            float duration = 0f;
+            if (disembowelBuff.Any())
             {
-                drawList.AddRect(cursorPos, cursorPos + _config.DisembowelBarSize, 0xFF000000);
-
-                return;
+                StatusEffect buff = disembowelBuff.First();
+                if (buff.Duration <= 0)
+                {
+                    duration = 0f;
+                }
+                else
+                {
+                    duration = buff.Duration;
+                }
             }
 
-            StatusEffect buff = disembowelBuff.First();
-
-            if (buff.Duration <= 0)
-            {
-                drawList.AddRect(cursorPos, cursorPos + _config.DisembowelBarSize, 0xFF000000);
-
-                return;
-            }
-
-            float scale = buff.Duration / 30f;
-            Vector2 disembowelBarSize = new(_config.DisembowelBarSize.X * scale, _config.DisembowelBarSize.Y);
-
-            drawList.AddRectFilledMultiColor(
-                cursorPos,
-                cursorPos + disembowelBarSize,
-                _config.DisembowelBarColor.Map["gradientLeft"],
-                _config.DisembowelBarColor.Map["gradientRight"],
-                _config.DisembowelBarColor.Map["gradientRight"],
-                _config.DisembowelBarColor.Map["gradientLeft"]
-            );
+            BarBuilder builder = BarBuilder.Create(cursorPos, _config.DisembowelBarSize);
+            Bar bar = builder.AddInnerBar(duration, 30f, _config.DisembowelBarColor.Map)
+                             .SetBackgroundColor(EmptyColor["background"])
+                             .Build();
 
             if (_config.ShowDisembowelBarText)
             {
-                string durationText = ((int)buff.Duration).ToString();
-                Vector2 textSize = ImGui.CalcTextSize(durationText);
-                DrawOutlinedText(durationText, new Vector2(cursorPos.X + 5f, cursorPos.Y + _config.DisembowelBarSize.Y / 2f - textSize.Y / 2f));
+                builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
-
-            drawList.AddRect(cursorPos, cursorPos + _config.DisembowelBarSize, 0xFF000000);
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            bar.Draw(drawList, PluginConfiguration);
         }
     }
 
@@ -332,7 +239,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Eye Of The Dragon Bar Size", max = 2000f)]
         [CollapseWith(0, 2)]
-        public Vector2 EyeOfTheDragonBarSize = new(126, 20);
+        public Vector2 EyeOfTheDragonBarSize = new(254, 20);
 
         [DragFloat2("Eye Of The Dragon Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]

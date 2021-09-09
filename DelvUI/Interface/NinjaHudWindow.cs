@@ -283,7 +283,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Huton Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 HutonGaugePosition = new(0, 426);
+        public Vector2 HutonGaugePosition = new(0, 427);
 
         [ColorEdit4("Huton Gauge Color")]
         [CollapseWith(10, 0)]
@@ -311,7 +311,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Ninki Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(15, 1)]
-        public Vector2 NinkiGaugePosition = new(0, 448);
+        public Vector2 NinkiGaugePosition = new(0, 449);
 
         [DragFloat("Ninki Gauge Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(20, 1)]
@@ -339,7 +339,7 @@ namespace DelvUI.Interface
 
         [Checkbox("Show Suiton Bar")]
         [CollapseControl(20, 3)]
-        public bool ShowSuitonBar = true;
+        public bool ShowSuitonBar = false;
 
         [Checkbox("Show Suiton Bar Text")]
         [CollapseWith(0, 3)]
@@ -355,7 +355,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Trick/Suiton Bar Position", min = -4000f, max = 4000f)]
         [Order(30)]
-        public Vector2 TrickBarPosition = new(0, 470);
+        public Vector2 TrickBarPosition = new(0, 471);
 
         [Checkbox("Show Mudra Bars")]
         [CollapseControl(35, 4)]
@@ -373,9 +373,9 @@ namespace DelvUI.Interface
         [CollapseWith(5, 4)]
         public Vector2 MudraBarSize = new(254, 10);
 
-        [DragFloat2("Mudra Bar Position", max = 2000f)]
+        [DragFloat2("Mudra Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 4)]
-        public Vector2 MudraBarPosition = new(0, 406);
+        public Vector2 MudraBarPosition = new(0, 407);
 
         [DragFloat("Mudra Bar Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(15, 4)]

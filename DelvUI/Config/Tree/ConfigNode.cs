@@ -4,6 +4,7 @@ using DelvUI.Config.Attributes;
 using ImGuiNET;
 using ImGuiScene;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,6 +32,36 @@ namespace DelvUI.Config.Tree
             foreach (Node child in children)
             {
                 child.Load(ConfigurationManager.GetInstance().ConfigDirectory);
+            }
+        }
+
+        public virtual string GetBase64String()
+        {
+            if (children == null)
+            {
+                return "";
+            }
+            string base64String = "";
+            foreach (Node child in children)
+            {
+                string childString = child.GetBase64String();
+                if (childString != "")
+                {
+                    base64String += "|" + childString;
+                }
+            }
+            return base64String;
+        }
+
+        public virtual void LoadBase64String(string[] importStrings)
+        {
+            if (children == null)
+            {
+                return;
+            }
+            foreach (Node child in children)
+            {
+                child.LoadBase64String(importStrings);
             }
         }
     }
@@ -63,6 +94,36 @@ namespace DelvUI.Config.Tree
             }
 
             return null;
+        }
+
+        public override string GetBase64String()
+        {
+            if (children == null)
+            {
+                return "";
+            }
+            string base64String = "";
+            foreach (Node child in children)
+            {
+                string childString = child.GetBase64String();
+                if (childString != "")
+                {
+                    base64String += "|" + childString;
+                }
+            }
+            return base64String;
+        }
+
+        public override void LoadBase64String(string[] importStrings)
+        {
+            if (children == null)
+            {
+                return;
+            }
+            foreach (Node child in children)
+            {
+                child.LoadBase64String(importStrings);
+            }
         }
 
         private void ToggleJobPacks()
@@ -99,12 +160,14 @@ namespace DelvUI.Config.Tree
 
                     ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
 
-                    bool selected = false;
+                    // if no section is selected, select the first
+                    if (children.Any() && children.All(o => !o.Selected))
+                    {
+                        children[0].Selected = true;
+                    }
 
                     foreach (SectionNode selectionNode in children)
                     {
-                        selected |= selectionNode.Selected;
-
                         if (ImGui.Selectable(selectionNode.Name, selectionNode.Selected))
                         {
                             selectionNode.Selected = true;
@@ -114,11 +177,6 @@ namespace DelvUI.Config.Tree
                                 otherNode.Selected = false;
                             }
                         }
-                    }
-
-                    if (!selected && children.Count > 0)
-                    {
-                        children[0].Selected = true;
                     }
 
                     ImGui.EndChild();
@@ -154,11 +212,12 @@ namespace DelvUI.Config.Tree
 
                 ImGui.SameLine();
 
-                if (ImGui.Button("Lock HUD")) // TODO: Functioning buttons
-                { }
-
+                /*
+                    if (ImGui.Button("Lock HUD")) // TODO: Functioning buttons
+                    { }
+                
                 ImGui.SameLine();
-
+                */
                 if (ImGui.Button("Toggle HUD"))
                 {
                     ConfigurationManager.GetInstance().ConfigurationWindow.ToggleHud();
@@ -182,7 +241,14 @@ namespace DelvUI.Config.Tree
                 ImGui.SameLine();
 
                 Vector2 pos = ImGui.GetCursorPos();
-                ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 60, ImGui.GetCursorPos().Y));
+                ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 120, ImGui.GetCursorPos().Y));
+
+                if (ImGui.Button("Support"))
+                {
+                    Process.Start("https://discord.gg/delvui");
+                }
+
+                ImGui.SameLine();
 
                 if (ImGui.Button("Donate!"))
                 {
@@ -265,6 +331,36 @@ namespace DelvUI.Config.Tree
         public string Name;
 
         public SectionNode() { children = new List<SubSectionNode>(); }
+
+        public override string GetBase64String()
+        {
+            if (children == null)
+            {
+                return "";
+            }
+            string base64String = "";
+            foreach (Node child in children)
+            {
+                string childString = child.GetBase64String();
+                if (childString != "")
+                {
+                    base64String += "|" + childString;
+                }
+            }
+            return base64String;
+        }
+
+        public override void LoadBase64String(string[] importStrings)
+        {
+            if (children == null)
+            {
+                return;
+            }
+            foreach (Node child in children)
+            {
+                child.LoadBase64String(importStrings);
+            }
+        }
 
         public void Draw(ref bool changed)
         {
@@ -387,6 +483,36 @@ namespace DelvUI.Config.Tree
         public new List<SubSectionNode> children;
 
         public NestedSubSectionNode() { children = new List<SubSectionNode>(); }
+
+        public override string GetBase64String()
+        {
+            if (children == null)
+            {
+                return "";
+            }
+            string base64String = "";
+            foreach (Node child in children)
+            {
+                string childString = child.GetBase64String();
+                if (childString != "")
+                {
+                    base64String += "|" + childString;
+                }
+            }
+            return base64String;
+        }
+
+        public override void LoadBase64String(string[] importStrings)
+        {
+            if (children == null)
+            {
+                return;
+            }
+            foreach (Node child in children)
+            {
+                child.LoadBase64String(importStrings);
+            }
+        }
 
         public override void Draw(ref bool changed)
         {
@@ -518,6 +644,7 @@ namespace DelvUI.Config.Tree
                         continue;
                     }
 
+
                     var value = field.GetValue(_configObject);
                     if (value is not PluginConfigObject nestedConfig)
                     {
@@ -529,6 +656,45 @@ namespace DelvUI.Config.Tree
                     configPageNode.Name = nestedConfigAttribute.friendlyName;
 
                     _nestedConfigPageNodes.Add(field.Name, configPageNode);
+                }
+            }
+        }
+
+        private string _importString = "";
+        private string _exportString = "";
+
+        public override string GetBase64String()
+        {
+            PortableAttribute portableAttribute = (PortableAttribute)ConfigObject.GetType().GetCustomAttribute(typeof(PortableAttribute), false);
+            return portableAttribute == null || portableAttribute.portable ? ConfigurationManager.GenerateExportString(ConfigObject) : "";
+        }
+
+        public override void LoadBase64String(string[] importStrings)
+        {
+            // go through and check types
+            // if type matches, load it
+            foreach (string importString in importStrings)
+            {
+                // get type from json
+                string jsonString = ConfigurationManager.Base64DecodeAndDecompress(importString);
+                Type importedType = Type.GetType((string)JObject.Parse(jsonString)["$type"]);
+                // abort import if the import string is for the wrong type
+                if (ConfigObject.GetType().FullName == importedType.FullName)
+                {
+                    // see comments on ConfigPageNode's Load
+                    MethodInfo methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
+                    MethodInfo function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
+                    PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(ConfigurationManager.GetInstance(), new object[] { importString });
+                    if (importedConfigObject != null)
+                    {
+                        PluginLog.Log($"Importing {importedConfigObject.GetType()}");
+                        ConfigObject = importedConfigObject;
+                        ConfigurationManager.GetInstance().SaveConfigurations();
+                    }
+                    else
+                    {
+                        PluginLog.Log($"Could not load from import string (of type {importedConfigObject.GetType()})");
+                    }
                 }
             }
         }
@@ -634,6 +800,111 @@ namespace DelvUI.Config.Tree
                     ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 5));
                 }
             }
+
+            // if the ConfigPageNode requires any manual drawing (i.e. not dictated by attributes), draw it now
+            foreach (MethodInfo method in ConfigObject.GetType().GetMethods())
+            {
+                if (!method.GetCustomAttributes(typeof(ManualDrawAttribute), false).Any())
+                {
+                    continue;
+                }
+                // TODO allow the manual draw methods to take parameters
+                method.Invoke(ConfigObject, null);
+            }
+
+            // if the config object is not marked with [Portable(false)], or is marked with [Portable(true)],
+            // draw the import/export UI
+            PortableAttribute portableAttribute = (PortableAttribute)ConfigObject.GetType().GetCustomAttribute(typeof(PortableAttribute), false);
+            if (portableAttribute == null || portableAttribute.portable)
+            {
+                DrawImportExportGeneralConfig();
+            }
+        }
+
+        private void DrawImportExportGeneralConfig()
+        {
+            uint maxLength = 40000;
+            ImGui.BeginChild("importpane", new Vector2(0, ImGui.GetWindowHeight() / 6), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+            {
+                ImGui.Text("Import string:");
+                ImGui.InputText("", ref _importString, maxLength);
+
+                if (ImGui.Button("Import configuration"))
+                {
+                    // get type from json
+                    string jsonString = ConfigurationManager.Base64DecodeAndDecompress(_importString);
+                    Type importedType = Type.GetType((string)JObject.Parse(jsonString)["$type"]);
+                    // abort import if the import string is for the wrong type
+                    if (ConfigObject.GetType().FullName == importedType.FullName)
+                    {
+                        // see comments on ConfigPageNode's Load
+                        MethodInfo methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
+                        MethodInfo function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
+                        PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(ConfigurationManager.GetInstance(), new object[] { _importString });
+                        if (importedConfigObject != null)
+                        {
+                            PluginLog.Log($"Importing {importedConfigObject.GetType()}");
+                            ConfigObject = importedConfigObject;
+                            ConfigurationManager.GetInstance().SaveConfigurations();
+                        }
+                        else
+                        {
+                            PluginLog.Log($"Could not load from import string (of type {importedConfigObject.GetType()})");
+                        }
+                    }
+                    else
+                    {
+                        PluginLog.Log($"Could not convert {importedType} to {ConfigObject.GetType()}! Aborting import.");
+                    }
+                }
+
+                ImGui.SameLine();
+
+                if (ImGui.Button("Paste from clipboard"))
+                {
+                    try
+                    {
+                        _importString = ImGui.GetClipboardText();
+                    }
+                    catch (Exception ex)
+                    {
+                        PluginLog.Log("Could not get clipboard text:\n" + ex.StackTrace);
+                    }
+
+                }
+            }
+
+            ImGui.EndChild();
+
+            ImGui.BeginChild("exportpane", new Vector2(0, ImGui.GetWindowHeight() / 6), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+
+            {
+                ImGui.Text("Export string:");
+                ImGui.InputText("", ref _exportString, maxLength, ImGuiInputTextFlags.ReadOnly);
+
+                if (ImGui.Button("Export configuration"))
+                {
+                    _exportString = ConfigurationManager.GenerateExportString(ConfigObject);
+                    PluginLog.Log($"Exported type {ConfigObject.GetType()}");
+                }
+
+                ImGui.SameLine();
+
+                if (ImGui.Button("Copy to clipboard") && _exportString != "")
+                {
+                    try
+                    {
+                        ImGui.SetClipboardText(_exportString);
+                    }
+                    catch (Exception ex)
+                    {
+                        PluginLog.Log("Could not set clipboard text:\n" + ex.StackTrace);
+                    }
+
+                }
+            }
+
+            ImGui.EndChild();
         }
 
         public override void Save(string path)
