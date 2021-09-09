@@ -1383,7 +1383,7 @@ namespace DelvUI.Interface
 
         #region Primary Resource Threshold
 
-        [Checkbox("Show Primary Resource Threshold Market")]
+        [Checkbox("Show Primary Resource Threshold Marker")]
         [CollapseControl(15, 1)]
         public bool ShowPrimaryResourceBarThresholdMarker = false;
 
