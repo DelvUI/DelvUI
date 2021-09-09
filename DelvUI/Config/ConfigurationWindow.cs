@@ -47,13 +47,9 @@ namespace DelvUI.Config
         {
             _pluginConfiguration.HideHud = !_pluginConfiguration.HideHud;
             _changed = true;
-            
-        }        
-        public bool GetToggleHudState()
-        {
-            return _pluginConfiguration.HideHud;
-
         }
+
+        public bool GetToggleHudState() { return _pluginConfiguration.HideHud; }
 
         public void ToggleJobPacks()
         {
@@ -185,7 +181,7 @@ namespace DelvUI.Config
 
             ImGui.BeginGroup();
 
-            if (ImGui.Button(GetToggleHudState()?"Show HUD":"Hide HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
+            if (ImGui.Button(GetToggleHudState() ? "Show HUD" : "Hide HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
                 ToggleHud();
             }
@@ -200,36 +196,39 @@ namespace DelvUI.Config
             }
 
             ImGui.SameLine();
-            
-            ImGui.BeginChild("versionleft", new Vector2(ImGui.GetWindowWidth() / 7+10, 0));
-            ImGui.EndChild(); 
-            
+
+            ImGui.BeginChild("versionleft", new Vector2(ImGui.GetWindowWidth() / 7 + 10, 0));
+            ImGui.EndChild();
+
             ImGui.SameLine();
 
-            ImGui.BeginChild("versioncenter", new Vector2(ImGui.GetWindowWidth() / 7+85, 0));
+            ImGui.BeginChild("versioncenter", new Vector2(ImGui.GetWindowWidth() / 7 + 85, 0));
             ImGui.Text($"v{Plugin.Version}");
             ImGui.EndChild();
-            
-            
+
             ImGui.SameLine();
-            
-            ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(114f/255f,137f/255f,218f/255f,1f));
-            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(124f/255f,147f/255f,228f/255f,1f));
+
+            ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, 1f));
+            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(124f / 255f, 147f / 255f, 228f / 255f, 1f));
+
             if (ImGui.Button("Help!", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
                 Process.Start("https://discord.gg/delvui");
             }
+
             ImGui.PopStyleColor();
             ImGui.PopStyleColor();
-            
+
             ImGui.SameLine();
-            
-            ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(255f/255f,94f/255f,91f/255f,1f));
-            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(255f/255f,104f/255f,101f/255f,1f));
+
+            ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, 1f));
+            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(255f / 255f, 104f / 255f, 101f / 255f, 1f));
+
             if (ImGui.Button("Donate!", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
                 Process.Start("https://ko-fi.com/DelvUI");
             }
+
             ImGui.PopStyleColor();
             ImGui.PopStyleColor();
 
