@@ -115,30 +115,31 @@ namespace DelvUI.Interface
         {
             var target = PluginInterface.ClientState.LocalPlayer;
             var buffsSize = new Vector2(_config.BuffsBarSize.X / 2f - _config.BuffsPadding / 2f, _config.BuffsBarSize.Y);
+            var order = _config.buffOrder;
 
             // shifu
             var shifu = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1299);
             var shifuDuration = shifu.Duration;
             var shifuPos = new Vector2(
-                OriginX + _config.BuffsBarPosition.X - _config.BuffsBarSize.X / 2f,
+                OriginX + _config.BuffsBarPosition.X + (2 * order[0] - 1) * _config.BuffsBarSize.X / 2f - order[0] * buffsSize.X,
                 OriginY + _config.BuffsBarPosition.Y - _config.BuffsBarSize.Y / 2f
             );
             var shifuBuilder = BarBuilder.Create(shifuPos, buffsSize)
                 .SetBackgroundColor(EmptyColor["background"])
                 .AddInnerBar(shifuDuration, 40f, _config.ShifuColor.Map)
-                .SetFlipDrainDirection(true);
+                .SetFlipDrainDirection(Convert.ToBoolean(order[0]));
 
             // jinpu
             var jinpu = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1298);
             var jinpuDuration = jinpu.Duration;
             var jinpuPos = new Vector2(
-                OriginX + _config.BuffsBarPosition.X + _config.BuffsBarSize.X / 2f - buffsSize.X,
+                OriginX + _config.BuffsBarPosition.X + (2 * order[1] - 1) * _config.BuffsBarSize.X / 2f - order[1] * buffsSize.X,
                 OriginY + _config.BuffsBarPosition.Y - _config.BuffsBarSize.Y / 2f
             );
             var jinpuBuilder = BarBuilder.Create(jinpuPos, buffsSize)
                 .SetBackgroundColor(EmptyColor["background"])
                 .AddInnerBar(jinpuDuration, 40f, _config.JinpuColor.Map)
-                .SetFlipDrainDirection(false);
+                .SetFlipDrainDirection(Convert.ToBoolean(order[1]));
 
             if (_config.ShowBuffsText)
             {
@@ -164,13 +165,14 @@ namespace DelvUI.Interface
             var drawList = ImGui.GetWindowDrawList();
 
             // setsu, getsu, ka
+            var order = _config.senOrder;
             var hasSen = new int[] { gauge.HasSetsu() ? 1 : 0, gauge.HasGetsu() ? 1 : 0, gauge.HasKa() ? 1 : 0 };
             var colors = new PluginConfigColor[] { _config.SetsuColor, _config.GetsuColor, _config.KaColor };
 
             for (int i = 0; i < 3; i++)
             {
                 var builder = BarBuilder.Create(cursorPos, senBarSize).
-                    AddInnerBar(hasSen[i], 1, colors[i].Map);
+                    AddInnerBar(hasSen[order[i]], 1, colors[order[i]].Map);
 
                 builder.Build().Draw(drawList, PluginConfiguration);
                 cursorPos.X += senBarWidth + _config.SenBarPadding;
@@ -299,6 +301,14 @@ namespace DelvUI.Interface
         [Checkbox("Show Higanbana Text")]
         [CollapseWith(10, 4)]
         public bool ShowHiganbanaText = true;
+        #endregion
+
+        #region BarOrders
+        [DragDropHorizontal("Shifu/Jinpu Order", new string[] {"Shifu", "Jinpu"})]
+        public int[] buffOrder = new int[] {0, 1};
+
+        [DragDropHorizontal("Sen Order", new string[] {"Setsu", "Getsu", "Ka"})]
+        public int[] senOrder = new int[] {0, 1, 2};
         #endregion
 
         #region colors
