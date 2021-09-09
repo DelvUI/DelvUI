@@ -122,7 +122,7 @@ namespace DelvUI.Interface
             _hudElementsUsingPlayer.Add(gcdIndicator);
 
             // mp ticker
-            var mpTickerConfig = DefaultHudElements.MPTicker();
+            var mpTickerConfig = ConfigurationManager.GetInstance().GetConfigObject<MPTickerConfig>();
             var mpTicker = new MPTickerHud("mpTicker", mpTickerConfig);
             _hudElements.Add(mpTicker);
             _hudElementsUsingPlayer.Add(mpTicker);
