@@ -73,10 +73,10 @@ namespace DelvUI
         {
             return num switch
             {
-                >= 100000000 => (num / 1000000).ToString("#,0M", CultureInfo.InvariantCulture),
-                >= 1000000 => (num / 1000000).ToString("0.#", CultureInfo.InvariantCulture) + "M",
-                >= 100000 => (num / 1000).ToString("#,0K", CultureInfo.InvariantCulture),
-                >= 10000 => (num / 1000).ToString("0.#", CultureInfo.InvariantCulture) + "K",
+                >= 100000000 => (num / 1000000.0).ToString("#,0M", CultureInfo.InvariantCulture),
+                >= 1000000 => (num / 1000000.0).ToString("0.0", CultureInfo.InvariantCulture) + "M",
+                >= 100000 => (num / 1000.0).ToString("#,0K", CultureInfo.InvariantCulture),
+                >= 10000 => (num / 1000.0).ToString("0.0", CultureInfo.InvariantCulture) + "K",
                 _ => num.ToString("#,0", CultureInfo.InvariantCulture)
             };
         }
