@@ -29,18 +29,12 @@ namespace DelvUI.Interface
 
         public HudManager()
         {
-            _hudElements = new List<HudElement>();
-            _hudElementsUsingPlayer = new List<IHudElementWithActor>();
-            _hudElementsUsingTarget = new List<IHudElementWithActor>();
-            _hudElementsUsingTargetOfTarget = new List<IHudElementWithActor>();
-            _hudElementsUsingFocusTarget = new List<IHudElementWithActor>();
-
             CreateJobsMap();
-            CreateUnitFrames();
-            CreateCastbars();
-            CreateStatusEffectsLists();
-            CaretMiscElements();
+
+            ConfigurationManager.GetInstance().ResetEvent += OnConfigReset;
+            CreateHudElements();
         }
+
         ~HudManager()
         {
             _hudElements.Clear();
@@ -48,6 +42,25 @@ namespace DelvUI.Interface
             _hudElementsUsingTarget.Clear();
             _hudElementsUsingTargetOfTarget.Clear();
             _hudElementsUsingFocusTarget.Clear();
+        }
+
+        private void OnConfigReset(object sender, EventArgs e)
+        {
+            CreateHudElements();
+        }
+
+        private void CreateHudElements()
+        {
+            _hudElements = new List<HudElement>();
+            _hudElementsUsingPlayer = new List<IHudElementWithActor>();
+            _hudElementsUsingTarget = new List<IHudElementWithActor>();
+            _hudElementsUsingTargetOfTarget = new List<IHudElementWithActor>();
+            _hudElementsUsingFocusTarget = new List<IHudElementWithActor>();
+
+            CreateUnitFrames();
+            CreateCastbars();
+            CreateStatusEffectsLists();
+            CaretMiscElements();
         }
 
         private void CreateUnitFrames()
