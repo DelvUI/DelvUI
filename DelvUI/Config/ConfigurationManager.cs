@@ -63,6 +63,7 @@ namespace DelvUI.Config
 
                 typeof(WhiteMageConfig),
                 typeof(ScholarConfig),
+                typeof(AstrologianConfig),
 
                 typeof(SamuraiConfig),
 
