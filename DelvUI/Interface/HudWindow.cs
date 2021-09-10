@@ -249,26 +249,20 @@ namespace DelvUI.Interface
             switch (type)
             {
                 case PrimaryResourceType.MP:
-                {
                     current = actor.CurrentMp;
                     max = actor.MaxMp;
-                }
 
                     break;
 
                 case PrimaryResourceType.CP:
-                {
                     current = actor.CurrentCp;
                     max = actor.MaxCp;
-                }
 
                     break;
 
                 case PrimaryResourceType.GP:
-                {
                     current = actor.CurrentGp;
                     max = actor.MaxGp;
-                }
 
                     break;
             }
@@ -276,17 +270,18 @@ namespace DelvUI.Interface
             BarSize = ConfigGeneral.PrimaryResourceSize;
             Vector2 position = CalculatePosition(ConfigGeneral.PrimaryResourcePosition, ConfigGeneral.PrimaryResourceSize);
 
+            // text config
+            string text = ConfigGeneral.ShowPrimaryResourceBarValue ? current.ToString() : "";
+            BarText barText = new(BarTextPosition.CenterLeft, BarTextType.Custom, text)
+            {
+                TextOffset = ConfigGeneral.PrimaryResourceBarTextOffset
+            };
+
             BarBuilder builder = BarBuilder.Create(position, BarSize)
                                            .AddInnerBar(current, max, partialFillColor.Map)
                                            .SetBackgroundColor(ConfigGeneral.BarBackgroundColor.Background)
                                            .SetTextMode(BarTextMode.Single)
-                                           .SetText(
-                                               BarTextPosition.CenterLeft,
-                                               BarTextType.Custom,
-                                               ConfigGeneral.ShowPrimaryResourceBarValue
-                                                   ? current.ToString()
-                                                   : ""
-                                           );
+                                           .SetText(barText);
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
