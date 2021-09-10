@@ -65,6 +65,10 @@ namespace DelvUI.Config
         public string HealthBarTextLeft = "[name:abbreviate]";
         public string HealthBarTextRight = "[health:max-short] | [health:percent]";
         public bool HideHud = false;
+
+        [JsonIgnore]
+        public Vector4 GenericTankColor = new(11f / 255f, 93f / 255f, 238f / 255f, 100f / 100f);
+
         public Vector4 JobColorAST = new(121f / 255f, 85f / 255f, 72f / 255f, 100f / 100f);
 
         public Vector4 JobColorBLM = new(126f / 255f, 87f / 255f, 194f / 255f, 100f / 100f);

@@ -190,7 +190,13 @@ namespace DelvUI.Interface
                 if (HasTankInvuln(actor) == 1)
                 {
                     Dictionary<string, uint> jobColors = PluginConfiguration.JobColorMap[PluginInterface.ClientState.LocalPlayer.ClassJob.Id];
-                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, jobColors["invuln"]);
+                    jobColors.TryGetValue("invuln", out uint tankInvulnColor);
+                    if (tankInvulnColor == 0u)
+                    {
+                        tankInvulnColor = ImGui.ColorConvertFloat4ToU32(PluginConfiguration.GenericTankColor);
+                    }
+
+                    drawList.AddRectFilled(cursorPos, cursorPos + BarSize, tankInvulnColor);
                 }
 
                 drawList.AddRectFilledMultiColor(
@@ -370,7 +376,14 @@ namespace DelvUI.Interface
 
                             if (HasTankInvuln(actor) == 1)
                             {
-                                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, colors["invuln"]);
+
+                                colors.TryGetValue("invuln", out uint tankInvulnColor);
+                                if (tankInvulnColor == 0u)
+                                {
+                                    tankInvulnColor = ImGui.ColorConvertFloat4ToU32(PluginConfiguration.GenericTankColor);
+                                }
+
+                                drawList.AddRectFilled(cursorPos, cursorPos + BarSize, tankInvulnColor);
                             }
 
                             drawListPtr.AddRectFilledMultiColor(
@@ -466,7 +479,13 @@ namespace DelvUI.Interface
 
                     if (HasTankInvuln(actor) == 1)
                     {
-                        drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["invuln"]);
+                        colors.TryGetValue("invuln", out uint tankInvulnColor);
+                        if (tankInvulnColor == 0u)
+                        {
+                            tankInvulnColor = ImGui.ColorConvertFloat4ToU32(PluginConfiguration.GenericTankColor);
+                        }
+
+                        drawList.AddRectFilled(cursorPos, cursorPos + barSize, tankInvulnColor);
                     }
 
                     drawList.AddRectFilledMultiColor(
@@ -555,7 +574,14 @@ namespace DelvUI.Interface
 
                 if (HasTankInvuln(actor) == 1)
                 {
-                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, colors["invuln"]);
+
+                    colors.TryGetValue("invuln", out uint tankInvulnColor);
+                    if (tankInvulnColor == 0u)
+                    {
+                        tankInvulnColor = ImGui.ColorConvertFloat4ToU32(PluginConfiguration.GenericTankColor);
+                    }
+
+                    drawList.AddRectFilled(cursorPos, cursorPos + barSize, tankInvulnColor);
                 }
 
                 drawList.AddRectFilledMultiColor(
