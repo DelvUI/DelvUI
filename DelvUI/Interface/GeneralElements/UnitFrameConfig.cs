@@ -128,17 +128,21 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor CustomBackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [Checkbox("Show Tank Invulnerability")]
-        [CollapseControl(40, 2)]
+        [Order(40)]
         public bool ShowTankInvulnerability = true;
 
-        [ColorEdit4("Invulnerability Color")]
-        [CollapseWith(0, 2)]
-        public PluginConfigColor InvulnerabilityColor = new PluginConfigColor(new Vector4(100f / 255f, 100f / 255f, 1000f / 255f, 100f / 100f));
+        [Checkbox("Use Custom Invulnerability Color")]
+        [CollapseControl(45, 2)]
+        public bool UseCustomInvulnerabilityColor = true;
 
-        [NestedConfig("Shields", 45)]
+        [ColorEdit4("Custom Invulnerability Color")]
+        [CollapseWith(0, 2)]
+        public PluginConfigColor CustomInvulnerabilityColor = new PluginConfigColor(new Vector4(100f / 255f, 100f / 255f, 100f / 255f, 100f / 100f));
+
+        [NestedConfig("Shields", 50)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
-        [NestedConfig("Tank Stance", 50)]
+        [NestedConfig("Tank Stance", 51)]
         public TankStanceIndicatorConfig TankStanceIndicatorConfig = null;
 
         public UnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)

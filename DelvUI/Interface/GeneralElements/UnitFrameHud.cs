@@ -217,8 +217,17 @@ namespace DelvUI.Interface.GeneralElements
         {
             if (Config.ShowTankInvulnerability && Utils.HasTankInvulnerability(chara))
             {
-                var color = GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id);
-                return ImGui.ColorConvertFloat4ToU32(color.Vector.AdjustColor(-.8f));
+                uint color;
+                if (Config.UseCustomInvulnerabilityColor)
+                {
+                    color = Config.CustomInvulnerabilityColor.Base;
+                }
+                else
+                {
+                    color = ImGui.ColorConvertFloat4ToU32(GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Vector.AdjustColor(-.8f));
+                }
+
+                return color;
             }
 
             if (Config.UseCustomBackgroundColor)
