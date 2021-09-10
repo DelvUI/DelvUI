@@ -26,7 +26,9 @@ namespace DelvUI.Config
         public bool LockHUD = true;
         public bool ShowHUD = true;
 
-        public ConfigurationManager(bool defaultConfig, TextureWrap bannerImage, string configDirectory, BaseNode configBaseNode)
+        public event EventHandler ResetEvent;
+
+        public ConfigurationManager(bool defaultConfig, TextureWrap bannerImage, string configDirectory, BaseNode configBaseNode, EventHandler resetEvent = null)
         {
             BannerImage = bannerImage;
             ConfigDirectory = configDirectory;
@@ -35,6 +37,12 @@ namespace DelvUI.Config
             if (!defaultConfig)
             {
                 LoadConfigurations();
+            }
+            ResetEvent = resetEvent;
+
+            if (ResetEvent != null)
+            {
+                ResetEvent(this, null);
             }
         }
 
@@ -106,7 +114,8 @@ namespace DelvUI.Config
 
             TextureWrap banner = Plugin.bannerTexture;
 
-            return new ConfigurationManager(defaultConfig, banner, Plugin.GetPluginInterface().GetPluginConfigDirectory(), node);
+            var currentResetEvent = GetInstance()?.ResetEvent;
+            return new ConfigurationManager(defaultConfig, banner, Plugin.GetPluginInterface().GetPluginConfigDirectory(), node, currentResetEvent);
         }
 
         public static ConfigurationManager GetInstance() => _instance;
