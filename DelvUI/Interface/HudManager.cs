@@ -290,7 +290,7 @@ namespace DelvUI.Interface
                 // ranged
                 [JobIDs.MCH] = new JobHudTypes(typeof(MachinistHud), typeof(MachinistConfig)),
                 [JobIDs.DNC] = new JobHudTypes(typeof(DancerHud), typeof(DancerConfig)),
-                [JobIDs.DNC] = new JobHudTypes(typeof(BardHud), typeof(BardConfig)),
+                [JobIDs.BRD] = new JobHudTypes(typeof(BardHud), typeof(BardConfig)),
 
                 // casters
                 [JobIDs.BLM] = new JobHudTypes(typeof(BlackMageHud), typeof(BlackMageConfig)),
