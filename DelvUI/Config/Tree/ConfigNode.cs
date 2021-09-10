@@ -162,7 +162,7 @@ namespace DelvUI.Config.Tree
                         ImGui.Image(delvUiBanner.ImGuiHandle, new Vector2(delvUiBanner.Width, delvUiBanner.Height));
                     }
 
-                    ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing() - 32), true);
+                    ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
 
                     // if no section is selected, select the first
                     if (children.Any() && children.All(o => !o.Selected))
@@ -368,7 +368,7 @@ namespace DelvUI.Config.Tree
 
             ImGui.BeginChild(
                 "item view",
-                new Vector2(0, -ImGui.GetFrameHeightWithSpacing() - 32),
+                new Vector2(0, -ImGui.GetFrameHeightWithSpacing()),
                 false,
                 ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
             ); // Leave room for 1 line below us
