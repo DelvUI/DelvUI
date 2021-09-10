@@ -211,7 +211,7 @@ namespace DelvUI.Interface
 
             if (config != null)
             {
-                _primaryResourceHud.ResourceType = config.UseDefaulyPrimaryResourceBar ? config.PrimaryResourceType : PrimaryResourceTypes.None;
+                _primaryResourceHud.ResourceType = config.UseDefaultPrimaryResourceBar ? config.PrimaryResourceType : PrimaryResourceTypes.None;
             }
         }
 

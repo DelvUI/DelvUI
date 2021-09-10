@@ -7,7 +7,7 @@ namespace DelvUI.Interface.Jobs
     {
         public CraftersConfig()
         {
-            UseDefaulyPrimaryResourceBar = true;
+            UseDefaultPrimaryResourceBar = true;
             PrimaryResourceType = PrimaryResourceTypes.CP;
         }
     }

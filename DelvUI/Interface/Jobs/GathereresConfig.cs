@@ -7,7 +7,7 @@ namespace DelvUI.Interface.Jobs
     {
         public GatherersConfig()
         {
-            UseDefaulyPrimaryResourceBar = true;
+            UseDefaultPrimaryResourceBar = true;
             PrimaryResourceType = PrimaryResourceTypes.GP;
         }
     }

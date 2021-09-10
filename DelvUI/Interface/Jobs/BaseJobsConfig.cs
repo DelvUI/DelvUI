@@ -7,7 +7,7 @@ namespace DelvUI.Interface.Jobs
     {
         public BaseJobsConfig()
         {
-            UseDefaulyPrimaryResourceBar = true;
+            UseDefaultPrimaryResourceBar = true;
         }
     }
 

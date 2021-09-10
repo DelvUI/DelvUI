@@ -15,7 +15,7 @@ namespace DelvUI.Interface.Jobs
 
         [Checkbox("Use Default Primary Resource Bar")]
         [Order(20)]
-        public bool UseDefaulyPrimaryResourceBar = false;
+        public bool UseDefaultPrimaryResourceBar = false;
 
         [JsonIgnore]
         public PrimaryResourceTypes PrimaryResourceType = PrimaryResourceTypes.MP;
