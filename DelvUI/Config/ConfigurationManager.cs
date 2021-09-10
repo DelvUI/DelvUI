@@ -123,10 +123,6 @@ namespace DelvUI.Config
 
         public void SaveConfigurations() { ConfigBaseNode.Save(ConfigDirectory); }
 
-        public PluginConfigObject GetConfiguration(PluginConfigObject configObject)
-        {
-            return GetConfigObjectForType(configObject.GetType());
-        }
         public PluginConfigObject GetConfigObjectForType(Type type)
         {
             var genericMethod = GetType().GetMethod("GetConfigObject");
