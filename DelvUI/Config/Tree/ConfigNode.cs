@@ -290,20 +290,12 @@ namespace DelvUI.Config.Tree
         {
             object[] attributes = typeof(T).GetCustomAttributes(true);
 
-            PluginLog.Log("\n\nBASE NODE");
-
             foreach (object attribute in attributes)
             {
-                PluginLog.Log("ATTRIBUTE: " + attribute.GetType());
-
                 if (attribute is SectionAttribute sectionAttribute)
                 {
-                    PluginLog.Log("SECTION ATTRIBUTE: " + sectionAttribute.SectionName);
-
                     foreach (SectionNode sectionNode in children)
                     {
-                        PluginLog.Log("SECTION NODE: " + sectionNode.Name);
-
                         if (sectionNode.Name == sectionAttribute.SectionName)
                         {
                             return sectionNode.GetOrAddConfig<T>();
@@ -435,21 +427,13 @@ namespace DelvUI.Config.Tree
         public ConfigPageNode GetOrAddConfig<T>() where T : PluginConfigObject
         {
             object[] attributes = typeof(T).GetCustomAttributes(true);
-            PluginLog.Log("\n\nSECTION NODE");
-
 
             foreach (object attribute in attributes)
             {
-                PluginLog.Log("ATTRIBUTE: " + attribute.GetType());
-
                 if (attribute is SubSectionAttribute subSectionAttribute)
                 {
-                    PluginLog.Log("SUBSECTION ATTRIBUTE: " + subSectionAttribute.SubSectionName);
-
                     foreach (SubSectionNode subSectionNode in children)
                     {
-                        PluginLog.Log("SUBSECTION NODE: " + subSectionNode.Name);
-
                         if (subSectionNode.Name == subSectionAttribute.SubSectionName)
                         {
                             return subSectionNode.GetOrAddConfig<T>();
