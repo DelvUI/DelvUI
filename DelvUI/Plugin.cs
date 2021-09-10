@@ -244,15 +244,15 @@ namespace DelvUI
                 //JobIDs.BLM => new BlackMageHud(_pluginInterface, _pluginConfiguration),
 
                 //Low jobs
-                JobIDs.MRD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.GLD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.CNJ => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.PGL => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.LNC => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.ROG => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.ARC => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.THM => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.ACN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.MRD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.GLD => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.CNJ => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.PGL => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.LNC => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.ROG => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.ARC => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.THM => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.ACN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //Hand
                 //JobIDs.CRP => new HandHudWindow(_pluginInterface, _pluginConfiguration),
@@ -270,7 +270,7 @@ namespace DelvUI
                 //JobIDs.FSH => new LandHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //dont have packs yet
-                JobIDs.BLU => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.BLU => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
                 _ => _hudWindow
             };
         }

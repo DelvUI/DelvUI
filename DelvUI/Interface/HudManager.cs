@@ -274,6 +274,8 @@ namespace DelvUI.Interface
 
             _unsupportedJobsMap = new Dictionary<uint, Type>()
             {
+                [JobIDs.BLU] = typeof(BlueMageConfig),
+
                 // base jobs
                 [JobIDs.GLD] = typeof(GladiatorConfig),
                 [JobIDs.MRD] = typeof(MarauderConfig),

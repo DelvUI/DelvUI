@@ -11,6 +11,11 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
+    public class BlueMageConfig : BaseJobsConfig
+    {
+        [JsonIgnore] public new uint JobId = JobIDs.BLU;
+    }
+
     public class GladiatorConfig : BaseJobsConfig
     {
         [JsonIgnore] public new uint JobId = JobIDs.GLD;
