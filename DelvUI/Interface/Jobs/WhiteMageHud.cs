@@ -1,67 +1,56 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
+using Newtonsoft.Json;
 using System;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
-namespace DelvUI.Interface
+namespace DelvUI.Interface.Jobs
 {
-    public class WhiteMageHudWindow : HudWindow
+    public class WhiteMageHud : JobHud
     {
-        public WhiteMageHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
-
-        public override uint JobId => 24;
-        private WhiteMageHudConfig _config => (WhiteMageHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new WhiteMageHudConfig());
-
-        private Vector2 Origin => new Vector2(CenterX + _config.BasePosition.X, CenterY + _config.BasePosition.Y);
+        private new WhiteMageConfig Config => (WhiteMageConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
-        protected override void Draw(bool _)
+        public WhiteMageHud(string id, WhiteMageConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
         {
-            if (_config.ShowLilyBars)
+
+        }
+
+        public override void Draw(Vector2 origin)
+        {
+            if (Config.ShowLilyBars)
             {
-                DrawLilyBars();
+                DrawLilyBars(origin);
             }
 
-            if (_config.ShowDiaBar)
+            if (Config.ShowDiaBar)
             {
-                DrawDiaBar();
+                DrawDiaBar(origin);
             }
         }
 
-        protected override void DrawPrimaryResourceBar()
-        {
-            if (!_config.ShowPrimaryResourceBar)
-            {
-                return;
-            }
-
-            base.DrawPrimaryResourceBar();
-        }
-
-        private void DrawDiaBar()
+        private void DrawDiaBar(Vector2 origin)
         {
             Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
-            Vector2 barCoords = _config.BasePosition + _config.DiaBarPosition - _config.DiaBarSize / 2f;
-            Vector2 cursorPos = new(CenterX + barCoords.X, CenterY + barCoords.Y);
+            Vector2 cursorPos = origin + Config.Position + Config.DiaBarPosition - Config.DiaBarSize / 2f;
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
             if (target is not Chara)
             {
-                drawList.AddRectFilled(cursorPos, cursorPos + _config.DiaBarSize, EmptyColor.Background);
-                drawList.AddRect(cursorPos, cursorPos + _config.DiaBarSize, 0xFF000000);
+                drawList.AddRectFilled(cursorPos, cursorPos + Config.DiaBarSize, EmptyColor.Background);
+                drawList.AddRect(cursorPos, cursorPos + Config.DiaBarSize, 0xFF000000);
 
                 return;
             }
@@ -75,33 +64,33 @@ namespace DelvUI.Interface
             float diaCooldown = dia.EffectId == 1871 ? 30f : 18f;
             float diaDuration = dia.Duration;
 
-            drawList.AddRectFilled(cursorPos, cursorPos + _config.DiaBarSize, EmptyColor.Background);
+            drawList.AddRectFilled(cursorPos, cursorPos + Config.DiaBarSize, EmptyColor.Background);
 
             drawList.AddRectFilled(
                 cursorPos,
-                cursorPos + new Vector2(_config.DiaBarSize.X / diaCooldown * diaDuration, _config.DiaBarSize.Y),
-                _config.DiaColor.Map["gradientRight"]
+                cursorPos + new Vector2(Config.DiaBarSize.X / diaCooldown * diaDuration, Config.DiaBarSize.Y),
+                Config.DiaColor.Map["gradientRight"]
             );
 
-            drawList.AddRect(cursorPos, cursorPos + _config.DiaBarSize, 0xFF000000);
+            drawList.AddRect(cursorPos, cursorPos + Config.DiaBarSize, 0xFF000000);
 
             DrawHelper.DrawOutlinedText(
                 string.Format(CultureInfo.InvariantCulture, "{0,2:N0}", diaDuration), // keeps 10 -> 9 from jumping
                 new Vector2(
                     // smooths transition of counter to the right of the emptying bar
                     cursorPos.X
-                  + _config.DiaBarSize.X * diaDuration / diaCooldown
+                  + Config.DiaBarSize.X * diaDuration / diaCooldown
                   - (Math.Abs(diaDuration - diaCooldown) < float.Epsilon
                         ? diaCooldown
                         : diaDuration > 3
                             ? 20
                             : diaDuration * (20f / 3f)),
-                    cursorPos.Y + _config.DiaBarSize.Y / 2 - 12
+                    cursorPos.Y + Config.DiaBarSize.Y / 2 - 12
                 )
             );
         }
 
-        private void DrawLilyBars()
+        private void DrawLilyBars(Vector2 origin)
         {
             WHMGauge gauge = PluginInterface.ClientState.JobGauges.Get<WHMGauge>();
 
@@ -114,37 +103,37 @@ namespace DelvUI.Interface
 
             float lilyScale = getScale(gauge.NumLilies, gauge.LilyTimer, lilyCooldown);
 
-            var posX = Origin.X + _config.LilyBarPosition.X - _config.LilyBarSize.X / 2f;
-            var posY = Origin.Y + _config.LilyBarPosition.Y - _config.LilyBarSize.Y / 2f;
+            var posX = origin.X + Config.Position.X + Config.LilyBarPosition.X - Config.LilyBarSize.X / 2f;
+            var posY = origin.Y + Config.Position.Y + Config.LilyBarPosition.Y - Config.LilyBarSize.Y / 2f;
 
-            BarBuilder builder = BarBuilder.Create(posX, posY, _config.LilyBarSize.Y, _config.LilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
+            BarBuilder builder = BarBuilder.Create(posX, posY, Config.LilyBarSize.Y, Config.LilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
-            builder.SetChunks(3).SetChunkPadding(_config.LilyBarPad).AddInnerBar(lilyScale, 3, _config.LilyColor.Map, PartialFillColor.Map);
+            builder.SetChunks(3).SetChunkPadding(Config.LilyBarPad).AddInnerBar(lilyScale, 3, Config.LilyColor.Map, PartialFillColor.Map);
 
-            if (_config.ShowLilyBarTimer)
+            if (Config.ShowLilyBarTimer)
             {
                 string timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
                 Vector2 size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
-                float lilyChunkSize = (_config.LilyBarSize.X / 3f) + _config.LilyBarPad;
+                float lilyChunkSize = (Config.LilyBarSize.X / 3f) + Config.LilyBarPad;
                 float lilyChunkOffset = lilyChunkSize * ((int)gauge.NumLilies + 1);
 
                 if (gauge.NumLilies < 3)
                 {
                     DrawHelper.DrawOutlinedText(timer, new Vector2(
                         posX + lilyChunkOffset - (lilyChunkSize / 2f) - (size.X / 2f),
-                        posY - _config.LilyBarSize.Y - 4f));
+                        posY - Config.LilyBarSize.Y - 4f));
                 }
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
 
-            posX = Origin.X + _config.BloodLilyBarPosition.X - _config.BloodLilyBarSize.X / 2f;
-            posY = Origin.Y + _config.BloodLilyBarPosition.Y - _config.BloodLilyBarSize.Y / 2f;
+            posX = origin.X + Config.Position.X + Config.BloodLilyBarPosition.X - Config.BloodLilyBarSize.X / 2f;
+            posY = origin.Y + Config.Position.Y + Config.BloodLilyBarPosition.Y - Config.BloodLilyBarSize.Y / 2f;
 
-            builder = BarBuilder.Create(posX, posY, _config.BloodLilyBarSize.Y, _config.BloodLilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
+            builder = BarBuilder.Create(posX, posY, Config.BloodLilyBarSize.Y, Config.BloodLilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
-            builder.SetChunks(3).SetChunkPadding(_config.BloodLilyBarPad).AddInnerBar(gauge.NumBloodLily, 3, _config.BloodLilyColor.Map);
+            builder.SetChunks(3).SetChunkPadding(Config.BloodLilyBarPad).AddInnerBar(gauge.NumBloodLily, 3, Config.BloodLilyColor.Map);
 
             drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
@@ -155,20 +144,14 @@ namespace DelvUI.Interface
     [Section("Job Specific Bars")]
     [SubSection("Healer", 0)]
     [SubSection("White Mage", 1)]
-    public class WhiteMageHudConfig : PluginConfigObject
+    public class WhiteMageConfig : JobConfig
     {
-        [DragFloat2("Base Position", min = -4000f, max = 4000f)]
-        [Order(0)]
-        public Vector2 BasePosition = new(0, 0);
-
-        [Checkbox("Show Primary Resource Bar")]
-        [Order(5)]
-        public bool ShowPrimaryResourceBar = true;
+        [JsonIgnore] public new uint JobId = JobIDs.WHM;
+        public new static WhiteMageConfig DefaultConfig() { return new WhiteMageConfig(); }
 
         #region Lily Bar
-
         [Checkbox("Show Lily Bars")]
-        [CollapseControl(10, 0)]
+        [CollapseControl(30, 0)]
         public bool ShowLilyBars = true;
 
         [Checkbox("Show Lily Bar Timer")]
@@ -181,7 +164,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Lily Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
-        public Vector2 LilyBarPosition = new(-64, 405);
+        public Vector2 LilyBarPosition = new(-64, HUDConstants.JobHudsBaseY - 32);
 
         [DragInt("Lily Bar Padding", min = 0, max = 1000)]
         [CollapseWith(15, 0)]
@@ -194,18 +177,16 @@ namespace DelvUI.Interface
         [ColorEdit4("Lily Bar Charging Color")]
         [CollapseWith(25, 0)]
         public PluginConfigColor LilyChargingColor = new(new Vector4(141f / 255f, 141f / 255f, 141f / 255f, 1f));
-
         #endregion
 
         #region Blood Lily Bar
-
         [DragFloat2("Blood Lily Bar Size", max = 2000f)]
         [CollapseWith(30, 0)]
         public Vector2 BloodLilyBarSize = new(125, 20);
 
         [DragFloat2("Blood Lily Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(35, 0)]
-        public Vector2 BloodLilyBarPosition = new(64, 405);
+        public Vector2 BloodLilyBarPosition = new(64, HUDConstants.JobHudsBaseY - 32);
 
         [DragInt("Blood Lily Bar Padding", min = 0, max = 1000)]
         [CollapseWith(40, 0)]
@@ -214,13 +195,11 @@ namespace DelvUI.Interface
         [ColorEdit4("Blood Lily Bar Color")]
         [CollapseWith(45, 0)]
         public PluginConfigColor BloodLilyColor = new(new Vector4(199f / 255f, 40f / 255f, 9f / 255f, 1f));
-
         #endregion
 
         #region Dia Bar
-
         [Checkbox("Show Dia Bar")]
-        [CollapseControl(15, 1)]
+        [CollapseControl(35, 1)]
         public bool ShowDiaBar = true;
 
         [DragFloat2("Dia Bar Size", max = 2000f)]
@@ -229,12 +208,11 @@ namespace DelvUI.Interface
 
         [DragFloat2("Dia Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 DiaBarPosition = new(0, 427);
+        public Vector2 DiaBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
 
         [ColorEdit4("Dia Bar Color")]
         [CollapseWith(10, 1)]
         public PluginConfigColor DiaColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
-
         #endregion
     }
 }

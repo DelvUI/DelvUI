@@ -264,6 +264,7 @@ namespace DelvUI.Interface
                 [JobIDs.GNB] = new JobHudTypes(typeof(GunbreakerHud), typeof(GunbreakerConfig)),
 
                 [JobIDs.SCH] = new JobHudTypes(typeof(ScholarHud), typeof(ScholarConfig)),
+                [JobIDs.WHM] = new JobHudTypes(typeof(WhiteMageHud), typeof(WhiteMageConfig)),
 
                 [JobIDs.SAM] = new JobHudTypes(typeof(SamuraiHud), typeof(SamuraiConfig)),
 

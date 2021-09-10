@@ -223,7 +223,7 @@ namespace DelvUI
                 JobIDs.PLD => new PaladinHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //Healers
-                JobIDs.WHM => new WhiteMageHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.WHM => new WhiteMageHud(_pluginInterface, _pluginConfiguration),
                 //JobIDs.SCH => new ScholarHudWindow(_pluginInterface, _pluginConfiguration),
                 JobIDs.AST => new AstrologianHudWindow(_pluginInterface, _pluginConfiguration),
 
