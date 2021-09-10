@@ -240,7 +240,7 @@ namespace DelvUI
 
                 //Caster DPS
                 //JobIDs.RDM => new RedMageHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.SMN => new SummonerHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.SMN => new SummonerHudWindow(_pluginInterface, _pluginConfiguration),
                 //JobIDs.BLM => new BlackMageHud(_pluginInterface, _pluginConfiguration),
 
                 //Low jobs

@@ -249,9 +249,13 @@ namespace DelvUI.Interface
         {
             _jobsMap = new Dictionary<uint, JobHudTypes>()
             {
+                [JobIDs.SAM] = new JobHudTypes(typeof(SamuraiHud), typeof(SamuraiConfig)),
+
                 [JobIDs.BLM] = new JobHudTypes(typeof(BlackMageHud), typeof(BlackMageConfig)),
                 [JobIDs.RDM] = new JobHudTypes(typeof(RedMageHud), typeof(RedMageConfig)),
-                [JobIDs.SAM] = new JobHudTypes(typeof(SamuraiHud), typeof(SamuraiConfig))
+                [JobIDs.SMN] = new JobHudTypes(typeof(SummonerHud), typeof(SummonerConfig))
+
+
             };
         }
     }

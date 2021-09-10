@@ -1,5 +1,4 @@
 ﻿using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
