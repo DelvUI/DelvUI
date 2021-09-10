@@ -235,7 +235,8 @@ namespace DelvUI
 
                 //Ranged DPS
                 JobIDs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.DNC => new DancerHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.DNC => new DancerHud(_pluginInterface, _pluginConfiguration),
+                //JobIDs.MCH => new MachinistHud(_pluginInterface, _pluginConfiguration),
 
                 //Caster DPS
                 //JobIDs.RDM => new RedMageHudWindow(_pluginInterface, _pluginConfiguration),

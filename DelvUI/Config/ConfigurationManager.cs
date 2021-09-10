@@ -71,6 +71,8 @@ namespace DelvUI.Config
                 typeof(SamuraiConfig),
 
                 typeof(MachinistConfig),
+                typeof(DancerConfig),
+
                 typeof(BlackMageConfig),
                 typeof(RedMageConfig),
                 typeof(SummonerConfig),
