@@ -37,7 +37,7 @@ namespace DelvUI.Interface.GeneralElements
             var castInfo = battleChara->SpellCastInfo;
             var isCasting = castInfo.IsCasting > 0;
 
-            if (castInfo.IsCasting <= 0)
+            if (castInfo.IsCasting <= 0 && !Config.Preview)
             {
                 return;
             }
@@ -81,20 +81,28 @@ namespace DelvUI.Interface.GeneralElements
 
             // icon
             var iconSize = Vector2.Zero;
-            if (Config.ShowIcon && _lastUsedCast.IconTexture != null)
+            if (Config.ShowIcon)
             {
-                ImGui.SetCursorPos(startPos);
-                iconSize = new Vector2(Config.Size.Y, Config.Size.Y);
-                ImGui.Image(_lastUsedCast.IconTexture.ImGuiHandle, iconSize);
-                drawList.AddRect(startPos, startPos + iconSize, 0xFF000000);
+                if (_lastUsedCast.IconTexture != null)
+                {
+                    ImGui.SetCursorPos(startPos);
+                    iconSize = new Vector2(Config.Size.Y, Config.Size.Y);
+                    ImGui.Image(_lastUsedCast.IconTexture.ImGuiHandle, iconSize);
+                    drawList.AddRect(startPos, startPos + iconSize, 0xFF000000);
+                }
+                else if (Config.Preview)
+                {
+                    drawList.AddRect(startPos, startPos + new Vector2(Config.Size.Y, Config.Size.Y), 0xFF000000);
+                }
             }
 
             // cast name
-            Config.CastNameConfig.SetText(_lastUsedCast.ActionText);
+            Config.CastNameConfig.SetText(Config.Preview ? "Name" : _lastUsedCast.ActionText);
             _castNameLabel.Draw(origin + Config.Position);
 
             // cast time
-            Config.CastTimeConfig.SetText(Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture));
+            var text = Config.Preview ? "Time" : Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
+            Config.CastTimeConfig.SetText(text);
             _castTimeLabel.Draw(origin + Config.Position);
         }
 
@@ -120,7 +128,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void DrawExtras(Vector2 origin, float totalCastTime)
         {
-            if (!Config.ShowSlideCast || Config.SlideCastTime <= 0)
+            if (!Config.ShowSlideCast || Config.SlideCastTime <= 0 || Config.Preview)
             {
                 return;
             }

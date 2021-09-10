@@ -11,11 +11,11 @@ namespace DelvUI.Interface.GeneralElements
     public class PlayerCastbarConfig : CastbarConfig
     {
         [Checkbox("Use Job Color")]
-        [Order(40)]
+        [Order(45)]
         public bool UseJobColor = false;
 
         [Checkbox("Show Slide Cast")]
-        [CollapseControl(45, 0)]
+        [CollapseControl(50, 0)]
         public bool ShowSlideCast = true;
 
         [DragInt("Slide Cast Time (milliseconds)", min = 0, max = 10000)]
@@ -50,7 +50,7 @@ namespace DelvUI.Interface.GeneralElements
     public class TargetCastbarConfig : CastbarConfig
     {
         [Checkbox("Show Interruptable Color")]
-        [CollapseControl(40, 0)]
+        [CollapseControl(45, 0)]
         public bool ShowInterruptableColor = true;
 
         [ColorEdit4("Interruptable Color")]
@@ -58,7 +58,7 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor InterruptableColor = new PluginConfigColor(new(255f / 255f, 0 / 255f, 255f / 255f, 100f / 100f));
 
         [Checkbox("Use Damage Type Colors")]
-        [CollapseControl(45, 1)]
+        [CollapseControl(50, 1)]
         public bool UseColorForDamageTypes = true;
 
         [ColorEdit4("Physical Damage Color")]
@@ -93,18 +93,22 @@ namespace DelvUI.Interface.GeneralElements
     [Serializable]
     public abstract class CastbarConfig : MovablePluginConfigObject
     {
-        [NestedConfig("Cast Name Label", 20)]
+        [Checkbox("Preview")]
+        [Order(20)]
+        public bool Preview = false;
+
+        [NestedConfig("Cast Name Label", 25)]
         public LabelConfig CastNameConfig;
 
-        [NestedConfig("Cast Time Label", 25)]
+        [NestedConfig("Cast Time Label", 30)]
         public LabelConfig CastTimeConfig;
 
         [Checkbox("Show Icon")]
-        [Order(30)]
+        [Order(35)]
         public bool ShowIcon = true;
 
         [ColorEdit4("Color")]
-        [Order(35)]
+        [Order(40)]
         public PluginConfigColor Color = new PluginConfigColor(new(255f / 255f, 158f / 255f, 208f / 255f, 100f / 100f));
 
         public CastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
