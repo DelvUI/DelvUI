@@ -45,6 +45,9 @@ namespace DelvUI.Config
         [JsonIgnore]
         public Dictionary<string, Dictionary<string, uint>> CastBarColorMap;
 
+        public bool ShowFocusBar = true;
+        public bool ShowTargetOfTargetBar = true;
+
         public bool ColorCastBarByDamageType = false;
         public bool ColorCastBarByJob = false;
         public Vector4 CustomHealthBarBackgroundColor = new(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f);

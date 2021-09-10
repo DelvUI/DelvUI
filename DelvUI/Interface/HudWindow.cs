@@ -423,6 +423,11 @@ namespace DelvUI.Interface
 
         protected virtual void DrawFocusBar()
         {
+            if (!PluginConfiguration.ShowFocusBar)
+            {
+                return;
+            }
+
             Actor focus = PluginInterface.ClientState.Targets.FocusTarget;
 
             if (focus is null)
@@ -519,6 +524,11 @@ namespace DelvUI.Interface
 
         protected virtual void DrawTargetOfTargetBar(int targetActorId)
         {
+            if (!PluginConfiguration.ShowTargetOfTargetBar)
+            {
+                return;
+            }
+
             Actor target = null;
 
             if (targetActorId == 0 && PluginInterface.ClientState.LocalPlayer.TargetActorID == 0)
