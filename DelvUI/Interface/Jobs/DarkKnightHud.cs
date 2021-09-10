@@ -1,81 +1,76 @@
 ﻿using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
-namespace DelvUI.Interface
+namespace DelvUI.Interface.Jobs
 {
-    public class DarkKnightHudWindow : HudWindow
+    public class DarkKnightHud : JobHud
     {
-        public override uint JobId => JobIDs.DRK;
+        private new DarkKnightConfig Config => (DarkKnightConfig)_config;
 
-        private DarkKnightHudConfig _config => (DarkKnightHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new DarkKnightHudConfig());
-        private Vector2 Origin => new Vector2(CenterX + _config.Position.X, CenterY + _config.Position.Y);
+        public DarkKnightHud(string id, DarkKnightConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        {
+
+        }
 
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
-        public DarkKnightHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration)
+        public override void Draw(Vector2 origin)
         {
-
-        }
-
-        protected override void Draw(bool _)
-        {
-            if (_config.ShowManaBar)
+            if (Config.ShowManaBar)
             {
-                DrawManaBar();
+                DrawManaBar(origin);
             }
 
-            if (_config.ShowBloodGauge)
+            if (Config.ShowBloodGauge)
             {
-                DrawBloodGauge();
+                DrawBloodGauge(origin);
             }
 
-            if (_config.ShowBuffBar)
+            if (Config.ShowBuffBar)
             {
-                DrawBuffBar();
+                DrawBuffBar(origin);
             }
 
-            if (_config.ShowLivingShadowBar)
+            if (Config.ShowLivingShadowBar)
             {
-                DrawLivingShadowBar();
+                DrawLivingShadowBar(origin);
             }
         }
 
-        protected override void DrawPrimaryResourceBar() { }
-
-        private void DrawManaBar()
+        private void DrawManaBar(Vector2 origin)
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var actor = PluginInterface.ClientState.LocalPlayer;
             var darkArtsBuff = PluginInterface.ClientState.JobGauges.Get<DRKGauge>().HasDarkArts();
 
-            var posX = Origin.X + _config.ManaBarPosition.X - _config.ManaBarSize.X / 2f;
-            var posY = Origin.Y + _config.ManaBarPosition.Y - _config.ManaBarSize.Y / 2f;
+            var posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
+            var posY = origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f;
 
-            BarBuilder builder = BarBuilder.Create(posX, posY, _config.ManaBarSize.Y, _config.ManaBarSize.X).SetBackgroundColor(EmptyColor.Background);
+            BarBuilder builder = BarBuilder.Create(posX, posY, Config.ManaBarSize.Y, Config.ManaBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
-            if (_config.ChunkManaBar)
+            if (Config.ChunkManaBar)
             {
-                builder.SetChunks(3).SetChunkPadding(_config.ManaBarPadding).AddInnerBar(actor.CurrentMp, 9000, _config.ManaBarColor.Map, PartialFillColor.Map);
+                builder.SetChunks(3).SetChunkPadding(Config.ManaBarPadding).AddInnerBar(actor.CurrentMp, 9000, Config.ManaBarColor.Map, PartialFillColor.Map);
             }
             else
             {
-                builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, _config.ManaBarColor.Map);
+                builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, Config.ManaBarColor.Map);
             }
 
-            if (_config.ShowManaBarText)
+            if (Config.ShowManaBarText)
             {
                 var formattedManaText = TextTags.GenerateFormattedTextFromTags(actor, "[mana:current-short]");
 
@@ -85,38 +80,38 @@ namespace DelvUI.Interface
             if (darkArtsBuff)
             {
                 builder.SetGlowSize(2);
-                builder.SetGlowColor(_config.DarkArtsColor.Base);
-                builder.SetChunksColors(_config.DarkArtsColor.Map);
-                builder.SetPartialFillColor(_config.DarkArtsColor.Map);
-                builder.SetBackgroundColor(_config.DarkArtsColor.Background);
+                builder.SetGlowColor(Config.DarkArtsColor.Base);
+                builder.SetChunksColors(Config.DarkArtsColor.Map);
+                builder.SetPartialFillColor(Config.DarkArtsColor.Map);
+                builder.SetBackgroundColor(Config.DarkArtsColor.Background);
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawBloodGauge()
+        private void DrawBloodGauge(Vector2 origin)
         {
             var gauge = PluginInterface.ClientState.JobGauges.Get<DRKGauge>();
 
-            var posX = Origin.X + _config.BloodGaugePosition.X - _config.BloodGaugeSize.X / 2f;
-            var posY = Origin.Y + _config.BloodGaugePosition.Y - _config.BloodGaugeSize.Y / 2f;
+            var posX = origin.X + Config.Position.X + Config.BloodGaugePosition.X - Config.BloodGaugeSize.X / 2f;
+            var posY = origin.Y + Config.Position.Y + Config.BloodGaugePosition.Y - Config.BloodGaugeSize.Y / 2f;
 
-            BarBuilder builder = BarBuilder.Create(posX, posY, _config.BloodGaugeSize.Y, _config.BloodGaugeSize.X).SetBackgroundColor(EmptyColor.Background);
+            BarBuilder builder = BarBuilder.Create(posX, posY, Config.BloodGaugeSize.Y, Config.BloodGaugeSize.X).SetBackgroundColor(EmptyColor.Background);
 
-            if (_config.ChunkBloodGauge)
+            if (Config.ChunkBloodGauge)
             {
-                builder.SetChunks(2).SetChunkPadding(_config.BloodGaugePadding).AddInnerBar(gauge.Blood, 100, _config.BloodColor.Map, PartialFillColor.Map);
+                builder.SetChunks(2).SetChunkPadding(Config.BloodGaugePadding).AddInnerBar(gauge.Blood, 100, Config.BloodColor.Map, PartialFillColor.Map);
             }
             else
             {
                 if (gauge.Blood == 100)
                 {
-                    builder.AddInnerBar(gauge.Blood, 100, _config.BloodColorFull.Map);
+                    builder.AddInnerBar(gauge.Blood, 100, Config.BloodColorFull.Map);
                 }
                 else if (gauge.Blood > 100)
                 {
-                    builder.AddInnerBar(gauge.Blood, 100, _config.BloodColor.Map);
+                    builder.AddInnerBar(gauge.Blood, 100, Config.BloodColor.Map);
                 }
                 else
                 {
@@ -128,35 +123,35 @@ namespace DelvUI.Interface
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawBuffBar()
+        private void DrawBuffBar(Vector2 origin)
         {
             IEnumerable<StatusEffect> bloodWeaponBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 742);
             IEnumerable<StatusEffect> deliriumBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1972);
 
-            var xPos = Origin.X + _config.BuffBarPosition.X - _config.BuffBarSize.X / 2f;
-            var yPos = Origin.Y + _config.BuffBarPosition.Y - _config.BuffBarSize.Y / 2f;
+            var xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
+            var yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.BuffBarSize.Y, _config.BuffBarSize.X).SetBackgroundColor(EmptyColor.Background);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.BuffBarSize.Y, Config.BuffBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
             if (bloodWeaponBuff.Any())
             {
                 var fightOrFlightDuration = Math.Abs(bloodWeaponBuff.First().Duration);
-                builder.AddInnerBar(fightOrFlightDuration, 10, _config.BloodWeaponColor.Map);
+                builder.AddInnerBar(fightOrFlightDuration, 10, Config.BloodWeaponColor.Map);
 
-                if (_config.ShowBuffBarText)
+                if (Config.ShowBuffBarText)
                 {
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterLeft, BarTextType.Current, _config.BloodWeaponColor.Vector, Vector4.UnitW, null);
+                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.BloodWeaponColor.Vector, Vector4.UnitW, null);
                 }
             }
 
             if (deliriumBuff.Any())
             {
                 var deliriumDuration = Math.Abs(deliriumBuff.First().Duration);
-                builder.AddInnerBar(deliriumDuration, 10, _config.DeliriumColor.Map);
+                builder.AddInnerBar(deliriumDuration, 10, Config.DeliriumColor.Map);
 
-                if (_config.ShowBuffBarText)
+                if (Config.ShowBuffBarText)
                 {
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterRight, BarTextType.Current, _config.DeliriumColor.Vector, Vector4.UnitW, null);
+                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.DeliriumColor.Vector, Vector4.UnitW, null);
                 }
             }
 
@@ -164,24 +159,24 @@ namespace DelvUI.Interface
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawLivingShadowBar()
+        private void DrawLivingShadowBar(Vector2 origin)
         {
             var actor = PluginInterface.ClientState.LocalPlayer;
             var shadowTimeRemaining = PluginInterface.ClientState.JobGauges.Get<DRKGauge>().ShadowTimeRemaining / 1000;
             var livingShadow = actor.Level >= 80 && shadowTimeRemaining is > 0 and <= 24;
 
-            var xPos = Origin.X + _config.LivingShadowBarPosition.X - _config.LivingShadowBarSize.X / 2f;
-            var yPos = Origin.Y + _config.LivingShadowBarPosition.Y - _config.LivingShadowBarSize.Y / 2f;
+            var xPos = origin.X + Config.Position.X + Config.LivingShadowBarPosition.X - Config.LivingShadowBarSize.X / 2f;
+            var yPos = origin.Y + Config.Position.Y + Config.LivingShadowBarPosition.Y - Config.LivingShadowBarSize.Y / 2f;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.LivingShadowBarSize.Y, _config.LivingShadowBarSize.X).SetBackgroundColor(EmptyColor.Background);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.LivingShadowBarSize.Y, Config.LivingShadowBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
             if (livingShadow)
             {
-                builder.AddInnerBar(shadowTimeRemaining, 24, _config.LivingShadowColor.Map);
+                builder.AddInnerBar(shadowTimeRemaining, 24, Config.LivingShadowColor.Map);
 
-                if (_config.ShowLivingShadowBarText)
+                if (Config.ShowLivingShadowBarText)
                 {
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterLeft, BarTextType.Current, _config.LivingShadowColor.Vector, Vector4.UnitW, null);
+                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.LivingShadowColor.Vector, Vector4.UnitW, null);
                 }
             }
 
@@ -194,15 +189,14 @@ namespace DelvUI.Interface
     [Section("Job Specific Bars")]
     [SubSection("Tank", 0)]
     [SubSection("Dark Knight", 1)]
-    public class DarkKnightHudConfig : PluginConfigObject
+    public class DarkKnightConfig : JobConfig
     {
-        [DragFloat2("Base Position" + "##DarkKnight", min = -4000f, max = 4000f)]
-        [Order(0)]
-        public Vector2 Position = new Vector2(0, 0);
+        [JsonIgnore] public new uint JobId = JobIDs.DRK;
+        public new static DarkKnightConfig DefaultConfig() { return new DarkKnightConfig(); }
 
         #region Mana Bar
         [Checkbox("Show Mana Bar")]
-        [CollapseControl(5, 0)]
+        [CollapseControl(30, 0)]
         public bool ShowManaBar = true;
 
         [Checkbox("Show Text" + "##DRKManaBar")]
@@ -215,7 +209,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##DRKManaBar", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
-        public Vector2 ManaBarPosition = new Vector2(0, 442);
+        public Vector2 ManaBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 61);
 
         [DragFloat2("Size" + "##DRKManaBar", min = 0, max = 4000f)]
         [CollapseWith(15, 0)]
@@ -236,7 +230,7 @@ namespace DelvUI.Interface
 
         #region Blood Gauge
         [Checkbox("Show Blood Gauge")]
-        [CollapseControl(10, 1)]
+        [CollapseControl(35, 1)]
         public bool ShowBloodGauge = true;
 
         [Checkbox("Chunk Blood Gauge")]
@@ -245,7 +239,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##DRKBloodGauge", min = -4000f, max = 4000f)]
         [CollapseWith(10, 1)]
-        public Vector2 BloodGaugePosition = new Vector2(0, 454);
+        public Vector2 BloodGaugePosition = new Vector2(0, HUDConstants.JobHudsBaseY - 49);
 
         [DragFloat2("Size" + "##DRKBloodGauge", min = 0, max = 4000f)]
         [CollapseWith(15, 1)]
@@ -266,7 +260,7 @@ namespace DelvUI.Interface
 
         #region Buff Bar
         [Checkbox("Show Buff Bar")]
-        [CollapseControl(15, 2)]
+        [CollapseControl(40, 2)]
         public bool ShowBuffBar = false;
 
         [Checkbox("Show Text" + "##DRKBuffBar")]
@@ -275,7 +269,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##DRKBuffBar", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]
-        public Vector2 BuffBarPosition = new Vector2(0, 471);
+        public Vector2 BuffBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 32);
 
         [DragFloat2("Size" + "##DRKBuffBar", min = 0, max = 4000f)]
         [CollapseWith(10, 2)]
@@ -296,7 +290,7 @@ namespace DelvUI.Interface
 
         #region Living Shadow
         [Checkbox("Show Living Shadow Bar")]
-        [CollapseControl(20, 3)]
+        [CollapseControl(45, 3)]
         public bool ShowLivingShadowBar = false;
 
         [Checkbox("Show Text" + "##DRKLivingShadow")]
@@ -305,7 +299,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##DRKLivingShadow", min = -4000f, max = 4000f)]
         [CollapseWith(5, 3)]
-        public Vector2 LivingShadowBarPosition = new Vector2(0, 493);
+        public Vector2 LivingShadowBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 10);
 
         [DragFloat2("Size" + "##DRKLivingShadow", min = 0, max = 4000f)]
         [CollapseWith(10, 3)]

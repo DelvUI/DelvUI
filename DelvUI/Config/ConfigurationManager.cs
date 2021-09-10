@@ -56,6 +56,7 @@ namespace DelvUI.Config
                 typeof(TargetBuffsListConfig),
                 typeof(TargetDebuffsListConfig),
 
+                typeof(DarkKnightConfig),
                 typeof(PaladinConfig),
                 typeof(WarriorConfig),
                 typeof(GunbreakerConfig),
@@ -79,7 +80,6 @@ namespace DelvUI.Config
                 typeof(PrimaryResourceConfig),
                 typeof(GCDIndicatorConfig),
                 typeof(MPTickerConfig)
-
             };
 
             return Initialize(defaultConfig, configObjects);

@@ -217,7 +217,7 @@ namespace DelvUI
             _hudWindow = _pluginInterface.ClientState.LocalPlayer?.ClassJob.Id switch
             {
                 //Tanks
-                JobIDs.DRK => new DarkKnightHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.DRK => new DarkKnightHud(_pluginInterface, _pluginConfiguration),
                 //JobIDs.GNB => new GunbreakerHudWindow(_pluginInterface, _pluginConfiguration),
                 //JobIDs.WAR => new WarriorHud(_pluginInterface, _pluginConfiguration),
                 //JobIDs.PLD => new PaladinHud(_pluginInterface, _pluginConfiguration),
