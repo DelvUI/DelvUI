@@ -230,7 +230,7 @@ namespace DelvUI
                 //Melee DPS
                 //JobIDs.DRG => new DragoonHud(_pluginInterface, _pluginConfiguration),
                 //JobIDs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.MNK => new MonkHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.MNK => new MonkHudWindow(_pluginInterface, _pluginConfiguration),
                 //JobIDs.NIN => new NinjaHud(_pluginInterface, _pluginConfiguration),
 
                 //Ranged DPS
