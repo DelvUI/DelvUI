@@ -1,81 +1,71 @@
 ﻿using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
-namespace DelvUI.Interface
+namespace DelvUI.Interface.Jobs
 {
-    public class GunbreakerHudWindow : HudWindow
+    public class GunbreakerHud : JobHud
     {
-        public GunbreakerHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
-
-        private GunbreakerHudConfig _config => (GunbreakerHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new GunbreakerHudConfig());
-
-        public override uint JobId => JobIDs.GNB;
-
-        private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
-
+        private new GunbreakerConfig Config => (GunbreakerConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        private Vector2 CalculatePosition(Vector2 position, Vector2 size)
+        public GunbreakerHud(string id, GunbreakerConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
         {
-            return Origin + position - size / 2f;
+
         }
 
-        protected override void Draw(bool _)
+        public override void Draw(Vector2 origin)
         {
-            if (_config.ShowPowderGauge)
+            if (Config.ShowPowderGauge)
             {
-                DrawPowderGauge();
+                DrawPowderGauge(origin);
             }
 
-            if (_config.ShowNoMercyBar)
+            if (Config.ShowNoMercyBar)
             {
-                DrawNoMercyBar();
+                DrawNoMercyBar(origin);
             }
         }
 
-        protected override void DrawPrimaryResourceBar() { }
-
-        private void DrawPowderGauge()
+        private void DrawPowderGauge(Vector2 origin)
         {
-
-            var position = CalculatePosition(_config.PowderGaugeBarPosition, _config.PowderGaugeBarSize);
-            var builder = BarBuilder.Create(position, _config.PowderGaugeBarSize);
+            Vector2 position = origin + Config.Position + Config.PowderGaugeBarPosition - Config.PowderGaugeBarSize / 2f;
+            var builder = BarBuilder.Create(position, Config.PowderGaugeBarSize);
 
             var gauge = PluginInterface.ClientState.JobGauges.Get<GNBGauge>();
 
             builder.SetChunks(2)
-                   .SetChunkPadding(_config.PowderGaugeSpacing)
-                   .AddInnerBar(gauge.NumAmmo, 2, _config.PowderGaugeFillColor.Map, null)
+                   .SetChunkPadding(Config.PowderGaugeSpacing)
+                   .AddInnerBar(gauge.NumAmmo, 2, Config.PowderGaugeFillColor.Map, null)
                    .SetBackgroundColor(EmptyColor["background"]);
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawNoMercyBar()
-        {
 
-            var position = CalculatePosition(_config.NoMercyBarPosition, _config.NoMercyBarSize);
+        private void DrawNoMercyBar(Vector2 origin)
+        {
+            Vector2 position = origin + Config.Position + Config.NoMercyBarPosition - Config.NoMercyBarSize / 2f;
             var noMercyBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1831);
 
-            var builder = BarBuilder.Create(position, _config.NoMercyBarSize)
+            var builder = BarBuilder.Create(position, Config.NoMercyBarSize)
                 .SetBackgroundColor(EmptyColor["background"]);
 
             if (noMercyBuff.Any())
             {
                 var duration = noMercyBuff.First().Duration;
 
-                builder.AddInnerBar(duration, 20, _config.NoMercyFillColor.Map, null)
+                builder.AddInnerBar(duration, 20, Config.NoMercyFillColor.Map, null)
                        .SetTextMode(BarTextMode.EachChunk)
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
@@ -89,20 +79,19 @@ namespace DelvUI.Interface
     [Section("Job Specific Bars")]
     [SubSection("Tank", 0)]
     [SubSection("Gunbreaker", 1)]
-    public class GunbreakerHudConfig : PluginConfigObject
+    public class GunbreakerConfig : JobConfig
     {
-        [DragFloat2("Base Position" + "##Gunbreaker", min = -4000f, max = 4000f)]
-        [Order(0)]
-        public Vector2 Position = new Vector2(0, 0);
+        [JsonIgnore] public new uint JobId = JobIDs.GNB;
+        public new static GunbreakerConfig DefaultConfig() { return new GunbreakerConfig(); }
 
         #region Powder Gauge
         [Checkbox("Show Powder Gauge")]
-        [CollapseControl(5, 0)]
+        [CollapseControl(30, 0)]
         public bool ShowPowderGauge = true;
 
         [DragFloat2("Position" + "##PowderGauge", min = -4000f, max = 4000f)]
         [CollapseWith(0, 0)]
-        public Vector2 PowderGaugeBarPosition = new(0, 428);
+        public Vector2 PowderGaugeBarPosition = new(0, HUDConstants.JobHudsBaseY - 32);
 
         [DragFloat2("Size" + "##PowderGauge", min = 1f, max = 4000f)]
         [CollapseWith(5, 0)]
@@ -119,12 +108,12 @@ namespace DelvUI.Interface
 
         #region No Mercy
         [Checkbox("Show No Mercy Bar")]
-        [CollapseControl(10, 1)]
+        [CollapseControl(35, 1)]
         public bool ShowNoMercyBar = true;
 
         [DragFloat2("Position" + "##NoMercy", min = -4000f, max = 4000f)]
         [CollapseWith(0, 1)]
-        public Vector2 NoMercyBarPosition = new(0, 449);
+        public Vector2 NoMercyBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
 
         [DragFloat2("Size" + "##NoMercy", min = 1f, max = 4000f)]
         [CollapseWith(5, 1)]

@@ -56,6 +56,7 @@ namespace DelvUI.Config
                 typeof(TargetBuffsListConfig),
                 typeof(TargetDebuffsListConfig),
 
+                typeof(GunbreakerConfig),
                 typeof(ScholarConfig),
                 typeof(SamuraiConfig),
                 typeof(BlackMageConfig),

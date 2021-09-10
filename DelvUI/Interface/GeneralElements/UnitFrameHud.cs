@@ -127,7 +127,7 @@ namespace DelvUI.Interface.GeneralElements
         {
             if (Config.TankStanceIndicatorConfig != null && Config.TankStanceIndicatorConfig.Enabled && JobsHelper.IsJobTank(chara.ClassJob.Id))
             {
-                DrawTankStanceIndicator(origin);
+                DrawTankStanceIndicator(drawList, origin);
             }
 
             var startPos = new Vector2(origin.X + Config.Position.X - Config.Size.X / 2f, origin.Y + Config.Position.Y - Config.Size.Y / 2f);
@@ -188,7 +188,7 @@ namespace DelvUI.Interface.GeneralElements
             drawList.AddRect(startPos, endPos, 0xFF000000);
         }
 
-        private void DrawTankStanceIndicator(Vector2 origin)
+        private void DrawTankStanceIndicator(ImDrawListPtr drawList, Vector2 origin)
         {
             var tankStanceBuff = Actor.StatusEffects.Where(
                 o => o.EffectId == 79 ||    // IRON WILL
@@ -210,7 +210,6 @@ namespace DelvUI.Interface.GeneralElements
 
             var color = tankStanceBuff.Count() <= 0 ? Config.TankStanceIndicatorConfig.UnactiveColor : Config.TankStanceIndicatorConfig.ActiveColor;
 
-            var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, color.Base);
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
         }
