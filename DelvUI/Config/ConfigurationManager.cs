@@ -57,6 +57,7 @@ namespace DelvUI.Config
                 typeof(TargetDebuffsListConfig),
 
                 typeof(BlackMageConfig),
+                typeof(RedMageConfig),
 
                 typeof(TanksColorConfig),
                 typeof(HealersColorConfig),
