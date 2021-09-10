@@ -7,48 +7,47 @@ using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
-namespace DelvUI.Interface
+namespace DelvUI.Interface.Jobs
 {
-    public class WarriorHudWindow : HudWindow
+    public class WarriorHud : JobHud
     {
-        public override uint JobId => JobIDs.WAR;
-        private WarriorHudConfig _config => (WarriorHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new WarriorHudConfig());
-        private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
+        private new WarriorConfig Config => (WarriorConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
-        public WarriorHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
 
-        protected override void Draw(bool _)
+        public WarriorHud(string id, WarriorConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
         {
-            if (_config.ShowStormsEye)
+
+        }
+
+        public override void Draw(Vector2 origin)
+        {
+            if (Config.ShowStormsEye)
             {
-                DrawStormsEyeBar();
+                DrawStormsEyeBar(origin);
             }
 
-            if (_config.ShowBeastGauge)
+            if (Config.ShowBeastGauge)
             {
-                DrawBeastGauge();
+                DrawBeastGauge(origin);
             }
         }
 
-        protected override void DrawPrimaryResourceBar() { }
-
-        private Vector2 CalculatePosition(Vector2 position, Vector2 size) => Origin + position - size / 2f;
-
-        private void DrawStormsEyeBar()
+        private void DrawStormsEyeBar(Vector2 origin)
         {
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             IEnumerable<StatusEffect> innerReleaseBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1177);
             IEnumerable<StatusEffect> stormsEyeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
 
-            Vector2 position = CalculatePosition(_config.StormsEyePosition, _config.StormsEyeSize);
+            Vector2 position = origin + Config.Position + Config.StormsEyePosition - Config.StormsEyeSize / 2f;
 
-            BarBuilder builder = BarBuilder.Create(position, _config.StormsEyeSize).SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder builder = BarBuilder.Create(position, Config.StormsEyeSize).SetBackgroundColor(EmptyColor["background"]);
 
             var duration = 0f;
             var maximum = 10f;
@@ -57,18 +56,18 @@ namespace DelvUI.Interface
             if (innerReleaseBuff.Any())
             {
                 duration = Math.Abs(innerReleaseBuff.First().Duration);
-                color = _config.InnerReleaseColor.Map;
+                color = Config.InnerReleaseColor.Map;
             }
             else if (stormsEyeBuff.Any())
             {
                 duration = Math.Abs(stormsEyeBuff.First().Duration);
                 maximum = 60f;
-                color = _config.StormsEyeColor.Map;
+                color = Config.StormsEyeColor.Map;
             }
 
             builder.AddInnerBar(duration, maximum, color);
 
-            if (_config.ShowStormsEyeText)
+            if (Config.ShowStormsEyeText)
             {
                 builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
@@ -77,25 +76,25 @@ namespace DelvUI.Interface
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawBeastGauge()
+        private void DrawBeastGauge(Vector2 origin)
         {
             WARGauge gauge = PluginInterface.ClientState.JobGauges.Get<WARGauge>();
             IEnumerable<StatusEffect> nascentChaosBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1897);
 
-            Vector2 position = CalculatePosition(_config.BeastGaugePosition, _config.BeastGaugeSize);
+            Vector2 position = origin + Config.Position + Config.BeastGaugePosition - Config.BeastGaugeSize / 2f;
 
-            BarBuilder builder = BarBuilder.Create(position, _config.BeastGaugeSize)
+            BarBuilder builder = BarBuilder.Create(position, Config.BeastGaugeSize)
                                            .SetChunks(2)
-                                           .AddInnerBar(gauge.BeastGaugeAmount, 100, _config.BeastGaugeFillColor.Map)
+                                           .AddInnerBar(gauge.BeastGaugeAmount, 100, Config.BeastGaugeFillColor.Map)
                                            .SetBackgroundColor(EmptyColor["background"])
-                                           .SetChunkPadding(_config.BeastGaugePadding);
+                                           .SetChunkPadding(Config.BeastGaugePadding);
 
             if (nascentChaosBuff.Any())
             {
-                builder.SetChunksColors(_config.NascentChaosColor.Map);
+                builder.SetChunksColors(Config.NascentChaosColor.Map);
             }
 
-            if (_config.ShowBeastGaugeText)
+            if (Config.ShowBeastGaugeText)
             {
                 builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
@@ -109,16 +108,14 @@ namespace DelvUI.Interface
     [Section("Job Specific Bars")]
     [SubSection("Tank", 0)]
     [SubSection("Warrior", 1)]
-    public class WarriorHudConfig : PluginConfigObject
+    public class WarriorConfig : JobConfig
     {
-        [DragFloat2("Base Position" + "##Warrior", min = -4000f, max = 4000f)]
-        [Order(0)]
-        public Vector2 Position = new(0, 0);
+        [JsonIgnore] public new uint JobId = JobIDs.WAR;
+        public new static WarriorConfig DefaultConfig() { return new WarriorConfig(); }
 
-        /* Storm's Eye */
         #region Storm's Eye
         [Checkbox("Show Storm's Eye")]
-        [CollapseControl(5, 0)]
+        [CollapseControl(30, 0)]
         public bool ShowStormsEye = true;
 
         [Checkbox("Show Text" + "##StormsEye")]
@@ -127,7 +124,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##StormsEye", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 StormsEyePosition = new(0, 428);
+        public Vector2 StormsEyePosition = new(0, HUDConstants.JobHudsBaseY - 32);
 
         [DragFloat2("Size" + "##StormsEye", min = 1f, max = 4000f)]
         [CollapseWith(10, 0)]
@@ -142,10 +139,9 @@ namespace DelvUI.Interface
         public PluginConfigColor StormsEyeColor = new(new Vector4(255f / 255f, 136f / 255f, 146f / 255f, 100f / 100f));
         #endregion
 
-        /* Beast Gauge*/
         #region Beast Gauge
         [Checkbox("Show Beast Gauge")]
-        [CollapseControl(10, 1)]
+        [CollapseControl(35, 1)]
         public bool ShowBeastGauge = true;
 
         [Checkbox("Show Text" + "##BeastGauge")]
@@ -154,7 +150,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##BeastGauge", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 BeastGaugePosition = new(0, 449);
+        public Vector2 BeastGaugePosition = new(0, HUDConstants.JobHudsBaseY - 10);
 
         [DragFloat2("Size" + "##BeastGauge", min = 1f, max = 4000f)]
         [CollapseWith(10, 1)]

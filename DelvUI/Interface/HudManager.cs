@@ -261,6 +261,7 @@ namespace DelvUI.Interface
         {
             _jobsMap = new Dictionary<uint, JobHudTypes>()
             {
+                [JobIDs.WAR] = new JobHudTypes(typeof(WarriorHud), typeof(WarriorConfig)),
                 [JobIDs.GNB] = new JobHudTypes(typeof(GunbreakerHud), typeof(GunbreakerConfig)),
 
                 [JobIDs.SCH] = new JobHudTypes(typeof(ScholarHud), typeof(ScholarConfig)),
