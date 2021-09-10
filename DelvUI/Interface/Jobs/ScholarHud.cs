@@ -50,10 +50,7 @@ namespace DelvUI.Interface.Jobs
             float fairyGauge = PluginInterface.ClientState.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
 
             Vector2 barSize = Config.FairySize;
-            Vector2 position = new Vector2(
-                origin.X + Config.Position.X + Config.FairyPosition.X - barSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.FairyPosition.Y - barSize.Y / 2f
-            );
+            Vector2 position = origin + Config.Position + Config.FairyPosition - barSize / 2f;
 
             BarBuilder builder = BarBuilder.Create(position, barSize);
 
@@ -74,10 +71,7 @@ namespace DelvUI.Interface.Jobs
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             StatusEffect aetherFlowBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
             Vector2 barSize = Config.AetherSize;
-            Vector2 position = new Vector2(
-                origin.X + Config.Position.X + Config.AetherPosition.X - barSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.AetherPosition.Y - barSize.Y / 2f
-            );
+            Vector2 position = origin + Config.Position + Config.AetherPosition - barSize / 2f;
 
             if (!Config.ShowAether)
             {
@@ -115,10 +109,7 @@ namespace DelvUI.Interface.Jobs
             PluginConfigColor bioColor = bioDuration > 5 ? Config.BioColor : Config.ExpireColor;
 
             Vector2 barSize = Config.BioSize;
-            Vector2 position = new Vector2(
-                origin.X + Config.Position.X + Config.BioPosition.X - barSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.BioPosition.Y - barSize.Y / 2f
-            );
+            Vector2 position = origin + Config.Position + Config.BioPosition - barSize / 2f;
 
 
             BarBuilder builder = BarBuilder.Create(position, barSize);

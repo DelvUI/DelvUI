@@ -79,10 +79,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             Vector2 barSize = Config.TranceSize;
-            Vector2 position = new Vector2(
-                origin.X + Config.Position.X + Config.TrancePosition.X - barSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.TrancePosition.Y - barSize.Y / 2f
-            );
+            Vector2 position = origin + Config.Position + Config.TrancePosition - barSize / 2f;
 
             BarBuilder builder = BarBuilder.Create(position, barSize);
 
@@ -112,10 +109,7 @@ namespace DelvUI.Interface.Jobs
             if (Config.ShowDemiIndicator)
             {
                 Vector2 barSize = Config.IndicatorSize;
-                Vector2 position = new Vector2(
-                    origin.X + Config.Position.X + Config.IndicatorPosition.X - barSize.X / 2f,
-                    origin.Y + Config.Position.Y + Config.IndicatorPosition.Y - barSize.Y / 2f
-                );
+                Vector2 position = origin + Config.Position + Config.IndicatorPosition - barSize / 2f;
 
                 BarBuilder builder = BarBuilder.Create(position, barSize);
 
@@ -144,10 +138,7 @@ namespace DelvUI.Interface.Jobs
             if (Config.ShowDreadwyrmAetherBars)
             {
                 Vector2 barSize = Config.DreadwyrmAetherBarSize;
-                Vector2 position = new Vector2(
-                    origin.X + Config.Position.X + Config.DreadwyrmAetherBarPosition.X - barSize.X / 2f,
-                    origin.Y + Config.Position.Y + Config.DreadwyrmAetherBarPosition.Y - barSize.Y / 2f
-                );
+                Vector2 position = origin + Config.Position + Config.DreadwyrmAetherBarPosition - barSize / 2f;
 
                 var filledChunkCount = 0;
 
@@ -194,10 +185,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             Vector2 barSize = Config.MiasmaSize;
-            Vector2 position = new Vector2(
-                origin.X + Config.Position.X + Config.MiasmaPosition.X - barSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.MiasmaPosition.Y - barSize.Y / 2f
-            );
+            Vector2 position = origin + Config.Position + Config.MiasmaPosition - barSize / 2f;
 
             List<Bar> barDrawList = new();
 
@@ -231,10 +219,7 @@ namespace DelvUI.Interface.Jobs
                 PluginConfigColor bioColor = bioDuration > 5 ? Config.BioColor : Config.ExpireColor;
 
                 barSize = Config.BioSize;
-                position = new Vector2(
-                    origin.X + Config.Position.X + Config.BioPosition.X - barSize.X / 2f,
-                    origin.Y + Config.Position.Y + Config.BioPosition.Y - barSize.Y / 2f
-                );
+                position = origin + Config.Position + Config.BioPosition - barSize / 2f;
 
                 BarBuilder builder = BarBuilder.Create(position, barSize);
 
@@ -261,10 +246,7 @@ namespace DelvUI.Interface.Jobs
             StatusEffect ruinBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1212);
 
             Vector2 barSize = Config.RuinSize;
-            Vector2 position = new Vector2(
-                origin.X + Config.Position.X + Config.RuinPosition.X - barSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.RuinPosition.Y - barSize.Y / 2f
-            );
+            Vector2 position = origin + Config.Position + Config.RuinPosition - barSize / 2f;
 
             if (!Config.ShowRuin)
             {
@@ -287,10 +269,7 @@ namespace DelvUI.Interface.Jobs
             StatusEffect aetherFlowBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
 
             Vector2 barSize = Config.AetherSize;
-            Vector2 position = new Vector2(
-                origin.X + Config.Position.X + Config.AetherPosition.X - barSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.AetherPosition.Y - barSize.Y / 2f
-            );
+            Vector2 position = origin + Config.Position + Config.AetherPosition - barSize / 2f;
 
             if (!Config.ShowAether)
             {
