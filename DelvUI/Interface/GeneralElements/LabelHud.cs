@@ -16,33 +16,33 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void Draw(Vector2 origin)
         {
-            if (!Config.Enabled || Config.Text == null)
+            if (!Config.Enabled || Config.GetText() == null)
             {
                 return;
             }
 
-            var size = ImGui.CalcTextSize(Config.Text);
+            var size = ImGui.CalcTextSize(Config.GetText());
             var offset = OffsetForSize(size);
 
             if (Config.ShowOutline)
             {
-                DrawHelper.DrawOutlinedText(Config.Text, origin + Config.Position + offset, Config.Color.Vector, Config.OutlineColor.Vector);
+                DrawHelper.DrawOutlinedText(Config.GetText(), origin + Config.Position + offset, Config.Color.Vector, Config.OutlineColor.Vector);
             }
             else
             {
                 ImGui.SetCursorPos(origin + Config.Position + offset);
-                ImGui.TextColored(Config.Color.Vector, Config.Text);
+                ImGui.TextColored(Config.Color.Vector, Config.GetText());
             }
         }
 
         public void DrawWithActor(Vector2 origin, Actor actor)
         {
-            if (!Config.Enabled || Config.Text == null)
+            if (!Config.Enabled || Config.GetText() == null)
             {
                 return;
             }
 
-            var text = TextTags.GenerateFormattedTextFromTags(actor, Config.Text);
+            var text = TextTags.GenerateFormattedTextFromTags(actor, Config.GetText());
             var size = ImGui.CalcTextSize(text);
             var offset = OffsetForSize(size);
 

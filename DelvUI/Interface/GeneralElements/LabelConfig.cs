@@ -12,21 +12,29 @@ namespace DelvUI.Interface.GeneralElements
     {
         [InputText("Text")]
         [Order(20)]
-        public new string Text;
+        public string Text;
 
         public EditableLabelConfig(Vector2 position, string text, LabelTextAnchor anchor) : base(position, text, anchor)
         {
             Text = text;
         }
 
+        public override string GetText()
+        {
+            return Text;
+        }
+
+        public override void SetText(string text)
+        {
+            Text = text;
+        }
     }
 
     [Serializable]
     [Portable(false)]
     public class LabelConfig : MovablePluginConfigObject
     {
-        [JsonIgnore] public string Text; // hide text on immutable labels
-        public new Vector2 Size; // hide size for labels
+        [JsonIgnore] protected string _text;
 
         [Combo("Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
         [Order(25)]
@@ -47,9 +55,19 @@ namespace DelvUI.Interface.GeneralElements
         public LabelConfig(Vector2 position, string text, LabelTextAnchor anchor)
         {
             Position = position;
-            Text = text;
+            _text = text;
             Anchor = anchor;
             Position = position;
+        }
+
+        public virtual string GetText()
+        {
+            return _text;
+        }
+
+        public virtual void SetText(string text)
+        {
+            _text = text;
         }
     }
 

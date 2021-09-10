@@ -90,11 +90,11 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             // cast name
-            Config.CastNameConfig.Text = _lastUsedCast.ActionText;
+            Config.CastNameConfig.SetText(_lastUsedCast.ActionText);
             _castNameLabel.Draw(origin + Config.Position);
 
             // cast time
-            Config.CastTimeConfig.Text = Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
+            Config.CastTimeConfig.SetText(Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture));
             _castTimeLabel.Draw(origin + Config.Position);
         }
 
