@@ -1,7 +1,9 @@
-﻿using ImGuiNET;
+﻿using DelvUI.Config.Attributes;
+using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace DelvUI.Config
@@ -9,6 +11,9 @@ namespace DelvUI.Config
     [Serializable]
     public abstract class PluginConfigObject
     {
+        [Checkbox("Enabled")]
+        [Order(0)]
+        public bool Enabled = true;
 
         protected bool ColorEdit4(string label, ref PluginConfigColor color)
         {
@@ -23,6 +28,24 @@ namespace DelvUI.Config
 
             return false;
         }
+
+        public static PluginConfigObject DefaultConfig()
+        {
+            Debug.Assert(false, "Static method 'DefaultConfig' not found !!!");
+            return null;
+        }
+    }
+
+    [Serializable]
+    public abstract class MovablePluginConfigObject : PluginConfigObject
+    {
+        [DragInt2("Position", min = -4000, max = 4000)]
+        [Order(5)]
+        public Vector2 Position = Vector2.Zero;
+
+        [DragInt2("Size", min = 1, max = 4000)]
+        [Order(10)]
+        public Vector2 Size = Vector2.Zero;
     }
 
     [Serializable]
@@ -36,7 +59,7 @@ namespace DelvUI.Config
         {
             _vector = vector;
 
-            if (colorMapRatios is { Length: >= 3 })
+            if (colorMapRatios != null && colorMapRatios.Length >= 3)
             {
                 _colorMapRatios = colorMapRatios;
             }

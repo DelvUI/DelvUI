@@ -100,6 +100,19 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
+    public class ComboAttribute : Attribute
+    {
+        public string friendlyName;
+        public string[] options;
+
+        public ComboAttribute(string friendlyName, params string[] options)
+        {
+            this.friendlyName = friendlyName;
+            this.options = options;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
     public class OrderAttribute : Attribute
     {
         public int pos;
@@ -149,5 +162,19 @@ namespace DelvUI.Config.Attributes
 
     [AttributeUsage(AttributeTargets.Method)]
     public class ManualDrawAttribute : Attribute
-    { }
+    {
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public class NestedConfigAttribute : Attribute
+    {
+        public string friendlyName;
+        public int pos;
+
+        public NestedConfigAttribute(string friendlyName, int pos)
+        {
+            this.friendlyName = friendlyName;
+            this.pos = pos;
+        }
+    }
 }

@@ -1,9 +1,10 @@
 using Dalamud.Plugin;
 using DelvUI.Config.Tree;
-using DelvUI.Interface;
+using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.Jobs;
+using DelvUI.Interface.StatusEffects;
 using ImGuiScene;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.IO;
 using System.IO.Compression;
@@ -22,7 +23,8 @@ namespace DelvUI.Config
         public string ConfigDirectory;
         public bool DrawConfigWindow;
 
-        public ConfigurationWindow ConfigurationWindow { get; set; }
+        public bool LockHUD = true;
+        public bool ShowHUD = true;
 
         public ConfigurationManager(bool defaultConfig, TextureWrap bannerImage, string configDirectory, BaseNode configBaseNode)
         {
@@ -39,27 +41,67 @@ namespace DelvUI.Config
 
         public static ConfigurationManager Initialize(bool defaultConfig)
         {
-            PluginConfigObject[] configObjects =
+            Type[] configObjects =
             {
-                new GeneralHudConfig(),
-                new TankHudConfig(), new PaladinHudConfig(), new WarriorHudConfig(), new DarkKnightHudConfig(), new GunbreakerHudConfig(),
-                new WhiteMageHudConfig(), new ScholarHudConfig(), new AstrologianHudConfig(),
-                new MonkHudConfig(), new DragoonHudConfig(), new NinjaHudConfig(), new SamuraiHudConfig(),
-                new BardHudConfig(), new MachinistHudConfig(), new DancerHudConfig(),
-                new BlackMageHudConfig(), new SummonerHudConfig(), new RedMageHudConfig(),
-                new ImportExportHudConfig()
+                typeof(PlayerUnitFrameConfig),
+                typeof(TargetUnitFrameConfig),
+                typeof(TargetOfTargetUnitFrameConfig),
+                typeof(FocusTargetUnitFrameConfig),
+
+                typeof(PlayerCastbarConfig),
+                typeof(TargetCastbarConfig),
+
+                typeof(PlayerBuffsListConfig),
+                typeof(PlayerDebuffsListConfig),
+                typeof(TargetBuffsListConfig),
+                typeof(TargetDebuffsListConfig),
+
+                typeof(DarkKnightConfig),
+                typeof(PaladinConfig),
+                typeof(WarriorConfig),
+                typeof(GunbreakerConfig),
+
+                typeof(WhiteMageConfig),
+                typeof(ScholarConfig),
+                typeof(AstrologianConfig),
+
+                typeof(MonkConfig),
+                typeof(DragoonConfig),
+                typeof(NinjaConfig),
+                typeof(SamuraiConfig),
+
+                typeof(MachinistConfig),
+                typeof(DancerConfig),
+                typeof(BardConfig),
+
+                typeof(BlackMageConfig),
+                typeof(RedMageConfig),
+                typeof(SummonerConfig),
+
+                typeof(TanksColorConfig),
+                typeof(HealersColorConfig),
+                typeof(MeleeColorConfig),
+                typeof(RangedColorConfig),
+                typeof(CastersColorConfig),
+                typeof(MiscColorConfig),
+
+                typeof(PrimaryResourceConfig),
+                typeof(GCDIndicatorConfig),
+                typeof(MPTickerConfig)
             };
 
             return Initialize(defaultConfig, configObjects);
         }
 
-        public static ConfigurationManager Initialize(bool defaultConfig, params PluginConfigObject[] configObjects)
+        public static ConfigurationManager Initialize(bool defaultConfig, params Type[] configObjectTypes)
         {
             BaseNode node = new();
 
-            foreach (PluginConfigObject configObject in configObjects)
+            foreach (Type type in configObjectTypes)
             {
-                node.GetOrAddConfig(configObject);
+                var genericMethod = node.GetType().GetMethod("GetOrAddConfig");
+                var method = genericMethod.MakeGenericMethod(type);
+                method.Invoke(node, null);
             }
 
             TextureWrap banner = Plugin.bannerTexture;
@@ -81,7 +123,13 @@ namespace DelvUI.Config
 
         public void SaveConfigurations() { ConfigBaseNode.Save(ConfigDirectory); }
 
-        public PluginConfigObject GetConfiguration(PluginConfigObject configObject) => ConfigBaseNode.GetOrAddConfig(configObject).ConfigObject;
+        public PluginConfigObject GetConfigObjectForType(Type type)
+        {
+            var genericMethod = GetType().GetMethod("GetConfigObject");
+            var method = genericMethod.MakeGenericMethod(type);
+            return (PluginConfigObject)method.Invoke(this, null);
+        }
+        public T GetConfigObject<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigObject<T>();
 
         public static string CompressAndBase64Encode(string jsonString)
         {

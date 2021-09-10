@@ -1,5 +1,4 @@
-﻿using DelvUI.Config;
-using DelvUI.Helpers;
+﻿using DelvUI.Helpers;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -68,7 +67,7 @@ namespace DelvUI.Interface.Bars
 
         public Vector2 GetBarSize() => new(BarWidth, BarHeight);
 
-        public void Draw(ImDrawListPtr drawList, PluginConfiguration configuration)
+        public void Draw(ImDrawListPtr drawList)
         {
             var barWidth = BarWidth + ChunkPadding;   // For loop adds one extra padding more than is needed
             var barHeight = BarHeight + ChunkPadding; // For loop adds one extra padding more than is needed
@@ -86,7 +85,7 @@ namespace DelvUI.Interface.Bars
 
             foreach (var innerBar in InnerBars)
             {
-                innerBar.Draw(drawList, configuration);
+                innerBar.Draw(drawList);
             }
 
             cursorPos = new Vector2(XPosition, YPosition);
@@ -105,13 +104,13 @@ namespace DelvUI.Interface.Bars
 
             foreach (var innerBar in InnerBars)
             {
-                innerBar.DrawText(drawList, configuration);
+                innerBar.DrawText(drawList);
             }
 
-            DrawText(drawList, configuration);
+            DrawText(drawList);
         }
 
-        public void DrawText(ImDrawListPtr drawList, PluginConfiguration configuration)
+        public void DrawText(ImDrawListPtr drawList)
         {
             foreach (var text in PrimaryTexts)
             {
@@ -128,7 +127,7 @@ namespace DelvUI.Interface.Bars
 
                 var textPos = text.CalcTextPosition(cursorPos, strText, BarWidth, BarHeight);
 
-                DrawHelper.DrawOutlinedText(strText, textPos, text.Color, text.OutlineColor, text.Scale, configuration);
+                DrawHelper.DrawOutlinedText(strText, textPos, text.Color, text.OutlineColor, text.Scale);
             }
         }
     }
@@ -171,7 +170,7 @@ namespace DelvUI.Interface.Bars
         public BarTextMode TextMode { get; set; }
         public BarText[] Texts { get; set; }
 
-        public virtual void Draw(ImDrawListPtr drawList, PluginConfiguration configuration)
+        public virtual void Draw(ImDrawListPtr drawList)
         {
             var barWidth = Parent.Vertical ? (float)1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
             var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float)1 / Parent.InnerBars.Count * Parent.BarHeight;
@@ -317,7 +316,7 @@ namespace DelvUI.Interface.Bars
             }
         }
 
-        public void DrawText(ImDrawListPtr drawList, PluginConfiguration configuration)
+        public void DrawText(ImDrawListPtr drawList)
         {
             var barWidth = Parent.Vertical ? (float)1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
             var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float)1 / Parent.InnerBars.Count * Parent.BarHeight;
@@ -338,7 +337,7 @@ namespace DelvUI.Interface.Bars
 
                 var textPos = textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, Parent.BarHeight);
 
-                DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale, configuration);
+                DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale);
             }
 
             var currentFill = CurrentValue / MaximumValue;
@@ -383,7 +382,7 @@ namespace DelvUI.Interface.Bars
                             ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y)
                             : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
 
-                        DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale, configuration);
+                        DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale);
                     }
 
                     i++;
@@ -433,7 +432,7 @@ namespace DelvUI.Interface.Bars
                             ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y)
                             : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
 
-                        DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale, configuration);
+                        DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale);
                     }
 
                     i++;
@@ -464,7 +463,7 @@ namespace DelvUI.Interface.Bars
             }
         }
 
-        public override void Draw(ImDrawListPtr drawList, PluginConfiguration configuration)
+        public override void Draw(ImDrawListPtr drawList)
         {
             var barWidth = Parent.Vertical ? (float)1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
             var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float)1 / Parent.InnerBars.Count * Parent.BarHeight;

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Runtime.InteropServices;
-using System.Text;
-using Dalamud.Hooking;
+﻿using Dalamud.Hooking;
 using Dalamud.Plugin;
 using FFXIVClientStructs.FFXIV.Component.GUI;
+using System;
+using System.Runtime.InteropServices;
+using System.Text;
 using ValueType = FFXIVClientStructs.FFXIV.Component.GUI.ValueType;
 
 namespace DelvUI.Helpers
@@ -17,14 +17,13 @@ namespace DelvUI.Helpers
         private readonly Hook<AgentHudOpenSystemMenuPrototype> _hookAgentHudOpenSystemMenu;
 
         private readonly Hook<UiModuleRequestMainCommand> _hookUiModuleRequestMainCommand;
-        private readonly DalamudPluginInterface _pluginInterface;
+
 
         // This hook overrides Dalamuds one (or comes after so the Dalamud changes don't go through) change this for Dalamud 5 
         // https://github.com/goatcorp/Dalamud/blob/7ac46ed869a5f31ffb21c74eec30f43ca185ac46/Dalamud/Game/Internal/DalamudAtkTweaks.cs#L190
 
         public SystemMenuHook(DalamudPluginInterface pluginInterface)
         {
-            _pluginInterface = pluginInterface;
             IntPtr openSystemMenuAddress = pluginInterface.TargetModuleScanner.ScanText("E8 ?? ?? ?? ?? 32 C0 4C 8B AC 24 ?? ?? ?? ?? 48 8B 8D ?? ?? ?? ??");
 
             _hookAgentHudOpenSystemMenu = new Hook<AgentHudOpenSystemMenuPrototype>(openSystemMenuAddress, AgentHudOpenSystemMenuDetour);
@@ -136,17 +135,17 @@ namespace DelvUI.Helpers
             switch (commandId)
             {
                 case 69420:
-                    _pluginInterface.CommandManager.ProcessCommand("/delvui");
+                    Plugin.GetPluginInterface().CommandManager.ProcessCommand("/delvui");
 
                     break;
 
                 case 69421:
-                    _pluginInterface.CommandManager.ProcessCommand("/xlplugins");
+                    Plugin.GetPluginInterface().CommandManager.ProcessCommand("/xlplugins");
 
                     break;
 
                 case 69422:
-                    _pluginInterface.CommandManager.ProcessCommand("/xlsettings");
+                    Plugin.GetPluginInterface().CommandManager.ProcessCommand("/xlsettings");
 
                     break;
 
@@ -179,8 +178,6 @@ namespace DelvUI.Helpers
 
             _hookUiModuleRequestMainCommand.Disable();
             _hookUiModuleRequestMainCommand.Dispose();
-
-            _pluginInterface.Dispose();
         }
 
         public void Dispose()
