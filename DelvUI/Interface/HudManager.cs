@@ -334,7 +334,7 @@ namespace DelvUI.Interface
     {
         internal static int BaseHUDOffsetY = (int)(ImGui.GetMainViewport().Size.Y * 0.3f);
         internal static int UnitFramesOffsetX = 160;
-        internal static int PlayerCastbarY = BaseHUDOffsetY - 12;
+        internal static int PlayerCastbarY = BaseHUDOffsetY - 13;
         internal static int JobHudsBaseY = PlayerCastbarY - 14;
         internal static Vector2 DefaultBigUnitFrameSize = new Vector2(270, 50);
         internal static Vector2 DefaultSmallUnitFrameSize = new Vector2(120, 20);

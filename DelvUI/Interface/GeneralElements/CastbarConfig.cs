@@ -34,7 +34,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public new static PlayerCastbarConfig DefaultConfig()
         {
-            var size = new Vector2(254, 25);
+            var size = new Vector2(254, 24);
             var pos = new Vector2(0, HUDConstants.PlayerCastbarY);
 
             var castNameConfig = new LabelConfig(new Vector2(-size.X / 2f + size.Y + 5, 0), "", LabelTextAnchor.Left);
@@ -80,7 +80,7 @@ namespace DelvUI.Interface.GeneralElements
         }
         public new static TargetCastbarConfig DefaultConfig()
         {
-            var size = new Vector2(254, 25);
+            var size = new Vector2(254, 24);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY / 2f - size.Y / 2);
 
             var castNameConfig = new LabelConfig(new Vector2(-size.X / 2f + size.Y + 5, 0), "", LabelTextAnchor.Left);
