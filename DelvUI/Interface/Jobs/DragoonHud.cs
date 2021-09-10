@@ -8,6 +8,7 @@ using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -15,15 +16,17 @@ using System.Linq;
 using System.Numerics;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
-namespace DelvUI.Interface
+namespace DelvUI.Interface.Jobs
 {
-    public class DragoonHudWindow : HudWindow
+    public class DragoonHud : JobHud
     {
-        public DragoonHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
+        private new DragoonConfig Config => (DragoonConfig)_config;
 
-        public override uint JobId => JobIDs.DRG;
-        private readonly DragoonHudConfig _config = (DragoonHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new DragoonHudConfig());
-        private Vector2 Origin => new(CenterX + _config.BasePosition.X, CenterY + _config.BasePosition.Y);
+        public DragoonHud(string id, DragoonConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        {
+
+        }
+
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
         //protected List<uint> GetJobSpecificBuffs()
@@ -45,35 +48,31 @@ namespace DelvUI.Interface
         //    return new List<uint>(ids);
         //}
 
-        protected override void Draw(bool _)
+        public override void Draw(Vector2 origin)
         {
-            if (_config.ShowChaosThrustBar)
+            if (Config.ShowChaosThrustBar)
             {
-                DrawChaosThrustBar();
+                DrawChaosThrustBar(origin);
             }
 
-            if (_config.ShowDisembowelBar)
+            if (Config.ShowDisembowelBar)
             {
-                DrawDisembowelBar();
+                DrawDisembowelBar(origin);
             }
 
-            if (_config.ShowEyeOfTheDragonBar)
+            if (Config.ShowEyeOfTheDragonBar)
             {
-                DrawEyeOfTheDragonBars();
+                DrawEyeOfTheDragonBars(origin);
             }
 
-            if (_config.ShowBloodBar)
+            if (Config.ShowBloodBar)
             {
-                DrawBloodOfTheDragonBar();
+                DrawBloodOfTheDragonBar(origin);
             }
         }
 
-        // Never draw the mana bar for Dragoons as it's useless.
-        protected override void DrawPrimaryResourceBar() { }
-
-        private void DrawChaosThrustBar()
+        private void DrawChaosThrustBar(Vector2 origin)
         {
-            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             float duration = 0f;
 
@@ -85,13 +84,13 @@ namespace DelvUI.Interface
                 duration = Math.Max(0f, chaosThrust.Duration);
             }
 
-            Vector2 cursorPos = Origin + _config.ChaosThrustBarPosition - _config.ChaosThrustBarSize / 2f;
-            BarBuilder builder = BarBuilder.Create(cursorPos, _config.ChaosThrustBarSize);
-            Bar bar = builder.AddInnerBar(duration, 24f, _config.ChaosThrustBarColor.Map)
+            Vector2 cursorPos = origin + Config.Position + Config.ChaosThrustBarPosition - Config.ChaosThrustBarSize / 2f;
+            BarBuilder builder = BarBuilder.Create(cursorPos, Config.ChaosThrustBarSize);
+            Bar bar = builder.AddInnerBar(duration, 24f, Config.ChaosThrustBarColor.Map)
                              .SetBackgroundColor(EmptyColor["background"])
                              .Build();
 
-            if (_config.ShowChaosThrustBarText && duration > 0f)
+            if (Config.ShowChaosThrustBarText && duration > 0f)
             {
                 builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
@@ -99,39 +98,39 @@ namespace DelvUI.Interface
             bar.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawEyeOfTheDragonBars()
+        private void DrawEyeOfTheDragonBars(Vector2 origin)
         {
             DRGGauge gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
 
-            Vector2 cursorPos = Origin + _config.EyeOfTheDragonBarPosition - _config.EyeOfTheDragonBarSize / 2f;
+            Vector2 cursorPos = origin + Config.Position + Config.EyeOfTheDragonBarPosition - Config.EyeOfTheDragonBarSize / 2f;
 
             byte eyeCount = gauge.EyeCount;
 
-            BarBuilder builder = BarBuilder.Create(cursorPos, _config.EyeOfTheDragonBarSize);
+            BarBuilder builder = BarBuilder.Create(cursorPos, Config.EyeOfTheDragonBarSize);
             Bar eyeBars = builder.SetChunks(2)
-                                 .SetChunkPadding(_config.EyeOfTheDragonBarPadding)
-                                 .AddInnerBar(eyeCount, 2, _config.EyeOfTheDragonColor.Map)
+                                 .SetChunkPadding(Config.EyeOfTheDragonBarPadding)
+                                 .AddInnerBar(eyeCount, 2, Config.EyeOfTheDragonColor.Map)
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .Build();
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             eyeBars.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawBloodOfTheDragonBar()
+        private void DrawBloodOfTheDragonBar(Vector2 origin)
         {
             DRGGauge gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
 
-            Vector2 cursorPos = Origin + _config.BloodBarPosition - _config.BloodBarSize / 2f;
+            Vector2 cursorPos = origin + Config.Position + Config.BloodBarPosition - Config.BloodBarSize / 2f;
 
             int maxTimerMs = 30 * 1000;
             short currTimerMs = gauge.BOTDTimer;
-            PluginConfigColor color = gauge.BOTDState == BOTDState.LOTD ? _config.LifeOfTheDragonColor : _config.BloodOfTheDragonColor;
-            BarBuilder builder = BarBuilder.Create(cursorPos, _config.BloodBarSize);
+            PluginConfigColor color = gauge.BOTDState == BOTDState.LOTD ? Config.LifeOfTheDragonColor : Config.BloodOfTheDragonColor;
+            BarBuilder builder = BarBuilder.Create(cursorPos, Config.BloodBarSize);
             Bar bar = builder.AddInnerBar(currTimerMs / 1000f, maxTimerMs / 1000f, color.Map)
                              .SetBackgroundColor(EmptyColor["background"])
                              .Build();
 
-            if (_config.ShowBloodBarText)
+            if (Config.ShowBloodBarText)
             {
                 builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
@@ -139,11 +138,9 @@ namespace DelvUI.Interface
             bar.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawDisembowelBar()
+        private void DrawDisembowelBar(Vector2 origin)
         {
-            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
-
-            Vector2 cursorPos = Origin + _config.DisembowelBarPosition - _config.DisembowelBarSize / 2f;
+            Vector2 cursorPos = origin + Config.Position + Config.DisembowelBarPosition - Config.DisembowelBarSize / 2f;
 
             IEnumerable<StatusEffect> disembowelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1914 or 121);
             float duration = 0f;
@@ -160,12 +157,12 @@ namespace DelvUI.Interface
                 }
             }
 
-            BarBuilder builder = BarBuilder.Create(cursorPos, _config.DisembowelBarSize);
-            Bar bar = builder.AddInnerBar(duration, 30f, _config.DisembowelBarColor.Map)
+            BarBuilder builder = BarBuilder.Create(cursorPos, Config.DisembowelBarSize);
+            Bar bar = builder.AddInnerBar(duration, 30f, Config.DisembowelBarColor.Map)
                              .SetBackgroundColor(EmptyColor["background"])
                              .Build();
 
-            if (_config.ShowDisembowelBarText)
+            if (Config.ShowDisembowelBarText)
             {
                 builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
@@ -178,16 +175,14 @@ namespace DelvUI.Interface
     [Section("Job Specific Bars")]
     [SubSection("Melee", 0)]
     [SubSection("Dragoon", 1)]
-    public class DragoonHudConfig : PluginConfigObject
+    public class DragoonConfig : JobConfig
     {
-        [DragFloat2("Base Position", min = -4000f, max = 4000f)]
-        [Order(0)]
-        public Vector2 BasePosition = new(0, 0);
+        [JsonIgnore] public new uint JobId = JobIDs.DRG;
+        public new static DragoonConfig DefaultConfig() { return new DragoonConfig(); }
 
         #region Chaos Thrust Bar
-
         [Checkbox("Show Chaos Thrust Bar")]
-        [CollapseControl(5, 0)]
+        [CollapseControl(30, 0)]
         public bool ShowChaosThrustBar = true;
 
         [DragFloat2("Chaos Thrust Bar Size", max = 2000f)]
@@ -196,7 +191,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Chaos Thrust Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 ChaosThrustBarPosition = new(0, 383);
+        public Vector2 ChaosThrustBarPosition = new(0, HUDConstants.JobHudsBaseY - 76);
 
         [Checkbox("Show Chaos Bar Thrust Text")]
         [CollapseWith(10, 0)]
@@ -205,13 +200,11 @@ namespace DelvUI.Interface
         [ColorEdit4("Chaos Thrust Bar Color")]
         [CollapseWith(15, 0)]
         public PluginConfigColor ChaosThrustBarColor = new(new Vector4(106f / 255f, 82f / 255f, 148f / 255f, 100f / 100f));
-
         #endregion
 
         #region Disembowel Bar
-
         [Checkbox("Show Disembowel Bar")]
-        [CollapseControl(10, 1)]
+        [CollapseControl(35, 1)]
         public bool ShowDisembowelBar = true;
 
         [DragFloat2("Disembowel Bar Size", max = 2000f)]
@@ -220,7 +213,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Disembowel Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 DisembowelBarPosition = new(0, 405);
+        public Vector2 DisembowelBarPosition = new(0, HUDConstants.JobHudsBaseY - 54);
 
         [Checkbox("Show Disembowel Bar Text")]
         [CollapseWith(10, 1)]
@@ -229,13 +222,11 @@ namespace DelvUI.Interface
         [ColorEdit4("Disembowel Bar Color")]
         [CollapseWith(15, 1)]
         public PluginConfigColor DisembowelBarColor = new(new Vector4(244f / 255f, 206f / 255f, 191f / 255f, 100f / 100f));
-
         #endregion
 
         #region Eye Of The Dragon Bar
-
         [Checkbox("Show Eye Of The Dragon Bar")]
-        [CollapseControl(15, 2)]
+        [CollapseControl(40, 2)]
         public bool ShowEyeOfTheDragonBar = true;
 
         [DragFloat2("Eye Of The Dragon Bar Size", max = 2000f)]
@@ -244,7 +235,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Eye Of The Dragon Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]
-        public Vector2 EyeOfTheDragonBarPosition = new(0, 427);
+        public Vector2 EyeOfTheDragonBarPosition = new(0, HUDConstants.JobHudsBaseY - 32);
 
         [DragInt("Eye Of The Dragon Bar Padding")]
         [CollapseWith(10, 2)]
@@ -253,13 +244,11 @@ namespace DelvUI.Interface
         [ColorEdit4("Eye Of The Dragon Bar Color")]
         [CollapseWith(15, 2)]
         public PluginConfigColor EyeOfTheDragonColor = new(new Vector4(1f, 182f / 255f, 194f / 255f, 100f / 100f));
-
         #endregion
 
         #region Blood Bar
-
         [Checkbox("Show Blood Bar")]
-        [CollapseControl(20, 3)]
+        [CollapseControl(45, 3)]
         public bool ShowBloodBar = true;
 
         [DragFloat2("Blood Bar Size", max = 2000f)]
@@ -268,7 +257,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Blood Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 3)]
-        public Vector2 BloodBarPosition = new(0, 449);
+        public Vector2 BloodBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
 
         [Checkbox("Show Blood Bar Text")]
         [CollapseWith(10, 3)]
@@ -281,7 +270,6 @@ namespace DelvUI.Interface
         [ColorEdit4("Life Of The Dragon Bar Color")]
         [CollapseWith(20, 3)]
         public PluginConfigColor LifeOfTheDragonColor = new(new Vector4(139f / 255f, 24f / 255f, 24f / 255f, 100f / 100f));
-
         #endregion
     }
 }

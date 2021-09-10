@@ -270,6 +270,7 @@ namespace DelvUI.Interface
                 [JobIDs.WHM] = new JobHudTypes(typeof(WhiteMageHud), typeof(WhiteMageConfig)),
                 [JobIDs.AST] = new JobHudTypes(typeof(AstrologianHud), typeof(AstrologianConfig)),
 
+                [JobIDs.DRG] = new JobHudTypes(typeof(DragoonHud), typeof(DragoonConfig)),
                 [JobIDs.NIN] = new JobHudTypes(typeof(NinjaHud), typeof(NinjaConfig)),
                 [JobIDs.SAM] = new JobHudTypes(typeof(SamuraiHud), typeof(SamuraiConfig)),
 

@@ -65,6 +65,7 @@ namespace DelvUI.Config
                 typeof(ScholarConfig),
                 typeof(AstrologianConfig),
 
+                typeof(DragoonConfig),
                 typeof(NinjaConfig),
                 typeof(SamuraiConfig),
 
