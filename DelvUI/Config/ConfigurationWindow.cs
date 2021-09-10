@@ -1073,8 +1073,7 @@ namespace DelvUI.Config
 
         private void DrawIndividualUnitFramesToTConfig()
         {
-            bool disabled = true;
-            ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
+            _changed |= ImGui.Checkbox("Enabled", ref _pluginConfiguration.ShowTargetOfTargetBar);
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
 
@@ -1224,8 +1223,7 @@ namespace DelvUI.Config
 
         private void DrawIndividualUnitFramesFocusConfig()
         {
-            bool disabled = true;
-            ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
+            _changed |= ImGui.Checkbox("Enabled", ref _pluginConfiguration.ShowFocusBar);
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
 
