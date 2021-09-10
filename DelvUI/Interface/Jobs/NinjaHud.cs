@@ -1,66 +1,64 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
-namespace DelvUI.Interface
+namespace DelvUI.Interface.Jobs
 {
-    public class NinjaHudWindow : HudWindow
+    public class NinjaHud : JobHud
     {
-        public override uint JobId => JobIDs.NIN;
-
-        private NinjaHudConfig _config => (NinjaHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new NinjaHudConfig());
-
+        private new NinjaConfig Config => (NinjaConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
         private Dictionary<string, uint> PartialFillColor => GlobalColors.Instance.PartialFillColor.Map;
 
-        public NinjaHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration) { }
+        public NinjaHud(string id, NinjaConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        {
+
+        }
 
         private readonly SpellHelper _spellHelper = new();
         private float _oldMudraCooldownInfo;
 
-        protected override void Draw(bool _)
+        public override void Draw(Vector2 origin)
         {
-            if (_config.ShowMudraCooldown)
+            if (Config.ShowMudraCooldown)
             {
-                DrawMudraBars();
+                DrawMudraBars(origin);
             }
 
-            if (_config.ShowHutonGauge)
+            if (Config.ShowHutonGauge)
             {
-                DrawHutonGauge();
+                DrawHutonGauge(origin);
             }
 
-            if (_config.ShowNinkiGauge)
+            if (Config.ShowNinkiGauge)
             {
-                DrawNinkiGauge();
+                DrawNinkiGauge(origin);
             }
 
-            if (_config.ShowTrickBar || _config.ShowSuitonBar)
+            if (Config.ShowTrickBar || Config.ShowSuitonBar)
             {
-                DrawTrickAndSuitonGauge();
+                DrawTrickAndSuitonGauge(origin);
             }
         }
 
-        protected override void DrawPrimaryResourceBar() { }
-
-        private void DrawMudraBars()
+        private void DrawMudraBars(Vector2 origin)
         {
-            float xPos = CenterX + _config.Position.X + _config.MudraBarPosition.X - _config.MudraBarSize.X / 2f;
-            float yPos = CenterY + _config.Position.Y + _config.MudraBarPosition.Y - _config.MudraBarSize.Y / 2f;
+            float xPos = origin.X + Config.Position.X + Config.MudraBarPosition.X - Config.MudraBarSize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.MudraBarPosition.Y - Config.MudraBarSize.Y / 2f;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.MudraBarSize.Y, _config.MudraBarSize.X);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.MudraBarSize.Y, Config.MudraBarSize.X);
 
             // each of the 2 mudra charges has a cooldown of 20s
             float maximum = 40f;
@@ -110,9 +108,9 @@ namespace DelvUI.Interface
                 {
                     ninjutsuText = GenerateNinjutsuText(tcjBuff.First().StackCount, haveKassatsuBuff, haveTCJBuff);
                 }
-                PluginConfigColor barColor = haveTCJBuff ? _config.TCJBarColor : (haveKassatsuBuff ? _config.KassatsuBarColor : _config.MudraBarColor);
+                PluginConfigColor barColor = haveTCJBuff ? Config.TCJBarColor : (haveKassatsuBuff ? Config.KassatsuBarColor : Config.MudraBarColor);
                 builder.AddInnerBar(maximum, maximum, barColor.Map);
-                if (_config.ShowNinjutsuText)
+                if (Config.ShowNinjutsuText)
                 {
                     builder.SetTextMode(BarTextMode.Single)
                            .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, ninjutsuText);
@@ -123,9 +121,9 @@ namespace DelvUI.Interface
                 // if we are neither casting ninjutsu nor in kassatsu nor in TCJ, show the mudra charges and cooldowns
                 _oldMudraCooldownInfo = mudraCooldownInfo;
                 builder.SetChunks(2)
-                   .SetChunkPadding(_config.MudraBarChunkPadding)
-                   .AddInnerBar(maximum - mudraCooldownInfo, maximum, _config.MudraBarColor.Map);
-                if (_config.ShowMudraBarText)
+                   .SetChunkPadding(Config.MudraBarChunkPadding)
+                   .AddInnerBar(maximum - mudraCooldownInfo, maximum, Config.MudraBarColor.Map);
+                if (Config.ShowMudraBarText)
                 {
                     builder.SetTextMode(BarTextMode.EachChunk)
                            .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
@@ -154,23 +152,23 @@ namespace DelvUI.Interface
             };
         }
 
-        private void DrawHutonGauge()
+        private void DrawHutonGauge(Vector2 origin)
         {
             NINGauge gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
             int hutonDurationLeft = (int)Math.Ceiling((float)(gauge.HutonTimeLeft / (double)1000));
 
-            float xPos = CenterX + _config.Position.X + _config.HutonGaugePosition.X - _config.HutonGaugeSize.X / 2f;
-            float yPos = CenterY + _config.Position.Y + _config.HutonGaugePosition.Y - _config.HutonGaugeSize.Y / 2f;
+            float xPos = origin.X + Config.Position.X + Config.HutonGaugePosition.X - Config.HutonGaugeSize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.HutonGaugePosition.Y - Config.HutonGaugeSize.Y / 2f;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.HutonGaugeSize.Y, _config.HutonGaugeSize.X);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.HutonGaugeSize.Y, Config.HutonGaugeSize.X);
             float maximum = 70f;
 
-            builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, _config.HutonGaugeColor.Map)
+            builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, Config.HutonGaugeColor.Map)
                    .SetTextMode(BarTextMode.Single)
                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                    .SetBackgroundColor(EmptyColor["background"]);
 
-            if (!_config.ShowHutonGaugeBorder)
+            if (!Config.ShowHutonGaugeBorder)
             {
                 builder.SetDrawBorder(false);
             }
@@ -181,32 +179,32 @@ namespace DelvUI.Interface
             bar.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawNinkiGauge()
+        private void DrawNinkiGauge(Vector2 origin)
         {
             NINGauge gauge = PluginInterface.ClientState.JobGauges.Get<NINGauge>();
 
-            float xPos = CenterX + _config.Position.X + _config.NinkiGaugePosition.X - _config.NinkiGaugeSize.X / 2f;
-            float yPos = CenterY + _config.Position.Y + _config.NinkiGaugePosition.Y - _config.NinkiGaugeSize.Y / 2f;
+            float xPos = origin.X + Config.Position.X + Config.NinkiGaugePosition.X - Config.NinkiGaugeSize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.NinkiGaugePosition.Y - Config.NinkiGaugeSize.Y / 2f;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.NinkiGaugeSize.Y, _config.NinkiGaugeSize.X);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.NinkiGaugeSize.Y, Config.NinkiGaugeSize.X);
 
-            if (_config.ChunkNinkiGauge)
+            if (Config.ChunkNinkiGauge)
             {
-                builder.SetChunks(2).SetChunkPadding(_config.NinkiGaugeChunkPadding).AddInnerBar(gauge.Ninki, 100, _config.NinkiGaugeColor.Map, PartialFillColor);
+                builder.SetChunks(2).SetChunkPadding(Config.NinkiGaugeChunkPadding).AddInnerBar(gauge.Ninki, 100, Config.NinkiGaugeColor.Map, PartialFillColor);
             }
             else
             {
-                builder.AddInnerBar(gauge.Ninki, 100, _config.NinkiGaugeColor.Map);
+                builder.AddInnerBar(gauge.Ninki, 100, Config.NinkiGaugeColor.Map);
             }
 
             builder.SetBackgroundColor(EmptyColor["background"]);
 
-            if (_config.ShowNinkiGaugeText)
+            if (Config.ShowNinkiGaugeText)
             {
                 builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
-            if (!_config.ShowNinkiGaugeBorder)
+            if (!Config.ShowNinkiGaugeBorder)
             {
                 builder.SetDrawBorder(false);
             }
@@ -217,16 +215,16 @@ namespace DelvUI.Interface
             bar.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawTrickAndSuitonGauge()
+        private void DrawTrickAndSuitonGauge(Vector2 origin)
         {
-            float xPos = CenterX + _config.Position.X + _config.TrickBarPosition.X - _config.TrickBarSize.X / 2f;
-            float yPos = CenterY + _config.Position.Y + _config.TrickBarPosition.Y - _config.TrickBarSize.Y / 2f;
+            float xPos = origin.X + Config.Position.X + Config.TrickBarPosition.X - Config.TrickBarSize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.TrickBarPosition.Y - Config.TrickBarSize.Y / 2f;
 
             Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
             float trickDuration = 0f;
             const float trickMaxDuration = 15f;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, _config.TrickBarSize.Y, _config.TrickBarSize.X);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.TrickBarSize.Y, Config.TrickBarSize.X);
 
             if (target is Chara)
             {
@@ -236,9 +234,9 @@ namespace DelvUI.Interface
 
             if (trickDuration != 0)
             {
-                builder.AddInnerBar(trickDuration, trickMaxDuration, _config.TrickBarColor.Map);
+                builder.AddInnerBar(trickDuration, trickMaxDuration, Config.TrickBarColor.Map);
 
-                if (_config.ShowTrickBarText)
+                if (Config.ShowTrickBarText)
                 {
                     builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
                 }
@@ -246,14 +244,14 @@ namespace DelvUI.Interface
 
             IEnumerable<StatusEffect> suitonBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 507);
 
-            if (suitonBuff.Any() && _config.ShowSuitonBar)
+            if (suitonBuff.Any() && Config.ShowSuitonBar)
             {
                 float suitonDuration = Math.Abs(suitonBuff.First().Duration);
-                builder.AddInnerBar(suitonDuration, 20, _config.SuitonBarColor.Map);
+                builder.AddInnerBar(suitonDuration, 20, Config.SuitonBarColor.Map);
 
-                if (_config.ShowSuitonBarText)
+                if (Config.ShowSuitonBarText)
                 {
-                    builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterRight, BarTextType.Current, _config.SuitonBarColor.Vector, Vector4.UnitW, null);
+                    builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.SuitonBarColor.Vector, Vector4.UnitW, null);
                 }
             }
 
@@ -267,14 +265,14 @@ namespace DelvUI.Interface
     [Section("Job Specific Bars")]
     [SubSection("Melee", 0)]
     [SubSection("Ninja", 1)]
-    public class NinjaHudConfig : PluginConfigObject
+    public class NinjaConfig : JobConfig
     {
-        [DragFloat2("Base Position", min = -4000f, max = 4000f)]
-        [Order(0)]
-        public Vector2 Position = new(0, 0);
+        [JsonIgnore] public new uint JobId = JobIDs.NIN;
+        public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
 
+        #region huton gauge
         [Checkbox("Show Huton Gauge")]
-        [CollapseControl(5, 0)]
+        [CollapseControl(30, 0)]
         public bool ShowHutonGauge = true;
 
         [DragFloat2("Huton Gauge Size", max = 2000f)]
@@ -283,7 +281,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Huton Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 HutonGaugePosition = new(0, 427);
+        public Vector2 HutonGaugePosition = new(0, HUDConstants.JobHudsBaseY - 54);
 
         [ColorEdit4("Huton Gauge Color")]
         [CollapseWith(10, 0)]
@@ -292,9 +290,11 @@ namespace DelvUI.Interface
         [Checkbox("Show Huton Gauge Border")]
         [CollapseWith(15, 0)]
         public bool ShowHutonGaugeBorder = true;
+        #endregion
 
+        #region ninki gauge
         [Checkbox("Show Ninki Gauge")]
-        [CollapseControl(10, 1)]
+        [CollapseControl(35, 1)]
         public bool ShowNinkiGauge = true;
 
         [Checkbox("Show Ninki Gauge Text")]
@@ -311,7 +311,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Ninki Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(15, 1)]
-        public Vector2 NinkiGaugePosition = new(0, 449);
+        public Vector2 NinkiGaugePosition = new(0, HUDConstants.JobHudsBaseY - 32);
 
         [DragFloat("Ninki Gauge Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(20, 1)]
@@ -324,9 +324,11 @@ namespace DelvUI.Interface
         [Checkbox("Show Ninki Gauge Border")]
         [CollapseWith(30, 1)]
         public bool ShowNinkiGaugeBorder = true;
+        #endregion
 
+        #region trick / suiton
         [Checkbox("Show Trick Bar")]
-        [CollapseControl(15, 2)]
+        [CollapseControl(40, 2)]
         public bool ShowTrickBar = false;
 
         [Checkbox("Show Trick Bar Text")]
@@ -338,7 +340,7 @@ namespace DelvUI.Interface
         public PluginConfigColor TrickBarColor = new(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f));
 
         [Checkbox("Show Suiton Bar")]
-        [CollapseControl(20, 3)]
+        [CollapseControl(45, 3)]
         public bool ShowSuitonBar = false;
 
         [Checkbox("Show Suiton Bar Text")]
@@ -350,15 +352,17 @@ namespace DelvUI.Interface
         public PluginConfigColor SuitonBarColor = new(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f));
 
         [DragFloat2("Trick/Suiton Bar Size", max = 2000f)]
-        [Order(25)]
+        [Order(50)]
         public Vector2 TrickBarSize = new(254, 20);
 
         [DragFloat2("Trick/Suiton Bar Position", min = -4000f, max = 4000f)]
-        [Order(30)]
-        public Vector2 TrickBarPosition = new(0, 471);
+        [Order(55)]
+        public Vector2 TrickBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        #endregion
 
+        #region mudra
         [Checkbox("Show Mudra Bars")]
-        [CollapseControl(35, 4)]
+        [CollapseControl(60, 4)]
         public bool ShowMudraCooldown = true;
 
         [Checkbox("Show Mudra Bar Timers")]
@@ -375,7 +379,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Mudra Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 4)]
-        public Vector2 MudraBarPosition = new(0, 407);
+        public Vector2 MudraBarPosition = new(0, HUDConstants.JobHudsBaseY - 73);
 
         [DragFloat("Mudra Bar Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(15, 4)]
@@ -392,5 +396,6 @@ namespace DelvUI.Interface
         [ColorEdit4("TCJ Bar Color")]
         [CollapseWith(30, 4)]
         public PluginConfigColor TCJBarColor = new(new Vector4(181 / 255f, 33 / 255f, 41 / 242f, 100f / 100f));
+        #endregion
     }
 }

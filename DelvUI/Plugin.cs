@@ -231,7 +231,7 @@ namespace DelvUI
                 JobIDs.DRG => new DragoonHudWindow(_pluginInterface, _pluginConfiguration),
                 //JobIDs.SAM => new SamuraiHudWindow(_pluginInterface, _pluginConfiguration),
                 JobIDs.MNK => new MonkHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.NIN => new NinjaHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.NIN => new NinjaHud(_pluginInterface, _pluginConfiguration),
 
                 //Ranged DPS
                 JobIDs.BRD => new BardHudWindow(_pluginInterface, _pluginConfiguration),
