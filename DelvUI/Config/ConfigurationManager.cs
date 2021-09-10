@@ -56,6 +56,7 @@ namespace DelvUI.Config
                 typeof(TargetBuffsListConfig),
                 typeof(TargetDebuffsListConfig),
 
+                typeof(PaladinConfig),
                 typeof(WarriorConfig),
                 typeof(GunbreakerConfig),
 
