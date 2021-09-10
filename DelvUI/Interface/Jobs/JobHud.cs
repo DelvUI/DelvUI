@@ -1,10 +1,11 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Plugin;
 using DelvUI.Config;
+using System.Numerics;
 
 namespace DelvUI.Interface.Jobs
 {
-    public abstract class JobHud : HudElement, IHudElementWithActor
+    public class JobHud : HudElement, IHudElementWithActor
     {
         protected PluginConfiguration PluginConfiguration;
         protected DalamudPluginInterface PluginInterface => Plugin.GetPluginInterface();
@@ -17,6 +18,10 @@ namespace DelvUI.Interface.Jobs
         {
             // NOTE: Temporary due to fonts
             PluginConfiguration = pluginConfiguration;
+        }
+
+        public override void Draw(Vector2 origin)
+        {
         }
     }
 }

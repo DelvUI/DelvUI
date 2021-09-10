@@ -255,19 +255,19 @@ namespace DelvUI
                 JobIDs.ACN => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //Hand
-                JobIDs.CRP => new HandHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.BSM => new HandHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.ARM => new HandHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.GSM => new HandHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.LTW => new HandHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.WVR => new HandHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.ALC => new HandHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.CUL => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.CRP => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.BSM => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.ARM => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.GSM => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.LTW => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.WVR => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.ALC => new HandHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.CUL => new HandHudWindow(_pluginInterface, _pluginConfiguration),
 
-                //Land
-                JobIDs.MIN => new LandHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.BOT => new LandHudWindow(_pluginInterface, _pluginConfiguration),
-                JobIDs.FSH => new LandHudWindow(_pluginInterface, _pluginConfiguration),
+                ////Land
+                //JobIDs.MIN => new LandHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.BOT => new LandHudWindow(_pluginInterface, _pluginConfiguration),
+                //JobIDs.FSH => new LandHudWindow(_pluginInterface, _pluginConfiguration),
 
                 //dont have packs yet
                 JobIDs.BLU => new UnitFrameOnlyHudWindow(_pluginInterface, _pluginConfiguration),

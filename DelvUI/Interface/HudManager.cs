@@ -28,6 +28,7 @@ namespace DelvUI.Interface
         private PrimaryResourceHud _primaryResourceHud;
         private JobHud _jobHud = null;
         private Dictionary<uint, JobHudTypes> _jobsMap;
+        private Dictionary<uint, Type> _unsupportedJobsMap;
 
         public HudManager(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration)
         {
@@ -198,15 +199,26 @@ namespace DelvUI.Interface
                 return;
             }
 
-            if (!_jobsMap.TryGetValue(newJobId, out var types))
+            JobConfig config = null;
+
+            // unsupported jobs
+            if (_unsupportedJobsMap.ContainsKey(newJobId) && _unsupportedJobsMap.TryGetValue(newJobId, out var type))
             {
-                return;
+                config = (JobConfig)Activator.CreateInstance(type);
+                _jobHud = new JobHud(type.FullName, config, _pluginConfiguration);
             }
 
-            var config = (JobConfig)ConfigurationManager.GetInstance().GetConfigObjectForType(types.ConfigType);
-            _jobHud = (JobHud)Activator.CreateInstance(types.HudType, types.HudType.FullName, config, _pluginConfiguration);
+            // supported jobs
+            if (_jobsMap.TryGetValue(newJobId, out var types))
+            {
+                config = (JobConfig)ConfigurationManager.GetInstance().GetConfigObjectForType(types.ConfigType);
+                _jobHud = (JobHud)Activator.CreateInstance(types.HudType, types.HudType.FullName, config, _pluginConfiguration);
+            }
 
-            _primaryResourceHud.ResourceType = config.UseDefaulyPrimaryResourceBar ? config.PrimaryResourceType : PrimaryResourceTypes.None;
+            if (config != null)
+            {
+                _primaryResourceHud.ResourceType = config.UseDefaulyPrimaryResourceBar ? config.PrimaryResourceType : PrimaryResourceTypes.None;
+            }
         }
 
         private void AssignActors()
@@ -258,6 +270,35 @@ namespace DelvUI.Interface
                 [JobIDs.BLM] = new JobHudTypes(typeof(BlackMageHud), typeof(BlackMageConfig)),
                 [JobIDs.RDM] = new JobHudTypes(typeof(RedMageHud), typeof(RedMageConfig)),
                 [JobIDs.SMN] = new JobHudTypes(typeof(SummonerHud), typeof(SummonerConfig))
+            };
+
+            _unsupportedJobsMap = new Dictionary<uint, Type>()
+            {
+                // base jobs
+                [JobIDs.GLD] = typeof(GladiatorConfig),
+                [JobIDs.MRD] = typeof(MarauderConfig),
+                [JobIDs.PGL] = typeof(PugilistConfig),
+                [JobIDs.LNC] = typeof(LancerConfig),
+                [JobIDs.ROG] = typeof(RogueConfig),
+                [JobIDs.ARC] = typeof(ArcherConfig),
+                [JobIDs.THM] = typeof(ThaumaturgeConfig),
+                [JobIDs.ACN] = typeof(ArcanistConfig),
+                [JobIDs.CNJ] = typeof(ConjurerConfig),
+
+                // crafters
+                [JobIDs.CRP] = typeof(CarpenterConfig),
+                [JobIDs.BSM] = typeof(BlacksmithConfig),
+                [JobIDs.ARM] = typeof(ArmorerConfig),
+                [JobIDs.GSM] = typeof(GoldsmithConfig),
+                [JobIDs.LTW] = typeof(LeatherworkerConfig),
+                [JobIDs.WVR] = typeof(WeaverConfig),
+                [JobIDs.ALC] = typeof(AlchemistConfig),
+                [JobIDs.CUL] = typeof(CulinarianConfig),
+
+                // gatherers
+                [JobIDs.MIN] = typeof(MinerConfig),
+                [JobIDs.BOT] = typeof(BotanistConfig),
+                [JobIDs.FSH] = typeof(FisherConfig),
             };
         }
     }
