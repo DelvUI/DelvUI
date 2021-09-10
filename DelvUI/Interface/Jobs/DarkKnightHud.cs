@@ -52,7 +52,6 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawManaBar(Vector2 origin)
         {
-            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var actor = PluginInterface.ClientState.LocalPlayer;
             var darkArtsBuff = PluginInterface.ClientState.JobGauges.Get<DRKGauge>().HasDarkArts();
 

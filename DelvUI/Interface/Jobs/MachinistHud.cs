@@ -1,73 +1,66 @@
 ﻿using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
+using Newtonsoft.Json;
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
-namespace DelvUI.Interface
+namespace DelvUI.Interface.Jobs
 {
-    public class MachinistHudWindow : HudWindow
+    public class MachinistHud : JobHud
     {
         private readonly float[] _robotDuration = { 12.450f, 13.950f, 15.450f, 16.950f, 18.450f, 19.950f };
-        private MachinistHudConfig _config => (MachinistHudConfig)ConfigurationManager.GetInstance().GetConfiguration(new MachinistHudConfig());
+        private new MachinistConfig Config => (MachinistConfig)_config;
 
-        public override uint JobId => JobIDs.MCH;
-        private Vector2 Origin => new(CenterX + _config.Position.X, CenterY + _config.Position.Y);
+        public MachinistHud(string id, MachinistConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        {
+
+        }
 
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
-        public MachinistHudWindow(DalamudPluginInterface pluginInterface, PluginConfiguration pluginConfiguration) : base(pluginInterface, pluginConfiguration)
+
+        public override void Draw(Vector2 origin)
         {
-
-        }
-
-        protected override void Draw(bool _)
-        {
-            if (_config.ShowOverheat)
+            if (Config.ShowOverheat)
             {
-                DrawOverheatBar();
+                DrawOverheatBar(origin);
             }
 
-            if (_config.ShowHeatGauge)
+            if (Config.ShowHeatGauge)
             {
-                DrawHeatGauge();
+                DrawHeatGauge(origin);
             }
 
-            if (_config.ShowBatteryGauge)
+            if (Config.ShowBatteryGauge)
             {
-                DrawBatteryGauge();
+                DrawBatteryGauge(origin);
             }
 
-            if (_config.ShowWildfire)
+            if (Config.ShowWildfire)
             {
-                DrawWildfireBar();
+                DrawWildfireBar(origin);
             }
         }
 
-        protected override void DrawPrimaryResourceBar() { }
-        private Vector2 CalculatePosition(Vector2 position, Vector2 size) => Origin + position - size / 2f;
-
-        private void DrawHeatGauge()
+        private void DrawHeatGauge(Vector2 origin)
         {
-            Debug.Assert(PluginInterface.ClientState.JobGauges != null, "PluginInterface.ClientState.JobGauges != null");
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
 
-            Vector2 position = CalculatePosition(_config.HeatGaugePosition, _config.HeatGaugeSize);
+            var position = origin + Config.Position + Config.HeatGaugePosition - Config.HeatGaugeSize / 2f;
 
-            var builder = BarBuilder.Create(position, _config.HeatGaugeSize)
+            var builder = BarBuilder.Create(position, Config.HeatGaugeSize)
                                     .SetChunks(2)
-                                    .SetChunkPadding(_config.HeatGaugePadding)
-                                    .AddInnerBar(gauge.Heat, 100, _config.HeatGaugeFillColor.Map, PartialFillColor.Map);
+                                    .SetChunkPadding(Config.HeatGaugePadding)
+                                    .AddInnerBar(gauge.Heat, 100, Config.HeatGaugeFillColor.Map, PartialFillColor.Map);
 
-            if (_config.ShowHeatGaugeText)
+            if (Config.ShowHeatGaugeText)
             {
                 builder.SetTextMode(BarTextMode.EachChunk)
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
@@ -78,37 +71,36 @@ namespace DelvUI.Interface
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawBatteryGauge()
+        private void DrawBatteryGauge(Vector2 origin)
         {
-            Debug.Assert(PluginInterface.ClientState.JobGauges != null, "PluginInterface.ClientState.JobGauges != null");
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
 
-            Vector2 position = CalculatePosition(_config.BatteryGaugePosition, _config.BatteryGaugeSize);
+            var position = origin + Config.Position + Config.BatteryGaugePosition - Config.BatteryGaugeSize / 2f;
 
-            var builder = BarBuilder.Create(position, _config.BatteryGaugeSize)
+            var builder = BarBuilder.Create(position, Config.BatteryGaugeSize)
                                     .SetChunks(new[] { .5f, .1f, .1f, .1f, .1f, .1f })
-                                    .SetChunkPadding(_config.BatteryGaugePadding)
+                                    .SetChunkPadding(Config.BatteryGaugePadding)
                                     .SetBackgroundColor(EmptyColor.Background);
 
-            if (_config.ShowBatteryGaugeBattery)
+            if (Config.ShowBatteryGaugeBattery)
             {
-                builder.AddInnerBar(gauge.Battery, 100, _config.BatteryFillColor.Map, PartialFillColor.Map);
+                builder.AddInnerBar(gauge.Battery, 100, Config.BatteryFillColor.Map, PartialFillColor.Map);
 
-                if (_config.ShowBatteryGaugeBatteryText)
+                if (Config.ShowBatteryGaugeBatteryText)
                 {
                     builder.SetTextMode(BarTextMode.Single)
-                           .SetText(BarTextPosition.CenterLeft, BarTextType.Current, _config.BatteryFillColor.Vector, Vector4.UnitW, null);
+                           .SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.BatteryFillColor.Vector, Vector4.UnitW, null);
                 }
             }
 
-            if (gauge.IsRobotActive() && _config.ShowBatteryGaugeRobotDuration)
+            if (gauge.IsRobotActive() && Config.ShowBatteryGaugeRobotDuration)
             {
-                builder.AddInnerBar(gauge.RobotTimeRemaining / 1000f, _robotDuration[gauge.LastRobotBatteryPower / 10 - 5], _config.RobotFillColor.Map, null);
+                builder.AddInnerBar(gauge.RobotTimeRemaining / 1000f, _robotDuration[gauge.LastRobotBatteryPower / 10 - 5], Config.RobotFillColor.Map, null);
 
-                if (_config.ShowBatteryGaugeRobotDurationText)
+                if (Config.ShowBatteryGaugeRobotDurationText)
                 {
                     builder.SetTextMode(BarTextMode.Single)
-                           .SetText(BarTextPosition.CenterRight, BarTextType.Current, _config.RobotFillColor.Vector, Vector4.UnitW, null);
+                           .SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.RobotFillColor.Vector, Vector4.UnitW, null);
                 }
             }
 
@@ -117,21 +109,20 @@ namespace DelvUI.Interface
             bar.Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawOverheatBar()
+        private void DrawOverheatBar(Vector2 origin)
         {
-            Debug.Assert(PluginInterface.ClientState.JobGauges != null, "PluginInterface.ClientState.JobGauges != null");
             var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
 
-            Vector2 position = CalculatePosition(_config.OverheatPosition, _config.OverheatSize);
+            var position = origin + Config.Position + Config.OverheatPosition - Config.OverheatSize / 2f;
 
-            var builder = BarBuilder.Create(position, _config.OverheatSize)
+            var builder = BarBuilder.Create(position, Config.OverheatSize)
                 .SetBackgroundColor(EmptyColor.Background);
 
             if (gauge.IsOverheated())
             {
-                builder.AddInnerBar(gauge.OverheatTimeRemaining / 1000f, 8, _config.OverheatFillColor.Map, null);
+                builder.AddInnerBar(gauge.OverheatTimeRemaining / 1000f, 8, Config.OverheatFillColor.Map, null);
 
-                if (_config.ShowOverheatText)
+                if (Config.ShowOverheatText)
                 {
                     builder.SetTextMode(BarTextMode.EachChunk)
                            .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
@@ -142,21 +133,20 @@ namespace DelvUI.Interface
             builder.Build().Draw(drawList, PluginConfiguration);
         }
 
-        private void DrawWildfireBar()
+        private void DrawWildfireBar(Vector2 origin)
         {
-            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             var wildfireBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1946);
 
-            Vector2 position = CalculatePosition(_config.WildfirePosition, _config.WildfireSize);
+            var position = origin + Config.Position + Config.WildfirePosition - Config.WildfireSize / 2f;
 
-            var builder = BarBuilder.Create(position, _config.WildfireSize);
+            var builder = BarBuilder.Create(position, Config.WildfireSize);
 
             if (wildfireBuff.Any())
             {
                 var duration = wildfireBuff.First().Duration;
-                builder.AddInnerBar(duration, 10, _config.WildfireFillColor.Map, null);
+                builder.AddInnerBar(duration, 10, Config.WildfireFillColor.Map, null);
 
-                if (_config.ShowWildfireText)
+                if (Config.ShowWildfireText)
                 {
                     builder.SetTextMode(BarTextMode.EachChunk)
                            .SetBackgroundColor(EmptyColor.Background)
@@ -173,15 +163,14 @@ namespace DelvUI.Interface
     [Section("Job Specific Bars")]
     [SubSection("Ranged", 0)]
     [SubSection("Machinist", 1)]
-    public class MachinistHudConfig : PluginConfigObject
+    public class MachinistConfig : JobConfig
     {
-        [DragFloat2("Base Position" + "##Machinist", min = -4000f, max = 4000f)]
-        [Order(0)]
-        public Vector2 Position = new(0, 0);
+        [JsonIgnore] public new uint JobId = JobIDs.MCH;
+        public new static MachinistConfig DefaultConfig() { return new MachinistConfig(); }
 
         #region Overheat
         [Checkbox("Show Overheat Bar")]
-        [CollapseControl(5, 0)]
+        [CollapseControl(30, 0)]
         public bool ShowOverheat = true;
 
         [Checkbox("Show Text" + "##Overheat")]
@@ -190,7 +179,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##Overheat", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 OverheatPosition = new(0, 405);
+        public Vector2 OverheatPosition = new(0, HUDConstants.JobHudsBaseY - 54);
 
         [DragFloat2("Size" + "##Overheat", min = 0, max = 4000f)]
         [CollapseWith(10, 0)]
@@ -203,7 +192,7 @@ namespace DelvUI.Interface
 
         #region Heat Gauge
         [Checkbox("Show Heat Gauge")]
-        [CollapseControl(10, 1)]
+        [CollapseControl(35, 1)]
         public bool ShowHeatGauge = true;
 
         [Checkbox("Show Text" + "##HeatGauge")]
@@ -212,7 +201,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##HeatGauge", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 HeatGaugePosition = new(0, 427);
+        public Vector2 HeatGaugePosition = new(0, HUDConstants.JobHudsBaseY - 32);
 
         [DragFloat2("Size" + "##HeatGauge", min = 0, max = 4000f)]
         [CollapseWith(10, 1)]
@@ -229,7 +218,7 @@ namespace DelvUI.Interface
 
         #region Battery Gauge
         [Checkbox("Show Battery Gauge")]
-        [CollapseControl(15, 2)]
+        [CollapseControl(40, 2)]
         public bool ShowBatteryGauge = true;
 
         [Checkbox("Show Battery" + "##BatteryGauge")]
@@ -250,7 +239,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##BatteryGauge", min = -4000f, max = 4000f)]
         [CollapseWith(20, 2)]
-        public Vector2 BatteryGaugePosition = new(0, 449);
+        public Vector2 BatteryGaugePosition = new(0, HUDConstants.JobHudsBaseY - 10);
 
         [DragFloat2("Size" + "##BatteryGauge", min = 0, max = 4000f)]
         [CollapseWith(25, 2)]
@@ -271,7 +260,7 @@ namespace DelvUI.Interface
 
         #region Wildfire
         [Checkbox("Show Wildfire")]
-        [CollapseControl(20, 3)]
+        [CollapseControl(45, 3)]
         public bool ShowWildfire = false;
 
         [Checkbox("Show Text" + "##Wildfire")]
@@ -280,7 +269,7 @@ namespace DelvUI.Interface
 
         [DragFloat2("Position" + "##Wildfire", min = -4000f, max = 4000f)]
         [CollapseWith(5, 3)]
-        public Vector2 WildfirePosition = new(0, 383);
+        public Vector2 WildfirePosition = new(0, HUDConstants.JobHudsBaseY - 76);
 
         [DragFloat2("Size" + "##Wildfire", min = 0, max = 4000f)]
         [CollapseWith(10, 3)]

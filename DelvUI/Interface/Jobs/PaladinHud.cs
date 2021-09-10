@@ -58,7 +58,6 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawManaBar(Vector2 origin)
         {
-            Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             PlayerCharacter actor = PluginInterface.ClientState.LocalPlayer;
 
             float posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
