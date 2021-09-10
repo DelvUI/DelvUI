@@ -18,7 +18,7 @@ namespace DelvUI.Interface.Jobs
         private new GunbreakerConfig Config => (GunbreakerConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public GunbreakerHud(string id, GunbreakerConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public GunbreakerHud(string id, GunbreakerConfig config) : base(id, config)
         {
 
         }
@@ -49,7 +49,7 @@ namespace DelvUI.Interface.Jobs
                    .SetBackgroundColor(EmptyColor["background"]);
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
 
@@ -71,7 +71,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
     }
 

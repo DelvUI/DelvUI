@@ -18,7 +18,7 @@ namespace DelvUI.Interface.Jobs
         private new BlackMageConfig Config => (BlackMageConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public BlackMageHud(string id, BlackMageConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public BlackMageHud(string id, BlackMageConfig config) : base(id, config)
         {
 
         }
@@ -77,7 +77,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
 
             // threshold marker
             if (Config.ShowManaThresholdMarker && gauge.InAstralFire())
@@ -127,7 +127,7 @@ namespace DelvUI.Interface.Jobs
                                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         protected virtual void DrawPolyglot(Vector2 origin)
@@ -155,7 +155,7 @@ namespace DelvUI.Interface.Jobs
                 builder.SetGlowColor(0x88FFFFFF);
             }
 
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
 
             // 2
             position.X += barWidth + Config.PolyglotPadding;
@@ -168,7 +168,7 @@ namespace DelvUI.Interface.Jobs
                 builder.SetGlowColor(0x88FFFFFF);
             }
 
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         protected virtual void DrawTripleCast(Vector2 origin)
@@ -188,7 +188,7 @@ namespace DelvUI.Interface.Jobs
                                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         protected virtual void DrawProcs(Vector2 origin)
@@ -221,7 +221,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         protected virtual void DrawDotTimer(Vector2 origin)
@@ -260,7 +260,7 @@ namespace DelvUI.Interface.Jobs
                 .SetFlipDrainDirection(Config.InvertDoTBar);
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
     }
 

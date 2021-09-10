@@ -19,7 +19,7 @@ namespace DelvUI.Interface.Jobs
         private new SamuraiConfig Config => (SamuraiConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public SamuraiHud(string id, SamuraiConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public SamuraiHud(string id, SamuraiConfig config) : base(id, config)
         {
 
         }
@@ -70,7 +70,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            kenkiBuilder.Build().Draw(drawList, PluginConfiguration);
+            kenkiBuilder.Build().Draw(drawList);
         }
 
         private void DrawHiganbanaBar(Vector2 origin)
@@ -104,7 +104,7 @@ namespace DelvUI.Interface.Jobs
                 higanbanaBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
             var drawList = ImGui.GetWindowDrawList();
-            higanbanaBuilder.Build().Draw(drawList, PluginConfiguration);
+            higanbanaBuilder.Build().Draw(drawList);
         }
 
         private void DrawActiveBuffs(Vector2 origin)
@@ -143,8 +143,8 @@ namespace DelvUI.Interface.Jobs
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            shifuBuilder.Build().Draw(drawList, PluginConfiguration);
-            jinpuBuilder.Build().Draw(drawList, PluginConfiguration);
+            shifuBuilder.Build().Draw(drawList);
+            jinpuBuilder.Build().Draw(drawList);
         }
 
         private void DrawSenResourceBar(Vector2 origin)
@@ -168,7 +168,7 @@ namespace DelvUI.Interface.Jobs
                 var builder = BarBuilder.Create(cursorPos, senBarSize).
                     AddInnerBar(hasSen[i], 1, colors[i].Map);
 
-                builder.Build().Draw(drawList, PluginConfiguration);
+                builder.Build().Draw(drawList);
                 cursorPos.X += senBarWidth + Config.SenBarPadding;
             }
         }
@@ -189,7 +189,7 @@ namespace DelvUI.Interface.Jobs
                 .AddInnerBar(gauge.MeditationStacks, 3, Config.MeditationColor.Map);
 
             var drawList = ImGui.GetWindowDrawList();
-            meditationBuilder.Build().Draw(drawList, PluginConfiguration);
+            meditationBuilder.Build().Draw(drawList);
         }
     }
 

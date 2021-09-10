@@ -1,7 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
-using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using System;
 using System.Collections.Generic;

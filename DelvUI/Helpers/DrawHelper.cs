@@ -1,5 +1,4 @@
 ﻿using Dalamud.Game.Internal.Gui.Addon;
-using DelvUI.Config;
 using ImGuiNET;
 using Lumina.Excel;
 using System;
@@ -10,14 +9,14 @@ namespace DelvUI.Helpers
 {
     public static class DrawHelper
     {
-        public static void DrawOutlinedText(string text, Vector2 pos, float fontScale, PluginConfiguration pluginConfiguration)
+        public static void DrawOutlinedText(string text, Vector2 pos, float fontScale)
         {
-            DrawOutlinedText(text, pos, Vector4.One, Vector4.UnitW, fontScale, pluginConfiguration);
+            DrawOutlinedText(text, pos, Vector4.One, Vector4.UnitW, fontScale);
         }
 
-        public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor, float fontScale, PluginConfiguration pluginConfiguration)
+        public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor, float fontScale)
         {
-            DrawOutlinedText(text, pos, color, outlineColor, fontScale, pluginConfiguration.BigNoodleTooFont);
+            DrawOutlinedText(text, pos, color, outlineColor, fontScale, FontsManager.Instance.BigNoodleTooFont);
         }
 
         public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor, float fontScale, ImFontPtr fontPtr)

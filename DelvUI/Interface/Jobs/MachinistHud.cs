@@ -17,7 +17,7 @@ namespace DelvUI.Interface.Jobs
         private readonly float[] _robotDuration = { 12.450f, 13.950f, 15.450f, 16.950f, 18.450f, 19.950f };
         private new MachinistConfig Config => (MachinistConfig)_config;
 
-        public MachinistHud(string id, MachinistConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public MachinistHud(string id, MachinistConfig config) : base(id, config)
         {
 
         }
@@ -68,7 +68,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawBatteryGauge(Vector2 origin)
@@ -106,7 +106,7 @@ namespace DelvUI.Interface.Jobs
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             var bar = builder.Build();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawOverheatBar(Vector2 origin)
@@ -130,7 +130,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawWildfireBar(Vector2 origin)
@@ -155,7 +155,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
     }
 

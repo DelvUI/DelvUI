@@ -22,7 +22,7 @@ namespace DelvUI.Interface.Jobs
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
-        public WhiteMageHud(string id, WhiteMageConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public WhiteMageHud(string id, WhiteMageConfig config) : base(id, config)
         {
 
         }
@@ -126,7 +126,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
 
             posX = origin.X + Config.Position.X + Config.BloodLilyBarPosition.X - Config.BloodLilyBarSize.X / 2f;
             posY = origin.Y + Config.Position.Y + Config.BloodLilyBarPosition.Y - Config.BloodLilyBarSize.Y / 2f;
@@ -136,7 +136,7 @@ namespace DelvUI.Interface.Jobs
             builder.SetChunks(3).SetChunkPadding(Config.BloodLilyBarPad).AddInnerBar(gauge.NumBloodLily, 3, Config.BloodLilyColor.Map);
 
             drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
     }
 

@@ -18,7 +18,6 @@ namespace DelvUI
         private bool _fontBuilt;
         private bool _fontLoadFailed;
         private HudManager _hudManager;
-        private PluginConfiguration _pluginConfiguration;
         private SystemMenuHook _menuHook;
 
         private static DalamudPluginInterface _pluginInterface;
@@ -43,21 +42,7 @@ namespace DelvUI
 
             // initialize a not-necessarily-defaults configuration
             ConfigurationManager.Initialize(false);
-
-            // load a configuration with default parameters and write it to file
-            _pluginConfiguration = new PluginConfiguration();
-            PluginConfiguration.WriteConfig("default", _pluginConfiguration);
-
-            // if a previously used configuration exists, use it instead
-            var oldConfiguration = PluginConfiguration.ReadConfig(Name);
-
-            if (oldConfiguration != null)
-            {
-                _pluginConfiguration = oldConfiguration;
-            }
-
-            _pluginConfiguration.BannerImage = bannerTexture;
-            _pluginConfiguration.Init();
+            FontsManager.Initialize();
 
             _pluginInterface.UiBuilder.OnBuildUi += Draw;
             _pluginInterface.UiBuilder.OnBuildFonts += BuildFont;
@@ -84,11 +69,11 @@ namespace DelvUI
 
             _pluginInterface.CommandManager.AddHandler("/delvuireloadconfig", new CommandInfo(ReloadConfigCommand));
 
-            TexturesCache.Initialize(pluginInterface);
+            TexturesCache.Initialize();
             GlobalColors.Initialize();
             Resolver.Initialize();
 
-            _hudManager = new HudManager(_pluginInterface, _pluginConfiguration);
+            _hudManager = new HudManager();
         }
 
         public void Dispose()
@@ -107,7 +92,7 @@ namespace DelvUI
             {
                 try
                 {
-                    _pluginConfiguration.BigNoodleTooFont = ImGui.GetIO().Fonts.AddFontFromFileTTF(fontFile, 24);
+                    FontsManager.Instance.BigNoodleTooFont = ImGui.GetIO().Fonts.AddFontFromFileTTF(fontFile, 24);
                     _fontBuilt = true;
                 }
                 catch (Exception ex)
@@ -191,7 +176,7 @@ namespace DelvUI
 
             if (_fontBuilt)
             {
-                ImGui.PushFont(_pluginConfiguration.BigNoodleTooFont);
+                ImGui.PushFont(FontsManager.Instance.BigNoodleTooFont);
             }
 
             if (!hudState)

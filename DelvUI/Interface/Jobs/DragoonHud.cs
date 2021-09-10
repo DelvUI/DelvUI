@@ -1,7 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -11,7 +10,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
@@ -22,7 +20,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DragoonConfig Config => (DragoonConfig)_config;
 
-        public DragoonHud(string id, DragoonConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public DragoonHud(string id, DragoonConfig config) : base(id, config)
         {
 
         }
@@ -95,7 +93,7 @@ namespace DelvUI.Interface.Jobs
                 builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawEyeOfTheDragonBars(Vector2 origin)
@@ -113,7 +111,7 @@ namespace DelvUI.Interface.Jobs
                                  .SetBackgroundColor(EmptyColor["background"])
                                  .Build();
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            eyeBars.Draw(drawList, PluginConfiguration);
+            eyeBars.Draw(drawList);
         }
 
         private void DrawBloodOfTheDragonBar(Vector2 origin)
@@ -135,7 +133,7 @@ namespace DelvUI.Interface.Jobs
                 builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawDisembowelBar(Vector2 origin)
@@ -167,7 +165,7 @@ namespace DelvUI.Interface.Jobs
                 builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
     }
 

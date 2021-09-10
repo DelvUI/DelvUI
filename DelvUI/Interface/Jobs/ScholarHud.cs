@@ -10,7 +10,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
@@ -22,7 +21,7 @@ namespace DelvUI.Interface.Jobs
         private new ScholarConfig Config => (ScholarConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public ScholarHud(string id, ScholarConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public ScholarHud(string id, ScholarConfig config) : base(id, config)
         {
 
         }
@@ -63,7 +62,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawAetherBar(Vector2 origin)
@@ -85,7 +84,7 @@ namespace DelvUI.Interface.Jobs
                                 .Build();
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawBioBar(Vector2 origin)
@@ -124,7 +123,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bioBar.Draw(drawList, PluginConfiguration);
+            bioBar.Draw(drawList);
         }
     }
 

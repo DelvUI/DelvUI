@@ -1,5 +1,4 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
-using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
@@ -9,18 +8,11 @@ namespace DelvUI.Interface.GeneralElements
 {
     public class GCDIndicatorHud : HudElement, IHudElementWithActor
     {
-        private PluginConfiguration _pluginConfiguration;
         private GCDIndicatorConfig Config => (GCDIndicatorConfig)_config;
-        //private GCDIndicatorConfig Config => (GCDIndicatorConfig)ConfigurationManager.GetInstance().GetConfiguration<GCDIndicatorConfig>();
-
-
         public Actor Actor { get; set; } = null;
 
-        public GCDIndicatorHud(string ID, GCDIndicatorConfig config, PluginConfiguration pluginConfiguration) : base(ID, config)
+        public GCDIndicatorHud(string ID, GCDIndicatorConfig config) : base(ID, config)
         {
-            // NOTE: Temporary. Have to do this for now to use the bar builder.
-            // Ideally hud elements shouldna't need a reference to PluginConfiguration
-            _pluginConfiguration = pluginConfiguration;
         }
 
         public override void Draw(Vector2 origin)
@@ -52,7 +44,7 @@ namespace DelvUI.Interface.GeneralElements
                 .SetDrawBorder(Config.ShowBorder)
                 .SetVertical(Config.VerticalMode);
 
-            builder.Build().Draw(drawList, _pluginConfiguration);
+            builder.Build().Draw(drawList);
         }
     }
 }

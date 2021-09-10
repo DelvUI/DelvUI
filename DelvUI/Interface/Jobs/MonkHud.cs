@@ -16,7 +16,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new MonkConfig Config => (MonkConfig)_config;
 
-        public MonkHud(string id, MonkConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public MonkHud(string id, MonkConfig config) : base(id, config)
         {
 
         }
@@ -94,7 +94,7 @@ namespace DelvUI.Interface.Jobs
                                  .Build();
 
                 var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList, PluginConfiguration);
+                bar.Draw(drawList);
             }
 
             if (raptorFormDuration > 0)
@@ -106,7 +106,7 @@ namespace DelvUI.Interface.Jobs
                                  .Build();
 
                 var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList, PluginConfiguration);
+                bar.Draw(drawList);
             }
 
             if (coeurlFormDuration > 0)
@@ -118,7 +118,7 @@ namespace DelvUI.Interface.Jobs
                                  .Build();
 
                 var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList, PluginConfiguration);
+                bar.Draw(drawList);
             }
 
             if (formlessFist.Duration > 0)
@@ -130,7 +130,7 @@ namespace DelvUI.Interface.Jobs
                                  .Build();
 
                 var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList, PluginConfiguration);
+                bar.Draw(drawList);
             }
             else
             {
@@ -139,7 +139,7 @@ namespace DelvUI.Interface.Jobs
                                  .Build();
 
                 var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList, PluginConfiguration);
+                bar.Draw(drawList);
             }
         }
 
@@ -162,7 +162,7 @@ namespace DelvUI.Interface.Jobs
                                  .Build();
 
                 var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList, PluginConfiguration);
+                bar.Draw(drawList);
             }
             else
             {
@@ -171,7 +171,7 @@ namespace DelvUI.Interface.Jobs
                                  .Build();
 
                 var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList, PluginConfiguration);
+                bar.Draw(drawList);
             }
         }
 
@@ -196,7 +196,7 @@ namespace DelvUI.Interface.Jobs
                                  .Build();
 
                 var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList, PluginConfiguration);
+                bar.Draw(drawList);
             }
             else
             {
@@ -205,7 +205,7 @@ namespace DelvUI.Interface.Jobs
                                  .Build();
 
                 var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList, PluginConfiguration);
+                bar.Draw(drawList);
             }
         }
 
@@ -229,7 +229,7 @@ namespace DelvUI.Interface.Jobs
                                  .Build();
 
                 var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList, PluginConfiguration);
+                bar.Draw(drawList);
             }
             else
             {
@@ -239,7 +239,7 @@ namespace DelvUI.Interface.Jobs
                                  .Build();
 
                 var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList, PluginConfiguration);
+                bar.Draw(drawList);
             }
         }
 
@@ -256,7 +256,7 @@ namespace DelvUI.Interface.Jobs
                                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawTwinSnakesBar(Vector2 origin)
@@ -278,7 +278,7 @@ namespace DelvUI.Interface.Jobs
                              .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawLeadenFistBar(Vector2 origin)
@@ -301,7 +301,7 @@ namespace DelvUI.Interface.Jobs
                                  .Build();
 
                 var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList, PluginConfiguration);
+                bar.Draw(drawList);
             }
             else
             {
@@ -310,7 +310,7 @@ namespace DelvUI.Interface.Jobs
                                  .Build();
 
                 var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList, PluginConfiguration);
+                bar.Draw(drawList);
             }
         }
 
@@ -331,7 +331,7 @@ namespace DelvUI.Interface.Jobs
                              .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
     }
 

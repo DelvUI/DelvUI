@@ -10,7 +10,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
@@ -23,7 +22,7 @@ namespace DelvUI.Interface.Jobs
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
         private Dictionary<string, uint> PartialFillColor => GlobalColors.Instance.PartialFillColor.Map;
 
-        public PaladinHud(string id, PaladinConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public PaladinHud(string id, PaladinConfig config) : base(id, config)
         {
 
         }
@@ -82,7 +81,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawOathGauge(Vector2 origin)
@@ -104,7 +103,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawBuffBar(Vector2 origin)
@@ -140,7 +139,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawAtonementBar(Vector2 origin)
@@ -158,7 +157,7 @@ namespace DelvUI.Interface.Jobs
                                            .AddInnerBar(stackCount, 3, Config.AtonementColor.Map, null);
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawDoTBar(Vector2 origin)
@@ -187,7 +186,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
     }
 

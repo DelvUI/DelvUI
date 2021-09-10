@@ -1,6 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -10,7 +9,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -21,7 +19,7 @@ namespace DelvUI.Interface.Jobs
         private new WarriorConfig Config => (WarriorConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public WarriorHud(string id, WarriorConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public WarriorHud(string id, WarriorConfig config) : base(id, config)
         {
 
         }
@@ -72,7 +70,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawBeastGauge(Vector2 origin)
@@ -99,7 +97,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
     }
 

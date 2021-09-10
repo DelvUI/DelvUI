@@ -9,7 +9,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -19,7 +18,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DarkKnightConfig Config => (DarkKnightConfig)_config;
 
-        public DarkKnightHud(string id, DarkKnightConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public DarkKnightHud(string id, DarkKnightConfig config) : base(id, config)
         {
 
         }
@@ -86,7 +85,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawBloodGauge(Vector2 origin)
@@ -119,7 +118,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawBuffBar(Vector2 origin)
@@ -155,7 +154,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawLivingShadowBar(Vector2 origin)
@@ -180,7 +179,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
     }
 

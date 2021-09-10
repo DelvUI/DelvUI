@@ -24,7 +24,7 @@ namespace DelvUI.Interface.Jobs
         private new AstrologianConfig Config => (AstrologianConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public AstrologianHud(string id, AstrologianConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public AstrologianHud(string id, AstrologianConfig config) : base(id, config)
         {
 
         }
@@ -189,7 +189,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Build().Draw(drawList, PluginConfiguration);
+            bar.Build().Draw(drawList);
         }
 
         private void DrawDraw(Vector2 origin)
@@ -322,7 +322,7 @@ namespace DelvUI.Interface.Jobs
                 bar.AddPrimaryText(new BarText(BarTextPosition.CenterRight, BarTextType.Custom, redrawText));
             }
 
-            bar.Build().Draw(drawList, PluginConfiguration);
+            bar.Build().Draw(drawList);
         }
 
         private void DrawDot(Vector2 origin)
@@ -349,7 +349,7 @@ namespace DelvUI.Interface.Jobs
                                          )
                                          .Build();
 
-                barNoTarget.Draw(drawList, PluginConfiguration);
+                barNoTarget.Draw(drawList);
 
                 return;
             }
@@ -377,7 +377,7 @@ namespace DelvUI.Interface.Jobs
                              )
                              .Build();
 
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawLightspeed(Vector2 origin)
@@ -412,7 +412,7 @@ namespace DelvUI.Interface.Jobs
                              .Build();
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawStar(Vector2 origin)
@@ -461,7 +461,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Build().Draw(drawList, PluginConfiguration);
+            bar.Build().Draw(drawList);
         }
     }
 

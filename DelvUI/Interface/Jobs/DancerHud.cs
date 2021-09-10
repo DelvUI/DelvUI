@@ -19,7 +19,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DancerConfig Config => (DancerConfig)_config;
 
-        public DancerHud(string id, DancerConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public DancerHud(string id, DancerConfig config) : base(id, config)
         {
 
         }
@@ -79,7 +79,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawFeathersBar(Vector2 origin)
@@ -102,7 +102,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private unsafe void DrawStepBar(Vector2 origin)
@@ -185,7 +185,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawBuffBar(Vector2 origin)
@@ -223,7 +223,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawStandardBar(Vector2 origin)
@@ -246,7 +246,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.SetBackgroundColor(EmptyColor["background"]).Build().Draw(drawList, PluginConfiguration);
+            builder.SetBackgroundColor(EmptyColor["background"]).Build().Draw(drawList);
         }
 
         private void DrawProcBar(Vector2 origin)
@@ -296,10 +296,10 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            cascadeBuilder.Build().Draw(drawList, PluginConfiguration);
-            fountainBuilder.Build().Draw(drawList, PluginConfiguration);
-            windmillBuilder.Build().Draw(drawList, PluginConfiguration);
-            showerBuilder.Build().Draw(drawList, PluginConfiguration);
+            cascadeBuilder.Build().Draw(drawList);
+            fountainBuilder.Build().Draw(drawList);
+            windmillBuilder.Build().Draw(drawList);
+            showerBuilder.Build().Draw(drawList);
         }
     }
 

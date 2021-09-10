@@ -1,7 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -23,7 +22,7 @@ namespace DelvUI.Interface.Jobs
         private new BardConfig Config => (BardConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public BardHud(string id, BardConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public BardHud(string id, BardConfig config) : base(id, config)
         {
 
         }
@@ -106,7 +105,7 @@ namespace DelvUI.Interface.Jobs
 
             foreach (Bar bar in barDrawList)
             {
-                bar.Draw(drawList, PluginConfiguration);
+                bar.Draw(drawList);
             }
         }
 
@@ -189,7 +188,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawSongTimer(Vector2 origin, short songTimer, Dictionary<string, uint> songColor)
@@ -213,7 +212,7 @@ namespace DelvUI.Interface.Jobs
                              .Build();
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawSoulVoiceBar(Vector2 origin)
@@ -234,7 +233,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawStacks(Vector2 origin, int amount, int max, Dictionary<string, uint> stackColor)
@@ -257,7 +256,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
     }
 

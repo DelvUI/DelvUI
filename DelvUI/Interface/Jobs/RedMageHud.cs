@@ -18,7 +18,7 @@ namespace DelvUI.Interface.Jobs
         private new RedMageConfig Config => (RedMageConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public RedMageHud(string id, RedMageConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public RedMageHud(string id, RedMageConfig config) : base(id, config)
         {
 
         }
@@ -72,7 +72,7 @@ namespace DelvUI.Interface.Jobs
                 builder.SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
 
             // threshold marker
             if (Config.ShowManaThresholdMarker)
@@ -129,7 +129,7 @@ namespace DelvUI.Interface.Jobs
                 .AddInnerBar(value, 1, color.Map)
                 .SetBackgroundColor(EmptyColor["background"]);
 
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawWhiteManaBar(Vector2 origin)
@@ -175,7 +175,7 @@ namespace DelvUI.Interface.Jobs
                                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawDualCastBar(Vector2 origin)
@@ -193,7 +193,7 @@ namespace DelvUI.Interface.Jobs
                 .AddInnerBar(value, 1, Config.DualCastColor.Map)
                 .SetBackgroundColor(EmptyColor["background"]);
 
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawVerstoneProc(Vector2 origin)
@@ -242,7 +242,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList, PluginConfiguration);
+            builder.Build().Draw(drawList);
 
             // threshold marker
             if (thresholdRatio <= 0)

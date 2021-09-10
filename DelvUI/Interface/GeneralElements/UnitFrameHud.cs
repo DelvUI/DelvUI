@@ -1,6 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.Internal.Gui.Addon;
-using DelvUI.Config;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;

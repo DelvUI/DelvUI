@@ -22,7 +22,7 @@ namespace DelvUI.Interface.Jobs
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
         private Dictionary<string, uint> PartialFillColor => GlobalColors.Instance.PartialFillColor.Map;
 
-        public NinjaHud(string id, NinjaConfig config, PluginConfiguration pluginConfiguration) : base(id, config, pluginConfiguration)
+        public NinjaHud(string id, NinjaConfig config) : base(id, config)
         {
 
         }
@@ -134,7 +134,7 @@ namespace DelvUI.Interface.Jobs
                              .Build();
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private string GenerateNinjutsuText(byte param, bool haveKassatsuBuff, bool haveTCJBuff)
@@ -176,7 +176,7 @@ namespace DelvUI.Interface.Jobs
             Bar bar = builder.Build();
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawNinkiGauge(Vector2 origin)
@@ -212,7 +212,7 @@ namespace DelvUI.Interface.Jobs
             Bar bar = builder.Build();
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
 
         private void DrawTrickAndSuitonGauge(Vector2 origin)
@@ -257,7 +257,7 @@ namespace DelvUI.Interface.Jobs
 
             Bar bar = builder.Build();
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList, PluginConfiguration);
+            bar.Draw(drawList);
         }
     }
 

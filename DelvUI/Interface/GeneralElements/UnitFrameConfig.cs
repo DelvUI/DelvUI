@@ -1,6 +1,5 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using Newtonsoft.Json;
 using System;
 using System.Numerics;
 

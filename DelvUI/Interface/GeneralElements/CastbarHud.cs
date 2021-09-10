@@ -1,5 +1,4 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
-using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
