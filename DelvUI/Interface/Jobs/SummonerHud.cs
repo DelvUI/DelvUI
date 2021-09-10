@@ -28,9 +28,6 @@ namespace DelvUI.Interface.Jobs
 
         }
 
-        //private Vector2 Origin => new(origin.X + Config.Position.X, origin.Y + Config.Position.Y);
-
-
         public override void Draw(Vector2 origin)
         {
             DrawActiveDots(origin);
