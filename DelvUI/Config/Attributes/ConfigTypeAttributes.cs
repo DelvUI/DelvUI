@@ -155,7 +155,7 @@ namespace DelvUI.Config.Attributes
         public string friendlyName;
         public string[] names;
 
-        public DragDropHorizontalAttribute(string friendlyName, string[] names)
+        public DragDropHorizontalAttribute(string friendlyName, params string[] names)
         {
             this.friendlyName = friendlyName;
             this.names = names;
