@@ -1,4 +1,9 @@
-﻿using Dalamud.Interface;
+﻿using System;
+using System.Collections.Generic;
+using System.Numerics;
+using Dalamud.Game.ClientState.Actors.Types;
+using Dalamud.Interface;
+using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -6,15 +11,12 @@ using DelvUI.Interface.Jobs;
 using DelvUI.Interface.StatusEffects;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
-using System;
-using System.Collections.Generic;
-using System.Numerics;
 
 namespace DelvUI.Interface
 {
     public class HudManager
     {
-        private Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
+        private readonly Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
 
         private List<HudElement> _hudElements;
         private List<IHudElementWithActor> _hudElementsUsingPlayer;
@@ -23,7 +25,7 @@ namespace DelvUI.Interface
         private List<IHudElementWithActor> _hudElementsUsingFocusTarget;
 
         private PrimaryResourceHud _primaryResourceHud;
-        private JobHud _jobHud = null;
+        private JobHud _jobHud;
         private Dictionary<uint, JobHudTypes> _jobsMap;
         private Dictionary<uint, Type> _unsupportedJobsMap;
 
@@ -44,10 +46,7 @@ namespace DelvUI.Interface
             _hudElementsUsingFocusTarget.Clear();
         }
 
-        private void OnConfigReset(object sender, EventArgs e)
-        {
-            CreateHudElements();
-        }
+        private void OnConfigReset(object sender, EventArgs e) { CreateHudElements(); }
 
         private void CreateHudElements()
         {
@@ -65,80 +64,80 @@ namespace DelvUI.Interface
 
         private void CreateUnitFrames()
         {
-            var playerUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerUnitFrameConfig>();
-            var playerUnitFrame = new UnitFrameHud("playerUnitFrame", playerUnitFrameConfig);
+            PlayerUnitFrameConfig playerUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerUnitFrameConfig>();
+            UnitFrameHud playerUnitFrame = new("playerUnitFrame", playerUnitFrameConfig);
             _hudElements.Add(playerUnitFrame);
             _hudElementsUsingPlayer.Add(playerUnitFrame);
 
-            var targetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetUnitFrameConfig>();
-            var targetUnitFrame = new UnitFrameHud("targetUnitFrame", targetUnitFrameConfig);
+            TargetUnitFrameConfig targetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetUnitFrameConfig>();
+            UnitFrameHud targetUnitFrame = new("targetUnitFrame", targetUnitFrameConfig);
             _hudElements.Add(targetUnitFrame);
             _hudElementsUsingTarget.Add(targetUnitFrame);
 
-            var targetOfTargetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetOfTargetUnitFrameConfig>();
-            var targetOfTargetUnitFrame = new UnitFrameHud("targetOfTargetUnitFrame", targetOfTargetUnitFrameConfig);
+            TargetOfTargetUnitFrameConfig targetOfTargetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetOfTargetUnitFrameConfig>();
+            UnitFrameHud targetOfTargetUnitFrame = new("targetOfTargetUnitFrame", targetOfTargetUnitFrameConfig);
             _hudElements.Add(targetOfTargetUnitFrame);
             _hudElementsUsingTargetOfTarget.Add(targetOfTargetUnitFrame);
 
-            var focusTargetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<FocusTargetUnitFrameConfig>();
-            var focusTargetUnitFrame = new UnitFrameHud("focusTargetUnitFrame", focusTargetUnitFrameConfig);
+            FocusTargetUnitFrameConfig focusTargetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<FocusTargetUnitFrameConfig>();
+            UnitFrameHud focusTargetUnitFrame = new("focusTargetUnitFrame", focusTargetUnitFrameConfig);
             _hudElements.Add(focusTargetUnitFrame);
             _hudElementsUsingFocusTarget.Add(focusTargetUnitFrame);
         }
 
         private void CreateCastbars()
         {
-            var playerCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerCastbarConfig>();
-            var playerCastbar = new PlayerCastbarHud("playerCastbar", playerCastbarConfig);
+            PlayerCastbarConfig playerCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerCastbarConfig>();
+            PlayerCastbarHud playerCastbar = new("playerCastbar", playerCastbarConfig);
             _hudElements.Add(playerCastbar);
             _hudElementsUsingPlayer.Add(playerCastbar);
 
-            var targetCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetCastbarConfig>();
-            var targetCastbar = new TargetCastbarHud("targetCastbar", targetCastbarConfig);
+            TargetCastbarConfig targetCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetCastbarConfig>();
+            TargetCastbarHud targetCastbar = new("targetCastbar", targetCastbarConfig);
             _hudElements.Add(targetCastbar);
             _hudElementsUsingTarget.Add(targetCastbar);
         }
 
         private void CreateStatusEffectsLists()
         {
-            var playerBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerBuffsListConfig>();
-            var playerBuffs = new StatusEffectsListHud("playerBuffs", playerBuffsConfig);
+            PlayerBuffsListConfig playerBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerBuffsListConfig>();
+            StatusEffectsListHud playerBuffs = new("playerBuffs", playerBuffsConfig);
             _hudElements.Add(playerBuffs);
             _hudElementsUsingPlayer.Add(playerBuffs);
 
-            var playerDebuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerDebuffsListConfig>();
-            var playerDebuffs = new StatusEffectsListHud("playerDebuffs", playerDebuffsConfig);
+            PlayerDebuffsListConfig playerDebuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerDebuffsListConfig>();
+            StatusEffectsListHud playerDebuffs = new("playerDebuffs", playerDebuffsConfig);
             _hudElements.Add(playerDebuffs);
             _hudElementsUsingPlayer.Add(playerDebuffs);
 
-            var targetBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetBuffsListConfig>();
-            var targetBuffs = new StatusEffectsListHud("targetBuffs", targetBuffsConfig);
+            TargetBuffsListConfig targetBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetBuffsListConfig>();
+            StatusEffectsListHud targetBuffs = new("targetBuffs", targetBuffsConfig);
             _hudElements.Add(targetBuffs);
             _hudElementsUsingTarget.Add(targetBuffs);
 
-            var targetDebuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetDebuffsListConfig>();
-            var targetDebuffs = new StatusEffectsListHud("targetDebuffs", targetDebuffsConfig);
+            TargetDebuffsListConfig targetDebuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetDebuffsListConfig>();
+            StatusEffectsListHud targetDebuffs = new("targetDebuffs", targetDebuffsConfig);
             _hudElements.Add(targetDebuffs);
             _hudElementsUsingTarget.Add(targetDebuffs);
         }
 
         private void CaretMiscElements()
         {
-            // primary resource bar
-            var primaryResourceConfig = ConfigurationManager.GetInstance().GetConfigObject<PrimaryResourceConfig>();
+            // Primary Resource Bar
+            PrimaryResourceConfig primaryResourceConfig = ConfigurationManager.GetInstance().GetConfigObject<PrimaryResourceConfig>();
             _primaryResourceHud = new PrimaryResourceHud("primaryResource", primaryResourceConfig);
             _hudElements.Add(_primaryResourceHud);
             _hudElementsUsingPlayer.Add(_primaryResourceHud);
 
-            // gcd indicator
-            var gcdIndicatorConfig = ConfigurationManager.GetInstance().GetConfigObject<GCDIndicatorConfig>();
-            var gcdIndicator = new GCDIndicatorHud("gcdIndicator", gcdIndicatorConfig);
+            // GCD Indicator
+            GCDIndicatorConfig gcdIndicatorConfig = ConfigurationManager.GetInstance().GetConfigObject<GCDIndicatorConfig>();
+            GCDIndicatorHud gcdIndicator = new("gcdIndicator", gcdIndicatorConfig);
             _hudElements.Add(gcdIndicator);
             _hudElementsUsingPlayer.Add(gcdIndicator);
 
-            // mp ticker
-            var mpTickerConfig = ConfigurationManager.GetInstance().GetConfigObject<MPTickerConfig>();
-            var mpTicker = new MPTickerHud("mpTicker", mpTickerConfig);
+            // MP Ticker
+            MPTickerConfig mpTickerConfig = ConfigurationManager.GetInstance().GetConfigObject<MPTickerConfig>();
+            MPTickerHud mpTicker = new("mpTicker", mpTickerConfig);
             _hudElements.Add(mpTicker);
             _hudElementsUsingPlayer.Add(mpTicker);
         }
@@ -154,7 +153,7 @@ namespace DelvUI.Interface
             ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
 
-            var begin = ImGui.Begin(
+            bool begin = ImGui.Begin(
                 "DelvUI2",
                 ImGuiWindowFlags.NoTitleBar
               | ImGuiWindowFlags.NoScrollbar
@@ -172,7 +171,7 @@ namespace DelvUI.Interface
             UpdateJob();
             AssignActors();
 
-            foreach (var element in _hudElements)
+            foreach (HudElement element in _hudElements)
             {
                 element.Draw(_origin);
             }
@@ -192,15 +191,16 @@ namespace DelvUI.Interface
                 return false;
             }
 
-            var parameterWidget = (AtkUnitBase*)Plugin.GetPluginInterface().Framework.Gui.GetUiObjectByName("_ParameterWidget", 1);
-            var fadeMiddleWidget = (AtkUnitBase*)Plugin.GetPluginInterface().Framework.Gui.GetUiObjectByName("FadeMiddle", 1);
+            AtkUnitBase* parameterWidget = (AtkUnitBase*)Plugin.GetPluginInterface().Framework.Gui.GetUiObjectByName("_ParameterWidget", 1);
+            AtkUnitBase* fadeMiddleWidget = (AtkUnitBase*)Plugin.GetPluginInterface().Framework.Gui.GetUiObjectByName("FadeMiddle", 1);
 
             return parameterWidget->IsVisible && !fadeMiddleWidget->IsVisible;
         }
 
         private void UpdateJob()
         {
-            var newJobId = Plugin.GetPluginInterface().ClientState.LocalPlayer.ClassJob.Id;
+            uint newJobId = Plugin.GetPluginInterface().ClientState.LocalPlayer.ClassJob.Id;
+
             if (_jobHud != null && _jobHud.Config.JobId == newJobId)
             {
                 return;
@@ -208,15 +208,15 @@ namespace DelvUI.Interface
 
             JobConfig config = null;
 
-            // unsupported jobs
-            if (_unsupportedJobsMap.ContainsKey(newJobId) && _unsupportedJobsMap.TryGetValue(newJobId, out var type))
+            // Unsupported Jobs
+            if (_unsupportedJobsMap.ContainsKey(newJobId) && _unsupportedJobsMap.TryGetValue(newJobId, out Type type))
             {
                 config = (JobConfig)Activator.CreateInstance(type);
                 _jobHud = new JobHud(type.FullName, config);
             }
 
-            // supported jobs
-            if (_jobsMap.TryGetValue(newJobId, out var types))
+            // Supported Jobs
+            if (_jobsMap.TryGetValue(newJobId, out JobHudTypes types))
             {
                 config = (JobConfig)ConfigurationManager.GetInstance().GetConfigObjectForType(types.ConfigType);
                 _jobHud = (JobHud)Activator.CreateInstance(types.HudType, types.HudType.FullName, config);
@@ -230,11 +230,12 @@ namespace DelvUI.Interface
 
         private void AssignActors()
         {
-            var pluginInterface = Plugin.GetPluginInterface();
+            DalamudPluginInterface pluginInterface = Plugin.GetPluginInterface();
 
-            // player
-            var player = pluginInterface.ClientState.LocalPlayer;
-            foreach (var element in _hudElementsUsingPlayer)
+            // Player
+            PlayerCharacter player = pluginInterface.ClientState.LocalPlayer;
+
+            foreach (IHudElementWithActor element in _hudElementsUsingPlayer)
             {
                 element.Actor = player;
 
@@ -244,23 +245,26 @@ namespace DelvUI.Interface
                 }
             }
 
-            // target
-            var target = pluginInterface.ClientState.Targets.SoftTarget ?? pluginInterface.ClientState.Targets.CurrentTarget;
-            foreach (var element in _hudElementsUsingTarget)
+            // Target
+            Actor target = pluginInterface.ClientState.Targets.SoftTarget ?? pluginInterface.ClientState.Targets.CurrentTarget;
+
+            foreach (IHudElementWithActor element in _hudElementsUsingTarget)
             {
                 element.Actor = target;
             }
 
-            // target of target
-            var targetOfTarget = Utils.FindTargetOfTarget(target, player, pluginInterface.ClientState.Actors);
-            foreach (var element in _hudElementsUsingTargetOfTarget)
+            // Target of Target
+            Actor targetOfTarget = Utils.FindTargetOfTarget(target, player, pluginInterface.ClientState.Actors);
+
+            foreach (IHudElementWithActor element in _hudElementsUsingTargetOfTarget)
             {
                 element.Actor = targetOfTarget;
             }
 
-            // focus
-            var focusTarget = pluginInterface.ClientState.Targets.FocusTarget;
-            foreach (var element in _hudElementsUsingFocusTarget)
+            // Focus
+            Actor focusTarget = pluginInterface.ClientState.Targets.FocusTarget;
+
+            foreach (IHudElementWithActor element in _hudElementsUsingFocusTarget)
             {
                 element.Actor = focusTarget;
             }
@@ -268,41 +272,42 @@ namespace DelvUI.Interface
 
         protected void CreateJobsMap()
         {
-            _jobsMap = new Dictionary<uint, JobHudTypes>()
+            _jobsMap = new Dictionary<uint, JobHudTypes>
             {
-                // tanks
-                [JobIDs.DRK] = new JobHudTypes(typeof(DarkKnightHud), typeof(DarkKnightConfig)),
-                [JobIDs.PLD] = new JobHudTypes(typeof(PaladinHud), typeof(PaladinConfig)),
-                [JobIDs.WAR] = new JobHudTypes(typeof(WarriorHud), typeof(WarriorConfig)),
-                [JobIDs.GNB] = new JobHudTypes(typeof(GunbreakerHud), typeof(GunbreakerConfig)),
+                // Tanks
+                [JobIDs.PLD] = new(typeof(PaladinHud), typeof(PaladinConfig)),
+                [JobIDs.WAR] = new(typeof(WarriorHud), typeof(WarriorConfig)),
+                [JobIDs.DRK] = new(typeof(DarkKnightHud), typeof(DarkKnightConfig)),
+                [JobIDs.GNB] = new(typeof(GunbreakerHud), typeof(GunbreakerConfig)),
 
-                // healers
-                [JobIDs.SCH] = new JobHudTypes(typeof(ScholarHud), typeof(ScholarConfig)),
-                [JobIDs.WHM] = new JobHudTypes(typeof(WhiteMageHud), typeof(WhiteMageConfig)),
-                [JobIDs.AST] = new JobHudTypes(typeof(AstrologianHud), typeof(AstrologianConfig)),
+                // Healers
+                [JobIDs.WHM] = new(typeof(WhiteMageHud), typeof(WhiteMageConfig)),
+                [JobIDs.SCH] = new(typeof(ScholarHud), typeof(ScholarConfig)),
+                [JobIDs.AST] = new(typeof(AstrologianHud), typeof(AstrologianConfig)),
 
-                // melee
-                [JobIDs.MNK] = new JobHudTypes(typeof(MonkHud), typeof(MonkConfig)),
-                [JobIDs.DRG] = new JobHudTypes(typeof(DragoonHud), typeof(DragoonConfig)),
-                [JobIDs.NIN] = new JobHudTypes(typeof(NinjaHud), typeof(NinjaConfig)),
-                [JobIDs.SAM] = new JobHudTypes(typeof(SamuraiHud), typeof(SamuraiConfig)),
+                // Melee
+                [JobIDs.MNK] = new(typeof(MonkHud), typeof(MonkConfig)),
+                [JobIDs.DRG] = new(typeof(DragoonHud), typeof(DragoonConfig)),
+                [JobIDs.NIN] = new(typeof(NinjaHud), typeof(NinjaConfig)),
+                [JobIDs.SAM] = new(typeof(SamuraiHud), typeof(SamuraiConfig)),
 
-                // ranged
-                [JobIDs.MCH] = new JobHudTypes(typeof(MachinistHud), typeof(MachinistConfig)),
-                [JobIDs.DNC] = new JobHudTypes(typeof(DancerHud), typeof(DancerConfig)),
-                [JobIDs.BRD] = new JobHudTypes(typeof(BardHud), typeof(BardConfig)),
+                // Ranged
+                [JobIDs.BRD] = new(typeof(BardHud), typeof(BardConfig)),
+                [JobIDs.MCH] = new(typeof(MachinistHud), typeof(MachinistConfig)),
+                [JobIDs.DNC] = new(typeof(DancerHud), typeof(DancerConfig)),
 
-                // casters
-                [JobIDs.BLM] = new JobHudTypes(typeof(BlackMageHud), typeof(BlackMageConfig)),
-                [JobIDs.RDM] = new JobHudTypes(typeof(RedMageHud), typeof(RedMageConfig)),
-                [JobIDs.SMN] = new JobHudTypes(typeof(SummonerHud), typeof(SummonerConfig))
+                // Casters
+                [JobIDs.BLM] = new(typeof(BlackMageHud), typeof(BlackMageConfig)),
+                [JobIDs.SMN] = new(typeof(SummonerHud), typeof(SummonerConfig)),
+                [JobIDs.RDM] = new(typeof(RedMageHud), typeof(RedMageConfig))
             };
 
-            _unsupportedJobsMap = new Dictionary<uint, Type>()
+            _unsupportedJobsMap = new Dictionary<uint, Type>
             {
+                // Casters
                 [JobIDs.BLU] = typeof(BlueMageConfig),
 
-                // base jobs
+                // Base jobs
                 [JobIDs.GLD] = typeof(GladiatorConfig),
                 [JobIDs.MRD] = typeof(MarauderConfig),
                 [JobIDs.PGL] = typeof(PugilistConfig),
@@ -313,7 +318,7 @@ namespace DelvUI.Interface
                 [JobIDs.ACN] = typeof(ArcanistConfig),
                 [JobIDs.CNJ] = typeof(ConjurerConfig),
 
-                // crafters
+                // Crafters
                 [JobIDs.CRP] = typeof(CarpenterConfig),
                 [JobIDs.BSM] = typeof(BlacksmithConfig),
                 [JobIDs.ARM] = typeof(ArmorerConfig),
@@ -323,10 +328,10 @@ namespace DelvUI.Interface
                 [JobIDs.ALC] = typeof(AlchemistConfig),
                 [JobIDs.CUL] = typeof(CulinarianConfig),
 
-                // gatherers
+                // Gatherers
                 [JobIDs.MIN] = typeof(MinerConfig),
                 [JobIDs.BOT] = typeof(BotanistConfig),
-                [JobIDs.FSH] = typeof(FisherConfig),
+                [JobIDs.FSH] = typeof(FisherConfig)
             };
         }
     }
@@ -349,8 +354,8 @@ namespace DelvUI.Interface
         internal static int UnitFramesOffsetX = 160;
         internal static int PlayerCastbarY = BaseHUDOffsetY - 13;
         internal static int JobHudsBaseY = PlayerCastbarY - 14;
-        internal static Vector2 DefaultBigUnitFrameSize = new Vector2(270, 50);
-        internal static Vector2 DefaultSmallUnitFrameSize = new Vector2(120, 20);
-        internal static Vector2 DefaultStatusEffectsListSize = new Vector2(292, 82);
+        internal static Vector2 DefaultBigUnitFrameSize = new(270, 50);
+        internal static Vector2 DefaultSmallUnitFrameSize = new(120, 20);
+        internal static Vector2 DefaultStatusEffectsListSize = new(292, 82);
     }
 }
