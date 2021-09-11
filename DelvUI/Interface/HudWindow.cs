@@ -148,6 +148,11 @@ namespace DelvUI.Interface
 
         protected virtual void DrawHealthBar()
         {
+            if (!PluginConfiguration.ShowHealthBar)
+            {
+                return;
+            }
+            
             Debug.Assert(PluginInterface.ClientState.LocalPlayer != null, "PluginInterface.ClientState.LocalPlayer != null");
             BarSize = new Vector2(HealthBarWidth, HealthBarHeight);
             PlayerCharacter actor = PluginInterface.ClientState.LocalPlayer;
@@ -296,6 +301,11 @@ namespace DelvUI.Interface
 
         protected virtual void DrawTargetBar()
         {
+            if (!PluginConfiguration.ShowTargetBar)
+            {
+                return;
+            }
+            
             Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
 
             if (target is null)

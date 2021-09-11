@@ -47,6 +47,8 @@ namespace DelvUI.Config
 
         public bool ShowFocusBar = true;
         public bool ShowTargetOfTargetBar = true;
+        public bool ShowHealthBar = true;
+        public bool ShowTargetBar = true;
 
         public bool ColorCastBarByDamageType = false;
         public bool ColorCastBarByJob = false;

@@ -681,8 +681,7 @@ namespace DelvUI.Config
 
         private void DrawIndividualUnitFramesPlayerConfig()
         {
-            bool disabled = true;
-            ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
+            _changed |= ImGui.Checkbox("Enabled", ref _pluginConfiguration.ShowHealthBar);
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
 
@@ -893,8 +892,7 @@ namespace DelvUI.Config
 
         private void DrawIndividualUnitFramesTargetConfig()
         {
-            bool disabled = true;
-            ImGui.Checkbox("Enabled", ref disabled); //TODO CODE THIS
+            _changed |= ImGui.Checkbox("Enabled", ref _pluginConfiguration.ShowTargetBar);
             ImGui.BeginGroup();
             ImGui.BeginGroup(); // Left
 
