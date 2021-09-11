@@ -13,13 +13,32 @@ namespace DelvUI
         public static string Abbreviate(this string str)
         {
             var splits = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
             for (var i = 0; i < splits.Length - 1; i++)
             {
                 splits[i] = splits[i][0].ToString();
             }
 
             return string.Join(". ", splits).ToUpper();
+        }
+
+        public static string FirstName(this string str)
+        {
+            var splits = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (splits.Length > 0)
+            {
+                return splits[0];
+            }
+            return "";
+        }
+
+        public static string LastName(this string str)
+        {
+            var splits = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (splits.Length > 1)
+            {
+                return splits[splits.Length - 1];
+            }
+            return "";
         }
 
         public static Vector4 AdjustColor(this Vector4 vec, float correctionFactor)

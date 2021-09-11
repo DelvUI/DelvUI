@@ -60,7 +60,7 @@ namespace DelvUI.Interface
             CreateUnitFrames();
             CreateCastbars();
             CreateStatusEffectsLists();
-            CaretMiscElements();
+            CreateMiscElements();
         }
 
         private void CreateUnitFrames()
@@ -122,7 +122,7 @@ namespace DelvUI.Interface
             _hudElementsUsingTarget.Add(targetDebuffs);
         }
 
-        private void CaretMiscElements()
+        private void CreateMiscElements()
         {
             // primary resource bar
             var primaryResourceConfig = ConfigurationManager.GetInstance().GetConfigObject<PrimaryResourceConfig>();

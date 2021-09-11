@@ -1,4 +1,6 @@
-﻿using System;
+﻿
+using Dalamud.Game.ClientState.Actors.Types;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 using static DelvUI.Extensions;
@@ -68,6 +70,10 @@ namespace DelvUI.Helpers
 
                 // Name
                 "[name]" when IsPropertyExist(actor, "Name") => actor.Name.ToString(),
+                "[name:first]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).FirstName(),
+                "[name:first-initial]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).FirstName().Length == 0 ? "" : ((string)actor.Name).FirstName().Substring(0, 1),
+                "[name:last]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).LastName(),
+                "[name:last-initial]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).LastName().Length == 0 ? "" : ((string)actor.Name).LastName().Substring(0, 1),
                 "[name:abbreviate]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Abbreviate(),
                 "[name:veryshort]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Truncate(5),
                 "[name:short]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Truncate(10),
@@ -78,6 +84,7 @@ namespace DelvUI.Helpers
                 // Misc
                 "[company]" when IsPropertyExist(actor, "CompanyTag") => actor.CompanyTag,
                 "[level]" when IsPropertyExist(actor, "Level") => actor.Level.ToString(),
+                "[job]" when actor is Chara => JobsHelper.JobNames.TryGetValue(((Chara)actor).ClassJob.Id, out var jobName) ? jobName : "",
                 _ => ""
             };
         }
