@@ -64,9 +64,9 @@ namespace DelvUI.Config
                 typeof(TargetBuffsListConfig),
                 typeof(TargetDebuffsListConfig),
 
-                typeof(DarkKnightConfig),
                 typeof(PaladinConfig),
                 typeof(WarriorConfig),
+                typeof(DarkKnightConfig),
                 typeof(GunbreakerConfig),
 
                 typeof(WhiteMageConfig),
@@ -78,13 +78,13 @@ namespace DelvUI.Config
                 typeof(NinjaConfig),
                 typeof(SamuraiConfig),
 
+                typeof(BardConfig),
                 typeof(MachinistConfig),
                 typeof(DancerConfig),
-                typeof(BardConfig),
 
                 typeof(BlackMageConfig),
-                typeof(RedMageConfig),
                 typeof(SummonerConfig),
+                typeof(RedMageConfig),
 
                 typeof(TanksColorConfig),
                 typeof(HealersColorConfig),
