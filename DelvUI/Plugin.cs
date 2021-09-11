@@ -10,6 +10,11 @@ using ImGuiNET;
 using System;
 using System.IO;
 using System.Reflection;
+using Dalamud.Data;
+using Dalamud.Game.ClientState.Actors;
+using Dalamud.Game.Internal;
+using Dalamud.Game.Internal.Gui;
+using Dalamud.Interface;
 
 namespace DelvUI
 {
@@ -20,8 +25,6 @@ namespace DelvUI
         private HudManager _hudManager;
         private SystemMenuHook _menuHook;
 
-        private static DalamudPluginInterface _pluginInterface;
-
         public static ImGuiScene.TextureWrap bannerTexture;
 
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
@@ -30,12 +33,24 @@ namespace DelvUI
         public string Name => "DelvUI";
         public static string Version = "";
 
-        public static DalamudPluginInterface GetPluginInterface() => _pluginInterface;
+        public static ClientState ClientState => PluginInterface.ClientState;
 
+        public static CommandManager CommandManager => PluginInterface.CommandManager;
+        public static Condition Condition => ClientState.Condition;
+        public static DalamudPluginInterface PluginInterface { get; private set; }
+        public static DataManager DataManager => PluginInterface.Data;
+        public static Framework Framework => PluginInterface.Framework;
+        public static GameGui GameGui => Framework.Gui;
+        public static JobGauges JobGauges => ClientState.JobGauges;
+        public static ActorTable ObjectTable => ClientState.Actors;
+        public static Dalamud.Game.SigScanner SigScanner => PluginInterface.TargetModuleScanner;
+        public static Targets TargetManager => ClientState.Targets;
+        public static UiBuilder UiBuilder => PluginInterface.UiBuilder;
+        
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
-            _pluginInterface = pluginInterface;
-
+            PluginInterface = pluginInterface;
+            
             Version = Assembly.GetExecutingAssembly()?.GetName().Version.ToString() ?? "";
 
             LoadBanner();
@@ -44,16 +59,16 @@ namespace DelvUI
             ConfigurationManager.Initialize(false);
             FontsManager.Initialize();
 
-            _pluginInterface.UiBuilder.OnBuildUi += Draw;
-            _pluginInterface.UiBuilder.OnBuildFonts += BuildFont;
-            _pluginInterface.UiBuilder.OnOpenConfigUi += OpenConfigUi;
+            UiBuilder.OnBuildUi += Draw;
+            UiBuilder.OnBuildFonts += BuildFont;
+            UiBuilder.OnOpenConfigUi += OpenConfigUi;
 
             if (!_fontBuilt && !_fontLoadFailed)
             {
-                _pluginInterface.UiBuilder.RebuildFonts();
+                UiBuilder.RebuildFonts();
             }
 
-            _pluginInterface.CommandManager.AddHandler(
+            CommandManager.AddHandler(
                 "/delvui",
                 new CommandInfo(PluginCommand)
                 {
@@ -65,9 +80,9 @@ namespace DelvUI
                 }
             );
 
-            _menuHook = new SystemMenuHook(_pluginInterface);
+            _menuHook = new SystemMenuHook(PluginInterface);
 
-            _pluginInterface.CommandManager.AddHandler("/delvuireloadconfig", new CommandInfo(ReloadConfigCommand));
+            CommandManager.AddHandler("/delvuireloadconfig", new CommandInfo(ReloadConfigCommand));
 
             TexturesCache.Initialize();
             GlobalColors.Initialize();
@@ -117,7 +132,7 @@ namespace DelvUI
             {
                 try
                 {
-                    bannerTexture = _pluginInterface.UiBuilder.LoadImage(bannerImage);
+                    bannerTexture = UiBuilder.LoadImage(bannerImage);
                 }
                 catch (Exception ex)
                 {
@@ -163,14 +178,14 @@ namespace DelvUI
 
         private void Draw()
         {
-            bool hudState = _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene]
-                         || _pluginInterface.ClientState.Condition[ConditionFlag.WatchingCutscene78]
-                         || _pluginInterface.ClientState.Condition[ConditionFlag.OccupiedInCutSceneEvent]
-                         || _pluginInterface.ClientState.Condition[ConditionFlag.CreatingCharacter]
-                         || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas]
-                         || _pluginInterface.ClientState.Condition[ConditionFlag.BetweenAreas51];
+            bool hudState = Condition[ConditionFlag.WatchingCutscene]
+                         || Condition[ConditionFlag.WatchingCutscene78]
+                         || Condition[ConditionFlag.OccupiedInCutSceneEvent]
+                         || Condition[ConditionFlag.CreatingCharacter]
+                         || Condition[ConditionFlag.BetweenAreas]
+                         || Condition[ConditionFlag.BetweenAreas51];
 
-            _pluginInterface.UiBuilder.OverrideGameCursor = false;
+            UiBuilder.OverrideGameCursor = false;
 
             ConfigurationManager.GetInstance().Draw();
 
@@ -204,12 +219,12 @@ namespace DelvUI
 
             ConfigurationManager.GetInstance().DrawConfigWindow = false;
 
-            _pluginInterface.CommandManager.RemoveHandler("/delvui");
-            _pluginInterface.CommandManager.RemoveHandler("/delvuireloadconfig");
-            _pluginInterface.UiBuilder.OnBuildUi -= Draw;
-            _pluginInterface.UiBuilder.OnBuildFonts -= BuildFont;
-            _pluginInterface.UiBuilder.OnOpenConfigUi -= OpenConfigUi;
-            _pluginInterface.UiBuilder.RebuildFonts();
+            CommandManager.RemoveHandler("/delvui");
+            CommandManager.RemoveHandler("/delvuireloadconfig");
+            UiBuilder.OnBuildUi -= Draw;
+            UiBuilder.OnBuildFonts -= BuildFont;
+            UiBuilder.OnOpenConfigUi -= OpenConfigUi;
+            UiBuilder.RebuildFonts();
         }
     }
 }

@@ -39,8 +39,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawStormsEyeBar(Vector2 origin)
         {
-            IEnumerable<StatusEffect> innerReleaseBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1177);
-            IEnumerable<StatusEffect> stormsEyeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
+            IEnumerable<StatusEffect> innerReleaseBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1177);
+            IEnumerable<StatusEffect> stormsEyeBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
 
             Vector2 position = origin + Config.Position + Config.StormsEyePosition - Config.StormsEyeSize / 2f;
 
@@ -75,8 +75,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBeastGauge(Vector2 origin)
         {
-            WARGauge gauge = PluginInterface.ClientState.JobGauges.Get<WARGauge>();
-            IEnumerable<StatusEffect> nascentChaosBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1897);
+            WARGauge gauge = Plugin.JobGauges.Get<WARGauge>();
+            IEnumerable<StatusEffect> nascentChaosBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1897);
 
             Vector2 position = origin + Config.Position + Config.BeastGaugePosition - Config.BeastGaugeSize / 2f;
 

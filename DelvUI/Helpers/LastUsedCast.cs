@@ -31,7 +31,7 @@ namespace DelvUI.Helpers
 
         private void SetCastProperties()
         {
-            var target = Plugin.GetPluginInterface().ClientState.Targets.SoftTarget ?? Plugin.GetPluginInterface().ClientState.Targets.CurrentTarget;
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
             var targetKind = target?.ObjectKind;
 
             switch (targetKind)
@@ -73,7 +73,7 @@ namespace DelvUI.Helpers
                 case ActionType.PvPAction:
                 case ActionType.CraftAction:
                 case ActionType.Ability:
-                    _lastUsedAction = Plugin.GetPluginInterface().Data.GetExcelSheet<Action>()?.GetRow(CastId);
+                    _lastUsedAction = Plugin.DataManager.GetExcelSheet<Action>()?.GetRow(CastId);
                     ActionText = _lastUsedAction?.Name.ToString();
                     IconTexture = TexturesCache.Instance.GetTexture<Action>(_lastUsedAction);
                     DamageType = GetDamageType(_lastUsedAction);
@@ -81,7 +81,7 @@ namespace DelvUI.Helpers
                     break;
 
                 case ActionType.Mount:
-                    _lastUsedAction = Plugin.GetPluginInterface().Data.GetExcelSheet<Mount>()?.GetRow(CastId);
+                    _lastUsedAction = Plugin.DataManager.GetExcelSheet<Mount>()?.GetRow(CastId);
                     ActionText = _lastUsedAction?.Singular.ToString();
                     IconTexture = TexturesCache.Instance.GetTexture<Mount>(_lastUsedAction);
                     DamageType = DamageType.Unknown;
@@ -90,7 +90,7 @@ namespace DelvUI.Helpers
 
                 case ActionType.KeyItem:
                 case ActionType.Item:
-                    _lastUsedAction = Plugin.GetPluginInterface().Data.GetExcelSheet<Item>()?.GetRow(CastId);
+                    _lastUsedAction = Plugin.DataManager.GetExcelSheet<Item>()?.GetRow(CastId);
                     ActionText = _lastUsedAction?.Name.ToString() ?? "Using item...";
                     IconTexture = TexturesCache.Instance.GetTexture<Item>(_lastUsedAction);
                     DamageType = DamageType.Unknown;
@@ -98,7 +98,7 @@ namespace DelvUI.Helpers
                     break;
 
                 case ActionType.Companion:
-                    _lastUsedAction = Plugin.GetPluginInterface().Data.GetExcelSheet<Companion>()?.GetRow(CastId);
+                    _lastUsedAction = Plugin.DataManager.GetExcelSheet<Companion>()?.GetRow(CastId);
                     ActionText = _lastUsedAction?.Singular.ToString();
                     IconTexture = TexturesCache.Instance.GetTexture<Companion>(_lastUsedAction);
                     DamageType = DamageType.Unknown;

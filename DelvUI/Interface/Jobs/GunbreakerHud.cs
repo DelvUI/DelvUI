@@ -41,7 +41,7 @@ namespace DelvUI.Interface.Jobs
             Vector2 position = origin + Config.Position + Config.PowderGaugeBarPosition - Config.PowderGaugeBarSize / 2f;
             var builder = BarBuilder.Create(position, Config.PowderGaugeBarSize);
 
-            var gauge = PluginInterface.ClientState.JobGauges.Get<GNBGauge>();
+            var gauge = Plugin.JobGauges.Get<GNBGauge>();
 
             builder.SetChunks(2)
                    .SetChunkPadding(Config.PowderGaugeSpacing)
@@ -56,7 +56,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawNoMercyBar(Vector2 origin)
         {
             Vector2 position = origin + Config.Position + Config.NoMercyBarPosition - Config.NoMercyBarSize / 2f;
-            var noMercyBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1831);
+            var noMercyBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1831);
 
             var builder = BarBuilder.Create(position, Config.NoMercyBarSize)
                 .SetBackgroundColor(EmptyColor["background"]);

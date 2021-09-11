@@ -46,7 +46,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawFairyBar(Vector2 origin)
         {
-            float fairyGauge = PluginInterface.ClientState.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
+            float fairyGauge = Plugin.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
 
             Vector2 barSize = Config.FairySize;
             Vector2 position = origin + Config.Position + Config.FairyPosition - barSize / 2f;
@@ -67,7 +67,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAetherBar(Vector2 origin)
         {
-            StatusEffect aetherFlowBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
+            StatusEffect aetherFlowBuff = Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
             Vector2 barSize = Config.AetherSize;
             Vector2 position = origin + Config.Position + Config.AetherPosition - barSize / 2f;
 
@@ -89,16 +89,16 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBioBar(Vector2 origin)
         {
-            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
 
             float bioDuration = 0;
 
             if (target is Chara)
             {
                 StatusEffect bio = target.StatusEffects.FirstOrDefault(
-                    o => o.EffectId == 179 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                      || o.EffectId == 189 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                      || o.EffectId == 1895 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                    o => o.EffectId == 179 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                      || o.EffectId == 189 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                      || o.EffectId == 1895 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
                 );
 
                 bioDuration = Math.Abs(bio.Duration);

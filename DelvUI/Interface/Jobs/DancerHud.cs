@@ -62,7 +62,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawEspritBar(Vector2 origin)
         {
-            DNCGauge gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
+            DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
 
             var xPos = origin.X + Config.Position.X + Config.EspritGaugePosition.X - Config.EspritGaugeSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.EspritGaugePosition.Y - Config.EspritGaugeSize.Y / 2f;
@@ -84,8 +84,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawFeathersBar(Vector2 origin)
         {
-            IEnumerable<StatusEffect> flourishingBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1820 or 2021);
-            DNCGauge gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
+            IEnumerable<StatusEffect> flourishingBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1820 or 2021);
+            DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
 
             var xPos = origin.X + Config.Position.X + Config.FeatherGaugePosition.X - Config.FeatherGaugeSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.FeatherGaugePosition.Y - Config.FeatherGaugeSize.Y / 2f;
@@ -107,7 +107,7 @@ namespace DelvUI.Interface.Jobs
 
         private unsafe void DrawStepBar(Vector2 origin)
         {
-            DNCGauge gauge = PluginInterface.ClientState.JobGauges.Get<DNCGauge>();
+            DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
             DNCGauge* gaugePtr = &gauge;
             OpenDNCGauge openGauge = *(OpenDNCGauge*)gaugePtr;
 
@@ -190,8 +190,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBuffBar(Vector2 origin)
         {
-            IEnumerable<StatusEffect> devilmentBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1825);
-            IEnumerable<StatusEffect> technicalFinishBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1822 or 2050);
+            IEnumerable<StatusEffect> devilmentBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1825);
+            IEnumerable<StatusEffect> technicalFinishBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1822 or 2050);
 
             var xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
@@ -228,7 +228,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawStandardBar(Vector2 origin)
         {
-            IEnumerable<StatusEffect> standardFinishBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1821 or 2024 or 2105 or 2113);
+            IEnumerable<StatusEffect> standardFinishBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1821 or 2024 or 2105 or 2113);
 
             var xPos = origin.X + Config.Position.X + Config.StandardBarPosition.X - Config.StandardBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.StandardBarPosition.Y - Config.StandardBarSize.Y / 2f;
@@ -251,10 +251,10 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawProcBar(Vector2 origin)
         {
-            IEnumerable<StatusEffect> flourishingCascadeBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1814);
-            IEnumerable<StatusEffect> flourishingFountainBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1815);
-            IEnumerable<StatusEffect> flourishingWindmillBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1816);
-            IEnumerable<StatusEffect> flourishingShowerBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1817);
+            IEnumerable<StatusEffect> flourishingCascadeBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1814);
+            IEnumerable<StatusEffect> flourishingFountainBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1815);
+            IEnumerable<StatusEffect> flourishingWindmillBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1816);
+            IEnumerable<StatusEffect> flourishingShowerBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1817);
 
             var xPos = origin.X + Config.Position.X + Config.ProcBarPosition.X - Config.ProcBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarSize.Y / 2f;

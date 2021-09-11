@@ -53,7 +53,7 @@ namespace DelvUI.Interface.Jobs
 
         protected void DrawManaBar(Vector2 origin)
         {
-            var actor = PluginInterface.ClientState.LocalPlayer;
+            var actor = Plugin.ClientState.LocalPlayer;
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f,
@@ -96,9 +96,9 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBalanceBar(Vector2 origin)
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<RDMGauge>();
-            var whiteGauge = (float)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().WhiteGauge;
-            var blackGauge = (float)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().BlackGauge;
+            var gauge = Plugin.JobGauges.Get<RDMGauge>();
+            var whiteGauge = (float)Plugin.JobGauges.Get<RDMGauge>().WhiteGauge;
+            var blackGauge = (float)Plugin.JobGauges.Get<RDMGauge>().BlackGauge;
             var scale = gauge.WhiteGauge - gauge.BlackGauge;
 
             var position = new Vector2(
@@ -134,7 +134,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawWhiteManaBar(Vector2 origin)
         {
-            var gauge = (int)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().WhiteGauge;
+            var gauge = (int)Plugin.JobGauges.Get<RDMGauge>().WhiteGauge;
             var thresholdRatio = Config.WhiteManaBarInverted ? 0.2f : 0.8f;
 
             var position = new Vector2(
@@ -147,7 +147,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBlackManaBar(Vector2 origin)
         {
-            var gauge = (int)PluginInterface.ClientState.JobGauges.Get<RDMGauge>().BlackGauge;
+            var gauge = (int)Plugin.JobGauges.Get<RDMGauge>().BlackGauge;
             var thresholdRatio = Config.BlackManaBarInverted ? 0.2f : 0.8f;
 
             var position = new Vector2(
@@ -160,7 +160,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAccelerationBar(Vector2 origin)
         {
-            var accelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1238);
+            var accelBuff = Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1238);
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.AccelerationBarPosition.X - Config.AccelerationBarSize.X / 2f,
@@ -180,7 +180,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDualCastBar(Vector2 origin)
         {
-            var dualCastBuff = Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1249).Duration);
+            var dualCastBuff = Math.Abs(Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1249).Duration);
             var value = dualCastBuff > 0 ? 1 : 0;
 
             var position = new Vector2(
@@ -198,7 +198,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawVerstoneProc(Vector2 origin)
         {
-            var duration = (int)Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1235).Duration);
+            var duration = (int)Math.Abs(Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1235).Duration);
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.VerstoneBarPosition.X - Config.VerstoneBarSize.X / 2f,
@@ -210,7 +210,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawVerfireProc(Vector2 origin)
         {
-            var duration = (int)Math.Abs(PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1234).Duration);
+            var duration = (int)Math.Abs(Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1234).Duration);
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.VerfireBarPosition.X - Config.VerfireBarSize.X / 2f,

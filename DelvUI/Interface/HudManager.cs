@@ -1,4 +1,4 @@
-﻿using Dalamud.Interface;
+using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -187,20 +187,20 @@ namespace DelvUI.Interface
 
         protected unsafe bool ShouldBeVisible()
         {
-            if (!ConfigurationManager.GetInstance().ShowHUD || Plugin.GetPluginInterface().ClientState.LocalPlayer == null)
+            if (!ConfigurationManager.GetInstance().ShowHUD || Plugin.ClientState.LocalPlayer == null)
             {
                 return false;
             }
 
-            var parameterWidget = (AtkUnitBase*)Plugin.GetPluginInterface().Framework.Gui.GetUiObjectByName("_ParameterWidget", 1);
-            var fadeMiddleWidget = (AtkUnitBase*)Plugin.GetPluginInterface().Framework.Gui.GetUiObjectByName("FadeMiddle", 1);
+            var parameterWidget = (AtkUnitBase*)Plugin.GameGui.GetUiObjectByName("_ParameterWidget", 1);
+            var fadeMiddleWidget = (AtkUnitBase*)Plugin.GameGui.GetUiObjectByName("FadeMiddle", 1);
 
             return parameterWidget->IsVisible && !fadeMiddleWidget->IsVisible;
         }
 
         private void UpdateJob()
         {
-            var newJobId = Plugin.GetPluginInterface().ClientState.LocalPlayer.ClassJob.Id;
+            var newJobId = Plugin.ClientState.LocalPlayer.ClassJob.Id;
             if (_jobHud != null && _jobHud.Config.JobId == newJobId)
             {
                 return;
@@ -230,10 +230,10 @@ namespace DelvUI.Interface
 
         private void AssignActors()
         {
-            var pluginInterface = Plugin.GetPluginInterface();
+            var pluginInterface = Plugin.PluginInterface;
 
             // player
-            var player = pluginInterface.ClientState.LocalPlayer;
+            var player = Plugin.ClientState.LocalPlayer;
             foreach (var element in _hudElementsUsingPlayer)
             {
                 element.Actor = player;
@@ -245,21 +245,21 @@ namespace DelvUI.Interface
             }
 
             // target
-            var target = pluginInterface.ClientState.Targets.SoftTarget ?? pluginInterface.ClientState.Targets.CurrentTarget;
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
             foreach (var element in _hudElementsUsingTarget)
             {
                 element.Actor = target;
             }
 
             // target of target
-            var targetOfTarget = Utils.FindTargetOfTarget(target, player, pluginInterface.ClientState.Actors);
+            var targetOfTarget = Utils.FindTargetOfTarget(target, player, Plugin.ObjectTable);
             foreach (var element in _hudElementsUsingTargetOfTarget)
             {
                 element.Actor = targetOfTarget;
             }
 
             // focus
-            var focusTarget = pluginInterface.ClientState.Targets.FocusTarget;
+            var focusTarget = Plugin.TargetManager.FocusTarget;
             foreach (var element in _hudElementsUsingFocusTarget)
             {
                 element.Actor = focusTarget;
@@ -271,14 +271,14 @@ namespace DelvUI.Interface
             _jobsMap = new Dictionary<uint, JobHudTypes>()
             {
                 // tanks
-                [JobIDs.DRK] = new JobHudTypes(typeof(DarkKnightHud), typeof(DarkKnightConfig)),
                 [JobIDs.PLD] = new JobHudTypes(typeof(PaladinHud), typeof(PaladinConfig)),
                 [JobIDs.WAR] = new JobHudTypes(typeof(WarriorHud), typeof(WarriorConfig)),
+                [JobIDs.DRK] = new JobHudTypes(typeof(DarkKnightHud), typeof(DarkKnightConfig)),
                 [JobIDs.GNB] = new JobHudTypes(typeof(GunbreakerHud), typeof(GunbreakerConfig)),
 
                 // healers
-                [JobIDs.SCH] = new JobHudTypes(typeof(ScholarHud), typeof(ScholarConfig)),
                 [JobIDs.WHM] = new JobHudTypes(typeof(WhiteMageHud), typeof(WhiteMageConfig)),
+                [JobIDs.SCH] = new JobHudTypes(typeof(ScholarHud), typeof(ScholarConfig)),
                 [JobIDs.AST] = new JobHudTypes(typeof(AstrologianHud), typeof(AstrologianConfig)),
 
                 // melee
@@ -288,14 +288,14 @@ namespace DelvUI.Interface
                 [JobIDs.SAM] = new JobHudTypes(typeof(SamuraiHud), typeof(SamuraiConfig)),
 
                 // ranged
+                [JobIDs.BRD] = new JobHudTypes(typeof(BardHud), typeof(BardConfig)),
                 [JobIDs.MCH] = new JobHudTypes(typeof(MachinistHud), typeof(MachinistConfig)),
                 [JobIDs.DNC] = new JobHudTypes(typeof(DancerHud), typeof(DancerConfig)),
-                [JobIDs.BRD] = new JobHudTypes(typeof(BardHud), typeof(BardConfig)),
 
                 // casters
                 [JobIDs.BLM] = new JobHudTypes(typeof(BlackMageHud), typeof(BlackMageConfig)),
-                [JobIDs.RDM] = new JobHudTypes(typeof(RedMageHud), typeof(RedMageConfig)),
-                [JobIDs.SMN] = new JobHudTypes(typeof(SummonerHud), typeof(SummonerConfig))
+                [JobIDs.SMN] = new JobHudTypes(typeof(SummonerHud), typeof(SummonerConfig)),
+                [JobIDs.RDM] = new JobHudTypes(typeof(RedMageHud), typeof(RedMageConfig))
             };
 
             _unsupportedJobsMap = new Dictionary<uint, Type>()

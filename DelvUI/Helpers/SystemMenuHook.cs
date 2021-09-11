@@ -24,23 +24,23 @@ namespace DelvUI.Helpers
 
         public SystemMenuHook(DalamudPluginInterface pluginInterface)
         {
-            IntPtr openSystemMenuAddress = pluginInterface.TargetModuleScanner.ScanText("E8 ?? ?? ?? ?? 32 C0 4C 8B AC 24 ?? ?? ?? ?? 48 8B 8D ?? ?? ?? ??");
+            IntPtr openSystemMenuAddress = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 32 C0 4C 8B AC 24 ?? ?? ?? ?? 48 8B 8D ?? ?? ?? ??");
 
             _hookAgentHudOpenSystemMenu = new Hook<AgentHudOpenSystemMenuPrototype>(openSystemMenuAddress, AgentHudOpenSystemMenuDetour);
             _hookAgentHudOpenSystemMenu.Enable();
 
             IntPtr atkValueChangeTypeAddress =
-                pluginInterface.TargetModuleScanner.ScanText("E8 ?? ?? ?? ?? 45 84 F6 48 8D 4C 24 ??");
+                Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 45 84 F6 48 8D 4C 24 ??");
 
             _atkValueChangeType =
                 Marshal.GetDelegateForFunctionPointer<AtkValueChangeType>(atkValueChangeTypeAddress);
 
             IntPtr atkValueSetStringAddress =
-                pluginInterface.TargetModuleScanner.ScanText("E8 ?? ?? ?? ?? 41 03 ED");
+                Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 41 03 ED");
 
             _atkValueSetString = Marshal.GetDelegateForFunctionPointer<AtkValueSetString>(atkValueSetStringAddress);
 
-            IntPtr uiModuleRequestMainCommandAddress = pluginInterface.TargetModuleScanner.ScanText(
+            IntPtr uiModuleRequestMainCommandAddress = Plugin.SigScanner.ScanText(
                 "40 53 56 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 ?? ?? ?? ?? 48 8B 01 8B DA 48 8B F1 FF 90 ?? ?? ?? ??"
             );
 
@@ -135,17 +135,17 @@ namespace DelvUI.Helpers
             switch (commandId)
             {
                 case 69420:
-                    Plugin.GetPluginInterface().CommandManager.ProcessCommand("/delvui");
+                    Plugin.CommandManager.ProcessCommand("/delvui");
 
                     break;
 
                 case 69421:
-                    Plugin.GetPluginInterface().CommandManager.ProcessCommand("/xlplugins");
+                    Plugin.CommandManager.ProcessCommand("/xlplugins");
 
                     break;
 
                 case 69422:
-                    Plugin.GetPluginInterface().CommandManager.ProcessCommand("/xlsettings");
+                    Plugin.CommandManager.ProcessCommand("/xlsettings");
 
                     break;
 

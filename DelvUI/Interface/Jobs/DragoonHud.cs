@@ -71,13 +71,13 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawChaosThrustBar(Vector2 origin)
         {
-            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
             float duration = 0f;
 
             if (target is Chara)
             {
                 StatusEffect chaosThrust = target.StatusEffects.FirstOrDefault(
-                    o => (o.EffectId == 1312 || o.EffectId == 118) && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                    o => (o.EffectId == 1312 || o.EffectId == 118) && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
                 );
                 duration = Math.Max(0f, chaosThrust.Duration);
             }
@@ -98,7 +98,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawEyeOfTheDragonBars(Vector2 origin)
         {
-            DRGGauge gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
+            DRGGauge gauge = Plugin.JobGauges.Get<DRGGauge>();
 
             Vector2 cursorPos = origin + Config.Position + Config.EyeOfTheDragonBarPosition - Config.EyeOfTheDragonBarSize / 2f;
 
@@ -116,7 +116,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBloodOfTheDragonBar(Vector2 origin)
         {
-            DRGGauge gauge = PluginInterface.ClientState.JobGauges.Get<DRGGauge>();
+            DRGGauge gauge = Plugin.JobGauges.Get<DRGGauge>();
 
             Vector2 cursorPos = origin + Config.Position + Config.BloodBarPosition - Config.BloodBarSize / 2f;
 
@@ -140,7 +140,7 @@ namespace DelvUI.Interface.Jobs
         {
             Vector2 cursorPos = origin + Config.Position + Config.DisembowelBarPosition - Config.DisembowelBarSize / 2f;
 
-            IEnumerable<StatusEffect> disembowelBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1914 or 121);
+            IEnumerable<StatusEffect> disembowelBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1914 or 121);
             float duration = 0f;
             if (disembowelBuff.Any())
             {
