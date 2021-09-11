@@ -75,7 +75,7 @@ namespace DelvUI.Helpers
             position.Y = position.Y - _size.Y;
 
             // correct tooltips off screen
-            _position = CalculatePosition(position, _size);
+            _position = ConstrainPosition(position, _size);
         }
 
         public void RemoveTooltip()
@@ -144,7 +144,7 @@ namespace DelvUI.Helpers
             return result;
         }
 
-        private Vector2 CalculatePosition(Vector2 position, Vector2 size)
+        private Vector2 ConstrainPosition(Vector2 position, Vector2 size)
         {
             var screenSize = ImGui.GetWindowViewport().Size;
 
