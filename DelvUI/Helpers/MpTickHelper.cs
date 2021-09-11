@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright(c) 2021 talimity (https://github.com/talimity/mptimer)
 Modifications Copyright(c) 2021 DelvUI
 08/29/2021 - Mostly using original's code with minimal adaptations
@@ -18,10 +18,10 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using Dalamud.Game.Internal;
 using ImGuiNET;
 using System;
 using System.Linq;
+using Dalamud.Game;
 
 namespace DelvUI.Helpers
 {
@@ -35,7 +35,7 @@ namespace DelvUI.Helpers
 
         public MPTickHelper()
         {
-            Plugin.Framework.OnUpdateEvent += FrameworkOnOnUpdateEvent;
+            Plugin.Framework.Update += FrameworkOnOnUpdateEvent;
         }
 
         public double LastTick => LastTickTime;
@@ -59,7 +59,7 @@ namespace DelvUI.Helpers
             var mp = player.CurrentMp;
 
             // account for lucid dreaming screwing up mp calculations
-            var lucidDreamingActive = player.StatusEffects.Any(e => e.EffectId == 1204);
+            var lucidDreamingActive = player.StatusList.Any(e => e.StatusId == 1204);
 
             if (!lucidDreamingActive && _lastMpValue < mp)
             {
@@ -70,7 +70,7 @@ namespace DelvUI.Helpers
                 LastTickTime += ServerTickRate;
             }
 
-            _lastMpValue = mp;
+            _lastMpValue = (int)mp;
         }
 
         protected virtual void Dispose(bool disposing)
@@ -80,7 +80,7 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            Plugin.Framework.OnUpdateEvent -= FrameworkOnOnUpdateEvent;
+            Plugin.Framework.Update -= FrameworkOnOnUpdateEvent;
         }
 
         public void Dispose()

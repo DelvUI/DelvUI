@@ -1,5 +1,4 @@
-﻿using DelvUI.Config;
-using DelvUI.Helpers;
+﻿using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -31,27 +30,27 @@ namespace DelvUI.Interface.StatusEffects
             // duration
             if (config.DurationLabelConfig.Enabled && !statusEffectData.Data.IsPermanent && !statusEffectData.Data.IsFcBuff)
             {
-                var duration = Math.Round(Math.Abs(statusEffectData.StatusEffect.Duration));
+                var duration = Math.Round(Math.Abs(statusEffectData.Status.RemainingTime));
                 config.DurationLabelConfig.SetText(Utils.DurationToString(duration));
 
                 durationLabel.Draw(position, config.Size);
             }
 
             // stacks
-            if (config.StacksLabelConfig.Enabled && statusEffectData.Data.MaxStacks > 0 && statusEffectData.StatusEffect.StackCount > 0 && !statusEffectData.Data.IsFcBuff)
+            if (config.StacksLabelConfig.Enabled && statusEffectData.Data.MaxStacks > 0 && statusEffectData.Status.StackCount > 0 && !statusEffectData.Data.IsFcBuff)
             {
-                var text = $"{statusEffectData.StatusEffect.StackCount}";
+                var text = $"{statusEffectData.Status.StackCount}";
                 config.StacksLabelConfig.SetText(text);
 
                 stacksLabel.Draw(position, config.Size);
             }
         }
 
-        public static StatusEffectIconBorderConfig GetBorderConfig(StatusEffectIconConfig config, StatusEffectData statusEffectData)
+        public static StatusEffectIconBorderConfig? GetBorderConfig(StatusEffectIconConfig config, StatusEffectData statusEffectData)
         {
-            StatusEffectIconBorderConfig borderConfig = null;
+            StatusEffectIconBorderConfig? borderConfig = null;
 
-            if (config.OwnedBorderConfig.Enabled && statusEffectData.StatusEffect.OwnerId == Plugin.ClientState.LocalPlayer?.ActorId)
+            if (config.OwnedBorderConfig.Enabled && statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId)
             {
                 borderConfig = config.OwnedBorderConfig;
             }

@@ -1,8 +1,8 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using DelvUI.Config;
-using DelvUI.Helpers;
+﻿using DelvUI.Helpers;
 using ImGuiNET;
 using System.Numerics;
+using Dalamud.Game.ClientState.Objects.Types;
+using DelvUI.Config;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -17,10 +17,10 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void Draw(Vector2 origin)
         {
-            Draw(origin, null, null);
+            Draw(origin);
         }
 
-        public void Draw(Vector2 origin, Vector2? parentSize = null, Actor actor = null)
+        public void Draw(Vector2 origin, Vector2? parentSize = null, GameObject? actor = null)
         {
             if (!Config.Enabled || Config.GetText() == null)
             {
@@ -33,7 +33,7 @@ namespace DelvUI.Interface.GeneralElements
             DrawLabel(text, origin, size, actor);
         }
 
-        private void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, Actor actor = null)
+        private void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
         {
             var fontPushed = FontsManager.Instance.PushFont(Config.FontID);
 
@@ -57,18 +57,19 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
-        public virtual PluginConfigColor Color(Actor actor = null)
+        public virtual PluginConfigColor Color(GameObject? actor = null)
         {
             if (!Config.UseJobColor)
             {
                 return Config.Color;
             }
-            else if (Config.UseJobColor && actor is not Chara)
+
+            if (Config.UseJobColor && actor is not null)
             {
                 return GlobalColors.Instance.NPCFriendlyColor;
             }
 
-            return Utils.ColorForActor((Chara)actor);
+            return Utils.ColorForActor(actor);
         }
     }
 }

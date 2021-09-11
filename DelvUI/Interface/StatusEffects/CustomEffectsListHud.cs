@@ -1,9 +1,5 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface.StatusEffects
 {
@@ -13,7 +9,7 @@ namespace DelvUI.Interface.StatusEffects
         {
         }
 
-        public Actor TargetActor { get; set; } = null;
+        public GameObject TargetActor { get; set; } = null;
 
         protected override List<StatusEffectData> StatusEffectsData()
         {

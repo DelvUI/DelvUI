@@ -1,5 +1,4 @@
-﻿using Dalamud.Game.ClientState.Structs.JobGauge;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
@@ -8,8 +7,11 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -107,14 +109,14 @@ namespace DelvUI.Interface.Jobs
 
             var position = origin + Config.Position + Config.ManaBarPosition - Config.ManaBarSize / 2f;
 
-            var color = gauge.InAstralFire() ? Config.ManaBarFireColor : gauge.InUmbralIce() ? Config.ManaBarIceColor : Config.ManaBarNoElementColor;
+            var color = gauge.InAstralFire ? Config.ManaBarFireColor : gauge.InUmbralIce ? Config.ManaBarIceColor : Config.ManaBarNoElementColor;
 
             var builder = BarBuilder.Create(position, Config.ManaBarSize)
                 .AddInnerBar(actor.CurrentMp, actor.MaxMp, color)
                 .SetBackgroundColor(EmptyColor.Base);
 
             // element timer
-            if (gauge.InAstralFire() || gauge.InUmbralIce())
+            if (gauge.InAstralFire || gauge.InUmbralIce)
             {
                 var time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000 + 1 : 0;
                 builder.SetTextMode(BarTextMode.Single);
@@ -122,7 +124,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             // enochian
-            if (gauge.IsEnoActive())
+            if (gauge.IsEnochianActive)
             {
                 builder.SetGlowSize(2);
                 builder.SetGlowColor(0x88FFFFFF);
@@ -132,7 +134,7 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
 
             // threshold marker
-            if (Config.ShowManaThresholdMarker && gauge.InAstralFire())
+            if (Config.ShowManaThresholdMarker && gauge.InAstralFire)
             {
                 var pos = new Vector2(
                     position.X + Config.ManaThresholdValue / 10000f * Config.ManaBarSize.X,
@@ -166,13 +168,12 @@ namespace DelvUI.Interface.Jobs
         protected virtual void DrawUmbralHeartStacks(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
-
             var position = origin + Config.Position + Config.UmbralHeartPosition - Config.UmbralHeartSize / 2f;
 
             var bar = BarBuilder.Create(position, Config.UmbralHeartSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.UmbralHeartPadding)
-                                .AddInnerBar(gauge.NumUmbralHearts, 3, Config.UmbralHeartColor, EmptyColor)
+                                .AddInnerBar(gauge.UmbralHearts, 3, Config.UmbralHeartColor, EmptyColor)
                                 .SetBackgroundColor(EmptyColor.Base)
                                 .Build();
 
@@ -189,15 +190,15 @@ namespace DelvUI.Interface.Jobs
             var barWidth = (int)(Config.PolyglotSize.X - Config.PolyglotPadding) / 2;
             var barSize = new Vector2(barWidth, Config.PolyglotSize.Y);
 
-            var scale = 1 - (gauge.IsEnoActive() ? gauge.TimeUntilNextPolyglot / 30000f : 1);
+            var scale = 1 - (gauge.IsEnochianActive ? gauge.EnochianTimer / 30000f : 1);
             var drawList = ImGui.GetWindowDrawList();
 
             // 1
             var builder = BarBuilder.Create(position, barSize)
-                                    .AddInnerBar(gauge.NumPolyglotStacks < 1 ? scale : 1, 1, Config.PolyglotColor)
+                                    .AddInnerBar(gauge.PolyglotStacks < 1 ? scale : 1, 1, Config.PolyglotColor)
                                     .SetBackgroundColor(EmptyColor.Base);
 
-            if (gauge.NumPolyglotStacks >= 1)
+            if (gauge.PolyglotStacks >= 1)
             {
                 builder.SetGlowColor(0x88FFFFFF);
             }
@@ -207,10 +208,10 @@ namespace DelvUI.Interface.Jobs
             // 2
             position.X += barWidth + Config.PolyglotPadding;
             builder = BarBuilder.Create(position, barSize)
-                                .AddInnerBar(gauge.NumPolyglotStacks == 1 ? scale : gauge.NumPolyglotStacks == 0 ? 0 : 1, 1, Config.PolyglotColor)
+                                .AddInnerBar(gauge.PolyglotStacks == 1 ? scale : gauge.PolyglotStacks == 0 ? 0 : 1, 1, Config.PolyglotColor)
                                 .SetBackgroundColor(EmptyColor.Base);
 
-            if (gauge.NumPolyglotStacks == 2)
+            if (gauge.PolyglotStacks == 2)
             {
                 builder.SetGlowColor(0x88FFFFFF);
             }
@@ -220,14 +221,15 @@ namespace DelvUI.Interface.Jobs
 
         protected virtual void DrawTripleCast(Vector2 origin)
         {
-            var tripleStackBuff = Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1211);
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
+            var tripleStackBuff = Plugin.ClientState.LocalPlayer.StatusList.FirstOrDefault(o => o.StatusId == 1211);
 
             var position = origin + Config.Position + Config.TriplecastPosition - Config.TriplecastSize / 2f;
 
             var bar = BarBuilder.Create(position, Config.TriplecastSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.TriplecastPadding)
-                                .AddInnerBar(tripleStackBuff.StackCount, 3, Config.TriplecastColor, EmptyColor)
+                                .AddInnerBar(tripleStackBuff?.StackCount ?? 0, 3, Config.TriplecastColor, EmptyColor)
                                 .SetBackgroundColor(EmptyColor.Base)
                                 .Build();
 
@@ -237,9 +239,10 @@ namespace DelvUI.Interface.Jobs
 
         protected virtual void DrawProcs(Vector2 origin)
         {
-            var statusEffects = Plugin.ClientState.LocalPlayer.StatusEffects;
-            var firestarterTimer = Config.ShowFirestarterProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 165).Duration) : 0;
-            var thundercloudTimer = Config.ShowThundercloudProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 164).Duration) : 0;
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
+            var statusEffects = Plugin.ClientState.LocalPlayer.StatusList;
+            var firestarterTimer = Config.ShowFirestarterProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.StatusId == 165)?.RemainingTime ?? 0f) : 0;
+            var thundercloudTimer = Config.ShowThundercloudProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.StatusId == 164)?.RemainingTime ?? 0f) : 0;
 
             var position = origin + Config.Position + Config.ProcsBarPosition - Config.ProcsBarSize / 2f;
 
@@ -267,20 +270,20 @@ namespace DelvUI.Interface.Jobs
 
         protected virtual void DrawDotTimer(Vector2 origin)
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
+            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float timer = 0;
             float maxDuration = 1;
 
-            if (target != null)
+            if (actor is BattleChara target)
             {
                 // thunder 1 to 4
                 int[] dotIDs = { 161, 162, 163, 1210 };
                 float[] dotDurations = { 12, 18, 24, 18 };
-                var player = Plugin.ClientState.LocalPlayer;
 
                 for (var i = 0; i < 4; i++)
                 {
-                    timer = target.StatusEffects.FirstOrDefault(o => o.EffectId == dotIDs[i] && o.OwnerId == player.ActorId).Duration;
+                    timer = target.StatusList.FirstOrDefault(o => o.StatusId == dotIDs[i] && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId)?.RemainingTime ?? 0f;
 
                     if (timer > 0)
                     {

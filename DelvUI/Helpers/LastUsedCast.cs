@@ -1,5 +1,5 @@
-﻿using Dalamud.Game.ClientState.Actors;
-using Dalamud.Plugin;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Logging;
 using DelvUI.Enums;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
@@ -31,7 +31,7 @@ namespace DelvUI.Helpers
 
         private void SetCastProperties()
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             var targetKind = target?.ObjectKind;
 
             switch (targetKind)

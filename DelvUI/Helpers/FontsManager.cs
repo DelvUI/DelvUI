@@ -1,10 +1,10 @@
-﻿using Dalamud.Plugin;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Dalamud.Logging;
 
 namespace DelvUI.Helpers
 {
@@ -22,7 +22,7 @@ namespace DelvUI.Helpers
         }
 
         public static FontsManager Instance { get; private set; }
-        private FontsConfig _config = null;
+        private FontsConfig? _config;
 
         public void LoadConfig()
         {
@@ -61,14 +61,14 @@ namespace DelvUI.Helpers
             return false;
         }
 
-        public bool PushFont(string fontID)
+        public bool PushFont(string? fontId)
         {
-            if (fontID == null || !_config.Fonts.ContainsKey(fontID))
+            if (fontId == null || !_config.Fonts.ContainsKey(fontId))
             {
                 return false;
             }
 
-            var index = _config.Fonts.IndexOfKey(fontID);
+            var index = _config.Fonts.IndexOfKey(fontId);
             if (index < 0 || index >= _fonts.Count)
             {
                 return false;
