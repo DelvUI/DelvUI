@@ -87,7 +87,6 @@ namespace DelvUI.Interface.Jobs
             }
             else
             {
-                //PluginLog.Log($"NOT in ninjutsu with cd {mudraCooldownInfo} and old cd {_oldMudraCooldownInfo}");
                 _oldMudraCooldownInfo = mudraCooldownInfo;
             }
             // if we are casting ninjutsu then show ninjutsu info
