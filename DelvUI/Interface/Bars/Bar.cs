@@ -119,6 +119,7 @@ namespace DelvUI.Interface.Bars
                 var strText = text.Type switch
                 {
                     BarTextType.Current => throw new InvalidOperationException("Full bar text must be 'Custom' type."),
+                    BarTextType.Remaining => throw new InvalidOperationException("Full bar text must be 'Custom' type."),
                     BarTextType.Maximum => throw new InvalidOperationException("Full bar text must be 'Custom' type."),
                     BarTextType.Percentage => throw new InvalidOperationException("Full bar text must be 'Custom' type."),
                     BarTextType.Custom => text.Text,
@@ -329,6 +330,7 @@ namespace DelvUI.Interface.Bars
                 var text = textObj.Type switch
                 {
                     BarTextType.Current => Math.Round(CurrentValue).ToString(CultureInfo.InvariantCulture),
+                    BarTextType.Remaining => Math.Round(MaximumValue - CurrentValue).ToString(CultureInfo.InvariantCulture),
                     BarTextType.Maximum => Math.Round(MaximumValue).ToString(CultureInfo.InvariantCulture),
                     BarTextType.Percentage => Math.Round(CurrentValue / MaximumValue * 100f).ToString(CultureInfo.InvariantCulture),
                     BarTextType.Custom => textObj.Text,
@@ -372,6 +374,7 @@ namespace DelvUI.Interface.Bars
                         var text = textObj.Type switch
                         {
                             BarTextType.Current => Math.Round(barValue).ToString(CultureInfo.InvariantCulture),
+                            BarTextType.Remaining => Math.Round(barMaximum - barValue).ToString(CultureInfo.InvariantCulture),
                             BarTextType.Maximum => Math.Round(barMaximum).ToString(CultureInfo.InvariantCulture),
                             BarTextType.Percentage => Math.Round(currentFill * 100f).ToString(CultureInfo.InvariantCulture),
                             BarTextType.Custom => textObj.Text,
@@ -422,6 +425,7 @@ namespace DelvUI.Interface.Bars
                         var text = textObj.Type switch
                         {
                             BarTextType.Current => Math.Round(barValue).ToString(CultureInfo.InvariantCulture),
+                            BarTextType.Remaining => Math.Round(barMaximum - barValue).ToString(CultureInfo.InvariantCulture),
                             BarTextType.Maximum => Math.Round(barMaximum).ToString(CultureInfo.InvariantCulture),
                             BarTextType.Percentage => Math.Round(currentFill * 100f).ToString(CultureInfo.InvariantCulture),
                             BarTextType.Custom => textObj.Text,
@@ -713,6 +717,7 @@ namespace DelvUI.Interface.Bars
     public enum BarTextType
     {
         Current,
+        Remaining,
         Maximum,
         Percentage,
         Custom
