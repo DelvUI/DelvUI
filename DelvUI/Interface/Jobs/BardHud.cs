@@ -45,8 +45,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawActiveDots(Vector2 origin)
         {
-            bool targetIsChara = target is Chara;
             Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            bool targetIsChara = target is Chara;
 
             if (!targetIsChara && !Config.CBNoTarget && !Config.SBNoTarget)
             {
