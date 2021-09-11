@@ -44,7 +44,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            SMNGauge gauge = PluginInterface.ClientState.JobGauges.Get<SMNGauge>();
+            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
 
             PluginConfigColor tranceColor;
             float maxDuration;
@@ -102,7 +102,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            SMNGauge gauge = PluginInterface.ClientState.JobGauges.Get<SMNGauge>();
+            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             var stacks = gauge.NumStacks;
             List<Bar> barDrawList = new();
 
@@ -172,7 +172,7 @@ namespace DelvUI.Interface.Jobs
         }
         private void DrawActiveDots(Vector2 origin)
         {
-            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
 
             if (!Config.ShowBio && !Config.ShowMiasma)
             {
@@ -192,8 +192,8 @@ namespace DelvUI.Interface.Jobs
             if (Config.ShowMiasma)
             {
                 StatusEffect miasma = target.StatusEffects.FirstOrDefault(
-                    o => o.EffectId == 1215 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                      || o.EffectId == 180 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                    o => o.EffectId == 1215 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                      || o.EffectId == 180 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
                 );
 
                 float miasmaDuration = Math.Abs(miasma.Duration);
@@ -210,9 +210,9 @@ namespace DelvUI.Interface.Jobs
             if (Config.ShowBio)
             {
                 StatusEffect bio = target.StatusEffects.FirstOrDefault(
-                    o => o.EffectId == 1214 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                      || o.EffectId == 179 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                      || o.EffectId == 189 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                    o => o.EffectId == 1214 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                      || o.EffectId == 179 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                      || o.EffectId == 189 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
                 );
 
                 float bioDuration = Math.Abs(bio.Duration);
@@ -243,7 +243,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawRuinBar(Vector2 origin)
         {
-            StatusEffect ruinBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1212);
+            StatusEffect ruinBuff = Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1212);
 
             Vector2 barSize = Config.RuinSize;
             Vector2 position = origin + Config.Position + Config.RuinPosition - barSize / 2f;
@@ -266,7 +266,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAetherBar(Vector2 origin)
         {
-            StatusEffect aetherFlowBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
+            StatusEffect aetherFlowBuff = Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
 
             Vector2 barSize = Config.AetherSize;
             Vector2 position = origin + Config.Position + Config.AetherPosition - barSize / 2f;

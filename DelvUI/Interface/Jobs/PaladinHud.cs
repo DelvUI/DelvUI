@@ -57,7 +57,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawManaBar(Vector2 origin)
         {
-            PlayerCharacter actor = PluginInterface.ClientState.LocalPlayer;
+            PlayerCharacter actor = Plugin.ClientState.LocalPlayer;
 
             float posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
             float posY = origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f;
@@ -86,7 +86,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawOathGauge(Vector2 origin)
         {
-            PLDGauge gauge = PluginInterface.ClientState.JobGauges.Get<PLDGauge>();
+            PLDGauge gauge = Plugin.JobGauges.Get<PLDGauge>();
 
             float xPos = origin.X + Config.Position.X + Config.OathGaugePosition.X - Config.OathGaugeSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.OathGaugePosition.Y - Config.OathGaugeSize.Y / 2f;
@@ -108,8 +108,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBuffBar(Vector2 origin)
         {
-            IEnumerable<StatusEffect> fightOrFlightBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 76);
-            IEnumerable<StatusEffect> requiescatBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1368);
+            IEnumerable<StatusEffect> fightOrFlightBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 76);
+            IEnumerable<StatusEffect> requiescatBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1368);
 
             float xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
@@ -144,7 +144,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAtonementBar(Vector2 origin)
         {
-            IEnumerable<StatusEffect> atonementBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1902);
+            IEnumerable<StatusEffect> atonementBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1902);
             int stackCount = atonementBuff.Any() ? atonementBuff.First().StackCount : 0;
 
             float xPos = origin.X + Config.Position.X + Config.AtonementBarPosition.X - Config.AtonementBarSize.X / 2f;
@@ -162,14 +162,14 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDoTBar(Vector2 origin)
         {
-            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
 
             if (target is not Chara)
             {
                 return;
             }
 
-            StatusEffect goringBlade = target.StatusEffects.FirstOrDefault(o => o.EffectId == 725 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId);
+            StatusEffect goringBlade = target.StatusEffects.FirstOrDefault(o => o.EffectId == 725 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId);
 
             float duration = Math.Abs(goringBlade.Duration);
 

@@ -47,8 +47,8 @@ namespace DelvUI.Interface.Jobs
 
         protected virtual void DrawManaBar(Vector2 origin)
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
-            var actor = PluginInterface.ClientState.LocalPlayer;
+            var gauge = Plugin.JobGauges.Get<BLMGauge>();
+            var actor = Plugin.ClientState.LocalPlayer;
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f,
@@ -113,7 +113,7 @@ namespace DelvUI.Interface.Jobs
 
         protected virtual void DrawUmbralHeartStacks(Vector2 origin)
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
+            var gauge = Plugin.JobGauges.Get<BLMGauge>();
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.UmbralHeartPosition.X - Config.UmbralHeartSize.X / 2f,
                 origin.Y + Config.Position.Y + Config.UmbralHeartPosition.Y - Config.UmbralHeartSize.Y / 2f
@@ -132,7 +132,7 @@ namespace DelvUI.Interface.Jobs
 
         protected virtual void DrawPolyglot(Vector2 origin)
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<BLMGauge>();
+            var gauge = Plugin.JobGauges.Get<BLMGauge>();
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.PolyglotPosition.X - Config.PolyglotSize.X / 2f,
@@ -173,7 +173,7 @@ namespace DelvUI.Interface.Jobs
 
         protected virtual void DrawTripleCast(Vector2 origin)
         {
-            var tripleStackBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1211);
+            var tripleStackBuff = Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1211);
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.TriplecastPosition.X - Config.TripleCastSize.X / 2f,
@@ -193,7 +193,7 @@ namespace DelvUI.Interface.Jobs
 
         protected virtual void DrawProcs(Vector2 origin)
         {
-            var statusEffects = PluginInterface.ClientState.LocalPlayer.StatusEffects;
+            var statusEffects = Plugin.ClientState.LocalPlayer.StatusEffects;
             var firestarterTimer = Config.ShowFirestarterProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 165).Duration) : 0;
             var thundercloudTimer = Config.ShowThundercloudProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 164).Duration) : 0;
 
@@ -226,7 +226,7 @@ namespace DelvUI.Interface.Jobs
 
         protected virtual void DrawDotTimer(Vector2 origin)
         {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
             float timer = 0;
             float maxDuration = 1;
 
@@ -235,7 +235,7 @@ namespace DelvUI.Interface.Jobs
                 // thunder 1 to 4
                 int[] dotIDs = { 161, 162, 163, 1210 };
                 float[] dotDurations = { 12, 18, 24, 18 };
-                var player = PluginInterface.ClientState.LocalPlayer;
+                var player = Plugin.ClientState.LocalPlayer;
 
                 for (var i = 0; i < 4; i++)
                 {

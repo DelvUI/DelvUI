@@ -45,7 +45,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawActiveDots(Vector2 origin)
         {
-            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
 
             if (target is not Chara)
             {
@@ -60,8 +60,8 @@ namespace DelvUI.Interface.Jobs
             if (Config.ShowCB)
             {
                 StatusEffect cb = target.StatusEffects.FirstOrDefault(
-                    o => o.EffectId == 1200 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                      || o.EffectId == 124 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                    o => o.EffectId == 1200 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                      || o.EffectId == 124 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
                 );
 
                 float duration = Math.Abs(cb.Duration);
@@ -81,8 +81,8 @@ namespace DelvUI.Interface.Jobs
             if (Config.ShowSB)
             {
                 StatusEffect sb = target.StatusEffects.FirstOrDefault(
-                    o => o.EffectId == 1201 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                      || o.EffectId == 129 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                    o => o.EffectId == 1201 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                      || o.EffectId == 129 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
                 );
 
                 float duration = Math.Abs(sb.Duration);
@@ -111,7 +111,7 @@ namespace DelvUI.Interface.Jobs
 
         private void HandleCurrentSong(Vector2 origin)
         {
-            BRDGauge gauge = PluginInterface.ClientState.JobGauges.Get<BRDGauge>();
+            BRDGauge gauge = Plugin.JobGauges.Get<BRDGauge>();
             byte songStacks = gauge.NumSongStacks;
             CurrentSong song = gauge.ActiveSong;
             short songTimer = gauge.SongTimer;
@@ -217,7 +217,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawSoulVoiceBar(Vector2 origin)
         {
-            byte soulVoice = PluginInterface.ClientState.JobGauges.Get<BRDGauge>().SoulVoiceValue;
+            byte soulVoice = Plugin.JobGauges.Get<BRDGauge>().SoulVoiceValue;
 
             Vector2 barSize = Config.SoulGaugeSize;
             Vector2 position = origin + Config.Position + Config.SoulGaugePosition - barSize / 2f;

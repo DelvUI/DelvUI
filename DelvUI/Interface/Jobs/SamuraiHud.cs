@@ -54,7 +54,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawKenkiBar(Vector2 origin)
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
+            var gauge = Plugin.JobGauges.Get<SAMGauge>();
             var pos = new Vector2(
                 origin.X + Config.Position.X + Config.KenkiBarPosition.X - Config.KenkiBarSize.X / 2f,
                 origin.Y + Config.Position.Y + Config.KenkiBarPosition.Y - Config.KenkiBarSize.Y / 2f
@@ -75,13 +75,13 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawHiganbanaBar(Vector2 origin)
         {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
             if (target is not Chara)
             {
                 return;
             }
 
-            var actorId = PluginInterface.ClientState.LocalPlayer.ActorId;
+            var actorId = Plugin.ClientState.LocalPlayer.ActorId;
             var higanbana = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1228 && o.OwnerId == actorId || o.EffectId == 1319 && o.OwnerId == actorId);
             var higanbanaDuration = higanbana.Duration;
             if (higanbanaDuration == 0)
@@ -109,7 +109,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawActiveBuffs(Vector2 origin)
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
+            var target = Plugin.ClientState.LocalPlayer;
             var buffsSize = new Vector2(Config.BuffsBarSize.X / 2f - Config.BuffsPadding / 2f, Config.BuffsBarSize.Y);
             var order = Config.buffOrder;
 
@@ -150,7 +150,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawSenResourceBar(Vector2 origin)
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
+            var gauge = Plugin.JobGauges.Get<SAMGauge>();
             var senBarWidth = (Config.SenBarSize.X - Config.SenBarPadding * 2) / 3f;
             var senBarSize = new Vector2(senBarWidth, Config.SenBarSize.Y);
 
@@ -177,7 +177,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawMeditationResourceBar(Vector2 origin)
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<SAMGauge>();
+            var gauge = Plugin.JobGauges.Get<SAMGauge>();
 
             var pos = new Vector2(
                 origin.X + Config.Position.X + Config.MeditationBarPosition.X - Config.MeditationBarSize.X / 2f,

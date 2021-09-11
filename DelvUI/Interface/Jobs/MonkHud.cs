@@ -69,7 +69,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawFormsBar(Vector2 origin)
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
+            var target = Plugin.ClientState.LocalPlayer;
             var opoOpoForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 107);
             var raptorForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 108);
             var coeurlForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 109);
@@ -145,7 +145,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawTrueNorthBar(Vector2 origin)
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
+            var target = Plugin.ClientState.LocalPlayer;
             var trueNorth = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1250);
             var trueNorthDuration = trueNorth.Duration;
 
@@ -177,7 +177,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawPerfectBalanceBar(Vector2 origin)
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
+            var target = Plugin.ClientState.LocalPlayer;
             var perfectBalance = target.StatusEffects.FirstOrDefault(o => o.EffectId == 110);
             var perfectBalanceDuration = perfectBalance.StackCount;
 
@@ -211,7 +211,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawRiddleOfEarthBar(Vector2 origin)
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
+            var target = Plugin.ClientState.LocalPlayer;
             var riddleOfEarth = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1179);
             var riddleOfEarthDuration = riddleOfEarth.StackCount;
 
@@ -245,7 +245,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawChakraGauge(Vector2 origin)
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<MNKGauge>();
+            var gauge = Plugin.JobGauges.Get<MNKGauge>();
 
             var position = origin + Config.Position + Config.ChakraBarPosition - Config.ChakraBarSize / 2f;
             var bar = BarBuilder.Create(position, Config.ChakraBarSize)
@@ -261,7 +261,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawTwinSnakesBar(Vector2 origin)
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
+            var target = Plugin.ClientState.LocalPlayer;
             var twinSnakes = target.StatusEffects.FirstOrDefault(o => o.EffectId == 101);
             var twinSnakesDuration = twinSnakes.Duration;
 
@@ -283,7 +283,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawLeadenFistBar(Vector2 origin)
         {
-            var target = PluginInterface.ClientState.LocalPlayer;
+            var target = Plugin.ClientState.LocalPlayer;
             var leadenFist = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1861);
             var leadenFistDuration = leadenFist.Duration;
 
@@ -316,7 +316,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDemolishBar(Vector2 origin)
         {
-            var target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget ?? PluginInterface.ClientState.LocalPlayer;
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget ?? Plugin.ClientState.LocalPlayer;
             var demolish = target.StatusEffects.FirstOrDefault(o => o.EffectId == 246 || o.EffectId == 1309);
             var demolishDuration = demolish.Duration;
 

@@ -115,7 +115,7 @@ namespace DelvUI.Config
             TextureWrap banner = Plugin.bannerTexture;
 
             var currentResetEvent = GetInstance()?.ResetEvent;
-            return new ConfigurationManager(defaultConfig, banner, Plugin.GetPluginInterface().GetPluginConfigDirectory(), node, currentResetEvent);
+            return new ConfigurationManager(defaultConfig, banner, Plugin.PluginInterface.GetPluginConfigDirectory(), node, currentResetEvent);
         }
 
         public static ConfigurationManager GetInstance() => _instance;

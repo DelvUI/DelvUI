@@ -187,20 +187,20 @@ namespace DelvUI.Interface
 
         protected unsafe bool ShouldBeVisible()
         {
-            if (!ConfigurationManager.GetInstance().ShowHUD || Plugin.GetPluginInterface().ClientState.LocalPlayer == null)
+            if (!ConfigurationManager.GetInstance().ShowHUD || Plugin.ClientState.LocalPlayer == null)
             {
                 return false;
             }
 
-            var parameterWidget = (AtkUnitBase*)Plugin.GetPluginInterface().Framework.Gui.GetUiObjectByName("_ParameterWidget", 1);
-            var fadeMiddleWidget = (AtkUnitBase*)Plugin.GetPluginInterface().Framework.Gui.GetUiObjectByName("FadeMiddle", 1);
+            var parameterWidget = (AtkUnitBase*)Plugin.GameGui.GetUiObjectByName("_ParameterWidget", 1);
+            var fadeMiddleWidget = (AtkUnitBase*)Plugin.GameGui.GetUiObjectByName("FadeMiddle", 1);
 
             return parameterWidget->IsVisible && !fadeMiddleWidget->IsVisible;
         }
 
         private void UpdateJob()
         {
-            var newJobId = Plugin.GetPluginInterface().ClientState.LocalPlayer.ClassJob.Id;
+            var newJobId = Plugin.ClientState.LocalPlayer.ClassJob.Id;
             if (_jobHud != null && _jobHud.Config.JobId == newJobId)
             {
                 return;
@@ -230,10 +230,10 @@ namespace DelvUI.Interface
 
         private void AssignActors()
         {
-            var pluginInterface = Plugin.GetPluginInterface();
+            var pluginInterface = Plugin.PluginInterface;
 
             // player
-            var player = pluginInterface.ClientState.LocalPlayer;
+            var player = Plugin.ClientState.LocalPlayer;
             foreach (var element in _hudElementsUsingPlayer)
             {
                 element.Actor = player;
@@ -245,21 +245,21 @@ namespace DelvUI.Interface
             }
 
             // target
-            var target = pluginInterface.ClientState.Targets.SoftTarget ?? pluginInterface.ClientState.Targets.CurrentTarget;
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
             foreach (var element in _hudElementsUsingTarget)
             {
                 element.Actor = target;
             }
 
             // target of target
-            var targetOfTarget = Utils.FindTargetOfTarget(target, player, pluginInterface.ClientState.Actors);
+            var targetOfTarget = Utils.FindTargetOfTarget(target, player, Plugin.ObjectTable);
             foreach (var element in _hudElementsUsingTargetOfTarget)
             {
                 element.Actor = targetOfTarget;
             }
 
             // focus
-            var focusTarget = pluginInterface.ClientState.Targets.FocusTarget;
+            var focusTarget = Plugin.TargetManager.FocusTarget;
             foreach (var element in _hudElementsUsingFocusTarget)
             {
                 element.Actor = focusTarget;
