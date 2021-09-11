@@ -1,4 +1,4 @@
-﻿using Dalamud.Interface;
+using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -271,14 +271,14 @@ namespace DelvUI.Interface
             _jobsMap = new Dictionary<uint, JobHudTypes>()
             {
                 // tanks
-                [JobIDs.DRK] = new JobHudTypes(typeof(DarkKnightHud), typeof(DarkKnightConfig)),
                 [JobIDs.PLD] = new JobHudTypes(typeof(PaladinHud), typeof(PaladinConfig)),
                 [JobIDs.WAR] = new JobHudTypes(typeof(WarriorHud), typeof(WarriorConfig)),
+                [JobIDs.DRK] = new JobHudTypes(typeof(DarkKnightHud), typeof(DarkKnightConfig)),
                 [JobIDs.GNB] = new JobHudTypes(typeof(GunbreakerHud), typeof(GunbreakerConfig)),
 
                 // healers
-                [JobIDs.SCH] = new JobHudTypes(typeof(ScholarHud), typeof(ScholarConfig)),
                 [JobIDs.WHM] = new JobHudTypes(typeof(WhiteMageHud), typeof(WhiteMageConfig)),
+                [JobIDs.SCH] = new JobHudTypes(typeof(ScholarHud), typeof(ScholarConfig)),
                 [JobIDs.AST] = new JobHudTypes(typeof(AstrologianHud), typeof(AstrologianConfig)),
 
                 // melee
@@ -288,14 +288,14 @@ namespace DelvUI.Interface
                 [JobIDs.SAM] = new JobHudTypes(typeof(SamuraiHud), typeof(SamuraiConfig)),
 
                 // ranged
+                [JobIDs.BRD] = new JobHudTypes(typeof(BardHud), typeof(BardConfig)),
                 [JobIDs.MCH] = new JobHudTypes(typeof(MachinistHud), typeof(MachinistConfig)),
                 [JobIDs.DNC] = new JobHudTypes(typeof(DancerHud), typeof(DancerConfig)),
-                [JobIDs.BRD] = new JobHudTypes(typeof(BardHud), typeof(BardConfig)),
 
                 // casters
                 [JobIDs.BLM] = new JobHudTypes(typeof(BlackMageHud), typeof(BlackMageConfig)),
-                [JobIDs.RDM] = new JobHudTypes(typeof(RedMageHud), typeof(RedMageConfig)),
-                [JobIDs.SMN] = new JobHudTypes(typeof(SummonerHud), typeof(SummonerConfig))
+                [JobIDs.SMN] = new JobHudTypes(typeof(SummonerHud), typeof(SummonerConfig)),
+                [JobIDs.RDM] = new JobHudTypes(typeof(RedMageHud), typeof(RedMageConfig))
             };
 
             _unsupportedJobsMap = new Dictionary<uint, Type>()
