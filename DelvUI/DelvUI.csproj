@@ -5,9 +5,9 @@
         <LangVersion>preview</LangVersion>
         <Platforms>AnyCPU</Platforms>
         <Configurations>Debug;Release</Configurations>
-        <AssemblyVersion>0.1.0.0</AssemblyVersion>
-        <FileVersion>0.1.0.0</FileVersion>
-        <InformationalVersion>1.0.0-beta1</InformationalVersion>
+        <AssemblyVersion>0.1.1.0</AssemblyVersion>
+        <FileVersion>0.1.1.0</FileVersion>
+        <InformationalVersion>0.1.1.0 (Beta1-Patch1)</InformationalVersion>
     </PropertyGroup>
 
     <!-- Assembly Configuration -->

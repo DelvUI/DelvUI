@@ -1,10 +1,10 @@
 ﻿{
   "Name": "DelvUI",
   "Author": "DelvUI",
-  "Description": "Provides an ElvUI style HUD for FFXIV",
+  "Description": "Provides an ElvUI style HUD for FFXIV.  All support for this plugin is handled at discord.gg/delvui",
   "RepoUrl": "https://github.com/delvui/delvui",
   "Tags": ["UI"],
-  "AssemblyVersion": "0.1.0.0",
+  "AssemblyVersion": "0.1.1.0",
   "ApplicableVersion": "any",
   "DalamudApiLevel": 3
 }
