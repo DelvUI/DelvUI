@@ -1,19 +1,18 @@
-﻿using FFXIVClientStructs.FFXIV.Client.System.String;
-using System;
-using System.Collections.Generic;
-using System.Dynamic;
+﻿using System;
 using System.Globalization;
 using System.Numerics;
 using System.Text;
+using Dalamud.Game.Text.SeStringHandling;
+using FFXIVClientStructs.FFXIV.Client.System.String;
 
 namespace DelvUI
 {
     public static class Extensions
     {
-        public static string Abbreviate(this string str)
+        public static string Abbreviate(this SeString str)
         {
-            var splits = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            for (var i = 0; i < splits.Length - 1; i++)
+            string[] splits = str.ToString().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = 0; i < splits.Length - 1; i++)
             {
                 splits[i] = splits[i][0].ToString();
             }
@@ -21,31 +20,23 @@ namespace DelvUI
             return string.Join(". ", splits).ToUpper();
         }
 
-        public static string FirstName(this string str)
+        public static string FirstName(this SeString str)
         {
-            var splits = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            if (splits.Length > 0)
-            {
-                return splits[0];
-            }
-            return "";
+            string[] splits = str.ToString().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            return splits.Length > 0 ? splits[0] : "";
         }
 
-        public static string LastName(this string str)
+        public static string LastName(this SeString str)
         {
-            var splits = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            if (splits.Length > 1)
-            {
-                return splits[splits.Length - 1];
-            }
-            return "";
+            string[] splits = str.ToString().Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            return splits.Length > 1 ? splits[^1] : "";
         }
 
         public static Vector4 AdjustColor(this Vector4 vec, float correctionFactor)
         {
-            var red = vec.X;
-            var green = vec.Y;
-            var blue = vec.Z;
+            float red = vec.X;
+            float green = vec.Y;
+            float blue = vec.Z;
 
             if (correctionFactor < 0)
             {
@@ -64,19 +55,9 @@ namespace DelvUI
             return new Vector4(red, green, blue, vec.W);
         }
 
-        public static bool IsPropertyExist(dynamic settings, string name)
-        {
-            if (settings is ExpandoObject)
-            {
-                return ((IDictionary<string, object>)settings).ContainsKey(name);
-            }
-
-            return settings.GetType().GetProperty(name) != null;
-        }
-
         public static unsafe string GetString(this Utf8String utf8String)
         {
-            var s = utf8String.BufUsed > int.MaxValue ? int.MaxValue : (int)utf8String.BufUsed;
+            int s = utf8String.BufUsed > int.MaxValue ? int.MaxValue : (int)utf8String.BufUsed;
 
             try
             {
@@ -88,7 +69,7 @@ namespace DelvUI
             }
         }
 
-        public static string KiloFormat(this int num)
+        public static string KiloFormat(this uint num)
         {
             return num switch
             {
@@ -100,14 +81,15 @@ namespace DelvUI
             };
         }
 
-        public static string Truncate(this string value, int maxLength)
+        public static string Truncate(this SeString value, int maxLength)
         {
-            if (string.IsNullOrEmpty(value))
+            string str = value.ToString();
+            if (string.IsNullOrEmpty(str))
             {
-                return value;
+                return str;
             }
 
-            return value.Length <= maxLength ? value : value.Substring(0, maxLength);
+            return str.Length <= maxLength ? str : str[..maxLength];
         }
     }
 }

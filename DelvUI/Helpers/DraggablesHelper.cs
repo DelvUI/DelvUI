@@ -155,6 +155,7 @@ namespace DelvUI.Helpers
 
             if (!ImGui.Begin("Grid", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
             {
+                ImGui.End();
                 return;
             }
 

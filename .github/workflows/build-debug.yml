@@ -21,6 +21,13 @@ jobs:
       #    dotnet-version: "6.0.x"
       #    include-prerelease: true
 
+      - name: Extract Dalamud version
+        id: dalamud-version
+        uses: mavrosxristoforos/get-xml-info@1.0
+        with:
+          xml-file: "./DelvUI/DelvUI.csproj"
+          xpath: "//DalamudVersion"
+
       - name: CSProj Cache
         id: cache-csproj
         uses: actions/cache@v2
@@ -28,14 +35,26 @@ jobs:
           path: |
             ./dalamud
             ~/.nuget/packages
-          key: ${{ runner.os }}-csproj-v2-${{ hashFiles('**/*.csproj') }}
+          key: ${{ runner.os }}-csproj-v3-${{ hashFiles('**/*.csproj') }}
 
       - name: Setup Dalamud
-        if: steps.cache-csproj.outputs.cache-hit != 'true'
+        if: |
+          steps.cache-csproj.outputs.cache-hit != 'true' &&
+          steps.dalamud-version.outputs.info != 'dev'
         shell: pwsh
         run: |
           mkdir ./dalamud
           Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/latest.zip -OutFile ./dalamud/latest.zip
+          Expand-Archive -Path ./dalamud/latest.zip ./dalamud
+
+      - name: Setup dev Dalamud
+        if: |
+          steps.cache-csproj.outputs.cache-hit != 'true' &&
+          steps.dalamud-version.outputs.info == 'dev'
+        shell: pwsh
+        run: |
+          mkdir ./dalamud
+          Invoke-WebRequest -Uri https://goatcorp.github.io/dalamud-distrib/stg/latest.zip -OutFile ./dalamud/latest.zip
           Expand-Archive -Path ./dalamud/latest.zip ./dalamud
 
       - name: Restore project dependencies

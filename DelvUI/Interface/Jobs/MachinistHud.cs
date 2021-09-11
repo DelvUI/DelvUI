@@ -1,15 +1,15 @@
-﻿using Dalamud.Game.ClientState.Structs.JobGauge;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.JobGauge.Types;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -119,9 +119,9 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            if (gauge.IsRobotActive() && Config.ShowBatteryGaugeRobotDuration)
+            if (gauge.IsRobotActive && Config.ShowBatteryGaugeRobotDuration)
             {
-                builder.AddInnerBar(gauge.RobotTimeRemaining / 1000f, _robotDuration[gauge.LastRobotBatteryPower / 10 - 5], Config.RobotFillColor, null);
+                builder.AddInnerBar(gauge.SummonTimeRemaining / 1000f, _robotDuration[gauge.LastSummonBatteryPower / 10 - 5], Config.RobotFillColor, null);
 
                 if (Config.ShowBatteryGaugeRobotDurationText)
                 {
@@ -144,7 +144,7 @@ namespace DelvUI.Interface.Jobs
             var builder = BarBuilder.Create(position, Config.OverheatSize)
                 .SetBackgroundColor(EmptyColor.Background);
 
-            if (gauge.IsOverheated())
+            if (gauge.IsOverheated)
             {
                 builder.AddInnerBar(gauge.OverheatTimeRemaining / 1000f, 8, Config.OverheatFillColor, null);
 
@@ -161,7 +161,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawWildfireBar(Vector2 origin)
         {
-            var wildfireBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1946);
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
+            var wildfireBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 1946);
 
             var position = origin + Config.Position + Config.WildfirePosition - Config.WildfireSize / 2f;
 
@@ -169,7 +170,7 @@ namespace DelvUI.Interface.Jobs
 
             if (wildfireBuff.Any())
             {
-                var duration = wildfireBuff.First().Duration;
+                var duration = wildfireBuff.First().RemainingTime;
                 builder.AddInnerBar(duration, 10, Config.WildfireFillColor, null);
 
                 if (Config.ShowWildfireText)

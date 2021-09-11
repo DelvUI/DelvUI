@@ -1,18 +1,19 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using DelvUI.Config;
+﻿using System;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
-using System;
 using System.Collections.Generic;
 using System.Numerics;
+using DelvUI.Config;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface.GeneralElements
 {
     public class GCDIndicatorHud : DraggableHudElement, IHudElementWithActor
     {
         private GCDIndicatorConfig Config => (GCDIndicatorConfig)_config;
-        public Actor Actor { get; set; } = null;
+        public GameObject? Actor { get; set; } = null;
 
         public GCDIndicatorHud(string ID, GCDIndicatorConfig config, string displayName) : base(ID, config, displayName) { }
 

@@ -1,6 +1,4 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+﻿using Dalamud.Game.ClientState.Structs;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -10,9 +8,13 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
+using Dalamud.Game.ClientState.JobGauge.Enums;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -103,15 +105,14 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawChaosThrustBar(Vector2 origin)
         {
-            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float duration = 0f;
 
-            if (target is Chara)
+            if (actor is BattleChara target)
             {
-                StatusEffect chaosThrust = target.StatusEffects.FirstOrDefault(
-                    o => (o.EffectId == 1312 || o.EffectId == 118) && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
-                );
-                duration = Math.Max(0f, chaosThrust.Duration);
+                Status? chaosThrust = target.StatusList.FirstOrDefault(o => o.StatusId is 1312 or 118 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId);
+                duration = Math.Max(0f, chaosThrust?.RemainingTime ?? 0f);
             }
 
             Vector2 cursorPos = origin + Config.Position + Config.ChaosThrustBarPosition - Config.ChaosThrustBarSize / 2f;
@@ -170,20 +171,21 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDisembowelBar(Vector2 origin)
         {
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
             Vector2 cursorPos = origin + Config.Position + Config.DisembowelBarPosition - Config.DisembowelBarSize / 2f;
 
-            IEnumerable<StatusEffect> disembowelBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1914 or 121);
+            IEnumerable<Status> disembowelBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId is 1914 or 121);
             float duration = 0f;
             if (disembowelBuff.Any())
             {
-                StatusEffect buff = disembowelBuff.First();
-                if (buff.Duration <= 0)
+                Status buff = disembowelBuff.First();
+                if (buff.RemainingTime <= 0)
                 {
                     duration = 0f;
                 }
                 else
                 {
-                    duration = buff.Duration;
+                    duration = buff.RemainingTime;
                 }
             }
 

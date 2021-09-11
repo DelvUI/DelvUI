@@ -1,15 +1,13 @@
-﻿using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Actors.Types;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using System.Diagnostics;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System.Runtime.InteropServices;
 using System;
-using Dalamud.Plugin;
-using DelvUI.Config.Attributes;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
+using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Interface.Jobs;
 
 namespace DelvUI.Interface
@@ -124,8 +122,8 @@ namespace DelvUI.Interface
 
             if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig))
             {
+                Debug.Assert(Plugin.ClientState.LocalPlayer != null, "HudHelper.LocalPlayer is NULL.");
                 PlayerCharacter player = Plugin.ClientState.LocalPlayer;
-                Debug.Assert(player != null, "HudHelper.LocalPlayer is NULL.");
                 isHidden = isHidden && player.CurrentHp == player.MaxHp;
             }
 
@@ -230,12 +228,12 @@ namespace DelvUI.Interface
 
         private bool IsInCombat()
         {
-            return Plugin.ClientState.Condition[ConditionFlag.InCombat];
+            return Plugin.Condition[ConditionFlag.InCombat];
         }
 
         private bool IsInDuty()
         {
-            return Plugin.ClientState.Condition[ConditionFlag.BoundByDuty];
+            return Plugin.Condition[ConditionFlag.BoundByDuty];
         }
 
         public static unsafe void ToggleDefaultComponent(Action<GUIAddon> action)

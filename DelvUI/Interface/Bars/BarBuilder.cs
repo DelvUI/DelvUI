@@ -123,7 +123,7 @@ namespace DelvUI.Interface.Bars
 
         public BarBuilder AddInnerBar(float currentValue, float maximumValue, PluginConfigColor color) => AddInnerBar(currentValue, maximumValue, color, null);
 
-        public BarBuilder AddInnerBar(float currentValue, float maximumValue, PluginConfigColor color, PluginConfigColor partialColor)
+        public BarBuilder AddInnerBar(float currentValue, float maximumValue, PluginConfigColor color, PluginConfigColor? partialColor)
         {
             var colors = new PluginConfigColor[_bar.ChunkSizes.Length];
 
@@ -137,16 +137,16 @@ namespace DelvUI.Interface.Bars
 
         public BarBuilder AddInnerBar(float currentValue, float maximumValue, PluginConfigColor[] colors) => AddInnerBar(currentValue, maximumValue, colors, null);
 
-        public BarBuilder AddInnerBar(float currentValue, float maximumValue, PluginConfigColor[] colors, PluginConfigColor partialColor) =>
+        public BarBuilder AddInnerBar(float currentValue, float maximumValue, PluginConfigColor[] colors, PluginConfigColor? partialColor) =>
             AddInnerBar(currentValue, maximumValue, colors, partialColor, BarTextMode.None, null);
 
         public BarBuilder AddInnerBar(
             float currentValue,
             float maximumValue,
             PluginConfigColor[] chunkColors,
-            PluginConfigColor partialFillColor,
+            PluginConfigColor? partialFillColor,
             BarTextMode textMode,
-            BarText[] texts
+            BarText[]? texts
         )
         {
             var innerBar = new InnerBar();
@@ -325,7 +325,7 @@ namespace DelvUI.Interface.Bars
 
         public BarBuilder SetText(BarTextPosition position, BarTextType type, string text, float scale) => SetText(position, type, Vector4.One, Vector4.UnitW, text, scale);
 
-        public BarBuilder SetText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string text) =>
+        public BarBuilder SetText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string? text) =>
             SetText(new BarText(position, type, color, outlineColor, text));
 
         public BarBuilder SetText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string text, float scale) =>
