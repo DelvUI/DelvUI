@@ -238,6 +238,10 @@ namespace DelvUI.Interface.Jobs
         [DragFloat2("Sen Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(10, 1)]
         public Vector2 SenBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 17);
+
+        [DragDropHorizontal("Sen Order", new string[] {"Setsu", "Getsu", "Ka"})]
+        [CollapseWith(15, 1)]
+        public int[] senOrder = new int[] {0, 1, 2};
         #endregion
 
         #region Meditation
@@ -278,6 +282,11 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Show Buffs Bar Text")]
         [CollapseWith(15, 3)]
         public bool ShowBuffsText = true;
+
+        [DragDropHorizontal("Shifu/Jinpu Order", new string[] {"Shifu", "Jinpu"})]
+        [CollapseWith(20, 3)]
+        public int[] buffOrder = new int[] {0, 1};
+        
         #endregion
 
         #region Higanbana
@@ -299,11 +308,9 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region BarOrders
-        [DragDropHorizontal("Shifu/Jinpu Order", new string[] {"Shifu", "Jinpu"})]
-        public int[] buffOrder = new int[] {0, 1};
+        
 
-        [DragDropHorizontal("Sen Order", new string[] {"Setsu", "Getsu", "Ka"})]
-        public int[] senOrder = new int[] {0, 1, 2};
+        
         #endregion
 
         #region colors

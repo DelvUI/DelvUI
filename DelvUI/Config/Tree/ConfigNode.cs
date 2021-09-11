@@ -1115,6 +1115,7 @@ namespace DelvUI.Config.Tree
                     int[] order = (int[])fieldVal;
                     string[] names = dragDropHorizontalAttribute.names;
                     for(int i = 0; i < order.Count(); i++){
+                        ImGui.SameLine();
                         ImGui.Button(names[order[i]], new Vector2(100, 25));
                         if (ImGui.IsItemActive()){
                             float drag_dx = ImGui.GetMouseDragDelta(0).X;
@@ -1135,8 +1136,6 @@ namespace DelvUI.Config.Tree
                                 ImGui.ResetMouseDragDelta();
                             }
                         }
-                        if (i < order.Count() - 1) 
-                            ImGui.SameLine();
                     }
                 }
             }
