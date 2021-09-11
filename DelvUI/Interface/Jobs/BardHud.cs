@@ -1,4 +1,4 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
+using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using DelvUI.Config;
@@ -46,8 +46,9 @@ namespace DelvUI.Interface.Jobs
         private void DrawActiveDots(Vector2 origin)
         {
             Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            bool targetIsChara = target is Chara;
 
-            if (target is not Chara)
+            if (!targetIsChara && !Config.CBNoTarget && !Config.SBNoTarget)
             {
                 return;
             }
@@ -59,12 +60,17 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowCB)
             {
-                StatusEffect cb = target.StatusEffects.FirstOrDefault(
-                    o => o.EffectId == 1200 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                      || o.EffectId == 124 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                );
+                float duration = 0;
 
-                float duration = Math.Abs(cb.Duration);
+                if (targetIsChara)
+                {
+                    StatusEffect cb = target.StatusEffects.FirstOrDefault(
+                        o => o.EffectId == 1200 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                          || o.EffectId == 124 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                    );
+
+                    duration = Math.Abs(cb.Duration);
+                }
 
                 PluginConfigColor color = duration <= 5 ? Config.ExpireColor : Config.CBColor;
 
@@ -72,7 +78,17 @@ namespace DelvUI.Interface.Jobs
 
                 Bar cbBar = builder.AddInnerBar(duration, 30f, color.Map).SetFlipDrainDirection(Config.CBInverted).SetBackgroundColor(EmptyColor["background"]).Build();
 
-                barDrawList.Add(cbBar);
+                if (Config.CBValue)
+                {
+                    BarTextPosition textPos = Config.CBInverted ? BarTextPosition.CenterRight : BarTextPosition.CenterLeft;
+                    builder.SetTextMode(BarTextMode.Single);
+                    builder.SetText(textPos, BarTextType.Current);
+                }
+
+                if (targetIsChara || Config.CBNoTarget)
+                {
+                    barDrawList.Add(cbBar);
+                }
             }
 
             barSize = Config.SBSize;
@@ -80,12 +96,17 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowSB)
             {
-                StatusEffect sb = target.StatusEffects.FirstOrDefault(
-                    o => o.EffectId == 1201 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                      || o.EffectId == 129 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                );
+                float duration = 0;
 
-                float duration = Math.Abs(sb.Duration);
+                if (targetIsChara)
+                {
+                    StatusEffect sb = target.StatusEffects.FirstOrDefault(
+                        o => o.EffectId == 1201 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                          || o.EffectId == 129 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                    );
+
+                    duration = Math.Abs(sb.Duration);
+                }
 
                 PluginConfigColor color = duration <= 5 ? Config.ExpireColor : Config.SBColor;
 
@@ -93,7 +114,17 @@ namespace DelvUI.Interface.Jobs
 
                 Bar sbBar = builder.AddInnerBar(duration, 30f, color.Map).SetFlipDrainDirection(Config.SBInverted).SetBackgroundColor(EmptyColor["background"]).Build();
 
-                barDrawList.Add(sbBar);
+                if (Config.SBValue)
+                {
+                    BarTextPosition textPos = Config.SBInverted ? BarTextPosition.CenterRight : BarTextPosition.CenterLeft;
+                    builder.SetTextMode(BarTextMode.Single);
+                    builder.SetText(textPos, BarTextType.Current);
+                }
+
+                if (targetIsChara || Config.SBNoTarget)
+                {
+                    barDrawList.Add(sbBar);
+                }
             }
 
             if (barDrawList.Count <= 0)
@@ -149,11 +180,21 @@ namespace DelvUI.Interface.Jobs
                     break;
 
                 case CurrentSong.NONE:
+                    if (Config.ShowEmptyStacks)
+                    {
+                        DrawStacks(origin, 0, 3, Config.APStackColor.Map);
+                    }
+                    
                     DrawSongTimer(origin, 0, EmptyColor);
 
                     break;
 
                 default:
+                    if (Config.ShowEmptyStacks)
+                    {
+                        DrawStacks(origin, 0, 3, Config.APStackColor.Map);
+                    }
+                    
                     DrawSongTimer(origin, 0, EmptyColor);
 
                     break;
@@ -317,7 +358,7 @@ namespace DelvUI.Interface.Jobs
         public PluginConfigColor SoulGaugeColor = new(new Vector4(248f / 255f, 227f / 255f, 0f / 255f, 100f / 100f));
         #endregion
 
-        #region misc
+        #region Song Procs / Stacks
         [Checkbox("Wanderer's Minuet Stacks Enabled")]
         [Order(40)]
         public bool ShowWMStacks = true;
@@ -338,76 +379,96 @@ namespace DelvUI.Interface.Jobs
         [Order(60)]
         public bool ShowAPStacks = true;
 
-        [DragFloat2("Stack Size", min = 1f, max = 2000f)]
+        [Checkbox("Show Empty Stack Area")]
         [Order(65)]
+        public bool ShowEmptyStacks = true;
+
+        [DragFloat2("Stack Size", min = 1f, max = 2000f)]
+        [Order(70)]
         public Vector2 StackSize = new(254, 10);
 
         [DragFloat2("Stack Position", min = -4000f, max = 4000f)]
-        [Order(70)]
+        [Order(75)]
         public Vector2 StackPosition = new(0, HUDConstants.JobHudsBaseY - 39);
 
         [DragInt("Stack Padding", max = 1000)]
-        [Order(75)]
+        [Order(80)]
         public int StackPadding = 2;
 
         [ColorEdit4("Wanderer's Minuet Stack Color")]
-        [Order(80)]
+        [Order(85)]
         public PluginConfigColor WMStackColor = new(new Vector4(150f / 255f, 215f / 255f, 232f / 255f, 100f / 100f));
 
         [ColorEdit4("Mage's Ballad Proc Color")]
-        [Order(85)]
+        [Order(90)]
         public PluginConfigColor MBProcColor = new(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
 
         [ColorEdit4("Army's Paeon Stack Color")]
-        [Order(90)]
+        [Order(95)]
         public PluginConfigColor APStackColor = new(new Vector4(0f / 255f, 222f / 255f, 177f / 255f, 100f / 100f));
 
         [ColorEdit4("DoT Expire Color")]
-        [Order(95)]
+        [Order(100)]
         public PluginConfigColor ExpireColor = new(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
         #endregion
 
         #region caustic bite
         [Checkbox("Caustic Bite Enabled")]
-        [CollapseControl(100, 2)]
+        [CollapseControl(105, 2)]
         public bool ShowCB = true;
 
-        [Checkbox("Caustic Bite Inverted")]
+        [Checkbox("Show Caustic Bite On No Target")]
         [CollapseWith(0, 2)]
+        public bool CBNoTarget = true;
+
+        [Checkbox("Caustic Bite Value")]
+        [CollapseWith(5, 2)]
+        public bool CBValue = true;
+
+        [Checkbox("Caustic Bite Inverted")]
+        [CollapseWith(10, 2)]
         public bool CBInverted = true;
 
         [DragFloat2("Caustic Bite Size", max = 2000f)]
-        [CollapseWith(5, 2)]
+        [CollapseWith(15, 2)]
         public Vector2 CBSize = new(126, 10);
 
         [DragFloat2("Caustic Bite Position", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 2)]
+        [CollapseWith(20, 2)]
         public Vector2 CBPosition = new(-64, HUDConstants.JobHudsBaseY - 51);
 
         [ColorEdit4("Caustic Bite Color")]
-        [CollapseWith(15, 2)]
+        [CollapseWith(25, 2)]
         public PluginConfigColor CBColor = new(new Vector4(182f / 255f, 68f / 255f, 235f / 255f, 100f / 100f));
         #endregion
 
         #region stormbite
         [Checkbox("Stormbite Enabled")]
-        [CollapseControl(105, 3)]
+        [CollapseControl(110, 3)]
         public bool ShowSB = true;
 
-        [Checkbox("Stormbite Inverted")]
+        [Checkbox("Show Stormbite On No Target")]
         [CollapseWith(0, 3)]
+        public bool SBNoTarget = true;
+
+        [Checkbox("Stormbite Value")]
+        [CollapseWith(5, 3)]
+        public bool SBValue = true;
+
+        [Checkbox("Stormbite Inverted")]
+        [CollapseWith(10, 3)]
         public bool SBInverted = false;
 
         [DragFloat2("Stormbite Size", max = 2000f)]
-        [CollapseWith(5, 3)]
+        [CollapseWith(15, 3)]
         public Vector2 SBSize = new(126, 10);
 
         [DragFloat2("Stormbite Position", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 3)]
+        [CollapseWith(20, 3)]
         public Vector2 SBPosition = new(64, HUDConstants.JobHudsBaseY - 51);
 
         [ColorEdit4("Stormbite Color")]
-        [CollapseWith(15, 3)]
+        [CollapseWith(25, 3)]
         public PluginConfigColor SBColor = new(new Vector4(72f / 255f, 117f / 255f, 202f / 255f, 100f / 100f));
         #endregion
     }
