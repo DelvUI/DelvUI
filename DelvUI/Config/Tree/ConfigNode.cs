@@ -1109,6 +1109,35 @@ namespace DelvUI.Config.Tree
                         changed = true;
                     }
                 }
+                else if (attribute is DragDropHorizontalAttribute dragDropHorizontalAttribute)
+                {
+                    ImGui.Text(dragDropHorizontalAttribute.friendlyName);
+                    int[] order = (int[])fieldVal;
+                    string[] names = dragDropHorizontalAttribute.names;
+                    for(int i = 0; i < order.Count(); i++){
+                        ImGui.SameLine();
+                        ImGui.Button(names[order[i]], new Vector2(100, 25));
+                        if (ImGui.IsItemActive()){
+                            float drag_dx = ImGui.GetMouseDragDelta(0).X;
+                            if ((drag_dx > 80.0f && i < order.Count() - 1))
+                            {
+                                var _curri = order[i];
+                                order[i] = order[i+1];
+                                order[i+1] = _curri;
+                                field.SetValue(ConfigObject, order);
+                                ImGui.ResetMouseDragDelta();
+                            }
+                            else if ((drag_dx < -80.0f && i > 0))
+                            {
+                                var _curri = order[i];
+                                order[i] = order[i-1];
+                                order[i-1] = _curri;
+                                field.SetValue(ConfigObject, order);
+                                ImGui.ResetMouseDragDelta();
+                            }
+                        }
+                    }
+                }
             }
         }
     }

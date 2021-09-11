@@ -149,6 +149,19 @@ namespace DelvUI.Config.Attributes
         }
     }
 
+    [AttributeUsage(AttributeTargets.Field)]
+    public class DragDropHorizontalAttribute : Attribute
+    {   
+        public string friendlyName;
+        public string[] names;
+
+        public DragDropHorizontalAttribute(string friendlyName, params string[] names)
+        {
+            this.friendlyName = friendlyName;
+            this.names = names;
+        }
+    }
+
     [AttributeUsage(AttributeTargets.Class)]
     public class PortableAttribute : Attribute
     {
@@ -159,7 +172,6 @@ namespace DelvUI.Config.Attributes
             this.portable = portable;
         }
     }
-
     [AttributeUsage(AttributeTargets.Method)]
     public class ManualDrawAttribute : Attribute
     {
