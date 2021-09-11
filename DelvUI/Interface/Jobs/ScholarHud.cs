@@ -133,7 +133,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Scholar", 1)]
     public class ScholarConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.SCH;
+        [JsonIgnore] public override uint JobId => JobIDs.SCH;
         public new static ScholarConfig DefaultConfig() { return new ScholarConfig(); }
 
         #region aether

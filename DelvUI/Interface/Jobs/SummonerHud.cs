@@ -294,7 +294,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Summoner", 1)]
     public class SummonerConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.SMN;
+        [JsonIgnore] public override uint JobId => JobIDs.SMN;
         public new static SummonerConfig DefaultConfig() { return new SummonerConfig(); }
 
         #region aether

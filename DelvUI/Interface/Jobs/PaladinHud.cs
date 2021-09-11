@@ -196,7 +196,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Paladin", 1)]
     public class PaladinConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.PLD;
+        [JsonIgnore] public override uint JobId => JobIDs.PLD;
         public new static PaladinConfig DefaultConfig() { return new PaladinConfig(); }
 
         #region mana bar

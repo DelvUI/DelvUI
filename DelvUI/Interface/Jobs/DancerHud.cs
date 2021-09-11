@@ -309,7 +309,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Dancer", 1)]
     public class DancerConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.DNC;
+        [JsonIgnore] public override uint JobId => JobIDs.DNC;
         public new static DancerConfig DefaultConfig() { return new DancerConfig(); }
 
         #region espirit

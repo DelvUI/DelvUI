@@ -341,7 +341,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Monk", 1)]
     public class MonkConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.MNK;
+        [JsonIgnore] public override uint JobId => JobIDs.MNK;
         public new static MonkConfig DefaultConfig() { return new MonkConfig(); }
 
         #region Demolish Bar

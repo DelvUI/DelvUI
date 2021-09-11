@@ -5,6 +5,8 @@ namespace DelvUI.Interface.Jobs
 {
     public class GatherersConfig : JobConfig
     {
+        public override uint JobId => 0;
+
         public GatherersConfig()
         {
             UseDefaultPrimaryResourceBar = true;
@@ -14,16 +16,16 @@ namespace DelvUI.Interface.Jobs
 
     public class MinerConfig : GatherersConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.MIN;
+        [JsonIgnore] public override uint JobId => JobIDs.MIN;
     }
 
     public class BotanistConfig : GatherersConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.BOT;
+        [JsonIgnore] public override uint JobId => JobIDs.BOT;
     }
 
     public class FisherConfig : GatherersConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.FSH;
+        [JsonIgnore] public override uint JobId => JobIDs.FSH;
     }
 }

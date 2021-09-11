@@ -471,7 +471,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Astrologian", 1)]
     public class AstrologianConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.AST;
+        [JsonIgnore] public override uint JobId => JobIDs.AST;
         public new static AstrologianConfig DefaultConfig() { return new AstrologianConfig(); }
 
         #region Draw Bar

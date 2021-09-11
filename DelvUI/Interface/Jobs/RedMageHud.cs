@@ -273,7 +273,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Red Mage", 1)]
     public class RedMageConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.RDM;
+        [JsonIgnore] public override uint JobId => JobIDs.RDM;
         public new static RedMageConfig DefaultConfig() { return new RedMageConfig(); }
 
         #region mana bar

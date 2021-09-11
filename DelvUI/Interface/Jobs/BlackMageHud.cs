@@ -270,7 +270,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Black Mage", 1)]
     public class BlackMageConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.BLM;
+        [JsonIgnore] public override uint JobId => JobIDs.BLM;
         public new static BlackMageConfig DefaultConfig() { return new BlackMageConfig(); }
 
         #region mana bar

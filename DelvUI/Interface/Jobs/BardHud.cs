@@ -266,7 +266,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Bard", 1)]
     public class BardConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.BRD;
+        [JsonIgnore] public override uint JobId => JobIDs.BRD;
         public new static BardConfig DefaultConfig() { return new BardConfig(); }
 
         #region song gauge

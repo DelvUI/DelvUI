@@ -175,7 +175,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Dragoon", 1)]
     public class DragoonConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.DRG;
+        [JsonIgnore] public override uint JobId => JobIDs.DRG;
         public new static DragoonConfig DefaultConfig() { return new DragoonConfig(); }
 
         #region Chaos Thrust Bar

@@ -8,10 +8,10 @@ using System.Reflection;
 namespace DelvUI.Interface.Jobs
 {
     [Serializable]
-    public class JobConfig : MovablePluginConfigObject
+    public abstract class JobConfig : MovablePluginConfigObject
     {
         [JsonIgnore]
-        public uint JobId;
+        public abstract uint JobId { get; }
 
         [Checkbox("Use Default Primary Resource Bar")]
         [Order(20)]

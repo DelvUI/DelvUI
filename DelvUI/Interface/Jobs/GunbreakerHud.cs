@@ -81,7 +81,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Gunbreaker", 1)]
     public class GunbreakerConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.GNB;
+        [JsonIgnore] public override uint JobId => JobIDs.GNB;
         public new static GunbreakerConfig DefaultConfig() { return new GunbreakerConfig(); }
 
         #region Powder Gauge

@@ -199,7 +199,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Samurai", 1)]
     public class SamuraiConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.SAM;
+        [JsonIgnore] public override uint JobId => JobIDs.SAM;
         public new static SamuraiConfig DefaultConfig() { return new SamuraiConfig(); }
 
         #region Kenki
