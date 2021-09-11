@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
+using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -86,6 +87,7 @@ namespace DelvUI.Interface.Jobs
             }
             else
             {
+                //PluginLog.Log($"NOT in ninjutsu with cd {mudraCooldownInfo} and old cd {_oldMudraCooldownInfo}");
                 _oldMudraCooldownInfo = mudraCooldownInfo;
             }
             // if we are casting ninjutsu then show ninjutsu info
@@ -109,7 +111,14 @@ namespace DelvUI.Interface.Jobs
                     ninjutsuText = GenerateNinjutsuText(tcjBuff.First().StackCount, haveKassatsuBuff, haveTCJBuff);
                 }
                 PluginConfigColor barColor = haveTCJBuff ? Config.TCJBarColor : (haveKassatsuBuff ? Config.KassatsuBarColor : Config.MudraBarColor);
-                builder.AddInnerBar(maximum, maximum, barColor.Map);
+                float duration = haveTCJBuff ? tcjBuff.First().Duration : (haveKassatsuBuff ? kassatsuBuff.First().Duration : maximum - mudraCooldownInfo);
+                float tcjKassMaximum = haveTCJBuff ? 6f : (haveKassatsuBuff ? 15f : maximum);
+                // it seems there is some time before the duration is updated after the buff is obtained
+                if (duration < 0)
+                {
+                    duration = tcjKassMaximum;
+                }
+                builder.AddInnerBar(duration, tcjKassMaximum, barColor.Map);
                 if (Config.ShowNinjutsuText)
                 {
                     builder.SetTextMode(BarTextMode.Single)
@@ -119,14 +128,31 @@ namespace DelvUI.Interface.Jobs
             else
             {
                 // if we are neither casting ninjutsu nor in kassatsu nor in TCJ, show the mudra charges and cooldowns
-                _oldMudraCooldownInfo = mudraCooldownInfo;
                 builder.SetChunks(2)
-                   .SetChunkPadding(Config.MudraBarChunkPadding)
-                   .AddInnerBar(maximum - mudraCooldownInfo, maximum, Config.MudraBarColor.Map);
+                   .SetChunkPadding(Config.MudraBarChunkPadding);
+                // show the mudra recharge timer on bars that aren't full
                 if (Config.ShowMudraBarText)
                 {
-                    builder.SetTextMode(BarTextMode.EachChunk)
-                           .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                    Dictionary<string, uint>[] chunkColors = { Config.MudraBarColor.Map, Config.MudraBarColor.Map };
+                    BarText[] charges = new BarText[2];
+                    charges[0] = new BarText(BarTextPosition.CenterMiddle, BarTextType.Remaining);
+                    charges[1] = new BarText(BarTextPosition.CenterMiddle, BarTextType.Remaining);
+                    if (mudraCooldownInfo < 20)
+                    {
+                        charges[0] = new BarText(BarTextPosition.CenterMiddle, BarTextType.Custom, "");
+                    }
+                    if (mudraCooldownInfo == 0)
+                    {
+                        charges[1] = new BarText(BarTextPosition.CenterMiddle, BarTextType.Custom, "");
+                    }
+
+                    BarText[] barTexts = { };
+                    builder.AddInnerBar(maximum - mudraCooldownInfo, maximum, chunkColors, PartialFillColor,
+                        BarTextMode.EachChunk, charges);
+                }
+                else
+                {
+                    builder.AddInnerBar(maximum - mudraCooldownInfo, maximum, Config.MudraBarColor.Map);
                 }
             }
 
@@ -163,10 +189,14 @@ namespace DelvUI.Interface.Jobs
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.HutonGaugeSize.Y, Config.HutonGaugeSize.X);
             float maximum = 70f;
 
-            builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, Config.HutonGaugeColor.Map)
-                   .SetTextMode(BarTextMode.Single)
-                   .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+            builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, hutonDurationLeft > Config.HutonGaugeExpiryThreshold ? Config.HutonGaugeColor.Map : Config.HutonGaugeExpiryColor.Map)
                    .SetBackgroundColor(EmptyColor["background"]);
+
+            if (Config.ShowHutonGaugeText)
+            {
+                builder.SetTextMode(BarTextMode.Single)
+                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+            }
 
             if (!Config.ShowHutonGaugeBorder)
             {
@@ -275,8 +305,12 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(30, 0)]
         public bool ShowHutonGauge = true;
 
-        [DragFloat2("Huton Gauge Size", max = 2000f)]
+        [Checkbox("Show Huton Gauge Text")]
         [CollapseWith(0, 0)]
+        public bool ShowHutonGaugeText = true;
+
+        [DragFloat2("Huton Gauge Size", max = 2000f)]
+        [CollapseWith(1, 0)]
         public Vector2 HutonGaugeSize = new(254, 20);
 
         [DragFloat2("Huton Gauge Position", min = -4000f, max = 4000f)]
@@ -286,6 +320,18 @@ namespace DelvUI.Interface.Jobs
         [ColorEdit4("Huton Gauge Color")]
         [CollapseWith(10, 0)]
         public PluginConfigColor HutonGaugeColor = new(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f));
+
+        [Checkbox("Show Huton Gauge Expiry")]
+        [CollapseWith(11, 0)]
+        public bool ShowHutonGaugeExpiry = true;
+
+        [DragFloat("Huton Gauge Expiry Threshold", min = 1f, max = 70f)]
+        [CollapseWith(12, 0)]
+        public float HutonGaugeExpiryThreshold = 40f;
+
+        [ColorEdit4("Huton Gauge Expiry Color")]
+        [CollapseWith(13, 0)]
+        public PluginConfigColor HutonGaugeExpiryColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
 
         [Checkbox("Show Huton Gauge Border")]
         [CollapseWith(15, 0)]
