@@ -17,6 +17,7 @@ namespace DelvUI.Interface.StatusEffects
         private uint _rowCount;
         private uint _colCount;
         private GrowthDirections _lastGrowthDirections;
+        private bool _showingTooltip = false;
 
         public Actor Actor { get; set; } = null;
 
@@ -171,6 +172,7 @@ namespace DelvUI.Interface.StatusEffects
 
             var row = 0;
             var col = 0;
+            var showingTooltip = false;
 
             for (var i = 0; i < count; i++)
             {
@@ -184,6 +186,13 @@ namespace DelvUI.Interface.StatusEffects
 
                 // draw
                 StatusEffectIconDrawHelper.DrawStatusEffectIcon(drawList, iconPos, statusEffectData, Config.IconConfig);
+
+                // tooltip
+                if (ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
+                {
+                    TooltipsHelper.Instance.ShowTooltipOnCursor(statusEffectData.Data.Description, statusEffectData.Data.Name);
+                    showingTooltip = true;
+                }
 
                 // rows / columns
                 if (Config.FillRowsFirst)
@@ -205,6 +214,12 @@ namespace DelvUI.Interface.StatusEffects
                     }
                 }
             }
+
+            if (_showingTooltip && !showingTooltip)
+            {
+                TooltipsHelper.Instance.RemoveTooltip();
+            }
+            _showingTooltip = showingTooltip;
         }
 
         private GrowthDirections ValidateGrowthDirections(GrowthDirections directions)

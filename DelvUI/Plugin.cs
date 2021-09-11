@@ -86,6 +86,7 @@ namespace DelvUI
 
             TexturesCache.Initialize();
             GlobalColors.Initialize();
+            TooltipsHelper.Initialize();
             Resolver.Initialize();
 
             _hudManager = new HudManager();
