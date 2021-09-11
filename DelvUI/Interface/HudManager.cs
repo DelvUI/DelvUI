@@ -172,15 +172,20 @@ namespace DelvUI.Interface
             UpdateJob();
             AssignActors();
 
+            // general elements
             foreach (var element in _hudElements)
             {
                 element.Draw(_origin);
             }
 
+            // job hud
             if (_jobHud != null && _jobHud.Config.Enabled)
             {
                 _jobHud.Draw(_origin);
             }
+
+            // tooltip
+            TooltipsHelper.Instance.Draw();
 
             ImGui.End();
         }

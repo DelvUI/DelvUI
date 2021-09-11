@@ -1,5 +1,6 @@
 using Dalamud.Plugin;
 using DelvUI.Config.Tree;
+using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
 using DelvUI.Interface.StatusEffects;
@@ -94,6 +95,7 @@ namespace DelvUI.Config
                 typeof(MiscColorConfig),
 
                 typeof(PrimaryResourceConfig),
+                typeof(TooltipsConfig),
                 typeof(GCDIndicatorConfig),
                 typeof(MPTickerConfig)
             };
