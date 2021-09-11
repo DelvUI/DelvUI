@@ -51,8 +51,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawManaBar(Vector2 origin)
         {
-            var actor = PluginInterface.ClientState.LocalPlayer;
-            var darkArtsBuff = PluginInterface.ClientState.JobGauges.Get<DRKGauge>().HasDarkArts();
+            var actor = Plugin.ClientState.LocalPlayer;
+            var darkArtsBuff = Plugin.JobGauges.Get<DRKGauge>().HasDarkArts();
 
             var posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
             var posY = origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f;
@@ -90,7 +90,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBloodGauge(Vector2 origin)
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<DRKGauge>();
+            var gauge = Plugin.JobGauges.Get<DRKGauge>();
 
             var posX = origin.X + Config.Position.X + Config.BloodGaugePosition.X - Config.BloodGaugeSize.X / 2f;
             var posY = origin.Y + Config.Position.Y + Config.BloodGaugePosition.Y - Config.BloodGaugeSize.Y / 2f;
@@ -123,8 +123,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBuffBar(Vector2 origin)
         {
-            IEnumerable<StatusEffect> bloodWeaponBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 742);
-            IEnumerable<StatusEffect> deliriumBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1972);
+            IEnumerable<StatusEffect> bloodWeaponBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 742);
+            IEnumerable<StatusEffect> deliriumBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1972);
 
             var xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
@@ -159,8 +159,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawLivingShadowBar(Vector2 origin)
         {
-            var actor = PluginInterface.ClientState.LocalPlayer;
-            var shadowTimeRemaining = PluginInterface.ClientState.JobGauges.Get<DRKGauge>().ShadowTimeRemaining / 1000;
+            var actor = Plugin.ClientState.LocalPlayer;
+            var shadowTimeRemaining = Plugin.JobGauges.Get<DRKGauge>().ShadowTimeRemaining / 1000;
             var livingShadow = actor.Level >= 80 && shadowTimeRemaining is > 0 and <= 24;
 
             var xPos = origin.X + Config.Position.X + Config.LivingShadowBarPosition.X - Config.LivingShadowBarSize.X / 2f;

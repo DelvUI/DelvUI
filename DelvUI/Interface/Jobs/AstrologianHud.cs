@@ -93,7 +93,7 @@ namespace DelvUI.Interface.Jobs
         {
             List<Dictionary<string, uint>> chunkColors = new();
 
-            ASTGauge gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
+            ASTGauge gauge = Plugin.JobGauges.Get<ASTGauge>();
 
             FieldInfo field = typeof(ASTGauge).GetField("seals", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance);
 
@@ -194,7 +194,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDraw(Vector2 origin)
         {
-            ASTGauge gauge = PluginInterface.ClientState.JobGauges.Get<ASTGauge>();
+            ASTGauge gauge = Plugin.JobGauges.Get<ASTGauge>();
 
             float xPos = origin.X + Config.Position.X + Config.DrawBarPosition.X - Config.DrawBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.DrawBarPosition.Y - Config.DrawBarSize.Y / 2f;
@@ -327,7 +327,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDot(Vector2 origin)
         {
-            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
             float xPos = origin.X + Config.Position.X + Config.DotBarPosition.X - Config.DotBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.DotBarPosition.Y - Config.DotBarSize.Y / 2f;
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -355,9 +355,9 @@ namespace DelvUI.Interface.Jobs
             }
 
             StatusEffect dot = target.StatusEffects.FirstOrDefault(
-                o => o.EffectId == 1881 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                  || o.EffectId == 843 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                  || o.EffectId == 838 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                o => o.EffectId == 1881 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                  || o.EffectId == 843 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                  || o.EffectId == 838 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
             );
 
             float dotCooldown = dot.EffectId == 838 ? 18f : 30f;
@@ -382,7 +382,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawLightspeed(Vector2 origin)
         {
-            List<StatusEffect> lightspeedBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 841).ToList();
+            List<StatusEffect> lightspeedBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 841).ToList();
             float lightspeedDuration = 0f;
             const float lightspeedMaxDuration = 15f;
 
@@ -417,9 +417,9 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawStar(Vector2 origin)
         {
-            List<StatusEffect> starPreCookingBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1224).ToList();
+            List<StatusEffect> starPreCookingBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1224).ToList();
 
-            List<StatusEffect> starPostCookingBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1248).ToList();
+            List<StatusEffect> starPostCookingBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1248).ToList();
 
             float starDuration = 0f;
             const float starMaxDuration = 10f;

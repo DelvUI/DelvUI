@@ -62,7 +62,7 @@ namespace DelvUI.Interface.StatusEffects
                 return list;
             }
 
-            var sheet = Plugin.GetPluginInterface().Data.GetExcelSheet<Status>();
+            var sheet = Plugin.DataManager.GetExcelSheet<Status>();
             if (sheet == null)
             {
                 return list;

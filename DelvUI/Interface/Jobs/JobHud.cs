@@ -6,7 +6,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class JobHud : HudElement, IHudElementWithActor
     {
-        protected DalamudPluginInterface PluginInterface => Plugin.GetPluginInterface();
+        protected DalamudPluginInterface PluginInterface => Plugin.PluginInterface;
 
         public JobConfig Config => (JobConfig)_config;
 

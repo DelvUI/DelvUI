@@ -42,7 +42,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDiaBar(Vector2 origin)
         {
-            Actor target = PluginInterface.ClientState.Targets.SoftTarget ?? PluginInterface.ClientState.Targets.CurrentTarget;
+            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
             Vector2 cursorPos = origin + Config.Position + Config.DiaBarPosition - Config.DiaBarSize / 2f;
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -56,9 +56,9 @@ namespace DelvUI.Interface.Jobs
             }
 
             StatusEffect dia = target.StatusEffects.FirstOrDefault(
-                o => o.EffectId == 1871 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                  || o.EffectId == 144 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
-                  || o.EffectId == 143 && o.OwnerId == PluginInterface.ClientState.LocalPlayer.ActorId
+                o => o.EffectId == 1871 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                  || o.EffectId == 144 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                  || o.EffectId == 143 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
             );
 
             float diaCooldown = dia.EffectId == 1871 ? 30f : 18f;
@@ -92,7 +92,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawLilyBars(Vector2 origin)
         {
-            WHMGauge gauge = PluginInterface.ClientState.JobGauges.Get<WHMGauge>();
+            WHMGauge gauge = Plugin.JobGauges.Get<WHMGauge>();
 
             const float lilyCooldown = 30000f;
 

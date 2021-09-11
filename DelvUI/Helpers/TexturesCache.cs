@@ -22,7 +22,7 @@ namespace DelvUI.Helpers
 
         public TextureWrap GetTexture<T>(uint rowId, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
         {
-            var sheet = Plugin.GetPluginInterface().Data.GetExcelSheet<T>();
+            var sheet = Plugin.DataManager.GetExcelSheet<T>();
 
             return sheet == null ? null : GetTexture<T>(sheet.GetRow(rowId), stackCount, hdIcon);
         }
@@ -62,7 +62,7 @@ namespace DelvUI.Helpers
                 return null;
             }
 
-            var builder = Plugin.GetPluginInterface().UiBuilder;
+            var builder = Plugin.UiBuilder;
             var newTexture = builder.LoadImageRaw(iconFile.GetRgbaImageData(), iconFile.Header.Width, iconFile.Header.Height, 4);
             map.Add(iconId + stackCount, newTexture);
 
@@ -74,12 +74,12 @@ namespace DelvUI.Helpers
             var hdString = hdIcon ? "_hr1" : "";
             var path = $"ui/icon/{id / 1000 * 1000:000000}/{id:000000}{hdString}.tex";
 
-            return Plugin.GetPluginInterface().Data.GetFile<TexFile>(path);
+            return Plugin.DataManager.GetFile<TexFile>(path);
         }
 
         private void RemoveTexture<T>(uint rowId) where T : ExcelRow
         {
-            var sheet = Plugin.GetPluginInterface().Data.GetExcelSheet<T>();
+            var sheet = Plugin.DataManager.GetExcelSheet<T>();
 
             if (sheet == null)
             {

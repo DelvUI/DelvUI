@@ -51,7 +51,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawHeatGauge(Vector2 origin)
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
+            var gauge = Plugin.JobGauges.Get<MCHGauge>();
 
             var position = origin + Config.Position + Config.HeatGaugePosition - Config.HeatGaugeSize / 2f;
 
@@ -73,7 +73,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBatteryGauge(Vector2 origin)
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
+            var gauge = Plugin.JobGauges.Get<MCHGauge>();
 
             var position = origin + Config.Position + Config.BatteryGaugePosition - Config.BatteryGaugeSize / 2f;
 
@@ -111,7 +111,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawOverheatBar(Vector2 origin)
         {
-            var gauge = PluginInterface.ClientState.JobGauges.Get<MCHGauge>();
+            var gauge = Plugin.JobGauges.Get<MCHGauge>();
 
             var position = origin + Config.Position + Config.OverheatPosition - Config.OverheatSize / 2f;
 
@@ -135,7 +135,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawWildfireBar(Vector2 origin)
         {
-            var wildfireBuff = PluginInterface.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1946);
+            var wildfireBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1946);
 
             var position = origin + Config.Position + Config.WildfirePosition - Config.WildfireSize / 2f;
 
