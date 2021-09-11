@@ -40,6 +40,7 @@ namespace DelvUI.Helpers
         {
             ShowTooltip(text, ImGui.GetMousePos(), title);
         }
+
         public void ShowTooltip(string text, Vector2 position, string title = null)
         {
             if (text == null)
