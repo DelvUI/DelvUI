@@ -146,7 +146,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("White Mage", 1)]
     public class WhiteMageConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.WHM;
+        [JsonIgnore] public override uint JobId => JobIDs.WHM;
         public new static WhiteMageConfig DefaultConfig() { return new WhiteMageConfig(); }
 
         #region Lily Bar

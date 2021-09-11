@@ -296,7 +296,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Ninja", 1)]
     public class NinjaConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.NIN;
+        [JsonIgnore] public override uint JobId => JobIDs.NIN;
         public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
 
         #region huton gauge

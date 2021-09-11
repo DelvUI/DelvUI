@@ -107,7 +107,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Warrior", 1)]
     public class WarriorConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.WAR;
+        [JsonIgnore] public override uint JobId => JobIDs.WAR;
         public new static WarriorConfig DefaultConfig() { return new WarriorConfig(); }
 
         #region Storm's Eye

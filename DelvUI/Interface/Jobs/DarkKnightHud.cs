@@ -189,7 +189,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Dark Knight", 1)]
     public class DarkKnightConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.DRK;
+        [JsonIgnore] public override uint JobId => JobIDs.DRK;
         public new static DarkKnightConfig DefaultConfig() { return new DarkKnightConfig(); }
 
         #region Mana Bar

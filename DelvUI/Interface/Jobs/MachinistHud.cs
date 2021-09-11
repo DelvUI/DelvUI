@@ -165,7 +165,7 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Machinist", 1)]
     public class MachinistConfig : JobConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.MCH;
+        [JsonIgnore] public override uint JobId => JobIDs.MCH;
         public new static MachinistConfig DefaultConfig() { return new MachinistConfig(); }
 
         #region Overheat

@@ -5,6 +5,8 @@ namespace DelvUI.Interface.Jobs
 {
     public class CraftersConfig : JobConfig
     {
+        public override uint JobId => 0;
+
         public CraftersConfig()
         {
             UseDefaultPrimaryResourceBar = true;
@@ -14,41 +16,41 @@ namespace DelvUI.Interface.Jobs
 
     public class CarpenterConfig : CraftersConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.CRP;
+        [JsonIgnore] public override uint JobId => JobIDs.CRP;
     }
 
     public class BlacksmithConfig : CraftersConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.BSM;
+        [JsonIgnore] public override uint JobId => JobIDs.BSM;
     }
 
     public class ArmorerConfig : CraftersConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.ARM;
+        [JsonIgnore] public override uint JobId => JobIDs.ARM;
     }
 
     public class GoldsmithConfig : CraftersConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.GSM;
+        [JsonIgnore] public override uint JobId => JobIDs.GSM;
     }
 
     public class LeatherworkerConfig : CraftersConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.LTW;
+        [JsonIgnore] public override uint JobId => JobIDs.LTW;
     }
 
     public class WeaverConfig : CraftersConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.WVR;
+        [JsonIgnore] public override uint JobId => JobIDs.WVR;
     }
 
     public class AlchemistConfig : CraftersConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.ALC;
+        [JsonIgnore] public override uint JobId => JobIDs.ALC;
     }
 
     public class CulinarianConfig : CraftersConfig
     {
-        [JsonIgnore] public new uint JobId = JobIDs.CUL;
+        [JsonIgnore] public override uint JobId => JobIDs.CUL;
     }
 }
