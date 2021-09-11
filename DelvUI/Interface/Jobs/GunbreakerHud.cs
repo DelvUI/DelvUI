@@ -1,5 +1,4 @@
-﻿using Dalamud.Game.ClientState.Structs.JobGauge;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
@@ -8,8 +7,10 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.JobGauge.Types;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -65,7 +66,7 @@ namespace DelvUI.Interface.Jobs
 
             builder.SetChunks(2)
                    .SetChunkPadding(Config.PowderGaugeSpacing)
-                   .AddInnerBar(gauge.NumAmmo, 2, Config.PowderGaugeFillColor, null)
+                   .AddInnerBar(gauge.Ammo, 2, Config.PowderGaugeFillColor, null)
                    .SetBackgroundColor(EmptyColor.Base);
 
             var drawList = ImGui.GetWindowDrawList();
@@ -75,15 +76,16 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawNoMercyBar(Vector2 origin)
         {
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
             Vector2 position = origin + Config.Position + Config.NoMercyBarPosition - Config.NoMercyBarSize / 2f;
-            var noMercyBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1831);
+            var noMercyBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 1831);
 
             var builder = BarBuilder.Create(position, Config.NoMercyBarSize)
                 .SetBackgroundColor(EmptyColor.Base);
 
             if (noMercyBuff.Any())
             {
-                var duration = noMercyBuff.First().Duration;
+                var duration = noMercyBuff.First().RemainingTime;
 
                 builder.AddInnerBar(duration, 20, Config.NoMercyFillColor, null)
                        .SetTextMode(BarTextMode.EachChunk)

@@ -1,4 +1,3 @@
-using Dalamud.Plugin;
 using DelvUI.Config.Tree;
 using DelvUI.Helpers;
 using DelvUI.Interface;
@@ -13,6 +12,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Reflection;
 using System.Text;
+using Dalamud.Logging;
 
 namespace DelvUI.Config
 {
@@ -20,7 +20,7 @@ namespace DelvUI.Config
     {
         private static ConfigurationManager _instance;
 
-        public readonly TextureWrap BannerImage;
+        public readonly TextureWrap? BannerImage;
 
         public BaseNode ConfigBaseNode;
 
@@ -67,7 +67,7 @@ namespace DelvUI.Config
         public event EventHandler ResetEvent;
         public event EventHandler LockEvent;
 
-        public ConfigurationManager(bool defaultConfig, TextureWrap bannerImage, string configDirectory, BaseNode configBaseNode, EventHandler resetEvent = null, EventHandler lockEvent = null)
+        public ConfigurationManager(bool defaultConfig, TextureWrap? bannerImage, string configDirectory, BaseNode configBaseNode, EventHandler resetEvent = null, EventHandler lockEvent = null)
         {
             BannerImage = bannerImage;
             ConfigDirectory = configDirectory;
@@ -163,7 +163,7 @@ namespace DelvUI.Config
                 method.Invoke(node, null);
             }
 
-            TextureWrap banner = Plugin.bannerTexture;
+            TextureWrap? banner = Plugin.BannerTexture;
 
             var currentResetEvent = GetInstance()?.ResetEvent;
             var currentLockEvent = GetInstance()?.LockEvent;

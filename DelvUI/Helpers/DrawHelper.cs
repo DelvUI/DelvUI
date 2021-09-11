@@ -1,10 +1,10 @@
-﻿using Dalamud.Game.Internal.Gui.Addon;
-using DelvUI.Config;
-using ImGuiNET;
-using ImGuiScene;
+﻿using ImGuiNET;
 using Lumina.Excel;
 using System;
 using System.Numerics;
+using DelvUI.Config;
+using FFXIVClientStructs.FFXIV.Component.GUI;
+using ImGuiScene;
 
 namespace DelvUI.Helpers
 {
@@ -237,11 +237,18 @@ namespace DelvUI.Helpers
             DrawGradientFilledRect(cursorPos, new Vector2(Math.Max(1, barSize.X * shield), h), color, drawList);
         }
 
-        public static void ClipAround(Addon addon, string windowName, ImDrawListPtr drawList, Action<ImDrawListPtr, string> drawAction)
+        public static unsafe void ClipAround(AtkUnitBase* addon, string windowName, ImDrawListPtr drawList, Action<ImDrawListPtr, string> drawAction)
         {
-            if (addon is { Visible: true })
+            if (addon->IsVisible)
             {
-                ClipAround(new Vector2(addon.X + 5, addon.Y + 5), new Vector2(addon.X + addon.Width - 5, addon.Y + addon.Height - 5), windowName, drawList, drawAction);
+                ClipAround(
+                    new Vector2(addon->X+5, addon->Y+5), 
+                    new Vector2(
+                        addon->X + addon->WindowNode->AtkResNode.Width - 5, 
+                        addon->Y + addon->WindowNode->AtkResNode.Height - 5
+                    ), 
+                    windowName, drawList, drawAction
+                );
             }
             else
             {

@@ -469,7 +469,7 @@ namespace DelvUI.Interface.Bars
             Scale = scale;
         }
 
-        public BarText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string text)
+        public BarText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string? text)
         {
             Position = position;
             Type = type;
@@ -504,7 +504,7 @@ namespace DelvUI.Interface.Bars
         public BarTextType Type { get; set; }
         public Vector4 Color { get; set; }
         public Vector4 OutlineColor { get; set; }
-        public string Text { get; set; }
+        public string? Text { get; set; }
         public float Scale { get; set; }
 
         public Vector2 CalcTextPosition(Vector2 cursorPos, string text, float barWidth, float barHeight)

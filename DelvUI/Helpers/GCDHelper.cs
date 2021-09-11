@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright(c) 2021 0ceal0t (https://github.com/0ceal0t/JobBars)
 Modifications Copyright(c) 2021 DelvUI
 08/29/2021 - Extracted code to get the GCD state of player actions.
@@ -17,9 +17,9 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using Dalamud.Game.ClientState.Actors.Types;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using System.Collections.Generic;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 
 namespace DelvUI.Helpers
 {

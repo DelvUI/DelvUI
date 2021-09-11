@@ -1,10 +1,10 @@
-﻿using Dalamud.Data.LuminaExtensions;
-using ImGuiScene;
+﻿using ImGuiScene;
 using Lumina.Data.Files;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
+using Dalamud.Utility;
 using Action = Lumina.Excel.GeneratedSheets.Action;
 
 namespace DelvUI.Helpers

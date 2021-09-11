@@ -1,7 +1,4 @@
-using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs;
-using Dalamud.Game.ClientState.Structs.JobGauge;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
@@ -10,9 +7,13 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
+using Dalamud.Game.ClientState.JobGauge.Enums;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -80,10 +81,10 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawActiveDots(Vector2 origin)
         {
-            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
-            bool targetIsChara = target is Chara;
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            if (!targetIsChara && !Config.CBNoTarget && !Config.SBNoTarget)
+            if (actor is not BattleChara && !Config.CBNoTarget && !Config.SBNoTarget)
             {
                 return;
             }
@@ -97,14 +98,14 @@ namespace DelvUI.Interface.Jobs
             {
                 float duration = 0;
 
-                if (targetIsChara)
+                if (actor is BattleChara target)
                 {
-                    StatusEffect cb = target.StatusEffects.FirstOrDefault(
-                        o => o.EffectId == 1200 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
-                          || o.EffectId == 124 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                    Status? cb = target.StatusList.FirstOrDefault(
+                        o => o.StatusId == 1200 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
+                          || o.StatusId == 124 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
                     );
 
-                    duration = Math.Abs(cb.Duration);
+                    duration = Math.Abs(cb?.RemainingTime ?? 0f);
                 }
 
                 PluginConfigColor color = duration <= 5 ? Config.ExpireColor : Config.CBColor;
@@ -120,7 +121,7 @@ namespace DelvUI.Interface.Jobs
                     builder.SetText(textPos, BarTextType.Current);
                 }
 
-                if (targetIsChara || Config.CBNoTarget)
+                if (actor is BattleChara || Config.CBNoTarget)
                 {
                     barDrawList.Add(cbBar);
                 }
@@ -133,14 +134,14 @@ namespace DelvUI.Interface.Jobs
             {
                 float duration = 0;
 
-                if (targetIsChara)
+                if (actor is BattleChara target)
                 {
-                    StatusEffect sb = target.StatusEffects.FirstOrDefault(
-                        o => o.EffectId == 1201 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
-                          || o.EffectId == 129 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                    Status? sb = target.StatusList.FirstOrDefault(
+                        o => o.StatusId == 1201 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
+                          || o.StatusId == 129 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
                     );
 
-                    duration = Math.Abs(sb.Duration);
+                    duration = Math.Abs(sb?.RemainingTime ?? 0f);
                 }
 
                 PluginConfigColor color = duration <= 5 ? Config.ExpireColor : Config.SBColor;
@@ -156,7 +157,7 @@ namespace DelvUI.Interface.Jobs
                     builder.SetText(textPos, BarTextType.Current);
                 }
 
-                if (targetIsChara || Config.SBNoTarget)
+                if (actor is BattleChara || Config.SBNoTarget)
                 {
                     barDrawList.Add(sbBar);
                 }
@@ -178,13 +179,13 @@ namespace DelvUI.Interface.Jobs
         private void HandleCurrentSong(Vector2 origin)
         {
             BRDGauge gauge = Plugin.JobGauges.Get<BRDGauge>();
-            byte songStacks = gauge.NumSongStacks;
-            CurrentSong song = gauge.ActiveSong;
+            byte songStacks = gauge.Repertoire;
+            Song song = gauge.Song;
             short songTimer = gauge.SongTimer;
 
             switch (song)
             {
-                case CurrentSong.WANDERER:
+                case Song.WANDERER:
                     if (Config.ShowWMStacks)
                     {
                         DrawStacks(origin, songStacks, 3, Config.WMStackColor);
@@ -194,7 +195,7 @@ namespace DelvUI.Interface.Jobs
 
                     break;
 
-                case CurrentSong.MAGE:
+                case Song.MAGE:
                     if (Config.ShowMBProc)
                     {
                         DrawBloodletterReady(origin, Config.MBProcColor);
@@ -204,7 +205,7 @@ namespace DelvUI.Interface.Jobs
 
                     break;
 
-                case CurrentSong.ARMY:
+                case Song.ARMY:
                     if (Config.ShowAPStacks)
                     {
                         DrawStacks(origin, songStacks, 4, Config.APStackColor);
@@ -214,7 +215,7 @@ namespace DelvUI.Interface.Jobs
 
                     break;
 
-                case CurrentSong.NONE:
+                case Song.NONE:
                     if (Config.ShowEmptyStacks)
                     {
                         DrawStacks(origin, 0, 3, Config.APStackColor);
@@ -293,7 +294,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawSoulVoiceBar(Vector2 origin)
         {
-            byte soulVoice = Plugin.JobGauges.Get<BRDGauge>().SoulVoiceValue;
+            byte soulVoice = Plugin.JobGauges.Get<BRDGauge>().SoulVoice;
 
             Vector2 barSize = Config.SoulGaugeSize;
             Vector2 position = origin + Config.Position + Config.SoulGaugePosition - barSize / 2f;
