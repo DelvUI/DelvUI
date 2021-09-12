@@ -1119,6 +1119,7 @@ namespace DelvUI.Config.Tree
                         ImGui.Button(names[order[i]], new Vector2(100, 25));
                         if (ImGui.IsItemActive()){
                             float drag_dx = ImGui.GetMouseDragDelta(0).X;
+                            float drag_dx = ImGui.GetMouseDragDelta(ImGuiMouseButton.Left).X;
                             if ((drag_dx > 80.0f && i < order.Count() - 1))
                             {
                                 var _curri = order[i];

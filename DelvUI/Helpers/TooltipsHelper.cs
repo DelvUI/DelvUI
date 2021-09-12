@@ -48,8 +48,6 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            PluginLog.Log(SanitizeText(text));
-
             // remove styling tags from text
             if (_previousRawText != text)
             {
@@ -129,7 +127,7 @@ namespace DelvUI.Helpers
         {
             // some data comes with unicode characters i couldn't figure out how to get rid of
             // so im doing a pretty aggressive replace to keep only "nice" characters
-            var result = Regex.Replace(text, @"[^a-zA-Z0-9 -\.\,\?]", "");
+            var result = Regex.Replace(text, @"[^a-zA-Z0-9 -\.\,\?\!\(\)%]", "");
 
             // after that there's still some leftovers characters that need to be removed
             Regex regex = new Regex("HI(.*?)IH");
@@ -140,6 +138,8 @@ namespace DelvUI.Helpers
                     result = result.Replace(match.Value, match.Groups[1].Value);
                 }
             }
+
+            result = result.Replace("%", "%%");
 
             return result;
         }
