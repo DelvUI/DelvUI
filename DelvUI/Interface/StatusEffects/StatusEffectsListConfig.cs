@@ -135,6 +135,14 @@ namespace DelvUI.Interface.StatusEffects
         [Order(60)]
         public bool ShowPermanentEffects;
 
+        [Checkbox("Show Only My Effects")]
+        [Order(65)]
+        public bool ShowOnlyMine = false;
+
+        [Checkbox("Show My Effects First")]
+        [Order(70)]
+        public bool ShowMineFirst = false;
+
         public StatusEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
             GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
         {
