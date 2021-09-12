@@ -69,6 +69,8 @@ namespace DelvUI.Interface.StatusEffects
                 return list;
             }
 
+            var player = Plugin.ClientState.LocalPlayer;
+
             for (var i = 0; i < effectCount; i++)
             {
                 var status = Actor.StatusEffects[i];
@@ -84,17 +86,26 @@ namespace DelvUI.Interface.StatusEffects
                     continue;
                 }
 
+                // buffs
                 if (!Config.ShowBuffs && row.Category == 1)
                 {
                     continue;
                 }
 
+                // debuffs
                 if (!Config.ShowDebuffs && row.Category != 1)
                 {
                     continue;
                 }
 
+                // permanent
                 if (!Config.ShowPermanentEffects && row.IsPermanent)
+                {
+                    continue;
+                }
+
+                // only mine
+                if (Config.ShowOnlyMine && player?.ActorId != status.OwnerId)
                 {
                     continue;
                 }
@@ -102,21 +113,43 @@ namespace DelvUI.Interface.StatusEffects
                 list.Add(new StatusEffectData(status, row));
             }
 
-            if (filterBuffs.Count == 0)
+            // filters
+            var toReturn = list;
+            if (filterBuffs.Count > 0)
             {
-                return list;
-            }
+                toReturn = new List<StatusEffectData>();
 
-            // Always adhere to the priority of buffs set by filterBuffs.
-            var toReturn = new List<StatusEffectData>();
-            foreach (var buffId in filterBuffs)
-            {
-                var idx = list.FindIndex(s => (uint)s.StatusEffect.EffectId == buffId);
-                if (idx >= 0)
+                foreach (var buffId in filterBuffs)
                 {
-                    toReturn.Add(list[idx]);
+                    var idx = list.FindIndex(s => (uint)s.StatusEffect.EffectId == buffId);
+                    if (idx >= 0)
+                    {
+                        toReturn.Add(list[idx]);
+                    }
                 }
             }
+
+            // show mine first
+            if (Config.ShowMineFirst && player != null)
+            {
+                toReturn.Sort((a, b) =>
+                {
+                    bool isAFromPlayer = a.StatusEffect.OwnerId == player.ActorId;
+                    bool isBFromPlayer = b.StatusEffect.OwnerId == player.ActorId;
+
+                    if (isAFromPlayer && !isBFromPlayer)
+                    {
+                        return -1;
+                    }
+                    else if (!isAFromPlayer && isBFromPlayer)
+                    {
+                        return 1;
+                    }
+
+                    return 0;
+                });
+            }
+
             return toReturn;
         }
 
