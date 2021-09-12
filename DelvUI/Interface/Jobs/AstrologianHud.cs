@@ -57,7 +57,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected string RedrawText(float redrawCastInfo, int redrawStacks)
+        private string RedrawText(float redrawCastInfo, int redrawStacks)
         {
             if (!Config.ShowRedrawBar)
             {
@@ -285,7 +285,7 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            if (!Config.ShowDrawTextBar)
+            if (!Config.ShowDrawCooldownTextBar)
             {
                 if (!(cardJob == "RANGED" || cardJob == "MELEE" || cardJob == "READY"))
                 {
@@ -296,23 +296,31 @@ namespace DelvUI.Interface.Jobs
             switch (cardJob)
             {
                 case "RANGED":
-                    bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, cardJob);
-
+                    bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, Config.ShowDrawTextBar ? cardJob : "");
+                    if (Config.ShowDrawCardWhileDrawn)
+                    {
+                        bar.AddPrimaryText(new BarText(BarTextPosition.CenterLeft, BarTextType.Custom, Config.ShowDrawCooldownTextBar ? Math.Abs(drawCastInfo).ToString(Config.EnableDecimalDrawBar ? "N1" : "N0") : ""));
+                    }
                     break;
 
                 case "MELEE":
-                    bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, cardJob);
-
+                    bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, Config.ShowDrawTextBar ? cardJob : "");
+                    if (Config.ShowDrawCardWhileDrawn)
+                    {
+                        bar.AddPrimaryText(new BarText(BarTextPosition.CenterLeft, BarTextType.Custom, Config.ShowDrawCooldownTextBar ? Math.Abs(drawCastInfo).ToString(Config.EnableDecimalDrawBar ? "N1" : "N0") : ""));
+                    }
                     break;
 
                 case "READY":
-                    bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, cardJob);
-
+                    bar.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, Config.ShowDrawTextBar ? cardJob : "");
+                    if (Config.ShowDrawCardWhileDrawn)
+                    {
+                        bar.AddPrimaryText(new BarText(BarTextPosition.CenterLeft, BarTextType.Custom, Config.ShowDrawCooldownTextBar ? Math.Abs(drawCastInfo).ToString(Config.EnableDecimalDrawBar ? "N1" : "N0") : ""));
+                    }
                     break;
 
                 default:
                     bar.SetText(BarTextPosition.CenterLeft, BarTextType.Custom, Config.ShowDrawCooldownTextBar ? cardJob : "");
-
                     break;
             }
 
@@ -515,28 +523,32 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(40, 0)]
         public bool ShowDrawCooldownTextBar = true;
 
-        [Checkbox("Enable Redraw Stacks & Cooldown")]
+        [Checkbox("Show Draw Timer while you have a card drawn.")]
         [CollapseWith(45, 0)]
+        public bool ShowDrawCardWhileDrawn;
+
+        [Checkbox("Enable Redraw Stacks & Cooldown")]
+        [CollapseWith(50, 0)]
         public bool ShowRedrawBar = true;
 
         [Checkbox("Show Redraw Timer")]
-        [CollapseWith(50, 0)]
+        [CollapseWith(55, 0)]
         public bool ShowRedrawCooldownTextBar = true;
 
         [Checkbox("Show Redraw Stacks")]
-        [CollapseWith(55, 0)]
+        [CollapseWith(60, 0)]
         public bool ShowRedrawTextBar = true;
 
         [Checkbox("Change next Redraw cooldown to total Redraw cooldown")]
-        [CollapseWith(60, 0)]
+        [CollapseWith(65, 0)]
         public bool EnableRedrawCooldownCumulated;
 
         [Checkbox("Change Draw timer to decimal")]
-        [CollapseWith(65, 0)]
+        [CollapseWith(70, 0)]
         public bool EnableDecimalDrawBar;
 
         [Checkbox("Change Redraw timer to decimal")]
-        [CollapseWith(70, 0)]
+        [CollapseWith(75, 0)]
         public bool EnableDecimalRedrawBar;
         #endregion
 
