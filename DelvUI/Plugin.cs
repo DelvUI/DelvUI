@@ -46,11 +46,14 @@ namespace DelvUI
         public static Dalamud.Game.SigScanner SigScanner => PluginInterface.TargetModuleScanner;
         public static Targets TargetManager => ClientState.Targets;
         public static UiBuilder UiBuilder => PluginInterface.UiBuilder;
-        
+
+
+
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
             PluginInterface = pluginInterface;
-            
+
+
             Version = Assembly.GetExecutingAssembly()?.GetName().Version.ToString() ?? "";
 
             LoadBanner();
@@ -87,6 +90,7 @@ namespace DelvUI
             TexturesCache.Initialize();
             GlobalColors.Initialize();
             TooltipsHelper.Initialize();
+            ChatHelper.Initialize();
             Resolver.Initialize();
 
             _hudManager = new HudManager();

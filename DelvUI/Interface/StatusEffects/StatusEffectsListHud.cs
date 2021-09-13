@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Structs;
+using Dalamud.Plugin;
 using DelvUI.Helpers;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
@@ -182,25 +183,29 @@ namespace DelvUI.Interface.StatusEffects
                 _lastGrowthDirections = growthDirections;
             }
 
-            // draw area
-            var drawList = ImGui.GetWindowDrawList();
-            var position = origin + Config.Position;
+            // window
+            ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoTitleBar;
+            //windowFlags |= ImGuiWindowFlags.NoMove;
+            windowFlags |= ImGuiWindowFlags.NoDecoration;
+            windowFlags |= ImGuiWindowFlags.NoBackground;
 
+            // imgui clips the left and right borders inside windows for some reason
+            // we make the window bigger so the actual drawable size is the expected one
+            var position = origin + Config.Position;
+            var margin = new Vector2(4, 0);
+            var windowPos = CalculateStartPosition(position, Config.Size, growthDirections) - margin;
+            ImGui.SetNextWindowPos(windowPos, ImGuiCond.Always);
+            ImGui.SetNextWindowSize(Config.Size + margin * 2);
+
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
+            ImGui.Begin("statusEffecdtList " + ID, windowFlags);
+            var drawList = ImGui.GetWindowDrawList();
+
+            // draw area
             if (Config.ShowArea)
             {
-                var area = Config.Size;
-
-                if ((growthDirections & GrowthDirections.Left) != 0)
-                {
-                    area.X = -area.X;
-                }
-
-                if ((growthDirections & GrowthDirections.Up) != 0)
-                {
-                    area.Y = -area.Y;
-                }
-
-                drawList.AddRectFilled(position, position + area, 0x88000000);
+                var areaStartPos = windowPos + margin;
+                drawList.AddRectFilled(areaStartPos, areaStartPos + Config.Size, 0x88000000);
             }
 
             var row = 0;
@@ -225,6 +230,14 @@ namespace DelvUI.Interface.StatusEffects
                 {
                     TooltipsHelper.Instance.ShowTooltipOnCursor(statusEffectData.Data.Description, statusEffectData.Data.Name);
                     showingTooltip = true;
+
+                    // remove buff on right click
+                    bool isFromPlayer = statusEffectData.StatusEffect.OwnerId == Plugin.ClientState.LocalPlayer?.ActorId;
+
+                    if (statusEffectData.Data.Category == 1 && isFromPlayer && ImGui.GetIO().MouseClicked[1])
+                    {
+                        ChatHelper.SendChatMessage("/statusoff \"" + statusEffectData.Data.Name + "\"");
+                    }
                 }
 
                 // rows / columns
@@ -247,6 +260,9 @@ namespace DelvUI.Interface.StatusEffects
                     }
                 }
             }
+
+            ImGui.End();
+            ImGui.PopStyleVar();
 
             if (_showingTooltip && !showingTooltip)
             {
@@ -313,6 +329,35 @@ namespace DelvUI.Interface.StatusEffects
                 offset.X = direction.X == 1 ? 0 : -Config.IconConfig.Size.X;
                 offset.Y = direction.Y == 1 ? 0 : -Config.IconConfig.Size.Y;
             }
+        }
+
+        private Vector2 CalculateStartPosition(Vector2 position, Vector2 size, GrowthDirections growthDirections)
+        {
+            var area = size;
+            if ((growthDirections & GrowthDirections.Left) != 0)
+            {
+                area.X = -area.X;
+            }
+
+            if ((growthDirections & GrowthDirections.Up) != 0)
+            {
+                area.Y = -area.Y;
+            }
+
+            var endPos = position + area;
+            var startPos = position;
+
+            if (endPos.X < position.X)
+            {
+                startPos.X = endPos.X;
+            }
+
+            if (endPos.Y < position.Y)
+            {
+                startPos.Y = endPos.Y;
+            }
+
+            return startPos;
         }
     }
 
