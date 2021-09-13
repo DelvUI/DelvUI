@@ -39,15 +39,22 @@ namespace DelvUI.Interface.GeneralElements
             var startPos = origin + Config.Position - Config.Size / 2f;
             var size = !Config.VerticalMode ? Config.Size : new Vector2(Config.Size.Y, -Config.Size.X);
 
-            var percentNonQueue = 1F - 0.5F / total;
+            var percentNonQueue = 1F - (500f / 1000f) / total;
 
             var drawList = ImGui.GetWindowDrawList();
             var builder = BarBuilder.Create(startPos, size)
-                .SetChunks(new float[]{percentNonQueue, 1F - percentNonQueue})
-                .SetChunkPadding(Config.GCDQueuePaddingSize)
+                .SetChunks(new float[2]{percentNonQueue, 1F - percentNonQueue})
                 .AddInnerBar(elapsed, total, Config.Color.Map)
                 .SetDrawBorder(Config.ShowBorder)
                 .SetVertical(Config.VerticalMode);
+
+            var queueStartOffset = Config.VerticalMode ? new Vector2(0, percentNonQueue * size.Y) : new Vector2(percentNonQueue * size.X, 0);
+            var queueEndOffset = Config.VerticalMode ? new Vector2(size.X, percentNonQueue * size.Y + 1f) : new Vector2(percentNonQueue * size.X + 1f, size.Y);
+            if (Config.ShowGCDQueueIndicator)
+            {
+                builder.SetChunksColors(new Dictionary<string, uint>[2]{Config.Color.Map, Config.QueueColor.Map});
+                drawList.AddRect(startPos + queueStartOffset, startPos + queueEndOffset, Config.QueueColor.Base);
+            }
 
             builder.Build().Draw(drawList);
         }
