@@ -109,8 +109,21 @@ namespace DelvUI
             {
                 try
                 {
-                    FontsManager.Instance.BigNoodleTooFont = ImGui.GetIO().Fonts.AddFontFromFileTTF(fontFile, 24);
-                    _fontBuilt = true;
+                    ImGuiIOPtr io = ImGui.GetIO();
+
+                    unsafe
+                    {
+                        var builder = new ImFontGlyphRangesBuilderPtr(ImGuiNative.ImFontGlyphRangesBuilder_ImFontGlyphRangesBuilder());
+                        
+                        // GetGlyphRangesChineseFull() includes Default + Hiragana, Katakana, Half-Width, Selection of 1946 Ideographs
+                        // https://skia.googlesource.com/external/github.com/ocornut/imgui/+/v1.53/extra_fonts/README.txt
+                        builder.AddRanges(io.Fonts.GetGlyphRangesChineseFull());
+                        builder.AddRanges(io.Fonts.GetGlyphRangesKorean());
+                        builder.BuildRanges(out ImVector ranges);
+                        
+                        FontsManager.Instance.BigNoodleTooFont = io.Fonts.AddFontFromFileTTF(fontFile, 24, null, ranges.Data);
+                        _fontBuilt = true;
+                    }
                 }
                 catch (Exception ex)
                 {
