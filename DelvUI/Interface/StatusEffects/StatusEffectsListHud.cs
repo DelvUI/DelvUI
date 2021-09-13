@@ -226,7 +226,7 @@ namespace DelvUI.Interface.StatusEffects
                 StatusEffectIconDrawHelper.DrawStatusEffectIcon(drawList, iconPos, statusEffectData, Config.IconConfig);
 
                 // tooltip
-                if (ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
+                if (Config.ShowTooltips && ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
                 {
                     TooltipsHelper.Instance.ShowTooltipOnCursor(statusEffectData.Data.Description, statusEffectData.Data.Name);
                     showingTooltip = true;

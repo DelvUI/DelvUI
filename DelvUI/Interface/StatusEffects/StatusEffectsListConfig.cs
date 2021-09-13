@@ -146,6 +146,10 @@ namespace DelvUI.Interface.StatusEffects
         [Order(70)]
         public bool ShowMineFirst = false;
 
+        [Checkbox("Show Tooltips")]
+        [Order(75)]
+        public bool ShowTooltips = true;
+
         public StatusEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
             GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
         {
