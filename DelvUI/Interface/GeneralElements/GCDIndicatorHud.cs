@@ -2,6 +2,7 @@
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
@@ -38,8 +39,12 @@ namespace DelvUI.Interface.GeneralElements
             var startPos = origin + Config.Position - Config.Size / 2f;
             var size = !Config.VerticalMode ? Config.Size : new Vector2(Config.Size.Y, -Config.Size.X);
 
+            var percentNonQueue = 1F - 0.5F / total;
+
             var drawList = ImGui.GetWindowDrawList();
             var builder = BarBuilder.Create(startPos, size)
+                .SetChunks(new float[]{percentNonQueue, 1F - percentNonQueue})
+                .SetChunkPadding(Config.GCDQueuePaddingSize)
                 .AddInnerBar(elapsed, total, Config.Color.Map)
                 .SetDrawBorder(Config.ShowBorder)
                 .SetVertical(Config.VerticalMode);

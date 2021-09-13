@@ -22,6 +22,10 @@ namespace DelvUI.Interface.GeneralElements
         [Order(30)]
         public bool VerticalMode = false;
 
+        [DragFloat("GCD Queue Padding Size")]
+        [Order(40)]
+        public float GCDQueuePaddingSize = 1f;
+
         [ColorEdit4("Color")]
         [Order(35)]
         public PluginConfigColor Color = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f));
