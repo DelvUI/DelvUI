@@ -185,7 +185,7 @@ namespace DelvUI.Interface.StatusEffects
 
             // window
             ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoTitleBar;
-            //windowFlags |= ImGuiWindowFlags.NoMove;
+            windowFlags |= ImGuiWindowFlags.NoMove;
             windowFlags |= ImGuiWindowFlags.NoDecoration;
             windowFlags |= ImGuiWindowFlags.NoBackground;
 
