@@ -74,7 +74,7 @@ namespace DelvUI.Config.Tree
     public class BaseNode : Node
     {
         public new List<SectionNode> children;
-        private Dictionary<Type, PluginConfigObject> configObjectsMap;
+        public Dictionary<Type, PluginConfigObject> configObjectsMap;
 
         public BaseNode()
         {
@@ -865,8 +865,12 @@ namespace DelvUI.Config.Tree
                         if (importedConfigObject != null)
                         {
                             PluginLog.Log($"Importing {importedConfigObject.GetType()}");
+                            // update the tree
                             ConfigObject = importedConfigObject;
+                            // but also update the dictionary
+                            ConfigurationManager.GetInstance().ConfigBaseNode.configObjectsMap[ConfigObject.GetType()] = ConfigObject;
                             ConfigurationManager.GetInstance().SaveConfigurations();
+                            ConfigurationManager.GetInstance().RequestResetEvent();
                         }
                         else
                         {

@@ -122,6 +122,14 @@ namespace DelvUI.Config
 
         public static ConfigurationManager GetInstance() => _instance;
 
+        public void RequestResetEvent()
+        {
+            if(ResetEvent != null)
+            {
+                ResetEvent(this, null);
+            }
+        }
+
         public void Draw()
         {
             if (DrawConfigWindow)
@@ -146,7 +154,7 @@ namespace DelvUI.Config
         {
             using MemoryStream output = new();
 
-            using (DeflateStream gzip = new(output, CompressionLevel.Fastest))
+            using (DeflateStream gzip = new(output, CompressionLevel.Optimal))
             {
                 using StreamWriter writer = new(gzip, Encoding.UTF8);
                 writer.Write(jsonString);
