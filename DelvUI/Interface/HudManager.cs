@@ -49,7 +49,7 @@ namespace DelvUI.Interface
         {
             _jobHud = null;
             CreateHudElements();
-            PluginLog.Log("resetting hud");
+            ConfigurationManager.GetInstance().SaveConfigurations();
         }
 
         private void CreateHudElements()

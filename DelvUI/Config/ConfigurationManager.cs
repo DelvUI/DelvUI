@@ -1,14 +1,20 @@
 using Dalamud.Plugin;
+using DelvUI.Config.Attributes;
 using DelvUI.Config.Tree;
 using DelvUI.Helpers;
+using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
 using DelvUI.Interface.StatusEffects;
+using ImGuiNET;
 using ImGuiScene;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
+using System.Reflection;
 using System.Text;
 
 namespace DelvUI.Config
@@ -97,7 +103,9 @@ namespace DelvUI.Config
                 typeof(PrimaryResourceConfig),
                 typeof(TooltipsConfig),
                 typeof(GCDIndicatorConfig),
-                typeof(MPTickerConfig)
+                typeof(MPTickerConfig),
+
+                typeof(ImportExportConfig)
             };
 
             return Initialize(defaultConfig, configObjects);
@@ -121,14 +129,6 @@ namespace DelvUI.Config
         }
 
         public static ConfigurationManager GetInstance() => _instance;
-
-        public void RequestResetEvent()
-        {
-            if(ResetEvent != null)
-            {
-                ResetEvent(this, null);
-            }
-        }
 
         public void Draw()
         {
@@ -181,6 +181,49 @@ namespace DelvUI.Config
                 new JsonSerializerSettings { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects });
 
             return CompressAndBase64Encode(jsonString);
+        }
+
+        public static string ExportBaseNode(BaseNode baseNode)
+        {
+            //SkipNonPortableContractResolver resolver = new SkipNonPortableContractResolver();
+            JsonSerializerSettings settings = new JsonSerializerSettings
+            {
+                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
+                TypeNameHandling = TypeNameHandling.Objects
+                //ContractResolver = new SkipNonPortableContractResolver()
+            };
+            var jsonString = JsonConvert.SerializeObject(baseNode, Formatting.Indented, settings);
+            ImGui.SetClipboardText(jsonString);
+            return CompressAndBase64Encode(jsonString);
+        }
+
+        public static void LoadImportedConfiguration(string importString, ConfigPageNode configPageNode)
+        {
+            // see comments on ConfigPageNode's Load
+            MethodInfo methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
+            MethodInfo function = methodInfo.MakeGenericMethod(configPageNode.ConfigObject.GetType());
+            PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(ConfigurationManager.GetInstance(), new object[] { importString });
+
+            if (importedConfigObject != null)
+            {
+                PluginLog.Log($"Importing {importedConfigObject.GetType()}");
+                // update the tree
+                configPageNode.ConfigObject = importedConfigObject;
+                // but also update the dictionary
+                ConfigurationManager.GetInstance().ConfigBaseNode.configObjectsMap[configPageNode.ConfigObject.GetType()] = configPageNode.ConfigObject;
+                ConfigurationManager.GetInstance().SaveConfigurations();
+                _instance.ResetEvent(_instance, null);
+            }
+            else
+            {
+                PluginLog.Log($"Could not load from import string (of type {importedConfigObject.GetType()})");
+            }
+        }
+
+        public static void LoadTotalConfiguration(string[] importStrings)
+        {
+            _instance.ConfigBaseNode.LoadBase64String(importStrings);
+            _instance.ResetEvent(_instance, null);
         }
 
         public static T LoadImportString<T>(string importString) where T : PluginConfigObject
