@@ -9,15 +9,13 @@ namespace DelvUI.Helpers
         #region Singleton
         private ChatHelper()
         {
-            var scanner = Plugin.PluginInterface.TargetModuleScanner;
-
-            IntPtr baseUi = scanner.GetStaticAddressFromSig("48 8B 0D ?? ?? ?? ?? 48 8D 54 24 ?? 48 83 C1 10 E8");
-            IntPtr uiModule = scanner.ScanText("E8 ?? ?? ?? ?? 48 83 7F ?? 00 48 8B F0");
+            IntPtr baseUi = Plugin.SigScanner.GetStaticAddressFromSig("48 8B 0D ?? ?? ?? ?? 48 8D 54 24 ?? 48 83 C1 10 E8");
+            IntPtr uiModule = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 83 7F ?? 00 48 8B F0");
 
             UiModuleDelegate uiModuleDelegate = Marshal.GetDelegateForFunctionPointer<UiModuleDelegate>(uiModule);
             _uiModulePtr = (IntPtr)uiModuleDelegate.DynamicInvoke(Marshal.ReadIntPtr(baseUi));
 
-            _chatModulePtr = scanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9");
+            _chatModulePtr = Plugin.SigScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9");
         }
 
         public static void Initialize() { Instance = new ChatHelper(); }
