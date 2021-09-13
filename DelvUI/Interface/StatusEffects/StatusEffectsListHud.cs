@@ -173,6 +173,11 @@ namespace DelvUI.Interface.StatusEffects
 
             // calculate layout
             var list = StatusEffectsData(filterStatusEffects);
+            if (list.Count == 0)
+            {
+                return;
+            }
+
             var count = CalculateLayout(list);
 
             // validate growth directions
@@ -188,6 +193,10 @@ namespace DelvUI.Interface.StatusEffects
             windowFlags |= ImGuiWindowFlags.NoMove;
             windowFlags |= ImGuiWindowFlags.NoDecoration;
             windowFlags |= ImGuiWindowFlags.NoBackground;
+            if (!Config.ShowBuffs)
+            {
+                windowFlags |= ImGuiWindowFlags.NoInputs;
+            }
 
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
