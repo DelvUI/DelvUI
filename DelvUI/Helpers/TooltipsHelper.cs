@@ -91,20 +91,35 @@ namespace DelvUI.Helpers
             }
 
             // bg
+            ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoTitleBar;
+            windowFlags |= ImGuiWindowFlags.NoMove;
+            windowFlags |= ImGuiWindowFlags.NoDecoration;
+            windowFlags |= ImGuiWindowFlags.NoBackground;
+
+            // imgui clips the left and right borders inside windows for some reason
+            // we make the window bigger so the actual drawable size is the expected one
+            var windowMargin = new Vector2(4, 0);
+            var windowPos = _position - windowMargin;
+            ImGui.SetNextWindowPos(windowPos, ImGuiCond.Always);
+            ImGui.SetNextWindowSize(_size + windowMargin * 2);
+
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
+            ImGui.Begin("delvui_tooltip", windowFlags);
             var drawList = ImGui.GetWindowDrawList();
+
             drawList.AddRectFilled(_position, _position + _size, _config.BackgroundColor.Base);
 
             if (_currentTooltipTitle != null)
             {
                 // title
-                var cursorPos = new Vector2(_position.X + _size.X / 2f - _titleSize.X / 2f, _position.Y + Margin);
+                var cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _titleSize.X / 2f, Margin);
                 ImGui.SetCursorPos(cursorPos);
                 ImGui.PushTextWrapPos(cursorPos.X + _titleSize.X);
                 ImGui.TextColored(_config.TitleColor.Vector, _currentTooltipTitle);
                 ImGui.PopTextWrapPos();
 
                 // text
-                cursorPos = new Vector2(_position.X + _size.X / 2f - _textSize.X / 2f, _position.Y + Margin + _titleSize.Y);
+                cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _textSize.X / 2f, Margin + _titleSize.Y);
                 ImGui.SetCursorPos(cursorPos);
                 ImGui.PushTextWrapPos(cursorPos.X + _textSize.X);
                 ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
@@ -113,7 +128,7 @@ namespace DelvUI.Helpers
             else
             {
                 // text
-                var cursorPos = _position + new Vector2(Margin, Margin);
+                var cursorPos = windowMargin + new Vector2(Margin, Margin);
                 var textWidth = _size.X - Margin * 2;
 
                 ImGui.SetCursorPos(cursorPos);
@@ -121,6 +136,9 @@ namespace DelvUI.Helpers
                 ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
                 ImGui.PopTextWrapPos();
             }
+
+            ImGui.End();
+            ImGui.PopStyleVar();
         }
 
         private string SanitizeText(string text)
