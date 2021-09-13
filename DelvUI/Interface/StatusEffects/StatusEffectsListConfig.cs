@@ -9,7 +9,7 @@ using System.Numerics;
 namespace DelvUI.Interface.StatusEffects
 {
     [Serializable]
-    [Section("Buffs / Debuffs")]
+    [Section("Buffs and Debuffs")]
     [SubSection("Player Buffs", 0)]
     public class PlayerBuffsListConfig : StatusEffectsListConfig
     {
@@ -18,6 +18,7 @@ namespace DelvUI.Interface.StatusEffects
             var screenSize = ImGui.GetMainViewport().Size;
             var pos = new Vector2(screenSize.X * 0.38f, -screenSize.Y * 0.45f);
             var iconConfig = new StatusEffectIconConfig();
+            iconConfig.DispellableBorderConfig.Enabled = false;
 
             return new PlayerBuffsListConfig(pos, HUDConstants.DefaultStatusEffectsListSize, true, false, true, GrowthDirections.Left | GrowthDirections.Down, iconConfig);
         }
@@ -30,7 +31,7 @@ namespace DelvUI.Interface.StatusEffects
     }
 
     [Serializable]
-    [Section("Buffs / Debuffs")]
+    [Section("Buffs and Debuffs")]
     [SubSection("Player Debuffs", 0)]
     public class PlayerDebuffsListConfig : StatusEffectsListConfig
     {
@@ -51,7 +52,7 @@ namespace DelvUI.Interface.StatusEffects
     }
 
     [Serializable]
-    [Section("Buffs / Debuffs")]
+    [Section("Buffs and Debuffs")]
     [SubSection("Target Buffs", 0)]
     public class TargetBuffsListConfig : StatusEffectsListConfig
     {
@@ -59,6 +60,7 @@ namespace DelvUI.Interface.StatusEffects
         {
             var pos = new Vector2(HUDConstants.UnitFramesOffsetX, HUDConstants.BaseHUDOffsetY - 50);
             var iconConfig = new StatusEffectIconConfig();
+            iconConfig.DispellableBorderConfig.Enabled = false;
 
             return new TargetBuffsListConfig(pos, HUDConstants.DefaultStatusEffectsListSize, true, false, true, GrowthDirections.Right | GrowthDirections.Up, iconConfig);
         }
@@ -71,7 +73,7 @@ namespace DelvUI.Interface.StatusEffects
     }
 
     [Serializable]
-    [Section("Buffs / Debuffs")]
+    [Section("Buffs and Debuffs")]
     [SubSection("Target Debuffs", 0)]
     public class TargetDebuffsListConfig : StatusEffectsListConfig
     {
@@ -79,6 +81,7 @@ namespace DelvUI.Interface.StatusEffects
         {
             var pos = new Vector2(HUDConstants.UnitFramesOffsetX, HUDConstants.BaseHUDOffsetY - HUDConstants.DefaultStatusEffectsListSize.Y - 50);
             var iconConfig = new StatusEffectIconConfig();
+            iconConfig.DispellableBorderConfig.Enabled = false;
 
             return new TargetDebuffsListConfig(pos, HUDConstants.DefaultStatusEffectsListSize, false, true, true, GrowthDirections.Right | GrowthDirections.Up, iconConfig);
         }
@@ -204,42 +207,41 @@ namespace DelvUI.Interface.StatusEffects
         [Order(10)]
         public bool ShowStacksText = true;
 
-        [Checkbox("Show Border")]
-        [CollapseControl(15, 0)]
-        public bool ShowBorder = true;
+        [NestedConfig("Border", 15)]
+        public StatusEffectIconBorderConfig BorderConfig = new StatusEffectIconBorderConfig();
 
-        [ColorEdit4("Border Color")]
-        [CollapseWith(0, 0)]
-        public PluginConfigColor BorderColor = new(new Vector4(0f / 255f, 0 / 255f, 0 / 255f, 100f / 100f));
+        [NestedConfig("Dispellable Effects Border", 20)]
+        public StatusEffectIconBorderConfig DispellableBorderConfig = new StatusEffectIconBorderConfig(new(Vector4.One), 2);
 
-        [DragInt("Thickness", min = 1, max = 100)]
-        [CollapseWith(5, 0)]
-        public int BorderThickness = 1;
-
-        [Checkbox("Show Dispellable Border")]
-        [CollapseControl(20, 1)]
-        public bool ShowDispellableBorder = true;
-
-        [ColorEdit4("Color ##DispellableColor")]
-        [CollapseWith(0, 1)]
-        public PluginConfigColor DispellableBorderColor = new(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
-
-        [DragInt("Thickness ##DispellableThickness", min = 1, max = 100)]
-        [CollapseWith(5, 1)]
-        public int DispellableBorderThickness = 2;
+        [NestedConfig("My Effects Border", 25)]
+        public StatusEffectIconBorderConfig OwnedBorderConfig = new StatusEffectIconBorderConfig(new(new(50f / 255f, 255f / 255f, 100f / 255f, 100f / 100f)), 2);
 
         public StatusEffectIconConfig()
         {
 
         }
+    }
 
-        public StatusEffectIconConfig(Vector2 size, bool showDurationText, bool showStacksText, bool showBorder, bool showDispellableBorder)
+    [Serializable]
+    [Portable(false)]
+    public class StatusEffectIconBorderConfig : PluginConfigObject
+    {
+        [ColorEdit4("Color")]
+        [Order(0)]
+        public PluginConfigColor Color = new(Vector4.UnitW);
+
+        [DragInt("Thickness", min = 1, max = 100)]
+        [Order(5)]
+        public int Thickness = 1;
+
+        public StatusEffectIconBorderConfig()
         {
-            Size = size;
-            ShowDurationText = showDurationText;
-            ShowStacksText = showStacksText;
-            ShowBorder = showBorder;
-            ShowDispellableBorder = showDispellableBorder;
+        }
+
+        public StatusEffectIconBorderConfig(PluginConfigColor color, int thickness)
+        {
+            Color = color;
+            Thickness = thickness;
         }
     }
 }
