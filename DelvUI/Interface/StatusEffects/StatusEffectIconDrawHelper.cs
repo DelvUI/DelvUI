@@ -11,7 +11,7 @@ namespace DelvUI.Interface.StatusEffects
         public static void DrawStatusEffectIcon(ImDrawListPtr drawList, Vector2 position, StatusEffectData statusEffectData, StatusEffectIconConfig config)
         {
             // icon
-            DrawHelper.DrawIcon<Status>(statusEffectData.Data, config.Size, position, config.ShowBorder);
+            DrawHelper.DrawIcon<Status>(statusEffectData.Data, position, config.Size, false, drawList);
 
             // border
             if (config.ShowDispellableBorder && statusEffectData.Data.CanDispel)
@@ -29,7 +29,13 @@ namespace DelvUI.Interface.StatusEffects
                 var duration = Math.Round(Math.Abs(statusEffectData.StatusEffect.Duration));
                 var text = Utils.DurationToString(duration);
                 var textSize = ImGui.CalcTextSize(text);
-                DrawHelper.DrawOutlinedText(text, position + new Vector2(config.Size.X / 2f - textSize.X / 2f, config.Size.Y / 2f - textSize.Y / 2f));
+
+                DrawHelper.DrawOutlinedText(
+                    text,
+                    position + new Vector2(config.Size.X / 2f - textSize.X / 2f, config.Size.Y / 2f - textSize.Y / 2f),
+                    drawList,
+                    2
+                );
             }
 
             // stacks
@@ -41,8 +47,10 @@ namespace DelvUI.Interface.StatusEffects
                 DrawHelper.DrawOutlinedText(
                     text,
                     position + new Vector2(config.Size.X * 0.9f - textSize.X / 2f, config.Size.X * 0.2f - textSize.Y / 2f),
-                    Vector4.UnitW,
-                    Vector4.One
+                    0xFF000000,
+                    0xFFFFFFFF,
+                    drawList,
+                    2
                 );
             }
         }
