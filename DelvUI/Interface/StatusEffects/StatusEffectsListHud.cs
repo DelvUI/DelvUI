@@ -198,7 +198,7 @@ namespace DelvUI.Interface.StatusEffects
             ImGui.SetNextWindowSize(Config.Size + margin * 2);
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
-            ImGui.Begin("statusEffecdtList " + ID, windowFlags);
+            ImGui.Begin("statusEffectList " + ID, windowFlags);
             var drawList = ImGui.GetWindowDrawList();
 
             // draw area
@@ -226,7 +226,7 @@ namespace DelvUI.Interface.StatusEffects
                 StatusEffectIconDrawHelper.DrawStatusEffectIcon(drawList, iconPos, statusEffectData, Config.IconConfig);
 
                 // tooltip
-                if (ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
+                if (Config.ShowTooltips && ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
                 {
                     TooltipsHelper.Instance.ShowTooltipOnCursor(statusEffectData.Data.Description, statusEffectData.Data.Name);
                     showingTooltip = true;
@@ -278,6 +278,20 @@ namespace DelvUI.Interface.StatusEffects
                 return GrowthDirections.Right | GrowthDirections.Down;
             }
 
+            // validate Out
+            if ((directions & GrowthDirections.Out) != 0)
+            {
+                if ((directions & GrowthDirections.Left) != 0)
+                {
+                    return GrowthDirections.Out | GrowthDirections.Right;
+                }
+                if ((directions & GrowthDirections.Up) != 0)
+                {
+                    return GrowthDirections.Out | GrowthDirections.Down;
+                }
+                return directions;
+            }
+
             // validate Right & Left
             if ((directions & GrowthDirections.Right) == 0 && (directions & GrowthDirections.Left) == 0)
             {
@@ -298,16 +312,6 @@ namespace DelvUI.Interface.StatusEffects
             if ((directions & GrowthDirections.Down) != 0 && (directions & GrowthDirections.Up) != 0)
             {
                 return directions & ~GrowthDirections.Up;
-            }
-
-            // validate Out
-            if ((directions & GrowthDirections.Out) != 0 && (directions & GrowthDirections.Left) != 0)
-            {
-                return GrowthDirections.Out | GrowthDirections.Right;
-            }
-            if ((directions & GrowthDirections.Out) != 0 && (directions & GrowthDirections.Up) != 0)
-            {
-                return GrowthDirections.Out | GrowthDirections.Down;
             }
 
             return directions;
@@ -346,6 +350,11 @@ namespace DelvUI.Interface.StatusEffects
 
             var endPos = position + area;
             var startPos = position;
+
+            if ((growthDirections & GrowthDirections.Out) != 0)
+            {
+                startPos = position - size / 2f;
+            }
 
             if (endPos.X < position.X)
             {
