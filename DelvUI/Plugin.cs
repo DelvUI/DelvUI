@@ -1,5 +1,10 @@
-﻿using Dalamud.Game.ClientState;
+﻿using Dalamud.Data;
+using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.Command;
+using Dalamud.Game.Internal;
+using Dalamud.Game.Internal.Gui;
+using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Helpers;
@@ -10,11 +15,6 @@ using ImGuiNET;
 using System;
 using System.IO;
 using System.Reflection;
-using Dalamud.Data;
-using Dalamud.Game.ClientState.Actors;
-using Dalamud.Game.Internal;
-using Dalamud.Game.Internal.Gui;
-using Dalamud.Interface;
 
 namespace DelvUI
 {
@@ -47,12 +47,9 @@ namespace DelvUI
         public static Targets TargetManager => ClientState.Targets;
         public static UiBuilder UiBuilder => PluginInterface.UiBuilder;
 
-
-
         public void Initialize(DalamudPluginInterface pluginInterface)
         {
             PluginInterface = pluginInterface;
-
 
             Version = Assembly.GetExecutingAssembly()?.GetName().Version.ToString() ?? "";
 
