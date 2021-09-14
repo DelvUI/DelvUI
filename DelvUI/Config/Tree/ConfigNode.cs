@@ -74,7 +74,7 @@ namespace DelvUI.Config.Tree
     public class BaseNode : Node
     {
         public new List<SectionNode> children;
-        private Dictionary<Type, PluginConfigObject> configObjectsMap;
+        public Dictionary<Type, PluginConfigObject> configObjectsMap;
 
         public BaseNode()
         {
@@ -690,9 +690,11 @@ namespace DelvUI.Config.Tree
 
                     if (importedConfigObject != null)
                     {
-                        PluginLog.Log($"Importing {importedConfigObject.GetType()}");
+                        // update the object
                         ConfigObject = importedConfigObject;
-                        ConfigurationManager.GetInstance().SaveConfigurations();
+                        // update the dictionary
+                        ConfigurationManager.GetInstance().ConfigBaseNode.configObjectsMap[ConfigObject.GetType()] = ConfigObject;
+                        //ConfigurationManager.GetInstance().SaveConfigurations();
                     }
                     else
                     {
@@ -853,25 +855,10 @@ namespace DelvUI.Config.Tree
                     {
                         PluginLog.Log($"Error parsing import string!\n{ex.StackTrace}");
                     }
-
                     // abort import if the import string is for the wrong type
                     if (importedType != null && ConfigObject.GetType().FullName == importedType.FullName)
                     {
-                        // see comments on ConfigPageNode's Load
-                        MethodInfo methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
-                        MethodInfo function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
-                        PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(ConfigurationManager.GetInstance(), new object[] { _importString });
-
-                        if (importedConfigObject != null)
-                        {
-                            PluginLog.Log($"Importing {importedConfigObject.GetType()}");
-                            ConfigObject = importedConfigObject;
-                            ConfigurationManager.GetInstance().SaveConfigurations();
-                        }
-                        else
-                        {
-                            PluginLog.Log($"Could not load from import string (of type {importedConfigObject.GetType()})");
-                        }
+                        ConfigurationManager.LoadImportedConfiguration(_importString, this);
                     }
                     else
                     {
@@ -1114,24 +1101,26 @@ namespace DelvUI.Config.Tree
                     ImGui.Text(dragDropHorizontalAttribute.friendlyName);
                     int[] order = (int[])fieldVal;
                     string[] names = dragDropHorizontalAttribute.names;
-                    for(int i = 0; i < order.Count(); i++){
+                    for (int i = 0; i < order.Count(); i++)
+                    {
                         ImGui.SameLine();
                         ImGui.Button(names[order[i]], new Vector2(100, 25));
-                        if (ImGui.IsItemActive()){
+                        if (ImGui.IsItemActive())
+                        {
                             float drag_dx = ImGui.GetMouseDragDelta(ImGuiMouseButton.Left).X;
                             if ((drag_dx > 80.0f && i < order.Count() - 1))
                             {
                                 var _curri = order[i];
-                                order[i] = order[i+1];
-                                order[i+1] = _curri;
+                                order[i] = order[i + 1];
+                                order[i + 1] = _curri;
                                 field.SetValue(ConfigObject, order);
                                 ImGui.ResetMouseDragDelta();
                             }
                             else if ((drag_dx < -80.0f && i > 0))
                             {
                                 var _curri = order[i];
-                                order[i] = order[i-1];
-                                order[i-1] = _curri;
+                                order[i] = order[i - 1];
+                                order[i - 1] = _curri;
                                 field.SetValue(ConfigObject, order);
                                 ImGui.ResetMouseDragDelta();
                             }

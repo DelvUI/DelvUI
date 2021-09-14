@@ -1,4 +1,5 @@
 using Dalamud.Interface;
+using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -46,7 +47,9 @@ namespace DelvUI.Interface
 
         private void OnConfigReset(object sender, EventArgs e)
         {
+            _jobHud = null;
             CreateHudElements();
+            ConfigurationManager.GetInstance().SaveConfigurations();
         }
 
         private void CreateHudElements()
