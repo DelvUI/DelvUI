@@ -100,6 +100,16 @@ namespace DelvUI.Interface
             var targetCastbar = new TargetCastbarHud("targetCastbar", targetCastbarConfig);
             _hudElements.Add(targetCastbar);
             _hudElementsUsingTarget.Add(targetCastbar);
+
+            var targetOfTargetCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetOfTargetCastbarConfig>();
+            var targetOfTargetCastbar = new TargetOfTargetCastbarHud("targetOfTargetCastbar", targetOfTargetCastbarConfig);
+            _hudElements.Add(targetOfTargetCastbar);
+            _hudElementsUsingTargetOfTarget.Add(targetOfTargetCastbar);
+
+            var focusTargetCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<FocusTargetCastbarConfig>();
+            var focusTargetCastbar = new FocusTargetCastbarHud("focusTargetCastbar", focusTargetCastbarConfig);
+            _hudElements.Add(focusTargetCastbar);
+            _hudElementsUsingFocusTarget.Add(focusTargetCastbar);
         }
 
         private void CreateStatusEffectsLists()
