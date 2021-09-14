@@ -65,6 +65,8 @@ namespace DelvUI.Config
 
                 typeof(PlayerCastbarConfig),
                 typeof(TargetCastbarConfig),
+                typeof(TargetOfTargetCastbarConfig),
+                typeof(FocusTargetCastbarConfig),
 
                 typeof(PlayerBuffsListConfig),
                 typeof(PlayerDebuffsListConfig),

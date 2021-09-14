@@ -91,6 +91,56 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Serializable]
+    [Section("Castbars")]
+    [SubSection("Target of Target", 0)]
+    public class TargetOfTargetCastbarConfig : TargetCastbarConfig
+    {
+        public TargetOfTargetCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
+            : base(position, size, castNameConfig, castTimeConfig)
+        {
+
+        }
+        public new static TargetOfTargetCastbarConfig DefaultConfig()
+        {
+            var size = new Vector2(120, 24);
+            var pos = new Vector2(
+                HUDConstants.UnitFramesOffsetX + HUDConstants.DefaultBigUnitFrameSize.X + 6 + size.X / 2f,
+                HUDConstants.BaseHUDOffsetY + 5
+            );
+
+            var castNameConfig = new LabelConfig(new Vector2(-size.X / 2f + size.Y + 5, 0), "", LabelTextAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
+
+            return new TargetOfTargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
+        }
+    }
+
+    [Serializable]
+    [Section("Castbars")]
+    [SubSection("Focus Target", 0)]
+    public class FocusTargetCastbarConfig : TargetCastbarConfig
+    {
+        public FocusTargetCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
+            : base(position, size, castNameConfig, castTimeConfig)
+        {
+
+        }
+        public new static FocusTargetCastbarConfig DefaultConfig()
+        {
+            var size = new Vector2(120, 24);
+            var pos = new Vector2(
+                -HUDConstants.UnitFramesOffsetX - HUDConstants.DefaultBigUnitFrameSize.X - 6 - size.X / 2f,
+                HUDConstants.BaseHUDOffsetY + 5
+            );
+
+            var castNameConfig = new LabelConfig(new Vector2(-size.X / 2f + size.Y + 5, 0), "", LabelTextAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
+
+            return new FocusTargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
+        }
+    }
+
+    [Serializable]
     public abstract class CastbarConfig : MovablePluginConfigObject
     {
         [Checkbox("Preview")]
