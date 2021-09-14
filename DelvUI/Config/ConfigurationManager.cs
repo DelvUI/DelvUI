@@ -146,8 +146,8 @@ namespace DelvUI.Config
 
         public PluginConfigObject GetConfigObjectForType(Type type)
         {
-            var genericMethod = GetType().GetMethod("GetConfigObject");
-            var method = genericMethod.MakeGenericMethod(type);
+            MethodInfo genericMethod = GetType().GetMethod("GetConfigObject");
+            MethodInfo method = genericMethod.MakeGenericMethod(type);
             return (PluginConfigObject)method.Invoke(this, null);
         }
         public T GetConfigObject<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigObject<T>();
