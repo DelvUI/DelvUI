@@ -202,20 +202,4 @@ namespace DelvUI.Interface.GeneralElements
             return Config.Color.Map;
         }
     }
-
-    public class TargetOfTargetCastbarHud : TargetCastbarHud
-    {
-        public TargetOfTargetCastbarHud(string id, TargetOfTargetCastbarConfig config) : base(id, config)
-        {
-
-        }
-    }
-
-    public class FocusTargetCastbarHud : TargetCastbarHud
-    {
-        public FocusTargetCastbarHud(string id, FocusTargetCastbarConfig config) : base(id, config)
-        {
-
-        }
-    }
 }

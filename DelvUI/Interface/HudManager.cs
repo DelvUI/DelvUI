@@ -1,5 +1,4 @@
 using Dalamud.Interface;
-using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -102,12 +101,12 @@ namespace DelvUI.Interface
             _hudElementsUsingTarget.Add(targetCastbar);
 
             var targetOfTargetCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetOfTargetCastbarConfig>();
-            var targetOfTargetCastbar = new TargetOfTargetCastbarHud("targetOfTargetCastbar", targetOfTargetCastbarConfig);
+            var targetOfTargetCastbar = new CastbarHud("targetOfTargetCastbar", targetOfTargetCastbarConfig);
             _hudElements.Add(targetOfTargetCastbar);
             _hudElementsUsingTargetOfTarget.Add(targetOfTargetCastbar);
 
             var focusTargetCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<FocusTargetCastbarConfig>();
-            var focusTargetCastbar = new FocusTargetCastbarHud("focusTargetCastbar", focusTargetCastbarConfig);
+            var focusTargetCastbar = new CastbarHud("focusTargetCastbar", focusTargetCastbarConfig);
             _hudElements.Add(focusTargetCastbar);
             _hudElementsUsingFocusTarget.Add(focusTargetCastbar);
         }
