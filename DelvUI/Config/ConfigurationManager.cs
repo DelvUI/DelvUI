@@ -187,12 +187,10 @@ namespace DelvUI.Config
 
         public static string ExportBaseNode(BaseNode baseNode)
         {
-            //SkipNonPortableContractResolver resolver = new SkipNonPortableContractResolver();
             JsonSerializerSettings settings = new JsonSerializerSettings
             {
                 TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                 TypeNameHandling = TypeNameHandling.Objects
-                //ContractResolver = new SkipNonPortableContractResolver()
             };
             var jsonString = JsonConvert.SerializeObject(baseNode, Formatting.Indented, settings);
             ImGui.SetClipboardText(jsonString);
@@ -204,7 +202,7 @@ namespace DelvUI.Config
             // see comments on ConfigPageNode's Load
             MethodInfo methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
             MethodInfo function = methodInfo.MakeGenericMethod(configPageNode.ConfigObject.GetType());
-            PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(ConfigurationManager.GetInstance(), new object[] { importString });
+            PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(GetInstance(), new object[] { importString });
 
             if (importedConfigObject != null)
             {
@@ -212,8 +210,8 @@ namespace DelvUI.Config
                 // update the tree
                 configPageNode.ConfigObject = importedConfigObject;
                 // but also update the dictionary
-                ConfigurationManager.GetInstance().ConfigBaseNode.configObjectsMap[configPageNode.ConfigObject.GetType()] = configPageNode.ConfigObject;
-                ConfigurationManager.GetInstance().SaveConfigurations();
+                GetInstance().ConfigBaseNode.configObjectsMap[configPageNode.ConfigObject.GetType()] = configPageNode.ConfigObject;
+                GetInstance().SaveConfigurations();
                 _instance.ResetEvent(_instance, null);
             }
             else
