@@ -102,6 +102,7 @@ namespace DelvUI.Helpers
             var windowPos = _position - windowMargin;
             ImGui.SetNextWindowPos(windowPos, ImGuiCond.Always);
             ImGui.SetNextWindowSize(_size + windowMargin * 2);
+            ImGui.SetNextWindowFocus();
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
             ImGui.Begin("delvui_tooltip", windowFlags);
@@ -145,7 +146,7 @@ namespace DelvUI.Helpers
         {
             // some data comes with unicode characters i couldn't figure out how to get rid of
             // so im doing a pretty aggressive replace to keep only "nice" characters
-            var result = Regex.Replace(text, @"[^a-zA-Z0-9 -\.\,\?\!\(\)%]", "");
+            var result = Regex.Replace(text, @"[^a-zA-Z0-9 -\:\.\,\?\!\(\)%]", "");
 
             // after that there's still some leftovers characters that need to be removed
             Regex regex = new Regex("HI(.*?)IH");

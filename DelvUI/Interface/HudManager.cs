@@ -15,7 +15,9 @@ namespace DelvUI.Interface
     public class HudManager
     {
         private Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
+
         private DraggablesConfig _draggablesConfig = new DraggablesConfig();
+        private DraggableHudElement _selectedElement = null;
 
         private List<DraggableHudElement> _hudElements;
         private List<IHudElementWithActor> _hudElementsUsingPlayer;
@@ -60,9 +62,30 @@ namespace DelvUI.Interface
             foreach (var element in _hudElements)
             {
                 element.DraggingEnabled = draggingEnabled;
+                element.Selected = false;
             }
 
-            _jobHud.DraggingEnabled = draggingEnabled;
+            if (_jobHud != null)
+            {
+                _jobHud.DraggingEnabled = draggingEnabled;
+            }
+
+            _selectedElement = null;
+        }
+
+        private void OnDraggableElementSelected(object sender, EventArgs e)
+        {
+            foreach (var element in _hudElements)
+            {
+                element.Selected = element == sender;
+            }
+
+            if (_jobHud != null)
+            {
+                _jobHud.Selected = _jobHud == sender;
+            }
+
+            _selectedElement = (DraggableHudElement)sender;
         }
 
         private void CreateHudElements()
@@ -77,6 +100,11 @@ namespace DelvUI.Interface
             CreateCastbars();
             CreateStatusEffectsLists();
             CreateMiscElements();
+
+            foreach (var element in _hudElements)
+            {
+                element.SelectEvent += OnDraggableElementSelected;
+            }
         }
 
         private void CreateUnitFrames()
@@ -202,18 +230,28 @@ namespace DelvUI.Interface
             if (!ConfigurationManager.GetInstance().LockHUD)
             {
                 DraggablesHelper.DrawGrid(_draggablesConfig);
+                TooltipsHelper.Instance.RemoveTooltip();
             }
 
             // general elements
             foreach (var element in _hudElements)
             {
-                element.Draw(_origin);
+                if (element != _selectedElement)
+                {
+                    element.Draw(_origin);
+                }
             }
 
             // job hud
-            if (_jobHud != null && _jobHud.Config.Enabled)
+            if (_jobHud != null && _jobHud.Config.Enabled && _jobHud != _selectedElement)
             {
                 _jobHud.Draw(_origin);
+            }
+
+            // selected
+            if (_selectedElement != null)
+            {
+                _selectedElement.Draw(_origin);
             }
 
             // tooltip
@@ -257,6 +295,7 @@ namespace DelvUI.Interface
             {
                 config = (JobConfig)ConfigurationManager.GetInstance().GetConfigObjectForType(types.ConfigType);
                 _jobHud = (JobHud)Activator.CreateInstance(types.HudType, types.HudType.FullName, config, types.DisplayName);
+                _jobHud.SelectEvent += OnDraggableElementSelected;
             }
 
             if (config != null && _primaryResourceHud != null)

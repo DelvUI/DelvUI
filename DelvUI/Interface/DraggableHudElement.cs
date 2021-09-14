@@ -16,10 +16,10 @@ namespace DelvUI.Interface
             _displayName = displayName ?? id;
         }
 
-        private string _displayName;
-
+        public event EventHandler SelectEvent;
         public bool Selected = false;
 
+        private string _displayName;
         private bool _windowPositionSet = false;
 
         private bool _draggingEnabled = false;
@@ -74,6 +74,20 @@ namespace DelvUI.Interface
             var windowPos = ImGui.GetWindowPos();
             _config.Position = windowPos + size / 2f - origin;
 
+            // check selection
+            if (ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
+            {
+                bool cliked = ImGui.IsMouseClicked(ImGuiMouseButton.Left) || ImGui.IsMouseDown(ImGuiMouseButton.Left);
+                if (cliked && !Selected && SelectEvent != null)
+                {
+                    SelectEvent(this, null);
+                }
+
+                // tooltip
+                var text = "x: " + _config.Position.X.ToString() + "    y: " + _config.Position.Y.ToString();
+                TooltipsHelper.Instance.ShowTooltipOnCursor(text);
+            }
+
             // draw window
             var drawList = ImGui.GetWindowDrawList();
             var contentPos = windowPos + contentMargin;
@@ -84,13 +98,17 @@ namespace DelvUI.Interface
 
             // draw draggable indicators
             drawList.AddRectFilled(contentPos, contentPos + contentSize, 0x88444444, 3);
-            drawList.AddRect(contentPos, contentPos + contentSize, 0xAAFFFFFF, 3, ImDrawFlags.None, 2);
-            drawList.AddLine(contentPos + new Vector2(contentSize.X / 2f, 0), contentPos + new Vector2(contentSize.X / 2, contentSize.Y), 0xAAFFFFFF);
-            drawList.AddLine(contentPos + new Vector2(0, contentSize.Y / 2f), contentPos + new Vector2(contentSize.X, contentSize.Y / 2), 0xAAFFFFFF);
+
+            var lineColor = Selected ? 0xEEFFFFFF : 0x66FFFFFF;
+            drawList.AddRect(contentPos, contentPos + contentSize, lineColor, 3, ImDrawFlags.None, 2);
+            drawList.AddLine(contentPos + new Vector2(contentSize.X / 2f, 0), contentPos + new Vector2(contentSize.X / 2, contentSize.Y), lineColor);
+            drawList.AddLine(contentPos + new Vector2(0, contentSize.Y / 2f), contentPos + new Vector2(contentSize.X, contentSize.Y / 2), lineColor);
 
             // element name
             var textSize = ImGui.CalcTextSize(_displayName);
-            DrawHelper.DrawOutlinedText(_displayName, contentPos + contentSize / 2f - textSize / 2f, drawList);
+            var textColor = Selected ? 0xFFFFFFFF : 0xEEFFFFFF;
+            var textOutlineColor = Selected ? 0xFF000000 : 0xEE000000;
+            DrawHelper.DrawOutlinedText(_displayName, contentPos + contentSize / 2f - textSize / 2f, textColor, textOutlineColor, drawList);
 
             ImGui.End();
         }

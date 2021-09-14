@@ -86,7 +86,7 @@ namespace DelvUI.Interface.GeneralElements
                     }
 
                     // Check if mouse is hovering over the box properly
-                    if (ImGui.IsMouseHoveringRect(startPos, endPos))
+                    if (ImGui.IsMouseHoveringRect(startPos, endPos) && !DraggingEnabled)
                     {
                         if (ImGui.GetIO().MouseClicked[0])
                         {
