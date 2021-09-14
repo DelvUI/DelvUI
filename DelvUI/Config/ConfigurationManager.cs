@@ -1,5 +1,4 @@
 using Dalamud.Plugin;
-using DelvUI.Config.Attributes;
 using DelvUI.Config.Tree;
 using DelvUI.Helpers;
 using DelvUI.Interface;
@@ -9,11 +8,9 @@ using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
 using ImGuiScene;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using System;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 
