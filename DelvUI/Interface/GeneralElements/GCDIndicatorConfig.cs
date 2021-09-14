@@ -10,6 +10,10 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("GCD Indicator", 0)]
     public class GCDIndicatorConfig : MovablePluginConfigObject
     {
+        [DragInt2("Size", min = 1, max = 4000)]
+        [Order(15)]
+        public Vector2 Size;
+
         [Checkbox("Always Show")]
         [Order(20)]
         public bool AlwaysShow = false;

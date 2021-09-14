@@ -16,7 +16,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new MonkConfig Config => (MonkConfig)_config;
 
-        public MonkHud(string id, MonkConfig config) : base(id, config)
+        public MonkHud(string id, MonkConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -24,7 +24,7 @@ namespace DelvUI.Interface.Jobs
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowFormsBar)
             {

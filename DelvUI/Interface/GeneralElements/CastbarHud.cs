@@ -10,7 +10,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class CastbarHud : HudElement, IHudElementWithActor
+    public class CastbarHud : DraggableHudElement, IHudElementWithActor
     {
         private CastbarConfig Config => (CastbarConfig)_config;
         private LabelHud _castNameLabel;
@@ -20,13 +20,18 @@ namespace DelvUI.Interface.GeneralElements
 
         public Actor Actor { get; set; } = null;
 
-        public CastbarHud(string id, CastbarConfig config) : base(id, config)
+        public CastbarHud(string id, CastbarConfig config, string displayName) : base(id, config, displayName)
         {
             _castNameLabel = new LabelHud(id + "_castNameLabel", config.CastNameConfig);
             _castTimeLabel = new LabelHud(id + "_castTimeLabel", config.CastTimeConfig);
         }
 
-        public override unsafe void Draw(Vector2 origin)
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
+        }
+
+        public unsafe override void DrawChildren(Vector2 origin)
         {
             if (!Config.Enabled || Actor == null || Actor is not Chara)
             {
@@ -121,7 +126,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private PlayerCastbarConfig Config => (PlayerCastbarConfig)_config;
 
-        public PlayerCastbarHud(string id, PlayerCastbarConfig config) : base(id, config)
+        public PlayerCastbarHud(string id, PlayerCastbarConfig config, string displayName) : base(id, config, displayName)
         {
 
         }
@@ -167,7 +172,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private TargetCastbarConfig Config => (TargetCastbarConfig)_config;
 
-        public TargetCastbarHud(string id, TargetCastbarConfig config) : base(id, config)
+        public TargetCastbarHud(string id, TargetCastbarConfig config, string displayName) : base(id, config, displayName)
         {
 
         }

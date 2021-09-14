@@ -22,12 +22,12 @@ namespace DelvUI.Interface.Jobs
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
-        public WhiteMageHud(string id, WhiteMageConfig config) : base(id, config)
+        public WhiteMageHud(string id, WhiteMageConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowLilyBars)
             {

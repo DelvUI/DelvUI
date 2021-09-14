@@ -23,12 +23,12 @@ namespace DelvUI.Interface.Jobs
         private new SummonerConfig Config => (SummonerConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public SummonerHud(string id, SummonerConfig config) : base(id, config)
+        public SummonerHud(string id, SummonerConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             DrawActiveDots(origin);
             DrawRuinBar(origin);

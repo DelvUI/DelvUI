@@ -7,16 +7,19 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class GCDIndicatorHud : HudElement, IHudElementWithActor
+    public class GCDIndicatorHud : DraggableHudElement, IHudElementWithActor
     {
         private GCDIndicatorConfig Config => (GCDIndicatorConfig)_config;
         public Actor Actor { get; set; } = null;
 
-        public GCDIndicatorHud(string ID, GCDIndicatorConfig config) : base(ID, config)
+        public GCDIndicatorHud(string ID, GCDIndicatorConfig config, string displayName) : base(ID, config, displayName) { }
+
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
+            return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
         }
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (!Config.Enabled || Actor == null || Actor is not PlayerCharacter)
             {
@@ -43,7 +46,7 @@ namespace DelvUI.Interface.GeneralElements
 
             var drawList = ImGui.GetWindowDrawList();
             var builder = BarBuilder.Create(startPos, size)
-                .SetChunks(new float[2]{percentNonQueue, 1F - percentNonQueue})
+                .SetChunks(new float[2] { percentNonQueue, 1F - percentNonQueue })
                 .AddInnerBar(elapsed, total, Config.Color.Map)
                 .SetDrawBorder(Config.ShowBorder)
                 .SetVertical(Config.VerticalMode);
@@ -52,7 +55,7 @@ namespace DelvUI.Interface.GeneralElements
             var queueEndOffset = Config.VerticalMode ? new Vector2(size.X, percentNonQueue * size.Y + 1f) : new Vector2(percentNonQueue * size.X + 1f, size.Y);
             if (Config.ShowGCDQueueIndicator)
             {
-                builder.SetChunksColors(new Dictionary<string, uint>[2]{Config.Color.Map, Config.QueueColor.Map});
+                builder.SetChunksColors(new Dictionary<string, uint>[2] { Config.Color.Map, Config.QueueColor.Map });
                 drawList.AddRect(startPos + queueStartOffset, startPos + queueEndOffset, Config.QueueColor.Base);
             }
 

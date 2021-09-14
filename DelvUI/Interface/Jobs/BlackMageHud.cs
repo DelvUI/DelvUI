@@ -18,18 +18,55 @@ namespace DelvUI.Interface.Jobs
         private new BlackMageConfig Config => (BlackMageConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public BlackMageHud(string id, BlackMageConfig config) : base(id, config)
+        public BlackMageHud(string id, BlackMageConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
-        public override void Draw(Vector2 origin)
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>()
+            {
+                Config.ManaBarPosition,
+                Config.UmbralHeartPosition,
+                Config.PolyglotPosition
+            };
+
+            List<Vector2> sizes = new List<Vector2>()
+            {
+                Config.ManaBarSize,
+                Config.UmbralHeartSize,
+                Config.PolyglotSize
+            };
+
+            if (Config.ShowTriplecast)
+            {
+                positions.Add(Config.TriplecastPosition);
+                sizes.Add(Config.TriplecastSize);
+            }
+
+            if (Config.ShowFirestarterProcs || Config.ShowThundercloudProcs)
+            {
+                positions.Add(Config.ProcsBarPosition);
+                sizes.Add(Config.ProcsBarSize);
+            }
+
+            if (Config.ShowDotBar)
+            {
+                positions.Add(Config.DoTBarPosition);
+                sizes.Add(Config.DoTBarSize);
+            }
+
+            return (positions, sizes);
+        }
+
+        public override void DrawChildren(Vector2 origin)
         {
             DrawManaBar(origin);
             DrawUmbralHeartStacks(origin);
             DrawPolyglot(origin);
 
-            if (Config.ShowTripleCast)
+            if (Config.ShowTriplecast)
             {
                 DrawTripleCast(origin);
             }
@@ -50,10 +87,7 @@ namespace DelvUI.Interface.Jobs
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
             var actor = Plugin.ClientState.LocalPlayer;
 
-            var position = new Vector2(
-                origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f
-            );
+            var position = origin + Config.Position + Config.ManaBarPosition - Config.ManaBarSize / 2f;
 
             var color = gauge.InAstralFire() ? Config.ManaBarFireColor.Map : gauge.InUmbralIce() ? Config.ManaBarIceColor.Map : Config.ManaBarNoElementColor.Map;
 
@@ -114,10 +148,8 @@ namespace DelvUI.Interface.Jobs
         protected virtual void DrawUmbralHeartStacks(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
-            var position = new Vector2(
-                origin.X + Config.Position.X + Config.UmbralHeartPosition.X - Config.UmbralHeartSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.UmbralHeartPosition.Y - Config.UmbralHeartSize.Y / 2f
-            );
+
+            var position = origin + Config.Position + Config.UmbralHeartPosition - Config.UmbralHeartSize / 2f;
 
             var bar = BarBuilder.Create(position, Config.UmbralHeartSize)
                                 .SetChunks(3)
@@ -134,10 +166,7 @@ namespace DelvUI.Interface.Jobs
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
 
-            var position = new Vector2(
-                origin.X + Config.Position.X + Config.PolyglotPosition.X - Config.PolyglotSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.PolyglotPosition.Y - Config.PolyglotSize.Y / 2f
-            );
+            var position = origin + Config.Position + Config.PolyglotPosition - Config.PolyglotSize / 2f;
 
             var barWidth = (int)(Config.PolyglotSize.X - Config.PolyglotPadding) / 2;
             var barSize = new Vector2(barWidth, Config.PolyglotSize.Y);
@@ -175,12 +204,9 @@ namespace DelvUI.Interface.Jobs
         {
             var tripleStackBuff = Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1211);
 
-            var position = new Vector2(
-                origin.X + Config.Position.X + Config.TriplecastPosition.X - Config.TripleCastSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.TriplecastPosition.Y - Config.TripleCastSize.Y / 2f
-            );
+            var position = origin + Config.Position + Config.TriplecastPosition - Config.TriplecastSize / 2f;
 
-            var bar = BarBuilder.Create(position, Config.TripleCastSize)
+            var bar = BarBuilder.Create(position, Config.TriplecastSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.TriplecastPadding)
                                 .AddInnerBar(tripleStackBuff.StackCount, 3, Config.TriplecastColor.Map, EmptyColor)
@@ -197,10 +223,7 @@ namespace DelvUI.Interface.Jobs
             var firestarterTimer = Config.ShowFirestarterProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 165).Duration) : 0;
             var thundercloudTimer = Config.ShowThundercloudProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 164).Duration) : 0;
 
-            var position = new Vector2(
-                origin.X + Config.Position.X + Config.ProcsBarPosition.X,
-                origin.Y + Config.Position.Y + Config.ProcsBarPosition.Y - Config.ProcsBarSize.Y / 2f
-            );
+            var position = origin + Config.Position + Config.ProcsBarPosition - Config.ProcsBarSize / 2f;
 
             var builder = BarBuilder.Create(position, Config.ProcsBarSize);
 
@@ -250,10 +273,7 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            var position = new Vector2(
-                origin.X + Config.Position.X + Config.DoTBarPosition.X,
-                origin.Y + Config.Position.Y + Config.DoTBarPosition.Y - Config.DoTBarSize.Y / 2f
-            );
+            var position = origin + Config.Position + Config.DoTBarPosition - Config.DoTBarSize / 2f;
 
             var builder = BarBuilder.Create(position, Config.DoTBarSize)
                 .AddInnerBar(timer, maxDuration, Config.DotColor.Map)
@@ -276,7 +296,7 @@ namespace DelvUI.Interface.Jobs
         #region mana bar
         [DragFloat2("Mana Bar Position", min = -2000, max = 2000f)]
         [Order(30)]
-        public Vector2 ManaBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 ManaBarPosition = new Vector2(0, 28);
 
         [DragFloat2("Mana Bar Size", max = 2000f)]
         [Order(35)]
@@ -310,7 +330,7 @@ namespace DelvUI.Interface.Jobs
         #region umbral heart
         [DragFloat2("Umbral Heart Bar Position", min = -2000, max = 2000f)]
         [Order(65)]
-        public Vector2 UmbralHeartPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 30);
+        public Vector2 UmbralHeartPosition = new Vector2(0, 8);
 
         [DragFloat2("Umbral Heart Bar Size", max = 2000f)]
         [Order(70)]
@@ -328,15 +348,15 @@ namespace DelvUI.Interface.Jobs
         #region triple cast
         [Checkbox("Show Triplecast")]
         [CollapseControl(85, 1)]
-        public bool ShowTripleCast = true;
+        public bool ShowTriplecast = true;
 
         [DragFloat2("Triplecast Position", min = -2000, max = 2000f)]
         [CollapseWith(0, 1)]
-        public Vector2 TriplecastPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 48);
+        public Vector2 TriplecastPosition = new Vector2(0, -10);
 
         [DragFloat2("Triplecast Size", max = 2000)]
         [CollapseWith(5, 1)]
-        public Vector2 TripleCastSize = new Vector2(254, 16);
+        public Vector2 TriplecastSize = new Vector2(254, 16);
 
         [DragInt("Trioplecast Padding", min = -100, max = 100)]
         [CollapseWith(10, 1)]
@@ -350,7 +370,7 @@ namespace DelvUI.Interface.Jobs
         #region polyglot
         [DragFloat2("Polyglot Position", min = -2000, max = 2000f)]
         [Order(90)]
-        public Vector2 PolyglotPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 67);
+        public Vector2 PolyglotPosition = new Vector2(0, -29);
 
         [DragFloat2("Polyglot Size", max = 2000f)]
         [Order(95)]
@@ -380,7 +400,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Procs Bar Position", min = -2000, max = 2000f)]
         [CollapseWith(10, 2)]
-        public Vector2 ProcsBarPosition = new Vector2(-127, HUDConstants.JobHudsBaseY - 67);
+        public Vector2 ProcsBarPosition = new Vector2(-74, -29);
 
         [DragFloat2("Procs Bar Size", max = 2000f)]
         [CollapseWith(15, 2)]
@@ -406,7 +426,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("DoT Bar Position", min = -2000, max = 2000f)]
         [CollapseWith(5, 4)]
-        public Vector2 DoTBarPosition = new Vector2(21, HUDConstants.JobHudsBaseY - 67);
+        public Vector2 DoTBarPosition = new Vector2(74, -29);
 
         [DragFloat2("DoT Bar Size", max = 2000f)]
         [CollapseWith(10, 4)]

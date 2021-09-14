@@ -1,5 +1,6 @@
 ﻿using Dalamud.Hooking;
 using Dalamud.Plugin;
+using DelvUI.Config;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Runtime.InteropServices;
@@ -135,6 +136,8 @@ namespace DelvUI.Helpers
             switch (commandId)
             {
                 case 69420:
+                    ConfigurationManager.GetInstance().LockHUD = true;
+                    ConfigurationManager.GetInstance().DrawConfigWindow = false;
                     Plugin.CommandManager.ProcessCommand("/delvui");
 
                     break;

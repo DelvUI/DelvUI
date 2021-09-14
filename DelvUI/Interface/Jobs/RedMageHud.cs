@@ -18,12 +18,12 @@ namespace DelvUI.Interface.Jobs
         private new RedMageConfig Config => (RedMageConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public RedMageHud(string id, RedMageConfig config) : base(id, config)
+        public RedMageHud(string id, RedMageConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             DrawManaBar(origin);
             DrawBalanceBar(origin);

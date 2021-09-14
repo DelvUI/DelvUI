@@ -23,7 +23,7 @@ namespace DelvUI.Interface.Jobs
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
         private Dictionary<string, uint> PartialFillColor => GlobalColors.Instance.PartialFillColor.Map;
 
-        public NinjaHud(string id, NinjaConfig config) : base(id, config)
+        public NinjaHud(string id, NinjaConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -31,7 +31,7 @@ namespace DelvUI.Interface.Jobs
         private readonly SpellHelper _spellHelper = new();
         private float _oldMudraCooldownInfo;
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowMudraCooldown)
             {

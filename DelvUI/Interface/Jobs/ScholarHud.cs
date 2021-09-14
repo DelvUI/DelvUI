@@ -21,12 +21,12 @@ namespace DelvUI.Interface.Jobs
         private new ScholarConfig Config => (ScholarConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public ScholarHud(string id, ScholarConfig config) : base(id, config)
+        public ScholarHud(string id, ScholarConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowFairy)
             {

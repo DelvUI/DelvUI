@@ -27,10 +27,35 @@ namespace DelvUI.Config
         public string ConfigDirectory;
         public bool DrawConfigWindow;
 
-        public bool LockHUD = true;
+        private bool _lockHUD = true;
+        public bool LockHUD
+        {
+            get => _lockHUD;
+            set
+            {
+                if (_lockHUD == value)
+                {
+                    return;
+                }
+
+                _lockHUD = value;
+
+                if (LockEvent != null)
+                {
+                    LockEvent(this, null);
+                }
+
+                if (_lockHUD)
+                {
+                    SaveConfigurations();
+                }
+            }
+        }
+
         public bool ShowHUD = true;
 
         public event EventHandler ResetEvent;
+        public event EventHandler LockEvent;
 
         public ConfigurationManager(bool defaultConfig, TextureWrap bannerImage, string configDirectory, BaseNode configBaseNode, EventHandler resetEvent = null)
         {
@@ -131,7 +156,7 @@ namespace DelvUI.Config
 
         public void Draw()
         {
-            if (DrawConfigWindow)
+            if (DrawConfigWindow && LockHUD)
             {
                 ConfigBaseNode.Draw();
             }

@@ -19,12 +19,12 @@ namespace DelvUI.Interface.Jobs
         private new SamuraiConfig Config => (SamuraiConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public SamuraiHud(string id, SamuraiConfig config) : base(id, config)
+        public SamuraiHud(string id, SamuraiConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowKenkiBar)
             {
@@ -241,7 +241,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragDropHorizontal("Sen Order", "Setsu", "Getsu", "Ka")]
         [CollapseWith(15, 1)]
-        public int[] senOrder = new int[] {0, 1, 2};
+        public int[] senOrder = new int[] { 0, 1, 2 };
         #endregion
 
         #region Meditation
@@ -285,8 +285,8 @@ namespace DelvUI.Interface.Jobs
 
         [DragDropHorizontal("Shifu/Jinpu Order", "Shifu", "Jinpu")]
         [CollapseWith(20, 3)]
-        public int[] buffOrder = new int[] {0, 1};
-        
+        public int[] buffOrder = new int[] { 0, 1 };
+
         #endregion
 
         #region Higanbana
@@ -308,9 +308,9 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region BarOrders
-        
 
-        
+
+
         #endregion
 
         #region colors

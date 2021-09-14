@@ -18,12 +18,12 @@ namespace DelvUI.Interface.Jobs
         private new GunbreakerConfig Config => (GunbreakerConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public GunbreakerHud(string id, GunbreakerConfig config) : base(id, config)
+        public GunbreakerHud(string id, GunbreakerConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowPowderGauge)
             {

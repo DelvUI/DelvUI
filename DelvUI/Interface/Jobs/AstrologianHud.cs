@@ -24,12 +24,12 @@ namespace DelvUI.Interface.Jobs
         private new AstrologianConfig Config => (AstrologianConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public AstrologianHud(string id, AstrologianConfig config) : base(id, config)
+        public AstrologianHud(string id, AstrologianConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowDivinationBar)
             {

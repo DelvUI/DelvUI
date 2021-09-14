@@ -20,7 +20,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DragoonConfig Config => (DragoonConfig)_config;
 
-        public DragoonHud(string id, DragoonConfig config) : base(id, config)
+        public DragoonHud(string id, DragoonConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -46,7 +46,7 @@ namespace DelvUI.Interface.Jobs
         //    return new List<uint>(ids);
         //}
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowChaosThrustBar)
             {

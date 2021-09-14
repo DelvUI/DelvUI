@@ -1,10 +1,11 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Plugin;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace DelvUI.Interface.Jobs
 {
-    public class JobHud : HudElement, IHudElementWithActor
+    public class JobHud : DraggableHudElement, IHudElementWithActor
     {
         protected DalamudPluginInterface PluginInterface => Plugin.PluginInterface;
 
@@ -12,11 +13,11 @@ namespace DelvUI.Interface.Jobs
 
         public Actor Actor { get; set; } = null;
 
-        public JobHud(string ID, JobConfig config) : base(ID, config)
+        public JobHud(string ID, JobConfig config, string displayName = null) : base(ID, config, displayName)
         {
         }
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
         }
     }

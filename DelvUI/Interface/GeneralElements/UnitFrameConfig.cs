@@ -105,6 +105,10 @@ namespace DelvUI.Interface.GeneralElements
     [Serializable]
     public class UnitFrameConfig : MovablePluginConfigObject
     {
+        [DragInt2("Size", min = 1, max = 4000)]
+        [Order(15)]
+        public Vector2 Size;
+
         [NestedConfig("Left Label", 20)]
         public EditableLabelConfig LeftLabelConfig;
 

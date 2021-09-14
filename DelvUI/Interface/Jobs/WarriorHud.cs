@@ -19,12 +19,12 @@ namespace DelvUI.Interface.Jobs
         private new WarriorConfig Config => (WarriorConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public WarriorHud(string id, WarriorConfig config) : base(id, config)
+        public WarriorHud(string id, WarriorConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowStormsEye)
             {

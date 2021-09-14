@@ -22,13 +22,13 @@ namespace DelvUI.Interface.Jobs
         private new BardConfig Config => (BardConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public BardHud(string id, BardConfig config) : base(id, config)
+        public BardHud(string id, BardConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowCB || Config.ShowSB)
             {
@@ -184,7 +184,7 @@ namespace DelvUI.Interface.Jobs
                     {
                         DrawStacks(origin, 0, 3, Config.APStackColor.Map);
                     }
-                    
+
                     DrawSongTimer(origin, 0, EmptyColor);
 
                     break;
@@ -194,7 +194,7 @@ namespace DelvUI.Interface.Jobs
                     {
                         DrawStacks(origin, 0, 3, Config.APStackColor.Map);
                     }
-                    
+
                     DrawSongTimer(origin, 0, EmptyColor);
 
                     break;

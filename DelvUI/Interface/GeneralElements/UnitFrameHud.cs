@@ -4,13 +4,14 @@ using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public unsafe class UnitFrameHud : HudElement, IHudElementWithActor
+    public unsafe class UnitFrameHud : DraggableHudElement, IHudElementWithActor
     {
         private UnitFrameConfig Config => (UnitFrameConfig)_config;
         private LabelHud _leftLabel;
@@ -21,7 +22,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public Actor Actor { get; set; } = null;
 
-        public UnitFrameHud(string id, UnitFrameConfig config) : base(id, config)
+        public UnitFrameHud(string id, UnitFrameConfig config, string displayName) : base(id, config, displayName)
         {
             // labels
             _leftLabel = new LabelHud(id + "_leftLabel", Config.LeftLabelConfig);
@@ -38,7 +39,12 @@ namespace DelvUI.Interface.GeneralElements
             _childFlags |= ImGuiWindowFlags.NoBringToFrontOnFocus;
         }
 
-        public override void Draw(Vector2 origin)
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
+        }
+
+        public override void DrawChildren(Vector2 origin)
         {
             if (!Config.Enabled || Actor == null)
             {
@@ -52,7 +58,7 @@ namespace DelvUI.Interface.GeneralElements
             windowFlags |= ImGuiWindowFlags.NoDecoration;
             windowFlags |= ImGuiWindowFlags.NoInputs;
 
-            var startPos = new Vector2(origin.X + Config.Position.X - Config.Size.X / 2f, origin.Y + Config.Position.Y - Config.Size.Y / 2f);
+            var startPos = origin + Config.Position - Config.Size / 2f;
             var endPos = startPos + Config.Size;
 
             var drawList = ImGui.GetWindowDrawList();

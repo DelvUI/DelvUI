@@ -10,6 +10,10 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Primary Resource Bar", 0)]
     public class PrimaryResourceConfig : MovablePluginConfigObject
     {
+        [DragInt2("Size", min = 1, max = 4000)]
+        [Order(15)]
+        public Vector2 Size;
+
         [Checkbox("Show Value")]
         [Order(20)]
         public bool ShowValue = true;

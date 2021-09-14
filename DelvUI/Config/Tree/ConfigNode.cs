@@ -213,6 +213,13 @@ namespace DelvUI.Config.Tree
 
             ImGui.SameLine();
 
+            if (ImGui.Button(ConfigurationManager.GetInstance().LockHUD ? "Unlock HUD" : "Lock HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
+            {
+                ConfigurationManager.GetInstance().LockHUD = !ConfigurationManager.GetInstance().LockHUD;
+            }
+
+            ImGui.SameLine();
+
             if (ImGui.Button("Reset to Default", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
                 // make a new configuration from defaults

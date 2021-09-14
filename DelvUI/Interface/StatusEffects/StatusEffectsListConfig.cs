@@ -96,6 +96,10 @@ namespace DelvUI.Interface.StatusEffects
     [Serializable]
     public class StatusEffectsListConfig : MovablePluginConfigObject
     {
+        [DragInt2("Size", min = 1, max = 4000)]
+        [Order(15)]
+        public Vector2 Size;
+
         [Checkbox("Fill Rows First")]
         [Order(20)]
         public bool FillRowsFirst = true;

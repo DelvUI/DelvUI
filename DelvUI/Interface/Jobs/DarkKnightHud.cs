@@ -18,7 +18,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DarkKnightConfig Config => (DarkKnightConfig)_config;
 
-        public DarkKnightHud(string id, DarkKnightConfig config) : base(id, config)
+        public DarkKnightHud(string id, DarkKnightConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -26,7 +26,7 @@ namespace DelvUI.Interface.Jobs
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowManaBar)
             {

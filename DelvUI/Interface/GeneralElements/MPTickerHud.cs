@@ -2,22 +2,26 @@
 using DelvUI.Helpers;
 using ImGuiNET;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class MPTickerHud : HudElement, IHudElementWithActor
+    public class MPTickerHud : DraggableHudElement, IHudElementWithActor
     {
         private MPTickerConfig Config => (MPTickerConfig)_config;
 
         private MPTickHelper _mpTickHelper;
         public Actor Actor { get; set; } = null;
 
-        public MPTickerHud(string ID, MPTickerConfig config) : base(ID, config)
+        public MPTickerHud(string ID, MPTickerConfig config, string displayName) : base(ID, config, displayName) { }
+
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
+            return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
         }
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (!Config.Enabled || Actor == null || Actor is not Chara)
             {
