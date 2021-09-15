@@ -71,7 +71,7 @@ namespace DelvUI.Interface.Jobs
                 DrawTripleCast(origin);
             }
 
-            if (Config.ShowFirestarterProcs || Config.ShowThundercloudProcs)
+            if (Config.ShowProcs)
             {
                 DrawProcs(origin);
             }
@@ -386,32 +386,36 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region procs
-        [Checkbox("Show Firestarter Procs")]
+        [Checkbox("Show Procs")]
         [CollapseControl(110, 2)]
+        public bool ShowProcs = true;
+
+        [Checkbox("Show Firestarter Procs")]
+        [CollapseWith(0, 2)]
         public bool ShowFirestarterProcs = true;
 
         [Checkbox("Show Thundercloud Procs")]
-        [CollapseWith(0, 2)]
+        [CollapseWith(5, 2)]
         public bool ShowThundercloudProcs = true;
 
         [Checkbox("Invert Procs Bar")]
-        [CollapseWith(5, 2)]
+        [CollapseWith(10, 2)]
         public bool InvertProcsBar = true;
 
         [DragFloat2("Procs Bar Position", min = -2000, max = 2000f)]
-        [CollapseWith(10, 2)]
+        [CollapseWith(15, 2)]
         public Vector2 ProcsBarPosition = new Vector2(-74, -67);
 
         [DragFloat2("Procs Bar Size", max = 2000f)]
-        [CollapseWith(15, 2)]
+        [CollapseWith(20, 2)]
         public Vector2 ProcsBarSize = new Vector2(106, 18);
 
         [ColorEdit4("Firestarter Color")]
-        [CollapseWith(20, 2)]
+        [CollapseWith(25, 2)]
         public PluginConfigColor FirestarterColor = new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f));
 
         [ColorEdit4("Thundercloud Color")]
-        [CollapseWith(25, 2)]
+        [CollapseWith(30, 2)]
         public PluginConfigColor ThundercloudColor = new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f));
         #endregion
 
