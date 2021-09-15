@@ -1,11 +1,7 @@
 ﻿using DelvUI.Interface;
 using ImGuiNET;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DelvUI.Helpers
 {
@@ -57,5 +53,64 @@ namespace DelvUI.Helpers
             ImGui.End();
         }
 
+        public static bool DrawArrows(Vector2 position, Vector2 size, string tooltipText, out Vector2 offset)
+        {
+            offset = Vector2.Zero;
+
+            var windowFlags = ImGuiWindowFlags.NoScrollbar
+                | ImGuiWindowFlags.NoTitleBar
+                | ImGuiWindowFlags.NoResize
+                | ImGuiWindowFlags.NoBackground
+                | ImGuiWindowFlags.NoDecoration;
+
+            var arrowSize = new Vector2(40, 40);
+            var margin = new Vector2(4, 0);
+            var windowSize = arrowSize + margin * 2;
+
+            // left, right, up, down
+            var positions = new Vector2[]
+            {
+                new Vector2(position.X - arrowSize.X + 10, position.Y + size.Y / 2f - arrowSize.Y / 2f - 2),
+                new Vector2(position.X + size.X - 8, position.Y + size.Y / 2f - arrowSize.Y / 2f - 2),
+                new Vector2(position.X + size.X / 2f - arrowSize.X / 2f + 2, position.Y - arrowSize.Y + 1),
+                new Vector2(position.X + size.X / 2f - arrowSize.X / 2f + 2, position.Y + size.Y - 7)
+            };
+            var offsets = new Vector2[]
+            {
+                new Vector2(-1, 0),
+                new Vector2(1, 0),
+                new Vector2(0, -1),
+                new Vector2(0, 1)
+            };
+
+            for (int i = 0; i < 4; i++)
+            {
+                var pos = positions[i] - margin;
+
+                ImGui.SetNextWindowSize(windowSize, ImGuiCond.Always);
+                ImGui.SetNextWindowPos(pos);
+
+                ImGui.Begin("arrow " + i.ToString(), windowFlags);
+
+                // fake button
+                ImGui.ArrowButton("arrow button " + i.ToString(), (ImGuiDir)i);
+
+                if (ImGui.IsMouseHoveringRect(pos, pos + windowSize))
+                {
+                    // track click manually to not deal with window focus stuff
+                    if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                    {
+                        offset = offsets[i];
+                    }
+
+                    // tooltip
+                    TooltipsHelper.Instance.ShowTooltipOnCursor(tooltipText);
+                }
+
+                ImGui.End();
+            }
+
+            return offset != Vector2.Zero;
+        }
     }
 }

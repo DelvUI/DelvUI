@@ -68,11 +68,17 @@ namespace DelvUI.Interface
                 ImGui.SetNextWindowPos(origin + _config.Position - size / 2f);
                 _windowPositionSet = true;
             }
+            var tooltipText = "x: " + _config.Position.X.ToString() + "    y: " + _config.Position.Y.ToString();
 
             // update config object position
             ImGui.Begin("dragArea " + ID, windowFlags);
             var windowPos = ImGui.GetWindowPos();
-            _config.Position = windowPos + size / 2f - origin;
+
+            // round numbers when saving the position
+            _config.Position = new Vector2(
+                (int)(windowPos.X + size.X / 2f - origin.X),
+                (int)(windowPos.Y + size.Y / 2f - origin.Y)
+            );
 
             // check selection
             if (ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
@@ -84,8 +90,8 @@ namespace DelvUI.Interface
                 }
 
                 // tooltip
-                var text = "x: " + _config.Position.X.ToString() + "    y: " + _config.Position.Y.ToString();
-                TooltipsHelper.Instance.ShowTooltipOnCursor(text);
+
+                TooltipsHelper.Instance.ShowTooltipOnCursor(tooltipText);
             }
 
             // draw window
@@ -111,6 +117,18 @@ namespace DelvUI.Interface
             DrawHelper.DrawOutlinedText(_displayName, contentPos + contentSize / 2f - textSize / 2f, textColor, textOutlineColor, drawList);
 
             ImGui.End();
+
+            // arrows
+            if (Selected)
+            {
+                if (DraggablesHelper.DrawArrows(windowPos, size, tooltipText, out var offset))
+                {
+                    _minPos += offset;
+                    _maxPos += offset;
+                    _config.Position += offset;
+                    _windowPositionSet = false;
+                }
+            }
         }
 
         public virtual void DrawChildren(Vector2 origin) { }

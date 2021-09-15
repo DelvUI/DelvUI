@@ -1,5 +1,4 @@
-﻿using Dalamud.Plugin;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
 using System;
@@ -32,6 +31,7 @@ namespace DelvUI.Helpers
         private string _currentTooltipTitle = null;
         private Vector2 _titleSize;
         private string _previousRawText = null;
+        private int _mouseDownCounter = 0;
 
         private Vector2 _position;
         private Vector2 _size;
@@ -91,15 +91,18 @@ namespace DelvUI.Helpers
             }
 
             // bg
-            ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoTitleBar;
-            windowFlags |= ImGuiWindowFlags.NoMove;
-            windowFlags |= ImGuiWindowFlags.NoDecoration;
-            windowFlags |= ImGuiWindowFlags.NoBackground;
+            ImGuiWindowFlags windowFlags =
+                  ImGuiWindowFlags.NoTitleBar
+                | ImGuiWindowFlags.NoMove
+                | ImGuiWindowFlags.NoDecoration
+                | ImGuiWindowFlags.NoBackground
+                | ImGuiWindowFlags.NoInputs;
 
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
             var windowMargin = new Vector2(4, 0);
             var windowPos = _position - windowMargin;
+
             ImGui.SetNextWindowPos(windowPos, ImGuiCond.Always);
             ImGui.SetNextWindowSize(_size + windowMargin * 2);
             ImGui.SetNextWindowFocus();
