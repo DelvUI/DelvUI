@@ -27,6 +27,38 @@ namespace DelvUI.Interface.Jobs
 
         }
 
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowManaBar)
+            {
+                positions.Add(Config.Position + Config.ManaBarPosition);
+                sizes.Add(Config.ManaBarSize);
+            }
+
+            if (Config.ShowOathGauge)
+            {
+                positions.Add(Config.Position + Config.OathGaugePosition);
+                sizes.Add(Config.OathGaugeSize);
+            }
+
+            if (Config.ShowBuffBar)
+            {
+                positions.Add(Config.Position + Config.BuffBarPosition);
+                sizes.Add(Config.BuffBarSize);
+            }
+
+            if (Config.ShowAtonementBar)
+            {
+                positions.Add(Config.Position + Config.AtonementBarPosition);
+                sizes.Add(Config.AtonementBarSize);
+            }
+
+            return (positions, sizes);
+        }
+
         public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowManaBar)

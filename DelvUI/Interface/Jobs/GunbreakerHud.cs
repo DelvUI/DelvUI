@@ -23,6 +23,26 @@ namespace DelvUI.Interface.Jobs
 
         }
 
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowPowderGauge)
+            {
+                positions.Add(Config.Position + Config.PowderGaugeBarPosition);
+                sizes.Add(Config.PowderGaugeBarSize);
+            }
+
+            if (Config.ShowNoMercyBar)
+            {
+                positions.Add(Config.Position + Config.NoMercyBarPosition);
+                sizes.Add(Config.NoMercyBarSize);
+            }
+
+            return (positions, sizes);
+        }
+
         public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowPowderGauge)

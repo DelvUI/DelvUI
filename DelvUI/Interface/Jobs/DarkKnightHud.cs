@@ -26,6 +26,38 @@ namespace DelvUI.Interface.Jobs
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowManaBar)
+            {
+                positions.Add(Config.Position + Config.ManaBarPosition);
+                sizes.Add(Config.ManaBarSize);
+            }
+
+            if (Config.ShowBloodGauge)
+            {
+                positions.Add(Config.Position + Config.BloodGaugePosition);
+                sizes.Add(Config.BloodGaugeSize);
+            }
+
+            if (Config.ShowBuffBar)
+            {
+                positions.Add(Config.Position + Config.BuffBarPosition);
+                sizes.Add(Config.BuffBarSize);
+            }
+
+            if (Config.ShowLivingShadowBar)
+            {
+                positions.Add(Config.Position + Config.LivingShadowBarPosition);
+                sizes.Add(Config.LivingShadowBarSize);
+            }
+
+            return (positions, sizes);
+        }
+
         public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowManaBar)
