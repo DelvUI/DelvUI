@@ -15,11 +15,11 @@ jobs:
         with:
           submodules: recursive
 
-      - name: Install .NET 6
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: "6.0.x"
-          include-prerelease: true
+      # - name: Install .NET 6
+      #  uses: actions/setup-dotnet@v1
+      #  with:
+      #    dotnet-version: "6.0.x"
+      #    include-prerelease: true
 
       - name: CSProj Cache
         id: cache-csproj
@@ -28,7 +28,7 @@ jobs:
           path: |
             ./dalamud
             ~/.nuget/packages
-          key: ${{ runner.os }}-csproj-v1-${{ hashFiles('**/*.csproj') }}
+          key: ${{ runner.os }}-csproj-v2-${{ hashFiles('**/*.csproj') }}
 
       - name: Setup Dalamud
         if: steps.cache-csproj.outputs.cache-hit != 'true'
