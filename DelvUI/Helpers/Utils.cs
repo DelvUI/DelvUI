@@ -53,7 +53,7 @@ namespace DelvUI.Helpers
 
             if (t.Minutes >= 1)
             {
-                return t.Minutes + ":" + t.Seconds;
+                return $"{t.Minutes}:{t.Seconds:00}";
             }
 
             return t.Seconds.ToString();
