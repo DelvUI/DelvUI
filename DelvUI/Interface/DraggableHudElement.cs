@@ -21,6 +21,9 @@ namespace DelvUI.Interface
 
         private string _displayName;
         private bool _windowPositionSet = false;
+        private Vector2 _positionOffset;
+        private Vector2 _lastWindowPos;
+        private Vector2 _contentMargin = new Vector2(4, 0);
 
         private bool _draggingEnabled = false;
         public bool DraggingEnabled
@@ -55,37 +58,28 @@ namespace DelvUI.Interface
             | ImGuiWindowFlags.NoBackground
             | ImGuiWindowFlags.NoDecoration;
 
-            // validate size
-            var contentMargin = new Vector2(4, 0);
-            var size = MaxPos - MinPos;
-            size.X = Math.Max(100, size.X + contentMargin.X * 2);
-            size.Y = Math.Max(20, size.Y + contentMargin.Y * 2);
-
             // always update size
+            var size = MaxPos - MinPos + _contentMargin * 2;
             ImGui.SetNextWindowSize(size, ImGuiCond.Always);
 
             // set initial position
-            var offset = DragAreaOffset();
             if (!_windowPositionSet)
             {
-                ImGui.SetNextWindowPos(origin + _config.Position + offset - size / 2f);
+                ImGui.SetNextWindowPos(origin + MinPos - _contentMargin);
                 _windowPositionSet = true;
+
+                _positionOffset = _config.Position - MinPos + _contentMargin;
             }
 
             // update config object position
             ImGui.Begin("dragArea " + ID, windowFlags);
-            var windowPos = ImGui.GetWindowPos();
-
-            // round numbers when saving the position
-            _config.Position = new Vector2(
-                (int)(windowPos.X + size.X / 2f - origin.X - offset.X),
-                (int)(windowPos.Y + size.Y / 2f - origin.Y - offset.Y)
-            );
+            _lastWindowPos = ImGui.GetWindowPos();
+            _config.Position = _lastWindowPos + _positionOffset - origin;
 
             // check selection
             var tooltipText = "x: " + _config.Position.X.ToString() + "    y: " + _config.Position.Y.ToString();
 
-            if (ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
+            if (ImGui.IsMouseHoveringRect(_lastWindowPos, _lastWindowPos + size))
             {
                 bool cliked = ImGui.IsMouseClicked(ImGuiMouseButton.Left) || ImGui.IsMouseDown(ImGuiMouseButton.Left);
                 if (cliked && !Selected && SelectEvent != null)
@@ -100,8 +94,8 @@ namespace DelvUI.Interface
 
             // draw window
             var drawList = ImGui.GetWindowDrawList();
-            var contentPos = windowPos + contentMargin;
-            var contentSize = size - contentMargin * 2;
+            var contentPos = _lastWindowPos + _contentMargin;
+            var contentSize = size - _contentMargin * 2;
 
             // draw draggable indicators
             drawList.AddRectFilled(contentPos, contentPos + contentSize, 0x88444444, 3);
@@ -111,25 +105,25 @@ namespace DelvUI.Interface
             drawList.AddLine(contentPos + new Vector2(contentSize.X / 2f, 0), contentPos + new Vector2(contentSize.X / 2, contentSize.Y), lineColor);
             drawList.AddLine(contentPos + new Vector2(0, contentSize.Y / 2f), contentPos + new Vector2(contentSize.X, contentSize.Y / 2), lineColor);
 
-            // element name
-            var textSize = ImGui.CalcTextSize(_displayName);
-            var textColor = Selected ? 0xFFFFFFFF : 0xEEFFFFFF;
-            var textOutlineColor = Selected ? 0xFF000000 : 0xEE000000;
-            DrawHelper.DrawOutlinedText(_displayName, contentPos + contentSize / 2f - textSize / 2f, textColor, textOutlineColor, drawList);
-
             ImGui.End();
 
             // arrows
             if (Selected)
             {
-                if (DraggablesHelper.DrawArrows(windowPos, size, tooltipText, out var movement))
+                if (DraggablesHelper.DrawArrows(_lastWindowPos, size, tooltipText, out var movement))
                 {
-                    _minPos += movement;
-                    _maxPos += movement;
+                    _minPos = null;
+                    _maxPos = null;
                     _config.Position += movement;
                     _windowPositionSet = false;
                 }
             }
+
+            // element name
+            var textSize = ImGui.CalcTextSize(_displayName);
+            var textColor = Selected ? 0xFFFFFFFF : 0xEEFFFFFF;
+            var textOutlineColor = Selected ? 0xFF000000 : 0xEE000000;
+            DrawHelper.DrawOutlinedText(_displayName, contentPos + contentSize / 2f - textSize / 2f, textColor, textOutlineColor, drawList);
         }
 
         public virtual void DrawChildren(Vector2 origin) { }
@@ -206,11 +200,6 @@ namespace DelvUI.Interface
         protected virtual (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
             return (new List<Vector2>(), new List<Vector2>());
-        }
-
-        protected virtual Vector2 DragAreaOffset()
-        {
-            return Vector2.Zero;
         }
         #endregion
     }

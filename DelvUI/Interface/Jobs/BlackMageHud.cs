@@ -27,9 +27,9 @@ namespace DelvUI.Interface.Jobs
         {
             List<Vector2> positions = new List<Vector2>()
             {
-                Config.ManaBarPosition,
-                Config.UmbralHeartPosition,
-                Config.PolyglotPosition
+                Config.Position + Config.ManaBarPosition,
+                Config.Position + Config.UmbralHeartPosition,
+                Config.Position + Config.PolyglotPosition
             };
 
             List<Vector2> sizes = new List<Vector2>()
@@ -41,19 +41,19 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowTriplecast)
             {
-                positions.Add(Config.TriplecastPosition);
+                positions.Add(Config.Position + Config.TriplecastPosition);
                 sizes.Add(Config.TriplecastSize);
             }
 
             if (Config.ShowFirestarterProcs || Config.ShowThundercloudProcs)
             {
-                positions.Add(Config.ProcsBarPosition);
+                positions.Add(Config.Position + Config.ProcsBarPosition);
                 sizes.Add(Config.ProcsBarSize);
             }
 
             if (Config.ShowDotBar)
             {
-                positions.Add(Config.DoTBarPosition);
+                positions.Add(Config.Position + Config.DoTBarPosition);
                 sizes.Add(Config.DoTBarSize);
             }
 

@@ -28,25 +28,8 @@ namespace DelvUI.Interface.StatusEffects
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
-        }
-
-        protected override Vector2 DragAreaOffset()
-        {
-            var directions = Config.GetGrowthDirections();
-            var offset = Config.Size / 2f;
-
-            if ((directions & GrowthDirections.Left) != 0)
-            {
-                offset.X *= -1;
-
-            }
-            else if ((directions & GrowthDirections.Right) != 0)
-            {
-                offset.Y *= -1;
-            }
-
-            return offset;
+            var pos = CalculateStartPosition(Config.Position, Config.Size, Config.GetGrowthDirections());
+            return (new List<Vector2>() { pos + Config.Size / 2f }, new List<Vector2>() { Config.Size });
         }
 
         private uint CalculateLayout(List<StatusEffectData> list)
