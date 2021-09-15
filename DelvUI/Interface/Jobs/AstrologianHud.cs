@@ -26,7 +26,44 @@ namespace DelvUI.Interface.Jobs
 
         public AstrologianHud(string id, AstrologianConfig config, string displayName = null) : base(id, config, displayName)
         {
+        }
 
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowDrawBar)
+            {
+                positions.Add(Config.Position + Config.DrawBarPosition);
+                sizes.Add(Config.DrawBarSize);
+            }
+
+            if (Config.ShowDivinationBar)
+            {
+                positions.Add(Config.Position + Config.DivinationBarPosition);
+                sizes.Add(Config.DivinationBarSize);
+            }
+
+            if (Config.ShowDotBar)
+            {
+                positions.Add(Config.Position + Config.DotBarPosition);
+                sizes.Add(Config.DotBarSize);
+            }
+
+            if (Config.ShowStarBar)
+            {
+                positions.Add(Config.Position + Config.StarBarPosition);
+                sizes.Add(Config.StarBarSize);
+            }
+
+            if (Config.ShowLightspeedBar)
+            {
+                positions.Add(Config.Position + Config.LightspeedBarPosition);
+                sizes.Add(Config.LightspeedBarSize);
+            }
+
+            return (positions, sizes);
         }
 
         public override void DrawChildren(Vector2 origin)

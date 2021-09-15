@@ -9,6 +9,7 @@ using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
@@ -25,6 +26,28 @@ namespace DelvUI.Interface.Jobs
         public WhiteMageHud(string id, WhiteMageConfig config, string displayName = null) : base(id, config, displayName)
         {
 
+        }
+
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowLilyBars)
+            {
+                positions.Add(Config.Position + Config.LilyBarPosition);
+                sizes.Add(Config.LilyBarSize);
+                positions.Add(Config.Position + Config.BloodLilyBarPosition);
+                sizes.Add(Config.BloodLilyBarSize);
+            }
+
+            if (Config.ShowDiaBar)
+            {
+                positions.Add(Config.Position + Config.DiaBarPosition);
+                sizes.Add(Config.DiaBarSize);
+            }
+
+            return (positions, sizes);
         }
 
         public override void DrawChildren(Vector2 origin)

@@ -26,6 +26,32 @@ namespace DelvUI.Interface.Jobs
 
         }
 
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowAether)
+            {
+                positions.Add(Config.Position + Config.AetherPosition);
+                sizes.Add(Config.AetherSize);
+            }
+
+            if (Config.ShowFairy)
+            {
+                positions.Add(Config.Position + Config.FairyPosition);
+                sizes.Add(Config.FairySize);
+            }
+
+            if (Config.ShowBio)
+            {
+                positions.Add(Config.Position + Config.BioPosition);
+                sizes.Add(Config.BioSize);
+            }
+
+            return (positions, sizes);
+        }
+
         public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowFairy)
