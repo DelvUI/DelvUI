@@ -58,7 +58,7 @@ namespace DelvUI.Interface.GeneralElements
             // threshold
             if (Config.ShowThresholdMarker)
             {
-                var position = new Vector2(startPos.X + Config.ThresholdMarkerValue / 10000f * Config.Size.X - 2, Config.Size.Y);
+                var position = new Vector2(startPos.X + Config.ThresholdMarkerValue / 10000f * Config.Size.X - 2, startPos.Y);
                 var size = new Vector2(2, Config.Size.Y);
                 drawList.AddRect(position, position + size, 0xFF000000);
             }
