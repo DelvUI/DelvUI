@@ -232,7 +232,7 @@ namespace DelvUI.Interface
             // grid
             if (_gridConfig.Enabled)
             {
-                DraggablesHelper.DrawGrid(_gridConfig);
+                DraggablesHelper.DrawGrid(_gridConfig, _selectedElement?.GetConfig());
             }
 
             // general elements
@@ -467,5 +467,9 @@ namespace DelvUI.Interface
         [DragInt("Subdivision Count", min = 1, max = 10)]
         [Order(30)]
         public int GridSubdivisionCount = 4;
+
+        [Checkbox("Show Anchor Points")]
+        [Order(35)]
+        public bool ShowAnchorPoints = true;
     }
 }

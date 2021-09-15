@@ -8,7 +8,7 @@ namespace DelvUI.Helpers
 {
     public static class DraggablesHelper
     {
-        public static void DrawGrid(GridConfig config)
+        public static void DrawGrid(GridConfig config, MovablePluginConfigObject selectedElementConfig)
         {
             ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
@@ -27,11 +27,12 @@ namespace DelvUI.Helpers
 
             var drawList = ImGui.GetWindowDrawList();
             var screenSize = ImGui.GetMainViewport().Size;
+            var center = screenSize / 2f;
 
+            // grid
             if (config.ShowGrid)
             {
                 int count = (int)(Math.Max(screenSize.X, screenSize.Y) / config.GridDivisionsDistance) / 2 + 1;
-                var center = screenSize / 2f;
 
                 for (int i = 0; i < count; i++)
                 {
@@ -59,10 +60,21 @@ namespace DelvUI.Helpers
                 }
             }
 
+            // center lines
             if (config.ShowCenterLines)
             {
-                drawList.AddLine(new Vector2(screenSize.X / 2f, 0), new Vector2(screenSize.X / 2f, screenSize.Y), 0xAAFFFFFF, 1);
-                drawList.AddLine(new Vector2(0, screenSize.Y / 2f), new Vector2(screenSize.X, screenSize.Y / 2f), 0xAAFFFFFF, 1);
+                drawList.AddLine(new Vector2(center.X, 0), new Vector2(center.X, screenSize.Y), 0xAAFFFFFF);
+                drawList.AddLine(new Vector2(0, center.Y), new Vector2(screenSize.X, center.Y), 0xAAFFFFFF);
+            }
+
+            // anchor
+            if (config.ShowAnchorPoints && selectedElementConfig != null)
+            {
+                var anchorPos = center + selectedElementConfig.Position;
+                drawList.AddLine(center, anchorPos, 0xAAFFFFFF, 2);
+
+                var anchorSize = new Vector2(10, 10);
+                drawList.AddRectFilled(anchorPos - anchorSize / 2f, anchorPos + anchorSize / 2f, 0xAAFFFFFF);
             }
 
             ImGui.End();
@@ -137,7 +149,7 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            ImGui.SetNextWindowSize(new Vector2(345, 253), ImGuiCond.Appearing);
+            ImGui.SetNextWindowSize(new Vector2(345, 278), ImGuiCond.Appearing);
             ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
 
             if (!ImGui.Begin("Grid", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
