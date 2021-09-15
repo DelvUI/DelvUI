@@ -41,17 +41,19 @@ namespace DelvUI.Interface
 
         public sealed override void Draw(Vector2 origin)
         {
+
+            DrawChildren(origin);
+
             if (!_draggingEnabled)
             {
-                DrawChildren(origin);
                 return;
             }
 
             var windowFlags = ImGuiWindowFlags.NoScrollbar
-                | ImGuiWindowFlags.NoTitleBar
-                | ImGuiWindowFlags.NoResize
-                | ImGuiWindowFlags.NoBackground
-                | ImGuiWindowFlags.NoDecoration;
+            | ImGuiWindowFlags.NoTitleBar
+            | ImGuiWindowFlags.NoResize
+            | ImGuiWindowFlags.NoBackground
+            | ImGuiWindowFlags.NoDecoration;
 
             // validate size
             var contentMargin = new Vector2(4, 0);
@@ -100,9 +102,6 @@ namespace DelvUI.Interface
             var drawList = ImGui.GetWindowDrawList();
             var contentPos = windowPos + contentMargin;
             var contentSize = size - contentMargin * 2;
-
-            // draw hud elements
-            DrawChildren(origin);
 
             // draw draggable indicators
             drawList.AddRectFilled(contentPos, contentPos + contentSize, 0x88444444, 3);
