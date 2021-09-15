@@ -1,6 +1,5 @@
 ﻿using Dalamud.Hooking;
 using Dalamud.Plugin;
-using DelvUI.Config;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using System;
 using System.Runtime.InteropServices;

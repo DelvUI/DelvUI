@@ -19,7 +19,6 @@ namespace DelvUI.Helpers
                 ImGuiWindowFlags.NoTitleBar
               | ImGuiWindowFlags.NoScrollbar
               | ImGuiWindowFlags.AlwaysAutoResize
-              //| ImGuiWindowFlags.NoBackground
               | ImGuiWindowFlags.NoInputs
               | ImGuiWindowFlags.NoBringToFrontOnFocus
               | ImGuiWindowFlags.NoDecoration

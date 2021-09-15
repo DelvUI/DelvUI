@@ -22,7 +22,6 @@ namespace DelvUI.Interface
         private string _displayName;
         private bool _windowPositionSet = false;
         private Vector2 _positionOffset;
-        private Vector2 _lastWindowPos;
         private Vector2 _contentMargin = new Vector2(4, 0);
 
         private bool _draggingEnabled = false;
@@ -73,13 +72,13 @@ namespace DelvUI.Interface
 
             // update config object position
             ImGui.Begin("dragArea " + ID, windowFlags);
-            _lastWindowPos = ImGui.GetWindowPos();
-            _config.Position = _lastWindowPos + _positionOffset - origin;
+            var windowPos = ImGui.GetWindowPos();
+            _config.Position = windowPos + _positionOffset - origin;
 
             // check selection
             var tooltipText = "x: " + _config.Position.X.ToString() + "    y: " + _config.Position.Y.ToString();
 
-            if (ImGui.IsMouseHoveringRect(_lastWindowPos, _lastWindowPos + size))
+            if (ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
             {
                 bool cliked = ImGui.IsMouseClicked(ImGuiMouseButton.Left) || ImGui.IsMouseDown(ImGuiMouseButton.Left);
                 if (cliked && !Selected && SelectEvent != null)
@@ -94,7 +93,7 @@ namespace DelvUI.Interface
 
             // draw window
             var drawList = ImGui.GetWindowDrawList();
-            var contentPos = _lastWindowPos + _contentMargin;
+            var contentPos = windowPos + _contentMargin;
             var contentSize = size - _contentMargin * 2;
 
             // draw draggable indicators
@@ -110,7 +109,7 @@ namespace DelvUI.Interface
             // arrows
             if (Selected)
             {
-                if (DraggablesHelper.DrawArrows(_lastWindowPos, size, tooltipText, out var movement))
+                if (DraggablesHelper.DrawArrows(windowPos, size, tooltipText, out var movement))
                 {
                     _minPos = null;
                     _maxPos = null;
