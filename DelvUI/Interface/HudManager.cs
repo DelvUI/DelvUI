@@ -220,6 +220,7 @@ namespace DelvUI.Interface
             var newJobId = Plugin.ClientState.LocalPlayer.ClassJob.Id;
             if (_jobHud != null && _jobHud.Config.JobId == newJobId)
             {
+                _primaryResourceHud.ResourceType = _jobHud.Config.UseDefaultPrimaryResourceBar ? _jobHud.Config.PrimaryResourceType : PrimaryResourceTypes.None;
                 return;
             }
 
