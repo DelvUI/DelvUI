@@ -45,7 +45,7 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.TriplecastSize);
             }
 
-            if (Config.ShowFirestarterProcs || Config.ShowThundercloudProcs)
+            if (Config.ShowProcs)
             {
                 positions.Add(Config.Position + Config.ProcsBarPosition);
                 sizes.Add(Config.ProcsBarSize);
