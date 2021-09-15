@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
+﻿using Dalamud.Game.ClientState.Actors;
+using Dalamud.Game.ClientState.Actors.Types;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
@@ -29,6 +30,11 @@ namespace DelvUI.Interface.GeneralElements
         public override unsafe void Draw(Vector2 origin)
         {
             if (!Config.Enabled || Actor == null || Actor is not Chara)
+            {
+                return;
+            }
+
+            if (Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc)
             {
                 return;
             }
