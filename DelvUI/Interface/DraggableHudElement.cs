@@ -63,12 +63,12 @@ namespace DelvUI.Interface
             ImGui.SetNextWindowSize(size, ImGuiCond.Always);
 
             // set initial position
+            var offset = DragAreaOffset();
             if (!_windowPositionSet)
             {
-                ImGui.SetNextWindowPos(origin + _config.Position - size / 2f);
+                ImGui.SetNextWindowPos(origin + _config.Position + offset - size / 2f);
                 _windowPositionSet = true;
             }
-            var tooltipText = "x: " + _config.Position.X.ToString() + "    y: " + _config.Position.Y.ToString();
 
             // update config object position
             ImGui.Begin("dragArea " + ID, windowFlags);
@@ -76,11 +76,13 @@ namespace DelvUI.Interface
 
             // round numbers when saving the position
             _config.Position = new Vector2(
-                (int)(windowPos.X + size.X / 2f - origin.X),
-                (int)(windowPos.Y + size.Y / 2f - origin.Y)
+                (int)(windowPos.X + size.X / 2f - origin.X - offset.X),
+                (int)(windowPos.Y + size.Y / 2f - origin.Y - offset.Y)
             );
 
             // check selection
+            var tooltipText = "x: " + _config.Position.X.ToString() + "    y: " + _config.Position.Y.ToString();
+
             if (ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
             {
                 bool cliked = ImGui.IsMouseClicked(ImGuiMouseButton.Left) || ImGui.IsMouseDown(ImGuiMouseButton.Left);
@@ -121,11 +123,11 @@ namespace DelvUI.Interface
             // arrows
             if (Selected)
             {
-                if (DraggablesHelper.DrawArrows(windowPos, size, tooltipText, out var offset))
+                if (DraggablesHelper.DrawArrows(windowPos, size, tooltipText, out var movement))
                 {
-                    _minPos += offset;
-                    _maxPos += offset;
-                    _config.Position += offset;
+                    _minPos += movement;
+                    _maxPos += movement;
+                    _config.Position += movement;
                     _windowPositionSet = false;
                 }
             }
@@ -160,7 +162,8 @@ namespace DelvUI.Interface
                     minY = Math.Min(minY, pos.Y);
                 }
 
-                return new Vector2(minX, minY);
+                _minPos = new Vector2(minX, minY);
+                return (Vector2)_minPos;
             }
         }
 
@@ -190,7 +193,8 @@ namespace DelvUI.Interface
                     maxY = Math.Max(maxY, pos.Y);
                 }
 
-                return new Vector2(maxX, maxY);
+                _maxPos = new Vector2(maxX, maxY);
+                return (Vector2)_maxPos;
             }
         }
 
@@ -203,6 +207,11 @@ namespace DelvUI.Interface
         protected virtual (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
             return (new List<Vector2>(), new List<Vector2>());
+        }
+
+        protected virtual Vector2 DragAreaOffset()
+        {
+            return Vector2.Zero;
         }
         #endregion
     }

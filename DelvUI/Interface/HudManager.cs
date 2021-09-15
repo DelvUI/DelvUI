@@ -155,25 +155,25 @@ namespace DelvUI.Interface
 
         private void CreateStatusEffectsLists()
         {
-            //var playerBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerBuffsListConfig>();
-            //var playerBuffs = new StatusEffectsListHud("playerBuffs", playerBuffsConfig);
-            //_hudElements.Add(playerBuffs);
-            //_hudElementsUsingPlayer.Add(playerBuffs);
+            var playerBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerBuffsListConfig>();
+            var playerBuffs = new StatusEffectsListHud("playerBuffs", playerBuffsConfig, "Buffs");
+            _hudElements.Add(playerBuffs);
+            _hudElementsUsingPlayer.Add(playerBuffs);
 
-            //var playerDebuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerDebuffsListConfig>();
-            //var playerDebuffs = new StatusEffectsListHud("playerDebuffs", playerDebuffsConfig);
-            //_hudElements.Add(playerDebuffs);
-            //_hudElementsUsingPlayer.Add(playerDebuffs);
+            var playerDebuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerDebuffsListConfig>();
+            var playerDebuffs = new StatusEffectsListHud("playerDebuffs", playerDebuffsConfig, "Debufffs");
+            _hudElements.Add(playerDebuffs);
+            _hudElementsUsingPlayer.Add(playerDebuffs);
 
-            //var targetBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetBuffsListConfig>();
-            //var targetBuffs = new StatusEffectsListHud("targetBuffs", targetBuffsConfig);
-            //_hudElements.Add(targetBuffs);
-            //_hudElementsUsingTarget.Add(targetBuffs);
+            var targetBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetBuffsListConfig>();
+            var targetBuffs = new StatusEffectsListHud("targetBuffs", targetBuffsConfig, "Target Buffs");
+            _hudElements.Add(targetBuffs);
+            _hudElementsUsingTarget.Add(targetBuffs);
 
-            //var targetDebuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetDebuffsListConfig>();
-            //var targetDebuffs = new StatusEffectsListHud("targetDebuffs", targetDebuffsConfig);
-            //_hudElements.Add(targetDebuffs);
-            //_hudElementsUsingTarget.Add(targetDebuffs);
+            var targetDebuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetDebuffsListConfig>();
+            var targetDebuffs = new StatusEffectsListHud("targetDebuffs", targetDebuffsConfig, "Target Debuffs");
+            _hudElements.Add(targetDebuffs);
+            _hudElementsUsingTarget.Add(targetDebuffs);
         }
 
         private void CreateMiscElements()

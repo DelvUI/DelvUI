@@ -108,10 +108,10 @@ namespace DelvUI.Interface.StatusEffects
             "Right and Down",
             "Right and Up",
             "Left and Down",
-            "Left and Up",
-            "Centered (horizontal)",
-            "Centered (vertical)"
+            "Left and Up"
         )]
+        //"Centered (horizontal)",    not working as expected
+        //"Centered (vertical)"       not working as expected
         [Order(25)]
         public int Directions;
 
