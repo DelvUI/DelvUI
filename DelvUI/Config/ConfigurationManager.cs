@@ -28,6 +28,8 @@ namespace DelvUI.Config
         public bool DrawConfigWindow;
 
         private bool _lockHUD = true;
+        private GridConfig _gridConfig => (GridConfig)ConfigBaseNode.configPageNodesMap[typeof(GridConfig)].ConfigObject;
+
         public bool LockHUD
         {
             get => _lockHUD;
@@ -128,6 +130,7 @@ namespace DelvUI.Config
                 typeof(TooltipsConfig),
                 typeof(GCDIndicatorConfig),
                 typeof(MPTickerConfig),
+                typeof(GridConfig),
 
                 typeof(ImportExportConfig)
             };
@@ -156,9 +159,17 @@ namespace DelvUI.Config
 
         public void Draw()
         {
-            if (DrawConfigWindow && LockHUD)
+            if (DrawConfigWindow)
             {
-                ConfigBaseNode.Draw();
+                if (LockHUD)
+                {
+                    ConfigBaseNode.Draw();
+                }
+                else
+                {
+                    DraggablesHelper.DrawGridWindow(_gridConfig);
+                }
+
             }
         }
 
@@ -173,6 +184,7 @@ namespace DelvUI.Config
             return (PluginConfigObject)method.Invoke(this, null);
         }
         public T GetConfigObject<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigObject<T>();
+        public ConfigPageNode GetConfigPageNode<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigPageNode<T>();
 
         public static string CompressAndBase64Encode(string jsonString)
         {
@@ -229,10 +241,10 @@ namespace DelvUI.Config
             if (importedConfigObject != null)
             {
                 PluginLog.Log($"Importing {importedConfigObject.GetType()}");
-                // update the tree
+                // update the tree 
                 configPageNode.ConfigObject = importedConfigObject;
                 // but also update the dictionary
-                GetInstance().ConfigBaseNode.configObjectsMap[configPageNode.ConfigObject.GetType()] = configPageNode.ConfigObject;
+                GetInstance().ConfigBaseNode.configPageNodesMap[configPageNode.ConfigObject.GetType()] = configPageNode;
                 GetInstance().SaveConfigurations();
                 _instance.ResetEvent(_instance, null);
             }

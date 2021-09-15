@@ -1,5 +1,6 @@
 using Dalamud.Interface;
 using DelvUI.Config;
+using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
@@ -16,7 +17,7 @@ namespace DelvUI.Interface
     {
         private Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
 
-        private DraggablesConfig _draggablesConfig = new DraggablesConfig();
+        private GridConfig _gridConfig;
         private DraggableHudElement _selectedElement = null;
 
         private List<DraggableHudElement> _hudElements;
@@ -90,6 +91,8 @@ namespace DelvUI.Interface
 
         private void CreateHudElements()
         {
+            _gridConfig = ConfigurationManager.GetInstance().GetConfigObject<GridConfig>();
+
             _hudElements = new List<DraggableHudElement>();
             _hudElementsUsingPlayer = new List<IHudElementWithActor>();
             _hudElementsUsingTarget = new List<IHudElementWithActor>();
@@ -227,10 +230,9 @@ namespace DelvUI.Interface
             AssignActors();
 
             // grid
-            if (!ConfigurationManager.GetInstance().LockHUD)
+            if (_gridConfig.Enabled)
             {
-                DraggablesHelper.DrawGrid(_draggablesConfig);
-                TooltipsHelper.Instance.RemoveTooltip();
+                DraggablesHelper.DrawGrid(_gridConfig);
             }
 
             // general elements
@@ -432,10 +434,37 @@ namespace DelvUI.Interface
         internal static Vector2 DefaultStatusEffectsListSize = new Vector2(292, 82);
     }
 
-    public class DraggablesConfig : PluginConfigObject
+    [Portable(false)]
+    [Section("Misc")]
+    [SubSection("Grid", 0)]
+    public class GridConfig : PluginConfigObject
     {
-        public bool ShowGuideLines = true;
+        public new static GridConfig DefaultConfig()
+        {
+            var config = new GridConfig();
+            config.Enabled = false;
+
+            return config;
+        }
+
+        [DragFloat("Background Alpha", min = 0, max = 1, velocity = .05f)]
+        [Order(10)]
+        public float BackgroundAlpha = 0.3f;
+
+        [Checkbox("Show Center Lines")]
+        [Order(15)]
+        public bool ShowCenterLines = true;
+
+        [Checkbox("Show Grid")]
+        [Order(20)]
         public bool ShowGrid = true;
-        public int GridSubdivisionDistance = 50;
+
+        [DragInt("Divisions Distance", min = 50, max = 500)]
+        [Order(25)]
+        public int GridDivisionsDistance = 50;
+
+        [DragInt("Subdivision Count", min = 1, max = 10)]
+        [Order(30)]
+        public int GridSubdivisionCount = 4;
     }
 }

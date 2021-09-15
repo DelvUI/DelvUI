@@ -74,28 +74,38 @@ namespace DelvUI.Config.Tree
     public class BaseNode : Node
     {
         public new List<SectionNode> children;
-        public Dictionary<Type, PluginConfigObject> configObjectsMap;
+        public Dictionary<Type, ConfigPageNode> configPageNodesMap;
 
         public BaseNode()
         {
             children = new List<SectionNode>();
-            configObjectsMap = new Dictionary<Type, PluginConfigObject>();
+            configPageNodesMap = new Dictionary<Type, ConfigPageNode>();
         }
 
         public T GetConfigObject<T>() where T : PluginConfigObject
         {
             var type = typeof(T);
 
-            if (configObjectsMap.TryGetValue(type, out var configObject))
+            if (configPageNodesMap.TryGetValue(type, out var node))
             {
-                return (T)configObject;
+                return (T)node.ConfigObject;
             }
 
             var configPageNode = GetOrAddConfig<T>();
             if (configPageNode != null && configPageNode.ConfigObject != null)
             {
-                configObjectsMap.Add(type, configPageNode.ConfigObject);
+                configPageNodesMap.Add(type, configPageNode);
                 return (T)configPageNode.ConfigObject;
+            }
+
+            return null;
+        }
+
+        public ConfigPageNode GetConfigPageNode<T>() where T : PluginConfigObject
+        {
+            if (configPageNodesMap.TryGetValue(typeof(T), out var node))
+            {
+                return node;
             }
 
             return null;
@@ -687,6 +697,7 @@ namespace DelvUI.Config.Tree
                 {
                     PluginLog.Log($"Error parsing import string!\n{ex.StackTrace}");
                 }
+
                 // abort import if the import string is for the wrong type
                 if (importedType != null && ConfigObject.GetType().FullName == importedType.FullName)
                 {
@@ -697,11 +708,7 @@ namespace DelvUI.Config.Tree
 
                     if (importedConfigObject != null)
                     {
-                        // update the object
                         ConfigObject = importedConfigObject;
-                        // update the dictionary
-                        ConfigurationManager.GetInstance().ConfigBaseNode.configObjectsMap[ConfigObject.GetType()] = ConfigObject;
-                        //ConfigurationManager.GetInstance().SaveConfigurations();
                     }
                     else
                     {

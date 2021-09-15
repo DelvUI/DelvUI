@@ -114,13 +114,13 @@ namespace DelvUI
                     unsafe
                     {
                         var builder = new ImFontGlyphRangesBuilderPtr(ImGuiNative.ImFontGlyphRangesBuilder_ImFontGlyphRangesBuilder());
-                        
+
                         // GetGlyphRangesChineseFull() includes Default + Hiragana, Katakana, Half-Width, Selection of 1946 Ideographs
                         // https://skia.googlesource.com/external/github.com/ocornut/imgui/+/v1.53/extra_fonts/README.txt
                         builder.AddRanges(io.Fonts.GetGlyphRangesChineseFull());
                         builder.AddRanges(io.Fonts.GetGlyphRangesKorean());
                         builder.BuildRanges(out ImVector ranges);
-                        
+
                         FontsManager.Instance.BigNoodleTooFont = io.Fonts.AddFontFromFileTTF(fontFile, 24, null, ranges.Data);
                         _fontBuilt = true;
                     }
@@ -163,7 +163,16 @@ namespace DelvUI
 
         private void PluginCommand(string command, string arguments)
         {
-            ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
+            var configManager = ConfigurationManager.GetInstance();
+
+            if (configManager.DrawConfigWindow && !configManager.LockHUD)
+            {
+                configManager.LockHUD = true;
+            }
+            else
+            {
+                configManager.DrawConfigWindow = !configManager.DrawConfigWindow;
+            }
 
             //switch (arguments)
             //{

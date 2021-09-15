@@ -1,4 +1,5 @@
-﻿using DelvUI.Interface;
+﻿using DelvUI.Config;
+using DelvUI.Interface;
 using ImGuiNET;
 using System;
 using System.Numerics;
@@ -7,12 +8,12 @@ namespace DelvUI.Helpers
 {
     public static class DraggablesHelper
     {
-        public static void DrawGrid(DraggablesConfig config)
+        public static void DrawGrid(GridConfig config)
         {
             ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
 
-            ImGui.SetNextWindowBgAlpha(0.3f);
+            ImGui.SetNextWindowBgAlpha(config.BackgroundAlpha);
 
             ImGui.Begin("DelvUI_draggables",
                 ImGuiWindowFlags.NoTitleBar
@@ -29,25 +30,39 @@ namespace DelvUI.Helpers
 
             if (config.ShowGrid)
             {
-                int count = (int)(Math.Max(screenSize.X, screenSize.Y) / config.GridSubdivisionDistance) / 2 + 1;
+                int count = (int)(Math.Max(screenSize.X, screenSize.Y) / config.GridDivisionsDistance) / 2 + 1;
                 var center = screenSize / 2f;
 
-                for (int i = 1; i < count; i++)
+                for (int i = 0; i < count; i++)
                 {
-                    var step = i * config.GridSubdivisionDistance;
+                    var step = i * config.GridDivisionsDistance;
 
-                    drawList.AddLine(new Vector2(center.X + step, 0), new Vector2(center.X + step, screenSize.Y), 0x33FFFFFF);
-                    drawList.AddLine(new Vector2(center.X - step, 0), new Vector2(center.X - step, screenSize.Y), 0x33FFFFFF);
+                    drawList.AddLine(new Vector2(center.X + step, 0), new Vector2(center.X + step, screenSize.Y), 0x88888888);
+                    drawList.AddLine(new Vector2(center.X - step, 0), new Vector2(center.X - step, screenSize.Y), 0x88888888);
 
-                    drawList.AddLine(new Vector2(0, center.Y + step), new Vector2(screenSize.X, center.Y + step), 0x33FFFFFF);
-                    drawList.AddLine(new Vector2(0, center.Y - step), new Vector2(screenSize.X, center.Y - step), 0x33FFFFFF);
+                    drawList.AddLine(new Vector2(0, center.Y + step), new Vector2(screenSize.X, center.Y + step), 0x88888888);
+                    drawList.AddLine(new Vector2(0, center.Y - step), new Vector2(screenSize.X, center.Y - step), 0x88888888);
+
+                    if (config.GridSubdivisionCount > 1)
+                    {
+                        for (int j = 1; j < config.GridSubdivisionCount; j++)
+                        {
+                            var subStep = j * (config.GridDivisionsDistance / config.GridSubdivisionCount);
+
+                            drawList.AddLine(new Vector2(center.X + step + subStep, 0), new Vector2(center.X + step + subStep, screenSize.Y), 0x44888888);
+                            drawList.AddLine(new Vector2(center.X - step - subStep, 0), new Vector2(center.X - step - subStep, screenSize.Y), 0x44888888);
+
+                            drawList.AddLine(new Vector2(0, center.Y + step + subStep), new Vector2(screenSize.X, center.Y + step + subStep), 0x44888888);
+                            drawList.AddLine(new Vector2(0, center.Y - step - subStep), new Vector2(screenSize.X, center.Y - step - subStep), 0x44888888);
+                        }
+                    }
                 }
             }
 
-            if (config.ShowGuideLines)
+            if (config.ShowCenterLines)
             {
-                drawList.AddLine(new Vector2(screenSize.X / 2f, 0), new Vector2(screenSize.X / 2f, screenSize.Y), 0xAA000000, 3);
-                drawList.AddLine(new Vector2(0, screenSize.Y / 2f), new Vector2(screenSize.X, screenSize.Y / 2f), 0xAA000000, 3);
+                drawList.AddLine(new Vector2(screenSize.X / 2f, 0), new Vector2(screenSize.X / 2f, screenSize.Y), 0xAAFFFFFF, 1);
+                drawList.AddLine(new Vector2(0, screenSize.Y / 2f), new Vector2(screenSize.X, screenSize.Y / 2f), 0xAAFFFFFF, 1);
             }
 
             ImGui.End();
@@ -111,6 +126,43 @@ namespace DelvUI.Helpers
             }
 
             return offset != Vector2.Zero;
+        }
+
+        public static void DrawGridWindow(GridConfig config)
+        {
+            var configManager = ConfigurationManager.GetInstance();
+            var node = configManager.GetConfigPageNode<GridConfig>();
+            if (node == null)
+            {
+                return;
+            }
+
+            ImGui.SetNextWindowSize(new Vector2(345, 253), ImGuiCond.Appearing);
+            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
+
+            if (!ImGui.Begin("Grid", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
+            {
+                return;
+            }
+
+            var changed = false;
+            node.Draw(ref changed);
+
+            ImGui.NewLine();
+
+            if (ImGui.Button("Lock HUD", new Vector2(329, 30)))
+            {
+                changed = true;
+                config.Enabled = false;
+                configManager.LockHUD = true;
+            }
+
+            if (changed)
+            {
+                configManager.SaveConfigurations();
+            }
+
+            ImGui.End();
         }
     }
 }

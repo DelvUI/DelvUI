@@ -136,10 +136,7 @@ namespace DelvUI.Helpers
             switch (commandId)
             {
                 case 69420:
-                    ConfigurationManager.GetInstance().LockHUD = true;
-                    ConfigurationManager.GetInstance().DrawConfigWindow = false;
                     Plugin.CommandManager.ProcessCommand("/delvui");
-
                     break;
 
                 case 69421:

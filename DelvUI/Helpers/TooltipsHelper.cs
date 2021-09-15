@@ -31,7 +31,6 @@ namespace DelvUI.Helpers
         private string _currentTooltipTitle = null;
         private Vector2 _titleSize;
         private string _previousRawText = null;
-        private int _mouseDownCounter = 0;
 
         private Vector2 _position;
         private Vector2 _size;
@@ -143,6 +142,8 @@ namespace DelvUI.Helpers
 
             ImGui.End();
             ImGui.PopStyleVar();
+
+            RemoveTooltip();
         }
 
         private string SanitizeText(string text)
