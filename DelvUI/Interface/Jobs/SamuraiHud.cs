@@ -215,7 +215,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Kenki Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(5, 0)]
-        public Vector2 KenkiBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 34);
+        public Vector2 KenkiBarPosition = new Vector2(0, -34);
 
         [Checkbox("Show Kenki Text")]
         [CollapseWith(10, 0)]
@@ -237,7 +237,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Sen Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(10, 1)]
-        public Vector2 SenBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 17);
+        public Vector2 SenBarPosition = new Vector2(0, -17);
 
         [DragDropHorizontal("Sen Order", "Setsu", "Getsu", "Ka")]
         [CollapseWith(15, 1)]
@@ -259,7 +259,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Meditation Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(10, 2)]
-        public Vector2 MeditationBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 5);
+        public Vector2 MeditationBarPosition = new Vector2(0, -5);
         #endregion
 
         #region Buffs
@@ -277,7 +277,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Buffs Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(10, 3)]
-        public Vector2 BuffsBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 56);
+        public Vector2 BuffsBarPosition = new Vector2(0, -56);
 
         [Checkbox("Show Buffs Bar Text")]
         [CollapseWith(15, 3)]
@@ -300,7 +300,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Higanbana Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(5, 4)]
-        public Vector2 HiganbanaBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 78);
+        public Vector2 HiganbanaBarPosition = new Vector2(0, -78);
 
         [Checkbox("Show Higanbana Text")]
         [CollapseWith(10, 4)]

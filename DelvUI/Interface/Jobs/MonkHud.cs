@@ -351,7 +351,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Demolish", min = -4000f, max = 4000f)]
         [CollapseWith(0, 0)]
-        public Vector2 DemolishBarPosition = new(71, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 DemolishBarPosition = new(71, -10);
 
         [DragFloat2("Size" + "##Demolish", min = 0, max = 4000f)]
         [CollapseWith(5, 0)]
@@ -369,7 +369,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Chakbra", min = -4000f, max = 4000f)]
         [CollapseWith(0, 1)]
-        public Vector2 ChakraBarPosition = new(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 ChakraBarPosition = new(0, -32);
 
         [DragFloat2("Size" + "##Chakbra", min = 0, max = 4000f)]
         [CollapseWith(5, 1)]
@@ -387,7 +387,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##LeadenFist", min = -4000f, max = 4000f)]
         [CollapseWith(0, 2)]
-        public Vector2 LeadenFistBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 LeadenFistBarPosition = new(0, -10);
 
         [DragFloat2("Size" + "##LeadenFist", min = 0, max = 4000f)]
         [CollapseWith(5, 2)]
@@ -405,7 +405,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##TwinSnakes", min = -4000f, max = 4000f)]
         [CollapseWith(0, 3)]
-        public Vector2 TwinSnakesBarPosition = new(-71, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 TwinSnakesBarPosition = new(-71, -10);
 
         [DragFloat2("Size" + "##TwinSnakes", min = 0, max = 4000f)]
         [CollapseWith(5, 3)]
@@ -427,7 +427,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##RiddleofEarth", min = -4000f, max = 4000f)]
         [CollapseWith(0, 4)]
-        public Vector2 RiddleofEarthBarPosition = new(-69, HUDConstants.JobHudsBaseY - 54);
+        public Vector2 RiddleofEarthBarPosition = new(-69, -54);
 
         [DragFloat2("Size" + "##RiddleofEarth", min = 0, max = 4000f)]
         [CollapseWith(5, 4)]
@@ -449,7 +449,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##PerfectBalance", min = -4000f, max = 4000f)]
         [CollapseWith(0, 5)]
-        public Vector2 PerfectBalanceBarPosition = new(0, HUDConstants.JobHudsBaseY - 54);
+        public Vector2 PerfectBalanceBarPosition = new(0, -54);
 
         [DragFloat2("Size" + "##PerfectBalance", min = 0, max = 4000f)]
         [CollapseWith(5, 5)]
@@ -471,7 +471,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##TrueNorth", min = -4000f, max = 4000f)]
         [CollapseWith(0, 6)]
-        public Vector2 TrueNorthBarPosition = new(69, HUDConstants.JobHudsBaseY - 54);
+        public Vector2 TrueNorthBarPosition = new(69, -54);
 
         [DragFloat2("Size" + "##TrueNorth", min = 0, max = 4000f)]
         [CollapseWith(5, 6)]
@@ -489,7 +489,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Forms", min = -4000f, max = 4000f)]
         [CollapseWith(0, 7)]
-        public Vector2 FormsBarPosition = new(0, HUDConstants.JobHudsBaseY - 76);
+        public Vector2 FormsBarPosition = new(0, -76);
 
         [DragFloat2("Size" + "##Forms", min = 0, max = 4000f)]
         [CollapseWith(5, 7)]

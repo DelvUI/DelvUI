@@ -296,7 +296,7 @@ namespace DelvUI.Interface.Jobs
         #region mana bar
         [DragFloat2("Mana Bar Position", min = -2000, max = 2000f)]
         [Order(30)]
-        public Vector2 ManaBarPosition = new Vector2(0, 28);
+        public Vector2 ManaBarPosition = new Vector2(0, -10);
 
         [DragFloat2("Mana Bar Size", max = 2000f)]
         [Order(35)]
@@ -330,7 +330,7 @@ namespace DelvUI.Interface.Jobs
         #region umbral heart
         [DragFloat2("Umbral Heart Bar Position", min = -2000, max = 2000f)]
         [Order(65)]
-        public Vector2 UmbralHeartPosition = new Vector2(0, 8);
+        public Vector2 UmbralHeartPosition = new Vector2(0, -30);
 
         [DragFloat2("Umbral Heart Bar Size", max = 2000f)]
         [Order(70)]
@@ -352,7 +352,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Triplecast Position", min = -2000, max = 2000f)]
         [CollapseWith(0, 1)]
-        public Vector2 TriplecastPosition = new Vector2(0, -10);
+        public Vector2 TriplecastPosition = new Vector2(0, -48);
 
         [DragFloat2("Triplecast Size", max = 2000)]
         [CollapseWith(5, 1)]
@@ -370,7 +370,7 @@ namespace DelvUI.Interface.Jobs
         #region polyglot
         [DragFloat2("Polyglot Position", min = -2000, max = 2000f)]
         [Order(90)]
-        public Vector2 PolyglotPosition = new Vector2(0, -29);
+        public Vector2 PolyglotPosition = new Vector2(0, -67);
 
         [DragFloat2("Polyglot Size", max = 2000f)]
         [Order(95)]
@@ -400,7 +400,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Procs Bar Position", min = -2000, max = 2000f)]
         [CollapseWith(10, 2)]
-        public Vector2 ProcsBarPosition = new Vector2(-74, -29);
+        public Vector2 ProcsBarPosition = new Vector2(-74, -67);
 
         [DragFloat2("Procs Bar Size", max = 2000f)]
         [CollapseWith(15, 2)]
@@ -426,7 +426,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("DoT Bar Position", min = -2000, max = 2000f)]
         [CollapseWith(5, 4)]
-        public Vector2 DoTBarPosition = new Vector2(74, -29);
+        public Vector2 DoTBarPosition = new Vector2(74, -67);
 
         [DragFloat2("DoT Bar Size", max = 2000f)]
         [CollapseWith(10, 4)]

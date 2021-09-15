@@ -308,7 +308,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Aether Tracker Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 AetherPosition = new(-67, HUDConstants.JobHudsBaseY - 6);
+        public Vector2 AetherPosition = new(-67, -6);
 
         [DragInt("Aether Padding", max = 1000)]
         [CollapseWith(10, 1)]
@@ -330,7 +330,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Ruin Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]
-        public Vector2 RuinPosition = new(0, HUDConstants.JobHudsBaseY - 45);
+        public Vector2 RuinPosition = new(0, -45);
 
         [DragInt("Ruin Padding", max = 1000)]
         [CollapseWith(10, 2)]
@@ -356,7 +356,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Miasma Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 3)]
-        public Vector2 MiasmaPosition = new(-64, HUDConstants.JobHudsBaseY - 67);
+        public Vector2 MiasmaPosition = new(-64, -67);
 
         [ColorEdit4("Miasma Color")]
         [CollapseWith(15, 3)]
@@ -378,7 +378,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Bio Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 4)]
-        public Vector2 BioPosition = new(64, HUDConstants.JobHudsBaseY - 67);
+        public Vector2 BioPosition = new(64, -67);
 
         [ColorEdit4("Bio Color")]
         [CollapseWith(15, 4)]
@@ -396,7 +396,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Trance Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 5)]
-        public Vector2 TrancePosition = new(0, HUDConstants.JobHudsBaseY - 23);
+        public Vector2 TrancePosition = new(0, -23);
 
         [DragFloat2("Trance Gauge Size", min = 1f, max = 2000f)]
         [CollapseWith(10, 5)]
@@ -426,7 +426,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Demi Status Indicator Position", min = -4000f, max = -4000f)]
         [CollapseWith(5, 6)]
-        public Vector2 IndicatorPosition = new(0, HUDConstants.JobHudsBaseY - 6);
+        public Vector2 IndicatorPosition = new(0, -6);
 
         [DragFloat2("Demi Status Indicator Size", min = 1f, max = 2000f)]
         [CollapseWith(10, 6)]
@@ -446,7 +446,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Dreadwyrm Aether Bars Position", min = -4000f, max = -4000f)]
         [CollapseWith(30, 6)]
-        public Vector2 DreadwyrmAetherBarPosition = new(67, HUDConstants.JobHudsBaseY - 6);
+        public Vector2 DreadwyrmAetherBarPosition = new(67, -6);
 
         [DragFloat2("Dreadwyrm Aether Bars Size", min = 1f, max = 2000f)]
         [CollapseWith(35, 6)]

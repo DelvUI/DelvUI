@@ -314,7 +314,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Huton Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 HutonGaugePosition = new(0, HUDConstants.JobHudsBaseY - 54);
+        public Vector2 HutonGaugePosition = new(0, -54);
 
         [ColorEdit4("Huton Gauge Color")]
         [CollapseWith(10, 0)]
@@ -356,7 +356,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Ninki Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(15, 1)]
-        public Vector2 NinkiGaugePosition = new(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 NinkiGaugePosition = new(0, -32);
 
         [DragFloat("Ninki Gauge Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(20, 1)]
@@ -402,7 +402,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Trick/Suiton Bar Position", min = -4000f, max = 4000f)]
         [Order(55)]
-        public Vector2 TrickBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 TrickBarPosition = new(0, -10);
         #endregion
 
         #region mudra
@@ -424,7 +424,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Mudra Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 4)]
-        public Vector2 MudraBarPosition = new(0, HUDConstants.JobHudsBaseY - 73);
+        public Vector2 MudraBarPosition = new(0, -73);
 
         [DragFloat("Mudra Bar Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(15, 4)]

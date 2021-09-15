@@ -283,7 +283,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Mana Bar Position", min = -2000f, max = 2000f)]
         [Order(35)]
-        public Vector2 ManaBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 ManaBarPosition = new Vector2(0, -10);
 
         [Checkbox("Show Mana Value")]
         [Order(40)]
@@ -304,7 +304,7 @@ namespace DelvUI.Interface.Jobs
         #region balance bar
         [DragFloat2("Balance Bar Position", min = -2000f, max = 2000f)]
         [Order(50)]
-        public Vector2 BalanceBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 BalanceBarPosition = new Vector2(0, -32);
 
         [DragFloat2("Balance Bar Size", max = 2000f)]
         [Order(55)]
@@ -318,7 +318,7 @@ namespace DelvUI.Interface.Jobs
         #region white mana bar
         [DragFloat2("White Mana Bar Position", min = -2000f, max = 2000f)]
         [Order(65)]
-        public Vector2 WhiteManaBarPosition = new Vector2(-70, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 WhiteManaBarPosition = new Vector2(-70, -32);
 
         [DragFloat2("White Mana Bar Size", max = 2000f)]
         [Order(70)]
@@ -340,7 +340,7 @@ namespace DelvUI.Interface.Jobs
         #region black mana bar
         [DragFloat2("Black Mana Bar Position", min = -2000f, max = 2000f)]
         [Order(90)]
-        public Vector2 BlackManaBarPosition = new Vector2(70, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 BlackManaBarPosition = new Vector2(70, -32);
 
         [DragFloat2("Black Mana Bar Size", max = 2000f)]
         [Order(95)]
@@ -366,7 +366,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Acceleration Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(0, 1)]
-        public Vector2 AccelerationBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 50);
+        public Vector2 AccelerationBarPosition = new Vector2(0, -50);
 
         [DragFloat2("Acceleration Size", max = 2000f)]
         [CollapseWith(5, 1)]
@@ -388,7 +388,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Dualcast Position", min = -2000f, max = 2000f)]
         [CollapseWith(0, 2)]
-        public Vector2 DualCastPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 66);
+        public Vector2 DualCastPosition = new Vector2(0, -66);
 
         [DragFloat2("Dualcast Size", max = 2000f)]
         [CollapseWith(5, 2)]
@@ -414,7 +414,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Verstone Bar Position", min = -2000, max = 2000f)]
         [CollapseWith(10, 3)]
-        public Vector2 VerstoneBarPosition = new Vector2(-69, HUDConstants.JobHudsBaseY - 66);
+        public Vector2 VerstoneBarPosition = new Vector2(-69, -66);
 
         [DragFloat2("Verstone Bar Size", max = 2000f)]
         [CollapseWith(15, 3)]
@@ -440,7 +440,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Verfire Bar Position", min = -2000, max = 2000f)]
         [CollapseWith(10, 4)]
-        public Vector2 VerfireBarPosition = new Vector2(69, HUDConstants.JobHudsBaseY - 66);
+        public Vector2 VerfireBarPosition = new Vector2(69, -66);
 
         [DragFloat2("Verfire Bar Size", max = 2000f)]
         [CollapseWith(15, 4)]

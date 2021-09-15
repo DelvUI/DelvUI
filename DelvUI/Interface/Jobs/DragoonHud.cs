@@ -189,7 +189,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Chaos Thrust Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 ChaosThrustBarPosition = new(0, HUDConstants.JobHudsBaseY - 76);
+        public Vector2 ChaosThrustBarPosition = new(0, -76);
 
         [Checkbox("Show Chaos Bar Thrust Text")]
         [CollapseWith(10, 0)]
@@ -211,7 +211,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Disembowel Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 DisembowelBarPosition = new(0, HUDConstants.JobHudsBaseY - 54);
+        public Vector2 DisembowelBarPosition = new(0, -54);
 
         [Checkbox("Show Disembowel Bar Text")]
         [CollapseWith(10, 1)]
@@ -233,7 +233,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Eye Of The Dragon Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]
-        public Vector2 EyeOfTheDragonBarPosition = new(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 EyeOfTheDragonBarPosition = new(0, -32);
 
         [DragInt("Eye Of The Dragon Bar Padding")]
         [CollapseWith(10, 2)]
@@ -255,7 +255,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Blood Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 3)]
-        public Vector2 BloodBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 BloodBarPosition = new(0, -10);
 
         [Checkbox("Show Blood Bar Text")]
         [CollapseWith(10, 3)]

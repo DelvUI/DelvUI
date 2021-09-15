@@ -91,7 +91,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##PowderGauge", min = -4000f, max = 4000f)]
         [CollapseWith(0, 0)]
-        public Vector2 PowderGaugeBarPosition = new(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 PowderGaugeBarPosition = new(0, -32);
 
         [DragFloat2("Size" + "##PowderGauge", min = 1f, max = 4000f)]
         [CollapseWith(5, 0)]
@@ -113,7 +113,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##NoMercy", min = -4000f, max = 4000f)]
         [CollapseWith(0, 1)]
-        public Vector2 NoMercyBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 NoMercyBarPosition = new(0, -10);
 
         [DragFloat2("Size" + "##NoMercy", min = 1f, max = 4000f)]
         [CollapseWith(5, 1)]

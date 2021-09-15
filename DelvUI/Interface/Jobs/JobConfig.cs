@@ -24,5 +24,10 @@ namespace DelvUI.Interface.Jobs
         {
             return (JobConfig)Activator.CreateInstance(MethodBase.GetCurrentMethod().DeclaringType);
         }
+
+        public JobConfig()
+        {
+            Position.Y = HUDConstants.JobHudsBaseY;
+        }
     }
 }

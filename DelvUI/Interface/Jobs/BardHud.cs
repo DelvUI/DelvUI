@@ -321,7 +321,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Song Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 SongGaugePosition = new(0, HUDConstants.JobHudsBaseY - 22);
+        public Vector2 SongGaugePosition = new(0, -22);
 
         [ColorEdit4("Wanderer's Minuet Color")]
         [CollapseWith(10, 0)]
@@ -351,7 +351,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Soul Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 1)]
-        public Vector2 SoulGaugePosition = new(0, HUDConstants.JobHudsBaseY - 5);
+        public Vector2 SoulGaugePosition = new(0, -5);
 
         [ColorEdit4("Soul Gauge Color")]
         [CollapseWith(15, 1)]
@@ -389,7 +389,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Stack Position", min = -4000f, max = 4000f)]
         [Order(75)]
-        public Vector2 StackPosition = new(0, HUDConstants.JobHudsBaseY - 39);
+        public Vector2 StackPosition = new(0, -39);
 
         [DragInt("Stack Padding", max = 1000)]
         [Order(80)]
@@ -435,7 +435,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Caustic Bite Position", min = -4000f, max = 4000f)]
         [CollapseWith(20, 2)]
-        public Vector2 CBPosition = new(-64, HUDConstants.JobHudsBaseY - 51);
+        public Vector2 CBPosition = new(-64, -51);
 
         [ColorEdit4("Caustic Bite Color")]
         [CollapseWith(25, 2)]
@@ -465,7 +465,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Stormbite Position", min = -4000f, max = 4000f)]
         [CollapseWith(20, 3)]
-        public Vector2 SBPosition = new(64, HUDConstants.JobHudsBaseY - 51);
+        public Vector2 SBPosition = new(64, -51);
 
         [ColorEdit4("Stormbite Color")]
         [CollapseWith(25, 3)]

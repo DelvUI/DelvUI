@@ -179,7 +179,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Overheat", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 OverheatPosition = new(0, HUDConstants.JobHudsBaseY - 54);
+        public Vector2 OverheatPosition = new(0, -54);
 
         [DragFloat2("Size" + "##Overheat", min = 0, max = 4000f)]
         [CollapseWith(10, 0)]
@@ -201,7 +201,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##HeatGauge", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 HeatGaugePosition = new(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 HeatGaugePosition = new(0, -32);
 
         [DragFloat2("Size" + "##HeatGauge", min = 0, max = 4000f)]
         [CollapseWith(10, 1)]
@@ -239,7 +239,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##BatteryGauge", min = -4000f, max = 4000f)]
         [CollapseWith(20, 2)]
-        public Vector2 BatteryGaugePosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 BatteryGaugePosition = new(0, -10);
 
         [DragFloat2("Size" + "##BatteryGauge", min = 0, max = 4000f)]
         [CollapseWith(25, 2)]
@@ -269,7 +269,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Wildfire", min = -4000f, max = 4000f)]
         [CollapseWith(5, 3)]
-        public Vector2 WildfirePosition = new(0, HUDConstants.JobHudsBaseY - 76);
+        public Vector2 WildfirePosition = new(0, -76);
 
         [DragFloat2("Size" + "##Wildfire", min = 0, max = 4000f)]
         [CollapseWith(10, 3)]

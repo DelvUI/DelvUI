@@ -207,7 +207,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##DRKManaBar", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
-        public Vector2 ManaBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 61);
+        public Vector2 ManaBarPosition = new Vector2(0, -61);
 
         [DragFloat2("Size" + "##DRKManaBar", min = 0, max = 4000f)]
         [CollapseWith(15, 0)]
@@ -237,7 +237,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##DRKBloodGauge", min = -4000f, max = 4000f)]
         [CollapseWith(10, 1)]
-        public Vector2 BloodGaugePosition = new Vector2(0, HUDConstants.JobHudsBaseY - 49);
+        public Vector2 BloodGaugePosition = new Vector2(0, -49);
 
         [DragFloat2("Size" + "##DRKBloodGauge", min = 0, max = 4000f)]
         [CollapseWith(15, 1)]
@@ -267,7 +267,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##DRKBuffBar", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]
-        public Vector2 BuffBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 BuffBarPosition = new Vector2(0, -32);
 
         [DragFloat2("Size" + "##DRKBuffBar", min = 0, max = 4000f)]
         [CollapseWith(10, 2)]
@@ -297,7 +297,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##DRKLivingShadow", min = -4000f, max = 4000f)]
         [CollapseWith(5, 3)]
-        public Vector2 LivingShadowBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 LivingShadowBarPosition = new Vector2(0, -10);
 
         [DragFloat2("Size" + "##DRKLivingShadow", min = 0, max = 4000f)]
         [CollapseWith(10, 3)]

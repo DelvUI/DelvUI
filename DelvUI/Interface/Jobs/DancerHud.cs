@@ -327,7 +327,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Esprit Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
-        public Vector2 EspritGaugePosition = new(0, HUDConstants.JobHudsBaseY - 54);
+        public Vector2 EspritGaugePosition = new(0, -54);
 
         [DragFloat("Esprit Gauge Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(15, 0)]
@@ -353,7 +353,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Feather Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 1)]
-        public Vector2 FeatherGaugePosition = new(0, HUDConstants.JobHudsBaseY - 71);
+        public Vector2 FeatherGaugePosition = new(0, -71);
 
         [DragFloat("Feather Gauge Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(15, 1)]
@@ -395,7 +395,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Buff Bars Position", min = -4000f, max = 4000f)]
         [CollapseWith(25, 2)]
-        public Vector2 BuffBarPosition = new(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 BuffBarPosition = new(0, -32);
 
         [ColorEdit4("Technical Finish Bar Color")]
         [CollapseWith(30, 2)]
@@ -421,7 +421,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Standard Finish Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 3)]
-        public Vector2 StandardBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 StandardBarPosition = new(0, -10);
 
         [ColorEdit4("Standard Finish Bar Color")]
         [CollapseWith(15, 3)]
@@ -447,7 +447,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Step Bars Position", min = -4000f, max = 4000f)]
         [CollapseWith(15, 4)]
-        public Vector2 StepBarPosition = new(0, HUDConstants.JobHudsBaseY - 93);        
+        public Vector2 StepBarPosition = new(0, -93);
 
         [DragFloat("Step Bar Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(20, 4)]
@@ -493,7 +493,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Proc Bars Position", min = -4000f, max = 4000f)]
         [CollapseWith(15, 5)]
-        public Vector2 ProcBarPosition = new(0, HUDConstants.JobHudsBaseY - 83);
+        public Vector2 ProcBarPosition = new(0, -83);
 
         [DragFloat("Proc Bar Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(20, 5)]

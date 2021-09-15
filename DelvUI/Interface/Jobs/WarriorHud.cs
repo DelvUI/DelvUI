@@ -121,7 +121,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##StormsEye", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 StormsEyePosition = new(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 StormsEyePosition = new(0, -32);
 
         [DragFloat2("Size" + "##StormsEye", min = 1f, max = 4000f)]
         [CollapseWith(10, 0)]
@@ -147,7 +147,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##BeastGauge", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 BeastGaugePosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 BeastGaugePosition = new(0, -10);
 
         [DragFloat2("Size" + "##BeastGauge", min = 1f, max = 4000f)]
         [CollapseWith(10, 1)]

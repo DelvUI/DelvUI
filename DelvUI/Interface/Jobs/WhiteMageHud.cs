@@ -164,7 +164,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Lily Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
-        public Vector2 LilyBarPosition = new(-64, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 LilyBarPosition = new(-64, -32);
 
         [DragInt("Lily Bar Padding", min = 0, max = 1000)]
         [CollapseWith(15, 0)]
@@ -186,7 +186,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Blood Lily Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(35, 0)]
-        public Vector2 BloodLilyBarPosition = new(64, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 BloodLilyBarPosition = new(64, -32);
 
         [DragInt("Blood Lily Bar Padding", min = 0, max = 1000)]
         [CollapseWith(40, 0)]
@@ -208,7 +208,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Dia Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 DiaBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 DiaBarPosition = new(0, -10);
 
         [ColorEdit4("Dia Bar Color")]
         [CollapseWith(10, 1)]
