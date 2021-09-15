@@ -167,7 +167,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             var xPos = origin.X + Config.Position.X + Config.StepBarPosition.X - Config.StepBarSize.X / 2f;
-            var yPos = origin.Y + Config.Position.Y + Config.StepBarPosition.X - Config.StepBarSize.Y / 2f;
+            var yPos = origin.Y + Config.Position.Y + Config.StepBarPosition.Y - Config.StepBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.StepBarSize.Y, Config.StepBarSize.X)
                                            .SetChunks(chunkCount)
@@ -321,7 +321,7 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(0, 0)]
         public bool EspritTextEnabled = true;
 
-        [DragFloat2("Esprit Gauge Size", max = 2000f)]
+        [DragFloat2("Esprit Gauge Size", min = 1f, max = 2000f)]
         [CollapseWith(5, 0)]
         public Vector2 EspritGaugeSize = new(254, 20);
 
@@ -347,7 +347,7 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(0, 1)]
         public bool FlourishingGlowEnabled = true;
 
-        [DragFloat2("Feather Guage Size")]
+        [DragFloat2("Feather Guage Size", min = 1f, max = 2000f)]
         [CollapseWith(5, 1)]
         public Vector2 FeatherGaugeSize = new(254, 10);
 
@@ -389,11 +389,11 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(15, 2)]
         public bool DevilmentTextEnabled = true;
 
-        [DragFloat2("Buff Bars Size")]
+        [DragFloat2("Buff Bars Size", min = 1f, max = 2000f)]
         [CollapseWith(20, 2)]
         public Vector2 BuffBarSize = new(254, 20);
 
-        [DragFloat2("Buff Bars Position")]
+        [DragFloat2("Buff Bars Position", min = -4000f, max = 4000f)]
         [CollapseWith(25, 2)]
         public Vector2 BuffBarPosition = new(0, HUDConstants.JobHudsBaseY - 32);
 
@@ -415,11 +415,11 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(0, 3)]
         public bool StandardTextEnabled = true;
 
-        [DragFloat2("Standard Finish Bar Size")]
+        [DragFloat2("Standard Finish Bar Size", min = 1f, max = 2000f)]
         [CollapseWith(5, 3)]
         public Vector2 StandardBarSize = new(254, 20);
 
-        [DragFloat2("Standard Finish Bar Position")]
+        [DragFloat2("Standard Finish Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 3)]
         public Vector2 StandardBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
 
@@ -441,15 +441,15 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(5, 4)]
         public bool DanceReadyGlowEnabled = true;
 
-        [DragFloat2("Step Bars Size")]
+        [DragFloat2("Step Bars Size", min = 1f, max = 2000f)]
         [CollapseWith(10, 4)]
         public Vector2 StepBarSize = new(254, 10);
 
-        [DragFloat2("Step Bars Position")]
+        [DragFloat2("Step Bars Position", min = -4000f, max = 4000f)]
         [CollapseWith(15, 4)]
-        public Vector2 StepBarPosition = new(0, HUDConstants.JobHudsBaseY - 93);
+        public Vector2 StepBarPosition = new(0, HUDConstants.JobHudsBaseY - 93);        
 
-        [DragFloat("Step Bar Chunk Padding")]
+        [DragFloat("Step Bar Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(20, 4)]
         public float StepBarChunkPadding = 2;
 
@@ -487,15 +487,15 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(0, 5)]
         public bool StaticProcBarsEnabled = true;
 
-        [DragFloat2("Proc Bars Size")]
+        [DragFloat2("Proc Bars Size", min = 1f, max = 2000f)]
         [CollapseWith(10, 5)]
         public Vector2 ProcBarSize = new(254, 10);
 
-        [DragFloat2("Proc Bars Position")]
+        [DragFloat2("Proc Bars Position", min = -4000f, max = 4000f)]
         [CollapseWith(15, 5)]
         public Vector2 ProcBarPosition = new(0, HUDConstants.JobHudsBaseY - 83);
 
-        [DragFloat("Proc Bar Chunk Padding")]
+        [DragFloat("Proc Bar Chunk Padding", min = -4000f, max = 4000f)]
         [CollapseWith(20, 5)]
         public float ProcBarChunkPadding = 2;
 
