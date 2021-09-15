@@ -170,7 +170,12 @@ namespace DelvUI.Interface.Jobs
     public class WhiteMageConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.WHM;
-        public new static WhiteMageConfig DefaultConfig() { return new WhiteMageConfig(); }
+        public new static WhiteMageConfig DefaultConfig()
+        {
+            var config = new WhiteMageConfig();
+            config.UseDefaultPrimaryResourceBar = true;
+            return config;
+        }
 
         #region Lily Bar
         [Checkbox("Show Lily Bars")]
@@ -187,7 +192,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Lily Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
-        public Vector2 LilyBarPosition = new(-64, -32);
+        public Vector2 LilyBarPosition = new(-64, -54);
 
         [DragInt("Lily Bar Padding", min = 0, max = 1000)]
         [CollapseWith(15, 0)]
@@ -209,7 +214,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Blood Lily Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(35, 0)]
-        public Vector2 BloodLilyBarPosition = new(64, -32);
+        public Vector2 BloodLilyBarPosition = new(64, -54);
 
         [DragInt("Blood Lily Bar Padding", min = 0, max = 1000)]
         [CollapseWith(40, 0)]
@@ -231,7 +236,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Dia Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 DiaBarPosition = new(0, -10);
+        public Vector2 DiaBarPosition = new(0, -32);
 
         [ColorEdit4("Dia Bar Color")]
         [CollapseWith(10, 1)]

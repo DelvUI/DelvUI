@@ -160,7 +160,12 @@ namespace DelvUI.Interface.Jobs
     public class ScholarConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.SCH;
-        public new static ScholarConfig DefaultConfig() { return new ScholarConfig(); }
+        public new static ScholarConfig DefaultConfig()
+        {
+            var config = new ScholarConfig();
+            config.UseDefaultPrimaryResourceBar = true;
+            return config;
+        }
 
         #region aether
         [Checkbox("Aether Tracker Enabled")]
@@ -173,7 +178,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Aether Tracker Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 AetherPosition = new(0, -54);
+        public Vector2 AetherPosition = new(0, -76);
 
         [DragInt("Aether Padding", max = 1000)]
         [CollapseWith(10, 1)]
@@ -199,7 +204,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Fairy Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 2)]
-        public Vector2 FairyPosition = new(0, -32);
+        public Vector2 FairyPosition = new(0, -54);
 
         [ColorEdit4("Fairy Gauge Color")]
         [CollapseWith(15, 2)]
@@ -225,7 +230,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Bio Position", min = -4000f, max = 4000f)]
         [CollapseWith(15, 3)]
-        public Vector2 BioPosition = new(0, -10);
+        public Vector2 BioPosition = new(0, -32);
 
         [ColorEdit4("Bio Color")]
         [CollapseWith(20, 3)]
