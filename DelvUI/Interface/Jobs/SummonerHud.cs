@@ -28,6 +28,47 @@ namespace DelvUI.Interface.Jobs
 
         }
 
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowAether)
+            {
+                positions.Add(Config.Position + Config.AetherPosition);
+                sizes.Add(Config.AetherSize);
+            }
+
+            if (Config.ShowRuin)
+            {
+                positions.Add(Config.Position + Config.RuinPosition);
+                sizes.Add(Config.RuinSize);
+            }
+
+            if (Config.ShowTrance)
+            {
+                positions.Add(Config.Position + Config.TrancePosition);
+                sizes.Add(Config.TranceSize);
+            }
+
+            if (Config.ShowDreadwyrmAether)
+            {
+                if (Config.ShowDemiIndicator)
+                {
+                    positions.Add(Config.Position + Config.IndicatorPosition);
+                    sizes.Add(Config.IndicatorSize);
+                }
+
+                if (Config.ShowDreadwyrmAetherBars)
+                {
+                    positions.Add(Config.Position + Config.DreadwyrmAetherBarPosition);
+                    sizes.Add(Config.DreadwyrmAetherBarSize);
+                }
+            }
+
+            return (positions, sizes);
+        }
+
         public override void DrawChildren(Vector2 origin)
         {
             DrawActiveDots(origin);
