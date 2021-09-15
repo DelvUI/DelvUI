@@ -7,6 +7,7 @@ using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
@@ -25,6 +26,31 @@ namespace DelvUI.Interface.Jobs
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowOverheat)
+            {
+                positions.Add(Config.Position + Config.OverheatPosition);
+                sizes.Add(Config.OverheatSize);
+            }
+
+            if (Config.ShowHeatGauge)
+            {
+                positions.Add(Config.Position + Config.HeatGaugePosition);
+                sizes.Add(Config.HeatGaugeSize);
+            }
+
+            if (Config.ShowBatteryGauge)
+            {
+                positions.Add(Config.Position + Config.BatteryGaugePosition);
+                sizes.Add(Config.BatteryGaugeSize);
+            }
+
+            return (positions, sizes);
+        }
 
         public override void DrawChildren(Vector2 origin)
         {

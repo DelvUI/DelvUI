@@ -27,6 +27,44 @@ namespace DelvUI.Interface.Jobs
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
         private Dictionary<string, uint> PartialFillColor => GlobalColors.Instance.PartialFillColor.Map;
 
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.EspritGuageEnabled)
+            {
+                positions.Add(Config.Position + Config.EspritGaugePosition);
+                sizes.Add(Config.EspritGaugeSize);
+            }
+
+            if (Config.FeatherGuageEnabled)
+            {
+                positions.Add(Config.Position + Config.FeatherGaugePosition);
+                sizes.Add(Config.FeatherGaugeSize);
+            }
+
+            if (Config.BuffBarEnabled)
+            {
+                positions.Add(Config.Position + Config.BuffBarPosition);
+                sizes.Add(Config.BuffBarSize);
+            }
+
+            if (Config.StandardBarEnabled)
+            {
+                positions.Add(Config.Position + Config.StandardBarPosition);
+                sizes.Add(Config.StandardBarSize);
+            }
+
+            if (Config.ProcBarEnabled)
+            {
+                positions.Add(Config.Position + Config.ProcBarPosition);
+                sizes.Add(Config.ProcBarSize);
+            }
+
+            return (positions, sizes);
+        }
+
         public override void DrawChildren(Vector2 origin)
         {
             if (Config.EspritGuageEnabled)

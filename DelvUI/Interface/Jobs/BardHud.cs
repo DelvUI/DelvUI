@@ -24,10 +24,45 @@ namespace DelvUI.Interface.Jobs
 
         public BardHud(string id, BardConfig config, string displayName = null) : base(id, config, displayName)
         {
-
         }
 
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
 
+            if (Config.ShowSongGauge)
+            {
+                positions.Add(Config.Position + Config.SongGaugePosition);
+                sizes.Add(Config.SongGaugeSize);
+            }
+
+            if (Config.ShowSoulGauge)
+            {
+                positions.Add(Config.Position + Config.SoulGaugePosition);
+                sizes.Add(Config.SoulGaugeSize);
+            }
+
+            if (Config.ShowAPStacks || Config.ShowEmptyStacks || Config.ShowMBProc || Config.ShowWMStacks)
+            {
+                positions.Add(Config.Position + Config.StackPosition);
+                sizes.Add(Config.StackSize);
+            }
+
+            if (Config.ShowCB)
+            {
+                positions.Add(Config.Position + Config.CBPosition);
+                sizes.Add(Config.CBSize);
+            }
+
+            if (Config.ShowSB)
+            {
+                positions.Add(Config.Position + Config.SBPosition);
+                sizes.Add(Config.SBSize);
+            }
+
+            return (positions, sizes);
+        }
         public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowCB || Config.ShowSB)
