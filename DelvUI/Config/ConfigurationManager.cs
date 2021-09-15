@@ -59,18 +59,21 @@ namespace DelvUI.Config
         public event EventHandler ResetEvent;
         public event EventHandler LockEvent;
 
-        public ConfigurationManager(bool defaultConfig, TextureWrap bannerImage, string configDirectory, BaseNode configBaseNode, EventHandler resetEvent = null)
+        public ConfigurationManager(bool defaultConfig, TextureWrap bannerImage, string configDirectory, BaseNode configBaseNode, EventHandler resetEvent = null, EventHandler lockEvent = null)
         {
             BannerImage = bannerImage;
             ConfigDirectory = configDirectory;
             ConfigBaseNode = configBaseNode;
             _instance = this;
+
             if (!defaultConfig)
             {
                 LoadConfigurations();
             }
-            ResetEvent = resetEvent;
 
+            LockEvent = lockEvent;
+
+            ResetEvent = resetEvent;
             if (ResetEvent != null)
             {
                 ResetEvent(this, null);
@@ -152,7 +155,8 @@ namespace DelvUI.Config
             TextureWrap banner = Plugin.bannerTexture;
 
             var currentResetEvent = GetInstance()?.ResetEvent;
-            return new ConfigurationManager(defaultConfig, banner, Plugin.PluginInterface.GetPluginConfigDirectory(), node, currentResetEvent);
+            var currentLockEvent = GetInstance()?.LockEvent;
+            return new ConfigurationManager(defaultConfig, banner, Plugin.PluginInterface.GetPluginConfigDirectory(), node, currentResetEvent, currentLockEvent);
         }
 
         public static ConfigurationManager GetInstance() => _instance;
