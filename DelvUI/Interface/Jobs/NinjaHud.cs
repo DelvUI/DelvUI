@@ -31,6 +31,38 @@ namespace DelvUI.Interface.Jobs
         private readonly SpellHelper _spellHelper = new();
         private float _oldMudraCooldownInfo;
 
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowHutonGauge)
+            {
+                positions.Add(Config.Position + Config.HutonGaugePosition);
+                sizes.Add(Config.HutonGaugeSize);
+            }
+
+            if (Config.ShowNinkiGauge)
+            {
+                positions.Add(Config.Position + Config.NinkiGaugePosition);
+                sizes.Add(Config.NinkiGaugeSize);
+            }
+
+            if (Config.ShowTrickBar || Config.ShowSuitonBar)
+            {
+                positions.Add(Config.Position + Config.TrickBarPosition);
+                sizes.Add(Config.TrickBarSize);
+            }
+
+            if (Config.ShowMudraCooldown)
+            {
+                positions.Add(Config.Position + Config.MudraBarPosition);
+                sizes.Add(Config.MudraBarSize);
+            }
+
+            return (positions, sizes);
+        }
+
         public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowMudraCooldown)

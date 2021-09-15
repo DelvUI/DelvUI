@@ -7,6 +7,7 @@ using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
@@ -23,6 +24,56 @@ namespace DelvUI.Interface.Jobs
 
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
+
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowDemolishBar)
+            {
+                positions.Add(Config.Position + Config.DemolishBarPosition);
+                sizes.Add(Config.DemolishBarSize);
+            }
+
+            if (Config.ShowChakraBar)
+            {
+                positions.Add(Config.Position + Config.ChakraBarPosition);
+                sizes.Add(Config.ChakraBarSize);
+            }
+
+            if (Config.ShowLeadenFistBar)
+            {
+                positions.Add(Config.Position + Config.LeadenFistBarPosition);
+                sizes.Add(Config.LeadenFistBarSize);
+            }
+
+            if (Config.ShowTwinSnakesBar)
+            {
+                positions.Add(Config.Position + Config.TwinSnakesBarPosition);
+                sizes.Add(Config.TwinSnakesBarSize);
+            }
+
+            if (Config.ShowRiddleofEarthBar)
+            {
+                positions.Add(Config.Position + Config.RiddleofEarthBarPosition);
+                sizes.Add(Config.RiddleofEarthBarSize);
+            }
+
+            if (Config.ShowPerfectBalanceBar)
+            {
+                positions.Add(Config.Position + Config.PerfectBalanceBarPosition);
+                sizes.Add(Config.PerfectBalanceBarSize);
+            }
+
+            if (Config.ShowTrueNorthBar)
+            {
+                positions.Add(Config.Position + Config.TrueNorthBarPosition);
+                sizes.Add(Config.TrueNorthBarSize);
+            }
+
+            return (positions, sizes);
+        }
 
         public override void DrawChildren(Vector2 origin)
         {

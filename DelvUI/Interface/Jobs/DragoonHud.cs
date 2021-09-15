@@ -46,6 +46,38 @@ namespace DelvUI.Interface.Jobs
         //    return new List<uint>(ids);
         //}
 
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowChaosThrustBar)
+            {
+                positions.Add(Config.Position + Config.ChaosThrustBarPosition);
+                sizes.Add(Config.ChaosThrustBarSize);
+            }
+
+            if (Config.ShowDisembowelBar)
+            {
+                positions.Add(Config.Position + Config.DisembowelBarPosition);
+                sizes.Add(Config.DisembowelBarSize);
+            }
+
+            if (Config.ShowEyeOfTheDragonBar)
+            {
+                positions.Add(Config.Position + Config.EyeOfTheDragonBarPosition);
+                sizes.Add(Config.EyeOfTheDragonBarSize);
+            }
+
+            if (Config.ShowBloodBar)
+            {
+                positions.Add(Config.Position + Config.BloodBarPosition);
+                sizes.Add(Config.BloodBarSize);
+            }
+
+            return (positions, sizes);
+        }
+
         public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowChaosThrustBar)

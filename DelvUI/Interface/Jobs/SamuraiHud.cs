@@ -21,7 +21,38 @@ namespace DelvUI.Interface.Jobs
 
         public SamuraiHud(string id, SamuraiConfig config, string displayName = null) : base(id, config, displayName)
         {
+        }
 
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowKenkiBar)
+            {
+                positions.Add(Config.Position + Config.KenkiBarPosition);
+                sizes.Add(Config.KenkiBarSize);
+            }
+
+            if (Config.ShowSenBar)
+            {
+                positions.Add(Config.Position + Config.SenBarPosition);
+                sizes.Add(Config.SenBarSize);
+            }
+
+            if (Config.ShowMeditationBar)
+            {
+                positions.Add(Config.Position + Config.MeditationBarPosition);
+                sizes.Add(Config.MeditationBarSize);
+            }
+
+            if (Config.ShowBuffsBar)
+            {
+                positions.Add(Config.Position + Config.BuffsBarPosition);
+                sizes.Add(Config.BuffsBarSize);
+            }
+
+            return (positions, sizes);
         }
 
         public override void DrawChildren(Vector2 origin)
