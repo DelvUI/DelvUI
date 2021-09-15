@@ -136,7 +136,6 @@ namespace DelvUI.Helpers
             {
                 case 69420:
                     Plugin.CommandManager.ProcessCommand("/delvui");
-
                     break;
 
                 case 69421:

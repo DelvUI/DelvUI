@@ -22,13 +22,48 @@ namespace DelvUI.Interface.Jobs
         private new BardConfig Config => (BardConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public BardHud(string id, BardConfig config) : base(id, config)
+        public BardHud(string id, BardConfig config, string displayName = null) : base(id, config, displayName)
         {
-
         }
 
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
 
-        public override void Draw(Vector2 origin)
+            if (Config.ShowSongGauge)
+            {
+                positions.Add(Config.Position + Config.SongGaugePosition);
+                sizes.Add(Config.SongGaugeSize);
+            }
+
+            if (Config.ShowSoulGauge)
+            {
+                positions.Add(Config.Position + Config.SoulGaugePosition);
+                sizes.Add(Config.SoulGaugeSize);
+            }
+
+            if (Config.ShowAPStacks || Config.ShowEmptyStacks || Config.ShowMBProc || Config.ShowWMStacks)
+            {
+                positions.Add(Config.Position + Config.StackPosition);
+                sizes.Add(Config.StackSize);
+            }
+
+            if (Config.ShowCB)
+            {
+                positions.Add(Config.Position + Config.CBPosition);
+                sizes.Add(Config.CBSize);
+            }
+
+            if (Config.ShowSB)
+            {
+                positions.Add(Config.Position + Config.SBPosition);
+                sizes.Add(Config.SBSize);
+            }
+
+            return (positions, sizes);
+        }
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowCB || Config.ShowSB)
             {
@@ -184,7 +219,7 @@ namespace DelvUI.Interface.Jobs
                     {
                         DrawStacks(origin, 0, 3, Config.APStackColor.Map);
                     }
-                    
+
                     DrawSongTimer(origin, 0, EmptyColor);
 
                     break;
@@ -194,7 +229,7 @@ namespace DelvUI.Interface.Jobs
                     {
                         DrawStacks(origin, 0, 3, Config.APStackColor.Map);
                     }
-                    
+
                     DrawSongTimer(origin, 0, EmptyColor);
 
                     break;
@@ -321,7 +356,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Song Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 SongGaugePosition = new(0, HUDConstants.JobHudsBaseY - 22);
+        public Vector2 SongGaugePosition = new(0, -22);
 
         [ColorEdit4("Wanderer's Minuet Color")]
         [CollapseWith(10, 0)]
@@ -351,7 +386,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Soul Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 1)]
-        public Vector2 SoulGaugePosition = new(0, HUDConstants.JobHudsBaseY - 5);
+        public Vector2 SoulGaugePosition = new(0, -5);
 
         [ColorEdit4("Soul Gauge Color")]
         [CollapseWith(15, 1)]
@@ -389,7 +424,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Stack Position", min = -4000f, max = 4000f)]
         [Order(75)]
-        public Vector2 StackPosition = new(0, HUDConstants.JobHudsBaseY - 39);
+        public Vector2 StackPosition = new(0, -39);
 
         [DragInt("Stack Padding", max = 1000)]
         [Order(80)]
@@ -435,7 +470,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Caustic Bite Position", min = -4000f, max = 4000f)]
         [CollapseWith(20, 2)]
-        public Vector2 CBPosition = new(-64, HUDConstants.JobHudsBaseY - 51);
+        public Vector2 CBPosition = new(-64, -51);
 
         [ColorEdit4("Caustic Bite Color")]
         [CollapseWith(25, 2)]
@@ -465,7 +500,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Stormbite Position", min = -4000f, max = 4000f)]
         [CollapseWith(20, 3)]
-        public Vector2 SBPosition = new(64, HUDConstants.JobHudsBaseY - 51);
+        public Vector2 SBPosition = new(64, -51);
 
         [ColorEdit4("Stormbite Color")]
         [CollapseWith(25, 3)]

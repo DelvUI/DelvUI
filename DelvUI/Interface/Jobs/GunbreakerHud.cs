@@ -18,12 +18,32 @@ namespace DelvUI.Interface.Jobs
         private new GunbreakerConfig Config => (GunbreakerConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public GunbreakerHud(string id, GunbreakerConfig config) : base(id, config)
+        public GunbreakerHud(string id, GunbreakerConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
-        public override void Draw(Vector2 origin)
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowPowderGauge)
+            {
+                positions.Add(Config.Position + Config.PowderGaugeBarPosition);
+                sizes.Add(Config.PowderGaugeBarSize);
+            }
+
+            if (Config.ShowNoMercyBar)
+            {
+                positions.Add(Config.Position + Config.NoMercyBarPosition);
+                sizes.Add(Config.NoMercyBarSize);
+            }
+
+            return (positions, sizes);
+        }
+
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowPowderGauge)
             {
@@ -91,7 +111,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##PowderGauge", min = -4000f, max = 4000f)]
         [CollapseWith(0, 0)]
-        public Vector2 PowderGaugeBarPosition = new(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 PowderGaugeBarPosition = new(0, -32);
 
         [DragFloat2("Size" + "##PowderGauge", min = 1f, max = 4000f)]
         [CollapseWith(5, 0)]
@@ -113,7 +133,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##NoMercy", min = -4000f, max = 4000f)]
         [CollapseWith(0, 1)]
-        public Vector2 NoMercyBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 NoMercyBarPosition = new(0, -10);
 
         [DragFloat2("Size" + "##NoMercy", min = 1f, max = 4000f)]
         [CollapseWith(5, 1)]

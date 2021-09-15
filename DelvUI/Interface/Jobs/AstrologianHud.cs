@@ -24,12 +24,49 @@ namespace DelvUI.Interface.Jobs
         private new AstrologianConfig Config => (AstrologianConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public AstrologianHud(string id, AstrologianConfig config) : base(id, config)
+        public AstrologianHud(string id, AstrologianConfig config, string displayName = null) : base(id, config, displayName)
         {
-
         }
 
-        public override void Draw(Vector2 origin)
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowDrawBar)
+            {
+                positions.Add(Config.Position + Config.DrawBarPosition);
+                sizes.Add(Config.DrawBarSize);
+            }
+
+            if (Config.ShowDivinationBar)
+            {
+                positions.Add(Config.Position + Config.DivinationBarPosition);
+                sizes.Add(Config.DivinationBarSize);
+            }
+
+            if (Config.ShowDotBar)
+            {
+                positions.Add(Config.Position + Config.DotBarPosition);
+                sizes.Add(Config.DotBarSize);
+            }
+
+            if (Config.ShowStarBar)
+            {
+                positions.Add(Config.Position + Config.StarBarPosition);
+                sizes.Add(Config.StarBarSize);
+            }
+
+            if (Config.ShowLightspeedBar)
+            {
+                positions.Add(Config.Position + Config.LightspeedBarPosition);
+                sizes.Add(Config.LightspeedBarSize);
+            }
+
+            return (positions, sizes);
+        }
+
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowDivinationBar)
             {
@@ -480,7 +517,12 @@ namespace DelvUI.Interface.Jobs
     public class AstrologianConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.AST;
-        public new static AstrologianConfig DefaultConfig() { return new AstrologianConfig(); }
+        public new static AstrologianConfig DefaultConfig()
+        {
+            var config = new AstrologianConfig();
+            config.UseDefaultPrimaryResourceBar = true;
+            return config;
+        }
 
         #region Draw Bar
         [Checkbox("Show Draw Bar")]
@@ -493,7 +535,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Draw Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(5, 0)]
-        public Vector2 DrawBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 DrawBarPosition = new(0, -32);
 
         [ColorEdit4("Draw on CD Color")]
         [CollapseWith(10, 0)]
@@ -563,7 +605,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Divination Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(5, 1)]
-        public Vector2 DivinationBarPosition = new(0, HUDConstants.JobHudsBaseY - 49);
+        public Vector2 DivinationBarPosition = new(0, -71);
 
         [DragInt("Divination Bar Padding", min = -1000, max = 1000)]
         [CollapseWith(10, 1)]
@@ -605,7 +647,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Dot Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(5, 2)]
-        public Vector2 DotBarPosition = new(-85, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 DotBarPosition = new(-85, -54);
 
         [ColorEdit4("Dot Color")]
         [CollapseWith(10, 2)]
@@ -631,7 +673,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Star Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(5, 3)]
-        public Vector2 StarBarPosition = new(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 StarBarPosition = new(0, -54);
 
         [ColorEdit4("Star Earthly Color")]
         [CollapseWith(10, 3)]
@@ -669,7 +711,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Lightspeed Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(5, 4)]
-        public Vector2 LightspeedBarPosition = new(85, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 LightspeedBarPosition = new(85, -54);
 
         [ColorEdit4("Lightspeed Color")]
         [CollapseWith(10, 4)]

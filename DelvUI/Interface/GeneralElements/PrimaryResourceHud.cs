@@ -2,23 +2,29 @@
 using DelvUI.Helpers;
 using ImGuiNET;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class PrimaryResourceHud : HudElement, IHudElementWithActor
+    public class PrimaryResourceHud : DraggableHudElement, IHudElementWithActor
     {
         private PrimaryResourceConfig Config => (PrimaryResourceConfig)_config;
         private LabelHud _valueLabel;
         public Actor Actor { get; set; } = null;
         public PrimaryResourceTypes ResourceType = PrimaryResourceTypes.MP;
 
-        public PrimaryResourceHud(string ID, PrimaryResourceConfig config) : base(ID, config)
+        public PrimaryResourceHud(string ID, PrimaryResourceConfig config, string displayName) : base(ID, config, displayName)
         {
             _valueLabel = new LabelHud(ID + "_valueLabel", config.ValueLabelConfig);
         }
 
-        public override void Draw(Vector2 origin)
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
+        }
+
+        public override void DrawChildren(Vector2 origin)
         {
             if (!Config.Enabled || ResourceType == PrimaryResourceTypes.None || Actor == null || Actor is not Chara)
             {

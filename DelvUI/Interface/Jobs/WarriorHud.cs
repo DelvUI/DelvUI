@@ -19,12 +19,32 @@ namespace DelvUI.Interface.Jobs
         private new WarriorConfig Config => (WarriorConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public WarriorHud(string id, WarriorConfig config) : base(id, config)
+        public WarriorHud(string id, WarriorConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
-        public override void Draw(Vector2 origin)
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowStormsEye)
+            {
+                positions.Add(Config.Position + Config.StormsEyePosition);
+                sizes.Add(Config.StormsEyeSize);
+            }
+
+            if (Config.ShowBeastGauge)
+            {
+                positions.Add(Config.Position + Config.BeastGaugePosition);
+                sizes.Add(Config.BeastGaugeSize);
+            }
+
+            return (positions, sizes);
+        }
+
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowStormsEye)
             {
@@ -121,7 +141,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##StormsEye", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 StormsEyePosition = new(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 StormsEyePosition = new(0, -32);
 
         [DragFloat2("Size" + "##StormsEye", min = 1f, max = 4000f)]
         [CollapseWith(10, 0)]
@@ -147,7 +167,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##BeastGauge", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 BeastGaugePosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 BeastGaugePosition = new(0, -10);
 
         [DragFloat2("Size" + "##BeastGauge", min = 1f, max = 4000f)]
         [CollapseWith(10, 1)]

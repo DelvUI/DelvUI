@@ -7,6 +7,7 @@ using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
@@ -17,7 +18,7 @@ namespace DelvUI.Interface.Jobs
         private readonly float[] _robotDuration = { 12.450f, 13.950f, 15.450f, 16.950f, 18.450f, 19.950f };
         private new MachinistConfig Config => (MachinistConfig)_config;
 
-        public MachinistHud(string id, MachinistConfig config) : base(id, config)
+        public MachinistHud(string id, MachinistConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -25,8 +26,33 @@ namespace DelvUI.Interface.Jobs
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
 
-        public override void Draw(Vector2 origin)
+            if (Config.ShowOverheat)
+            {
+                positions.Add(Config.Position + Config.OverheatPosition);
+                sizes.Add(Config.OverheatSize);
+            }
+
+            if (Config.ShowHeatGauge)
+            {
+                positions.Add(Config.Position + Config.HeatGaugePosition);
+                sizes.Add(Config.HeatGaugeSize);
+            }
+
+            if (Config.ShowBatteryGauge)
+            {
+                positions.Add(Config.Position + Config.BatteryGaugePosition);
+                sizes.Add(Config.BatteryGaugeSize);
+            }
+
+            return (positions, sizes);
+        }
+
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowOverheat)
             {
@@ -179,7 +205,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Overheat", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
-        public Vector2 OverheatPosition = new(0, HUDConstants.JobHudsBaseY - 54);
+        public Vector2 OverheatPosition = new(0, -54);
 
         [DragFloat2("Size" + "##Overheat", min = 0, max = 4000f)]
         [CollapseWith(10, 0)]
@@ -201,7 +227,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##HeatGauge", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 HeatGaugePosition = new(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 HeatGaugePosition = new(0, -32);
 
         [DragFloat2("Size" + "##HeatGauge", min = 0, max = 4000f)]
         [CollapseWith(10, 1)]
@@ -239,7 +265,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##BatteryGauge", min = -4000f, max = 4000f)]
         [CollapseWith(20, 2)]
-        public Vector2 BatteryGaugePosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 BatteryGaugePosition = new(0, -10);
 
         [DragFloat2("Size" + "##BatteryGauge", min = 0, max = 4000f)]
         [CollapseWith(25, 2)]
@@ -269,7 +295,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Wildfire", min = -4000f, max = 4000f)]
         [CollapseWith(5, 3)]
-        public Vector2 WildfirePosition = new(0, HUDConstants.JobHudsBaseY - 76);
+        public Vector2 WildfirePosition = new(0, -76);
 
         [DragFloat2("Size" + "##Wildfire", min = 0, max = 4000f)]
         [CollapseWith(10, 3)]

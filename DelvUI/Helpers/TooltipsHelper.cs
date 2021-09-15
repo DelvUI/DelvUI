@@ -1,5 +1,4 @@
-﻿using Dalamud.Plugin;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
 using System;
@@ -91,17 +90,21 @@ namespace DelvUI.Helpers
             }
 
             // bg
-            ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoTitleBar;
-            windowFlags |= ImGuiWindowFlags.NoMove;
-            windowFlags |= ImGuiWindowFlags.NoDecoration;
-            windowFlags |= ImGuiWindowFlags.NoBackground;
+            ImGuiWindowFlags windowFlags =
+                  ImGuiWindowFlags.NoTitleBar
+                | ImGuiWindowFlags.NoMove
+                | ImGuiWindowFlags.NoDecoration
+                | ImGuiWindowFlags.NoBackground
+                | ImGuiWindowFlags.NoInputs;
 
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
             var windowMargin = new Vector2(4, 0);
             var windowPos = _position - windowMargin;
+
             ImGui.SetNextWindowPos(windowPos, ImGuiCond.Always);
             ImGui.SetNextWindowSize(_size + windowMargin * 2);
+            ImGui.SetNextWindowFocus();
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
             ImGui.Begin("delvui_tooltip", windowFlags);
@@ -139,13 +142,15 @@ namespace DelvUI.Helpers
 
             ImGui.End();
             ImGui.PopStyleVar();
+
+            RemoveTooltip();
         }
 
         private string SanitizeText(string text)
         {
             // some data comes with unicode characters i couldn't figure out how to get rid of
             // so im doing a pretty aggressive replace to keep only "nice" characters
-            var result = Regex.Replace(text, @"[^a-zA-Z0-9 -\.\,\?\!\(\)%]", "");
+            var result = Regex.Replace(text, @"[^a-zA-Z0-9 -\:\.\,\?\!\(\)%]", "");
 
             // after that there's still some leftovers characters that need to be removed
             Regex regex = new Regex("HI(.*?)IH");

@@ -143,6 +143,10 @@ namespace DelvUI.Interface.GeneralElements
     [Serializable]
     public abstract class CastbarConfig : MovablePluginConfigObject
     {
+        [DragInt2("Size", min = 1, max = 4000)]
+        [Order(15)]
+        public Vector2 Size;
+
         [Checkbox("Preview")]
         [Order(20)]
         public bool Preview = false;

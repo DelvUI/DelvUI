@@ -9,6 +9,7 @@ using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
@@ -22,12 +23,34 @@ namespace DelvUI.Interface.Jobs
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
-        public WhiteMageHud(string id, WhiteMageConfig config) : base(id, config)
+        public WhiteMageHud(string id, WhiteMageConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
-        public override void Draw(Vector2 origin)
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowLilyBars)
+            {
+                positions.Add(Config.Position + Config.LilyBarPosition);
+                sizes.Add(Config.LilyBarSize);
+                positions.Add(Config.Position + Config.BloodLilyBarPosition);
+                sizes.Add(Config.BloodLilyBarSize);
+            }
+
+            if (Config.ShowDiaBar)
+            {
+                positions.Add(Config.Position + Config.DiaBarPosition);
+                sizes.Add(Config.DiaBarSize);
+            }
+
+            return (positions, sizes);
+        }
+
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowLilyBars)
             {
@@ -147,7 +170,12 @@ namespace DelvUI.Interface.Jobs
     public class WhiteMageConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.WHM;
-        public new static WhiteMageConfig DefaultConfig() { return new WhiteMageConfig(); }
+        public new static WhiteMageConfig DefaultConfig()
+        {
+            var config = new WhiteMageConfig();
+            config.UseDefaultPrimaryResourceBar = true;
+            return config;
+        }
 
         #region Lily Bar
         [Checkbox("Show Lily Bars")]
@@ -164,7 +192,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Lily Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
-        public Vector2 LilyBarPosition = new(-64, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 LilyBarPosition = new(-64, -54);
 
         [DragInt("Lily Bar Padding", min = 0, max = 1000)]
         [CollapseWith(15, 0)]
@@ -186,7 +214,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Blood Lily Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(35, 0)]
-        public Vector2 BloodLilyBarPosition = new(64, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 BloodLilyBarPosition = new(64, -54);
 
         [DragInt("Blood Lily Bar Padding", min = 0, max = 1000)]
         [CollapseWith(40, 0)]
@@ -208,7 +236,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Dia Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public Vector2 DiaBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 DiaBarPosition = new(0, -32);
 
         [ColorEdit4("Dia Bar Color")]
         [CollapseWith(10, 1)]

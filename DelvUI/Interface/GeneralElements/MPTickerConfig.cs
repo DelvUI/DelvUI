@@ -10,6 +10,10 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("MP Ticker", 0)]
     public class MPTickerConfig : MovablePluginConfigObject
     {
+        [DragInt2("Size", min = 1, max = 4000)]
+        [Order(15)]
+        public Vector2 Size;
+
         [Checkbox("Hide on Full MP")]
         [Order(20)]
         public bool HideOnFullMP = true;

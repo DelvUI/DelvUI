@@ -19,12 +19,43 @@ namespace DelvUI.Interface.Jobs
         private new SamuraiConfig Config => (SamuraiConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public SamuraiHud(string id, SamuraiConfig config) : base(id, config)
+        public SamuraiHud(string id, SamuraiConfig config, string displayName = null) : base(id, config, displayName)
         {
-
         }
 
-        public override void Draw(Vector2 origin)
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowKenkiBar)
+            {
+                positions.Add(Config.Position + Config.KenkiBarPosition);
+                sizes.Add(Config.KenkiBarSize);
+            }
+
+            if (Config.ShowSenBar)
+            {
+                positions.Add(Config.Position + Config.SenBarPosition);
+                sizes.Add(Config.SenBarSize);
+            }
+
+            if (Config.ShowMeditationBar)
+            {
+                positions.Add(Config.Position + Config.MeditationBarPosition);
+                sizes.Add(Config.MeditationBarSize);
+            }
+
+            if (Config.ShowBuffsBar)
+            {
+                positions.Add(Config.Position + Config.BuffsBarPosition);
+                sizes.Add(Config.BuffsBarSize);
+            }
+
+            return (positions, sizes);
+        }
+
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowKenkiBar)
             {
@@ -215,7 +246,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Kenki Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(5, 0)]
-        public Vector2 KenkiBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 34);
+        public Vector2 KenkiBarPosition = new Vector2(0, -34);
 
         [Checkbox("Show Kenki Text")]
         [CollapseWith(10, 0)]
@@ -237,11 +268,11 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Sen Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(10, 1)]
-        public Vector2 SenBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 17);
+        public Vector2 SenBarPosition = new Vector2(0, -17);
 
         [DragDropHorizontal("Sen Order", "Setsu", "Getsu", "Ka")]
         [CollapseWith(15, 1)]
-        public int[] senOrder = new int[] {0, 1, 2};
+        public int[] senOrder = new int[] { 0, 1, 2 };
         #endregion
 
         #region Meditation
@@ -259,7 +290,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Meditation Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(10, 2)]
-        public Vector2 MeditationBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 5);
+        public Vector2 MeditationBarPosition = new Vector2(0, -5);
         #endregion
 
         #region Buffs
@@ -277,7 +308,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Buffs Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(10, 3)]
-        public Vector2 BuffsBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 56);
+        public Vector2 BuffsBarPosition = new Vector2(0, -56);
 
         [Checkbox("Show Buffs Bar Text")]
         [CollapseWith(15, 3)]
@@ -285,8 +316,8 @@ namespace DelvUI.Interface.Jobs
 
         [DragDropHorizontal("Shifu/Jinpu Order", "Shifu", "Jinpu")]
         [CollapseWith(20, 3)]
-        public int[] buffOrder = new int[] {0, 1};
-        
+        public int[] buffOrder = new int[] { 0, 1 };
+
         #endregion
 
         #region Higanbana
@@ -300,7 +331,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Higanbana Bar Position", min = -2000f, max = 2000f)]
         [CollapseWith(5, 4)]
-        public Vector2 HiganbanaBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 78);
+        public Vector2 HiganbanaBarPosition = new Vector2(0, -78);
 
         [Checkbox("Show Higanbana Text")]
         [CollapseWith(10, 4)]
@@ -308,9 +339,9 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region BarOrders
-        
 
-        
+
+
         #endregion
 
         #region colors

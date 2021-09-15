@@ -22,12 +22,44 @@ namespace DelvUI.Interface.Jobs
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
         private Dictionary<string, uint> PartialFillColor => GlobalColors.Instance.PartialFillColor.Map;
 
-        public PaladinHud(string id, PaladinConfig config) : base(id, config)
+        public PaladinHud(string id, PaladinConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
-        public override void Draw(Vector2 origin)
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowManaBar)
+            {
+                positions.Add(Config.Position + Config.ManaBarPosition);
+                sizes.Add(Config.ManaBarSize);
+            }
+
+            if (Config.ShowOathGauge)
+            {
+                positions.Add(Config.Position + Config.OathGaugePosition);
+                sizes.Add(Config.OathGaugeSize);
+            }
+
+            if (Config.ShowBuffBar)
+            {
+                positions.Add(Config.Position + Config.BuffBarPosition);
+                sizes.Add(Config.BuffBarSize);
+            }
+
+            if (Config.ShowAtonementBar)
+            {
+                positions.Add(Config.Position + Config.AtonementBarPosition);
+                sizes.Add(Config.AtonementBarSize);
+            }
+
+            return (positions, sizes);
+        }
+
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowManaBar)
             {
@@ -222,7 +254,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Mana Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(20, 0)]
-        public Vector2 ManaBarPosition = new(0, HUDConstants.JobHudsBaseY - 76);
+        public Vector2 ManaBarPosition = new(0, -76);
 
         [ColorEdit4("Mana Bar Color")]
         [CollapseWith(25, 0)]
@@ -248,7 +280,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Oath Gauge Position", min = -4000f, max = 4000f)]
         [CollapseWith(15, 1)]
-        public Vector2 OathGaugePosition = new(0, HUDConstants.JobHudsBaseY - 54);
+        public Vector2 OathGaugePosition = new(0, -54);
 
         [ColorEdit4("Oath Gauge Color")]
         [CollapseWith(20, 1)]
@@ -270,7 +302,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Buff Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 2)]
-        public Vector2 BuffBarPosition = new(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 BuffBarPosition = new(0, -32);
 
         [ColorEdit4("Fight or Flight Bar Color")]
         [CollapseWith(15, 2)]
@@ -296,7 +328,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Atonement Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 3)]
-        public Vector2 AtonementBarPosition = new(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 AtonementBarPosition = new(0, -10);
 
         [ColorEdit4("Atonement Bar Color")]
         [CollapseWith(15, 3)]
@@ -318,7 +350,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Goring Blade Bar Position", min = -4000f, max = 4000f)]
         [CollapseWith(10, 4)]
-        public Vector2 GoringBladeBarPosition = new(0, HUDConstants.JobHudsBaseY - 98);
+        public Vector2 GoringBladeBarPosition = new(0, -98);
 
         [ColorEdit4("Goring Blade Color")]
         [CollapseWith(15, 4)]

@@ -11,7 +11,7 @@ using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface.StatusEffects
 {
-    public class StatusEffectsListHud : HudElement, IHudElementWithActor
+    public class StatusEffectsListHud : DraggableHudElement, IHudElementWithActor
     {
         private StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
 
@@ -22,8 +22,14 @@ namespace DelvUI.Interface.StatusEffects
 
         public Actor Actor { get; set; } = null;
 
-        public StatusEffectsListHud(string ID, StatusEffectsListConfig config) : base(ID, config)
+        public StatusEffectsListHud(string ID, StatusEffectsListConfig config, string displayName) : base(ID, config, displayName)
         {
+        }
+
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            var pos = CalculateStartPosition(Config.Position, Config.Size, Config.GetGrowthDirections());
+            return (new List<Vector2>() { pos + Config.Size / 2f }, new List<Vector2>() { Config.Size });
         }
 
         private uint CalculateLayout(List<StatusEffectData> list)
@@ -154,12 +160,12 @@ namespace DelvUI.Interface.StatusEffects
             return toReturn;
         }
 
-        public override void Draw(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
-            Draw(origin, new List<uint>());
+            DrawChildren(origin, new List<uint>());
         }
 
-        public void Draw(Vector2 origin, List<uint> filterStatusEffects)
+        public void DrawChildren(Vector2 origin, List<uint> filterStatusEffects)
         {
             if (!Config.Enabled || Actor == null)
             {

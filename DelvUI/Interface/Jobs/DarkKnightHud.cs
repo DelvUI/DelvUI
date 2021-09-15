@@ -18,7 +18,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DarkKnightConfig Config => (DarkKnightConfig)_config;
 
-        public DarkKnightHud(string id, DarkKnightConfig config) : base(id, config)
+        public DarkKnightHud(string id, DarkKnightConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -26,7 +26,39 @@ namespace DelvUI.Interface.Jobs
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
-        public override void Draw(Vector2 origin)
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
+        {
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
+
+            if (Config.ShowManaBar)
+            {
+                positions.Add(Config.Position + Config.ManaBarPosition);
+                sizes.Add(Config.ManaBarSize);
+            }
+
+            if (Config.ShowBloodGauge)
+            {
+                positions.Add(Config.Position + Config.BloodGaugePosition);
+                sizes.Add(Config.BloodGaugeSize);
+            }
+
+            if (Config.ShowBuffBar)
+            {
+                positions.Add(Config.Position + Config.BuffBarPosition);
+                sizes.Add(Config.BuffBarSize);
+            }
+
+            if (Config.ShowLivingShadowBar)
+            {
+                positions.Add(Config.Position + Config.LivingShadowBarPosition);
+                sizes.Add(Config.LivingShadowBarSize);
+            }
+
+            return (positions, sizes);
+        }
+
+        public override void DrawChildren(Vector2 origin)
         {
             if (Config.ShowManaBar)
             {
@@ -207,7 +239,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##DRKManaBar", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
-        public Vector2 ManaBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 61);
+        public Vector2 ManaBarPosition = new Vector2(0, -61);
 
         [DragFloat2("Size" + "##DRKManaBar", min = 0, max = 4000f)]
         [CollapseWith(15, 0)]
@@ -237,7 +269,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##DRKBloodGauge", min = -4000f, max = 4000f)]
         [CollapseWith(10, 1)]
-        public Vector2 BloodGaugePosition = new Vector2(0, HUDConstants.JobHudsBaseY - 49);
+        public Vector2 BloodGaugePosition = new Vector2(0, -49);
 
         [DragFloat2("Size" + "##DRKBloodGauge", min = 0, max = 4000f)]
         [CollapseWith(15, 1)]
@@ -267,7 +299,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##DRKBuffBar", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]
-        public Vector2 BuffBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 32);
+        public Vector2 BuffBarPosition = new Vector2(0, -32);
 
         [DragFloat2("Size" + "##DRKBuffBar", min = 0, max = 4000f)]
         [CollapseWith(10, 2)]
@@ -297,7 +329,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##DRKLivingShadow", min = -4000f, max = 4000f)]
         [CollapseWith(5, 3)]
-        public Vector2 LivingShadowBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 10);
+        public Vector2 LivingShadowBarPosition = new Vector2(0, -10);
 
         [DragFloat2("Size" + "##DRKLivingShadow", min = 0, max = 4000f)]
         [CollapseWith(10, 3)]

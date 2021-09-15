@@ -18,23 +18,78 @@ namespace DelvUI.Interface.Jobs
         private new BlackMageConfig Config => (BlackMageConfig)_config;
         private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
-        public BlackMageHud(string id, BlackMageConfig config) : base(id, config)
+        public BlackMageHud(string id, BlackMageConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
 
-        public override void Draw(Vector2 origin)
+        protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            DrawManaBar(origin);
-            DrawUmbralHeartStacks(origin);
-            DrawPolyglot(origin);
+            List<Vector2> positions = new List<Vector2>();
+            List<Vector2> sizes = new List<Vector2>();
 
-            if (Config.ShowTripleCast)
+            if (Config.ShowManaBar)
+            {
+                positions.Add(Config.Position + Config.ManaBarPosition);
+                sizes.Add(Config.ManaBarSize);
+            }
+
+            if (Config.ShowUmbralHeart)
+            {
+                positions.Add(Config.Position + Config.UmbralHeartPosition);
+                sizes.Add(Config.UmbralHeartSize);
+            }
+
+            if (Config.ShowPolyglot)
+            {
+                positions.Add(Config.Position + Config.PolyglotPosition);
+                sizes.Add(Config.PolyglotSize);
+            }
+
+            if (Config.ShowTriplecast)
+            {
+                positions.Add(Config.Position + Config.TriplecastPosition);
+                sizes.Add(Config.TriplecastSize);
+            }
+
+            if (Config.ShowProcs)
+            {
+                positions.Add(Config.Position + Config.ProcsBarPosition);
+                sizes.Add(Config.ProcsBarSize);
+            }
+
+            if (Config.ShowDotBar)
+            {
+                positions.Add(Config.Position + Config.DoTBarPosition);
+                sizes.Add(Config.DoTBarSize);
+            }
+
+            return (positions, sizes);
+        }
+
+        public override void DrawChildren(Vector2 origin)
+        {
+            if (Config.ShowManaBar)
+            {
+                DrawManaBar(origin);
+            }
+
+            if (Config.ShowUmbralHeart)
+            {
+                DrawUmbralHeartStacks(origin);
+            }
+
+            if (Config.ShowPolyglot)
+            {
+                DrawPolyglot(origin);
+            }
+
+            if (Config.ShowTriplecast)
             {
                 DrawTripleCast(origin);
             }
 
-            if (Config.ShowFirestarterProcs || Config.ShowThundercloudProcs)
+            if (Config.ShowProcs)
             {
                 DrawProcs(origin);
             }
@@ -50,10 +105,7 @@ namespace DelvUI.Interface.Jobs
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
             var actor = Plugin.ClientState.LocalPlayer;
 
-            var position = new Vector2(
-                origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f
-            );
+            var position = origin + Config.Position + Config.ManaBarPosition - Config.ManaBarSize / 2f;
 
             var color = gauge.InAstralFire() ? Config.ManaBarFireColor.Map : gauge.InUmbralIce() ? Config.ManaBarIceColor.Map : Config.ManaBarNoElementColor.Map;
 
@@ -114,10 +166,8 @@ namespace DelvUI.Interface.Jobs
         protected virtual void DrawUmbralHeartStacks(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
-            var position = new Vector2(
-                origin.X + Config.Position.X + Config.UmbralHeartPosition.X - Config.UmbralHeartSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.UmbralHeartPosition.Y - Config.UmbralHeartSize.Y / 2f
-            );
+
+            var position = origin + Config.Position + Config.UmbralHeartPosition - Config.UmbralHeartSize / 2f;
 
             var bar = BarBuilder.Create(position, Config.UmbralHeartSize)
                                 .SetChunks(3)
@@ -134,10 +184,7 @@ namespace DelvUI.Interface.Jobs
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
 
-            var position = new Vector2(
-                origin.X + Config.Position.X + Config.PolyglotPosition.X - Config.PolyglotSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.PolyglotPosition.Y - Config.PolyglotSize.Y / 2f
-            );
+            var position = origin + Config.Position + Config.PolyglotPosition - Config.PolyglotSize / 2f;
 
             var barWidth = (int)(Config.PolyglotSize.X - Config.PolyglotPadding) / 2;
             var barSize = new Vector2(barWidth, Config.PolyglotSize.Y);
@@ -175,12 +222,9 @@ namespace DelvUI.Interface.Jobs
         {
             var tripleStackBuff = Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1211);
 
-            var position = new Vector2(
-                origin.X + Config.Position.X + Config.TriplecastPosition.X - Config.TripleCastSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.TriplecastPosition.Y - Config.TripleCastSize.Y / 2f
-            );
+            var position = origin + Config.Position + Config.TriplecastPosition - Config.TriplecastSize / 2f;
 
-            var bar = BarBuilder.Create(position, Config.TripleCastSize)
+            var bar = BarBuilder.Create(position, Config.TriplecastSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.TriplecastPadding)
                                 .AddInnerBar(tripleStackBuff.StackCount, 3, Config.TriplecastColor.Map, EmptyColor)
@@ -197,10 +241,7 @@ namespace DelvUI.Interface.Jobs
             var firestarterTimer = Config.ShowFirestarterProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 165).Duration) : 0;
             var thundercloudTimer = Config.ShowThundercloudProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 164).Duration) : 0;
 
-            var position = new Vector2(
-                origin.X + Config.Position.X + Config.ProcsBarPosition.X,
-                origin.Y + Config.Position.Y + Config.ProcsBarPosition.Y - Config.ProcsBarSize.Y / 2f
-            );
+            var position = origin + Config.Position + Config.ProcsBarPosition - Config.ProcsBarSize / 2f;
 
             var builder = BarBuilder.Create(position, Config.ProcsBarSize);
 
@@ -250,10 +291,7 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            var position = new Vector2(
-                origin.X + Config.Position.X + Config.DoTBarPosition.X,
-                origin.Y + Config.Position.Y + Config.DoTBarPosition.Y - Config.DoTBarSize.Y / 2f
-            );
+            var position = origin + Config.Position + Config.DoTBarPosition - Config.DoTBarSize / 2f;
 
             var builder = BarBuilder.Create(position, Config.DoTBarSize)
                 .AddInnerBar(timer, maxDuration, Config.DotColor.Map)
@@ -274,146 +312,162 @@ namespace DelvUI.Interface.Jobs
         public new static BlackMageConfig DefaultConfig() { return new BlackMageConfig(); }
 
         #region mana bar
+        [Checkbox("Show Mana Bar")]
+        [CollapseControl(30, 0)]
+        public bool ShowManaBar = true;
+
         [DragFloat2("Mana Bar Position", min = -2000, max = 2000f)]
-        [Order(30)]
-        public Vector2 ManaBarPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 10);
+        [CollapseWith(0, 0)]
+        public Vector2 ManaBarPosition = new Vector2(0, -10);
 
         [DragFloat2("Mana Bar Size", max = 2000f)]
-        [Order(35)]
+        [CollapseWith(5, 0)]
         public Vector2 ManaBarSize = new Vector2(254, 20);
 
         [Checkbox("Show Mana Value")]
-        [Order(40)]
+        [CollapseWith(10, 0)]
         public bool ShowManaValue = false;
 
         [Checkbox("Show Mana Threshold Marker During Astral Fire")]
-        [CollapseControl(45, 0)]
+        [CollapseWith(15, 0)]
         public bool ShowManaThresholdMarker = true;
 
         [DragInt("Mana Threshold Marker Value", max = 10000)]
-        [CollapseWith(0, 0)]
+        [CollapseWith(20, 0)]
         public int ManaThresholdValue = 2400;
 
         [ColorEdit4("Mana Bar Color")]
-        [Order(50)]
+        [CollapseWith(25, 0)]
         public PluginConfigColor ManaBarNoElementColor = new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
 
         [ColorEdit4("Mana Bar Ice Color")]
-        [Order(55)]
+        [CollapseWith(30, 0)]
         public PluginConfigColor ManaBarIceColor = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
 
         [ColorEdit4("Mana Bar Fire Color")]
-        [Order(60)]
+        [CollapseWith(35, 0)]
         public PluginConfigColor ManaBarFireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
         #endregion
 
         #region umbral heart
+        [Checkbox("Show Umbral Heart Bar")]
+        [CollapseControl(35, 1)]
+        public bool ShowUmbralHeart = true;
+
         [DragFloat2("Umbral Heart Bar Position", min = -2000, max = 2000f)]
-        [Order(65)]
-        public Vector2 UmbralHeartPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 30);
+        [CollapseWith(0, 1)]
+        public Vector2 UmbralHeartPosition = new Vector2(0, -30);
 
         [DragFloat2("Umbral Heart Bar Size", max = 2000f)]
-        [Order(70)]
+        [CollapseWith(5, 1)]
         public Vector2 UmbralHeartSize = new Vector2(254, 16);
 
         [DragInt("Umbral Heart Padding", min = -100, max = 100)]
-        [Order(75)]
+        [CollapseWith(10, 1)]
         public int UmbralHeartPadding = 2;
 
         [ColorEdit4("Umbral Heart Color")]
-        [Order(80)]
+        [CollapseWith(15, 1)]
         public PluginConfigColor UmbralHeartColor = new PluginConfigColor(new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f));
         #endregion
 
         #region triple cast
         [Checkbox("Show Triplecast")]
-        [CollapseControl(85, 1)]
-        public bool ShowTripleCast = true;
+        [CollapseControl(40, 2)]
+        public bool ShowTriplecast = true;
 
         [DragFloat2("Triplecast Position", min = -2000, max = 2000f)]
-        [CollapseWith(0, 1)]
-        public Vector2 TriplecastPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 48);
+        [CollapseWith(0, 2)]
+        public Vector2 TriplecastPosition = new Vector2(0, -48);
 
         [DragFloat2("Triplecast Size", max = 2000)]
-        [CollapseWith(5, 1)]
-        public Vector2 TripleCastSize = new Vector2(254, 16);
+        [CollapseWith(5, 2)]
+        public Vector2 TriplecastSize = new Vector2(254, 16);
 
         [DragInt("Trioplecast Padding", min = -100, max = 100)]
-        [CollapseWith(10, 1)]
+        [CollapseWith(10, 2)]
         public int TriplecastPadding = 2;
 
         [ColorEdit4("Triplecast Color")]
-        [CollapseWith(15, 1)]
+        [CollapseWith(15, 2)]
         public PluginConfigColor TriplecastColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         #region polyglot
+        [Checkbox("Show Polyglot Stacks")]
+        [CollapseControl(45, 3)]
+        public bool ShowPolyglot = true;
+
         [DragFloat2("Polyglot Position", min = -2000, max = 2000f)]
-        [Order(90)]
-        public Vector2 PolyglotPosition = new Vector2(0, HUDConstants.JobHudsBaseY - 67);
+        [CollapseWith(0, 3)]
+        public Vector2 PolyglotPosition = new Vector2(0, -67);
 
         [DragFloat2("Polyglot Size", max = 2000f)]
-        [Order(95)]
+        [CollapseWith(5, 3)]
         public Vector2 PolyglotSize = new Vector2(38, 18);
 
         [DragInt("Polyglot Padding", min = -100, max = 100)]
-        [Order(100)]
+        [CollapseWith(10, 3)]
         public int PolyglotPadding = 2;
 
         [ColorEdit4("Polyglot Color")]
-        [Order(105)]
+        [CollapseWith(15, 3)]
         public PluginConfigColor PolyglotColor = new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
         #endregion
 
         #region procs
+        [Checkbox("Show Procs")]
+        [CollapseControl(50, 4)]
+        public bool ShowProcs = true;
+
         [Checkbox("Show Firestarter Procs")]
-        [CollapseControl(110, 2)]
+        [CollapseWith(0, 4)]
         public bool ShowFirestarterProcs = true;
 
         [Checkbox("Show Thundercloud Procs")]
-        [CollapseWith(0, 2)]
+        [CollapseWith(5, 4)]
         public bool ShowThundercloudProcs = true;
 
         [Checkbox("Invert Procs Bar")]
-        [CollapseWith(5, 2)]
+        [CollapseWith(10, 4)]
         public bool InvertProcsBar = true;
 
         [DragFloat2("Procs Bar Position", min = -2000, max = 2000f)]
-        [CollapseWith(10, 2)]
-        public Vector2 ProcsBarPosition = new Vector2(-127, HUDConstants.JobHudsBaseY - 67);
+        [CollapseWith(15, 4)]
+        public Vector2 ProcsBarPosition = new Vector2(-74, -67);
 
         [DragFloat2("Procs Bar Size", max = 2000f)]
-        [CollapseWith(15, 2)]
+        [CollapseWith(20, 4)]
         public Vector2 ProcsBarSize = new Vector2(106, 18);
 
         [ColorEdit4("Firestarter Color")]
-        [CollapseWith(20, 2)]
+        [CollapseWith(25, 4)]
         public PluginConfigColor FirestarterColor = new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f));
 
         [ColorEdit4("Thundercloud Color")]
-        [CollapseWith(25, 2)]
+        [CollapseWith(30, 4)]
         public PluginConfigColor ThundercloudColor = new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f));
         #endregion
 
         #region thunder dots
         [Checkbox("Show DoT Bar")]
-        [CollapseControl(115, 4)]
+        [CollapseControl(55, 5)]
         public bool ShowDotBar = true;
 
         [Checkbox("Invert DoT Bar")]
-        [CollapseWith(0, 4)]
+        [CollapseWith(0, 5)]
         public bool InvertDoTBar = false;
 
         [DragFloat2("DoT Bar Position", min = -2000, max = 2000f)]
-        [CollapseWith(5, 4)]
-        public Vector2 DoTBarPosition = new Vector2(21, HUDConstants.JobHudsBaseY - 67);
+        [CollapseWith(5, 5)]
+        public Vector2 DoTBarPosition = new Vector2(74, -67);
 
         [DragFloat2("DoT Bar Size", max = 2000f)]
-        [CollapseWith(10, 4)]
+        [CollapseWith(10, 5)]
         public Vector2 DoTBarSize = new Vector2(106, 18);
 
         [ColorEdit4("DoT Color")]
-        [CollapseWith(15, 4)]
+        [CollapseWith(15, 5)]
         public PluginConfigColor DotColor = new PluginConfigColor(new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f));
         #endregion
     }
