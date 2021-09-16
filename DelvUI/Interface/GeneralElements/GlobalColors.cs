@@ -123,27 +123,27 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Paladin")]
         [Order(5)]
-        public PluginConfigColor PLDColor = new PluginConfigColor(new(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f));
+        public PluginConfigColor PLDColor = new PluginConfigColor(new(168f / 255f, 210f / 255f, 230f / 255f, 100f / 100f));
 
         [ColorEdit4("Dark Knight")]
         [Order(10)]
-        public PluginConfigColor DRKColor = new PluginConfigColor(new(136f / 255f, 14f / 255f, 79f / 255f, 100f / 100f));
+        public PluginConfigColor DRKColor = new PluginConfigColor(new(209f / 255f, 38f / 255f, 204f / 255f, 100f / 100f));
 
         [ColorEdit4("Warrior")]
         [Order(15)]
-        public PluginConfigColor WARColor = new PluginConfigColor(new(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f));
+        public PluginConfigColor WARColor = new PluginConfigColor(new(207f / 255f, 38f / 255f, 33f / 255f, 100f / 100f));
 
         [ColorEdit4("Gunbreaker")]
         [Order(20)]
-        public PluginConfigColor GNBColor = new PluginConfigColor(new(78f / 255f, 52f / 255f, 46f / 255f, 100f / 100f));
+        public PluginConfigColor GNBColor = new PluginConfigColor(new(121f / 255f, 109f / 255f, 48f / 255f, 100f / 100f));
 
         [ColorEdit4("Gladiator")]
         [Order(25)]
-        public PluginConfigColor GLDColor = new PluginConfigColor(new(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f));
+        public PluginConfigColor GLDColor = new PluginConfigColor(new(168f / 255f, 210f / 255f, 230f / 255f, 100f / 100f));
 
         [ColorEdit4("Marauder")]
         [Order(30)]
-        public PluginConfigColor MRDColor = new PluginConfigColor(new(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f));
+        public PluginConfigColor MRDColor = new PluginConfigColor(new(207f / 255f, 38f / 255f, 33f / 255f, 100f / 100f));
     }
 
     [Serializable]
@@ -155,19 +155,19 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Scholar")]
         [Order(5)]
-        public PluginConfigColor SCHColor = new PluginConfigColor(new(121f / 255f, 134f / 255f, 203f / 255f, 100f / 100f));
+        public PluginConfigColor SCHColor = new PluginConfigColor(new(134f / 255f, 87f / 255f, 255f / 255f, 100f / 100f));
 
         [ColorEdit4("White Mage")]
         [Order(10)]
-        public PluginConfigColor WHMColor = new PluginConfigColor(new(150f / 255f, 150f / 255f, 150f / 255f, 100f / 100f));
+        public PluginConfigColor WHMColor = new PluginConfigColor(new(255f / 255f, 240f / 255f, 220f / 255f, 100f / 100f));
 
         [ColorEdit4("Astrologian")]
         [Order(15)]
-        public PluginConfigColor ASTColor = new PluginConfigColor(new(121f / 255f, 85f / 255f, 72f / 255f, 100f / 100f));
+        public PluginConfigColor ASTColor = new PluginConfigColor(new(255f / 255f, 231f / 255f, 74f / 255f, 100f / 100f));
 
         [ColorEdit4("Conjurer")]
         [Order(20)]
-        public PluginConfigColor CNJColor = new PluginConfigColor(new(150f / 255f, 150f / 255f, 150f / 255f, 100f / 100f));
+        public PluginConfigColor CNJColor = new PluginConfigColor(new(255f / 255f, 240f / 255f, 220f / 255f, 100f / 100f));
     }
 
     [Serializable]
@@ -179,31 +179,31 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Monk")]
         [Order(5)]
-        public PluginConfigColor MNKColor = new PluginConfigColor(new(78f / 255f, 52f / 255f, 46f / 255f, 100f / 100f));
+        public PluginConfigColor MNKColor = new PluginConfigColor(new(214f / 255f, 156f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Ninja")]
         [Order(10)]
-        public PluginConfigColor NINColor = new PluginConfigColor(new(211f / 255f, 47f / 255f, 47f / 255f, 100f / 100f));
+        public PluginConfigColor NINColor = new PluginConfigColor(new(175f / 255f, 25f / 255f, 100f / 255f, 100f / 100f));
 
         [ColorEdit4("Dragoon")]
         [Order(15)]
-        public PluginConfigColor DRGColor = new PluginConfigColor(new(63f / 255f, 81f / 255f, 181f / 255f, 100f / 100f));
+        public PluginConfigColor DRGColor = new PluginConfigColor(new(65f / 255f, 100f / 255f, 205f / 255f, 100f / 100f));
 
         [ColorEdit4("Samurai")]
         [Order(20)]
-        public PluginConfigColor SAMColor = new PluginConfigColor(new(255f / 255f, 202f / 255f, 40f / 255f, 100f / 100f));
+        public PluginConfigColor SAMColor = new PluginConfigColor(new(228f / 255f, 109f / 255f, 4f / 255f, 100f / 100f));
 
         [ColorEdit4("Pugilist")]
         [Order(25)]
-        public PluginConfigColor PGLColor = new PluginConfigColor(new(78f / 255f, 52f / 255f, 46f / 255f, 100f / 100f));
+        public PluginConfigColor PGLColor = new PluginConfigColor(new(214f / 255f, 156f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Rogue")]
         [Order(30)]
-        public PluginConfigColor ROGColor = new PluginConfigColor(new(211f / 255f, 47f / 255f, 47f / 255f, 100f / 100f));
+        public PluginConfigColor ROGColor = new PluginConfigColor(new(175f / 255f, 25f / 255f, 100f / 255f, 100f / 100f));
 
         [ColorEdit4("Lancer")]
         [Order(35)]
-        public PluginConfigColor LNCColor = new PluginConfigColor(new(63f / 255f, 81f / 255f, 181f / 255f, 100f / 100f));
+        public PluginConfigColor LNCColor = new PluginConfigColor(new(65f / 255f, 100f / 255f, 205f / 255f, 100f / 100f));
     }
 
     [Serializable]
@@ -215,19 +215,19 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Bard")]
         [Order(5)]
-        public PluginConfigColor BRDColor = new PluginConfigColor(new(158f / 255f, 157f / 255f, 36f / 255f, 100f / 100f));
+        public PluginConfigColor BRDColor = new PluginConfigColor(new(145f / 255f, 186f / 255f, 94f / 255f, 100f / 100f));
 
         [ColorEdit4("Machinist")]
         [Order(10)]
-        public PluginConfigColor MCHColor = new PluginConfigColor(new(0f / 255f, 151f / 255f, 167f / 255f, 100f / 100f));
+        public PluginConfigColor MCHColor = new PluginConfigColor(new(110f / 255f, 225f / 255f, 214f / 255f, 100f / 100f));
 
         [ColorEdit4("Dancer")]
         [Order(15)]
-        public PluginConfigColor DNCColor = new PluginConfigColor(new(244f / 255f, 143f / 255f, 177f / 255f, 100f / 100f));
+        public PluginConfigColor DNCColor = new PluginConfigColor(new(226f / 255f, 176f / 255f, 175f / 255f, 100f / 100f));
 
         [ColorEdit4("Archer")]
         [Order(20)]
-        public PluginConfigColor ARCColor = new PluginConfigColor(new(158f / 255f, 157f / 255f, 36f / 255f, 100f / 100f));
+        public PluginConfigColor ARCColor = new PluginConfigColor(new(145f / 255f, 186f / 255f, 94f / 255f, 100f / 100f));
     }
 
     [Serializable]
@@ -239,15 +239,15 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Black Mage")]
         [Order(5)]
-        public PluginConfigColor BLMColor = new PluginConfigColor(new(126f / 255f, 87f / 255f, 194f / 255f, 100f / 100f));
+        public PluginConfigColor BLMColor = new PluginConfigColor(new(165f / 255f, 121f / 255f, 214f / 255f, 100f / 100f));
 
         [ColorEdit4("Summoner")]
         [Order(10)]
-        public PluginConfigColor SMNColor = new PluginConfigColor(new(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f));
+        public PluginConfigColor SMNColor = new PluginConfigColor(new(45f / 255f, 155f / 255f, 120f / 255f, 100f / 100f));
 
         [ColorEdit4("Red Mage")]
         [Order(15)]
-        public PluginConfigColor RDMColor = new PluginConfigColor(new(233f / 255f, 30f / 255f, 99f / 255f, 100f / 100f));
+        public PluginConfigColor RDMColor = new PluginConfigColor(new(232f / 255f, 123f / 255f, 123f / 255f, 100f / 100f));
 
         [ColorEdit4("Blue Mage")]
         [Order(20)]
@@ -255,11 +255,11 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Thaumaturge")]
         [Order(25)]
-        public PluginConfigColor THMColor = new PluginConfigColor(new(126f / 255f, 87f / 255f, 194f / 255f, 100f / 100f));
+        public PluginConfigColor THMColor = new PluginConfigColor(new(165f / 255f, 121f / 255f, 214f / 255f, 100f / 100f));
 
         [ColorEdit4("Arcanist")]
         [Order(30)]
-        public PluginConfigColor ACNColor = new PluginConfigColor(new(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f));
+        public PluginConfigColor ACNColor = new PluginConfigColor(new(45f / 255f, 155f / 255f, 120f / 255f, 100f / 100f));
     }
 
     [Serializable]
@@ -287,7 +287,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("NPC Hostile")]
         [Order(25)]
-        public PluginConfigColor NPCHostileColor = new PluginConfigColor(new(205f / 255f, 25f / 255f, 25f / 255f, 100f / 100f));
+        public PluginConfigColor NPCHostileColor = new PluginConfigColor(new(128f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("NPC Neutral")]
         [Order(30)]
