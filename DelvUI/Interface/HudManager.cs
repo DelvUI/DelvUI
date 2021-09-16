@@ -1,3 +1,4 @@
+using Dalamud.Game.ClientState;
 using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
@@ -30,6 +31,12 @@ namespace DelvUI.Interface
         private JobHud _jobHud = null;
         private Dictionary<uint, JobHudTypes> _jobsMap;
         private Dictionary<uint, Type> _unsupportedJobsMap;
+
+        public HudHelper helper { get; } = new HudHelper();
+
+        public static string playerUnitFrameID = "playerUnitFrame";
+        public static string playerCastbarID = "playerCastbar";
+
 
         public HudManager()
         {
@@ -113,7 +120,7 @@ namespace DelvUI.Interface
         private void CreateUnitFrames()
         {
             var playerUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerUnitFrameConfig>();
-            var playerUnitFrame = new UnitFrameHud("playerUnitFrame", playerUnitFrameConfig, "Player");
+            var playerUnitFrame = new UnitFrameHud(HudManager.playerUnitFrameID, playerUnitFrameConfig, "Player");
             _hudElements.Add(playerUnitFrame);
             _hudElementsUsingPlayer.Add(playerUnitFrame);
 
@@ -136,7 +143,7 @@ namespace DelvUI.Interface
         private void CreateCastbars()
         {
             var playerCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerCastbarConfig>();
-            var playerCastbar = new PlayerCastbarHud("playerCastbar", playerCastbarConfig, "Player Castbar");
+            var playerCastbar = new PlayerCastbarHud(playerCastbarID, playerCastbarConfig, "Player Castbar");
             _hudElements.Add(playerCastbar);
             _hudElementsUsingPlayer.Add(playerCastbar);
 
@@ -207,6 +214,8 @@ namespace DelvUI.Interface
                 return;
             }
 
+            helper.ConfigureCombatActionBars();
+
             ImGuiHelpers.ForceNextWindowMainViewport();
             ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
@@ -235,10 +244,13 @@ namespace DelvUI.Interface
                 DraggablesHelper.DrawGrid(_gridConfig, _selectedElement?.GetConfig());
             }
 
+            bool isHudLocked = ConfigurationManager.GetInstance().LockHUD;
+
+
             // general elements
             foreach (var element in _hudElements)
             {
-                if (element != _selectedElement)
+                if (element != _selectedElement && !helper.IsElementHidden(element))
                 {
                     element.Draw(_origin);
                 }
@@ -247,7 +259,10 @@ namespace DelvUI.Interface
             // job hud
             if (_jobHud != null && _jobHud.Config.Enabled && _jobHud != _selectedElement)
             {
-                _jobHud.Draw(_origin);
+                if (!helper.IsElementHidden())
+                {
+                    _jobHud.Draw(_origin);
+                }
             }
 
             // selected
@@ -303,6 +318,8 @@ namespace DelvUI.Interface
 
             if (config != null && _primaryResourceHud != null)
             {
+                helper.ApplyCurrentConfig();
+
                 _primaryResourceHud.ResourceType = config.UseDefaultPrimaryResourceBar ? config.PrimaryResourceType : PrimaryResourceTypes.None;
             }
         }

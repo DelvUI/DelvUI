@@ -1036,6 +1036,14 @@ namespace DelvUI.Config.Tree
                     {
                         field.SetValue(ConfigObject, boolVal);
                         changed = true;
+
+                        if (changed && checkboxAttribute.isMonitored
+                            && ConfigObject is IOnChangeEventArgs eventObject)
+                        {
+                            eventObject.onValueChangedRegisterEvent(
+                                new OnChangeEventArgs<bool>(field.Name, boolVal)
+                            );
+                        }
                     }
                 }
                 else if (attribute is DragFloatAttribute dragFloatAttribute)
@@ -1140,6 +1148,78 @@ namespace DelvUI.Config.Tree
                             }
                         }
                     }
+                }
+                else if (attribute is DynamicList dynamicList)
+                {
+                    List<string> opts = (List<string>)fieldVal;
+
+                    ImGui.BeginGroup();
+
+                    if (ImGui.BeginTable("##myTable2" + dynamicList.friendlyName + idText, 2))
+                    {
+                        ImGui.TableNextColumn();
+
+                        List<string> addOptions = new(dynamicList.options);
+                        for (int i = 0; i < opts.Count(); i++)
+                        {
+                            addOptions.Remove(opts[i]);
+                        }
+
+                        int intVal = 0;
+                        ImGui.Text("Add");
+                        if (ImGui.Combo("##Add" + idText + dynamicList.friendlyName, ref intVal, addOptions.ToArray(), addOptions.Count(), 6))
+                        {
+                            var change = addOptions[intVal];
+                            opts.Add(change);
+                            field.SetValue(ConfigObject, opts);
+                            changed = true;
+
+                            if (dynamicList.isMonitored && ConfigObject is IOnChangeEventArgs eventObject)
+                            {
+                                eventObject.onValueChangedRegisterEvent(
+                                    new OnChangeEventArgs<string>(field.Name, change, ChangeType.ListAdd)
+                                );
+                            }
+                        }
+
+                        ImGui.TableNextColumn();
+
+                        var removeOpts = opts;
+
+                        int removeVal = 0;
+                        ImGui.Text("Remove");
+                        if (ImGui.Combo("##Remove" + idText + dynamicList.friendlyName, ref removeVal, removeOpts.ToArray(), removeOpts.Count(), 6))
+                        {
+                            var change = removeOpts[removeVal];
+                            opts.Remove(change);
+                            field.SetValue(ConfigObject, opts);
+                            changed = true;
+
+                            if (dynamicList.isMonitored && ConfigObject is IOnChangeEventArgs eventObject)
+                            {
+                                eventObject.onValueChangedRegisterEvent(
+                                    new OnChangeEventArgs<string>(field.Name, change, ChangeType.ListRemove)
+                                );
+                            }
+                        }
+
+                        ImGui.EndTable();
+                    }
+
+                    ImGui.Text(dynamicList.friendlyName + ":");
+
+                    if (opts.Count() > 0 && ImGui.BeginTable("##myTable" + dynamicList.friendlyName, 5))
+                    {
+                        var length = opts.Count();
+                        for (int i = 0; i < length; i++)
+                        {
+                            ImGui.TableNextColumn();
+                            ImGui.Text(opts[i]);
+                        }
+                        ImGui.EndTable();
+                    }
+
+                    ImGui.EndGroup();
                 }
             }
         }

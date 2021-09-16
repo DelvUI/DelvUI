@@ -3,7 +3,13 @@
 namespace DelvUI.Config.Attributes
 {
     [AttributeUsage(AttributeTargets.Field)]
-    public class CheckboxAttribute : Attribute
+    public class ConfigAttribute : Attribute
+    {
+        public bool isMonitored = false;
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public class CheckboxAttribute : ConfigAttribute
     {
         public string friendlyName;
 
@@ -151,7 +157,7 @@ namespace DelvUI.Config.Attributes
 
     [AttributeUsage(AttributeTargets.Field)]
     public class DragDropHorizontalAttribute : Attribute
-    {   
+    {
         public string friendlyName;
         public string[] names;
 
@@ -187,6 +193,19 @@ namespace DelvUI.Config.Attributes
         {
             this.friendlyName = friendlyName;
             this.pos = pos;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
+    public class DynamicList : ConfigAttribute
+    {
+        public string friendlyName;
+        public string[] options;
+
+        public DynamicList(string friendlyName, params string[] options)
+        {
+            this.friendlyName = friendlyName;
+            this.options = options;
         }
     }
 }
