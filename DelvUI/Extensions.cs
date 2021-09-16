@@ -13,7 +13,6 @@ namespace DelvUI
         public static string Abbreviate(this string str)
         {
             var splits = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
             for (var i = 0; i < splits.Length - 1; i++)
             {
                 splits[i] = splits[i][0].ToString();
@@ -22,16 +21,24 @@ namespace DelvUI
             return string.Join(". ", splits).ToUpper();
         }
 
-        public static string Initials(this string str)
+        public static string FirstName(this string str)
         {
             var splits = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-
-            for (var i = 0; i < splits.Length; i++)
+            if (splits.Length > 0)
             {
-                splits[i] = splits[i][0].ToString();
+                return splits[0];
             }
+            return "";
+        }
 
-            return string.Join(". ", splits).ToUpper() + ".";
+        public static string LastName(this string str)
+        {
+            var splits = str.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+            if (splits.Length > 1)
+            {
+                return splits[splits.Length - 1];
+            }
+            return "";
         }
 
         public static Vector4 AdjustColor(this Vector4 vec, float correctionFactor)
@@ -90,10 +97,10 @@ namespace DelvUI
         {
             return num switch
             {
-                >= 100000000 => (num / 1000000).ToString("#,0M", CultureInfo.InvariantCulture),
-                >= 1000000 => (num / 1000000).ToString("0.#", CultureInfo.InvariantCulture) + "M",
-                >= 100000 => (num / 1000).ToString("#,0K", CultureInfo.InvariantCulture),
-                >= 10000 => (num / 1000).ToString("0.#", CultureInfo.InvariantCulture) + "K",
+                >= 100000000 => (num / 1000000.0).ToString("#,0M", CultureInfo.InvariantCulture),
+                >= 1000000 => (num / 1000000.0).ToString("0.0", CultureInfo.InvariantCulture) + "M",
+                >= 100000 => (num / 1000.0).ToString("#,0K", CultureInfo.InvariantCulture),
+                >= 10000 => (num / 1000.0).ToString("0.0", CultureInfo.InvariantCulture) + "K",
                 _ => num.ToString("#,0", CultureInfo.InvariantCulture)
             };
         }

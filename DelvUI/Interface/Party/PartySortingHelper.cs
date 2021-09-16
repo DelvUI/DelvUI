@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace DelvUI.Interface.Party
 {
-    public enum PartySortingMode
+    public enum PartySortingMode : int
     {
         Tank_DPS_Healer = 0,
         Tank_Healer_DPS = 1,
@@ -15,16 +15,6 @@ namespace DelvUI.Interface.Party
 
     public static class PartySortingHelper
     {
-        public static string[] SortingModesNames = new string[]
-        {
-            "Tank => DPS => Healer",
-            "Tank => Healer => DPS",
-            "DPS => Tank => Healer",
-            "DPS => Healer => Tank",
-            "Healer => Tank => DPS",
-            "Healer => DPS => Tank"
-        };
-
         public static void SortPartyMembers(ref List<IGroupMember> members, PartySortingMode mode)
         {
             members.Sort((a, b) =>

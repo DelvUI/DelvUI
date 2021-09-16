@@ -1,6 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.Internal;
-using Dalamud.Plugin;
+using DelvUI.Config;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using System;
 using System.Collections.Generic;
@@ -13,28 +13,27 @@ namespace DelvUI.Interface.Party
     {
         #region Singleton
         private static PartyManager _instance = null;
-        private DalamudPluginInterface _pluginInterface;
-        private PartyHudConfig _config;
+        private PartyFramesConfig _config;
 
-        private PartyManager(DalamudPluginInterface pluginInterface, PartyHudConfig config)
+        private PartyManager(PartyFramesConfig config)
         {
-            _pluginInterface = pluginInterface;
-            _pluginInterface.Framework.OnUpdateEvent += FrameworkOnOnUpdateEvent;
+            Plugin.Framework.OnUpdateEvent += FrameworkOnOnUpdateEvent;
 
             _config = config;
-            _config.PropertyChanged += OnConfigPropertyChanged;
-            _config.SortConfig.PropertyChanged += OnSortConfigPropertyChanged;
+            //_config.PropertyChanged += OnConfigPropertyChanged;
+            //_config.SortConfig.PropertyChanged += OnSortConfigPropertyChanged;
         }
 
         ~PartyManager()
         {
-            _pluginInterface.Framework.OnUpdateEvent -= FrameworkOnOnUpdateEvent;
-            _config.PropertyChanged -= OnConfigPropertyChanged;
+            Plugin.Framework.OnUpdateEvent -= FrameworkOnOnUpdateEvent;
+            //_config.PropertyChanged -= OnConfigPropertyChanged;
         }
 
-        public static void Initialize(DalamudPluginInterface pluginInterface, PartyHudConfig config)
+        public static void Initialize()
         {
-            _instance = new PartyManager(pluginInterface, config);
+            var config = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesConfig>();
+            _instance = new PartyManager(config);
         }
 
         public static PartyManager Instance => _instance;
@@ -67,7 +66,7 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
-            var player = _pluginInterface.ClientState.LocalPlayer;
+            var player = Plugin.ClientState.LocalPlayer;
             if (player is null || player is not PlayerCharacter)
             {
                 return;
@@ -86,10 +85,10 @@ namespace DelvUI.Interface.Party
                 for (int i = 0; i < manager->MemberCount; i++)
                 {
                     PartyMember* partyMember = (PartyMember*)(new IntPtr(manager->PartyMembers) + 0x230 * i);
-                    _groupMembers.Add(new GroupMember(partyMember, _pluginInterface));
+                    _groupMembers.Add(new GroupMember(partyMember));
                 }
 
-                PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortConfig.Mode);
+                PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortingMode);
             }
             catch
             {
@@ -127,7 +126,7 @@ namespace DelvUI.Interface.Party
                     _groupMembers.Add(new FakeGroupMember());
                 }
 
-                PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortConfig.Mode);
+                PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortingMode);
             }
 
             if (MembersChangedEvent != null)
@@ -146,7 +145,7 @@ namespace DelvUI.Interface.Party
 
         private void UpdateSortingMode()
         {
-            PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortConfig.Mode);
+            PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortingMode);
 
             if (MembersChangedEvent != null)
             {

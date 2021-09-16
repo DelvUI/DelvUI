@@ -1,6 +1,10 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
+﻿using Dalamud.Game.ClientState.Actors;
+using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
+using DelvUI.Interface.GeneralElements;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace DelvUI.Helpers
 {
@@ -49,10 +53,64 @@ namespace DelvUI.Helpers
 
             if (t.Minutes >= 1)
             {
-                return t.Minutes + ":" + t.Seconds;
+                return $"{t.Minutes}:{t.Seconds:00}";
             }
 
             return t.Seconds.ToString();
+        }
+
+        public static Dictionary<string, uint> ColorForActor(Chara actor)
+        {
+            switch (actor.ObjectKind)
+            {
+                // Still need to figure out the "orange" state; aggroed but not yet attacked.
+                case ObjectKind.Player:
+                    return GlobalColors.Instance.SafeColorForJobId(actor.ClassJob.Id).Map;
+
+                case ObjectKind.BattleNpc when (actor.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat:
+                    return GlobalColors.Instance.NPCHostileColor.Map;
+
+                case ObjectKind.BattleNpc:
+                    if (!IsHostileMemory((BattleNpc)actor))
+                    {
+                        return GlobalColors.Instance.NPCFriendlyColor.Map;
+                    }
+                    break;
+            }
+
+            return GlobalColors.Instance.NPCNeutralColor.Map;
+        }
+
+        public static bool HasTankInvulnerability(Actor actor)
+        {
+            var tankInvulnBuff = actor.StatusEffects.Where(o => o.EffectId is 810 or 1302 or 409 or 1836);
+            return tankInvulnBuff.Count() > 0;
+        }
+
+        public static Actor FindTargetOfTarget(Actor target, Actor player, ActorTable actors)
+        {
+            if (target == null)
+            {
+                return null;
+            }
+
+            if (target.TargetActorID == 0 && player.TargetActorID == 0)
+            {
+                return player;
+            }
+
+            // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
+            // we do a step of 2 because its always an actor followed by its companion
+            for (var i = 0; i < 200; i += 2)
+            {
+                var actor = actors[i];
+                if (actor?.ActorId == target.TargetActorID)
+                {
+                    return actor;
+                }
+            }
+
+            return null;
         }
     }
 }

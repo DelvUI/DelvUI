@@ -12,6 +12,14 @@ namespace DelvUI.Helpers
         Unknown
     }
 
+    public enum PrimaryResourceTypes
+    {
+        MP = 0,
+        CP = 1,
+        GP = 2,
+        None = 3
+    }
+
     public static class JobsHelper
     {
         public static JobRoles RoleForJob(uint jobId)
@@ -62,60 +70,115 @@ namespace DelvUI.Helpers
         public static Dictionary<uint, JobRoles> JobRolesMap = new Dictionary<uint, JobRoles>()
         {
             // tanks
-            [Jobs.GLD] = JobRoles.Tank,
-            [Jobs.MRD] = JobRoles.Tank,
-            [Jobs.PLD] = JobRoles.Tank,
-            [Jobs.WAR] = JobRoles.Tank,
-            [Jobs.DRK] = JobRoles.Tank,
-            [Jobs.GNB] = JobRoles.Tank,
+            [JobIDs.GLD] = JobRoles.Tank,
+            [JobIDs.MRD] = JobRoles.Tank,
+            [JobIDs.PLD] = JobRoles.Tank,
+            [JobIDs.WAR] = JobRoles.Tank,
+            [JobIDs.DRK] = JobRoles.Tank,
+            [JobIDs.GNB] = JobRoles.Tank,
 
             // melee dps
-            [Jobs.PGL] = JobRoles.DPS,
-            [Jobs.LNC] = JobRoles.DPS,
-            [Jobs.ROG] = JobRoles.DPS,
-            [Jobs.MNK] = JobRoles.DPS,
-            [Jobs.DRG] = JobRoles.DPS,
-            [Jobs.NIN] = JobRoles.DPS,
-            [Jobs.SAM] = JobRoles.DPS,
+            [JobIDs.PGL] = JobRoles.DPS,
+            [JobIDs.LNC] = JobRoles.DPS,
+            [JobIDs.ROG] = JobRoles.DPS,
+            [JobIDs.MNK] = JobRoles.DPS,
+            [JobIDs.DRG] = JobRoles.DPS,
+            [JobIDs.NIN] = JobRoles.DPS,
+            [JobIDs.SAM] = JobRoles.DPS,
 
             // ranged phys dps
-            [Jobs.ARC] = JobRoles.DPS,
-            [Jobs.BRD] = JobRoles.DPS,
-            [Jobs.MCH] = JobRoles.DPS,
-            [Jobs.DNC] = JobRoles.DPS,
+            [JobIDs.ARC] = JobRoles.DPS,
+            [JobIDs.BRD] = JobRoles.DPS,
+            [JobIDs.MCH] = JobRoles.DPS,
+            [JobIDs.DNC] = JobRoles.DPS,
 
             // ranged magic dps
-            [Jobs.THM] = JobRoles.DPS,
-            [Jobs.ACN] = JobRoles.DPS,
-            [Jobs.BLM] = JobRoles.DPS,
-            [Jobs.SMN] = JobRoles.DPS,
-            [Jobs.RDM] = JobRoles.DPS,
-            [Jobs.BLU] = JobRoles.DPS,
+            [JobIDs.THM] = JobRoles.DPS,
+            [JobIDs.ACN] = JobRoles.DPS,
+            [JobIDs.BLM] = JobRoles.DPS,
+            [JobIDs.SMN] = JobRoles.DPS,
+            [JobIDs.RDM] = JobRoles.DPS,
+            [JobIDs.BLU] = JobRoles.DPS,
 
             // healers
-            [Jobs.CNJ] = JobRoles.Healer,
-            [Jobs.WHM] = JobRoles.Healer,
-            [Jobs.SCH] = JobRoles.Healer,
-            [Jobs.AST] = JobRoles.Healer,
+            [JobIDs.CNJ] = JobRoles.Healer,
+            [JobIDs.WHM] = JobRoles.Healer,
+            [JobIDs.SCH] = JobRoles.Healer,
+            [JobIDs.AST] = JobRoles.Healer,
 
             // crafters
-            [Jobs.CRP] = JobRoles.Crafter,
-            [Jobs.BSM] = JobRoles.Crafter,
-            [Jobs.ARM] = JobRoles.Crafter,
-            [Jobs.GSM] = JobRoles.Crafter,
-            [Jobs.LTW] = JobRoles.Crafter,
-            [Jobs.WVR] = JobRoles.Crafter,
-            [Jobs.ALC] = JobRoles.Crafter,
-            [Jobs.CUL] = JobRoles.Crafter,
+            [JobIDs.CRP] = JobRoles.Crafter,
+            [JobIDs.BSM] = JobRoles.Crafter,
+            [JobIDs.ARM] = JobRoles.Crafter,
+            [JobIDs.GSM] = JobRoles.Crafter,
+            [JobIDs.LTW] = JobRoles.Crafter,
+            [JobIDs.WVR] = JobRoles.Crafter,
+            [JobIDs.ALC] = JobRoles.Crafter,
+            [JobIDs.CUL] = JobRoles.Crafter,
 
             // gatherers
-            [Jobs.MIN] = JobRoles.Gatherer,
-            [Jobs.BOT] = JobRoles.Gatherer,
-            [Jobs.FSH] = JobRoles.Gatherer,
+            [JobIDs.MIN] = JobRoles.Gatherer,
+            [JobIDs.BOT] = JobRoles.Gatherer,
+            [JobIDs.FSH] = JobRoles.Gatherer,
+        };
+
+        public static Dictionary<uint, string> JobNames = new Dictionary<uint, string>()
+        {
+            // tanks
+            [JobIDs.GLD] = "GLD",
+            [JobIDs.MRD] = "MRD",
+            [JobIDs.PLD] = "PLD",
+            [JobIDs.WAR] = "WAR",
+            [JobIDs.DRK] = "DRK",
+            [JobIDs.GNB] = "GNB",
+
+            // melee dps
+            [JobIDs.PGL] = "PGL",
+            [JobIDs.LNC] = "LNC",
+            [JobIDs.ROG] = "ROG",
+            [JobIDs.MNK] = "MNK",
+            [JobIDs.DRG] = "DRG",
+            [JobIDs.NIN] = "NIN",
+            [JobIDs.SAM] = "SAM",
+
+            // ranged phys dps
+            [JobIDs.ARC] = "ARC",
+            [JobIDs.BRD] = "BRD",
+            [JobIDs.MCH] = "MCH",
+            [JobIDs.DNC] = "DNC",
+
+            // ranged magic dps
+            [JobIDs.THM] = "THM",
+            [JobIDs.ACN] = "ACN",
+            [JobIDs.BLM] = "BLM",
+            [JobIDs.SMN] = "SMN",
+            [JobIDs.RDM] = "RDM",
+            [JobIDs.BLU] = "BLU",
+
+            // healers
+            [JobIDs.CNJ] = "CNJ",
+            [JobIDs.WHM] = "WHM",
+            [JobIDs.SCH] = "SCH",
+            [JobIDs.AST] = "AST",
+
+            // crafters
+            [JobIDs.CRP] = "CRP",
+            [JobIDs.BSM] = "BSM",
+            [JobIDs.ARM] = "ARM",
+            [JobIDs.GSM] = "GSM",
+            [JobIDs.LTW] = "LTW",
+            [JobIDs.WVR] = "WVR",
+            [JobIDs.ALC] = "ALC",
+            [JobIDs.CUL] = "CUL",
+
+            // gatherers
+            [JobIDs.MIN] = "MIN",
+            [JobIDs.BOT] = "BOT",
+            [JobIDs.FSH] = "FSH",
         };
     }
 
-    public static class Jobs
+    public static class JobIDs
     {
         public const uint GLD = 1;
         public const uint MRD = 3;

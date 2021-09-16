@@ -1,5 +1,4 @@
-﻿using DelvUI.Config;
-using DelvUI.Helpers;
+﻿using DelvUI.Helpers;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -68,7 +67,7 @@ namespace DelvUI.Interface.Bars
 
         public Vector2 GetBarSize() => new(BarWidth, BarHeight);
 
-        public void Draw(ImDrawListPtr drawList, PluginConfiguration configuration)
+        public void Draw(ImDrawListPtr drawList)
         {
             var barWidth = BarWidth + ChunkPadding;   // For loop adds one extra padding more than is needed
             var barHeight = BarHeight + ChunkPadding; // For loop adds one extra padding more than is needed
@@ -86,7 +85,7 @@ namespace DelvUI.Interface.Bars
 
             foreach (var innerBar in InnerBars)
             {
-                innerBar.Draw(drawList, configuration);
+                innerBar.Draw(drawList);
             }
 
             cursorPos = new Vector2(XPosition, YPosition);
@@ -105,13 +104,13 @@ namespace DelvUI.Interface.Bars
 
             foreach (var innerBar in InnerBars)
             {
-                innerBar.DrawText(drawList, configuration);
+                innerBar.DrawText(drawList);
             }
 
-            DrawText(drawList, configuration);
+            DrawText(drawList);
         }
 
-        public void DrawText(ImDrawListPtr drawList, PluginConfiguration configuration)
+        public void DrawText(ImDrawListPtr drawList)
         {
             foreach (var text in PrimaryTexts)
             {
@@ -120,6 +119,7 @@ namespace DelvUI.Interface.Bars
                 var strText = text.Type switch
                 {
                     BarTextType.Current => throw new InvalidOperationException("Full bar text must be 'Custom' type."),
+                    BarTextType.Remaining => throw new InvalidOperationException("Full bar text must be 'Custom' type."),
                     BarTextType.Maximum => throw new InvalidOperationException("Full bar text must be 'Custom' type."),
                     BarTextType.Percentage => throw new InvalidOperationException("Full bar text must be 'Custom' type."),
                     BarTextType.Custom => text.Text,
@@ -128,7 +128,7 @@ namespace DelvUI.Interface.Bars
 
                 var textPos = text.CalcTextPosition(cursorPos, strText, BarWidth, BarHeight);
 
-                DrawHelper.DrawOutlinedText(strText, textPos, text.Color, text.OutlineColor, text.Scale, configuration);
+                DrawHelper.DrawOutlinedText(strText, textPos, text.Color, text.OutlineColor, text.Scale);
             }
         }
     }
@@ -171,7 +171,7 @@ namespace DelvUI.Interface.Bars
         public BarTextMode TextMode { get; set; }
         public BarText[] Texts { get; set; }
 
-        public virtual void Draw(ImDrawListPtr drawList, PluginConfiguration configuration)
+        public virtual void Draw(ImDrawListPtr drawList)
         {
             var barWidth = Parent.Vertical ? (float)1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
             var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float)1 / Parent.InnerBars.Count * Parent.BarHeight;
@@ -249,7 +249,7 @@ namespace DelvUI.Interface.Bars
             else
             {
                 var xPos = Parent.Vertical ? Parent.XPosition - (float)ChildNum / Parent.InnerBars.Count * Parent.BarWidth : Parent.XPosition + barWidth;
-                var yPos = Parent.Vertical ? Parent.YPosition + barHeight : Parent.YPosition - (float)ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
+                var yPos = Parent.Vertical ? Parent.YPosition + barHeight : Parent.YPosition + (float)ChildNum / Parent.InnerBars.Count * Parent.BarHeight;
                 var cursorPos = new Vector2(xPos, yPos);
 
                 foreach (var chunkSize in Parent.ChunkSizes.AsEnumerable().Reverse().ToList())
@@ -317,7 +317,7 @@ namespace DelvUI.Interface.Bars
             }
         }
 
-        public void DrawText(ImDrawListPtr drawList, PluginConfiguration configuration)
+        public void DrawText(ImDrawListPtr drawList)
         {
             var barWidth = Parent.Vertical ? (float)1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
             var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float)1 / Parent.InnerBars.Count * Parent.BarHeight;
@@ -330,6 +330,7 @@ namespace DelvUI.Interface.Bars
                 var text = textObj.Type switch
                 {
                     BarTextType.Current => Math.Round(CurrentValue).ToString(CultureInfo.InvariantCulture),
+                    BarTextType.Remaining => Math.Round(MaximumValue - CurrentValue).ToString(CultureInfo.InvariantCulture),
                     BarTextType.Maximum => Math.Round(MaximumValue).ToString(CultureInfo.InvariantCulture),
                     BarTextType.Percentage => Math.Round(CurrentValue / MaximumValue * 100f).ToString(CultureInfo.InvariantCulture),
                     BarTextType.Custom => textObj.Text,
@@ -338,7 +339,7 @@ namespace DelvUI.Interface.Bars
 
                 var textPos = textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, Parent.BarHeight);
 
-                DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale, configuration);
+                DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale);
             }
 
             var currentFill = CurrentValue / MaximumValue;
@@ -373,6 +374,7 @@ namespace DelvUI.Interface.Bars
                         var text = textObj.Type switch
                         {
                             BarTextType.Current => Math.Round(barValue).ToString(CultureInfo.InvariantCulture),
+                            BarTextType.Remaining => Math.Round(barMaximum - barValue).ToString(CultureInfo.InvariantCulture),
                             BarTextType.Maximum => Math.Round(barMaximum).ToString(CultureInfo.InvariantCulture),
                             BarTextType.Percentage => Math.Round(currentFill * 100f).ToString(CultureInfo.InvariantCulture),
                             BarTextType.Custom => textObj.Text,
@@ -383,7 +385,7 @@ namespace DelvUI.Interface.Bars
                             ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y)
                             : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
 
-                        DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale, configuration);
+                        DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale);
                     }
 
                     i++;
@@ -423,6 +425,7 @@ namespace DelvUI.Interface.Bars
                         var text = textObj.Type switch
                         {
                             BarTextType.Current => Math.Round(barValue).ToString(CultureInfo.InvariantCulture),
+                            BarTextType.Remaining => Math.Round(barMaximum - barValue).ToString(CultureInfo.InvariantCulture),
                             BarTextType.Maximum => Math.Round(barMaximum).ToString(CultureInfo.InvariantCulture),
                             BarTextType.Percentage => Math.Round(currentFill * 100f).ToString(CultureInfo.InvariantCulture),
                             BarTextType.Custom => textObj.Text,
@@ -433,7 +436,7 @@ namespace DelvUI.Interface.Bars
                             ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y)
                             : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
 
-                        DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale, configuration);
+                        DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale);
                     }
 
                     i++;
@@ -464,7 +467,7 @@ namespace DelvUI.Interface.Bars
             }
         }
 
-        public override void Draw(ImDrawListPtr drawList, PluginConfiguration configuration)
+        public override void Draw(ImDrawListPtr drawList)
         {
             var barWidth = Parent.Vertical ? (float)1 / Parent.InnerBars.Count * Parent.BarWidth : Parent.BarWidth + Parent.ChunkPadding;
             var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float)1 / Parent.InnerBars.Count * Parent.BarHeight;
@@ -714,6 +717,7 @@ namespace DelvUI.Interface.Bars
     public enum BarTextType
     {
         Current,
+        Remaining,
         Maximum,
         Percentage,
         Custom

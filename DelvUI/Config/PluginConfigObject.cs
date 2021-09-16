@@ -1,22 +1,19 @@
-﻿using ImGuiNET;
+﻿using DelvUI.Config.Attributes;
+using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
+using System.Diagnostics;
 using System.Numerics;
-using System.Runtime.CompilerServices;
 
 namespace DelvUI.Config
 {
     [Serializable]
-    public abstract class PluginConfigObject : INotifyPropertyChanged
+    public abstract class PluginConfigObject
     {
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void NotifyPropertyChanged([CallerMemberName] string propertyName = "")
-        {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
+        [Checkbox("Enabled")]
+        [Order(0)]
+        public bool Enabled = true;
 
         protected bool ColorEdit4(string label, ref PluginConfigColor color)
         {
@@ -31,19 +28,34 @@ namespace DelvUI.Config
 
             return false;
         }
+
+        public static PluginConfigObject DefaultConfig()
+        {
+            Debug.Assert(false, "Static method 'DefaultConfig' not found !!!");
+            return null;
+        }
+    }
+
+    [Serializable]
+    public abstract class MovablePluginConfigObject : PluginConfigObject
+    {
+        [DragInt2("Position", min = -4000, max = 4000)]
+        [Order(5)]
+        public Vector2 Position = Vector2.Zero;
     }
 
     [Serializable]
     public class PluginConfigColor
     {
         [JsonIgnore] private float[] _colorMapRatios = { -.8f, -.1f, .1f };
+
         [JsonIgnore] private Vector4 _vector;
 
         public PluginConfigColor(Vector4 vector, float[] colorMapRatios = null)
         {
             _vector = vector;
 
-            if (colorMapRatios is { Length: >= 3 })
+            if (colorMapRatios != null && colorMapRatios.Length >= 3)
             {
                 _colorMapRatios = colorMapRatios;
             }
@@ -62,14 +74,19 @@ namespace DelvUI.Config
                 }
 
                 _vector = value;
+
                 Update();
             }
         }
 
         [JsonIgnore] public uint Base { get; private set; }
+
         [JsonIgnore] public uint Background { get; private set; }
+
         [JsonIgnore] public uint LeftGradient { get; private set; }
+
         [JsonIgnore] public uint RightGradient { get; private set; }
+
         [JsonIgnore] public Dictionary<string, uint> Map { get; private set; }
 
         private void Update()

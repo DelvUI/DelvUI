@@ -1,4 +1,5 @@
-﻿using DelvUI.Helpers;
+﻿using DelvUI.Config;
+using DelvUI.Helpers;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 using System;
@@ -11,16 +12,13 @@ namespace DelvUI.Interface.StatusEffects
         public static void DrawStatusEffectIcon(ImDrawListPtr drawList, Vector2 position, StatusEffectData statusEffectData, StatusEffectIconConfig config)
         {
             // icon
-            DrawHelper.DrawIcon<Status>(statusEffectData.Data, config.Size, position, config.ShowBorder);
+            DrawHelper.DrawIcon<Status>(statusEffectData.Data, position, config.Size, false, drawList);
 
             // border
-            if (config.ShowDispellableBorder && statusEffectData.Data.CanDispel)
+            var borderConfig = GetBorderConfig(config, statusEffectData);
+            if (borderConfig != null)
             {
-                drawList.AddRect(position, position + config.Size, config.DispellableBorderColor.Base, 0, ImDrawFlags.None, config.DispellableBorderThickness);
-            }
-            else if (config.ShowBorder)
-            {
-                drawList.AddRect(position, position + config.Size, config.BorderColor.Base, 0, ImDrawFlags.None, config.BorderThickness);
+                drawList.AddRect(position, position + config.Size, borderConfig.Color.Base, 0, ImDrawFlags.None, borderConfig.Thickness);
             }
 
             // duration
@@ -29,7 +27,13 @@ namespace DelvUI.Interface.StatusEffects
                 var duration = Math.Round(Math.Abs(statusEffectData.StatusEffect.Duration));
                 var text = Utils.DurationToString(duration);
                 var textSize = ImGui.CalcTextSize(text);
-                DrawHelper.DrawOutlinedText(text, position + new Vector2(config.Size.X / 2f - textSize.X / 2f, config.Size.Y / 2f - textSize.Y / 2f));
+
+                DrawHelper.DrawOutlinedText(
+                    text,
+                    position + new Vector2(config.Size.X / 2f - textSize.X / 2f, config.Size.Y / 2f - textSize.Y / 2f),
+                    drawList,
+                    2
+                );
             }
 
             // stacks
@@ -41,10 +45,32 @@ namespace DelvUI.Interface.StatusEffects
                 DrawHelper.DrawOutlinedText(
                     text,
                     position + new Vector2(config.Size.X * 0.9f - textSize.X / 2f, config.Size.X * 0.2f - textSize.Y / 2f),
-                    Vector4.UnitW,
-                    Vector4.One
+                    0xFF000000,
+                    0xFFFFFFFF,
+                    drawList,
+                    2
                 );
             }
+        }
+
+        public static StatusEffectIconBorderConfig GetBorderConfig(StatusEffectIconConfig config, StatusEffectData statusEffectData)
+        {
+            StatusEffectIconBorderConfig borderConfig = null;
+
+            if (config.OwnedBorderConfig.Enabled && statusEffectData.StatusEffect.OwnerId == Plugin.ClientState.LocalPlayer?.ActorId)
+            {
+                borderConfig = config.OwnedBorderConfig;
+            }
+            else if (config.DispellableBorderConfig.Enabled && statusEffectData.Data.CanDispel)
+            {
+                borderConfig = config.DispellableBorderConfig;
+            }
+            else if (config.BorderConfig.Enabled)
+            {
+                borderConfig = config.BorderConfig;
+            }
+
+            return borderConfig;
         }
     }
 }

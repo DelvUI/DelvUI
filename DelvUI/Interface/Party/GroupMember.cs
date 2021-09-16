@@ -15,18 +15,17 @@ namespace DelvUI.Interface.Party
 {
     public unsafe class GroupMember : IGroupMember
     {
-        private DalamudPluginInterface pluginInterface = null;
-        protected PartyMember* partyMember = null;
+        protected PartyMember* _partyMember = null;
 
-        public int ActorID => partyMember != null ? (int)partyMember->ObjectID : Actor.ActorId;
+        public int ActorID => _partyMember != null ? (int)_partyMember->ObjectID : Actor.ActorId;
         protected string _name;
         public string Name => _name == null ? "???" : _name;
-        public uint Level => partyMember != null ? partyMember->Level : BattleCharacter->Character.Level;
-        public uint JobId => partyMember != null ? partyMember->ClassJob : BattleCharacter->Character.ClassJob;
-        public uint HP => partyMember != null ? partyMember->CurrentHP : BattleCharacter->Character.Health;
-        public uint MaxHP => partyMember != null ? partyMember->MaxHP : BattleCharacter->Character.MaxHealth;
-        public uint MP => partyMember != null ? partyMember->CurrentMP : BattleCharacter->Character.Mana;
-        public uint MaxMP => partyMember != null ? partyMember->MaxMP : BattleCharacter->Character.MaxMana;
+        public uint Level => _partyMember != null ? _partyMember->Level : BattleCharacter->Character.Level;
+        public uint JobId => _partyMember != null ? _partyMember->ClassJob : BattleCharacter->Character.ClassJob;
+        public uint HP => _partyMember != null ? _partyMember->CurrentHP : BattleCharacter->Character.Health;
+        public uint MaxHP => _partyMember != null ? _partyMember->MaxHP : BattleCharacter->Character.MaxHealth;
+        public uint MP => _partyMember != null ? _partyMember->CurrentMP : BattleCharacter->Character.Mana;
+        public uint MaxMP => _partyMember != null ? _partyMember->MaxMP : BattleCharacter->Character.MaxMana;
         public float Shield => Utils.ActorShieldValue(GetActor());
         public StatusEffect[] StatusEffects
         {
@@ -46,10 +45,9 @@ namespace DelvUI.Interface.Party
         private BattleChara* BattleCharacter => (BattleChara*)GetActor().Address;
 
 
-        public GroupMember(PartyMember* partyMember, DalamudPluginInterface pluginInterface)
+        public GroupMember(PartyMember* partyMember)
         {
-            this.pluginInterface = pluginInterface;
-            this.partyMember = partyMember;
+            _partyMember = partyMember;
 
             // name
             byte[] nameBytes = new byte[64];
@@ -61,16 +59,15 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        public GroupMember(Actor actor, DalamudPluginInterface pluginInterface)
+        public GroupMember(Actor actor)
         {
-            this.pluginInterface = pluginInterface;
             Actor = actor;
             _name = Actor.Name;
         }
 
         public Actor GetActor()
         {
-            return Actor ?? pluginInterface.ClientState.Actors.FirstOrDefault(o => o.ActorId == ActorID);
+            return Actor ?? Plugin.ClientState.Actors.FirstOrDefault(o => o.ActorId == ActorID);
         }
     }
 
