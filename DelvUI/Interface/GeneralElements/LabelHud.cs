@@ -21,21 +21,20 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var size = ImGui.CalcTextSize(Config.GetText());
-            var offset = OffsetForSize(size);
-
-            if (Config.ShowOutline)
-            {
-                DrawHelper.DrawOutlinedText(Config.GetText(), origin + Config.Position + offset, Config.Color.Vector, Config.OutlineColor.Vector);
-            }
-            else
-            {
-                ImGui.SetCursorPos(origin + Config.Position + offset);
-                ImGui.TextColored(Config.Color.Vector, Config.GetText());
-            }
+            DrawLabel(Config.GetText(), origin, Vector2.Zero);
         }
 
-        public void DrawWithActor(Vector2 origin, Actor actor)
+        public void DrawRelativeToParent(Vector2 parentOrigin, Vector2 parentSize)
+        {
+            if (!Config.Enabled || Config.GetText() == null)
+            {
+                return;
+            }
+
+            DrawLabel(Config.GetText(), parentOrigin, parentSize);
+        }
+
+        public void DrawRelativeToParent(Vector2 parentOrigin, Vector2 parentSize, Actor actor)
         {
             if (!Config.Enabled || Config.GetText() == null)
             {
@@ -43,33 +42,38 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             var text = TextTags.GenerateFormattedTextFromTags(actor, Config.GetText());
-            var size = ImGui.CalcTextSize(text);
-            var offset = OffsetForSize(size);
+            DrawLabel(text, parentOrigin, parentSize);
+        }
+
+        private void DrawLabel(string text, Vector2 parentOrigin, Vector2 parentSize)
+        {
+            var textSize = ImGui.CalcTextSize(text);
+            var offset = OffsetForSize(textSize, parentSize);
 
             if (Config.ShowOutline)
             {
-                DrawHelper.DrawOutlinedText(text, origin + Config.Position + offset, Config.Color.Vector, Config.OutlineColor.Vector);
+                DrawHelper.DrawOutlinedText(text, parentOrigin + Config.Position + offset, Config.Color.Vector, Config.OutlineColor.Vector);
             }
             else
             {
-                ImGui.SetCursorPos(origin + Config.Position + offset);
+                ImGui.SetCursorPos(parentOrigin + Config.Position + offset);
                 ImGui.TextColored(Config.Color.Vector, text);
             }
         }
 
-        private Vector2 OffsetForSize(Vector2 size)
+        private Vector2 OffsetForSize(Vector2 textSize, Vector2 parentSize)
         {
             switch (Config.Anchor)
             {
-                case LabelTextAnchor.Center: return -size / 2f;
-                case LabelTextAnchor.Left: return new Vector2(0, -size.Y / 2f);
-                case LabelTextAnchor.Right: return new Vector2(-size.X, -size.Y / 2f);
-                case LabelTextAnchor.Top: return new Vector2(-size.X / 2f, 0);
-                case LabelTextAnchor.TopLeft: return Vector2.Zero;
-                case LabelTextAnchor.TopRight: return new Vector2(size.X, 0);
-                case LabelTextAnchor.Bottom: return new Vector2(-size.X / 2f, -size.Y);
-                case LabelTextAnchor.BottomLeft: return new Vector2(0, -size.Y);
-                case LabelTextAnchor.BottomRight: return -size;
+                case LabelTextAnchor.Center: return -textSize / 2f;
+                case LabelTextAnchor.Left: return new Vector2(-parentSize.X / 2f, -textSize.Y / 2f);
+                case LabelTextAnchor.Right: return new Vector2(parentSize.X / 2f - textSize.X, -textSize.Y / 2f);
+                case LabelTextAnchor.Top: return new Vector2(-textSize.X / 2f, -parentSize.Y / 2f);
+                case LabelTextAnchor.TopLeft: return -parentSize / 2f;
+                case LabelTextAnchor.TopRight: return new Vector2(parentSize.X / 2f - textSize.X, -parentSize.Y / 2f);
+                case LabelTextAnchor.Bottom: return new Vector2(-textSize.X / 2f, parentSize.Y / 2f - textSize.Y);
+                case LabelTextAnchor.BottomLeft: return new Vector2(-parentSize.X / 2f, parentSize.Y / 2f - textSize.Y);
+                case LabelTextAnchor.BottomRight: return new Vector2(parentSize.X / 2f - textSize.X, parentSize.Y / 2f - textSize.Y);
             }
 
             return Vector2.Zero;

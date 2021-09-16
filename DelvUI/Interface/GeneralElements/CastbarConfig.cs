@@ -37,8 +37,8 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(254, 24);
             var pos = new Vector2(0, HUDConstants.PlayerCastbarY);
 
-            var castNameConfig = new LabelConfig(new Vector2(-size.X / 2f + size.Y + 5, 0), "", LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
+            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", LabelTextAnchor.Right);
 
             return new PlayerCastbarConfig(pos, size, castNameConfig, castTimeConfig);
         }
@@ -83,8 +83,8 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(254, 24);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY / 2f - size.Y / 2);
 
-            var castNameConfig = new LabelConfig(new Vector2(-size.X / 2f + size.Y + 5, 0), "", LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
+            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", LabelTextAnchor.Right);
 
             return new TargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
         }
@@ -108,8 +108,8 @@ namespace DelvUI.Interface.GeneralElements
                 HUDConstants.BaseHUDOffsetY + 5
             );
 
-            var castNameConfig = new LabelConfig(new Vector2(-size.X / 2f + size.Y + 5, 0), "", LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
+            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", LabelTextAnchor.Right);
 
             return new TargetOfTargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
         }
@@ -133,8 +133,8 @@ namespace DelvUI.Interface.GeneralElements
                 HUDConstants.BaseHUDOffsetY + 5
             );
 
-            var castNameConfig = new LabelConfig(new Vector2(-size.X / 2f + size.Y + 5, 0), "", LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
+            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", LabelTextAnchor.Right);
 
             return new FocusTargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
         }
