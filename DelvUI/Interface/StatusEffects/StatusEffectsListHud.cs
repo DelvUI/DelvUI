@@ -266,7 +266,7 @@ namespace DelvUI.Interface.StatusEffects
 
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
-            var margin = new Vector2(4, 0);
+            var margin = new Vector2(14, 10);
             var windowPos = minPos - margin;
             var windowSize = maxPos - minPos;
             ImGui.SetNextWindowPos(windowPos, ImGuiCond.Always);
