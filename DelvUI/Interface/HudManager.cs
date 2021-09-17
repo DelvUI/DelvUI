@@ -1,3 +1,4 @@
+using Dalamud.Game.ClientState;
 using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
@@ -30,6 +31,8 @@ namespace DelvUI.Interface
         private JobHud _jobHud = null;
         private Dictionary<uint, JobHudTypes> _jobsMap;
         private Dictionary<uint, Type> _unsupportedJobsMap;
+
+        public HudHelper Helper { get; } = new HudHelper();
 
         public HudManager()
         {
@@ -207,6 +210,14 @@ namespace DelvUI.Interface
                 return;
             }
 
+            if (Helper.UserInterfaceWasHidden)
+            {
+                Helper.ConfigureDefaultJobGauge();
+                Helper.UserInterfaceWasHidden = false;
+            }
+
+            Helper.ConfigureCombatActionBars();
+
             ImGuiHelpers.ForceNextWindowMainViewport();
             ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
@@ -235,10 +246,13 @@ namespace DelvUI.Interface
                 DraggablesHelper.DrawGrid(_gridConfig, _selectedElement?.GetConfig());
             }
 
+            bool isHudLocked = ConfigurationManager.GetInstance().LockHUD;
+
+
             // general elements
             foreach (var element in _hudElements)
             {
-                if (element != _selectedElement)
+                if (element != _selectedElement && !Helper.IsElementHidden(element))
                 {
                     element.Draw(_origin);
                 }
@@ -247,7 +261,10 @@ namespace DelvUI.Interface
             // job hud
             if (_jobHud != null && _jobHud.Config.Enabled && _jobHud != _selectedElement)
             {
-                _jobHud.Draw(_origin);
+                if (!Helper.IsElementHidden())
+                {
+                    _jobHud.Draw(_origin);
+                }
             }
 
             // selected
@@ -303,6 +320,8 @@ namespace DelvUI.Interface
 
             if (config != null && _primaryResourceHud != null)
             {
+                Helper.ApplyCurrentConfig();
+
                 _primaryResourceHud.ResourceType = config.UseDefaultPrimaryResourceBar ? config.PrimaryResourceType : PrimaryResourceTypes.None;
             }
         }
