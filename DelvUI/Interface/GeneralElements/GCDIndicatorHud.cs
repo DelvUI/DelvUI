@@ -75,7 +75,7 @@ namespace DelvUI.Interface.GeneralElements
             const float queueTime = 0.5f;
             // TODO add this as a parameter
             const float startAngle = 0f;
-
+            
             // always draw until the queue threshold
             float progressAngle = Math.Min(current, total - (Config.ShowGCDQueueIndicator ? queueTime : 0f)) / total * 2f * (float)Math.PI;
             // drawing an arc with thickness to make it look like an annular sector
@@ -100,6 +100,12 @@ namespace DelvUI.Interface.GeneralElements
                 
                 drawList.PathArcTo(position, radius + Config.CircleThickness / 2f, 0f, 2f * (float)Math.PI, segments);
                 drawList.PathStroke(0xFF000000, ImDrawFlags.None, 1);
+            }
+
+            if (Config.AlwaysShow && Config.CircularMode && Config.AnchorToMouse && current == total)
+            {
+                drawList.PathArcTo(position, radius, 0f, 2f * (float)Math.PI, segments);
+                drawList.PathStroke(Config.Color.Base, ImDrawFlags.None, Config.CircleThickness);
             }
         }
 
