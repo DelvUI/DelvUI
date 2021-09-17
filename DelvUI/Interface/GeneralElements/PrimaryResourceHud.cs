@@ -47,10 +47,10 @@ namespace DelvUI.Interface.GeneralElements
             drawList.AddRectFilledMultiColor(
                 startPos,
                 startPos + new Vector2(Math.Max(1, Config.Size.X * scale), Config.Size.Y),
-                Config.Color.LeftGradient,
-                Config.Color.RightGradient,
-                Config.Color.RightGradient,
-                Config.Color.LeftGradient
+                Config.Color.TopGradient,
+                Config.Color.TopGradient,
+                Config.Color.BottomGradient,
+                Config.Color.BottomGradient
             );
 
             drawList.AddRect(startPos, startPos + Config.Size, 0xFF000000);

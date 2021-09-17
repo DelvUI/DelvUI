@@ -92,9 +92,11 @@ namespace DelvUI.Config.Tree
             }
 
             var configPageNode = GetOrAddConfig<T>();
+
             if (configPageNode != null && configPageNode.ConfigObject != null)
             {
                 configPageNodesMap.Add(type, configPageNode);
+
                 return (T)configPageNode.ConfigObject;
             }
 
@@ -146,19 +148,83 @@ namespace DelvUI.Config.Tree
             }
         }
 
+        private void PushStyles()
+        {
+            ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(46f / 255f, 45f / 255f, 46f / 255f, 1f));
+            ImGui.PushStyleColor(ImGuiCol.ButtonActive, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, .2f));
+            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, .2f));
+            
+            ImGui.PushStyleColor(ImGuiCol.Separator, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, .4f));
+
+            ImGui.PushStyleColor(ImGuiCol.ScrollbarBg, new Vector4(20f / 255f, 21f / 255f, 20f / 255f, .7f));
+            ImGui.PushStyleColor(ImGuiCol.ScrollbarGrab, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, .7f));
+            ImGui.PushStyleColor(ImGuiCol.ScrollbarGrabActive, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, .7f));
+            ImGui.PushStyleColor(ImGuiCol.ScrollbarGrabHovered, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, .7f));
+
+            ImGui.PushStyleColor(ImGuiCol.Tab, new Vector4(46f / 255f, 45f / 255f, 46f / 255f, 1f));
+            ImGui.PushStyleColor(ImGuiCol.TabActive, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, .7f));
+            ImGui.PushStyleColor(ImGuiCol.TabHovered, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, .2f));
+            ImGui.PushStyleColor(ImGuiCol.TabUnfocused, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, .2f));
+
+            ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f));
+            ImGui.PushStyleColor(ImGuiCol.CheckMark, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f));
+            
+            ImGui.PushStyleVar(ImGuiStyleVar.ScrollbarRounding, 1); //Scrollbar Radius
+            ImGui.PushStyleVar(ImGuiStyleVar.TabRounding, 1); //Tabs Radius Radius
+            ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 1); //Intractable Elements Radius
+            ImGui.PushStyleVar(ImGuiStyleVar.GrabRounding, 1); //Gradable Elements Radius
+            ImGui.PushStyleVar(ImGuiStyleVar.PopupRounding, 1); //Popup Radius
+        }
+
+        private void PopStyles()
+        {
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
+            
+            ImGui.PopStyleColor();
+            
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
+            
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
+            
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
+            
+            ImGui.PopStyleVar();
+            ImGui.PopStyleVar();
+            ImGui.PopStyleVar();
+            ImGui.PopStyleVar();
+            ImGui.PopStyleVar();
+        }
+
         public void Draw()
         {
             bool changed = false;
 
             ImGui.SetNextWindowSize(new Vector2(1050, 750), ImGuiCond.Appearing);
-            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
+            ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(30f / 255f, 31f / 255f, 30f / 255f, 1f));
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 1);
+            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(20f / 255f, 21f / 255f, 20f / 255f, 1f));
 
             if (!ImGui.Begin("titlebarnew", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 return;
             }
-
             ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
+            ImGui.PopStyleVar();
+            ImGui.PopStyleVar();
+            PushStyles();
+            
+
             ImGui.BeginGroup(); // Middle section
 
             {
@@ -172,7 +238,7 @@ namespace DelvUI.Config.Tree
                         ImGui.Image(delvUiBanner.ImGuiHandle, new Vector2(delvUiBanner.Width, delvUiBanner.Height));
                     }
 
-                    ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing()), true);
+                    ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing() - 15), true);
 
                     // if no section is selected, select the first
                     if (children.Any() && children.All(o => !o.Selected))
@@ -215,21 +281,27 @@ namespace DelvUI.Config.Tree
             ImGui.EndGroup(); // Middle section
 
             ImGui.BeginGroup();
-
+            ImGui.PushStyleColor(ImGuiCol.Border, Vector4.Zero);
+            ImGui.BeginChild("buttons", new Vector2(0, 0), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+            ImGui.PopStyleColor();
+            
+            ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
             if (ImGui.Button(ConfigurationManager.GetInstance().ShowHUD ? "Hide HUD" : "Show HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
                 ConfigurationManager.GetInstance().ShowHUD = !ConfigurationManager.GetInstance().ShowHUD;
             }
-
+            ImGui.PopStyleVar();
             ImGui.SameLine();
+            ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
 
             if (ImGui.Button(ConfigurationManager.GetInstance().LockHUD ? "Unlock HUD" : "Lock HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
                 ConfigurationManager.GetInstance().LockHUD = !ConfigurationManager.GetInstance().LockHUD;
             }
+            ImGui.PopStyleVar();
 
             ImGui.SameLine();
-
+            /*
             if (ImGui.Button("Reset to Default", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
                 // make a new configuration from defaults
@@ -239,22 +311,23 @@ namespace DelvUI.Config.Tree
                 // prevent the config window from closing
                 ConfigurationManager.GetInstance().DrawConfigWindow = true;
             }
-
+*/
             ImGui.SameLine();
+            ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
+            ImGui.PushStyleColor(ImGuiCol.ButtonActive, Vector4.Zero);
+            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, Vector4.Zero);
 
-            ImGui.BeginChild("versionleft", new Vector2(ImGui.GetWindowWidth() / 7 + 10, 0));
-            ImGui.EndChild();
+            if (ImGui.Button($"v{Plugin.Version}", new Vector2(ImGui.GetWindowWidth() / 7 * 3 - 50, 0)))
+            { }
 
-            ImGui.SameLine();
-
-            ImGui.BeginChild("versioncenter", new Vector2(ImGui.GetWindowWidth() / 7 + 85, 0));
-            ImGui.Text($"v{Plugin.Version}");
-            ImGui.EndChild();
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
+            ImGui.PopStyleColor();
 
             ImGui.SameLine();
 
             ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, 1f));
-            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(124f / 255f, 147f / 255f, 228f / 255f, 1f));
+            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, .85f));
 
             if (ImGui.Button("Help!", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
@@ -267,7 +340,7 @@ namespace DelvUI.Config.Tree
             ImGui.SameLine();
 
             ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, 1f));
-            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(255f / 255f, 104f / 255f, 101f / 255f, 1f));
+            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, .85f));
 
             if (ImGui.Button("Donate!", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
@@ -276,9 +349,9 @@ namespace DelvUI.Config.Tree
 
             ImGui.PopStyleColor();
             ImGui.PopStyleColor();
-
+            ImGui.EndChild();
             ImGui.EndGroup();
-
+            PopStyles();
             ImGui.End();
 
             if (changed)
@@ -377,7 +450,6 @@ namespace DelvUI.Config.Tree
 
         public void Draw(ref bool changed)
         {
-
             if (!Selected)
             {
                 return;
@@ -385,7 +457,7 @@ namespace DelvUI.Config.Tree
 
             ImGui.BeginChild(
                 "item view",
-                new Vector2(0, -ImGui.GetFrameHeightWithSpacing()),
+                new Vector2(0, -ImGui.GetFrameHeightWithSpacing() - 15),
                 false,
                 ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
             ); // Leave room for 1 line below us
@@ -403,6 +475,7 @@ namespace DelvUI.Config.Tree
                         ImGui.BeginChild("subconfig value", new Vector2(0, 0), true);
                         subSectionNode.Draw(ref changed);
                         ImGui.EndChild();
+
                         ImGui.EndTabItem();
                     }
 
@@ -411,11 +484,12 @@ namespace DelvUI.Config.Tree
                     Vector2 pos = ImGui.GetCursorPos();
                     ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 20, 0));
                     ImGui.PushFont(UiBuilder.IconFont);
-
-                    if (ImGui.Button(FontAwesomeIcon.Times.ToIconString()))
+                    ImGui.PushStyleColor(ImGuiCol.Text,new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f));
+                    if (ImGui.Button(FontAwesomeIcon.Times.ToIconString(), new Vector2(20,20)))
                     {
                         ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
                     }
+                    ImGui.PopStyleColor();
 
                     ImGui.PopFont();
                     ImGui.SetCursorPos(pos);
@@ -526,36 +600,54 @@ namespace DelvUI.Config.Tree
 
         public override void Draw(ref bool changed)
         {
-            ImGui.BeginChild("item" + Depth + " view", new Vector2(0, -ImGui.GetFrameHeightWithSpacing())); // Leave room for 1 line below us
-
+            if (children.Count > 1)
             {
+                ImGui.BeginChild(
+                    "item" + Depth + " view",
+                    new Vector2(0, ImGui.GetWindowHeight() - 20),
+                    false,
+                    ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
+                ); // Leave room for 1 line below us
+
                 if (ImGui.BeginTabBar("##tabs" + Depth, ImGuiTabBarFlags.None))
                 {
-                    foreach (SubSectionNode subSectionNode in children)
-                    {
-                        if (subSectionNode is NestedSubSectionNode)
-                        {
-                            if (!ImGui.BeginTabItem(subSectionNode.Name))
-                            {
-                                continue;
-                            }
-
-                            ImGui.BeginChild("subconfig" + Depth + " value", new Vector2(0, 0), true);
-                            subSectionNode.Draw(ref changed);
-                            ImGui.EndChild();
-                            ImGui.EndTabItem();
-                        }
-                        else
-                        {
-                            subSectionNode.Draw(ref changed);
-                        }
-                    }
-
-                    ImGui.EndTabBar();
+                    DrawSubConfig(ref changed);
                 }
+
+                ImGui.EndTabBar();
+            }
+            else
+            {
+                ImGui.BeginChild("item" + Depth + " view", new Vector2(0, ImGui.GetWindowHeight() - 20)); // Leave room for 1 line below us
+
+                DrawSubConfig(ref changed);
             }
 
             ImGui.EndChild();
+        }
+
+        public void DrawSubConfig(ref bool changed)
+        {
+            foreach (SubSectionNode subSectionNode in children)
+            {
+                if (subSectionNode is NestedSubSectionNode)
+                {
+                    if (!ImGui.BeginTabItem(subSectionNode.Name))
+                    {
+                        continue;
+                    }
+
+                    ImGui.BeginChild("subconfig" + Depth + " value", new Vector2(0, ImGui.GetWindowHeight()));
+                    subSectionNode.Draw(ref changed);
+                    ImGui.EndChild();
+
+                    ImGui.EndTabItem();
+                }
+                else
+                {
+                    subSectionNode.Draw(ref changed);
+                }
+            }
         }
 
         public override void Save(string path)
@@ -654,8 +746,8 @@ namespace DelvUI.Config.Tree
                         continue;
                     }
 
-
                     var value = field.GetValue(_configObject);
+
                     if (value is not PluginConfigObject nestedConfig)
                     {
                         continue;
@@ -687,6 +779,7 @@ namespace DelvUI.Config.Tree
             foreach (string importString in importStrings)
             {
                 Type importedType = null;
+
                 try
                 {
                     // get type from json
@@ -718,10 +811,7 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public override void Draw(ref bool changed)
-        {
-            DrawWithID(ref changed);
-        }
+        public override void Draw(ref bool changed) { DrawWithID(ref changed); }
 
         private void DrawWithID(ref bool changed, string ID = null)
         {
@@ -752,13 +842,11 @@ namespace DelvUI.Config.Tree
                         collapseWithList.Add(field);
                         hasOrderAttribute = true;
                     }
-                    else if (attribute is NestedConfigAttribute nestedConfigAttribute &&
-                    _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode node))
+                    else if (attribute is NestedConfigAttribute nestedConfigAttribute && _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode node))
                     {
                         CategoryField categoryField = new(field, ConfigObject);
                         drawList.Add(new KeyValuePair<int, object>(nestedConfigAttribute.pos, node));
                         hasOrderAttribute = true;
-
                     }
                 }
 
@@ -804,21 +892,12 @@ namespace DelvUI.Config.Tree
                 }
                 else if (pair.Value is ConfigPageNode node)
                 {
-                    ImGui.Spacing(); ImGui.Spacing(); ImGui.Spacing();
+                    ImGui.Text("");
+                    ImGui.Separator();
+                    ImGui.Text("");
                     ImGui.BeginGroup();
-                    ImGui.Text(node.Name);
                     node.DrawWithID(ref changed, node.Name);
                     ImGui.EndGroup();
-
-                    ImGui.GetWindowDrawList()
-                    .AddRect(
-                        ImGui.GetItemRectMin() + new Vector2(0, -2),
-                        ImGui.GetItemRectMax() + new Vector2(ImGui.GetContentRegionAvail().X - ImGui.GetItemRectMax().X + ImGui.GetItemRectMin().X - 4, 4),
-                        0xFF4A4141
-                    );
-
-                    ImGui.Spacing(); ImGui.Spacing(); ImGui.Spacing();
-                    ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 5));
                 }
             }
 
@@ -846,8 +925,10 @@ namespace DelvUI.Config.Tree
 
         private void DrawImportExportGeneralConfig()
         {
-            ImGui.Spacing(); ImGui.Spacing(); ImGui.Spacing();
-            ImGui.Spacing(); ImGui.Spacing(); ImGui.Spacing();
+            ImGui.Text("");
+            ImGui.Text("");
+            ImGui.Separator();
+            ImGui.Text("");
 
             uint maxLength = 40000;
             ImGui.BeginChild("importpane", new Vector2(0, ImGui.GetWindowHeight() / 6), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
@@ -860,6 +941,7 @@ namespace DelvUI.Config.Tree
                 {
                     // get type from json
                     Type importedType = null;
+
                     try
                     {
                         string jsonString = ConfigurationManager.Base64DecodeAndDecompress(_importString);
@@ -869,6 +951,7 @@ namespace DelvUI.Config.Tree
                     {
                         PluginLog.Log($"Error parsing import string!\n{ex.StackTrace}");
                     }
+
                     // abort import if the import string is for the wrong type
                     if (importedType != null && ConfigObject.GetType().FullName == importedType.FullName)
                     {
@@ -994,29 +1077,19 @@ namespace DelvUI.Config.Tree
 
         public void Draw(ref bool changed)
         {
-            Draw(ref changed, MainField, 0);
+            Draw(ref changed, MainField, 2);
 
             if (CategoryId != -1 && (bool)MainField.GetValue(ConfigObject))
             {
                 ImGui.BeginGroup();
-                ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 5));
+                ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 0));
 
                 foreach (FieldInfo child in Children.Values)
                 {
-                    Draw(ref changed, child, 4);
+                    Draw(ref changed, child, 25);
                 }
 
                 ImGui.EndGroup();
-
-                ImGui.GetWindowDrawList()
-                     .AddRect(
-                         ImGui.GetItemRectMin() + new Vector2(0, -2),
-                         ImGui.GetItemRectMax() + new Vector2(ImGui.GetContentRegionAvail().X - ImGui.GetItemRectMax().X + ImGui.GetItemRectMin().X - 4, 4),
-                         0xFF4A4141
-                     );
-
-                ImGui.Spacing();
-                ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 5));
             }
         }
 
@@ -1032,7 +1105,7 @@ namespace DelvUI.Config.Tree
                 {
                     bool boolVal = (bool)fieldVal;
 
-                    if (ImGui.Checkbox(checkboxAttribute.friendlyName + idText, ref boolVal))
+                    if (ImGui.Checkbox(ID != null && checkboxAttribute.friendlyName == "Enabled" ? ID : checkboxAttribute.friendlyName + idText, ref boolVal))
                     {
                         field.SetValue(ConfigObject, boolVal);
                         changed = true;
@@ -1115,13 +1188,16 @@ namespace DelvUI.Config.Tree
                     ImGui.Text(dragDropHorizontalAttribute.friendlyName);
                     int[] order = (int[])fieldVal;
                     string[] names = dragDropHorizontalAttribute.names;
+
                     for (int i = 0; i < order.Count(); i++)
                     {
                         ImGui.SameLine();
                         ImGui.Button(names[order[i]], new Vector2(100, 25));
+
                         if (ImGui.IsItemActive())
                         {
                             float drag_dx = ImGui.GetMouseDragDelta(ImGuiMouseButton.Left).X;
+
                             if ((drag_dx > 80.0f && i < order.Count() - 1))
                             {
                                 var _curri = order[i];

@@ -47,7 +47,7 @@ namespace DelvUI.Config
     [Serializable]
     public class PluginConfigColor
     {
-        [JsonIgnore] private float[] _colorMapRatios = { -.8f, -.1f, .1f };
+        [JsonIgnore] private float[] _colorMapRatios = { -.8f, -.3f, .1f };
 
         [JsonIgnore] private Vector4 _vector;
 
@@ -83,9 +83,9 @@ namespace DelvUI.Config
 
         [JsonIgnore] public uint Background { get; private set; }
 
-        [JsonIgnore] public uint LeftGradient { get; private set; }
+        [JsonIgnore] public uint TopGradient { get; private set; }
 
-        [JsonIgnore] public uint RightGradient { get; private set; }
+        [JsonIgnore] public uint BottomGradient { get; private set; }
 
         [JsonIgnore] public Dictionary<string, uint> Map { get; private set; }
 
@@ -93,9 +93,9 @@ namespace DelvUI.Config
         {
             Base = ImGui.ColorConvertFloat4ToU32(_vector);
             Background = ImGui.ColorConvertFloat4ToU32(_vector.AdjustColor(_colorMapRatios[0]));
-            LeftGradient = ImGui.ColorConvertFloat4ToU32(_vector.AdjustColor(_colorMapRatios[1]));
-            RightGradient = ImGui.ColorConvertFloat4ToU32(_vector.AdjustColor(_colorMapRatios[2]));
-            Map = new Dictionary<string, uint> { ["base"] = Base, ["background"] = Background, ["gradientLeft"] = LeftGradient, ["gradientRight"] = RightGradient };
+            TopGradient = ImGui.ColorConvertFloat4ToU32(_vector.AdjustColor(_colorMapRatios[1]));
+            BottomGradient = ImGui.ColorConvertFloat4ToU32(_vector.AdjustColor(_colorMapRatios[2]));
+            Map = new Dictionary<string, uint> { ["base"] = Base, ["background"] = Background, ["gradientTop"] = TopGradient, ["gradientBottom"] = BottomGradient };
         }
     }
 }

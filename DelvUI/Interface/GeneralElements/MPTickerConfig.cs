@@ -20,11 +20,11 @@ namespace DelvUI.Interface.GeneralElements
 
         [Checkbox("Show Border")]
         [Order(25)]
-        public bool ShowBorder = false;
+        public bool ShowBorder = true;
 
         [ColorEdit4("Color")]
         [Order(30)]
-        public PluginConfigColor Color = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f));
+        public PluginConfigColor Color = new PluginConfigColor(new(240f / 255f, 92f / 255f, 232f / 255f, 100f / 100f));
 
         public MPTickerConfig(Vector2 position, Vector2 size)
         {

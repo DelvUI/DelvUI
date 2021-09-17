@@ -199,10 +199,10 @@ namespace DelvUI.Interface.Bars
                         drawList.AddRectFilledMultiColor(
                             cursorPos,
                             cursorPos + barSize,
-                            ChunkColors[i]["gradientLeft"],
-                            ChunkColors[i]["gradientRight"],
-                            ChunkColors[i]["gradientRight"],
-                            ChunkColors[i]["gradientLeft"]
+                            ChunkColors[i]["gradientTop"],
+                            ChunkColors[i]["gradientTop"],
+                            ChunkColors[i]["gradientBottom"],
+                            ChunkColors[i]["gradientBottom"]
                         );
                     }
                     else
@@ -215,10 +215,10 @@ namespace DelvUI.Interface.Bars
                             drawList.AddRectFilledMultiColor(
                                 cursorPos,
                                 cursorPos + fillVector,
-                                PartialFillColor["gradientLeft"],
-                                PartialFillColor["gradientRight"],
-                                PartialFillColor["gradientRight"],
-                                PartialFillColor["gradientLeft"]
+                                PartialFillColor["gradientTop"],
+                                PartialFillColor["gradientTop"],
+                                PartialFillColor["gradientBottom"],
+                                PartialFillColor["gradientBottom"]
                             );
                         }
                         else
@@ -226,10 +226,10 @@ namespace DelvUI.Interface.Bars
                             drawList.AddRectFilledMultiColor(
                                 cursorPos,
                                 cursorPos + fillVector,
-                                ChunkColors[i]["gradientLeft"],
-                                ChunkColors[i]["gradientRight"],
-                                ChunkColors[i]["gradientRight"],
-                                ChunkColors[i]["gradientLeft"]
+                                ChunkColors[i]["gradientTop"],
+                                ChunkColors[i]["gradientTop"],
+                                ChunkColors[i]["gradientBottom"],
+                                ChunkColors[i]["gradientBottom"]
                             );
                         }
                     }
@@ -269,10 +269,10 @@ namespace DelvUI.Interface.Bars
                         drawList.AddRectFilledMultiColor(
                             cursorPos,
                             cursorPos + barSize,
-                            ChunkColors[i]["gradientLeft"],
-                            ChunkColors[i]["gradientRight"],
-                            ChunkColors[i]["gradientRight"],
-                            ChunkColors[i]["gradientLeft"]
+                            ChunkColors[i]["gradientTop"],
+                            ChunkColors[i]["gradientTop"],
+                            ChunkColors[i]["gradientBottom"],
+                            ChunkColors[i]["gradientBottom"]
                         );
                     }
                     else
@@ -285,10 +285,10 @@ namespace DelvUI.Interface.Bars
                             drawList.AddRectFilledMultiColor(
                                 cursorPos + barSize - fillVector,
                                 cursorPos + barSize,
-                                PartialFillColor["gradientLeft"],
-                                PartialFillColor["gradientRight"],
-                                PartialFillColor["gradientRight"],
-                                PartialFillColor["gradientLeft"]
+                                PartialFillColor["gradientTop"],
+                                PartialFillColor["gradientTop"],
+                                PartialFillColor["gradientBottom"],
+                                PartialFillColor["gradientBottom"]
                             );
                         }
                         else
@@ -296,10 +296,10 @@ namespace DelvUI.Interface.Bars
                             drawList.AddRectFilledMultiColor(
                                 cursorPos + barSize - fillVector,
                                 cursorPos + barSize,
-                                ChunkColors[i]["gradientLeft"],
-                                ChunkColors[i]["gradientRight"],
-                                ChunkColors[i]["gradientRight"],
-                                ChunkColors[i]["gradientLeft"]
+                                ChunkColors[i]["gradientTop"],
+                                ChunkColors[i]["gradientTop"],
+                                ChunkColors[i]["gradientBottom"],
+                                ChunkColors[i]["gradientBottom"]
                             );
                         }
                     }
@@ -488,10 +488,10 @@ namespace DelvUI.Interface.Bars
                     drawList.AddRectFilledMultiColor(
                         cursorPos,
                         cursorPos + barSize,
-                        ChunkColors[i]["gradientLeft"],
-                        ChunkColors[i]["gradientRight"],
-                        ChunkColors[i]["gradientRight"],
-                        ChunkColors[i]["gradientLeft"]
+                        ChunkColors[i]["gradientTop"],
+                        ChunkColors[i]["gradientTop"],
+                        ChunkColors[i]["gradientBottom"],
+                        ChunkColors[i]["gradientBottom"]
                     );
                 }
                 else
@@ -501,10 +501,10 @@ namespace DelvUI.Interface.Bars
                         drawList.AddRectFilledMultiColor(
                             cursorPos,
                             cursorPos + barSize,
-                            PartialFillColor["gradientLeft"],
-                            PartialFillColor["gradientRight"],
-                            PartialFillColor["gradientRight"],
-                            PartialFillColor["gradientLeft"]
+                            PartialFillColor["gradientTop"],
+                            PartialFillColor["gradientTop"],
+                            PartialFillColor["gradientBottom"],
+                            PartialFillColor["gradientBottom"]
                         );
                     }
                 }

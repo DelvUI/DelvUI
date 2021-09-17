@@ -171,31 +171,29 @@ namespace DelvUI
             }
             else
             {
-                configManager.DrawConfigWindow = !configManager.DrawConfigWindow;
+                switch (arguments)
+                {
+                    case "toggle":
+                        ConfigurationManager.GetInstance().ShowHUD = !ConfigurationManager.GetInstance().ShowHUD;
+
+                        break;
+
+                    case "show":
+                        ConfigurationManager.GetInstance().ShowHUD = true;
+
+                        break;
+
+                    case "hide":
+                        ConfigurationManager.GetInstance().ShowHUD = false;
+
+                        break;
+
+                    default:
+                        configManager.DrawConfigWindow = !configManager.DrawConfigWindow;
+
+                        break;
+                }
             }
-
-            //switch (arguments)
-            //{
-            //    case "toggle":
-            //        _configurationWindow.ToggleHud();
-
-            //        break;
-
-            //    case "show":
-            //        _configurationWindow.ShowHud();
-
-            //        break;
-
-            //    case "hide":
-            //        _configurationWindow.HideHud();
-
-            //        break;
-
-            //    default:
-            //        ConfigurationManager.GetInstance().DrawConfigWindow = false;
-
-            //        break;
-            //}
         }
 
         private void ReloadConfigCommand(string command, string arguments) { ConfigurationManager.GetInstance().LoadConfigurations(); }

@@ -61,10 +61,10 @@ namespace DelvUI.Interface.GeneralElements
             drawList.AddRectFilledMultiColor(
                 startPos,
                 startPos + barSize,
-                Config.Color.LeftGradient,
-                Config.Color.RightGradient,
-                Config.Color.RightGradient,
-                Config.Color.LeftGradient
+                Config.Color.TopGradient,
+                Config.Color.TopGradient,
+                Config.Color.BottomGradient,
+                Config.Color.BottomGradient
             );
 
             if (Config.ShowBorder)

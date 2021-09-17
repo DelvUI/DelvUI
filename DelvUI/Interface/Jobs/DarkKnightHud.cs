@@ -251,7 +251,7 @@ namespace DelvUI.Interface.Jobs
 
         [CollapseWith(25, 0)]
         [ColorEdit4("Mana Color" + "##DRKManaBar")]
-        public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 142f / 255f, 254f / 255f, 100f / 100f));
+        public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
 
         [ColorEdit4("Dark Arts Buff Color" + "##DRKManaBar")]
         [CollapseWith(30, 0)]
