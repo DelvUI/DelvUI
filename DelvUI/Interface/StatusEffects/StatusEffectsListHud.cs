@@ -179,12 +179,6 @@ namespace DelvUI.Interface.StatusEffects
 
             // calculate layout
             var list = StatusEffectsData(filterStatusEffects);
-            if (list.Count == 0)
-            {
-                return;
-            }
-
-            var count = CalculateLayout(list);
 
             // validate growth directions
             var growthDirections = Config.GetGrowthDirections();
@@ -194,66 +188,44 @@ namespace DelvUI.Interface.StatusEffects
                 _lastGrowthDirections = growthDirections;
             }
 
-            // window
-            ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoTitleBar;
-            windowFlags |= ImGuiWindowFlags.NoMove;
-            windowFlags |= ImGuiWindowFlags.NoDecoration;
-            windowFlags |= ImGuiWindowFlags.NoBackground;
-            if (!Config.ShowBuffs)
-            {
-                windowFlags |= ImGuiWindowFlags.NoInputs;
-            }
-
-            // imgui clips the left and right borders inside windows for some reason
-            // we make the window bigger so the actual drawable size is the expected one
+            // area
             var position = origin + Config.Position;
-            var margin = new Vector2(4, 0);
-            var windowPos = CalculateStartPosition(position, Config.Size, growthDirections) - margin;
-            ImGui.SetNextWindowPos(windowPos, ImGuiCond.Always);
-            ImGui.SetNextWindowSize(Config.Size + margin * 2);
-
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
-            ImGui.Begin("statusEffectList " + ID, windowFlags);
+            var areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
             var drawList = ImGui.GetWindowDrawList();
 
-            // draw area
             if (Config.ShowArea)
             {
-                var areaStartPos = windowPos + margin;
-                drawList.AddRectFilled(areaStartPos, areaStartPos + Config.Size, 0x88000000);
+                drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
             }
 
+            // no need to do anything else if there are no effects
+            if (list.Count == 0)
+            {
+                return;
+            }
+
+            // calculate icon positions
+            var count = CalculateLayout(list);
             var row = 0;
             var col = 0;
-            var showingTooltip = false;
+            CalculateAxisDirections(growthDirections, count, out var direction, out var offset);
+            var iconPositions = new List<Vector2>();
+            var minPos = new Vector2(float.MaxValue, float.MaxValue);
+            var maxPos = Vector2.Zero;
 
             for (var i = 0; i < count; i++)
             {
-                var statusEffectData = list[i];
-
-                CalculateAxisDirections(growthDirections, list.Count, out var direction, out var offset);
-                var iconPos = new Vector2(
+                var pos = new Vector2(
                     position.X + offset.X + Config.IconConfig.Size.X * col * direction.X + Config.IconPadding.X * col * direction.X,
                     position.Y + offset.Y + Config.IconConfig.Size.Y * row * direction.Y + Config.IconPadding.Y * row * direction.Y
                 );
 
-                // draw
-                StatusEffectIconDrawHelper.DrawStatusEffectIcon(drawList, iconPos, statusEffectData, Config.IconConfig);
+                minPos.X = Math.Min(pos.X, minPos.X);
+                minPos.Y = Math.Min(pos.Y, minPos.Y);
+                maxPos.X = Math.Max(pos.X + Config.IconConfig.Size.X, maxPos.X);
+                maxPos.Y = Math.Max(pos.Y + Config.IconConfig.Size.Y, maxPos.Y);
 
-                // tooltip
-                if (Config.ShowTooltips && ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
-                {
-                    TooltipsHelper.Instance.ShowTooltipOnCursor(statusEffectData.Data.Description, statusEffectData.Data.Name);
-                    showingTooltip = true;
-
-                    // remove buff on right click
-                    bool isFromPlayer = statusEffectData.StatusEffect.OwnerId == Plugin.ClientState.LocalPlayer?.ActorId;
-
-                    if (statusEffectData.Data.Category == 1 && isFromPlayer && ImGui.GetIO().MouseClicked[1])
-                    {
-                        ChatHelper.SendChatMessage("/statusoff \"" + statusEffectData.Data.Name + "\"");
-                    }
-                }
+                iconPositions.Add(pos);
 
                 // rows / columns
                 if (Config.FillRowsFirst)
@@ -274,6 +246,55 @@ namespace DelvUI.Interface.StatusEffects
                         col += 1;
                     }
                 }
+            }
+
+            // window
+            ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoTitleBar;
+            windowFlags |= ImGuiWindowFlags.NoMove;
+            windowFlags |= ImGuiWindowFlags.NoDecoration;
+            windowFlags |= ImGuiWindowFlags.NoBackground;
+            if (!Config.ShowBuffs)
+            {
+                windowFlags |= ImGuiWindowFlags.NoInputs;
+            }
+
+            // imgui clips the left and right borders inside windows for some reason
+            // we make the window bigger so the actual drawable size is the expected one
+            var margin = new Vector2(4, 0);
+            var windowPos = minPos - margin;
+            var windowSize = maxPos - minPos;
+            ImGui.SetNextWindowPos(windowPos, ImGuiCond.Always);
+            ImGui.SetNextWindowSize(windowSize + margin * 2);
+
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
+            ImGui.Begin("statusEffectList " + ID, windowFlags);
+
+            // draw
+            drawList = ImGui.GetWindowDrawList();
+            var showingTooltip = false;
+
+            for (var i = 0; i < count; i++)
+            {
+                var iconPos = iconPositions[i];
+                var statusEffectData = list[i];
+
+                StatusEffectIconDrawHelper.DrawStatusEffectIcon(drawList, iconPos, statusEffectData, Config.IconConfig);
+
+                // tooltip
+                if (Config.ShowTooltips && ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
+                {
+                    TooltipsHelper.Instance.ShowTooltipOnCursor(statusEffectData.Data.Description, statusEffectData.Data.Name);
+                    showingTooltip = true;
+
+                    // remove buff on right click
+                    bool isFromPlayer = statusEffectData.StatusEffect.OwnerId == Plugin.ClientState.LocalPlayer?.ActorId;
+
+                    if (statusEffectData.Data.Category == 1 && isFromPlayer && ImGui.GetIO().MouseClicked[1])
+                    {
+                        ChatHelper.SendChatMessage("/statusoff \"" + statusEffectData.Data.Name + "\"");
+                    }
+                }
+
             }
 
             ImGui.End();
@@ -332,7 +353,7 @@ namespace DelvUI.Interface.StatusEffects
             return directions;
         }
 
-        private void CalculateAxisDirections(GrowthDirections growthDirections, int elementCount, out Vector2 direction, out Vector2 offset)
+        private void CalculateAxisDirections(GrowthDirections growthDirections, uint elementCount, out Vector2 direction, out Vector2 offset)
         {
             if ((growthDirections & GrowthDirections.Out) != 0)
             {
