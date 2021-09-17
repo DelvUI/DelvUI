@@ -212,7 +212,7 @@ namespace DelvUI.Interface
 
             if (Helper.UserInterfaceWasHidden)
             {
-                Helper.ConfigureDefaultJobGauge();
+                Helper.ApplyCurrentConfig();
                 Helper.UserInterfaceWasHidden = false;
             }
 
