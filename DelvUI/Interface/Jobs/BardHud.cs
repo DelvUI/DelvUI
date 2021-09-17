@@ -20,7 +20,7 @@ namespace DelvUI.Interface.Jobs
     {
         private readonly SpellHelper _spellHelper = new();
         private new BardConfig Config => (BardConfig)_config;
-        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public BardHud(string id, BardConfig config, string displayName = null) : base(id, config, displayName)
         {
@@ -111,7 +111,7 @@ namespace DelvUI.Interface.Jobs
 
                 BarBuilder builder = BarBuilder.Create(position, barSize);
 
-                Bar cbBar = builder.AddInnerBar(duration, 30f, color.Map).SetFlipDrainDirection(Config.CBInverted).SetBackgroundColor(EmptyColor["background"]).Build();
+                Bar cbBar = builder.AddInnerBar(duration, 30f, color).SetFlipDrainDirection(Config.CBInverted).SetBackgroundColor(EmptyColor.Base).Build();
 
                 if (Config.CBValue)
                 {
@@ -147,7 +147,7 @@ namespace DelvUI.Interface.Jobs
 
                 BarBuilder builder = BarBuilder.Create(position, barSize);
 
-                Bar sbBar = builder.AddInnerBar(duration, 30f, color.Map).SetFlipDrainDirection(Config.SBInverted).SetBackgroundColor(EmptyColor["background"]).Build();
+                Bar sbBar = builder.AddInnerBar(duration, 30f, color).SetFlipDrainDirection(Config.SBInverted).SetBackgroundColor(EmptyColor.Base).Build();
 
                 if (Config.SBValue)
                 {
@@ -187,37 +187,37 @@ namespace DelvUI.Interface.Jobs
                 case CurrentSong.WANDERER:
                     if (Config.ShowWMStacks)
                     {
-                        DrawStacks(origin, songStacks, 3, Config.WMStackColor.Map);
+                        DrawStacks(origin, songStacks, 3, Config.WMStackColor);
                     }
 
-                    DrawSongTimer(origin, songTimer, Config.WMColor.Map);
+                    DrawSongTimer(origin, songTimer, Config.WMColor);
 
                     break;
 
                 case CurrentSong.MAGE:
                     if (Config.ShowMBProc)
                     {
-                        DrawBloodletterReady(origin, Config.MBProcColor.Map);
+                        DrawBloodletterReady(origin, Config.MBProcColor);
                     }
 
-                    DrawSongTimer(origin, songTimer, Config.MBColor.Map);
+                    DrawSongTimer(origin, songTimer, Config.MBColor);
 
                     break;
 
                 case CurrentSong.ARMY:
                     if (Config.ShowAPStacks)
                     {
-                        DrawStacks(origin, songStacks, 4, Config.APStackColor.Map);
+                        DrawStacks(origin, songStacks, 4, Config.APStackColor);
                     }
 
-                    DrawSongTimer(origin, songTimer, Config.APColor.Map);
+                    DrawSongTimer(origin, songTimer, Config.APColor);
 
                     break;
 
                 case CurrentSong.NONE:
                     if (Config.ShowEmptyStacks)
                     {
-                        DrawStacks(origin, 0, 3, Config.APStackColor.Map);
+                        DrawStacks(origin, 0, 3, Config.APStackColor);
                     }
 
                     DrawSongTimer(origin, 0, EmptyColor);
@@ -227,7 +227,7 @@ namespace DelvUI.Interface.Jobs
                 default:
                     if (Config.ShowEmptyStacks)
                     {
-                        DrawStacks(origin, 0, 3, Config.APStackColor.Map);
+                        DrawStacks(origin, 0, 3, Config.APStackColor);
                     }
 
                     DrawSongTimer(origin, 0, EmptyColor);
@@ -236,7 +236,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawBloodletterReady(Vector2 origin, Dictionary<string, uint> color)
+        private void DrawBloodletterReady(Vector2 origin, PluginConfigColor color)
         {
             // I want to draw Bloodletter procs here (just color entire bar red to indicate cooldown is ready).
             // But can't find a way yet to accomplish this.
@@ -253,8 +253,8 @@ namespace DelvUI.Interface.Jobs
 
             int active = _spellHelper.GetSpellCooldown(110) == 0 ? 100 : 0;
 
-            Bar bar = builder.AddInnerBar(active, 100, Config.MBProcColor.Map)
-                             .SetBackgroundColor(EmptyColor["background"])
+            Bar bar = builder.AddInnerBar(active, 100, Config.MBProcColor)
+                             .SetBackgroundColor(EmptyColor.Base)
                              .Build();
 
             if (Config.ShowMBProcGlow && active == 100)
@@ -267,7 +267,7 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawSongTimer(Vector2 origin, short songTimer, Dictionary<string, uint> songColor)
+        private void DrawSongTimer(Vector2 origin, short songTimer, PluginConfigColor songColor)
         {
             if (!Config.ShowSongGauge)
             {
@@ -284,7 +284,7 @@ namespace DelvUI.Interface.Jobs
             Bar bar = builder.AddInnerBar(duration / 1000f, 30f, songColor)
                              .SetTextMode(BarTextMode.EachChunk)
                              .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                             .SetBackgroundColor(EmptyColor["background"])
+                             .SetBackgroundColor(EmptyColor.Base)
                              .Build();
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -300,7 +300,7 @@ namespace DelvUI.Interface.Jobs
 
             BarBuilder builder = BarBuilder.Create(position, barSize);
 
-            Bar bar = builder.AddInnerBar(soulVoice, 100f, Config.SoulGaugeColor.Map).SetBackgroundColor(EmptyColor["background"]).Build();
+            Bar bar = builder.AddInnerBar(soulVoice, 100f, Config.SoulGaugeColor).SetBackgroundColor(EmptyColor.Base).Build();
 
             if (Config.ShowSoulGaugeGlow && soulVoice == 100)
             {
@@ -312,7 +312,7 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawStacks(Vector2 origin, int amount, int max, Dictionary<string, uint> stackColor)
+        private void DrawStacks(Vector2 origin, int amount, int max, PluginConfigColor stackColor)
         {
             Vector2 barSize = Config.StackSize;
             Vector2 position = origin + Config.Position + Config.StackPosition - barSize / 2f;
@@ -322,7 +322,7 @@ namespace DelvUI.Interface.Jobs
             Bar bar = builder.SetChunks(max)
                              .SetChunkPadding(Config.StackPadding)
                              .AddInnerBar(amount, max, stackColor)
-                             .SetBackgroundColor(EmptyColor["background"])
+                             .SetBackgroundColor(EmptyColor.Base)
                              .Build();
 
             if (Config.ShowWMStacksGlow && amount == 3 && max == 3)

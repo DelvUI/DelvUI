@@ -19,8 +19,8 @@ namespace DelvUI.Interface.Jobs
     public class PaladinHud : JobHud
     {
         private new PaladinConfig Config => (PaladinConfig)_config;
-        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
-        private Dictionary<string, uint> PartialFillColor => GlobalColors.Instance.PartialFillColor.Map;
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
+        private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
         public PaladinHud(string id, PaladinConfig config, string displayName = null) : base(id, config, displayName)
         {
@@ -94,15 +94,15 @@ namespace DelvUI.Interface.Jobs
             float posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
             float posY = origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f;
 
-            BarBuilder builder = BarBuilder.Create(posX, posY, Config.ManaBarSize.Y, Config.ManaBarSize.X).SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder builder = BarBuilder.Create(posX, posY, Config.ManaBarSize.Y, Config.ManaBarSize.X).SetBackgroundColor(EmptyColor.Base);
 
             if (Config.ChunkManaBar)
             {
-                builder.SetChunks(5).SetChunkPadding(Config.ManaBarPadding).AddInnerBar(actor.CurrentMp, actor.MaxMp, Config.ManaBarColor.Map, EmptyColor);
+                builder.SetChunks(5).SetChunkPadding(Config.ManaBarPadding).AddInnerBar(actor.CurrentMp, actor.MaxMp, Config.ManaBarColor, EmptyColor);
             }
             else
             {
-                builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, Config.ManaBarColor.Map);
+                builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, Config.ManaBarColor);
             }
 
             if (Config.ShowManaBarText)
@@ -126,8 +126,8 @@ namespace DelvUI.Interface.Jobs
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.OathGaugeSize.Y, Config.OathGaugeSize.X)
                                            .SetChunks(2)
                                            .SetChunkPadding(Config.OathGaugePadding)
-                                           .SetBackgroundColor(EmptyColor["background"])
-                                           .AddInnerBar(gauge.GaugeAmount, 100, Config.OathGaugeColor.Map, PartialFillColor);
+                                           .SetBackgroundColor(EmptyColor.Base)
+                                           .AddInnerBar(gauge.GaugeAmount, 100, Config.OathGaugeColor, PartialFillColor);
 
             if (Config.ShowOathGaugeText)
             {
@@ -146,12 +146,12 @@ namespace DelvUI.Interface.Jobs
             float xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.BuffBarSize.Y, Config.BuffBarSize.X).SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.BuffBarSize.Y, Config.BuffBarSize.X).SetBackgroundColor(EmptyColor.Base);
 
             if (fightOrFlightBuff.Any())
             {
                 float fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().Duration);
-                builder.AddInnerBar(fightOrFlightDuration, 25, Config.FightOrFlightColor.Map);
+                builder.AddInnerBar(fightOrFlightDuration, 25, Config.FightOrFlightColor);
 
                 if (Config.ShowBuffBarText)
                 {
@@ -162,7 +162,7 @@ namespace DelvUI.Interface.Jobs
             if (requiescatBuff.Any())
             {
                 float requiescatDuration = Math.Abs(requiescatBuff.First().Duration);
-                builder.AddInnerBar(requiescatDuration, 12, Config.RequiescatColor.Map);
+                builder.AddInnerBar(requiescatDuration, 12, Config.RequiescatColor);
 
                 if (Config.ShowBuffBarText)
                 {
@@ -185,8 +185,8 @@ namespace DelvUI.Interface.Jobs
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.AtonementBarSize.Y, Config.AtonementBarSize.X)
                                            .SetChunks(3)
                                            .SetChunkPadding(Config.AtonementBarPadding)
-                                           .SetBackgroundColor(EmptyColor["background"])
-                                           .AddInnerBar(stackCount, 3, Config.AtonementColor.Map, null);
+                                           .SetBackgroundColor(EmptyColor.Base)
+                                           .AddInnerBar(stackCount, 3, Config.AtonementColor, null);
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
@@ -209,8 +209,8 @@ namespace DelvUI.Interface.Jobs
             float yPos = origin.Y + Config.Position.Y + Config.GoringBladeBarPosition.Y - Config.GoringBladeBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.GoringBladeBarSize.Y, Config.GoringBladeBarSize.X)
-                                           .AddInnerBar(duration, 21, Config.GoringBladeColor.Map)
-                                           .SetBackgroundColor(EmptyColor["background"]);
+                                           .AddInnerBar(duration, 21, Config.GoringBladeColor)
+                                           .SetBackgroundColor(EmptyColor.Base);
 
             if (Config.ShowGoringBladeBarText)
             {

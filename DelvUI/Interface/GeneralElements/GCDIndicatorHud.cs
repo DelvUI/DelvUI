@@ -45,7 +45,7 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             var startPos = origin + Config.Position - Config.Size / 2f;
-            
+
             if (Config.AnchorToMouse)
             {
                 startPos = ImGui.GetMousePos();
@@ -55,7 +55,7 @@ namespace DelvUI.Interface.GeneralElements
                     startPos += Config.Position;
                 }
             }
-            
+
             if (Config.CircularMode)
             {
                 DrawCircularIndicator(startPos, Config.CircleRadius, elapsed, total);
@@ -82,7 +82,7 @@ namespace DelvUI.Interface.GeneralElements
             drawList.PathArcTo(position, radius, startAngle, progressAngle, segments);
             drawList.PathStroke(Config.Color.Base, ImDrawFlags.None, Config.CircleThickness);
             // draw the queue indicator
-            if(Config.ShowGCDQueueIndicator && current > total - queueTime)
+            if (Config.ShowGCDQueueIndicator && current > total - queueTime)
             {
                 float oldAngle = progressAngle - 0.0003f * total * 2f * (float)Math.PI;
                 progressAngle = current / total * 2f * (float)Math.PI;
@@ -97,7 +97,7 @@ namespace DelvUI.Interface.GeneralElements
             {
                 drawList.PathArcTo(position, radius - Config.CircleThickness / 2f, 0f, 2f * (float)Math.PI, segments);
                 drawList.PathStroke(0xFF000000, ImDrawFlags.None, 1);
-                
+
                 drawList.PathArcTo(position, radius + Config.CircleThickness / 2f, 0f, 2f * (float)Math.PI, segments);
                 drawList.PathStroke(0xFF000000, ImDrawFlags.None, 1);
             }
@@ -118,7 +118,7 @@ namespace DelvUI.Interface.GeneralElements
             var drawList = ImGui.GetWindowDrawList();
             var builder = BarBuilder.Create(position, size)
                                     .SetChunks(new float[2] { percentNonQueue, 1F - percentNonQueue })
-                                    .AddInnerBar(current, total, Config.Color.Map)
+                                    .AddInnerBar(current, total, Config.Color)
                                     .SetDrawBorder(Config.ShowBorder)
                                     .SetVertical(Config.VerticalMode);
 
@@ -126,12 +126,12 @@ namespace DelvUI.Interface.GeneralElements
             var queueEndOffset = Config.VerticalMode ? new Vector2(size.X, percentNonQueue * size.Y + 1f) : new Vector2(percentNonQueue * size.X + 1f, size.Y);
             if (Config.ShowGCDQueueIndicator)
             {
-                builder.SetChunksColors(new Dictionary<string, uint>[2] { Config.Color.Map, Config.QueueColor.Map });
+                builder.SetChunksColors(new PluginConfigColor[2] { Config.Color, Config.QueueColor });
                 drawList.AddRect(position + queueStartOffset, position + queueEndOffset, Config.QueueColor.Base);
             }
-            
+
             builder.Build().Draw(drawList);
         }
-        
+
     }
 }

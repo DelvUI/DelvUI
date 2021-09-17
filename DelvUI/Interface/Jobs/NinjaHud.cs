@@ -20,8 +20,8 @@ namespace DelvUI.Interface.Jobs
     public class NinjaHud : JobHud
     {
         private new NinjaConfig Config => (NinjaConfig)_config;
-        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
-        private Dictionary<string, uint> PartialFillColor => GlobalColors.Instance.PartialFillColor.Map;
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
+        private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
         public NinjaHud(string id, NinjaConfig config, string displayName = null) : base(id, config, displayName)
         {
@@ -149,7 +149,7 @@ namespace DelvUI.Interface.Jobs
                 {
                     duration = tcjKassMaximum;
                 }
-                builder.AddInnerBar(duration, tcjKassMaximum, barColor.Map);
+                builder.AddInnerBar(duration, tcjKassMaximum, barColor);
                 if (Config.ShowNinjutsuText)
                 {
                     builder.SetTextMode(BarTextMode.Single)
@@ -164,7 +164,7 @@ namespace DelvUI.Interface.Jobs
                 // show the mudra recharge timer on bars that aren't full
                 if (Config.ShowMudraBarText)
                 {
-                    Dictionary<string, uint>[] chunkColors = { Config.MudraBarColor.Map, Config.MudraBarColor.Map };
+                    PluginConfigColor[] chunkColors = { Config.MudraBarColor, Config.MudraBarColor };
                     BarText[] charges = new BarText[2];
                     charges[0] = new BarText(BarTextPosition.CenterMiddle, BarTextType.Remaining);
                     charges[1] = new BarText(BarTextPosition.CenterMiddle, BarTextType.Remaining);
@@ -183,11 +183,11 @@ namespace DelvUI.Interface.Jobs
                 }
                 else
                 {
-                    builder.AddInnerBar(maximum - mudraCooldownInfo, maximum, Config.MudraBarColor.Map);
+                    builder.AddInnerBar(maximum - mudraCooldownInfo, maximum, Config.MudraBarColor);
                 }
             }
 
-            Bar bar = builder.SetBackgroundColor(EmptyColor["background"])
+            Bar bar = builder.SetBackgroundColor(EmptyColor.Base)
                              .Build();
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -220,8 +220,8 @@ namespace DelvUI.Interface.Jobs
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.HutonGaugeSize.Y, Config.HutonGaugeSize.X);
             float maximum = 70f;
 
-            builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, hutonDurationLeft > Config.HutonGaugeExpiryThreshold ? Config.HutonGaugeColor.Map : Config.HutonGaugeExpiryColor.Map)
-                   .SetBackgroundColor(EmptyColor["background"]);
+            builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, hutonDurationLeft > Config.HutonGaugeExpiryThreshold ? Config.HutonGaugeColor : Config.HutonGaugeExpiryColor)
+                   .SetBackgroundColor(EmptyColor.Base);
 
             if (Config.ShowHutonGaugeText)
             {
@@ -251,14 +251,14 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ChunkNinkiGauge)
             {
-                builder.SetChunks(2).SetChunkPadding(Config.NinkiGaugeChunkPadding).AddInnerBar(gauge.Ninki, 100, Config.NinkiGaugeColor.Map, PartialFillColor);
+                builder.SetChunks(2).SetChunkPadding(Config.NinkiGaugeChunkPadding).AddInnerBar(gauge.Ninki, 100, Config.NinkiGaugeColor, PartialFillColor);
             }
             else
             {
-                builder.AddInnerBar(gauge.Ninki, 100, Config.NinkiGaugeColor.Map);
+                builder.AddInnerBar(gauge.Ninki, 100, Config.NinkiGaugeColor);
             }
 
-            builder.SetBackgroundColor(EmptyColor["background"]);
+            builder.SetBackgroundColor(EmptyColor.Base);
 
             if (Config.ShowNinkiGaugeText)
             {
@@ -295,7 +295,7 @@ namespace DelvUI.Interface.Jobs
 
             if (trickDuration != 0)
             {
-                builder.AddInnerBar(trickDuration, trickMaxDuration, Config.TrickBarColor.Map);
+                builder.AddInnerBar(trickDuration, trickMaxDuration, Config.TrickBarColor);
 
                 if (Config.ShowTrickBarText)
                 {
@@ -308,7 +308,7 @@ namespace DelvUI.Interface.Jobs
             if (suitonBuff.Any() && Config.ShowSuitonBar)
             {
                 float suitonDuration = Math.Abs(suitonBuff.First().Duration);
-                builder.AddInnerBar(suitonDuration, 20, Config.SuitonBarColor.Map);
+                builder.AddInnerBar(suitonDuration, 20, Config.SuitonBarColor);
 
                 if (Config.ShowSuitonBarText)
                 {

@@ -16,7 +16,7 @@ namespace DelvUI.Interface.Jobs
     public class BlackMageHud : JobHud
     {
         private new BlackMageConfig Config => (BlackMageConfig)_config;
-        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public BlackMageHud(string id, BlackMageConfig config, string displayName = null) : base(id, config, displayName)
         {
@@ -107,11 +107,11 @@ namespace DelvUI.Interface.Jobs
 
             var position = origin + Config.Position + Config.ManaBarPosition - Config.ManaBarSize / 2f;
 
-            var color = gauge.InAstralFire() ? Config.ManaBarFireColor.Map : gauge.InUmbralIce() ? Config.ManaBarIceColor.Map : Config.ManaBarNoElementColor.Map;
+            var color = gauge.InAstralFire() ? Config.ManaBarFireColor : gauge.InUmbralIce() ? Config.ManaBarIceColor : Config.ManaBarNoElementColor;
 
             var builder = BarBuilder.Create(position, Config.ManaBarSize)
                 .AddInnerBar(actor.CurrentMp, actor.MaxMp, color)
-                .SetBackgroundColor(EmptyColor["background"]);
+                .SetBackgroundColor(EmptyColor.Base);
 
             // element timer
             if (gauge.InAstralFire() || gauge.InUmbralIce())
@@ -172,8 +172,8 @@ namespace DelvUI.Interface.Jobs
             var bar = BarBuilder.Create(position, Config.UmbralHeartSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.UmbralHeartPadding)
-                                .AddInnerBar(gauge.NumUmbralHearts, 3, Config.UmbralHeartColor.Map, EmptyColor)
-                                .SetBackgroundColor(EmptyColor["background"])
+                                .AddInnerBar(gauge.NumUmbralHearts, 3, Config.UmbralHeartColor, EmptyColor)
+                                .SetBackgroundColor(EmptyColor.Base)
                                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
@@ -194,8 +194,8 @@ namespace DelvUI.Interface.Jobs
 
             // 1
             var builder = BarBuilder.Create(position, barSize)
-                                    .AddInnerBar(gauge.NumPolyglotStacks < 1 ? scale : 1, 1, Config.PolyglotColor.Map)
-                                    .SetBackgroundColor(EmptyColor["background"]);
+                                    .AddInnerBar(gauge.NumPolyglotStacks < 1 ? scale : 1, 1, Config.PolyglotColor)
+                                    .SetBackgroundColor(EmptyColor.Base);
 
             if (gauge.NumPolyglotStacks >= 1)
             {
@@ -207,8 +207,8 @@ namespace DelvUI.Interface.Jobs
             // 2
             position.X += barWidth + Config.PolyglotPadding;
             builder = BarBuilder.Create(position, barSize)
-                                .AddInnerBar(gauge.NumPolyglotStacks == 1 ? scale : gauge.NumPolyglotStacks == 0 ? 0 : 1, 1, Config.PolyglotColor.Map)
-                                .SetBackgroundColor(EmptyColor["background"]);
+                                .AddInnerBar(gauge.NumPolyglotStacks == 1 ? scale : gauge.NumPolyglotStacks == 0 ? 0 : 1, 1, Config.PolyglotColor)
+                                .SetBackgroundColor(EmptyColor.Base);
 
             if (gauge.NumPolyglotStacks == 2)
             {
@@ -227,8 +227,8 @@ namespace DelvUI.Interface.Jobs
             var bar = BarBuilder.Create(position, Config.TriplecastSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.TriplecastPadding)
-                                .AddInnerBar(tripleStackBuff.StackCount, 3, Config.TriplecastColor.Map, EmptyColor)
-                                .SetBackgroundColor(EmptyColor["background"])
+                                .AddInnerBar(tripleStackBuff.StackCount, 3, Config.TriplecastColor, EmptyColor)
+                                .SetBackgroundColor(EmptyColor.Base)
                                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
@@ -249,7 +249,7 @@ namespace DelvUI.Interface.Jobs
             if (Config.ShowFirestarterProcs)
             {
                 var scale = firestarterTimer / 18f;
-                builder.AddInnerBar(firestarterTimer, 18f, Config.FirestarterColor.Map);
+                builder.AddInnerBar(firestarterTimer, 18f, Config.FirestarterColor);
                 builder.SetFlipDrainDirection(Config.InvertProcsBar);
             }
 
@@ -257,7 +257,7 @@ namespace DelvUI.Interface.Jobs
             if (Config.ShowThundercloudProcs)
             {
                 var scale = thundercloudTimer / 18f;
-                builder.AddInnerBar(thundercloudTimer, 18f, Config.ThundercloudColor.Map);
+                builder.AddInnerBar(thundercloudTimer, 18f, Config.ThundercloudColor);
                 builder.SetFlipDrainDirection(Config.InvertProcsBar);
             }
 
@@ -294,7 +294,7 @@ namespace DelvUI.Interface.Jobs
             var position = origin + Config.Position + Config.DoTBarPosition - Config.DoTBarSize / 2f;
 
             var builder = BarBuilder.Create(position, Config.DoTBarSize)
-                .AddInnerBar(timer, maxDuration, Config.DotColor.Map)
+                .AddInnerBar(timer, maxDuration, Config.DotColor)
                 .SetFlipDrainDirection(Config.InvertDoTBar);
 
             var drawList = ImGui.GetWindowDrawList();

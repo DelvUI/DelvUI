@@ -92,7 +92,7 @@ namespace DelvUI.Interface.Jobs
             drawList.AddRectFilled(
                 cursorPos,
                 cursorPos + new Vector2(Config.DiaBarSize.X / diaCooldown * diaDuration, Config.DiaBarSize.Y),
-                Config.DiaColor.Map["gradientBottom"]
+                Config.DiaColor.BottomGradient
             );
 
             drawList.AddRect(cursorPos, cursorPos + Config.DiaBarSize, 0xFF000000);
@@ -131,7 +131,7 @@ namespace DelvUI.Interface.Jobs
 
             BarBuilder builder = BarBuilder.Create(posX, posY, Config.LilyBarSize.Y, Config.LilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
-            builder.SetChunks(3).SetChunkPadding(Config.LilyBarPad).AddInnerBar(lilyScale, 3, Config.LilyColor.Map, PartialFillColor.Map);
+            builder.SetChunks(3).SetChunkPadding(Config.LilyBarPad).AddInnerBar(lilyScale, 3, Config.LilyColor, PartialFillColor);
 
             if (Config.ShowLilyBarTimer)
             {
@@ -156,7 +156,7 @@ namespace DelvUI.Interface.Jobs
 
             builder = BarBuilder.Create(posX, posY, Config.BloodLilyBarSize.Y, Config.BloodLilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
-            builder.SetChunks(3).SetChunkPadding(Config.BloodLilyBarPad).AddInnerBar(gauge.NumBloodLily, 3, Config.BloodLilyColor.Map);
+            builder.SetChunks(3).SetChunkPadding(Config.BloodLilyBarPad).AddInnerBar(gauge.NumBloodLily, 3, Config.BloodLilyColor);
 
             drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);

@@ -138,21 +138,14 @@ namespace DelvUI.Interface.GeneralElements
             var startPos = new Vector2(origin.X + Config.Position.X - Config.Size.X / 2f, origin.Y + Config.Position.Y - Config.Size.Y / 2f);
             var endPos = startPos + Config.Size;
             var scale = (float)chara.CurrentHp / Math.Max(1, chara.MaxHp);
-            var color = Config.UseCustomColor ? Config.CustomColor.Map : Utils.ColorForActor(chara);
+            var color = Config.UseCustomColor ? Config.CustomColor : Utils.ColorForActor(chara);
             var bgColor = BackgroundColor(chara);
 
             // background
             drawList.AddRectFilled(startPos, endPos, bgColor);
 
             // health
-            drawList.AddRectFilledMultiColor(
-                startPos,
-                startPos + new Vector2(Config.Size.X * scale, Config.Size.Y),
-                color["gradientTop"],
-                color["gradientTop"],
-                color["gradientBottom"],
-                color["gradientBottom"]
-            );
+            DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X * scale, Config.Size.Y), color, drawList);
 
             // shield
             if (Config.ShieldConfig.Enabled)
@@ -162,12 +155,12 @@ namespace DelvUI.Interface.GeneralElements
                 if (Config.ShieldConfig.FillHealthFirst)
                 {
                     DrawHelper.DrawShield(shield, scale, startPos, Config.Size,
-                        Config.ShieldConfig.Height, Config.ShieldConfig.HeightInPixels, Config.ShieldConfig.Color.Map, drawList);
+                        Config.ShieldConfig.Height, Config.ShieldConfig.HeightInPixels, Config.ShieldConfig.Color, drawList);
                 }
                 else
                 {
                     DrawHelper.DrawOvershield(shield, startPos, Config.Size,
-                        Config.ShieldConfig.Height, Config.ShieldConfig.HeightInPixels, Config.ShieldConfig.Color.Map, drawList);
+                        Config.ShieldConfig.Height, Config.ShieldConfig.HeightInPixels, Config.ShieldConfig.Color, drawList);
                 }
             }
 

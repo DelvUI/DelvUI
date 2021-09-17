@@ -21,7 +21,7 @@ namespace DelvUI.Interface.Jobs
         private bool _bahamutFinished = true;
 
         private new SummonerConfig Config => (SummonerConfig)_config;
-        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public SummonerHud(string id, SummonerConfig config, string displayName = null) : base(id, config, displayName)
         {
@@ -124,7 +124,7 @@ namespace DelvUI.Interface.Jobs
 
             BarBuilder builder = BarBuilder.Create(position, barSize);
 
-            Bar bar = builder.AddInnerBar(tranceDuration / 1000f, maxDuration / 1000f, tranceColor.Map).SetBackgroundColor(EmptyColor["background"]).Build();
+            Bar bar = builder.AddInnerBar(tranceDuration / 1000f, maxDuration / 1000f, tranceColor).SetBackgroundColor(EmptyColor.Base).Build();
 
             if (Config.ShowTranceText)
             {
@@ -156,21 +156,21 @@ namespace DelvUI.Interface.Jobs
 
                 if (stacks >= 8 && stacks < 16)
                 {
-                    Bar indicatorBar = builder.AddInnerBar(1, 1, Config.BahamutReadyColor.Map)
-                                              .SetBackgroundColor(EmptyColor["background"])
+                    Bar indicatorBar = builder.AddInnerBar(1, 1, Config.BahamutReadyColor)
+                                              .SetBackgroundColor(EmptyColor.Base)
                                               .Build();
                     barDrawList.Add(indicatorBar);
                 }
                 if (stacks >= 16)
                 {
-                    Bar indicatorBar = builder.AddInnerBar(1, 1, Config.PhoenixReadyColor.Map)
-                                              .SetBackgroundColor(EmptyColor["background"])
+                    Bar indicatorBar = builder.AddInnerBar(1, 1, Config.PhoenixReadyColor)
+                                              .SetBackgroundColor(EmptyColor.Base)
                                               .Build();
                     barDrawList.Add(indicatorBar);
                 }
                 if (stacks < 8)
                 {
-                    Bar indicatorBar = builder.SetBackgroundColor(EmptyColor["background"])
+                    Bar indicatorBar = builder.SetBackgroundColor(EmptyColor.Base)
                                               .Build();
                     barDrawList.Add(indicatorBar);
                 }
@@ -195,8 +195,8 @@ namespace DelvUI.Interface.Jobs
                 Bar DreadwyrmAetherBars = BarBuilder.Create(position, barSize)
                                                     .SetChunks(2)
                                                     .SetChunkPadding(Config.DreadwyrmAetherBarPadding)
-                                                    .AddInnerBar(filledChunkCount, 2, Config.DreadwyrmAetherBarColor.Map)
-                                                    .SetBackgroundColor(EmptyColor["background"])
+                                                    .AddInnerBar(filledChunkCount, 2, Config.DreadwyrmAetherBarColor)
+                                                    .SetBackgroundColor(EmptyColor.Base)
                                                     .Build();
                 barDrawList.Add(DreadwyrmAetherBars);
             }
@@ -241,7 +241,7 @@ namespace DelvUI.Interface.Jobs
                 PluginConfigColor miasmaColor = miasmaDuration > 5 ? Config.MiasmaColor : Config.ExpireColor;
                 BarBuilder builder = BarBuilder.Create(position, barSize);
 
-                Bar miasmaBar = builder.AddInnerBar(miasmaDuration, 30f, miasmaColor.Map)
+                Bar miasmaBar = builder.AddInnerBar(miasmaDuration, 30f, miasmaColor)
                                        .SetFlipDrainDirection(Config.MiasmaInverted)
                                        .Build();
 
@@ -264,7 +264,7 @@ namespace DelvUI.Interface.Jobs
 
                 BarBuilder builder = BarBuilder.Create(position, barSize);
 
-                Bar bioBar = builder.AddInnerBar(bioDuration, 30f, bioColor.Map)
+                Bar bioBar = builder.AddInnerBar(bioDuration, 30f, bioColor)
                                     .SetFlipDrainDirection(Config.BioInverted)
                                     .Build();
 
@@ -297,8 +297,8 @@ namespace DelvUI.Interface.Jobs
             Bar bar = BarBuilder.Create(position, barSize)
                                 .SetChunks(4)
                                 .SetChunkPadding(Config.RuinPadding)
-                                .AddInnerBar(ruinBuff.StackCount, 4, Config.RuinColor.Map)
-                                .SetBackgroundColor(EmptyColor["background"])
+                                .AddInnerBar(ruinBuff.StackCount, 4, Config.RuinColor)
+                                .SetBackgroundColor(EmptyColor.Base)
                                 .Build();
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -320,8 +320,8 @@ namespace DelvUI.Interface.Jobs
             Bar bar = BarBuilder.Create(position, barSize)
                                 .SetChunks(2)
                                 .SetChunkPadding(Config.AetherPadding)
-                                .AddInnerBar(aetherFlowBuff.StackCount, 2, Config.AetherColor.Map)
-                                .SetBackgroundColor(EmptyColor["background"])
+                                .AddInnerBar(aetherFlowBuff.StackCount, 2, Config.AetherColor)
+                                .SetBackgroundColor(EmptyColor.Base)
                                 .Build();
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();

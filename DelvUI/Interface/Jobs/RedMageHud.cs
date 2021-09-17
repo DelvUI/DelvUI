@@ -16,7 +16,7 @@ namespace DelvUI.Interface.Jobs
     public class RedMageHud : JobHud
     {
         private new RedMageConfig Config => (RedMageConfig)_config;
-        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public RedMageHud(string id, RedMageConfig config, string displayName = null) : base(id, config, displayName)
         {
@@ -141,8 +141,8 @@ namespace DelvUI.Interface.Jobs
 
             var drawList = ImGui.GetWindowDrawList();
             var builder = BarBuilder.Create(position, Config.BalanceBarSize)
-                .AddInnerBar(value, 1, color.Map)
-                .SetBackgroundColor(EmptyColor["background"]);
+                .AddInnerBar(value, 1, color)
+                .SetBackgroundColor(EmptyColor.Base);
 
             builder.Build().Draw(drawList);
         }
@@ -185,8 +185,8 @@ namespace DelvUI.Interface.Jobs
             var bar = BarBuilder.Create(position, Config.AccelerationBarSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.AccelerationBarPadding)
-                                .AddInnerBar(accelBuff.StackCount, 3, Config.AccelerationBarColor.Map, EmptyColor)
-                                .SetBackgroundColor(EmptyColor["background"])
+                                .AddInnerBar(accelBuff.StackCount, 3, Config.AccelerationBarColor, EmptyColor)
+                                .SetBackgroundColor(EmptyColor.Base)
                                 .Build();
 
             var drawList = ImGui.GetWindowDrawList();
@@ -205,8 +205,8 @@ namespace DelvUI.Interface.Jobs
 
             var drawList = ImGui.GetWindowDrawList();
             var builder = BarBuilder.Create(position, Config.DualCastSize)
-                .AddInnerBar(value, 1, Config.DualCastColor.Map)
-                .SetBackgroundColor(EmptyColor["background"]);
+                .AddInnerBar(value, 1, Config.DualCastColor)
+                .SetBackgroundColor(EmptyColor.Base);
 
             builder.Build().Draw(drawList);
         }
@@ -246,7 +246,7 @@ namespace DelvUI.Interface.Jobs
             bool showText)
         {
             var builder = BarBuilder.Create(position, size)
-                .AddInnerBar(value, max, color.Map)
+                .AddInnerBar(value, max, color)
                 .SetFlipDrainDirection(inverted);
 
             if (showText)

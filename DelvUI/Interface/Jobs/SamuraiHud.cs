@@ -17,7 +17,7 @@ namespace DelvUI.Interface.Jobs
     public class SamuraiHud : JobHud
     {
         private new SamuraiConfig Config => (SamuraiConfig)_config;
-        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public SamuraiHud(string id, SamuraiConfig config, string displayName = null) : base(id, config, displayName)
         {
@@ -92,8 +92,8 @@ namespace DelvUI.Interface.Jobs
             );
 
             var kenkiBuilder = BarBuilder.Create(pos, Config.KenkiBarSize)
-                .SetBackgroundColor(EmptyColor["background"])
-                .AddInnerBar(gauge.Kenki, 100, Config.KenkiColor.Map);
+                .SetBackgroundColor(EmptyColor.Base)
+                .AddInnerBar(gauge.Kenki, 100, Config.KenkiColor);
 
             if (Config.ShowKenkiText)
             {
@@ -120,14 +120,14 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var higanbanaColor = higanbanaDuration > 5 ? Config.HiganbanaColor.Map : Config.HiganbanaExpiryColor.Map;
+            var higanbanaColor = higanbanaDuration > 5 ? Config.HiganbanaColor : Config.HiganbanaExpiryColor;
             var pos = new Vector2(
                 origin.X + Config.Position.X + Config.HiganbanaBarPosition.X - Config.HiganbanaBarSize.X / 2f,
                 origin.Y + Config.Position.Y + Config.HiganbanaBarPosition.Y - Config.HiganbanaBarSize.Y / 2f
             );
 
             var higanbanaBuilder = BarBuilder.Create(pos, Config.HiganbanaBarSize)
-                .SetBackgroundColor(EmptyColor["background"])
+                .SetBackgroundColor(EmptyColor.Base)
                 .AddInnerBar(higanbanaDuration, 60f, higanbanaColor).SetFlipDrainDirection(false);
 
             if (Config.ShowHiganbanaText)
@@ -152,8 +152,8 @@ namespace DelvUI.Interface.Jobs
                 origin.Y + Config.Position.Y + Config.BuffsBarPosition.Y - Config.BuffsBarSize.Y / 2f
             );
             var shifuBuilder = BarBuilder.Create(shifuPos, buffsSize)
-                .SetBackgroundColor(EmptyColor["background"])
-                .AddInnerBar(shifuDuration, 40f, Config.ShifuColor.Map)
+                .SetBackgroundColor(EmptyColor.Base)
+                .AddInnerBar(shifuDuration, 40f, Config.ShifuColor)
                 .SetFlipDrainDirection(true);
 
             // jinpu
@@ -164,8 +164,8 @@ namespace DelvUI.Interface.Jobs
                 origin.Y + Config.Position.Y + Config.BuffsBarPosition.Y - Config.BuffsBarSize.Y / 2f
             );
             var jinpuBuilder = BarBuilder.Create(jinpuPos, buffsSize)
-                .SetBackgroundColor(EmptyColor["background"])
-                .AddInnerBar(jinpuDuration, 40f, Config.JinpuColor.Map)
+                .SetBackgroundColor(EmptyColor.Base)
+                .AddInnerBar(jinpuDuration, 40f, Config.JinpuColor)
                 .SetFlipDrainDirection(false);
 
             if (Config.ShowBuffsText)
@@ -199,7 +199,7 @@ namespace DelvUI.Interface.Jobs
             for (int i = 0; i < 3; i++)
             {
                 var builder = BarBuilder.Create(cursorPos, senBarSize).
-                    AddInnerBar(hasSen[order[i]], 1, colors[order[i]].Map);
+                    AddInnerBar(hasSen[order[i]], 1, colors[order[i]]);
 
                 builder.Build().Draw(drawList);
                 cursorPos.X += senBarWidth + Config.SenBarPadding;
@@ -217,9 +217,9 @@ namespace DelvUI.Interface.Jobs
 
             var meditationBuilder = BarBuilder.Create(pos, Config.MeditationBarSize)
                 .SetChunks(3)
-                .SetBackgroundColor(EmptyColor["background"])
+                .SetBackgroundColor(EmptyColor.Base)
                 .SetChunkPadding(Config.MeditationBarPadding)
-                .AddInnerBar(gauge.MeditationStacks, 3, Config.MeditationColor.Map);
+                .AddInnerBar(gauge.MeditationStacks, 3, Config.MeditationColor);
 
             var drawList = ImGui.GetWindowDrawList();
             meditationBuilder.Build().Draw(drawList);

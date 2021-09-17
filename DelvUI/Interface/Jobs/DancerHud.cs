@@ -24,8 +24,8 @@ namespace DelvUI.Interface.Jobs
 
         }
 
-        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
-        private Dictionary<string, uint> PartialFillColor => GlobalColors.Instance.PartialFillColor.Map;
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
+        private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
@@ -108,8 +108,8 @@ namespace DelvUI.Interface.Jobs
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.EspritGaugeSize.Y, Config.EspritGaugeSize.X)
                                            .SetChunks(2)
                                            .SetChunkPadding(Config.EspritGaugeChunkPadding)
-                                           .SetBackgroundColor(EmptyColor["background"])
-                                           .AddInnerBar(gauge.Esprit, 100, Config.EspritGaugeColor.Map, PartialFillColor);
+                                           .SetBackgroundColor(EmptyColor.Base)
+                                           .AddInnerBar(gauge.Esprit, 100, Config.EspritGaugeColor, PartialFillColor);
 
             if (Config.EspritTextEnabled)
             {
@@ -130,9 +130,9 @@ namespace DelvUI.Interface.Jobs
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.FeatherGaugeSize.Y, Config.FeatherGaugeSize.X)
                                            .SetChunks(4)
-                                           .SetBackgroundColor(EmptyColor["background"])
+                                           .SetBackgroundColor(EmptyColor.Base)
                                            .SetChunkPadding(Config.FeatherGaugeChunkPadding)
-                                           .AddInnerBar(gauge.NumFeathers, 4, Config.FeatherGaugeColor.Map);
+                                           .AddInnerBar(gauge.NumFeathers, 4, Config.FeatherGaugeColor);
 
             if (Config.FlourishingGlowEnabled && flourishingBuff.Any())
             {
@@ -155,7 +155,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             byte chunkCount = 0;
-            List<Dictionary<string, uint>> chunkColors = new List<Dictionary<string, uint>>();
+            List<PluginConfigColor> chunkColors = new List<PluginConfigColor>();
             List<bool> glowChunks = new List<bool>();
             var danceReady = true;
 
@@ -183,22 +183,22 @@ namespace DelvUI.Interface.Jobs
                 switch (step)
                 {
                     case DNCStep.Emboite:
-                        chunkColors.Add(Config.EmboiteColor.Map);
+                        chunkColors.Add(Config.EmboiteColor);
 
                         break;
 
                     case DNCStep.Entrechat:
-                        chunkColors.Add(Config.EntrechatColor.Map);
+                        chunkColors.Add(Config.EntrechatColor);
 
                         break;
 
                     case DNCStep.Jete:
-                        chunkColors.Add(Config.JeteColor.Map);
+                        chunkColors.Add(Config.JeteColor);
 
                         break;
 
                     case DNCStep.Pirouette:
-                        chunkColors.Add(Config.PirouetteColor.Map);
+                        chunkColors.Add(Config.PirouetteColor);
 
                         break;
                 }
@@ -210,7 +210,7 @@ namespace DelvUI.Interface.Jobs
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.StepBarSize.Y, Config.StepBarSize.X)
                                            .SetChunks(chunkCount)
                                            .SetChunkPadding(Config.StepBarChunkPadding)
-                                           .SetBackgroundColor(EmptyColor["background"])
+                                           .SetBackgroundColor(EmptyColor.Base)
                                            .AddInnerBar(chunkCount, chunkCount, chunkColors.ToArray());
 
             if (danceReady && Config.DanceReadyGlowEnabled)
@@ -234,11 +234,11 @@ namespace DelvUI.Interface.Jobs
             var xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.BuffBarSize.Y, Config.BuffBarSize.X).SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.BuffBarSize.Y, Config.BuffBarSize.X).SetBackgroundColor(EmptyColor.Base);
 
             if (technicalFinishBuff.Any() && Config.TechnicalBarEnabled)
             {
-                builder.AddInnerBar(Math.Abs(technicalFinishBuff.First().Duration), 20, Config.TechnicalFinishBarColor.Map);
+                builder.AddInnerBar(Math.Abs(technicalFinishBuff.First().Duration), 20, Config.TechnicalFinishBarColor);
 
                 if (Config.TechnicalTextEnabled)
                 {
@@ -250,7 +250,7 @@ namespace DelvUI.Interface.Jobs
 
             if (devilmentBuff.Any() && Config.DevilmentBarEnabled)
             {
-                builder.AddInnerBar(Math.Abs(devilmentBuff.First().Duration), 20, Config.DevilmentBarColor.Map);
+                builder.AddInnerBar(Math.Abs(devilmentBuff.First().Duration), 20, Config.DevilmentBarColor);
 
                 if (Config.DevilmentTextEnabled)
                 {
@@ -275,7 +275,7 @@ namespace DelvUI.Interface.Jobs
 
             if (standardFinishBuff.Any())
             {
-                builder.AddInnerBar(standardFinishBuff.First().Duration, 60, Config.StandardFinishBarColor.Map);
+                builder.AddInnerBar(standardFinishBuff.First().Duration, 60, Config.StandardFinishBarColor);
 
                 if (Config.StandardTextEnabled)
                 {
@@ -284,7 +284,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.SetBackgroundColor(EmptyColor["background"]).Build().Draw(drawList);
+            builder.SetBackgroundColor(EmptyColor.Base).Build().Draw(drawList);
         }
 
         private void DrawProcBar(Vector2 origin)
@@ -301,10 +301,10 @@ namespace DelvUI.Interface.Jobs
 
             var chunkoffset = procWidth + Config.ProcBarChunkPadding;
 
-            BarBuilder cascadeBuilder = BarBuilder.Create(xPos, yPos, procHeight, procWidth).SetBackgroundColor(EmptyColor["background"]);
-            BarBuilder fountainBuilder = BarBuilder.Create(xPos + chunkoffset, yPos, procHeight, procWidth).SetBackgroundColor(EmptyColor["background"]);
-            BarBuilder windmillBuilder = BarBuilder.Create(xPos + 2 * chunkoffset, yPos, procHeight, procWidth).SetBackgroundColor(EmptyColor["background"]);
-            BarBuilder showerBuilder = BarBuilder.Create(xPos + 3 * chunkoffset, yPos, procHeight, procWidth).SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder cascadeBuilder = BarBuilder.Create(xPos, yPos, procHeight, procWidth).SetBackgroundColor(EmptyColor.Base);
+            BarBuilder fountainBuilder = BarBuilder.Create(xPos + chunkoffset, yPos, procHeight, procWidth).SetBackgroundColor(EmptyColor.Base);
+            BarBuilder windmillBuilder = BarBuilder.Create(xPos + 2 * chunkoffset, yPos, procHeight, procWidth).SetBackgroundColor(EmptyColor.Base);
+            BarBuilder showerBuilder = BarBuilder.Create(xPos + 3 * chunkoffset, yPos, procHeight, procWidth).SetBackgroundColor(EmptyColor.Base);
 
             var timersEnabled = !Config.StaticProcBarsEnabled;
             var procEnabled = Config.ProcBarEnabled;
@@ -312,25 +312,25 @@ namespace DelvUI.Interface.Jobs
             if (flourishingCascadeBuff.Any() && procEnabled)
             {
                 var cascadeStart = timersEnabled ? Math.Abs(flourishingCascadeBuff.First().Duration) : 20;
-                cascadeBuilder.AddInnerBar(cascadeStart, 20, Config.FlourishingCascadeColor.Map);
+                cascadeBuilder.AddInnerBar(cascadeStart, 20, Config.FlourishingCascadeColor);
             }
 
             if (flourishingFountainBuff.Any() && procEnabled)
             {
                 var fountainStart = timersEnabled ? Math.Abs(flourishingFountainBuff.First().Duration) : 20;
-                fountainBuilder.AddInnerBar(fountainStart, 20, Config.FlourishingFountainColor.Map);
+                fountainBuilder.AddInnerBar(fountainStart, 20, Config.FlourishingFountainColor);
             }
 
             if (flourishingWindmillBuff.Any() && procEnabled)
             {
                 var windmillStart = timersEnabled ? Math.Abs(flourishingWindmillBuff.First().Duration) : 20;
-                windmillBuilder.AddInnerBar(windmillStart, 20, Config.FlourishingWindmillColor.Map);
+                windmillBuilder.AddInnerBar(windmillStart, 20, Config.FlourishingWindmillColor);
             }
 
             if (flourishingShowerBuff.Any() && procEnabled)
             {
                 var showerStart = timersEnabled ? Math.Abs(flourishingShowerBuff.First().Duration) : 20;
-                showerBuilder.AddInnerBar(showerStart, 20, Config.FlourishingShowerColor.Map);
+                showerBuilder.AddInnerBar(showerStart, 20, Config.FlourishingShowerColor);
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
