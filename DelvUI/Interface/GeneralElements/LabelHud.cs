@@ -48,7 +48,7 @@ namespace DelvUI.Interface.GeneralElements
         private void DrawLabel(string text, Vector2 parentOrigin, Vector2 parentSize)
         {
             var textSize = ImGui.CalcTextSize(text);
-            var offset = OffsetForFrameAchor(parentSize) + OffsetForTextAnchor(textSize);
+            var offset = OffsetForFrameAnchor(parentSize) + OffsetForTextAnchor(textSize);
             var drawList = ImGui.GetWindowDrawList();
 
             if (Config.ShowOutline)
@@ -79,7 +79,7 @@ namespace DelvUI.Interface.GeneralElements
             return Vector2.Zero;
         }
 
-        private Vector2 OffsetForFrameAchor(Vector2 parentSize)
+        private Vector2 OffsetForFrameAnchor(Vector2 parentSize)
         {
             switch (Config.FrameAnchor)
             {
