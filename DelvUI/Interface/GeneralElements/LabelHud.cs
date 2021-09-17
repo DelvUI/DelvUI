@@ -49,15 +49,15 @@ namespace DelvUI.Interface.GeneralElements
         {
             var textSize = ImGui.CalcTextSize(text);
             var offset = OffsetForFrameAchor(parentSize) + OffsetForTextAnchor(textSize);
+            var drawList = ImGui.GetWindowDrawList();
 
             if (Config.ShowOutline)
             {
-                DrawHelper.DrawOutlinedText(text, parentOrigin + Config.Position + offset, Config.Color.Vector, Config.OutlineColor.Vector);
+                DrawHelper.DrawOutlinedText(Config.GetText(), parentOrigin + Config.Position + offset, Config.Color.Base, Config.OutlineColor.Base, drawList);
             }
             else
             {
-                ImGui.SetCursorPos(parentOrigin + Config.Position + offset);
-                ImGui.TextColored(Config.Color.Vector, text);
+                drawList.AddText(parentOrigin + Config.Position + offset, Config.Color.Base, Config.GetText());
             }
         }
 
