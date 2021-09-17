@@ -19,12 +19,13 @@ namespace DelvUI.Interface.Jobs
     public class ScholarHud : JobHud
     {
         private new ScholarConfig Config => (ScholarConfig)_config;
-        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
 
         public ScholarHud(string id, ScholarConfig config, string displayName = null) : base(id, config, displayName)
         {
 
         }
+
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
@@ -73,22 +74,41 @@ namespace DelvUI.Interface.Jobs
         private void DrawFairyBar(Vector2 origin)
         {
             float fairyGauge = Plugin.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
+            float seraphDuration = Math.Abs(Plugin.JobGauges.Get<SCHGauge>().SeraphTimer / 1000);            
 
             Vector2 barSize = Config.FairySize;
             Vector2 position = origin + Config.Position + Config.FairyPosition - barSize / 2f;
 
             BarBuilder builder = BarBuilder.Create(position, barSize);
 
-            Bar bar = builder.AddInnerBar(fairyGauge, 100f, Config.FairyColor.Map).SetBackgroundColor(EmptyColor["background"]).Build();
-
-            if (Config.ShowFairyText)
+            if (seraphDuration > 0)
             {
-                builder.SetTextMode(BarTextMode.Single)
-                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-            }
+                builder.AddInnerBar(seraphDuration, 22f, Config.SeraphColor.Map)
+                    .SetBackgroundColor(EmptyColor.Background);
 
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+                if (Config.ShowSeraphText)
+                {
+                    builder.SetTextMode(BarTextMode.Single)
+                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
+
+                var drawList = ImGui.GetWindowDrawList();
+                builder.Build().Draw(drawList);
+            }
+            else
+            {
+                builder.AddInnerBar(fairyGauge, 100f, Config.FairyColor.Map)
+                    .SetBackgroundColor(EmptyColor.Background);
+
+                if (Config.ShowFairyText)
+                {
+                    builder.SetTextMode(BarTextMode.Single)
+                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
+
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+                builder.Build().Draw(drawList);
+            }
         }
 
         private void DrawAetherBar(Vector2 origin)
@@ -106,7 +126,7 @@ namespace DelvUI.Interface.Jobs
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.AetherPadding)
                                 .AddInnerBar(aetherFlowBuff.StackCount, 3, Config.AetherColor.Map)
-                                .SetBackgroundColor(EmptyColor["background"])
+                                .SetBackgroundColor(EmptyColor.Background)
                                 .Build();
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -197,18 +217,30 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Fairy Gauge Text")]
         [CollapseWith(0, 2)]
         public bool ShowFairyText = true;
+               
+        [Checkbox("Seraph Bar Enabled")]
+        [CollapseWith(5, 2)]
+        public bool ShowSeraph = true;
+
+        [Checkbox("Seraph Bar Text")]
+        [CollapseWith(10, 2)]
+        public bool ShowSeraphText = true;
 
         [DragFloat2("Fairy Gauge Size", min = 1f, max = 2000f)]
-        [CollapseWith(5, 2)]
+        [CollapseWith(15, 2)]
         public Vector2 FairySize = new(254, 20);
 
         [DragFloat2("Fairy Gauge Position", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 2)]
+        [CollapseWith(20, 2)]
         public Vector2 FairyPosition = new(0, -54);
 
         [ColorEdit4("Fairy Gauge Color")]
-        [CollapseWith(15, 2)]
-        public PluginConfigColor FairyColor = new(new Vector4(94f / 255f, 250f / 255f, 154f / 255f, 100f / 100f));
+        [CollapseWith(25, 2)]
+        public PluginConfigColor FairyColor = new(new Vector4(69f / 255f, 199 / 255f, 164f / 255f, 100f / 100f));
+
+        [ColorEdit4("Seraph Bar Color")]
+        [CollapseWith(30, 2)]
+        public PluginConfigColor SeraphColor = new(new Vector4(232f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));        
         #endregion
 
         #region bio
