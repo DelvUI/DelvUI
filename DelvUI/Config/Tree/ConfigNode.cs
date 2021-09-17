@@ -277,18 +277,6 @@ namespace DelvUI.Config.Tree
             ImGui.PopStyleVar();
 
             ImGui.SameLine();
-            /*
-            if (ImGui.Button("Reset to Default", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
-            {
-                // make a new configuration from defaults
-                ConfigurationManager.Initialize(true);
-                // save the defaults to file
-                ConfigurationManager.GetInstance().SaveConfigurations();
-                // prevent the config window from closing
-                ConfigurationManager.GetInstance().DrawConfigWindow = true;
-            }
-            */
-            ImGui.SameLine();
             ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
             ImGui.PushStyleColor(ImGuiCol.ButtonActive, Vector4.Zero);
             ImGui.PushStyleColor(ImGuiCol.ButtonHovered, Vector4.Zero);
