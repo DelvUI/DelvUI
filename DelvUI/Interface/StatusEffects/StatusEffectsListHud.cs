@@ -179,12 +179,6 @@ namespace DelvUI.Interface.StatusEffects
 
             // calculate layout
             var list = StatusEffectsData(filterStatusEffects);
-            if (list.Count == 0)
-            {
-                return;
-            }
-
-
 
             // validate growth directions
             var growthDirections = Config.GetGrowthDirections();
@@ -202,6 +196,12 @@ namespace DelvUI.Interface.StatusEffects
             if (Config.ShowArea)
             {
                 drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
+            }
+
+            // no need to do anything else if there are no effects
+            if (list.Count == 0)
+            {
+                return;
             }
 
             // calculate icon positions
