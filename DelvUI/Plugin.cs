@@ -214,6 +214,7 @@ namespace DelvUI
 
             if (hudState)
             {
+                _hudManager.Helper.ApplyCurrentConfig();
                 _hudManager.Helper.UserInterfaceWasHidden = true;
             }
 
