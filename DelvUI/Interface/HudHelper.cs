@@ -36,6 +36,7 @@ namespace DelvUI.Interface
         private HideHudConfig Config => ConfigurationManager.GetInstance().GetConfigObject<HideHudConfig>();
 
         private bool _previousCombatState = true;
+        public bool UserInterfaceWasHidden = false;
 
         public HudHelper()
         {
@@ -90,7 +91,7 @@ namespace DelvUI.Interface
             }
 
             var currentCombatState = IsInCombat();
-            if (_previousCombatState != currentCombatState && Config.CombatActionBars.Count > 0)
+            if (_previousCombatState != currentCombatState && Config.CombatActionBars.Count > 0 || UserInterfaceWasHidden)
             {
                 Config.CombatActionBars.ForEach(name => ToggleActionbar(name, !currentCombatState));
                 _previousCombatState = currentCombatState;
@@ -166,7 +167,7 @@ namespace DelvUI.Interface
             });
         }
 
-        private unsafe void ConfigureDefaultJobGauge()
+        public unsafe void ConfigureDefaultJobGauge()
         {
             ToggleDefaultComponent(delegate (GUIAddon addon)
             {

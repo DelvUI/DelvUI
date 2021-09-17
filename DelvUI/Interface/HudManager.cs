@@ -214,6 +214,12 @@ namespace DelvUI.Interface
                 return;
             }
 
+            if (helper.UserInterfaceWasHidden)
+            {
+                helper.ConfigureDefaultJobGauge();
+                helper.UserInterfaceWasHidden = false;
+            }
+
             helper.ConfigureCombatActionBars();
 
             ImGuiHelpers.ForceNextWindowMainViewport();
