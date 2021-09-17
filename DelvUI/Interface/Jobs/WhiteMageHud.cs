@@ -92,7 +92,7 @@ namespace DelvUI.Interface.Jobs
             drawList.AddRectFilled(
                 cursorPos,
                 cursorPos + new Vector2(Config.DiaBarSize.X / diaCooldown * diaDuration, Config.DiaBarSize.Y),
-                Config.DiaColor.Map["gradientRight"]
+                Config.DiaColor.Map["gradientBottom"]
             );
 
             drawList.AddRect(cursorPos, cursorPos + Config.DiaBarSize, 0xFF000000);

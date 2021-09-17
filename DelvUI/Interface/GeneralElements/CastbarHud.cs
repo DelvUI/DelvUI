@@ -81,10 +81,10 @@ namespace DelvUI.Interface.GeneralElements
             drawList.AddRectFilledMultiColor(
                 startPos,
                 startPos + new Vector2(Config.Size.X * castScale, Config.Size.Y),
-                color["gradientLeft"],
-                color["gradientRight"],
-                color["gradientRight"],
-                color["gradientLeft"]
+                color["gradientTop"],
+                color["gradientTop"],
+                color["gradientBottom"],
+                color["gradientBottom"]
             );
 
             // border
@@ -154,10 +154,10 @@ namespace DelvUI.Interface.GeneralElements
             drawList.AddRectFilledMultiColor(
                 startPos,
                 endPos,
-                color["gradientLeft"],
-                color["gradientRight"],
-                color["gradientRight"],
-                color["gradientLeft"]
+                color["gradientTop"],
+                color["gradientTop"],
+                color["gradientBottom"],
+                color["gradientBottom"]
             );
         }
 

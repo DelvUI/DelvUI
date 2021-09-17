@@ -20,7 +20,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [Checkbox("Show Border")]
         [Order(25)]
-        public bool ShowBorder = false;
+        public bool ShowBorder = true;
 
         [Checkbox("Vertical Mode")]
         [Order(30)]
@@ -28,7 +28,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Color")]
         [Order(35)]
-        public PluginConfigColor Color = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 70f / 100f));
+        public PluginConfigColor Color = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [Checkbox("Show GCD Queue Indicator")]
         [Order(40)]
@@ -36,7 +36,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("GCD Queue Color")]
         [Order(45)]
-        public PluginConfigColor QueueColor = new PluginConfigColor(new(0f / 255f, 255f / 255f, 0f / 255f, 70f / 100f));
+        public PluginConfigColor QueueColor = new PluginConfigColor(new(15f / 255f, 235f / 255f, 38f / 255f, 100f / 100f));
 
         public GCDIndicatorConfig(Vector2 position, Vector2 size)
         {

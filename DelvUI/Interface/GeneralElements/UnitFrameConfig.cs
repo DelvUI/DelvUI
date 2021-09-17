@@ -164,7 +164,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         [DragInt("Height")]
         [Order(5)]
-        public int Height = 10;
+        public int Height = 26;
 
         [Checkbox("Height in Pixels")]
         [Order(10)]

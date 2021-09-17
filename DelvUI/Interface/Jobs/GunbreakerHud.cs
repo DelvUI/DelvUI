@@ -123,7 +123,7 @@ namespace DelvUI.Interface.Jobs
 
         [ColorEdit4("Color" + "##PowderGauge")]
         [CollapseWith(15, 0)]
-        public PluginConfigColor PowderGaugeFillColor = new(new Vector4(46f / 255f, 179f / 255f, 255f / 255f, 1f));
+        public PluginConfigColor PowderGaugeFillColor = new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 1f));
         #endregion
 
         #region No Mercy

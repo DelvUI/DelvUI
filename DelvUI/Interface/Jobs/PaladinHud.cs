@@ -258,7 +258,7 @@ namespace DelvUI.Interface.Jobs
 
         [ColorEdit4("Mana Bar Color")]
         [CollapseWith(25, 0)]
-        public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 203f / 255f, 230f / 255f, 100f / 100f));
+        public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
         #endregion
 
         #region oath gauge
