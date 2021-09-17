@@ -12,12 +12,12 @@ namespace DelvUI.Config
 
     public class OnChangeBaseArgs : EventArgs
     {
-        public string KeyName { get; }
+        public string PropertyName { get; }
         public ChangeType ChangeType { get; private set; }
 
         public OnChangeBaseArgs(string keyName, ChangeType type = ChangeType.None)
         {
-            KeyName = keyName;
+            PropertyName = keyName;
             ChangeType = type;
         }
     }

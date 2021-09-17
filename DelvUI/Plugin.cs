@@ -211,7 +211,7 @@ namespace DelvUI
 
             if (hudState)
             {
-                _hudManager.helper.UserInterfaceWasHidden = true;
+                _hudManager.Helper.UserInterfaceWasHidden = true;
             }
 
             UiBuilder.OverrideGameCursor = false;

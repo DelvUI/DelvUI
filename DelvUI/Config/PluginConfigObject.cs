@@ -9,7 +9,7 @@ using System.Numerics;
 namespace DelvUI.Config
 {
     [Serializable]
-    public abstract class PluginConfigObject
+    public abstract class PluginConfigObject : IOnChangeEventArgs
     {
         [Checkbox("Enabled")]
         [Order(0)]
@@ -34,6 +34,19 @@ namespace DelvUI.Config
             Debug.Assert(false, "Static method 'DefaultConfig' not found !!!");
             return null;
         }
+
+        #region IOnChangeEventArgs
+
+        // sending event outside of the config
+        public event EventHandler<OnChangeBaseArgs> onValueChanged;
+
+        // received events from the node
+        public void onValueChangedRegisterEvent(OnChangeBaseArgs e)
+        {
+            onValueChanged?.Invoke(this, e);
+        }
+
+        #endregion
     }
 
     [Serializable]

@@ -17,7 +17,7 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class DragFloatAttribute : Attribute
+    public class DragFloatAttribute : ConfigAttribute
     {
         public string friendlyName;
         public float min;
@@ -34,7 +34,7 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class DragIntAttribute : Attribute
+    public class DragIntAttribute : ConfigAttribute
     {
         public string friendlyName;
         public int min;
@@ -51,7 +51,7 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class DragFloat2Attribute : Attribute
+    public class DragFloat2Attribute : ConfigAttribute
     {
         public string friendlyName;
         public float min;
@@ -68,7 +68,7 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class DragInt2Attribute : Attribute
+    public class DragInt2Attribute : ConfigAttribute
     {
         public string friendlyName;
         public int min;
@@ -85,7 +85,7 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class InputTextAttribute : Attribute
+    public class InputTextAttribute : ConfigAttribute
     {
         public string friendlyName;
         public uint maxLength;
@@ -98,7 +98,7 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class ColorEdit4Attribute : Attribute
+    public class ColorEdit4Attribute : ConfigAttribute
     {
         public string friendlyName;
 
@@ -106,7 +106,7 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class ComboAttribute : Attribute
+    public class ComboAttribute : ConfigAttribute
     {
         public string friendlyName;
         public string[] options;

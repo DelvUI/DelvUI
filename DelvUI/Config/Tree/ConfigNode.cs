@@ -1054,6 +1054,13 @@ namespace DelvUI.Config.Tree
                     {
                         field.SetValue(ConfigObject, floatVal);
                         changed = true;
+
+                        if (changed && dragFloatAttribute.isMonitored && ConfigObject is IOnChangeEventArgs eventObject)
+                        {
+                            eventObject.onValueChangedRegisterEvent(
+                                new OnChangeEventArgs<float>(field.Name, floatVal)
+                            );
+                        }
                     }
                 }
                 else if (attribute is DragIntAttribute dragIntAttribute)
@@ -1064,6 +1071,13 @@ namespace DelvUI.Config.Tree
                     {
                         field.SetValue(ConfigObject, intVal);
                         changed = true;
+
+                        if (changed && dragIntAttribute.isMonitored && ConfigObject is IOnChangeEventArgs eventObject)
+                        {
+                            eventObject.onValueChangedRegisterEvent(
+                                new OnChangeEventArgs<float>(field.Name, intVal)
+                            );
+                        }
                     }
                 }
                 else if (attribute is DragFloat2Attribute dragFloat2Attribute)
@@ -1075,6 +1089,14 @@ namespace DelvUI.Config.Tree
                         field.SetValue(ConfigObject, floatVal);
                         changed = true;
                     }
+
+                    if (changed && dragFloat2Attribute.isMonitored && ConfigObject is IOnChangeEventArgs eventObject)
+                    {
+                        eventObject.onValueChangedRegisterEvent(
+                            new OnChangeEventArgs<Vector2>(field.Name, floatVal)
+                        );
+                    }
+
                 }
                 else if (attribute is DragInt2Attribute dragInt2Attribute)
                 {
@@ -1084,6 +1106,13 @@ namespace DelvUI.Config.Tree
                     {
                         field.SetValue(ConfigObject, intVal);
                         changed = true;
+
+                        if (changed && dragInt2Attribute.isMonitored && ConfigObject is IOnChangeEventArgs eventObject)
+                        {
+                            eventObject.onValueChangedRegisterEvent(
+                                new OnChangeEventArgs<Vector2>(field.Name, intVal)
+                            );
+                        }
                     }
                 }
                 else if (attribute is InputTextAttribute inputTextAttribute)
@@ -1094,6 +1123,13 @@ namespace DelvUI.Config.Tree
                     {
                         field.SetValue(ConfigObject, stringVal);
                         changed = true;
+
+                        if (changed && inputTextAttribute.isMonitored && ConfigObject is IOnChangeEventArgs eventObject)
+                        {
+                            eventObject.onValueChangedRegisterEvent(
+                                new OnChangeEventArgs<string>(field.Name, stringVal)
+                            );
+                        }
                     }
                 }
                 else if (attribute is ColorEdit4Attribute colorEdit4Attribute)
@@ -1106,6 +1142,13 @@ namespace DelvUI.Config.Tree
                         colorVal.Vector = vector;
                         field.SetValue(ConfigObject, colorVal);
                         changed = true;
+
+                        if (changed && colorEdit4Attribute.isMonitored && ConfigObject is IOnChangeEventArgs eventObject)
+                        {
+                            eventObject.onValueChangedRegisterEvent(
+                                new OnChangeEventArgs<PluginConfigColor>(field.Name, colorVal)
+                            );
+                        }
                     }
                 }
                 else if (attribute is ComboAttribute comboAttribute)
@@ -1116,6 +1159,13 @@ namespace DelvUI.Config.Tree
                     {
                         field.SetValue(ConfigObject, intVal);
                         changed = true;
+
+                        if (changed && comboAttribute.isMonitored && ConfigObject is IOnChangeEventArgs eventObject)
+                        {
+                            eventObject.onValueChangedRegisterEvent(
+                                new OnChangeEventArgs<int>(field.Name, intVal)
+                            );
+                        }
                     }
                 }
                 else if (attribute is DragDropHorizontalAttribute dragDropHorizontalAttribute)

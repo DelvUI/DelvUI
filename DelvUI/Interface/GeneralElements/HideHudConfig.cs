@@ -3,13 +3,14 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
     [Serializable]
     [Section("Misc")]
     [SubSection("Hide Options", 0)]
-    public class HideHudConfig : PluginConfigObject, IOnChangeEventArgs
+    public class HideHudConfig : PluginConfigObject
     {
         [Checkbox("Hide DelvUI outside of combat")]
         [Order(5)]
@@ -32,18 +33,5 @@ namespace DelvUI.Interface.GeneralElements
         public List<string> CombatActionBars = new();
 
         public new static HideHudConfig DefaultConfig() { return new HideHudConfig(); }
-
-        #region OnChangeEventInterface
-
-        // sending event outside of the config
-        public event EventHandler<OnChangeBaseArgs> onValueChanged;
-
-        // received events from the node
-        public void onValueChangedRegisterEvent(OnChangeBaseArgs e)
-        {
-            onValueChanged?.Invoke(this, e);
-        }
-
-        #endregion
     }
 }

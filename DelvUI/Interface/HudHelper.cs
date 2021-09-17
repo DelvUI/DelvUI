@@ -52,19 +52,19 @@ namespace DelvUI.Interface
 
         public void ConfigValueChanged(object sender, OnChangeBaseArgs e)
         {
-            if (e.KeyName == "HideDefaultCastbar")
+            if (e.PropertyName == "HideDefaultCastbar")
             {
                 ConfigureDefaultCastBar();
             }
-            else if (e.KeyName == "HideDefaultJobGauges")
+            else if (e.PropertyName == "HideDefaultJobGauges")
             {
                 ConfigureDefaultJobGauge();
             }
-            else if (e.KeyName == "EnableCombatActionBars" && e is OnChangeEventArgs<bool> boolEvent)
+            else if (e.PropertyName == "EnableCombatActionBars" && e is OnChangeEventArgs<bool> boolEvent)
             {
                 Config.CombatActionBars.ForEach(name => ToggleActionbar(name, boolEvent.Value));
             }
-            else if (e.KeyName == "CombatActionBars" && e is OnChangeEventArgs<string> listEvent)
+            else if (e.PropertyName == "CombatActionBars" && e is OnChangeEventArgs<string> listEvent)
             {
                 switch (listEvent.ChangeType)
                 {
@@ -76,6 +76,7 @@ namespace DelvUI.Interface
                         break;
                 }
             }
+
 
         }
 
@@ -111,12 +112,12 @@ namespace DelvUI.Interface
 
             if (element != null)
             {
-                if (element.ID == HudManager.playerCastbarID)
+                if (element.GetType() == typeof(PlayerCastbarHud))
                 {
                     return false;
                 }
 
-                if (element.ID == HudManager.playerUnitFrameID)
+                if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig))
                 {
                     PlayerCharacter player = Plugin.ClientState.LocalPlayer;
                     Debug.Assert(player != null, "HudHelper.LocalPlayer is NULL.");

@@ -32,11 +32,7 @@ namespace DelvUI.Interface
         private Dictionary<uint, JobHudTypes> _jobsMap;
         private Dictionary<uint, Type> _unsupportedJobsMap;
 
-        public HudHelper helper { get; } = new HudHelper();
-
-        public static string playerUnitFrameID = "playerUnitFrame";
-        public static string playerCastbarID = "playerCastbar";
-
+        public HudHelper Helper { get; } = new HudHelper();
 
         public HudManager()
         {
@@ -120,7 +116,7 @@ namespace DelvUI.Interface
         private void CreateUnitFrames()
         {
             var playerUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerUnitFrameConfig>();
-            var playerUnitFrame = new UnitFrameHud(HudManager.playerUnitFrameID, playerUnitFrameConfig, "Player");
+            var playerUnitFrame = new UnitFrameHud("playerUnitFrame", playerUnitFrameConfig, "Player");
             _hudElements.Add(playerUnitFrame);
             _hudElementsUsingPlayer.Add(playerUnitFrame);
 
@@ -143,7 +139,7 @@ namespace DelvUI.Interface
         private void CreateCastbars()
         {
             var playerCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerCastbarConfig>();
-            var playerCastbar = new PlayerCastbarHud(playerCastbarID, playerCastbarConfig, "Player Castbar");
+            var playerCastbar = new PlayerCastbarHud("playerCastbar", playerCastbarConfig, "Player Castbar");
             _hudElements.Add(playerCastbar);
             _hudElementsUsingPlayer.Add(playerCastbar);
 
@@ -214,13 +210,13 @@ namespace DelvUI.Interface
                 return;
             }
 
-            if (helper.UserInterfaceWasHidden)
+            if (Helper.UserInterfaceWasHidden)
             {
-                helper.ConfigureDefaultJobGauge();
-                helper.UserInterfaceWasHidden = false;
+                Helper.ConfigureDefaultJobGauge();
+                Helper.UserInterfaceWasHidden = false;
             }
 
-            helper.ConfigureCombatActionBars();
+            Helper.ConfigureCombatActionBars();
 
             ImGuiHelpers.ForceNextWindowMainViewport();
             ImGui.SetNextWindowPos(Vector2.Zero);
@@ -256,7 +252,7 @@ namespace DelvUI.Interface
             // general elements
             foreach (var element in _hudElements)
             {
-                if (element != _selectedElement && !helper.IsElementHidden(element))
+                if (element != _selectedElement && !Helper.IsElementHidden(element))
                 {
                     element.Draw(_origin);
                 }
@@ -265,7 +261,7 @@ namespace DelvUI.Interface
             // job hud
             if (_jobHud != null && _jobHud.Config.Enabled && _jobHud != _selectedElement)
             {
-                if (!helper.IsElementHidden())
+                if (!Helper.IsElementHidden())
                 {
                     _jobHud.Draw(_origin);
                 }
@@ -324,7 +320,7 @@ namespace DelvUI.Interface
 
             if (config != null && _primaryResourceHud != null)
             {
-                helper.ApplyCurrentConfig();
+                Helper.ApplyCurrentConfig();
 
                 _primaryResourceHud.ResourceType = config.UseDefaultPrimaryResourceBar ? config.PrimaryResourceType : PrimaryResourceTypes.None;
             }
