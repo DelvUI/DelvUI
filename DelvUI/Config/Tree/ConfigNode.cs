@@ -178,30 +178,8 @@ namespace DelvUI.Config.Tree
 
         private void PopStyles()
         {
-            ImGui.PopStyleColor();
-            ImGui.PopStyleColor();
-            ImGui.PopStyleColor();
-            
-            ImGui.PopStyleColor();
-            
-            ImGui.PopStyleColor();
-            ImGui.PopStyleColor();
-            ImGui.PopStyleColor();
-            ImGui.PopStyleColor();
-            
-            ImGui.PopStyleColor();
-            ImGui.PopStyleColor();
-            ImGui.PopStyleColor();
-            ImGui.PopStyleColor();
-            
-            ImGui.PopStyleColor();
-            ImGui.PopStyleColor();
-            
-            ImGui.PopStyleVar();
-            ImGui.PopStyleVar();
-            ImGui.PopStyleVar();
-            ImGui.PopStyleVar();
-            ImGui.PopStyleVar();
+            ImGui.PopStyleColor(14);
+            ImGui.PopStyleVar(5);
         }
 
         public void Draw()
@@ -218,10 +196,8 @@ namespace DelvUI.Config.Tree
             {
                 return;
             }
-            ImGui.PopStyleColor();
-            ImGui.PopStyleColor();
-            ImGui.PopStyleVar();
-            ImGui.PopStyleVar();
+            ImGui.PopStyleColor(2);
+            ImGui.PopStyleVar(2);
             PushStyles();
             
 
@@ -311,7 +287,7 @@ namespace DelvUI.Config.Tree
                 // prevent the config window from closing
                 ConfigurationManager.GetInstance().DrawConfigWindow = true;
             }
-*/
+            */
             ImGui.SameLine();
             ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
             ImGui.PushStyleColor(ImGuiCol.ButtonActive, Vector4.Zero);
@@ -320,9 +296,7 @@ namespace DelvUI.Config.Tree
             if (ImGui.Button($"v{Plugin.Version}", new Vector2(ImGui.GetWindowWidth() / 7 * 3 - 50, 0)))
             { }
 
-            ImGui.PopStyleColor();
-            ImGui.PopStyleColor();
-            ImGui.PopStyleColor();
+            ImGui.PopStyleColor(3);
 
             ImGui.SameLine();
 
@@ -334,8 +308,7 @@ namespace DelvUI.Config.Tree
                 Process.Start("https://discord.gg/delvui");
             }
 
-            ImGui.PopStyleColor();
-            ImGui.PopStyleColor();
+            ImGui.PopStyleColor(2);
 
             ImGui.SameLine();
 
@@ -347,8 +320,7 @@ namespace DelvUI.Config.Tree
                 Process.Start("https://ko-fi.com/DelvUI");
             }
 
-            ImGui.PopStyleColor();
-            ImGui.PopStyleColor();
+            ImGui.PopStyleColor(2);
             ImGui.EndChild();
             ImGui.EndGroup();
             PopStyles();
