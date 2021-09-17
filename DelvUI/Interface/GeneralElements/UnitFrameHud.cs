@@ -104,8 +104,8 @@ namespace DelvUI.Interface.GeneralElements
                 ImGui.End();
 
                 // labels
-                _leftLabel.DrawRelativeToParent(origin + Config.Position, Config.Size, Actor);
-                _rightLabel.DrawRelativeToParent(origin + Config.Position, Config.Size, Actor);
+                _leftLabel.Draw(origin + Config.Position, Config.Size, Actor);
+                _rightLabel.Draw(origin + Config.Position, Config.Size, Actor);
             });
         }
 

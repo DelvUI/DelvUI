@@ -34,7 +34,7 @@ namespace DelvUI.Interface.StatusEffects
                 var duration = Math.Round(Math.Abs(statusEffectData.StatusEffect.Duration));
                 config.DurationLabelConfig.SetText(Utils.DurationToString(duration));
 
-                durationLabel.Draw(position + config.Size / 2f);
+                durationLabel.Draw(position + config.Size / 2f, config.Size);
             }
 
             // stacks
@@ -43,7 +43,7 @@ namespace DelvUI.Interface.StatusEffects
                 var text = $"{statusEffectData.StatusEffect.StackCount}";
                 config.StacksLabelConfig.SetText(text);
 
-                stacksLabel.Draw(position + config.Size / 2f);
+                stacksLabel.Draw(position + config.Size / 2f, config.Size);
             }
         }
 

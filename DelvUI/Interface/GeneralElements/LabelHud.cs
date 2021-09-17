@@ -16,33 +16,20 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void Draw(Vector2 origin)
         {
-            if (!Config.Enabled || Config.GetText() == null)
-            {
-                return;
-            }
-
-            DrawLabel(Config.GetText(), origin, Vector2.Zero);
+            Draw(origin, null, null);
         }
 
-        public void DrawRelativeToParent(Vector2 parentOrigin, Vector2 parentSize)
+        public void Draw(Vector2 origin, Vector2? parentSize = null, Actor actor = null)
         {
             if (!Config.Enabled || Config.GetText() == null)
             {
                 return;
             }
 
-            DrawLabel(Config.GetText(), parentOrigin, parentSize);
-        }
+            var text = actor != null ? TextTags.GenerateFormattedTextFromTags(actor, Config.GetText()) : Config.GetText();
+            var size = parentSize ?? Vector2.Zero;
 
-        public void DrawRelativeToParent(Vector2 parentOrigin, Vector2 parentSize, Actor actor)
-        {
-            if (!Config.Enabled || Config.GetText() == null)
-            {
-                return;
-            }
-
-            var text = TextTags.GenerateFormattedTextFromTags(actor, Config.GetText());
-            DrawLabel(text, parentOrigin, parentSize);
+            DrawLabel(text, origin, size);
         }
 
         private void DrawLabel(string text, Vector2 parentOrigin, Vector2 parentSize)
