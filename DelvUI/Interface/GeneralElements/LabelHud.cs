@@ -23,15 +23,15 @@ namespace DelvUI.Interface.GeneralElements
 
             var size = ImGui.CalcTextSize(Config.GetText());
             var offset = OffsetForSize(size);
+            var drawList = ImGui.GetWindowDrawList();
 
             if (Config.ShowOutline)
             {
-                DrawHelper.DrawOutlinedText(Config.GetText(), origin + Config.Position + offset, Config.Color.Vector, Config.OutlineColor.Vector);
+                DrawHelper.DrawOutlinedText(Config.GetText(), origin + Config.Position + offset, Config.Color.Base, Config.OutlineColor.Base, drawList);
             }
             else
             {
-                ImGui.SetCursorPos(origin + Config.Position + offset);
-                ImGui.TextColored(Config.Color.Vector, Config.GetText());
+                drawList.AddText(origin + Config.Position + offset, Config.Color.Base, Config.GetText());
             }
         }
 
@@ -45,15 +45,15 @@ namespace DelvUI.Interface.GeneralElements
             var text = TextTags.GenerateFormattedTextFromTags(actor, Config.GetText());
             var size = ImGui.CalcTextSize(text);
             var offset = OffsetForSize(size);
+            var drawList = ImGui.GetWindowDrawList();
 
             if (Config.ShowOutline)
             {
-                DrawHelper.DrawOutlinedText(text, origin + Config.Position + offset, Config.Color.Vector, Config.OutlineColor.Vector);
+                DrawHelper.DrawOutlinedText(text, origin + Config.Position + offset, Config.Color.Base, Config.OutlineColor.Base, drawList);
             }
             else
             {
-                ImGui.SetCursorPos(origin + Config.Position + offset);
-                ImGui.TextColored(Config.Color.Vector, text);
+                drawList.AddText(origin + Config.Position + offset, Config.Color.Base, Config.GetText());
             }
         }
 

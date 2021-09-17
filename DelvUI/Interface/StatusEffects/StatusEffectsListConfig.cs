@@ -1,5 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
@@ -207,13 +208,11 @@ namespace DelvUI.Interface.StatusEffects
         [Order(0)]
         public Vector2 Size = new(40, 40);
 
-        [Checkbox("Show Duration")]
-        [Order(5)]
-        public bool ShowDurationText = true;
+        [NestedConfig("Duration", 5)]
+        public LabelConfig DurationLabelConfig;
 
-        [Checkbox("Show Stacks")]
-        [Order(10)]
-        public bool ShowStacksText = true;
+        [NestedConfig("Stacks", 10)]
+        public LabelConfig StacksLabelConfig;
 
         [NestedConfig("Border", 15)]
         public StatusEffectIconBorderConfig BorderConfig = new StatusEffectIconBorderConfig();
@@ -224,9 +223,10 @@ namespace DelvUI.Interface.StatusEffects
         [NestedConfig("My Effects Border", 25)]
         public StatusEffectIconBorderConfig OwnedBorderConfig = new StatusEffectIconBorderConfig(new(new(50f / 255f, 255f / 255f, 100f / 255f, 100f / 100f)), 2);
 
-        public StatusEffectIconConfig()
+        public StatusEffectIconConfig(LabelConfig durationLabelConfig = null, LabelConfig stacksLabelConfig = null)
         {
-
+            DurationLabelConfig = durationLabelConfig ?? StatusEffectsListsDefaults.DefaultDurationLabelConfig();
+            StacksLabelConfig = stacksLabelConfig ?? StatusEffectsListsDefaults.DefaultStacksLabelConfig();
         }
     }
 
@@ -250,6 +250,23 @@ namespace DelvUI.Interface.StatusEffects
         {
             Color = color;
             Thickness = thickness;
+        }
+    }
+
+    internal class StatusEffectsListsDefaults
+    {
+        internal static LabelConfig DefaultDurationLabelConfig()
+        {
+            return new LabelConfig(Vector2.Zero, "", LabelTextAnchor.Center);
+        }
+
+        internal static LabelConfig DefaultStacksLabelConfig()
+        {
+            var config = new LabelConfig(new Vector2(16, -11), "", LabelTextAnchor.Center);
+            config.Color = new(Vector4.UnitW);
+            config.OutlineColor = new(Vector4.One);
+
+            return config;
         }
     }
 }
