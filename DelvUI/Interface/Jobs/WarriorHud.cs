@@ -17,7 +17,7 @@ namespace DelvUI.Interface.Jobs
     public class WarriorHud : JobHud
     {
         private new WarriorConfig Config => (WarriorConfig)_config;
-        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public WarriorHud(string id, WarriorConfig config, string displayName = null) : base(id, config, displayName)
         {
@@ -64,22 +64,22 @@ namespace DelvUI.Interface.Jobs
 
             Vector2 position = origin + Config.Position + Config.StormsEyePosition - Config.StormsEyeSize / 2f;
 
-            BarBuilder builder = BarBuilder.Create(position, Config.StormsEyeSize).SetBackgroundColor(EmptyColor["background"]);
+            BarBuilder builder = BarBuilder.Create(position, Config.StormsEyeSize).SetBackgroundColor(EmptyColor.Base);
 
             var duration = 0f;
             var maximum = 10f;
-            Dictionary<string, uint> color = EmptyColor;
+            PluginConfigColor color = EmptyColor;
 
             if (innerReleaseBuff.Any())
             {
                 duration = Math.Abs(innerReleaseBuff.First().Duration);
-                color = Config.InnerReleaseColor.Map;
+                color = Config.InnerReleaseColor;
             }
             else if (stormsEyeBuff.Any())
             {
                 duration = Math.Abs(stormsEyeBuff.First().Duration);
                 maximum = 60f;
-                color = Config.StormsEyeColor.Map;
+                color = Config.StormsEyeColor;
             }
 
             builder.AddInnerBar(duration, maximum, color);
@@ -102,13 +102,13 @@ namespace DelvUI.Interface.Jobs
 
             BarBuilder builder = BarBuilder.Create(position, Config.BeastGaugeSize)
                                            .SetChunks(2)
-                                           .AddInnerBar(gauge.BeastGaugeAmount, 100, Config.BeastGaugeFillColor.Map)
-                                           .SetBackgroundColor(EmptyColor["background"])
+                                           .AddInnerBar(gauge.BeastGaugeAmount, 100, Config.BeastGaugeFillColor)
+                                           .SetBackgroundColor(EmptyColor.Base)
                                            .SetChunkPadding(Config.BeastGaugePadding);
 
             if (nascentChaosBuff.Any())
             {
-                builder.SetChunksColors(Config.NascentChaosColor.Map);
+                builder.SetChunksColors(Config.NascentChaosColor);
             }
 
             if (Config.ShowBeastGaugeText)

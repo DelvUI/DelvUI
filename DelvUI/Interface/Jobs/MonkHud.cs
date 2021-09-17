@@ -138,7 +138,7 @@ namespace DelvUI.Interface.Jobs
 
             if (opoOpoFormDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(opoOpoFormDuration), maximum, Config.FormsBarFillColor.Map)
+                var bar = builder.AddInnerBar(Math.Abs(opoOpoFormDuration), maximum, Config.FormsBarFillColor)
                                  .SetTextMode(BarTextMode.EachChunk)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Opo-Opo Form")
                                  .SetBackgroundColor(EmptyColor.Background)
@@ -150,7 +150,7 @@ namespace DelvUI.Interface.Jobs
 
             if (raptorFormDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(raptorFormDuration), maximum, Config.FormsBarFillColor.Map)
+                var bar = builder.AddInnerBar(Math.Abs(raptorFormDuration), maximum, Config.FormsBarFillColor)
                                  .SetTextMode(BarTextMode.EachChunk)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Raptor Form")
                                  .SetBackgroundColor(EmptyColor.Background)
@@ -162,7 +162,7 @@ namespace DelvUI.Interface.Jobs
 
             if (coeurlFormDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(coeurlFormDuration), maximum, Config.FormsBarFillColor.Map)
+                var bar = builder.AddInnerBar(Math.Abs(coeurlFormDuration), maximum, Config.FormsBarFillColor)
                                  .SetTextMode(BarTextMode.EachChunk)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Coeurl Form")
                                  .SetBackgroundColor(EmptyColor.Background)
@@ -174,7 +174,7 @@ namespace DelvUI.Interface.Jobs
 
             if (formlessFist.Duration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(formlessFist.Duration), maximum, Config.FormsBarFillColor.Map)
+                var bar = builder.AddInnerBar(Math.Abs(formlessFist.Duration), maximum, Config.FormsBarFillColor)
                                  .SetTextMode(BarTextMode.EachChunk)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Formless Fist")
                                  .SetBackgroundColor(EmptyColor.Background)
@@ -185,7 +185,7 @@ namespace DelvUI.Interface.Jobs
             }
             else
             {
-                var bar = builder.AddInnerBar(0, maximum, Config.FormsBarFillColor.Map)
+                var bar = builder.AddInnerBar(0, maximum, Config.FormsBarFillColor)
                                  .SetBackgroundColor(EmptyColor.Background)
                                  .Build();
 
@@ -206,7 +206,7 @@ namespace DelvUI.Interface.Jobs
 
             if (trueNorthDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, Config.TrueNorthBarFillColor.Map)
+                var bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, Config.TrueNorthBarFillColor)
                                  .SetTextMode(BarTextMode.EachChunk)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                                  .SetBackgroundColor(EmptyColor.Background)
@@ -217,7 +217,7 @@ namespace DelvUI.Interface.Jobs
             }
             else
             {
-                var bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, Config.TrueNorthBarFillColor.Map)
+                var bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, Config.TrueNorthBarFillColor)
                                  .SetBackgroundColor(EmptyColor.Background)
                                  .Build();
 
@@ -238,7 +238,7 @@ namespace DelvUI.Interface.Jobs
 
             if (perfectBalanceDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, Config.PerfectBalanceBarFillColor.Map)
+                var bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, Config.PerfectBalanceBarFillColor)
                                  .SetVertical(true)
                                  .SetFlipDrainDirection(Config.PerfectBalanceInverted)
                                  .SetTextMode(BarTextMode.EachChunk)
@@ -251,7 +251,7 @@ namespace DelvUI.Interface.Jobs
             }
             else
             {
-                var bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, Config.PerfectBalanceBarFillColor.Map)
+                var bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, Config.PerfectBalanceBarFillColor)
                                  .SetBackgroundColor(EmptyColor.Background)
                                  .Build();
 
@@ -272,7 +272,7 @@ namespace DelvUI.Interface.Jobs
 
             if (riddleOfEarthDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, Config.RiddleofEarthBarFillColor.Map)
+                var bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, Config.RiddleofEarthBarFillColor)
                                  .SetTextMode(BarTextMode.EachChunk)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                                  .SetBackgroundColor(EmptyColor.Background)
@@ -284,7 +284,7 @@ namespace DelvUI.Interface.Jobs
             }
             else
             {
-                var bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, Config.RiddleofEarthBarFillColor.Map)
+                var bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, Config.RiddleofEarthBarFillColor)
                                  .SetBackgroundColor(EmptyColor.Background)
                                  .SetFlipDrainDirection(Config.RiddleofEarthInverted == false)
                                  .Build();
@@ -302,7 +302,7 @@ namespace DelvUI.Interface.Jobs
             var bar = BarBuilder.Create(position, Config.ChakraBarSize)
                                 .SetChunks(5)
                                 .SetChunkPadding(2)
-                                .AddInnerBar(gauge.NumChakra, 5, Config.ChakraBarFillColor.Map, EmptyColor.Map)
+                                .AddInnerBar(gauge.NumChakra, 5, Config.ChakraBarFillColor, EmptyColor)
                                 .SetBackgroundColor(EmptyColor.Background)
                                 .Build();
 
@@ -321,7 +321,7 @@ namespace DelvUI.Interface.Jobs
             var builder = BarBuilder.Create(position, Config.TwinSnakesBarSize);
             var maximum = 15f;
 
-            var bar = builder.AddInnerBar(Math.Abs(twinSnakesDuration), maximum, Config.TwinSnakesBarFillColor.Map)
+            var bar = builder.AddInnerBar(Math.Abs(twinSnakesDuration), maximum, Config.TwinSnakesBarFillColor)
                              .SetTextMode(BarTextMode.EachChunk)
                              .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                              .SetBackgroundColor(EmptyColor.Background)
@@ -344,7 +344,7 @@ namespace DelvUI.Interface.Jobs
 
             if (leadenFistDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, Config.LeadenFistBarFillColor.Map)
+                var bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, Config.LeadenFistBarFillColor)
                                  .SetVertical(true)
                                  .SetTextMode(BarTextMode.EachChunk)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
@@ -356,7 +356,7 @@ namespace DelvUI.Interface.Jobs
             }
             else
             {
-                var bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, Config.LeadenFistBarFillColor.Map)
+                var bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, Config.LeadenFistBarFillColor)
                                  .SetBackgroundColor(EmptyColor.Background)
                                  .Build();
 
@@ -375,7 +375,7 @@ namespace DelvUI.Interface.Jobs
             var builder = BarBuilder.Create(position, Config.DemolishBarSize);
             var maximum = 18f;
 
-            var bar = builder.AddInnerBar(Math.Abs(demolishDuration), maximum, Config.DemolishBarFillColor.Map)
+            var bar = builder.AddInnerBar(Math.Abs(demolishDuration), maximum, Config.DemolishBarFillColor)
                              .SetTextMode(BarTextMode.EachChunk)
                              .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
                              .SetBackgroundColor(EmptyColor.Background)

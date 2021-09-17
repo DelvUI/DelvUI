@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.Internal.Gui.Addon;
+using DelvUI.Config;
 using ImGuiNET;
 using ImGuiScene;
 using Lumina.Excel;
@@ -8,8 +9,55 @@ using System.Numerics;
 
 namespace DelvUI.Helpers
 {
+    public enum GradientDirection
+    {
+        None,
+        Right,
+        Left,
+        Up,
+        Down,
+        CenteredHorizonal,
+    }
+
     public static class DrawHelper
     {
+        private static uint[] ColorArray(PluginConfigColor color, GradientDirection gradientDirection)
+        {
+            switch (gradientDirection)
+            {
+                case GradientDirection.None: return new uint[] { color.Base, color.Base, color.Base, color.Base };
+                case GradientDirection.Right: return new uint[] { color.TopGradient, color.BottomGradient, color.BottomGradient, color.TopGradient };
+                case GradientDirection.Left: return new uint[] { color.BottomGradient, color.TopGradient, color.TopGradient, color.BottomGradient };
+                case GradientDirection.Up: return new uint[] { color.BottomGradient, color.BottomGradient, color.TopGradient, color.TopGradient };
+            }
+
+            return new uint[] { color.TopGradient, color.TopGradient, color.BottomGradient, color.BottomGradient };
+        }
+
+        public static void DrawGradientFilledRect(Vector2 position, Vector2 size, PluginConfigColor color, ImDrawListPtr drawList, GradientDirection gradientDirection = GradientDirection.Down)
+        {
+            var colorArray = ColorArray(color, gradientDirection);
+
+            if (gradientDirection == GradientDirection.CenteredHorizonal)
+            {
+                drawList.AddRectFilledMultiColor(
+                    position, position + size / 2f,
+                    colorArray[0], colorArray[1], colorArray[2], colorArray[3]
+                );
+                drawList.AddRectFilledMultiColor(
+                    position + size / 2f, position + size,
+                    colorArray[3], colorArray[2], colorArray[1], colorArray[0]
+                );
+            }
+            else
+            {
+                drawList.AddRectFilledMultiColor(
+                    position, position + size,
+                    colorArray[0], colorArray[1], colorArray[2], colorArray[3]
+                );
+            }
+        }
+
         public static void DrawOutlinedText(string text, Vector2 pos, float fontScale)
         {
             DrawOutlinedText(text, pos, Vector4.One, Vector4.UnitW, fontScale);
@@ -137,7 +185,7 @@ namespace DelvUI.Helpers
             return texture;
         }
 
-        public static void DrawOvershield(float shield, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, Dictionary<string, uint> color, ImDrawListPtr drawList)
+        public static void DrawOvershield(float shield, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, PluginConfigColor color, ImDrawListPtr drawList)
         {
             if (shield == 0)
             {
@@ -146,13 +194,10 @@ namespace DelvUI.Helpers
 
             var h = !useRatioForHeight ? barSize.Y / 100 * height : height;
 
-            drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + new Vector2(Math.Max(1, barSize.X * shield), h),
-                color["gradientTop"], color["gradientTop"], color["gradientBottom"], color["gradientBottom"]
-            );
+            DrawGradientFilledRect(cursorPos, new Vector2(Math.Max(1, barSize.X * shield), h), color, drawList);
         }
 
-        public static void DrawShield(float shield, float hp, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, Dictionary<string, uint> color, ImDrawListPtr drawList)
+        public static void DrawShield(float shield, float hp, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, PluginConfigColor color, ImDrawListPtr drawList)
         {
             if (shield == 0)
             {
@@ -166,16 +211,13 @@ namespace DelvUI.Helpers
                 return;
             }
 
-
             // hp portion
             var h = !useRatioForHeight ? barSize.Y / 100 * Math.Min(100, height) : height;
             var missingHPRatio = 1 - hp;
             var s = Math.Min(shield, missingHPRatio);
             var shieldStartPos = cursorPos + new Vector2(Math.Max(1, barSize.X * hp), 0);
-            drawList.AddRectFilledMultiColor(
-                shieldStartPos, shieldStartPos + new Vector2(Math.Max(1, barSize.X * s), barSize.Y),
-                color["gradientTop"], color["gradientTop"], color["gradientBottom"], color["gradientBottom"]
-            );
+            DrawGradientFilledRect(shieldStartPos, new Vector2(Math.Max(1, barSize.X * s), barSize.Y), color, drawList);
+
 
             // overshield
             shield = shield - s;
@@ -184,10 +226,7 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            drawList.AddRectFilledMultiColor(
-                cursorPos, cursorPos + new Vector2(Math.Max(1, barSize.X * shield), h),
-                color["gradientTop"], color["gradientTop"], color["gradientBottom"], color["gradientBottom"]
-            );
+            DrawGradientFilledRect(cursorPos, new Vector2(Math.Max(1, barSize.X * shield), h), color, drawList);
         }
 
         public static void ClipAround(Addon addon, string windowName, ImDrawListPtr drawList, Action<ImDrawListPtr, string> drawAction)

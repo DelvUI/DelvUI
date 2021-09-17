@@ -22,7 +22,7 @@ namespace DelvUI.Interface.Jobs
     {
         private readonly SpellHelper _spellHelper = new();
         private new AstrologianConfig Config => (AstrologianConfig)_config;
-        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public AstrologianHud(string id, AstrologianConfig config, string displayName = null) : base(id, config, displayName)
         {
@@ -128,7 +128,7 @@ namespace DelvUI.Interface.Jobs
 
         private unsafe void DrawDivinationBar(Vector2 origin)
         {
-            List<Dictionary<string, uint>> chunkColors = new();
+            List<PluginConfigColor> chunkColors = new();
 
             ASTGauge gauge = Plugin.JobGauges.Get<ASTGauge>();
 
@@ -153,17 +153,17 @@ namespace DelvUI.Interface.Jobs
                         break;
 
                     case SealType.MOON:
-                        chunkColors.Add(Config.SealLunarColor.Map);
+                        chunkColors.Add(Config.SealLunarColor);
 
                         break;
 
                     case SealType.SUN:
-                        chunkColors.Add(Config.SealSunColor.Map);
+                        chunkColors.Add(Config.SealSunColor);
 
                         break;
 
                     case SealType.CELESTIAL:
-                        chunkColors.Add(Config.SealCelestialColor.Map);
+                        chunkColors.Add(Config.SealCelestialColor);
 
                         break;
                 }
@@ -198,7 +198,7 @@ namespace DelvUI.Interface.Jobs
             float yPos = origin.Y + Config.Position.Y + Config.DivinationBarPosition.Y - Config.DivinationBarSize.Y / 2f;
 
             BarBuilder bar = BarBuilder.Create(xPos, yPos, Config.DivinationBarSize.Y, Config.DivinationBarSize.X)
-                                       .SetBackgroundColor(EmptyColor["background"])
+                                       .SetBackgroundColor(EmptyColor.Base)
                                        .SetChunks(3)
                                        .SetChunkPadding(Config.DivinationBarPad)
                                        .AddInnerBar(chunkColors.Count(n => n != EmptyColor), 3, chunkColors.ToArray())
@@ -222,7 +222,7 @@ namespace DelvUI.Interface.Jobs
                 }
 
                 bar.SetGlowChunks(chucksToGlow);
-                bar.SetGlowColor(Config.DivinationGlowColor.Map["base"]);
+                bar.SetGlowColor(Config.DivinationGlowColor.Base);
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -237,43 +237,43 @@ namespace DelvUI.Interface.Jobs
             float yPos = origin.Y + Config.Position.Y + Config.DrawBarPosition.Y - Config.DrawBarSize.Y / 2f;
 
             string cardJob = "";
-            Dictionary<string, uint> cardColor = EmptyColor;
+            PluginConfigColor cardColor = EmptyColor;
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.DrawBarSize.Y, Config.DrawBarSize.X);
 
             switch (gauge.DrawnCard())
             {
                 case CardType.BALANCE:
-                    cardColor = Config.SealSunColor.Map;
+                    cardColor = Config.SealSunColor;
                     cardJob = "MELEE";
 
                     break;
 
                 case CardType.BOLE:
-                    cardColor = Config.SealSunColor.Map;
+                    cardColor = Config.SealSunColor;
                     cardJob = "RANGED";
 
                     break;
 
                 case CardType.ARROW:
-                    cardColor = Config.SealLunarColor.Map;
+                    cardColor = Config.SealLunarColor;
                     cardJob = "MELEE";
 
                     break;
 
                 case CardType.EWER:
-                    cardColor = Config.SealLunarColor.Map;
+                    cardColor = Config.SealLunarColor;
                     cardJob = "RANGED";
 
                     break;
 
                 case CardType.SPEAR:
-                    cardColor = Config.SealCelestialColor.Map;
+                    cardColor = Config.SealCelestialColor;
                     cardJob = "MELEE";
 
                     break;
 
                 case CardType.SPIRE:
-                    cardColor = Config.SealCelestialColor.Map;
+                    cardColor = Config.SealCelestialColor;
                     cardJob = "RANGED";
 
                     break;
@@ -297,12 +297,12 @@ namespace DelvUI.Interface.Jobs
 
                 cardJob = drawCastInfo > 0 ? Math.Abs(drawCastInfo).ToString(Config.EnableDecimalDrawBar ? "N1" : "N0") : "READY";
 
-                cardColor = drawCastInfo > 0 ? Config.DrawCdColor.Map : Config.DrawCdReadyColor.Map;
+                cardColor = drawCastInfo > 0 ? Config.DrawCdColor : Config.DrawCdReadyColor;
                 cardMax = drawCastInfo > 0 ? 30f : 1f;
             }
 
             BarBuilder bar = builder.AddInnerBar(Math.Abs(cardPresent), cardMax, cardColor)
-                                    .SetBackgroundColor(EmptyColor["background"])
+                                    .SetBackgroundColor(EmptyColor.Base)
                                     .SetTextMode(BarTextMode.Single)
                                     .SetText(BarTextPosition.CenterLeft, BarTextType.Custom, Config.ShowDrawCooldownTextBar ? Math.Abs(cardPresent).ToString("G") : "");
 
@@ -311,12 +311,12 @@ namespace DelvUI.Interface.Jobs
                 switch (cardJob)
                 {
                     case "RANGED":
-                        bar.SetGlowColor(Config.DrawRangedGlowColor.Map["base"]);
+                        bar.SetGlowColor(Config.DrawRangedGlowColor.Base);
 
                         break;
 
                     case "MELEE":
-                        bar.SetGlowColor(Config.DrawMeleeGlowColor.Map["base"]);
+                        bar.SetGlowColor(Config.DrawMeleeGlowColor.Base);
 
                         break;
                 }
@@ -380,8 +380,8 @@ namespace DelvUI.Interface.Jobs
 
             if (target is not Chara)
             {
-                Bar barNoTarget = builder.AddInnerBar(0, 30f, Config.DotColor.Map)
-                                         .SetBackgroundColor(EmptyColor["background"])
+                Bar barNoTarget = builder.AddInnerBar(0, 30f, Config.DotColor)
+                                         .SetBackgroundColor(EmptyColor.Base)
                                          .SetTextMode(BarTextMode.Single)
                                          .SetText(
                                              BarTextPosition.CenterMiddle,
@@ -408,8 +408,8 @@ namespace DelvUI.Interface.Jobs
             float dotCooldown = dot.EffectId == 838 ? 18f : 30f;
             float dotDuration = Config.EnableDecimalDotBar ? dot.Duration : Math.Abs(dot.Duration);
 
-            Bar bar = builder.AddInnerBar(dotDuration, dotCooldown, Config.DotColor.Map)
-                             .SetBackgroundColor(EmptyColor["background"])
+            Bar bar = builder.AddInnerBar(dotDuration, dotCooldown, Config.DotColor)
+                             .SetBackgroundColor(EmptyColor.Base)
                              .SetTextMode(BarTextMode.Single)
                              .SetText(
                                  BarTextPosition.CenterMiddle,
@@ -441,9 +441,9 @@ namespace DelvUI.Interface.Jobs
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.LightspeedBarSize.Y, Config.LightspeedBarSize.X);
 
-            Bar bar = builder.AddInnerBar(lightspeedDuration, lightspeedMaxDuration, EmptyColor, Config.LightspeedColor.Map)
+            Bar bar = builder.AddInnerBar(lightspeedDuration, lightspeedMaxDuration, EmptyColor, Config.LightspeedColor)
                              .SetTextMode(BarTextMode.Single)
-                             .SetBackgroundColor(EmptyColor["background"])
+                             .SetBackgroundColor(EmptyColor.Base)
                              .SetFlipDrainDirection(true)
                              .SetText(
                                  BarTextPosition.CenterMiddle,
@@ -471,25 +471,25 @@ namespace DelvUI.Interface.Jobs
 
             float xPos = origin.X + Config.Position.X + Config.StarBarPosition.X - Config.StarBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.StarBarPosition.Y - Config.StarBarSize.Y / 2f;
-            Dictionary<string, uint> starColorSelector = EmptyColor;
+            PluginConfigColor starColorSelector = EmptyColor;
 
             if (starPreCookingBuff.Any())
             {
                 starDuration = starMaxDuration - Math.Abs(starPreCookingBuff.First().Duration);
-                starColorSelector = Config.StarEarthlyColor.Map;
+                starColorSelector = Config.StarEarthlyColor;
             }
 
             if (starPostCookingBuff.Any())
             {
                 starDuration = Math.Abs(starPostCookingBuff.First().Duration);
-                starColorSelector = Config.StarGiantColor.Map;
+                starColorSelector = Config.StarGiantColor;
             }
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.StarBarSize.Y, Config.StarBarSize.X);
 
             BarBuilder bar = builder.AddInnerBar(starDuration, starMaxDuration, EmptyColor, starColorSelector)
                                     .SetTextMode(BarTextMode.Single)
-                                    .SetBackgroundColor(EmptyColor["background"])
+                                    .SetBackgroundColor(EmptyColor.Base)
                                     .SetText(
                                         BarTextPosition.CenterMiddle,
                                         BarTextType.Custom,
@@ -500,9 +500,9 @@ namespace DelvUI.Interface.Jobs
                                             : ""
                                     );
 
-            if (starColorSelector == Config.StarGiantColor.Map && Config.ShowStarGlowBar)
+            if (starColorSelector == Config.StarGiantColor && Config.ShowStarGlowBar)
             {
-                bar.SetGlowColor(Config.StarGlowColor.Map["base"]);
+                bar.SetGlowColor(Config.StarGlowColor.Base);
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();

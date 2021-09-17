@@ -14,29 +14,49 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public Vector2 Size;
 
-        [Checkbox("Always Show")]
+        [Checkbox("Anchor To Mouse")]
         [Order(20)]
+        public bool AnchorToMouse = false;
+        
+        [Checkbox("Offset Mouse Position")]
+        [Order(25)]
+        public bool OffsetMousePosition = false;
+        
+        [Checkbox("Always Show")]
+        [Order(30)]
         public bool AlwaysShow = false;
 
         [Checkbox("Show Border")]
-        [Order(25)]
+        [Order(35)]
         public bool ShowBorder = true;
 
         [Checkbox("Vertical Mode")]
-        [Order(30)]
+        [Order(40)]
         public bool VerticalMode = false;
+        
+        [Checkbox("Circular Mode")]
+        [Order(45)]
+        public bool CircularMode = false;
+        
+        [DragInt("Radius")]
+        [Order(50)]
+        public int CircleRadius = 40;
+        
+        [DragInt("Thickness")]
+        [Order(55)]
+        public int CircleThickness = 10;
 
         [ColorEdit4("Color")]
-        [Order(35)]
-        public PluginConfigColor Color = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        [Order(60)]
+        public PluginConfigColor Color = new PluginConfigColor(new(220f / 255f, 220f / 255f, 220f / 255f, 100f / 100f));
 
         [Checkbox("Show GCD Queue Indicator")]
-        [Order(40)]
+        [Order(65)]
         public bool ShowGCDQueueIndicator = true;
 
         [ColorEdit4("GCD Queue Color")]
-        [Order(45)]
-        public PluginConfigColor QueueColor = new PluginConfigColor(new(15f / 255f, 235f / 255f, 38f / 255f, 100f / 100f));
+        [Order(70)]
+        public PluginConfigColor QueueColor = new PluginConfigColor(new(13f / 255f, 207f / 255f, 31f / 255f, 100f / 100f));
 
         public GCDIndicatorConfig(Vector2 position, Vector2 size)
         {
