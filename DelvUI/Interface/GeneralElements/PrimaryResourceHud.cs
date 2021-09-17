@@ -67,7 +67,7 @@ namespace DelvUI.Interface.GeneralElements
             if (Config.ShowValue)
             {
                 Config.ValueLabelConfig.SetText($"{current,0}");
-                _valueLabel.Draw(origin + Config.Position);
+                _valueLabel.Draw(origin + Config.Position, Config.Size);
             }
         }
 
