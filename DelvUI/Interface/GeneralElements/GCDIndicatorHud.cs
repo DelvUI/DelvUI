@@ -113,11 +113,11 @@ namespace DelvUI.Interface.GeneralElements
         {
             var size = !Config.VerticalMode ? Config.Size : new Vector2(Config.Size.Y, -Config.Size.X);
 
-            var percentNonQueue = 1F - (500f / 1000f) / total;
+            var percentNonQueue = total != 0 ? 1F - (500f / 1000f) / total : 0;
 
             var drawList = ImGui.GetWindowDrawList();
             var builder = BarBuilder.Create(position, size)
-                                    .SetChunks(new float[2] { percentNonQueue, 1F - percentNonQueue })
+                                    .SetChunks(new float[2] { percentNonQueue, 1f - percentNonQueue })
                                     .AddInnerBar(current, total, Config.Color.Map)
                                     .SetDrawBorder(Config.ShowBorder)
                                     .SetVertical(Config.VerticalMode);
