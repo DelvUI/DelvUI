@@ -48,7 +48,7 @@ namespace DelvUI.Interface.GeneralElements
         private void DrawLabel(string text, Vector2 parentOrigin, Vector2 parentSize)
         {
             var textSize = ImGui.CalcTextSize(text);
-            var offset = OffsetForSize(textSize, parentSize);
+            var offset = OffsetForFrameAchor(parentSize) + OffsetForTextAnchor(textSize);
 
             if (Config.ShowOutline)
             {
@@ -61,19 +61,37 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
-        private Vector2 OffsetForSize(Vector2 textSize, Vector2 parentSize)
+        private Vector2 OffsetForTextAnchor(Vector2 textSize)
         {
-            switch (Config.Anchor)
+            switch (Config.TextAnchor)
             {
                 case LabelTextAnchor.Center: return -textSize / 2f;
-                case LabelTextAnchor.Left: return new Vector2(-parentSize.X / 2f, -textSize.Y / 2f);
-                case LabelTextAnchor.Right: return new Vector2(parentSize.X / 2f - textSize.X, -textSize.Y / 2f);
-                case LabelTextAnchor.Top: return new Vector2(-textSize.X / 2f, -parentSize.Y / 2f);
+                case LabelTextAnchor.Left: return new Vector2(0, -textSize.Y / 2f);
+                case LabelTextAnchor.Right: return new Vector2(-textSize.X, -textSize.Y / 2f);
+                case LabelTextAnchor.Top: return new Vector2(-textSize.X / 2f, 0);
+                case LabelTextAnchor.TopLeft: return Vector2.Zero;
+                case LabelTextAnchor.TopRight: return new Vector2(-textSize.X, 0);
+                case LabelTextAnchor.Bottom: return new Vector2(-textSize.X / 2f, -textSize.Y);
+                case LabelTextAnchor.BottomLeft: return new Vector2(0, -textSize.Y);
+                case LabelTextAnchor.BottomRight: return new Vector2(-textSize.X, -textSize.Y);
+            }
+
+            return Vector2.Zero;
+        }
+
+        private Vector2 OffsetForFrameAchor(Vector2 parentSize)
+        {
+            switch (Config.FrameAnchor)
+            {
+                case LabelTextAnchor.Center: return Vector2.Zero;
+                case LabelTextAnchor.Left: return new Vector2(-parentSize.X / 2f, 0);
+                case LabelTextAnchor.Right: return new Vector2(parentSize.X / 2f, 0);
+                case LabelTextAnchor.Top: return new Vector2(0, -parentSize.Y / 2f);
                 case LabelTextAnchor.TopLeft: return -parentSize / 2f;
-                case LabelTextAnchor.TopRight: return new Vector2(parentSize.X / 2f - textSize.X, -parentSize.Y / 2f);
-                case LabelTextAnchor.Bottom: return new Vector2(-textSize.X / 2f, parentSize.Y / 2f - textSize.Y);
-                case LabelTextAnchor.BottomLeft: return new Vector2(-parentSize.X / 2f, parentSize.Y / 2f - textSize.Y);
-                case LabelTextAnchor.BottomRight: return new Vector2(parentSize.X / 2f - textSize.X, parentSize.Y / 2f - textSize.Y);
+                case LabelTextAnchor.TopRight: return new Vector2(parentSize.X / 2f, -parentSize.Y / 2f);
+                case LabelTextAnchor.Bottom: return new Vector2(0, parentSize.Y / 2f);
+                case LabelTextAnchor.BottomLeft: return new Vector2(-parentSize.X / 2f, parentSize.Y / 2f);
+                case LabelTextAnchor.BottomRight: return parentSize / 2f;
             }
 
             return Vector2.Zero;

@@ -14,7 +14,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(20)]
         public string Text;
 
-        public EditableLabelConfig(Vector2 position, string text, LabelTextAnchor anchor) : base(position, text, anchor)
+        public EditableLabelConfig(Vector2 position, string text, LabelTextAnchor frameAnchor, LabelTextAnchor textAnchor) : base(position, text, frameAnchor, textAnchor)
         {
             Text = text;
         }
@@ -36,27 +36,32 @@ namespace DelvUI.Interface.GeneralElements
     {
         [JsonIgnore] protected string _text;
 
-        [Combo("Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
+        [Combo("Frame Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
         [Order(25)]
-        public LabelTextAnchor Anchor = LabelTextAnchor.Center;
+        public LabelTextAnchor FrameAnchor = LabelTextAnchor.Center;
+
+        [Combo("Text Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
+        [Order(30)]
+        public LabelTextAnchor TextAnchor = LabelTextAnchor.TopLeft;
 
         [ColorEdit4("Color")]
-        [Order(30)]
+        [Order(35)]
         public PluginConfigColor Color = new PluginConfigColor(Vector4.One);
 
         [Checkbox("Show Outline")]
-        [CollapseControl(35, 0)]
+        [CollapseControl(40, 0)]
         public bool ShowOutline = true;
 
         [ColorEdit4("Outline Color")]
         [CollapseWith(0, 0)]
         public PluginConfigColor OutlineColor = new PluginConfigColor(Vector4.UnitW);
 
-        public LabelConfig(Vector2 position, string text, LabelTextAnchor anchor)
+        public LabelConfig(Vector2 position, string text, LabelTextAnchor frameAnchor, LabelTextAnchor textAnchor)
         {
             Position = position;
             _text = text;
-            Anchor = anchor;
+            FrameAnchor = frameAnchor;
+            TextAnchor = textAnchor;
             Position = position;
         }
 
