@@ -4,7 +4,6 @@ using ImGuiNET;
 using ImGuiScene;
 using Lumina.Excel;
 using System;
-using System.Collections.Generic;
 using System.Numerics;
 
 namespace DelvUI.Helpers
@@ -34,18 +33,27 @@ namespace DelvUI.Helpers
             return new uint[] { color.TopGradient, color.TopGradient, color.BottomGradient, color.BottomGradient };
         }
 
+        public static void DrawGradientFilledRect(Vector2 position, Vector2 size, PluginConfigColor color, ImDrawListPtr drawList)
+        {
+            var gradientDirection = ConfigurationManager.GetInstance().GradientDirection;
+            DrawGradientFilledRect(position, size, color, drawList, gradientDirection);
+        }
+
         public static void DrawGradientFilledRect(Vector2 position, Vector2 size, PluginConfigColor color, ImDrawListPtr drawList, GradientDirection gradientDirection = GradientDirection.Down)
         {
             var colorArray = ColorArray(color, gradientDirection);
 
             if (gradientDirection == GradientDirection.CenteredHorizonal)
             {
+                var halfSize = new Vector2(size.X, size.Y / 2f);
                 drawList.AddRectFilledMultiColor(
-                    position, position + size / 2f,
+                    position, position + halfSize,
                     colorArray[0], colorArray[1], colorArray[2], colorArray[3]
                 );
+
+                var pos = position + new Vector2(0, halfSize.Y);
                 drawList.AddRectFilledMultiColor(
-                    position + size / 2f, position + size,
+                    pos, pos + halfSize,
                     colorArray[3], colorArray[2], colorArray[1], colorArray[0]
                 );
             }
