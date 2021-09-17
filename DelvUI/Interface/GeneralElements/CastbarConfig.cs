@@ -24,7 +24,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Slide Cast Color")]
         [CollapseWith(5, 0)]
-        public PluginConfigColor SlideCastColor = new PluginConfigColor(new(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor SlideCastColor = new PluginConfigColor(new(190f / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
 
         public PlayerCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
             : base(position, size, castNameConfig, castTimeConfig)
@@ -37,8 +37,8 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(254, 24);
             var pos = new Vector2(0, HUDConstants.PlayerCastbarY);
 
-            var castNameConfig = new LabelConfig(new Vector2(-size.X / 2f + size.Y + 5, 0), "", LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
+            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left, LabelTextAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", LabelTextAnchor.Right, LabelTextAnchor.Right);
 
             return new PlayerCastbarConfig(pos, size, castNameConfig, castTimeConfig);
         }
@@ -55,7 +55,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Interruptable Color")]
         [CollapseWith(0, 0)]
-        public PluginConfigColor InterruptableColor = new PluginConfigColor(new(255f / 255f, 0 / 255f, 255f / 255f, 100f / 100f));
+        public PluginConfigColor InterruptableColor = new PluginConfigColor(new(255f / 255f, 87f / 255f, 113f / 255f, 100f / 100f));
 
         [Checkbox("Use Damage Type Colors")]
         [CollapseControl(50, 1)]
@@ -63,15 +63,15 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Physical Damage Color")]
         [CollapseWith(0, 1)]
-        public PluginConfigColor PhysicalDamageColor = new PluginConfigColor(new(255f / 255f, 0 / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor PhysicalDamageColor = new PluginConfigColor(new(190f / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
 
         [ColorEdit4("Magical Damage Color")]
         [CollapseWith(5, 1)]
-        public PluginConfigColor MagicalDamageColor = new PluginConfigColor(new(0f / 255f, 0 / 255f, 255f / 255f, 100f / 100f));
+        public PluginConfigColor MagicalDamageColor = new PluginConfigColor(new(0f / 255f, 72f / 255f, 179f / 255f, 100f / 100f));
 
         [ColorEdit4("Darkness Damage Color")]
         [CollapseWith(10, 1)]
-        public PluginConfigColor DarknessDamageColor = new PluginConfigColor(new(255f / 255f, 0 / 255f, 255f / 255f, 100f / 100f));
+        public PluginConfigColor DarknessDamageColor = new PluginConfigColor(new(188f / 255f, 19f / 255f, 254f / 255f, 100f / 100f));
 
         public TargetCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
             : base(position, size, castNameConfig, castTimeConfig)
@@ -83,8 +83,8 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(254, 24);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY / 2f - size.Y / 2);
 
-            var castNameConfig = new LabelConfig(new Vector2(-size.X / 2f + size.Y + 5, 0), "", LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
+            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left, LabelTextAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", LabelTextAnchor.Right, LabelTextAnchor.Right);
 
             return new TargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
         }
@@ -108,8 +108,8 @@ namespace DelvUI.Interface.GeneralElements
                 HUDConstants.BaseHUDOffsetY + 5
             );
 
-            var castNameConfig = new LabelConfig(new Vector2(-size.X / 2f + size.Y + 5, 0), "", LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
+            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left, LabelTextAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", LabelTextAnchor.Right, LabelTextAnchor.Right);
 
             return new TargetOfTargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
         }
@@ -133,8 +133,8 @@ namespace DelvUI.Interface.GeneralElements
                 HUDConstants.BaseHUDOffsetY + 5
             );
 
-            var castNameConfig = new LabelConfig(new Vector2(-size.X / 2f + size.Y + 5, 0), "", LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(size.X / 2f - 5, 0), "", LabelTextAnchor.Right);
+            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left, LabelTextAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", LabelTextAnchor.Right, LabelTextAnchor.Right);
 
             return new FocusTargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
         }
@@ -163,7 +163,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Color")]
         [Order(40)]
-        public PluginConfigColor Color = new PluginConfigColor(new(255f / 255f, 158f / 255f, 208f / 255f, 100f / 100f));
+        public PluginConfigColor Color = new PluginConfigColor(new(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
 
         public CastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
         {

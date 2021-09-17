@@ -104,8 +104,8 @@ namespace DelvUI.Interface.GeneralElements
                 ImGui.End();
 
                 // labels
-                _leftLabel.DrawWithActor(origin + Config.Position, Actor);
-                _rightLabel.DrawWithActor(origin + Config.Position, Actor);
+                _leftLabel.Draw(origin + Config.Position, Config.Size, Actor);
+                _rightLabel.Draw(origin + Config.Position, Config.Size, Actor);
             });
         }
 
@@ -148,10 +148,10 @@ namespace DelvUI.Interface.GeneralElements
             drawList.AddRectFilledMultiColor(
                 startPos,
                 startPos + new Vector2(Config.Size.X * scale, Config.Size.Y),
-                color["gradientLeft"],
-                color["gradientRight"],
-                color["gradientRight"],
-                color["gradientLeft"]
+                color["gradientTop"],
+                color["gradientTop"],
+                color["gradientBottom"],
+                color["gradientBottom"]
             );
 
             // shield
@@ -184,10 +184,10 @@ namespace DelvUI.Interface.GeneralElements
             drawList.AddRectFilledMultiColor(
                 startPos,
                 endPos,
-                color.LeftGradient,
-                color.RightGradient,
-                color.RightGradient,
-                color.LeftGradient
+                color.TopGradient,
+                color.TopGradient,
+                color.BottomGradient,
+                color.BottomGradient
             );
 
             drawList.AddRect(startPos, endPos, 0xFF000000);

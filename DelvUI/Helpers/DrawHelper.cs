@@ -144,11 +144,11 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            var h = useRatioForHeight ? barSize.Y / 100 * height : height;
+            var h = !useRatioForHeight ? barSize.Y / 100 * height : height;
 
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(Math.Max(1, barSize.X * shield), h),
-                color["gradientLeft"], color["gradientRight"], color["gradientRight"], color["gradientLeft"]
+                color["gradientTop"], color["gradientTop"], color["gradientBottom"], color["gradientBottom"]
             );
         }
 
@@ -168,13 +168,13 @@ namespace DelvUI.Helpers
 
 
             // hp portion
-            var h = useRatioForHeight ? barSize.Y / 100 * Math.Min(100, height) : height;
+            var h = !useRatioForHeight ? barSize.Y / 100 * Math.Min(100, height) : height;
             var missingHPRatio = 1 - hp;
             var s = Math.Min(shield, missingHPRatio);
             var shieldStartPos = cursorPos + new Vector2(Math.Max(1, barSize.X * hp), 0);
             drawList.AddRectFilledMultiColor(
                 shieldStartPos, shieldStartPos + new Vector2(Math.Max(1, barSize.X * s), barSize.Y),
-                color["gradientLeft"], color["gradientRight"], color["gradientRight"], color["gradientLeft"]
+                color["gradientTop"], color["gradientTop"], color["gradientBottom"], color["gradientBottom"]
             );
 
             // overshield
@@ -186,7 +186,7 @@ namespace DelvUI.Helpers
 
             drawList.AddRectFilledMultiColor(
                 cursorPos, cursorPos + new Vector2(Math.Max(1, barSize.X * shield), h),
-                color["gradientLeft"], color["gradientRight"], color["gradientRight"], color["gradientLeft"]
+                color["gradientTop"], color["gradientTop"], color["gradientBottom"], color["gradientBottom"]
             );
         }
 

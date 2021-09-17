@@ -1,5 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Helpers;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 using System;
@@ -9,7 +10,13 @@ namespace DelvUI.Interface.StatusEffects
 {
     internal static class StatusEffectIconDrawHelper
     {
-        public static void DrawStatusEffectIcon(ImDrawListPtr drawList, Vector2 position, StatusEffectData statusEffectData, StatusEffectIconConfig config)
+        public static void DrawStatusEffectIcon(
+            ImDrawListPtr drawList,
+            Vector2 position,
+            StatusEffectData statusEffectData,
+            StatusEffectIconConfig config,
+            LabelHud durationLabel,
+            LabelHud stacksLabel)
         {
             // icon
             DrawHelper.DrawIcon<Status>(statusEffectData.Data, position, config.Size, false, drawList);
@@ -22,34 +29,21 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             // duration
-            if (config.ShowDurationText && !statusEffectData.Data.IsPermanent && !statusEffectData.Data.IsFcBuff)
+            if (config.DurationLabelConfig.Enabled && !statusEffectData.Data.IsPermanent && !statusEffectData.Data.IsFcBuff)
             {
                 var duration = Math.Round(Math.Abs(statusEffectData.StatusEffect.Duration));
-                var text = Utils.DurationToString(duration);
-                var textSize = ImGui.CalcTextSize(text);
+                config.DurationLabelConfig.SetText(Utils.DurationToString(duration));
 
-                DrawHelper.DrawOutlinedText(
-                    text,
-                    position + new Vector2(config.Size.X / 2f - textSize.X / 2f, config.Size.Y / 2f - textSize.Y / 2f),
-                    drawList,
-                    2
-                );
+                durationLabel.Draw(position + config.Size / 2f, config.Size);
             }
 
             // stacks
-            if (config.ShowStacksText && statusEffectData.Data.MaxStacks > 0 && statusEffectData.StatusEffect.StackCount > 0 && !statusEffectData.Data.IsFcBuff)
+            if (config.StacksLabelConfig.Enabled && statusEffectData.Data.MaxStacks > 0 && statusEffectData.StatusEffect.StackCount > 0 && !statusEffectData.Data.IsFcBuff)
             {
                 var text = $"{statusEffectData.StatusEffect.StackCount}";
-                var textSize = ImGui.CalcTextSize(text);
+                config.StacksLabelConfig.SetText(text);
 
-                DrawHelper.DrawOutlinedText(
-                    text,
-                    position + new Vector2(config.Size.X * 0.9f - textSize.X / 2f, config.Size.X * 0.2f - textSize.Y / 2f),
-                    0xFF000000,
-                    0xFFFFFFFF,
-                    drawList,
-                    2
-                );
+                stacksLabel.Draw(position + config.Size / 2f, config.Size);
             }
         }
 

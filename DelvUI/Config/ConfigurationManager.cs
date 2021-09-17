@@ -133,6 +133,7 @@ namespace DelvUI.Config
                 typeof(CastersColorConfig),
                 typeof(MiscColorConfig),
 
+                typeof(HideHudConfig),
                 typeof(PrimaryResourceConfig),
                 typeof(TooltipsConfig),
                 typeof(GCDIndicatorConfig),

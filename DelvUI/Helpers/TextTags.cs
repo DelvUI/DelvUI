@@ -91,7 +91,6 @@ namespace DelvUI.Helpers
 
         public static string GenerateFormattedTextFromTags(dynamic actor, string text)
         {
-            text = text.Replace("%", "%%"); // Fixes rendering for % in ImGui
             var matches = Regex.Matches(text, @"\[(.*?)\]");
 
             return matches.Cast<Match>().Aggregate(text, (current, m) => current.Replace(m.Value, ReplaceTagWithString(m.Value, actor)));

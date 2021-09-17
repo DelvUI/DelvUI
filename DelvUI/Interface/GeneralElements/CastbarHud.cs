@@ -81,10 +81,10 @@ namespace DelvUI.Interface.GeneralElements
             drawList.AddRectFilledMultiColor(
                 startPos,
                 startPos + new Vector2(Config.Size.X * castScale, Config.Size.Y),
-                color["gradientLeft"],
-                color["gradientRight"],
-                color["gradientRight"],
-                color["gradientLeft"]
+                color["gradientTop"],
+                color["gradientTop"],
+                color["gradientBottom"],
+                color["gradientBottom"]
             );
 
             // border
@@ -109,12 +109,12 @@ namespace DelvUI.Interface.GeneralElements
 
             // cast name
             Config.CastNameConfig.SetText(Config.Preview ? "Name" : _lastUsedCast.ActionText);
-            _castNameLabel.Draw(origin + Config.Position);
+            _castNameLabel.Draw(origin + Config.Position + new Vector2(iconSize.X, 0), Config.Size);
 
             // cast time
             var text = Config.Preview ? "Time" : Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
             Config.CastTimeConfig.SetText(text);
-            _castTimeLabel.Draw(origin + Config.Position);
+            _castTimeLabel.Draw(origin + Config.Position, Config.Size);
         }
 
         public virtual void DrawExtras(Vector2 origin, float totalCastTime)
@@ -154,10 +154,10 @@ namespace DelvUI.Interface.GeneralElements
             drawList.AddRectFilledMultiColor(
                 startPos,
                 endPos,
-                color["gradientLeft"],
-                color["gradientRight"],
-                color["gradientRight"],
-                color["gradientLeft"]
+                color["gradientTop"],
+                color["gradientTop"],
+                color["gradientBottom"],
+                color["gradientBottom"]
             );
         }
 

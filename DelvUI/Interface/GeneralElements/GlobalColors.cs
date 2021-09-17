@@ -283,22 +283,22 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("NPC Friendly")]
         [Order(20)]
-        public PluginConfigColor NPCFriendlyColor = new PluginConfigColor(new(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
+        public PluginConfigColor NPCFriendlyColor = new PluginConfigColor(new(99f / 255f, 172f / 255f, 14f / 255f, 100f / 100f));
 
         [ColorEdit4("NPC Hostile")]
         [Order(25)]
-        public PluginConfigColor NPCHostileColor = new PluginConfigColor(new(128f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor NPCHostileColor = new PluginConfigColor(new(160f / 255f, 51f / 255f, 51f / 255f, 100f / 100f));
 
         [ColorEdit4("NPC Neutral")]
         [Order(30)]
-        public PluginConfigColor NPCNeutralColor = new PluginConfigColor(new(214f / 255f, 145f / 255f, 64f / 255f, 100f / 100f));
+        public PluginConfigColor NPCNeutralColor = new PluginConfigColor(new(218f / 255f, 157f / 255f, 46f / 255f, 100f / 100f));
 
         [ColorEdit4("Disciples of the Land")]
         [Order(35)]
-        public PluginConfigColor LANDColor = new PluginConfigColor(new(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
+        public PluginConfigColor LANDColor = new PluginConfigColor(new(99f / 255f, 172f / 255f, 14f / 255f, 100f / 100f));
 
         [ColorEdit4("Disciples of the Hand")]
         [Order(40)]
-        public PluginConfigColor HANDColor = new PluginConfigColor(new(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
+        public PluginConfigColor HANDColor = new PluginConfigColor(new(99f / 255f, 172f / 255f, 14f / 255f, 100f / 100f));
     }
 }

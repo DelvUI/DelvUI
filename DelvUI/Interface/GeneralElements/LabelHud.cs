@@ -16,60 +16,69 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void Draw(Vector2 origin)
         {
-            if (!Config.Enabled || Config.GetText() == null)
-            {
-                return;
-            }
-
-            var size = ImGui.CalcTextSize(Config.GetText());
-            var offset = OffsetForSize(size);
-
-            if (Config.ShowOutline)
-            {
-                DrawHelper.DrawOutlinedText(Config.GetText(), origin + Config.Position + offset, Config.Color.Vector, Config.OutlineColor.Vector);
-            }
-            else
-            {
-                ImGui.SetCursorPos(origin + Config.Position + offset);
-                ImGui.TextColored(Config.Color.Vector, Config.GetText());
-            }
+            Draw(origin, null, null);
         }
 
-        public void DrawWithActor(Vector2 origin, Actor actor)
+        public void Draw(Vector2 origin, Vector2? parentSize = null, Actor actor = null)
         {
             if (!Config.Enabled || Config.GetText() == null)
             {
                 return;
             }
 
-            var text = TextTags.GenerateFormattedTextFromTags(actor, Config.GetText());
-            var size = ImGui.CalcTextSize(text);
-            var offset = OffsetForSize(size);
+            var text = actor != null ? TextTags.GenerateFormattedTextFromTags(actor, Config.GetText()) : Config.GetText();
+            var size = parentSize ?? Vector2.Zero;
+
+            DrawLabel(text, origin, size);
+        }
+
+        private void DrawLabel(string text, Vector2 parentOrigin, Vector2 parentSize)
+        {
+            var textSize = ImGui.CalcTextSize(text);
+            var offset = OffsetForFrameAnchor(parentSize) + OffsetForTextAnchor(textSize);
+            var drawList = ImGui.GetWindowDrawList();
 
             if (Config.ShowOutline)
             {
-                DrawHelper.DrawOutlinedText(text, origin + Config.Position + offset, Config.Color.Vector, Config.OutlineColor.Vector);
+                DrawHelper.DrawOutlinedText(text, parentOrigin + Config.Position + offset, Config.Color.Base, Config.OutlineColor.Base, drawList);
             }
             else
             {
-                ImGui.SetCursorPos(origin + Config.Position + offset);
-                ImGui.TextColored(Config.Color.Vector, text);
+                drawList.AddText(parentOrigin + Config.Position + offset, Config.Color.Base, text);
             }
         }
 
-        private Vector2 OffsetForSize(Vector2 size)
+        private Vector2 OffsetForTextAnchor(Vector2 textSize)
         {
-            switch (Config.Anchor)
+            switch (Config.TextAnchor)
             {
-                case LabelTextAnchor.Center: return -size / 2f;
-                case LabelTextAnchor.Left: return new Vector2(0, -size.Y / 2f);
-                case LabelTextAnchor.Right: return new Vector2(-size.X, -size.Y / 2f);
-                case LabelTextAnchor.Top: return new Vector2(-size.X / 2f, 0);
+                case LabelTextAnchor.Center: return -textSize / 2f;
+                case LabelTextAnchor.Left: return new Vector2(0, -textSize.Y / 2f);
+                case LabelTextAnchor.Right: return new Vector2(-textSize.X, -textSize.Y / 2f);
+                case LabelTextAnchor.Top: return new Vector2(-textSize.X / 2f, 0);
                 case LabelTextAnchor.TopLeft: return Vector2.Zero;
-                case LabelTextAnchor.TopRight: return new Vector2(size.X, 0);
-                case LabelTextAnchor.Bottom: return new Vector2(-size.X / 2f, -size.Y);
-                case LabelTextAnchor.BottomLeft: return new Vector2(0, -size.Y);
-                case LabelTextAnchor.BottomRight: return -size;
+                case LabelTextAnchor.TopRight: return new Vector2(-textSize.X, 0);
+                case LabelTextAnchor.Bottom: return new Vector2(-textSize.X / 2f, -textSize.Y);
+                case LabelTextAnchor.BottomLeft: return new Vector2(0, -textSize.Y);
+                case LabelTextAnchor.BottomRight: return new Vector2(-textSize.X, -textSize.Y);
+            }
+
+            return Vector2.Zero;
+        }
+
+        private Vector2 OffsetForFrameAnchor(Vector2 parentSize)
+        {
+            switch (Config.FrameAnchor)
+            {
+                case LabelTextAnchor.Center: return Vector2.Zero;
+                case LabelTextAnchor.Left: return new Vector2(-parentSize.X / 2f, 0);
+                case LabelTextAnchor.Right: return new Vector2(parentSize.X / 2f, 0);
+                case LabelTextAnchor.Top: return new Vector2(0, -parentSize.Y / 2f);
+                case LabelTextAnchor.TopLeft: return -parentSize / 2f;
+                case LabelTextAnchor.TopRight: return new Vector2(parentSize.X / 2f, -parentSize.Y / 2f);
+                case LabelTextAnchor.Bottom: return new Vector2(0, parentSize.Y / 2f);
+                case LabelTextAnchor.BottomLeft: return new Vector2(-parentSize.X / 2f, parentSize.Y / 2f);
+                case LabelTextAnchor.BottomRight: return parentSize / 2f;
             }
 
             return Vector2.Zero;

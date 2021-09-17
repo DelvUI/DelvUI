@@ -31,7 +31,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Color")]
         [Order(35)]
-        public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 205f / 255f, 230f / 255f, 100f / 100f));
+        public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
 
         public PrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
         {
@@ -45,7 +45,7 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(254, 20);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY - 37);
 
-            var labelConfig = new LabelConfig(Vector2.Zero, "", LabelTextAnchor.Center);
+            var labelConfig = new LabelConfig(Vector2.Zero, "", LabelTextAnchor.Center, LabelTextAnchor.Center);
 
             return new PrimaryResourceConfig(pos, size, labelConfig);
         }
