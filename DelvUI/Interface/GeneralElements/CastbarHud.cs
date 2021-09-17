@@ -109,12 +109,12 @@ namespace DelvUI.Interface.GeneralElements
 
             // cast name
             Config.CastNameConfig.SetText(Config.Preview ? "Name" : _lastUsedCast.ActionText);
-            _castNameLabel.Draw(origin + Config.Position);
+            _castNameLabel.DrawRelativeToParent(origin + Config.Position + new Vector2(iconSize.X, 0), Config.Size);
 
             // cast time
             var text = Config.Preview ? "Time" : Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
             Config.CastTimeConfig.SetText(text);
-            _castTimeLabel.Draw(origin + Config.Position);
+            _castTimeLabel.DrawRelativeToParent(origin + Config.Position, Config.Size);
         }
 
         public virtual void DrawExtras(Vector2 origin, float totalCastTime)
