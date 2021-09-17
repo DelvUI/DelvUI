@@ -75,7 +75,7 @@ namespace DelvUI.Interface.GeneralElements
             const float queueTime = 0.5f;
             // TODO add this as a parameter
             const float startAngle = 0f;
-            
+
             // always draw until the queue threshold
             float progressAngle = Math.Min(current, total - (Config.ShowGCDQueueIndicator ? queueTime : 0f)) / total * 2f * (float)Math.PI;
             // drawing an arc with thickness to make it look like an annular sector
@@ -113,11 +113,11 @@ namespace DelvUI.Interface.GeneralElements
         {
             var size = !Config.VerticalMode ? Config.Size : new Vector2(Config.Size.Y, -Config.Size.X);
 
-            var percentNonQueue = 1F - (500f / 1000f) / total;
+            var percentNonQueue = total != 0 ? 1F - (500f / 1000f) / total : 0;
 
             var drawList = ImGui.GetWindowDrawList();
             var builder = BarBuilder.Create(position, size)
-                                    .SetChunks(new float[2] { percentNonQueue, 1F - percentNonQueue })
+                                    .SetChunks(new float[2] { percentNonQueue, 1f - percentNonQueue })
                                     .AddInnerBar(current, total, Config.Color)
                                     .SetDrawBorder(Config.ShowBorder)
                                     .SetVertical(Config.VerticalMode);
