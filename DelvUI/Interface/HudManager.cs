@@ -261,7 +261,7 @@ namespace DelvUI.Interface
             // job hud
             if (_jobHud != null && _jobHud.Config.Enabled && _jobHud != _selectedElement)
             {
-                if (!Helper.IsElementHidden())
+                if (!Helper.IsElementHidden(_jobHud))
                 {
                     _jobHud.Draw(_origin);
                 }

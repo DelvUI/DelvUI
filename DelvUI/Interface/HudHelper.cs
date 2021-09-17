@@ -10,6 +10,7 @@ using Dalamud.Plugin;
 using DelvUI.Config.Attributes;
 using System.Linq;
 using System.Collections.Generic;
+using DelvUI.Interface.Jobs;
 
 namespace DelvUI.Interface
 {
@@ -76,8 +77,6 @@ namespace DelvUI.Interface
                         break;
                 }
             }
-
-
         }
 
         #endregion
@@ -101,7 +100,7 @@ namespace DelvUI.Interface
 
         #endregion
 
-        public bool IsElementHidden(HudElement element = null)
+        public bool IsElementHidden(HudElement element)
         {
             if (!ConfigurationManager.GetInstance().LockHUD)
             {
@@ -109,6 +108,11 @@ namespace DelvUI.Interface
             }
 
             bool isHidden = Config.HideOutsideOfCombat && !IsInCombat();
+
+            if ( !isHidden && element is JobHud _jobHud)
+            {
+                return Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
+            }
 
             if (element != null)
             {
