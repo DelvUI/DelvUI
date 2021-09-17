@@ -28,7 +28,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [Checkbox("Show Border")]
         [Order(35)]
-        public bool ShowBorder = false;
+        public bool ShowBorder = true;
 
         [Checkbox("Vertical Mode")]
         [Order(40)]
