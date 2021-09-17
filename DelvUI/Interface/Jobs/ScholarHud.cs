@@ -74,8 +74,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawFairyBar(Vector2 origin)
         {
             float fairyGauge = Plugin.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
-            float seraphTimer = Plugin.JobGauges.Get<SCHGauge>().SeraphTimer;
-            float seraphDuration = Math.Abs(seraphTimer / 1000);
+            float seraphDuration = Math.Abs(Plugin.JobGauges.Get<SCHGauge>().SeraphTimer / 1000);            
 
             Vector2 barSize = Config.FairySize;
             Vector2 position = origin + Config.Position + Config.FairyPosition - barSize / 2f;
@@ -241,11 +240,7 @@ namespace DelvUI.Interface.Jobs
 
         [ColorEdit4("Seraph Bar Color")]
         [CollapseWith(30, 2)]
-        public PluginConfigColor SeraphColor = new(new Vector4(232f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
-                
-        //[ColorEdit4("Aetherpact Color")]
-        //[CollapseWith(35, 2)]
-        //public PluginConfigColor AetherpactColor = new(new Vector4(255f / 255f, 255f / 255f, 155f / 255f, 100f / 100f));
+        public PluginConfigColor SeraphColor = new(new Vector4(232f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));        
         #endregion
 
         #region bio
