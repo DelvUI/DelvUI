@@ -150,6 +150,12 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
+            var count = PartyManager.Instance.MemberCount;
+            if (count < 1)
+            {
+                return;
+            }
+
             // size and position
             ImGui.SetNextWindowPos(Config.Position, ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSize(Config.Size, ImGuiCond.FirstUseEver);
@@ -165,12 +171,6 @@ namespace DelvUI.Interface.Party
             var windowSize = ImGui.GetWindowSize();
             Config.Position = windowPos;
             Config.Size = windowSize;
-
-            var count = PartyManager.Instance.MemberCount;
-            if (count < 1)
-            {
-                return;
-            }
 
             // recalculate layout on settings or size change
             var margin = ImGui.GetWindowContentRegionMin().X;

@@ -135,10 +135,10 @@ namespace DelvUI.Interface
             _hudElements.Add(focusTargetUnitFrame);
             _hudElementsUsingFocusTarget.Add(focusTargetUnitFrame);
 
-            //var partyFramesConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesConfig>();
-            //var partyHealthBarsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesHealthBarsConfig>();
-            //_partyFramesHud = new PartyFramesHud("partyFrames", partyFramesConfig, partyHealthBarsConfig, "Party Frames");
-            //_hudElements.Add(_partyFramesHud);
+            var partyFramesConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesConfig>();
+            var partyHealthBarsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesHealthBarsConfig>();
+            _partyFramesHud = new PartyFramesHud("partyFrames", partyFramesConfig, partyHealthBarsConfig, "Party Frames");
+            _hudElements.Add(_partyFramesHud);
         }
 
         private void CreateCastbars()
