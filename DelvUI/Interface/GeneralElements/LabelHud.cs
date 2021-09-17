@@ -53,11 +53,11 @@ namespace DelvUI.Interface.GeneralElements
 
             if (Config.ShowOutline)
             {
-                DrawHelper.DrawOutlinedText(Config.GetText(), parentOrigin + Config.Position + offset, Config.Color.Base, Config.OutlineColor.Base, drawList);
+                DrawHelper.DrawOutlinedText(text, parentOrigin + Config.Position + offset, Config.Color.Base, Config.OutlineColor.Base, drawList);
             }
             else
             {
-                drawList.AddText(parentOrigin + Config.Position + offset, Config.Color.Base, Config.GetText());
+                drawList.AddText(parentOrigin + Config.Position + offset, Config.Color.Base, text);
             }
         }
 
