@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DelvUI.Config;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -120,11 +121,11 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
-        public BarBuilder AddInnerBar(float currentValue, float maximumValue, Dictionary<string, uint> color) => AddInnerBar(currentValue, maximumValue, color, null);
+        public BarBuilder AddInnerBar(float currentValue, float maximumValue, PluginConfigColor color) => AddInnerBar(currentValue, maximumValue, color, null);
 
-        public BarBuilder AddInnerBar(float currentValue, float maximumValue, Dictionary<string, uint> color, Dictionary<string, uint> partialColor)
+        public BarBuilder AddInnerBar(float currentValue, float maximumValue, PluginConfigColor color, PluginConfigColor partialColor)
         {
-            var colors = new Dictionary<string, uint>[_bar.ChunkSizes.Length];
+            var colors = new PluginConfigColor[_bar.ChunkSizes.Length];
 
             for (var i = 0; i < colors.Length; i++)
             {
@@ -134,16 +135,16 @@ namespace DelvUI.Interface.Bars
             return AddInnerBar(currentValue, maximumValue, colors, partialColor);
         }
 
-        public BarBuilder AddInnerBar(float currentValue, float maximumValue, Dictionary<string, uint>[] colors) => AddInnerBar(currentValue, maximumValue, colors, null);
+        public BarBuilder AddInnerBar(float currentValue, float maximumValue, PluginConfigColor[] colors) => AddInnerBar(currentValue, maximumValue, colors, null);
 
-        public BarBuilder AddInnerBar(float currentValue, float maximumValue, Dictionary<string, uint>[] colors, Dictionary<string, uint> partialColor) =>
+        public BarBuilder AddInnerBar(float currentValue, float maximumValue, PluginConfigColor[] colors, PluginConfigColor partialColor) =>
             AddInnerBar(currentValue, maximumValue, colors, partialColor, BarTextMode.None, null);
 
         public BarBuilder AddInnerBar(
             float currentValue,
             float maximumValue,
-            Dictionary<string, uint>[] chunkColors,
-            Dictionary<string, uint> partialFillColor,
+            PluginConfigColor[] chunkColors,
+            PluginConfigColor partialFillColor,
             BarTextMode textMode,
             BarText[] texts
         )
@@ -166,11 +167,11 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
-        public BarBuilder AddInnerBooleanBar(bool[] values, Dictionary<string, uint> color) => AddInnerBooleanBar(values, color, null);
+        public BarBuilder AddInnerBooleanBar(bool[] values, PluginConfigColor color) => AddInnerBooleanBar(values, color, null);
 
-        public BarBuilder AddInnerBooleanBar(bool[] values, Dictionary<string, uint> color, Dictionary<string, uint> partialColor)
+        public BarBuilder AddInnerBooleanBar(bool[] values, PluginConfigColor color, PluginConfigColor partialColor)
         {
-            var colors = new Dictionary<string, uint>[_bar.ChunkSizes.Length];
+            var colors = new PluginConfigColor[_bar.ChunkSizes.Length];
 
             for (var i = 0; i < colors.Length; i++)
             {
@@ -180,15 +181,15 @@ namespace DelvUI.Interface.Bars
             return AddInnerBooleanBar(values, colors, partialColor);
         }
 
-        public BarBuilder AddInnerBooleanBar(bool[] values, Dictionary<string, uint>[] colors) => AddInnerBooleanBar(values, colors, null);
+        public BarBuilder AddInnerBooleanBar(bool[] values, PluginConfigColor[] colors) => AddInnerBooleanBar(values, colors, null);
 
-        public BarBuilder AddInnerBooleanBar(bool[] values, Dictionary<string, uint>[] colors, Dictionary<string, uint> partialColor) =>
+        public BarBuilder AddInnerBooleanBar(bool[] values, PluginConfigColor[] colors, PluginConfigColor partialColor) =>
             AddInnerBooleanBar(values, colors, partialColor, BarTextMode.None, null);
 
         public BarBuilder AddInnerBooleanBar(
             bool[] values,
-            Dictionary<string, uint>[] chunkColors,
-            Dictionary<string, uint> partialFillColor,
+            PluginConfigColor[] chunkColors,
+            PluginConfigColor partialFillColor,
             BarTextMode textMode,
             BarText[] texts
         )
@@ -210,7 +211,7 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
-        public BarBuilder SetPartialFillColor(Dictionary<string, uint> partialFillColor)
+        public BarBuilder SetPartialFillColor(PluginConfigColor partialFillColor)
         {
             if (_currentInnerBar == -1)
             {
@@ -263,9 +264,9 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
-        public BarBuilder SetChunksColors(Dictionary<string, uint> color)
+        public BarBuilder SetChunksColors(PluginConfigColor color)
         {
-            var colors = new Dictionary<string, uint>[_bar.ChunkSizes.Length];
+            var colors = new PluginConfigColor[_bar.ChunkSizes.Length];
 
             for (var i = 0; i < colors.Length; i++)
             {
@@ -275,7 +276,7 @@ namespace DelvUI.Interface.Bars
             return SetChunksColors(colors);
         }
 
-        public BarBuilder SetChunksColors(Dictionary<string, uint>[] colors)
+        public BarBuilder SetChunksColors(PluginConfigColor[] colors)
         {
             if (_currentInnerBar == -1)
             {

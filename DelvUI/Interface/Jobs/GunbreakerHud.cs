@@ -16,7 +16,7 @@ namespace DelvUI.Interface.Jobs
     public class GunbreakerHud : JobHud
     {
         private new GunbreakerConfig Config => (GunbreakerConfig)_config;
-        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public GunbreakerHud(string id, GunbreakerConfig config, string displayName = null) : base(id, config, displayName)
         {
@@ -65,8 +65,8 @@ namespace DelvUI.Interface.Jobs
 
             builder.SetChunks(2)
                    .SetChunkPadding(Config.PowderGaugeSpacing)
-                   .AddInnerBar(gauge.NumAmmo, 2, Config.PowderGaugeFillColor.Map, null)
-                   .SetBackgroundColor(EmptyColor["background"]);
+                   .AddInnerBar(gauge.NumAmmo, 2, Config.PowderGaugeFillColor, null)
+                   .SetBackgroundColor(EmptyColor.Base);
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
@@ -79,13 +79,13 @@ namespace DelvUI.Interface.Jobs
             var noMercyBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1831);
 
             var builder = BarBuilder.Create(position, Config.NoMercyBarSize)
-                .SetBackgroundColor(EmptyColor["background"]);
+                .SetBackgroundColor(EmptyColor.Base);
 
             if (noMercyBuff.Any())
             {
                 var duration = noMercyBuff.First().Duration;
 
-                builder.AddInnerBar(duration, 20, Config.NoMercyFillColor.Map, null)
+                builder.AddInnerBar(duration, 20, Config.NoMercyFillColor, null)
                        .SetTextMode(BarTextMode.EachChunk)
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }

@@ -1,4 +1,5 @@
-﻿using DelvUI.Helpers;
+﻿using DelvUI.Config;
+using DelvUI.Helpers;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -143,8 +144,8 @@ namespace DelvUI.Interface.Bars
         public int ChildNum { get; set; }
         public float MaximumValue { get; set; }
         public float CurrentValue { get; set; }
-        public Dictionary<string, uint>[] ChunkColors { get; set; }
-        public Dictionary<string, uint> PartialFillColor { get; set; }
+        public PluginConfigColor[] ChunkColors { get; set; }
+        public PluginConfigColor PartialFillColor { get; set; }
 
         public uint GlowColor
         {
@@ -196,14 +197,7 @@ namespace DelvUI.Interface.Bars
                     {
                         currentFill -= chunkSize;
 
-                        drawList.AddRectFilledMultiColor(
-                            cursorPos,
-                            cursorPos + barSize,
-                            ChunkColors[i]["gradientTop"],
-                            ChunkColors[i]["gradientTop"],
-                            ChunkColors[i]["gradientBottom"],
-                            ChunkColors[i]["gradientBottom"]
-                        );
+                        DrawHelper.DrawGradientFilledRect(cursorPos, barSize, ChunkColors[i], drawList);
                     }
                     else
                     {
@@ -212,25 +206,11 @@ namespace DelvUI.Interface.Bars
 
                         if (PartialFillColor != null)
                         {
-                            drawList.AddRectFilledMultiColor(
-                                cursorPos,
-                                cursorPos + fillVector,
-                                PartialFillColor["gradientTop"],
-                                PartialFillColor["gradientTop"],
-                                PartialFillColor["gradientBottom"],
-                                PartialFillColor["gradientBottom"]
-                            );
+                            DrawHelper.DrawGradientFilledRect(cursorPos, fillVector, PartialFillColor, drawList);
                         }
                         else
                         {
-                            drawList.AddRectFilledMultiColor(
-                                cursorPos,
-                                cursorPos + fillVector,
-                                ChunkColors[i]["gradientTop"],
-                                ChunkColors[i]["gradientTop"],
-                                ChunkColors[i]["gradientBottom"],
-                                ChunkColors[i]["gradientBottom"]
-                            );
+                            DrawHelper.DrawGradientFilledRect(cursorPos, fillVector, ChunkColors[i], drawList);
                         }
                     }
 
@@ -266,14 +246,7 @@ namespace DelvUI.Interface.Bars
                     {
                         currentFill -= chunkSize;
 
-                        drawList.AddRectFilledMultiColor(
-                            cursorPos,
-                            cursorPos + barSize,
-                            ChunkColors[i]["gradientTop"],
-                            ChunkColors[i]["gradientTop"],
-                            ChunkColors[i]["gradientBottom"],
-                            ChunkColors[i]["gradientBottom"]
-                        );
+                        DrawHelper.DrawGradientFilledRect(cursorPos, barSize, ChunkColors[i], drawList);
                     }
                     else
                     {
@@ -282,25 +255,11 @@ namespace DelvUI.Interface.Bars
 
                         if (PartialFillColor != null)
                         {
-                            drawList.AddRectFilledMultiColor(
-                                cursorPos + barSize - fillVector,
-                                cursorPos + barSize,
-                                PartialFillColor["gradientTop"],
-                                PartialFillColor["gradientTop"],
-                                PartialFillColor["gradientBottom"],
-                                PartialFillColor["gradientBottom"]
-                            );
+                            DrawHelper.DrawGradientFilledRect(cursorPos + barSize - fillVector, fillVector, PartialFillColor, drawList);
                         }
                         else
                         {
-                            drawList.AddRectFilledMultiColor(
-                                cursorPos + barSize - fillVector,
-                                cursorPos + barSize,
-                                ChunkColors[i]["gradientTop"],
-                                ChunkColors[i]["gradientTop"],
-                                ChunkColors[i]["gradientBottom"],
-                                ChunkColors[i]["gradientBottom"]
-                            );
+                            DrawHelper.DrawGradientFilledRect(cursorPos + barSize - fillVector, fillVector, ChunkColors[i], drawList);
                         }
                     }
 
@@ -485,28 +444,11 @@ namespace DelvUI.Interface.Bars
 
                 if (EnableArray[i])
                 {
-                    drawList.AddRectFilledMultiColor(
-                        cursorPos,
-                        cursorPos + barSize,
-                        ChunkColors[i]["gradientTop"],
-                        ChunkColors[i]["gradientTop"],
-                        ChunkColors[i]["gradientBottom"],
-                        ChunkColors[i]["gradientBottom"]
-                    );
+                    DrawHelper.DrawGradientFilledRect(cursorPos, barSize, ChunkColors[i], drawList);
                 }
-                else
+                else if (PartialFillColor != null)
                 {
-                    if (PartialFillColor != null)
-                    {
-                        drawList.AddRectFilledMultiColor(
-                            cursorPos,
-                            cursorPos + barSize,
-                            PartialFillColor["gradientTop"],
-                            PartialFillColor["gradientTop"],
-                            PartialFillColor["gradientBottom"],
-                            PartialFillColor["gradientBottom"]
-                        );
-                    }
+                    DrawHelper.DrawGradientFilledRect(cursorPos, barSize, PartialFillColor, drawList);
                 }
 
                 i++;

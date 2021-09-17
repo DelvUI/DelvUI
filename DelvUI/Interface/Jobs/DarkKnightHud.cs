@@ -93,11 +93,11 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ChunkManaBar)
             {
-                builder.SetChunks(3).SetChunkPadding(Config.ManaBarPadding).AddInnerBar(actor.CurrentMp, 9000, Config.ManaBarColor.Map, PartialFillColor.Map);
+                builder.SetChunks(3).SetChunkPadding(Config.ManaBarPadding).AddInnerBar(actor.CurrentMp, 9000, Config.ManaBarColor, PartialFillColor);
             }
             else
             {
-                builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, Config.ManaBarColor.Map);
+                builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, Config.ManaBarColor);
             }
 
             if (Config.ShowManaBarText)
@@ -111,8 +111,8 @@ namespace DelvUI.Interface.Jobs
             {
                 builder.SetGlowSize(2);
                 builder.SetGlowColor(Config.DarkArtsColor.Base);
-                builder.SetChunksColors(Config.DarkArtsColor.Map);
-                builder.SetPartialFillColor(Config.DarkArtsColor.Map);
+                builder.SetChunksColors(Config.DarkArtsColor);
+                builder.SetPartialFillColor(Config.DarkArtsColor);
                 builder.SetBackgroundColor(Config.DarkArtsColor.Background);
             }
 
@@ -131,21 +131,21 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ChunkBloodGauge)
             {
-                builder.SetChunks(2).SetChunkPadding(Config.BloodGaugePadding).AddInnerBar(gauge.Blood, 100, Config.BloodColor.Map, PartialFillColor.Map);
+                builder.SetChunks(2).SetChunkPadding(Config.BloodGaugePadding).AddInnerBar(gauge.Blood, 100, Config.BloodColor, PartialFillColor);
             }
             else
             {
                 if (gauge.Blood == 100)
                 {
-                    builder.AddInnerBar(gauge.Blood, 100, Config.BloodColorFull.Map);
+                    builder.AddInnerBar(gauge.Blood, 100, Config.BloodColorFull);
                 }
                 else if (gauge.Blood > 100)
                 {
-                    builder.AddInnerBar(gauge.Blood, 100, Config.BloodColor.Map);
+                    builder.AddInnerBar(gauge.Blood, 100, Config.BloodColor);
                 }
                 else
                 {
-                    builder.AddInnerBar(gauge.Blood, 100, PartialFillColor.Map);
+                    builder.AddInnerBar(gauge.Blood, 100, PartialFillColor);
                 }
             }
 
@@ -166,7 +166,7 @@ namespace DelvUI.Interface.Jobs
             if (bloodWeaponBuff.Any())
             {
                 var fightOrFlightDuration = Math.Abs(bloodWeaponBuff.First().Duration);
-                builder.AddInnerBar(fightOrFlightDuration, 10, Config.BloodWeaponColor.Map);
+                builder.AddInnerBar(fightOrFlightDuration, 10, Config.BloodWeaponColor);
 
                 if (Config.ShowBuffBarText)
                 {
@@ -177,7 +177,7 @@ namespace DelvUI.Interface.Jobs
             if (deliriumBuff.Any())
             {
                 var deliriumDuration = Math.Abs(deliriumBuff.First().Duration);
-                builder.AddInnerBar(deliriumDuration, 10, Config.DeliriumColor.Map);
+                builder.AddInnerBar(deliriumDuration, 10, Config.DeliriumColor);
 
                 if (Config.ShowBuffBarText)
                 {
@@ -202,7 +202,7 @@ namespace DelvUI.Interface.Jobs
 
             if (livingShadow)
             {
-                builder.AddInnerBar(shadowTimeRemaining, 24, Config.LivingShadowColor.Map);
+                builder.AddInnerBar(shadowTimeRemaining, 24, Config.LivingShadowColor);
 
                 if (Config.ShowLivingShadowBarText)
                 {

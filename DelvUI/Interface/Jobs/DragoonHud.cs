@@ -25,7 +25,7 @@ namespace DelvUI.Interface.Jobs
 
         }
 
-        private Dictionary<string, uint> EmptyColor => GlobalColors.Instance.EmptyColor.Map;
+        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         //protected List<uint> GetJobSpecificBuffs()
         //{
@@ -116,8 +116,8 @@ namespace DelvUI.Interface.Jobs
 
             Vector2 cursorPos = origin + Config.Position + Config.ChaosThrustBarPosition - Config.ChaosThrustBarSize / 2f;
             BarBuilder builder = BarBuilder.Create(cursorPos, Config.ChaosThrustBarSize);
-            Bar bar = builder.AddInnerBar(duration, 24f, Config.ChaosThrustBarColor.Map)
-                             .SetBackgroundColor(EmptyColor["background"])
+            Bar bar = builder.AddInnerBar(duration, 24f, Config.ChaosThrustBarColor)
+                             .SetBackgroundColor(EmptyColor.Base)
                              .Build();
 
             if (Config.ShowChaosThrustBarText && duration > 0f)
@@ -139,8 +139,8 @@ namespace DelvUI.Interface.Jobs
             BarBuilder builder = BarBuilder.Create(cursorPos, Config.EyeOfTheDragonBarSize);
             Bar eyeBars = builder.SetChunks(2)
                                  .SetChunkPadding(Config.EyeOfTheDragonBarPadding)
-                                 .AddInnerBar(eyeCount, 2, Config.EyeOfTheDragonColor.Map)
-                                 .SetBackgroundColor(EmptyColor["background"])
+                                 .AddInnerBar(eyeCount, 2, Config.EyeOfTheDragonColor)
+                                 .SetBackgroundColor(EmptyColor.Base)
                                  .Build();
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             eyeBars.Draw(drawList);
@@ -156,8 +156,8 @@ namespace DelvUI.Interface.Jobs
             short currTimerMs = gauge.BOTDTimer;
             PluginConfigColor color = gauge.BOTDState == BOTDState.LOTD ? Config.LifeOfTheDragonColor : Config.BloodOfTheDragonColor;
             BarBuilder builder = BarBuilder.Create(cursorPos, Config.BloodBarSize);
-            Bar bar = builder.AddInnerBar(currTimerMs / 1000f, maxTimerMs / 1000f, color.Map)
-                             .SetBackgroundColor(EmptyColor["background"])
+            Bar bar = builder.AddInnerBar(currTimerMs / 1000f, maxTimerMs / 1000f, color)
+                             .SetBackgroundColor(EmptyColor.Base)
                              .Build();
 
             if (Config.ShowBloodBarText)
@@ -188,8 +188,8 @@ namespace DelvUI.Interface.Jobs
             }
 
             BarBuilder builder = BarBuilder.Create(cursorPos, Config.DisembowelBarSize);
-            Bar bar = builder.AddInnerBar(duration, 30f, Config.DisembowelBarColor.Map)
-                             .SetBackgroundColor(EmptyColor["background"])
+            Bar bar = builder.AddInnerBar(duration, 30f, Config.DisembowelBarColor)
+                             .SetBackgroundColor(EmptyColor.Base)
                              .Build();
 
             if (Config.ShowDisembowelBarText)
