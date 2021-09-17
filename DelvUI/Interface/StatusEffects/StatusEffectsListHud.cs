@@ -2,6 +2,7 @@
 using Dalamud.Game.ClientState.Structs;
 using Dalamud.Plugin;
 using DelvUI.Helpers;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Lumina.Excel.GeneratedSheets;
 using System;
@@ -20,10 +21,15 @@ namespace DelvUI.Interface.StatusEffects
         private GrowthDirections _lastGrowthDirections;
         private bool _showingTooltip = false;
 
+        private LabelHud _durationLabel;
+        private LabelHud _stacksLabel;
+
         public Actor Actor { get; set; } = null;
 
-        public StatusEffectsListHud(string ID, StatusEffectsListConfig config, string displayName) : base(ID, config, displayName)
+        public StatusEffectsListHud(string id, StatusEffectsListConfig config, string displayName) : base(id, config, displayName)
         {
+            _durationLabel = new LabelHud(id + "_duration", config.IconConfig.DurationLabelConfig);
+            _stacksLabel = new LabelHud(id + "_stacks", config.IconConfig.StacksLabelConfig);
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -260,7 +266,7 @@ namespace DelvUI.Interface.StatusEffects
 
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
-            var margin = new Vector2(4, 0);
+            var margin = new Vector2(14, 10);
             var windowPos = minPos - margin;
             var windowSize = maxPos - minPos;
             ImGui.SetNextWindowPos(windowPos, ImGuiCond.Always);
@@ -278,7 +284,7 @@ namespace DelvUI.Interface.StatusEffects
                 var iconPos = iconPositions[i];
                 var statusEffectData = list[i];
 
-                StatusEffectIconDrawHelper.DrawStatusEffectIcon(drawList, iconPos, statusEffectData, Config.IconConfig);
+                StatusEffectIconDrawHelper.DrawStatusEffectIcon(drawList, iconPos, statusEffectData, Config.IconConfig, _durationLabel, _stacksLabel);
 
                 // tooltip
                 if (Config.ShowTooltips && ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
