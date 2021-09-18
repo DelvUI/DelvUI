@@ -51,10 +51,10 @@ namespace DelvUI.Interface.Party
 
     [Serializable]
     [Section("Party Frames")]
-    [SubSection("Health Bars", 0)]
-    public class PartyFramesHealthBarsConfig : PluginConfigObject
+    [SubSection("Bars", 0)]
+    public class PartyFramesBarsConfig : PluginConfigObject
     {
-        public new static PartyFramesHealthBarsConfig DefaultConfig() { return new PartyFramesHealthBarsConfig(); }
+        public new static PartyFramesBarsConfig DefaultConfig() { return new PartyFramesBarsConfig(); }
 
         [DragInt2("Size", isMonitored = true)]
         [Order(30)]
@@ -64,9 +64,8 @@ namespace DelvUI.Interface.Party
         [Order(35)]
         public Vector2 Padding = new Vector2(1, 1);
 
-        [InputText("Text Format")]
-        [Order(40)]
-        public string TextFormat = "[name:initials]";
+        [NestedConfig("Name Label", 40)]
+        public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:first-initial]. [name:last-initial].", HudElementAnchor.Center, HudElementAnchor.Center);
 
         [NestedConfig("Colors", 45)]
         public PartyFramesColorsConfig ColorsConfig = new PartyFramesColorsConfig();

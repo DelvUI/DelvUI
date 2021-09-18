@@ -11,7 +11,7 @@ namespace DelvUI.Interface.Party
     public class PartyFramesHud : DraggableHudElement
     {
         private PartyFramesConfig Config => (PartyFramesConfig)_config;
-        private PartyFramesHealthBarsConfig HealthBarsConfig;
+        private PartyFramesBarsConfig HealthBarsConfig;
 
         private const ImGuiWindowFlags _lockedBarFlags = ImGuiWindowFlags.NoBackground |
                                                         ImGuiWindowFlags.NoMove |
@@ -29,20 +29,20 @@ namespace DelvUI.Interface.Party
         private uint _memberCount = 0;
         private bool _layoutDirty = true;
 
-        private List<PartyFramesHealthBar> bars;
+        private List<PartyFramesBar> bars;
 
 
-        public PartyFramesHud(string id, PartyFramesConfig config, PartyFramesHealthBarsConfig healthBarsConfig, string displayName) : base(id, config, displayName)
+        public PartyFramesHud(string id, PartyFramesConfig config, PartyFramesBarsConfig healthBarsConfig, string displayName) : base(id, config, displayName)
         {
             HealthBarsConfig = healthBarsConfig;
             config.onValueChanged += OnLayoutPropertyChanged;
             healthBarsConfig.onValueChanged += OnLayoutPropertyChanged;
             healthBarsConfig.ColorsConfig.onValueChanged += OnLayoutPropertyChanged;
 
-            bars = new List<PartyFramesHealthBar>(MaxMemberCount);
+            bars = new List<PartyFramesBar>(MaxMemberCount);
             for (int i = 0; i < bars.Capacity; i++)
             {
-                bars.Add(new PartyFramesHealthBar(healthBarsConfig));
+                bars.Add(new PartyFramesBar(i.ToString(), healthBarsConfig));
             }
 
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
@@ -61,7 +61,10 @@ namespace DelvUI.Interface.Party
 
         private void OnLayoutPropertyChanged(object sender, OnChangeBaseArgs args)
         {
-            if (args.PropertyName == "Size" || args.PropertyName == "FillRowsFirst" || args.PropertyName == "BarsAnchor")
+            if (args.PropertyName == "Size" ||
+                args.PropertyName == "FillRowsFirst" ||
+                args.PropertyName == "BarsAnchor" ||
+                args.PropertyName == "Padding")
             {
                 _layoutDirty = true;
             }
@@ -81,7 +84,7 @@ namespace DelvUI.Interface.Party
 
             for (int i = 0; i < bars.Count; i++)
             {
-                PartyFramesHealthBar bar = bars[i];
+                PartyFramesBar bar = bars[i];
                 if (i >= memberCount)
                 {
                     bar.Visible = false;

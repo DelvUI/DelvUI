@@ -9,17 +9,20 @@ using System.Numerics;
 
 namespace DelvUI.Interface.Party
 {
-    public class PartyFramesHealthBar
+    public class PartyFramesBar
     {
-        private PartyFramesHealthBarsConfig _config;
+        private PartyFramesBarsConfig _config;
+        private LabelHud _labelHud;
 
         public IPartyFramesMember Member;
         public bool Visible = false;
         public Vector2 Position;
 
-        public PartyFramesHealthBar(PartyFramesHealthBarsConfig config)
+        public PartyFramesBar(string id, PartyFramesBarsConfig config)
         {
             _config = config;
+
+            _labelHud = new LabelHud("partyFramesBar_" + id, config.NameLabelConfig);
         }
 
         public PluginConfigColor GetColor()
@@ -124,12 +127,31 @@ namespace DelvUI.Interface.Party
 
             if (actor != null)
             {
-                name = TextTags.GenerateFormattedTextFromTags(actor, _config.TextFormat);
+                _labelHud.Draw(Position + _config.Size / 2f, _config.Size, actor);
+            }
+            else
+            {
+                var previousText = _config.NameLabelConfig.GetText();
+                _config.NameLabelConfig.SetText(name);
+
+                var previousColor = _config.NameLabelConfig.Color;
+                var previousOutlineColor = _config.NameLabelConfig.OutlineColor;
+                if (Member is not FakePartyFramesMember)
+                {
+                    _config.NameLabelConfig.Color = new(_config.NameLabelConfig.Color.Vector.AdjustColorAlpha(-.3f));
+                    _config.NameLabelConfig.OutlineColor = new(_config.NameLabelConfig.OutlineColor.Vector.AdjustColorAlpha(-.3f));
+                }
+
+                _labelHud.Draw(Position + _config.Size / 2f, _config.Size);
+
+                _config.NameLabelConfig.SetText(previousText);
+                _config.NameLabelConfig.Color = previousColor;
+                _config.NameLabelConfig.OutlineColor = previousOutlineColor;
             }
 
-            var textSize = ImGui.CalcTextSize(name);
-            var textPos = new Vector2(Position.X + _config.Size.X / 2f - textSize.X / 2f, Position.Y + _config.Size.Y / 2f - textSize.Y / 2f);
-            drawList.AddText(textPos, actor == null && Member is not FakePartyFramesMember ? 0x44FFFFFF : 0xFFFFFFFF, name);
+            //var textSize = ImGui.CalcTextSize(name);
+            //var textPos = new Vector2(Position.X + _config.Size.X / 2f - textSize.X / 2f, Position.Y + _config.Size.Y / 2f - textSize.Y / 2f);
+            //drawList.AddText(textPos, actor == null && Member is not FakePartyFramesMember ? 0x44FFFFFF : 0xFFFFFFFF, name);
 
             // icon
             if (_config.RoleIconConfig.Enabled)

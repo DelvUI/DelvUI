@@ -100,7 +100,7 @@ namespace DelvUI.Config
                 typeof(FocusTargetUnitFrameConfig),
 
                 typeof(PartyFramesConfig),
-                typeof(PartyFramesHealthBarsConfig),
+                typeof(PartyFramesBarsConfig),
 
                 typeof(PlayerCastbarConfig),
                 typeof(TargetCastbarConfig),

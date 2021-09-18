@@ -139,7 +139,7 @@ namespace DelvUI.Interface
             _hudElementsUsingFocusTarget.Add(focusTargetUnitFrame);
 
             var partyFramesConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesConfig>();
-            var partyHealthBarsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesHealthBarsConfig>();
+            var partyHealthBarsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesBarsConfig>();
             _partyFramesHud = new PartyFramesHud("partyFrames", partyFramesConfig, partyHealthBarsConfig, "Party Frames");
             _hudElements.Add(_partyFramesHud);
         }
