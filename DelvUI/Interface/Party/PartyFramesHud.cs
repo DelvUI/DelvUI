@@ -223,12 +223,26 @@ namespace DelvUI.Interface.Party
             _size = maxSize;
 
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            var targetIndex = -1;
 
             // draw
             var drawList = ImGui.GetWindowDrawList();
-            for (int i = 0; i < bars.Count; i++)
+            for (int i = 0; i < count; i++)
             {
-                bars[i].Draw(origin, target, drawList);
+                bars[i].Draw(origin, drawList);
+
+                if (target != null && bars[i].Member.ActorID == target.ActorId)
+                {
+                    targetIndex = i;
+                }
+            }
+
+            // target border
+            if (targetIndex >= 0)
+            {
+                var borderPos = bars[targetIndex].Position - Vector2.One;
+                var borderSize = HealthBarsConfig.Size + Vector2.One * 2;
+                drawList.AddRect(borderPos, borderPos + borderSize, 0xFFFFFFFF);
             }
 
             ImGui.End();

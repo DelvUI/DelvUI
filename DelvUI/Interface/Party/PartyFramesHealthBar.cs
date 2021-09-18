@@ -54,7 +54,7 @@ namespace DelvUI.Interface.Party
             return _config.ColorsConfig.GenericRoleColor;
         }
 
-        public void Draw(Vector2 origin, Actor target, ImDrawListPtr drawList)
+        public void Draw(Vector2 origin, ImDrawListPtr drawList)
         {
             if (!Visible)
             {
@@ -143,9 +143,7 @@ namespace DelvUI.Interface.Party
             // border
             var borderPos = Position - Vector2.One;
             var borderSize = _config.Size + Vector2.One * 2;
-            var borderColor = target?.ActorId == Member.ActorID ? 0xFFFFFFFF : 0xFF000000;
-
-            drawList.AddRect(borderPos, borderPos + borderSize, borderColor);
+            drawList.AddRect(borderPos, borderPos + borderSize, 0xFF000000);
         }
     }
 }
