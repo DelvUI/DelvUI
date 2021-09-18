@@ -144,11 +144,13 @@ namespace DelvUI.Helpers
 
         public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder) where T : ExcelRow
         {
-            var texture = GetIconAndTexCoordinates<T>(row, size, out Vector2 uv0, out Vector2 uv1);
+            TextureWrap texture = TexturesCache.Instance.GetTexture<T>(row);
             if (texture == null)
             {
                 return;
             }
+
+            (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(texture, size);
 
             ImGui.SetCursorPos(position);
             ImGui.Image(texture.ImGuiHandle, size, uv0, uv1);
@@ -162,11 +164,13 @@ namespace DelvUI.Helpers
 
         public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder, ImDrawListPtr drawList) where T : ExcelRow
         {
-            var texture = GetIconAndTexCoordinates<T>(row, size, out Vector2 uv0, out Vector2 uv1);
+            TextureWrap texture = TexturesCache.Instance.GetTexture<T>(row);
             if (texture == null)
             {
                 return;
             }
+
+            (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(texture, size);
 
             drawList.AddImage(texture.ImGuiHandle, position, position + size, uv0, uv1);
 
@@ -176,21 +180,34 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static TextureWrap GetIconAndTexCoordinates<T>(dynamic row, Vector2 size, out Vector2 uv0, out Vector2 uv1) where T : ExcelRow
+        public static void DrawIcon(uint iconId, Vector2 position, Vector2 size, bool drawBorder, ImDrawListPtr drawList)
         {
-            uv0 = Vector2.Zero;
-            uv1 = Vector2.Zero;
-
-            // Status = 24x32, show from 2,7 until 22,26
-            var texture = TexturesCache.Instance.GetTexture<T>(row);
+            TextureWrap texture = TexturesCache.Instance.GetTextureFromIconId(iconId);
             if (texture == null)
             {
-                return null;
+                return;
             }
 
-            uv0 = new Vector2(4f / texture.Width, 14f / texture.Height);
-            uv1 = new Vector2(1f - 4f / texture.Width, 1f - 12f / texture.Height);
-            return texture;
+            drawList.AddImage(texture.ImGuiHandle, position, position + size, Vector2.Zero, Vector2.One);
+
+            if (drawBorder)
+            {
+                drawList.AddRect(position, position + size, 0xFF000000);
+            }
+        }
+
+        public static (Vector2, Vector2) GetTexCoordinates(TextureWrap texture, Vector2 size)
+        {
+            if (texture == null)
+            {
+                return (Vector2.Zero, Vector2.Zero);
+            }
+
+            // Status = 24x32, show from 2,7 until 22,26
+            var uv0 = new Vector2(4f / texture.Width, 14f / texture.Height);
+            var uv1 = new Vector2(1f - 4f / texture.Width, 1f - 12f / texture.Height);
+
+            return (uv0, uv1);
         }
 
         public static void DrawOvershield(float shield, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, PluginConfigColor color, ImDrawListPtr drawList)

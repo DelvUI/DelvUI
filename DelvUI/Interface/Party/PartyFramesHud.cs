@@ -63,17 +63,10 @@ namespace DelvUI.Interface.Party
 
         private void OnLayoutPropertyChanged(object sender, OnChangeBaseArgs args)
         {
-            if (args.PropertyName == "UseRoleColors")
+            if (args.PropertyName == "Size" || args.PropertyName == "FillRowsFirst")
             {
-                foreach (var bar in bars)
-                {
-                    bar.UpdateColor();
-                }
-
-                return;
+                _layoutDirty = true;
             }
-
-            _layoutDirty = true;
         }
 
         private void OnMembersChanged(object sender, EventArgs args)
@@ -97,7 +90,7 @@ namespace DelvUI.Interface.Party
                 }
 
                 // update bar
-                IGroupMember member = PartyManager.Instance.GroupMembers.ElementAt(i);
+                IPartyFramesMember member = PartyManager.Instance.GroupMembers.ElementAt(i);
                 bar.Member = member;
                 bar.Position = new Vector2(
                     origin.X + HealthBarsConfig.Size.X * col + HealthBarsConfig.Padding.X * col,

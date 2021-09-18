@@ -4,7 +4,6 @@ using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
-using System.Collections.Generic;
 using System.Numerics;
 
 
@@ -14,42 +13,31 @@ namespace DelvUI.Interface.Party
     {
         private PartyFramesHealthBarsConfig _config;
 
-        private IGroupMember _member = null;
-        public IGroupMember Member
-        {
-            get { return _member; }
-            set
-            {
-                _member = value;
-                UpdateColor();
-            }
-        }
-
+        public IPartyFramesMember Member;
         public bool Visible = false;
         public Vector2 Position;
-        private PluginConfigColor _color;
 
         public PartyFramesHealthBar(PartyFramesHealthBarsConfig config)
         {
             _config = config;
         }
 
-        public void UpdateColor()
+        public PluginConfigColor GetColor()
         {
-            _color = _config.ColorsConfig.GenericRoleColor;
-            if (Member == null)
+            var color = _config.ColorsConfig.GenericRoleColor;
+            if (Member != null)
             {
-                return;
+                if (_config.ColorsConfig.UseRoleColors)
+                {
+                    color = ColorForJob(Member.JobId);
+                }
+                else
+                {
+                    color = GlobalColors.Instance.SafeColorForJobId(Member.JobId);
+                }
             }
 
-            if (_config.ColorsConfig.UseRoleColors)
-            {
-                _color = ColorForJob(Member.JobId);
-            }
-            else
-            {
-                _color = GlobalColors.Instance.SafeColorForJobId(Member.JobId);
-            }
+            return color;
         }
 
         private PluginConfigColor ColorForJob(uint jodId)
@@ -90,7 +78,7 @@ namespace DelvUI.Interface.Party
                 var scale = Member.MaxHP > 0 ? (float)Member.HP / (float)Member.MaxHP : 1;
                 var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), _config.Size.Y);
 
-                DrawHelper.DrawGradientFilledRect(Position, fillSize, _color, drawList);
+                DrawHelper.DrawGradientFilledRect(Position, fillSize, GetColor(), drawList);
             }
 
             // shield
@@ -141,6 +129,16 @@ namespace DelvUI.Interface.Party
             var textSize = ImGui.CalcTextSize(name);
             var textPos = new Vector2(Position.X + _config.Size.X / 2f - textSize.X / 2f, Position.Y + _config.Size.Y / 2f - textSize.Y / 2f);
             drawList.AddText(textPos, actor == null ? 0x44FFFFFF : 0xFFFFFFFF, name);
+
+            // icon
+            if (_config.RoleIconConfig.Enabled)
+            {
+                var iconId = _config.RoleIconConfig.UseRoleIcons ?
+                    JobsHelper.RoleIconIDForJob(Member.JobId, _config.RoleIconConfig.UseSpecificDPSRoleIcons) :
+                    JobsHelper.IconIDForJob(Member.JobId) + (uint)_config.RoleIconConfig.Style * 100;
+
+                DrawHelper.DrawIcon(iconId, Position + _config.RoleIconConfig.Position, _config.RoleIconConfig.Size, false, drawList);
+            }
 
             // border
             var borderPos = Position - Vector2.One;

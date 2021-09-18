@@ -41,7 +41,7 @@ namespace DelvUI.Helpers
 
                 case ObjectKind.Aetheryte:
                     ActionText = "Attuning...";
-                    IconTexture = TexturesCache.Instance.GetTextureFromIconId<Action>(112);
+                    IconTexture = TexturesCache.Instance.GetTexture<Action>(112);
 
                     return;
 

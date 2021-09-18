@@ -67,7 +67,10 @@ namespace DelvUI.Interface.Party
         [NestedConfig("Colors", 45)]
         public PartyFramesColorsConfig ColorsConfig = new PartyFramesColorsConfig();
 
-        [NestedConfig("Shield", 50)]
+        [NestedConfig("Job/Role Icons", 50)]
+        public PartyFramesRoleIconConfig RoleIconConfig = new PartyFramesRoleIconConfig();
+
+        [NestedConfig("Shield", 55)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
     }
 
@@ -102,5 +105,26 @@ namespace DelvUI.Interface.Party
         [ColorEdit4("Out of Reach Color")]
         [Order(10)]
         public PluginConfigColor UnreachableColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 30f / 100f));
+    }
+
+    [Serializable]
+    [Portable(false)]
+    public class PartyFramesRoleIconConfig : MovablePluginConfigObject
+    {
+        [DragInt2("Size", min = 1, max = 1000)]
+        [Order(30)]
+        public Vector2 Size = new(20, 20);
+
+        [Combo("Style", "Style 1", "Style 2")]
+        [Order(35)]
+        public int Style = 0;
+
+        [Checkbox("Use Role Icons")]
+        [CollapseControl(40, 0)]
+        public bool UseRoleIcons = false;
+
+        [Checkbox("Use Specific DPS Role Icons")]
+        [CollapseWith(0, 0)]
+        public bool UseSpecificDPSRoleIcons = false;
     }
 }

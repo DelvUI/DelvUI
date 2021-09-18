@@ -15,7 +15,7 @@ namespace DelvUI.Interface.Party
 
     public static class PartySortingHelper
     {
-        public static void SortPartyMembers(ref List<IGroupMember> members, PartySortingMode mode)
+        public static void SortPartyMembers(ref List<IPartyFramesMember> members, PartySortingMode mode)
         {
             members.Sort((a, b) =>
             {

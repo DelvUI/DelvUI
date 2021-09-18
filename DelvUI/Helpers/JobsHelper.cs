@@ -67,6 +67,36 @@ namespace DelvUI.Helpers
             return IsJobARole(jobId, JobRoles.Gatherer);
         }
 
+        public static uint IconIDForJob(uint jobId)
+        {
+            return jobId + 62000;
+        }
+
+        public static uint RoleIconIDForJob(uint jobId, bool specificDPSIcons = false)
+        {
+            var role = RoleForJob(jobId);
+
+            switch (role)
+            {
+                case JobRoles.Tank: return 62581;
+                case JobRoles.Healer: return 62582;
+                case JobRoles.DPS:
+                    if (specificDPSIcons && SpecifigDPSIcons.TryGetValue(jobId, out var iconId))
+                    {
+                        return iconId;
+                    }
+                    else
+                    {
+                        return 62583;
+                    }
+                case JobRoles.Gatherer:
+                case JobRoles.Crafter:
+                    return IconIDForJob(jobId);
+            }
+
+            return 0;
+        }
+
         public static Dictionary<uint, JobRoles> JobRolesMap = new Dictionary<uint, JobRoles>()
         {
             // tanks
@@ -175,6 +205,32 @@ namespace DelvUI.Helpers
             [JobIDs.MIN] = "MIN",
             [JobIDs.BOT] = "BOT",
             [JobIDs.FSH] = "FSH",
+        };
+
+        public static Dictionary<uint, uint> SpecifigDPSIcons = new Dictionary<uint, uint>()
+        {
+            // melee dps
+            [JobIDs.PGL] = 62584,
+            [JobIDs.LNC] = 62584,
+            [JobIDs.ROG] = 62584,
+            [JobIDs.MNK] = 62584,
+            [JobIDs.DRG] = 62584,
+            [JobIDs.NIN] = 62584,
+            [JobIDs.SAM] = 62584,
+
+            // ranged phys dps
+            [JobIDs.ARC] = 62586,
+            [JobIDs.BRD] = 62586,
+            [JobIDs.MCH] = 62586,
+            [JobIDs.DNC] = 62586,
+
+            // ranged magic dps
+            [JobIDs.THM] = 62587,
+            [JobIDs.ACN] = 62587,
+            [JobIDs.BLM] = 62587,
+            [JobIDs.SMN] = 62587,
+            [JobIDs.RDM] = 62587,
+            [JobIDs.BLU] = 62587
         };
     }
 

@@ -13,7 +13,7 @@ using PartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
 
 namespace DelvUI.Interface.Party
 {
-    public unsafe class GroupMember : IGroupMember
+    public unsafe class PartyFramesMember : IPartyFramesMember
     {
         protected PartyMember* _partyMember = null;
 
@@ -45,7 +45,7 @@ namespace DelvUI.Interface.Party
         private BattleChara* BattleCharacter => (BattleChara*)GetActor().Address;
 
 
-        public GroupMember(PartyMember* partyMember)
+        public PartyFramesMember(PartyMember* partyMember)
         {
             _partyMember = partyMember;
 
@@ -59,7 +59,7 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        public GroupMember(Actor actor)
+        public PartyFramesMember(Actor actor)
         {
             Actor = actor;
             _name = Actor.Name;
@@ -71,7 +71,7 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    public class FakeGroupMember : IGroupMember
+    public class FakePartyFramesMember : IPartyFramesMember
     {
         private static Random RNG = new Random((int)ImGui.GetTime());
 
@@ -87,25 +87,25 @@ namespace DelvUI.Interface.Party
         public float Shield { get; private set; }
         public StatusEffect[] StatusEffects { get; private set; }
 
-        public FakeGroupMember()
+        public FakePartyFramesMember()
         {
-            Level = (uint)FakeGroupMember.RNG.Next(1, 80);
-            JobId = (uint)FakeGroupMember.RNG.Next(19, 38);
-            MaxHP = (uint)FakeGroupMember.RNG.Next(90000, 150000);
-            HP = (uint)(MaxHP * FakeGroupMember.RNG.Next(50, 100) / 100f);
+            Level = (uint)RNG.Next(1, 80);
+            JobId = (uint)RNG.Next(19, 38);
+            MaxHP = (uint)RNG.Next(90000, 150000);
+            HP = (uint)(MaxHP * RNG.Next(50, 100) / 100f);
             MaxMP = 10000;
-            MP = (uint)(MaxMP * FakeGroupMember.RNG.Next(100) / 100f);
-            Shield = FakeGroupMember.RNG.Next(30) / 100f;
+            MP = (uint)(MaxMP * RNG.Next(100) / 100f);
+            Shield = RNG.Next(30) / 100f;
 
-            var statusEffectCount = FakeGroupMember.RNG.Next(1, 5);
+            var statusEffectCount = RNG.Next(1, 5);
             StatusEffects = new StatusEffect[statusEffectCount];
 
             for (int i = 0; i < statusEffectCount; i++)
             {
                 var fakeEffect = new StatusEffect();
-                fakeEffect.Duration = FakeGroupMember.RNG.Next(1, 30);
-                fakeEffect.EffectId = (short)FakeGroupMember.RNG.Next(1, 200);
-                fakeEffect.StackCount = (byte)FakeGroupMember.RNG.Next(0, 3);
+                fakeEffect.Duration = RNG.Next(1, 30);
+                fakeEffect.EffectId = (short)RNG.Next(1, 200);
+                fakeEffect.StackCount = (byte)RNG.Next(0, 3);
 
                 StatusEffects[i] = fakeEffect;
             }
@@ -117,7 +117,7 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    public interface IGroupMember
+    public interface IPartyFramesMember
     {
         public int ActorID { get; }
         public string Name { get; }

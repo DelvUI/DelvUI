@@ -45,8 +45,8 @@ namespace DelvUI.Interface.Party
         public static PartyManager Instance => _instance;
         #endregion Singleton
 
-        private List<IGroupMember> _groupMembers = new List<IGroupMember>();
-        public IReadOnlyCollection<IGroupMember> GroupMembers => _groupMembers.AsReadOnly();
+        private List<IPartyFramesMember> _groupMembers = new List<IPartyFramesMember>();
+        public IReadOnlyCollection<IPartyFramesMember> GroupMembers => _groupMembers.AsReadOnly();
         public uint MemberCount => (uint)_groupMembers.Count;
 
         public event EventHandler<EventArgs> MembersChangedEvent;
@@ -90,7 +90,7 @@ namespace DelvUI.Interface.Party
                 }
 
                 _groupMembers.Clear();
-                _groupMembers.Add(new GroupMember(player));
+                _groupMembers.Add(new PartyFramesMember(player));
 
                 if (MembersChangedEvent != null)
                 {
@@ -113,7 +113,7 @@ namespace DelvUI.Interface.Party
                 for (int i = 0; i < manager->MemberCount; i++)
                 {
                     PartyMember* partyMember = (PartyMember*)(new IntPtr(manager->PartyMembers) + 0x230 * i);
-                    _groupMembers.Add(new GroupMember(partyMember));
+                    _groupMembers.Add(new PartyFramesMember(partyMember));
                 }
 
                 PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortingMode);
@@ -156,7 +156,7 @@ namespace DelvUI.Interface.Party
             {
                 for (int i = 0; i < 8; i++)
                 {
-                    _groupMembers.Add(new FakeGroupMember());
+                    _groupMembers.Add(new FakePartyFramesMember());
                 }
 
                 PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortingMode);

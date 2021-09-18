@@ -11,14 +11,7 @@ namespace DelvUI.Helpers
 {
     public class TexturesCache
     {
-        private readonly Dictionary<Type, Dictionary<uint, TextureWrap>> _cache = new()
-        {
-            [typeof(Status)] = new Dictionary<uint, TextureWrap>(),
-            [typeof(Action)] = new Dictionary<uint, TextureWrap>(),
-            [typeof(Mount)] = new Dictionary<uint, TextureWrap>(),
-            [typeof(Item)] = new Dictionary<uint, TextureWrap>(),
-            [typeof(Companion)] = new Dictionary<uint, TextureWrap>()
-        };
+        private Dictionary<uint, TextureWrap> _cache = new();
 
         public TextureWrap GetTexture<T>(uint rowId, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
         {
@@ -35,26 +28,16 @@ namespace DelvUI.Helpers
             }
 
             var iconId = row.Icon;
-
-            return iconId == null ? null : (TextureWrap)GetTextureFromIconId<T>(iconId, stackCount, hdIcon);
+            return GetTextureFromIconId(iconId);
         }
 
-        public TextureWrap GetTextureFromIconId<T>(uint iconId, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
+        public TextureWrap GetTextureFromIconId(uint iconId, uint stackCount = 0, bool hdIcon = true)
         {
-            if (_cache.TryGetValue(typeof(T), out var map))
+            if (_cache.TryGetValue(iconId + stackCount, out var texture))
             {
-                if (map.TryGetValue(iconId + stackCount, out var texture))
-                {
-                    return texture;
-                }
+                return texture;
             }
 
-            if (map == null)
-            {
-                return null;
-            }
-
-            //TexFile iconFile = pluginInterface.Data.GetIcon((int)iconId + (int)stackCount);
             var iconFile = LoadIcon(iconId + stackCount, hdIcon);
 
             if (iconFile == null)
@@ -64,7 +47,7 @@ namespace DelvUI.Helpers
 
             var builder = Plugin.UiBuilder;
             var newTexture = builder.LoadImageRaw(iconFile.GetRgbaImageData(), iconFile.Header.Width, iconFile.Header.Height, 4);
-            map.Add(iconId + stackCount, newTexture);
+            _cache.Add(iconId + stackCount, newTexture);
 
             return newTexture;
         }
@@ -91,24 +74,20 @@ namespace DelvUI.Helpers
 
         public void RemoveTexture<T>(dynamic row) where T : ExcelRow
         {
-            if (row == null)
+            if (row == null || row?.Icon == null)
             {
                 return;
             }
 
-            var iconId = row?.Icon;
+            var iconId = row.Icon;
+            RemoveTexture(iconId);
+        }
 
-            if (iconId == null)
+        public void RemoveTexture(uint iconId)
+        {
+            if (_cache.ContainsKey(iconId))
             {
-                return;
-            }
-
-            if (_cache.TryGetValue(typeof(T), out var map))
-            {
-                if (map.ContainsKey(iconId))
-                {
-                    map.Remove(iconId);
-                }
+                _cache.Remove(iconId);
             }
         }
 
