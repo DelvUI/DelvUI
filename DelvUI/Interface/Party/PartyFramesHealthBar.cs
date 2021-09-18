@@ -62,7 +62,8 @@ namespace DelvUI.Interface.Party
             }
 
             // click
-            if (ImGui.IsMouseHoveringRect(Position, Position + _config.Size) && ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+            bool isHovering = ImGui.IsMouseHoveringRect(Position, Position + _config.Size);
+            if (isHovering && ImGui.IsMouseClicked(ImGuiMouseButton.Left))
             {
                 Plugin.TargetManager.SetCurrentTarget(Member.GetActor());
             }
@@ -138,6 +139,12 @@ namespace DelvUI.Interface.Party
                     JobsHelper.IconIDForJob(Member.JobId) + (uint)_config.RoleIconConfig.Style * 100;
 
                 DrawHelper.DrawIcon(iconId, Position + _config.RoleIconConfig.Position, _config.RoleIconConfig.Size, false, drawList);
+            }
+
+            // highlight
+            if (_config.ColorsConfig.ShowHighlight && isHovering)
+            {
+                drawList.AddRectFilled(Position, Position + _config.Size, _config.ColorsConfig.HighlightColor.Base);
             }
 
             // border

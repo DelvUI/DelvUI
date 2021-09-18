@@ -102,12 +102,20 @@ namespace DelvUI.Interface.Party
         [CollapseWith(15, 0)]
         public PluginConfigColor GenericRoleColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
+        [Checkbox("Highlight When Hovering With Cursor")]
+        [CollapseControl(5, 1)]
+        public bool ShowHighlight = true;
+
+        [ColorEdit4("Highlight Color")]
+        [CollapseWith(0, 1)]
+        public PluginConfigColor HighlightColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 5f / 100f));
+
         [ColorEdit4("Background Color")]
-        [Order(5)]
+        [Order(10)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 70f / 100f));
 
         [ColorEdit4("Out of Reach Color")]
-        [Order(10)]
+        [Order(15)]
         public PluginConfigColor UnreachableColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 30f / 100f));
     }
 
