@@ -695,7 +695,8 @@ namespace DelvUI.Config.Tree
         private Dictionary<string, ConfigPageNode> _nestedConfigPageNodes;
 
         private void GenerateNestedConfigPageNodes()
-        {
+        {                        
+
             _nestedConfigPageNodes = new Dictionary<string, ConfigPageNode>();
 
             FieldInfo[] fields = _configObject.GetType().GetFields();
@@ -715,7 +716,6 @@ namespace DelvUI.Config.Tree
                     {
                         continue;
                     }
-
                     ConfigPageNode configPageNode = new();
                     configPageNode.ConfigObject = nestedConfig;
                     configPageNode.Name = nestedConfigAttribute.friendlyName;
@@ -855,9 +855,6 @@ namespace DelvUI.Config.Tree
                 }
                 else if (pair.Value is ConfigPageNode node)
                 {
-                    ImGui.Text("");
-                    ImGui.Separator();
-                    ImGui.Text("");
                     ImGui.BeginGroup();
                     node.DrawWithID(ref changed, node.Name);
                     ImGui.EndGroup();
@@ -1038,6 +1035,35 @@ namespace DelvUI.Config.Tree
 
         public void AddChild(int position, FieldInfo field) { Children.Add(position, field); }
 
+        public void AddSeparator(FieldInfo field)
+        {
+            foreach (object attribute in field.GetCustomAttributes(true))
+            {
+                if (attribute is CheckboxAttribute { separator: true }) {}
+                else if (attribute is DragFloatAttribute { separator: true }) {}
+                else if (attribute is DragIntAttribute { separator: true }) {}
+                else if (attribute is DragFloat2Attribute { separator: true }) {}
+                else if (attribute is DragInt2Attribute { separator: true }) {}
+                else if (attribute is InputTextAttribute { separator: true }) {}
+                else if (attribute is ColorEdit4Attribute { separator: true }) {}
+                else if (attribute is ComboAttribute { separator: true }) {}
+                else if (attribute is DragDropHorizontalAttribute { separator: true }) {}
+                else if (attribute is DynamicList { separator: true }) { }
+                else if (attribute is NestedConfigAttribute { separator: true }) { }
+                else
+                {
+
+                    continue;
+                }
+
+                ImGui.Text("");
+                ImGui.Separator();
+                ImGui.Text("");
+
+                
+            }
+
+        }
         public void Draw(ref bool changed)
         {
             Draw(ref changed, MainField, 2);
@@ -1060,6 +1086,7 @@ namespace DelvUI.Config.Tree
 
         public void Draw(ref bool changed, FieldInfo field, int xOffset)
         {
+            AddSeparator(field);
             ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(xOffset, 0));
             object fieldVal = field.GetValue(ConfigObject);
             var idText = ID != null ? " ##" + ID : "";

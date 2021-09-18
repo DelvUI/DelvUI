@@ -14,7 +14,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(35)]
         public bool UseJobColor = false;
 
-        [Checkbox("Slide Cast")]
+        [Checkbox("Slide Cast", separator = true)]
         [CollapseControl(40, 0)]
         public bool ShowSlideCast = true;
 
@@ -146,12 +146,12 @@ namespace DelvUI.Interface.GeneralElements
         [DragInt2("Size", min = 1, max = 4000)]
         [Order(15)]
         public Vector2 Size;
-
+        
         [Checkbox("Preview")]
         [Order(20)]
         public bool Preview = false;
         
-        [Checkbox("Icon")]
+        [Checkbox("Icon", separator = true)]
         [Order(25)]
         public bool ShowIcon = true;
 
@@ -161,10 +161,10 @@ namespace DelvUI.Interface.GeneralElements
         
         //CHARA TYPE SPECIFIC CONFIGS SPAWN HERE
         
-        [NestedConfig("Cast Name", 45)]
+        [NestedConfig("Cast Name", 45, separator = true)]
         public LabelConfig CastNameConfig;
 
-        [NestedConfig("Cast Time", 50)]
+        [NestedConfig("Cast Time", 50, separator = true)]
         public LabelConfig CastTimeConfig;
 
         
