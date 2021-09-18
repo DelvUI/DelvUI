@@ -74,7 +74,8 @@ namespace DelvUI.Interface.Jobs
         private void DrawFairyBar(Vector2 origin)
         {
             float fairyGauge = Plugin.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
-            float seraphDuration = Math.Abs(Plugin.JobGauges.Get<SCHGauge>().SeraphTimer / 1000);
+            float seraphTimer = Plugin.JobGauges.Get<SCHGauge>().SeraphTimer;
+            float seraphDuration = Math.Abs(seraphTimer / 1000);
 
             Vector2 barSize = Config.FairySize;
             Vector2 position = origin + Config.Position + Config.FairyPosition - barSize / 2f;
