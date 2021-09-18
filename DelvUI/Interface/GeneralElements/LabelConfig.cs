@@ -44,15 +44,15 @@ namespace DelvUI.Interface.GeneralElements
         [Order(30)]
         public LabelTextAnchor TextAnchor = LabelTextAnchor.TopLeft;
 
-        [ColorEdit4("Color")]
+        [ColorEdit4("Color ##Text")]
         [Order(35)]
         public PluginConfigColor Color = new PluginConfigColor(Vector4.One);
 
-        [Checkbox("Show Outline")]
+        [Checkbox("Outline")]
         [CollapseControl(40, 0)]
         public bool ShowOutline = true;
 
-        [ColorEdit4("Outline Color")]
+        [ColorEdit4("Color ##Outline")]
         [CollapseWith(0, 0)]
         public PluginConfigColor OutlineColor = new PluginConfigColor(Vector4.UnitW);
 
