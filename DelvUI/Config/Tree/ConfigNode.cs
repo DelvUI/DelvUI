@@ -1039,22 +1039,17 @@ namespace DelvUI.Config.Tree
         {
             foreach (object attribute in field.GetCustomAttributes(true))
             {
-                if (attribute is CheckboxAttribute { friendlyName: "Enabled", separator: true } && ID != null) { }
-                else if (attribute is DragFloatAttribute { separator: true }) {}
-                else if (attribute is DragIntAttribute { separator: true }) {}
-                else if (attribute is DragFloat2Attribute { separator: true }) {}
-                else if (attribute is DragInt2Attribute { separator: true }) {}
-                else if (attribute is InputTextAttribute { separator: true }) {}
-                else if (attribute is ColorEdit4Attribute { separator: true }) {}
-                else if (attribute is ComboAttribute { separator: true }) {}
-                else if (attribute is DragDropHorizontalAttribute { separator: true }) {}
-                else if (attribute is DynamicList { separator: true }) { }
+                if (attribute is ConfigAttribute { separator: true })
+                {
+                    if (attribute is CheckboxAttribute checkboxAttribute && 
+                        (checkboxAttribute.friendlyName=="Enabled" && ID != null || checkboxAttribute.friendlyName!="Enabled")) { }
+                    else { continue; }
+                }
                 else { continue; }
 
                 ImGui.Text("");
                 ImGui.Separator();
                 ImGui.Text("");
-
                 
             }
 

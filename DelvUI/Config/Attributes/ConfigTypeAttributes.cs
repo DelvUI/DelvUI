@@ -17,7 +17,6 @@ namespace DelvUI.Config.Attributes
         public CheckboxAttribute(string friendlyName)
         {
             this.friendlyName = friendlyName;
-            separator = false;
         }
     }
 
@@ -36,7 +35,6 @@ namespace DelvUI.Config.Attributes
             min = 1f;
             max = 1000f;
             velocity = 1f;
-            separator = false;
 
         }
     }
@@ -55,7 +53,6 @@ namespace DelvUI.Config.Attributes
             min = 1;
             max = 1000;
             velocity = 1;
-            separator = false;
         }
     }
 
@@ -73,7 +70,6 @@ namespace DelvUI.Config.Attributes
             min = 1f;
             max = 1000f;
             velocity = 1f;
-            separator = false;
         }
     }
 
@@ -91,7 +87,6 @@ namespace DelvUI.Config.Attributes
             min = 1;
             max = 1000;
             velocity = 1;
-            separator = false;
         }
     }
 
@@ -106,7 +101,6 @@ namespace DelvUI.Config.Attributes
         {
             this.friendlyName = friendlyName;
             maxLength = 999;
-            separator = false;
 
         }
     }
@@ -120,7 +114,6 @@ namespace DelvUI.Config.Attributes
         public ColorEdit4Attribute(string friendlyName)
         {
             this.friendlyName = friendlyName;
-            separator = false;
 
         }
     }
@@ -136,7 +129,6 @@ namespace DelvUI.Config.Attributes
         {
             this.friendlyName = friendlyName;
             this.options = options;
-            separator = false;
 
         }
     }
@@ -194,7 +186,6 @@ namespace DelvUI.Config.Attributes
         {
             this.friendlyName = friendlyName;
             this.names = names;
-            separator = false;
 
         }
     }
@@ -241,7 +232,6 @@ namespace DelvUI.Config.Attributes
         {
             this.friendlyName = friendlyName;
             this.options = options;
-            separator = false;
 
         }
     }    
