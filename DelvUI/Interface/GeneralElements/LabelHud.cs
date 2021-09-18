@@ -52,15 +52,15 @@ namespace DelvUI.Interface.GeneralElements
         {
             switch (Config.TextAnchor)
             {
-                case LabelTextAnchor.Center: return -textSize / 2f;
-                case LabelTextAnchor.Left: return new Vector2(0, -textSize.Y / 2f);
-                case LabelTextAnchor.Right: return new Vector2(-textSize.X, -textSize.Y / 2f);
-                case LabelTextAnchor.Top: return new Vector2(-textSize.X / 2f, 0);
-                case LabelTextAnchor.TopLeft: return Vector2.Zero;
-                case LabelTextAnchor.TopRight: return new Vector2(-textSize.X, 0);
-                case LabelTextAnchor.Bottom: return new Vector2(-textSize.X / 2f, -textSize.Y);
-                case LabelTextAnchor.BottomLeft: return new Vector2(0, -textSize.Y);
-                case LabelTextAnchor.BottomRight: return new Vector2(-textSize.X, -textSize.Y);
+                case HudElementAnchor.Center: return -textSize / 2f;
+                case HudElementAnchor.Left: return new Vector2(0, -textSize.Y / 2f);
+                case HudElementAnchor.Right: return new Vector2(-textSize.X, -textSize.Y / 2f);
+                case HudElementAnchor.Top: return new Vector2(-textSize.X / 2f, 0);
+                case HudElementAnchor.TopLeft: return Vector2.Zero;
+                case HudElementAnchor.TopRight: return new Vector2(-textSize.X, 0);
+                case HudElementAnchor.Bottom: return new Vector2(-textSize.X / 2f, -textSize.Y);
+                case HudElementAnchor.BottomLeft: return new Vector2(0, -textSize.Y);
+                case HudElementAnchor.BottomRight: return new Vector2(-textSize.X, -textSize.Y);
             }
 
             return Vector2.Zero;
@@ -70,15 +70,15 @@ namespace DelvUI.Interface.GeneralElements
         {
             switch (Config.FrameAnchor)
             {
-                case LabelTextAnchor.Center: return Vector2.Zero;
-                case LabelTextAnchor.Left: return new Vector2(-parentSize.X / 2f, 0);
-                case LabelTextAnchor.Right: return new Vector2(parentSize.X / 2f, 0);
-                case LabelTextAnchor.Top: return new Vector2(0, -parentSize.Y / 2f);
-                case LabelTextAnchor.TopLeft: return -parentSize / 2f;
-                case LabelTextAnchor.TopRight: return new Vector2(parentSize.X / 2f, -parentSize.Y / 2f);
-                case LabelTextAnchor.Bottom: return new Vector2(0, parentSize.Y / 2f);
-                case LabelTextAnchor.BottomLeft: return new Vector2(-parentSize.X / 2f, parentSize.Y / 2f);
-                case LabelTextAnchor.BottomRight: return parentSize / 2f;
+                case HudElementAnchor.Center: return Vector2.Zero;
+                case HudElementAnchor.Left: return new Vector2(-parentSize.X / 2f, 0);
+                case HudElementAnchor.Right: return new Vector2(parentSize.X / 2f, 0);
+                case HudElementAnchor.Top: return new Vector2(0, -parentSize.Y / 2f);
+                case HudElementAnchor.TopLeft: return -parentSize / 2f;
+                case HudElementAnchor.TopRight: return new Vector2(parentSize.X / 2f, -parentSize.Y / 2f);
+                case HudElementAnchor.Bottom: return new Vector2(0, parentSize.Y / 2f);
+                case HudElementAnchor.BottomLeft: return new Vector2(-parentSize.X / 2f, parentSize.Y / 2f);
+                case HudElementAnchor.BottomRight: return parentSize / 2f;
             }
 
             return Vector2.Zero;

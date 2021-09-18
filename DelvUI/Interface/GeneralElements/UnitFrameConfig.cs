@@ -20,8 +20,8 @@ namespace DelvUI.Interface.GeneralElements
             var size = HUDConstants.DefaultBigUnitFrameSize;
             var pos = new Vector2(-HUDConstants.UnitFramesOffsetX - size.X / 2f, HUDConstants.BaseHUDOffsetY);
 
-            var leftLabelConfig = new EditableLabelConfig(new Vector2(5, 0), "[name:abbreviate]", LabelTextAnchor.TopLeft, LabelTextAnchor.BottomLeft);
-            var rightLabelConfig = new EditableLabelConfig(new Vector2(-5, 0), "[health:current-short] | [health:percent]", LabelTextAnchor.TopRight, LabelTextAnchor.BottomRight);
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(5, 0), "[name:abbreviate]", HudElementAnchor.TopLeft, HudElementAnchor.BottomLeft);
+            var rightLabelConfig = new EditableLabelConfig(new Vector2(-5, 0), "[health:current-short] | [health:percent]", HudElementAnchor.TopRight, HudElementAnchor.BottomRight);
 
             var config = new PlayerUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig);
             config.TankStanceIndicatorConfig = new TankStanceIndicatorConfig();
@@ -45,8 +45,8 @@ namespace DelvUI.Interface.GeneralElements
             var size = HUDConstants.DefaultBigUnitFrameSize;
             var pos = new Vector2(HUDConstants.UnitFramesOffsetX + size.X / 2f, HUDConstants.BaseHUDOffsetY);
 
-            var leftLabelConfig = new EditableLabelConfig(new Vector2(5, 0), "[health:current-short] | [health:percent]", LabelTextAnchor.TopLeft, LabelTextAnchor.BottomLeft);
-            var rightLabelConfig = new EditableLabelConfig(new Vector2(-5, 0), "[name:abbreviate]", LabelTextAnchor.TopRight, LabelTextAnchor.BottomRight);
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(5, 0), "[health:current-short] | [health:percent]", HudElementAnchor.TopLeft, HudElementAnchor.BottomLeft);
+            var rightLabelConfig = new EditableLabelConfig(new Vector2(-5, 0), "[name:abbreviate]", HudElementAnchor.TopRight, HudElementAnchor.BottomRight);
 
             return new TargetUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig);
         }
@@ -70,8 +70,8 @@ namespace DelvUI.Interface.GeneralElements
                 HUDConstants.BaseHUDOffsetY - 15
             );
 
-            var leftLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "[name:abbreviate]", LabelTextAnchor.Top, LabelTextAnchor.Bottom);
-            var rightLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", LabelTextAnchor.Center, LabelTextAnchor.TopLeft);
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "[name:abbreviate]", HudElementAnchor.Top, HudElementAnchor.Bottom);
+            var rightLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", HudElementAnchor.Center, HudElementAnchor.TopLeft);
 
             return new TargetOfTargetUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig);
         }
@@ -95,8 +95,8 @@ namespace DelvUI.Interface.GeneralElements
                 HUDConstants.BaseHUDOffsetY - 15
             );
 
-            var leftLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "[name:abbreviate]", LabelTextAnchor.Top, LabelTextAnchor.Bottom);
-            var rightLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", LabelTextAnchor.Center, LabelTextAnchor.Center);
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "[name:abbreviate]", HudElementAnchor.Top, HudElementAnchor.Bottom);
+            var rightLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", HudElementAnchor.Center, HudElementAnchor.Center);
 
             return new FocusTargetUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig);
         }

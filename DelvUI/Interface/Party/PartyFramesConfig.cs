@@ -42,6 +42,10 @@ namespace DelvUI.Interface.Party
         )]
         [Order(50)]
         public PartySortingMode SortingMode = PartySortingMode.Tank_Healer_DPS;
+
+        [Anchor("Bars Anchor", isMonitored = true)]
+        [Order(55)]
+        public HudElementAnchor BarsAnchor = HudElementAnchor.TopLeft;
     }
 
 

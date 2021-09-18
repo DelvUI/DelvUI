@@ -3,10 +3,8 @@ using DelvUI.Helpers;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Numerics;
-
 
 namespace DelvUI.Interface.Party
 {
@@ -20,14 +18,14 @@ namespace DelvUI.Interface.Party
                                                         ImGuiWindowFlags.NoResize |
                                                         ImGuiWindowFlags.NoNav;
 
+        private Vector2 _contentMargin = new Vector2(5, 5);
         private const string _mainWindowName = "Party List";
         private static int MaxMemberCount = 8;
 
         // layout
         private Vector2 _origin;
         private Vector2 _size;
-        private uint _rowCount = 0;
-        private uint _colCount = 0;
+        private LayoutInfo _layoutInfo;
         private uint _memberCount = 0;
         private bool _layoutDirty = true;
 
@@ -63,7 +61,7 @@ namespace DelvUI.Interface.Party
 
         private void OnLayoutPropertyChanged(object sender, OnChangeBaseArgs args)
         {
-            if (args.PropertyName == "Size" || args.PropertyName == "FillRowsFirst")
+            if (args.PropertyName == "Size" || args.PropertyName == "FillRowsFirst" || args.PropertyName == "BarsAnchor")
             {
                 _layoutDirty = true;
             }
@@ -77,8 +75,9 @@ namespace DelvUI.Interface.Party
         public void UpdateBars(Vector2 origin)
         {
             var memberCount = PartyManager.Instance.MemberCount;
-            int row = 0;
-            int col = 0;
+            uint row = 0;
+            uint col = 0;
+            var spaceSize = Config.Size - _contentMargin * 2;
 
             for (int i = 0; i < bars.Count; i++)
             {
@@ -92,17 +91,20 @@ namespace DelvUI.Interface.Party
                 // update bar
                 IPartyFramesMember member = PartyManager.Instance.GroupMembers.ElementAt(i);
                 bar.Member = member;
-                bar.Position = new Vector2(
-                    origin.X + HealthBarsConfig.Size.X * col + HealthBarsConfig.Padding.X * col,
-                    origin.Y + HealthBarsConfig.Size.Y * row + HealthBarsConfig.Padding.Y * row
-                );
                 bar.Visible = true;
+
+                // anchor and position
+                CalculateBarPosition(origin, spaceSize, out var x, out var y);
+                bar.Position = new Vector2(
+                    x + HealthBarsConfig.Size.X * col + HealthBarsConfig.Padding.X * col,
+                    y + HealthBarsConfig.Size.Y * row + HealthBarsConfig.Padding.Y * row
+                );
 
                 // layout
                 if (Config.FillRowsFirst)
                 {
                     col = col + 1;
-                    if (col >= _colCount)
+                    if (col >= _layoutInfo.TotalColCount)
                     {
                         col = 0;
                         row = row + 1;
@@ -111,12 +113,44 @@ namespace DelvUI.Interface.Party
                 else
                 {
                     row = row + 1;
-                    if (row >= _rowCount)
+                    if (row >= _layoutInfo.TotalRowCount)
                     {
                         row = 0;
                         col = col + 1;
                     }
                 }
+            }
+        }
+
+        private void CalculateBarPosition(Vector2 position, Vector2 spaceSize, out float x, out float y)
+        {
+            x = position.X;
+            y = position.Y;
+
+            if (Config.BarsAnchor == HudElementAnchor.Top ||
+                Config.BarsAnchor == HudElementAnchor.Center ||
+                Config.BarsAnchor == HudElementAnchor.Bottom)
+            {
+                x += (spaceSize.X - _layoutInfo.ContentSize.X) / 2f;
+            }
+            else if (Config.BarsAnchor == HudElementAnchor.TopRight ||
+                Config.BarsAnchor == HudElementAnchor.Right ||
+                Config.BarsAnchor == HudElementAnchor.BottomRight)
+            {
+                x += spaceSize.X - _layoutInfo.ContentSize.X;
+            }
+
+            if (Config.BarsAnchor == HudElementAnchor.Left ||
+                Config.BarsAnchor == HudElementAnchor.Center ||
+                Config.BarsAnchor == HudElementAnchor.Right)
+            {
+                y += (spaceSize.Y - _layoutInfo.ContentSize.Y) / 2f;
+            }
+            else if (Config.BarsAnchor == HudElementAnchor.BottomLeft ||
+                Config.BarsAnchor == HudElementAnchor.Bottom ||
+                Config.BarsAnchor == HudElementAnchor.BottomRight)
+            {
+                y += spaceSize.Y - _layoutInfo.ContentSize.Y;
             }
         }
 
@@ -147,9 +181,8 @@ namespace DelvUI.Interface.Party
             }
 
             // size and position
-            var margin = new Vector2(5, 5);
-            ImGui.SetNextWindowPos(Config.Position - margin, ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSize(Config.Size + margin * 2, ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowPos(Config.Position - _contentMargin, ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(Config.Size + _contentMargin * 2, ImGuiCond.FirstUseEver);
 
             var windowFlags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoTitleBar;
             if (Config.Lock)
@@ -164,19 +197,17 @@ namespace DelvUI.Interface.Party
             Config.Size = windowSize;
 
             // recalculate layout on settings or size change
-            var contentStartPos = windowPos + margin;
-            var maxSize = windowSize - margin * 2;
+            var contentStartPos = windowPos + _contentMargin;
+            var maxSize = windowSize - _contentMargin * 2;
 
             if (_layoutDirty || _size != maxSize || _memberCount != count)
             {
-                LayoutHelper.CalculateLayout(
+                _layoutInfo = LayoutHelper.CalculateLayout(
                     maxSize,
                     HealthBarsConfig.Size,
                     PartyManager.Instance.MemberCount,
                     HealthBarsConfig.Padding,
-                    Config.FillRowsFirst,
-                    out _rowCount,
-                    out _colCount
+                    Config.FillRowsFirst
                 );
 
                 UpdateBars(contentStartPos);

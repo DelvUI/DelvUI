@@ -257,12 +257,12 @@ namespace DelvUI.Interface.StatusEffects
     {
         internal static LabelConfig DefaultDurationLabelConfig()
         {
-            return new LabelConfig(Vector2.Zero, "", LabelTextAnchor.Center, LabelTextAnchor.Center);
+            return new LabelConfig(Vector2.Zero, "", HudElementAnchor.Center, HudElementAnchor.Center);
         }
 
         internal static LabelConfig DefaultStacksLabelConfig()
         {
-            var config = new LabelConfig(new Vector2(16, -11), "", LabelTextAnchor.Center, LabelTextAnchor.Center);
+            var config = new LabelConfig(new Vector2(16, -11), "", HudElementAnchor.Center, HudElementAnchor.Center);
             config.Color = new(Vector4.UnitW);
             config.OutlineColor = new(Vector4.One);
 

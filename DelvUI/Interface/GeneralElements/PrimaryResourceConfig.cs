@@ -43,7 +43,7 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(254, 20);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY - 37);
 
-            var labelConfig = new LabelConfig(Vector2.Zero, "", LabelTextAnchor.Center, LabelTextAnchor.Center);
+            var labelConfig = new LabelConfig(Vector2.Zero, "", HudElementAnchor.Center, HudElementAnchor.Center);
 
             return new PrimaryResourceConfig(pos, size, labelConfig);
         }

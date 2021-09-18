@@ -14,7 +14,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(20)]
         public string Text;
 
-        public EditableLabelConfig(Vector2 position, string text, LabelTextAnchor frameAnchor, LabelTextAnchor textAnchor) : base(position, text, frameAnchor, textAnchor)
+        public EditableLabelConfig(Vector2 position, string text, HudElementAnchor frameAnchor, HudElementAnchor textAnchor) : base(position, text, frameAnchor, textAnchor)
         {
             Text = text;
         }
@@ -36,13 +36,13 @@ namespace DelvUI.Interface.GeneralElements
     {
         [JsonIgnore] protected string _text;
 
-        [Combo("Frame Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
+        [Anchor("Frame Anchor")]
         [Order(25)]
-        public LabelTextAnchor FrameAnchor = LabelTextAnchor.Center;
+        public HudElementAnchor FrameAnchor = HudElementAnchor.Center;
 
-        [Combo("Text Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
+        [Anchor("Text Anchor")]
         [Order(30)]
-        public LabelTextAnchor TextAnchor = LabelTextAnchor.TopLeft;
+        public HudElementAnchor TextAnchor = HudElementAnchor.TopLeft;
 
         [ColorEdit4("Color ##Text")]
         [Order(35)]
@@ -56,7 +56,7 @@ namespace DelvUI.Interface.GeneralElements
         [CollapseWith(0, 0)]
         public PluginConfigColor OutlineColor = new PluginConfigColor(Vector4.UnitW);
 
-        public LabelConfig(Vector2 position, string text, LabelTextAnchor frameAnchor, LabelTextAnchor textAnchor)
+        public LabelConfig(Vector2 position, string text, HudElementAnchor frameAnchor, HudElementAnchor textAnchor)
         {
             Position = position;
             _text = text;
@@ -74,18 +74,5 @@ namespace DelvUI.Interface.GeneralElements
         {
             _text = text;
         }
-    }
-
-    public enum LabelTextAnchor
-    {
-        Center = 0,
-        Left = 1,
-        Right = 2,
-        Top = 3,
-        TopLeft = 4,
-        TopRight = 5,
-        Bottom = 6,
-        BottomLeft = 7,
-        BottomRight = 8
     }
 }

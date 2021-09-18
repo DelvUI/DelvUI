@@ -1,5 +1,5 @@
 ﻿using DelvUI.Config;
-using DelvUI.Interface;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Numerics;

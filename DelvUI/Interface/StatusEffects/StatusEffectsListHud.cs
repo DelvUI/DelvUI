@@ -16,8 +16,7 @@ namespace DelvUI.Interface.StatusEffects
     {
         private StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
 
-        private uint _rowCount;
-        private uint _colCount;
+        private LayoutInfo _layoutInfo;
         private GrowthDirections _lastGrowthDirections;
         private bool _showingTooltip = false;
 
@@ -48,15 +47,12 @@ namespace DelvUI.Interface.StatusEffects
                 return 0;
             }
 
-            LayoutHelper.CalculateLayout(
+            _layoutInfo = LayoutHelper.CalculateLayout(
                 Config.Size,
                 Config.IconConfig.Size,
                 count,
-                (int)Config.IconPadding.X,
-                (int)Config.IconPadding.Y,
-                Config.FillRowsFirst,
-                out _rowCount,
-                out _colCount
+                Config.IconPadding,
+                Config.FillRowsFirst
             );
 
             return count;
@@ -237,7 +233,7 @@ namespace DelvUI.Interface.StatusEffects
                 if (Config.FillRowsFirst)
                 {
                     col += 1;
-                    if (col >= _colCount)
+                    if (col >= _layoutInfo.TotalColCount)
                     {
                         col = 0;
                         row += 1;
@@ -246,7 +242,7 @@ namespace DelvUI.Interface.StatusEffects
                 else
                 {
                     row += 1;
-                    if (row >= _rowCount)
+                    if (row >= _layoutInfo.TotalRowCount)
                     {
                         row = 0;
                         col += 1;

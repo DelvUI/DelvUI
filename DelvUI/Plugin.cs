@@ -260,6 +260,8 @@ namespace DelvUI
             UiBuilder.OnBuildFonts -= BuildFont;
             UiBuilder.OnOpenConfigUi -= OpenConfigUi;
             UiBuilder.RebuildFonts();
+
+            PartyManager.Destroy();
         }
     }
 }
