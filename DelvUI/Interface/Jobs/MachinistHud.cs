@@ -195,7 +195,7 @@ namespace DelvUI.Interface.Jobs
         public new static MachinistConfig DefaultConfig() { return new MachinistConfig(); }
 
         #region Overheat
-        [Checkbox("Show Overheat Bar")]
+        [Checkbox("Show Overheat Bar", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowOverheat = true;
 
@@ -217,7 +217,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Heat Gauge
-        [Checkbox("Show Heat Gauge")]
+        [Checkbox("Show Heat Gauge", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowHeatGauge = true;
 
@@ -243,7 +243,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Battery Gauge
-        [Checkbox("Show Battery Gauge")]
+        [Checkbox("Show Battery Gauge", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowBatteryGauge = true;
 
@@ -285,7 +285,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Wildfire
-        [Checkbox("Show Wildfire")]
+        [Checkbox("Show Wildfire", separator = true)]
         [CollapseControl(45, 3)]
         public bool ShowWildfire = false;
 

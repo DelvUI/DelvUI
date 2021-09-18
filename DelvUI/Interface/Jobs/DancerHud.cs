@@ -385,7 +385,7 @@ namespace DelvUI.Interface.Jobs
         public new static DancerConfig DefaultConfig() { return new DancerConfig(); }
 
         #region espirit
-        [Checkbox("Show Esprit Guage")]
+        [Checkbox("Show Esprit Guage", separator = true)]
         [CollapseControl(30, 0)]
         public bool EspritGuageEnabled = true;
 
@@ -411,7 +411,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region feathers
-        [Checkbox("Show Feather Guage")]
+        [Checkbox("Show Feather Guage", separator = true)]
         [CollapseControl(35, 1)]
         public bool FeatherGuageEnabled = true;
 
@@ -441,7 +441,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region buff bars
-        [Checkbox("Show Buff Bar")]
+        [Checkbox("Show Buff Bar", separator = true)]
         [CollapseControl(40, 2)]
         public bool BuffBarEnabled = true;
 
@@ -479,7 +479,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region standard finish
-        [Checkbox("Show Standard Finish Bar")]
+        [Checkbox("Show Standard Finish Bar", separator = true)]
         [CollapseControl(45, 3)]
         public bool StandardBarEnabled = true;
 
@@ -501,7 +501,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region steps
-        [Checkbox("Show Step Bars")]
+        [Checkbox("Show Step Bars", separator = true)]
         [CollapseControl(50, 4)]
         public bool StepBarEnabled = true;
 
@@ -551,7 +551,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region procs
-        [Checkbox("Show Proc Bars")]
+        [Checkbox("Show Proc Bars", separator = true)]
         [CollapseControl(55, 5)]
         public bool ProcBarEnabled = true;
 

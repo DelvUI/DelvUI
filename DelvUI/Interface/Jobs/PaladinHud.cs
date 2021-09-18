@@ -232,105 +232,105 @@ namespace DelvUI.Interface.Jobs
         public new static PaladinConfig DefaultConfig() { return new PaladinConfig(); }
 
         #region mana bar
-        [Checkbox("Show Mana Bar", separator = true)]
+        [Checkbox("Mana", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowManaBar = true;
 
-        [Checkbox("Show Mana Bar Text")]
+        [Checkbox("Text" + "##MP")]
         [CollapseWith(0, 0)]
         public bool ShowManaBarText = true;
 
-        [Checkbox("Chunk Mana Bar")]
+        [Checkbox("Split Bar" + "##MP")]
         [CollapseWith(5, 0)]
         public bool ChunkManaBar = true;
-
-        [DragFloat2("Mana Bar Size", max = 2000f)]
+        
+        [DragFloat2("Position" + "##MP", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
+        public Vector2 ManaBarPosition = new(0, -76);
+        
+        [DragFloat2("Size" + "##MP", max = 2000f)]
+        [CollapseWith(15, 0)]
         public Vector2 ManaBarSize = new(254, 20);
 
-        [DragInt("Mana Bar Padding", max = 100)]
-        [CollapseWith(15, 0)]
-        public int ManaBarPadding = 2;
-
-        [DragFloat2("Mana Bar Position", min = -4000f, max = 4000f)]
+        [DragInt("Spacing" + "##MP", max = 100)]
         [CollapseWith(20, 0)]
-        public Vector2 ManaBarPosition = new(0, -76);
-
-        [ColorEdit4("Mana Bar Color")]
+        public int ManaBarPadding = 2;
+        
+        [ColorEdit4("Color" + "##MP")]
         [CollapseWith(25, 0)]
         public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
         #endregion
 
         #region oath gauge
-        [Checkbox("Show Oath Gauge", separator = true)]
+        [Checkbox("Oath Gauge", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowOathGauge = true;
 
-        [Checkbox("Show Oath Gauge Text")]
+        [Checkbox("Text" + "##Oath")]
         [CollapseWith(0, 1)]
         public bool ShowOathGaugeText = true;
-
-        [DragFloat2("Oath Gauge Size", min = -4000f, max = 4000f)]
+        
+        [DragFloat2("Position" + "##Oath", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
+        public Vector2 OathGaugePosition = new(0, -54);
+        
+        [DragFloat2("Size" + "##Oath", min = -4000f, max = 4000f)]
+        [CollapseWith(10, 1)]
         public Vector2 OathGaugeSize = new(254, 20);
 
-        [DragInt("Oath Gauge Padding", max = 100)]
-        [CollapseWith(10, 1)]
-        public int OathGaugePadding = 2;
-
-        [DragFloat2("Oath Gauge Position", min = -4000f, max = 4000f)]
+        [DragInt("Spacing" + "##Oath", max = 100)]
         [CollapseWith(15, 1)]
-        public Vector2 OathGaugePosition = new(0, -54);
-
-        [ColorEdit4("Oath Gauge Color")]
+        public int OathGaugePadding = 2;
+        
+        [ColorEdit4("Color" + "##Oath")]
         [CollapseWith(20, 1)]
         public PluginConfigColor OathGaugeColor = new(new Vector4(24f / 255f, 80f / 255f, 175f / 255f, 100f / 100f));
         #endregion
 
         #region buff
-        [Checkbox("Show Buff Bar", separator = true)]
+        [Checkbox("Fight or Flight & Requiescat", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowBuffBar = true;
 
-        [Checkbox("Show Buff Bar Text")]
+        [Checkbox("Duration Text")]
         [CollapseWith(0, 2)]
         public bool ShowBuffBarText = true;
 
-        [DragFloat2("Buff Bar Size", min = -4000f, max = 4000f)]
+        [DragFloat2("Position", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]
+        public Vector2 BuffBarPosition = new(0, -32);
+        
+        [DragFloat2("Size", min = -4000f, max = 4000f)]
+        [CollapseWith(10, 2)]
         public Vector2 BuffBarSize = new(254, 20);
 
-        [DragFloat2("Buff Bar Position", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 2)]
-        public Vector2 BuffBarPosition = new(0, -32);
-
-        [ColorEdit4("Fight or Flight Bar Color")]
+        [ColorEdit4("Fight or Flight")]
         [CollapseWith(15, 2)]
         public PluginConfigColor FightOrFlightColor = new(new Vector4(240f / 255f, 50f / 255f, 0f / 255f, 100f / 100f));
 
-        [ColorEdit4("Requiescat Bar Color")]
+        [ColorEdit4("Requiescat")]
         [CollapseWith(20, 2)]
         public PluginConfigColor RequiescatColor = new(new Vector4(61f / 255f, 61f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         #region atonement
-        [Checkbox("Show Atonement Bar", separator = true)]
+        [Checkbox("Atonement" + "##Atonement", separator = true)]
         [CollapseControl(45, 3)]
         public bool ShowAtonementBar = true;
 
-        [DragFloat2("Atonement Bar Size", min = -4000f, max = 4000f)]
+        [DragFloat2("Size" + "##Atonement", min = -4000f, max = 4000f)]
         [CollapseWith(0, 3)]
         public Vector2 AtonementBarSize = new(254, 20);
 
-        [DragInt("Atonement Bar Padding", max = 100)]
+        [DragInt("Padding" + "##Atonement", max = 100)]
         [CollapseWith(5, 3)]
         public int AtonementBarPadding = 2;
 
-        [DragFloat2("Atonement Bar Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##Atonement", min = -4000f, max = 4000f)]
         [CollapseWith(10, 3)]
         public Vector2 AtonementBarPosition = new(0, -10);
 
-        [ColorEdit4("Atonement Bar Color")]
+        [ColorEdit4("Color" + "##Atonement")]
         [CollapseWith(15, 3)]
         public PluginConfigColor AtonementColor = new(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f));
         #endregion
