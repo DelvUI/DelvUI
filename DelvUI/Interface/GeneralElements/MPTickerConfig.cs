@@ -1,5 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using System;
 using System.Numerics;
 
@@ -14,16 +15,20 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public Vector2 Size;
 
-        [Checkbox("Hide on Full MP")]
+        [Combo("Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
         [Order(20)]
+        public DrawAnchor Anchor = DrawAnchor.Center;
+
+        [Checkbox("Hide on Full MP")]
+        [Order(25)]
         public bool HideOnFullMP = true;
 
         [Checkbox("Show Border")]
-        [Order(25)]
+        [Order(30)]
         public bool ShowBorder = true;
 
         [ColorEdit4("Color")]
-        [Order(30)]
+        [Order(35)]
         public PluginConfigColor Color = new PluginConfigColor(new(240f / 255f, 92f / 255f, 232f / 255f, 100f / 100f));
 
         public MPTickerConfig(Vector2 position, Vector2 size)

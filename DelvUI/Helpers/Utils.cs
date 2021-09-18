@@ -2,10 +2,12 @@
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
 using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace DelvUI.Helpers
 {
@@ -112,6 +114,24 @@ namespace DelvUI.Helpers
             }
 
             return null;
+        }
+
+        public static Vector2 GetAnchoredPosition(Vector2 position, Vector2 size, DrawAnchor anchor)
+        {
+            switch (anchor)
+            {
+                case DrawAnchor.Center: return position - size / 2f;
+                case DrawAnchor.Left: return position + new Vector2(0, -size.Y / 2f);
+                case DrawAnchor.Right: return position + new Vector2(-size.X, -size.Y / 2f);
+                case DrawAnchor.Top: return position + new Vector2(-size.X / 2f, 0);
+                case DrawAnchor.TopLeft: return position;
+                case DrawAnchor.TopRight: return position + new Vector2(-size.X, 0);
+                case DrawAnchor.Bottom: return position + new Vector2(-size.X / 2f, -size.Y);
+                case DrawAnchor.BottomLeft: return position + new Vector2(0, -size.Y);
+                case DrawAnchor.BottomRight: return position + new Vector2(-size.X, -size.Y);
+            }
+
+            return position;
         }
     }
 }

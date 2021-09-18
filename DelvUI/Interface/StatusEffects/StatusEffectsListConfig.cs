@@ -1,5 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
@@ -257,12 +258,12 @@ namespace DelvUI.Interface.StatusEffects
     {
         internal static LabelConfig DefaultDurationLabelConfig()
         {
-            return new LabelConfig(Vector2.Zero, "", LabelTextAnchor.Center, LabelTextAnchor.Center);
+            return new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
         }
 
         internal static LabelConfig DefaultStacksLabelConfig()
         {
-            var config = new LabelConfig(new Vector2(16, -11), "", LabelTextAnchor.Center, LabelTextAnchor.Center);
+            var config = new LabelConfig(new Vector2(16, -11), "", DrawAnchor.Center, DrawAnchor.Center);
             config.Color = new(Vector4.UnitW);
             config.OutlineColor = new(Vector4.One);
 

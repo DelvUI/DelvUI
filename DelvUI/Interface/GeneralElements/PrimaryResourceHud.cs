@@ -38,7 +38,7 @@ namespace DelvUI.Interface.GeneralElements
             GetResources(ref current, ref max, chara);
 
             var scale = (float)current / max;
-            var startPos = origin + Config.Position - Config.Size / 2f;
+            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
 
             // bar
             var drawList = ImGui.GetWindowDrawList();

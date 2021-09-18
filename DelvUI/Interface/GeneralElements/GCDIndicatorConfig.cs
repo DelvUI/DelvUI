@@ -1,5 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using System;
 using System.Numerics;
 
@@ -14,48 +15,52 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public Vector2 Size;
 
-        [Checkbox("Anchor To Mouse")]
+        [Combo("Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
         [Order(20)]
+        public DrawAnchor Anchor = DrawAnchor.Center;
+
+        [Checkbox("Anchor To Mouse")]
+        [Order(25)]
         public bool AnchorToMouse = false;
         
         [Checkbox("Offset Mouse Position")]
-        [Order(25)]
+        [Order(30)]
         public bool OffsetMousePosition = false;
         
         [Checkbox("Always Show")]
-        [Order(30)]
+        [Order(35)]
         public bool AlwaysShow = false;
 
         [Checkbox("Show Border")]
-        [Order(35)]
+        [Order(40)]
         public bool ShowBorder = true;
 
         [Checkbox("Vertical Mode")]
-        [Order(40)]
+        [Order(45)]
         public bool VerticalMode = false;
         
         [Checkbox("Circular Mode")]
-        [Order(45)]
+        [Order(50)]
         public bool CircularMode = false;
         
         [DragInt("Radius")]
-        [Order(50)]
+        [Order(55)]
         public int CircleRadius = 40;
         
         [DragInt("Thickness")]
-        [Order(55)]
+        [Order(60)]
         public int CircleThickness = 10;
 
         [ColorEdit4("Color")]
-        [Order(60)]
+        [Order(65)]
         public PluginConfigColor Color = new PluginConfigColor(new(220f / 255f, 220f / 255f, 220f / 255f, 100f / 100f));
 
         [Checkbox("Show GCD Queue Indicator")]
-        [Order(65)]
+        [Order(70)]
         public bool ShowGCDQueueIndicator = true;
 
         [ColorEdit4("GCD Queue Color")]
-        [Order(70)]
+        [Order(75)]
         public PluginConfigColor QueueColor = new PluginConfigColor(new(13f / 255f, 207f / 255f, 31f / 255f, 100f / 100f));
 
         public GCDIndicatorConfig(Vector2 position, Vector2 size)

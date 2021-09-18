@@ -53,7 +53,7 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             var barSize = new Vector2(Math.Max(1f, Config.Size.X * scale), Config.Size.Y);
-            var startPos = origin + Config.Position - Config.Size / 2f;
+            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
 
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(startPos, startPos + Config.Size, 0x88000000);

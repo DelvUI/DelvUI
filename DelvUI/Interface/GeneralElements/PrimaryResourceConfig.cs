@@ -1,5 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using System;
 using System.Numerics;
 
@@ -14,15 +15,19 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public Vector2 Size;
 
-        [ColorEdit4("Color")]
+        [Combo("Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
         [Order(20)]
+        public DrawAnchor Anchor = DrawAnchor.Center;
+
+        [ColorEdit4("Color")]
+        [Order(25)]
         public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
 
-        [NestedConfig("Label", 25)]
+        [NestedConfig("Label", 30)]
         public LabelConfig ValueLabelConfig;
 
         [Checkbox("Threshold Marker")]
-        [CollapseControl(30, 0)]
+        [CollapseControl(35, 0)]
         public bool ShowThresholdMarker = false;
 
         [DragInt("Value", min = 1, max = 10000)]
@@ -43,7 +48,7 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(254, 20);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY - 37);
 
-            var labelConfig = new LabelConfig(Vector2.Zero, "", LabelTextAnchor.Center, LabelTextAnchor.Center);
+            var labelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
 
             return new PrimaryResourceConfig(pos, size, labelConfig);
         }
