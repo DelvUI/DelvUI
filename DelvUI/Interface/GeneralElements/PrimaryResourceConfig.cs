@@ -14,24 +14,22 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public Vector2 Size;
 
-        [Checkbox("Show Value")]
+        [ColorEdit4("Color")]
         [Order(20)]
-        public bool ShowValue = true;
+        public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
 
         [NestedConfig("Label", 25)]
         public LabelConfig ValueLabelConfig;
 
-        [Checkbox("Show Threshold Marker")]
+        [Checkbox("Threshold Marker")]
         [CollapseControl(30, 0)]
         public bool ShowThresholdMarker = false;
 
-        [DragInt("Threshold Marker Value", min = 1, max = 10000)]
+        [DragInt("Value", min = 1, max = 10000)]
         [CollapseWith(0, 0)]
         public int ThresholdMarkerValue = 7000;
+        //TODO ADD BELOW THRESHOLD COLOR
 
-        [ColorEdit4("Color")]
-        [Order(35)]
-        public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
 
         public PrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
         {

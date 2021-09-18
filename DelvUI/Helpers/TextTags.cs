@@ -22,15 +22,15 @@ namespace DelvUI.Helpers
                 "[health:current-percent-short]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => actor.CurrentHp == actor.MaxHp
                     ? ((int)actor.CurrentHp).KiloFormat()
                     : $"{Math.Round(100f / actor.MaxHp * actor.CurrentHp)}",
-                "[health:current-max]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => $"{actor.CurrentHp.ToString()} | {actor.MaxHp}",
+                "[health:current-max]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => $"{actor.CurrentHp.ToString()}  |  {actor.MaxHp}",
                 "[health:current-max-short]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") =>
-                    $"{((int)actor.CurrentHp).KiloFormat()} | {((int)actor.MaxHp).KiloFormat()}",
+                    $"{((int)actor.CurrentHp).KiloFormat()}  |  {((int)actor.MaxHp).KiloFormat()}",
                 "[health:current-max-percent]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => actor.CurrentHp == actor.MaxHp
                     ? $"{Math.Round(100f / actor.MaxHp * actor.CurrentHp)} - 100"
                     : $"{actor.CurrentHp} - {actor.MaxHp}",
                 "[health:current-max-percent-short]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => actor.CurrentHp == actor.MaxHp
                     ? $"{Math.Round(100f / actor.MaxHp * actor.CurrentHp)} - 100"
-                    : $"{((int)actor.CurrentHp).KiloFormat()} | {((int)actor.MaxHp).KiloFormat()}",
+                    : $"{((int)actor.CurrentHp).KiloFormat()}  |  {((int)actor.MaxHp).KiloFormat()}",
                 "[health:max]" when IsPropertyExist(actor, "MaxHp") => actor.MaxHp.ToString(),
                 "[health:max-short]" when IsPropertyExist(actor, "MaxHp") => ((int)actor.MaxHp).KiloFormat(),
                 "[health:percent]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => $"{Math.Round(100f / actor.MaxHp * actor.CurrentHp)}",
@@ -48,14 +48,14 @@ namespace DelvUI.Helpers
                 "[mana:current-percent-short]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") => actor.CurrentMp == actor.MaxMp
                     ? ((int)actor.CurrentMp).KiloFormat()
                     : $"{Math.Round(100f / actor.MaxMp * actor.CurrentMp)}",
-                "[mana:current-max]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") => $"{actor.CurrentMp.ToString()} | {actor.MaxMp}",
+                "[mana:current-max]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") => $"{actor.CurrentMp.ToString()}  |  {actor.MaxMp}",
                 "[mana:current-max-short]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") =>
                     $"{((int)actor.CurrentMp).KiloFormat()} | {((int)actor.MaxMp).KiloFormat()}",
                 "[mana:current-max-percent]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") => actor.CurrentMp == actor.MaxMp
-                    ? $"{Math.Round(100f / actor.MaxMp * actor.CurrentMp)} | 100"
+                    ? $"{Math.Round(100f / actor.MaxMp * actor.CurrentMp)}  |  100"
                     : $"{actor.CurrentMp} - {actor.MaxMp}",
                 "[mana:current-max-percent-short]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") => actor.CurrentMp == actor.MaxMp
-                    ? $"{Math.Round(100f / actor.MaxMp * actor.CurrentMp)} | 100"
+                    ? $"{Math.Round(100f / actor.MaxMp * actor.CurrentMp)}  |  100"
                     : $"{((int)actor.CurrentMp).KiloFormat()} - {((int)actor.MaxMp).KiloFormat()}",
                 "[mana:max]" when IsPropertyExist(actor, "MaxMp") => actor.MaxMp.ToString(),
                 "[mana:max-short]" when IsPropertyExist(actor, "MaxMp") => ((int)actor.MaxMp).KiloFormat(),

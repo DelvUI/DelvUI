@@ -62,13 +62,7 @@ namespace DelvUI.Interface.GeneralElements
                 var size = new Vector2(2, Config.Size.Y);
                 drawList.AddRect(position, position + size, 0xFF000000);
             }
-
-            // text
-            if (Config.ShowValue)
-            {
-                Config.ValueLabelConfig.SetText($"{current,0}");
-                _valueLabel.Draw(origin + Config.Position, Config.Size);
-            }
+            
         }
 
         private void GetResources(ref int current, ref int max, Chara actor)

@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
+using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.Game.Character;
@@ -32,7 +33,7 @@ namespace DelvUI.Interface.GeneralElements
             return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
         }
 
-        public unsafe override void DrawChildren(Vector2 origin)
+        public override unsafe void DrawChildren(Vector2 origin)
         {
             if (!Config.Enabled || Actor == null || Actor is not Chara)
             {
@@ -78,14 +79,7 @@ namespace DelvUI.Interface.GeneralElements
 
             // cast bar
             var color = Color();
-            drawList.AddRectFilledMultiColor(
-                startPos,
-                startPos + new Vector2(Config.Size.X * castScale, Config.Size.Y),
-                color["gradientTop"],
-                color["gradientTop"],
-                color["gradientBottom"],
-                color["gradientBottom"]
-            );
+            DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X * castScale, Config.Size.Y), color, drawList);
 
             // border
             drawList.AddRect(startPos, endPos, 0xFF000000);
@@ -122,9 +116,9 @@ namespace DelvUI.Interface.GeneralElements
             // override
         }
 
-        public virtual Dictionary<string, uint> Color()
+        public virtual PluginConfigColor Color()
         {
-            return Config.Color.Map;
+            return Config.Color;
         }
     }
 
@@ -149,28 +143,21 @@ namespace DelvUI.Interface.GeneralElements
             var slideCastWidth = Math.Min(Config.Size.X, (Config.SlideCastTime / 1000f) * Config.Size.X / totalCastTime);
             var startPos = new Vector2(origin.X + Config.Size.X / 2f - slideCastWidth, origin.Y - Config.Size.Y / 2f);
             var endPos = startPos + new Vector2(slideCastWidth, Config.Size.Y);
-            var color = Config.SlideCastColor.Map;
+            var color = Config.SlideCastColor;
 
-            drawList.AddRectFilledMultiColor(
-                startPos,
-                endPos,
-                color["gradientTop"],
-                color["gradientTop"],
-                color["gradientBottom"],
-                color["gradientBottom"]
-            );
+            DrawHelper.DrawGradientFilledRect(startPos, new Vector2(slideCastWidth, Config.Size.Y), color, drawList);
         }
 
-        public override Dictionary<string, uint> Color()
+        public override PluginConfigColor Color()
         {
             if (!Config.UseJobColor || Actor is not Chara)
             {
-                return Config.Color.Map;
+                return Config.Color;
             }
 
             var chara = (Chara)Actor;
             var color = GlobalColors.Instance.ColorForJobId(chara.ClassJob.Id);
-            return color != null ? color.Map : Config.Color.Map;
+            return color != null ? color : Config.Color;
         }
     }
 
@@ -183,16 +170,16 @@ namespace DelvUI.Interface.GeneralElements
 
         }
 
-        public override Dictionary<string, uint> Color()
+        public override PluginConfigColor Color()
         {
             if (Config.ShowInterruptableColor && _lastUsedCast.Interruptable)
             {
-                return Config.InterruptableColor.Map;
+                return Config.InterruptableColor;
             }
 
             if (!Config.UseColorForDamageTypes)
             {
-                return Config.Color.Map;
+                return Config.Color;
             }
 
             switch (_lastUsedCast.DamageType)
@@ -201,16 +188,16 @@ namespace DelvUI.Interface.GeneralElements
                 case DamageType.Blunt:
                 case DamageType.Slashing:
                 case DamageType.Piercing:
-                    return Config.PhysicalDamageColor.Map;
+                    return Config.PhysicalDamageColor;
 
                 case DamageType.Magic:
-                    return Config.MagicalDamageColor.Map;
+                    return Config.MagicalDamageColor;
 
                 case DamageType.Darkness:
-                    return Config.DarknessDamageColor.Map;
+                    return Config.DarknessDamageColor;
             }
 
-            return Config.Color.Map;
+            return Config.Color;
         }
     }
 }

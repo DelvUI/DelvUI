@@ -100,15 +100,12 @@ namespace DelvUI.Config
 
         [JsonIgnore] public uint BottomGradient { get; private set; }
 
-        [JsonIgnore] public Dictionary<string, uint> Map { get; private set; }
-
         private void Update()
         {
             Base = ImGui.ColorConvertFloat4ToU32(_vector);
             Background = ImGui.ColorConvertFloat4ToU32(_vector.AdjustColor(_colorMapRatios[0]));
             TopGradient = ImGui.ColorConvertFloat4ToU32(_vector.AdjustColor(_colorMapRatios[1]));
             BottomGradient = ImGui.ColorConvertFloat4ToU32(_vector.AdjustColor(_colorMapRatios[2]));
-            Map = new Dictionary<string, uint> { ["base"] = Base, ["background"] = Background, ["gradientTop"] = TopGradient, ["gradientBottom"] = BottomGradient };
         }
     }
 }

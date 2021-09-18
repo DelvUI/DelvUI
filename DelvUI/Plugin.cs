@@ -76,14 +76,13 @@ namespace DelvUI
                     HelpMessage = "Opens the DelvUI configuration window.\n"
                                 + "/delvui toggle → Toggles HUD visibility.\n"
                                 + "/delvui show → Shows HUD.\n"
-                                + "/delvui hide → Hides HUD.",
+                                + "/delvui hide → Hides HUD.\n"
+                                + "/delvui reset → Resets HUD to default. This is irreversible!",
                     ShowInHelp = true
                 }
             );
 
             _menuHook = new SystemMenuHook(PluginInterface);
-
-            CommandManager.AddHandler("/delvuireloadconfig", new CommandInfo(ReloadConfigCommand));
 
             Resolver.Initialize();
             TexturesCache.Initialize();
@@ -190,6 +189,12 @@ namespace DelvUI
 
                         break;
 
+                    case "reset":
+                        ConfigurationManager.Initialize(true);
+                        ConfigurationManager.GetInstance().SaveConfigurations();
+
+                        break;
+
                     default:
                         configManager.DrawConfigWindow = !configManager.DrawConfigWindow;
 
@@ -211,6 +216,7 @@ namespace DelvUI
 
             if (hudState)
             {
+                _hudManager.Helper.ApplyCurrentConfig();
                 _hudManager.Helper.UserInterfaceWasHidden = true;
             }
 

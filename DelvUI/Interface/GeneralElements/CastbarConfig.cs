@@ -11,18 +11,18 @@ namespace DelvUI.Interface.GeneralElements
     public class PlayerCastbarConfig : CastbarConfig
     {
         [Checkbox("Use Job Color")]
-        [Order(45)]
+        [Order(35)]
         public bool UseJobColor = false;
 
-        [Checkbox("Show Slide Cast")]
-        [CollapseControl(50, 0)]
+        [Checkbox("Slide Cast")]
+        [CollapseControl(40, 0)]
         public bool ShowSlideCast = true;
 
-        [DragInt("Slide Cast Time (milliseconds)", min = 0, max = 10000)]
+        [DragInt("Time (milliseconds)", min = 0, max = 10000)]
         [CollapseWith(0, 0)]
         public int SlideCastTime = 200;
 
-        [ColorEdit4("Slide Cast Color")]
+        [ColorEdit4("Color ##SlidecastColor")]
         [CollapseWith(5, 0)]
         public PluginConfigColor SlideCastColor = new PluginConfigColor(new(190f / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
 
@@ -49,27 +49,27 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Target", 0)]
     public class TargetCastbarConfig : CastbarConfig
     {
-        [Checkbox("Show Interruptable Color")]
-        [CollapseControl(45, 0)]
+        [Checkbox("User Interruptable Color")]
+        [CollapseControl(35, 0)]
         public bool ShowInterruptableColor = true;
 
-        [ColorEdit4("Interruptable Color")]
+        [ColorEdit4("Interruptable")]
         [CollapseWith(0, 0)]
         public PluginConfigColor InterruptableColor = new PluginConfigColor(new(255f / 255f, 87f / 255f, 113f / 255f, 100f / 100f));
 
         [Checkbox("Use Damage Type Colors")]
-        [CollapseControl(50, 1)]
+        [CollapseControl(40, 1)]
         public bool UseColorForDamageTypes = true;
 
-        [ColorEdit4("Physical Damage Color")]
+        [ColorEdit4("Physical Damage")]
         [CollapseWith(0, 1)]
         public PluginConfigColor PhysicalDamageColor = new PluginConfigColor(new(190f / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
 
-        [ColorEdit4("Magical Damage Color")]
+        [ColorEdit4("Magical Damage")]
         [CollapseWith(5, 1)]
         public PluginConfigColor MagicalDamageColor = new PluginConfigColor(new(0f / 255f, 72f / 255f, 179f / 255f, 100f / 100f));
 
-        [ColorEdit4("Darkness Damage Color")]
+        [ColorEdit4("Darkness Damage")]
         [CollapseWith(10, 1)]
         public PluginConfigColor DarknessDamageColor = new PluginConfigColor(new(188f / 255f, 19f / 255f, 254f / 255f, 100f / 100f));
 
@@ -150,20 +150,24 @@ namespace DelvUI.Interface.GeneralElements
         [Checkbox("Preview")]
         [Order(20)]
         public bool Preview = false;
-
-        [NestedConfig("Cast Name Label", 25)]
-        public LabelConfig CastNameConfig;
-
-        [NestedConfig("Cast Time Label", 30)]
-        public LabelConfig CastTimeConfig;
-
-        [Checkbox("Show Icon")]
-        [Order(35)]
+        
+        [Checkbox("Icon")]
+        [Order(25)]
         public bool ShowIcon = true;
 
-        [ColorEdit4("Color")]
-        [Order(40)]
+        [ColorEdit4("Color ##Castbar")]
+        [Order(30)]
         public PluginConfigColor Color = new PluginConfigColor(new(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
+        
+        //CHARA TYPE SPECIFIC CONFIGS SPAWN HERE
+        
+        [NestedConfig("Cast Name", 45)]
+        public LabelConfig CastNameConfig;
+
+        [NestedConfig("Cast Time", 50)]
+        public LabelConfig CastTimeConfig;
+
+        
 
         public CastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
         {

@@ -74,7 +74,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawFairyBar(Vector2 origin)
         {
             float fairyGauge = Plugin.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
-            float seraphDuration = Math.Abs(Plugin.JobGauges.Get<SCHGauge>().SeraphTimer / 1000);            
+            float seraphDuration = Math.Abs(Plugin.JobGauges.Get<SCHGauge>().SeraphTimer / 1000);
 
             Vector2 barSize = Config.FairySize;
             Vector2 position = origin + Config.Position + Config.FairyPosition - barSize / 2f;
@@ -83,7 +83,7 @@ namespace DelvUI.Interface.Jobs
 
             if (seraphDuration > 0)
             {
-                builder.AddInnerBar(seraphDuration, 22f, Config.SeraphColor.Map)
+                builder.AddInnerBar(seraphDuration, 22f, Config.SeraphColor)
                     .SetBackgroundColor(EmptyColor.Background);
 
                 if (Config.ShowSeraphText)
@@ -97,7 +97,7 @@ namespace DelvUI.Interface.Jobs
             }
             else
             {
-                builder.AddInnerBar(fairyGauge, 100f, Config.FairyColor.Map)
+                builder.AddInnerBar(fairyGauge, 100f, Config.FairyColor)
                     .SetBackgroundColor(EmptyColor.Background);
 
                 if (Config.ShowFairyText)
@@ -125,7 +125,7 @@ namespace DelvUI.Interface.Jobs
             Bar bar = BarBuilder.Create(position, barSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.AetherPadding)
-                                .AddInnerBar(aetherFlowBuff.StackCount, 3, Config.AetherColor.Map)
+                                .AddInnerBar(aetherFlowBuff.StackCount, 3, Config.AetherColor)
                                 .SetBackgroundColor(EmptyColor.Background)
                                 .Build();
 
@@ -158,7 +158,7 @@ namespace DelvUI.Interface.Jobs
 
             BarBuilder builder = BarBuilder.Create(position, barSize);
 
-            Bar bioBar = builder.AddInnerBar(bioDuration, 30f, bioColor.Map)
+            Bar bioBar = builder.AddInnerBar(bioDuration, 30f, bioColor)
                                 .SetFlipDrainDirection(Config.BioInverted)
                                 .Build();
 
@@ -217,7 +217,7 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Fairy Gauge Text")]
         [CollapseWith(0, 2)]
         public bool ShowFairyText = true;
-               
+
         [Checkbox("Seraph Bar Enabled")]
         [CollapseWith(5, 2)]
         public bool ShowSeraph = true;
@@ -240,7 +240,7 @@ namespace DelvUI.Interface.Jobs
 
         [ColorEdit4("Seraph Bar Color")]
         [CollapseWith(30, 2)]
-        public PluginConfigColor SeraphColor = new(new Vector4(232f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));        
+        public PluginConfigColor SeraphColor = new(new Vector4(232f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         #region bio

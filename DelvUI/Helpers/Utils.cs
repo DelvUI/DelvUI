@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
+using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using System;
 using System.Collections.Generic;
@@ -59,26 +60,26 @@ namespace DelvUI.Helpers
             return t.Seconds.ToString();
         }
 
-        public static Dictionary<string, uint> ColorForActor(Chara actor)
+        public static PluginConfigColor ColorForActor(Chara actor)
         {
             switch (actor.ObjectKind)
             {
                 // Still need to figure out the "orange" state; aggroed but not yet attacked.
                 case ObjectKind.Player:
-                    return GlobalColors.Instance.SafeColorForJobId(actor.ClassJob.Id).Map;
+                    return GlobalColors.Instance.SafeColorForJobId(actor.ClassJob.Id);
 
                 case ObjectKind.BattleNpc when (actor.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat:
-                    return GlobalColors.Instance.NPCHostileColor.Map;
+                    return GlobalColors.Instance.NPCHostileColor;
 
                 case ObjectKind.BattleNpc:
                     if (!IsHostileMemory((BattleNpc)actor))
                     {
-                        return GlobalColors.Instance.NPCFriendlyColor.Map;
+                        return GlobalColors.Instance.NPCFriendlyColor;
                     }
                     break;
             }
 
-            return GlobalColors.Instance.NPCNeutralColor.Map;
+            return GlobalColors.Instance.NPCNeutralColor;
         }
 
         public static bool HasTankInvulnerability(Actor actor)

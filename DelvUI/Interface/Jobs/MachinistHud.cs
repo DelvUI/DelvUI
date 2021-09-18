@@ -84,7 +84,7 @@ namespace DelvUI.Interface.Jobs
             var builder = BarBuilder.Create(position, Config.HeatGaugeSize)
                                     .SetChunks(2)
                                     .SetChunkPadding(Config.HeatGaugePadding)
-                                    .AddInnerBar(gauge.Heat, 100, Config.HeatGaugeFillColor.Map, PartialFillColor.Map);
+                                    .AddInnerBar(gauge.Heat, 100, Config.HeatGaugeFillColor, PartialFillColor);
 
             if (Config.ShowHeatGaugeText)
             {
@@ -110,7 +110,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowBatteryGaugeBattery)
             {
-                builder.AddInnerBar(gauge.Battery, 100, Config.BatteryFillColor.Map, PartialFillColor.Map);
+                builder.AddInnerBar(gauge.Battery, 100, Config.BatteryFillColor, PartialFillColor);
 
                 if (Config.ShowBatteryGaugeBatteryText)
                 {
@@ -121,7 +121,7 @@ namespace DelvUI.Interface.Jobs
 
             if (gauge.IsRobotActive() && Config.ShowBatteryGaugeRobotDuration)
             {
-                builder.AddInnerBar(gauge.RobotTimeRemaining / 1000f, _robotDuration[gauge.LastRobotBatteryPower / 10 - 5], Config.RobotFillColor.Map, null);
+                builder.AddInnerBar(gauge.RobotTimeRemaining / 1000f, _robotDuration[gauge.LastRobotBatteryPower / 10 - 5], Config.RobotFillColor, null);
 
                 if (Config.ShowBatteryGaugeRobotDurationText)
                 {
@@ -146,7 +146,7 @@ namespace DelvUI.Interface.Jobs
 
             if (gauge.IsOverheated())
             {
-                builder.AddInnerBar(gauge.OverheatTimeRemaining / 1000f, 8, Config.OverheatFillColor.Map, null);
+                builder.AddInnerBar(gauge.OverheatTimeRemaining / 1000f, 8, Config.OverheatFillColor, null);
 
                 if (Config.ShowOverheatText)
                 {
@@ -170,7 +170,7 @@ namespace DelvUI.Interface.Jobs
             if (wildfireBuff.Any())
             {
                 var duration = wildfireBuff.First().Duration;
-                builder.AddInnerBar(duration, 10, Config.WildfireFillColor.Map, null);
+                builder.AddInnerBar(duration, 10, Config.WildfireFillColor, null);
 
                 if (Config.ShowWildfireText)
                 {

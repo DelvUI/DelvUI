@@ -25,6 +25,9 @@ namespace DelvUI.Config
 
         public BaseNode ConfigBaseNode;
 
+        private MiscColorConfig _miscColorConfig => (MiscColorConfig)ConfigBaseNode.configPageNodesMap[typeof(MiscColorConfig)].ConfigObject;
+        public GradientDirection GradientDirection => _miscColorConfig.GradientDirection;
+
         public string ConfigDirectory;
         public bool DrawConfigWindow;
 
