@@ -135,6 +135,7 @@ namespace DelvUI.Interface.Jobs
                 {
                     ninjutsuText = GenerateNinjutsuText(ninjutsuBuff.First().StackCount, haveKassatsuBuff, haveTCJBuff);
                 }
+
                 // notice that this approach will never display the third ninjutsu cast under TCJ
                 // as TCJ ends before the third ninjutsu is cast
                 if (haveTCJBuff)
@@ -142,14 +143,17 @@ namespace DelvUI.Interface.Jobs
                     ninjutsuText = GenerateNinjutsuText(tcjBuff.First().StackCount, haveKassatsuBuff, haveTCJBuff);
                 }
                 PluginConfigColor barColor = haveTCJBuff ? Config.TCJBarColor : (haveKassatsuBuff ? Config.KassatsuBarColor : Config.MudraBarColor);
-                float duration = haveTCJBuff ? tcjBuff.First().Duration : (haveKassatsuBuff ? kassatsuBuff.First().Duration : maximum - mudraCooldownInfo);
-                float tcjKassMaximum = haveTCJBuff ? 6f : (haveKassatsuBuff ? 15f : maximum);
+
+                float ninjutsuMaxDuration = haveMudraBuff || haveTCJBuff ? 6f : 15f;
+                float duration = haveTCJBuff ? tcjBuff.First().Duration : haveMudraBuff ? ninjutsuBuff.First().Duration : haveKassatsuBuff ? kassatsuBuff.First().Duration : ninjutsuMaxDuration;
+
                 // it seems there is some time before the duration is updated after the buff is obtained
                 if (duration < 0)
                 {
-                    duration = tcjKassMaximum;
+                    duration = ninjutsuMaxDuration;
                 }
-                builder.AddInnerBar(duration, tcjKassMaximum, barColor);
+
+                builder.AddInnerBar(duration, ninjutsuMaxDuration, barColor);
                 if (Config.ShowNinjutsuText)
                 {
                     builder.SetTextMode(BarTextMode.Single)
