@@ -21,7 +21,7 @@ namespace DelvUI.Interface.GeneralElements
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
+            return (new List<Vector2>() { Utils.GetAnchoredPosition(Config.Position, Config.Size, Config.Anchor) }, new List<Vector2>() { Config.Size });
         }
 
         public override void DrawChildren(Vector2 origin)

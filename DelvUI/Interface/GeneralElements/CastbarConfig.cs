@@ -142,16 +142,8 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Serializable]
-    public abstract class CastbarConfig : MovablePluginConfigObject
+    public abstract class CastbarConfig : AnchorablePluginConfigObject
     {
-        [DragInt2("Size", min = 1, max = 4000)]
-        [Order(15)]
-        public Vector2 Size;
-
-        [Combo("Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
-        [Order(20)]
-        public DrawAnchor Anchor = DrawAnchor.Center;
-
         [Checkbox("Preview")]
         [Order(25)]
         public bool Preview = false;

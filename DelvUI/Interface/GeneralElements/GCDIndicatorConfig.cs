@@ -1,6 +1,5 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using DelvUI.Enums;
 using System;
 using System.Numerics;
 
@@ -9,16 +8,8 @@ namespace DelvUI.Interface.GeneralElements
     [Serializable]
     [Section("Misc")]
     [SubSection("GCD Indicator", 0)]
-    public class GCDIndicatorConfig : MovablePluginConfigObject
+    public class GCDIndicatorConfig : AnchorablePluginConfigObject
     {
-        [DragInt2("Size", min = 1, max = 4000)]
-        [Order(15)]
-        public Vector2 Size;
-
-        [Combo("Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
-        [Order(20)]
-        public DrawAnchor Anchor = DrawAnchor.Center;
-
         [Checkbox("Anchor To Mouse")]
         [Order(25)]
         public bool AnchorToMouse = false;

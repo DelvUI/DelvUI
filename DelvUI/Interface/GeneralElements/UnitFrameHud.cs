@@ -1,6 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.Internal.Gui.Addon;
-using DelvUI.Enums;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
@@ -42,7 +41,7 @@ namespace DelvUI.Interface.GeneralElements
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
+            return (new List<Vector2>() { Utils.GetAnchoredPosition(Config.Position, Config.Size, Config.Anchor) }, new List<Vector2>() { Config.Size });
         }
 
         public override void DrawChildren(Vector2 origin)

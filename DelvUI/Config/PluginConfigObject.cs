@@ -1,4 +1,5 @@
 ﻿using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
@@ -55,6 +56,18 @@ namespace DelvUI.Config
         [DragInt2("Position", min = -4000, max = 4000)]
         [Order(5)]
         public Vector2 Position = Vector2.Zero;
+    }
+
+    [Serializable]
+    public abstract class AnchorablePluginConfigObject : MovablePluginConfigObject
+    {
+        [DragInt2("Size", min = 1, max = 4000)]
+        [Order(10)]
+        public Vector2 Size;
+
+        [Anchor("Anchor")]
+        [Order(15)]
+        public DrawAnchor Anchor = DrawAnchor.Center;
     }
 
     [Serializable]

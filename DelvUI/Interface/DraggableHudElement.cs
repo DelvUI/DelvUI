@@ -1,8 +1,6 @@
-﻿using Dalamud.Plugin;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Helpers;
 using ImGuiNET;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -78,19 +76,6 @@ namespace DelvUI.Interface
             // check selection
             var tooltipText = "x: " + _config.Position.X.ToString() + "    y: " + _config.Position.Y.ToString();
 
-            if (ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
-            {
-                bool cliked = ImGui.IsMouseClicked(ImGuiMouseButton.Left) || ImGui.IsMouseDown(ImGuiMouseButton.Left);
-                if (cliked && !Selected && SelectEvent != null)
-                {
-                    SelectEvent(this, null);
-                }
-
-                // tooltip
-
-                TooltipsHelper.Instance.ShowTooltipOnCursor(tooltipText);
-            }
-
             // draw window
             var drawList = ImGui.GetWindowDrawList();
             var contentPos = windowPos + _contentMargin;
@@ -103,6 +88,32 @@ namespace DelvUI.Interface
             drawList.AddRect(contentPos, contentPos + contentSize, lineColor, 3, ImDrawFlags.None, 2);
             drawList.AddLine(contentPos + new Vector2(contentSize.X / 2f, 0), contentPos + new Vector2(contentSize.X / 2, contentSize.Y), lineColor);
             drawList.AddLine(contentPos + new Vector2(0, contentSize.Y / 2f), contentPos + new Vector2(contentSize.X, contentSize.Y / 2), lineColor);
+
+            // element name
+            var textSize = ImGui.CalcTextSize(_displayName);
+            var textColor = Selected ? 0xFFFFFFFF : 0xEEFFFFFF;
+            var textOutlineColor = Selected ? 0xFF000000 : 0xEE000000;
+            DrawHelper.DrawOutlinedText(_displayName, contentPos + contentSize / 2f - textSize / 2f, textColor, textOutlineColor, drawList);
+
+            if (ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
+            {
+                bool clicked = ImGui.IsMouseClicked(ImGuiMouseButton.Left) || ImGui.IsMouseDown(ImGuiMouseButton.Left);
+                if (clicked && !Selected && SelectEvent != null)
+                {
+                    SelectEvent(this, null);
+                }
+
+                // tooltip
+                TooltipsHelper.Instance.ShowTooltipOnCursor(tooltipText);
+
+                var anchorableConfig = _config as AnchorablePluginConfigObject;
+                if (anchorableConfig != null)
+                {
+                    var anchorIndicatorPos = Utils.GetAnchoredPosition(contentPos, -contentSize, anchorableConfig.Anchor);
+                    var anchorIndicatorSize = new Vector2(8, 8);
+                    drawList.AddRectFilled(anchorIndicatorPos - anchorIndicatorSize / 2f, anchorIndicatorPos + anchorIndicatorSize / 2f, 0xFF0000FF);
+                }
+            }
 
             ImGui.End();
 
@@ -118,11 +129,6 @@ namespace DelvUI.Interface
                 }
             }
 
-            // element name
-            var textSize = ImGui.CalcTextSize(_displayName);
-            var textColor = Selected ? 0xFFFFFFFF : 0xEEFFFFFF;
-            var textOutlineColor = Selected ? 0xFF000000 : 0xEE000000;
-            DrawHelper.DrawOutlinedText(_displayName, contentPos + contentSize / 2f - textSize / 2f, textColor, textOutlineColor, drawList);
         }
 
         public virtual void DrawChildren(Vector2 origin) { }
@@ -149,7 +155,7 @@ namespace DelvUI.Interface
 
                 for (int i = 0; i < positions.Count; i++)
                 {
-                    var pos = positions[i] - sizes[i] / 2f;
+                    var pos = positions[i];
                     minX = Math.Min(minX, pos.X);
                     minY = Math.Min(minY, pos.Y);
                 }
@@ -180,7 +186,7 @@ namespace DelvUI.Interface
 
                 for (int i = 0; i < positions.Count; i++)
                 {
-                    var pos = positions[i] + sizes[i] / 2f;
+                    var pos = positions[i] + sizes[i];
                     maxX = Math.Max(maxX, pos.X);
                     maxY = Math.Max(maxY, pos.Y);
                 }

@@ -1,6 +1,5 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using DelvUI.Enums;
 using System;
 using System.Numerics;
 
@@ -9,16 +8,8 @@ namespace DelvUI.Interface.GeneralElements
     [Serializable]
     [Section("Misc")]
     [SubSection("MP Ticker", 0)]
-    public class MPTickerConfig : MovablePluginConfigObject
+    public class MPTickerConfig : AnchorablePluginConfigObject
     {
-        [DragInt2("Size", min = 1, max = 4000)]
-        [Order(15)]
-        public Vector2 Size;
-
-        [Combo("Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
-        [Order(20)]
-        public DrawAnchor Anchor = DrawAnchor.Center;
-
         [Checkbox("Hide on Full MP")]
         [Order(25)]
         public bool HideOnFullMP = true;

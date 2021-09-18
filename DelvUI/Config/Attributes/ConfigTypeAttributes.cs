@@ -119,6 +119,15 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
+    public class AnchorAttribute : ComboAttribute
+    {
+        public AnchorAttribute(string friendlyName)
+            : base(friendlyName, new string[] { "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight" })
+        {
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Field)]
     public class OrderAttribute : Attribute
     {
         public int pos;

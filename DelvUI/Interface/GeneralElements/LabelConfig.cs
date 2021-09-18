@@ -37,11 +37,11 @@ namespace DelvUI.Interface.GeneralElements
     {
         [JsonIgnore] protected string _text;
 
-        [Combo("Frame Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
+        [Anchor("Frame Anchor")]
         [Order(25)]
         public DrawAnchor FrameAnchor = DrawAnchor.Center;
 
-        [Combo("Text Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
+        [Anchor("Text Anchor")]
         [Order(30)]
         public DrawAnchor TextAnchor = DrawAnchor.TopLeft;
 

@@ -104,16 +104,8 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Serializable]
-    public class UnitFrameConfig : MovablePluginConfigObject
+    public class UnitFrameConfig : AnchorablePluginConfigObject
     {
-        [DragInt2("Size", min = 1, max = 4000)]
-        [Order(15)]
-        public Vector2 Size;
-
-        [Combo("Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
-        [Order(20)]
-        public DrawAnchor Anchor = DrawAnchor.Center;
-
         [Checkbox("Custom Frame Color")]
         [CollapseControl(25, 0)]
         public bool UseCustomColor = false;
