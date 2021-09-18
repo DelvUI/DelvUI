@@ -312,7 +312,7 @@ namespace DelvUI.Interface.Jobs
         public new static BlackMageConfig DefaultConfig() { return new BlackMageConfig(); }
 
         #region mana bar
-        [Checkbox("Show Mana Bar")]
+        [Checkbox("Show Mana Bar", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowManaBar = true;
 
@@ -350,7 +350,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region umbral heart
-        [Checkbox("Show Umbral Heart Bar")]
+        [Checkbox("Show Umbral Heart Bar", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowUmbralHeart = true;
 
@@ -372,7 +372,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region triple cast
-        [Checkbox("Show Triplecast")]
+        [Checkbox("Show Triplecast", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowTriplecast = true;
 
@@ -394,7 +394,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region polyglot
-        [Checkbox("Show Polyglot Stacks")]
+        [Checkbox("Show Polyglot Stacks", separator = true)]
         [CollapseControl(45, 3)]
         public bool ShowPolyglot = true;
 
@@ -416,7 +416,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region procs
-        [Checkbox("Show Procs")]
+        [Checkbox("Show Procs", separator = true)]
         [CollapseControl(50, 4)]
         public bool ShowProcs = true;
 
@@ -450,7 +450,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region thunder dots
-        [Checkbox("Show DoT Bar")]
+        [Checkbox("Show DoT Bar", separator = true)]
         [CollapseControl(55, 5)]
         public bool ShowDotBar = true;
 

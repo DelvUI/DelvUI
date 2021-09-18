@@ -339,7 +339,7 @@ namespace DelvUI.Interface.Jobs
         public new static SummonerConfig DefaultConfig() { return new SummonerConfig(); }
 
         #region aether
-        [Checkbox("Aether Tracker Enabled")]
+        [Checkbox("Aether Tracker Enabled", separator = true)]
         [CollapseControl(30, 1)]
         public bool ShowAether = true;
 
@@ -361,7 +361,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region ruin
-        [Checkbox("Ruin Enabled")]
+        [Checkbox("Ruin Enabled", separator = true)]
         [CollapseControl(35, 2)]
         public bool ShowRuin = true;
 
@@ -383,7 +383,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region miasma
-        [Checkbox("Miasma Enabled")]
+        [Checkbox("Miasma Enabled", separator = true)]
         [CollapseControl(40, 3)]
         public bool ShowMiasma = true;
 
@@ -405,7 +405,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region bio
-        [Checkbox("Bio Enabled")]
+        [Checkbox("Bio Enabled", separator = true)]
         [CollapseControl(45, 4)]
         public bool ShowBio = true;
 
@@ -427,7 +427,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region trance
-        [Checkbox("Trance Enabled")]
+        [Checkbox("Trance Enabled", separator = true)]
         [CollapseControl(50, 5)]
         public bool ShowTrance = true;
 
@@ -457,7 +457,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region dreadwyrm
-        [Checkbox("Dreadwyrm Trance Tracker Enabled")]
+        [Checkbox("Dreadwyrm Trance Tracker Enabled", separator = true)]
         [CollapseControl(55, 6)]
         public bool ShowDreadwyrmAether = true;
 

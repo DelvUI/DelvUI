@@ -110,7 +110,6 @@ namespace DelvUI.Config.Attributes
     {
         public string friendlyName;
 
-
         public ColorEdit4Attribute(string friendlyName)
         {
             this.friendlyName = friendlyName;

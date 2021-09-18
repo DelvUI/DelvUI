@@ -109,7 +109,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public Vector2 Size;
         
-        [Checkbox("Custom Frame Color")]
+        [Checkbox("Custom Frame Color", separator = true)]
         [CollapseControl(20, 0)]
         public bool UseCustomColor = false;
 

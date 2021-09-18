@@ -178,7 +178,7 @@ namespace DelvUI.Interface.Jobs
         }
 
         #region Lily Bar
-        [Checkbox("Show Lily Bars")]
+        [Checkbox("Show Lily Bars", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowLilyBars = true;
 
@@ -226,7 +226,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Dia Bar
-        [Checkbox("Show Dia Bar")]
+        [Checkbox("Show Dia Bar", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowDiaBar = true;
 

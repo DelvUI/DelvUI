@@ -1036,9 +1036,13 @@ namespace DelvUI.Config.Tree
             {
                 if (attribute is ConfigAttribute { separator: true })
                 {
-                    if (attribute is CheckboxAttribute checkboxAttribute && 
-                        (checkboxAttribute.friendlyName=="Enabled" && ID != null || checkboxAttribute.friendlyName!="Enabled")) { }
-                    else { continue; }
+                    if (attribute is CheckboxAttribute checkboxAttribute)
+                    {
+                        if (checkboxAttribute.friendlyName=="Enabled" && ID is not null || checkboxAttribute.friendlyName!="Enabled" ) { } 
+                        else { continue; }
+                    } 
+                        
+                    
                 }
                 else { continue; }
 

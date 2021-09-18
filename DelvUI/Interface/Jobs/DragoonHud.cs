@@ -211,7 +211,7 @@ namespace DelvUI.Interface.Jobs
         public new static DragoonConfig DefaultConfig() { return new DragoonConfig(); }
 
         #region Chaos Thrust Bar
-        [Checkbox("Show Chaos Thrust Bar")]
+        [Checkbox("Show Chaos Thrust Bar", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowChaosThrustBar = true;
 
@@ -233,7 +233,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Disembowel Bar
-        [Checkbox("Show Disembowel Bar")]
+        [Checkbox("Show Disembowel Bar", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowDisembowelBar = true;
 
@@ -255,7 +255,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Eye Of The Dragon Bar
-        [Checkbox("Show Eye Of The Dragon Bar")]
+        [Checkbox("Show Eye Of The Dragon Bar", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowEyeOfTheDragonBar = true;
 
@@ -277,7 +277,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Blood Bar
-        [Checkbox("Show Blood Bar")]
+        [Checkbox("Show Blood Bar", separator = true)]
         [CollapseControl(45, 3)]
         public bool ShowBloodBar = true;
 
