@@ -139,7 +139,7 @@ namespace DelvUI.Helpers
             return offset != Vector2.Zero;
         }
 
-        public static void DrawGridWindow(GridConfig config)
+        public static void DrawGridWindow()
         {
             var configManager = ConfigurationManager.GetInstance();
             var node = configManager.GetConfigPageNode<GridConfig>();
@@ -147,6 +147,8 @@ namespace DelvUI.Helpers
             {
                 return;
             }
+
+            GridConfig config = (GridConfig)node.ConfigObject;
 
             ImGui.SetNextWindowSize(new Vector2(345, 278), ImGuiCond.Appearing);
             ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
