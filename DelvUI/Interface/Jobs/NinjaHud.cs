@@ -114,7 +114,7 @@ namespace DelvUI.Interface.Jobs
 
             // for some reason (perhaps a slight delay), the mudras may be on cooldown before the "Mudra" buff is applied
             // hence we check for either
-            bool inNinjutsu = mudraStacks == -2 || mudraBuff != null;
+            bool inNinjutsu = mudraStacks == -2 || haveMudraBuff;
             // this ensures that if the cooldown suddenly drops to 0.5s because the player has casted a mudra
             // then the depicted cooldown freezes while the ninjutsu is being casted
             // unfortunately I can't quite get this to work for kassatsu
