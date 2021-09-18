@@ -1,5 +1,6 @@
 using Dalamud.Game.ClientState;
 using Dalamud.Interface;
+using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -32,7 +33,8 @@ namespace DelvUI.Interface
         private Dictionary<uint, JobHudTypes> _jobsMap;
         private Dictionary<uint, Type> _unsupportedJobsMap;
 
-        public HudHelper Helper { get; } = new HudHelper();
+        private HudHelper _helper { get; set; }
+        private bool _prevInEvent = true;
 
         public HudManager()
         {
@@ -210,13 +212,13 @@ namespace DelvUI.Interface
                 return;
             }
 
-            if (Helper.UserInterfaceWasHidden)
-            {
-                Helper.ApplyCurrentConfig();
-                Helper.UserInterfaceWasHidden = false;
-            }
+            bool inEvent = Plugin.Condition[ConditionFlag.OccupiedInEvent]
+                || Plugin.Condition[ConditionFlag.OccupiedInQuestEvent]
+                || Plugin.Condition[ConditionFlag.UsingHousingFunctions];
+            bool updateByEvent = _prevInEvent != inEvent;
 
-            Helper.ConfigureCombatActionBars();
+            _helper.Configure(isEvent: updateByEvent);
+            _prevInEvent = inEvent;
 
             ImGuiHelpers.ForceNextWindowMainViewport();
             ImGui.SetNextWindowPos(Vector2.Zero);
@@ -252,7 +254,7 @@ namespace DelvUI.Interface
             // general elements
             foreach (var element in _hudElements)
             {
-                if (element != _selectedElement && !Helper.IsElementHidden(element))
+                if (element != _selectedElement && !_helper.IsElementHidden(element))
                 {
                     element.Draw(_origin);
                 }
@@ -261,7 +263,7 @@ namespace DelvUI.Interface
             // job hud
             if (_jobHud != null && _jobHud.Config.Enabled && _jobHud != _selectedElement)
             {
-                if (!Helper.IsElementHidden(_jobHud))
+                if (!_helper.IsElementHidden(_jobHud))
                 {
                     _jobHud.Draw(_origin);
                 }
@@ -283,8 +285,17 @@ namespace DelvUI.Interface
         {
             if (!ConfigurationManager.GetInstance().ShowHUD || Plugin.ClientState.LocalPlayer == null)
             {
+                _helper = null;
                 return false;
             }
+
+            if (_helper == null)
+            {
+                _helper = new HudHelper();
+                _helper.Configure(true, true);
+            }
+
+
 
             var parameterWidget = (AtkUnitBase*)Plugin.GameGui.GetUiObjectByName("_ParameterWidget", 1);
             var fadeMiddleWidget = (AtkUnitBase*)Plugin.GameGui.GetUiObjectByName("FadeMiddle", 1);
@@ -316,11 +327,12 @@ namespace DelvUI.Interface
                 config = (JobConfig)ConfigurationManager.GetInstance().GetConfigObjectForType(types.ConfigType);
                 _jobHud = (JobHud)Activator.CreateInstance(types.HudType, types.HudType.FullName, config, types.DisplayName);
                 _jobHud.SelectEvent += OnDraggableElementSelected;
+
             }
 
             if (config != null && _primaryResourceHud != null)
             {
-                Helper.ApplyCurrentConfig();
+                _helper.Configure(true, true);
 
                 _primaryResourceHud.ResourceType = config.UseDefaultPrimaryResourceBar ? config.PrimaryResourceType : PrimaryResourceTypes.None;
             }
