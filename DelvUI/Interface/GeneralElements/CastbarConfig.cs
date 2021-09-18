@@ -161,10 +161,10 @@ namespace DelvUI.Interface.GeneralElements
         
         //CHARA TYPE SPECIFIC CONFIGS SPAWN HERE
         
-        [NestedConfig("Cast Name", 45, separator = true)]
+        [NestedConfig("Cast Name", 45)]
         public LabelConfig CastNameConfig;
 
-        [NestedConfig("Cast Time", 50, separator = true)]
+        [NestedConfig("Cast Time", 50)]
         public LabelConfig CastTimeConfig;
 
         

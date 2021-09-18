@@ -6,13 +6,13 @@ namespace DelvUI.Config.Attributes
     public class ConfigAttribute : Attribute
     {
         public bool isMonitored = false;
+        public bool separator = false;
     }
 
     [AttributeUsage(AttributeTargets.Field)]
     public class CheckboxAttribute : ConfigAttribute
     {
         public string friendlyName;
-        public bool separator;
 
         public CheckboxAttribute(string friendlyName)
         {
@@ -28,7 +28,6 @@ namespace DelvUI.Config.Attributes
         public float min;
         public float max;
         public float velocity;
-        public bool separator;
 
 
         public DragFloatAttribute(string friendlyName)
@@ -49,7 +48,6 @@ namespace DelvUI.Config.Attributes
         public int min;
         public int max;
         public int velocity;
-        public bool separator;
 
         public DragIntAttribute(string friendlyName)
         {
@@ -68,7 +66,6 @@ namespace DelvUI.Config.Attributes
         public float min;
         public float max;
         public float velocity;
-        public bool separator;
 
         public DragFloat2Attribute(string friendlyName)
         {
@@ -87,7 +84,6 @@ namespace DelvUI.Config.Attributes
         public int min;
         public int max;
         public int velocity;
-        public bool separator;
 
         public DragInt2Attribute(string friendlyName)
         {
@@ -104,7 +100,6 @@ namespace DelvUI.Config.Attributes
     {
         public string friendlyName;
         public uint maxLength;
-        public bool separator;
 
 
         public InputTextAttribute(string friendlyName)
@@ -120,7 +115,6 @@ namespace DelvUI.Config.Attributes
     public class ColorEdit4Attribute : ConfigAttribute
     {
         public string friendlyName;
-        public bool separator;
 
 
         public ColorEdit4Attribute(string friendlyName)
@@ -136,7 +130,6 @@ namespace DelvUI.Config.Attributes
     {
         public string friendlyName;
         public string[] options;
-        public bool separator;
 
 
         public ComboAttribute(string friendlyName, params string[] options)
@@ -152,12 +145,10 @@ namespace DelvUI.Config.Attributes
     public class OrderAttribute : Attribute
     {
         public int pos;
-        public bool separator;
 
         public OrderAttribute(int pos)
         {
             this.pos = pos;
-            separator = false;
 
         }
     }
@@ -193,11 +184,10 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class DragDropHorizontalAttribute : Attribute
+    public class DragDropHorizontalAttribute : ConfigAttribute
     {
         public string friendlyName;
         public string[] names;
-        public bool separator;
 
 
         public DragDropHorizontalAttribute(string friendlyName, params string[] names)
@@ -231,13 +221,11 @@ namespace DelvUI.Config.Attributes
     {
         public string friendlyName;
         public int pos;
-        public bool separator;
 
         public NestedConfigAttribute(string friendlyName, int pos)
         {
             this.friendlyName = friendlyName;
             this.pos = pos;
-            separator = false;
 
         }
     }
@@ -247,7 +235,6 @@ namespace DelvUI.Config.Attributes
     {
         public string friendlyName;
         public string[] options;
-        public bool separator;
 
 
         public DynamicList(string friendlyName, params string[] options)
