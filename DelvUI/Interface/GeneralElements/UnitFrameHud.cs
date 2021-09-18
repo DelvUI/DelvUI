@@ -206,7 +206,7 @@ namespace DelvUI.Interface.GeneralElements
                 origin.Y + Config.Position.Y - Config.Size.Y / 2f + thickness
             );
 
-            var color = tankStanceBuff.Count() <= 0 ? Config.TankStanceIndicatorConfig.UnactiveColor : Config.TankStanceIndicatorConfig.ActiveColor;
+            var color = tankStanceBuff.Count() <= 0 ? Config.TankStanceIndicatorConfig.InactiveColor : Config.TankStanceIndicatorConfig.ActiveColor;
 
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, color.Base);
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);

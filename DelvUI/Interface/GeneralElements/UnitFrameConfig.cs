@@ -108,41 +108,42 @@ namespace DelvUI.Interface.GeneralElements
         [DragInt2("Size", min = 1, max = 4000)]
         [Order(15)]
         public Vector2 Size;
-
-        [NestedConfig("Left Label", 20)]
-        public EditableLabelConfig LeftLabelConfig;
-
-        [NestedConfig("Right Label", 25)]
-        public EditableLabelConfig RightLabelConfig;
-
-        [Checkbox("Use Custom Color")]
-        [CollapseControl(30, 0)]
+        
+        [Checkbox("Custom Frame Color")]
+        [CollapseControl(20, 0)]
         public bool UseCustomColor = false;
 
-        [ColorEdit4("Custom Color")]
+        [ColorEdit4("Color ##CustomFrame")]
         [CollapseWith(0, 0)]
         public PluginConfigColor CustomColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
-        [Checkbox("Use Custom Background Color")]
-        [CollapseControl(35, 1)]
+        [Checkbox("Custom Background Color")]
+        [CollapseControl(25, 1)]
         public bool UseCustomBackgroundColor = false;
 
-        [ColorEdit4("Custom Background Color")]
+        [ColorEdit4("Color ##CustomBackground")]
         [CollapseWith(0, 1)]
         public PluginConfigColor CustomBackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [Checkbox("Show Tank Invulnerability")]
-        [Order(40)]
+        [Checkbox("Tank Invulnerability")]
+        [Order(30)]
         public bool ShowTankInvulnerability = true;
 
-        [Checkbox("Use Custom Invulnerability Color")]
-        [CollapseControl(45, 2)]
+        [Checkbox("Tank Invulnerability Custom Color")]
+        [CollapseControl(35, 2)]
         public bool UseCustomInvulnerabilityColor = true;
 
-        [ColorEdit4("Custom Invulnerability Color")]
+        [ColorEdit4("Color ##TankInvulnerabilityCustom")]
         [CollapseWith(0, 2)]
         public PluginConfigColor CustomInvulnerabilityColor = new PluginConfigColor(new Vector4(100f / 255f, 100f / 255f, 100f / 255f, 100f / 100f));
 
+        [NestedConfig("Left Text", 40)]
+        public EditableLabelConfig LeftLabelConfig;
+
+        [NestedConfig("Right Text", 45)]
+        public EditableLabelConfig RightLabelConfig;
+
+        
         [NestedConfig("Shields", 50)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
@@ -174,7 +175,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public bool FillHealthFirst = true;
 
-        [ColorEdit4("Color")]
+        [ColorEdit4("Color ##Shields")]
         [Order(20)]
         public PluginConfigColor Color = new PluginConfigColor(new Vector4(198f / 255f, 210f / 255f, 255f / 255f, 70f / 100f));
     }
@@ -187,12 +188,12 @@ namespace DelvUI.Interface.GeneralElements
         [Order(5)]
         public int Thickness = 2;
 
-        [ColorEdit4("Active Color")]
+        [ColorEdit4("Active")]
         [Order(10)]
         public PluginConfigColor ActiveColor = new PluginConfigColor(new Vector4(0f / 255f, 205f / 255f, 230f / 255f, 100f / 100f));
 
-        [ColorEdit4("Unactive Color")]
+        [ColorEdit4("Inactive")]
         [Order(15)]
-        public PluginConfigColor UnactiveColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 32f / 255f, 100f / 100f));
+        public PluginConfigColor InactiveColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 32f / 255f, 100f / 100f));
     }
 }

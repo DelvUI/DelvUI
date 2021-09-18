@@ -174,12 +174,13 @@ namespace DelvUI.Config.Tree
             ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 1); //Intractable Elements Radius
             ImGui.PushStyleVar(ImGuiStyleVar.GrabRounding, 1); //Gradable Elements Radius
             ImGui.PushStyleVar(ImGuiStyleVar.PopupRounding, 1); //Popup Radius
+            ImGui.PushStyleVar(ImGuiStyleVar.ScrollbarSize, 10); //Popup Radius
         }
 
         private void PopStyles()
         {
             ImGui.PopStyleColor(14);
-            ImGui.PopStyleVar(5);
+            ImGui.PopStyleVar(6);
         }
 
         public void Draw()
@@ -187,17 +188,20 @@ namespace DelvUI.Config.Tree
             bool changed = false;
 
             ImGui.SetNextWindowSize(new Vector2(1050, 750), ImGuiCond.Appearing);
-            ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(30f / 255f, 31f / 255f, 30f / 255f, 1f));
+            ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 1f));
+            ImGui.PushStyleColor(ImGuiCol.BorderShadow, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 1f));
+            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(20f / 255f, 21f / 255f, 20f / 255f, 1f));
+
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 1);
-            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(20f / 255f, 21f / 255f, 20f / 255f, 1f));
+            ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
 
             if (!ImGui.Begin("titlebarnew", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 return;
             }
-            ImGui.PopStyleColor(2);
-            ImGui.PopStyleVar(2);
+            ImGui.PopStyleColor(3);
+            ImGui.PopStyleVar(3);
             PushStyles();
             
 
@@ -262,7 +266,7 @@ namespace DelvUI.Config.Tree
             ImGui.PopStyleColor();
             
             ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
-            if (ImGui.Button(ConfigurationManager.GetInstance().ShowHUD ? "Hide HUD" : "Show HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
+            if (ImGui.Button((ConfigurationManager.GetInstance().ShowHUD ? "Hide" : "Show") + " HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
                 ConfigurationManager.GetInstance().ShowHUD = !ConfigurationManager.GetInstance().ShowHUD;
             }
@@ -270,7 +274,7 @@ namespace DelvUI.Config.Tree
             ImGui.SameLine();
             ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
 
-            if (ImGui.Button(ConfigurationManager.GetInstance().LockHUD ? "Unlock HUD" : "Lock HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
+            if (ImGui.Button((ConfigurationManager.GetInstance().LockHUD ? "Unlock" : "Lock")+ " HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
                 ConfigurationManager.GetInstance().LockHUD = !ConfigurationManager.GetInstance().LockHUD;
             }
@@ -450,7 +454,6 @@ namespace DelvUI.Config.Tree
                         ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
                     }
                     ImGui.PopStyleColor();
-
                     ImGui.PopFont();
                     ImGui.SetCursorPos(pos);
                 }
@@ -564,7 +567,7 @@ namespace DelvUI.Config.Tree
             {
                 ImGui.BeginChild(
                     "item" + Depth + " view",
-                    new Vector2(0, ImGui.GetWindowHeight() - 20),
+                    new Vector2(0, ImGui.GetWindowHeight() - 22),
                     false,
                     ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse
                 ); // Leave room for 1 line below us
@@ -1046,7 +1049,9 @@ namespace DelvUI.Config.Tree
 
                 foreach (FieldInfo child in Children.Values)
                 {
-                    Draw(ref changed, child, 25);
+                    ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f),"   \u2514");
+                    ImGui.SameLine();
+                    Draw(ref changed, child, 0);
                 }
 
                 ImGui.EndGroup();

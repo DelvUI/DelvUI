@@ -273,15 +273,15 @@ namespace DelvUI.Interface.GeneralElements
         [Order(4)]
         public GradientDirection GradientDirection = GradientDirection.Down;
 
-        [ColorEdit4("Empty Unit Frame Color")]
+        [ColorEdit4("Empty Unit Frame")]
         [Order(5)]
         public PluginConfigColor EmptyUnitFrameColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 95f / 100f));
 
-        [ColorEdit4("Empty Bar Color")]
+        [ColorEdit4("Empty Bar")]
         [Order(10)]
         public PluginConfigColor EmptyColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
 
-        [ColorEdit4("Partially Filled Bar Color")]
+        [ColorEdit4("Partially Filled Bar")]
         [Order(15)]
         public PluginConfigColor PartialFillColor = new PluginConfigColor(new(180f / 255f, 180f / 255f, 180f / 255f, 100f / 100f));
 
