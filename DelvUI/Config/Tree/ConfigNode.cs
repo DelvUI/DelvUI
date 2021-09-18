@@ -1034,25 +1034,22 @@ namespace DelvUI.Config.Tree
         {
             foreach (object attribute in field.GetCustomAttributes(true))
             {
-                if (attribute is ConfigAttribute { separator: true })
+                if (attribute is not ConfigAttribute { separator: true })
                 {
-                    if (attribute is CheckboxAttribute checkboxAttribute)
-                    {
-                        if (checkboxAttribute.friendlyName=="Enabled" && ID is not null || checkboxAttribute.friendlyName!="Enabled" ) { } 
-                        else { continue; }
-                    } 
-                        
-                    
+                    continue;
                 }
-                else { continue; }
+
+                if (attribute is CheckboxAttribute checkboxAttribute && (checkboxAttribute.friendlyName != "Enabled" || ID is null) && checkboxAttribute.friendlyName == "Enabled")
+                {
+                    continue;
+                }
 
                 ImGui.Text("");
                 ImGui.Separator();
                 ImGui.Text("");
-                
             }
-
         }
+        
         public void Draw(ref bool changed)
         {
             Draw(ref changed, MainField, 2);
