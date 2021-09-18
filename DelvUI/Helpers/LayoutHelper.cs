@@ -66,6 +66,8 @@ namespace DelvUI.Helpers
                         realRowCount++;
                         remaining -= (int)colCount;
                     }
+
+                    realColCount = Math.Min(count, colCount);
                 }
                 else
                 {
@@ -84,6 +86,8 @@ namespace DelvUI.Helpers
                         realColCount++;
                         remaining -= (int)rowCount;
                     }
+
+                    realRowCount = Math.Min(count, rowCount);
                 }
             }
 
