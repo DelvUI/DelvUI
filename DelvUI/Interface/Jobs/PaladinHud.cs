@@ -232,7 +232,7 @@ namespace DelvUI.Interface.Jobs
         public new static PaladinConfig DefaultConfig() { return new PaladinConfig(); }
 
         #region mana bar
-        [Checkbox("Show Mana Bar")]
+        [Checkbox("Show Mana Bar", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowManaBar = true;
 
@@ -262,7 +262,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region oath gauge
-        [Checkbox("Show Oath Gauge")]
+        [Checkbox("Show Oath Gauge", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowOathGauge = true;
 
@@ -288,7 +288,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region buff
-        [Checkbox("Show Buff Bar")]
+        [Checkbox("Show Buff Bar", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowBuffBar = true;
 
@@ -314,7 +314,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region atonement
-        [Checkbox("Show Atonement Bar")]
+        [Checkbox("Show Atonement Bar", separator = true)]
         [CollapseControl(45, 3)]
         public bool ShowAtonementBar = true;
 
@@ -336,7 +336,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region goring blade
-        [Checkbox("Show Goring Blade Bar")]
+        [Checkbox("Show Goring Blade Bar", separator = true)]
         [CollapseControl(50, 4)]
         public bool ShowGoringBladeBar = true;
 

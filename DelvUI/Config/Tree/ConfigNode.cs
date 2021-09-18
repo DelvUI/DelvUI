@@ -84,23 +84,9 @@ namespace DelvUI.Config.Tree
 
         public T GetConfigObject<T>() where T : PluginConfigObject
         {
-            var type = typeof(T);
+            var pageNode = GetConfigPageNode<T>();
 
-            if (configPageNodesMap.TryGetValue(type, out var node))
-            {
-                return (T)node.ConfigObject;
-            }
-
-            var configPageNode = GetOrAddConfig<T>();
-
-            if (configPageNode != null && configPageNode.ConfigObject != null)
-            {
-                configPageNodesMap.Add(type, configPageNode);
-
-                return (T)configPageNode.ConfigObject;
-            }
-
-            return null;
+            return pageNode != null ? (T)pageNode.ConfigObject : null;
         }
 
         public ConfigPageNode GetConfigPageNode<T>() where T : PluginConfigObject
@@ -108,6 +94,15 @@ namespace DelvUI.Config.Tree
             if (configPageNodesMap.TryGetValue(typeof(T), out var node))
             {
                 return node;
+            }
+
+            var configPageNode = GetOrAddConfig<T>();
+
+            if (configPageNode != null && configPageNode.ConfigObject != null)
+            {
+                configPageNodesMap.Add(typeof(T), configPageNode);
+
+                return configPageNode;
             }
 
             return null;
@@ -695,7 +690,8 @@ namespace DelvUI.Config.Tree
         private Dictionary<string, ConfigPageNode> _nestedConfigPageNodes;
 
         private void GenerateNestedConfigPageNodes()
-        {
+        {                        
+
             _nestedConfigPageNodes = new Dictionary<string, ConfigPageNode>();
 
             FieldInfo[] fields = _configObject.GetType().GetFields();
@@ -715,7 +711,6 @@ namespace DelvUI.Config.Tree
                     {
                         continue;
                     }
-
                     ConfigPageNode configPageNode = new();
                     configPageNode.ConfigObject = nestedConfig;
                     configPageNode.Name = nestedConfigAttribute.friendlyName;
@@ -855,9 +850,6 @@ namespace DelvUI.Config.Tree
                 }
                 else if (pair.Value is ConfigPageNode node)
                 {
-                    ImGui.Text("");
-                    ImGui.Separator();
-                    ImGui.Text("");
                     ImGui.BeginGroup();
                     node.DrawWithID(ref changed, node.Name);
                     ImGui.EndGroup();
@@ -1038,6 +1030,25 @@ namespace DelvUI.Config.Tree
 
         public void AddChild(int position, FieldInfo field) { Children.Add(position, field); }
 
+        public void AddSeparator(FieldInfo field)
+        {
+            foreach (object attribute in field.GetCustomAttributes(true))
+            {
+                if (attribute is ConfigAttribute { separator: true })
+                {
+                    if (attribute is CheckboxAttribute checkboxAttribute && 
+                        (checkboxAttribute.friendlyName=="Enabled" && ID != null || checkboxAttribute.friendlyName!="Enabled")) { }
+                    else { continue; }
+                }
+                else { continue; }
+
+                ImGui.Text("");
+                ImGui.Separator();
+                ImGui.Text("");
+                
+            }
+
+        }
         public void Draw(ref bool changed)
         {
             Draw(ref changed, MainField, 2);
@@ -1060,6 +1071,7 @@ namespace DelvUI.Config.Tree
 
         public void Draw(ref bool changed, FieldInfo field, int xOffset)
         {
+            AddSeparator(field);
             ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(xOffset, 0));
             object fieldVal = field.GetValue(ConfigObject);
             var idText = ID != null ? " ##" + ID : "";

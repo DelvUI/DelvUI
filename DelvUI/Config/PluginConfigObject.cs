@@ -11,13 +11,13 @@ namespace DelvUI.Config
     [Serializable]
     public abstract class PluginConfigObject : IOnChangeEventArgs
     {
-        [Checkbox("Enabled")]
+        [Checkbox("Enabled", separator = true)]
         [Order(0)]
         public bool Enabled = true;
 
         protected bool ColorEdit4(string label, ref PluginConfigColor color)
         {
-            var vector = color.Vector;
+            var vector = color.Vector; 
 
             if (ImGui.ColorEdit4(label, ref vector))
             {
