@@ -20,20 +20,26 @@ namespace DelvUI.Interface.Party
             Plugin.Framework.OnUpdateEvent += FrameworkOnOnUpdateEvent;
 
             _config = config;
-            //_config.PropertyChanged += OnConfigPropertyChanged;
-            //_config.SortConfig.PropertyChanged += OnSortConfigPropertyChanged;
+            _config.onValueChanged += OnConfigPropertyChanged;
+
+            UpdatePreview();
         }
 
         ~PartyManager()
         {
             Plugin.Framework.OnUpdateEvent -= FrameworkOnOnUpdateEvent;
-            //_config.PropertyChanged -= OnConfigPropertyChanged;
+            _config.onValueChanged -= OnConfigPropertyChanged;
         }
 
         public static void Initialize()
         {
             var config = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesConfig>();
             _instance = new PartyManager(config);
+        }
+
+        public static void Destroy()
+        {
+            _instance = null;
         }
 
         public static PartyManager Instance => _instance;
@@ -72,7 +78,29 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
+
             var manager = GroupManager.Instance();
+
+            // testing
+            if (manager->MemberCount == 0 && !_config.Preview)
+            {
+                if (_groupMembers.Count > 0)
+                {
+                    return;
+                }
+
+                _groupMembers.Clear();
+                _groupMembers.Add(new GroupMember(player));
+
+                if (MembersChangedEvent != null)
+                {
+                    MembersChangedEvent(this, null);
+                }
+
+                return;
+            }
+            // testing
+
             if (_groupMembers.Count == manager->MemberCount)
             {
                 return;
@@ -101,11 +129,15 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        private void OnConfigPropertyChanged(object sender, PropertyChangedEventArgs args)
+        private void OnConfigPropertyChanged(object sender, OnChangeBaseArgs args)
         {
             if (args.PropertyName == "Preview")
             {
                 UpdatePreview();
+            }
+            else if (args.PropertyName == "SortingMode")
+            {
+                UpdateSortingMode();
             }
         }
 
@@ -113,6 +145,7 @@ namespace DelvUI.Interface.Party
         {
             if (!_config.Preview)
             {
+                _groupMembers.Clear();
                 return;
             }
 
@@ -132,14 +165,6 @@ namespace DelvUI.Interface.Party
             if (MembersChangedEvent != null)
             {
                 MembersChangedEvent(this, null);
-            }
-        }
-
-        private void OnSortConfigPropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
-            if (args.PropertyName == "Mode")
-            {
-                UpdateSortingMode();
             }
         }
 

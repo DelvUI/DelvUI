@@ -15,7 +15,7 @@ namespace DelvUI.Interface.Party
     {
         public new static PartyFramesConfig DefaultConfig() { return new PartyFramesConfig(); }
 
-        [DragInt2("Size")]
+        [DragInt2("Size", isMonitored = true)]
         [Order(30)]
         public Vector2 Size = new Vector2(650, 150);
 
@@ -23,11 +23,11 @@ namespace DelvUI.Interface.Party
         [Order(35)]
         public bool Lock = true;
 
-        [Checkbox("Preview")]
+        [Checkbox("Preview", isMonitored = true)]
         [Order(40)]
         public bool Preview = false;
 
-        [Checkbox("Fill Rows First")]
+        [Checkbox("Fill Rows First", isMonitored = true)]
         [Order(45)]
         public bool FillRowsFirst = true;
 
@@ -37,7 +37,8 @@ namespace DelvUI.Interface.Party
             "DPS => Tank => Healer",
             "DPS => Healer => Tank",
             "Healer => Tank => DPS",
-            "Healer => DPS => Tank"
+            "Healer => DPS => Tank",
+            isMonitored = true
         )]
         [Order(50)]
         public PartySortingMode SortingMode = PartySortingMode.Tank_Healer_DPS;
@@ -51,11 +52,11 @@ namespace DelvUI.Interface.Party
     {
         public new static PartyFramesHealthBarsConfig DefaultConfig() { return new PartyFramesHealthBarsConfig(); }
 
-        [DragInt2("Size")]
+        [DragInt2("Size", isMonitored = true)]
         [Order(30)]
         public Vector2 Size = new Vector2(150, 50);
 
-        [DragInt2("Padding")]
+        [DragInt2("Padding", isMonitored = true)]
         [Order(35)]
         public Vector2 Padding = new Vector2(1, 1);
 
@@ -74,7 +75,7 @@ namespace DelvUI.Interface.Party
     [Portable(false)]
     public class PartyFramesColorsConfig : PluginConfigObject
     {
-        [Checkbox("Use Role Colors")]
+        [Checkbox("Use Role Colors", isMonitored = true)]
         [CollapseControl(0, 0)]
         public bool UseRoleColors = false;
 

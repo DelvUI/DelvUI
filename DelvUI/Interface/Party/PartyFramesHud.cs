@@ -18,8 +18,8 @@ namespace DelvUI.Interface.Party
         private const ImGuiWindowFlags _lockedBarFlags = ImGuiWindowFlags.NoBackground |
                                                         ImGuiWindowFlags.NoMove |
                                                         ImGuiWindowFlags.NoResize |
-                                                        ImGuiWindowFlags.NoNav |
-                                                        ImGuiWindowFlags.NoInputs;
+                                                        ImGuiWindowFlags.NoNav;
+
         private const string _mainWindowName = "Party List";
         private static int MaxMemberCount = 8;
 
@@ -37,9 +37,9 @@ namespace DelvUI.Interface.Party
         public PartyFramesHud(string id, PartyFramesConfig config, PartyFramesHealthBarsConfig healthBarsConfig, string displayName) : base(id, config, displayName)
         {
             HealthBarsConfig = healthBarsConfig;
-            //_config.PropertyChanged += OnLayoutPropertyChanged;
-            //_config.HealthBarsConfig.PropertyChanged += OnLayoutPropertyChanged;
-            //_config.SortConfig.PropertyChanged += OnSortingPropertyChanged;
+            config.onValueChanged += OnLayoutPropertyChanged;
+            healthBarsConfig.onValueChanged += OnLayoutPropertyChanged;
+            healthBarsConfig.ColorsConfig.onValueChanged += OnLayoutPropertyChanged;
 
             bars = new List<PartyFramesHealthBar>(MaxMemberCount);
             for (int i = 0; i < bars.Capacity; i++)
@@ -48,34 +48,32 @@ namespace DelvUI.Interface.Party
             }
 
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
+            UpdateBars(Vector2.Zero);
         }
 
         ~PartyFramesHud()
         {
             bars.Clear();
 
-            //_config.PropertyChanged -= OnLayoutPropertyChanged;
-            //_config.HealthBarsConfig.PropertyChanged -= OnLayoutPropertyChanged;
-            //_config.SortConfig.PropertyChanged -= OnSortingPropertyChanged;
+            _config.onValueChanged -= OnLayoutPropertyChanged;
+            HealthBarsConfig.onValueChanged -= OnLayoutPropertyChanged;
+            HealthBarsConfig.ColorsConfig.onValueChanged -= OnLayoutPropertyChanged;
             PartyManager.Instance.MembersChangedEvent -= OnMembersChanged;
         }
 
-        private void OnLayoutPropertyChanged(object sender, PropertyChangedEventArgs args)
+        private void OnLayoutPropertyChanged(object sender, OnChangeBaseArgs args)
         {
-            _layoutDirty = true;
-        }
-
-        private void OnSortingPropertyChanged(object sender, PropertyChangedEventArgs args)
-        {
-            if (args.PropertyName != "UseRoleColors")
+            if (args.PropertyName == "UseRoleColors")
             {
+                foreach (var bar in bars)
+                {
+                    bar.UpdateColor();
+                }
+
                 return;
             }
 
-            foreach (var bar in bars)
-            {
-                bar.UpdateColor();
-            }
+            _layoutDirty = true;
         }
 
         private void OnMembersChanged(object sender, EventArgs args)
@@ -105,7 +103,6 @@ namespace DelvUI.Interface.Party
                     origin.X + HealthBarsConfig.Size.X * col + HealthBarsConfig.Padding.X * col,
                     origin.Y + HealthBarsConfig.Size.Y * row + HealthBarsConfig.Padding.Y * row
                 );
-                bar.Size = HealthBarsConfig.Size;
                 bar.Visible = true;
 
                 // layout
@@ -157,8 +154,9 @@ namespace DelvUI.Interface.Party
             }
 
             // size and position
-            ImGui.SetNextWindowPos(Config.Position, ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSize(Config.Size, ImGuiCond.FirstUseEver);
+            var margin = new Vector2(5, 5);
+            ImGui.SetNextWindowPos(Config.Position - margin, ImGuiCond.FirstUseEver);
+            ImGui.SetNextWindowSize(Config.Size + margin * 2, ImGuiCond.FirstUseEver);
 
             var windowFlags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoTitleBar;
             if (Config.Lock)
@@ -173,9 +171,8 @@ namespace DelvUI.Interface.Party
             Config.Size = windowSize;
 
             // recalculate layout on settings or size change
-            var margin = ImGui.GetWindowContentRegionMin().X;
-            var contentStartPos = windowPos + new Vector2(margin, 0);
-            var maxSize = windowSize - new Vector2(margin + 5, 0);
+            var contentStartPos = windowPos + margin;
+            var maxSize = windowSize - margin * 2;
 
             if (_layoutDirty || _size != maxSize || _memberCount != count)
             {
@@ -201,11 +198,13 @@ namespace DelvUI.Interface.Party
             _memberCount = count;
             _size = maxSize;
 
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+
             // draw
             var drawList = ImGui.GetWindowDrawList();
             for (int i = 0; i < bars.Count; i++)
             {
-                bars[i].Draw(drawList, origin);
+                bars[i].Draw(origin, target, drawList);
             }
 
             ImGui.End();
