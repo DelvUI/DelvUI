@@ -84,23 +84,9 @@ namespace DelvUI.Config.Tree
 
         public T GetConfigObject<T>() where T : PluginConfigObject
         {
-            var type = typeof(T);
+            var pageNode = GetConfigPageNode<T>();
 
-            if (configPageNodesMap.TryGetValue(type, out var node))
-            {
-                return (T)node.ConfigObject;
-            }
-
-            var configPageNode = GetOrAddConfig<T>();
-
-            if (configPageNode != null && configPageNode.ConfigObject != null)
-            {
-                configPageNodesMap.Add(type, configPageNode);
-
-                return (T)configPageNode.ConfigObject;
-            }
-
-            return null;
+            return pageNode != null ? (T)pageNode.ConfigObject : null;
         }
 
         public ConfigPageNode GetConfigPageNode<T>() where T : PluginConfigObject
@@ -108,6 +94,15 @@ namespace DelvUI.Config.Tree
             if (configPageNodesMap.TryGetValue(typeof(T), out var node))
             {
                 return node;
+            }
+
+            var configPageNode = GetOrAddConfig<T>();
+
+            if (configPageNode != null && configPageNode.ConfigObject != null)
+            {
+                configPageNodesMap.Add(typeof(T), configPageNode);
+
+                return configPageNode;
             }
 
             return null;

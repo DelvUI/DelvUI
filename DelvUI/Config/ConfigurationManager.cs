@@ -28,12 +28,8 @@ namespace DelvUI.Config
         {
             get
             {
-                if (ConfigBaseNode.configPageNodesMap.TryGetValue(typeof(MiscColorConfig), out ConfigPageNode node))
-                {
-                    return ((MiscColorConfig)node.ConfigObject).GradientDirection;
-                }
-
-                return GradientDirection.None;
+                var config = GetInstance().GetConfigObject<MiscColorConfig>();
+                return config != null ? config.GradientDirection : GradientDirection.None;
             }
         }
 
