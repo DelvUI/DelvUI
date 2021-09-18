@@ -269,6 +269,10 @@ namespace DelvUI.Interface.GeneralElements
     {
         public new static MiscColorConfig DefaultConfig() { return new MiscColorConfig(); }
 
+        [Combo("Gradient Type For Bars", "Flat Color", "Right", "Left", "Up", "Down", "Centered Horizontal")]
+        [Order(4)]
+        public GradientDirection GradientDirection = GradientDirection.Down;
+
         [ColorEdit4("Empty Unit Frame")]
         [Order(5)]
         public PluginConfigColor EmptyUnitFrameColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 95f / 100f));
