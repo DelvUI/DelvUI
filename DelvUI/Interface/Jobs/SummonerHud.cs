@@ -245,7 +245,13 @@ namespace DelvUI.Interface.Jobs
                                        .SetFlipDrainDirection(Config.MiasmaInverted)
                                        .Build();
 
+                if (Config.ShowMiasmaText)
+                {
+                    builder.SetTextMode(BarTextMode.Single)
+                           .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
                 barDrawList.Add(miasmaBar);
+                
             }
 
             if (Config.ShowBio)
@@ -267,7 +273,11 @@ namespace DelvUI.Interface.Jobs
                 Bar bioBar = builder.AddInnerBar(bioDuration, 30f, bioColor)
                                     .SetFlipDrainDirection(Config.BioInverted)
                                     .Build();
-
+                if (Config.ShowBioText)
+                {
+                    builder.SetTextMode(BarTextMode.Single)
+                           .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
                 barDrawList.Add(bioBar);
             }
 
@@ -386,21 +396,25 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Miasma Enabled")]
         [CollapseControl(40, 3)]
         public bool ShowMiasma = true;
+        
+        [Checkbox("Miasma Text")]
+        [CollapseWith(0, 3)]
+        public bool ShowMiasmaText = true;
 
         [Checkbox("Miasma Inverted")]
-        [CollapseWith(0, 3)]
+        [CollapseWith(5, 3)]
         public bool MiasmaInverted = true;
 
         [DragFloat2("Miasma Size", max = 2000f)]
-        [CollapseWith(5, 3)]
+        [CollapseWith(10, 3)]
         public Vector2 MiasmaSize = new(126, 20);
 
         [DragFloat2("Miasma Position", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 3)]
+        [CollapseWith(15, 3)]
         public Vector2 MiasmaPosition = new(-64, -67);
 
         [ColorEdit4("Miasma Color")]
-        [CollapseWith(15, 3)]
+        [CollapseWith(20, 3)]
         public PluginConfigColor MiasmaColor = new(new Vector4(106f / 255f, 237f / 255f, 241f / 255f, 100f / 100f));
         #endregion
 
@@ -409,20 +423,24 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(45, 4)]
         public bool ShowBio = true;
 
-        [Checkbox("Bio Inverted")]
+        [Checkbox("Bio Text")]
         [CollapseWith(0, 4)]
+        public bool ShowBioText = true;
+
+        [Checkbox("Bio Inverted")]
+        [CollapseWith(5, 4)]
         public bool BioInverted = false;
 
         [DragFloat2("Bio Size", max = 2000f)]
-        [CollapseWith(5, 4)]
+        [CollapseWith(10, 4)]
         public Vector2 BioSize = new(126, 20);
 
         [DragFloat2("Bio Position", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 4)]
+        [CollapseWith(15, 4)]
         public Vector2 BioPosition = new(64, -67);
 
         [ColorEdit4("Bio Color")]
-        [CollapseWith(15, 4)]
+        [CollapseWith(20, 4)]
         public PluginConfigColor BioColor = new(new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 100f / 100f));
         #endregion
 
