@@ -1243,16 +1243,18 @@ namespace DelvUI.Config.Tree
                                 order[i] = order[i + 1];
                                 order[i + 1] = _curri;
                                 field.SetValue(ConfigObject, order);
-                                ImGui.ResetMouseDragDelta();
+                                ImGui.ResetMouseDragDelta();                                
                             }
                             else if ((drag_dx < -80.0f && i > 0))
                             {
                                 var _curri = order[i];
                                 order[i] = order[i - 1];
                                 order[i - 1] = _curri;
-                                field.SetValue(ConfigObject, order);
-                                ImGui.ResetMouseDragDelta();
+                                field.SetValue(ConfigObject, order);                                
+                                ImGui.ResetMouseDragDelta();                                
                             }
+
+                            changed = true;
                         }
                     }
                 }
