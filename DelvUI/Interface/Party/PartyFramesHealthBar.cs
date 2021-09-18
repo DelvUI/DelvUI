@@ -120,7 +120,7 @@ namespace DelvUI.Interface.Party
 
             // name
             var actor = Member.GetActor();
-            var name = Member.Name.Abbreviate() ?? "";
+            var name = Member.Name ?? "";
 
             if (actor != null)
             {
@@ -129,7 +129,7 @@ namespace DelvUI.Interface.Party
 
             var textSize = ImGui.CalcTextSize(name);
             var textPos = new Vector2(Position.X + _config.Size.X / 2f - textSize.X / 2f, Position.Y + _config.Size.Y / 2f - textSize.Y / 2f);
-            drawList.AddText(textPos, actor == null ? 0x44FFFFFF : 0xFFFFFFFF, name);
+            drawList.AddText(textPos, actor == null && Member is not FakePartyFramesMember ? 0x44FFFFFF : 0xFFFFFFFF, name);
 
             // icon
             if (_config.RoleIconConfig.Enabled)
