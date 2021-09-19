@@ -170,7 +170,7 @@ namespace DelvUI.Interface.GeneralElements
 
         private void DrawFriendlyNPC(ImDrawListPtr drawList, Vector2 startPos, Vector2 endPos)
         {
-            var color = GlobalColors.Instance.NPCFriendlyColor;
+            var color = Config.UseCustomColor ? Config.CustomColor : GlobalColors.Instance.NPCFriendlyColor;            
 
             drawList.AddRectFilled(startPos, endPos, GlobalColors.Instance.EmptyUnitFrameColor.Base);
 
