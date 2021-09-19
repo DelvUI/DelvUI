@@ -52,6 +52,10 @@ namespace DelvUI.Interface.GeneralElements
         [CollapseControl(40, 0)]
         public bool ShowOutline = true;
 
+        [Checkbox("Use Job Color")]
+        [Order(45)]
+        public bool UseJobColor = false;
+
         [ColorEdit4("Color ##Outline")]
         [CollapseWith(0, 0)]
         public PluginConfigColor OutlineColor = new PluginConfigColor(Vector4.UnitW);

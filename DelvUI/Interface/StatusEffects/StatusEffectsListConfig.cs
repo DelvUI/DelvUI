@@ -97,12 +97,23 @@ namespace DelvUI.Interface.StatusEffects
     [Serializable]
     public class StatusEffectsListConfig : MovablePluginConfigObject
     {
+        public bool ShowBuffs;
+        public bool ShowDebuffs;
+
         [DragInt2("Size", min = 1, max = 4000)]
         [Order(15)]
         public Vector2 Size;
 
-        [Checkbox("Fill Rows First")]
+        [DragInt2("Icon Padding", min = 0, max = 100)]
+        [Order(16)]
+        public Vector2 IconPadding = new(2, 2);
+
+        [Checkbox("Preview")]
         [Order(20)]
+        public bool ShowArea;
+
+        [Checkbox("Fill Rows First", separator = true)]
+        [Order(25)]
         public bool FillRowsFirst = true;
 
         [Combo("Icons Growth Direction",
@@ -113,50 +124,33 @@ namespace DelvUI.Interface.StatusEffects
         )]
         //"Centered (horizontal)",    not working as expected
         //"Centered (vertical)"       not working as expected
-        [Order(25)]
+        [Order(30)]
         public int Directions;
-
-        [NestedConfig("Icons", 30)]
-        public StatusEffectIconConfig IconConfig;
-
-        [DragInt2("Icon Padding", min = 0, max = 100)]
+        [DragInt("Limit (-1 for no limit)", min = -1, max = 1000)]
         [Order(35)]
-        public Vector2 IconPadding = new(2, 2);
-
-        [DragInt("Limit (-1 for not limit)", min = -1, max = 1000)]
-        [Order(40)]
         public int Limit = -1;
 
-        [Checkbox("Show Area")]
-        [Order(45)]
-        public bool ShowArea;
-
-        [Checkbox("Show Buffs")]
-        [Order(50)]
-        public bool ShowBuffs;
-
-        [Checkbox("Show Debuffs")]
-        [Order(55)]
-        public bool ShowDebuffs;
-
-        [Checkbox("Show Permanent Effects")]
-        [Order(60)]
+        [Checkbox("Permanent Effects", separator = true)]
+        [Order(40)]
         public bool ShowPermanentEffects;
 
-        [Checkbox("Show Only My Effects")]
-        [Order(65)]
+        [Checkbox("Only My Effects")]
+        [Order(45)]
         public bool ShowOnlyMine = false;
 
-        [Checkbox("Show My Effects First")]
-        [Order(70)]
+        [Checkbox("My Effects First")]
+        [Order(50)]
         public bool ShowMineFirst = false;
 
-        [Checkbox("Show Tooltips")]
-        [Order(75)]
+        [Checkbox("Tooltips")]
+        [Order(55)]
         public bool ShowTooltips = true;
 
+        [NestedConfig("Icons", 60)]
+        public StatusEffectIconConfig IconConfig;
+
         public StatusEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
-            GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
+                                       GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
         {
             Position = position;
             Size = size;
@@ -202,9 +196,10 @@ namespace DelvUI.Interface.StatusEffects
 
     [Serializable]
     [Portable(false)]
+    [Disableable(false)]
     public class StatusEffectIconConfig : PluginConfigObject
     {
-        [DragInt2("Size", min = 1, max = 1000)]
+        [DragInt2("Icon Size", min = 1, max = 1000)]
         [Order(0)]
         public Vector2 Size = new(40, 40);
 

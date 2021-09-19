@@ -49,7 +49,7 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Target", 0)]
     public class TargetCastbarConfig : CastbarConfig
     {
-        [Checkbox("User Interruptable Color")]
+        [Checkbox("Interruptable Color")]
         [CollapseControl(35, 0)]
         public bool ShowInterruptableColor = true;
 
@@ -57,19 +57,19 @@ namespace DelvUI.Interface.GeneralElements
         [CollapseWith(0, 0)]
         public PluginConfigColor InterruptableColor = new PluginConfigColor(new(255f / 255f, 87f / 255f, 113f / 255f, 100f / 100f));
 
-        [Checkbox("Use Damage Type Colors")]
+        [Checkbox("Damage Type Colors")]
         [CollapseControl(40, 1)]
         public bool UseColorForDamageTypes = true;
 
-        [ColorEdit4("Physical Damage")]
+        [ColorEdit4("Physical")]
         [CollapseWith(0, 1)]
         public PluginConfigColor PhysicalDamageColor = new PluginConfigColor(new(190f / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
 
-        [ColorEdit4("Magical Damage")]
+        [ColorEdit4("Magical")]
         [CollapseWith(5, 1)]
         public PluginConfigColor MagicalDamageColor = new PluginConfigColor(new(0f / 255f, 72f / 255f, 179f / 255f, 100f / 100f));
 
-        [ColorEdit4("Darkness Damage")]
+        [ColorEdit4("Darkness")]
         [CollapseWith(10, 1)]
         public PluginConfigColor DarknessDamageColor = new PluginConfigColor(new(188f / 255f, 19f / 255f, 254f / 255f, 100f / 100f));
 

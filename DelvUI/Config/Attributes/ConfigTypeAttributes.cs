@@ -2,6 +2,38 @@
 
 namespace DelvUI.Config.Attributes
 {
+    #region class attributes
+    [AttributeUsage(AttributeTargets.Class)]
+    public class PortableAttribute : Attribute
+    {
+        public bool portable;
+
+        public PortableAttribute(bool portable)
+        {
+            this.portable = portable;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class DisableableAttribute : Attribute
+    {
+        public bool disableable;
+
+        public DisableableAttribute(bool disableable)
+        {
+            this.disableable = disableable;
+        }
+    }
+    #endregion
+
+    #region method attributes
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ManualDrawAttribute : Attribute
+    {
+    }
+    #endregion
+
+    #region field attributes
     [AttributeUsage(AttributeTargets.Field)]
     public class ConfigAttribute : Attribute
     {
@@ -110,7 +142,6 @@ namespace DelvUI.Config.Attributes
     {
         public string friendlyName;
 
-
         public ColorEdit4Attribute(string friendlyName)
         {
             this.friendlyName = friendlyName;
@@ -199,23 +230,6 @@ namespace DelvUI.Config.Attributes
         }
     }
 
-    [AttributeUsage(AttributeTargets.Class)]
-    public class PortableAttribute : Attribute
-    {
-        public bool portable;
-
-
-        public PortableAttribute(bool portable)
-        {
-            this.portable = portable;
-
-        }
-    }
-    [AttributeUsage(AttributeTargets.Method)]
-    public class ManualDrawAttribute : Attribute
-    {
-    }
-
     [AttributeUsage(AttributeTargets.Field)]
     public class NestedConfigAttribute : Attribute
     {
@@ -243,6 +257,6 @@ namespace DelvUI.Config.Attributes
             this.options = options;
 
         }
-    }    
-
+    }
+    #endregion
 }

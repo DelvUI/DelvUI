@@ -74,7 +74,8 @@ namespace DelvUI.Interface.Jobs
         private void DrawFairyBar(Vector2 origin)
         {
             float fairyGauge = Plugin.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
-            float seraphDuration = Math.Abs(Plugin.JobGauges.Get<SCHGauge>().SeraphTimer / 1000);
+            float seraphTimer = Plugin.JobGauges.Get<SCHGauge>().SeraphTimer;
+            float seraphDuration = Math.Abs(seraphTimer / 1000);
 
             Vector2 barSize = Config.FairySize;
             Vector2 position = origin + Config.Position + Config.FairyPosition - barSize / 2f;
@@ -188,7 +189,7 @@ namespace DelvUI.Interface.Jobs
         }
 
         #region aether
-        [Checkbox("Aether Tracker Enabled")]
+        [Checkbox("Aether Tracker Enabled",separator = true)]
         [CollapseControl(30, 1)]
         public bool ShowAether = true;
 
@@ -210,7 +211,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region fairy
-        [Checkbox("Fairy Gauge Enabled")]
+        [Checkbox("Fairy Gauge Enabled",separator = true)]
         [CollapseControl(35, 2)]
         public bool ShowFairy = true;
 
@@ -244,7 +245,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region bio
-        [Checkbox("Bio Enabled")]
+        [Checkbox("Bio Enabled",separator = true)]
         [CollapseControl(40, 3)]
         public bool ShowBio = true;
 
@@ -267,10 +268,12 @@ namespace DelvUI.Interface.Jobs
         [ColorEdit4("Bio Color")]
         [CollapseWith(20, 3)]
         public PluginConfigColor BioColor = new(new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 1f));
+        
+        [ColorEdit4("DoT Expire Color")]
+        [CollapseWith(25, 3)]
+        public PluginConfigColor ExpireColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
         #endregion
 
-        [ColorEdit4("DoT Expire Color")]
-        [Order(45)]
-        public PluginConfigColor ExpireColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
+        
     }
 }

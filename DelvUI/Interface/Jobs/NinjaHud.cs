@@ -343,7 +343,7 @@ namespace DelvUI.Interface.Jobs
         public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
 
         #region huton gauge
-        [Checkbox("Show Huton Gauge")]
+        [Checkbox("Show Huton Gauge", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowHutonGauge = true;
 
@@ -381,7 +381,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region ninki gauge
-        [Checkbox("Show Ninki Gauge")]
+        [Checkbox("Show Ninki Gauge", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowNinkiGauge = true;
 
@@ -415,7 +415,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region trick / suiton
-        [Checkbox("Show Trick Bar")]
+        [Checkbox("Show Trick Bar", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowTrickBar = false;
 
@@ -449,7 +449,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region mudra
-        [Checkbox("Show Mudra Bars")]
+        [Checkbox("Show Mudra Bars", separator = true)]
         [CollapseControl(60, 4)]
         public bool ShowMudraCooldown = true;
 

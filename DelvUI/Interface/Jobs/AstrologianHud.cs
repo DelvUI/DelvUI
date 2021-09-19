@@ -525,7 +525,7 @@ namespace DelvUI.Interface.Jobs
         }
 
         #region Draw Bar
-        [Checkbox("Show Draw Bar")]
+        [Checkbox("Show Draw Bar", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowDrawBar = true;
 
@@ -595,7 +595,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Divination Bar
-        [Checkbox("Show Divination Bar")]
+        [Checkbox("Show Divination Bar", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowDivinationBar = true;
 
@@ -637,7 +637,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Dot Bar
-        [Checkbox("Show Dot Bar")]
+        [Checkbox("Show Dot Bar", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowDotBar = true;
 
@@ -663,7 +663,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Star Bar
-        [Checkbox("Show Star Bar")]
+        [Checkbox("Show Star Bar", separator = true)]
         [CollapseControl(45, 3)]
         public bool ShowStarBar = true;
 
@@ -701,7 +701,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Lightspeed Bar
-        [Checkbox("Show Lightspeed Bar")]
+        [Checkbox("Show Lightspeed Bar", separator = true)]
         [CollapseControl(50, 4)]
         public bool ShowLightspeedBar = true;
 

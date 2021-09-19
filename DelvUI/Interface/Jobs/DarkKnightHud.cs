@@ -225,7 +225,7 @@ namespace DelvUI.Interface.Jobs
         public new static DarkKnightConfig DefaultConfig() { return new DarkKnightConfig(); }
 
         #region Mana Bar
-        [Checkbox("Show Mana Bar")]
+        [Checkbox("Show Mana Bar", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowManaBar = true;
 
@@ -259,7 +259,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Blood Gauge
-        [Checkbox("Show Blood Gauge")]
+        [Checkbox("Show Blood Gauge", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowBloodGauge = true;
 
@@ -289,7 +289,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Buff Bar
-        [Checkbox("Show Buff Bar")]
+        [Checkbox("Show Buff Bar", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowBuffBar = false;
 
@@ -319,7 +319,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Living Shadow
-        [Checkbox("Show Living Shadow Bar")]
+        [Checkbox("Show Living Shadow Bar", separator = true)]
         [CollapseControl(45, 3)]
         public bool ShowLivingShadowBar = false;
 

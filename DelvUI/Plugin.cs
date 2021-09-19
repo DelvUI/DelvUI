@@ -214,12 +214,6 @@ namespace DelvUI
                          || Condition[ConditionFlag.BetweenAreas]
                          || Condition[ConditionFlag.BetweenAreas51];
 
-            if (hudState)
-            {
-                _hudManager.Helper.ApplyCurrentConfig();
-                _hudManager.Helper.UserInterfaceWasHidden = true;
-            }
-
             UiBuilder.OverrideGameCursor = false;
 
             ConfigurationManager.GetInstance().Draw();

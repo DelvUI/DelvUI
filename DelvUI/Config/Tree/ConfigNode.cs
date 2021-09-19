@@ -725,9 +725,7 @@ namespace DelvUI.Config.Tree
 
         public override string GetBase64String()
         {
-            PortableAttribute portableAttribute = (PortableAttribute)ConfigObject.GetType().GetCustomAttribute(typeof(PortableAttribute), false);
-
-            return portableAttribute == null || portableAttribute.portable ? ConfigurationManager.GenerateExportString(ConfigObject) : "";
+            return ConfigObject.Portable ? ConfigurationManager.GenerateExportString(ConfigObject) : "";
         }
 
         public override void LoadBase64String(string[] importStrings)
@@ -870,9 +868,7 @@ namespace DelvUI.Config.Tree
 
             // if the config object is not marked with [Portable(false)], or is marked with [Portable(true)],
             // draw the import/export UI
-            PortableAttribute portableAttribute = (PortableAttribute)ConfigObject.GetType().GetCustomAttribute(typeof(PortableAttribute), false);
-
-            if (portableAttribute == null || portableAttribute.portable)
+            if (ConfigObject.Portable)
             {
                 DrawImportExportGeneralConfig();
             }
@@ -1034,24 +1030,25 @@ namespace DelvUI.Config.Tree
         {
             foreach (object attribute in field.GetCustomAttributes(true))
             {
-                if (attribute is ConfigAttribute { separator: true })
+                if (attribute is not ConfigAttribute { separator: true })
                 {
-                    if (attribute is CheckboxAttribute checkboxAttribute && 
-                        (checkboxAttribute.friendlyName=="Enabled" && ID != null || checkboxAttribute.friendlyName!="Enabled")) { }
-                    else { continue; }
+                    continue;
                 }
-                else { continue; }
+
+                if (attribute is CheckboxAttribute checkboxAttribute && (checkboxAttribute.friendlyName != "Enabled" || ID is null) && checkboxAttribute.friendlyName == "Enabled")
+                {
+                    continue;
+                }
 
                 ImGui.Text("");
                 ImGui.Separator();
                 ImGui.Text("");
-                
             }
-
         }
+
         public void Draw(ref bool changed)
         {
-            Draw(ref changed, MainField, 2);
+            Draw(ref changed, MainField);
 
             if (CategoryId != -1 && (bool)MainField.GetValue(ConfigObject))
             {
@@ -1060,26 +1057,36 @@ namespace DelvUI.Config.Tree
 
                 foreach (FieldInfo child in Children.Values)
                 {
-                    ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f),"   \u2514");
+                    ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "   \u2514");
                     ImGui.SameLine();
-                    Draw(ref changed, child, 0);
+                    Draw(ref changed, child);
                 }
 
                 ImGui.EndGroup();
             }
         }
 
-        public void Draw(ref bool changed, FieldInfo field, int xOffset)
+        public void Draw(ref bool changed, FieldInfo field)
         {
             AddSeparator(field);
-            ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(xOffset, 0));
+
             object fieldVal = field.GetValue(ConfigObject);
             var idText = ID != null ? " ##" + ID : "";
+            var disableable = ConfigObject.Disableable;
 
             foreach (object attribute in field.GetCustomAttributes(true))
             {
                 if (attribute is CheckboxAttribute checkboxAttribute)
                 {
+                    if (!disableable && checkboxAttribute.friendlyName == "Enabled")
+                    {
+                        if (ID != null)
+                        {
+                            ImGui.Text(ID);
+                        }
+                        continue;
+                    }
+
                     bool boolVal = (bool)fieldVal;
 
                     if (ImGui.Checkbox(ID != null && checkboxAttribute.friendlyName == "Enabled" ? ID : checkboxAttribute.friendlyName + idText, ref boolVal))
@@ -1239,16 +1246,18 @@ namespace DelvUI.Config.Tree
                                 order[i] = order[i + 1];
                                 order[i + 1] = _curri;
                                 field.SetValue(ConfigObject, order);
-                                ImGui.ResetMouseDragDelta();
+                                ImGui.ResetMouseDragDelta();                                
                             }
                             else if ((drag_dx < -80.0f && i > 0))
                             {
                                 var _curri = order[i];
                                 order[i] = order[i - 1];
                                 order[i - 1] = _curri;
-                                field.SetValue(ConfigObject, order);
-                                ImGui.ResetMouseDragDelta();
+                                field.SetValue(ConfigObject, order);                                
+                                ImGui.ResetMouseDragDelta();                                
                             }
+
+                            changed = true;
                         }
                     }
                 }

@@ -289,48 +289,82 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawProcBar(Vector2 origin)
         {
-            IEnumerable<StatusEffect> flourishingCascadeBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1814);
-            IEnumerable<StatusEffect> flourishingFountainBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1815);
-            IEnumerable<StatusEffect> flourishingWindmillBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1816);
-            IEnumerable<StatusEffect> flourishingShowerBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1817);
-
-            var xPos = origin.X + Config.Position.X + Config.ProcBarPosition.X - Config.ProcBarSize.X / 2f;
-            var yPos = origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarSize.Y / 2f;
-            var procHeight = Config.ProcBarSize.Y;
-            var procWidth = (int)Math.Floor((Config.ProcBarSize.X - 3 * Config.ProcBarChunkPadding) / 4);
-
-            var chunkoffset = procWidth + Config.ProcBarChunkPadding;
-
-            BarBuilder cascadeBuilder = BarBuilder.Create(xPos, yPos, procHeight, procWidth).SetBackgroundColor(EmptyColor.Base);
-            BarBuilder fountainBuilder = BarBuilder.Create(xPos + chunkoffset, yPos, procHeight, procWidth).SetBackgroundColor(EmptyColor.Base);
-            BarBuilder windmillBuilder = BarBuilder.Create(xPos + 2 * chunkoffset, yPos, procHeight, procWidth).SetBackgroundColor(EmptyColor.Base);
-            BarBuilder showerBuilder = BarBuilder.Create(xPos + 3 * chunkoffset, yPos, procHeight, procWidth).SetBackgroundColor(EmptyColor.Base);
-
+            var player = Plugin.ClientState.LocalPlayer;
             var timersEnabled = !Config.StaticProcBarsEnabled;
-            var procEnabled = Config.ProcBarEnabled;
+            var procBarSize = new Vector2(Config.ProcBarSize.X / 4f - Config.ProcBarChunkPadding / 4f, Config.ProcBarSize.Y);
+            var order = Config.procsOrder;
 
-            if (flourishingCascadeBuff.Any() && procEnabled)
+            // Flourishing Cascade
+            var flourishingCascadeBuff = player.StatusEffects.FirstOrDefault(o => o.EffectId == 1814);
+            var cascadeDuration = flourishingCascadeBuff.Duration;
+            var cascadeStart = timersEnabled ? cascadeDuration : 20;
+            var cascadePos = new Vector2(
+                origin.X + Config.Position.X + Config.ProcBarPosition.X + (2 * order[0] - 2) * Config.ProcBarSize.X / 4f - order[0] * procBarSize.X,
+                origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarPosition.Y / 2f
+            );
+
+            var cascadeBuilder = BarBuilder.Create(cascadePos, procBarSize)
+            .SetBackgroundColor(EmptyColor.Base);
+
+            if (cascadeDuration > 0)
             {
-                var cascadeStart = timersEnabled ? Math.Abs(flourishingCascadeBuff.First().Duration) : 20;
-                cascadeBuilder.AddInnerBar(cascadeStart, 20, Config.FlourishingCascadeColor);
+                cascadeBuilder.AddInnerBar(cascadeStart, 20f, Config.FlourishingCascadeColor);
             }
 
-            if (flourishingFountainBuff.Any() && procEnabled)
+            // Flourishing Fountain            
+            var flourishingFountainBuff = player.StatusEffects.FirstOrDefault(o => o.EffectId == 1815);
+            var fountainDuration = flourishingFountainBuff.Duration;
+            var fountainStart = timersEnabled ? fountainDuration : 20;
+            var fountainPos = new Vector2(
+                origin.X + Config.Position.X + Config.ProcBarPosition.X + (2 * order[1] - 2) * Config.ProcBarSize.X / 4f - order[1] * procBarSize.X,
+                origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarPosition.Y / 2f
+            );
+            var fountainBuilder = BarBuilder.Create(fountainPos, procBarSize)
+                .SetBackgroundColor(EmptyColor.Base);
+
+            if (fountainDuration > 0)
             {
-                var fountainStart = timersEnabled ? Math.Abs(flourishingFountainBuff.First().Duration) : 20;
-                fountainBuilder.AddInnerBar(fountainStart, 20, Config.FlourishingFountainColor);
+                fountainBuilder.AddInnerBar(fountainStart, 20f, Config.FlourishingFountainColor);
             }
 
-            if (flourishingWindmillBuff.Any() && procEnabled)
+            // Flourishing Windmill
+            var flourishingWindmillBuff = player.StatusEffects.FirstOrDefault(o => o.EffectId == 1816);
+            var windmillDuration = flourishingWindmillBuff.Duration;
+            var windmillStart = timersEnabled ? windmillDuration : 20;
+            var windmillPos = new Vector2(
+                origin.X + Config.Position.X + Config.ProcBarPosition.X + (2 * order[2] - 2) * Config.ProcBarSize.X / 4f - order[2] * procBarSize.X,
+                origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarPosition.Y / 2f
+            );
+            var windmillBuilder = BarBuilder.Create(windmillPos, procBarSize)
+                .SetBackgroundColor(EmptyColor.Base);
+
+            if (windmillDuration > 0)
             {
-                var windmillStart = timersEnabled ? Math.Abs(flourishingWindmillBuff.First().Duration) : 20;
-                windmillBuilder.AddInnerBar(windmillStart, 20, Config.FlourishingWindmillColor);
+                windmillBuilder.AddInnerBar(windmillStart, 20f, Config.FlourishingWindmillColor);
             }
 
-            if (flourishingShowerBuff.Any() && procEnabled)
+            // Flourishing Shower
+            var flourishingShowerBuff = player.StatusEffects.FirstOrDefault(o => o.EffectId == 1817);
+            var showerDuration = flourishingShowerBuff.Duration;
+            var showerStart = timersEnabled ? showerDuration : 20;
+            var showerPos = new Vector2(
+                origin.X + Config.Position.X + Config.ProcBarPosition.X + (2 * order[3] - 2) * Config.ProcBarSize.X / 4f - order[3] * procBarSize.X,
+                origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarPosition.Y / 2f
+            );
+            var showerBuilder = BarBuilder.Create(showerPos, procBarSize)
+                .SetBackgroundColor(EmptyColor.Base);
+
+            if (showerDuration > 0)
             {
-                var showerStart = timersEnabled ? Math.Abs(flourishingShowerBuff.First().Duration) : 20;
-                showerBuilder.AddInnerBar(showerStart, 20, Config.FlourishingShowerColor);
+                showerBuilder.AddInnerBar(showerStart, 20f, Config.FlourishingShowerColor);
+            }
+
+            if (!Config.StaticProcBarsEnabled)
+            {
+                cascadeBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                fountainBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                windmillBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                showerBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -351,7 +385,7 @@ namespace DelvUI.Interface.Jobs
         public new static DancerConfig DefaultConfig() { return new DancerConfig(); }
 
         #region espirit
-        [Checkbox("Show Esprit Guage")]
+        [Checkbox("Show Esprit Guage", separator = true)]
         [CollapseControl(30, 0)]
         public bool EspritGuageEnabled = true;
 
@@ -377,7 +411,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region feathers
-        [Checkbox("Show Feather Guage")]
+        [Checkbox("Show Feather Guage", separator = true)]
         [CollapseControl(35, 1)]
         public bool FeatherGuageEnabled = true;
 
@@ -407,7 +441,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region buff bars
-        [Checkbox("Show Buff Bar")]
+        [Checkbox("Show Buff Bar", separator = true)]
         [CollapseControl(40, 2)]
         public bool BuffBarEnabled = true;
 
@@ -445,7 +479,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region standard finish
-        [Checkbox("Show Standard Finish Bar")]
+        [Checkbox("Show Standard Finish Bar", separator = true)]
         [CollapseControl(45, 3)]
         public bool StandardBarEnabled = true;
 
@@ -467,7 +501,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region steps
-        [Checkbox("Show Step Bars")]
+        [Checkbox("Show Step Bars", separator = true)]
         [CollapseControl(50, 4)]
         public bool StepBarEnabled = true;
 
@@ -517,7 +551,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region procs
-        [Checkbox("Show Proc Bars")]
+        [Checkbox("Show Proc Bars", separator = true)]
         [CollapseControl(55, 5)]
         public bool ProcBarEnabled = true;
 
@@ -537,20 +571,24 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(20, 5)]
         public float ProcBarChunkPadding = 2;
 
-        [ColorEdit4("Flourishing Cascade Color")]
+        [DragDropHorizontal("Procs Order", "Cascade", "Fountain", "Windmill", "Shower")]
         [CollapseWith(25, 5)]
+        public int[] procsOrder = new int[] { 0, 1, 2, 3 };
+
+        [ColorEdit4("Flourishing Cascade Color")]
+        [CollapseWith(30, 5)]
         public PluginConfigColor FlourishingCascadeColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Flourishing Fountain Color")]
-        [CollapseWith(30, 5)]
+        [CollapseWith(35, 5)]
         public PluginConfigColor FlourishingFountainColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Flourishing Windmill Color")]
-        [CollapseWith(35, 5)]
+        [CollapseWith(40, 5)]
         public PluginConfigColor FlourishingWindmillColor = new(new Vector4(0f / 255f, 215f / 255f, 215f / 255f, 100f / 100f));
 
         [ColorEdit4("Flourishing Shower Color")]
-        [CollapseWith(40, 5)]
+        [CollapseWith(45, 5)]
         public PluginConfigColor FlourishingShowerColor = new(new Vector4(255f / 255f, 100f / 255f, 0f / 255f, 100f / 100f));
         #endregion
     }
