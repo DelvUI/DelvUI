@@ -1,4 +1,5 @@
 ﻿using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using ImGuiNET;
 using System;
@@ -95,7 +96,8 @@ namespace DelvUI.Interface
             var textOutlineColor = Selected ? 0xFF000000 : 0xEE000000;
             DrawHelper.DrawOutlinedText(_displayName, contentPos + contentSize / 2f - textSize / 2f, textColor, textOutlineColor, drawList);
 
-            if (ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
+            bool mouseOver = ImGui.IsMouseHoveringRect(windowPos, windowPos + size);
+            if (mouseOver)
             {
                 bool clicked = ImGui.IsMouseClicked(ImGuiMouseButton.Left) || ImGui.IsMouseDown(ImGuiMouseButton.Left);
                 if (clicked && !Selected && SelectEvent != null)
@@ -105,17 +107,7 @@ namespace DelvUI.Interface
 
                 // tooltip
                 TooltipsHelper.Instance.ShowTooltipOnCursor(tooltipText);
-
-                var anchorableConfig = _config as AnchorablePluginConfigObject;
-                if (anchorableConfig != null)
-                {
-                    var anchorIndicatorPos = Utils.GetAnchoredPosition(contentPos, -contentSize, anchorableConfig.Anchor);
-                    var anchorIndicatorSize = new Vector2(8, 8);
-                    drawList.AddRectFilled(anchorIndicatorPos - anchorIndicatorSize / 2f, anchorIndicatorPos + anchorIndicatorSize / 2f, 0xFF0000FF);
-                }
             }
-
-            ImGui.End();
 
             // arrows
             if (Selected)
@@ -129,6 +121,24 @@ namespace DelvUI.Interface
                 }
             }
 
+            if (mouseOver || Selected)
+            {
+                var anchorableConfig = _config as AnchorablePluginConfigObject;
+                if (anchorableConfig != null)
+                {
+                    var anchorIndicatorSize = new Vector2(5, 5);
+                    var anchorIndicatorPos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(contentPos, -contentSize, anchorableConfig.Anchor), anchorIndicatorSize, anchorableConfig.Anchor);
+                    drawList.AddRectFilled(anchorIndicatorPos, anchorIndicatorPos + anchorIndicatorSize, 0xFF0000FF);
+                }
+                else
+                {
+                    var anchorIndicatorSize = new Vector2(5, 5);
+                    var anchorIndicatorPos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(contentPos, -contentSize, DrawAnchor.Center), anchorIndicatorSize, DrawAnchor.Center);
+                    drawList.AddRectFilled(anchorIndicatorPos, anchorIndicatorPos + anchorIndicatorSize, 0xFF0000FF);
+                }
+            }
+
+            ImGui.End();
         }
 
         public virtual void DrawChildren(Vector2 origin) { }
