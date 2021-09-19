@@ -103,6 +103,7 @@ namespace DelvUI.Interface.Party
     }
 
     [Serializable]
+    [Disableable(false)]
     [Portable(false)]
     public class PartyFramesColorsConfig : PluginConfigObject
     {
