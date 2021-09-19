@@ -386,7 +386,6 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
-    [Serializable]
     [Section("Job Specific Bars")]
     [SubSection("Melee", 0)]
     [SubSection("Monk", 1)]

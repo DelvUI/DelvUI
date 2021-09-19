@@ -5,7 +5,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Serializable]
     [Section("Misc")]
     [SubSection("GCD Indicator", 0)]
     public class GCDIndicatorConfig : MovablePluginConfigObject

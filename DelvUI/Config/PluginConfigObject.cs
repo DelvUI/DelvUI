@@ -9,7 +9,6 @@ using System.Reflection;
 
 namespace DelvUI.Config
 {
-    [Serializable]
     public abstract class PluginConfigObject : IOnChangeEventArgs
     {
         [Checkbox("Enabled", separator = true)]
@@ -38,7 +37,7 @@ namespace DelvUI.Config
 
         protected bool ColorEdit4(string label, ref PluginConfigColor color)
         {
-            var vector = color.Vector; 
+            var vector = color.Vector;
 
             if (ImGui.ColorEdit4(label, ref vector))
             {
@@ -70,7 +69,6 @@ namespace DelvUI.Config
         #endregion
     }
 
-    [Serializable]
     public abstract class MovablePluginConfigObject : PluginConfigObject
     {
         [DragInt2("Position", min = -4000, max = 4000)]
@@ -78,7 +76,6 @@ namespace DelvUI.Config
         public Vector2 Position = Vector2.Zero;
     }
 
-    [Serializable]
     public class PluginConfigColor
     {
         [JsonIgnore] private float[] _colorMapRatios = { -.8f, -.3f, .1f };

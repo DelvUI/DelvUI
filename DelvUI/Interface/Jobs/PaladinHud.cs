@@ -222,7 +222,6 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
-    [Serializable]
     [Section("Job Specific Bars")]
     [SubSection("Tank", 0)]
     [SubSection("Paladin", 1)]

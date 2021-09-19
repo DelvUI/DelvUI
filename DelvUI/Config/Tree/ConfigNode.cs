@@ -877,7 +877,8 @@ namespace DelvUI.Config.Tree
                 }
 
                 // TODO allow the manual draw methods to take parameters
-                method.Invoke(ConfigObject, null);
+                bool result = (bool)method.Invoke(ConfigObject, null);
+                changed |= result;
             }
 
             // if the config object is not marked with [Portable(false)], or is marked with [Portable(true)],

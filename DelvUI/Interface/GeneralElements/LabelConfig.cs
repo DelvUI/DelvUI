@@ -6,7 +6,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Serializable]
     [Portable(false)]
     public class EditableLabelConfig : LabelConfig
     {
@@ -30,7 +29,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     [Portable(false)]
     public class LabelConfig : MovablePluginConfigObject
     {
