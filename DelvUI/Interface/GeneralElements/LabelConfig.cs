@@ -47,10 +47,14 @@ namespace DelvUI.Interface.GeneralElements
         [ColorEdit4("Color ##Text")]
         [Order(35)]
         public PluginConfigColor Color = new PluginConfigColor(Vector4.One);
-
+                
         [Checkbox("Outline")]
         [CollapseControl(40, 0)]
         public bool ShowOutline = true;
+
+        [Checkbox("Use Job Color")]
+        [Order(45)]
+        public bool UseJobColor = false;
 
         [ColorEdit4("Color ##Outline")]
         [CollapseWith(0, 0)]

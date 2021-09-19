@@ -38,13 +38,30 @@ namespace DelvUI.Interface.GeneralElements
             var offset = OffsetForFrameAnchor(parentSize) + OffsetForTextAnchor(textSize);
             var drawList = ImGui.GetWindowDrawList();
 
-            if (Config.ShowOutline)
-            {
-                DrawHelper.DrawOutlinedText(text, parentOrigin + Config.Position + offset, Config.Color.Base, Config.OutlineColor.Base, drawList);
+            if (Config.UseJobColor)
+            {                       
+                var color = GlobalColors.Instance.SafeColorForJobId(Plugin.ClientState.LocalPlayer.ClassJob.Id);
+                var jobColor = color.Base;
+
+                if (Config.ShowOutline)
+                {
+                    DrawHelper.DrawOutlinedText(text, parentOrigin + Config.Position + offset, jobColor, Config.OutlineColor.Base, drawList);
+                }
+                else
+                {
+                    drawList.AddText(parentOrigin + Config.Position + offset, jobColor, text);
+                }
             }
             else
             {
-                drawList.AddText(parentOrigin + Config.Position + offset, Config.Color.Base, text);
+                if (Config.ShowOutline)
+                {
+                    DrawHelper.DrawOutlinedText(text, parentOrigin + Config.Position + offset, Config.Color.Base, Config.OutlineColor.Base, drawList);
+                }
+                else
+                {
+                    drawList.AddText(parentOrigin + Config.Position + offset, Config.Color.Base, text);
+                }
             }
         }
 
