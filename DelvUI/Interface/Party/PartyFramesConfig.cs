@@ -67,14 +67,38 @@ namespace DelvUI.Interface.Party
         [NestedConfig("Name Label", 40)]
         public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:first-initial]. [name:last-initial].", HudElementAnchor.Center, HudElementAnchor.Center);
 
-        [NestedConfig("Colors", 45)]
+        [NestedConfig("Mana Bar", 45)]
+        public PartyFramesManaBarConfig ManaBarConfig = new PartyFramesManaBarConfig();
+
+        [NestedConfig("Colors", 50)]
         public PartyFramesColorsConfig ColorsConfig = new PartyFramesColorsConfig();
 
-        [NestedConfig("Job/Role Icons", 50)]
+        [NestedConfig("Job/Role Icons", 55)]
         public PartyFramesRoleIconConfig RoleIconConfig = new PartyFramesRoleIconConfig();
 
-        [NestedConfig("Shield", 55)]
+        [NestedConfig("Shield", 60)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
+    }
+
+    [Serializable]
+    [Portable(false)]
+    public class PartyFramesManaBarConfig : MovablePluginConfigObject
+    {
+        [DragInt("Height", min = 1, max = 1000)]
+        [Order(30)]
+        public int Height = 6;
+
+        [Checkbox("Show Only For Healers")]
+        [Order(35)]
+        public bool ShowOnlyForHealers = true;
+
+        [ColorEdit4("Color")]
+        [Order(40)]
+        public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
+
+        [ColorEdit4("Background Color")]
+        [Order(45)]
+        public PluginConfigColor BackgroundColor = new PluginConfigColor(new(0 / 255f, 20f / 255f, 100f / 255f, 100f / 100f));
     }
 
     [Serializable]

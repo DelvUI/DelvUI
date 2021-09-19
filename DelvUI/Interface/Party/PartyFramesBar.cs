@@ -121,6 +121,21 @@ namespace DelvUI.Interface.Party
             //    pos.X = pos.X - size.X - 1;
             //}
 
+            // mana
+            if (_config.ManaBarConfig.Enabled && Member.MaxHP > 0 &&
+                (!_config.ManaBarConfig.ShowOnlyForHealers || JobsHelper.IsJobHealer(Member.JobId)))
+            {
+                var manaBarPos = Position + new Vector2(0, _config.Size.Y - _config.ManaBarConfig.Height);
+                var manaBarSize = new Vector2(_config.Size.X, _config.ManaBarConfig.Height);
+
+                drawList.AddRectFilled(manaBarPos, manaBarPos + manaBarSize, _config.ManaBarConfig.BackgroundColor.Base);
+
+                var scale = (float)Member.MP / (float)Member.MaxMP;
+                var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), manaBarSize.Y);
+
+                DrawHelper.DrawGradientFilledRect(manaBarPos, fillSize, _config.ManaBarConfig.Color, drawList);
+            }
+
             // name
             var actor = Member.GetActor();
             var name = Member.Name ?? "";
