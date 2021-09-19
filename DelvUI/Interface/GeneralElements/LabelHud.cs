@@ -6,7 +6,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public unsafe class LabelHud : HudElement
+    public class LabelHud : HudElement
     {
         private LabelConfig Config => (LabelConfig)_config;
 
