@@ -146,6 +146,10 @@ namespace DelvUI.Interface.StatusEffects
         [NestedConfig("Icons", 60)]
         public StatusEffectIconConfig IconConfig;
 
+        [NestedConfig("Black List", 65)]
+        public StatusEffectsBlacklistConfig BlacklistConfig = new StatusEffectsBlacklistConfig();
+
+
         public StatusEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
                                        GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
         {
@@ -214,9 +218,6 @@ namespace DelvUI.Interface.StatusEffects
         [NestedConfig("My Effects Border", 25)]
         public StatusEffectIconBorderConfig OwnedBorderConfig = new StatusEffectIconBorderConfig(new(new(35f / 255f, 179f / 255f, 69f / 255f, 100f / 100f)), 2);
 
-        [NestedConfig("Black List", 30)]
-        public StatusEffectsBlacklistConfig BlacklistConfig = new StatusEffectsBlacklistConfig();
-
         public StatusEffectIconConfig(LabelConfig durationLabelConfig = null, LabelConfig stacksLabelConfig = null)
         {
             DurationLabelConfig = durationLabelConfig ?? StatusEffectsListsDefaults.DefaultDurationLabelConfig();
@@ -267,7 +268,68 @@ namespace DelvUI.Interface.StatusEffects
     public class StatusEffectsBlacklistConfig : PluginConfigObject
     {
         public bool UseAsWhitelist = false;
-        public SortedList<string, uint> List = new SortedList<string, uint>();
+        public SortedList<uint, string> List = new SortedList<uint, string>();
+
+        public bool StatusEffectIDAllowed(uint id)
+        {
+            var inList = List.ContainsKey((uint)id);
+            if ((inList && !UseAsWhitelist) || (!inList && UseAsWhitelist))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool AddNewEntry(Status status)
+        {
+            if (status != null && !List.ContainsKey(status.RowId))
+            {
+                List.Add(status.RowId, status.Name);
+                _input = "";
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool AddNewEntry(string input, ExcelSheet<Status> sheet)
+        {
+            if (input.Length > 0)
+            {
+                Status status = null;
+
+                // try id
+                if (uint.TryParse(input, out uint uintValue))
+                {
+                    if (uintValue > 0)
+                    {
+                        status = sheet.GetRow(uintValue);
+                    }
+                }
+
+                // try name
+                if (status == null)
+                {
+                    var enumerator = sheet.GetEnumerator();
+
+                    while (enumerator.MoveNext())
+                    {
+                        Status item = enumerator.Current;
+                        if (item.Name.ToString().ToLower() == input.ToLower())
+                        {
+                            status = item;
+                            break;
+                        }
+                    }
+                }
+
+                return AddNewEntry(status);
+            }
+
+            return false;
+        }
 
         [JsonIgnore]
         private string _input = "";
@@ -293,54 +355,28 @@ namespace DelvUI.Interface.StatusEffects
             var iconSize = new Vector2(30, 30);
             var indexToRemove = -1;
 
-            if (ImGui.BeginChild("blacklist", new Vector2(0, 350), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            if (ImGui.BeginChild("blacklist", new Vector2(0, 360), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 changed |= ImGui.Checkbox("Use as White List", ref UseAsWhitelist);
 
                 ImGui.Text("");
+                ImGui.Text("Tip: You can [Ctrl + Alt + Shift] + Left Click on a status effect to automatically add it to the list.");
+                ImGui.Text("");
 
                 ImGui.Text("Type an ID or Name");
 
-                ImGui.InputText("", ref _input, 64);
+                if (ImGui.InputText("", ref _input, 64, ImGuiInputTextFlags.EnterReturnsTrue))
+                {
+                    changed |= AddNewEntry(_input, sheet);
+                    ImGui.SetKeyboardFocusHere(-1);
+                }
+
                 ImGui.SameLine();
+
                 if (ImGui.Button("Add", new Vector2(60, 23)))
                 {
-                    if (_input.Length > 0)
-                    {
-                        Status status = null;
-
-                        // try id
-                        if (uint.TryParse(_input, out uint uintValue))
-                        {
-                            if (uintValue > 0)
-                            {
-                                status = sheet.GetRow(uintValue);
-                            }
-                        }
-
-                        // try name
-                        if (status == null)
-                        {
-                            var enumerator = sheet.GetEnumerator();
-
-                            while (enumerator.MoveNext())
-                            {
-                                Status item = enumerator.Current;
-                                if (item.Name.ToString().ToLower() == _input.ToLower())
-                                {
-                                    status = item;
-                                    break;
-                                }
-                            }
-                        }
-
-                        if (status != null && !List.ContainsKey(status.Name))
-                        {
-                            changed = true;
-                            List.Add(status.Name, status.RowId);
-                            _input = "";
-                        }
-                    }
+                    changed |= AddNewEntry(_input, sheet);
+                    ImGui.SetKeyboardFocusHere(-2);
                 }
 
                 ImGui.NewLine();
@@ -356,8 +392,8 @@ namespace DelvUI.Interface.StatusEffects
 
                     for (int i = 0; i < List.Count; i++)
                     {
-                        var name = List.Keys[i];
-                        var id = List.Values[i];
+                        var id = List.Keys[i];
+                        var name = List.Values[i];
 
                         ImGui.PushID(i.ToString());
                         ImGui.TableNextRow(ImGuiTableRowFlags.None, iconSize.Y);
