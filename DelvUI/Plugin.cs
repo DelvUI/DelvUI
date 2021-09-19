@@ -244,6 +244,8 @@ namespace DelvUI
                 return;
             }
 
+            HudHelper.RestoreToGameDefaults();
+
             ConfigurationManager.GetInstance().DrawConfigWindow = false;
 
             CommandManager.RemoveHandler("/delvui");
