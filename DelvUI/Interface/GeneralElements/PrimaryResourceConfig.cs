@@ -18,11 +18,15 @@ namespace DelvUI.Interface.GeneralElements
         [Order(20)]
         public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
 
-        [NestedConfig("Label", 25)]
+        [Checkbox("Use Job Color")]
+        [Order(25)]
+        public bool UseJobColor = false;
+
+        [NestedConfig("Label", 30)]
         public LabelConfig ValueLabelConfig;
 
         [Checkbox("Threshold Marker", spacing = true)]
-        [CollapseControl(30, 0)]
+        [CollapseControl(35, 0)]
         public bool ShowThresholdMarker = false;
 
         [DragInt("Value", min = 1, max = 10000)]
