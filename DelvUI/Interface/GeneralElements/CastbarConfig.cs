@@ -49,7 +49,7 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Target", 0)]
     public class TargetCastbarConfig : CastbarConfig
     {
-        [Checkbox("Interruptable Color")]
+        [Checkbox("Interruptable Color", spacing = true)]
         [CollapseControl(35, 0)]
         public bool ShowInterruptableColor = true;
 
@@ -57,7 +57,7 @@ namespace DelvUI.Interface.GeneralElements
         [CollapseWith(0, 0)]
         public PluginConfigColor InterruptableColor = new PluginConfigColor(new(255f / 255f, 87f / 255f, 113f / 255f, 100f / 100f));
 
-        [Checkbox("Damage Type Colors")]
+        [Checkbox("Damage Type Colors", spacing = true)]
         [CollapseControl(40, 1)]
         public bool UseColorForDamageTypes = true;
 

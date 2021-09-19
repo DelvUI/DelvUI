@@ -122,7 +122,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         public new static TanksColorConfig DefaultConfig() { return new TanksColorConfig(); }
 
-        [ColorEdit4("Paladin")]
+        [ColorEdit4("Paladin", spacing = true)]
         [Order(5)]
         public PluginConfigColor PLDColor = new PluginConfigColor(new(168f / 255f, 210f / 255f, 230f / 255f, 100f / 100f));
 
@@ -138,7 +138,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(20)]
         public PluginConfigColor GNBColor = new PluginConfigColor(new(121f / 255f, 109f / 255f, 48f / 255f, 100f / 100f));
 
-        [ColorEdit4("Gladiator", separator = true)]
+        [ColorEdit4("Gladiator", spacing = true)]
         [Order(25)]
         public PluginConfigColor GLDColor = new PluginConfigColor(new(168f / 255f, 210f / 255f, 230f / 255f, 100f / 100f));
 
@@ -155,7 +155,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         public new static HealersColorConfig DefaultConfig() { return new HealersColorConfig(); }
 
-        [ColorEdit4("Scholar")]
+        [ColorEdit4("Scholar", spacing = true)]
         [Order(5)]
         public PluginConfigColor SCHColor = new PluginConfigColor(new(134f / 255f, 87f / 255f, 255f / 255f, 100f / 100f));
 
@@ -167,7 +167,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public PluginConfigColor ASTColor = new PluginConfigColor(new(255f / 255f, 231f / 255f, 74f / 255f, 100f / 100f));
 
-        [ColorEdit4("Conjurer", separator = true)]
+        [ColorEdit4("Conjurer", spacing = true)]
         [Order(20)]
         public PluginConfigColor CNJColor = new PluginConfigColor(new(255f / 255f, 240f / 255f, 220f / 255f, 100f / 100f));
     }
@@ -180,7 +180,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         public new static MeleeColorConfig DefaultConfig() { return new MeleeColorConfig(); }
 
-        [ColorEdit4("Monk")]
+        [ColorEdit4("Monk", spacing = true)]
         [Order(5)]
         public PluginConfigColor MNKColor = new PluginConfigColor(new(214f / 255f, 156f / 255f, 0f / 255f, 100f / 100f));
 
@@ -196,7 +196,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(20)]
         public PluginConfigColor SAMColor = new PluginConfigColor(new(228f / 255f, 109f / 255f, 4f / 255f, 100f / 100f));
 
-        [ColorEdit4("Pugilist", separator = true)]
+        [ColorEdit4("Pugilist", spacing = true)]
         [Order(25)]
         public PluginConfigColor PGLColor = new PluginConfigColor(new(214f / 255f, 156f / 255f, 0f / 255f, 100f / 100f));
 
@@ -217,7 +217,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         public new static RangedColorConfig DefaultConfig() { return new RangedColorConfig(); }
 
-        [ColorEdit4("Bard")]
+        [ColorEdit4("Bard", spacing = true)]
         [Order(5)]
         public PluginConfigColor BRDColor = new PluginConfigColor(new(145f / 255f, 186f / 255f, 94f / 255f, 100f / 100f));
 
@@ -242,7 +242,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         public new static CastersColorConfig DefaultConfig() { return new CastersColorConfig(); }
 
-        [ColorEdit4("Black Mage")]
+        [ColorEdit4("Black Mage", spacing = true)]
         [Order(5)]
         public PluginConfigColor BLMColor = new PluginConfigColor(new(165f / 255f, 121f / 255f, 214f / 255f, 100f / 100f));
 
@@ -254,7 +254,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public PluginConfigColor RDMColor = new PluginConfigColor(new(232f / 255f, 123f / 255f, 123f / 255f, 100f / 100f));
 
-        [ColorEdit4("Blue Mage", separator = true)]
+        [ColorEdit4("Blue Mage", spacing = true)]
         [Order(20)]
         public PluginConfigColor BLUColor = new PluginConfigColor(new(0f / 255f, 185f / 255f, 247f / 255f, 100f / 100f));
 
@@ -275,7 +275,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         public new static MiscColorConfig DefaultConfig() { return new MiscColorConfig(); }
 
-        [Combo("Gradient Type For Bars", "Flat Color", "Right", "Left", "Up", "Down", "Centered Horizontal")]
+        [Combo("Gradient Type For Bars", "Flat Color", "Right", "Left", "Up", "Down", "Centered Horizontal", spacing = true)]
         [Order(4)]
         public GradientDirection GradientDirection = GradientDirection.Down;
 
@@ -303,7 +303,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(30)]
         public PluginConfigColor NPCNeutralColor = new PluginConfigColor(new(218f / 255f, 157f / 255f, 46f / 255f, 100f / 100f));
 
-        [ColorEdit4("Disciples of the Land", separator = true)]
+        [ColorEdit4("Disciples of the Land", spacing = true)]
         [Order(35)]
         public PluginConfigColor LANDColor = new PluginConfigColor(new(99f / 255f, 172f / 255f, 14f / 255f, 100f / 100f));
 

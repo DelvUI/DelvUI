@@ -130,7 +130,7 @@ namespace DelvUI.Interface.StatusEffects
         [Order(35)]
         public int Limit = -1;
 
-        [Checkbox("Permanent Effects", separator = true)]
+        [Checkbox("Permanent Effects", spacing = true)]
         [Order(40)]
         public bool ShowPermanentEffects;
 

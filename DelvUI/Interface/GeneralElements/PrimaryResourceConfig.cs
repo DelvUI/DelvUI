@@ -21,7 +21,7 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Label", 25)]
         public LabelConfig ValueLabelConfig;
 
-        [Checkbox("Threshold Marker")]
+        [Checkbox("Threshold Marker", spacing = true)]
         [CollapseControl(30, 0)]
         public bool ShowThresholdMarker = false;
 
