@@ -2,6 +2,7 @@
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
 using System;
 using System.Numerics;
@@ -12,17 +13,26 @@ namespace DelvUI.Interface.Party
     public class PartyFramesBar
     {
         private PartyFramesBarsConfig _config;
+        private PartyFramesBuffsConfig _buffsConfig;
+        private PartyFramesDebuffsConfig _debuffsConfig;
+
         private LabelHud _labelHud;
+        private StatusEffectsListHud _buffsListHud;
+        private StatusEffectsListHud _debuffsListHud;
 
         public IPartyFramesMember Member;
         public bool Visible = false;
         public Vector2 Position;
 
-        public PartyFramesBar(string id, PartyFramesBarsConfig config)
+        public PartyFramesBar(string id, PartyFramesBarsConfig config, PartyFramesBuffsConfig buffsConfig, PartyFramesDebuffsConfig debuffsConfig)
         {
             _config = config;
+            _buffsConfig = buffsConfig;
+            _debuffsConfig = debuffsConfig;
 
-            _labelHud = new LabelHud("partyFramesBar_" + id, config.NameLabelConfig);
+            _labelHud = new LabelHud("partyFramesBar_Label_" + id, config.NameLabelConfig);
+            _buffsListHud = new StatusEffectsListHud("partyFramesBar_Buffs_" + id, buffsConfig, "");
+            _debuffsListHud = new StatusEffectsListHud("partyFramesBar_Debuffs_" + id, debuffsConfig, "");
         }
 
         public PluginConfigColor GetColor()
@@ -103,23 +113,17 @@ namespace DelvUI.Interface.Party
             }
 
             // buffs / debuffs
-            //var statusEffects = Member.StatusEffects;
-            //var pos = Position + Size - origin + new Vector2(6, 1);
+            ImGui.BeginChild("child_" + _buffsListHud.ID);
+            var buffsPos = CalculatePositionForAnchor(_buffsConfig.Anchor);
+            _buffsListHud.Actor = Member.GetActor();
+            _buffsListHud.Draw(buffsPos);
+            ImGui.EndChild();
 
-            //for (int s = 0; s < statusEffects.Length; s++)
-            //{
-            //    var id = (uint)statusEffects[s].EffectId;
-            //    if (id == 0) continue;
-
-            //    var texture = TexturesCache.Instance.GetTexture<Status>(id, (uint)Math.Max(0, statusEffects[s].StackCount - 1));
-            //    if (texture == null) continue;
-
-            //    var size = new Vector2(texture.Width, texture.Height);
-            //    ImGui.SetCursorPos(pos - size);
-            //    ImGui.Image(texture.ImGuiHandle, size);
-
-            //    pos.X = pos.X - size.X - 1;
-            //}
+            ImGui.BeginChild("child_" + _debuffsListHud.ID);
+            var debuffsPos = CalculatePositionForAnchor(_debuffsConfig.Anchor);
+            _debuffsListHud.Actor = Member.GetActor();
+            _debuffsListHud.Draw(debuffsPos);
+            ImGui.EndChild();
 
             // mana
             if (_config.ManaBarConfig.Enabled && Member.MaxHP > 0 &&
@@ -164,10 +168,6 @@ namespace DelvUI.Interface.Party
                 _config.NameLabelConfig.OutlineColor = previousOutlineColor;
             }
 
-            //var textSize = ImGui.CalcTextSize(name);
-            //var textPos = new Vector2(Position.X + _config.Size.X / 2f - textSize.X / 2f, Position.Y + _config.Size.Y / 2f - textSize.Y / 2f);
-            //drawList.AddText(textPos, actor == null && Member is not FakePartyFramesMember ? 0x44FFFFFF : 0xFFFFFFFF, name);
-
             // icon
             if (_config.RoleIconConfig.Enabled)
             {
@@ -188,6 +188,18 @@ namespace DelvUI.Interface.Party
             var borderPos = Position - Vector2.One;
             var borderSize = _config.Size + Vector2.One * 2;
             drawList.AddRect(borderPos, borderPos + borderSize, 0xFF000000);
+        }
+
+        private Vector2 CalculatePositionForAnchor(HudElementAnchor anchor)
+        {
+            switch (anchor)
+            {
+                case HudElementAnchor.TopLeft: return Position;
+                case HudElementAnchor.TopRight: return Position + new Vector2(_config.Size.X, 0);
+                case HudElementAnchor.BottomLeft: return Position + new Vector2(0, _config.Size.Y);
+            }
+
+            return Position + _config.Size;
         }
     }
 }

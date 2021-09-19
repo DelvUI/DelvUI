@@ -11,7 +11,9 @@ namespace DelvUI.Interface.Party
     public class PartyFramesHud : DraggableHudElement
     {
         private PartyFramesConfig Config => (PartyFramesConfig)_config;
-        private PartyFramesBarsConfig HealthBarsConfig;
+        private PartyFramesBarsConfig _healthBarsConfig;
+        private PartyFramesBuffsConfig _buffsConfig;
+        private PartyFramesDebuffsConfig _debuffsConfig;
 
         private const ImGuiWindowFlags _lockedBarFlags = ImGuiWindowFlags.NoBackground |
                                                         ImGuiWindowFlags.NoMove |
@@ -32,9 +34,18 @@ namespace DelvUI.Interface.Party
         private List<PartyFramesBar> bars;
 
 
-        public PartyFramesHud(string id, PartyFramesConfig config, PartyFramesBarsConfig healthBarsConfig, string displayName) : base(id, config, displayName)
+        public PartyFramesHud(
+            string id,
+            PartyFramesConfig config,
+            PartyFramesBarsConfig healthBarsConfig,
+            PartyFramesBuffsConfig buffsConfig,
+            PartyFramesDebuffsConfig debuffsConfig,
+            string displayName) : base(id, config, displayName)
         {
-            HealthBarsConfig = healthBarsConfig;
+            _healthBarsConfig = healthBarsConfig;
+            _buffsConfig = buffsConfig;
+            _debuffsConfig = debuffsConfig;
+
             config.onValueChanged += OnLayoutPropertyChanged;
             healthBarsConfig.onValueChanged += OnLayoutPropertyChanged;
             healthBarsConfig.ColorsConfig.onValueChanged += OnLayoutPropertyChanged;
@@ -42,7 +53,7 @@ namespace DelvUI.Interface.Party
             bars = new List<PartyFramesBar>(MaxMemberCount);
             for (int i = 0; i < bars.Capacity; i++)
             {
-                bars.Add(new PartyFramesBar(i.ToString(), healthBarsConfig));
+                bars.Add(new PartyFramesBar(i.ToString(), healthBarsConfig, buffsConfig, debuffsConfig));
             }
 
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
@@ -54,8 +65,8 @@ namespace DelvUI.Interface.Party
             bars.Clear();
 
             _config.onValueChanged -= OnLayoutPropertyChanged;
-            HealthBarsConfig.onValueChanged -= OnLayoutPropertyChanged;
-            HealthBarsConfig.ColorsConfig.onValueChanged -= OnLayoutPropertyChanged;
+            _healthBarsConfig.onValueChanged -= OnLayoutPropertyChanged;
+            _healthBarsConfig.ColorsConfig.onValueChanged -= OnLayoutPropertyChanged;
             PartyManager.Instance.MembersChangedEvent -= OnMembersChanged;
         }
 
@@ -99,8 +110,8 @@ namespace DelvUI.Interface.Party
                 // anchor and position
                 CalculateBarPosition(origin, spaceSize, out var x, out var y);
                 bar.Position = new Vector2(
-                    x + HealthBarsConfig.Size.X * col + HealthBarsConfig.Padding.X * col,
-                    y + HealthBarsConfig.Size.Y * row + HealthBarsConfig.Padding.Y * row
+                    x + _healthBarsConfig.Size.X * col + _healthBarsConfig.Padding.X * col,
+                    y + _healthBarsConfig.Size.Y * row + _healthBarsConfig.Padding.Y * row
                 );
 
                 // layout
@@ -187,7 +198,7 @@ namespace DelvUI.Interface.Party
             ImGui.SetNextWindowPos(Config.Position - _contentMargin, ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSize(Config.Size + _contentMargin * 2, ImGuiCond.FirstUseEver);
 
-            var windowFlags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoTitleBar;
+            var windowFlags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoBringToFrontOnFocus;
             if (Config.Lock)
             {
                 windowFlags |= _lockedBarFlags;
@@ -207,9 +218,9 @@ namespace DelvUI.Interface.Party
             {
                 _layoutInfo = LayoutHelper.CalculateLayout(
                     maxSize,
-                    HealthBarsConfig.Size,
-                    PartyManager.Instance.MemberCount,
-                    HealthBarsConfig.Padding,
+                    _healthBarsConfig.Size,
+                    count,
+                    _healthBarsConfig.Padding,
                     Config.FillRowsFirst
                 );
 
@@ -244,7 +255,7 @@ namespace DelvUI.Interface.Party
             if (targetIndex >= 0)
             {
                 var borderPos = bars[targetIndex].Position - Vector2.One;
-                var borderSize = HealthBarsConfig.Size + Vector2.One * 2;
+                var borderSize = _healthBarsConfig.Size + Vector2.One * 2;
                 drawList.AddRect(borderPos, borderPos + borderSize, 0xFFFFFFFF);
             }
 

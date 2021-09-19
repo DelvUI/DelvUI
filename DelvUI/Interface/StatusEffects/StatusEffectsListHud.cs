@@ -255,6 +255,7 @@ namespace DelvUI.Interface.StatusEffects
             windowFlags |= ImGuiWindowFlags.NoMove;
             windowFlags |= ImGuiWindowFlags.NoDecoration;
             windowFlags |= ImGuiWindowFlags.NoBackground;
+            windowFlags |= ImGuiWindowFlags.NoBackground;
             if (!Config.ShowBuffs)
             {
                 windowFlags |= ImGuiWindowFlags.NoInputs;

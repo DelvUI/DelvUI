@@ -17,7 +17,7 @@ namespace DelvUI.Interface.Party
     {
         protected PartyMember* _partyMember = null;
 
-        public int ActorID => _partyMember != null ? (int)_partyMember->ObjectID : Actor.ActorId;
+        public int ActorID => _partyMember != null ? (int)_partyMember->ObjectID : _actorID;
         protected string _name;
         public string Name => _name == null ? "???" : _name;
         public uint Level => _partyMember != null ? _partyMember->Level : BattleCharacter->Character.Level;
@@ -41,7 +41,7 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        private Actor Actor = null;
+        private int _actorID;
         private BattleChara* BattleCharacter => (BattleChara*)GetActor().Address;
 
 
@@ -61,13 +61,13 @@ namespace DelvUI.Interface.Party
 
         public PartyFramesMember(Actor actor)
         {
-            Actor = actor;
-            _name = Actor.Name;
+            _actorID = actor.ActorId;
+            _name = actor.Name;
         }
 
         public Actor GetActor()
         {
-            return Actor ?? Plugin.ClientState.Actors.FirstOrDefault(o => o.ActorId == ActorID);
+            return Plugin.ClientState.Actors.FirstOrDefault(o => o.ActorId == ActorID);
         }
     }
 

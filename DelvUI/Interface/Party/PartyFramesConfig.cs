@@ -1,6 +1,7 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
@@ -58,7 +59,7 @@ namespace DelvUI.Interface.Party
 
         [DragInt2("Size", isMonitored = true)]
         [Order(30)]
-        public Vector2 Size = new Vector2(150, 50);
+        public Vector2 Size = new Vector2(180, 80);
 
         [DragInt2("Padding", isMonitored = true)]
         [Order(35)]
@@ -161,5 +162,112 @@ namespace DelvUI.Interface.Party
         [Checkbox("Use Specific DPS Role Icons")]
         [CollapseWith(0, 0)]
         public bool UseSpecificDPSRoleIcons = false;
+    }
+
+    [Serializable]
+    [Section("Party Frames")]
+    [SubSection("Buffs", 0)]
+    public class PartyFramesBuffsConfig : PartyFramesStatusEffectsListConfig
+    {
+        public new static PartyFramesBuffsConfig DefaultConfig()
+        {
+            var durationConfig = new LabelConfig(new Vector2(0, -4), "", HudElementAnchor.Bottom, HudElementAnchor.Center);
+            var stacksConfig = new LabelConfig(new Vector2(-3, 4), "", HudElementAnchor.TopRight, HudElementAnchor.Center);
+            stacksConfig.Color = new(Vector4.UnitW);
+            stacksConfig.OutlineColor = new(Vector4.One);
+
+            var iconConfig = new StatusEffectIconConfig(durationConfig, stacksConfig);
+            iconConfig.DispellableBorderConfig.Enabled = false;
+            iconConfig.Size = new Vector2(24, 24);
+
+            var pos = new Vector2(-2, 2);
+            var size = new Vector2(iconConfig.Size.X * 4 + 6, iconConfig.Size.Y);
+
+            var config = new PartyFramesBuffsConfig(HudElementAnchor.TopRight, pos, size, true, false, false, GrowthDirections.Left | GrowthDirections.Down, iconConfig);
+            config.Limit = 4;
+
+            return config;
+        }
+
+        public PartyFramesBuffsConfig(HudElementAnchor anchor, Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
+            GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
+            : base(anchor, position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
+        {
+        }
+    }
+
+    [Serializable]
+    [Section("Party Frames")]
+    [SubSection("Debuffs", 0)]
+    public class PartyFramesDebuffsConfig : PartyFramesStatusEffectsListConfig
+    {
+        public new static PartyFramesDebuffsConfig DefaultConfig()
+        {
+            var durationConfig = new LabelConfig(new Vector2(0, -4), "", HudElementAnchor.Bottom, HudElementAnchor.Center);
+            var stacksConfig = new LabelConfig(new Vector2(-3, 4), "", HudElementAnchor.TopRight, HudElementAnchor.Center);
+            stacksConfig.Color = new(Vector4.UnitW);
+            stacksConfig.OutlineColor = new(Vector4.One);
+
+            var iconConfig = new StatusEffectIconConfig(durationConfig, stacksConfig);
+            iconConfig.Size = new Vector2(24, 24);
+
+            var pos = new Vector2(-2, -2);
+            var size = new Vector2(iconConfig.Size.X * 4 + 6, iconConfig.Size.Y);
+
+            var config = new PartyFramesDebuffsConfig(HudElementAnchor.BottomRight, pos, size, false, true, false, GrowthDirections.Left | GrowthDirections.Up, iconConfig);
+            config.Limit = 4;
+
+            return config;
+        }
+
+        public PartyFramesDebuffsConfig(HudElementAnchor anchor, Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
+            GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
+            : base(anchor, position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
+        {
+        }
+    }
+
+    [Serializable]
+
+    public class PartyFramesStatusEffectsListConfig : StatusEffectsListConfig
+    {
+        [Combo("Anchor", "Top Left", "Top Right", "Bottom Left", "Bottom Right")]
+        [Order(4)]
+        public int AnchorIndex;
+
+        [JsonIgnore]
+        public HudElementAnchor Anchor
+        {
+            get
+            {
+                switch (AnchorIndex)
+                {
+                    case 0: return HudElementAnchor.TopLeft;
+                    case 1: return HudElementAnchor.TopRight;
+                    case 2: return HudElementAnchor.BottomLeft;
+                }
+
+                return HudElementAnchor.BottomRight;
+            }
+
+            set
+            {
+                switch (value)
+                {
+                    case HudElementAnchor.TopLeft: AnchorIndex = 0; return;
+                    case HudElementAnchor.TopRight: AnchorIndex = 1; return;
+                    case HudElementAnchor.BottomLeft: AnchorIndex = 2; return;
+                }
+
+                AnchorIndex = 3;
+            }
+        }
+
+        public PartyFramesStatusEffectsListConfig(HudElementAnchor anchor, Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
+            GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
+            : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
+        {
+            Anchor = anchor;
+        }
     }
 }
