@@ -8,6 +8,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface
 {
+    [Disableable(false)]
     [Portable(false)]
     [Section("Import/Export")]
     [SubSection("General", 0)]
