@@ -24,9 +24,9 @@ namespace DelvUI.Interface.GeneralElements
         [CollapseControl(15, 0)]
         public bool HideDefaultJobGauges = false;
 
-        [Checkbox("I Dont Care About The Sound", isMonitored = true)]
+        [Checkbox("Disable Job Gauge Sounds", isMonitored = true)]
         [CollapseWith(0, 0)]
-        public bool IDontCareAboutTheSounds = false;
+        public bool DisableJobGaugeSounds = false;
 
         [Checkbox("Hide Default Castbar", isMonitored = true)]
         [Order(20)]

@@ -69,7 +69,7 @@ namespace DelvUI.Interface
                 ConfigureDefaultJobGauge();
             }
 
-            if (isEvent && !Config.IDontCareAboutTheSounds)
+            if (isEvent && !Config.DisableJobGaugeSounds)
             {
                 ConfigureDefaultJobGauge();
             }
@@ -123,8 +123,8 @@ namespace DelvUI.Interface
                 {
                     if (addon.name.StartsWith("JobHud"))
                     {
-                        addon.NodeListVisibilityToggle(Config.IDontCareAboutTheSounds);
-                        if (!Config.IDontCareAboutTheSounds)
+                        addon.NodeListVisibilityToggle(Config.DisableJobGaugeSounds);
+                        if (!Config.DisableJobGaugeSounds)
                         {
                             addon.VisibilityToggle(Config.HideDefaultJobGauges);
                         }
@@ -209,8 +209,8 @@ namespace DelvUI.Interface
                 {
                     bool isHidden = Config.HideDefaultJobGauges;
 
-                    addon.NodeListVisibilityToggle(isHidden && Config.IDontCareAboutTheSounds);
-                    if (!Config.IDontCareAboutTheSounds)
+                    addon.NodeListVisibilityToggle(isHidden && Config.DisableJobGaugeSounds);
+                    if (!Config.DisableJobGaugeSounds)
                     {
                         addon.VisibilityToggle(isHidden);
 
