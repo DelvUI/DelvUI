@@ -125,7 +125,7 @@ namespace DelvUI.Interface.GeneralElements
         [CollapseWith(0, 1)]
         public PluginConfigColor CustomBackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [Checkbox("Tank Invulnerability")]
+        [Checkbox("Tank Invulnerability", spacing = true)]
         [Order(30)]
         public bool ShowTankInvulnerability = true;
 

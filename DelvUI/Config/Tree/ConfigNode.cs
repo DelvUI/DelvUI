@@ -69,8 +69,22 @@ namespace DelvUI.Config.Tree
                 child.LoadBase64String(importStrings);
             }
         }
-    }
 
+        public static void Separator(int topSpacing, int bottomSpacing)
+        {
+            Spacing(topSpacing);
+            ImGui.Separator();
+            Spacing(bottomSpacing);
+        }
+
+        public static void Spacing(int spacingSize)
+        {
+            for (int i = 0; i < spacingSize; i++)
+            {
+                ImGui.Text("");
+            }
+        }
+    }
     public class BaseNode : Node
     {
         public new List<SectionNode> children;
@@ -873,13 +887,10 @@ namespace DelvUI.Config.Tree
                 DrawImportExportGeneralConfig();
             }
         }
-
         private void DrawImportExportGeneralConfig()
         {
-            ImGui.Text("");
-            ImGui.Text("");
-            ImGui.Separator();
-            ImGui.Text("");
+            
+            Separator(2,1);
 
             uint maxLength = 40000;
             ImGui.BeginChild("importpane", new Vector2(0, ImGui.GetWindowHeight() / 6), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
@@ -1007,7 +1018,7 @@ namespace DelvUI.Config.Tree
         public override ConfigPageNode GetOrAddConfig<T>() => this;
     }
 
-    public class CategoryField
+    public class CategoryField : Node
     {
         public SortedDictionary<int, FieldInfo> Children;
         public FieldInfo MainField;
@@ -1025,29 +1036,10 @@ namespace DelvUI.Config.Tree
         }
 
         public void AddChild(int position, FieldInfo field) { Children.Add(position, field); }
-
-        public void AddSeparator(FieldInfo field)
-        {
-            foreach (object attribute in field.GetCustomAttributes(true))
-            {
-                if (attribute is not ConfigAttribute { separator: true })
-                {
-                    continue;
-                }
-
-                if (attribute is CheckboxAttribute checkboxAttribute && (checkboxAttribute.friendlyName != "Enabled" || ID is null) && checkboxAttribute.friendlyName == "Enabled")
-                {
-                    continue;
-                }
-
-                ImGui.Text("");
-                ImGui.Separator();
-                ImGui.Text("");
-            }
-        }
-
+        
         public void Draw(ref bool changed)
         {
+            DrawStyleProperties(MainField, ID);
             Draw(ref changed, MainField);
 
             if (CategoryId != -1 && (bool)MainField.GetValue(ConfigObject))
@@ -1057,6 +1049,7 @@ namespace DelvUI.Config.Tree
 
                 foreach (FieldInfo child in Children.Values)
                 {
+                    DrawStyleProperties(child, ID);
                     ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "   \u2514");
                     ImGui.SameLine();
                     Draw(ref changed, child);
@@ -1068,7 +1061,6 @@ namespace DelvUI.Config.Tree
 
         public void Draw(ref bool changed, FieldInfo field)
         {
-            AddSeparator(field);
 
             object fieldVal = field.GetValue(ConfigObject);
             var idText = ID != null ? " ##" + ID : "";
@@ -1332,6 +1324,24 @@ namespace DelvUI.Config.Tree
                     }
 
                     ImGui.EndGroup();
+                }
+            }
+        }
+        
+        public void DrawStyleProperties(FieldInfo field, string ID)
+        {
+            foreach (object attribute in field.GetCustomAttributes(true))
+            {
+                if (attribute is ConfigAttribute { separator: true })
+                {
+                    if (attribute is CheckboxAttribute checkboxAttribute && (checkboxAttribute.friendlyName != "Enabled" || ID is null) && checkboxAttribute.friendlyName == "Enabled")
+                    {
+                        continue;
+                    }
+                    Separator(1,1);
+                }else if (attribute is ConfigAttribute { spacing: true })
+                {
+                    Spacing(1);
                 }
             }
         }
