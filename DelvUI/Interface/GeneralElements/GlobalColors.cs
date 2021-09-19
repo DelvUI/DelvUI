@@ -115,6 +115,7 @@ namespace DelvUI.Interface.GeneralElements
 
 
     [Serializable]
+    [Disableable(false)]
     [Section("Colors")]
     [SubSection("Tanks", 0)]
     public class TanksColorConfig : PluginConfigObject
@@ -147,6 +148,7 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Serializable]
+    [Disableable(false)]
     [Section("Colors")]
     [SubSection("Healers", 0)]
     public class HealersColorConfig : PluginConfigObject
@@ -171,6 +173,7 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Serializable]
+    [Disableable(false)]
     [Section("Colors")]
     [SubSection("Melee", 0)]
     public class MeleeColorConfig : PluginConfigObject
@@ -207,6 +210,7 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Serializable]
+    [Disableable(false)]
     [Section("Colors")]
     [SubSection("Ranged", 0)]
     public class RangedColorConfig : PluginConfigObject
@@ -231,6 +235,7 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Serializable]
+    [Disableable(false)]
     [Section("Colors")]
     [SubSection("Caster", 0)]
     public class CastersColorConfig : PluginConfigObject
@@ -263,6 +268,7 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Serializable]
+    [Disableable(false)]
     [Section("Colors")]
     [SubSection("Misc", 0)]
     public class MiscColorConfig : PluginConfigObject
