@@ -44,7 +44,22 @@ namespace DelvUI.Interface.GeneralElements
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(startPos, startPos + Config.Size, 0x88000000);
 
-            drawList.AddRectFilledMultiColor(
+            if (Config.UseJobColor)
+            {
+                var color = GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id);
+
+                drawList.AddRectFilledMultiColor(
+                startPos,
+                startPos + new Vector2(Math.Max(1, Config.Size.X * scale), Config.Size.Y),
+                color.TopGradient,
+                color.TopGradient,
+                color.BottomGradient,
+                color.BottomGradient
+            );
+            }
+            else
+            {
+                drawList.AddRectFilledMultiColor(
                 startPos,
                 startPos + new Vector2(Math.Max(1, Config.Size.X * scale), Config.Size.Y),
                 Config.Color.TopGradient,
@@ -52,6 +67,7 @@ namespace DelvUI.Interface.GeneralElements
                 Config.Color.BottomGradient,
                 Config.Color.BottomGradient
             );
+            }
 
             drawList.AddRect(startPos, startPos + Config.Size, 0xFF000000);
 
@@ -62,7 +78,7 @@ namespace DelvUI.Interface.GeneralElements
                 var size = new Vector2(2, Config.Size.Y);
                 drawList.AddRect(position, position + size, 0xFF000000);
             }
-            
+
         }
 
         private void GetResources(ref int current, ref int max, Chara actor)
