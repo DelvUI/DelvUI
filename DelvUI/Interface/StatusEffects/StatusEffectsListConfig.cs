@@ -99,15 +99,19 @@ namespace DelvUI.Interface.StatusEffects
     {
         public bool ShowBuffs;
         public bool ShowDebuffs;
-        
+
         [DragInt2("Size", min = 1, max = 4000)]
         [Order(15)]
         public Vector2 Size;
-        
+
+        [DragInt2("Icon Padding", min = 0, max = 100)]
+        [Order(16)]
+        public Vector2 IconPadding = new(2, 2);
+
         [Checkbox("Preview")]
         [Order(20)]
         public bool ShowArea;
-        
+
         [Checkbox("Fill Rows First", separator = true)]
         [Order(25)]
         public bool FillRowsFirst = true;
@@ -125,7 +129,7 @@ namespace DelvUI.Interface.StatusEffects
         [DragInt("Limit (-1 for no limit)", min = -1, max = 1000)]
         [Order(35)]
         public int Limit = -1;
-        
+
         [Checkbox("Permanent Effects", separator = true)]
         [Order(40)]
         public bool ShowPermanentEffects;
@@ -142,13 +146,8 @@ namespace DelvUI.Interface.StatusEffects
         [Order(55)]
         public bool ShowTooltips = true;
 
-
         [NestedConfig("Icons", 60)]
         public StatusEffectIconConfig IconConfig;
-
-        [DragInt2("Icon Padding", min = 0, max = 100)]
-        [Order(65)]
-        public Vector2 IconPadding = new(2, 2);
 
         public StatusEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
                                        GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
@@ -197,6 +196,7 @@ namespace DelvUI.Interface.StatusEffects
 
     [Serializable]
     [Portable(false)]
+    [Disableable(false)]
     public class StatusEffectIconConfig : PluginConfigObject
     {
         [DragInt2("Icon Size", min = 1, max = 1000)]

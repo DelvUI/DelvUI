@@ -8,6 +8,7 @@ using System.Numerics;
 namespace DelvUI.Interface.GeneralElements
 {
     [Serializable]
+    [Disableable(false)]
     [Section("Misc")]
     [SubSection("Hide Options", 0)]
     public class HideHudConfig : PluginConfigObject
