@@ -84,7 +84,7 @@ namespace DelvUI.Interface.Party
             // testing
             if (manager->MemberCount == 0 && !_config.Preview)
             {
-                if (_groupMembers.Count > 0)
+                if (_groupMembers.Count == 1)
                 {
                     return;
                 }
