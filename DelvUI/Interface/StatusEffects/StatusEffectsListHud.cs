@@ -123,7 +123,7 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 // blacklist
-                if (Config.BlacklistConfig.Enabled && !Config.BlacklistConfig.StatusEffectIDAllowed((uint)status.EffectId))
+                if (Config.BlacklistConfig.Enabled && !Config.BlacklistConfig.StatusAllowed(row))
                 {
                     continue;
                 }

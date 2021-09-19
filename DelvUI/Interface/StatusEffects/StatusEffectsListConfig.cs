@@ -268,11 +268,11 @@ namespace DelvUI.Interface.StatusEffects
     public class StatusEffectsBlacklistConfig : PluginConfigObject
     {
         public bool UseAsWhitelist = false;
-        public SortedList<uint, string> List = new SortedList<uint, string>();
+        public SortedList<string, uint> List = new SortedList<string, uint>();
 
-        public bool StatusEffectIDAllowed(uint id)
+        public bool StatusAllowed(Status status)
         {
-            var inList = List.ContainsKey((uint)id);
+            var inList = List.ContainsKey(status.Name);
             if ((inList && !UseAsWhitelist) || (!inList && UseAsWhitelist))
             {
                 return false;
@@ -283,9 +283,9 @@ namespace DelvUI.Interface.StatusEffects
 
         public bool AddNewEntry(Status status)
         {
-            if (status != null && !List.ContainsKey(status.RowId))
+            if (status != null && !List.ContainsKey(status.Name))
             {
-                List.Add(status.RowId, status.Name);
+                List.Add(status.Name, status.RowId);
                 _input = "";
 
                 return true;
@@ -392,8 +392,8 @@ namespace DelvUI.Interface.StatusEffects
 
                     for (int i = 0; i < List.Count; i++)
                     {
-                        var id = List.Keys[i];
-                        var name = List.Values[i];
+                        var id = List.Values[i];
+                        var name = List.Keys[i];
 
                         ImGui.PushID(i.ToString());
                         ImGui.TableNextRow(ImGuiTableRowFlags.None, iconSize.Y);
