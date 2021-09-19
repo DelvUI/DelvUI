@@ -293,7 +293,7 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(40, 2)]
         public bool ShowBuffBar = false;
 
-        [Checkbox("Text" + "##DRKBuffBar")]
+        [Checkbox("Timer" + "##DRKBuffBar")]
         [CollapseWith(0, 2)]
         public bool ShowBuffBarText = true;
 
@@ -323,7 +323,7 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(45, 3)]
         public bool ShowLivingShadowBar = false;
 
-        [Checkbox("Text" + "##DRKLivingShadow")]
+        [Checkbox("Timer" + "##DRKLivingShadow")]
         [CollapseWith(0, 3)]
         public bool ShowLivingShadowBarText = true;
 

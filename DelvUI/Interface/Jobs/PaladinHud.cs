@@ -292,7 +292,7 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(40, 2)]
         public bool ShowBuffBar = true;
 
-        [Checkbox("Duration Text")]
+        [Checkbox("Timer")]
         [CollapseWith(0, 2)]
         public bool ShowBuffBarText = true;
 
@@ -317,42 +317,42 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Atonement" + "##Atonement", separator = true)]
         [CollapseControl(45, 3)]
         public bool ShowAtonementBar = true;
-
-        [DragFloat2("Size" + "##Atonement", min = -4000f, max = 4000f)]
+        
+        [DragFloat2("Position" + "##Atonement", min = -4000f, max = 4000f)]
         [CollapseWith(0, 3)]
+        public Vector2 AtonementBarPosition = new(0, -10);
+        
+        [DragFloat2("Size" + "##Atonement", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 3)]
         public Vector2 AtonementBarSize = new(254, 20);
 
-        [DragInt("Padding" + "##Atonement", max = 100)]
-        [CollapseWith(5, 3)]
-        public int AtonementBarPadding = 2;
-
-        [DragFloat2("Position" + "##Atonement", min = -4000f, max = 4000f)]
+        [DragInt("Spacing" + "##Atonement", max = 100)]
         [CollapseWith(10, 3)]
-        public Vector2 AtonementBarPosition = new(0, -10);
-
+        public int AtonementBarPadding = 2;
+        
         [ColorEdit4("Color" + "##Atonement")]
         [CollapseWith(15, 3)]
         public PluginConfigColor AtonementColor = new(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f));
         #endregion
 
         #region goring blade
-        [Checkbox("Show Goring Blade Bar", separator = true)]
+        [Checkbox("Goring Blade" + "##GoringBlade", separator = true)]
         [CollapseControl(50, 4)]
         public bool ShowGoringBladeBar = true;
 
-        [Checkbox("Show Goring Blade Bar Text")]
+        [Checkbox("Timer" + "##GoringBlade")]
         [CollapseWith(0, 4)]
         public bool ShowGoringBladeBarText = true;
 
-        [DragFloat2("Goring Blade Bar Size", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##GoringBlade", min = -4000f, max = 4000f)]
         [CollapseWith(5, 4)]
-        public Vector2 GoringBladeBarSize = new(254, 20);
-
-        [DragFloat2("Goring Blade Bar Position", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 4)]
         public Vector2 GoringBladeBarPosition = new(0, -98);
-
-        [ColorEdit4("Goring Blade Color")]
+        
+        [DragFloat2("Size" + "##GoringBlade", min = -4000f, max = 4000f)]
+        [CollapseWith(10, 4)]
+        public Vector2 GoringBladeBarSize = new(254, 20);
+        
+        [ColorEdit4("Color" + "##GoringBlade")]
         [CollapseWith(15, 4)]
         public PluginConfigColor GoringBladeColor = new(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f));
         #endregion

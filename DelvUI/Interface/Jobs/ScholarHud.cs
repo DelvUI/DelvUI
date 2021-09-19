@@ -215,19 +215,11 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(35, 2)]
         public bool ShowFairy = true;
 
-        [Checkbox("Fairy Text" + "##Fairy")]
+        [Checkbox("Text" + "##Fairy")]
         [CollapseWith(0, 2)]
         public bool ShowFairyText = true;
 
-        [Checkbox("Seraph" + "##Seraph")]
-        [CollapseWith(5, 2)]
-        public bool ShowSeraph = true;
-        //TODO NOT ASSIGNED? ^
-        //TODO WHAT IS SERAPH? WHY IS IT NOT ITS OWN COLLAPSIBLE
-        
-        [Checkbox("Seraph Text" + "##Fairy")]
-        [CollapseWith(10, 2)]
-        public bool ShowSeraphText = true;
+
 
         [DragFloat2("Position" + "##Fairy", min = -4000f, max = 4000f)]
         [CollapseWith(15, 2)]
@@ -237,41 +229,50 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(20, 2)]
         public Vector2 FairySize = new(254, 20);
 
-        [ColorEdit4("Fairy Gauge" + "##Fairy")]
+        [ColorEdit4("Color" + "##Fairy")]
         [CollapseWith(25, 2)]
         public PluginConfigColor FairyColor = new(new Vector4(69f / 255f, 199 / 255f, 164f / 255f, 100f / 100f));
-
-        [ColorEdit4("Seraph" + "##SeraphColor")]
+        
+        [Checkbox("Seraph" + "##Seraph", spacing = true)]
         [CollapseWith(30, 2)]
+        public bool ShowSeraph = true;
+        //TODO NOT ASSIGNED? ^
+        
+        [Checkbox("Timer" + "##Seraph")]
+        [CollapseWith(35, 2)]
+        public bool ShowSeraphText = true;
+        
+        [ColorEdit4("Color" + "##SeraphColor")]
+        [CollapseWith(40, 2)]
         public PluginConfigColor SeraphColor = new(new Vector4(232f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         #region bio
-        [Checkbox("Bio",separator = true)]
+        [Checkbox("Bio" + "##Bio",separator = true)]
         [CollapseControl(40, 3)]
         public bool ShowBio = true;
 
-        [Checkbox("Text")]
+        [Checkbox("Timer" + "##Bio")]
         [CollapseWith(0, 3)]
         public bool ShowBioText = true;
 
-        [Checkbox("Invert Growth")]
+        [Checkbox("Invert Growth" + "##Bio")]
         [CollapseWith(5, 3)]
         public bool BioInverted = false;
 
-        [DragFloat2("Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##Bio", min = -4000f, max = 4000f)]
         [CollapseWith(10, 3)]
         public Vector2 BioPosition = new(0, -32);
         
-        [DragFloat2("Size", max = 2000f)]
+        [DragFloat2("Size" + "##Bio", max = 2000f)]
         [CollapseWith(15, 3)]
         public Vector2 BioSize = new(254, 20);
         
-        [ColorEdit4("Color")]
+        [ColorEdit4("Color" + "##Bio")]
         [CollapseWith(20, 3)]
         public PluginConfigColor BioColor = new(new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 1f));
         
-        [ColorEdit4("Expire Color")]
+        [ColorEdit4("Expire Color" + "##Bio")]
         [CollapseWith(25, 3)]
         public PluginConfigColor ExpireColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
         #endregion

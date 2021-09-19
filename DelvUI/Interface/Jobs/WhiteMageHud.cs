@@ -202,7 +202,7 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(20, 0)]
         public PluginConfigColor LilyColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
 
-        [ColorEdit4("Charging Color" + "##Lily")]
+        [ColorEdit4("Charging Color" + "##Lily")] //TODO CHANGE TO GLOBAL PARTIALLY FILLED COLOR?
         [CollapseWith(25, 0)]
         public PluginConfigColor LilyChargingColor = new(new Vector4(141f / 255f, 141f / 255f, 141f / 255f, 1f));
         #endregion
