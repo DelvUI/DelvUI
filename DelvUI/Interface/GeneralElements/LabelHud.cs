@@ -1,11 +1,12 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
+using DelvUI.Config;
 using DelvUI.Helpers;
 using ImGuiNET;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class LabelHud : HudElement
+    public unsafe class LabelHud : HudElement
     {
         private LabelConfig Config => (LabelConfig)_config;
 
@@ -29,40 +30,38 @@ namespace DelvUI.Interface.GeneralElements
             var text = actor != null ? TextTags.GenerateFormattedTextFromTags(actor, Config.GetText()) : Config.GetText();
             var size = parentSize ?? Vector2.Zero;
 
-            DrawLabel(text, origin, size);
+            DrawLabel(text, origin, size, actor);
         }
 
-        private void DrawLabel(string text, Vector2 parentOrigin, Vector2 parentSize)
+        private void DrawLabel(string text, Vector2 parentOrigin, Vector2 parentSize, Actor actor = null)
         {
             var textSize = ImGui.CalcTextSize(text);
             var offset = OffsetForFrameAnchor(parentSize) + OffsetForTextAnchor(textSize);
             var drawList = ImGui.GetWindowDrawList();
+            var color = Color(actor);
 
-            if (Config.UseJobColor)
-            {                       
-                var color = GlobalColors.Instance.SafeColorForJobId(Plugin.ClientState.LocalPlayer.ClassJob.Id);
-                var jobColor = color.Base;
-
-                if (Config.ShowOutline)
-                {
-                    DrawHelper.DrawOutlinedText(text, parentOrigin + Config.Position + offset, jobColor, Config.OutlineColor.Base, drawList);
-                }
-                else
-                {
-                    drawList.AddText(parentOrigin + Config.Position + offset, jobColor, text);
-                }
+            if (Config.ShowOutline)
+            {
+                DrawHelper.DrawOutlinedText(text, parentOrigin + Config.Position + offset, color.Base, Config.OutlineColor.Base, drawList);
             }
             else
             {
-                if (Config.ShowOutline)
-                {
-                    DrawHelper.DrawOutlinedText(text, parentOrigin + Config.Position + offset, Config.Color.Base, Config.OutlineColor.Base, drawList);
-                }
-                else
-                {
-                    drawList.AddText(parentOrigin + Config.Position + offset, Config.Color.Base, text);
-                }
+                drawList.AddText(parentOrigin + Config.Position + offset, color.Base, text);
             }
+        }
+
+        public virtual PluginConfigColor Color(Actor actor = null)
+        {
+            if (!Config.UseJobColor)
+            {
+                return Config.Color;
+            }
+            else if (Config.UseJobColor && actor is not Chara)
+            {
+                return GlobalColors.Instance.NPCFriendlyColor;
+            }
+
+            return Utils.ColorForActor((Chara)actor);
         }
 
         private Vector2 OffsetForTextAnchor(Vector2 textSize)
