@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
+using DelvUI.Config;
 using DelvUI.Helpers;
 using ImGuiNET;
 using System;
@@ -38,36 +39,14 @@ namespace DelvUI.Interface.GeneralElements
             GetResources(ref current, ref max, chara);
 
             var scale = (float)current / max;
-            var startPos = origin + Config.Position - Config.Size / 2f;
+            var startPos = origin + Config.Position - Config.Size / 2f;            
 
             // bar
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(startPos, startPos + Config.Size, 0x88000000);
-
-            if (Config.UseJobColor)
-            {
-                var color = GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id);
-
-                drawList.AddRectFilledMultiColor(
-                startPos,
-                startPos + new Vector2(Math.Max(1, Config.Size.X * scale), Config.Size.Y),
-                color.TopGradient,
-                color.TopGradient,
-                color.BottomGradient,
-                color.BottomGradient
-            );
-            }
-            else
-            {
-                drawList.AddRectFilledMultiColor(
-                startPos,
-                startPos + new Vector2(Math.Max(1, Config.Size.X * scale), Config.Size.Y),
-                Config.Color.TopGradient,
-                Config.Color.TopGradient,
-                Config.Color.BottomGradient,
-                Config.Color.BottomGradient
-            );
-            }
+            
+            var color = Color(Actor);
+            DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X * scale, Config.Size.Y), color, drawList);
 
             drawList.AddRect(startPos, startPos + Config.Size, 0xFF000000);
 
@@ -109,6 +88,20 @@ namespace DelvUI.Interface.GeneralElements
 
                     break;
             }
+        }
+
+        public virtual PluginConfigColor Color(Actor actor = null)
+        {
+            if (!Config.UseJobColor)
+            {
+                return Config.Color;
+            }
+            else if (Config.UseJobColor && actor is not Chara)
+            {
+                return GlobalColors.Instance.NPCFriendlyColor;
+            }
+
+            return Utils.ColorForActor((Chara)actor);
         }
     }
 }
