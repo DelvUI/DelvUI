@@ -28,6 +28,7 @@ namespace DelvUI.Interface
         private List<IHudElementWithActor> _hudElementsUsingTargetOfTarget;
         private List<IHudElementWithActor> _hudElementsUsingFocusTarget;
 
+        private CustomEffectsListHud _customEffectsHud;
         private PrimaryResourceHud _primaryResourceHud;
         private JobHud _jobHud = null;
         private Dictionary<uint, JobHudTypes> _jobsMap;
@@ -182,6 +183,11 @@ namespace DelvUI.Interface
             var targetDebuffs = new StatusEffectsListHud("targetDebuffs", targetDebuffsConfig, "Target Debuffs");
             _hudElements.Add(targetDebuffs);
             _hudElementsUsingTarget.Add(targetDebuffs);
+
+            var custonEffectsConfig = ConfigurationManager.GetInstance().GetConfigObject<CustomEffectsListConfig>();
+            _customEffectsHud = new CustomEffectsListHud("customEffects", custonEffectsConfig, "Custom Effects");
+            _hudElements.Add(_customEffectsHud);
+            _hudElementsUsingPlayer.Add(_customEffectsHud);
         }
 
         private void CreateMiscElements()
@@ -349,6 +355,11 @@ namespace DelvUI.Interface
             foreach (var element in _hudElementsUsingTarget)
             {
                 element.Actor = target;
+
+                if (_customEffectsHud != null)
+                {
+                    _customEffectsHud.TargetActor = target;
+                }
             }
 
             // target of target
@@ -478,18 +489,18 @@ namespace DelvUI.Interface
         public bool ShowCenterLines = true;
         [Checkbox("Show Anchor Points")]
         [Order(20)]
-        
+
         public bool ShowAnchorPoints = true;
         [Checkbox("Grid Divisions", spacing = true)]
-        [CollapseControl(25,0)]
+        [CollapseControl(25, 0)]
         public bool ShowGrid = true;
 
         [DragInt("Divisions Distance", min = 50, max = 500)]
-        [CollapseWith(0,0)]
+        [CollapseWith(0, 0)]
         public int GridDivisionsDistance = 50;
 
         [DragInt("Subdivision Count", min = 1, max = 10)]
-        [CollapseWith(5,0)]
+        [CollapseWith(5, 0)]
         public int GridSubdivisionCount = 4;
 
 
