@@ -13,7 +13,7 @@ namespace DelvUI.Interface.StatusEffects
 {
     public class StatusEffectsListHud : DraggableHudElement, IHudElementWithActor
     {
-        private StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
+        protected StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
 
         private uint _rowCount;
         private uint _colCount;
@@ -60,15 +60,28 @@ namespace DelvUI.Interface.StatusEffects
             return count;
         }
 
-        private List<StatusEffectData> StatusEffectsData()
+        protected virtual List<StatusEffectData> StatusEffectsData()
+        {
+            var list = StatusEffectDataList(Actor);
+
+            // show mine first
+            if (Config.ShowMineFirst)
+            {
+                OrderByMineFirst(list);
+            }
+
+            return list;
+        }
+
+        protected List<StatusEffectData> StatusEffectDataList(Actor actor)
         {
             var list = new List<StatusEffectData>();
-            if (Actor == null)
+            if (actor == null)
             {
                 return list;
             }
 
-            var effectCount = Actor.StatusEffects.Length;
+            var effectCount = actor.StatusEffects.Length;
             if (effectCount == 0)
             {
                 return list;
@@ -84,7 +97,7 @@ namespace DelvUI.Interface.StatusEffects
 
             for (var i = 0; i < effectCount; i++)
             {
-                var status = Actor.StatusEffects[i];
+                var status = actor.StatusEffects[i];
 
                 if (status.EffectId <= 0)
                 {
@@ -130,28 +143,33 @@ namespace DelvUI.Interface.StatusEffects
                 list.Add(new StatusEffectData(status, row));
             }
 
-            // show mine first
-            if (Config.ShowMineFirst && player != null)
+            return list;
+        }
+
+        protected void OrderByMineFirst(List<StatusEffectData> list)
+        {
+            var player = Plugin.ClientState.LocalPlayer;
+            if (player == null)
             {
-                list.Sort((a, b) =>
-                {
-                    bool isAFromPlayer = a.StatusEffect.OwnerId == player.ActorId;
-                    bool isBFromPlayer = b.StatusEffect.OwnerId == player.ActorId;
-
-                    if (isAFromPlayer && !isBFromPlayer)
-                    {
-                        return -1;
-                    }
-                    else if (!isAFromPlayer && isBFromPlayer)
-                    {
-                        return 1;
-                    }
-
-                    return 0;
-                });
+                return;
             }
 
-            return list;
+            list.Sort((a, b) =>
+            {
+                bool isAFromPlayer = a.StatusEffect.OwnerId == player.ActorId;
+                bool isBFromPlayer = b.StatusEffect.OwnerId == player.ActorId;
+
+                if (isAFromPlayer && !isBFromPlayer)
+                {
+                    return -1;
+                }
+                else if (!isAFromPlayer && isBFromPlayer)
+                {
+                    return 1;
+                }
+
+                return 0;
+            });
         }
 
         public override void DrawChildren(Vector2 origin)

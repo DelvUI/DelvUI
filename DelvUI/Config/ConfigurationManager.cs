@@ -107,7 +107,7 @@ namespace DelvUI.Config
                 typeof(PlayerDebuffsListConfig),
                 typeof(TargetBuffsListConfig),
                 typeof(TargetDebuffsListConfig),
-                typeof(TrackedBuffsListConfig),
+                typeof(CustomEffectsListConfig),
 
                 typeof(PaladinConfig),
                 typeof(WarriorConfig),

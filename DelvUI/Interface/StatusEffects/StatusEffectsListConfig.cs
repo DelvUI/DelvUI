@@ -217,7 +217,7 @@ namespace DelvUI.Interface.StatusEffects
         public StatusEffectIconBorderConfig DispellableBorderConfig = new StatusEffectIconBorderConfig(new(new(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f)), 2);
 
         [NestedConfig("My Effects Border", 25)]
-        public StatusEffectIconBorderConfig OwnedBorderConfig = new StatusEffectIconBorderConfig(new(new(35f / 255f, 179f / 255f, 69f / 255f, 100f / 100f)), 2);
+        public StatusEffectIconBorderConfig OwnedBorderConfig = new StatusEffectIconBorderConfig(new(new(35f / 255f, 179f / 255f, 69f / 255f, 100f / 100f)), 1);
 
         public StatusEffectIconConfig(LabelConfig durationLabelConfig = null, LabelConfig stacksLabelConfig = null)
         {
@@ -273,7 +273,7 @@ namespace DelvUI.Interface.StatusEffects
 
         public bool StatusAllowed(Status status)
         {
-            var inList = List.ContainsKey(status.Name);
+            var inList = List.ContainsKey(status.Name + "[" + status.RowId.ToString() + "]");
             if ((inList && !UseAsWhitelist) || (!inList && UseAsWhitelist))
             {
                 return false;
@@ -453,12 +453,12 @@ namespace DelvUI.Interface.StatusEffects
             return changed;
         }
     }
-
+    /**/
     [Section("Buffs and Debuffs")]
-    [SubSection("Tracked Buffs", 0)]
-    public class TrackedBuffsListConfig : StatusEffectsListConfig
+    [SubSection("Custom Effects", 0)]
+    public class CustomEffectsListConfig : StatusEffectsListConfig
     {
-        public new static TrackedBuffsListConfig DefaultConfig()
+        public new static CustomEffectsListConfig DefaultConfig()
         {
             var iconConfig = new StatusEffectIconConfig();
             iconConfig.DispellableBorderConfig.Enabled = false;
@@ -467,7 +467,7 @@ namespace DelvUI.Interface.StatusEffects
             var pos = new Vector2(-HUDConstants.UnitFramesOffsetX - HUDConstants.DefaultBigUnitFrameSize.X / 2f, HUDConstants.BaseHUDOffsetY - 50);
             var size = new Vector2(iconConfig.Size.X * 5 + 10, iconConfig.Size.Y * 3 + 10);
 
-            var config = new TrackedBuffsListConfig(pos, size, true, false, false, GrowthDirections.Centered | GrowthDirections.Up, iconConfig);
+            var config = new CustomEffectsListConfig(pos, size, true, true, false, GrowthDirections.Centered | GrowthDirections.Up, iconConfig);
             config.Enabled = false;
 
             // pre-populated white list
@@ -561,7 +561,7 @@ namespace DelvUI.Interface.StatusEffects
             return config;
         }
 
-        public TrackedBuffsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
+        public CustomEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
             GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
             : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
         {
