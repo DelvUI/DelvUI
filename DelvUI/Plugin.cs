@@ -53,11 +53,11 @@ namespace DelvUI
 
             Version = Assembly.GetExecutingAssembly()?.GetName().Version.ToString() ?? "";
 
+            FontsManager.Initialize(AssemblyLocation);
             LoadBanner();
 
             // initialize a not-necessarily-defaults configuration
             ConfigurationManager.Initialize(false);
-            FontsManager.Initialize();
 
             UiBuilder.OnBuildUi += Draw;
             UiBuilder.OnBuildFonts += BuildFont;
