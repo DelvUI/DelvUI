@@ -5,7 +5,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Serializable]
     [Section("Misc")]
     [SubSection("Primary Resource Bar", 0)]
     public class PrimaryResourceConfig : MovablePluginConfigObject

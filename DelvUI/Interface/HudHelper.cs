@@ -14,10 +14,16 @@ using DelvUI.Interface.Jobs;
 
 namespace DelvUI.Interface
 {
-    internal class GUIAddon
+    public class GUIAddon
     {
-        public unsafe AtkUnitBase* addonPtr;
-        public string name;
+        public readonly unsafe AtkUnitBase* addonPtr;
+        public readonly string name;
+
+        public unsafe GUIAddon(AtkUnitBase* addonPtr, string name)
+        {
+            this.addonPtr = addonPtr;
+            this.name = name;
+        }
 
         public unsafe void VisibilityToggle(bool isHidden)
         {
@@ -48,6 +54,7 @@ namespace DelvUI.Interface
         private HideHudConfig Config => ConfigurationManager.GetInstance().GetConfigObject<HideHudConfig>();
 
         private bool _previousCombatState = true;
+        private bool _isInitial = true;
 
         public HudHelper()
         {
@@ -59,21 +66,35 @@ namespace DelvUI.Interface
             Config.onValueChanged -= ConfigValueChanged;
         }
 
-        public unsafe void Configure(bool isInitial = false, bool isEvent = false)
+        public unsafe void Configure(bool forceUpdate = false)
         {
-            ConfigureCombatActionBars(isInitial || isEvent);
-
-            if (isInitial)
+            if (!_isInitial && !forceUpdate)
             {
-                ConfigureDefaultCastBar();
-                ConfigureDefaultJobGauge();
+                return;
             }
 
-            if (isEvent && !Config.DisableJobGaugeSounds)
-            {
-                ConfigureDefaultJobGauge();
-            }
+            ConfigureCombatActionBars(_isInitial || forceUpdate);
 
+            HudHelper.ToggleDefaultComponent(delegate (GUIAddon addon)
+            {
+                if (addon.name == "_CastBar")
+                {
+                    addon.NodeListVisibilityToggle(Config.HideDefaultCastbar);
+                }
+                else if (addon.name.StartsWith("JobHud"))
+                {
+                    bool isHidden = Config.HideDefaultJobGauges;
+
+                    addon.NodeListVisibilityToggle(isHidden && Config.DisableJobGaugeSounds);
+                    if (!Config.DisableJobGaugeSounds)
+                    {
+                        addon.VisibilityToggle(isHidden);
+
+                    }
+                }
+            });
+
+            _isInitial = false;
         }
 
         public bool IsElementHidden(HudElement element)
@@ -104,36 +125,19 @@ namespace DelvUI.Interface
             return isHidden;
         }
 
-        #region Event Handlers
-
         private void ConfigValueChanged(object sender, OnChangeBaseArgs e)
         {
             if (e.PropertyName == "HideDefaultCastbar")
             {
                 ConfigureDefaultCastBar();
             }
-            else if (e.PropertyName == "HideDefaultJobGauges")
+            else if (e.PropertyName == "HideDefaultJobGauges" || e.PropertyName == "DisableJobGaugeSounds")
             {
                 ConfigureDefaultJobGauge();
             }
-            else if (e.PropertyName == "IDontCareAboutTheSounds" && e is OnChangeEventArgs<bool> soundEvent)
+            else if (e.PropertyName == "EnableCombatActionBars")
             {
-                PluginLog.Log(e.PropertyName);
-                ToggleDefaultComponent(delegate (GUIAddon addon)
-                {
-                    if (addon.name.StartsWith("JobHud"))
-                    {
-                        addon.NodeListVisibilityToggle(Config.DisableJobGaugeSounds);
-                        if (!Config.DisableJobGaugeSounds)
-                        {
-                            addon.VisibilityToggle(Config.HideDefaultJobGauges);
-                        }
-                    }
-                });
-            }
-            else if (e.PropertyName == "EnableCombatActionBars" && e is OnChangeEventArgs<bool> boolEvent)
-            {
-                Config.CombatActionBars.ForEach(name => ToggleActionbar(name, boolEvent.Value));
+                Config.CombatActionBars.ForEach(name => ToggleActionbar(name, Config.EnableCombatActionBars));
             }
             else if (e.PropertyName == "CombatActionBars" && e is OnChangeEventArgs<string> listEvent)
             {
@@ -149,10 +153,7 @@ namespace DelvUI.Interface
             }
         }
 
-        #endregion
-
-        #region Action Bars
-        private void ConfigureCombatActionBars(bool forceHide = false)
+        private void ConfigureCombatActionBars(bool forceUpdate = false)
         {
             if (!Config.EnableCombatActionBars)
             {
@@ -160,18 +161,16 @@ namespace DelvUI.Interface
             }
 
             var currentCombatState = IsInCombat();
-            if (_previousCombatState != currentCombatState && Config.CombatActionBars.Count > 0 || forceHide)
+            if (_previousCombatState != currentCombatState && Config.CombatActionBars.Count > 0 || forceUpdate)
             {
                 Config.CombatActionBars.ForEach(name => ToggleActionbar(name, !currentCombatState));
                 _previousCombatState = currentCombatState;
             }
         }
 
-        #endregion
-
         private unsafe void ToggleActionbar(string targetName, bool isHidden)
         {
-            ToggleDefaultComponent(delegate (GUIAddon addon)
+            HudHelper.ToggleDefaultComponent(delegate (GUIAddon addon)
             {
                 string keyCode = GetActionBarName(targetName);
                 if (addon.name == keyCode)
@@ -192,7 +191,7 @@ namespace DelvUI.Interface
 
         private void ConfigureDefaultCastBar()
         {
-            ToggleDefaultComponent(delegate (GUIAddon addon)
+            HudHelper.ToggleDefaultComponent(delegate (GUIAddon addon)
             {
                 if (addon.name == "_CastBar")
                 {
@@ -203,17 +202,18 @@ namespace DelvUI.Interface
 
         private unsafe void ConfigureDefaultJobGauge()
         {
-            ToggleDefaultComponent(delegate (GUIAddon addon)
+            HudHelper.ToggleDefaultComponent(delegate (GUIAddon addon)
             {
                 if (addon.name.StartsWith("JobHud"))
                 {
                     bool isHidden = Config.HideDefaultJobGauges;
-
-                    addon.NodeListVisibilityToggle(isHidden && Config.DisableJobGaugeSounds);
-                    if (!Config.DisableJobGaugeSounds)
+                    if (isHidden && Config.DisableJobGaugeSounds)
+                    {
+                        addon.NodeListVisibilityToggle(isHidden);
+                    }
+                    else
                     {
                         addon.VisibilityToggle(isHidden);
-
                     }
                 }
             });
@@ -221,7 +221,17 @@ namespace DelvUI.Interface
 
         #region Helpers
 
-        private unsafe void ToggleDefaultComponent(Action<GUIAddon> action)
+        private bool IsInCombat()
+        {
+            return Plugin.ClientState.Condition[ConditionFlag.InCombat];
+        }
+
+        private bool IsInDuty()
+        {
+            return Plugin.ClientState.Condition[ConditionFlag.BoundByDuty];
+        }
+
+        public static unsafe void ToggleDefaultComponent(Action<GUIAddon> action)
         {
             var stage = AtkStage.GetSingleton();
             Debug.Assert(stage != null, "stage == null");
@@ -240,21 +250,24 @@ namespace DelvUI.Interface
                     continue;
                 }
 
-                action?.Invoke(new GUIAddon() { addonPtr = addon, name = name });
+                action?.Invoke(new GUIAddon(addon, name));
             }
         }
 
-        private bool IsInCombat()
+        public static unsafe void RestoreToGameDefaults()
         {
-            return Plugin.ClientState.Condition[ConditionFlag.InCombat];
+            HudHelper.ToggleDefaultComponent(delegate (GUIAddon addon)
+            {
+                if (addon.name == "_CastBar"
+                    || addon.name.StartsWith("JobHud")
+                    || addon.name.StartsWith("_ActionBar"))
+                {
+                    addon.VisibilityToggle(false);
+                }
+            });
         }
 
-        private bool IsInDuty()
-        {
-            return Plugin.ClientState.Condition[ConditionFlag.BoundByDuty];
-        }
-
-        private Dictionary<string, string> _hotbarMap => new Dictionary<string, string>()
+        public static Dictionary<string, string> HotbarMap => new Dictionary<string, string>()
             {
                 { "Hotbar 1", "_ActionBar" },
                 { "Hotbar 2", "_ActionBar01" },
@@ -270,7 +283,7 @@ namespace DelvUI.Interface
 
         private string GetActionBarName(string hotbarUserFriendlyName)
         {
-            _hotbarMap.TryGetValue(hotbarUserFriendlyName, out var result);
+            HudHelper.HotbarMap.TryGetValue(hotbarUserFriendlyName, out var result);
             return result ?? hotbarUserFriendlyName;
         }
 

@@ -174,7 +174,6 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
-    [Serializable]
     [Section("Job Specific Bars")]
     [SubSection("Healer", 0)]
     [SubSection("Scholar", 1)]

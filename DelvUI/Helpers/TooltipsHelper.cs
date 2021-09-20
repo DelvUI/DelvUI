@@ -189,7 +189,6 @@ namespace DelvUI.Helpers
         }
     }
 
-    [Serializable]
     [Section("Misc")]
     [SubSection("Tooltips", 0)]
     public class TooltipsConfig : PluginConfigObject

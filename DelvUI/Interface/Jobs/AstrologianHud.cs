@@ -510,7 +510,6 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
-    [Serializable]
     [Section("Job Specific Bars")]
     [SubSection("Healer", 0)]
     [SubSection("Astrologian", 1)]

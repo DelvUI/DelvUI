@@ -113,8 +113,6 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor NPCNeutralColor => _miscColorConfig.NPCNeutralColor;
     }
 
-
-    [Serializable]
     [Disableable(false)]
     [Section("Colors")]
     [SubSection("Tanks", 0)]
@@ -147,7 +145,6 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor MRDColor = new PluginConfigColor(new(207f / 255f, 38f / 255f, 33f / 255f, 100f / 100f));
     }
 
-    [Serializable]
     [Disableable(false)]
     [Section("Colors")]
     [SubSection("Healers", 0)]
@@ -172,7 +169,6 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor CNJColor = new PluginConfigColor(new(255f / 255f, 240f / 255f, 220f / 255f, 100f / 100f));
     }
 
-    [Serializable]
     [Disableable(false)]
     [Section("Colors")]
     [SubSection("Melee", 0)]
@@ -209,7 +205,6 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor LNCColor = new PluginConfigColor(new(65f / 255f, 100f / 255f, 205f / 255f, 100f / 100f));
     }
 
-    [Serializable]
     [Disableable(false)]
     [Section("Colors")]
     [SubSection("Ranged", 0)]
@@ -234,7 +229,6 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor ARCColor = new PluginConfigColor(new(145f / 255f, 186f / 255f, 94f / 255f, 100f / 100f));
     }
 
-    [Serializable]
     [Disableable(false)]
     [Section("Colors")]
     [SubSection("Caster", 0)]
@@ -267,7 +261,6 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor ACNColor = new PluginConfigColor(new(45f / 255f, 155f / 255f, 120f / 255f, 100f / 100f));
     }
 
-    [Serializable]
     [Disableable(false)]
     [Section("Colors")]
     [SubSection("Misc", 0)]
