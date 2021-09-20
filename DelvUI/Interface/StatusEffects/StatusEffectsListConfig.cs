@@ -1,15 +1,16 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
+using Lumina.Excel;
+using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Numerics;
 
 namespace DelvUI.Interface.StatusEffects
 {
-    [Serializable]
     [Section("Buffs and Debuffs")]
     [SubSection("Player Buffs", 0)]
     public class PlayerBuffsListConfig : StatusEffectsListConfig
@@ -31,7 +32,6 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 
-    [Serializable]
     [Section("Buffs and Debuffs")]
     [SubSection("Player Debuffs", 0)]
     public class PlayerDebuffsListConfig : StatusEffectsListConfig
@@ -52,7 +52,6 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 
-    [Serializable]
     [Section("Buffs and Debuffs")]
     [SubSection("Target Buffs", 0)]
     public class TargetBuffsListConfig : StatusEffectsListConfig
@@ -73,7 +72,6 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 
-    [Serializable]
     [Section("Buffs and Debuffs")]
     [SubSection("Target Debuffs", 0)]
     public class TargetDebuffsListConfig : StatusEffectsListConfig
@@ -94,7 +92,6 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 
-    [Serializable]
     public class StatusEffectsListConfig : MovablePluginConfigObject
     {
         public bool ShowBuffs;
@@ -149,6 +146,10 @@ namespace DelvUI.Interface.StatusEffects
         [NestedConfig("Icons", 60)]
         public StatusEffectIconConfig IconConfig;
 
+        [NestedConfig("Black List", 65)]
+        public StatusEffectsBlacklistConfig BlacklistConfig = new StatusEffectsBlacklistConfig();
+
+
         public StatusEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
                                        GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
         {
@@ -194,7 +195,6 @@ namespace DelvUI.Interface.StatusEffects
         };
     }
 
-    [Serializable]
     [Portable(false)]
     [Disableable(false)]
     public class StatusEffectIconConfig : PluginConfigObject
@@ -225,7 +225,6 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 
-    [Serializable]
     [Portable(false)]
     public class StatusEffectIconBorderConfig : PluginConfigObject
     {
@@ -264,9 +263,195 @@ namespace DelvUI.Interface.StatusEffects
             return config;
         }
     }
+
+    [Portable(false)]
+    public class StatusEffectsBlacklistConfig : PluginConfigObject
+    {
+        public bool UseAsWhitelist = false;
+        public SortedList<string, uint> List = new SortedList<string, uint>();
+
+        public bool StatusAllowed(Status status)
+        {
+            var inList = List.ContainsKey(status.Name);
+            if ((inList && !UseAsWhitelist) || (!inList && UseAsWhitelist))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        public bool AddNewEntry(Status status)
+        {
+            if (status != null && !List.ContainsKey(status.Name))
+            {
+                List.Add(status.Name, status.RowId);
+                _input = "";
+
+                return true;
+            }
+
+            return false;
+        }
+
+        private bool AddNewEntry(string input, ExcelSheet<Status> sheet)
+        {
+            if (input.Length > 0)
+            {
+                Status status = null;
+
+                // try id
+                if (uint.TryParse(input, out uint uintValue))
+                {
+                    if (uintValue > 0)
+                    {
+                        status = sheet.GetRow(uintValue);
+                    }
+                }
+
+                // try name
+                if (status == null)
+                {
+                    var enumerator = sheet.GetEnumerator();
+
+                    while (enumerator.MoveNext())
+                    {
+                        Status item = enumerator.Current;
+                        if (item.Name.ToString().ToLower() == input.ToLower())
+                        {
+                            status = item;
+                            break;
+                        }
+                    }
+                }
+
+                return AddNewEntry(status);
+            }
+
+            return false;
+        }
+
+        [JsonIgnore]
+        private string _input = "";
+
+        [ManualDraw]
+        public bool Draw()
+        {
+            if (!Enabled)
+            {
+                return false;
+            }
+
+            var flags =
+                ImGuiTableFlags.RowBg |
+                ImGuiTableFlags.Borders |
+                ImGuiTableFlags.BordersOuter |
+                ImGuiTableFlags.BordersInner |
+                ImGuiTableFlags.ScrollY |
+                ImGuiTableFlags.SizingFixedFit;
+
+            var changed = false;
+            var sheet = Plugin.DataManager.GetExcelSheet<Status>();
+            var iconSize = new Vector2(30, 30);
+            var indexToRemove = -1;
+
+            if (ImGui.BeginChild("blacklist", new Vector2(0, 360), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            {
+                changed |= ImGui.Checkbox("Use as White List", ref UseAsWhitelist);
+
+                ImGui.Text("");
+                ImGui.Text("Tip: You can [Ctrl + Alt + Shift] + Left Click on a status effect to automatically add it to the list.");
+                ImGui.Text("");
+
+                ImGui.Text("Type an ID or Name");
+
+                if (ImGui.InputText("", ref _input, 64, ImGuiInputTextFlags.EnterReturnsTrue))
+                {
+                    changed |= AddNewEntry(_input, sheet);
+                    ImGui.SetKeyboardFocusHere(-1);
+                }
+
+                ImGui.SameLine();
+
+                if (ImGui.Button("Add", new Vector2(60, 23)))
+                {
+                    changed |= AddNewEntry(_input, sheet);
+                    ImGui.SetKeyboardFocusHere(-2);
+                }
+
+                ImGui.NewLine();
+
+                if (ImGui.BeginTable("table", 4, flags, new Vector2(620, 200)))
+                {
+                    ImGui.TableSetupColumn("Remove", ImGuiTableColumnFlags.WidthFixed, 0, 0);
+                    ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 0, 1);
+                    ImGui.TableSetupColumn("ID", ImGuiTableColumnFlags.WidthFixed, 0, 2);
+                    ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthFixed, 0, 3);
+                    ImGui.TableSetupScrollFreeze(0, 1);
+                    ImGui.TableHeadersRow();
+
+                    for (int i = 0; i < List.Count; i++)
+                    {
+                        var id = List.Values[i];
+                        var name = List.Keys[i];
+
+                        ImGui.PushID(i.ToString());
+                        ImGui.TableNextRow(ImGuiTableRowFlags.None, iconSize.Y);
+
+                        // remove
+                        if (ImGui.TableSetColumnIndex(0))
+                        {
+                            var cursorPos = ImGui.GetCursorPos();
+                            cursorPos.X += 8;
+                            ImGui.SetCursorPos(cursorPos);
+
+                            if (ImGui.Button("X", iconSize))
+                            {
+                                changed = true;
+                                indexToRemove = i;
+                            }
+                        }
+
+                        // icon
+                        if (ImGui.TableSetColumnIndex(1))
+                        {
+                            var row = sheet.GetRow(id);
+                            if (row != null)
+                            {
+                                DrawHelper.DrawIcon<Status>(row, ImGui.GetCursorPos(), iconSize, false);
+                            }
+                        }
+
+                        // id
+                        if (ImGui.TableSetColumnIndex(2))
+                        {
+                            ImGui.Text(id.ToString());
+                        }
+
+                        // name
+                        if (ImGui.TableSetColumnIndex(3))
+                        {
+                            ImGui.Text(name);
+                        }
+
+                        ImGui.PopID();
+                    }
+
+                    ImGui.EndTable();
+                }
+            }
+
+            if (indexToRemove >= 0)
+            {
+                List.RemoveAt(indexToRemove);
+            }
+
+            ImGui.EndChild();
+
+            return changed;
+        }
+    }
 }
-
-
 
 // SAVING THESE FOR LATER
 /*

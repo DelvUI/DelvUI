@@ -7,7 +7,6 @@ using System.Reflection;
 
 namespace DelvUI.Interface.Jobs
 {
-    [Serializable]
     public abstract class JobConfig : MovablePluginConfigObject
     {
         [JsonIgnore]

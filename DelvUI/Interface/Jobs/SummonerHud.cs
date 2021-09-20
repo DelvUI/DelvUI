@@ -339,7 +339,6 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
-    [Serializable]
     [Section("Job Specific Bars")]
     [SubSection("Caster", 0)]
     [SubSection("Summoner", 1)]
