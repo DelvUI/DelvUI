@@ -16,28 +16,27 @@ namespace DelvUI.Interface.GeneralElements
             return config;
         }
 
-        [DragFloat("Background Alpha", min = 0, max = 1, velocity = .05f)]
+        [DragFloat("Background Alpha", min = 0, max = 1, velocity = .05f, spacing = true)]
         [Order(10)]
         public float BackgroundAlpha = 0.3f;
 
         [Checkbox("Show Center Lines")]
         [Order(15)]
         public bool ShowCenterLines = true;
-
-        [Checkbox("Show Grid")]
+        [Checkbox("Show Anchor Points")]
         [Order(20)]
+
+        public bool ShowAnchorPoints = true;
+        [Checkbox("Grid Divisions", spacing = true)]
+        [CollapseControl(25, 0)]
         public bool ShowGrid = true;
 
         [DragInt("Divisions Distance", min = 50, max = 500)]
-        [Order(25)]
+        [CollapseWith(0, 0)]
         public int GridDivisionsDistance = 50;
 
         [DragInt("Subdivision Count", min = 1, max = 10)]
-        [Order(30)]
+        [CollapseWith(5, 0)]
         public int GridSubdivisionCount = 4;
-
-        [Checkbox("Show Anchor Points")]
-        [Order(35)]
-        public bool ShowAnchorPoints = true;
     }
 }

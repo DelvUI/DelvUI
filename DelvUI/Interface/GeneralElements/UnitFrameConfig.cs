@@ -5,7 +5,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Serializable]
     [Section("Unit Frames")]
     [SubSection("Player", 0)]
     public class PlayerUnitFrameConfig : UnitFrameConfig
@@ -30,7 +29,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     [Section("Unit Frames")]
     [SubSection("Target", 0)]
     public class TargetUnitFrameConfig : UnitFrameConfig
@@ -52,7 +50,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     [Section("Unit Frames")]
     [SubSection("Target of Target", 0)]
     public class TargetOfTargetUnitFrameConfig : UnitFrameConfig
@@ -77,7 +74,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     [Section("Unit Frames")]
     [SubSection("Focus Target", 0)]
     public class FocusTargetUnitFrameConfig : UnitFrameConfig
@@ -102,13 +98,12 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     public class UnitFrameConfig : MovablePluginConfigObject
     {
         [DragInt2("Size", min = 1, max = 4000)]
         [Order(15)]
         public Vector2 Size;
-        
+
         [Checkbox("Custom Frame Color", separator = true)]
         [CollapseControl(20, 0)]
         public bool UseCustomColor = false;
@@ -125,7 +120,7 @@ namespace DelvUI.Interface.GeneralElements
         [CollapseWith(0, 1)]
         public PluginConfigColor CustomBackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [Checkbox("Tank Invulnerability")]
+        [Checkbox("Tank Invulnerability", spacing = true)]
         [Order(30)]
         public bool ShowTankInvulnerability = true;
 
@@ -143,7 +138,7 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Right Text", 45)]
         public EditableLabelConfig RightLabelConfig;
 
-        
+
         [NestedConfig("Shields", 50)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
@@ -159,7 +154,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     [Portable(false)]
     public class ShieldConfig : PluginConfigObject
     {
@@ -180,7 +174,6 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor Color = new PluginConfigColor(new Vector4(198f / 255f, 210f / 255f, 255f / 255f, 70f / 100f));
     }
 
-    [Serializable]
     [Portable(false)]
     public class TankStanceIndicatorConfig : PluginConfigObject
     {

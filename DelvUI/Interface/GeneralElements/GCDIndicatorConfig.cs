@@ -5,7 +5,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Serializable]
     [Section("Misc")]
     [SubSection("GCD Indicator", 0)]
     public class GCDIndicatorConfig : MovablePluginConfigObject
@@ -14,39 +13,39 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public Vector2 Size;
 
-        [Checkbox("Anchor To Mouse")]
+        [Checkbox("Always Show", separator = true)]
         [Order(20)]
-        public bool AnchorToMouse = false;
-        
-        [Checkbox("Offset Mouse Position")]
-        [Order(25)]
-        public bool OffsetMousePosition = false;
-        
-        [Checkbox("Always Show")]
-        [Order(30)]
         public bool AlwaysShow = false;
 
         [Checkbox("Show Border")]
-        [Order(35)]
+        [Order(25)]
         public bool ShowBorder = true;
 
-        [Checkbox("Vertical Mode")]
-        [Order(40)]
+        [Checkbox("Vertical Mode", spacing = true)]
+        [Order(30)]
         public bool VerticalMode = false;
         
         [Checkbox("Circular Mode")]
-        [Order(45)]
+        [CollapseControl(35, 0)]
         public bool CircularMode = false;
         
+        [Checkbox("Anchor To Mouse")]
+        [CollapseWith(40,0)]
+        public bool AnchorToMouse = false;
+        
+        [Checkbox("Change Position (0,0 = centered with cursor point)")]
+        [CollapseWith(45,0)]
+        public bool OffsetMousePosition = false;
+        
         [DragInt("Radius")]
-        [Order(50)]
+        [CollapseWith(50,0)]
         public int CircleRadius = 40;
         
         [DragInt("Thickness")]
-        [Order(55)]
+        [CollapseWith(55,0)]
         public int CircleThickness = 10;
 
-        [ColorEdit4("Color")]
+        [ColorEdit4("Color", spacing = true)]
         [Order(60)]
         public PluginConfigColor Color = new PluginConfigColor(new(220f / 255f, 220f / 255f, 220f / 255f, 100f / 100f));
 

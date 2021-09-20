@@ -1,6 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Structs;
-using Dalamud.Plugin;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
@@ -58,7 +57,7 @@ namespace DelvUI.Interface.StatusEffects
             return count;
         }
 
-        private List<StatusEffectData> StatusEffectsData(List<uint> filterBuffs)
+        private List<StatusEffectData> StatusEffectsData()
         {
             var list = new List<StatusEffectData>();
             if (Actor == null)
@@ -119,29 +118,19 @@ namespace DelvUI.Interface.StatusEffects
                     continue;
                 }
 
-                list.Add(new StatusEffectData(status, row));
-            }
-
-            // filters
-            var toReturn = list;
-            if (filterBuffs.Count > 0)
-            {
-                toReturn = new List<StatusEffectData>();
-
-                foreach (var buffId in filterBuffs)
+                // blacklist
+                if (Config.BlacklistConfig.Enabled && !Config.BlacklistConfig.StatusAllowed(row))
                 {
-                    var idx = list.FindIndex(s => (uint)s.StatusEffect.EffectId == buffId);
-                    if (idx >= 0)
-                    {
-                        toReturn.Add(list[idx]);
-                    }
+                    continue;
                 }
+
+                list.Add(new StatusEffectData(status, row));
             }
 
             // show mine first
             if (Config.ShowMineFirst && player != null)
             {
-                toReturn.Sort((a, b) =>
+                list.Sort((a, b) =>
                 {
                     bool isAFromPlayer = a.StatusEffect.OwnerId == player.ActorId;
                     bool isBFromPlayer = b.StatusEffect.OwnerId == player.ActorId;
@@ -159,15 +148,10 @@ namespace DelvUI.Interface.StatusEffects
                 });
             }
 
-            return toReturn;
+            return list;
         }
 
         public override void DrawChildren(Vector2 origin)
-        {
-            DrawChildren(origin, new List<uint>());
-        }
-
-        public void DrawChildren(Vector2 origin, List<uint> filterStatusEffects)
         {
             if (!Config.Enabled || Actor == null)
             {
@@ -180,7 +164,7 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             // calculate layout
-            var list = StatusEffectsData(filterStatusEffects);
+            var list = StatusEffectsData();
 
             // validate growth directions
             var growthDirections = Config.GetGrowthDirections();
@@ -283,11 +267,14 @@ namespace DelvUI.Interface.StatusEffects
 
                 StatusEffectIconDrawHelper.DrawStatusEffectIcon(drawList, iconPos, statusEffectData, Config.IconConfig, _durationLabel, _stacksLabel);
 
-                // tooltip
-                if (Config.ShowTooltips && ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
+                if (ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
                 {
-                    TooltipsHelper.Instance.ShowTooltipOnCursor(statusEffectData.Data.Description, statusEffectData.Data.Name);
-                    showingTooltip = true;
+                    // tooltip
+                    if (Config.ShowTooltips)
+                    {
+                        TooltipsHelper.Instance.ShowTooltipOnCursor(statusEffectData.Data.Description, statusEffectData.Data.Name);
+                        showingTooltip = true;
+                    }
 
                     // remove buff on right click
                     bool isFromPlayer = statusEffectData.StatusEffect.OwnerId == Plugin.ClientState.LocalPlayer?.ActorId;
@@ -295,6 +282,13 @@ namespace DelvUI.Interface.StatusEffects
                     if (statusEffectData.Data.Category == 1 && isFromPlayer && ImGui.GetIO().MouseClicked[1])
                     {
                         ChatHelper.SendChatMessage("/statusoff \"" + statusEffectData.Data.Name + "\"");
+                    }
+
+                    // automatic add to black list with ctrl+alt+shift click
+                    if (Config.BlacklistConfig.Enabled &&
+                        ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && ImGui.GetIO().MouseClicked[0])
+                    {
+                        Config.BlacklistConfig.AddNewEntry(statusEffectData.Data);
                     }
                 }
 

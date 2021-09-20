@@ -39,6 +39,7 @@ namespace DelvUI.Config.Attributes
     {
         public bool isMonitored = false;
         public bool separator = false;
+        public bool spacing = false;
     }
 
     [AttributeUsage(AttributeTargets.Field)]

@@ -5,7 +5,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Serializable]
     [Section("Misc")]
     [SubSection("MP Ticker", 0)]
     public class MPTickerConfig : MovablePluginConfigObject
@@ -14,7 +13,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public Vector2 Size;
 
-        [Checkbox("Hide on Full MP")]
+        [Checkbox("Hide on Full MP", spacing = true)]
         [Order(20)]
         public bool HideOnFullMP = true;
 

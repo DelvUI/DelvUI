@@ -95,7 +95,6 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
-    [Serializable]
     [Section("Job Specific Bars")]
     [SubSection("Tank", 0)]
     [SubSection("Gunbreaker", 1)]
@@ -105,7 +104,7 @@ namespace DelvUI.Interface.Jobs
         public new static GunbreakerConfig DefaultConfig() { return new GunbreakerConfig(); }
 
         #region Powder Gauge
-        [Checkbox("Show Powder Gauge", separator = true)]
+        [Checkbox("Powder Gauge", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowPowderGauge = true;
 
@@ -127,7 +126,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region No Mercy
-        [Checkbox("Show No Mercy Bar", separator = true)]
+        [Checkbox("No Mercy", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowNoMercyBar = true;
 

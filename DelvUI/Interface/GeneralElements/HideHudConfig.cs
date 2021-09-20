@@ -7,13 +7,12 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Serializable]
     [Disableable(false)]
     [Section("Misc")]
     [SubSection("Hide Options", 0)]
     public class HideHudConfig : PluginConfigObject
     {
-        [Checkbox("Hide DelvUI outside of combat")]
+        [Checkbox("Hide DelvUI outside of combat", spacing = true)]
         [Order(5)]
         public bool HideOutsideOfCombat = false;
 
@@ -21,7 +20,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(10)]
         public bool HideOnlyJobPackHudOutsideOfCombat = false;
 
-        [Checkbox("Hide Default Job Gauges", isMonitored = true)]
+        [Checkbox("Hide Default Job Gauges", isMonitored = true, spacing = true)]
         [CollapseControl(15, 0)]
         public bool HideDefaultJobGauges = false;
 
@@ -33,7 +32,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(20)]
         public bool HideDefaultCastbar = false;
 
-        [Checkbox("Enable Combat Hotbars", isMonitored = true)]
+        [Checkbox("Enable Combat Hotbars", isMonitored = true, spacing = true)]
         [CollapseControl(25, 1)]
         public bool EnableCombatActionBars = false;
 

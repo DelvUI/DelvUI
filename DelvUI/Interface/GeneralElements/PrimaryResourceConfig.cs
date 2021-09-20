@@ -5,7 +5,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Serializable]
     [Section("Misc")]
     [SubSection("Primary Resource Bar", 0)]
     public class PrimaryResourceConfig : MovablePluginConfigObject
@@ -25,7 +24,7 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Label", 30)]
         public LabelConfig ValueLabelConfig;
 
-        [Checkbox("Threshold Marker")]
+        [Checkbox("Threshold Marker", spacing = true)]
         [CollapseControl(35, 0)]
         public bool ShowThresholdMarker = false;
 

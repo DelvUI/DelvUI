@@ -5,7 +5,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Serializable]
     [Section("Castbars")]
     [SubSection("Player", 0)]
     public class PlayerCastbarConfig : CastbarConfig
@@ -44,12 +43,11 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     [Section("Castbars")]
     [SubSection("Target", 0)]
     public class TargetCastbarConfig : CastbarConfig
     {
-        [Checkbox("Interruptable Color")]
+        [Checkbox("Interruptable Color", spacing = true)]
         [CollapseControl(35, 0)]
         public bool ShowInterruptableColor = true;
 
@@ -57,7 +55,7 @@ namespace DelvUI.Interface.GeneralElements
         [CollapseWith(0, 0)]
         public PluginConfigColor InterruptableColor = new PluginConfigColor(new(255f / 255f, 87f / 255f, 113f / 255f, 100f / 100f));
 
-        [Checkbox("Damage Type Colors")]
+        [Checkbox("Damage Type Colors", spacing = true)]
         [CollapseControl(40, 1)]
         public bool UseColorForDamageTypes = true;
 
@@ -90,7 +88,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     [Section("Castbars")]
     [SubSection("Target of Target", 0)]
     public class TargetOfTargetCastbarConfig : TargetCastbarConfig
@@ -115,7 +112,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     [Section("Castbars")]
     [SubSection("Focus Target", 0)]
     public class FocusTargetCastbarConfig : TargetCastbarConfig
@@ -140,17 +136,16 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     public abstract class CastbarConfig : MovablePluginConfigObject
     {
         [DragInt2("Size", min = 1, max = 4000)]
         [Order(15)]
         public Vector2 Size;
-        
+
         [Checkbox("Preview")]
         [Order(20)]
         public bool Preview = false;
-        
+
         [Checkbox("Icon", separator = true)]
         [Order(25)]
         public bool ShowIcon = true;
@@ -158,16 +153,16 @@ namespace DelvUI.Interface.GeneralElements
         [ColorEdit4("Color ##Castbar")]
         [Order(30)]
         public PluginConfigColor Color = new PluginConfigColor(new(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
-        
+
         //CHARA TYPE SPECIFIC CONFIGS SPAWN HERE
-        
+
         [NestedConfig("Cast Name", 45)]
         public LabelConfig CastNameConfig;
 
         [NestedConfig("Cast Time", 50)]
         public LabelConfig CastTimeConfig;
 
-        
+
 
         public CastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
         {
