@@ -150,7 +150,7 @@ namespace DelvUI.Helpers
 
             GridConfig config = (GridConfig)node.ConfigObject;
 
-            ImGui.SetNextWindowSize(new Vector2(345, 278), ImGuiCond.Appearing);
+            ImGui.SetNextWindowSize(new Vector2(420, 324), ImGuiCond.Appearing);
             ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
 
             if (!ImGui.Begin("Grid", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
@@ -163,7 +163,7 @@ namespace DelvUI.Helpers
 
             ImGui.NewLine();
 
-            if (ImGui.Button("Lock HUD", new Vector2(329, 30)))
+            if (ImGui.Button("Lock HUD", new Vector2(ImGui.GetWindowContentRegionWidth(), 30)))
             {
                 changed = true;
                 config.Enabled = false;
