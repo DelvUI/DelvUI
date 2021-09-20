@@ -81,7 +81,7 @@ namespace DelvUI.Interface
                 {
                     addon.NodeListVisibilityToggle(Config.HideDefaultCastbar);
                 }
-                else if (addon.name.StartsWith("JobHud"))
+                else if (addon.name.StartsWith("JobHud") && !addon.name.StartsWith("JobHudNotice"))
                 {
                     bool isHidden = Config.HideDefaultJobGauges;
 
