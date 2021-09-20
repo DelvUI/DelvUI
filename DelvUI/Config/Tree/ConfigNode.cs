@@ -81,7 +81,7 @@ namespace DelvUI.Config.Tree
         {
             for (int i = 0; i < spacingSize; i++)
             {
-                ImGui.Text("");
+                ImGui.NewLine();
             }
         }
     }
@@ -178,6 +178,10 @@ namespace DelvUI.Config.Tree
             ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f));
             ImGui.PushStyleColor(ImGuiCol.CheckMark, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f));
             
+            ImGui.PushStyleColor(ImGuiCol.TableBorderStrong, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f));
+            ImGui.PushStyleColor(ImGuiCol.TableBorderLight, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, .4f));
+            ImGui.PushStyleColor(ImGuiCol.TableHeaderBg, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, .2f));
+            
             ImGui.PushStyleVar(ImGuiStyleVar.ScrollbarRounding, 1); //Scrollbar Radius
             ImGui.PushStyleVar(ImGuiStyleVar.TabRounding, 1); //Tabs Radius Radius
             ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 1); //Intractable Elements Radius
@@ -188,7 +192,7 @@ namespace DelvUI.Config.Tree
 
         private void PopStyles()
         {
-            ImGui.PopStyleColor(14);
+            ImGui.PopStyleColor(17);
             ImGui.PopStyleVar(6);
         }
 
@@ -1051,7 +1055,7 @@ namespace DelvUI.Config.Tree
                 foreach (FieldInfo child in Children.Values)
                 {
                     DrawStyleProperties(child, ID);
-                    ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "   \u2514");
+                    ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
                     ImGui.SameLine();
                     Draw(ref changed, child);
                 }
