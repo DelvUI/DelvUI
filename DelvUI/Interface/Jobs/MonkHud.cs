@@ -395,7 +395,7 @@ namespace DelvUI.Interface.Jobs
         public new static MonkConfig DefaultConfig() { return new MonkConfig(); }
 
         #region Demolish Bar
-        [Checkbox("Show Demolish Bar", separator = true)]
+        [Checkbox("Demolish", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowDemolishBar = true;
 
@@ -413,7 +413,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Chakra Bar
-        [Checkbox("Show Chakra Bar", separator = true)]
+        [Checkbox("Chakra", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowChakraBar = true;
 
@@ -431,7 +431,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Leaden Fist Bar
-        [Checkbox("Show Leaden Fist Bar", separator = true)]
+        [Checkbox("Leaden Fist", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowLeadenFistBar = true;
 
@@ -449,7 +449,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Twin Snakes Bar
-        [Checkbox("Show Twin Snakes Bar", separator = true)]
+        [Checkbox("Twin Snakes", separator = true)]
         [CollapseControl(45, 3)]
         public bool ShowTwinSnakesBar = true;
 
@@ -471,7 +471,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Riddle of Earth
-        [Checkbox("Show Riddle of Earth Bar", separator = true)]
+        [Checkbox("Riddle of Earth", separator = true)]
         [CollapseControl(50, 4)]
         public bool ShowRiddleofEarthBar = true;
 
@@ -493,7 +493,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Perfect Balance
-        [Checkbox("Show Perfect Balance Bar", separator = true)]
+        [Checkbox("Perfect Balance", separator = true)]
         [CollapseControl(55, 5)]
         public bool ShowPerfectBalanceBar = true;
 
@@ -515,7 +515,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region True North
-        [Checkbox("Show True North Bar", separator = true)]
+        [Checkbox("True North", separator = true)]
         [CollapseControl(60, 6)]
         public bool ShowTrueNorthBar = true;
 
@@ -533,7 +533,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Forms
-        [Checkbox("Show Forms Bar" + "##Forms", separator = true)]
+        [Checkbox("Forms" + "##Forms", separator = true)]
         [CollapseControl(65, 7)]
         public bool ShowFormsBar = false;
 
