@@ -96,11 +96,6 @@ namespace DelvUI.Interface.Jobs
 
         private string RedrawText(float redrawCastInfo, int redrawStacks)
         {
-            if (!Config.ShowRedrawBar)
-            {
-                return "";
-            }
-
             if (redrawCastInfo <= 0)
             {
                 return Config.ShowRedrawTextBar ? redrawStacks.ToString("N0") : "";
@@ -360,12 +355,8 @@ namespace DelvUI.Interface.Jobs
                     bar.SetText(BarTextPosition.CenterLeft, BarTextType.Custom, Config.ShowDrawCooldownTextBar ? cardJob : "");
                     break;
             }
-
-            if (Config.ShowRedrawBar)
-            {
-                string redrawText = RedrawText(redrawCastInfo, redrawStacks);
-                bar.AddPrimaryText(new BarText(BarTextPosition.CenterRight, BarTextType.Custom, redrawText));
-            }
+            string redrawText = RedrawText(redrawCastInfo, redrawStacks);
+            bar.AddPrimaryText(new BarText(BarTextPosition.CenterRight, BarTextType.Custom, redrawText));
 
             bar.Build().Draw(drawList);
         }
@@ -552,44 +543,40 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(25, 0)]
         public PluginConfigColor DrawRangedGlowColor = new(new Vector4(124f / 255f, 34f / 255f, 120f / 255f, 100f / 100f));
 
-        [Checkbox("Card Preferred Target with Glow", spacing = true)]
+        [Checkbox("Card Preferred Target with Glow" + "##Draw", spacing = true)]
         [CollapseWith(30, 0)]
         public bool ShowDrawGlowBar;
 
-        [Checkbox("Card Preferred Target with Text")]
+        [Checkbox("Card Preferred Target with Text" + "##Draw")]
         [CollapseWith(35, 0)]
         public bool ShowDrawTextBar = true;
 
-        [Checkbox("Draw Timer", spacing = true)]
+        [Checkbox("Draw Timer" + "##Draw", spacing = true)]
         [CollapseWith(40, 0)]
         public bool ShowDrawCooldownTextBar = true;
 
-        [Checkbox("with Decimals")]
+        [Checkbox("with Decimals" + "##Draw")]
         [CollapseWith(41, 0)]
         public bool EnableDecimalDrawBar;
         
-        [Checkbox("Card Drawn Timer")]
+        [Checkbox("Card Drawn Timer" + "##Draw")]
         [CollapseWith(45, 0)]
         public bool ShowDrawCardWhileDrawn;
         
-        [Checkbox("Redraw Stacks & Cooldown", spacing = true)]
-        [CollapseWith(50, 0)]
-        public bool ShowRedrawBar = true;
-
-        [Checkbox("Redraw Timer")]
+        [Checkbox("Redraw Timer" + "##Redraw", spacing = true)]
         [CollapseWith(55, 0)]
         public bool ShowRedrawCooldownTextBar = true;
         
-        [Checkbox("with Decimals")]
-        [CollapseWith(56, 0)]
+        [Checkbox("with Decimals" + "##Redraw")]
+        [CollapseWith(60, 0)]
         public bool EnableDecimalRedrawBar;
         
-        [Checkbox("Redraw Stacks")]
-        [CollapseWith(60, 0)]
+        [Checkbox("Redraw Stacks" + "##Redraw")]
+        [CollapseWith(65, 0)]
         public bool ShowRedrawTextBar = true;
 
-        [Checkbox("Total Redraw Cooldown Instead of Next")]
-        [CollapseWith(65, 0)]
+        [Checkbox("Total Redraw Cooldown Instead of Next" + "##Redraw")]
+        [CollapseWith(70, 0)]
         public bool EnableRedrawCooldownCumulated;
 
 
