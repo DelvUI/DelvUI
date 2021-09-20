@@ -17,7 +17,6 @@ namespace DelvUI.Interface.StatusEffects
 
         private uint _rowCount;
         private uint _colCount;
-        private GrowthDirections _lastGrowthDirections;
         private bool _showingTooltip = false;
 
         private LabelHud _durationLabel;
@@ -170,15 +169,8 @@ namespace DelvUI.Interface.StatusEffects
             // calculate layout
             var list = StatusEffectsData();
 
-            // validate growth directions
-            var growthDirections = Config.GetGrowthDirections();
-            if (growthDirections != _lastGrowthDirections)
-            {
-                growthDirections = ValidateGrowthDirections(growthDirections);
-                _lastGrowthDirections = growthDirections;
-            }
-
             // area
+            var growthDirections = Config.GetGrowthDirections();
             var position = origin + Config.Position;
             var areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
             var drawList = ImGui.GetWindowDrawList();
@@ -196,15 +188,17 @@ namespace DelvUI.Interface.StatusEffects
 
             // calculate icon positions
             var count = CalculateLayout(list);
-            var row = 0;
-            var col = 0;
-            CalculateAxisDirections(growthDirections, count, out var direction, out var offset);
             var iconPositions = new List<Vector2>();
             var minPos = new Vector2(float.MaxValue, float.MaxValue);
             var maxPos = Vector2.Zero;
 
+            var row = 0;
+            var col = 0;
+
             for (var i = 0; i < count; i++)
             {
+                CalculateAxisDirections(growthDirections, row, count, out var direction, out var offset);
+
                 var pos = new Vector2(
                     position.X + offset.X + Config.IconConfig.Size.X * col * direction.X + Config.IconPadding.X * col * direction.X,
                     position.Y + offset.Y + Config.IconConfig.Size.Y * row * direction.Y + Config.IconPadding.Y * row * direction.Y
@@ -218,7 +212,7 @@ namespace DelvUI.Interface.StatusEffects
                 iconPositions.Add(pos);
 
                 // rows / columns
-                if (Config.FillRowsFirst)
+                if (Config.FillRowsFirst || (growthDirections & GrowthDirections.Centered) != 0)
                 {
                     col += 1;
                     if (col >= _colCount)
@@ -307,60 +301,17 @@ namespace DelvUI.Interface.StatusEffects
             _showingTooltip = showingTooltip;
         }
 
-        private GrowthDirections ValidateGrowthDirections(GrowthDirections directions)
+        private void CalculateAxisDirections(GrowthDirections growthDirections, int row, uint elementCount, out Vector2 direction, out Vector2 offset)
         {
-            if (directions == 0)
+            if ((growthDirections & GrowthDirections.Centered) != 0)
             {
-                return GrowthDirections.Right | GrowthDirections.Down;
-            }
+                var elementsPerRow = (int)(Config.Size.X / (Config.IconConfig.Size.X + Config.IconPadding.X));
+                var elementsInRow = Math.Min(elementsPerRow, elementCount - (elementsPerRow * row));
 
-            // validate Out
-            if ((directions & GrowthDirections.Out) != 0)
-            {
-                if ((directions & GrowthDirections.Left) != 0)
-                {
-                    return GrowthDirections.Out | GrowthDirections.Right;
-                }
-                if ((directions & GrowthDirections.Up) != 0)
-                {
-                    return GrowthDirections.Out | GrowthDirections.Down;
-                }
-                return directions;
-            }
-
-            // validate Right & Left
-            if ((directions & GrowthDirections.Right) == 0 && (directions & GrowthDirections.Left) == 0)
-            {
-                return directions | GrowthDirections.Right;
-            }
-
-            if ((directions & GrowthDirections.Right) != 0 && (directions & GrowthDirections.Left) != 0)
-            {
-                return directions & ~GrowthDirections.Left;
-            }
-
-            // validate Down & Up
-            if ((directions & GrowthDirections.Down) == 0 && (directions & GrowthDirections.Up) == 0)
-            {
-                return directions | GrowthDirections.Down;
-            }
-
-            if ((directions & GrowthDirections.Down) != 0 && (directions & GrowthDirections.Up) != 0)
-            {
-                return directions & ~GrowthDirections.Up;
-            }
-
-            return directions;
-        }
-
-        private void CalculateAxisDirections(GrowthDirections growthDirections, uint elementCount, out Vector2 direction, out Vector2 offset)
-        {
-            if ((growthDirections & GrowthDirections.Out) != 0)
-            {
                 direction.X = 1;
-                direction.Y = 1;
-                offset.X = (growthDirections & GrowthDirections.Right) != 0 ? -1 * (Config.IconConfig.Size.X + Config.IconPadding.X) * elementCount / 2 : 0;
-                offset.Y = (growthDirections & GrowthDirections.Down) != 0 ? -1 * (Config.IconConfig.Size.Y + Config.IconPadding.Y) * elementCount / 2 : 0;
+                direction.Y = (growthDirections & GrowthDirections.Down) != 0 ? 1 : -1;
+                offset.X = -(Config.IconConfig.Size.X + Config.IconPadding.X) * elementsInRow / 2f;
+                offset.Y = direction.Y == 1 ? 0 : -Config.IconConfig.Size.Y;
             }
             else
             {
@@ -384,13 +335,13 @@ namespace DelvUI.Interface.StatusEffects
                 area.Y = -area.Y;
             }
 
-            var endPos = position + area;
             var startPos = position;
-
-            if ((growthDirections & GrowthDirections.Out) != 0)
+            if ((growthDirections & GrowthDirections.Centered) != 0)
             {
-                startPos = position - size / 2f;
+                startPos.X = position.X - size.X / 2f;
             }
+
+            var endPos = position + area;
 
             if (endPos.X < position.X)
             {
@@ -425,6 +376,6 @@ namespace DelvUI.Interface.StatusEffects
         Down = 2,
         Left = 4,
         Right = 8,
-        Out = 16,
+        Centered = 16,
     }
 }

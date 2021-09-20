@@ -117,12 +117,13 @@ namespace DelvUI.Interface.StatusEffects
             "Right and Down",
             "Right and Up",
             "Left and Down",
-            "Left and Up"
+            "Left and Up",
+            "Centered and Up",
+            "Centered and Down"
         )]
-        //"Centered (horizontal)",    not working as expected
-        //"Centered (vertical)"       not working as expected
         [Order(30)]
         public int Directions;
+
         [DragInt("Limit (-1 for no limit)", min = -1, max = 1000)]
         [Order(35)]
         public int Limit = -1;
@@ -190,8 +191,8 @@ namespace DelvUI.Interface.StatusEffects
             GrowthDirections.Right | GrowthDirections.Up,
             GrowthDirections.Left | GrowthDirections.Down,
             GrowthDirections.Left | GrowthDirections.Up,
-            GrowthDirections.Out | GrowthDirections.Right,
-            GrowthDirections.Out | GrowthDirections.Down
+            GrowthDirections.Centered | GrowthDirections.Up,
+            GrowthDirections.Centered | GrowthDirections.Down
         };
     }
 
