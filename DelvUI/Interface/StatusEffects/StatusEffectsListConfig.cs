@@ -286,7 +286,7 @@ namespace DelvUI.Interface.StatusEffects
         {
             if (status != null && !List.ContainsKey(status.Name))
             {
-                List.Add(status.Name, status.RowId);
+                List.Add(status.Name + "[" + status.RowId.ToString() + "]", status.RowId);
                 _input = "";
 
                 return true;
@@ -395,6 +395,7 @@ namespace DelvUI.Interface.StatusEffects
                     {
                         var id = List.Values[i];
                         var name = List.Keys[i];
+                        var row = sheet.GetRow(id);
 
                         ImGui.PushID(i.ToString());
                         ImGui.TableNextRow(ImGuiTableRowFlags.None, iconSize.Y);
@@ -416,7 +417,6 @@ namespace DelvUI.Interface.StatusEffects
                         // icon
                         if (ImGui.TableSetColumnIndex(1))
                         {
-                            var row = sheet.GetRow(id);
                             if (row != null)
                             {
                                 DrawHelper.DrawIcon<Status>(row, ImGui.GetCursorPos(), iconSize, false);
@@ -432,7 +432,8 @@ namespace DelvUI.Interface.StatusEffects
                         // name
                         if (ImGui.TableSetColumnIndex(3))
                         {
-                            ImGui.Text(name);
+                            var displayName = row != null ? row.Name : name;
+                            ImGui.Text(displayName);
                         }
 
                         ImGui.PopID();
@@ -452,53 +453,118 @@ namespace DelvUI.Interface.StatusEffects
             return changed;
         }
     }
-}
 
-// SAVING THESE FOR LATER
-/*
- 
-        protected uint[] _raidWideBuffs =
+    [Section("Buffs and Debuffs")]
+    [SubSection("Tracked Buffs", 0)]
+    public class TrackedBuffsListConfig : StatusEffectsListConfig
+    {
+        public new static TrackedBuffsListConfig DefaultConfig()
         {
-            // See https://external-preview.redd.it/bKacLk4PKav7vdP1ilT66gAtB1t7BTJjxsMrImRHr1k.png?auto=webp&s=cbe6880c34b45e2db20c247c8ab9eef543538e96
-            // Left Eye
-            1184, 1454,
-            // Battle Litany
-            786, 1414,
-            // Brotherhood
-            1185, 2174,
-            // Battle Voice
-            141,
-            // Devilment
-            1825,
-            // Technical Finish
-            1822, 2050,
-            // Standard Finish
-            1821, 2024, 2105, 2113,
-            // Embolden
-            1239, 1297, 2282,
-            // Devotion
-            1213,
-            // ------ AST Card Buffs -------
-            // The Balance
-            829, 1338, 1882,
-            // The Bole
-            830, 1339, 1883,
-            // The Arrow
-            831, 1884,
-            // The Spear
-            832, 1885,
-            // The Ewer
-            833, 1340, 1886,
-            // The Spire
-            834, 1341, 1887,
-            // Lord of Crowns
-            1451, 1876,
-            // Lady of Crowns
-            1452, 1877,
-            // Divination
-            1878, 2034,
-            // Chain Stratagem
-            1221, 1406
-        };
+            var iconConfig = new StatusEffectIconConfig();
+            iconConfig.DispellableBorderConfig.Enabled = false;
+            iconConfig.Size = new Vector2(30, 30);
 
-*/
+            var pos = new Vector2(-HUDConstants.UnitFramesOffsetX - HUDConstants.DefaultBigUnitFrameSize.X / 2f, HUDConstants.BaseHUDOffsetY - 50);
+            var size = new Vector2(iconConfig.Size.X * 5 + 10, iconConfig.Size.Y * 3 + 10);
+
+            var config = new TrackedBuffsListConfig(pos, size, true, false, false, GrowthDirections.Centered | GrowthDirections.Up, iconConfig);
+            config.Enabled = false;
+
+            // pre-populated white list
+            config.BlacklistConfig.UseAsWhitelist = true;
+
+            ExcelSheet<Status> sheet = Plugin.DataManager.GetExcelSheet<Status>();
+            if (sheet != null)
+            {
+                // Left Eye
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1184));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1454));
+
+                // Battle Litany
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(786));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1414));
+
+                // Brotherhood
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1185));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2174));
+
+                // Battle Voice
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(141));
+
+                // Devilment
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1825));
+
+                // Technical Finish
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1822));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2050));
+
+                // Standard Finish
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1821));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2024));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2105));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2113));
+
+                // Embolden
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1239));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1297));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2282));
+
+                // Devotion
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1213));
+
+                // ------ AST Card Buffs -------
+                // The Balance
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(829));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1338));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1882));
+
+                // The Bole
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(830));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1339));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1883));
+
+                // The Arrow
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(831));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1884));
+
+                // The Spear
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(832));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1885));
+
+                // The Ewer
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(833));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1340));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1886));
+
+                // The Spire
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(834));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1341));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1887));
+
+                // Lord of Crowns
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1451));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1876));
+
+                // Lady of Crowns
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1452));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1877));
+
+                // Divination
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1878));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2034));
+
+                // Chain Stratagem
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1221));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1406));
+            }
+
+            return config;
+        }
+
+        public TrackedBuffsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
+            GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
+            : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
+        {
+        }
+    }
+}

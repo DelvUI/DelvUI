@@ -182,6 +182,11 @@ namespace DelvUI.Interface
             var targetDebuffs = new StatusEffectsListHud("targetDebuffs", targetDebuffsConfig, "Target Debuffs");
             _hudElements.Add(targetDebuffs);
             _hudElementsUsingTarget.Add(targetDebuffs);
+
+            var trackedBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TrackedBuffsListConfig>();
+            var trackedBuffs = new StatusEffectsListHud("trackedBuffs", trackedBuffsConfig, "Tracked Buffs");
+            _hudElements.Add(trackedBuffs);
+            _hudElementsUsingPlayer.Add(trackedBuffs);
         }
 
         private void CreateMiscElements()
@@ -478,18 +483,18 @@ namespace DelvUI.Interface
         public bool ShowCenterLines = true;
         [Checkbox("Show Anchor Points")]
         [Order(20)]
-        
+
         public bool ShowAnchorPoints = true;
         [Checkbox("Grid Divisions", spacing = true)]
-        [CollapseControl(25,0)]
+        [CollapseControl(25, 0)]
         public bool ShowGrid = true;
 
         [DragInt("Divisions Distance", min = 50, max = 500)]
-        [CollapseWith(0,0)]
+        [CollapseWith(0, 0)]
         public int GridDivisionsDistance = 50;
 
         [DragInt("Subdivision Count", min = 1, max = 10)]
-        [CollapseWith(5,0)]
+        [CollapseWith(5, 0)]
         public int GridSubdivisionCount = 4;
 
 
