@@ -58,6 +58,13 @@ namespace DelvUI.Interface.GeneralElements
                 drawList.AddRect(position, position + size, 0xFF000000);
             }
 
+            // label
+            if (Config.ValueLabelConfig.Enabled)
+            {
+                Config.ValueLabelConfig.SetText($"{current,0}");
+                _valueLabel.Draw(origin + Config.Position, Config.Size);
+            }
+
         }
 
         private void GetResources(ref int current, ref int max, Chara actor)
