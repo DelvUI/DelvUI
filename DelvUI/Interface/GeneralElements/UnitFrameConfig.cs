@@ -1,6 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using System;
+using DelvUI.Enums;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
@@ -19,8 +19,8 @@ namespace DelvUI.Interface.GeneralElements
             var size = HUDConstants.DefaultBigUnitFrameSize;
             var pos = new Vector2(-HUDConstants.UnitFramesOffsetX - size.X / 2f, HUDConstants.BaseHUDOffsetY);
 
-            var leftLabelConfig = new EditableLabelConfig(new Vector2(5, 0), "[name:abbreviate]", LabelTextAnchor.TopLeft, LabelTextAnchor.BottomLeft);
-            var rightLabelConfig = new EditableLabelConfig(new Vector2(-5, 0), "[health:current-short] | [health:percent]", LabelTextAnchor.TopRight, LabelTextAnchor.BottomRight);
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(5, 0), "[name:abbreviate]", DrawAnchor.TopLeft, DrawAnchor.BottomLeft);
+            var rightLabelConfig = new EditableLabelConfig(new Vector2(-5, 0), "[health:current-short] | [health:percent]", DrawAnchor.TopRight, DrawAnchor.BottomRight);
 
             var config = new PlayerUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig);
             config.TankStanceIndicatorConfig = new TankStanceIndicatorConfig();
@@ -43,8 +43,8 @@ namespace DelvUI.Interface.GeneralElements
             var size = HUDConstants.DefaultBigUnitFrameSize;
             var pos = new Vector2(HUDConstants.UnitFramesOffsetX + size.X / 2f, HUDConstants.BaseHUDOffsetY);
 
-            var leftLabelConfig = new EditableLabelConfig(new Vector2(5, 0), "[health:current-short] | [health:percent]", LabelTextAnchor.TopLeft, LabelTextAnchor.BottomLeft);
-            var rightLabelConfig = new EditableLabelConfig(new Vector2(-5, 0), "[name:abbreviate]", LabelTextAnchor.TopRight, LabelTextAnchor.BottomRight);
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(5, 0), "[health:current-short] | [health:percent]", DrawAnchor.TopLeft, DrawAnchor.BottomLeft);
+            var rightLabelConfig = new EditableLabelConfig(new Vector2(-5, 0), "[name:abbreviate]", DrawAnchor.TopRight, DrawAnchor.BottomRight);
 
             return new TargetUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig);
         }
@@ -67,8 +67,8 @@ namespace DelvUI.Interface.GeneralElements
                 HUDConstants.BaseHUDOffsetY - 15
             );
 
-            var leftLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "[name:abbreviate]", LabelTextAnchor.Top, LabelTextAnchor.Bottom);
-            var rightLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", LabelTextAnchor.Center, LabelTextAnchor.TopLeft);
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "[name:abbreviate]", DrawAnchor.Top, DrawAnchor.Bottom);
+            var rightLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.TopLeft);
 
             return new TargetOfTargetUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig);
         }
@@ -91,19 +91,15 @@ namespace DelvUI.Interface.GeneralElements
                 HUDConstants.BaseHUDOffsetY - 15
             );
 
-            var leftLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "[name:abbreviate]", LabelTextAnchor.Top, LabelTextAnchor.Bottom);
-            var rightLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", LabelTextAnchor.Center, LabelTextAnchor.Center);
+            var leftLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "[name:abbreviate]", DrawAnchor.Top, DrawAnchor.Bottom);
+            var rightLabelConfig = new EditableLabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center);
 
             return new FocusTargetUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig);
         }
     }
 
-    public class UnitFrameConfig : MovablePluginConfigObject
+    public class UnitFrameConfig : AnchorablePluginConfigObject
     {
-        [DragInt2("Size", min = 1, max = 4000)]
-        [Order(15)]
-        public Vector2 Size;
-
         [Checkbox("Custom Frame Color", separator = true)]
         [CollapseControl(20, 0)]
         public bool UseCustomColor = false;
@@ -137,7 +133,6 @@ namespace DelvUI.Interface.GeneralElements
 
         [NestedConfig("Right Text", 45)]
         public EditableLabelConfig RightLabelConfig;
-
 
         [NestedConfig("Shields", 50)]
         public ShieldConfig ShieldConfig = new ShieldConfig();

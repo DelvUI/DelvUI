@@ -66,7 +66,7 @@ namespace DelvUI.Interface.GeneralElements
 
             var castPercent = 100f / totalCastTime * currentCastTime;
             var castScale = castPercent / 100f;
-            var startPos = origin + Config.Position - Config.Size / 2f;
+            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
             var endPos = startPos + Config.Size;
 
             var drawList = ImGui.GetWindowDrawList();
@@ -75,7 +75,7 @@ namespace DelvUI.Interface.GeneralElements
             drawList.AddRectFilled(startPos, endPos, 0x88000000);
 
             // extras
-            DrawExtras(origin + Config.Position, totalCastTime);
+            DrawExtras(startPos, totalCastTime);
 
             // cast bar
             var color = Color();
@@ -103,15 +103,15 @@ namespace DelvUI.Interface.GeneralElements
 
             // cast name
             Config.CastNameConfig.SetText(Config.Preview ? "Name" : _lastUsedCast.ActionText);
-            _castNameLabel.Draw(origin + Config.Position + new Vector2(iconSize.X, 0), Config.Size, Actor);
+            _castNameLabel.Draw(startPos + new Vector2(iconSize.X, 0), Config.Size, Actor);
 
             // cast time
             var text = Config.Preview ? "Time" : Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
             Config.CastTimeConfig.SetText(text);
-            _castTimeLabel.Draw(origin + Config.Position, Config.Size, Actor);
+            _castTimeLabel.Draw(startPos, Config.Size, Actor);
         }
 
-        public virtual void DrawExtras(Vector2 origin, float totalCastTime)
+        public virtual void DrawExtras(Vector2 castbarPos, float totalCastTime)
         {
             // override
         }
@@ -131,7 +131,7 @@ namespace DelvUI.Interface.GeneralElements
 
         }
 
-        public override void DrawExtras(Vector2 origin, float totalCastTime)
+        public override void DrawExtras(Vector2 castbarPos, float totalCastTime)
         {
             if (!Config.ShowSlideCast || Config.SlideCastTime <= 0 || Config.Preview)
             {
@@ -141,7 +141,7 @@ namespace DelvUI.Interface.GeneralElements
             var drawList = ImGui.GetWindowDrawList();
 
             var slideCastWidth = Math.Min(Config.Size.X, (Config.SlideCastTime / 1000f) * Config.Size.X / totalCastTime);
-            var startPos = new Vector2(origin.X + Config.Size.X / 2f - slideCastWidth, origin.Y - Config.Size.Y / 2f);
+            var startPos = new Vector2(castbarPos.X + Config.Size.X - slideCastWidth, castbarPos.Y);
             var endPos = startPos + new Vector2(slideCastWidth, Config.Size.Y);
             var color = Config.SlideCastColor;
 

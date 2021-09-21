@@ -1,6 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using System;
+using DelvUI.Enums;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
@@ -36,8 +36,8 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(254, 24);
             var pos = new Vector2(0, HUDConstants.PlayerCastbarY);
 
-            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left, LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", LabelTextAnchor.Right, LabelTextAnchor.Right);
+            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", DrawAnchor.Left, DrawAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
 
             return new PlayerCastbarConfig(pos, size, castNameConfig, castTimeConfig);
         }
@@ -81,8 +81,8 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(254, 24);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY / 2f - size.Y / 2);
 
-            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left, LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", LabelTextAnchor.Right, LabelTextAnchor.Right);
+            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", DrawAnchor.Left, DrawAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
 
             return new TargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
         }
@@ -105,8 +105,8 @@ namespace DelvUI.Interface.GeneralElements
                 HUDConstants.BaseHUDOffsetY + 5
             );
 
-            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left, LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", LabelTextAnchor.Right, LabelTextAnchor.Right);
+            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", DrawAnchor.Left, DrawAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
 
             return new TargetOfTargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
         }
@@ -129,19 +129,15 @@ namespace DelvUI.Interface.GeneralElements
                 HUDConstants.BaseHUDOffsetY + 5
             );
 
-            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", LabelTextAnchor.Left, LabelTextAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", LabelTextAnchor.Right, LabelTextAnchor.Right);
+            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", DrawAnchor.Left, DrawAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
 
             return new FocusTargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
         }
     }
 
-    public abstract class CastbarConfig : MovablePluginConfigObject
+    public abstract class CastbarConfig : AnchorablePluginConfigObject
     {
-        [DragInt2("Size", min = 1, max = 4000)]
-        [Order(15)]
-        public Vector2 Size;
-
         [Checkbox("Preview")]
         [Order(20)]
         public bool Preview = false;

@@ -1,8 +1,7 @@
-﻿using Dalamud.Plugin;
-using DelvUI.Config;
+﻿using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using ImGuiNET;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -147,9 +146,10 @@ namespace DelvUI.Interface
                 float minX = float.MaxValue;
                 float minY = float.MaxValue;
 
+                var anchorConfig = _config as AnchorablePluginConfigObject;
                 for (int i = 0; i < positions.Count; i++)
                 {
-                    var pos = positions[i] - sizes[i] / 2f;
+                    var pos = Utils.GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center);
                     minX = Math.Min(minX, pos.X);
                     minY = Math.Min(minY, pos.Y);
                 }
@@ -178,9 +178,10 @@ namespace DelvUI.Interface
                 float maxX = float.MinValue;
                 float maxY = float.MinValue;
 
+                var anchorConfig = _config as AnchorablePluginConfigObject;
                 for (int i = 0; i < positions.Count; i++)
                 {
-                    var pos = positions[i] + sizes[i] / 2f;
+                    var pos = Utils.GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center) + sizes[i];
                     maxX = Math.Max(maxX, pos.X);
                     maxY = Math.Max(maxY, pos.Y);
                 }

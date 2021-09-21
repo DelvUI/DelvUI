@@ -1,8 +1,8 @@
 ﻿using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
@@ -76,6 +76,19 @@ namespace DelvUI.Config
         public Vector2 Position = Vector2.Zero;
     }
 
+    [Serializable]
+    public abstract class AnchorablePluginConfigObject : MovablePluginConfigObject
+    {
+        [DragInt2("Size", min = 1, max = 4000)]
+        [Order(10)]
+        public Vector2 Size;
+
+        [Anchor("Anchor")]
+        [Order(15)]
+        public DrawAnchor Anchor = DrawAnchor.Center;
+    }
+
+    [Serializable]
     public class PluginConfigColor
     {
         [JsonIgnore] private float[] _colorMapRatios = { -.8f, -.3f, .1f };
