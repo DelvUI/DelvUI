@@ -95,7 +95,7 @@ namespace DelvUI.Interface.Party
                 var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), _config.Size.Y);
                 var color = GetColor();
 
-                if (_config.RangeConfig.Enabled)
+                if (_config.RangeConfig.Enabled && actor != null)
                 {
                     var alpha = _config.RangeConfig.AlphaForDistance(actor.YalmDistanceX) / 100f;
                     PluginLog.Log(alpha.ToString());
