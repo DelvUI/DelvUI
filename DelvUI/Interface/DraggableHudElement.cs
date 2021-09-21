@@ -60,13 +60,17 @@ namespace DelvUI.Interface
             var size = MaxPos - MinPos + _contentMargin * 2;
             ImGui.SetNextWindowSize(size, ImGuiCond.Always);
 
+            var anchorConfig = _config as AnchorablePluginConfigObject;
+            var winPos = Utils.GetAnchoredPosition(origin + MinPos, size, anchorConfig?.Anchor ?? DrawAnchor.Center);
+            var winPosOffset = winPos - (origin + MinPos);
+
             // set initial position
             if (!_windowPositionSet)
             {
-                ImGui.SetNextWindowPos(origin + MinPos - _contentMargin);
+                ImGui.SetNextWindowPos(winPos);
                 _windowPositionSet = true;
 
-                _positionOffset = _config.Position - MinPos + _contentMargin;
+                _positionOffset = _config.Position - MinPos - winPosOffset;
             }
 
             // update config object position
