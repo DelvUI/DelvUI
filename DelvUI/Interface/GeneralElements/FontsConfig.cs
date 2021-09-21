@@ -68,7 +68,7 @@ namespace DelvUI.Interface.GeneralElements
             _fonts = new string[fonts.Length];
             for (int i = 0; i < fonts.Length; i++)
             {
-                _fonts[i] = fonts[i].Replace(fontsPath, "").Replace(".ttf", "");
+                _fonts[i] = fonts[i].Replace(fontsPath, "").Replace(".ttf", "").Replace(".TTF", "");
             }
         }
 
