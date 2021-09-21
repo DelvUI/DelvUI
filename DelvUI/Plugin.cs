@@ -56,6 +56,7 @@ namespace DelvUI
 
             // initialize a not-necessarily-defaults configuration
             ConfigurationManager.Initialize(false);
+            FontsManager.Instance.LoadConfig();
 
             UiBuilder.OnBuildUi += Draw;
             UiBuilder.OnBuildFonts += BuildFont;

@@ -22,10 +22,27 @@ namespace DelvUI.Helpers
         }
 
         public static FontsManager Instance { get; private set; }
+        private FontsConfig _config = null;
 
+        public void LoadConfig()
+        {
+            if (_config != null)
+            {
+                return;
+            }
+
+            _config = ConfigurationManager.GetInstance().GetConfigObject<FontsConfig>();
+            ConfigurationManager.GetInstance().ResetEvent += OnConfigReset;
+        }
+
+        private void OnConfigReset(object sender, EventArgs e)
+        {
+            _config = ConfigurationManager.GetInstance().GetConfigObject<FontsConfig>();
+        }
         #endregion
 
         public readonly string FontsPath;
+
 
         public bool DefaultFontBuilt { get; private set; }
         public ImFontPtr DefaultFont { get; private set; } = null;
@@ -44,8 +61,14 @@ namespace DelvUI.Helpers
             return false;
         }
 
-        public bool PushFont(int index)
+        public bool PushFont(string fontID)
         {
+            if (fontID == null || !_config.Fonts.ContainsKey(fontID))
+            {
+                return false;
+            }
+
+            var index = _config.Fonts.IndexOfKey(fontID);
             if (index < 0 || index >= _fonts.Count)
             {
                 return false;

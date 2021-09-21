@@ -1,6 +1,8 @@
-﻿using ImGuiNET;
+﻿using DelvUI.Interface.GeneralElements;
+using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 
@@ -443,16 +445,38 @@ namespace DelvUI.Config.Attributes
         }
     }
 
-    //[AttributeUsage(AttributeTargets.Field)]
-    //public class FontAttribute : ConfigAttribute
-    //{
-    //    public FontAttribute() : base("") { }
+    [AttributeUsage(AttributeTargets.Field)]
+    public class FontAttribute : ConfigAttribute
+    {
+        public FontAttribute() : base("Font and Size") { }
 
-    //    public override bool Draw(FieldInfo field, PluginConfigObject config, string ID)
-    //    {
+        public override bool Draw(FieldInfo field, PluginConfigObject config, string ID)
+        {
+            var fontsConfig = ConfigurationManager.GetInstance().GetConfigObject<FontsConfig>();
+            if (fontsConfig == null)
+            {
+                return false;
+            }
 
-    //    }
-    //}
+            string stringVal = (string)field.GetValue(config);
+            int index = stringVal == null || stringVal.Length == 0 || !fontsConfig.Fonts.ContainsKey(stringVal) ? 0 :
+                fontsConfig.Fonts.IndexOfKey(stringVal);
+
+            var options = fontsConfig.Fonts.Values.Select(fontData => fontData.Name + "\u2002\u2002" + fontData.Size.ToString()).ToArray();
+
+            if (ImGui.Combo(friendlyName + IDText(ID), ref index, options, options.Length, 4))
+            {
+                stringVal = fontsConfig.Fonts.Keys[index];
+                field.SetValue(config, stringVal);
+
+                TriggerChangeEvent<string>(config, field.Name, stringVal);
+
+                return true;
+            }
+
+            return false;
+        }
+    }
     #endregion
 
     #region field ordering attributes

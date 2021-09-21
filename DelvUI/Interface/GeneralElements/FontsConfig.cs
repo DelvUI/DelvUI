@@ -95,6 +95,8 @@ namespace DelvUI.Interface.GeneralElements
             var fontData = new FontData(fontName, size);
             Fonts.Add(key, fontData);
 
+            Plugin.UiBuilder.RebuildFonts();
+
             return true;
         }
 
@@ -215,16 +217,16 @@ namespace DelvUI.Interface.GeneralElements
                 ImGui.NewLine();
                 ImGui.Text("\u2002");
                 ImGui.SameLine();
-                changed |= ImGui.Checkbox("Support Chinese", ref SupportChineseCharacters);
-
-                ImGui.SameLine();
-                changed |= ImGui.Checkbox("Support Korean", ref SupportKoreanCharacters);
-
-                ImGui.NewLine();
-                ImGui.Text("\u2002");
-                ImGui.SameLine();
-                if (ImGui.Button("Reload Fonts", new Vector2(326, 30)))
+                if (ImGui.Checkbox("Support Chinese", ref SupportChineseCharacters))
                 {
+                    changed = true;
+                    Plugin.UiBuilder.RebuildFonts();
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Checkbox("Support Korean", ref SupportKoreanCharacters))
+                {
+                    changed = true;
                     Plugin.UiBuilder.RebuildFonts();
                 }
             }
@@ -232,6 +234,7 @@ namespace DelvUI.Interface.GeneralElements
             if (indexToRemove >= 0)
             {
                 Fonts.RemoveAt(indexToRemove);
+                Plugin.UiBuilder.RebuildFonts();
             }
 
             ImGui.EndChild();
