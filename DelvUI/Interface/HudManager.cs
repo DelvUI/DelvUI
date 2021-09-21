@@ -29,6 +29,7 @@ namespace DelvUI.Interface
         private List<IHudElementWithActor> _hudElementsUsingTargetOfTarget;
         private List<IHudElementWithActor> _hudElementsUsingFocusTarget;
 
+        private CustomEffectsListHud _customEffectsHud;
         private PrimaryResourceHud _primaryResourceHud;
         private JobHud _jobHud = null;
         private PartyFramesHud _partyFramesHud;
@@ -192,6 +193,11 @@ namespace DelvUI.Interface
             var targetDebuffs = new StatusEffectsListHud("targetDebuffs", targetDebuffsConfig, "Target Debuffs");
             _hudElements.Add(targetDebuffs);
             _hudElementsUsingTarget.Add(targetDebuffs);
+
+            var custonEffectsConfig = ConfigurationManager.GetInstance().GetConfigObject<CustomEffectsListConfig>();
+            _customEffectsHud = new CustomEffectsListHud("customEffects", custonEffectsConfig, "Custom Effects");
+            _hudElements.Add(_customEffectsHud);
+            _hudElementsUsingPlayer.Add(_customEffectsHud);
         }
 
         private void CreateMiscElements()
@@ -359,6 +365,11 @@ namespace DelvUI.Interface
             foreach (var element in _hudElementsUsingTarget)
             {
                 element.Actor = target;
+
+                if (_customEffectsHud != null)
+                {
+                    _customEffectsHud.TargetActor = target;
+                }
             }
 
             // target of target

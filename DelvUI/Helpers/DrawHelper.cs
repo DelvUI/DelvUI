@@ -73,7 +73,7 @@ namespace DelvUI.Helpers
 
         public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor, float fontScale)
         {
-            DrawOutlinedText(text, pos, color, outlineColor, fontScale, FontsManager.Instance.BigNoodleTooFont);
+            DrawOutlinedText(text, pos, color, outlineColor, fontScale, FontsManager.Instance.DefaultFont);
         }
 
         public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor, float fontScale, ImFontPtr fontPtr)

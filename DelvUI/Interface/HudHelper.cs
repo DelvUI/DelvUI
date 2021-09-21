@@ -55,6 +55,7 @@ namespace DelvUI.Interface
 
         private bool _previousCombatState = true;
         private bool _isInitial = true;
+        private uint[] GoldSaucerIDs = new uint[] { 144, 388, 389, 390, 391, 579, 792, 899, 941 };
 
         public HudHelper()
         {
@@ -81,7 +82,7 @@ namespace DelvUI.Interface
                 {
                     addon.NodeListVisibilityToggle(Config.HideDefaultCastbar);
                 }
-                else if (addon.name.StartsWith("JobHud"))
+                else if (addon.name.StartsWith("JobHud") && !addon.name.StartsWith("JobHudNotice"))
                 {
                     bool isHidden = Config.HideDefaultJobGauges;
 
@@ -102,6 +103,12 @@ namespace DelvUI.Interface
             if (!ConfigurationManager.GetInstance().LockHUD)
             {
                 return ConfigurationManager.GetInstance().LockHUD;
+            }
+
+            // hide in gold saucer
+            if (Config.HideInGoldSaucer && GoldSaucerIDs.Where(id => id == Plugin.ClientState.TerritoryType).Count() > 0)
+            {
+                return true;
             }
 
             bool isHidden = Config.HideOutsideOfCombat && !IsInCombat();

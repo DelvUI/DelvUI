@@ -1,4 +1,5 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Interface;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -7,6 +8,7 @@ using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
 namespace DelvUI.Interface.StatusEffects
@@ -117,12 +119,13 @@ namespace DelvUI.Interface.StatusEffects
             "Right and Down",
             "Right and Up",
             "Left and Down",
-            "Left and Up"
+            "Left and Up",
+            "Centered and Up",
+            "Centered and Down"
         )]
-        //"Centered (horizontal)",    not working as expected
-        //"Centered (vertical)"       not working as expected
         [Order(30)]
         public int Directions;
+
         [DragInt("Limit (-1 for no limit)", min = -1, max = 1000)]
         [Order(35)]
         public int Limit = -1;
@@ -146,7 +149,7 @@ namespace DelvUI.Interface.StatusEffects
         [NestedConfig("Icons", 60)]
         public StatusEffectIconConfig IconConfig;
 
-        [NestedConfig("Black List", 65)]
+        [NestedConfig("Filter Status Effects", 65)]
         public StatusEffectsBlacklistConfig BlacklistConfig = new StatusEffectsBlacklistConfig();
 
 
@@ -190,8 +193,8 @@ namespace DelvUI.Interface.StatusEffects
             GrowthDirections.Right | GrowthDirections.Up,
             GrowthDirections.Left | GrowthDirections.Down,
             GrowthDirections.Left | GrowthDirections.Up,
-            GrowthDirections.Out | GrowthDirections.Right,
-            GrowthDirections.Out | GrowthDirections.Down
+            GrowthDirections.Centered | GrowthDirections.Up,
+            GrowthDirections.Centered | GrowthDirections.Down
         };
     }
 
@@ -272,7 +275,7 @@ namespace DelvUI.Interface.StatusEffects
 
         public bool StatusAllowed(Status status)
         {
-            var inList = List.ContainsKey(status.Name);
+            var inList = List.ContainsKey(status.Name + "[" + status.RowId.ToString() + "]");
             if ((inList && !UseAsWhitelist) || (!inList && UseAsWhitelist))
             {
                 return false;
@@ -285,7 +288,7 @@ namespace DelvUI.Interface.StatusEffects
         {
             if (status != null && !List.ContainsKey(status.Name))
             {
-                List.Add(status.Name, status.RowId);
+                List.Add(status.Name + "[" + status.RowId.ToString() + "]", status.RowId);
                 _input = "";
 
                 return true;
@@ -348,22 +351,26 @@ namespace DelvUI.Interface.StatusEffects
                 ImGuiTableFlags.BordersOuter |
                 ImGuiTableFlags.BordersInner |
                 ImGuiTableFlags.ScrollY |
-                ImGuiTableFlags.SizingFixedFit;
+                ImGuiTableFlags.SizingFixedSame;
 
             var changed = false;
             var sheet = Plugin.DataManager.GetExcelSheet<Status>();
             var iconSize = new Vector2(30, 30);
             var indexToRemove = -1;
 
-            if (ImGui.BeginChild("blacklist", new Vector2(0, 360), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            if (ImGui.BeginChild("Filter Effects", new Vector2(0, 360), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                changed |= ImGui.Checkbox("Use as White List", ref UseAsWhitelist);
+                ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
+                ImGui.SameLine();
+                changed |= ImGui.Checkbox(UseAsWhitelist ? "Whitelist" : "Blacklist", ref UseAsWhitelist);
+                ImGui.NewLine();
 
-                ImGui.Text("");
-                ImGui.Text("Tip: You can [Ctrl + Alt + Shift] + Left Click on a status effect to automatically add it to the list.");
-                ImGui.Text("");
-
+                ImGui.Text("\u2002 \u2002");
+                ImGui.SameLine();
                 ImGui.Text("Type an ID or Name");
+
+                ImGui.Text("\u2002 \u2002");
+                ImGui.SameLine();
 
                 if (ImGui.InputText("", ref _input, 64, ImGuiInputTextFlags.EnterReturnsTrue))
                 {
@@ -372,21 +379,25 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 ImGui.SameLine();
+                ImGui.PushFont(UiBuilder.IconFont);
 
-                if (ImGui.Button("Add", new Vector2(60, 23)))
+                if (ImGui.Button(FontAwesomeIcon.Plus.ToIconString(), new Vector2(0, 0)))
                 {
                     changed |= AddNewEntry(_input, sheet);
                     ImGui.SetKeyboardFocusHere(-2);
                 }
+                ImGui.PopFont();
 
-                ImGui.NewLine();
+                ImGui.Text("\u2002 \u2002");
+                ImGui.SameLine();
 
-                if (ImGui.BeginTable("table", 4, flags, new Vector2(620, 200)))
+                if (ImGui.BeginTable("table", 4, flags, new Vector2(583, List.Count > 0 ? 200 : 40)))
                 {
-                    ImGui.TableSetupColumn("Remove", ImGuiTableColumnFlags.WidthFixed, 0, 0);
-                    ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 0, 1);
-                    ImGui.TableSetupColumn("ID", ImGuiTableColumnFlags.WidthFixed, 0, 2);
-                    ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthFixed, 0, 3);
+                    ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 0, 0);
+                    ImGui.TableSetupColumn("ID", ImGuiTableColumnFlags.WidthFixed, 0, 1);
+                    ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 0, 2);
+                    ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 0, 3);
+
                     ImGui.TableSetupScrollFreeze(0, 1);
                     ImGui.TableHeadersRow();
 
@@ -394,28 +405,19 @@ namespace DelvUI.Interface.StatusEffects
                     {
                         var id = List.Values[i];
                         var name = List.Keys[i];
+                        var row = sheet.GetRow(id);
+
+                        if (_input != "" && !name.ToUpper().Contains(_input.ToUpper()))
+                        {
+                            continue;
+                        }
 
                         ImGui.PushID(i.ToString());
                         ImGui.TableNextRow(ImGuiTableRowFlags.None, iconSize.Y);
 
-                        // remove
+                        // icon
                         if (ImGui.TableSetColumnIndex(0))
                         {
-                            var cursorPos = ImGui.GetCursorPos();
-                            cursorPos.X += 8;
-                            ImGui.SetCursorPos(cursorPos);
-
-                            if (ImGui.Button("X", iconSize))
-                            {
-                                changed = true;
-                                indexToRemove = i;
-                            }
-                        }
-
-                        // icon
-                        if (ImGui.TableSetColumnIndex(1))
-                        {
-                            var row = sheet.GetRow(id);
                             if (row != null)
                             {
                                 DrawHelper.DrawIcon<Status>(row, ImGui.GetCursorPos(), iconSize, false);
@@ -423,22 +425,42 @@ namespace DelvUI.Interface.StatusEffects
                         }
 
                         // id
-                        if (ImGui.TableSetColumnIndex(2))
+                        if (ImGui.TableSetColumnIndex(1))
                         {
                             ImGui.Text(id.ToString());
                         }
 
                         // name
-                        if (ImGui.TableSetColumnIndex(3))
+                        if (ImGui.TableSetColumnIndex(2))
                         {
-                            ImGui.Text(name);
+                            var displayName = row != null ? row.Name : name;
+                            ImGui.Text(displayName);
                         }
 
+                        // remove
+                        if (ImGui.TableSetColumnIndex(3))
+                        {
+                            ImGui.PushFont(UiBuilder.IconFont);
+                            ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
+                            ImGui.PushStyleColor(ImGuiCol.ButtonActive, Vector4.Zero);
+                            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, Vector4.Zero);
+                            if (ImGui.Button(FontAwesomeIcon.Trash.ToIconString(), iconSize))
+                            {
+                                changed = true;
+                                indexToRemove = i;
+                            }
+                            ImGui.PopFont();
+                            ImGui.PopStyleColor(3);
+                        }
                         ImGui.PopID();
                     }
 
                     ImGui.EndTable();
                 }
+                ImGui.Text("\u2002 \u2002");
+                ImGui.SameLine();
+                ImGui.Text("Tip: You can [Ctrl + Alt + Shift] + Left Click on a status effect to automatically add it to the list.");
+
             }
 
             if (indexToRemove >= 0)
@@ -451,53 +473,118 @@ namespace DelvUI.Interface.StatusEffects
             return changed;
         }
     }
-}
-
-// SAVING THESE FOR LATER
-/*
- 
-        protected uint[] _raidWideBuffs =
+    /**/
+    [Section("Buffs and Debuffs")]
+    [SubSection("Custom Effects", 0)]
+    public class CustomEffectsListConfig : StatusEffectsListConfig
+    {
+        public new static CustomEffectsListConfig DefaultConfig()
         {
-            // See https://external-preview.redd.it/bKacLk4PKav7vdP1ilT66gAtB1t7BTJjxsMrImRHr1k.png?auto=webp&s=cbe6880c34b45e2db20c247c8ab9eef543538e96
-            // Left Eye
-            1184, 1454,
-            // Battle Litany
-            786, 1414,
-            // Brotherhood
-            1185, 2174,
-            // Battle Voice
-            141,
-            // Devilment
-            1825,
-            // Technical Finish
-            1822, 2050,
-            // Standard Finish
-            1821, 2024, 2105, 2113,
-            // Embolden
-            1239, 1297, 2282,
-            // Devotion
-            1213,
-            // ------ AST Card Buffs -------
-            // The Balance
-            829, 1338, 1882,
-            // The Bole
-            830, 1339, 1883,
-            // The Arrow
-            831, 1884,
-            // The Spear
-            832, 1885,
-            // The Ewer
-            833, 1340, 1886,
-            // The Spire
-            834, 1341, 1887,
-            // Lord of Crowns
-            1451, 1876,
-            // Lady of Crowns
-            1452, 1877,
-            // Divination
-            1878, 2034,
-            // Chain Stratagem
-            1221, 1406
-        };
+            var iconConfig = new StatusEffectIconConfig();
+            iconConfig.DispellableBorderConfig.Enabled = false;
+            iconConfig.Size = new Vector2(30, 30);
 
-*/
+            var pos = new Vector2(-HUDConstants.UnitFramesOffsetX - HUDConstants.DefaultBigUnitFrameSize.X / 2f, HUDConstants.BaseHUDOffsetY - 50);
+            var size = new Vector2(iconConfig.Size.X * 5 + 10, iconConfig.Size.Y * 3 + 10);
+
+            var config = new CustomEffectsListConfig(pos, size, true, true, false, GrowthDirections.Centered | GrowthDirections.Up, iconConfig);
+            config.Enabled = false;
+
+            // pre-populated white list
+            config.BlacklistConfig.UseAsWhitelist = true;
+
+            ExcelSheet<Status> sheet = Plugin.DataManager.GetExcelSheet<Status>();
+            if (sheet != null)
+            {
+                // Left Eye
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1184));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1454));
+
+                // Battle Litany
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(786));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1414));
+
+                // Brotherhood
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1185));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2174));
+
+                // Battle Voice
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(141));
+
+                // Devilment
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1825));
+
+                // Technical Finish
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1822));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2050));
+
+                // Standard Finish
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1821));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2024));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2105));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2113));
+
+                // Embolden
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1239));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1297));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2282));
+
+                // Devotion
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1213));
+
+                // ------ AST Card Buffs -------
+                // The Balance
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(829));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1338));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1882));
+
+                // The Bole
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(830));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1339));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1883));
+
+                // The Arrow
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(831));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1884));
+
+                // The Spear
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(832));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1885));
+
+                // The Ewer
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(833));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1340));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1886));
+
+                // The Spire
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(834));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1341));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1887));
+
+                // Lord of Crowns
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1451));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1876));
+
+                // Lady of Crowns
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1452));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1877));
+
+                // Divination
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1878));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(2034));
+
+                // Chain Stratagem
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1221));
+                config.BlacklistConfig.AddNewEntry(sheet.GetRow(1406));
+            }
+
+            return config;
+        }
+
+        public CustomEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
+            GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
+            : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
+        {
+        }
+    }
+}

@@ -34,6 +34,10 @@ namespace DelvUI.Interface.GeneralElements
     {
         [JsonIgnore] protected string _text;
 
+        [Font]
+        [Order(20)]
+        public string FontID = null;
+
         [Anchor("Frame Anchor")]
         [Order(25)]
         public HudElementAnchor FrameAnchor = HudElementAnchor.Center;

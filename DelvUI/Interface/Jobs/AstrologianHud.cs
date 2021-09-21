@@ -96,11 +96,6 @@ namespace DelvUI.Interface.Jobs
 
         private string RedrawText(float redrawCastInfo, int redrawStacks)
         {
-            if (!Config.ShowRedrawBar)
-            {
-                return "";
-            }
-
             if (redrawCastInfo <= 0)
             {
                 return Config.ShowRedrawTextBar ? redrawStacks.ToString("N0") : "";
@@ -360,12 +355,8 @@ namespace DelvUI.Interface.Jobs
                     bar.SetText(BarTextPosition.CenterLeft, BarTextType.Custom, Config.ShowDrawCooldownTextBar ? cardJob : "");
                     break;
             }
-
-            if (Config.ShowRedrawBar)
-            {
-                string redrawText = RedrawText(redrawCastInfo, redrawStacks);
-                bar.AddPrimaryText(new BarText(BarTextPosition.CenterRight, BarTextType.Custom, redrawText));
-            }
+            string redrawText = RedrawText(redrawCastInfo, redrawStacks);
+            bar.AddPrimaryText(new BarText(BarTextPosition.CenterRight, BarTextType.Custom, redrawText));
 
             bar.Build().Draw(drawList);
         }
@@ -552,44 +543,40 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(25, 0)]
         public PluginConfigColor DrawRangedGlowColor = new(new Vector4(124f / 255f, 34f / 255f, 120f / 255f, 100f / 100f));
 
-        [Checkbox("Card Preferred Target with Glow", spacing = true)]
+        [Checkbox("Card Preferred Target with Glow" + "##Draw", spacing = true)]
         [CollapseWith(30, 0)]
         public bool ShowDrawGlowBar;
 
-        [Checkbox("Card Preferred Target with Text")]
+        [Checkbox("Card Preferred Target with Text" + "##Draw")]
         [CollapseWith(35, 0)]
         public bool ShowDrawTextBar = true;
 
-        [Checkbox("Draw Timer", spacing = true)]
+        [Checkbox("Draw Timer" + "##Draw", spacing = true)]
         [CollapseWith(40, 0)]
         public bool ShowDrawCooldownTextBar = true;
 
-        [Checkbox("with Decimals")]
+        [Checkbox("with Decimals" + "##Draw")]
         [CollapseWith(41, 0)]
         public bool EnableDecimalDrawBar;
         
-        [Checkbox("Card Drawn Timer")]
+        [Checkbox("Card Drawn Timer" + "##Draw")]
         [CollapseWith(45, 0)]
         public bool ShowDrawCardWhileDrawn;
         
-        [Checkbox("Redraw Stacks & Cooldown", spacing = true)]
-        [CollapseWith(50, 0)]
-        public bool ShowRedrawBar = true;
-
-        [Checkbox("Redraw Timer")]
+        [Checkbox("Redraw Timer" + "##Redraw", spacing = true)]
         [CollapseWith(55, 0)]
         public bool ShowRedrawCooldownTextBar = true;
         
-        [Checkbox("with Decimals")]
-        [CollapseWith(56, 0)]
+        [Checkbox("with Decimals" + "##Redraw")]
+        [CollapseWith(60, 0)]
         public bool EnableDecimalRedrawBar;
         
-        [Checkbox("Redraw Stacks")]
-        [CollapseWith(60, 0)]
+        [Checkbox("Redraw Stacks" + "##Redraw")]
+        [CollapseWith(65, 0)]
         public bool ShowRedrawTextBar = true;
 
-        [Checkbox("Total Redraw Cooldown Instead of Next")]
-        [CollapseWith(65, 0)]
+        [Checkbox("Total Redraw Cooldown Instead of Next" + "##Redraw")]
+        [CollapseWith(70, 0)]
         public bool EnableRedrawCooldownCumulated;
 
 
@@ -597,70 +584,70 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Divination Bar
-        [Checkbox("Divination", separator = true)]
+        [Checkbox("Divination" + "##Divination", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowDivinationBar = true;
         
-        [DragFloat2("Position", min = -2000f, max = 2000f)]
+        [DragFloat2("Position" + "##Divination", min = -2000f, max = 2000f)]
         [CollapseWith(0, 1)]
         public Vector2 DivinationBarPosition = new(0, -71);
 
-        [DragFloat2("Size", min = 1f, max = 2000f)]
+        [DragFloat2("Size" + "##Divination", min = 1f, max = 2000f)]
         [CollapseWith(5, 1)]
         public Vector2 DivinationBarSize = new(254, 10);
         
-        [DragInt("Spacing", min = -1000, max = 1000)]
+        [DragInt("Spacing" + "##Divination", min = -1000, max = 1000)]
         [CollapseWith(10, 1)]
         public int DivinationBarPad = 2;
 
-        [ColorEdit4("Sun")]
+        [ColorEdit4("Sun" + "##Divination")]
         [CollapseWith(15, 1)]
         public PluginConfigColor SealSunColor = new(new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f));
 
-        [ColorEdit4("Lunar")]
+        [ColorEdit4("Lunar" + "##Divination")]
         [CollapseWith(20, 1)]
         public PluginConfigColor SealLunarColor = new(new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f));
 
-        [ColorEdit4("Celestial")]
+        [ColorEdit4("Celestial" + "##Divination")]
         [CollapseWith(25, 1)]
         public PluginConfigColor SealCelestialColor = new(new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f));
         
-        [Checkbox("Seal Count Text", spacing = true)]
+        [Checkbox("Seal Count Text" + "##Divination", spacing = true)]
         [CollapseWith(28, 1)]
         public bool ShowDivinationTextBar;
         
-        [Checkbox("Seal Count Glow")]
+        [Checkbox("Seal Count Glow" + "##Divination")]
         [CollapseWith(30, 1)]
         public bool ShowDivinationGlowBar = true;
         
-        [ColorEdit4("Glow")]
+        [ColorEdit4("Glow" + "##Divination")]
         [CollapseWith(35, 1)]
         public PluginConfigColor DivinationGlowColor = new(new Vector4(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f));
 
         #endregion
 
         #region Dot Bar
-        [Checkbox("Combust", separator = true)]
+        [Checkbox("Combust" + "##Combust", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowDotBar = true;
 
-        [DragFloat2("Size", min = 1f, max = 2000f)]
+        [DragFloat2("Size" + "##Combust", min = 1f, max = 2000f)]
         [CollapseWith(0, 2)]
         public Vector2 DotBarSize = new(84, 20);
 
-        [DragFloat2("Position", min = -2000f, max = 2000f)]
+        [DragFloat2("Position" + "##Combust", min = -2000f, max = 2000f)]
         [CollapseWith(5, 2)]
         public Vector2 DotBarPosition = new(-85, -54);
 
-        [ColorEdit4("Color")]
+        [ColorEdit4("Color" + "##Combust")]
         [CollapseWith(10, 2)]
         public PluginConfigColor DotColor = new(new Vector4(20f / 255f, 80f / 255f, 168f / 255f, 100f / 100f));
 
-        [Checkbox("Timer", spacing = true)]
+        [Checkbox("Timer" + "##Combust", spacing = true)]
         [CollapseWith(15, 2)]
         public bool ShowDotTextBar = true;
 
-        [Checkbox("with Decimals")]
+        [Checkbox("with Decimals" + "##Combust")]
         [CollapseWith(20, 2)]
         public bool EnableDecimalDotBar;
         #endregion
@@ -707,27 +694,27 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Lightspeed Bar
-        [Checkbox("Lightspeed", separator = true)]
+        [Checkbox("Lightspeed" + "##Lightspeed", separator = true)]
         [CollapseControl(50, 4)]
         public bool ShowLightspeedBar = true;
         
-        [DragFloat2("Position", min = -2000f, max = 2000f)]
+        [DragFloat2("Position" + "##Lightspeed", min = -2000f, max = 2000f)]
         [CollapseWith(0, 4)]
         public Vector2 LightspeedBarPosition = new(85, -54);
         
-        [DragFloat2("Size", min = 1f, max = 2000f)]
+        [DragFloat2("Size" + "##Lightspeed", min = 1f, max = 2000f)]
         [CollapseWith(5, 4)]
         public Vector2 LightspeedBarSize = new(84, 20);
         
-        [ColorEdit4("Color")]
+        [ColorEdit4("Color" + "##Lightspeed")]
         [CollapseWith(10, 4)]
         public PluginConfigColor LightspeedColor = new(new Vector4(255f / 255f, 255f / 255f, 173f / 255f, 100f / 100f));
 
-        [Checkbox("Timer", spacing = true)]
+        [Checkbox("Timer" + "##Lightspeed", spacing = true)]
         [CollapseWith(15, 4)]
         public bool ShowLightspeedTextBar = true;
 
-        [Checkbox("with Decimals")]
+        [Checkbox("with Decimals" + "##Lightspeed")]
         [CollapseWith(20, 4)]
         public bool EnableDecimalLightspeedBar;
         #endregion

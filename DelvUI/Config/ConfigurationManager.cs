@@ -113,6 +113,7 @@ namespace DelvUI.Config
                 typeof(PlayerDebuffsListConfig),
                 typeof(TargetBuffsListConfig),
                 typeof(TargetDebuffsListConfig),
+                typeof(CustomEffectsListConfig),
 
                 typeof(PaladinConfig),
                 typeof(WarriorConfig),
@@ -143,6 +144,7 @@ namespace DelvUI.Config
                 typeof(CastersColorConfig),
                 typeof(MiscColorConfig),
 
+                typeof(FontsConfig),
                 typeof(HideHudConfig),
                 typeof(PrimaryResourceConfig),
                 typeof(TooltipsConfig),
