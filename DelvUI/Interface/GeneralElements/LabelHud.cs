@@ -33,22 +33,22 @@ namespace DelvUI.Interface.GeneralElements
             DrawLabel(text, origin, size, actor);
         }
 
-        private void DrawLabel(string text, Vector2 parentOrigin, Vector2 parentSize, Actor actor = null)
+        private void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, Actor actor = null)
         {
             var fontPushed = FontsManager.Instance.PushFont(Config.FontID);
 
             var textSize = ImGui.CalcTextSize(text);
-            var offset = OffsetForFrameAnchor(parentSize) + OffsetForTextAnchor(textSize);
+            var textPos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), textSize, Config.TextAnchor);
             var drawList = ImGui.GetWindowDrawList();
             var color = Color(actor);
 
             if (Config.ShowOutline)
             {
-                DrawHelper.DrawOutlinedText(text, parentOrigin + Config.Position + offset, color.Base, Config.OutlineColor.Base, drawList);
+                DrawHelper.DrawOutlinedText(text, textPos, color.Base, Config.OutlineColor.Base, drawList);
             }
             else
             {
-                drawList.AddText(parentOrigin + Config.Position + offset, color.Base, text);
+                drawList.AddText(textPos, color.Base, text);
             }
 
             if (fontPushed)
@@ -69,42 +69,6 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             return Utils.ColorForActor((Chara)actor);
-        }
-
-        private Vector2 OffsetForTextAnchor(Vector2 textSize)
-        {
-            switch (Config.TextAnchor)
-            {
-                case HudElementAnchor.Center: return -textSize / 2f;
-                case HudElementAnchor.Left: return new Vector2(0, -textSize.Y / 2f);
-                case HudElementAnchor.Right: return new Vector2(-textSize.X, -textSize.Y / 2f);
-                case HudElementAnchor.Top: return new Vector2(-textSize.X / 2f, 0);
-                case HudElementAnchor.TopLeft: return Vector2.Zero;
-                case HudElementAnchor.TopRight: return new Vector2(-textSize.X, 0);
-                case HudElementAnchor.Bottom: return new Vector2(-textSize.X / 2f, -textSize.Y);
-                case HudElementAnchor.BottomLeft: return new Vector2(0, -textSize.Y);
-                case HudElementAnchor.BottomRight: return new Vector2(-textSize.X, -textSize.Y);
-            }
-
-            return Vector2.Zero;
-        }
-
-        private Vector2 OffsetForFrameAnchor(Vector2 parentSize)
-        {
-            switch (Config.FrameAnchor)
-            {
-                case HudElementAnchor.Center: return Vector2.Zero;
-                case HudElementAnchor.Left: return new Vector2(-parentSize.X / 2f, 0);
-                case HudElementAnchor.Right: return new Vector2(parentSize.X / 2f, 0);
-                case HudElementAnchor.Top: return new Vector2(0, -parentSize.Y / 2f);
-                case HudElementAnchor.TopLeft: return -parentSize / 2f;
-                case HudElementAnchor.TopRight: return new Vector2(parentSize.X / 2f, -parentSize.Y / 2f);
-                case HudElementAnchor.Bottom: return new Vector2(0, parentSize.Y / 2f);
-                case HudElementAnchor.BottomLeft: return new Vector2(-parentSize.X / 2f, parentSize.Y / 2f);
-                case HudElementAnchor.BottomRight: return parentSize / 2f;
-            }
-
-            return Vector2.Zero;
         }
     }
 }

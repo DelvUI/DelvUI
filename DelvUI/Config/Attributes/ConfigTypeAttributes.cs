@@ -296,7 +296,7 @@ namespace DelvUI.Config.Attributes
             {
                 field.SetValue(config, intVal);
 
-                TriggerChangeEvent<float>(config, field.Name, intVal);
+                TriggerChangeEvent<int>(config, field.Name, intVal);
 
                 return true;
             }

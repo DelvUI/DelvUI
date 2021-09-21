@@ -1,6 +1,6 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Plugin;
+﻿using Dalamud.Plugin;
 using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
@@ -155,7 +155,7 @@ namespace DelvUI.Interface.Party
 
             if (actor != null)
             {
-                _labelHud.Draw(Position + _config.Size / 2f, _config.Size, actor);
+                _labelHud.Draw(Position, _config.Size, actor);
             }
             else
             {
@@ -170,7 +170,7 @@ namespace DelvUI.Interface.Party
                     _config.NameLabelConfig.OutlineColor = new(_config.NameLabelConfig.OutlineColor.Vector.AdjustColorAlpha(-.3f));
                 }
 
-                _labelHud.Draw(Position + _config.Size / 2f, _config.Size);
+                _labelHud.Draw(Position, _config.Size);
 
                 _config.NameLabelConfig.SetText(previousText);
                 _config.NameLabelConfig.Color = previousColor;
@@ -199,13 +199,13 @@ namespace DelvUI.Interface.Party
             drawList.AddRect(borderPos, borderPos + borderSize, 0xFF000000);
         }
 
-        private Vector2 CalculatePositionForAnchor(HudElementAnchor anchor)
+        private Vector2 CalculatePositionForAnchor(DrawAnchor anchor)
         {
             switch (anchor)
             {
-                case HudElementAnchor.TopLeft: return Position;
-                case HudElementAnchor.TopRight: return Position + new Vector2(_config.Size.X, 0);
-                case HudElementAnchor.BottomLeft: return Position + new Vector2(0, _config.Size.Y);
+                case DrawAnchor.TopLeft: return Position;
+                case DrawAnchor.TopRight: return Position + new Vector2(_config.Size.X, 0);
+                case DrawAnchor.BottomLeft: return Position + new Vector2(0, _config.Size.Y);
             }
 
             return Position + _config.Size;

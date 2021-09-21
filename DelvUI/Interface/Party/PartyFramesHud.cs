@@ -1,4 +1,5 @@
 ﻿using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using ImGuiNET;
 using System;
@@ -141,28 +142,28 @@ namespace DelvUI.Interface.Party
             x = position.X;
             y = position.Y;
 
-            if (Config.BarsAnchor == HudElementAnchor.Top ||
-                Config.BarsAnchor == HudElementAnchor.Center ||
-                Config.BarsAnchor == HudElementAnchor.Bottom)
+            if (Config.BarsAnchor == DrawAnchor.Top ||
+                Config.BarsAnchor == DrawAnchor.Center ||
+                Config.BarsAnchor == DrawAnchor.Bottom)
             {
                 x += (spaceSize.X - _layoutInfo.ContentSize.X) / 2f;
             }
-            else if (Config.BarsAnchor == HudElementAnchor.TopRight ||
-                Config.BarsAnchor == HudElementAnchor.Right ||
-                Config.BarsAnchor == HudElementAnchor.BottomRight)
+            else if (Config.BarsAnchor == DrawAnchor.TopRight ||
+                Config.BarsAnchor == DrawAnchor.Right ||
+                Config.BarsAnchor == DrawAnchor.BottomRight)
             {
                 x += spaceSize.X - _layoutInfo.ContentSize.X;
             }
 
-            if (Config.BarsAnchor == HudElementAnchor.Left ||
-                Config.BarsAnchor == HudElementAnchor.Center ||
-                Config.BarsAnchor == HudElementAnchor.Right)
+            if (Config.BarsAnchor == DrawAnchor.Left ||
+                Config.BarsAnchor == DrawAnchor.Center ||
+                Config.BarsAnchor == DrawAnchor.Right)
             {
                 y += (spaceSize.Y - _layoutInfo.ContentSize.Y) / 2f;
             }
-            else if (Config.BarsAnchor == HudElementAnchor.BottomLeft ||
-                Config.BarsAnchor == HudElementAnchor.Bottom ||
-                Config.BarsAnchor == HudElementAnchor.BottomRight)
+            else if (Config.BarsAnchor == DrawAnchor.BottomLeft ||
+                Config.BarsAnchor == DrawAnchor.Bottom ||
+                Config.BarsAnchor == DrawAnchor.BottomRight)
             {
                 y += spaceSize.Y - _layoutInfo.ContentSize.Y;
             }

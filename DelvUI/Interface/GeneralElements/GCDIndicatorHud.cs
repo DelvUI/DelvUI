@@ -1,14 +1,11 @@
-﻿using System;
-using Dalamud.Game.ClientState.Actors.Types;
+﻿using Dalamud.Game.ClientState.Actors.Types;
+using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using ImGuiNET;
+using System;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Numerics;
-using Dalamud.Plugin;
-using DelvUI.Config;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -44,11 +41,11 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var startPos = origin + Config.Position - Config.Size / 2f;
+            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
 
             if (Config.AnchorToMouse)
             {
-                startPos = ImGui.GetMousePos();
+                startPos = Utils.GetAnchoredPosition(ImGui.GetMousePos(), Config.Size, Config.Anchor);
 
                 if (Config.OffsetMousePosition)
                 {

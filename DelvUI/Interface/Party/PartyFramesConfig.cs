@@ -1,8 +1,8 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Numerics;
@@ -46,7 +46,7 @@ namespace DelvUI.Interface.Party
 
         [Anchor("Bars Anchor", isMonitored = true)]
         [Order(55)]
-        public HudElementAnchor BarsAnchor = HudElementAnchor.TopLeft;
+        public DrawAnchor BarsAnchor = DrawAnchor.TopLeft;
     }
 
 
@@ -66,7 +66,7 @@ namespace DelvUI.Interface.Party
         public Vector2 Padding = new Vector2(1, 1);
 
         [NestedConfig("Name Label", 40)]
-        public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:first-initial]. [name:last-initial].", HudElementAnchor.Center, HudElementAnchor.Center);
+        public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:first-initial]. [name:last-initial].", DrawAnchor.Center, DrawAnchor.Center);
 
         [NestedConfig("Mana Bar", 45)]
         public PartyFramesManaBarConfig ManaBarConfig = new PartyFramesManaBarConfig();
@@ -220,8 +220,8 @@ namespace DelvUI.Interface.Party
     {
         public new static PartyFramesBuffsConfig DefaultConfig()
         {
-            var durationConfig = new LabelConfig(new Vector2(0, -4), "", HudElementAnchor.Bottom, HudElementAnchor.Center);
-            var stacksConfig = new LabelConfig(new Vector2(-3, 4), "", HudElementAnchor.TopRight, HudElementAnchor.Center);
+            var durationConfig = new LabelConfig(new Vector2(0, -4), "", DrawAnchor.Bottom, DrawAnchor.Center);
+            var stacksConfig = new LabelConfig(new Vector2(-3, 4), "", DrawAnchor.TopRight, DrawAnchor.Center);
             stacksConfig.Color = new(Vector4.UnitW);
             stacksConfig.OutlineColor = new(Vector4.One);
 
@@ -232,13 +232,13 @@ namespace DelvUI.Interface.Party
             var pos = new Vector2(-2, 2);
             var size = new Vector2(iconConfig.Size.X * 4 + 6, iconConfig.Size.Y);
 
-            var config = new PartyFramesBuffsConfig(HudElementAnchor.TopRight, pos, size, true, false, false, GrowthDirections.Left | GrowthDirections.Down, iconConfig);
+            var config = new PartyFramesBuffsConfig(DrawAnchor.TopRight, pos, size, true, false, false, GrowthDirections.Left | GrowthDirections.Down, iconConfig);
             config.Limit = 4;
 
             return config;
         }
 
-        public PartyFramesBuffsConfig(HudElementAnchor anchor, Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
+        public PartyFramesBuffsConfig(DrawAnchor anchor, Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
             GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
             : base(anchor, position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
         {
@@ -252,8 +252,8 @@ namespace DelvUI.Interface.Party
     {
         public new static PartyFramesDebuffsConfig DefaultConfig()
         {
-            var durationConfig = new LabelConfig(new Vector2(0, -4), "", HudElementAnchor.Bottom, HudElementAnchor.Center);
-            var stacksConfig = new LabelConfig(new Vector2(-3, 4), "", HudElementAnchor.TopRight, HudElementAnchor.Center);
+            var durationConfig = new LabelConfig(new Vector2(0, -4), "", DrawAnchor.Bottom, DrawAnchor.Center);
+            var stacksConfig = new LabelConfig(new Vector2(-3, 4), "", DrawAnchor.TopRight, DrawAnchor.Center);
             stacksConfig.Color = new(Vector4.UnitW);
             stacksConfig.OutlineColor = new(Vector4.One);
 
@@ -263,13 +263,13 @@ namespace DelvUI.Interface.Party
             var pos = new Vector2(-2, -2);
             var size = new Vector2(iconConfig.Size.X * 4 + 6, iconConfig.Size.Y);
 
-            var config = new PartyFramesDebuffsConfig(HudElementAnchor.BottomRight, pos, size, false, true, false, GrowthDirections.Left | GrowthDirections.Up, iconConfig);
+            var config = new PartyFramesDebuffsConfig(DrawAnchor.BottomRight, pos, size, false, true, false, GrowthDirections.Left | GrowthDirections.Up, iconConfig);
             config.Limit = 4;
 
             return config;
         }
 
-        public PartyFramesDebuffsConfig(HudElementAnchor anchor, Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
+        public PartyFramesDebuffsConfig(DrawAnchor anchor, Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
             GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
             : base(anchor, position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
         {
@@ -285,34 +285,34 @@ namespace DelvUI.Interface.Party
         public int AnchorIndex;
 
         [JsonIgnore]
-        public HudElementAnchor Anchor
+        public DrawAnchor Anchor
         {
             get
             {
                 switch (AnchorIndex)
                 {
-                    case 0: return HudElementAnchor.TopLeft;
-                    case 1: return HudElementAnchor.TopRight;
-                    case 2: return HudElementAnchor.BottomLeft;
+                    case 0: return DrawAnchor.TopLeft;
+                    case 1: return DrawAnchor.TopRight;
+                    case 2: return DrawAnchor.BottomLeft;
                 }
 
-                return HudElementAnchor.BottomRight;
+                return DrawAnchor.BottomRight;
             }
 
             set
             {
                 switch (value)
                 {
-                    case HudElementAnchor.TopLeft: AnchorIndex = 0; return;
-                    case HudElementAnchor.TopRight: AnchorIndex = 1; return;
-                    case HudElementAnchor.BottomLeft: AnchorIndex = 2; return;
+                    case DrawAnchor.TopLeft: AnchorIndex = 0; return;
+                    case DrawAnchor.TopRight: AnchorIndex = 1; return;
+                    case DrawAnchor.BottomLeft: AnchorIndex = 2; return;
                 }
 
                 AnchorIndex = 3;
             }
         }
 
-        public PartyFramesStatusEffectsListConfig(HudElementAnchor anchor, Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
+        public PartyFramesStatusEffectsListConfig(DrawAnchor anchor, Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
             GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
             : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
         {

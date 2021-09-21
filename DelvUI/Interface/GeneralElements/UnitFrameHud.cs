@@ -58,7 +58,7 @@ namespace DelvUI.Interface.GeneralElements
             windowFlags |= ImGuiWindowFlags.NoDecoration;
             windowFlags |= ImGuiWindowFlags.NoInputs;
 
-            var startPos = origin + Config.Position - Config.Size / 2f;
+            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
             var endPos = startPos + Config.Size;
 
             var drawList = ImGui.GetWindowDrawList();
@@ -82,7 +82,7 @@ namespace DelvUI.Interface.GeneralElements
                     }
                     else
                     {
-                        DrawChara(drawListPtr, origin, (Chara)Actor);
+                        DrawChara(drawListPtr, startPos, (Chara)Actor);
                     }
 
                     // Check if mouse is hovering over the box properly
@@ -97,6 +97,8 @@ namespace DelvUI.Interface.GeneralElements
                             var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
                             _openContextMenuFromTarget(agentHud, Actor.Address);
                         }
+
+                        MouseOverHelper.Instance.Target = Actor;
                     }
                 }
 
@@ -104,8 +106,8 @@ namespace DelvUI.Interface.GeneralElements
                 ImGui.End();
 
                 // labels
-                _leftLabel.Draw(origin + Config.Position, Config.Size, Actor);
-                _rightLabel.Draw(origin + Config.Position, Config.Size, Actor);
+                _leftLabel.Draw(startPos, Config.Size, Actor);
+                _rightLabel.Draw(startPos, Config.Size, Actor);
             });
         }
 
@@ -128,14 +130,13 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
-        private void DrawChara(ImDrawListPtr drawList, Vector2 origin, Chara chara)
+        private void DrawChara(ImDrawListPtr drawList, Vector2 startPos, Chara chara)
         {
             if (Config.TankStanceIndicatorConfig != null && Config.TankStanceIndicatorConfig.Enabled && JobsHelper.IsJobTank(chara.ClassJob.Id))
             {
-                DrawTankStanceIndicator(drawList, origin);
+                DrawTankStanceIndicator(drawList, startPos);
             }
 
-            var startPos = new Vector2(origin.X + Config.Position.X - Config.Size.X / 2f, origin.Y + Config.Position.Y - Config.Size.Y / 2f);
             var endPos = startPos + Config.Size;
             var scale = (float)chara.CurrentHp / Math.Max(1, chara.MaxHp);
             var color = Config.UseCustomColor ? Config.CustomColor : Utils.ColorForActor(chara);
@@ -179,7 +180,7 @@ namespace DelvUI.Interface.GeneralElements
             drawList.AddRect(startPos, endPos, 0xFF000000);
         }
 
-        private void DrawTankStanceIndicator(ImDrawListPtr drawList, Vector2 origin)
+        private void DrawTankStanceIndicator(ImDrawListPtr drawList, Vector2 startPos)
         {
             var tankStanceBuff = Actor.StatusEffects.Where(
                 o => o.EffectId == 79 ||    // IRON WILL
@@ -194,10 +195,7 @@ namespace DelvUI.Interface.GeneralElements
 
             var thickness = Config.TankStanceIndicatorConfig.Thickness + 1;
             var barSize = new Vector2(Config.Size.Y > Config.Size.X ? Config.Size.X : Config.Size.Y, Config.Size.Y);
-            var cursorPos = new Vector2(
-                origin.X + Config.Position.X - Config.Size.X / 2f - thickness,
-                origin.Y + Config.Position.Y - Config.Size.Y / 2f + thickness
-            );
+            var cursorPos = startPos + new Vector2(-thickness, thickness);
 
             var color = tankStanceBuff.Count() <= 0 ? Config.TankStanceIndicatorConfig.InactiveColor : Config.TankStanceIndicatorConfig.ActiveColor;
 
