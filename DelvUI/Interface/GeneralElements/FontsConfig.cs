@@ -34,23 +34,22 @@ namespace DelvUI.Interface.GeneralElements
         public bool SupportChineseCharacters = false;
         public bool SupportKoreanCharacters = false;
 
-        [JsonIgnore]
-        private int _inputFont = 0;
-        private int _inputSize = 23;
+        [JsonIgnore] public readonly string DefaultFontKey = "big-noodle-too_24";
+        [JsonIgnore] private int _inputFont = 0;
+        [JsonIgnore] private int _inputSize = 23;
 
-        private string[] _fonts;
-        private string[] _sizes;
+        [JsonIgnore] private string[] _fonts;
+        [JsonIgnore] private string[] _sizes;
 
         public FontsConfig()
         {
             ReloadFonts();
 
             // default font
-            var defaultFontKey = "big-noodle-too_24";
-            if (!Fonts.ContainsKey(defaultFontKey))
+            if (!Fonts.ContainsKey(DefaultFontKey))
             {
                 var defaultFont = new FontData("big-noodle-too", 24);
-                Fonts.Add(defaultFontKey, defaultFont);
+                Fonts.Add(DefaultFontKey, defaultFont);
             }
 
             // sizes
@@ -171,6 +170,7 @@ namespace DelvUI.Interface.GeneralElements
 
                     for (int i = 0; i < Fonts.Count; i++)
                     {
+                        var key = Fonts.Keys[i];
                         var fontData = Fonts.Values[i];
 
                         ImGui.PushID(i.ToString());
@@ -189,7 +189,7 @@ namespace DelvUI.Interface.GeneralElements
                         }
 
                         // remove
-                        if (ImGui.TableSetColumnIndex(2))
+                        if (key != DefaultFontKey && ImGui.TableSetColumnIndex(2))
                         {
                             ImGui.PushFont(UiBuilder.IconFont);
                             ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
@@ -225,7 +225,7 @@ namespace DelvUI.Interface.GeneralElements
                 ImGui.SameLine();
                 if (ImGui.Button("Reload Fonts", new Vector2(326, 30)))
                 {
-
+                    Plugin.UiBuilder.RebuildFonts();
                 }
             }
 
