@@ -597,70 +597,70 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Divination Bar
-        [Checkbox("Divination", separator = true)]
+        [Checkbox("Divination" + "##Divination", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowDivinationBar = true;
         
-        [DragFloat2("Position", min = -2000f, max = 2000f)]
+        [DragFloat2("Position" + "##Divination", min = -2000f, max = 2000f)]
         [CollapseWith(0, 1)]
         public Vector2 DivinationBarPosition = new(0, -71);
 
-        [DragFloat2("Size", min = 1f, max = 2000f)]
+        [DragFloat2("Size" + "##Divination", min = 1f, max = 2000f)]
         [CollapseWith(5, 1)]
         public Vector2 DivinationBarSize = new(254, 10);
         
-        [DragInt("Spacing", min = -1000, max = 1000)]
+        [DragInt("Spacing" + "##Divination", min = -1000, max = 1000)]
         [CollapseWith(10, 1)]
         public int DivinationBarPad = 2;
 
-        [ColorEdit4("Sun")]
+        [ColorEdit4("Sun" + "##Divination")]
         [CollapseWith(15, 1)]
         public PluginConfigColor SealSunColor = new(new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f));
 
-        [ColorEdit4("Lunar")]
+        [ColorEdit4("Lunar" + "##Divination")]
         [CollapseWith(20, 1)]
         public PluginConfigColor SealLunarColor = new(new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f));
 
-        [ColorEdit4("Celestial")]
+        [ColorEdit4("Celestial" + "##Divination")]
         [CollapseWith(25, 1)]
         public PluginConfigColor SealCelestialColor = new(new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f));
         
-        [Checkbox("Seal Count Text", spacing = true)]
+        [Checkbox("Seal Count Text" + "##Divination", spacing = true)]
         [CollapseWith(28, 1)]
         public bool ShowDivinationTextBar;
         
-        [Checkbox("Seal Count Glow")]
+        [Checkbox("Seal Count Glow" + "##Divination")]
         [CollapseWith(30, 1)]
         public bool ShowDivinationGlowBar = true;
         
-        [ColorEdit4("Glow")]
+        [ColorEdit4("Glow" + "##Divination")]
         [CollapseWith(35, 1)]
         public PluginConfigColor DivinationGlowColor = new(new Vector4(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f));
 
         #endregion
 
         #region Dot Bar
-        [Checkbox("Combust", separator = true)]
+        [Checkbox("Combust" + "##Combust", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowDotBar = true;
 
-        [DragFloat2("Size", min = 1f, max = 2000f)]
+        [DragFloat2("Size" + "##Combust", min = 1f, max = 2000f)]
         [CollapseWith(0, 2)]
         public Vector2 DotBarSize = new(84, 20);
 
-        [DragFloat2("Position", min = -2000f, max = 2000f)]
+        [DragFloat2("Position" + "##Combust", min = -2000f, max = 2000f)]
         [CollapseWith(5, 2)]
         public Vector2 DotBarPosition = new(-85, -54);
 
-        [ColorEdit4("Color")]
+        [ColorEdit4("Color" + "##Combust")]
         [CollapseWith(10, 2)]
         public PluginConfigColor DotColor = new(new Vector4(20f / 255f, 80f / 255f, 168f / 255f, 100f / 100f));
 
-        [Checkbox("Timer", spacing = true)]
+        [Checkbox("Timer" + "##Combust", spacing = true)]
         [CollapseWith(15, 2)]
         public bool ShowDotTextBar = true;
 
-        [Checkbox("with Decimals")]
+        [Checkbox("with Decimals" + "##Combust")]
         [CollapseWith(20, 2)]
         public bool EnableDecimalDotBar;
         #endregion
@@ -707,27 +707,27 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Lightspeed Bar
-        [Checkbox("Lightspeed", separator = true)]
+        [Checkbox("Lightspeed" + "##Lightspeed", separator = true)]
         [CollapseControl(50, 4)]
         public bool ShowLightspeedBar = true;
         
-        [DragFloat2("Position", min = -2000f, max = 2000f)]
+        [DragFloat2("Position" + "##Lightspeed", min = -2000f, max = 2000f)]
         [CollapseWith(0, 4)]
         public Vector2 LightspeedBarPosition = new(85, -54);
         
-        [DragFloat2("Size", min = 1f, max = 2000f)]
+        [DragFloat2("Size" + "##Lightspeed", min = 1f, max = 2000f)]
         [CollapseWith(5, 4)]
         public Vector2 LightspeedBarSize = new(84, 20);
         
-        [ColorEdit4("Color")]
+        [ColorEdit4("Color" + "##Lightspeed")]
         [CollapseWith(10, 4)]
         public PluginConfigColor LightspeedColor = new(new Vector4(255f / 255f, 255f / 255f, 173f / 255f, 100f / 100f));
 
-        [Checkbox("Timer", spacing = true)]
+        [Checkbox("Timer" + "##Lightspeed", spacing = true)]
         [CollapseWith(15, 4)]
         public bool ShowLightspeedTextBar = true;
 
-        [Checkbox("with Decimals")]
+        [Checkbox("with Decimals" + "##Lightspeed")]
         [CollapseWith(20, 4)]
         public bool EnableDecimalLightspeedBar;
         #endregion
