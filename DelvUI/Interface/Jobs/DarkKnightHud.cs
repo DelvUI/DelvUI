@@ -215,7 +215,6 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
-    [Serializable]
     [Section("Job Specific Bars")]
     [SubSection("Tank", 0)]
     [SubSection("Dark Knight", 1)]
@@ -225,15 +224,15 @@ namespace DelvUI.Interface.Jobs
         public new static DarkKnightConfig DefaultConfig() { return new DarkKnightConfig(); }
 
         #region Mana Bar
-        [Checkbox("Show Mana Bar")]
+        [Checkbox("Mana", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowManaBar = true;
 
-        [Checkbox("Show Text" + "##DRKManaBar")]
+        [Checkbox("Text" + "##DRKManaBar")]
         [CollapseWith(0, 0)]
         public bool ShowManaBarText = false;
 
-        [Checkbox("Chunk Mana Bar")]
+        [Checkbox("Split Bar")]
         [CollapseWith(5, 0)]
         public bool ChunkManaBar = true;
 
@@ -245,55 +244,55 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(15, 0)]
         public Vector2 ManaBarSize = new Vector2(254, 10);
 
-        [DragInt("Padding" + "##DRKManaBar", min = 0)]
+        [DragInt("Spacing" + "##DRKManaBar", min = 0)]
         [CollapseWith(20, 0)]
         public int ManaBarPadding = 1;
 
         [CollapseWith(25, 0)]
-        [ColorEdit4("Mana Color" + "##DRKManaBar")]
+        [ColorEdit4("Mana" + "##DRKManaBar")]
         public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
 
-        [ColorEdit4("Dark Arts Buff Color" + "##DRKManaBar")]
+        [ColorEdit4("Dark Arts Proc" + "##DRKManaBar")]
         [CollapseWith(30, 0)]
         public PluginConfigColor DarkArtsColor = new(new Vector4(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
         #endregion
 
         #region Blood Gauge
-        [Checkbox("Show Blood Gauge")]
+        [Checkbox("Blood Gauge" + "##BloodGauge", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowBloodGauge = true;
 
-        [Checkbox("Chunk Blood Gauge")]
+        [Checkbox("Split Bar" + "##BloodGauge")]
         [CollapseWith(0, 1)]
         public bool ChunkBloodGauge = true;
 
-        [DragFloat2("Position" + "##DRKBloodGauge", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##BloodGauge", min = -4000f, max = 4000f)]
         [CollapseWith(10, 1)]
         public Vector2 BloodGaugePosition = new Vector2(0, -49);
 
-        [DragFloat2("Size" + "##DRKBloodGauge", min = 0, max = 4000f)]
+        [DragFloat2("Size" + "##BloodGauge", min = 0, max = 4000f)]
         [CollapseWith(15, 1)]
         public Vector2 BloodGaugeSize = new Vector2(254, 10);
 
-        [DragInt("Padding" + "##DRKBloodGauge", min = 0)]
+        [DragInt("Spacing" + "##BloodGauge", min = 0)]
         [CollapseWith(20, 1)]
         public int BloodGaugePadding = 2;
 
-        [ColorEdit4("Blood Color Left" + "##DRKBloodGauge")]
+        [ColorEdit4("Color Left" + "##BloodGauge")]
         [CollapseWith(25, 1)]
         public PluginConfigColor BloodColor = new(new Vector4(196f / 255f, 20f / 255f, 122f / 255f, 100f / 100f));
 
-        [ColorEdit4("Blood Color Full" + "##DRKBloodGauge")]
+        [ColorEdit4("Color Filled" + "##BloodGauge")]
         [CollapseWith(30, 1)]
         public PluginConfigColor BloodColorFull = new(new Vector4(216f / 255f, 0f / 255f, 73f / 255f, 100f / 100f));
         #endregion
 
         #region Buff Bar
-        [Checkbox("Show Buff Bar")]
+        [Checkbox("Blood Weapon & Delirium", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowBuffBar = false;
 
-        [Checkbox("Show Text" + "##DRKBuffBar")]
+        [Checkbox("Timer" + "##DRKBuffBar")]
         [CollapseWith(0, 2)]
         public bool ShowBuffBarText = true;
 
@@ -305,25 +304,25 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(10, 2)]
         public Vector2 BuffBarSize = new Vector2(254, 20);
 
-        [DragInt("Padding" + "##DRKBuffBar", min = 0)]
+        [DragInt("Spacing" + "##DRKBuffBar", min = 0)]
         [CollapseWith(15, 2)]
         public int BuffBarPadding = 2;
 
-        [ColorEdit4("Blood Weapon Color" + "##DRKBuffBar")]
+        [ColorEdit4("Blood Weapon" + "##DRKBuffBar")]
         [CollapseWith(20, 2)]
         public PluginConfigColor BloodWeaponColor = new(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [ColorEdit4("Delirium Color" + "##DRKBuffBar")]
+        [ColorEdit4("Delirium" + "##DRKBuffBar")]
         [CollapseWith(25, 2)]
         public PluginConfigColor DeliriumColor = new(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         #region Living Shadow
-        [Checkbox("Show Living Shadow Bar")]
+        [Checkbox("Living Shadow", separator = true)]
         [CollapseControl(45, 3)]
         public bool ShowLivingShadowBar = false;
 
-        [Checkbox("Show Text" + "##DRKLivingShadow")]
+        [Checkbox("Timer" + "##DRKLivingShadow")]
         [CollapseWith(0, 3)]
         public bool ShowLivingShadowBarText = true;
 
@@ -335,7 +334,7 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(10, 3)]
         public Vector2 LivingShadowBarSize = new Vector2(254, 20);
 
-        [DragInt("Padding" + "##DRKLivingShadow", min = 0)]
+        [DragInt("Spacing" + "##DRKLivingShadow", min = 0)]
         [CollapseWith(15, 3)]
         public int LivingShadowPadding = 2;
 

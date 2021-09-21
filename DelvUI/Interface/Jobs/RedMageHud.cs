@@ -281,8 +281,6 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
-
-    [Serializable]
     [Section("Job Specific Bars")]
     [SubSection("Caster", 0)]
     [SubSection("Red Mage", 1)]
@@ -297,7 +295,7 @@ namespace DelvUI.Interface.Jobs
         }
 
         #region balance bar
-        [Checkbox("Show Balance Bar")]
+        [Checkbox("Show Balance Bar", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowBalanceBar = true;
 
@@ -315,7 +313,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region white mana bar
-        [Checkbox("Show White Mana Bar")]
+        [Checkbox("Show White Mana Bar", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowWhiteManaBar = true;
 
@@ -341,7 +339,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region black mana bar
-        [Checkbox("Show Black Mana Bar")]
+        [Checkbox("Show Black Mana Bar", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowBlackManaBar = true;
 
@@ -367,7 +365,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region acceleration
-        [Checkbox("Show Acceleration Bar")]
+        [Checkbox("Show Acceleration Bar", separator = true)]
         [CollapseControl(45, 3)]
         public bool ShowAcceleration = true;
 
@@ -389,7 +387,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region dualcast
-        [Checkbox("Show Dualcast")]
+        [Checkbox("Show Dualcast", separator = true)]
         [CollapseControl(50, 4)]
         public bool ShowDualCast = true;
 
@@ -407,7 +405,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region verstone
-        [Checkbox("Show Verstone Procs")]
+        [Checkbox("Show Verstone Procs", separator = true)]
         [CollapseControl(55, 5)]
         public bool ShowVerstoneProcs = true;
 
@@ -433,7 +431,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region verfire
-        [Checkbox("Show Verfire Procs")]
+        [Checkbox("Show Verfire Procs", separator = true)]
         [CollapseControl(130, 6)]
         public bool ShowVerfireProcs = true;
 

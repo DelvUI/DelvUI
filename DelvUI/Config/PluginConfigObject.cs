@@ -6,15 +6,35 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Numerics;
+using System.Reflection;
 
 namespace DelvUI.Config
 {
-    [Serializable]
     public abstract class PluginConfigObject : IOnChangeEventArgs
     {
-        [Checkbox("Enabled")]
+        [Checkbox("Enabled", separator = true)]
         [Order(0)]
         public bool Enabled = true;
+
+        [JsonIgnore]
+        public bool Portable
+        {
+            get
+            {
+                PortableAttribute attribute = (PortableAttribute)GetType().GetCustomAttribute(typeof(PortableAttribute), false);
+                return attribute == null || attribute.portable;
+            }
+        }
+
+        [JsonIgnore]
+        public bool Disableable
+        {
+            get
+            {
+                DisableableAttribute attribute = (DisableableAttribute)GetType().GetCustomAttribute(typeof(DisableableAttribute), false);
+                return attribute == null || attribute.disableable;
+            }
+        }
 
         protected bool ColorEdit4(string label, ref PluginConfigColor color)
         {
@@ -50,7 +70,6 @@ namespace DelvUI.Config
         #endregion
     }
 
-    [Serializable]
     public abstract class MovablePluginConfigObject : PluginConfigObject
     {
         [DragInt2("Position", min = -4000, max = 4000)]

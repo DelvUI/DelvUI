@@ -7,7 +7,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Serializable]
     [Portable(false)]
     public class EditableLabelConfig : LabelConfig
     {
@@ -31,7 +30,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     [Portable(false)]
     public class LabelConfig : MovablePluginConfigObject
     {
@@ -52,6 +50,10 @@ namespace DelvUI.Interface.GeneralElements
         [Checkbox("Outline")]
         [CollapseControl(40, 0)]
         public bool ShowOutline = true;
+
+        [Checkbox("Use Job Color")]
+        [Order(45)]
+        public bool UseJobColor = false;
 
         [ColorEdit4("Color ##Outline")]
         [CollapseWith(0, 0)]

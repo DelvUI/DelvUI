@@ -5,13 +5,12 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Serializable]
     [Section("Misc")]
     [SubSection("MP Ticker", 0)]
     public class MPTickerConfig : AnchorablePluginConfigObject
     {
-        [Checkbox("Hide on Full MP")]
-        [Order(25)]
+        [Checkbox("Hide on Full MP", spacing = true)]
+        [Order(20)]
         public bool HideOnFullMP = true;
 
         [Checkbox("Show Border")]

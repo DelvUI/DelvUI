@@ -2,10 +2,44 @@
 
 namespace DelvUI.Config.Attributes
 {
+    #region class attributes
+    [AttributeUsage(AttributeTargets.Class)]
+    public class PortableAttribute : Attribute
+    {
+        public bool portable;
+
+        public PortableAttribute(bool portable)
+        {
+            this.portable = portable;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class DisableableAttribute : Attribute
+    {
+        public bool disableable;
+
+        public DisableableAttribute(bool disableable)
+        {
+            this.disableable = disableable;
+        }
+    }
+    #endregion
+
+    #region method attributes
+    [AttributeUsage(AttributeTargets.Method)]
+    public class ManualDrawAttribute : Attribute
+    {
+    }
+    #endregion
+
+    #region field attributes
     [AttributeUsage(AttributeTargets.Field)]
     public class ConfigAttribute : Attribute
     {
         public bool isMonitored = false;
+        public bool separator = false;
+        public bool spacing = false;
     }
 
     [AttributeUsage(AttributeTargets.Field)]
@@ -13,7 +47,10 @@ namespace DelvUI.Config.Attributes
     {
         public string friendlyName;
 
-        public CheckboxAttribute(string friendlyName) { this.friendlyName = friendlyName; }
+        public CheckboxAttribute(string friendlyName)
+        {
+            this.friendlyName = friendlyName;
+        }
     }
 
     [AttributeUsage(AttributeTargets.Field)]
@@ -24,12 +61,14 @@ namespace DelvUI.Config.Attributes
         public float max;
         public float velocity;
 
+
         public DragFloatAttribute(string friendlyName)
         {
             this.friendlyName = friendlyName;
             min = 1f;
             max = 1000f;
             velocity = 1f;
+
         }
     }
 
@@ -90,10 +129,12 @@ namespace DelvUI.Config.Attributes
         public string friendlyName;
         public uint maxLength;
 
+
         public InputTextAttribute(string friendlyName)
         {
             this.friendlyName = friendlyName;
             maxLength = 999;
+
         }
     }
 
@@ -102,7 +143,11 @@ namespace DelvUI.Config.Attributes
     {
         public string friendlyName;
 
-        public ColorEdit4Attribute(string friendlyName) { this.friendlyName = friendlyName; }
+        public ColorEdit4Attribute(string friendlyName)
+        {
+            this.friendlyName = friendlyName;
+
+        }
     }
 
     [AttributeUsage(AttributeTargets.Field)]
@@ -111,10 +156,12 @@ namespace DelvUI.Config.Attributes
         public string friendlyName;
         public string[] options;
 
+
         public ComboAttribute(string friendlyName, params string[] options)
         {
             this.friendlyName = friendlyName;
             this.options = options;
+
         }
     }
 
@@ -135,6 +182,7 @@ namespace DelvUI.Config.Attributes
         public OrderAttribute(int pos)
         {
             this.pos = pos;
+
         }
     }
 
@@ -144,10 +192,12 @@ namespace DelvUI.Config.Attributes
         public int pos;
         public int id;
 
+
         public CollapseControlAttribute(int pos, int id)
         {
             this.pos = pos;
             this.id = id;
+
         }
     }
 
@@ -157,39 +207,28 @@ namespace DelvUI.Config.Attributes
         public int pos;
         public int id;
 
+
         public CollapseWithAttribute(int pos, int id)
         {
             this.pos = pos;
             this.id = id;
+
         }
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class DragDropHorizontalAttribute : Attribute
+    public class DragDropHorizontalAttribute : ConfigAttribute
     {
         public string friendlyName;
         public string[] names;
+
 
         public DragDropHorizontalAttribute(string friendlyName, params string[] names)
         {
             this.friendlyName = friendlyName;
             this.names = names;
-        }
-    }
 
-    [AttributeUsage(AttributeTargets.Class)]
-    public class PortableAttribute : Attribute
-    {
-        public bool portable;
-
-        public PortableAttribute(bool portable)
-        {
-            this.portable = portable;
         }
-    }
-    [AttributeUsage(AttributeTargets.Method)]
-    public class ManualDrawAttribute : Attribute
-    {
     }
 
     [AttributeUsage(AttributeTargets.Field)]
@@ -202,6 +241,7 @@ namespace DelvUI.Config.Attributes
         {
             this.friendlyName = friendlyName;
             this.pos = pos;
+
         }
     }
 
@@ -211,10 +251,13 @@ namespace DelvUI.Config.Attributes
         public string friendlyName;
         public string[] options;
 
+
         public DynamicList(string friendlyName, params string[] options)
         {
             this.friendlyName = friendlyName;
             this.options = options;
+
         }
     }
+    #endregion
 }

@@ -94,18 +94,24 @@ namespace DelvUI.Interface.Jobs
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.MudraBarSize.Y, Config.MudraBarSize.X);
 
             // each of the 2 mudra charges has a cooldown of 20s
-            float maximum = 40f;
+            float maxMudraCooldown = 40f;
             // get the current cooldown and number of charges on mudras
             float mudraCooldownInfo = _spellHelper.GetSpellCooldown(2259);
             int mudraStacks = _spellHelper.GetStackCount(2, 2259);
 
             // is the player casting ninjutsu or under kassatsu?
-            IEnumerable<StatusEffect> ninjutsuBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 496);
-            IEnumerable<StatusEffect> kassatsuBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 497);
-            IEnumerable<StatusEffect> tcjBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1186);
-            bool haveMudraBuff = ninjutsuBuff.Any();
-            bool haveKassatsuBuff = kassatsuBuff.Any();
-            bool haveTCJBuff = tcjBuff.Any();
+            StatusEffect? mudraBuff = null, kassatsuBuff = null, tcjBuff = null;
+            foreach (StatusEffect statusEffect in Plugin.ClientState.LocalPlayer.StatusEffects)
+            {
+                if (statusEffect.EffectId == 496) { mudraBuff = statusEffect; }
+                if (statusEffect.EffectId == 497) { kassatsuBuff = statusEffect; }
+                if (statusEffect.EffectId == 1186) { tcjBuff = statusEffect; }
+            }
+
+            bool haveMudraBuff = mudraBuff.HasValue;
+            bool haveKassatsuBuff = kassatsuBuff.HasValue;
+            bool haveTCJBuff = tcjBuff.HasValue;
+
             // for some reason (perhaps a slight delay), the mudras may be on cooldown before the "Mudra" buff is applied
             // hence we check for either
             bool inNinjutsu = mudraStacks == -2 || haveMudraBuff;
@@ -121,6 +127,7 @@ namespace DelvUI.Interface.Jobs
             {
                 _oldMudraCooldownInfo = mudraCooldownInfo;
             }
+
             // if we are casting ninjutsu then show ninjutsu info
             // if we are in kassatsu, simply show "kassatsu" unless we are casting ninjutsu
             // if we are in TCJ, simply show "ten chi jin" unless we are casting ninjutsu (this overrides kassatsu)
@@ -131,25 +138,29 @@ namespace DelvUI.Interface.Jobs
                 // thanks to daemitus for pointing me in this direction
                 // NOTE: in ClientStructs it seems that StackCount and Param are switched
                 // if this ever breaks -- possibly due to a ClientStructs update -- try swapping them
-                if (ninjutsuBuff.Any())
+                if (haveMudraBuff)
                 {
-                    ninjutsuText = GenerateNinjutsuText(ninjutsuBuff.First().StackCount, haveKassatsuBuff, haveTCJBuff);
+                    ninjutsuText = GenerateNinjutsuText(mudraBuff.Value.StackCount, haveKassatsuBuff, haveTCJBuff);
                 }
+
                 // notice that this approach will never display the third ninjutsu cast under TCJ
                 // as TCJ ends before the third ninjutsu is cast
                 if (haveTCJBuff)
                 {
-                    ninjutsuText = GenerateNinjutsuText(tcjBuff.First().StackCount, haveKassatsuBuff, haveTCJBuff);
+                    ninjutsuText = GenerateNinjutsuText(tcjBuff.Value.StackCount, haveKassatsuBuff, haveTCJBuff);
                 }
                 PluginConfigColor barColor = haveTCJBuff ? Config.TCJBarColor : (haveKassatsuBuff ? Config.KassatsuBarColor : Config.MudraBarColor);
-                float duration = haveTCJBuff ? tcjBuff.First().Duration : (haveKassatsuBuff ? kassatsuBuff.First().Duration : maximum - mudraCooldownInfo);
-                float tcjKassMaximum = haveTCJBuff ? 6f : (haveKassatsuBuff ? 15f : maximum);
+
+                float ninjutsuMaxDuration = haveMudraBuff || haveTCJBuff ? 6f : 15f;
+                float duration = haveTCJBuff ? tcjBuff.Value.Duration : haveMudraBuff ? mudraBuff.Value.Duration : haveKassatsuBuff ? kassatsuBuff.Value.Duration : ninjutsuMaxDuration;
+
                 // it seems there is some time before the duration is updated after the buff is obtained
                 if (duration < 0)
                 {
-                    duration = tcjKassMaximum;
+                    duration = ninjutsuMaxDuration;
                 }
-                builder.AddInnerBar(duration, tcjKassMaximum, barColor);
+
+                builder.AddInnerBar(duration, ninjutsuMaxDuration, barColor);
                 if (Config.ShowNinjutsuText)
                 {
                     builder.SetTextMode(BarTextMode.Single)
@@ -178,12 +189,12 @@ namespace DelvUI.Interface.Jobs
                     }
 
                     BarText[] barTexts = { };
-                    builder.AddInnerBar(maximum - mudraCooldownInfo, maximum, chunkColors, PartialFillColor,
+                    builder.AddInnerBar(maxMudraCooldown - mudraCooldownInfo, maxMudraCooldown, chunkColors, PartialFillColor,
                         BarTextMode.EachChunk, charges);
                 }
                 else
                 {
-                    builder.AddInnerBar(maximum - mudraCooldownInfo, maximum, Config.MudraBarColor);
+                    builder.AddInnerBar(maxMudraCooldown - mudraCooldownInfo, maxMudraCooldown, Config.MudraBarColor);
                 }
             }
 
@@ -322,7 +333,6 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
-    [Serializable]
     [Section("Job Specific Bars")]
     [SubSection("Melee", 0)]
     [SubSection("Ninja", 1)]
@@ -332,7 +342,7 @@ namespace DelvUI.Interface.Jobs
         public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
 
         #region huton gauge
-        [Checkbox("Show Huton Gauge")]
+        [Checkbox("Show Huton Gauge", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowHutonGauge = true;
 
@@ -370,7 +380,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region ninki gauge
-        [Checkbox("Show Ninki Gauge")]
+        [Checkbox("Show Ninki Gauge", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowNinkiGauge = true;
 
@@ -404,7 +414,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region trick / suiton
-        [Checkbox("Show Trick Bar")]
+        [Checkbox("Show Trick Bar", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowTrickBar = false;
 
@@ -438,7 +448,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region mudra
-        [Checkbox("Show Mudra Bars")]
+        [Checkbox("Show Mudra Bars", separator = true)]
         [CollapseControl(60, 4)]
         public bool ShowMudraCooldown = true;
 

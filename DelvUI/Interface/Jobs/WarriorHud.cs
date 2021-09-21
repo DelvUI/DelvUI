@@ -121,7 +121,6 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
-    [Serializable]
     [Section("Job Specific Bars")]
     [SubSection("Tank", 0)]
     [SubSection("Warrior", 1)]
@@ -131,11 +130,11 @@ namespace DelvUI.Interface.Jobs
         public new static WarriorConfig DefaultConfig() { return new WarriorConfig(); }
 
         #region Storm's Eye
-        [Checkbox("Show Storm's Eye")]
+        [Checkbox("Storm's Eye", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowStormsEye = true;
 
-        [Checkbox("Show Text" + "##StormsEye")]
+        [Checkbox("Text" + "##StormsEye")]
         [CollapseWith(0, 0)]
         public bool ShowStormsEyeText = true;
 
@@ -146,22 +145,24 @@ namespace DelvUI.Interface.Jobs
         [DragFloat2("Size" + "##StormsEye", min = 1f, max = 4000f)]
         [CollapseWith(10, 0)]
         public Vector2 StormsEyeSize = new(254, 20);
-
-        [ColorEdit4("Inner Release Color")]
+        
+        [ColorEdit4("Storm's Eye")]
         [CollapseWith(15, 0)]
+        public PluginConfigColor StormsEyeColor = new(new Vector4(255f / 255f, 136f / 255f, 146f / 255f, 100f / 100f));
+        
+        [ColorEdit4("Inner Release")]
+        [CollapseWith(20, 0)]
         public PluginConfigColor InnerReleaseColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [ColorEdit4("Storm's Eye Color")]
-        [CollapseWith(20, 0)]
-        public PluginConfigColor StormsEyeColor = new(new Vector4(255f / 255f, 136f / 255f, 146f / 255f, 100f / 100f));
+
         #endregion
 
         #region Beast Gauge
-        [Checkbox("Show Beast Gauge")]
+        [Checkbox("Beast Gauge",separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowBeastGauge = true;
 
-        [Checkbox("Show Text" + "##BeastGauge")]
+        [Checkbox("Text" + "##BeastGauge")]
         [CollapseWith(0, 1)]
         public bool ShowBeastGaugeText = false;
 
@@ -177,11 +178,11 @@ namespace DelvUI.Interface.Jobs
         [CollapseWith(15, 1)]
         public float BeastGaugePadding = 2.0f;
 
-        [ColorEdit4("Beast Gauge Color")]
+        [ColorEdit4("Beast Gauge")]
         [CollapseWith(20, 1)]
         public PluginConfigColor BeastGaugeFillColor = new(new Vector4(201f / 255f, 13f / 255f, 13f / 255f, 100f / 100f));
 
-        [ColorEdit4("Nascent Chaos Color")]
+        [ColorEdit4("Nascent Chaos")]
         [CollapseWith(25, 1)]
         public PluginConfigColor NascentChaosColor = new(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f));
         #endregion

@@ -1,6 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Structs;
-using Dalamud.Plugin;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
@@ -14,11 +13,10 @@ namespace DelvUI.Interface.StatusEffects
 {
     public class StatusEffectsListHud : DraggableHudElement, IHudElementWithActor
     {
-        private StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
+        protected StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
 
         private uint _rowCount;
         private uint _colCount;
-        private GrowthDirections _lastGrowthDirections;
         private bool _showingTooltip = false;
 
         private LabelHud _durationLabel;
@@ -62,15 +60,28 @@ namespace DelvUI.Interface.StatusEffects
             return count;
         }
 
-        private List<StatusEffectData> StatusEffectsData(List<uint> filterBuffs)
+        protected virtual List<StatusEffectData> StatusEffectsData()
+        {
+            var list = StatusEffectDataList(Actor);
+
+            // show mine first
+            if (Config.ShowMineFirst)
+            {
+                OrderByMineFirst(list);
+            }
+
+            return list;
+        }
+
+        protected List<StatusEffectData> StatusEffectDataList(Actor actor)
         {
             var list = new List<StatusEffectData>();
-            if (Actor == null)
+            if (actor == null)
             {
                 return list;
             }
 
-            var effectCount = Actor.StatusEffects.Length;
+            var effectCount = actor.StatusEffects.Length;
             if (effectCount == 0)
             {
                 return list;
@@ -86,7 +97,7 @@ namespace DelvUI.Interface.StatusEffects
 
             for (var i = 0; i < effectCount; i++)
             {
-                var status = Actor.StatusEffects[i];
+                var status = actor.StatusEffects[i];
 
                 if (status.EffectId <= 0)
                 {
@@ -123,55 +134,45 @@ namespace DelvUI.Interface.StatusEffects
                     continue;
                 }
 
+                // blacklist
+                if (Config.BlacklistConfig.Enabled && !Config.BlacklistConfig.StatusAllowed(row))
+                {
+                    continue;
+                }
+
                 list.Add(new StatusEffectData(status, row));
             }
 
-            // filters
-            var toReturn = list;
-            if (filterBuffs.Count > 0)
-            {
-                toReturn = new List<StatusEffectData>();
+            return list;
+        }
 
-                foreach (var buffId in filterBuffs)
+        protected void OrderByMineFirst(List<StatusEffectData> list)
+        {
+            var player = Plugin.ClientState.LocalPlayer;
+            if (player == null)
+            {
+                return;
+            }
+
+            list.Sort((a, b) =>
+            {
+                bool isAFromPlayer = a.StatusEffect.OwnerId == player.ActorId;
+                bool isBFromPlayer = b.StatusEffect.OwnerId == player.ActorId;
+
+                if (isAFromPlayer && !isBFromPlayer)
                 {
-                    var idx = list.FindIndex(s => (uint)s.StatusEffect.EffectId == buffId);
-                    if (idx >= 0)
-                    {
-                        toReturn.Add(list[idx]);
-                    }
+                    return -1;
                 }
-            }
-
-            // show mine first
-            if (Config.ShowMineFirst && player != null)
-            {
-                toReturn.Sort((a, b) =>
+                else if (!isAFromPlayer && isBFromPlayer)
                 {
-                    bool isAFromPlayer = a.StatusEffect.OwnerId == player.ActorId;
-                    bool isBFromPlayer = b.StatusEffect.OwnerId == player.ActorId;
+                    return 1;
+                }
 
-                    if (isAFromPlayer && !isBFromPlayer)
-                    {
-                        return -1;
-                    }
-                    else if (!isAFromPlayer && isBFromPlayer)
-                    {
-                        return 1;
-                    }
-
-                    return 0;
-                });
-            }
-
-            return toReturn;
+                return 0;
+            });
         }
 
         public override void DrawChildren(Vector2 origin)
-        {
-            DrawChildren(origin, new List<uint>());
-        }
-
-        public void DrawChildren(Vector2 origin, List<uint> filterStatusEffects)
         {
             if (!Config.Enabled || Actor == null)
             {
@@ -184,17 +185,10 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             // calculate layout
-            var list = StatusEffectsData(filterStatusEffects);
-
-            // validate growth directions
-            var growthDirections = Config.GetGrowthDirections();
-            if (growthDirections != _lastGrowthDirections)
-            {
-                growthDirections = ValidateGrowthDirections(growthDirections);
-                _lastGrowthDirections = growthDirections;
-            }
+            var list = StatusEffectsData();
 
             // area
+            var growthDirections = Config.GetGrowthDirections();
             var position = origin + Config.Position;
             var areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
             var drawList = ImGui.GetWindowDrawList();
@@ -212,15 +206,17 @@ namespace DelvUI.Interface.StatusEffects
 
             // calculate icon positions
             var count = CalculateLayout(list);
-            var row = 0;
-            var col = 0;
-            CalculateAxisDirections(growthDirections, count, out var direction, out var offset);
             var iconPositions = new List<Vector2>();
             var minPos = new Vector2(float.MaxValue, float.MaxValue);
             var maxPos = Vector2.Zero;
 
+            var row = 0;
+            var col = 0;
+
             for (var i = 0; i < count; i++)
             {
+                CalculateAxisDirections(growthDirections, row, count, out var direction, out var offset);
+
                 var pos = new Vector2(
                     position.X + offset.X + Config.IconConfig.Size.X * col * direction.X + Config.IconPadding.X * col * direction.X,
                     position.Y + offset.Y + Config.IconConfig.Size.Y * row * direction.Y + Config.IconPadding.Y * row * direction.Y
@@ -234,7 +230,7 @@ namespace DelvUI.Interface.StatusEffects
                 iconPositions.Add(pos);
 
                 // rows / columns
-                if (Config.FillRowsFirst)
+                if (Config.FillRowsFirst || (growthDirections & GrowthDirections.Centered) != 0)
                 {
                     col += 1;
                     if (col >= _colCount)
@@ -286,11 +282,14 @@ namespace DelvUI.Interface.StatusEffects
 
                 StatusEffectIconDrawHelper.DrawStatusEffectIcon(drawList, iconPos, statusEffectData, Config.IconConfig, _durationLabel, _stacksLabel);
 
-                // tooltip
-                if (Config.ShowTooltips && ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
+                if (ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
                 {
-                    TooltipsHelper.Instance.ShowTooltipOnCursor(statusEffectData.Data.Description, statusEffectData.Data.Name);
-                    showingTooltip = true;
+                    // tooltip
+                    if (Config.ShowTooltips)
+                    {
+                        TooltipsHelper.Instance.ShowTooltipOnCursor(statusEffectData.Data.Description, statusEffectData.Data.Name);
+                        showingTooltip = true;
+                    }
 
                     // remove buff on right click
                     bool isFromPlayer = statusEffectData.StatusEffect.OwnerId == Plugin.ClientState.LocalPlayer?.ActorId;
@@ -298,6 +297,13 @@ namespace DelvUI.Interface.StatusEffects
                     if (statusEffectData.Data.Category == 1 && isFromPlayer && ImGui.GetIO().MouseClicked[1])
                     {
                         ChatHelper.SendChatMessage("/statusoff \"" + statusEffectData.Data.Name + "\"");
+                    }
+
+                    // automatic add to black list with ctrl+alt+shift click
+                    if (Config.BlacklistConfig.Enabled &&
+                        ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && ImGui.GetIO().MouseClicked[0])
+                    {
+                        Config.BlacklistConfig.AddNewEntry(statusEffectData.Data);
                     }
                 }
 
@@ -313,60 +319,17 @@ namespace DelvUI.Interface.StatusEffects
             _showingTooltip = showingTooltip;
         }
 
-        private GrowthDirections ValidateGrowthDirections(GrowthDirections directions)
+        private void CalculateAxisDirections(GrowthDirections growthDirections, int row, uint elementCount, out Vector2 direction, out Vector2 offset)
         {
-            if (directions == 0)
+            if ((growthDirections & GrowthDirections.Centered) != 0)
             {
-                return GrowthDirections.Right | GrowthDirections.Down;
-            }
+                var elementsPerRow = (int)(Config.Size.X / (Config.IconConfig.Size.X + Config.IconPadding.X));
+                var elementsInRow = Math.Min(elementsPerRow, elementCount - (elementsPerRow * row));
 
-            // validate Out
-            if ((directions & GrowthDirections.Out) != 0)
-            {
-                if ((directions & GrowthDirections.Left) != 0)
-                {
-                    return GrowthDirections.Out | GrowthDirections.Right;
-                }
-                if ((directions & GrowthDirections.Up) != 0)
-                {
-                    return GrowthDirections.Out | GrowthDirections.Down;
-                }
-                return directions;
-            }
-
-            // validate Right & Left
-            if ((directions & GrowthDirections.Right) == 0 && (directions & GrowthDirections.Left) == 0)
-            {
-                return directions | GrowthDirections.Right;
-            }
-
-            if ((directions & GrowthDirections.Right) != 0 && (directions & GrowthDirections.Left) != 0)
-            {
-                return directions & ~GrowthDirections.Left;
-            }
-
-            // validate Down & Up
-            if ((directions & GrowthDirections.Down) == 0 && (directions & GrowthDirections.Up) == 0)
-            {
-                return directions | GrowthDirections.Down;
-            }
-
-            if ((directions & GrowthDirections.Down) != 0 && (directions & GrowthDirections.Up) != 0)
-            {
-                return directions & ~GrowthDirections.Up;
-            }
-
-            return directions;
-        }
-
-        private void CalculateAxisDirections(GrowthDirections growthDirections, uint elementCount, out Vector2 direction, out Vector2 offset)
-        {
-            if ((growthDirections & GrowthDirections.Out) != 0)
-            {
                 direction.X = 1;
-                direction.Y = 1;
-                offset.X = (growthDirections & GrowthDirections.Right) != 0 ? -1 * (Config.IconConfig.Size.X + Config.IconPadding.X) * elementCount / 2 : 0;
-                offset.Y = (growthDirections & GrowthDirections.Down) != 0 ? -1 * (Config.IconConfig.Size.Y + Config.IconPadding.Y) * elementCount / 2 : 0;
+                direction.Y = (growthDirections & GrowthDirections.Down) != 0 ? 1 : -1;
+                offset.X = -(Config.IconConfig.Size.X + Config.IconPadding.X) * elementsInRow / 2f;
+                offset.Y = direction.Y == 1 ? 0 : -Config.IconConfig.Size.Y;
             }
             else
             {
@@ -390,13 +353,13 @@ namespace DelvUI.Interface.StatusEffects
                 area.Y = -area.Y;
             }
 
-            var endPos = position + area;
             var startPos = position;
-
-            if ((growthDirections & GrowthDirections.Out) != 0)
+            if ((growthDirections & GrowthDirections.Centered) != 0)
             {
-                startPos = position - size / 2f;
+                startPos.X = position.X - size.X / 2f;
             }
+
+            var endPos = position + area;
 
             if (endPos.X < position.X)
             {
@@ -431,6 +394,6 @@ namespace DelvUI.Interface.StatusEffects
         Down = 2,
         Left = 4,
         Right = 8,
-        Out = 16,
+        Centered = 16,
     }
 }

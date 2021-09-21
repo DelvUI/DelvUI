@@ -6,19 +6,22 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Serializable]
     [Section("Misc")]
     [SubSection("Primary Resource Bar", 0)]
     public class PrimaryResourceConfig : AnchorablePluginConfigObject
     {
         [ColorEdit4("Color")]
-        [Order(25)]
+        [Order(20)]
         public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
+
+        [Checkbox("Use Job Color")]
+        [Order(25)]
+        public bool UseJobColor = false;
 
         [NestedConfig("Label", 30)]
         public LabelConfig ValueLabelConfig;
 
-        [Checkbox("Threshold Marker")]
+        [Checkbox("Threshold Marker", spacing = true)]
         [CollapseControl(35, 0)]
         public bool ShowThresholdMarker = false;
 

@@ -8,6 +8,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface
 {
+    [Disableable(false)]
     [Portable(false)]
     [Section("Import/Export")]
     [SubSection("General", 0)]
@@ -19,7 +20,7 @@ namespace DelvUI.Interface
         public new static ImportExportConfig DefaultConfig() { return new ImportExportConfig(); }
 
         [ManualDraw]
-        public void DrawFullImportExport()
+        public bool DrawFullImportExport()
         {
             uint maxLength = 100000;
             ImGui.BeginChild("importpane", new Vector2(0, ImGui.GetWindowHeight() / 6), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
@@ -79,6 +80,8 @@ namespace DelvUI.Interface
             }
 
             ImGui.EndChild();
+
+            return false;
         }
     }
 }

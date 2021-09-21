@@ -69,8 +69,22 @@ namespace DelvUI.Config.Tree
                 child.LoadBase64String(importStrings);
             }
         }
-    }
 
+        public static void Separator(int topSpacing, int bottomSpacing)
+        {
+            Spacing(topSpacing);
+            ImGui.Separator();
+            Spacing(bottomSpacing);
+        }
+
+        public static void Spacing(int spacingSize)
+        {
+            for (int i = 0; i < spacingSize; i++)
+            {
+                ImGui.NewLine();
+            }
+        }
+    }
     public class BaseNode : Node
     {
         public new List<SectionNode> children;
@@ -84,23 +98,9 @@ namespace DelvUI.Config.Tree
 
         public T GetConfigObject<T>() where T : PluginConfigObject
         {
-            var type = typeof(T);
+            var pageNode = GetConfigPageNode<T>();
 
-            if (configPageNodesMap.TryGetValue(type, out var node))
-            {
-                return (T)node.ConfigObject;
-            }
-
-            var configPageNode = GetOrAddConfig<T>();
-
-            if (configPageNode != null && configPageNode.ConfigObject != null)
-            {
-                configPageNodesMap.Add(type, configPageNode);
-
-                return (T)configPageNode.ConfigObject;
-            }
-
-            return null;
+            return pageNode != null ? (T)pageNode.ConfigObject : null;
         }
 
         public ConfigPageNode GetConfigPageNode<T>() where T : PluginConfigObject
@@ -108,6 +108,15 @@ namespace DelvUI.Config.Tree
             if (configPageNodesMap.TryGetValue(typeof(T), out var node))
             {
                 return node;
+            }
+
+            var configPageNode = GetOrAddConfig<T>();
+
+            if (configPageNode != null && configPageNode.ConfigObject != null)
+            {
+                configPageNodesMap.Add(typeof(T), configPageNode);
+
+                return configPageNode;
             }
 
             return null;
@@ -169,6 +178,10 @@ namespace DelvUI.Config.Tree
             ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f));
             ImGui.PushStyleColor(ImGuiCol.CheckMark, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f));
             
+            ImGui.PushStyleColor(ImGuiCol.TableBorderStrong, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f));
+            ImGui.PushStyleColor(ImGuiCol.TableBorderLight, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, .4f));
+            ImGui.PushStyleColor(ImGuiCol.TableHeaderBg, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, .2f));
+            
             ImGui.PushStyleVar(ImGuiStyleVar.ScrollbarRounding, 1); //Scrollbar Radius
             ImGui.PushStyleVar(ImGuiStyleVar.TabRounding, 1); //Tabs Radius Radius
             ImGui.PushStyleVar(ImGuiStyleVar.FrameRounding, 1); //Intractable Elements Radius
@@ -179,7 +192,7 @@ namespace DelvUI.Config.Tree
 
         private void PopStyles()
         {
-            ImGui.PopStyleColor(14);
+            ImGui.PopStyleColor(17);
             ImGui.PopStyleVar(6);
         }
 
@@ -695,7 +708,8 @@ namespace DelvUI.Config.Tree
         private Dictionary<string, ConfigPageNode> _nestedConfigPageNodes;
 
         private void GenerateNestedConfigPageNodes()
-        {
+        {                        
+
             _nestedConfigPageNodes = new Dictionary<string, ConfigPageNode>();
 
             FieldInfo[] fields = _configObject.GetType().GetFields();
@@ -715,7 +729,6 @@ namespace DelvUI.Config.Tree
                     {
                         continue;
                     }
-
                     ConfigPageNode configPageNode = new();
                     configPageNode.ConfigObject = nestedConfig;
                     configPageNode.Name = nestedConfigAttribute.friendlyName;
@@ -730,9 +743,7 @@ namespace DelvUI.Config.Tree
 
         public override string GetBase64String()
         {
-            PortableAttribute portableAttribute = (PortableAttribute)ConfigObject.GetType().GetCustomAttribute(typeof(PortableAttribute), false);
-
-            return portableAttribute == null || portableAttribute.portable ? ConfigurationManager.GenerateExportString(ConfigObject) : "";
+            return ConfigObject.Portable ? ConfigurationManager.GenerateExportString(ConfigObject) : "";
         }
 
         public override void LoadBase64String(string[] importStrings)
@@ -855,9 +866,6 @@ namespace DelvUI.Config.Tree
                 }
                 else if (pair.Value is ConfigPageNode node)
                 {
-                    ImGui.Text("");
-                    ImGui.Separator();
-                    ImGui.Text("");
                     ImGui.BeginGroup();
                     node.DrawWithID(ref changed, node.Name);
                     ImGui.EndGroup();
@@ -873,25 +881,21 @@ namespace DelvUI.Config.Tree
                 }
 
                 // TODO allow the manual draw methods to take parameters
-                method.Invoke(ConfigObject, null);
+                bool result = (bool)method.Invoke(ConfigObject, null);
+                changed |= result;
             }
 
             // if the config object is not marked with [Portable(false)], or is marked with [Portable(true)],
             // draw the import/export UI
-            PortableAttribute portableAttribute = (PortableAttribute)ConfigObject.GetType().GetCustomAttribute(typeof(PortableAttribute), false);
-
-            if (portableAttribute == null || portableAttribute.portable)
+            if (ConfigObject.Portable)
             {
                 DrawImportExportGeneralConfig();
             }
         }
-
         private void DrawImportExportGeneralConfig()
         {
-            ImGui.Text("");
-            ImGui.Text("");
-            ImGui.Separator();
-            ImGui.Text("");
+            
+            Separator(2,1);
 
             uint maxLength = 40000;
             ImGui.BeginChild("importpane", new Vector2(0, ImGui.GetWindowHeight() / 6), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
@@ -1019,7 +1023,7 @@ namespace DelvUI.Config.Tree
         public override ConfigPageNode GetOrAddConfig<T>() => this;
     }
 
-    public class CategoryField
+    public class CategoryField : Node
     {
         public SortedDictionary<int, FieldInfo> Children;
         public FieldInfo MainField;
@@ -1037,10 +1041,11 @@ namespace DelvUI.Config.Tree
         }
 
         public void AddChild(int position, FieldInfo field) { Children.Add(position, field); }
-
+        
         public void Draw(ref bool changed)
         {
-            Draw(ref changed, MainField, 2);
+            DrawStyleProperties(MainField, ID);
+            Draw(ref changed, MainField);
 
             if (CategoryId != -1 && (bool)MainField.GetValue(ConfigObject))
             {
@@ -1049,25 +1054,36 @@ namespace DelvUI.Config.Tree
 
                 foreach (FieldInfo child in Children.Values)
                 {
-                    ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f),"   \u2514");
+                    DrawStyleProperties(child, ID);
+                    ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
                     ImGui.SameLine();
-                    Draw(ref changed, child, 0);
+                    Draw(ref changed, child);
                 }
 
                 ImGui.EndGroup();
             }
         }
 
-        public void Draw(ref bool changed, FieldInfo field, int xOffset)
+        public void Draw(ref bool changed, FieldInfo field)
         {
-            ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(xOffset, 0));
+
             object fieldVal = field.GetValue(ConfigObject);
             var idText = ID != null ? " ##" + ID : "";
+            var disableable = ConfigObject.Disableable;
 
             foreach (object attribute in field.GetCustomAttributes(true))
             {
                 if (attribute is CheckboxAttribute checkboxAttribute)
                 {
+                    if (!disableable && checkboxAttribute.friendlyName == "Enabled")
+                    {
+                        if (ID != null)
+                        {
+                            ImGui.Text(ID);
+                        }
+                        continue;
+                    }
+
                     bool boolVal = (bool)fieldVal;
 
                     if (ImGui.Checkbox(ID != null && checkboxAttribute.friendlyName == "Enabled" ? ID : checkboxAttribute.friendlyName + idText, ref boolVal))
@@ -1227,16 +1243,18 @@ namespace DelvUI.Config.Tree
                                 order[i] = order[i + 1];
                                 order[i + 1] = _curri;
                                 field.SetValue(ConfigObject, order);
-                                ImGui.ResetMouseDragDelta();
+                                ImGui.ResetMouseDragDelta();                                
                             }
                             else if ((drag_dx < -80.0f && i > 0))
                             {
                                 var _curri = order[i];
                                 order[i] = order[i - 1];
                                 order[i - 1] = _curri;
-                                field.SetValue(ConfigObject, order);
-                                ImGui.ResetMouseDragDelta();
+                                field.SetValue(ConfigObject, order);                                
+                                ImGui.ResetMouseDragDelta();                                
                             }
+
+                            changed = true;
                         }
                     }
                 }
@@ -1311,6 +1329,24 @@ namespace DelvUI.Config.Tree
                     }
 
                     ImGui.EndGroup();
+                }
+            }
+        }
+        
+        public void DrawStyleProperties(FieldInfo field, string ID)
+        {
+            foreach (object attribute in field.GetCustomAttributes(true))
+            {
+                if (attribute is ConfigAttribute { separator: true })
+                {
+                    if (attribute is CheckboxAttribute checkboxAttribute && (checkboxAttribute.friendlyName != "Enabled" || ID is null) && checkboxAttribute.friendlyName == "Enabled")
+                    {
+                        continue;
+                    }
+                    Separator(1,1);
+                }else if (attribute is ConfigAttribute { spacing: true })
+                {
+                    Spacing(1);
                 }
             }
         }

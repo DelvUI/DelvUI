@@ -6,7 +6,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Serializable]
     [Section("Unit Frames")]
     [SubSection("Player", 0)]
     public class PlayerUnitFrameConfig : UnitFrameConfig
@@ -31,7 +30,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     [Section("Unit Frames")]
     [SubSection("Target", 0)]
     public class TargetUnitFrameConfig : UnitFrameConfig
@@ -53,7 +51,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     [Section("Unit Frames")]
     [SubSection("Target of Target", 0)]
     public class TargetOfTargetUnitFrameConfig : UnitFrameConfig
@@ -78,7 +75,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     [Section("Unit Frames")]
     [SubSection("Focus Target", 0)]
     public class FocusTargetUnitFrameConfig : UnitFrameConfig
@@ -103,11 +99,10 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     public class UnitFrameConfig : AnchorablePluginConfigObject
     {
-        [Checkbox("Custom Frame Color")]
-        [CollapseControl(25, 0)]
+        [Checkbox("Custom Frame Color", separator = true)]
+        [CollapseControl(20, 0)]
         public bool UseCustomColor = false;
 
         [ColorEdit4("Color ##CustomFrame")]
@@ -115,36 +110,35 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor CustomColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
         [Checkbox("Custom Background Color")]
-        [CollapseControl(30, 1)]
+        [CollapseControl(25, 1)]
         public bool UseCustomBackgroundColor = false;
 
         [ColorEdit4("Color ##CustomBackground")]
         [CollapseWith(0, 1)]
         public PluginConfigColor CustomBackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [Checkbox("Tank Invulnerability")]
-        [Order(35)]
+        [Checkbox("Tank Invulnerability", spacing = true)]
+        [Order(30)]
         public bool ShowTankInvulnerability = true;
 
         [Checkbox("Tank Invulnerability Custom Color")]
-        [CollapseControl(40, 2)]
+        [CollapseControl(35, 2)]
         public bool UseCustomInvulnerabilityColor = true;
 
         [ColorEdit4("Color ##TankInvulnerabilityCustom")]
         [CollapseWith(0, 2)]
         public PluginConfigColor CustomInvulnerabilityColor = new PluginConfigColor(new Vector4(100f / 255f, 100f / 255f, 100f / 255f, 100f / 100f));
 
-        [NestedConfig("Left Text", 45)]
+        [NestedConfig("Left Text", 40)]
         public EditableLabelConfig LeftLabelConfig;
 
-        [NestedConfig("Right Text", 50)]
+        [NestedConfig("Right Text", 45)]
         public EditableLabelConfig RightLabelConfig;
 
-        
-        [NestedConfig("Shields", 55)]
+        [NestedConfig("Shields", 50)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
-        [NestedConfig("Tank Stance", 56)]
+        [NestedConfig("Tank Stance", 51)]
         public TankStanceIndicatorConfig TankStanceIndicatorConfig = null;
 
         public UnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
@@ -156,7 +150,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Serializable]
     [Portable(false)]
     public class ShieldConfig : PluginConfigObject
     {
@@ -177,7 +170,6 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor Color = new PluginConfigColor(new Vector4(198f / 255f, 210f / 255f, 255f / 255f, 70f / 100f));
     }
 
-    [Serializable]
     [Portable(false)]
     public class TankStanceIndicatorConfig : PluginConfigObject
     {

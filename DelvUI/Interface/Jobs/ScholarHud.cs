@@ -74,7 +74,8 @@ namespace DelvUI.Interface.Jobs
         private void DrawFairyBar(Vector2 origin)
         {
             float fairyGauge = Plugin.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
-            float seraphDuration = Math.Abs(Plugin.JobGauges.Get<SCHGauge>().SeraphTimer / 1000);
+            float seraphTimer = Plugin.JobGauges.Get<SCHGauge>().SeraphTimer;
+            float seraphDuration = Math.Abs(seraphTimer / 1000);
 
             Vector2 barSize = Config.FairySize;
             Vector2 position = origin + Config.Position + Config.FairyPosition - barSize / 2f;
@@ -173,7 +174,6 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
-    [Serializable]
     [Section("Job Specific Bars")]
     [SubSection("Healer", 0)]
     [SubSection("Scholar", 1)]
@@ -188,89 +188,94 @@ namespace DelvUI.Interface.Jobs
         }
 
         #region aether
-        [Checkbox("Aether Tracker Enabled")]
+        [Checkbox("Aether" + "##Aether",separator = true)]
         [CollapseControl(30, 1)]
         public bool ShowAether = true;
-
-        [DragFloat2("Aether Tracker Size", min = 1f, max = 2000f)]
-        [CollapseWith(0, 1)]
-        public Vector2 AetherSize = new(254, 20);
-
-        [DragFloat2("Aether Tracker Position", min = -4000f, max = 4000f)]
+        
+        [DragFloat2("Position" + "##Aether", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
         public Vector2 AetherPosition = new(0, -76);
-
-        [DragInt("Aether Padding", max = 1000)]
+        
+        [DragFloat2("Size" + "##Aether", min = 1f, max = 2000f)]
         [CollapseWith(10, 1)]
+        public Vector2 AetherSize = new(254, 20);
+
+        [DragInt("Spacing" + "##Aether", max = 1000)]
+        [CollapseWith(15, 1)]
         public int AetherPadding = 2;
 
-        [ColorEdit4("Aether Tracker Color")]
-        [CollapseWith(15, 1)]
+        [ColorEdit4("Color" + "##Aether")]
+        [CollapseWith(20, 1)]
         public PluginConfigColor AetherColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
         #endregion
 
         #region fairy
-        [Checkbox("Fairy Gauge Enabled")]
+        [Checkbox("Fairy Gauge" + "##Fairy",separator = true)]
         [CollapseControl(35, 2)]
         public bool ShowFairy = true;
 
-        [Checkbox("Fairy Gauge Text")]
+        [Checkbox("Text" + "##Fairy")]
         [CollapseWith(0, 2)]
         public bool ShowFairyText = true;
 
-        [Checkbox("Seraph Bar Enabled")]
-        [CollapseWith(5, 2)]
-        public bool ShowSeraph = true;
 
-        [Checkbox("Seraph Bar Text")]
-        [CollapseWith(10, 2)]
-        public bool ShowSeraphText = true;
 
-        [DragFloat2("Fairy Gauge Size", min = 1f, max = 2000f)]
+        [DragFloat2("Position" + "##Fairy", min = -4000f, max = 4000f)]
         [CollapseWith(15, 2)]
-        public Vector2 FairySize = new(254, 20);
-
-        [DragFloat2("Fairy Gauge Position", min = -4000f, max = 4000f)]
-        [CollapseWith(20, 2)]
         public Vector2 FairyPosition = new(0, -54);
 
-        [ColorEdit4("Fairy Gauge Color")]
+        [DragFloat2("Size" + "##Fairy", min = 1f, max = 2000f)]
+        [CollapseWith(20, 2)]
+        public Vector2 FairySize = new(254, 20);
+
+        [ColorEdit4("Color" + "##Fairy")]
         [CollapseWith(25, 2)]
         public PluginConfigColor FairyColor = new(new Vector4(69f / 255f, 199 / 255f, 164f / 255f, 100f / 100f));
-
-        [ColorEdit4("Seraph Bar Color")]
+        
+        [Checkbox("Seraph" + "##Seraph", spacing = true)]
         [CollapseWith(30, 2)]
+        public bool ShowSeraph = true;
+        //TODO NOT ASSIGNED? ^
+        
+        [Checkbox("Timer" + "##Seraph")]
+        [CollapseWith(35, 2)]
+        public bool ShowSeraphText = true;
+        
+        [ColorEdit4("Color" + "##SeraphColor")]
+        [CollapseWith(40, 2)]
         public PluginConfigColor SeraphColor = new(new Vector4(232f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         #region bio
-        [Checkbox("Bio Enabled")]
+        [Checkbox("Bio" + "##Bio",separator = true)]
         [CollapseControl(40, 3)]
         public bool ShowBio = true;
 
-        [Checkbox("Bio Text")]
+        [Checkbox("Timer" + "##Bio")]
         [CollapseWith(0, 3)]
         public bool ShowBioText = true;
 
-        [Checkbox("Bio Inverted")]
+        [Checkbox("Invert Growth" + "##Bio")]
         [CollapseWith(5, 3)]
         public bool BioInverted = false;
 
-        [DragFloat2("Bio Size", max = 2000f)]
+        [DragFloat2("Position" + "##Bio", min = -4000f, max = 4000f)]
         [CollapseWith(10, 3)]
-        public Vector2 BioSize = new(254, 20);
-
-        [DragFloat2("Bio Position", min = -4000f, max = 4000f)]
-        [CollapseWith(15, 3)]
         public Vector2 BioPosition = new(0, -32);
-
-        [ColorEdit4("Bio Color")]
+        
+        [DragFloat2("Size" + "##Bio", max = 2000f)]
+        [CollapseWith(15, 3)]
+        public Vector2 BioSize = new(254, 20);
+        
+        [ColorEdit4("Color" + "##Bio")]
         [CollapseWith(20, 3)]
         public PluginConfigColor BioColor = new(new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 1f));
+        
+        [ColorEdit4("Expire Color" + "##Bio")]
+        [CollapseWith(25, 3)]
+        public PluginConfigColor ExpireColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
         #endregion
 
-        [ColorEdit4("DoT Expire Color")]
-        [Order(45)]
-        public PluginConfigColor ExpireColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
+        
     }
 }

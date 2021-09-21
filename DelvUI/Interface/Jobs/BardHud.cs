@@ -336,7 +336,6 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
-    [Serializable]
     [Section("Job Specific Bars")]
     [SubSection("Ranged", 0)]
     [SubSection("Bard", 1)]
@@ -346,7 +345,7 @@ namespace DelvUI.Interface.Jobs
         public new static BardConfig DefaultConfig() { return new BardConfig(); }
 
         #region song gauge
-        [Checkbox("Song Gauge Enabled")]
+        [Checkbox("Song Gauge Enabled", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowSongGauge = true;
 
@@ -372,7 +371,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region soul gauge
-        [Checkbox("Soul Gauge Enabled")]
+        [Checkbox("Soul Gauge Enabled", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowSoulGauge = true;
 
@@ -394,7 +393,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Song Procs / Stacks
-        [Checkbox("Wanderer's Minuet Stacks Enabled")]
+        [Checkbox("Wanderer's Minuet Stacks Enabled", separator = true)]
         [Order(40)]
         public bool ShowWMStacks = true;
 
@@ -448,7 +447,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region caustic bite
-        [Checkbox("Caustic Bite Enabled")]
+        [Checkbox("Caustic Bite Enabled", separator = true)]
         [CollapseControl(105, 2)]
         public bool ShowCB = true;
 
@@ -478,7 +477,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region stormbite
-        [Checkbox("Stormbite Enabled")]
+        [Checkbox("Stormbite Enabled", separator = true)]
         [CollapseControl(110, 3)]
         public bool ShowSB = true;
 

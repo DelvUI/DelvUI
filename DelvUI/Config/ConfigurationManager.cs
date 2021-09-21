@@ -24,14 +24,19 @@ namespace DelvUI.Config
 
         public BaseNode ConfigBaseNode;
 
-        private MiscColorConfig _miscColorConfig => (MiscColorConfig)ConfigBaseNode.configPageNodesMap[typeof(MiscColorConfig)].ConfigObject;
-        public GradientDirection GradientDirection => _miscColorConfig.GradientDirection;
+        public GradientDirection GradientDirection
+        {
+            get
+            {
+                var config = GetInstance().GetConfigObject<MiscColorConfig>();
+                return config != null ? config.GradientDirection : GradientDirection.None;
+            }
+        }
 
         public string ConfigDirectory;
         public bool DrawConfigWindow;
 
         private bool _lockHUD = true;
-        private GridConfig _gridConfig => (GridConfig)ConfigBaseNode.configPageNodesMap[typeof(GridConfig)].ConfigObject;
 
         public bool LockHUD
         {
@@ -102,6 +107,7 @@ namespace DelvUI.Config
                 typeof(PlayerDebuffsListConfig),
                 typeof(TargetBuffsListConfig),
                 typeof(TargetDebuffsListConfig),
+                typeof(CustomEffectsListConfig),
 
                 typeof(PaladinConfig),
                 typeof(WarriorConfig),
@@ -175,7 +181,7 @@ namespace DelvUI.Config
                 }
                 else
                 {
-                    DraggablesHelper.DrawGridWindow(_gridConfig);
+                    DraggablesHelper.DrawGridWindow();
                 }
 
             }

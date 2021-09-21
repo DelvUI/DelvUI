@@ -124,18 +124,10 @@ namespace DelvUI.Interface
             if (mouseOver || Selected)
             {
                 var anchorableConfig = _config as AnchorablePluginConfigObject;
-                if (anchorableConfig != null)
-                {
-                    var anchorIndicatorSize = new Vector2(5, 5);
-                    var anchorIndicatorPos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(contentPos, -contentSize, anchorableConfig.Anchor), anchorIndicatorSize, anchorableConfig.Anchor);
-                    drawList.AddRectFilled(anchorIndicatorPos, anchorIndicatorPos + anchorIndicatorSize, 0xFF0000FF);
-                }
-                else
-                {
-                    var anchorIndicatorSize = new Vector2(5, 5);
-                    var anchorIndicatorPos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(contentPos, -contentSize, DrawAnchor.Center), anchorIndicatorSize, DrawAnchor.Center);
-                    drawList.AddRectFilled(anchorIndicatorPos, anchorIndicatorPos + anchorIndicatorSize, 0xFF0000FF);
-                }
+                var anchorIndicatorSize = new Vector2(10, 10);
+                var anchor = anchorableConfig?.Anchor ?? DrawAnchor.Center;
+                var anchorIndicatorPos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(contentPos, -contentSize, anchor), anchorIndicatorSize, DrawAnchor.Center) + new Vector2(0, 1);
+                drawList.AddRectFilled(anchorIndicatorPos, anchorIndicatorPos + anchorIndicatorSize, 0xAAFFFFFF);
             }
 
             ImGui.End();

@@ -163,7 +163,6 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
-    [Serializable]
     [Section("Job Specific Bars")]
     [SubSection("Healer", 0)]
     [SubSection("White Mage", 1)]
@@ -178,67 +177,68 @@ namespace DelvUI.Interface.Jobs
         }
 
         #region Lily Bar
-        [Checkbox("Show Lily Bars")]
+        [Checkbox("Lily" + "##Lily", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowLilyBars = true;
 
-        [Checkbox("Show Lily Bar Timer")]
+        [Checkbox("Timer" + "##Lily")]
         [CollapseWith(0, 0)]
         public bool ShowLilyBarTimer = true;
-
-        [DragFloat2("Lily Bar Size", max = 2000f)]
+        
+        [DragFloat2("Position" + "##Lily", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
+        public Vector2 LilyBarPosition = new(-64, -54);
+        
+        [DragFloat2("Size" + "##Lily", max = 2000f)]
+        [CollapseWith(10, 0)]
         public Vector2 LilyBarSize = new(125, 20);
 
-        [DragFloat2("Lily Bar Position", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 0)]
-        public Vector2 LilyBarPosition = new(-64, -54);
-
-        [DragInt("Lily Bar Padding", min = 0, max = 1000)]
+        [DragInt("Spacing" + "##Lily", min = 0, max = 1000)]
         [CollapseWith(15, 0)]
         public int LilyBarPad = 2;
 
-        [ColorEdit4("Lily Bar Color")]
+        [ColorEdit4("Color" + "##Lily")]
         [CollapseWith(20, 0)]
         public PluginConfigColor LilyColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
 
-        [ColorEdit4("Lily Bar Charging Color")]
+        [ColorEdit4("Charging Color" + "##Lily")] //TODO CHANGE TO GLOBAL PARTIALLY FILLED COLOR?
         [CollapseWith(25, 0)]
         public PluginConfigColor LilyChargingColor = new(new Vector4(141f / 255f, 141f / 255f, 141f / 255f, 1f));
         #endregion
 
         #region Blood Lily Bar
-        [DragFloat2("Blood Lily Bar Size", max = 2000f)]
+        
+        [DragFloat2("Position" + "##BloodLily", min = -4000f, max = 4000f, spacing = true)]
         [CollapseWith(30, 0)]
+        public Vector2 BloodLilyBarPosition = new(64, -54);
+        
+        [DragFloat2("Size" + "##BloodLily", max = 2000f)]
+        [CollapseWith(35, 0)]
         public Vector2 BloodLilyBarSize = new(125, 20);
 
-        [DragFloat2("Blood Lily Bar Position", min = -4000f, max = 4000f)]
-        [CollapseWith(35, 0)]
-        public Vector2 BloodLilyBarPosition = new(64, -54);
-
-        [DragInt("Blood Lily Bar Padding", min = 0, max = 1000)]
+        [DragInt("Spacing" + "##BloodLily", min = 0, max = 1000)]
         [CollapseWith(40, 0)]
         public int BloodLilyBarPad = 2;
 
-        [ColorEdit4("Blood Lily Bar Color")]
+        [ColorEdit4("Color" + "##BloodLily")]
         [CollapseWith(45, 0)]
         public PluginConfigColor BloodLilyColor = new(new Vector4(199f / 255f, 40f / 255f, 9f / 255f, 1f));
         #endregion
 
         #region Dia Bar
-        [Checkbox("Show Dia Bar")]
+        [Checkbox("Dia", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowDiaBar = true;
 
-        [DragFloat2("Dia Bar Size", max = 2000f)]
+        [DragFloat2("Size " + "##Dia", max = 2000f)]
         [CollapseWith(0, 1)]
         public Vector2 DiaBarSize = new(254, 20);
 
-        [DragFloat2("Dia Bar Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##Dia", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
         public Vector2 DiaBarPosition = new(0, -32);
 
-        [ColorEdit4("Dia Bar Color")]
+        [ColorEdit4("Color" + "##Dia")]
         [CollapseWith(10, 1)]
         public PluginConfigColor DiaColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
         #endregion

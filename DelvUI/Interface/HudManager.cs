@@ -1,5 +1,6 @@
 using Dalamud.Game.ClientState;
 using Dalamud.Interface;
+using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -27,12 +28,14 @@ namespace DelvUI.Interface
         private List<IHudElementWithActor> _hudElementsUsingTargetOfTarget;
         private List<IHudElementWithActor> _hudElementsUsingFocusTarget;
 
+        private CustomEffectsListHud _customEffectsHud;
         private PrimaryResourceHud _primaryResourceHud;
         private JobHud _jobHud = null;
         private Dictionary<uint, JobHudTypes> _jobsMap;
         private Dictionary<uint, Type> _unsupportedJobsMap;
 
-        public HudHelper Helper { get; } = new HudHelper();
+        private HudHelper _helper { get; set; }
+        private bool _prevInEvent = true;
 
         public HudManager()
         {
@@ -180,6 +183,11 @@ namespace DelvUI.Interface
             var targetDebuffs = new StatusEffectsListHud("targetDebuffs", targetDebuffsConfig, "Target Debuffs");
             _hudElements.Add(targetDebuffs);
             _hudElementsUsingTarget.Add(targetDebuffs);
+
+            var custonEffectsConfig = ConfigurationManager.GetInstance().GetConfigObject<CustomEffectsListConfig>();
+            _customEffectsHud = new CustomEffectsListHud("customEffects", custonEffectsConfig, "Custom Effects");
+            _hudElements.Add(_customEffectsHud);
+            _hudElementsUsingPlayer.Add(_customEffectsHud);
         }
 
         private void CreateMiscElements()
@@ -207,16 +215,9 @@ namespace DelvUI.Interface
         {
             if (!ShouldBeVisible())
             {
+                _helper = null;
                 return;
             }
-
-            if (Helper.UserInterfaceWasHidden)
-            {
-                Helper.ApplyCurrentConfig();
-                Helper.UserInterfaceWasHidden = false;
-            }
-
-            Helper.ConfigureCombatActionBars();
 
             ImGuiHelpers.ForceNextWindowMainViewport();
             ImGui.SetNextWindowPos(Vector2.Zero);
@@ -237,6 +238,15 @@ namespace DelvUI.Interface
                 return;
             }
 
+            _helper ??= new HudHelper();
+
+            bool inEvent = Plugin.Condition[ConditionFlag.OccupiedInEvent]
+                || Plugin.Condition[ConditionFlag.OccupiedInQuestEvent]
+                || Plugin.Condition[ConditionFlag.UsingHousingFunctions];
+            bool updateByEvent = _prevInEvent != inEvent;
+
+            _helper.Configure(updateByEvent);
+
             UpdateJob();
             AssignActors();
 
@@ -252,7 +262,7 @@ namespace DelvUI.Interface
             // general elements
             foreach (var element in _hudElements)
             {
-                if (element != _selectedElement && !Helper.IsElementHidden(element))
+                if (element != _selectedElement && !_helper.IsElementHidden(element))
                 {
                     element.Draw(_origin);
                 }
@@ -261,7 +271,7 @@ namespace DelvUI.Interface
             // job hud
             if (_jobHud != null && _jobHud.Config.Enabled && _jobHud != _selectedElement)
             {
-                if (!Helper.IsElementHidden(_jobHud))
+                if (!_helper.IsElementHidden(_jobHud))
                 {
                     _jobHud.Draw(_origin);
                 }
@@ -320,8 +330,6 @@ namespace DelvUI.Interface
 
             if (config != null && _primaryResourceHud != null)
             {
-                Helper.ApplyCurrentConfig();
-
                 _primaryResourceHud.ResourceType = config.UseDefaultPrimaryResourceBar ? config.PrimaryResourceType : PrimaryResourceTypes.None;
             }
         }
@@ -347,6 +355,11 @@ namespace DelvUI.Interface
             foreach (var element in _hudElementsUsingTarget)
             {
                 element.Actor = target;
+
+                if (_customEffectsHud != null)
+                {
+                    _customEffectsHud.TargetActor = target;
+                }
             }
 
             // target of target
@@ -467,28 +480,29 @@ namespace DelvUI.Interface
             return config;
         }
 
-        [DragFloat("Background Alpha", min = 0, max = 1, velocity = .05f)]
+        [DragFloat("Background Alpha", min = 0, max = 1, velocity = .05f, spacing = true)]
         [Order(10)]
         public float BackgroundAlpha = 0.3f;
 
         [Checkbox("Show Center Lines")]
         [Order(15)]
         public bool ShowCenterLines = true;
-
-        [Checkbox("Show Grid")]
+        [Checkbox("Show Anchor Points")]
         [Order(20)]
+
+        public bool ShowAnchorPoints = true;
+        [Checkbox("Grid Divisions", spacing = true)]
+        [CollapseControl(25, 0)]
         public bool ShowGrid = true;
 
         [DragInt("Divisions Distance", min = 50, max = 500)]
-        [Order(25)]
+        [CollapseWith(0, 0)]
         public int GridDivisionsDistance = 50;
 
         [DragInt("Subdivision Count", min = 1, max = 10)]
-        [Order(30)]
+        [CollapseWith(5, 0)]
         public int GridSubdivisionCount = 4;
 
-        [Checkbox("Show Anchor Points")]
-        [Order(35)]
-        public bool ShowAnchorPoints = true;
+
     }
 }

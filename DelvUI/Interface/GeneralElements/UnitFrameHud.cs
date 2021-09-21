@@ -168,19 +168,12 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         private void DrawFriendlyNPC(ImDrawListPtr drawList, Vector2 startPos, Vector2 endPos)
-        {
-            var color = GlobalColors.Instance.NPCFriendlyColor;
+        {            
+            var color = Config.UseCustomColor ? Config.CustomColor : GlobalColors.Instance.NPCFriendlyColor;            
 
             drawList.AddRectFilled(startPos, endPos, GlobalColors.Instance.EmptyUnitFrameColor.Base);
 
-            drawList.AddRectFilledMultiColor(
-                startPos,
-                endPos,
-                color.TopGradient,
-                color.TopGradient,
-                color.BottomGradient,
-                color.BottomGradient
-            );
+            DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X, Config.Size.Y), color, drawList);
 
             drawList.AddRect(startPos, endPos, 0xFF000000);
         }
