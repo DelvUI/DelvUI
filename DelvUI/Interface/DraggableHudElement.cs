@@ -60,17 +60,13 @@ namespace DelvUI.Interface
             var size = MaxPos - MinPos + _contentMargin * 2;
             ImGui.SetNextWindowSize(size, ImGuiCond.Always);
 
-            var anchorConfig = _config as AnchorablePluginConfigObject;
-            var winPos = Utils.GetAnchoredPosition(origin + MinPos, size, anchorConfig?.Anchor ?? DrawAnchor.Center);
-            var winPosOffset = winPos - (origin + MinPos);
-
             // set initial position
             if (!_windowPositionSet)
             {
-                ImGui.SetNextWindowPos(winPos);
+                ImGui.SetNextWindowPos(origin + MinPos - _contentMargin);
                 _windowPositionSet = true;
 
-                _positionOffset = _config.Position - MinPos - winPosOffset;
+                _positionOffset = _config.Position - MinPos + _contentMargin;
             }
 
             // update config object position
@@ -80,6 +76,19 @@ namespace DelvUI.Interface
 
             // check selection
             var tooltipText = "x: " + _config.Position.X.ToString() + "    y: " + _config.Position.Y.ToString();
+
+            if (ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
+            {
+                bool cliked = ImGui.IsMouseClicked(ImGuiMouseButton.Left) || ImGui.IsMouseDown(ImGuiMouseButton.Left);
+                if (cliked && !Selected && SelectEvent != null)
+                {
+                    SelectEvent(this, null);
+                }
+
+                // tooltip
+
+                TooltipsHelper.Instance.ShowTooltipOnCursor(tooltipText);
+            }
 
             // draw window
             var drawList = ImGui.GetWindowDrawList();
@@ -94,24 +103,7 @@ namespace DelvUI.Interface
             drawList.AddLine(contentPos + new Vector2(contentSize.X / 2f, 0), contentPos + new Vector2(contentSize.X / 2, contentSize.Y), lineColor);
             drawList.AddLine(contentPos + new Vector2(0, contentSize.Y / 2f), contentPos + new Vector2(contentSize.X, contentSize.Y / 2), lineColor);
 
-            // element name
-            var textSize = ImGui.CalcTextSize(_displayName);
-            var textColor = Selected ? 0xFFFFFFFF : 0xEEFFFFFF;
-            var textOutlineColor = Selected ? 0xFF000000 : 0xEE000000;
-            DrawHelper.DrawOutlinedText(_displayName, contentPos + contentSize / 2f - textSize / 2f, textColor, textOutlineColor, drawList);
-
-            bool mouseOver = ImGui.IsMouseHoveringRect(windowPos, windowPos + size);
-            if (mouseOver)
-            {
-                bool clicked = ImGui.IsMouseClicked(ImGuiMouseButton.Left) || ImGui.IsMouseDown(ImGuiMouseButton.Left);
-                if (clicked && !Selected && SelectEvent != null)
-                {
-                    SelectEvent(this, null);
-                }
-
-                // tooltip
-                TooltipsHelper.Instance.ShowTooltipOnCursor(tooltipText);
-            }
+            ImGui.End();
 
             // arrows
             if (Selected)
@@ -125,16 +117,11 @@ namespace DelvUI.Interface
                 }
             }
 
-            if (mouseOver || Selected)
-            {
-                var anchorableConfig = _config as AnchorablePluginConfigObject;
-                var anchorIndicatorSize = new Vector2(10, 10);
-                var anchor = anchorableConfig?.Anchor ?? DrawAnchor.Center;
-                var anchorIndicatorPos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(contentPos, -contentSize, anchor), anchorIndicatorSize, DrawAnchor.Center) + new Vector2(0, 1);
-                drawList.AddRectFilled(anchorIndicatorPos, anchorIndicatorPos + anchorIndicatorSize, 0xAAFFFFFF);
-            }
-
-            ImGui.End();
+            // element name
+            var textSize = ImGui.CalcTextSize(_displayName);
+            var textColor = Selected ? 0xFFFFFFFF : 0xEEFFFFFF;
+            var textOutlineColor = Selected ? 0xFF000000 : 0xEE000000;
+            DrawHelper.DrawOutlinedText(_displayName, contentPos + contentSize / 2f - textSize / 2f, textColor, textOutlineColor, drawList);
         }
 
         public virtual void DrawChildren(Vector2 origin) { }
@@ -159,9 +146,10 @@ namespace DelvUI.Interface
                 float minX = float.MaxValue;
                 float minY = float.MaxValue;
 
+                var anchorConfig = _config as AnchorablePluginConfigObject;
                 for (int i = 0; i < positions.Count; i++)
                 {
-                    var pos = positions[i];
+                    var pos = Utils.GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center);
                     minX = Math.Min(minX, pos.X);
                     minY = Math.Min(minY, pos.Y);
                 }
@@ -190,9 +178,10 @@ namespace DelvUI.Interface
                 float maxX = float.MinValue;
                 float maxY = float.MinValue;
 
+                var anchorConfig = _config as AnchorablePluginConfigObject;
                 for (int i = 0; i < positions.Count; i++)
                 {
-                    var pos = positions[i] + sizes[i];
+                    var pos = Utils.GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center) + sizes[i];
                     maxX = Math.Max(maxX, pos.X);
                     maxY = Math.Max(maxY, pos.Y);
                 }
