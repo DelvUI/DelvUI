@@ -2,7 +2,6 @@
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using Newtonsoft.Json;
-using System;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements

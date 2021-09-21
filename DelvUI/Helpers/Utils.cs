@@ -5,7 +5,6 @@ using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 

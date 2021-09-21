@@ -1,7 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
-using System;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements

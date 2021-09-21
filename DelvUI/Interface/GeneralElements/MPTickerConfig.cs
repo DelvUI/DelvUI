@@ -1,6 +1,5 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using System;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
@@ -14,11 +13,11 @@ namespace DelvUI.Interface.GeneralElements
         public bool HideOnFullMP = true;
 
         [Checkbox("Show Border")]
-        [Order(30)]
+        [Order(25)]
         public bool ShowBorder = true;
 
         [ColorEdit4("Color")]
-        [Order(35)]
+        [Order(30)]
         public PluginConfigColor Color = new PluginConfigColor(new(240f / 255f, 92f / 255f, 232f / 255f, 100f / 100f));
 
         public MPTickerConfig(Vector2 position, Vector2 size)

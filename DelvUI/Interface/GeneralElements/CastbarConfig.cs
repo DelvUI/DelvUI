@@ -1,7 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
-using System;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
@@ -148,7 +147,7 @@ namespace DelvUI.Interface.GeneralElements
         public bool ShowIcon = true;
 
         [ColorEdit4("Color ##Castbar")]
-        [Order(35)]
+        [Order(30)]
         public PluginConfigColor Color = new PluginConfigColor(new(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
 
         //CHARA TYPE SPECIFIC CONFIGS SPAWN HERE
