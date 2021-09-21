@@ -94,12 +94,6 @@ namespace DelvUI.Helpers
                 return false;
             }
 
-            // range check
-            if (target.YalmDistanceX > action.Range)
-            {
-                return false;
-            }
-
             // friendly player (TODO: pvp? lol)
             if (target is PlayerCharacter)
             {
