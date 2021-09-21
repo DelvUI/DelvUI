@@ -69,6 +69,11 @@ namespace DelvUI
             return new Vector4(vec.X, vec.Y, vec.Z, Math.Min(1, Math.Max(0, vec.W + 1 * correctionFactor)));
         }
 
+        public static Vector4 WithNewAlpha(this Vector4 vec, float alpha)
+        {
+            return new Vector4(vec.X, vec.Y, vec.Z, alpha);
+        }
+
         public static bool IsPropertyExist(dynamic settings, string name)
         {
             if (settings is ExpandoObject)

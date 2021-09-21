@@ -79,6 +79,9 @@ namespace DelvUI.Interface.Party
 
         [NestedConfig("Shield", 60)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
+
+        [NestedConfig("Change Alpha Based on Range", 60)]
+        public PartyFramesRangeConfig RangeConfig = new PartyFramesRangeConfig();
     }
 
     [Serializable]
@@ -163,6 +166,51 @@ namespace DelvUI.Interface.Party
         [Checkbox("Use Specific DPS Role Icons")]
         [CollapseWith(0, 0)]
         public bool UseSpecificDPSRoleIcons = false;
+    }
+
+    [Serializable]
+    [Portable(false)]
+    public class PartyFramesRangeConfig : PluginConfigObject
+    {
+        [DragInt("Range (yalms)", min = 1, max = 500)]
+        [Order(5)]
+        public int Range = 30;
+
+        [DragFloat("Alpha", min = 1, max = 100)]
+        [Order(10)]
+        public float Alpha = 25;
+
+        [Checkbox("Use Additional Range Check")]
+        [CollapseControl(15, 0)]
+        public bool UseAdditionalRangeCheck = false;
+
+        [DragInt("Additional Range (yalms)", min = 1, max = 500)]
+        [CollapseWith(0, 0)]
+        public int AdditionalRange = 15;
+
+        [DragFloat("Additional Alpha", min = 1, max = 100)]
+        [CollapseWith(5, 0)]
+        public float AdditionalAlpha = 60;
+
+        public float AlphaForDistance(int distance)
+        {
+            if (!Enabled)
+            {
+                return 100f;
+            }
+
+            if (!UseAdditionalRangeCheck)
+            {
+                return distance > Range ? Alpha : 100f;
+            }
+
+            if (Range > AdditionalRange)
+            {
+                return distance > Range ? Alpha : (distance > AdditionalRange ? AdditionalAlpha : 100f);
+            }
+
+            return distance > AdditionalRange ? AdditionalAlpha : (distance > Range ? Alpha : 100f);
+        }
     }
 
     [Serializable]

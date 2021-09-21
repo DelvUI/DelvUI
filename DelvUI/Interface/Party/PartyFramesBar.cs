@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
+using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -94,9 +95,11 @@ namespace DelvUI.Interface.Party
                 var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), _config.Size.Y);
                 var color = GetColor();
 
-                if (actor.YalmDistanceX > 30)
+                if (_config.RangeConfig.Enabled)
                 {
-                    color = new(color.Vector.AdjustColorAlpha(-.7f));
+                    var alpha = _config.RangeConfig.AlphaForDistance(actor.YalmDistanceX) / 100f;
+                    PluginLog.Log(alpha.ToString());
+                    color = new(color.Vector.WithNewAlpha(alpha));
                 }
 
                 DrawHelper.DrawGradientFilledRect(Position, fillSize, color, drawList);
@@ -175,7 +178,7 @@ namespace DelvUI.Interface.Party
             }
 
             // icon
-            if (_config.RoleIconConfig.Enabled)
+            if (_config.RoleIconConfig.Enabled && isClose)
             {
                 var iconId = _config.RoleIconConfig.UseRoleIcons ?
                     JobsHelper.RoleIconIDForJob(Member.JobId, _config.RoleIconConfig.UseSpecificDPSRoleIcons) :
