@@ -86,6 +86,7 @@ namespace DelvUI
             GlobalColors.Initialize();
             TooltipsHelper.Initialize();
             ChatHelper.Initialize();
+            MouseOverHelper.Initialize();
             Resolver.Initialize();
 
             _hudManager = new HudManager();

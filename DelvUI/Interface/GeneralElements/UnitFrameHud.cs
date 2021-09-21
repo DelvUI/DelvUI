@@ -97,6 +97,8 @@ namespace DelvUI.Interface.GeneralElements
                             var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
                             _openContextMenuFromTarget(agentHud, Actor.Address);
                         }
+
+                        MouseOverHelper.Instance.Target = Actor;
                     }
                 }
 
