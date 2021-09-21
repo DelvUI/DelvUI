@@ -213,6 +213,8 @@ namespace DelvUI.Interface
 
         public void Draw()
         {
+            MouseOverHelper.Instance.Target = null;
+
             if (!ShouldBeVisible())
             {
                 _helper = null;
