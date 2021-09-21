@@ -101,31 +101,38 @@ namespace DelvUI.Interface.Party
             }
             // testing
 
-            if (_groupMembers.Count == manager->MemberCount)
-            {
-                return;
-            }
-
             try
             {
-                _groupMembers.Clear();
+                bool partyChanged = _groupMembers.Count != manager->MemberCount;
+                List<IPartyFramesMember> newMembers = new List<IPartyFramesMember>();
 
                 for (int i = 0; i < manager->MemberCount; i++)
                 {
                     PartyMember* partyMember = (PartyMember*)(new IntPtr(manager->PartyMembers) + 0x230 * i);
-                    _groupMembers.Add(new PartyFramesMember(partyMember));
+
+                    if (i < _groupMembers.Count && partyMember->ObjectID != _groupMembers[i].ActorID)
+                    {
+                        partyChanged = true;
+                    }
+
+                    newMembers.Add(new PartyFramesMember(partyMember));
                 }
 
-                PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortingMode);
+                PartySortingHelper.SortPartyMembers(ref newMembers, _config.SortingMode);
+
+                if (partyChanged)
+                {
+                    _groupMembers = newMembers;
+
+                    if (MembersChangedEvent != null)
+                    {
+                        MembersChangedEvent(this, null);
+                    }
+                }
             }
             catch
             {
-                _groupMembers.Clear();
-            }
-
-            if (MembersChangedEvent != null)
-            {
-                MembersChangedEvent(this, null);
+                
             }
         }
 
