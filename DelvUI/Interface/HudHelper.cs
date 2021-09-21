@@ -55,6 +55,7 @@ namespace DelvUI.Interface
 
         private bool _previousCombatState = true;
         private bool _isInitial = true;
+        private uint[] GoldSaucerIDs = new uint[] { 144, 388, 389, 390, 391, 579, 792, 899, 941 };
 
         public HudHelper()
         {
@@ -102,6 +103,14 @@ namespace DelvUI.Interface
             if (!ConfigurationManager.GetInstance().LockHUD)
             {
                 return ConfigurationManager.GetInstance().LockHUD;
+            }
+
+            // hide in gold saucer
+            var results = GoldSaucerIDs.Where(id => id == Plugin.ClientState.TerritoryType);
+            bool hasZoneIdMatch = results.Count() > 0;
+            if (Config.HideInGoldSaucer && hasZoneIdMatch)
+            {
+                return true;
             }
 
             bool isHidden = Config.HideOutsideOfCombat && !IsInCombat();
