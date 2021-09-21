@@ -106,9 +106,7 @@ namespace DelvUI.Interface
             }
 
             // hide in gold saucer
-            var results = GoldSaucerIDs.Where(id => id == Plugin.ClientState.TerritoryType);
-            bool hasZoneIdMatch = results.Count() > 0;
-            if (Config.HideInGoldSaucer && hasZoneIdMatch)
+            if (Config.HideInGoldSaucer && GoldSaucerIDs.Where(id => id == Plugin.ClientState.TerritoryType).Count() > 0)
             {
                 return true;
             }
