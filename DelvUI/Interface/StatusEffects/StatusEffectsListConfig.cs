@@ -1,4 +1,5 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Interface;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -10,7 +11,6 @@ using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Interface;
 
 namespace DelvUI.Interface.StatusEffects
 {
@@ -363,10 +363,17 @@ namespace DelvUI.Interface.StatusEffects
             {
                 ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
                 ImGui.SameLine();
-                ImGui.Text("Type an ID or Name");
+                changed |= ImGui.Checkbox(UseAsWhitelist ? "Whitelist" : "Blacklist", ref UseAsWhitelist);
+                ImGui.NewLine();
+
                 ImGui.Text("\u2002 \u2002");
                 ImGui.SameLine();
-                if (ImGui.InputTextMultiline("", ref _input, 64, new Vector2(464,24),ImGuiInputTextFlags.EnterReturnsTrue))
+                ImGui.Text("Type an ID or Name");
+
+                ImGui.Text("\u2002 \u2002");
+                ImGui.SameLine();
+
+                if (ImGui.InputText("", ref _input, 64, ImGuiInputTextFlags.EnterReturnsTrue))
                 {
                     changed |= AddNewEntry(_input, sheet);
                     ImGui.SetKeyboardFocusHere(-1);
@@ -381,11 +388,11 @@ namespace DelvUI.Interface.StatusEffects
                     ImGui.SetKeyboardFocusHere(-2);
                 }
                 ImGui.PopFont();
-                ImGui.SameLine();
-                changed |= ImGui.Checkbox(UseAsWhitelist?"Whitelist":"Blacklist", ref UseAsWhitelist);
+
                 ImGui.Text("\u2002 \u2002");
                 ImGui.SameLine();
-                if (ImGui.BeginTable("table", 4, flags, new Vector2(583,List.Any() ? 200 : 40)))
+
+                if (ImGui.BeginTable("table", 4, flags, new Vector2(583, List.Count > 0 ? 200 : 40)))
                 {
                     ImGui.TableSetupColumn("Icon", ImGuiTableColumnFlags.WidthFixed, 0, 0);
                     ImGui.TableSetupColumn("ID", ImGuiTableColumnFlags.WidthFixed, 0, 1);
@@ -394,15 +401,18 @@ namespace DelvUI.Interface.StatusEffects
 
                     ImGui.TableSetupScrollFreeze(0, 1);
                     ImGui.TableHeadersRow();
-                    
+
                     for (int i = 0; i < List.Count; i++)
                     {
-                        
                         var id = List.Values[i];
                         var name = List.Keys[i];
                         var row = sheet.GetRow(id);
 
-                        if (_input != "" && !name.ToUpper().Contains(_input.ToUpper())) { continue;}
+                        if (_input != "" && !name.ToUpper().Contains(_input.ToUpper()))
+                        {
+                            continue;
+                        }
+
                         ImGui.PushID(i.ToString());
                         ImGui.TableNextRow(ImGuiTableRowFlags.None, iconSize.Y);
 
@@ -427,13 +437,10 @@ namespace DelvUI.Interface.StatusEffects
                             var displayName = row != null ? row.Name : name;
                             ImGui.Text(displayName);
                         }
-                        
+
                         // remove
                         if (ImGui.TableSetColumnIndex(3))
                         {
-                            var cursorPos = ImGui.GetCursorPos();
-                            cursorPos.X += 8;
-                            ImGui.SetCursorPos(cursorPos);
                             ImGui.PushFont(UiBuilder.IconFont);
                             ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
                             ImGui.PushStyleColor(ImGuiCol.ButtonActive, Vector4.Zero);
