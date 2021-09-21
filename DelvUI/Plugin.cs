@@ -20,8 +20,6 @@ namespace DelvUI
 {
     public class Plugin : IDalamudPlugin
     {
-        private bool _fontBuilt;
-        private bool _fontLoadFailed;
         private HudManager _hudManager;
         private SystemMenuHook _menuHook;
 
@@ -53,17 +51,18 @@ namespace DelvUI
 
             Version = Assembly.GetExecutingAssembly()?.GetName().Version.ToString() ?? "";
 
+            FontsManager.Initialize(AssemblyLocation);
             LoadBanner();
 
             // initialize a not-necessarily-defaults configuration
             ConfigurationManager.Initialize(false);
-            FontsManager.Initialize();
+            FontsManager.Instance.LoadConfig();
 
             UiBuilder.OnBuildUi += Draw;
             UiBuilder.OnBuildFonts += BuildFont;
             UiBuilder.OnOpenConfigUi += OpenConfigUi;
 
-            if (!_fontBuilt && !_fontLoadFailed)
+            if (!FontsManager.Instance.DefaultFontBuilt)
             {
                 UiBuilder.RebuildFonts();
             }
@@ -101,41 +100,7 @@ namespace DelvUI
 
         private void BuildFont()
         {
-            string fontFile = Path.Combine(Path.GetDirectoryName(AssemblyLocation) ?? "", "Media", "Fonts", "big-noodle-too.ttf");
-            _fontBuilt = false;
-
-            if (File.Exists(fontFile))
-            {
-                try
-                {
-                    ImGuiIOPtr io = ImGui.GetIO();
-
-                    unsafe
-                    {
-                        var builder = new ImFontGlyphRangesBuilderPtr(ImGuiNative.ImFontGlyphRangesBuilder_ImFontGlyphRangesBuilder());
-
-                        // GetGlyphRangesChineseFull() includes Default + Hiragana, Katakana, Half-Width, Selection of 1946 Ideographs
-                        // https://skia.googlesource.com/external/github.com/ocornut/imgui/+/v1.53/extra_fonts/README.txt
-                        builder.AddRanges(io.Fonts.GetGlyphRangesChineseFull());
-                        builder.AddRanges(io.Fonts.GetGlyphRangesKorean());
-                        builder.BuildRanges(out ImVector ranges);
-
-                        FontsManager.Instance.BigNoodleTooFont = io.Fonts.AddFontFromFileTTF(fontFile, 24, null, ranges.Data);
-                        _fontBuilt = true;
-                    }
-                }
-                catch (Exception ex)
-                {
-                    PluginLog.Log($"Font failed to load. {fontFile}");
-                    PluginLog.Log(ex.ToString());
-                    _fontLoadFailed = true;
-                }
-            }
-            else
-            {
-                PluginLog.Log($"Font doesn't exist. {fontFile}");
-                _fontLoadFailed = true;
-            }
+            FontsManager.Instance.BuildFonts();
         }
 
         private void LoadBanner()
@@ -216,17 +181,14 @@ namespace DelvUI
 
             ConfigurationManager.GetInstance().Draw();
 
-            if (_fontBuilt)
-            {
-                ImGui.PushFont(FontsManager.Instance.BigNoodleTooFont);
-            }
+            var fontPushed = FontsManager.Instance.PushDefaultFont();
 
             if (!hudState)
             {
                 _hudManager?.Draw();
             }
 
-            if (_fontBuilt)
+            if (fontPushed)
             {
                 ImGui.PopFont();
             }

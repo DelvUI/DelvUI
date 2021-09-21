@@ -34,6 +34,10 @@ namespace DelvUI.Interface.GeneralElements
     {
         [JsonIgnore] protected string _text;
 
+        [Font]
+        [Order(20)]
+        public string FontID = null;
+
         [Combo("Frame Anchor", "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight")]
         [Order(25)]
         public LabelTextAnchor FrameAnchor = LabelTextAnchor.Center;

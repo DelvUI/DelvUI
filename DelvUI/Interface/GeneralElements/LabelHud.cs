@@ -35,6 +35,8 @@ namespace DelvUI.Interface.GeneralElements
 
         private void DrawLabel(string text, Vector2 parentOrigin, Vector2 parentSize, Actor actor = null)
         {
+            var fontPushed = FontsManager.Instance.PushFont(Config.FontID);
+
             var textSize = ImGui.CalcTextSize(text);
             var offset = OffsetForFrameAnchor(parentSize) + OffsetForTextAnchor(textSize);
             var drawList = ImGui.GetWindowDrawList();
@@ -47,6 +49,11 @@ namespace DelvUI.Interface.GeneralElements
             else
             {
                 drawList.AddText(parentOrigin + Config.Position + offset, color.Base, text);
+            }
+
+            if (fontPushed)
+            {
+                ImGui.PopFont();
             }
         }
 
