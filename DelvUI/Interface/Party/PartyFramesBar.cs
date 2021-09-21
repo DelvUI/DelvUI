@@ -76,6 +76,7 @@ namespace DelvUI.Interface.Party
 
             // click
             bool isHovering = ImGui.IsMouseHoveringRect(Position, Position + _config.Size);
+            var actor = Member.GetActor();
             if (isHovering && ImGui.IsMouseClicked(ImGuiMouseButton.Left))
             {
                 Plugin.TargetManager.SetCurrentTarget(Member.GetActor());
@@ -91,8 +92,14 @@ namespace DelvUI.Interface.Party
             {
                 var scale = Member.MaxHP > 0 ? (float)Member.HP / (float)Member.MaxHP : 1;
                 var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), _config.Size.Y);
+                var color = GetColor();
 
-                DrawHelper.DrawGradientFilledRect(Position, fillSize, GetColor(), drawList);
+                if (actor.YalmDistanceX > 30)
+                {
+                    color = new(color.Vector.AdjustColorAlpha(-.7f));
+                }
+
+                DrawHelper.DrawGradientFilledRect(Position, fillSize, color, drawList);
             }
 
             // shield
@@ -141,7 +148,6 @@ namespace DelvUI.Interface.Party
             }
 
             // name
-            var actor = Member.GetActor();
             var name = Member.Name ?? "";
 
             if (actor != null)
