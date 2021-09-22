@@ -142,10 +142,9 @@ namespace DelvUI.Interface.GeneralElements
             var color = Config.UseCustomColor ? Config.CustomColor : Utils.ColorForActor(chara);
             var bgColor = BackgroundColor(chara);
 
-            
             if(Config.UseCustomColor && Config.UseColorBasedOnHealthValue)
             {
-                color = Utils.ColorByHealthValue(chara);
+                color = Utils.ColorByHealthValue(scale,0.3f,0.8f);
             }
 
             // background

@@ -192,26 +192,23 @@ namespace DelvUI.Helpers
         }
 
 
-        public static PluginConfigColor ColorByHealthValue(Chara chara)
+        public static PluginConfigColor ColorByHealthValue(float i, float min, float max)
         {
-            float scale = (float)chara.CurrentHp / Math.Max(1, chara.MaxHp);
-            float ratio = scale;
-            float min = 0.3f;
-            float max = 0.8f;
+            float ratio = i;
             if (min > 0 || max < 1)
             {
-                if (scale < min)
+                if (i < min)
                 {
                     ratio = 0;
                 }
-                else if (scale > max)
+                else if (i > max)
                 {
                     ratio = 1;
                 }
                 else
                 {
                     var range = max - min;
-                    ratio = (scale - min) / range;
+                    ratio = (i - min) / range;
                 }
             }
             float hue = (ratio * 1.2f / 3.60f) * 360f;
