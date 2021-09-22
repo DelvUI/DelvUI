@@ -74,6 +74,8 @@ namespace DelvUI.Config
             ConfigBaseNode = configBaseNode;
             _instance = this;
 
+            ((ProfilesConfig)ConfigBaseNode.GetOrAddConfig<ProfilesConfig>().ConfigObject).GenerateDefaultsProfile(ConfigBaseNode);
+
             if (!defaultConfig)
             {
                 LoadConfigurations();
@@ -146,7 +148,8 @@ namespace DelvUI.Config
                 typeof(MPTickerConfig),
                 typeof(GridConfig),
 
-                typeof(ImportExportConfig)
+                typeof(ImportExportConfig),
+                typeof(ProfilesConfig)
             };
 
             return Initialize(defaultConfig, configObjects);
@@ -190,7 +193,14 @@ namespace DelvUI.Config
 
         public void LoadConfigurations() { ConfigBaseNode.Load(ConfigDirectory); }
 
-        public void SaveConfigurations() { ConfigBaseNode.Save(ConfigDirectory); }
+        public void SaveConfigurations()
+        {
+            ConfigBaseNode.Save(ConfigDirectory);
+
+            // update the profile dictionary
+            ProfilesConfig profilesConfig = (ProfilesConfig)GetConfigObjectForType(typeof(ProfilesConfig));
+            profilesConfig?.UpdateCurrentProfile(ConfigBaseNode);
+        }
 
         public PluginConfigObject GetConfigObjectForType(Type type)
         {
@@ -205,7 +215,7 @@ namespace DelvUI.Config
         {
             using MemoryStream output = new();
 
-            using (DeflateStream gzip = new(output, CompressionLevel.Optimal))
+            using (DeflateStream gzip = new(output, CompressionLevel.Fastest))
             {
                 using StreamWriter writer = new(gzip, Encoding.UTF8);
                 writer.Write(jsonString);
