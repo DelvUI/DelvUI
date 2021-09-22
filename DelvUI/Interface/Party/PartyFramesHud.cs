@@ -16,12 +16,7 @@ namespace DelvUI.Interface.Party
         private PartyFramesBuffsConfig _buffsConfig;
         private PartyFramesDebuffsConfig _debuffsConfig;
 
-        private const ImGuiWindowFlags _lockedBarFlags = ImGuiWindowFlags.NoBackground |
-                                                        ImGuiWindowFlags.NoMove |
-                                                        ImGuiWindowFlags.NoResize |
-                                                        ImGuiWindowFlags.NoNav;
-
-        private Vector2 _contentMargin = new Vector2(5, 5);
+        private Vector2 _contentMargin = new Vector2(40, 40);
         private const string _mainWindowName = "Party List";
         private static int MaxMemberCount = 8;
 
@@ -199,10 +194,14 @@ namespace DelvUI.Interface.Party
             ImGui.SetNextWindowPos(Config.Position - _contentMargin, ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSize(Config.Size + _contentMargin * 2, ImGuiCond.FirstUseEver);
 
-            var windowFlags = ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoBringToFrontOnFocus;
+            var windowFlags = ImGuiWindowFlags.NoScrollbar |
+                ImGuiWindowFlags.NoTitleBar |
+                ImGuiWindowFlags.NoBringToFrontOnFocus |
+                ImGuiWindowFlags.NoBackground;
+
             if (Config.Lock)
             {
-                windowFlags |= _lockedBarFlags;
+                windowFlags |= ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoNav;
             }
 
             ImGui.Begin(_mainWindowName, windowFlags);
@@ -240,8 +239,16 @@ namespace DelvUI.Interface.Party
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
             var targetIndex = -1;
 
-            // draw
+            // preview
             var drawList = ImGui.GetWindowDrawList();
+            if (!Config.Lock)
+            {
+                var margin = new Vector2(4, 0);
+                drawList.AddRectFilled(contentStartPos, contentStartPos + maxSize, 0x66000000);
+                drawList.AddRect(windowPos + margin, windowPos + windowSize - margin * 2, 0x88000000, 3, ImDrawFlags.None, 2);
+            }
+
+            // bars
             for (int i = 0; i < count; i++)
             {
                 bars[i].Draw(origin, drawList);

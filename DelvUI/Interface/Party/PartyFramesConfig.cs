@@ -152,8 +152,16 @@ namespace DelvUI.Interface.Party
     public class PartyFramesRoleIconConfig : MovablePluginConfigObject
     {
         [DragInt2("Size", min = 1, max = 1000)]
-        [Order(30)]
+        [Order(20)]
         public Vector2 Size = new(20, 20);
+
+        [Anchor("Bar Anchor")]
+        [Order(25)]
+        public DrawAnchor BarAnchor = DrawAnchor.TopLeft;
+
+        [Anchor("Anchor")]
+        [Order(30)]
+        public DrawAnchor Anchor = DrawAnchor.TopLeft;
 
         [Combo("Style", "Style 1", "Style 2")]
         [Order(35)]

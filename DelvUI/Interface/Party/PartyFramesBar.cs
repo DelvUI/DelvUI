@@ -184,7 +184,10 @@ namespace DelvUI.Interface.Party
                     JobsHelper.RoleIconIDForJob(Member.JobId, _config.RoleIconConfig.UseSpecificDPSRoleIcons) :
                     JobsHelper.IconIDForJob(Member.JobId) + (uint)_config.RoleIconConfig.Style * 100;
 
-                DrawHelper.DrawIcon(iconId, Position + _config.RoleIconConfig.Position, _config.RoleIconConfig.Size, false, drawList);
+                var parentPos = Utils.GetAnchoredPosition(Position, _config.Size, _config.RoleIconConfig.BarAnchor);
+                var iconPos = Utils.GetAnchoredPosition(parentPos + _config.RoleIconConfig.Position, _config.RoleIconConfig.Size, _config.RoleIconConfig.Anchor);
+
+                DrawHelper.DrawIcon(iconId, iconPos, _config.RoleIconConfig.Size, false, drawList);
             }
 
             // highlight
