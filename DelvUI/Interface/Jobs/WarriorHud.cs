@@ -59,7 +59,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawStormsEyeBar(Vector2 origin)
         {
-            IEnumerable<StatusEffect> innerReleaseBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1177);
+            IEnumerable<StatusEffect> innerReleaseBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1177 or 86);
             IEnumerable<StatusEffect> stormsEyeBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
 
             Vector2 position = origin + Config.Position + Config.StormsEyePosition - Config.StormsEyeSize / 2f;
