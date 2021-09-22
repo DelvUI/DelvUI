@@ -7,7 +7,6 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -115,7 +114,7 @@ namespace DelvUI.Interface.Jobs
             var actorId = Plugin.ClientState.LocalPlayer.ActorId;
             var higanbana = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1228 && o.OwnerId == actorId || o.EffectId == 1319 && o.OwnerId == actorId);
             var higanbanaDuration = higanbana.Duration;
-            if (higanbanaDuration == 0)
+            if (higanbanaDuration == 0 && Config.OnlyShowHiganbanaWhenActive)
             {
                 return;
             }
@@ -168,6 +167,11 @@ namespace DelvUI.Interface.Jobs
                 .AddInnerBar(jinpuDuration, 40f, Config.JinpuColor)
                 .SetFlipDrainDirection(false);
 
+            if (Config.OnlyShowBuffsWhenActive && jinpuDuration == 0 && shifuDuration == 0)
+            {
+                return;
+            }
+
             if (Config.ShowBuffsText)
             {
                 shifuBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
@@ -182,6 +186,12 @@ namespace DelvUI.Interface.Jobs
         private void DrawSenResourceBar(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<SAMGauge>();
+
+            if (Config.OnlyShowSenWhenActive && !gauge.HasKa() && !gauge.HasGetsu() && !gauge.HasSetsu())
+            {
+                return;
+            }
+
             var senBarWidth = (Config.SenBarSize.X - Config.SenBarPadding * 2) / 3f;
             var senBarSize = new Vector2(senBarWidth, Config.SenBarSize.Y);
 
@@ -209,6 +219,11 @@ namespace DelvUI.Interface.Jobs
         private void DrawMeditationResourceBar(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<SAMGauge>();
+
+            if (Config.OnlyShowMeditationWhenActive && gauge.MeditationStacks == 0)
+            {
+                return;
+            }
 
             var pos = new Vector2(
                 origin.X + Config.Position.X + Config.MeditationBarPosition.X - Config.MeditationBarSize.X / 2f,
@@ -239,15 +254,15 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(30, 0)]
         public bool ShowKenkiBar = true;
 
-        [DragFloat2("Kenki Bar Size", max = 2000f)]
+        [DragFloat2("Kenki Bar Size" + "##Kenki", max = 2000f)]
         [CollapseWith(0, 0)]
         public Vector2 KenkiBarSize = new Vector2(254, 20);
 
-        [DragFloat2("Kenki Bar Position", min = -2000f, max = 2000f)]
+        [DragFloat2("Kenki Bar Position" + "##Kenki", min = -2000f, max = 2000f)]
         [CollapseWith(5, 0)]
         public Vector2 KenkiBarPosition = new Vector2(0, -34);
 
-        [Checkbox("Show Kenki Text")]
+        [Checkbox("Show Kenki Text" + "##Kenki")]
         [CollapseWith(10, 0)]
         public bool ShowKenkiText = true;
         #endregion
@@ -257,20 +272,24 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(35, 1)]
         public bool ShowSenBar = true;
 
-        [DragInt("Sen Bar Padding", max = 1000)]
+        [Checkbox("Only Show When Active" + "##Sen")]
         [CollapseWith(0, 1)]
+        public bool OnlyShowSenWhenActive = true;
+
+        [DragInt("Sen Bar Padding" + "##Sen", max = 1000)]
+        [CollapseWith(5, 1)]
         public int SenBarPadding = 2;
 
-        [DragFloat2("Sen Bar Size", max = 2000f)]
-        [CollapseWith(5, 1)]
+        [DragFloat2("Sen Bar Size" + "##Sen", max = 2000f)]
+        [CollapseWith(10, 1)]
         public Vector2 SenBarSize = new Vector2(254, 10);
 
-        [DragFloat2("Sen Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(10, 1)]
+        [DragFloat2("Sen Bar Position" + "##Sen", min = -2000f, max = 2000f)]
+        [CollapseWith(15, 1)]
         public Vector2 SenBarPosition = new Vector2(0, -17);
 
-        [DragDropHorizontal("Sen Order", "Setsu", "Getsu", "Ka")]
-        [CollapseWith(15, 1)]
+        [DragDropHorizontal("Sen Order", "Setsu", "Getsu", "Ka" + "##Sen")]
+        [CollapseWith(20, 1)]
         public int[] senOrder = new int[] { 0, 1, 2 };
         #endregion
 
@@ -279,16 +298,20 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(40, 2)]
         public bool ShowMeditationBar = true;
 
-        [DragInt("Meditation Bar Padding", max = 1000)]
+        [Checkbox("Only Show When Active" + "##Meditation")]
         [CollapseWith(0, 2)]
+        public bool OnlyShowMeditationWhenActive = true;
+
+        [DragInt("Meditation Bar Padding" + "##Meditation", max = 1000)]
+        [CollapseWith(5, 2)]
         public int MeditationBarPadding = 2;
 
-        [DragFloat2("Meditation Bar Size", max = 2000f)]
-        [CollapseWith(5, 2)]
+        [DragFloat2("Meditation Bar Size" + "##Meditation", max = 2000f)]
+        [CollapseWith(10, 2)]
         public Vector2 MeditationBarSize = new Vector2(254, 10);
 
-        [DragFloat2("Meditation Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(10, 2)]
+        [DragFloat2("Meditation Bar Position" + "##Meditation", min = -2000f, max = 2000f)]
+        [CollapseWith(15, 2)]
         public Vector2 MeditationBarPosition = new Vector2(0, -5);
         #endregion
 
@@ -297,24 +320,28 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(45, 3)]
         public bool ShowBuffsBar = true;
 
-        [DragInt("Buffs Bar Padding", max = 1000)]
+        [Checkbox("Only Show When Active" + "##Buffs")]
         [CollapseWith(0, 3)]
+        public bool OnlyShowBuffsWhenActive = true;
+
+        [DragInt("Buffs Bar Padding" + "##Buffs", max = 1000)]
+        [CollapseWith(5, 3)]
         public int BuffsPadding = 2;
 
-        [DragFloat2("Buffs Bar Size", max = 2000f)]
-        [CollapseWith(5, 3)]
+        [DragFloat2("Buffs Bar Size" + "##Buffs", max = 2000f)]
+        [CollapseWith(10, 3)]
         public Vector2 BuffsBarSize = new Vector2(254, 20);
 
-        [DragFloat2("Buffs Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(10, 3)]
+        [DragFloat2("Buffs Bar Position" + "##Buffs", min = -2000f, max = 2000f)]
+        [CollapseWith(15, 3)]
         public Vector2 BuffsBarPosition = new Vector2(0, -56);
 
-        [Checkbox("Show Buffs Bar Text")]
-        [CollapseWith(15, 3)]
+        [Checkbox("Show Buffs Bar Text" + "##Buffs")]
+        [CollapseWith(20, 3)]
         public bool ShowBuffsText = true;
 
-        [DragDropHorizontal("Shifu/Jinpu Order", "Shifu", "Jinpu")]
-        [CollapseWith(20, 3)]
+        [DragDropHorizontal("Shifu/Jinpu Order", "Shifu", "Jinpu" + "##Buffs")]
+        [CollapseWith(25, 3)]
         public int[] buffOrder = new int[] { 0, 1 };
 
         #endregion
@@ -324,23 +351,21 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(300, 4)]
         public bool ShowHiganbanaBar = true;
 
-        [DragFloat2("Higanbana Bar Size", max = 2000f)]
+        [Checkbox("Only Show When Active" + "##Higanbana")]
         [CollapseWith(0, 4)]
+        public bool OnlyShowHiganbanaWhenActive = true;
+
+        [DragFloat2("Higanbana Bar Size" + "##Higanbana", max = 2000f)]
+        [CollapseWith(5, 4)]
         public Vector2 HiganbanaBarSize = new Vector2(254, 20);
 
-        [DragFloat2("Higanbana Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(5, 4)]
+        [DragFloat2("Higanbana Bar Position" + "##Higanbana", min = -2000f, max = 2000f)]
+        [CollapseWith(10, 4)]
         public Vector2 HiganbanaBarPosition = new Vector2(0, -78);
 
-        [Checkbox("Show Higanbana Text")]
-        [CollapseWith(10, 4)]
+        [Checkbox("Show Higanbana Text" + "##Higanbana")]
+        [CollapseWith(15, 4)]
         public bool ShowHiganbanaText = true;
-        #endregion
-
-        #region BarOrders
-
-
-
         #endregion
 
         #region colors
