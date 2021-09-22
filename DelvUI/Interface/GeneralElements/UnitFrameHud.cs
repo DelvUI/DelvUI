@@ -225,7 +225,7 @@ namespace DelvUI.Interface.GeneralElements
                 uint color;
                 if (Config.UseJobColorAsBackgroundColor)
                 {
-                    color = ImGui.ColorConvertFloat4ToU32(GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Vector);
+                    color = GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Base;
                     return color;
                 }
                 else
