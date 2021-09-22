@@ -243,6 +243,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Dia Bar
+        
         [Checkbox("Dia", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowDiaBar = true;
@@ -250,34 +251,35 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Timer")]
         [CollapseWith(0, 1)]
         public bool ShowDiaTimer = false;
-        
-        [Checkbox("Hide Inactive Dia Bar")]
+
+        [DragFloat2("Position" + "##Dia", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
-        public bool HideInactiveDiaBar = false;
+        public Vector2 DiaBarPosition = new(0, -32);
         
-        [Checkbox("Refresh Reminder")] // 3s
+        [DragFloat2("Size " + "##Dia", max = 2000f)]
         [CollapseWith(10, 1)]
+        public Vector2 DiaBarSize = new(254, 20);
+
+        [ColorEdit4("Color" + "##Dia")]
+        [CollapseWith(15, 1)]
+        public PluginConfigColor DiaColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
+        
+                
+        [Checkbox("Show Refresh Reminder", spacing = true)]
+        [CollapseWith(20, 1)]
         public bool ShowDiaRefresh = false;
 
-        [DragInt("Custom Refresh Reminder", min = 0, max = 30)]
-        [CollapseWith(15, 1)]
+        [DragInt("Refresh Reminder", min = 0, max = 30)]
+        [CollapseWith(25, 1)]
         public int DiaCustomRefresh = 3;
 
         [ColorEdit4("Refresh Color")]
-        [CollapseWith(20, 1)]
+        [CollapseWith(30, 1)]
         public PluginConfigColor DiaRefreshColor = new(new(190f / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
         
-        [DragFloat2("Size " + "##Dia", max = 2000f)]
-        [CollapseWith(25, 1)]
-        public Vector2 DiaBarSize = new(254, 20);
-
-        [DragFloat2("Position" + "##Dia", min = -4000f, max = 4000f)]
-        [CollapseWith(30, 1)]
-        public Vector2 DiaBarPosition = new(0, -32);
-
-        [ColorEdit4("Color" + "##Dia")]
+        [Checkbox("Hide when effect is not applied", spacing = true)]
         [CollapseWith(35, 1)]
-        public PluginConfigColor DiaColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
+        public bool HideInactiveDiaBar = false;
         #endregion
     }
 }
