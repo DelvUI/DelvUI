@@ -290,7 +290,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("NPC Hostile")]
         [Order(25)]
-        public PluginConfigColor NPCHostileColor = new PluginConfigColor(new(160f / 255f, 51f / 255f, 51f / 255f, 100f / 100f));
+        public PluginConfigColor NPCHostileColor = new PluginConfigColor(new(233f / 255f, 4f / 255f, 4f / 255f, 100f / 100f));
 
         [ColorEdit4("NPC Neutral")]
         [Order(30)]
