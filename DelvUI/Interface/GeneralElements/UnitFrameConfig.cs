@@ -112,6 +112,10 @@ namespace DelvUI.Interface.GeneralElements
         [CollapseControl(25, 1)]
         public bool UseCustomBackgroundColor = false;
 
+        [Checkbox("Job Color As Background Color")]
+        [CollapseControl(26, 1)]
+        public bool UseJobColorAsBackgroundColor = false;
+
         [ColorEdit4("Color ##CustomBackground")]
         [CollapseWith(0, 1)]
         public PluginConfigColor CustomBackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
