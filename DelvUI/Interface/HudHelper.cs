@@ -105,6 +105,11 @@ namespace DelvUI.Interface
                 return ConfigurationManager.GetInstance().LockHUD;
             }
 
+            if (element.GetType() == typeof(PlayerCastbarHud))
+            {
+                return false;
+            }
+
             // hide in gold saucer
             if (Config.HideInGoldSaucer && GoldSaucerIDs.Where(id => id == Plugin.ClientState.TerritoryType).Count() > 0)
             {
@@ -115,11 +120,6 @@ namespace DelvUI.Interface
             if (!isHidden && element is JobHud)
             {
                 return Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
-            }
-
-            if (element.GetType() == typeof(PlayerCastbarHud))
-            {
-                return false;
             }
 
             if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig))
