@@ -291,23 +291,23 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(40, 2)]
         public bool ShowBuffBar = true;
 
-        [Checkbox("Timer")]
+        [Checkbox("Timer" + "##Buff")]
         [CollapseWith(0, 2)]
         public bool ShowBuffBarText = true;
 
-        [DragFloat2("Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##Buff", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]
         public Vector2 BuffBarPosition = new(0, -32);
         
-        [DragFloat2("Size", min = -4000f, max = 4000f)]
+        [DragFloat2("Size" + "##Buff", min = -4000f, max = 4000f)]
         [CollapseWith(10, 2)]
         public Vector2 BuffBarSize = new(254, 20);
 
-        [ColorEdit4("Fight or Flight")]
+        [ColorEdit4("Fight or Flight" + "##Buff")]
         [CollapseWith(15, 2)]
         public PluginConfigColor FightOrFlightColor = new(new Vector4(240f / 255f, 50f / 255f, 0f / 255f, 100f / 100f));
 
-        [ColorEdit4("Requiescat")]
+        [ColorEdit4("Requiescat" + "##Buff")]
         [CollapseWith(20, 2)]
         public PluginConfigColor RequiescatColor = new(new Vector4(61f / 255f, 61f / 255f, 255f / 255f, 100f / 100f));
         #endregion
