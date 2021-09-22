@@ -1,4 +1,4 @@
-﻿
+﻿using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using System;
 using System.Linq;
@@ -71,6 +71,15 @@ namespace DelvUI.Helpers
                 // Name
                 "[name]" when IsPropertyExist(actor, "Name") => actor.Name.ToString(),
                 "[name:first]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).FirstName(),
+                "[name:first-npcmedium]" when IsPropertyExist(actor, "Name") && IsPropertyExist(actor, "ObjectKind") => actor.ObjectKind == ObjectKind.Player
+                ? ((string)actor.Name).FirstName()
+                : ((string)actor.Name).Truncate(15),
+                "[name:first-npclong]" when IsPropertyExist(actor, "Name") && IsPropertyExist(actor, "ObjectKind") => actor.ObjectKind == ObjectKind.Player
+                ? ((string)actor.Name).FirstName()
+                : ((string)actor.Name).Truncate(20),
+                "[name:first-npcfull]" when IsPropertyExist(actor, "Name") && IsPropertyExist(actor, "ObjectKind") => actor.ObjectKind == ObjectKind.Player
+                ? ((string)actor.Name).FirstName()
+                : actor.Name.ToString(),
                 "[name:first-initial]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).FirstName().Length == 0 ? "" : ((string)actor.Name).FirstName().Substring(0, 1),
                 "[name:last]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).LastName(),
                 "[name:last-initial]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).LastName().Length == 0 ? "" : ((string)actor.Name).LastName().Substring(0, 1),
