@@ -210,67 +210,67 @@ namespace DelvUI.Interface.Jobs
         public new static DragoonConfig DefaultConfig() { return new DragoonConfig(); }
 
         #region Chaos Thrust Bar
-        [Checkbox("Show Chaos Thrust Bar", separator = true)]
+        [Checkbox("Chaos Thrust" + "##ChaosThrust", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowChaosThrustBar = true;
-
-        [DragFloat2("Chaos Thrust Bar Size", max = 2000f)]
+        
+        [Checkbox("Timer" + "##ChaosThrust")]
         [CollapseWith(0, 0)]
-        public Vector2 ChaosThrustBarSize = new(254, 20);
-
-        [DragFloat2("Chaos Thrust Bar Position", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 0)]
-        public Vector2 ChaosThrustBarPosition = new(0, -76);
-
-        [Checkbox("Show Chaos Bar Thrust Text")]
-        [CollapseWith(10, 0)]
         public bool ShowChaosThrustBarText = true;
-
-        [ColorEdit4("Chaos Thrust Bar Color")]
+        
+        [DragFloat2("Position" + "##ChaosThrust", min = -4000f, max = 4000f)]
+        [CollapseWith(10, 0)]
+        public Vector2 ChaosThrustBarPosition = new(0, -76);
+        
+        [DragFloat2("Size" + "##ChaosThrust", max = 2000f)]
+        [CollapseWith(5, 0)]
+        public Vector2 ChaosThrustBarSize = new(254, 20);
+        
+        [ColorEdit4("Color" + "##ChaosThrust")]
         [CollapseWith(15, 0)]
         public PluginConfigColor ChaosThrustBarColor = new(new Vector4(106f / 255f, 82f / 255f, 148f / 255f, 100f / 100f));
         #endregion
 
         #region Disembowel Bar
-        [Checkbox("Show Disembowel Bar", separator = true)]
+        [Checkbox("Disembowel" + "##Disembowel", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowDisembowelBar = true;
-
-        [DragFloat2("Disembowel Bar Size", max = 2000f)]
+        
+        [Checkbox("Timer" + "##Disembowel")]
         [CollapseWith(0, 1)]
-        public Vector2 DisembowelBarSize = new(254, 20);
-
-        [DragFloat2("Disembowel Bar Position", min = -4000f, max = 4000f)]
+        public bool ShowDisembowelBarText = true;
+        
+        [DragFloat2("Position" + "##Disembowel", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
         public Vector2 DisembowelBarPosition = new(0, -54);
-
-        [Checkbox("Show Disembowel Bar Text")]
+        
+        [DragFloat2("Size" + "##Disembowel", max = 2000f)]
         [CollapseWith(10, 1)]
-        public bool ShowDisembowelBarText = true;
+        public Vector2 DisembowelBarSize = new(254, 20);
 
-        [ColorEdit4("Disembowel Bar Color")]
+        [ColorEdit4("Color" + "##Disembowel")]
         [CollapseWith(15, 1)]
         public PluginConfigColor DisembowelBarColor = new(new Vector4(244f / 255f, 206f / 255f, 191f / 255f, 100f / 100f));
         #endregion
 
         #region Eye Of The Dragon Bar
-        [Checkbox("Show Eye Of The Dragon Bar", separator = true)]
+        [Checkbox("Eye Of The Dragon" + "##EyeOfTheDragon", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowEyeOfTheDragonBar = true;
-
-        [DragFloat2("Eye Of The Dragon Bar Size", max = 2000f)]
+        
+        [DragFloat2("Position" + "##EyeOfTheDragon", min = -4000f, max = 4000f)]
         [CollapseWith(0, 2)]
-        public Vector2 EyeOfTheDragonBarSize = new(254, 20);
-
-        [DragFloat2("Eye Of The Dragon Bar Position", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 2)]
         public Vector2 EyeOfTheDragonBarPosition = new(0, -32);
 
-        [DragInt("Eye Of The Dragon Bar Padding")]
+        [DragFloat2("Size" + "##EyeOfTheDragon", max = 2000f)]
+        [CollapseWith(5, 2)]
+        public Vector2 EyeOfTheDragonBarSize = new(254, 20);
+
+        [DragInt("Spacing" + "##EyeOfTheDragon")]
         [CollapseWith(10, 2)]
         public int EyeOfTheDragonBarPadding = 2;
 
-        [ColorEdit4("Eye Of The Dragon Bar Color")]
+        [ColorEdit4("Color" + "##EyeOfTheDragon")]
         [CollapseWith(15, 2)]
         public PluginConfigColor EyeOfTheDragonColor = new(new Vector4(1f, 182f / 255f, 194f / 255f, 100f / 100f));
         #endregion
