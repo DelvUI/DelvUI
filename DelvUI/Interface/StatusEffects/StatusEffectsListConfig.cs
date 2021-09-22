@@ -270,7 +270,7 @@ namespace DelvUI.Interface.StatusEffects
     [Portable(false)]
     public class StatusEffectsBlacklistConfig : PluginConfigObject
     {
-        public bool UseAsWhitelist = false;
+        public bool UseAsWhitelist = true;
         public SortedList<string, uint> List = new SortedList<string, uint>();
 
         public bool StatusAllowed(Status status)
@@ -362,7 +362,7 @@ namespace DelvUI.Interface.StatusEffects
             {
                 ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
                 ImGui.SameLine();
-                changed |= ImGui.Checkbox(UseAsWhitelist ? "Whitelist" : "Blacklist", ref UseAsWhitelist);
+                changed |= ImGui.Checkbox("Show as Whitelist (disable for Blacklist)", ref UseAsWhitelist);
                 ImGui.NewLine();
 
                 ImGui.Text("\u2002 \u2002");
