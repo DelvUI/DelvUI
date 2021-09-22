@@ -12,12 +12,13 @@ namespace DelvUI.Interface.Party
     public class PartyFramesHud : DraggableHudElement
     {
         private PartyFramesConfig Config => (PartyFramesConfig)_config;
-        private PartyFramesBarsConfig _healthBarsConfig;
+        private PartyFramesHealthBarsConfig _healthBarsConfig;
+        private PartyFramesManaBarConfig _manaBarsConfig;
+        private PartyFramesRoleIconConfig _roleIconConfig;
         private PartyFramesBuffsConfig _buffsConfig;
         private PartyFramesDebuffsConfig _debuffsConfig;
 
         private Vector2 _contentMargin = new Vector2(40, 40);
-        private const string _mainWindowName = "Party List";
         private static int MaxMemberCount = 8;
 
         // layout
@@ -30,26 +31,22 @@ namespace DelvUI.Interface.Party
         private List<PartyFramesBar> bars;
 
 
-        public PartyFramesHud(
-            string id,
-            PartyFramesConfig config,
-            PartyFramesBarsConfig healthBarsConfig,
-            PartyFramesBuffsConfig buffsConfig,
-            PartyFramesDebuffsConfig debuffsConfig,
-            string displayName) : base(id, config, displayName)
+        public PartyFramesHud(string id, PartyFramesConfig config, string displayName) : base(id, config, displayName)
         {
-            _healthBarsConfig = healthBarsConfig;
-            _buffsConfig = buffsConfig;
-            _debuffsConfig = debuffsConfig;
+            _healthBarsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesHealthBarsConfig>();
+            _manaBarsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesManaBarConfig>();
+            _roleIconConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesRoleIconConfig>();
+            _buffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesBuffsConfig>();
+            _debuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesDebuffsConfig>();
 
             config.onValueChanged += OnLayoutPropertyChanged;
-            healthBarsConfig.onValueChanged += OnLayoutPropertyChanged;
-            healthBarsConfig.ColorsConfig.onValueChanged += OnLayoutPropertyChanged;
+            _healthBarsConfig.onValueChanged += OnLayoutPropertyChanged;
+            _healthBarsConfig.ColorsConfig.onValueChanged += OnLayoutPropertyChanged;
 
             bars = new List<PartyFramesBar>(MaxMemberCount);
             for (int i = 0; i < bars.Capacity; i++)
             {
-                bars.Add(new PartyFramesBar(i.ToString(), healthBarsConfig, buffsConfig, debuffsConfig));
+                bars.Add(new PartyFramesBar(i.ToString(), _healthBarsConfig, _manaBarsConfig, _roleIconConfig, _buffsConfig, _debuffsConfig));
             }
 
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
@@ -204,7 +201,7 @@ namespace DelvUI.Interface.Party
                 windowFlags |= ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoNav;
             }
 
-            ImGui.Begin(_mainWindowName, windowFlags);
+            ImGui.Begin("delvui_partyFrames", windowFlags);
             var windowPos = ImGui.GetWindowPos();
             var windowSize = ImGui.GetWindowSize();
             Config.Position = windowPos;

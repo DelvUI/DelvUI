@@ -52,10 +52,10 @@ namespace DelvUI.Interface.Party
 
     [Serializable]
     [Section("Party Frames")]
-    [SubSection("Bars", 0)]
-    public class PartyFramesBarsConfig : PluginConfigObject
+    [SubSection("Health Bar", 0)]
+    public class PartyFramesHealthBarsConfig : PluginConfigObject
     {
-        public new static PartyFramesBarsConfig DefaultConfig() { return new PartyFramesBarsConfig(); }
+        public new static PartyFramesHealthBarsConfig DefaultConfig() { return new PartyFramesHealthBarsConfig(); }
 
         [DragInt2("Size", isMonitored = true)]
         [Order(30)]
@@ -68,41 +68,14 @@ namespace DelvUI.Interface.Party
         [NestedConfig("Name Label", 40)]
         public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:first-initial]. [name:last-initial].", DrawAnchor.Center, DrawAnchor.Center);
 
-        [NestedConfig("Mana Bar", 45)]
-        public PartyFramesManaBarConfig ManaBarConfig = new PartyFramesManaBarConfig();
-
-        [NestedConfig("Colors", 50)]
+        [NestedConfig("Colors", 45)]
         public PartyFramesColorsConfig ColorsConfig = new PartyFramesColorsConfig();
 
-        [NestedConfig("Job/Role Icons", 55)]
-        public PartyFramesRoleIconConfig RoleIconConfig = new PartyFramesRoleIconConfig();
-
-        [NestedConfig("Shield", 60)]
+        [NestedConfig("Shield", 50)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
-        [NestedConfig("Change Alpha Based on Range", 60)]
+        [NestedConfig("Change Alpha Based on Range", 55)]
         public PartyFramesRangeConfig RangeConfig = new PartyFramesRangeConfig();
-    }
-
-    [Serializable]
-    [Portable(false)]
-    public class PartyFramesManaBarConfig : MovablePluginConfigObject
-    {
-        [DragInt("Height", min = 1, max = 1000)]
-        [Order(30)]
-        public int Height = 6;
-
-        [Checkbox("Show Only For Healers")]
-        [Order(35)]
-        public bool ShowOnlyForHealers = true;
-
-        [ColorEdit4("Color")]
-        [Order(40)]
-        public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
-
-        [ColorEdit4("Background Color")]
-        [Order(45)]
-        public PluginConfigColor BackgroundColor = new PluginConfigColor(new(0 / 255f, 20f / 255f, 100f / 255f, 100f / 100f));
     }
 
     [Serializable]
@@ -149,35 +122,6 @@ namespace DelvUI.Interface.Party
 
     [Serializable]
     [Portable(false)]
-    public class PartyFramesRoleIconConfig : MovablePluginConfigObject
-    {
-        [DragInt2("Size", min = 1, max = 1000)]
-        [Order(20)]
-        public Vector2 Size = new(20, 20);
-
-        [Anchor("Bar Anchor")]
-        [Order(25)]
-        public DrawAnchor BarAnchor = DrawAnchor.TopLeft;
-
-        [Anchor("Anchor")]
-        [Order(30)]
-        public DrawAnchor Anchor = DrawAnchor.TopLeft;
-
-        [Combo("Style", "Style 1", "Style 2")]
-        [Order(35)]
-        public int Style = 0;
-
-        [Checkbox("Use Role Icons")]
-        [CollapseControl(40, 0)]
-        public bool UseRoleIcons = false;
-
-        [Checkbox("Use Specific DPS Role Icons")]
-        [CollapseWith(0, 0)]
-        public bool UseSpecificDPSRoleIcons = false;
-    }
-
-    [Serializable]
-    [Portable(false)]
     public class PartyFramesRangeConfig : PluginConfigObject
     {
         [DragInt("Range (yalms)", min = 1, max = 500)]
@@ -219,6 +163,79 @@ namespace DelvUI.Interface.Party
 
             return distance > AdditionalRange ? AdditionalAlpha : (distance > Range ? Alpha : 100f);
         }
+    }
+
+    [Serializable]
+    [Section("Party Frames")]
+    [SubSection("Mana Bar", 0)]
+    public class PartyFramesManaBarConfig : MovablePluginConfigObject
+    {
+        public new static PartyFramesManaBarConfig DefaultConfig()
+        {
+            var config = new PartyFramesManaBarConfig();
+            config.ValueLabelConfig.Enabled = false;
+            return config;
+        }
+
+        [DragInt2("Size", min = 1, max = 1000)]
+        [Order(20)]
+        public Vector2 Size = new(180, 6);
+
+        [Anchor("Health Bar Anchor")]
+        [Order(25)]
+        public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;
+
+        [Anchor("Anchor")]
+        [Order(30)]
+        public DrawAnchor Anchor = DrawAnchor.BottomLeft;
+
+        [Checkbox("Show Only For Healers")]
+        [Order(35)]
+        public bool ShowOnlyForHealers = true;
+
+        [ColorEdit4("Color")]
+        [Order(40)]
+        public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
+
+        [ColorEdit4("Background Color")]
+        [Order(45)]
+        public PluginConfigColor BackgroundColor = new PluginConfigColor(new(0 / 255f, 20f / 255f, 100f / 255f, 100f / 100f));
+
+        [NestedConfig("Label", 50)]
+        public EditableLabelConfig ValueLabelConfig = new EditableLabelConfig(Vector2.Zero, "[mana:current-short]", DrawAnchor.Center, DrawAnchor.Center);
+    }
+
+
+    [Serializable]
+    [Section("Party Frames")]
+    [SubSection("Role-Job Icon", 0)]
+    public class PartyFramesRoleIconConfig : MovablePluginConfigObject
+    {
+        public new static PartyFramesRoleIconConfig DefaultConfig() { return new PartyFramesRoleIconConfig(); }
+
+        [DragInt2("Size", min = 1, max = 1000)]
+        [Order(20)]
+        public Vector2 Size = new(20, 20);
+
+        [Anchor("Health Bar Anchor")]
+        [Order(25)]
+        public DrawAnchor HealthBarAnchor = DrawAnchor.TopLeft;
+
+        [Anchor("Anchor")]
+        [Order(30)]
+        public DrawAnchor Anchor = DrawAnchor.TopLeft;
+
+        [Combo("Style", "Style 1", "Style 2")]
+        [Order(35)]
+        public int Style = 0;
+
+        [Checkbox("Use Role Icons")]
+        [CollapseControl(40, 0)]
+        public bool UseRoleIcons = false;
+
+        [Checkbox("Use Specific DPS Role Icons")]
+        [CollapseWith(0, 0)]
+        public bool UseSpecificDPSRoleIcons = false;
     }
 
     [Serializable]

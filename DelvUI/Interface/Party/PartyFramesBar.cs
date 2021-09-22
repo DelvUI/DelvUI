@@ -13,11 +13,14 @@ namespace DelvUI.Interface.Party
 {
     public class PartyFramesBar
     {
-        private PartyFramesBarsConfig _config;
+        private PartyFramesHealthBarsConfig _config;
+        private PartyFramesManaBarConfig _manaBarsConfig;
+        private PartyFramesRoleIconConfig _roleIconConfig;
         private PartyFramesBuffsConfig _buffsConfig;
         private PartyFramesDebuffsConfig _debuffsConfig;
 
         private LabelHud _labelHud;
+        private LabelHud _manaLabelHud;
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
 
@@ -25,13 +28,23 @@ namespace DelvUI.Interface.Party
         public bool Visible = false;
         public Vector2 Position;
 
-        public PartyFramesBar(string id, PartyFramesBarsConfig config, PartyFramesBuffsConfig buffsConfig, PartyFramesDebuffsConfig debuffsConfig)
+        public PartyFramesBar(
+            string id,
+            PartyFramesHealthBarsConfig config,
+            PartyFramesManaBarConfig manaBarsConfig,
+            PartyFramesRoleIconConfig roleIconConfig,
+            PartyFramesBuffsConfig buffsConfig,
+            PartyFramesDebuffsConfig debuffsConfig
+        )
         {
             _config = config;
+            _manaBarsConfig = manaBarsConfig;
+            _roleIconConfig = roleIconConfig;
             _buffsConfig = buffsConfig;
             _debuffsConfig = debuffsConfig;
 
-            _labelHud = new LabelHud("partyFramesBar_Label_" + id, config.NameLabelConfig);
+            _labelHud = new LabelHud("partyFramesBar_label_" + id, config.NameLabelConfig);
+            _manaLabelHud = new LabelHud("partyFramesBar_manaLabel_" + id, _manaBarsConfig.ValueLabelConfig);
             _buffsListHud = new StatusEffectsListHud("partyFramesBar_Buffs_" + id, buffsConfig, "");
             _debuffsListHud = new StatusEffectsListHud("partyFramesBar_Debuffs_" + id, debuffsConfig, "");
         }
@@ -122,6 +135,11 @@ namespace DelvUI.Interface.Party
                 }
             }
 
+            // border
+            var borderPos = Position - Vector2.One;
+            var borderSize = _config.Size + Vector2.One * 2;
+            drawList.AddRect(borderPos, borderPos + borderSize, 0xFF000000);
+
             // buffs / debuffs
             ImGui.BeginChild("child_" + _buffsListHud.ID);
             var buffsPos = CalculatePositionForAnchor(_buffsConfig.Anchor);
@@ -136,18 +154,20 @@ namespace DelvUI.Interface.Party
             ImGui.EndChild();
 
             // mana
-            if (_config.ManaBarConfig.Enabled && Member.MaxHP > 0 &&
-                (!_config.ManaBarConfig.ShowOnlyForHealers || JobsHelper.IsJobHealer(Member.JobId)))
+            if (_manaBarsConfig.Enabled && Member.MaxHP > 0 &&
+                (!_manaBarsConfig.ShowOnlyForHealers || JobsHelper.IsJobHealer(Member.JobId)))
             {
-                var manaBarPos = Position + new Vector2(0, _config.Size.Y - _config.ManaBarConfig.Height);
-                var manaBarSize = new Vector2(_config.Size.X, _config.ManaBarConfig.Height);
+                var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _manaBarsConfig.HealthBarAnchor);
+                var manaBarPos = Utils.GetAnchoredPosition(parentPos + _manaBarsConfig.Position, _manaBarsConfig.Size, _manaBarsConfig.Anchor);
 
-                drawList.AddRectFilled(manaBarPos, manaBarPos + manaBarSize, _config.ManaBarConfig.BackgroundColor.Base);
+                drawList.AddRectFilled(manaBarPos, manaBarPos + _manaBarsConfig.Size, _manaBarsConfig.BackgroundColor.Base);
 
                 var scale = (float)Member.MP / (float)Member.MaxMP;
-                var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), manaBarSize.Y);
+                var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), _manaBarsConfig.Size.Y);
 
-                DrawHelper.DrawGradientFilledRect(manaBarPos, fillSize, _config.ManaBarConfig.Color, drawList);
+                DrawHelper.DrawGradientFilledRect(manaBarPos, fillSize, _manaBarsConfig.Color, drawList);
+
+                _manaLabelHud.Draw(manaBarPos, _manaBarsConfig.Size, actor);
             }
 
             // name
@@ -178,16 +198,16 @@ namespace DelvUI.Interface.Party
             }
 
             // icon
-            if (_config.RoleIconConfig.Enabled && isClose)
+            if (_roleIconConfig.Enabled && isClose)
             {
-                var iconId = _config.RoleIconConfig.UseRoleIcons ?
-                    JobsHelper.RoleIconIDForJob(Member.JobId, _config.RoleIconConfig.UseSpecificDPSRoleIcons) :
-                    JobsHelper.IconIDForJob(Member.JobId) + (uint)_config.RoleIconConfig.Style * 100;
+                var iconId = _roleIconConfig.UseRoleIcons ?
+                    JobsHelper.RoleIconIDForJob(Member.JobId, _roleIconConfig.UseSpecificDPSRoleIcons) :
+                    JobsHelper.IconIDForJob(Member.JobId) + (uint)_roleIconConfig.Style * 100;
 
-                var parentPos = Utils.GetAnchoredPosition(Position, _config.Size, _config.RoleIconConfig.BarAnchor);
-                var iconPos = Utils.GetAnchoredPosition(parentPos + _config.RoleIconConfig.Position, _config.RoleIconConfig.Size, _config.RoleIconConfig.Anchor);
+                var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _roleIconConfig.HealthBarAnchor);
+                var iconPos = Utils.GetAnchoredPosition(parentPos + _roleIconConfig.Position, _roleIconConfig.Size, _roleIconConfig.Anchor);
 
-                DrawHelper.DrawIcon(iconId, iconPos, _config.RoleIconConfig.Size, false, drawList);
+                DrawHelper.DrawIcon(iconId, iconPos, _roleIconConfig.Size, false, drawList);
             }
 
             // highlight
@@ -196,10 +216,6 @@ namespace DelvUI.Interface.Party
                 drawList.AddRectFilled(Position, Position + _config.Size, _config.ColorsConfig.HighlightColor.Base);
             }
 
-            // border
-            var borderPos = Position - Vector2.One;
-            var borderSize = _config.Size + Vector2.One * 2;
-            drawList.AddRect(borderPos, borderPos + borderSize, 0xFF000000);
         }
 
         private Vector2 CalculatePositionForAnchor(DrawAnchor anchor)

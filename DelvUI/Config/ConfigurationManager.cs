@@ -100,7 +100,9 @@ namespace DelvUI.Config
                 typeof(FocusTargetUnitFrameConfig),
 
                 typeof(PartyFramesConfig),
-                typeof(PartyFramesBarsConfig),
+                typeof(PartyFramesHealthBarsConfig),
+                typeof(PartyFramesManaBarConfig),
+                typeof(PartyFramesRoleIconConfig),
                 typeof(PartyFramesBuffsConfig),
                 typeof(PartyFramesDebuffsConfig),
 
