@@ -61,18 +61,164 @@ namespace DelvUI.Helpers
             return t.Seconds.ToString();
         }
 
+        public struct RGB
+        {
+            private byte _r;
+            private byte _g;
+            private byte _b;
+
+            public RGB(byte r, byte g, byte b)
+            {
+                this._r = r;
+                this._g = g;
+                this._b = b;
+            }
+
+            public byte R
+            {
+                get { return this._r; }
+                set { this._r = value; }
+            }
+
+            public byte G
+            {
+                get { return this._g; }
+                set { this._g = value; }
+            }
+
+            public byte B
+            {
+                get { return this._b; }
+                set { this._b = value; }
+            }
+
+            public bool Equals(RGB rgb)
+            {
+                return (this.R == rgb.R) && (this.G == rgb.G) && (this.B == rgb.B);
+            }
+        }
+
+        public struct HSL
+        {
+            private int _h;
+            private float _s;
+            private float _l;
+
+            public HSL(int h, float s, float l)
+            {
+                this._h = h;
+                this._s = s;
+                this._l = l;
+            }
+
+            public int H
+            {
+                get { return this._h; }
+                set { this._h = value; }
+            }
+
+            public float S
+            {
+                get { return this._s; }
+                set { this._s = value; }
+            }
+
+            public float L
+            {
+                get { return this._l; }
+                set { this._l = value; }
+            }
+
+            public bool Equals(HSL hsl)
+            {
+                return (this.H == hsl.H) && (this.S == hsl.S) && (this.L == hsl.L);
+            }
+        }
+
+        public static RGB HSLToRGB(HSL hsl)
+        {
+            byte r = 0;
+            byte g = 0;
+            byte b = 0;
+
+            if (hsl.S == 0)
+            {
+                r = g = b = (byte)(hsl.L * 255);
+            }
+            else
+            {
+                float v1, v2;
+                float hue = (float)hsl.H / 360;
+
+                v2 = (hsl.L < 0.5) ? (hsl.L * (1 + hsl.S)) : ((hsl.L + hsl.S) - (hsl.L * hsl.S));
+                v1 = 2 * hsl.L - v2;
+
+                r = (byte)(255 * HueToRGB(v1, v2, hue + (1.0f / 3)));
+                g = (byte)(255 * HueToRGB(v1, v2, hue));
+                b = (byte)(255 * HueToRGB(v1, v2, hue - (1.0f / 3)));
+            }
+
+            return new RGB(r, g, b);
+        }
+
+        private static float HueToRGB(float v1, float v2, float vH)
+        {
+            if (vH < 0)
+            {
+                vH += 1;
+            }
+
+            if (vH > 1)
+            {
+                vH -= 1;
+            }
+
+            if ((6 * vH) < 1)
+            {
+                return (v1 + (v2 - v1) * 6 * vH);
+            }
+
+            if ((2 * vH) < 1)
+            {
+                return v2;
+            }
+
+            if ((3 * vH) < 2)
+            {
+                return (v1 + (v2 - v1) * ((2.0f / 3) - vH) * 6);
+            }
+
+            return v1;
+        }
 
 
         public static PluginConfigColor ColorByHealthValue(Chara chara)
         {
-            var scale = (float)chara.CurrentHp / Math.Max(1, chara.MaxHp);
-            float r, g, b;
+            float scale = (float)chara.CurrentHp / Math.Max(1, chara.MaxHp);
+            float ratio = scale;
+            float min = 0.3f;
+            float max = 0.8f;
+            if (min > 0 || max < 1)
+            {
+                if (scale < min)
+                {
+                    ratio = 0;
+                }
+                else if (scale > max)
+                {
+                    ratio = 1;
+                }
+                else
+                {
+                    var range = max - min;
+                    ratio = (scale - min) / range;
+                }
+            }
+            float hue = (ratio * 1.2f / 3.60f) * 360f;
 
-            r = 255f * (1f - scale);
-            g = 255f * scale;
-            b = 0f;
+            RGB rgb = HSLToRGB(new HSL((int)hue, 1f, .5f));
 
-            PluginConfigColor newColor = new PluginConfigColor(new(r / 255f, g / 255f, b / 255f, 100f / 100f));
+            PluginConfigColor newColor = new PluginConfigColor(new(rgb.R / 255f , rgb.G / 255f, rgb.B / 255f, 100f / 100f));
 
             return newColor;
         }
