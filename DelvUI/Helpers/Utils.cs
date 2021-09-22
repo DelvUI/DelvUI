@@ -61,6 +61,23 @@ namespace DelvUI.Helpers
             return t.Seconds.ToString();
         }
 
+
+
+        public static PluginConfigColor ColorByHealthValue(Chara chara)
+        {
+            var scale = (float)chara.CurrentHp / Math.Max(1, chara.MaxHp);
+            float r, g, b;
+
+            r = 255f * (1f - scale);
+            g = 255f * scale;
+            b = 0f;
+
+            PluginConfigColor newColor = new PluginConfigColor(new(r / 255f, g / 255f, b / 255f, 100f / 100f));
+
+            return newColor;
+        }
+
+
         public static PluginConfigColor ColorForActor(Chara actor)
         {
             switch (actor.ObjectKind)

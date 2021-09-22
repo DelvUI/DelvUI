@@ -142,6 +142,12 @@ namespace DelvUI.Interface.GeneralElements
             var color = Config.UseCustomColor ? Config.CustomColor : Utils.ColorForActor(chara);
             var bgColor = BackgroundColor(chara);
 
+            
+            if(Config.UseCustomColor && Config.UseColorBasedOnHealthValue)
+            {
+                color = Utils.ColorByHealthValue(chara);
+            }
+
             // background
             drawList.AddRectFilled(startPos, endPos, bgColor);
 
@@ -222,17 +228,14 @@ namespace DelvUI.Interface.GeneralElements
 
             if (Config.UseCustomBackgroundColor)
             {
-                uint color;
                 if (Config.UseJobColorAsBackgroundColor)
                 {
-                    color = GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Base;
-                    return color;
+                    return GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Base;
                 }
                 else
                 {
-                    color = Config.CustomBackgroundColor.Base;
+                    return Config.CustomBackgroundColor.Base;
                 }
-                return color;
             }
 
             return GlobalColors.Instance.EmptyUnitFrameColor.Base;

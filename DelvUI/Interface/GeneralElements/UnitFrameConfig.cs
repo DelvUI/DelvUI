@@ -108,6 +108,10 @@ namespace DelvUI.Interface.GeneralElements
         [CollapseWith(0, 0)]
         public PluginConfigColor CustomColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
+        [Checkbox("Color Based On Health Value")]
+        [CollapseWith(1, 0)]
+        public bool UseColorBasedOnHealthValue = false;
+
         [Checkbox("Custom Background Color")]
         [CollapseControl(25, 1)]
         public bool UseCustomBackgroundColor = false;
