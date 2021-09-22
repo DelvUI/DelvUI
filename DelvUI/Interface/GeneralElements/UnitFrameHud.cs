@@ -222,12 +222,17 @@ namespace DelvUI.Interface.GeneralElements
 
             if (Config.UseCustomBackgroundColor)
             {
-                return Config.CustomBackgroundColor.Base;
-            }
-
-            if (Config.UseJobColorAsBackgroundColor)
-            {
-                return ImGui.ColorConvertFloat4ToU32(GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Vector);
+                uint color;
+                if (Config.UseJobColorAsBackgroundColor)
+                {
+                    color = ImGui.ColorConvertFloat4ToU32(GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Vector);
+                    return color;
+                }
+                else
+                {
+                    color = Config.CustomBackgroundColor.Base;
+                }
+                return color;
             }
 
             return GlobalColors.Instance.EmptyUnitFrameColor.Base;
