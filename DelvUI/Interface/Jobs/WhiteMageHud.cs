@@ -72,6 +72,11 @@ namespace DelvUI.Interface.Jobs
 
             if (target is not Chara)
             {
+                if (Config.HideInactiveDiaBar)
+                {
+                    return;
+                }
+                
                 drawList.AddRectFilled(cursorPos, cursorPos + Config.DiaBarSize, EmptyColor.Background);
                 drawList.AddRect(cursorPos, cursorPos + Config.DiaBarSize, 0xFF000000);
 
@@ -86,31 +91,43 @@ namespace DelvUI.Interface.Jobs
 
             float diaCooldown = dia.EffectId == 1871 ? 30f : 18f;
             float diaDuration = dia.Duration;
+            
+            if (Config.HideInactiveDiaBar && dia.Duration == 0)
+            {
+                return;
+            }
 
             drawList.AddRectFilled(cursorPos, cursorPos + Config.DiaBarSize, EmptyColor.Background);
 
             drawList.AddRectFilled(
                 cursorPos,
                 cursorPos + new Vector2(Config.DiaBarSize.X / diaCooldown * diaDuration, Config.DiaBarSize.Y),
-                Config.DiaColor.BottomGradient
+                Config.ShowDiaRefresh 
+                    ? dia.Duration >= Config.DiaCustomRefresh
+                        ? Config.DiaColor.BottomGradient 
+                        : Config.DiaRefreshColor.BottomGradient 
+                    : Config.DiaColor.BottomGradient
             );
 
             drawList.AddRect(cursorPos, cursorPos + Config.DiaBarSize, 0xFF000000);
 
-            DrawHelper.DrawOutlinedText(
-                string.Format(CultureInfo.InvariantCulture, "{0,2:N0}", diaDuration), // keeps 10 -> 9 from jumping
-                new Vector2(
-                    // smooths transition of counter to the right of the emptying bar
-                    cursorPos.X
-                  + Config.DiaBarSize.X * diaDuration / diaCooldown
-                  - (Math.Abs(diaDuration - diaCooldown) < float.Epsilon
-                        ? diaCooldown
-                        : diaDuration > 3
-                            ? 20
-                            : diaDuration * (20f / 3f)),
-                    cursorPos.Y + Config.DiaBarSize.Y / 2 - 12
-                )
-            );
+            if (Config.ShowDiaTimer)
+            {
+                DrawHelper.DrawOutlinedText(
+                    string.Format(CultureInfo.InvariantCulture, "{0,2:N0}", diaDuration), // keeps 10 -> 9 from jumping
+                    new Vector2(
+                        // smooths transition of counter to the right of the emptying bar
+                        cursorPos.X
+                      + Config.DiaBarSize.X * diaDuration / diaCooldown
+                      - (Math.Abs(diaDuration - diaCooldown) < float.Epsilon
+                            ? diaCooldown
+                            : diaDuration > 3
+                                ? 20
+                                : diaDuration * (20f / 3f)),
+                        cursorPos.Y + Config.DiaBarSize.Y / 2 - 12
+                    )
+                );
+            }
         }
 
         private void DrawLilyBars(Vector2 origin)
@@ -229,17 +246,37 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Dia", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowDiaBar = true;
-
-        [DragFloat2("Size " + "##Dia", max = 2000f)]
+        
+        [Checkbox("Timer")]
         [CollapseWith(0, 1)]
+        public bool ShowDiaTimer = false;
+        
+        [Checkbox("Hide Inactive Dia Bar")]
+        [CollapseWith(5, 1)]
+        public bool HideInactiveDiaBar = false;
+        
+        [Checkbox("Refresh Reminder")] // 3s
+        [CollapseWith(10, 1)]
+        public bool ShowDiaRefresh = false;
+
+        [DragInt("Custom Refresh Reminder", min = 0, max = 30)]
+        [CollapseWith(15, 1)]
+        public int DiaCustomRefresh = 3;
+
+        [ColorEdit4("Refresh Color")]
+        [CollapseWith(20, 1)]
+        public PluginConfigColor DiaRefreshColor = new(new(190f / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
+        
+        [DragFloat2("Size " + "##Dia", max = 2000f)]
+        [CollapseWith(25, 1)]
         public Vector2 DiaBarSize = new(254, 20);
 
         [DragFloat2("Position" + "##Dia", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 1)]
+        [CollapseWith(30, 1)]
         public Vector2 DiaBarPosition = new(0, -32);
 
         [ColorEdit4("Color" + "##Dia")]
-        [CollapseWith(10, 1)]
+        [CollapseWith(35, 1)]
         public PluginConfigColor DiaColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
         #endregion
     }
