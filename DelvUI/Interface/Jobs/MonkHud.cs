@@ -367,8 +367,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDemolishBar(Vector2 origin)
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget ?? Plugin.ClientState.LocalPlayer;            
-            var demolish = target.StatusEffects.FirstOrDefault(o => o.EffectId == 246 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId);            
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget ?? Plugin.ClientState.LocalPlayer;
+            var demolish = target.StatusEffects.FirstOrDefault(o => o.EffectId == 246 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId);
             var demolishDuration = demolish.Duration;
 
             var position = origin + Config.Position + Config.DemolishBarPosition - Config.DemolishBarSize / 2f;
