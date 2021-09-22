@@ -43,12 +43,6 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.BloodGaugeSize);
             }
 
-            if (Config.ShowDarkside)
-            {
-                positions.Add(Config.Position + Config.DarksidePosition);
-                sizes.Add(Config.DarksideSize);
-            }
-
             if (Config.ShowBuffBar)
             {
                 positions.Add(Config.Position + Config.BuffBarPosition);
@@ -135,15 +129,12 @@ namespace DelvUI.Interface.Jobs
         {
             float darksideTimer = Plugin.JobGauges.Get<DRKGauge>().DarksideTimeRemaining;
             float darksideDuration = Math.Abs(darksideTimer / 1000);
+            var max = 60f;
 
             var posX = origin.X + Config.Position.X + Config.DarksidePosition.X - Config.DarksideSize.X / 2f;
             var posY = origin.Y + Config.Position.Y + Config.DarksidePosition.Y - Config.DarksideSize.Y / 2f;
-
-            //var duration = gauge.DarksideTimeRemaining;
-            //var darksideDuration = Convert.ToSingle(duration);
-            var max = 60f;
-
-            if (darksideDuration == 0)
+                        
+            if (darksideDuration == 0 && Config.OnlyShowWhenActive)
             {
                 return;
             }
@@ -334,25 +325,29 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(40, 2)]
         public bool ShowDarkside = true;
 
-        [Checkbox("Text" + "##Darkside")]
-        [CollapseWith(5, 2)]
-        public bool ShowDarksideText = true;
+        [Checkbox("Only Show When Active" + "##Darkside")]
+        [CollapseWith(0, 2)]
+        public bool OnlyShowWhenActive = true;        
 
         [DragFloat2("Position" + "##Darkside", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 2)]
-        public Vector2 DarksidePosition = new Vector2(0, -49);
+        [CollapseWith(5, 2)]
+        public Vector2 DarksidePosition = new Vector2(0, -73);
 
         [DragFloat2("Size" + "##Darkside", min = 0, max = 4000f)]
-        [CollapseWith(15, 2)]
+        [CollapseWith(10, 2)]
         public Vector2 DarksideSize = new Vector2(254, 10);
 
         [ColorEdit4("Darkside" + "##Darkside")]
-        [CollapseWith(20, 2)]
+        [CollapseWith(15, 2)]
         public PluginConfigColor DarksideColor = new(new Vector4(209 / 255f, 38f / 255f, 204f / 255f, 100f / 100f));
 
         [ColorEdit4("Darkside Expiry" + "##Darkside")]
-        [CollapseWith(25, 2)]
+        [CollapseWith(20, 2)]
         public PluginConfigColor DarksideExpiryColor = new(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [Checkbox("Show Darkside Text" + "##Darkside")]
+        [CollapseWith(25, 2)]
+        public bool ShowDarksideText = true;
         #endregion
 
         #region Buff Bar
