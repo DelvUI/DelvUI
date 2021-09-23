@@ -148,7 +148,6 @@ namespace DelvUI.Config
                 typeof(MPTickerConfig),
                 typeof(GridConfig),
 
-                typeof(ImportExportConfig),
                 typeof(ProfilesConfig)
             };
 

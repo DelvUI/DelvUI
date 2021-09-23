@@ -2,6 +2,7 @@
 using Dalamud.Plugin;
 using DelvUI.Config.Attributes;
 using DelvUI.Config.Tree;
+using DelvUI.Helpers;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
@@ -16,7 +17,7 @@ namespace DelvUI.Config
     [Disableable(false)]
     [Portable(false)]
     [Section("Profiles")]
-    [SubSection("General", 0)]
+    [SubSection("Profiles", 0)]
     public class ProfilesConfig : PluginConfigObject
     {
         [JsonIgnore] public static string DefaultProfileName = "Defaults";
@@ -24,12 +25,20 @@ namespace DelvUI.Config
         public Dictionary<string, string> Profiles = new Dictionary<string, string>();
         public string CurrentProfile = DefaultProfileName;
 
-        private string _newProfileName = "name";
+        public Dictionary<uint, string> JobProfileMap = new Dictionary<uint, string>();
+
+        private int _selectedJob = 0;
+        private int _selectedProfileForJob = 0;
+
+        private string _newProfileName = "New profile";
 
         public new static ProfilesConfig DefaultConfig() { return new ProfilesConfig(); }
 
+        // TODO ideally this would be done by DefaultConfig()
+        // but this needs to be called after ConfigurationManager's ConfigBaseNode is fully populated
         public void GenerateDefaultsProfile(BaseNode baseNode)
         {
+            // generate default and default player profiles
             string defaultString = baseNode.GetBase64String();
             Profiles[DefaultProfileName] = defaultString;
             Profiles[DefaultPlayerProfileName] = defaultString;
@@ -39,6 +48,19 @@ namespace DelvUI.Config
         public void UpdateCurrentProfile(BaseNode baseNode)
         {
             Profiles[CurrentProfile] = baseNode.GetBase64String();
+        }
+
+        public bool SwitchToProfile(string profileName)
+        {
+            string profileString;
+            if (!Profiles.TryGetValue(profileName, out profileString))
+            {
+                return false;
+            }
+            string[] importStrings = profileString.Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
+            ConfigurationManager.LoadTotalConfiguration(importStrings);
+            CurrentProfile = profileString;
+            return true;
         }
 
         [ManualDraw]
@@ -62,7 +84,7 @@ namespace DelvUI.Config
 
                 ImGui.Text("\u2002");
                 ImGui.SameLine();
-                if (ImGui.BeginTable("table", 3, flags, new Vector2(326, 150)))
+                if (ImGui.BeginTable("table", 3, flags, new Vector2(500, 150)))
                 {
                     ImGui.TableSetupColumn("Profile name", ImGuiTableColumnFlags.WidthStretch, 0, 0);
                     ImGui.TableSetupColumn("Export", ImGuiTableColumnFlags.WidthFixed, 0, 1);
@@ -70,8 +92,6 @@ namespace DelvUI.Config
 
                     ImGui.TableSetupScrollFreeze(0, 1);
                     ImGui.TableHeadersRow();
-
-                    //PluginLog.Log(Profiles.Count.ToString());
 
                     foreach (KeyValuePair<string, string> profile in Profiles)
                     {
@@ -151,54 +171,98 @@ namespace DelvUI.Config
                         }
                         ImGui.PopID();
                     }
+
+                    ImGui.PushID("new profile row");
+                    ImGui.TableNextRow(ImGuiTableRowFlags.None);
+
+                    if (ImGui.TableSetColumnIndex(0))
+                    {
+                        ImGui.PushItemWidth(150);
+                        ImGui.InputText("", ref _newProfileName, 80);
+
+                        ImGui.SameLine();
+                        ImGui.PushFont(UiBuilder.IconFont);
+                        if (ImGui.Button(FontAwesomeIcon.Plus.ToIconString(), new Vector2(0, 0)) && _newProfileName != "" && !Profiles.ContainsKey(_newProfileName))
+                        {
+                            // create a new profile copying the default
+                            Profiles[_newProfileName] = Profiles[DefaultProfileName];
+                            CurrentProfile = _newProfileName;
+                            changed = true;
+                        }
+                        ImGui.PopFont();
+
+                        ImGui.SameLine();
+                        ImGui.PushFont(UiBuilder.IconFont);
+                        if (ImGui.Button(FontAwesomeIcon.FileImport.ToIconString(), new Vector2(0, 0)))
+                        {
+                            string _importString = "";
+                            try
+                            {
+                                _importString = ImGui.GetClipboardText();
+                            }
+                            catch (Exception ex)
+                            {
+                                PluginLog.Log("Could not get clipboard text:\n" + ex.StackTrace);
+                            }
+
+                            if (_importString != "")
+                            {
+                                Profiles[_newProfileName] = _importString.Trim();
+                                changed = true;
+                            }
+                        }
+                        ImGui.PopFont();
+                    }
+
                     ImGui.EndTable();
                 }
             }
 
-            ImGui.NewLine();
+            // generate array of jobs
+            uint[] jobs = typeof(JobIDs).GetFields()
+                .Where(o => o.FieldType == typeof(uint))
+                .Select(o => (uint)o.GetValue(null))
+                .ToArray();
+            string[] jobNames = jobs.Select(o => JobsHelper.JobNames[o]).ToArray();
+            string[] availableProfiles = Profiles.Keys.Select(o => o == DefaultProfileName ? "-" : o).ToArray();
 
             ImGui.Text("\u2002");
             ImGui.SameLine();
-            ImGui.Text("Add a new profile: ");
-            ImGui.SameLine();
-            ImGui.PushItemWidth(150);
-            ImGui.InputText("", ref _newProfileName, 80);
-
-            ImGui.SameLine();
-            ImGui.PushFont(UiBuilder.IconFont);
-            if (ImGui.Button(FontAwesomeIcon.Plus.ToIconString(), new Vector2(0, 0)) && _newProfileName != "" && !Profiles.ContainsKey(_newProfileName))
+            if (ImGui.Combo("Job ##profilejobs", ref _selectedJob, jobNames, jobNames.Length, 10))
             {
-                // create a new profile copying the default
-                Profiles[_newProfileName] = Profiles[DefaultProfileName];
-                CurrentProfile = _newProfileName;
-                changed = true;
-            }
-            ImGui.PopFont();
-
-            ImGui.SameLine();
-            ImGui.PushFont(UiBuilder.IconFont);
-            if (ImGui.Button(FontAwesomeIcon.FileImport.ToIconString() + " from clipboard", new Vector2(0, 0)))
-            {
-                string _importString = "";
-                try
+                // if a job was selected in the jobs combo box, update the displayed profile for it, if it exists
+                string profileForJob;
+                if (JobProfileMap.TryGetValue(jobs[_selectedJob], out profileForJob))
                 {
-                    _importString = ImGui.GetClipboardText();
+                    PluginLog.Log($"loading {profileForJob} from key {jobs[_selectedJob]}");
+                    _selectedProfileForJob = Array.FindIndex(availableProfiles, o => o == profileForJob);
+                    // if the profile assigned to the job _selectedJob is no longer available
+                    // then set it to the default profile, which corresponds to the symbol "-"
+                    if (_selectedProfileForJob == -1)
+                    {
+                        _selectedProfileForJob = Array.FindIndex(availableProfiles, o => o == "-");
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    PluginLog.Log("Could not get clipboard text:\n" + ex.StackTrace);
-                }
-
-                if (_importString != "")
-                {
-                    Profiles[_newProfileName] = _importString.Trim();
-                    changed = true;
+                    _selectedProfileForJob = Array.FindIndex(availableProfiles, o => o == "-");
                 }
             }
-            ImGui.PopFont();
+
+            ImGui.Text("\u2002");
+            ImGui.SameLine();
+            ImGui.Text("\u2002");
+            ImGui.SameLine();
+            if (ImGui.Combo("Profile ##profilejobsoptions", ref _selectedProfileForJob, availableProfiles, availableProfiles.Length, 10))
+            {
+                if (availableProfiles[_selectedProfileForJob] != "-")
+                {
+                    JobProfileMap[jobs[_selectedJob]] = availableProfiles[_selectedProfileForJob];
+                    PluginLog.Log($"Adding profile {availableProfiles[_selectedProfileForJob]} to {jobs[_selectedJob]}");
+                }
+            }
 
             ImGui.EndChild();
-
 
             if (profileToRemove != "")
             {
