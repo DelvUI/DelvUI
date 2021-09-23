@@ -365,7 +365,7 @@ namespace DelvUI.Interface.Jobs
                     cascadeBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
                 if(fountainDuration > 0)
                     fountainBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                if(windmillDuration < 0)
+                if(windmillDuration > 0)
                     windmillBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
                 if(showerDuration > 0)
                     showerBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
