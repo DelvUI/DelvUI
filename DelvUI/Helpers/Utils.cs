@@ -1,7 +1,7 @@
-﻿using Dalamud.Game.ClientState.Actors;
+﻿using Colourful;
+using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
-using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
@@ -11,8 +11,11 @@ using System.Numerics;
 
 namespace DelvUI.Helpers
 {
+
+
     internal static class Utils
     {
+
         public static unsafe bool IsHostileMemory(BattleNpc npc)
         {
             if (npc == null)
@@ -62,6 +65,7 @@ namespace DelvUI.Helpers
             return t.Seconds.ToString();
         }
 
+        /*
         public struct RGB
         {
             private float _r;
@@ -245,6 +249,8 @@ namespace DelvUI.Helpers
 
             return hsl;
         }
+        */
+
 
         public static PluginConfigColor ColorByHealthValue(float i, float min, float max, PluginConfigColor fullHealthColor, PluginConfigColor lowHealthColor)
         {
@@ -266,6 +272,22 @@ namespace DelvUI.Helpers
                 }
             }
 
+            var _rgbToLab = new ConverterBuilder().FromRGB().ToLab().Build();
+            var _labToRgb = new ConverterBuilder().FromLab().ToRGB().Build();
+
+            var rgbFullHealthColor = new RGBColor(fullHealthColor.Vector.X, fullHealthColor.Vector.Y, fullHealthColor.Vector.Z);
+            var rgbLowHealthColor = new RGBColor(lowHealthColor.Vector.X, lowHealthColor.Vector.Y, lowHealthColor.Vector.Z);
+
+            var rgbFullHealthLab = _rgbToLab.Convert(rgbFullHealthColor);
+            var rgbLowHealthLab = _rgbToLab.Convert(rgbLowHealthColor);
+
+            float resultL = (float)((rgbFullHealthLab.L - rgbLowHealthLab.L) * ratio + rgbLowHealthLab.L);
+            float resultA = (float)((rgbFullHealthLab.a - rgbLowHealthLab.a) * ratio + rgbLowHealthLab.a);
+            float resultB = (float)((rgbFullHealthLab.b - rgbLowHealthLab.b) * ratio + rgbLowHealthLab.b);
+
+            var newColorLab = new LabColor(resultL, resultA, resultB);
+            var newColorLab2RGB = _labToRgb.Convert(newColorLab);
+            /*
             RGB rgbFH = new RGB(fullHealthColor.Vector.X,fullHealthColor.Vector.Y, fullHealthColor.Vector.Z);
             HSL hslFH = RGBToHSL(rgbFH);
 
@@ -277,8 +299,9 @@ namespace DelvUI.Helpers
             float resultLit  = (hslFH.L - hslLH.L) * ratio + hslLH.L;
 
             RGB rgb = HSLToRGB(new((int)resultHue, resultSat, resultLit));
+            */
 
-            PluginConfigColor newColor = new PluginConfigColor(new Vector4(rgb.R , rgb.G, rgb.B, 100f / 100f));
+            PluginConfigColor newColor = new PluginConfigColor(new Vector4((float)newColorLab2RGB.R, (float)newColorLab2RGB.G, (float)newColorLab2RGB.B, 100f / 100f));
             return newColor;
         }
 
