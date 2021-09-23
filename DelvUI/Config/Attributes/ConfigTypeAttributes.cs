@@ -459,8 +459,20 @@ namespace DelvUI.Config.Attributes
             }
 
             string stringVal = (string)field.GetValue(config);
-            int index = stringVal == null || stringVal.Length == 0 || !fontsConfig.Fonts.ContainsKey(stringVal) ? 0 :
+            int index = stringVal == null || stringVal.Length == 0 || !fontsConfig.Fonts.ContainsKey(stringVal) ? -1 :
                 fontsConfig.Fonts.IndexOfKey(stringVal);
+
+            if (index == -1)
+            {
+                if (fontsConfig.Fonts.ContainsKey(fontsConfig.DefaultFontKey))
+                {
+                    index = fontsConfig.Fonts.IndexOfKey(fontsConfig.DefaultFontKey);
+                }
+                else
+                {
+                    index = 0;
+                }
+            }
 
             var options = fontsConfig.Fonts.Values.Select(fontData => fontData.Name + "\u2002\u2002" + fontData.Size.ToString()).ToArray();
 
