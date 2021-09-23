@@ -112,6 +112,14 @@ namespace DelvUI.Interface.GeneralElements
         [CollapseWith(1, 0)]
         public bool UseColorBasedOnHealthValue = false;
 
+        [ColorEdit4("Full Health Color ##CustomFrame")]
+        [CollapseWith(2, 0)]
+        public PluginConfigColor FullHealthColor = new PluginConfigColor(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Low Health Color ##CustomFrame")]
+        [CollapseWith(3, 0)]
+        public PluginConfigColor LowHealthColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
         [Checkbox("Custom Background Color")]
         [CollapseControl(25, 1)]
         public bool UseCustomBackgroundColor = false;

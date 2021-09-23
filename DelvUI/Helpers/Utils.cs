@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
+using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
@@ -63,30 +64,30 @@ namespace DelvUI.Helpers
 
         public struct RGB
         {
-            private byte _r;
-            private byte _g;
-            private byte _b;
+            private float _r;
+            private float _g;
+            private float _b;
 
-            public RGB(byte r, byte g, byte b)
+            public RGB(float r, float g, float b)
             {
                 this._r = r;
                 this._g = g;
                 this._b = b;
             }
 
-            public byte R
+            public float R
             {
                 get { return this._r; }
                 set { this._r = value; }
             }
 
-            public byte G
+            public float G
             {
                 get { return this._g; }
                 set { this._g = value; }
             }
 
-            public byte B
+            public float B
             {
                 get { return this._b; }
                 set { this._b = value; }
@@ -137,13 +138,13 @@ namespace DelvUI.Helpers
 
         public static RGB HSLToRGB(HSL hsl)
         {
-            byte r = 0;
-            byte g = 0;
-            byte b = 0;
+            float r = 0;
+            float g = 0;
+            float b = 0;
 
             if (hsl.S == 0)
             {
-                r = g = b = (byte)(hsl.L * 255);
+                r = g = b = (float)(hsl.L * 255);
             }
             else
             {
@@ -153,9 +154,9 @@ namespace DelvUI.Helpers
                 v2 = (hsl.L < 0.5) ? (hsl.L * (1 + hsl.S)) : ((hsl.L + hsl.S) - (hsl.L * hsl.S));
                 v1 = 2 * hsl.L - v2;
 
-                r = (byte)(255 * HueToRGB(v1, v2, hue + (1.0f / 3)));
-                g = (byte)(255 * HueToRGB(v1, v2, hue));
-                b = (byte)(255 * HueToRGB(v1, v2, hue - (1.0f / 3)));
+                r = (float)(255 * HueToRGB(v1, v2, hue + (1.0f / 3)));
+                g = (float)(255 * HueToRGB(v1, v2, hue));
+                b = (float)(255 * HueToRGB(v1, v2, hue - (1.0f / 3)));
             }
 
             return new RGB(r, g, b);
@@ -191,32 +192,70 @@ namespace DelvUI.Helpers
             return v1;
         }
 
-
-        public static PluginConfigColor ColorByHealthValue(float i, float min, float max)
+        public static HSL RGBToHSL(RGB rgb)
         {
-            float ratio = i;
-            if (min > 0 || max < 1)
+            HSL hsl = new HSL();
+
+            float r = (rgb.R / 255.0f);
+            float g = (rgb.G / 255.0f);
+            float b = (rgb.B / 255.0f);
+
+            float min = Math.Min(Math.Min(r, g), b);
+            float max = Math.Max(Math.Max(r, g), b);
+            float delta = max - min;
+
+            hsl.L = (max + min) / 2;
+
+            if (delta == 0)
             {
-                if (i < min)
+                hsl.H = 0;
+                hsl.S = 0.0f;
+            }
+            else
+            {
+                hsl.S = (hsl.L <= 0.5) ? (delta / (max + min)) : (delta / (2 - max - min));
+
+                float hue;
+
+                if (r == max)
                 {
-                    ratio = 0;
+                    hue = ((g - b) / 6) / delta;
                 }
-                else if (i > max)
+                else if (g == max)
                 {
-                    ratio = 1;
+                    hue = (1.0f / 3) + ((b - r) / 6) / delta;
                 }
                 else
                 {
-                    var range = max - min;
-                    ratio = (i - min) / range;
+                    hue = (2.0f / 3) + ((r - g) / 6) / delta;
                 }
+
+                if (hue < 0)
+                {
+                    hue += 1;
+                }
+
+                if (hue > 1)
+                {
+                    hue -= 1;
+                }
+
+                hsl.H = (int)(hue * 360);
             }
-            float hue = (ratio * 1.2f / 3.60f) * 360f;
 
-            RGB rgb = HSLToRGB(new HSL((int)hue, 1f, .5f));
+            return hsl;
+        }
 
-            PluginConfigColor newColor = new PluginConfigColor(new(rgb.R / 255f , rgb.G / 255f, rgb.B / 255f, 100f / 100f));
-
+        public static PluginConfigColor ColorByHealthValue(float i, float min, float max, PluginConfigColor fullHealthColor, PluginConfigColor lowHealthColor)
+        {
+            float resultRed = (fullHealthColor.Vector.X - lowHealthColor.Vector.X) * i + lowHealthColor.Vector.X;
+            float resultGreen = (fullHealthColor.Vector.Y - lowHealthColor.Vector.Y) * i + lowHealthColor.Vector.Y;
+            float resultBlue = (fullHealthColor.Vector.Z - lowHealthColor.Vector.Z) * i + lowHealthColor.Vector.Z;
+            RGB data = new RGB(resultRed, resultGreen, resultBlue);
+            HSL hsl = RGBToHSL(data);
+            HSL data2 = new HSL(hsl.H, hsl.S, hsl.L);
+            RGB rgb = HSLToRGB(data2);
+            PluginConfigColor newColor = new PluginConfigColor(new Vector4(rgb.R , rgb.G, rgb.B, 100f / 100f));
             return newColor;
         }
 
