@@ -35,26 +35,33 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public virtual string GetBase64String()
+        public static string ImportExportSeparator = "_IMPORTEXPORTSEPARATOR_";
+
+        public virtual string GetJsonString()
         {
             if (children == null)
             {
                 return "";
             }
 
-            string base64String = "";
+            string jsonString = "";
 
             foreach (Node child in children)
             {
-                string childString = child.GetBase64String();
+                string childString = child.GetJsonString();
 
                 if (childString != "")
                 {
-                    base64String += "|" + childString;
+                    jsonString += ImportExportSeparator + childString;
                 }
             }
 
-            return base64String;
+            return jsonString;
+        }
+
+        public virtual string GetBase64String()
+        {
+            return ConfigurationManager.CompressAndBase64Encode(GetJsonString());
         }
 
         public virtual void LoadBase64String(string[] importStrings)
@@ -122,26 +129,26 @@ namespace DelvUI.Config.Tree
             return null;
         }
 
-        public override string GetBase64String()
+        public override string GetJsonString()
         {
             if (children == null)
             {
                 return "";
             }
 
-            string base64String = "";
+            string jsonString = "";
 
             foreach (Node child in children)
             {
-                string childString = child.GetBase64String();
+                string childString = child.GetJsonString();
 
                 if (childString != "")
                 {
-                    base64String += "|" + childString;
+                    jsonString += ImportExportSeparator + childString;
                 }
             }
 
-            return base64String;
+            return jsonString;
         }
 
         public override void LoadBase64String(string[] importStrings)
@@ -390,26 +397,26 @@ namespace DelvUI.Config.Tree
 
         public SectionNode() { children = new List<SubSectionNode>(); }
 
-        public override string GetBase64String()
+        public override string GetJsonString()
         {
             if (children == null)
             {
                 return "";
             }
 
-            string base64String = "";
+            string jsonString = "";
 
             foreach (Node child in children)
             {
-                string childString = child.GetBase64String();
+                string childString = child.GetJsonString();
 
                 if (childString != "")
                 {
-                    base64String += "|" + childString;
+                    jsonString += ImportExportSeparator + childString;
                 }
             }
 
-            return base64String;
+            return jsonString;
         }
 
         public override void LoadBase64String(string[] importStrings)
@@ -539,26 +546,26 @@ namespace DelvUI.Config.Tree
 
         public NestedSubSectionNode() { children = new List<SubSectionNode>(); }
 
-        public override string GetBase64String()
+        public override string GetJsonString()
         {
             if (children == null)
             {
                 return "";
             }
 
-            string base64String = "";
+            string jsonString = "";
 
             foreach (Node child in children)
             {
-                string childString = child.GetBase64String();
+                string childString = child.GetJsonString();
 
                 if (childString != "")
                 {
-                    base64String += "|" + childString;
+                    jsonString += ImportExportSeparator + childString;
                 }
             }
 
-            return base64String;
+            return jsonString;
         }
 
         public override void LoadBase64String(string[] importStrings)
@@ -741,37 +748,37 @@ namespace DelvUI.Config.Tree
         private string _importString = "";
         private string _exportString = "";
 
-        public override string GetBase64String()
+        public override string GetJsonString()
         {
-            return ConfigObject.Portable ? ConfigurationManager.GenerateExportString(ConfigObject) : "";
+            return ConfigObject.Portable ? ConfigurationManager.GenerateJsonString(ConfigObject) : "";
         }
 
+        // this method takes an array of json strings
         public override void LoadBase64String(string[] importStrings)
         {
             // go through and check types
             // if type matches, load it
-            foreach (string importString in importStrings)
+            foreach (string jsonString in importStrings)
             {
                 Type importedType = null;
 
                 try
                 {
                     // get type from json
-                    string jsonString = ConfigurationManager.Base64DecodeAndDecompress(importString);
                     importedType = Type.GetType((string)JObject.Parse(jsonString)["$type"]);
                 }
                 catch (Exception ex)
                 {
-                    PluginLog.Log($"Error parsing import string!\n{ex.StackTrace}");
+                    PluginLog.Log($"Error parsing import string!\n{ex}");
                 }
 
                 // abort import if the import string is for the wrong type
                 if (importedType != null && ConfigObject.GetType().FullName == importedType.FullName)
                 {
                     // see comments on ConfigPageNode's Load
-                    MethodInfo methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
+                    MethodInfo methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportJson");
                     MethodInfo function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
-                    PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(ConfigurationManager.GetInstance(), new object[] { importString });
+                    PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(ConfigurationManager.GetInstance(), new object[] { jsonString });
 
                     if (importedConfigObject != null)
                     {

@@ -243,6 +243,14 @@ namespace DelvUI.Config
             return CompressAndBase64Encode(jsonString);
         }
 
+        public static string GenerateJsonString(PluginConfigObject configObject)
+        {
+            var jsonString = JsonConvert.SerializeObject(configObject, Formatting.Indented,
+                new JsonSerializerSettings { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects });
+
+            return jsonString;
+        }
+
         public static string ExportBaseNode(BaseNode baseNode)
         {
             JsonSerializerSettings settings = new JsonSerializerSettings
@@ -264,7 +272,6 @@ namespace DelvUI.Config
 
             if (importedConfigObject != null)
             {
-                PluginLog.Log($"Importing {importedConfigObject.GetType()}");
                 // update the tree 
                 configPageNode.ConfigObject = importedConfigObject;
                 // but also update the dictionary
@@ -306,8 +313,7 @@ namespace DelvUI.Config
                 return;
             }
 
-            PluginLog.Log($"Switching to profile: {profileName} for job {JobsHelper.JobNames[jobID]}");
-            string[] importStrings = profileString.Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
+            string[] importStrings = Base64DecodeAndDecompress(profileString).Split(new string[] { BaseNode.ImportExportSeparator }, StringSplitOptions.RemoveEmptyEntries);
             LoadTotalConfiguration(importStrings);
             profilesConfig.CurrentProfile = profileName;
         }
@@ -317,6 +323,20 @@ namespace DelvUI.Config
             try
             {
                 var jsonString = Base64DecodeAndDecompress(importString);
+                return JsonConvert.DeserializeObject<T>(jsonString);
+            }
+            catch (Exception ex)
+            {
+                PluginLog.Log(ex.Message + "\n" + ex.StackTrace);
+
+                return default;
+            }
+        }
+
+        public static T LoadImportJson<T>(string jsonString) where T : PluginConfigObject
+        {
+            try
+            {
                 return JsonConvert.DeserializeObject<T>(jsonString);
             }
             catch (Exception ex)
