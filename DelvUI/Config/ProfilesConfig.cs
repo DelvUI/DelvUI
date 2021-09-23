@@ -50,19 +50,6 @@ namespace DelvUI.Config
             Profiles[CurrentProfile] = baseNode.GetBase64String();
         }
 
-        public bool SwitchToProfile(string profileName)
-        {
-            string profileString;
-            if (!Profiles.TryGetValue(profileName, out profileString))
-            {
-                return false;
-            }
-            string[] importStrings = profileString.Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
-            ConfigurationManager.LoadTotalConfiguration(importStrings);
-            CurrentProfile = profileName;
-            return true;
-        }
-
         [ManualDraw]
         public bool DrawProfile()
         {
@@ -253,7 +240,6 @@ namespace DelvUI.Config
                     else
                     {
                         _selectedProfileForJob = Array.FindIndex(availableProfiles, o => o == "-");
-                        JobProfileMap.Remove(jobs[_selectedJob]);
                     }
                 }
                 ImGui.PopItemWidth();
@@ -268,6 +254,10 @@ namespace DelvUI.Config
                     if (availableProfiles[_selectedProfileForJob] != "-")
                     {
                         JobProfileMap[jobs[_selectedJob]] = availableProfiles[_selectedProfileForJob];
+                    }
+                    else
+                    {
+                        JobProfileMap.Remove(jobs[_selectedJob]);
                     }
                     changed = true;
                 }

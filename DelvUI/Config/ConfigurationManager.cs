@@ -284,6 +284,32 @@ namespace DelvUI.Config
             _instance.ResetEvent(_instance, null);
         }
 
+        // loads configuration from profile matching a job ID (if one exists)
+        // if it's already the current profile, do nothing
+        public void LoadProfile(uint jobID)
+        {
+            ProfilesConfig profilesConfig = (ProfilesConfig)GetConfigObjectForType(typeof(ProfilesConfig));
+            if(profilesConfig == null)
+            {
+                return;
+            }
+
+            string profileName = profilesConfig.JobProfileMap[jobID];
+            if(profilesConfig.CurrentProfile == profileName)
+            {
+                return;
+            }
+
+            string profileString;
+            if (!profilesConfig.Profiles.TryGetValue(profileName, out profileString))
+            {
+                return;
+            }
+            string[] importStrings = profileString.Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
+            LoadTotalConfiguration(importStrings);
+            profilesConfig.CurrentProfile = profileName;
+        }
+
         public static T LoadImportString<T>(string importString) where T : PluginConfigObject
         {
             try
