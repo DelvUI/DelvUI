@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
 
@@ -17,7 +18,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class SummonerHud : JobHud
     {
-        // private bool _bahamutFinished = true;
+        private bool _bahamutFinished = true;
 
         private new SummonerConfig Config => (SummonerConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
@@ -79,136 +80,136 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawTranceBar(Vector2 origin)
         {
-            // if (!Config.ShowTrance)
-            // {
-            //     return;
-            // }
-            //
-            // SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
-            //
-            // PluginConfigColor tranceColor;
-            // float maxDuration;
-            // float tranceDuration = gauge.TimerRemaining;
-            //
-            // if (!_bahamutFinished && tranceDuration < 1)
-            // {
-            //     _bahamutFinished = true;
-            // }
-            //
-            // switch (gauge.NumStacks)
-            // {
-            //     case >= 16:
-            //         tranceColor = Config.PhoenixColor;
-            //         maxDuration = 20000f;
-            //
-            //         break;
-            //
-            //     case >= 8:
-            //         tranceColor = Config.BahamutColor;
-            //         maxDuration = 20000f;
-            //         _bahamutFinished = false;
-            //
-            //         break;
-            //
-            //     default:
-            //         // This is needed because as soon as you summon Bahamut the flag goes back to 0-2
-            //         tranceColor = _bahamutFinished ? Config.DreadwyrmColor : Config.BahamutColor;
-            //         maxDuration = _bahamutFinished ? 15000f : 20000f;
-            //
-            //         break;
-            // }
-            //
-            // Vector2 barSize = Config.TranceSize;
-            // Vector2 position = origin + Config.Position + Config.TrancePosition - barSize / 2f;
-            //
-            // BarBuilder builder = BarBuilder.Create(position, barSize);
-            //
-            // Bar bar = builder.AddInnerBar(tranceDuration / 1000f, maxDuration / 1000f, tranceColor).SetBackgroundColor(EmptyColor.Base).Build();
-            //
-            // if (Config.ShowTranceText)
-            // {
-            //     builder.SetTextMode(BarTextMode.Single)
-            //            .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-            // }
-            //
-            // ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            // bar.Draw(drawList);
+            if (!Config.ShowTrance)
+            {
+                return;
+            }
+            
+            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
+            
+            PluginConfigColor tranceColor;
+            float maxDuration;
+            float tranceDuration = gauge.TimerRemaining;
+            
+            if (!_bahamutFinished && tranceDuration < 1)
+            {
+                _bahamutFinished = true;
+            }
+            
+            switch (gauge.AetherFlags)
+            {
+                case >= 16:
+                    tranceColor = Config.PhoenixColor;
+                    maxDuration = 20000f;
+            
+                    break;
+            
+                case >= 8:
+                    tranceColor = Config.BahamutColor;
+                    maxDuration = 20000f;
+                    _bahamutFinished = false;
+            
+                    break;
+            
+                default:
+                    // This is needed because as soon as you summon Bahamut the flag goes back to 0-2
+                    tranceColor = _bahamutFinished ? Config.DreadwyrmColor : Config.BahamutColor;
+                    maxDuration = _bahamutFinished ? 15000f : 20000f;
+            
+                    break;
+            }
+            
+            Vector2 barSize = Config.TranceSize;
+            Vector2 position = origin + Config.Position + Config.TrancePosition - barSize / 2f;
+            
+            BarBuilder builder = BarBuilder.Create(position, barSize);
+            
+            Bar bar = builder.AddInnerBar(tranceDuration / 1000f, maxDuration / 1000f, tranceColor).SetBackgroundColor(EmptyColor.Base).Build();
+            
+            if (Config.ShowTranceText)
+            {
+                builder.SetTextMode(BarTextMode.Single)
+                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+            }
+            
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            bar.Draw(drawList);
         }
 
         public void DrawDreadWyrmAether(Vector2 origin)
         {
-            // if (!Config.ShowDreadwyrmAether)
-            // {
-            //     return;
-            // }
-            //
-            // SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
-            // var stacks = gauge.NumStacks;
-            // List<Bar> barDrawList = new();
-            //
-            // if (Config.ShowDemiIndicator)
-            // {
-            //     Vector2 barSize = Config.IndicatorSize;
-            //     Vector2 position = origin + Config.Position + Config.IndicatorPosition - barSize / 2f;
-            //
-            //     BarBuilder builder = BarBuilder.Create(position, barSize);
-            //
-            //     if (stacks >= 8 && stacks < 16)
-            //     {
-            //         Bar indicatorBar = builder.AddInnerBar(1, 1, Config.BahamutReadyColor)
-            //                                   .SetBackgroundColor(EmptyColor.Base)
-            //                                   .Build();
-            //         barDrawList.Add(indicatorBar);
-            //     }
-            //     if (stacks >= 16)
-            //     {
-            //         Bar indicatorBar = builder.AddInnerBar(1, 1, Config.PhoenixReadyColor)
-            //                                   .SetBackgroundColor(EmptyColor.Base)
-            //                                   .Build();
-            //         barDrawList.Add(indicatorBar);
-            //     }
-            //     if (stacks < 8)
-            //     {
-            //         Bar indicatorBar = builder.SetBackgroundColor(EmptyColor.Base)
-            //                                   .Build();
-            //         barDrawList.Add(indicatorBar);
-            //     }
-            // }
-            //
-            // if (Config.ShowDreadwyrmAetherBars)
-            // {
-            //     Vector2 barSize = Config.DreadwyrmAetherBarSize;
-            //     Vector2 position = origin + Config.Position + Config.DreadwyrmAetherBarPosition - barSize / 2f;
-            //
-            //     var filledChunkCount = 0;
-            //
-            //     if (stacks >= 4 && stacks < 8)
-            //     {
-            //         filledChunkCount = 1;
-            //     }
-            //     else if (stacks >= 8 && stacks < 16)
-            //     {
-            //         filledChunkCount = 2;
-            //     }
-            //
-            //     Bar DreadwyrmAetherBars = BarBuilder.Create(position, barSize)
-            //                                         .SetChunks(2)
-            //                                         .SetChunkPadding(Config.DreadwyrmAetherBarPadding)
-            //                                         .AddInnerBar(filledChunkCount, 2, Config.DreadwyrmAetherBarColor)
-            //                                         .SetBackgroundColor(EmptyColor.Base)
-            //                                         .Build();
-            //     barDrawList.Add(DreadwyrmAetherBars);
-            // }
-            //
-            // if (barDrawList.Count > 0)
-            // {
-            //     ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            //
-            //     foreach (Bar bar in barDrawList)
-            //     {
-            //         bar.Draw(drawList);
-            //     }
-            // }
+            if (!Config.ShowDreadwyrmAether)
+            {
+                return;
+            }
+            
+            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
+            var stacks = gauge.AetherFlags;
+            List<Bar> barDrawList = new();
+            
+            if (Config.ShowDemiIndicator)
+            {
+                Vector2 barSize = Config.IndicatorSize;
+                Vector2 position = origin + Config.Position + Config.IndicatorPosition - barSize / 2f;
+            
+                BarBuilder builder = BarBuilder.Create(position, barSize);
+            
+                if (stacks >= 8 && stacks < 16)
+                {
+                    Bar indicatorBar = builder.AddInnerBar(1, 1, Config.BahamutReadyColor)
+                                              .SetBackgroundColor(EmptyColor.Base)
+                                              .Build();
+                    barDrawList.Add(indicatorBar);
+                }
+                if (stacks >= 16)
+                {
+                    Bar indicatorBar = builder.AddInnerBar(1, 1, Config.PhoenixReadyColor)
+                                              .SetBackgroundColor(EmptyColor.Base)
+                                              .Build();
+                    barDrawList.Add(indicatorBar);
+                }
+                if (stacks < 8)
+                {
+                    Bar indicatorBar = builder.SetBackgroundColor(EmptyColor.Base)
+                                              .Build();
+                    barDrawList.Add(indicatorBar);
+                }
+            }
+            
+            if (Config.ShowDreadwyrmAetherBars)
+            {
+                Vector2 barSize = Config.DreadwyrmAetherBarSize;
+                Vector2 position = origin + Config.Position + Config.DreadwyrmAetherBarPosition - barSize / 2f;
+            
+                var filledChunkCount = 0;
+            
+                if (stacks >= 4 && stacks < 8)
+                {
+                    filledChunkCount = 1;
+                }
+                else if (stacks >= 8 && stacks < 16)
+                {
+                    filledChunkCount = 2;
+                }
+            
+                Bar DreadwyrmAetherBars = BarBuilder.Create(position, barSize)
+                                                    .SetChunks(2)
+                                                    .SetChunkPadding(Config.DreadwyrmAetherBarPadding)
+                                                    .AddInnerBar(filledChunkCount, 2, Config.DreadwyrmAetherBarColor)
+                                                    .SetBackgroundColor(EmptyColor.Base)
+                                                    .Build();
+                barDrawList.Add(DreadwyrmAetherBars);
+            }
+            
+            if (barDrawList.Count > 0)
+            {
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            
+                foreach (Bar bar in barDrawList)
+                {
+                    bar.Draw(drawList);
+                }
+            }
         }
         private void DrawActiveDots(Vector2 origin)
         {
