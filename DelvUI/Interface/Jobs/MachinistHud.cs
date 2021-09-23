@@ -139,6 +139,12 @@ namespace DelvUI.Interface.Jobs
         {
             var gauge = Plugin.JobGauges.Get<MCHGauge>();
 
+            if (Config.HideOverheatWhenNotAcitve && !gauge.IsOverheated())
+            {
+                return;
+            }
+
+
             var position = origin + Config.Position + Config.OverheatPosition - Config.OverheatSize / 2f;
 
             var builder = BarBuilder.Create(position, Config.OverheatSize)
@@ -198,20 +204,24 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(30, 0)]
         public bool ShowOverheat = true;
 
+        [Checkbox("Hide Overheat Bar when not in Hypercharge")]
+        [CollapseWith(0,0)]
+        public bool HideOverheatWhenNotAcitve = true;
+
         [Checkbox("Show Text" + "##Overheat")]
-        [CollapseWith(0, 0)]
+        [CollapseWith(5, 0)]
         public bool ShowOverheatText = true;
 
         [DragFloat2("Position" + "##Overheat", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 0)]
+        [CollapseWith(10, 0)]
         public Vector2 OverheatPosition = new(0, -54);
 
         [DragFloat2("Size" + "##Overheat", min = 0, max = 4000f)]
-        [CollapseWith(10, 0)]
+        [CollapseWith(15, 0)]
         public Vector2 OverheatSize = new(254, 20);
 
         [ColorEdit4("Fill Color" + "##Overheat")]
-        [CollapseWith(15, 0)]
+        [CollapseWith(20, 0)]
         public PluginConfigColor OverheatFillColor = new(new Vector4(255f / 255f, 239f / 255f, 14f / 255f, 100f / 100f));
         #endregion
 
