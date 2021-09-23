@@ -287,7 +287,7 @@ namespace DelvUI.Interface.Jobs
             builder.SetBackgroundColor(EmptyColor.Base).Build().Draw(drawList);
         }
 
-         private void DrawProcBar(Vector2 origin)
+        private void DrawProcBar(Vector2 origin)
         {
             var statusEffects = Plugin.ClientState.LocalPlayer.StatusEffects;
             var cascadeTimer = Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 1814).Duration);
