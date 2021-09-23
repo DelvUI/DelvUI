@@ -63,7 +63,7 @@ namespace DelvUI.Config.Tree
             return ImportExportHelper.CompressAndBase64Encode(GetJsonString());
         }
 
-        public virtual void LoadBase64String(string[] importStrings)
+        public virtual void LoadJsonStrings(string[] importStrings)
         {
             if (children == null)
             {
@@ -72,7 +72,7 @@ namespace DelvUI.Config.Tree
 
             foreach (Node child in children)
             {
-                child.LoadBase64String(importStrings);
+                child.LoadJsonStrings(importStrings);
             }
         }
 
@@ -150,7 +150,7 @@ namespace DelvUI.Config.Tree
             return jsonString;
         }
 
-        public override void LoadBase64String(string[] importStrings)
+        public override void LoadJsonStrings(string[] importStrings)
         {
             if (children == null)
             {
@@ -159,7 +159,7 @@ namespace DelvUI.Config.Tree
 
             foreach (Node child in children)
             {
-                child.LoadBase64String(importStrings);
+                child.LoadJsonStrings(importStrings);
             }
         }
 
@@ -418,7 +418,7 @@ namespace DelvUI.Config.Tree
             return jsonString;
         }
 
-        public override void LoadBase64String(string[] importStrings)
+        public override void LoadJsonStrings(string[] importStrings)
         {
             if (children == null)
             {
@@ -427,7 +427,7 @@ namespace DelvUI.Config.Tree
 
             foreach (Node child in children)
             {
-                child.LoadBase64String(importStrings);
+                child.LoadJsonStrings(importStrings);
             }
         }
 
@@ -567,7 +567,7 @@ namespace DelvUI.Config.Tree
             return jsonString;
         }
 
-        public override void LoadBase64String(string[] importStrings)
+        public override void LoadJsonStrings(string[] importStrings)
         {
             if (children == null)
             {
@@ -576,7 +576,7 @@ namespace DelvUI.Config.Tree
 
             foreach (Node child in children)
             {
-                child.LoadBase64String(importStrings);
+                child.LoadJsonStrings(importStrings);
             }
         }
 
@@ -753,7 +753,7 @@ namespace DelvUI.Config.Tree
         }
 
         // this method takes an array of json strings
-        public override void LoadBase64String(string[] importStrings)
+        public override void LoadJsonStrings(string[] importStrings)
         {
             // go through and check types
             // if type matches, load it

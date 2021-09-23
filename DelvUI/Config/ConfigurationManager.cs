@@ -242,7 +242,7 @@ namespace DelvUI.Config
 
         public static void LoadTotalConfiguration(string[] importStrings)
         {
-            _instance.ConfigBaseNode.LoadBase64String(importStrings);
+            _instance.ConfigBaseNode.LoadJsonStrings(importStrings);
             _instance.ResetEvent(_instance, null);
         }
 
