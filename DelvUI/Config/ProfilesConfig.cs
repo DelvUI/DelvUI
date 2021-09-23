@@ -59,7 +59,7 @@ namespace DelvUI.Config
             }
             string[] importStrings = profileString.Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
             ConfigurationManager.LoadTotalConfiguration(importStrings);
-            CurrentProfile = profileString;
+            CurrentProfile = profileName;
             return true;
         }
 
@@ -84,7 +84,7 @@ namespace DelvUI.Config
 
                 ImGui.Text("\u2002");
                 ImGui.SameLine();
-                if (ImGui.BeginTable("table", 3, flags, new Vector2(500, 150)))
+                if (ImGui.BeginTable("table", 3, flags, new Vector2(500, 300)))
                 {
                     ImGui.TableSetupColumn("Profile name", ImGuiTableColumnFlags.WidthStretch, 0, 0);
                     ImGui.TableSetupColumn("Export", ImGuiTableColumnFlags.WidthFixed, 0, 1);
@@ -155,9 +155,8 @@ namespace DelvUI.Config
                             ImGui.PopStyleColor(1);
                         }
 
-                        // enable a remove button for all non-default profiles
-                        // except for if there is only one non-default profile available
-                        if (profile.Key != DefaultProfileName && Profiles.Count != 2 && ImGui.TableSetColumnIndex(2))
+                        // enable a remove button for all non-default non-active profiles
+                        if (profile.Key != DefaultProfileName && profile.Key != CurrentProfile && ImGui.TableSetColumnIndex(2))
                         {
                             ImGui.PushFont(UiBuilder.IconFont);
                             ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
@@ -179,6 +178,7 @@ namespace DelvUI.Config
                     {
                         ImGui.PushItemWidth(150);
                         ImGui.InputText("", ref _newProfileName, 80);
+                        ImGui.PopItemWidth();
 
                         ImGui.SameLine();
                         ImGui.PushFont(UiBuilder.IconFont);
@@ -216,57 +216,79 @@ namespace DelvUI.Config
 
                     ImGui.EndTable();
                 }
-            }
 
-            // generate array of jobs
-            uint[] jobs = typeof(JobIDs).GetFields()
-                .Where(o => o.FieldType == typeof(uint))
-                .Select(o => (uint)o.GetValue(null))
-                .ToArray();
-            string[] jobNames = jobs.Select(o => JobsHelper.JobNames[o]).ToArray();
-            string[] availableProfiles = Profiles.Keys.Select(o => o == DefaultProfileName ? "-" : o).ToArray();
+                ImGui.NewLine();
 
-            ImGui.Text("\u2002");
-            ImGui.SameLine();
-            if (ImGui.Combo("Job ##profilejobs", ref _selectedJob, jobNames, jobNames.Length, 10))
-            {
-                // if a job was selected in the jobs combo box, update the displayed profile for it, if it exists
+                // generate array of jobs
+                uint[] jobs = typeof(JobIDs).GetFields()
+                    .Where(o => o.FieldType == typeof(uint))
+                    .Select(o => (uint)o.GetValue(null))
+                    .ToArray();
+                string[] jobNames = jobs.Select(o => JobsHelper.JobNames[o]).ToArray();
+                string[] availableProfiles = Profiles.Keys.Select(o => o == DefaultProfileName ? "-" : o).ToArray();
+
+                ImGui.Text("\u2002");
+                ImGui.SameLine();
+
+                // if the job combo box is used or the profile for the job doesn't match what's in the dictionary
+                // (due to removal of a profile) update the profile combo box
                 string profileForJob;
-                if (JobProfileMap.TryGetValue(jobs[_selectedJob], out profileForJob))
+                ImGui.PushItemWidth(50);
+                if (ImGui.ListBox("Job ##profilejobs", ref _selectedJob, jobNames, jobNames.Length, 10)
+                        || (JobProfileMap.TryGetValue(jobs[_selectedJob], out profileForJob)
+                        && _selectedProfileForJob != Array.FindIndex(availableProfiles, o => o == profileForJob)))
                 {
-                    PluginLog.Log($"loading {profileForJob} from key {jobs[_selectedJob]}");
-                    _selectedProfileForJob = Array.FindIndex(availableProfiles, o => o == profileForJob);
-                    // if the profile assigned to the job _selectedJob is no longer available
-                    // then set it to the default profile, which corresponds to the symbol "-"
-                    if (_selectedProfileForJob == -1)
+                    if (JobProfileMap.TryGetValue(jobs[_selectedJob], out profileForJob))
+                    {
+                        PluginLog.Log($"loading {profileForJob} from key {jobNames[_selectedJob]}");
+                        _selectedProfileForJob = Array.FindIndex(availableProfiles, o => o == profileForJob);
+                        // if the profile assigned to the job _selectedJob is no longer available
+                        // then set it to the default profile, which corresponds to the symbol "-"
+                        if (_selectedProfileForJob == -1)
+                        {
+                            PluginLog.Log($"profile {profileForJob} was not found for {jobNames[_selectedJob]}");
+                            _selectedProfileForJob = Array.FindIndex(availableProfiles, o => o == "-");
+                        }
+                    }
+                    else
                     {
                         _selectedProfileForJob = Array.FindIndex(availableProfiles, o => o == "-");
+                        JobProfileMap.Remove(jobs[_selectedJob]);
                     }
                 }
-                else
-                {
-                    _selectedProfileForJob = Array.FindIndex(availableProfiles, o => o == "-");
-                }
-            }
+                ImGui.PopItemWidth();
 
-            ImGui.Text("\u2002");
-            ImGui.SameLine();
-            ImGui.Text("\u2002");
-            ImGui.SameLine();
-            if (ImGui.Combo("Profile ##profilejobsoptions", ref _selectedProfileForJob, availableProfiles, availableProfiles.Length, 10))
-            {
-                if (availableProfiles[_selectedProfileForJob] != "-")
+                //ImGui.Text("\u2002");
+                ImGui.SameLine();
+                ImGui.Text("\u2002");
+                ImGui.SameLine();
+                ImGui.PushItemWidth(150);
+                if (ImGui.ListBox("Profile ##profilejobsoptions", ref _selectedProfileForJob, availableProfiles, availableProfiles.Length, 10))
                 {
-                    JobProfileMap[jobs[_selectedJob]] = availableProfiles[_selectedProfileForJob];
-                    PluginLog.Log($"Adding profile {availableProfiles[_selectedProfileForJob]} to {jobs[_selectedJob]}");
+                    if (availableProfiles[_selectedProfileForJob] != "-")
+                    {
+                        JobProfileMap[jobs[_selectedJob]] = availableProfiles[_selectedProfileForJob];
+                    }
+                    changed = true;
                 }
+                ImGui.PopItemWidth();
             }
 
             ImGui.EndChild();
 
             if (profileToRemove != "")
             {
-                CurrentProfile = DefaultProfileName;
+                // update the job profiles map by removing the profile from any job that maps to it
+                string[] profilesBeforeRemoval = Profiles.Keys.Select(o => o == DefaultProfileName ? "-" : o).ToArray();
+                uint[] keysToRemove = JobProfileMap.Where(o => o.Value == profileToRemove).Select(o => o.Key).ToArray();
+                foreach (uint key in keysToRemove)
+                {
+                    JobProfileMap.Remove(key);
+                }
+                // update the index of the selected profile of the currently open job
+                _selectedProfileForJob = Array.FindIndex(Profiles.Keys.ToArray(), o => o == profilesBeforeRemoval[_selectedProfileForJob]);
+
+                // remove the profile
                 Profiles.Remove(profileToRemove);
             }
 
