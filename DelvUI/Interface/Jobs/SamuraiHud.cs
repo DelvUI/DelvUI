@@ -90,6 +90,11 @@ namespace DelvUI.Interface.Jobs
                 origin.Y + Config.Position.Y + Config.KenkiBarPosition.Y - Config.KenkiBarSize.Y / 2f
             );
 
+            if (gauge.Kenki == 0 && Config.OnlyShowKenkiWhenActive)
+            {
+                return;
+            }
+
             var kenkiBuilder = BarBuilder.Create(pos, Config.KenkiBarSize)
                 .SetBackgroundColor(EmptyColor.Base)
                 .AddInnerBar(gauge.Kenki, 100, Config.KenkiColor);
@@ -125,14 +130,20 @@ namespace DelvUI.Interface.Jobs
                 origin.Y + Config.Position.Y + Config.HiganbanaBarPosition.Y - Config.HiganbanaBarSize.Y / 2f
             );
 
-            var higanbanaBuilder = BarBuilder.Create(pos, Config.HiganbanaBarSize)
-                .SetBackgroundColor(EmptyColor.Base)
-                .AddInnerBar(higanbanaDuration, 60f, higanbanaColor).SetFlipDrainDirection(false);
+            var higanbanaBuilder = BarBuilder.Create(pos, Config.HiganbanaBarSize);
 
-            if (Config.ShowHiganbanaText)
+            if (higanbanaDuration > 0 && Config.ShowHiganbanaText)
             {
-                higanbanaBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                higanbanaBuilder.SetBackgroundColor(EmptyColor.Base)
+                .AddInnerBar(higanbanaDuration, 60f, higanbanaColor).SetFlipDrainDirection(false)
+                .SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
+            else
+            {
+                higanbanaBuilder.SetBackgroundColor(EmptyColor.Base)
+                .AddInnerBar(higanbanaDuration, 60f, higanbanaColor).SetFlipDrainDirection(false);
+            }
+
             var drawList = ImGui.GetWindowDrawList();
             higanbanaBuilder.Build().Draw(drawList);
         }
@@ -150,32 +161,50 @@ namespace DelvUI.Interface.Jobs
                 origin.X + Config.Position.X + Config.BuffsBarPosition.X + (2 * order[0] - 1) * Config.BuffsBarSize.X / 2f - order[0] * buffsSize.X,
                 origin.Y + Config.Position.Y + Config.BuffsBarPosition.Y - Config.BuffsBarSize.Y / 2f
             );
-            var shifuBuilder = BarBuilder.Create(shifuPos, buffsSize)
-                .SetBackgroundColor(EmptyColor.Base)
+
+            var shifuBuilder = BarBuilder.Create(shifuPos, buffsSize);
+
+            if (shifuDuration > 0 && Config.ShowBuffsText)
+            {
+                shifuBuilder.SetBackgroundColor(EmptyColor.Base)
+                .AddInnerBar(shifuDuration, 40f, Config.ShifuColor)
+                .SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                .SetFlipDrainDirection(true);
+            }
+            else
+            {
+                shifuBuilder.SetBackgroundColor(EmptyColor.Base)
                 .AddInnerBar(shifuDuration, 40f, Config.ShifuColor)
                 .SetFlipDrainDirection(true);
+            }
 
-            // jinpu
+            // jinpu            
             var jinpu = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1298);
             var jinpuDuration = jinpu.Duration;
             var jinpuPos = new Vector2(
                 origin.X + Config.Position.X + Config.BuffsBarPosition.X + (2 * order[1] - 1) * Config.BuffsBarSize.X / 2f - order[1] * buffsSize.X,
                 origin.Y + Config.Position.Y + Config.BuffsBarPosition.Y - Config.BuffsBarSize.Y / 2f
             );
-            var jinpuBuilder = BarBuilder.Create(jinpuPos, buffsSize)
-                .SetBackgroundColor(EmptyColor.Base)
+
+            var jinpuBuilder = BarBuilder.Create(jinpuPos, buffsSize);
+
+            if (jinpuDuration > 0 && Config.ShowBuffsText)
+            {
+                jinpuBuilder.SetBackgroundColor(EmptyColor.Base)
+                .AddInnerBar(jinpuDuration, 40f, Config.JinpuColor)
+                .SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
+                .SetFlipDrainDirection(false);
+            }
+            else
+            {
+                jinpuBuilder.SetBackgroundColor(EmptyColor.Base)
                 .AddInnerBar(jinpuDuration, 40f, Config.JinpuColor)
                 .SetFlipDrainDirection(false);
+            }
 
             if (Config.OnlyShowBuffsWhenActive && jinpuDuration == 0 && shifuDuration == 0)
             {
                 return;
-            }
-
-            if (Config.ShowBuffsText)
-            {
-                shifuBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                jinpuBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
             var drawList = ImGui.GetWindowDrawList();
@@ -254,16 +283,20 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(30, 0)]
         public bool ShowKenkiBar = true;
 
-        [DragFloat2("Kenki Bar Size" + "##Kenki", max = 2000f)]
+        [Checkbox("Only Show When Active" + "##Kenki")]
         [CollapseWith(0, 0)]
+        public bool OnlyShowKenkiWhenActive = false;
+
+        [DragFloat2("Kenki Bar Size" + "##Kenki", max = 2000f)]
+        [CollapseWith(5, 0)]
         public Vector2 KenkiBarSize = new Vector2(254, 20);
 
         [DragFloat2("Kenki Bar Position" + "##Kenki", min = -2000f, max = 2000f)]
-        [CollapseWith(5, 0)]
+        [CollapseWith(10, 0)]
         public Vector2 KenkiBarPosition = new Vector2(0, -34);
 
         [Checkbox("Show Kenki Text" + "##Kenki")]
-        [CollapseWith(10, 0)]
+        [CollapseWith(15, 0)]
         public bool ShowKenkiText = true;
         #endregion
 
@@ -274,7 +307,7 @@ namespace DelvUI.Interface.Jobs
 
         [Checkbox("Only Show When Active" + "##Sen")]
         [CollapseWith(0, 1)]
-        public bool OnlyShowSenWhenActive = true;
+        public bool OnlyShowSenWhenActive = false;
 
         [DragInt("Sen Bar Padding" + "##Sen", max = 1000)]
         [CollapseWith(5, 1)]
@@ -300,7 +333,7 @@ namespace DelvUI.Interface.Jobs
 
         [Checkbox("Only Show When Active" + "##Meditation")]
         [CollapseWith(0, 2)]
-        public bool OnlyShowMeditationWhenActive = true;
+        public bool OnlyShowMeditationWhenActive = false;
 
         [DragInt("Meditation Bar Padding" + "##Meditation", max = 1000)]
         [CollapseWith(5, 2)]
@@ -322,7 +355,7 @@ namespace DelvUI.Interface.Jobs
 
         [Checkbox("Only Show When Active" + "##Buffs")]
         [CollapseWith(0, 3)]
-        public bool OnlyShowBuffsWhenActive = true;
+        public bool OnlyShowBuffsWhenActive = false;
 
         [DragInt("Buffs Bar Padding" + "##Buffs", max = 1000)]
         [CollapseWith(5, 3)]
@@ -343,7 +376,6 @@ namespace DelvUI.Interface.Jobs
         [DragDropHorizontal("Shifu/Jinpu Order", "Shifu", "Jinpu" + "##Buffs")]
         [CollapseWith(25, 3)]
         public int[] buffOrder = new int[] { 0, 1 };
-
         #endregion
 
         #region Higanbana
@@ -353,7 +385,7 @@ namespace DelvUI.Interface.Jobs
 
         [Checkbox("Only Show When Active" + "##Higanbana")]
         [CollapseWith(0, 4)]
-        public bool OnlyShowHiganbanaWhenActive = true;
+        public bool OnlyShowHiganbanaWhenActive = false;
 
         [DragFloat2("Higanbana Bar Size" + "##Higanbana", max = 2000f)]
         [CollapseWith(5, 4)]
