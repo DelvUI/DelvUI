@@ -144,7 +144,6 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-
             var position = origin + Config.Position + Config.OverheatPosition - Config.OverheatSize / 2f;
 
             var builder = BarBuilder.Create(position, Config.OverheatSize)
