@@ -10,12 +10,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
+using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -121,24 +120,26 @@ namespace DelvUI.Interface.Jobs
 
             return Config.ShowRedrawTextBar ? redrawStacks.ToString("N0") : "";
         }
-
+        
         private unsafe void DrawDivinationBar(Vector2 origin)
         {
             List<PluginConfigColor> chunkColors = new();
-
             ASTGauge gauge = Plugin.JobGauges.Get<ASTGauge>();
+            IntPtr gaugeAddress = gauge.Address;
+            byte[] sealsFromBytes = new byte[3];
 
-            FieldInfo field = typeof(ASTGauge).GetField("seals", BindingFlags.NonPublic | BindingFlags.GetField | BindingFlags.Instance);
+            AstrologianGauge* tmp = (AstrologianGauge*) gaugeAddress;
+            for (int ix = 0; ix < 3; ++ix)
+            {
+                sealsFromBytes[ix] = tmp->Seals[ix];
+            }
 
             string textSealReady = "";
             int sealNumbers = 0;
-            object result = field?.GetValue(gauge);
-            GCHandle hdl = GCHandle.Alloc(result, GCHandleType.Pinned);
-            byte* p = (byte*)hdl.AddrOfPinnedObject();
 
             for (int ix = 0; ix < 3; ++ix)
             {
-                byte seal = *(p + ix);
+                byte seal = sealsFromBytes[ix];
                 SealType type = (SealType)seal;
 
                 switch (type)
@@ -189,7 +190,6 @@ namespace DelvUI.Interface.Jobs
                 textSealReady = sealNumbers.ToString();
             }
 
-            hdl.Free();
             float xPos = origin.X + Config.Position.X + Config.DivinationBarPosition.X - Config.DivinationBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.DivinationBarPosition.Y - Config.DivinationBarSize.Y / 2f;
 
@@ -407,11 +407,17 @@ namespace DelvUI.Interface.Jobs
                              .SetText(
                                  BarTextPosition.CenterMiddle,
                                  BarTextType.Custom,
-                                 Config.ShowDotTextBar
+#pragma warning disable CS8604 // Possible null reference argument. (dot != null) is 
+                                 Config.ShowDotTextBar && dot != null
                                      ? !Config.EnableDecimalDotBar
                                          ? dot?.RemainingTime.ToString("N0")
                                          : Math.Abs(dot?.RemainingTime ?? 0f).ToString("N1")
-                                     : ""
+                                     : Config.ShowDotTextBar
+                                         ? !Config.EnableDecimalDotBar
+                                             ? "0"
+                                             : "0.0"
+                                         : ""
+#pragma warning restore CS8604 // Possible null reference argument.
                              )
                              .Build();
 
