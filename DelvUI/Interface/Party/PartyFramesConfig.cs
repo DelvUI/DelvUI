@@ -305,43 +305,15 @@ namespace DelvUI.Interface.Party
 
     public class PartyFramesStatusEffectsListConfig : StatusEffectsListConfig
     {
-        [Combo("Anchor", "Top Left", "Top Right", "Bottom Left", "Bottom Right")]
+        [Anchor("Health Bar Anchor")]
         [Order(4)]
-        public int AnchorIndex;
-
-        [JsonIgnore]
-        public DrawAnchor Anchor
-        {
-            get
-            {
-                switch (AnchorIndex)
-                {
-                    case 0: return DrawAnchor.TopLeft;
-                    case 1: return DrawAnchor.TopRight;
-                    case 2: return DrawAnchor.BottomLeft;
-                }
-
-                return DrawAnchor.BottomRight;
-            }
-
-            set
-            {
-                switch (value)
-                {
-                    case DrawAnchor.TopLeft: AnchorIndex = 0; return;
-                    case DrawAnchor.TopRight: AnchorIndex = 1; return;
-                    case DrawAnchor.BottomLeft: AnchorIndex = 2; return;
-                }
-
-                AnchorIndex = 3;
-            }
-        }
+        public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;
 
         public PartyFramesStatusEffectsListConfig(DrawAnchor anchor, Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
             GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
             : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
         {
-            Anchor = anchor;
+            HealthBarAnchor = anchor;
         }
     }
 }

@@ -141,17 +141,13 @@ namespace DelvUI.Interface.Party
             drawList.AddRect(borderPos, borderPos + borderSize, 0xFF000000);
 
             // buffs / debuffs
-            ImGui.BeginChild("child_" + _buffsListHud.ID);
-            var buffsPos = CalculatePositionForAnchor(_buffsConfig.Anchor);
+            var buffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _buffsConfig.HealthBarAnchor);
             _buffsListHud.Actor = Member.GetActor();
             _buffsListHud.Draw(buffsPos);
-            ImGui.EndChild();
 
-            ImGui.BeginChild("child_" + _debuffsListHud.ID);
-            var debuffsPos = CalculatePositionForAnchor(_debuffsConfig.Anchor);
+            var debuffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _debuffsConfig.HealthBarAnchor);
             _debuffsListHud.Actor = Member.GetActor();
             _debuffsListHud.Draw(debuffsPos);
-            ImGui.EndChild();
 
             // mana
             if (_manaBarsConfig.Enabled && Member.MaxHP > 0 &&
@@ -216,18 +212,6 @@ namespace DelvUI.Interface.Party
                 drawList.AddRectFilled(Position, Position + _config.Size, _config.ColorsConfig.HighlightColor.Base);
             }
 
-        }
-
-        private Vector2 CalculatePositionForAnchor(DrawAnchor anchor)
-        {
-            switch (anchor)
-            {
-                case DrawAnchor.TopLeft: return Position;
-                case DrawAnchor.TopRight: return Position + new Vector2(_config.Size.X, 0);
-                case DrawAnchor.BottomLeft: return Position + new Vector2(0, _config.Size.Y);
-            }
-
-            return Position + _config.Size;
         }
     }
 }
