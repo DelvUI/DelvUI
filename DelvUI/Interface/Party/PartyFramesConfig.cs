@@ -9,7 +9,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.Party
 {
-    [Serializable]
     [Section("Party Frames")]
     [SubSection("General", 0)]
     public class PartyFramesConfig : MovablePluginConfigObject
@@ -49,8 +48,7 @@ namespace DelvUI.Interface.Party
         public DrawAnchor BarsAnchor = DrawAnchor.TopLeft;
     }
 
-
-    [Serializable]
+    [Disableable(false)]
     [Section("Party Frames")]
     [SubSection("Health Bar", 0)]
     public class PartyFramesHealthBarsConfig : PluginConfigObject
@@ -78,7 +76,6 @@ namespace DelvUI.Interface.Party
         public PartyFramesRangeConfig RangeConfig = new PartyFramesRangeConfig();
     }
 
-    [Serializable]
     [Disableable(false)]
     [Portable(false)]
     public class PartyFramesColorsConfig : PluginConfigObject
@@ -120,7 +117,6 @@ namespace DelvUI.Interface.Party
         public PluginConfigColor UnreachableColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 30f / 100f));
     }
 
-    [Serializable]
     [Portable(false)]
     public class PartyFramesRangeConfig : PluginConfigObject
     {
@@ -165,7 +161,6 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    [Serializable]
     [Section("Party Frames")]
     [SubSection("Mana Bar", 0)]
     public class PartyFramesManaBarConfig : MovablePluginConfigObject
@@ -205,8 +200,6 @@ namespace DelvUI.Interface.Party
         public EditableLabelConfig ValueLabelConfig = new EditableLabelConfig(Vector2.Zero, "[mana:current-short]", DrawAnchor.Center, DrawAnchor.Center);
     }
 
-
-    [Serializable]
     [Section("Party Frames")]
     [SubSection("Role-Job Icon", 0)]
     public class PartyFramesRoleIconConfig : MovablePluginConfigObject
@@ -238,7 +231,6 @@ namespace DelvUI.Interface.Party
         public bool UseSpecificDPSRoleIcons = false;
     }
 
-    [Serializable]
     [Section("Party Frames")]
     [SubSection("Buffs", 0)]
     public class PartyFramesBuffsConfig : PartyFramesStatusEffectsListConfig
@@ -270,7 +262,6 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    [Serializable]
     [Section("Party Frames")]
     [SubSection("Debuffs", 0)]
     public class PartyFramesDebuffsConfig : PartyFramesStatusEffectsListConfig
@@ -301,8 +292,6 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    [Serializable]
-
     public class PartyFramesStatusEffectsListConfig : StatusEffectsListConfig
     {
         [Anchor("Health Bar Anchor")]
@@ -314,6 +303,39 @@ namespace DelvUI.Interface.Party
             : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
         {
             HealthBarAnchor = anchor;
+        }
+    }
+
+    [Section("Party Frames")]
+    [SubSection("Castbars", 0)]
+    public class PartyFramesCastbarConfig : CastbarConfig
+    {
+        public new static PartyFramesCastbarConfig DefaultConfig()
+        {
+            var size = new Vector2(180, 10);
+            var pos = Vector2.Zero;
+
+            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", DrawAnchor.Left, DrawAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
+            castTimeConfig.Enabled = false;
+
+            var config = new PartyFramesCastbarConfig(pos, size, castNameConfig, castTimeConfig);
+            config.HealthBarAnchor = DrawAnchor.BottomLeft;
+            config.Anchor = DrawAnchor.TopLeft;
+            config.ShowIcon = false;
+            config.Enabled = false;
+
+            return config;
+        }
+
+        [Anchor("Health Bar Anchor")]
+        [Order(14)]
+        public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;
+
+        public PartyFramesCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
+            : base(position, size, castNameConfig, castTimeConfig)
+        {
+
         }
     }
 }

@@ -13,10 +13,6 @@ namespace DelvUI.Interface.Party
     {
         private PartyFramesConfig Config => (PartyFramesConfig)_config;
         private PartyFramesHealthBarsConfig _healthBarsConfig;
-        private PartyFramesManaBarConfig _manaBarsConfig;
-        private PartyFramesRoleIconConfig _roleIconConfig;
-        private PartyFramesBuffsConfig _buffsConfig;
-        private PartyFramesDebuffsConfig _debuffsConfig;
 
         private Vector2 _contentMargin = new Vector2(40, 40);
         private static int MaxMemberCount = 8;
@@ -34,10 +30,11 @@ namespace DelvUI.Interface.Party
         public PartyFramesHud(string id, PartyFramesConfig config, string displayName) : base(id, config, displayName)
         {
             _healthBarsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesHealthBarsConfig>();
-            _manaBarsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesManaBarConfig>();
-            _roleIconConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesRoleIconConfig>();
-            _buffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesBuffsConfig>();
-            _debuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesDebuffsConfig>();
+            var manaBarConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesManaBarConfig>();
+            var castbarConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesCastbarConfig>();
+            var roleIconConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesRoleIconConfig>();
+            var buffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesBuffsConfig>();
+            var debuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesDebuffsConfig>();
 
             config.onValueChanged += OnLayoutPropertyChanged;
             _healthBarsConfig.onValueChanged += OnLayoutPropertyChanged;
@@ -46,7 +43,7 @@ namespace DelvUI.Interface.Party
             bars = new List<PartyFramesBar>(MaxMemberCount);
             for (int i = 0; i < bars.Capacity; i++)
             {
-                bars.Add(new PartyFramesBar(i.ToString(), _healthBarsConfig, _manaBarsConfig, _roleIconConfig, _buffsConfig, _debuffsConfig));
+                bars.Add(new PartyFramesBar(i.ToString(), _healthBarsConfig, manaBarConfig, castbarConfig, roleIconConfig, buffsConfig, debuffsConfig));
             }
 
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;

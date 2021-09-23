@@ -14,13 +14,15 @@ namespace DelvUI.Interface.Party
     public class PartyFramesBar
     {
         private PartyFramesHealthBarsConfig _config;
-        private PartyFramesManaBarConfig _manaBarsConfig;
+        private PartyFramesManaBarConfig _manaBarConfig;
+        private PartyFramesCastbarConfig _castbarConfig;
         private PartyFramesRoleIconConfig _roleIconConfig;
         private PartyFramesBuffsConfig _buffsConfig;
         private PartyFramesDebuffsConfig _debuffsConfig;
 
         private LabelHud _labelHud;
         private LabelHud _manaLabelHud;
+        private CastbarHud _castbarHud;
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
 
@@ -31,20 +33,23 @@ namespace DelvUI.Interface.Party
         public PartyFramesBar(
             string id,
             PartyFramesHealthBarsConfig config,
-            PartyFramesManaBarConfig manaBarsConfig,
+            PartyFramesManaBarConfig manaBarConfig,
+            PartyFramesCastbarConfig castbarConfig,
             PartyFramesRoleIconConfig roleIconConfig,
             PartyFramesBuffsConfig buffsConfig,
             PartyFramesDebuffsConfig debuffsConfig
         )
         {
             _config = config;
-            _manaBarsConfig = manaBarsConfig;
+            _manaBarConfig = manaBarConfig;
+            _castbarConfig = castbarConfig;
             _roleIconConfig = roleIconConfig;
             _buffsConfig = buffsConfig;
             _debuffsConfig = debuffsConfig;
 
             _labelHud = new LabelHud("partyFramesBar_label_" + id, config.NameLabelConfig);
-            _manaLabelHud = new LabelHud("partyFramesBar_manaLabel_" + id, _manaBarsConfig.ValueLabelConfig);
+            _manaLabelHud = new LabelHud("partyFramesBar_manaLabel_" + id, _manaBarConfig.ValueLabelConfig);
+            _castbarHud = new CastbarHud("partyFramesBar_castbar_" + id, _castbarConfig, "");
             _buffsListHud = new StatusEffectsListHud("partyFramesBar_Buffs_" + id, buffsConfig, "");
             _debuffsListHud = new StatusEffectsListHud("partyFramesBar_Debuffs_" + id, debuffsConfig, "");
         }
@@ -142,29 +147,34 @@ namespace DelvUI.Interface.Party
 
             // buffs / debuffs
             var buffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _buffsConfig.HealthBarAnchor);
-            _buffsListHud.Actor = Member.GetActor();
+            _buffsListHud.Actor = actor;
             _buffsListHud.Draw(buffsPos);
 
             var debuffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _debuffsConfig.HealthBarAnchor);
-            _debuffsListHud.Actor = Member.GetActor();
+            _debuffsListHud.Actor = actor;
             _debuffsListHud.Draw(debuffsPos);
 
             // mana
-            if (_manaBarsConfig.Enabled && Member.MaxHP > 0 &&
-                (!_manaBarsConfig.ShowOnlyForHealers || JobsHelper.IsJobHealer(Member.JobId)))
+            if (_manaBarConfig.Enabled && Member.MaxHP > 0 &&
+                (!_manaBarConfig.ShowOnlyForHealers || JobsHelper.IsJobHealer(Member.JobId)))
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _manaBarsConfig.HealthBarAnchor);
-                var manaBarPos = Utils.GetAnchoredPosition(parentPos + _manaBarsConfig.Position, _manaBarsConfig.Size, _manaBarsConfig.Anchor);
+                var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _manaBarConfig.HealthBarAnchor);
+                var manaBarPos = Utils.GetAnchoredPosition(parentPos + _manaBarConfig.Position, _manaBarConfig.Size, _manaBarConfig.Anchor);
 
-                drawList.AddRectFilled(manaBarPos, manaBarPos + _manaBarsConfig.Size, _manaBarsConfig.BackgroundColor.Base);
+                drawList.AddRectFilled(manaBarPos, manaBarPos + _manaBarConfig.Size, _manaBarConfig.BackgroundColor.Base);
 
                 var scale = (float)Member.MP / (float)Member.MaxMP;
-                var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), _manaBarsConfig.Size.Y);
+                var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), _manaBarConfig.Size.Y);
 
-                DrawHelper.DrawGradientFilledRect(manaBarPos, fillSize, _manaBarsConfig.Color, drawList);
+                DrawHelper.DrawGradientFilledRect(manaBarPos, fillSize, _manaBarConfig.Color, drawList);
 
-                _manaLabelHud.Draw(manaBarPos, _manaBarsConfig.Size, actor);
+                _manaLabelHud.Draw(manaBarPos, _manaBarConfig.Size, actor);
             }
+
+            // castbar
+            var castbarPos = Utils.GetAnchoredPosition(Position, -_config.Size, _castbarConfig.HealthBarAnchor);
+            _castbarHud.Actor = actor;
+            _castbarHud.Draw(castbarPos);
 
             // name
             var name = Member.Name ?? "";

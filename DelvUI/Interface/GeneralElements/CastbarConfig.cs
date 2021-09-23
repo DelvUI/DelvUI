@@ -158,8 +158,6 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Cast Time", 50)]
         public LabelConfig CastTimeConfig;
 
-
-
         public CastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
         {
             Position = position;

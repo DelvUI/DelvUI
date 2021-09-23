@@ -59,7 +59,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public virtual PluginConfigColor Color(Actor actor = null)
         {
-            if (!Config.UseJobColor)
+            if (!Config.UseJobColor || actor == null)
             {
                 return Config.Color;
             }
