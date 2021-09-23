@@ -15,7 +15,7 @@ namespace DelvUI.Interface.Party
         private PartyFramesHealthBarsConfig _healthBarsConfig;
 
         private Vector2 _contentMargin = new Vector2(40, 40);
-        private static int MaxMemberCount = 8;
+        private static int MaxMemberCount = 16; // 8 players + 8 chocobos
 
         // layout
         private Vector2 _origin;

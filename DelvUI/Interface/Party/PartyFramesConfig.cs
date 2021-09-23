@@ -15,20 +15,32 @@ namespace DelvUI.Interface.Party
     {
         public new static PartyFramesConfig DefaultConfig() { return new PartyFramesConfig(); }
 
+        [Checkbox("Lock")]
+        [Order(3)]
+
+        public bool Lock = true;
+        [Checkbox("Preview", isMonitored = true)]
+        [Order(4)]
+        public bool Preview = false;
+
         [DragInt2("Size", isMonitored = true)]
         [Order(30)]
         public Vector2 Size = new Vector2(650, 150);
 
-        [Checkbox("Lock")]
-        [Order(35)]
-        public bool Lock = true;
-
-        [Checkbox("Preview", isMonitored = true)]
+        [Anchor("Bars Anchor", isMonitored = true)]
         [Order(40)]
-        public bool Preview = false;
+        public DrawAnchor BarsAnchor = DrawAnchor.TopLeft;
 
-        [Checkbox("Fill Rows First", isMonitored = true)]
-        [Order(45)]
+        [Checkbox("Show When Solo", separator = true)]
+        [Order(50)]
+        public bool ShowWhenSolo = false;
+
+        [Checkbox("Show Companions")]
+        [Order(55)]
+        public bool ShowCompanions = true;
+
+        [Checkbox("Fill Rows First", isMonitored = true, separator = true)]
+        [Order(60)]
         public bool FillRowsFirst = true;
 
         [Combo("Sorting Mode",
@@ -40,12 +52,8 @@ namespace DelvUI.Interface.Party
             "Healer => DPS => Tank",
             isMonitored = true
         )]
-        [Order(50)]
+        [Order(65)]
         public PartySortingMode SortingMode = PartySortingMode.Tank_Healer_DPS;
-
-        [Anchor("Bars Anchor", isMonitored = true)]
-        [Order(55)]
-        public DrawAnchor BarsAnchor = DrawAnchor.TopLeft;
     }
 
     [Disableable(false)]

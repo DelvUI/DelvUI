@@ -1,10 +1,14 @@
 ﻿using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.Internal;
+using Dalamud.Plugin;
 using DelvUI.Config;
+using DelvUI.Helpers;
+using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 using PartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
 
 namespace DelvUI.Interface.Party
@@ -78,29 +82,16 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
-
             var manager = GroupManager.Instance();
 
-            // testing
-            if (manager->MemberCount == 0 && !_config.Preview)
+            // solo
+            if (_config.ShowWhenSolo && manager->MemberCount == 0 && !_config.Preview)
             {
-                if (_groupMembers.Count == 1)
-                {
-                    return;
-                }
-
-                _groupMembers.Clear();
-                _groupMembers.Add(new PartyFramesMember(player));
-
-                if (MembersChangedEvent != null)
-                {
-                    MembersChangedEvent(this, null);
-                }
-
+                UpdateSoloParty(player);
                 return;
             }
-            // testing
 
+            // party
             try
             {
                 bool partyChanged = _groupMembers.Count != manager->MemberCount;
@@ -115,7 +106,17 @@ namespace DelvUI.Interface.Party
                         partyChanged = true;
                     }
 
-                    newMembers.Add(new PartyFramesMember(partyMember));
+                    var member = new PartyFramesMember(partyMember);
+                    newMembers.Add(member);
+
+                    if (_config.ShowCompanions)
+                    {
+                        var companion = Utils.GetBattleCompanion(member.GetActor());
+                        if (companion != null)
+                        {
+                            _groupMembers.Add(new PartyFramesMember(companion));
+                        }
+                    }
                 }
 
                 PartySortingHelper.SortPartyMembers(ref newMembers, _config.SortingMode);
@@ -132,7 +133,32 @@ namespace DelvUI.Interface.Party
             }
             catch
             {
-                
+
+            }
+        }
+
+        private void UpdateSoloParty(PlayerCharacter player)
+        {
+            List<IPartyFramesMember> newMembers = new List<IPartyFramesMember>();
+
+            newMembers.Add(new PartyFramesMember(player));
+
+            if (_config.ShowCompanions)
+            {
+                var companion = Utils.GetBattleCompanion(player);
+                if (companion != null)
+                {
+                    newMembers.Add(new PartyFramesMember(companion));
+                }
+            }
+
+            if (newMembers.Count != _groupMembers.Count)
+            {
+                _groupMembers = newMembers;
+                if (MembersChangedEvent != null)
+                {
+                    MembersChangedEvent(this, null);
+                }
             }
         }
 

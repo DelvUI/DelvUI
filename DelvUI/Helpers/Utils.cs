@@ -12,6 +12,28 @@ namespace DelvUI.Helpers
 {
     internal static class Utils
     {
+        public static Actor GetBattleCompanion(Actor player)
+        {
+            // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
+            // we do a step of 2 because its always an actor followed by its companion
+            for (var i = 0; i < 200; i += 2)
+            {
+                var actor = Plugin.ClientState.Actors[i];
+
+                if (actor is not BattleNpc battleNpc)
+                {
+                    continue;
+                }
+
+                if (battleNpc.OwnerId == player.ActorId)
+                {
+                    return actor;
+                }
+            }
+
+            return null;
+        }
+
         public static unsafe bool IsHostileMemory(BattleNpc npc)
         {
             if (npc == null)

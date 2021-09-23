@@ -1,4 +1,5 @@
-﻿using Dalamud.Plugin;
+﻿using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
+using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -96,9 +97,10 @@ namespace DelvUI.Interface.Party
             // click
             bool isHovering = ImGui.IsMouseHoveringRect(Position, Position + _config.Size);
             var actor = Member.GetActor();
+
             if (isHovering && ImGui.IsMouseClicked(ImGuiMouseButton.Left))
             {
-                Plugin.TargetManager.SetCurrentTarget(Member.GetActor());
+                Plugin.TargetManager.SetCurrentTarget(actor);
             }
 
             // bg
@@ -206,14 +208,26 @@ namespace DelvUI.Interface.Party
             // icon
             if (_roleIconConfig.Enabled && isClose)
             {
-                var iconId = _roleIconConfig.UseRoleIcons ?
-                    JobsHelper.RoleIconIDForJob(Member.JobId, _roleIconConfig.UseSpecificDPSRoleIcons) :
-                    JobsHelper.IconIDForJob(Member.JobId) + (uint)_roleIconConfig.Style * 100;
+                uint iconId = 0;
 
-                var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _roleIconConfig.HealthBarAnchor);
-                var iconPos = Utils.GetAnchoredPosition(parentPos + _roleIconConfig.Position, _roleIconConfig.Size, _roleIconConfig.Anchor);
+                if (actor is BattleNpc)
+                {
+                    iconId = JobsHelper.RoleIconIDForBattleCompanion + (uint)_roleIconConfig.Style * 100;
+                }
+                else
+                {
+                    iconId = _roleIconConfig.UseRoleIcons ?
+                        JobsHelper.RoleIconIDForJob(Member.JobId, _roleIconConfig.UseSpecificDPSRoleIcons) :
+                        JobsHelper.IconIDForJob(Member.JobId) + (uint)_roleIconConfig.Style * 100;
+                }
 
-                DrawHelper.DrawIcon(iconId, iconPos, _roleIconConfig.Size, false, drawList);
+                if (iconId > 0)
+                {
+                    var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _roleIconConfig.HealthBarAnchor);
+                    var iconPos = Utils.GetAnchoredPosition(parentPos + _roleIconConfig.Position, _roleIconConfig.Size, _roleIconConfig.Anchor);
+
+                    DrawHelper.DrawIcon(iconId, iconPos, _roleIconConfig.Size, false, drawList);
+                }
             }
 
             // highlight

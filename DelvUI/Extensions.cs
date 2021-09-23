@@ -41,6 +41,25 @@ namespace DelvUI
             return "";
         }
 
+        public static string Initials(this string str)
+        {
+            var initials = "";
+            var firstName = FirstName(str);
+            var lastName = LastName(str);
+
+            if (firstName.Length > 0)
+            {
+                initials = firstName[0] + ".";
+            }
+
+            if (lastName.Length > 0)
+            {
+                initials += " " + lastName[0] + ".";
+            }
+
+            return initials;
+        }
+
         public static Vector4 AdjustColor(this Vector4 vec, float correctionFactor)
         {
             var red = vec.X;

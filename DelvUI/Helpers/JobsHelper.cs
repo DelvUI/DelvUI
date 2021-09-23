@@ -97,6 +97,8 @@ namespace DelvUI.Helpers
             return 0;
         }
 
+        public static uint RoleIconIDForBattleCompanion => 62039;
+
         public static Dictionary<uint, JobRoles> JobRolesMap = new Dictionary<uint, JobRoles>()
         {
             // tanks

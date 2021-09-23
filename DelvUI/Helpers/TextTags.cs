@@ -83,6 +83,7 @@ namespace DelvUI.Helpers
                 "[name:first-initial]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).FirstName().Length == 0 ? "" : ((string)actor.Name).FirstName().Substring(0, 1),
                 "[name:last]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).LastName(),
                 "[name:last-initial]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).LastName().Length == 0 ? "" : ((string)actor.Name).LastName().Substring(0, 1),
+                "[name:initials]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Initials(),
                 "[name:abbreviate]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Abbreviate(),
                 "[name:veryshort]" when Extensions.IsPropertyExist(actor, "Name") => ((string)actor.Name).Truncate(5),
                 "[name:short]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Truncate(10),
