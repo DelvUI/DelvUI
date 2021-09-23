@@ -21,15 +21,15 @@ namespace DelvUI.Interface.GeneralElements
         public bool VerticalMode = false;
         
         [Checkbox("Circular Mode")]
-        [CollapseControl(35, 0)]
+        [Order(35)]
         public bool CircularMode = false;
         
-        [Checkbox("Anchor To Mouse")]
-        [CollapseWith(40,0)]
+        [Checkbox("Anchor To Mouse", spacing = true)]
+        [Order(40)]
         public bool AnchorToMouse = false;
         
         [Checkbox("Change Position (0,0 = centered with cursor point)")]
-        [CollapseWith(45,0)]
+        [Order(45)]
         public bool OffsetMousePosition = false;
         
         [DragInt("Radius")]
