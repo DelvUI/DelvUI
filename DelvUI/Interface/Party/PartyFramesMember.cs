@@ -27,19 +27,6 @@ namespace DelvUI.Interface.Party
         public uint MP => _partyMember != null ? _partyMember->CurrentMP : BattleCharacter->Character.Mana;
         public uint MaxMP => _partyMember != null ? _partyMember->MaxMP : BattleCharacter->Character.MaxMana;
         public float Shield => Utils.ActorShieldValue(GetActor());
-        public StatusEffect[] StatusEffects
-        {
-            get
-            {
-                var actor = GetActor();
-                if (actor == null)
-                {
-                    return new StatusEffect[0];
-                }
-
-                return actor.StatusEffects;
-            }
-        }
 
         private int _actorID;
         private BattleChara* BattleCharacter => (BattleChara*)GetActor().Address;
@@ -85,7 +72,6 @@ namespace DelvUI.Interface.Party
         public uint MP { get; private set; }
         public uint MaxMP { get; private set; }
         public float Shield { get; private set; }
-        public StatusEffect[] StatusEffects { get; private set; }
 
         public FakePartyFramesMember()
         {
@@ -96,19 +82,6 @@ namespace DelvUI.Interface.Party
             MaxMP = 10000;
             MP = (uint)(MaxMP * RNG.Next(100) / 100f);
             Shield = RNG.Next(30) / 100f;
-
-            var statusEffectCount = RNG.Next(1, 5);
-            StatusEffects = new StatusEffect[statusEffectCount];
-
-            for (int i = 0; i < statusEffectCount; i++)
-            {
-                var fakeEffect = new StatusEffect();
-                fakeEffect.Duration = RNG.Next(1, 30);
-                fakeEffect.EffectId = (short)RNG.Next(1, 200);
-                fakeEffect.StackCount = (byte)RNG.Next(0, 3);
-
-                StatusEffects[i] = fakeEffect;
-            }
         }
 
         public Actor GetActor()
@@ -128,7 +101,6 @@ namespace DelvUI.Interface.Party
         public uint MP { get; }
         public uint MaxMP { get; }
         public float Shield { get; }
-        public StatusEffect[] StatusEffects { get; }
         public abstract Actor GetActor();
     }
 }

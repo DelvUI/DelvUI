@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Structs;
+using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
@@ -17,6 +18,7 @@ namespace DelvUI.Interface.StatusEffects
 
         private LayoutInfo _layoutInfo;
         private bool _showingTooltip = false;
+        private StatusEffect[] _fakeEffects = null;
 
         private LabelHud _durationLabel;
         private LabelHud _stacksLabel;
@@ -25,8 +27,17 @@ namespace DelvUI.Interface.StatusEffects
 
         public StatusEffectsListHud(string id, StatusEffectsListConfig config, string displayName) : base(id, config, displayName)
         {
+            _config.onValueChanged += OnConfigPropertyChanged;
+
             _durationLabel = new LabelHud(id + "_duration", config.IconConfig.DurationLabelConfig);
             _stacksLabel = new LabelHud(id + "_stacks", config.IconConfig.StacksLabelConfig);
+
+            UpdatePreview();
+        }
+
+        ~StatusEffectsListHud()
+        {
+            _config.onValueChanged -= OnConfigPropertyChanged;
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -40,7 +51,7 @@ namespace DelvUI.Interface.StatusEffects
             var effectCount = (uint)list.Count;
             var count = Config.Limit >= 0 ? Math.Min((uint)Config.Limit, effectCount) : effectCount;
 
-            if (Actor == null || count <= 0)
+            if (count <= 0)
             {
                 return 0;
             }
@@ -72,12 +83,14 @@ namespace DelvUI.Interface.StatusEffects
         protected List<StatusEffectData> StatusEffectDataList(Actor actor)
         {
             var list = new List<StatusEffectData>();
-            if (actor == null)
+            var statusEffects = _fakeEffects != null ? _fakeEffects : actor.StatusEffects;
+
+            if (statusEffects == null)
             {
                 return list;
             }
 
-            var effectCount = actor.StatusEffects.Length;
+            var effectCount = statusEffects.Length;
             if (effectCount == 0)
             {
                 return list;
@@ -93,7 +106,7 @@ namespace DelvUI.Interface.StatusEffects
 
             for (var i = 0; i < effectCount; i++)
             {
-                var status = actor.StatusEffects[i];
+                var status = statusEffects[i];
 
                 if (status.EffectId <= 0)
                 {
@@ -170,12 +183,12 @@ namespace DelvUI.Interface.StatusEffects
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || Actor == null)
+            if (!Config.Enabled)
             {
                 return;
             }
 
-            if (Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc)
+            if (_fakeEffects == null && (Actor == null || Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc))
             {
                 return;
             }
@@ -189,7 +202,7 @@ namespace DelvUI.Interface.StatusEffects
             var areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
             var drawList = ImGui.GetWindowDrawList();
 
-            if (Config.ShowArea)
+            if (Config.Preview)
             {
                 drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
             }
@@ -279,7 +292,7 @@ namespace DelvUI.Interface.StatusEffects
 
                 StatusEffectIconDrawHelper.DrawStatusEffectIcon(drawList, iconPos, statusEffectData, Config.IconConfig, _durationLabel, _stacksLabel);
 
-                if (ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
+                if (Actor != null && ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
                 {
                     // tooltip
                     if (Config.ShowTooltips)
@@ -369,6 +382,36 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             return startPos;
+        }
+
+        private void OnConfigPropertyChanged(object sender, OnChangeBaseArgs args)
+        {
+            if (args.PropertyName == "Preview")
+            {
+                UpdatePreview();
+            }
+        }
+
+        private void UpdatePreview()
+        {
+            if (!Config.Preview)
+            {
+                _fakeEffects = null;
+                return;
+            }
+
+            var RNG = new Random((int)ImGui.GetTime());
+            _fakeEffects = new StatusEffect[20];
+
+            for (int i = 0; i < 20; i++)
+            {
+                var fakeEffect = new StatusEffect();
+                fakeEffect.Duration = RNG.Next(1, 30);
+                fakeEffect.EffectId = (short)RNG.Next(1, 200);
+                fakeEffect.StackCount = (byte)RNG.Next(0, 3);
+
+                _fakeEffects[i] = fakeEffect;
+            }
         }
     }
 
