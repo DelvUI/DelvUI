@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.ClientState.Structs;
+﻿using Dalamud.Game.ClientState.Actors.Types;
+using Dalamud.Game.ClientState.Structs;
 using Dalamud.Game.ClientState.Structs.JobGauge;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
@@ -127,6 +128,12 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDarkside(Vector2 origin)
         {
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            if (target is not Chara && Config.HideDarksideWhenNoTarget)
+            {
+                return;
+            }
+
             float darksideTimer = Plugin.JobGauges.Get<DRKGauge>().DarksideTimeRemaining;
             float darksideDuration = Math.Abs(darksideTimer / 1000);
             var max = 60f;
@@ -348,6 +355,10 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Show Darkside Text" + "##Darkside")]
         [CollapseWith(25, 2)]
         public bool ShowDarksideText = true;
+
+        [Checkbox("Hide When No Target" + "##Darkside")]
+        [CollapseWith(30, 2)]
+        public bool HideDarksideWhenNoTarget = false;
         #endregion
 
         #region Buff Bar
