@@ -210,39 +210,6 @@ namespace DelvUI.Config
         public T GetConfigObject<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigObject<T>();
         public ConfigPageNode GetConfigPageNode<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigPageNode<T>();
 
-        public static string CompressAndBase64Encode(string jsonString)
-        {
-            using MemoryStream output = new();
-
-            using (DeflateStream gzip = new(output, CompressionLevel.Fastest))
-            {
-                using StreamWriter writer = new(gzip, Encoding.UTF8);
-                writer.Write(jsonString);
-            }
-
-            return Convert.ToBase64String(output.ToArray());
-        }
-
-        public static string Base64DecodeAndDecompress(string base64String)
-        {
-            var base64EncodedBytes = Convert.FromBase64String(base64String);
-
-            using MemoryStream inputStream = new(base64EncodedBytes);
-            using DeflateStream gzip = new(inputStream, CompressionMode.Decompress);
-            using StreamReader reader = new(gzip, Encoding.UTF8);
-            var decodedString = reader.ReadToEnd();
-
-            return decodedString;
-        }
-
-        public static string GenerateExportString(PluginConfigObject configObject)
-        {
-            var jsonString = JsonConvert.SerializeObject(configObject, Formatting.Indented,
-                new JsonSerializerSettings { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects });
-
-            return CompressAndBase64Encode(jsonString);
-        }
-
         public static string GenerateJsonString(PluginConfigObject configObject)
         {
             var jsonString = JsonConvert.SerializeObject(configObject, Formatting.Indented,
@@ -251,24 +218,12 @@ namespace DelvUI.Config
             return jsonString;
         }
 
-        public static string ExportBaseNode(BaseNode baseNode)
-        {
-            JsonSerializerSettings settings = new JsonSerializerSettings
-            {
-                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-                TypeNameHandling = TypeNameHandling.Objects
-            };
-            var jsonString = JsonConvert.SerializeObject(baseNode, Formatting.Indented, settings);
-            ImGui.SetClipboardText(jsonString);
-            return CompressAndBase64Encode(jsonString);
-        }
-
         public static void LoadImportedConfiguration(string importString, ConfigPageNode configPageNode)
         {
             // see comments on ConfigPageNode's Load
-            MethodInfo methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
+            MethodInfo methodInfo = typeof(ImportExportHelper).GetMethod("LoadImportString");
             MethodInfo function = methodInfo.MakeGenericMethod(configPageNode.ConfigObject.GetType());
-            PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(GetInstance(), new object[] { importString });
+            PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(null, new object[] { importString });
 
             if (importedConfigObject != null)
             {
@@ -313,38 +268,9 @@ namespace DelvUI.Config
                 return;
             }
 
-            string[] importStrings = Base64DecodeAndDecompress(profileString).Split(new string[] { BaseNode.ImportExportSeparator }, StringSplitOptions.RemoveEmptyEntries);
+            string[] importStrings = ImportExportHelper.Base64DecodeAndDecompress(profileString).Split(new string[] { ImportExportHelper.Separator }, StringSplitOptions.RemoveEmptyEntries);
             LoadTotalConfiguration(importStrings);
             profilesConfig.CurrentProfile = profileName;
-        }
-
-        public static T LoadImportString<T>(string importString) where T : PluginConfigObject
-        {
-            try
-            {
-                var jsonString = Base64DecodeAndDecompress(importString);
-                return JsonConvert.DeserializeObject<T>(jsonString);
-            }
-            catch (Exception ex)
-            {
-                PluginLog.Log(ex.Message + "\n" + ex.StackTrace);
-
-                return default;
-            }
-        }
-
-        public static T LoadImportJson<T>(string jsonString) where T : PluginConfigObject
-        {
-            try
-            {
-                return JsonConvert.DeserializeObject<T>(jsonString);
-            }
-            catch (Exception ex)
-            {
-                PluginLog.Log(ex.Message + "\n" + ex.StackTrace);
-
-                return default;
-            }
         }
     }
 }

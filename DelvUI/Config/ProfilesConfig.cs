@@ -101,8 +101,8 @@ namespace DelvUI.Config
                                 ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
                                 if (ImGui.Button((profile.Key == CurrentProfile ? "> " : "") + profile.Key) && profile.Value != "" && profile.Key != CurrentProfile)
                                 {
-                                    string[] importStrings = ConfigurationManager.Base64DecodeAndDecompress(profile.Value)
-                                        .Split(new string[] { BaseNode.ImportExportSeparator }, StringSplitOptions.RemoveEmptyEntries);
+                                    string[] importStrings = ImportExportHelper.Base64DecodeAndDecompress(profile.Value)
+                                        .Split(new string[] { ImportExportHelper.Separator }, StringSplitOptions.RemoveEmptyEntries);
                                     ConfigurationManager.LoadTotalConfiguration(importStrings);
                                     CurrentProfile = profile.Key;
                                     changed = true;

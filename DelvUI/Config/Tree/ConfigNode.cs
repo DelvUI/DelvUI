@@ -1,6 +1,7 @@
 using Dalamud.Interface;
 using Dalamud.Plugin;
 using DelvUI.Config.Attributes;
+using DelvUI.Helpers;
 using ImGuiNET;
 using ImGuiScene;
 using Newtonsoft.Json;
@@ -35,8 +36,6 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public static string ImportExportSeparator = "_IMPORTEXPORTSEPARATOR_";
-
         public virtual string GetJsonString()
         {
             if (children == null)
@@ -52,7 +51,7 @@ namespace DelvUI.Config.Tree
 
                 if (childString != "")
                 {
-                    jsonString += ImportExportSeparator + childString;
+                    jsonString += ImportExportHelper.Separator + childString;
                 }
             }
 
@@ -61,7 +60,7 @@ namespace DelvUI.Config.Tree
 
         public virtual string GetBase64String()
         {
-            return ConfigurationManager.CompressAndBase64Encode(GetJsonString());
+            return ImportExportHelper.CompressAndBase64Encode(GetJsonString());
         }
 
         public virtual void LoadBase64String(string[] importStrings)
@@ -144,7 +143,7 @@ namespace DelvUI.Config.Tree
 
                 if (childString != "")
                 {
-                    jsonString += ImportExportSeparator + childString;
+                    jsonString += ImportExportHelper.Separator + childString;
                 }
             }
 
@@ -412,7 +411,7 @@ namespace DelvUI.Config.Tree
 
                 if (childString != "")
                 {
-                    jsonString += ImportExportSeparator + childString;
+                    jsonString += ImportExportHelper.Separator + childString;
                 }
             }
 
@@ -561,7 +560,7 @@ namespace DelvUI.Config.Tree
 
                 if (childString != "")
                 {
-                    jsonString += ImportExportSeparator + childString;
+                    jsonString += ImportExportHelper.Separator + childString;
                 }
             }
 
@@ -776,9 +775,9 @@ namespace DelvUI.Config.Tree
                 if (importedType != null && ConfigObject.GetType().FullName == importedType.FullName)
                 {
                     // see comments on ConfigPageNode's Load
-                    MethodInfo methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportJson");
+                    MethodInfo methodInfo = typeof(ImportExportHelper).GetMethod("LoadImportJson");
                     MethodInfo function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
-                    PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(ConfigurationManager.GetInstance(), new object[] { jsonString });
+                    PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(null, new object[] { jsonString });
 
                     if (importedConfigObject != null)
                     {
@@ -918,7 +917,7 @@ namespace DelvUI.Config.Tree
 
                     try
                     {
-                        string jsonString = ConfigurationManager.Base64DecodeAndDecompress(_importString);
+                        string jsonString = ImportExportHelper.Base64DecodeAndDecompress(_importString);
                         importedType = Type.GetType((string)JObject.Parse(jsonString)["$type"]);
                     }
                     catch (Exception ex)
@@ -962,7 +961,7 @@ namespace DelvUI.Config.Tree
 
                 if (ImGui.Button("Export configuration"))
                 {
-                    _exportString = ConfigurationManager.GenerateExportString(ConfigObject);
+                    _exportString = ImportExportHelper.GenerateExportString(ConfigObject);
                     PluginLog.Log($"Exported type {ConfigObject.GetType()}");
                 }
 
