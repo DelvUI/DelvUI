@@ -120,6 +120,14 @@ namespace DelvUI.Interface.GeneralElements
         [CollapseWith(3, 0)]
         public PluginConfigColor LowHealthColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
+        [DragFloat("Full Health Color Above Health %", min = 50f, max = 100f , velocity = 1f)]
+        [CollapseWith(4, 0)]
+        public float FullHealthColorThreshold = 75f;
+
+        [DragFloat("Low Health Color Below Health %", min = 0f, max = 50f, velocity = 1f)]
+        [CollapseWith(5, 0)]
+        public float LowHealthColorThreshold = 25f;
+
         [Checkbox("Custom Background Color")]
         [CollapseControl(25, 1)]
         public bool UseCustomBackgroundColor = false;

@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
+using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
@@ -264,13 +265,19 @@ namespace DelvUI.Helpers
                     ratio = (i - min) / range;
                 }
             }
-            float resultRed = (fullHealthColor.Vector.X - lowHealthColor.Vector.X) * ratio + lowHealthColor.Vector.X;
-            float resultGreen = (fullHealthColor.Vector.Y - lowHealthColor.Vector.Y) * ratio + lowHealthColor.Vector.Y;
-            float resultBlue = (fullHealthColor.Vector.Z - lowHealthColor.Vector.Z) * ratio + lowHealthColor.Vector.Z;
-            RGB data = new RGB(resultRed, resultGreen, resultBlue);
-            HSL hsl = RGBToHSL(data);
-            HSL data2 = new HSL(hsl.H, hsl.S, hsl.L);
-            RGB rgb = HSLToRGB(data2);
+
+            RGB rgbFH = new RGB(fullHealthColor.Vector.X,fullHealthColor.Vector.Y, fullHealthColor.Vector.Z);
+            HSL hslFH = RGBToHSL(rgbFH);
+
+            RGB rgbLH = new RGB(lowHealthColor.Vector.X, lowHealthColor.Vector.Y, lowHealthColor.Vector.Z);
+            HSL hslLH = RGBToHSL(rgbLH);
+
+            float resultHue = (int)((hslFH.H - hslLH.H) * ratio + hslLH.H);
+            float resultSat = (hslFH.S - hslLH.S) * ratio + hslLH.S;
+            float resultLit  = (hslFH.L - hslLH.L) * ratio + hslLH.L;
+
+            RGB rgb = HSLToRGB(new((int)resultHue, resultSat, resultLit));
+
             PluginConfigColor newColor = new PluginConfigColor(new Vector4(rgb.R , rgb.G, rgb.B, 100f / 100f));
             return newColor;
         }

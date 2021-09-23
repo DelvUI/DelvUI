@@ -144,7 +144,7 @@ namespace DelvUI.Interface.GeneralElements
 
             if(Config.UseCustomColor && Config.UseColorBasedOnHealthValue)
             {
-                color = Utils.ColorByHealthValue(scale,0.3f,0.8f,Config.FullHealthColor,Config.LowHealthColor);
+                color = Utils.ColorByHealthValue(scale, Config.LowHealthColorThreshold / 100f , Config.FullHealthColorThreshold / 100f, Config.FullHealthColor , Config.LowHealthColor);
             }
 
             // background
