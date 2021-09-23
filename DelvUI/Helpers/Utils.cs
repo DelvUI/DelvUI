@@ -1,7 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Actors;
 using Dalamud.Game.ClientState.Actors.Types;
 using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
-using Dalamud.Plugin;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
@@ -248,9 +247,26 @@ namespace DelvUI.Helpers
 
         public static PluginConfigColor ColorByHealthValue(float i, float min, float max, PluginConfigColor fullHealthColor, PluginConfigColor lowHealthColor)
         {
-            float resultRed = (fullHealthColor.Vector.X - lowHealthColor.Vector.X) * i + lowHealthColor.Vector.X;
-            float resultGreen = (fullHealthColor.Vector.Y - lowHealthColor.Vector.Y) * i + lowHealthColor.Vector.Y;
-            float resultBlue = (fullHealthColor.Vector.Z - lowHealthColor.Vector.Z) * i + lowHealthColor.Vector.Z;
+            float ratio = i;
+            if (min > 0 || max < 1)
+            {
+                if (i < min)
+                {
+                    ratio = 0;
+                }
+                else if (i > max)
+                {
+                    ratio = 1;
+                }
+                else
+                {
+                    var range = max - min;
+                    ratio = (i - min) / range;
+                }
+            }
+            float resultRed = (fullHealthColor.Vector.X - lowHealthColor.Vector.X) * ratio + lowHealthColor.Vector.X;
+            float resultGreen = (fullHealthColor.Vector.Y - lowHealthColor.Vector.Y) * ratio + lowHealthColor.Vector.Y;
+            float resultBlue = (fullHealthColor.Vector.Z - lowHealthColor.Vector.Z) * ratio + lowHealthColor.Vector.Z;
             RGB data = new RGB(resultRed, resultGreen, resultBlue);
             HSL hsl = RGBToHSL(data);
             HSL data2 = new HSL(hsl.H, hsl.S, hsl.L);
