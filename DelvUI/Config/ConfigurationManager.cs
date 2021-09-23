@@ -289,13 +289,13 @@ namespace DelvUI.Config
         public void LoadProfile(uint jobID)
         {
             ProfilesConfig profilesConfig = (ProfilesConfig)GetConfigObjectForType(typeof(ProfilesConfig));
-            if(profilesConfig == null)
+            if (profilesConfig == null)
             {
                 return;
             }
 
-            string profileName = profilesConfig.JobProfileMap[jobID];
-            if(profilesConfig.CurrentProfile == profileName)
+            string profileName;
+            if (!profilesConfig.JobProfileMap.TryGetValue(jobID, out profileName) || profilesConfig.CurrentProfile == profileName)
             {
                 return;
             }
@@ -305,6 +305,8 @@ namespace DelvUI.Config
             {
                 return;
             }
+
+            PluginLog.Log($"Switching to profile: {profileName} for job {JobsHelper.JobNames[jobID]}");
             string[] importStrings = profileString.Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
             LoadTotalConfiguration(importStrings);
             profilesConfig.CurrentProfile = profileName;

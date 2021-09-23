@@ -227,13 +227,11 @@ namespace DelvUI.Config
                 {
                     if (JobProfileMap.TryGetValue(jobs[_selectedJob], out profileForJob))
                     {
-                        PluginLog.Log($"loading {profileForJob} from key {jobNames[_selectedJob]}");
                         _selectedProfileForJob = Array.FindIndex(availableProfiles, o => o == profileForJob);
                         // if the profile assigned to the job _selectedJob is no longer available
                         // then set it to the default profile, which corresponds to the symbol "-"
                         if (_selectedProfileForJob == -1)
                         {
-                            PluginLog.Log($"profile {profileForJob} was not found for {jobNames[_selectedJob]}");
                             _selectedProfileForJob = Array.FindIndex(availableProfiles, o => o == "-");
                         }
                     }
