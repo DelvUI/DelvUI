@@ -178,12 +178,6 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
-            var count = PartyManager.Instance.MemberCount;
-            if (count < 1)
-            {
-                return;
-            }
-
             // size and position
             ImGui.SetNextWindowPos(Config.Position - _contentMargin, ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSize(Config.Size + _contentMargin * 2, ImGuiCond.FirstUseEver);
@@ -207,6 +201,22 @@ namespace DelvUI.Interface.Party
             // recalculate layout on settings or size change
             var contentStartPos = windowPos + _contentMargin;
             var maxSize = windowSize - _contentMargin * 2;
+
+            // preview
+            var drawList = ImGui.GetWindowDrawList();
+            if (!Config.Lock)
+            {
+                var margin = new Vector2(4, 0);
+                drawList.AddRectFilled(contentStartPos, contentStartPos + maxSize, 0x66000000);
+                drawList.AddRect(windowPos + margin, windowPos + windowSize - margin * 2, 0x88000000, 3, ImDrawFlags.None, 2);
+            }
+
+            var count = PartyManager.Instance.MemberCount;
+            if (count < 1)
+            {
+                ImGui.End();
+                return;
+            }
 
             if (_layoutDirty || _size != maxSize || _memberCount != count)
             {
@@ -232,15 +242,6 @@ namespace DelvUI.Interface.Party
 
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
             var targetIndex = -1;
-
-            // preview
-            var drawList = ImGui.GetWindowDrawList();
-            if (!Config.Lock)
-            {
-                var margin = new Vector2(4, 0);
-                drawList.AddRectFilled(contentStartPos, contentStartPos + maxSize, 0x66000000);
-                drawList.AddRect(windowPos + margin, windowPos + windowSize - margin * 2, 0x88000000, 3, ImDrawFlags.None, 2);
-            }
 
             // bars
             for (int i = 0; i < count; i++)
