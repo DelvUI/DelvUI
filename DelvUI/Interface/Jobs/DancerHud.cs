@@ -287,91 +287,46 @@ namespace DelvUI.Interface.Jobs
             builder.SetBackgroundColor(EmptyColor.Base).Build().Draw(drawList);
         }
 
-        private void DrawProcBar(Vector2 origin)
+         private void DrawProcBar(Vector2 origin)
         {
-            var player = Plugin.ClientState.LocalPlayer;
-            var timersEnabled = !Config.StaticProcBarsEnabled;
-            var procBarSize = new Vector2(Config.ProcBarSize.X / 4f - Config.ProcBarChunkPadding / 4f, Config.ProcBarSize.Y);
+            var statusEffects = Plugin.ClientState.LocalPlayer.StatusEffects;
+            var cascadeTimer = Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 1814).Duration);
+            var fountainTimer = Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 1815).Duration);
+            var windmillTimer =  Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 1816).Duration);
+            var showerTimer =  Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 1817).Duration);
+    
+
+            var procBarWidth = (Config.ProcBarSize.X - Config.ProcBarChunkPadding * 3) / 4f;
+            var procBarSize =  new Vector2(procBarWidth, Config.ProcBarSize.Y);
+
+            var cursorPos = new Vector2(
+                origin.X + Config.Position.X + Config.ProcBarPosition.X - Config.ProcBarSize.X / 2f,
+                origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarSize.Y / 2f
+            );
+
+            var drawList = ImGui.GetWindowDrawList();
+
             var order = Config.procsOrder;
+            var procTimers = new float[] {cascadeTimer, fountainTimer, windmillTimer, showerTimer};
+            var colors = new PluginConfigColor[] { Config.FlourishingCascadeColor, Config.FlourishingFountainColor, Config.FlourishingWindmillColor, Config.FlourishingShowerColor};
 
-            // Flourishing Cascade
-            var flourishingCascadeBuff = player.StatusEffects.FirstOrDefault(o => o.EffectId == 1814);
-            var cascadeDuration = flourishingCascadeBuff.Duration;
-            var cascadeStart = timersEnabled ? cascadeDuration : 20;
-            var cascadePos = new Vector2(
-                origin.X + Config.Position.X + Config.ProcBarPosition.X + (2 * order[0] - 2) * Config.ProcBarSize.X / 4f - order[0] * procBarSize.X,
-                origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarPosition.Y / 2f
-            );
-
-            var cascadeBuilder = BarBuilder.Create(cascadePos, procBarSize)
-            .SetBackgroundColor(EmptyColor.Base);
-
-            if (cascadeDuration > 0)
+            for(int i = 0; i < 4; i++)
             {
-                cascadeBuilder.AddInnerBar(cascadeStart, 20f, Config.FlourishingCascadeColor);
+                if(Config.StaticProcBarsEnabled)
+                {
+                    var builder = BarBuilder.Create(cursorPos, procBarSize).
+                        AddInnerBar(procTimers[order[i]] > 0 ? 1 : 0, 1, colors[order[i]]);
+                    builder.Build().Draw(drawList);
+                }
+                else
+                {
+                    var builder = BarBuilder.Create(cursorPos, procBarSize).
+                        AddInnerBar(procTimers[order[i]], 20f, colors[order[i]]);
+                    builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                    builder.Build().Draw(drawList);
+                }
+                cursorPos.X += procBarWidth + Config.ProcBarChunkPadding;
             }
-
-            // Flourishing Fountain            
-            var flourishingFountainBuff = player.StatusEffects.FirstOrDefault(o => o.EffectId == 1815);
-            var fountainDuration = flourishingFountainBuff.Duration;
-            var fountainStart = timersEnabled ? fountainDuration : 20;
-            var fountainPos = new Vector2(
-                origin.X + Config.Position.X + Config.ProcBarPosition.X + (2 * order[1] - 2) * Config.ProcBarSize.X / 4f - order[1] * procBarSize.X,
-                origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarPosition.Y / 2f
-            );
-            var fountainBuilder = BarBuilder.Create(fountainPos, procBarSize)
-                .SetBackgroundColor(EmptyColor.Base);
-
-            if (fountainDuration > 0)
-            {
-                fountainBuilder.AddInnerBar(fountainStart, 20f, Config.FlourishingFountainColor);
-            }
-
-            // Flourishing Windmill
-            var flourishingWindmillBuff = player.StatusEffects.FirstOrDefault(o => o.EffectId == 1816);
-            var windmillDuration = flourishingWindmillBuff.Duration;
-            var windmillStart = timersEnabled ? windmillDuration : 20;
-            var windmillPos = new Vector2(
-                origin.X + Config.Position.X + Config.ProcBarPosition.X + (2 * order[2] - 2) * Config.ProcBarSize.X / 4f - order[2] * procBarSize.X,
-                origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarPosition.Y / 2f
-            );
-            var windmillBuilder = BarBuilder.Create(windmillPos, procBarSize)
-                .SetBackgroundColor(EmptyColor.Base);
-
-            if (windmillDuration > 0)
-            {
-                windmillBuilder.AddInnerBar(windmillStart, 20f, Config.FlourishingWindmillColor);
-            }
-
-            // Flourishing Shower
-            var flourishingShowerBuff = player.StatusEffects.FirstOrDefault(o => o.EffectId == 1817);
-            var showerDuration = flourishingShowerBuff.Duration;
-            var showerStart = timersEnabled ? showerDuration : 20;
-            var showerPos = new Vector2(
-                origin.X + Config.Position.X + Config.ProcBarPosition.X + (2 * order[3] - 2) * Config.ProcBarSize.X / 4f - order[3] * procBarSize.X,
-                origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarPosition.Y / 2f
-            );
-            var showerBuilder = BarBuilder.Create(showerPos, procBarSize)
-                .SetBackgroundColor(EmptyColor.Base);
-
-            if (showerDuration > 0)
-            {
-                showerBuilder.AddInnerBar(showerStart, 20f, Config.FlourishingShowerColor);
-            }
-
-            if (!Config.StaticProcBarsEnabled)
-            {
-                cascadeBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                fountainBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                windmillBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                showerBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            cascadeBuilder.Build().Draw(drawList);
-            fountainBuilder.Build().Draw(drawList);
-            windmillBuilder.Build().Draw(drawList);
-            showerBuilder.Build().Draw(drawList);
         }
     }
 
