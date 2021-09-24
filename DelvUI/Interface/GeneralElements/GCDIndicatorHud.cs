@@ -114,16 +114,22 @@ namespace DelvUI.Interface.GeneralElements
             var percentNonQueue = total != 0 ? 1F - (500f / 1000f) / total : 0;
 
             var drawList = ImGui.GetWindowDrawList();
-            var builder = BarBuilder.Create(position, size)
-                                    .SetChunks(new float[2] { percentNonQueue, 1f - percentNonQueue })
-                                    .AddInnerBar(current, total, Config.Color)
-                                    .SetDrawBorder(Config.ShowBorder)
-                                    .SetVertical(Config.VerticalMode);
+            var builder = BarBuilder.Create(position, size);
 
-            var queueStartOffset = Config.VerticalMode ? new Vector2(0, percentNonQueue * size.Y) : new Vector2(percentNonQueue * size.X, 0);
-            var queueEndOffset = Config.VerticalMode ? new Vector2(size.X, percentNonQueue * size.Y + 1f) : new Vector2(percentNonQueue * size.X + 1f, size.Y);
-            if (Config.ShowGCDQueueIndicator)
+            if (percentNonQueue > 0 && Config.ShowGCDQueueIndicator)
             {
+                builder.SetChunks(new float[2] { percentNonQueue, 1f - percentNonQueue });
+            }
+
+            builder.AddInnerBar(current, total, Config.Color)
+                .SetDrawBorder(Config.ShowBorder)
+                .SetVertical(Config.VerticalMode);
+
+            if (percentNonQueue > 0 && Config.ShowGCDQueueIndicator)
+            {
+                Vector2 queueStartOffset = Config.VerticalMode ? new(0, percentNonQueue * size.Y) : new(percentNonQueue * size.X, 0);
+                Vector2 queueEndOffset = Config.VerticalMode ? new(size.X, percentNonQueue * size.Y) : new(percentNonQueue * size.X, size.Y);
+
                 builder.SetChunksColors(new PluginConfigColor[2] { Config.Color, Config.QueueColor });
                 drawList.AddRect(position + queueStartOffset, position + queueEndOffset, Config.QueueColor.Base);
             }
