@@ -158,6 +158,7 @@ namespace DelvUI.Helpers
                 ImGui.End();
                 return;
             }
+            ImGui.PopStyleColor();
 
             var changed = false;
             node.Draw(ref changed);

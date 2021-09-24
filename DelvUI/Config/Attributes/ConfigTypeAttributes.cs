@@ -1,4 +1,5 @@
-﻿using DelvUI.Interface.GeneralElements;
+﻿using Dalamud.Interface;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -57,14 +58,14 @@ namespace DelvUI.Config.Attributes
 
         protected string IDText(string ID) => ID != null ? " ##" + ID : "";
 
-        protected void TriggerChangeEvent<T>(PluginConfigObject config, string fieldName, object value)
+        protected void TriggerChangeEvent<T>(PluginConfigObject config, string fieldName, object value, ChangeType type = ChangeType.None)
         {
             if (!isMonitored || config is not IOnChangeEventArgs eventObject)
             {
                 return;
             }
 
-            eventObject.onValueChangedRegisterEvent(new OnChangeEventArgs<T>(fieldName, (T)value));
+            eventObject.onValueChangedRegisterEvent(new OnChangeEventArgs<T>(fieldName, (T)value, type));
         }
     }
 
@@ -368,80 +369,102 @@ namespace DelvUI.Config.Attributes
 
         public override bool Draw(FieldInfo field, PluginConfigObject config, string ID)
         {
+            var changed = false;
+
             List<string> opts = (List<string>)field.GetValue(config);
             var idText = IDText(ID);
+            int indexToRemove = -1;
 
-            ImGui.BeginGroup();
+            ImGui.BeginChild(friendlyName, new Vector2(400, 230));
 
-            if (ImGui.BeginTable("##myTable2" + friendlyName + idText, 2))
+            List<string> addOptions = new(options);
+            for (int i = 0; i < opts.Count; i++)
             {
-                ImGui.TableNextColumn();
+                addOptions.Remove(opts[i]);
+            }
 
-                List<string> addOptions = new(options);
-                for (int i = 0; i < opts.Count; i++)
+            int intVal = 0;
+            ImGui.Text("Add");
+            if (ImGui.Combo("##Add" + idText + friendlyName, ref intVal, addOptions.ToArray(), addOptions.Count, 6))
+            {
+                var change = addOptions[intVal];
+                opts.Add(change);
+                field.SetValue(config, opts);
+
+                if (isMonitored && config is IOnChangeEventArgs eventObject)
                 {
-                    addOptions.Remove(opts[i]);
+                    TriggerChangeEvent<string>(config, field.Name, change, ChangeType.ListAdd);
                 }
-
-                int intVal = 0;
-                ImGui.Text("Add");
-                if (ImGui.Combo("##Add" + idText + friendlyName, ref intVal, addOptions.ToArray(), addOptions.Count, 6))
-                {
-                    var change = addOptions[intVal];
-                    opts.Add(change);
-                    field.SetValue(config, opts);
-
-                    if (isMonitored && config is IOnChangeEventArgs eventObject)
-                    {
-                        eventObject.onValueChangedRegisterEvent(
-                            new OnChangeEventArgs<string>(field.Name, change, ChangeType.ListAdd)
-                        );
-                    }
-
-                    return true;
-                }
-
-                ImGui.TableNextColumn();
-
-                var removeOpts = opts;
-
-                int removeVal = 0;
-                ImGui.Text("Remove");
-                if (ImGui.Combo("##Remove" + idText + friendlyName, ref removeVal, removeOpts.ToArray(), removeOpts.Count, 6))
-                {
-                    var change = removeOpts[removeVal];
-                    opts.Remove(change);
-                    field.SetValue(config, opts);
-
-                    if (isMonitored && config is IOnChangeEventArgs eventObject)
-                    {
-                        eventObject.onValueChangedRegisterEvent(
-                            new OnChangeEventArgs<string>(field.Name, change, ChangeType.ListRemove)
-                        );
-                    }
-
-                    return true;
-                }
-
-                ImGui.EndTable();
             }
 
             ImGui.Text(friendlyName + ":");
+            var flags =
+                ImGuiTableFlags.RowBg |
+                ImGuiTableFlags.Borders |
+                ImGuiTableFlags.BordersOuter |
+                ImGuiTableFlags.BordersInner |
+                ImGuiTableFlags.ScrollY |
+                ImGuiTableFlags.SizingFixedSame;
 
-            if (opts.Count > 0 && ImGui.BeginTable("##myTable" + friendlyName, 5))
+            if (ImGui.BeginTable("##myTable2" + friendlyName + idText, 2, flags, new Vector2(326, 150)))
             {
-                var length = opts.Count;
-                for (int i = 0; i < length; i++)
+                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 0, 0);
+                ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 0, 1);
+
+                ImGui.TableSetupScrollFreeze(0, 1);
+                ImGui.TableHeadersRow();
+
+                for (int i = 0; i < opts.Count(); i++)
                 {
-                    ImGui.TableNextColumn();
-                    ImGui.Text(opts[i]);
+                    ImGui.PushID(i.ToString());
+                    ImGui.TableNextRow(ImGuiTableRowFlags.None);
+
+                    if (ImGui.TableSetColumnIndex(0))
+                    {
+                        ImGui.Text(opts[i]);
+                    }
+
+                    if (ImGui.TableSetColumnIndex(1))
+                    {
+                        ImGui.PushFont(UiBuilder.IconFont);
+                        ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
+                        ImGui.PushStyleColor(ImGuiCol.ButtonActive, Vector4.Zero);
+                        ImGui.PushStyleColor(ImGuiCol.ButtonHovered, Vector4.Zero);
+
+                        if (ImGui.Button(FontAwesomeIcon.Trash.ToIconString()))
+                        {
+                            changed = true;
+                            indexToRemove = i;
+                        }
+
+                        ImGui.PopFont();
+                        ImGui.PopStyleColor(3);
+                    }
                 }
+
                 ImGui.EndTable();
             }
 
-            ImGui.EndGroup();
+            if (indexToRemove >= 0)
+            {
+                var change = opts[indexToRemove];
+                opts.Remove(change);
+                field.SetValue(config, opts);
 
-            return false;
+                if (isMonitored && config is IOnChangeEventArgs eventObject)
+                {
+                    eventObject.onValueChangedRegisterEvent(
+                        new OnChangeEventArgs<string>(field.Name, change, ChangeType.ListRemove)
+                    );
+                }
+
+            }
+
+            ImGui.EndChild();
+
+
+
+            return changed;
         }
     }
 
