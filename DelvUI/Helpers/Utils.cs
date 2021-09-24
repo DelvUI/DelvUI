@@ -14,13 +14,18 @@ namespace DelvUI.Helpers
     {
         public static Actor GetBattleCompanion(Actor player)
         {
+            if (player == null)
+            {
+                return null;
+            }
+
             // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
             // we do a step of 2 because its always an actor followed by its companion
             for (var i = 0; i < 200; i += 2)
             {
                 var actor = Plugin.ClientState.Actors[i];
 
-                if (actor is not BattleNpc battleNpc)
+                if (actor == null || actor is not BattleNpc battleNpc)
                 {
                     continue;
                 }
