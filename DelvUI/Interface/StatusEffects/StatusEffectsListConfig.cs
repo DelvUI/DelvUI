@@ -203,22 +203,22 @@ namespace DelvUI.Interface.StatusEffects
     public class StatusEffectIconConfig : PluginConfigObject
     {
         [DragInt2("Icon Size", min = 1, max = 1000)]
-        [Order(0)]
+        [Order(5)]
         public Vector2 Size = new(40, 40);
 
-        [NestedConfig("Duration", 5)]
+        [NestedConfig("Duration", 10)]
         public LabelConfig DurationLabelConfig;
 
-        [NestedConfig("Stacks", 10)]
+        [NestedConfig("Stacks", 15)]
         public LabelConfig StacksLabelConfig;
 
-        [NestedConfig("Border", 15)]
+        [NestedConfig("Border", 20)]
         public StatusEffectIconBorderConfig BorderConfig = new();
 
-        [NestedConfig("Dispellable Effects Border", 20)]
+        [NestedConfig("Dispellable Effects Border", 25)]
         public StatusEffectIconBorderConfig DispellableBorderConfig = new(new PluginConfigColor(new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f)), 2);
 
-        [NestedConfig("My Effects Border", 25)]
+        [NestedConfig("My Effects Border", 30)]
         public StatusEffectIconBorderConfig OwnedBorderConfig = new(new PluginConfigColor(new Vector4(35f / 255f, 179f / 255f, 69f / 255f, 100f / 100f)), 1);
 
         public StatusEffectIconConfig(LabelConfig? durationLabelConfig = null, LabelConfig? stacksLabelConfig = null)
@@ -232,11 +232,11 @@ namespace DelvUI.Interface.StatusEffects
     public class StatusEffectIconBorderConfig : PluginConfigObject
     {
         [ColorEdit4("Color")]
-        [Order(0)]
+        [Order(5)]
         public PluginConfigColor Color = new(Vector4.UnitW);
 
         [DragInt("Thickness", min = 1, max = 100)]
-        [Order(5)]
+        [Order(10)]
         public int Thickness = 1;
 
         public StatusEffectIconBorderConfig()
