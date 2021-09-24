@@ -30,7 +30,7 @@ namespace DelvUI.Helpers
                     continue;
                 }
 
-                if (battleNpc.OwnerId == player.ActorId)
+                if (battleNpc.BattleNpcKind != BattleNpcSubKind.Enemy && battleNpc.OwnerId == player.ActorId)
                 {
                     return actor;
                 }

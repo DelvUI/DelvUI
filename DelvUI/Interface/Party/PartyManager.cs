@@ -43,7 +43,7 @@ namespace DelvUI.Interface.Party
 
         public static void Destroy()
         {
-            _instance = null;
+            //_instance = null;
         }
 
         public static PartyManager Instance => _instance;
