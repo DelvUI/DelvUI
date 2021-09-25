@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using Dalamud.Data;
+﻿using Dalamud.Data;
 using Dalamud.Game;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Conditions;
@@ -13,13 +10,16 @@ using Dalamud.Interface;
 using Dalamud.Logging;
 using Dalamud.Plugin;
 using DelvUI.Config;
-using DelvUI.Interface;
 using DelvUI.Helpers;
+using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Party;
 using FFXIVClientStructs;
 using ImGuiNET;
 using ImGuiScene;
+using System;
+using System.IO;
+using System.Reflection;
 using SigScanner = Dalamud.Game.SigScanner;
 using Dalamud.Game.ClientState.Party;
 
@@ -45,7 +45,7 @@ namespace DelvUI
 
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         // ReSharper disable once MemberCanBePrivate.Global
-        public string AssemblyLocation { get; set; }
+        public string AssemblyLocation { get; }
         public string Name => "DelvUI";
 
         public static string Version { get; private set; } = "";
