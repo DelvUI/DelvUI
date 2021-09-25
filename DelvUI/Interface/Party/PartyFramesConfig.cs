@@ -35,9 +35,9 @@ namespace DelvUI.Interface.Party
         [Order(50)]
         public bool ShowWhenSolo = false;
 
-        [Checkbox("Show Companions")]
+        [Checkbox("Show Chocobo")]
         [Order(55)]
-        public bool ShowCompanions = true;
+        public bool ShowChocobo = true;
 
         [Checkbox("Fill Rows First", isMonitored = true, separator = true)]
         [Order(60)]

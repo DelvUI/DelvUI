@@ -104,9 +104,9 @@ namespace DelvUI.Interface.Party
                     var member = new PartyFramesMember(partyMember);
                     newMembers.Add(member);
 
-                    if (_config.ShowCompanions)
+                    if (_config.ShowChocobo)
                     {
-                        var companion = Utils.GetBattleCompanion(member.Character);
+                        var companion = Utils.GetBattleChocobo(member.Character);
                         if (companion is Character companionCharacter)
                         {
                             newMembers.Add(new PartyFramesMember(companionCharacter));
@@ -135,9 +135,9 @@ namespace DelvUI.Interface.Party
 
             newMembers.Add(new PartyFramesMember(player));
 
-            if (_config.ShowCompanions)
+            if (_config.ShowChocobo)
             {
-                var companion = Utils.GetBattleCompanion(player);
+                var companion = Utils.GetBattleChocobo(player);
                 if (companion is Character companionCharacter)
                 {
                     newMembers.Add(new PartyFramesMember(companionCharacter));

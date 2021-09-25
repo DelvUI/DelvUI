@@ -12,7 +12,7 @@ namespace DelvUI.Helpers
 {
     internal static class Utils
     {
-        public static GameObject? GetBattleCompanion(GameObject? player)
+        public static GameObject? GetBattleChocobo(GameObject? player)
         {
             if (player == null)
             {
@@ -30,7 +30,7 @@ namespace DelvUI.Helpers
                     continue;
                 }
 
-                if (battleNpc.BattleNpcKind != BattleNpcSubKind.Enemy && battleNpc.OwnerId == player.ObjectId)
+                if (battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo && battleNpc.OwnerId == player.ObjectId)
                 {
                     return gameObject;
                 }
