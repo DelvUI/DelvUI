@@ -304,7 +304,10 @@ namespace DelvUI.Interface
             var parameterWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_ParameterWidget", 1);
             var fadeMiddleWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("FadeMiddle", 1);
 
-            return parameterWidget->IsVisible && !fadeMiddleWidget->IsVisible;
+            var paramenterVisible = parameterWidget != null && parameterWidget->IsVisible;
+            var fadeMiddleVisible = fadeMiddleWidget != null && fadeMiddleWidget->IsVisible;
+
+            return paramenterVisible && !fadeMiddleVisible;
         }
 
         private void UpdateJob()
