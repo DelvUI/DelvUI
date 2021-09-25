@@ -1,7 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using Dalamud.Data;
+﻿using Dalamud.Data;
 using Dalamud.Game;
 using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Conditions;
@@ -13,12 +10,15 @@ using Dalamud.Interface;
 using Dalamud.Logging;
 using Dalamud.Plugin;
 using DelvUI.Config;
-using DelvUI.Interface;
 using DelvUI.Helpers;
+using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs;
 using ImGuiNET;
 using ImGuiScene;
+using System;
+using System.IO;
+using System.Reflection;
 using SigScanner = Dalamud.Game.SigScanner;
 
 namespace DelvUI
@@ -42,11 +42,11 @@ namespace DelvUI
 
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         // ReSharper disable once MemberCanBePrivate.Global
-        public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
+        public string AssemblyLocation { get; }
         public string Name => "DelvUI";
 
         public static string Version { get; private set; } = "";
-        
+
         private bool _fontBuilt;
         private bool _fontLoadFailed;
         private HudManager _hudManager;
@@ -78,6 +78,7 @@ namespace DelvUI
             SigScanner = sigScanner;
             TargetManager = targetManager;
             UiBuilder = PluginInterface.UiBuilder;
+            AssemblyLocation = Assembly.GetExecutingAssembly().Location;
 
             Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "";
             FontsManager.Initialize(AssemblyLocation);
