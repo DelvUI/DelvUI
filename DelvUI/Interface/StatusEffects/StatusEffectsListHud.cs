@@ -1,14 +1,15 @@
-﻿using Dalamud.Game.ClientState.Actors;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Structs;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
+using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
+using Status = Dalamud.Game.ClientState.Statuses.Status;
 
 namespace DelvUI.Interface.StatusEffects
 {
@@ -18,12 +19,12 @@ namespace DelvUI.Interface.StatusEffects
 
         private LayoutInfo _layoutInfo;
         private bool _showingTooltip = false;
-        private StatusEffect[] _fakeEffects = null;
+        //private List<Status>? _fakeEffects = null;
 
         private LabelHud _durationLabel;
         private LabelHud _stacksLabel;
 
-        public Actor Actor { get; set; } = null;
+        public GameObject? Actor { get; set; } = null;
 
         public StatusEffectsListHud(string id, StatusEffectsListConfig config, string displayName) : base(id, config, displayName)
         {
@@ -80,76 +81,63 @@ namespace DelvUI.Interface.StatusEffects
             return list;
         }
 
-        protected List<StatusEffectData> StatusEffectDataList(Actor actor)
+        protected List<StatusEffectData> StatusEffectDataList(GameObject? actor)
         {
             var list = new List<StatusEffectData>();
-            var statusEffects = _fakeEffects != null ? _fakeEffects : actor.StatusEffects;
 
-            if (statusEffects == null)
+            if (actor == null || actor is not BattleChara character)
             {
                 return list;
             }
 
-            var effectCount = statusEffects.Length;
+            var effectCount = character.StatusList.Length;
             if (effectCount == 0)
-            {
-                return list;
-            }
-
-            var sheet = Plugin.DataManager.GetExcelSheet<Status>();
-            if (sheet == null)
             {
                 return list;
             }
 
             var player = Plugin.ClientState.LocalPlayer;
 
-            for (var i = 0; i < effectCount; i++)
+            foreach (Status status in character.StatusList)
             {
-                var status = statusEffects[i];
-
-                if (status.EffectId <= 0)
+                if (status is not { StatusId: > 0 })
                 {
                     continue;
                 }
 
-                var row = sheet.GetRow((uint)status.EffectId);
-                if (row == null)
-                {
-                    continue;
-                }
+                var data = status.GameData;
 
                 // buffs
-                if (!Config.ShowBuffs && row.Category == 1)
+                if (!Config.ShowBuffs && data.Category == 1)
                 {
                     continue;
                 }
 
                 // debuffs
-                if (!Config.ShowDebuffs && row.Category != 1)
+                if (!Config.ShowDebuffs && data.Category != 1)
                 {
                     continue;
                 }
 
                 // permanent
-                if (!Config.ShowPermanentEffects && row.IsPermanent)
+                if (!Config.ShowPermanentEffects && data.IsPermanent)
                 {
                     continue;
                 }
 
                 // only mine
-                if (Config.ShowOnlyMine && player?.ActorId != status.OwnerId)
+                if (Config.ShowOnlyMine && player?.ObjectId != status.SourceID)
                 {
                     continue;
                 }
 
                 // blacklist
-                if (Config.BlacklistConfig.Enabled && !Config.BlacklistConfig.StatusAllowed(row))
+                if (Config.BlacklistConfig.Enabled && !Config.BlacklistConfig.StatusAllowed(data))
                 {
                     continue;
                 }
 
-                list.Add(new StatusEffectData(status, row));
+                list.Add(new StatusEffectData(status, data));
             }
 
             return list;
@@ -165,14 +153,15 @@ namespace DelvUI.Interface.StatusEffects
 
             list.Sort((a, b) =>
             {
-                bool isAFromPlayer = a.StatusEffect.OwnerId == player.ActorId;
-                bool isBFromPlayer = b.StatusEffect.OwnerId == player.ActorId;
+                bool isAFromPlayer = a.Status.SourceID == player.ObjectId;
+                bool isBFromPlayer = b.Status.SourceID == player.ObjectId;
 
                 if (isAFromPlayer && !isBFromPlayer)
                 {
                     return -1;
                 }
-                else if (!isAFromPlayer && isBFromPlayer)
+
+                if (!isAFromPlayer && isBFromPlayer)
                 {
                     return 1;
                 }
@@ -188,7 +177,7 @@ namespace DelvUI.Interface.StatusEffects
                 return;
             }
 
-            if (_fakeEffects == null && (Actor == null || Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc))
+            if (Actor == null || Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc)
             {
                 return;
             }
@@ -302,7 +291,7 @@ namespace DelvUI.Interface.StatusEffects
                     }
 
                     // remove buff on right click
-                    bool isFromPlayer = statusEffectData.StatusEffect.OwnerId == Plugin.ClientState.LocalPlayer?.ActorId;
+                    bool isFromPlayer = statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId;
 
                     if (statusEffectData.Data.Category == 1 && isFromPlayer && ImGui.GetIO().MouseClicked[1])
                     {
@@ -384,7 +373,7 @@ namespace DelvUI.Interface.StatusEffects
             return startPos;
         }
 
-        private void OnConfigPropertyChanged(object sender, OnChangeBaseArgs args)
+        private void OnConfigPropertyChanged(object? sender, OnChangeBaseArgs args)
         {
             if (args.PropertyName == "Preview")
             {
@@ -394,35 +383,35 @@ namespace DelvUI.Interface.StatusEffects
 
         private void UpdatePreview()
         {
-            if (!Config.Preview)
-            {
-                _fakeEffects = null;
-                return;
-            }
+            //if (!Config.Preview)
+            //{
+            //    _fakeEffects = null;
+            //    return;
+            //}
 
-            var RNG = new Random((int)ImGui.GetTime());
-            _fakeEffects = new StatusEffect[20];
+            //var RNG = new Random((int)ImGui.GetTime());
+            //_fakeEffects = new List<Status>(20);
 
-            for (int i = 0; i < 20; i++)
-            {
-                var fakeEffect = new StatusEffect();
-                fakeEffect.Duration = RNG.Next(1, 30);
-                fakeEffect.EffectId = (short)RNG.Next(1, 200);
-                fakeEffect.StackCount = (byte)RNG.Next(0, 3);
+            //for (int i = 0; i < 20; i++)
+            //{
+            //    var fakeEffect = new StatusEffect();
+            //    fakeEffect.Duration = RNG.Next(1, 30);
+            //    fakeEffect.EffectId = (short)RNG.Next(1, 200);
+            //    fakeEffect.StackCount = (byte)RNG.Next(0, 3);
 
-                _fakeEffects[i] = fakeEffect;
-            }
+            //    _fakeEffects.Add(new Status(&fakeEffect));
+            //}
         }
     }
 
     public struct StatusEffectData
     {
-        public StatusEffect StatusEffect;
-        public readonly Status Data;
+        public Status Status;
+        public LuminaStatus Data;
 
-        public StatusEffectData(StatusEffect statusEffect, Status data)
+        public StatusEffectData(Status status, LuminaStatus data)
         {
-            StatusEffect = statusEffect;
+            Status = status;
             Data = data;
         }
     }

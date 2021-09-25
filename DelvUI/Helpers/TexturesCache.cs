@@ -1,10 +1,10 @@
-﻿using Dalamud.Data.LuminaExtensions;
-using ImGuiScene;
+﻿using ImGuiScene;
 using Lumina.Data.Files;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
+using Dalamud.Utility;
 using Action = Lumina.Excel.GeneratedSheets.Action;
 
 namespace DelvUI.Helpers
@@ -13,14 +13,14 @@ namespace DelvUI.Helpers
     {
         private Dictionary<uint, TextureWrap> _cache = new();
 
-        public TextureWrap GetTexture<T>(uint rowId, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
+        public TextureWrap? GetTexture<T>(uint rowId, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
         {
             var sheet = Plugin.DataManager.GetExcelSheet<T>();
 
             return sheet == null ? null : GetTexture<T>(sheet.GetRow(rowId), stackCount, hdIcon);
         }
 
-        public TextureWrap GetTexture<T>(dynamic row, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
+        public TextureWrap? GetTexture<T>(dynamic? row, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
         {
             if (row == null)
             {
@@ -31,7 +31,7 @@ namespace DelvUI.Helpers
             return GetTextureFromIconId(iconId);
         }
 
-        public TextureWrap GetTextureFromIconId(uint iconId, uint stackCount = 0, bool hdIcon = true)
+        public TextureWrap? GetTextureFromIconId(uint iconId, uint stackCount = 0, bool hdIcon = true)
         {
             if (_cache.TryGetValue(iconId + stackCount, out var texture))
             {
@@ -52,7 +52,7 @@ namespace DelvUI.Helpers
             return newTexture;
         }
 
-        private TexFile LoadIcon(uint id, bool hdIcon)
+        private TexFile? LoadIcon(uint id, bool hdIcon)
         {
             var hdString = hdIcon ? "_hr1" : "";
             var path = $"ui/icon/{id / 1000 * 1000:000000}/{id:000000}{hdString}.tex";
@@ -72,14 +72,14 @@ namespace DelvUI.Helpers
             RemoveTexture<T>(sheet.GetRow(rowId));
         }
 
-        public void RemoveTexture<T>(dynamic row) where T : ExcelRow
+        public void RemoveTexture<T>(dynamic? row) where T : ExcelRow
         {
             if (row == null || row?.Icon == null)
             {
                 return;
             }
 
-            var iconId = row.Icon;
+            var iconId = row!.Icon;
             RemoveTexture(iconId);
         }
 

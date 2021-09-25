@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Dalamud.Game.ClientState.Objects.Types;
+using System.Collections.Generic;
 
 namespace DelvUI.Helpers
 {
@@ -65,6 +66,40 @@ namespace DelvUI.Helpers
         public static bool IsJobGatherer(uint jobId)
         {
             return IsJobARole(jobId, JobRoles.Gatherer);
+        }
+
+        public static uint CurrentPrimaryResource(Character character)
+        {
+            uint jobId = character.ClassJob.Id;
+
+            if (IsJobGatherer(jobId))
+            {
+                return character.CurrentGp;
+            }
+
+            if (IsJobCrafter(jobId))
+            {
+                return character.CurrentCp;
+            }
+
+            return character.CurrentMp;
+        }
+
+        public static uint MaxPrimaryResource(Character character)
+        {
+            uint jobId = character.ClassJob.Id;
+
+            if (IsJobGatherer(jobId))
+            {
+                return character.MaxGp;
+            }
+
+            if (IsJobCrafter(jobId))
+            {
+                return character.MaxCp;
+            }
+
+            return character.MaxMp;
         }
 
         public static uint IconIDForJob(uint jobId)

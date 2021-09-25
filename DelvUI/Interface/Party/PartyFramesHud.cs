@@ -240,15 +240,16 @@ namespace DelvUI.Interface.Party
             _memberCount = count;
             _size = maxSize;
 
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             var targetIndex = -1;
 
             // bars
             for (int i = 0; i < count; i++)
             {
                 bars[i].Draw(origin, drawList);
+                var member = bars[i].Member;
 
-                if (target != null && bars[i].Member.ActorID == target.ActorId)
+                if (target != null && member != null && member.ObjectId == target.ObjectId)
                 {
                     targetIndex = i;
                 }

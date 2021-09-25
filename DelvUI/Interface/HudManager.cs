@@ -13,6 +13,8 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface
 {
@@ -244,6 +246,7 @@ namespace DelvUI.Interface
 
             if (!begin)
             {
+                ImGui.End();
                 return;
             }
 
@@ -305,8 +308,8 @@ namespace DelvUI.Interface
                 return false;
             }
 
-            var parameterWidget = (AtkUnitBase*)Plugin.GameGui.GetUiObjectByName("_ParameterWidget", 1);
-            var fadeMiddleWidget = (AtkUnitBase*)Plugin.GameGui.GetUiObjectByName("FadeMiddle", 1);
+            var parameterWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_ParameterWidget", 1);
+            var fadeMiddleWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("FadeMiddle", 1);
 
             return parameterWidget->IsVisible && !fadeMiddleWidget->IsVisible;
         }
@@ -345,8 +348,6 @@ namespace DelvUI.Interface
 
         private void AssignActors()
         {
-            var pluginInterface = Plugin.PluginInterface;
-
             // player
             var player = Plugin.ClientState.LocalPlayer;
             foreach (var element in _hudElementsUsingPlayer)
@@ -360,7 +361,7 @@ namespace DelvUI.Interface
             }
 
             // target
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             foreach (var element in _hudElementsUsingTarget)
             {
                 element.Actor = target;

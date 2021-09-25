@@ -1,60 +1,41 @@
-﻿using Dalamud.Game.ClientState.Structs;
-using Dalamud.Plugin;
+﻿using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Party;
 using DelvUI.Helpers;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using ImGuiNET;
 using System;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text.RegularExpressions;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
-using PartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
-
 
 namespace DelvUI.Interface.Party
 {
     public unsafe class PartyFramesMember : IPartyFramesMember
     {
-        protected PartyMember* _partyMember = null;
+        protected PartyMember? _partyMember = null;
 
-        public int ActorID => _partyMember != null ? (int)_partyMember->ObjectID : _actorID;
-        protected string _name;
-        public string Name => _name == null ? "???" : _name;
-        public uint Level => _partyMember != null ? _partyMember->Level : BattleCharacter->Character.Level;
-        public uint JobId => _partyMember != null ? _partyMember->ClassJob : BattleCharacter->Character.ClassJob;
-        public uint HP => _partyMember != null ? _partyMember->CurrentHP : BattleCharacter->Character.Health;
-        public uint MaxHP => _partyMember != null ? _partyMember->MaxHP : BattleCharacter->Character.MaxHealth;
-        public uint MP => _partyMember != null ? _partyMember->CurrentMP : BattleCharacter->Character.Mana;
-        public uint MaxMP => _partyMember != null ? _partyMember->MaxMP : BattleCharacter->Character.MaxMana;
-        public float Shield => Utils.ActorShieldValue(GetActor());
+        public uint ObjectId => _partyMember != null ? _partyMember.ObjectId : Character!.ObjectId;
+        public Character? Character { get; private set; }
 
-        private int _actorID;
-        private BattleChara* BattleCharacter => (BattleChara*)GetActor().Address;
+        public string Name => _partyMember != null ? _partyMember.Name.ToString() : Character!.Name.ToString();
+        public uint Level => _partyMember != null ? _partyMember.Level : Character!.Level;
+        public uint JobId => _partyMember != null ? _partyMember.ClassJob.Id : Character!.ClassJob.Id;
+        public uint HP => _partyMember != null ? _partyMember.CurrentHP : Character!.CurrentHp;
+        public uint MaxHP => _partyMember != null ? _partyMember.MaxHP : Character!.MaxHp;
+        public uint MP => _partyMember != null ? _partyMember.CurrentMP : JobsHelper.CurrentPrimaryResource(Character!);
+        public uint MaxMP => _partyMember != null ? _partyMember.MaxMP : JobsHelper.MaxPrimaryResource(Character!);
+        public float Shield => Utils.ActorShieldValue(Character);
 
-
-        public PartyFramesMember(PartyMember* partyMember)
+        public PartyFramesMember(PartyMember partyMember)
         {
             _partyMember = partyMember;
 
-            // name
-            byte[] nameBytes = new byte[64];
-            Marshal.Copy((IntPtr)partyMember->Name, nameBytes, 0, 64);
-            var text = System.Text.Encoding.Default.GetString(nameBytes);
-            if (text != null)
+            var gameObject = partyMember.GameObject;
+            if (gameObject is Character character)
             {
-                _name = Regex.Replace(text, "[^a-zA-Z0-9_. ]+", "", RegexOptions.Compiled);
+                Character = character;
             }
         }
 
-        public PartyFramesMember(Actor actor)
+        public PartyFramesMember(Character character)
         {
-            _actorID = actor.ActorId;
-            _name = actor.Name;
-        }
-
-        public Actor GetActor()
-        {
-            return Plugin.ClientState.Actors.FirstOrDefault(o => o.ActorId == ActorID);
+            Character = character;
         }
     }
 
@@ -62,9 +43,10 @@ namespace DelvUI.Interface.Party
     {
         private static Random RNG = new Random((int)ImGui.GetTime());
 
-        public int ActorID => -1;
-        public string Name => "Fake Name";
+        public uint ObjectId => GameObject.InvalidGameObjectId;
+        public Character? Character => null;
 
+        public string Name => "Fake Name";
         public uint Level { get; private set; }
         public uint JobId { get; private set; }
         public uint HP { get; private set; }
@@ -83,16 +65,13 @@ namespace DelvUI.Interface.Party
             MP = (uint)(MaxMP * RNG.Next(100) / 100f);
             Shield = RNG.Next(30) / 100f;
         }
-
-        public Actor GetActor()
-        {
-            return null;
-        }
     }
 
     public interface IPartyFramesMember
     {
-        public int ActorID { get; }
+        public uint ObjectId { get; }
+        public Character? Character { get; }
+
         public string Name { get; }
         public uint Level { get; }
         public uint JobId { get; }
@@ -101,6 +80,5 @@ namespace DelvUI.Interface.Party
         public uint MP { get; }
         public uint MaxMP { get; }
         public float Shield { get; }
-        public abstract Actor GetActor();
     }
 }

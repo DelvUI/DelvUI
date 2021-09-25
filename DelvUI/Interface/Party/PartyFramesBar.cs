@@ -1,14 +1,11 @@
-﻿using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
-using Dalamud.Plugin;
-using DelvUI.Config;
-using DelvUI.Enums;
+﻿using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
 using System;
 using System.Numerics;
-
+using Dalamud.Game.ClientState.Objects.Enums;
 
 namespace DelvUI.Interface.Party
 {
@@ -27,7 +24,7 @@ namespace DelvUI.Interface.Party
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
 
-        public IPartyFramesMember Member;
+        public IPartyFramesMember? Member;
         public bool Visible = false;
         public Vector2 Position;
 
@@ -89,18 +86,18 @@ namespace DelvUI.Interface.Party
 
         public void Draw(Vector2 origin, ImDrawListPtr drawList)
         {
-            if (!Visible)
+            if (!Visible || Member is null)
             {
                 return;
             }
 
             // click
             bool isHovering = ImGui.IsMouseHoveringRect(Position, Position + _config.Size);
-            var actor = Member.GetActor();
+            var character = Member.Character;
 
             if (isHovering && ImGui.IsMouseClicked(ImGuiMouseButton.Left))
             {
-                Plugin.TargetManager.SetCurrentTarget(actor);
+                Plugin.TargetManager.SetTarget(character);
             }
 
             // bg
@@ -115,10 +112,9 @@ namespace DelvUI.Interface.Party
                 var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), _config.Size.Y);
                 var color = GetColor();
 
-                if (_config.RangeConfig.Enabled && actor != null)
+                if (_config.RangeConfig.Enabled && character != null)
                 {
-                    var alpha = _config.RangeConfig.AlphaForDistance(actor.YalmDistanceX) / 100f;
-                    PluginLog.Log(alpha.ToString());
+                    var alpha = _config.RangeConfig.AlphaForDistance(character.YalmDistanceX) / 100f;
                     color = new(color.Vector.WithNewAlpha(alpha));
                 }
 
@@ -149,11 +145,11 @@ namespace DelvUI.Interface.Party
 
             // buffs / debuffs
             var buffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _buffsConfig.HealthBarAnchor);
-            _buffsListHud.Actor = actor;
+            _buffsListHud.Actor = character;
             _buffsListHud.Draw(buffsPos);
 
             var debuffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _debuffsConfig.HealthBarAnchor);
-            _debuffsListHud.Actor = actor;
+            _debuffsListHud.Actor = character;
             _debuffsListHud.Draw(debuffsPos);
 
             // mana
@@ -170,20 +166,20 @@ namespace DelvUI.Interface.Party
 
                 DrawHelper.DrawGradientFilledRect(manaBarPos, fillSize, _manaBarConfig.Color, drawList);
 
-                _manaLabelHud.Draw(manaBarPos, _manaBarConfig.Size, actor);
+                _manaLabelHud.Draw(manaBarPos, _manaBarConfig.Size, character);
             }
 
             // castbar
             var castbarPos = Utils.GetAnchoredPosition(Position, -_config.Size, _castbarConfig.HealthBarAnchor);
-            _castbarHud.Actor = actor;
+            _castbarHud.Actor = character;
             _castbarHud.Draw(castbarPos);
 
             // name
             var name = Member.Name ?? "";
 
-            if (actor != null)
+            if (character != null)
             {
-                _labelHud.Draw(Position, _config.Size, actor);
+                _labelHud.Draw(Position, _config.Size, character);
             }
             else
             {
@@ -208,12 +204,14 @@ namespace DelvUI.Interface.Party
             // icon
             if (_roleIconConfig.Enabled && isClose)
             {
-                uint iconId = 0;
+                uint iconId;
 
-                if (actor is BattleNpc)
+                // chocobo icon
+                if (character != null && character.ObjectKind == ObjectKind.BattleNpc)
                 {
                     iconId = JobsHelper.RoleIconIDForBattleCompanion + (uint)_roleIconConfig.Style * 100;
                 }
+                // role/job icon
                 else
                 {
                     iconId = _roleIconConfig.UseRoleIcons ?

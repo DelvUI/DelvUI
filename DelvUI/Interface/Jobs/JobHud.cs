@@ -1,7 +1,6 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Plugin;
-using System.Collections.Generic;
+﻿using Dalamud.Plugin;
 using System.Numerics;
+using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -11,9 +10,9 @@ namespace DelvUI.Interface.Jobs
 
         public JobConfig Config => (JobConfig)_config;
 
-        public Actor Actor { get; set; } = null;
+        public GameObject? Actor { get; set; } = null;
 
-        public JobHud(string ID, JobConfig config, string displayName = null) : base(ID, config, displayName)
+        public JobHud(string id, JobConfig config, string? displayName = null) : base(id, config, displayName)
         {
         }
 

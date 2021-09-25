@@ -1,7 +1,4 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs;
-using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
+﻿using Dalamud.Game.ClientState.Structs;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -11,9 +8,12 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -88,6 +88,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawMudraBars(Vector2 origin)
         {
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
+
             float xPos = origin.X + Config.Position.X + Config.MudraBarPosition.X - Config.MudraBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.MudraBarPosition.Y - Config.MudraBarSize.Y / 2f;
 
@@ -100,17 +102,17 @@ namespace DelvUI.Interface.Jobs
             int mudraStacks = _spellHelper.GetStackCount(2, 2259);
 
             // is the player casting ninjutsu or under kassatsu?
-            StatusEffect? mudraBuff = null, kassatsuBuff = null, tcjBuff = null;
-            foreach (StatusEffect statusEffect in Plugin.ClientState.LocalPlayer.StatusEffects)
+            Status? mudraBuff = null, kassatsuBuff = null, tcjBuff = null;
+            foreach (Status statusEffect in Plugin.ClientState.LocalPlayer.StatusList)
             {
-                if (statusEffect.EffectId == 496) { mudraBuff = statusEffect; }
-                if (statusEffect.EffectId == 497) { kassatsuBuff = statusEffect; }
-                if (statusEffect.EffectId == 1186) { tcjBuff = statusEffect; }
+                if (statusEffect.StatusId == 496) { mudraBuff = statusEffect; }
+                if (statusEffect.StatusId == 497) { kassatsuBuff = statusEffect; }
+                if (statusEffect.StatusId == 1186) { tcjBuff = statusEffect; }
             }
 
-            bool haveMudraBuff = mudraBuff.HasValue;
-            bool haveKassatsuBuff = kassatsuBuff.HasValue;
-            bool haveTCJBuff = tcjBuff.HasValue;
+            bool haveMudraBuff = mudraBuff is not null;
+            bool haveKassatsuBuff = kassatsuBuff is not null;
+            bool haveTCJBuff = tcjBuff is not null;
 
             // for some reason (perhaps a slight delay), the mudras may be on cooldown before the "Mudra" buff is applied
             // hence we check for either
@@ -140,19 +142,19 @@ namespace DelvUI.Interface.Jobs
                 // if this ever breaks -- possibly due to a ClientStructs update -- try swapping them
                 if (haveMudraBuff)
                 {
-                    ninjutsuText = GenerateNinjutsuText(mudraBuff.Value.StackCount, haveKassatsuBuff, haveTCJBuff);
+                    ninjutsuText = GenerateNinjutsuText(mudraBuff?.StackCount ?? 0, haveKassatsuBuff, haveTCJBuff);
                 }
 
                 // notice that this approach will never display the third ninjutsu cast under TCJ
                 // as TCJ ends before the third ninjutsu is cast
                 if (haveTCJBuff)
                 {
-                    ninjutsuText = GenerateNinjutsuText(tcjBuff.Value.StackCount, haveKassatsuBuff, haveTCJBuff);
+                    ninjutsuText = GenerateNinjutsuText(tcjBuff?.StackCount ?? 0, haveKassatsuBuff, haveTCJBuff);
                 }
                 PluginConfigColor barColor = haveTCJBuff ? Config.TCJBarColor : (haveKassatsuBuff ? Config.KassatsuBarColor : Config.MudraBarColor);
 
                 float ninjutsuMaxDuration = haveMudraBuff || haveTCJBuff ? 6f : 15f;
-                float duration = haveTCJBuff ? tcjBuff.Value.Duration : haveMudraBuff ? mudraBuff.Value.Duration : haveKassatsuBuff ? kassatsuBuff.Value.Duration : ninjutsuMaxDuration;
+                float duration = haveTCJBuff ? tcjBuff?.RemainingTime ?? 0f : haveMudraBuff ? mudraBuff?.RemainingTime ?? 0f: haveKassatsuBuff ? kassatsuBuff?.RemainingTime ?? 0f : ninjutsuMaxDuration;
 
                 // it seems there is some time before the duration is updated after the buff is obtained
                 if (duration < 0)
@@ -223,7 +225,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawHutonGauge(Vector2 origin)
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
-            int hutonDurationLeft = (int)Math.Ceiling((float)(gauge.HutonTimeLeft / (double)1000));
+            int hutonDurationLeft = (int)Math.Ceiling((float)(gauge.HutonTimer / (double)1000));
 
             float xPos = origin.X + Config.Position.X + Config.HutonGaugePosition.X - Config.HutonGaugeSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.HutonGaugePosition.Y - Config.HutonGaugeSize.Y / 2f;
@@ -292,16 +294,17 @@ namespace DelvUI.Interface.Jobs
             float xPos = origin.X + Config.Position.X + Config.TrickBarPosition.X - Config.TrickBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.TrickBarPosition.Y - Config.TrickBarSize.Y / 2f;
 
-            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float trickDuration = 0f;
             const float trickMaxDuration = 15f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.TrickBarSize.Y, Config.TrickBarSize.X);
 
-            if (target is Chara)
+            if (actor is BattleChara target)
             {
-                StatusEffect trickStatus = target.StatusEffects.FirstOrDefault(o => o.EffectId == 638 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId);
-                trickDuration = Math.Max(trickStatus.Duration, 0);
+                Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
+                Status trickStatus = target.StatusList.FirstOrDefault(o => o.StatusId == 638 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId);
+                trickDuration = Math.Max(trickStatus?.RemainingTime ?? 0f, 0);
             }
 
             if (trickDuration != 0)
@@ -314,11 +317,12 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            IEnumerable<StatusEffect> suitonBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 507);
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
+            IEnumerable<Status> suitonBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 507);
 
             if (suitonBuff.Any() && Config.ShowSuitonBar)
             {
-                float suitonDuration = Math.Abs(suitonBuff.First().Duration);
+                float suitonDuration = Math.Abs(suitonBuff.First().RemainingTime);
                 builder.AddInnerBar(suitonDuration, 20, Config.SuitonBarColor);
 
                 if (Config.ShowSuitonBarText)

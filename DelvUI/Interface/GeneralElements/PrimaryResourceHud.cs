@@ -1,9 +1,9 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using ImGuiNET;
 using System.Collections.Generic;
 using System.Numerics;
+using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -11,7 +11,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private PrimaryResourceConfig Config => (PrimaryResourceConfig)_config;
         private LabelHud _valueLabel;
-        public Actor Actor { get; set; } = null;
+        public GameObject? Actor { get; set; } = null;
         public PrimaryResourceTypes ResourceType = PrimaryResourceTypes.MP;
 
         public PrimaryResourceHud(string ID, PrimaryResourceConfig config, string displayName) : base(ID, config, displayName)
@@ -26,12 +26,12 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || ResourceType == PrimaryResourceTypes.None || Actor == null || Actor is not Chara)
+            if (!Config.Enabled || ResourceType == PrimaryResourceTypes.None || Actor == null || Actor is not Character)
             {
                 return;
             }
 
-            var chara = (Chara)Actor;
+            var chara = (Character)Actor;
             int current = 0;
             int max = 0;
 
@@ -66,48 +66,44 @@ namespace DelvUI.Interface.GeneralElements
 
         }
 
-        private void GetResources(ref int current, ref int max, Chara actor)
+        private void GetResources(ref int current, ref int max, Character actor)
         {
             switch (ResourceType)
             {
                 case PrimaryResourceTypes.MP:
                     {
-                        current = actor.CurrentMp;
-                        max = actor.MaxMp;
+                        current = (int)actor.CurrentMp;
+                        max = (int)actor.MaxMp;
                     }
 
                     break;
 
                 case PrimaryResourceTypes.CP:
                     {
-                        current = actor.CurrentCp;
-                        max = actor.MaxCp;
+                        current = (int)actor.CurrentCp;
+                        max = (int)actor.MaxCp;
                     }
 
                     break;
 
                 case PrimaryResourceTypes.GP:
                     {
-                        current = actor.CurrentGp;
-                        max = actor.MaxGp;
+                        current = (int)actor.CurrentGp;
+                        max = (int)actor.MaxGp;
                     }
 
                     break;
             }
         }
 
-        public virtual PluginConfigColor Color(Actor actor = null)
+        public virtual PluginConfigColor Color(GameObject? actor = null)
         {
             if (!Config.UseJobColor)
             {
                 return Config.Color;
             }
-            else if (Config.UseJobColor && actor is not Chara)
-            {
-                return GlobalColors.Instance.NPCFriendlyColor;
-            }
 
-            return Utils.ColorForActor((Chara)actor);
+            return actor is not Character character ? GlobalColors.Instance.NPCFriendlyColor : Utils.ColorForActor(character);
         }
     }
 }

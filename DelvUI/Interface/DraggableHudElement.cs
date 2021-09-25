@@ -10,7 +10,7 @@ namespace DelvUI.Interface
 {
     public class DraggableHudElement : HudElement
     {
-        public DraggableHudElement(string id, MovablePluginConfigObject config, string displayName = null) : base(id, config)
+        public DraggableHudElement(string id, MovablePluginConfigObject config, string? displayName = null) : base(id, config)
         {
             _displayName = displayName ?? id;
         }

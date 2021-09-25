@@ -1,19 +1,16 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.Internal;
-using Dalamud.Plugin;
+﻿using Dalamud.Game;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Helpers;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using PartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
 
 namespace DelvUI.Interface.Party
 {
-    public unsafe class PartyManager
+    public unsafe class PartyManager : IDisposable
     {
         #region Singleton
         private static PartyManager _instance = null;
@@ -21,18 +18,12 @@ namespace DelvUI.Interface.Party
 
         private PartyManager(PartyFramesConfig config)
         {
-            Plugin.Framework.OnUpdateEvent += FrameworkOnOnUpdateEvent;
+            Plugin.Framework.Update += FrameworkOnOnUpdateEvent;
 
             _config = config;
             _config.onValueChanged += OnConfigPropertyChanged;
 
             UpdatePreview();
-        }
-
-        ~PartyManager()
-        {
-            Plugin.Framework.OnUpdateEvent -= FrameworkOnOnUpdateEvent;
-            _config.onValueChanged -= OnConfigPropertyChanged;
         }
 
         public static void Initialize()
@@ -41,9 +32,10 @@ namespace DelvUI.Interface.Party
             _instance = new PartyManager(config);
         }
 
-        public static void Destroy()
+        public void Dispose()
         {
-            //_instance = null;
+            Plugin.Framework.Update -= FrameworkOnOnUpdateEvent;
+            _config.onValueChanged -= OnConfigPropertyChanged;
         }
 
         public static PartyManager Instance => _instance;
@@ -53,7 +45,7 @@ namespace DelvUI.Interface.Party
         public IReadOnlyCollection<IPartyFramesMember> GroupMembers => _groupMembers.AsReadOnly();
         public uint MemberCount => (uint)_groupMembers.Count;
 
-        public event EventHandler<EventArgs> MembersChangedEvent;
+        public event EventHandler<EventArgs>? MembersChangedEvent;
 
         public bool isInParty
         {
@@ -82,10 +74,9 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
-            var manager = GroupManager.Instance();
-
             // solo
-            if (_config.ShowWhenSolo && manager->MemberCount == 0 && !_config.Preview)
+            var memberCount = Plugin.PartyList.Length;
+            if (_config.ShowWhenSolo && memberCount == 0)
             {
                 UpdateSoloParty(player);
                 return;
@@ -94,14 +85,18 @@ namespace DelvUI.Interface.Party
             // party
             try
             {
-                bool partyChanged = _groupMembers.Count != manager->MemberCount;
+                bool partyChanged = _groupMembers.Count != memberCount;
                 List<IPartyFramesMember> newMembers = new List<IPartyFramesMember>();
 
-                for (int i = 0; i < manager->MemberCount; i++)
+                for (int i = 0; i < memberCount; i++)
                 {
-                    PartyMember* partyMember = (PartyMember*)(new IntPtr(manager->PartyMembers) + 0x230 * i);
+                    var partyMember = Plugin.PartyList[i];
+                    if (partyMember == null)
+                    {
+                        continue;
+                    }
 
-                    if (i < _groupMembers.Count && partyMember->ObjectID != _groupMembers[i].ActorID)
+                    if (i < _groupMembers.Count && partyMember.ObjectId != _groupMembers[i].ObjectId)
                     {
                         partyChanged = true;
                     }
@@ -111,10 +106,10 @@ namespace DelvUI.Interface.Party
 
                     if (_config.ShowCompanions)
                     {
-                        var companion = Utils.GetBattleCompanion(member.GetActor());
-                        if (companion != null)
+                        var companion = Utils.GetBattleCompanion(member.Character);
+                        if (companion is Character companionCharacter)
                         {
-                            _groupMembers.Add(new PartyFramesMember(companion));
+                            newMembers.Add(new PartyFramesMember(companionCharacter));
                         }
                     }
                 }
@@ -125,10 +120,7 @@ namespace DelvUI.Interface.Party
                 {
                     _groupMembers = newMembers;
 
-                    if (MembersChangedEvent != null)
-                    {
-                        MembersChangedEvent(this, null);
-                    }
+                    MembersChangedEvent?.Invoke(this, new EventArgs());
                 }
             }
             catch
@@ -146,19 +138,16 @@ namespace DelvUI.Interface.Party
             if (_config.ShowCompanions)
             {
                 var companion = Utils.GetBattleCompanion(player);
-                if (companion != null)
+                if (companion is Character companionCharacter)
                 {
-                    newMembers.Add(new PartyFramesMember(companion));
+                    newMembers.Add(new PartyFramesMember(companionCharacter));
                 }
             }
 
             if (newMembers.Count != _groupMembers.Count)
             {
                 _groupMembers = newMembers;
-                if (MembersChangedEvent != null)
-                {
-                    MembersChangedEvent(this, null);
-                }
+                MembersChangedEvent?.Invoke(this, new EventArgs());
             }
         }
 
@@ -195,20 +184,14 @@ namespace DelvUI.Interface.Party
                 PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortingMode);
             }
 
-            if (MembersChangedEvent != null)
-            {
-                MembersChangedEvent(this, null);
-            }
+            MembersChangedEvent?.Invoke(this, new EventArgs());
         }
 
         private void UpdateSortingMode()
         {
             PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortingMode);
 
-            if (MembersChangedEvent != null)
-            {
-                MembersChangedEvent(this, null);
-            }
+            MembersChangedEvent?.Invoke(this, new EventArgs());
         }
     }
 }

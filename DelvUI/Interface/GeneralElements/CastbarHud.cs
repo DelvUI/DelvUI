@@ -1,10 +1,9 @@
-﻿using Dalamud.Game.ClientState.Actors;
-using Dalamud.Game.ClientState.Actors.Types;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -19,9 +18,9 @@ namespace DelvUI.Interface.GeneralElements
         private LabelHud _castNameLabel;
         private LabelHud _castTimeLabel;
 
-        protected LastUsedCast _lastUsedCast = null;
+        protected LastUsedCast? LastUsedCast;
 
-        public Actor Actor { get; set; } = null;
+        public GameObject? Actor { get; set; }
 
         public CastbarHud(string id, CastbarConfig config, string displayName) : base(id, config, displayName)
         {
@@ -42,7 +41,7 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             if (!Config.Preview &&
-                (Actor == null || Actor is not Chara || Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc))
+                (Actor == null || Actor is not Character || Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc))
             {
                 return;
             }
@@ -77,11 +76,11 @@ namespace DelvUI.Interface.GeneralElements
             var iconSize = Vector2.Zero;
             if (Config.ShowIcon)
             {
-                if (_lastUsedCast != null && _lastUsedCast.IconTexture != null)
+                if (LastUsedCast != null && LastUsedCast.IconTexture != null)
                 {
                     ImGui.SetCursorPos(startPos);
                     iconSize = new Vector2(Config.Size.Y, Config.Size.Y);
-                    ImGui.Image(_lastUsedCast.IconTexture.ImGuiHandle, iconSize);
+                    ImGui.Image(LastUsedCast.IconTexture.ImGuiHandle, iconSize);
                     drawList.AddRect(startPos, startPos + iconSize, 0xFF000000);
                 }
                 else if (Config.Preview)
@@ -91,7 +90,7 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             // cast name
-            Config.CastNameConfig.SetText(Config.Preview ? "Cast Name" : (_lastUsedCast != null ? _lastUsedCast.ActionText : ""));
+            Config.CastNameConfig.SetText(Config.Preview ? "Cast Name" : (LastUsedCast != null ? LastUsedCast.ActionText : ""));
             _castNameLabel.Draw(startPos + new Vector2(iconSize.X, 0), Config.Size, Actor);
 
             // cast time
@@ -105,29 +104,25 @@ namespace DelvUI.Interface.GeneralElements
             currentCastTime = Config.Preview ? 0.5f : 0f;
             totalCastTime = 1f;
 
-            if (Actor == null || Config.Preview)
+            if (Config.Preview || Actor is not BattleChara battleChara)
             {
                 return;
             }
 
             totalCastTime = 0;
-            var battleChara = (BattleChara*)Actor.Address;
-            var castInfo = battleChara->SpellCastInfo;
-            var isCasting = castInfo.IsCasting > 0;
-
-            if (castInfo.IsCasting <= 0 && !Config.Preview)
+            if (!battleChara.IsCasting)
             {
                 return;
             }
 
-            var currentCastId = castInfo.ActionID;
-            var currentCastType = castInfo.ActionType;
-            currentCastTime = castInfo.CurrentCastTime;
-            totalCastTime = castInfo.TotalCastTime;
+            var currentCastId = battleChara.CastActionId;
+            var currentCastType = (ActionType)battleChara.CastActionType;
+            currentCastTime = battleChara.CurrentCastTime;
+            totalCastTime = battleChara.TotalCastTime;
 
-            if (_lastUsedCast == null || _lastUsedCast.CastId != currentCastId || _lastUsedCast.ActionType != currentCastType)
+            if (LastUsedCast == null || LastUsedCast.CastId != currentCastId || LastUsedCast.ActionType != currentCastType)
             {
-                _lastUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo);
+                LastUsedCast = new LastUsedCast(currentCastId, currentCastType, battleChara.IsCastInterruptible);
             }
         }
 
@@ -170,12 +165,12 @@ namespace DelvUI.Interface.GeneralElements
 
         public override PluginConfigColor Color()
         {
-            if (!Config.UseJobColor || Actor is not Chara)
+            if (!Config.UseJobColor || Actor is not Character)
             {
                 return Config.Color;
             }
 
-            var chara = (Chara)Actor;
+            var chara = (Character)Actor;
             var color = GlobalColors.Instance.ColorForJobId(chara.ClassJob.Id);
             return color != null ? color : Config.Color;
         }
@@ -192,7 +187,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public override PluginConfigColor Color()
         {
-            if (Config.ShowInterruptableColor && _lastUsedCast.Interruptable)
+            if (Config.ShowInterruptableColor && LastUsedCast.Interruptible)
             {
                 return Config.InterruptableColor;
             }
@@ -202,7 +197,7 @@ namespace DelvUI.Interface.GeneralElements
                 return Config.Color;
             }
 
-            switch (_lastUsedCast.DamageType)
+            switch (LastUsedCast.DamageType)
             {
                 case DamageType.Physical:
                 case DamageType.Blunt:

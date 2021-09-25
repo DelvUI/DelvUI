@@ -1,6 +1,4 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+﻿using Dalamud.Game.ClientState.Structs;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -10,9 +8,13 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -29,8 +31,8 @@ namespace DelvUI.Interface.Jobs
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            List<Vector2> positions = new List<Vector2>();
-            List<Vector2> sizes = new List<Vector2>();
+            List<Vector2> positions = new();
+            List<Vector2> sizes = new();
 
             if (Config.ShowManaBar)
             {
@@ -89,6 +91,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawManaBar(Vector2 origin)
         {
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
             PlayerCharacter actor = Plugin.ClientState.LocalPlayer;
 
             float posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
@@ -127,7 +130,7 @@ namespace DelvUI.Interface.Jobs
                                            .SetChunks(2)
                                            .SetChunkPadding(Config.OathGaugePadding)
                                            .SetBackgroundColor(EmptyColor.Base)
-                                           .AddInnerBar(gauge.GaugeAmount, 100, Config.OathGaugeColor, PartialFillColor);
+                                           .AddInnerBar(gauge.OathGauge, 100, Config.OathGaugeColor, PartialFillColor);
 
             if (Config.ShowOathGaugeText)
             {
@@ -140,8 +143,9 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBuffBar(Vector2 origin)
         {
-            IEnumerable<StatusEffect> fightOrFlightBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 76);
-            IEnumerable<StatusEffect> requiescatBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1368);
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
+            IEnumerable<Status> fightOrFlightBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 76);
+            IEnumerable<Status> requiescatBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 1368);
 
             float xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
@@ -150,7 +154,7 @@ namespace DelvUI.Interface.Jobs
 
             if (fightOrFlightBuff.Any())
             {
-                float fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().Duration);
+                float fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().RemainingTime);
                 builder.AddInnerBar(fightOrFlightDuration, 25, Config.FightOrFlightColor);
 
                 if (Config.ShowBuffBarText)
@@ -161,7 +165,7 @@ namespace DelvUI.Interface.Jobs
 
             if (requiescatBuff.Any())
             {
-                float requiescatDuration = Math.Abs(requiescatBuff.First().Duration);
+                float requiescatDuration = Math.Abs(requiescatBuff.First().RemainingTime);
                 builder.AddInnerBar(requiescatDuration, 12, Config.RequiescatColor);
 
                 if (Config.ShowBuffBarText)
@@ -176,7 +180,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAtonementBar(Vector2 origin)
         {
-            IEnumerable<StatusEffect> atonementBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1902);
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
+            IEnumerable<Status> atonementBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 1902);
             int stackCount = atonementBuff.Any() ? atonementBuff.First().StackCount : 0;
 
             float xPos = origin.X + Config.Position.X + Config.AtonementBarPosition.X - Config.AtonementBarSize.X / 2f;
@@ -194,16 +199,17 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDoTBar(Vector2 origin)
         {
-            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            if (target is not Chara)
+            if (actor is not BattleChara target)
             {
                 return;
             }
 
-            StatusEffect goringBlade = target.StatusEffects.FirstOrDefault(o => o.EffectId == 725 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId);
+            Status? goringBlade = target.StatusList.FirstOrDefault(o => o.StatusId == 725 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId);
 
-            float duration = Math.Abs(goringBlade.Duration);
+            float duration = Math.Abs(goringBlade?.RemainingTime ?? 0f);
 
             float xPos = origin.X + Config.Position.X + Config.GoringBladeBarPosition.X - Config.GoringBladeBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.GoringBladeBarPosition.Y - Config.GoringBladeBarSize.Y / 2f;

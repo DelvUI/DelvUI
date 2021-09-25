@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using Dalamud.Logging;
 
 namespace DelvUI.Config.Tree
 {
@@ -211,8 +212,10 @@ namespace DelvUI.Config.Tree
 
             if (!ImGui.Begin("titlebarnew", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
             {
+                ImGui.End();
                 return;
             }
+            
             ImGui.PopStyleColor(3);
             ImGui.PopStyleVar(3);
             PushStyles();
@@ -224,7 +227,7 @@ namespace DelvUI.Config.Tree
                 ImGui.BeginGroup(); // Left
 
                 {
-                    TextureWrap delvUiBanner = ConfigurationManager.GetInstance().BannerImage;
+                    TextureWrap? delvUiBanner = ConfigurationManager.GetInstance().BannerImage;
 
                     if (delvUiBanner != null)
                     {
@@ -591,15 +594,17 @@ namespace DelvUI.Config.Tree
                 }
 
                 ImGui.EndTabBar();
+                
+                ImGui.EndChild();
             }
             else
             {
                 ImGui.BeginChild("item" + Depth + " view", new Vector2(0, ImGui.GetWindowHeight() - 20)); // Leave room for 1 line below us
 
                 DrawSubConfig(ref changed);
+                
+                ImGui.EndChild();
             }
-
-            ImGui.EndChild();
         }
 
         public void DrawSubConfig(ref bool changed)

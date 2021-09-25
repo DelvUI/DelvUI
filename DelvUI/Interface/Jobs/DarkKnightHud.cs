@@ -1,6 +1,3 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs;
-using Dalamud.Game.ClientState.Structs.JobGauge;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -10,8 +7,12 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -29,8 +30,8 @@ namespace DelvUI.Interface.Jobs
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            List<Vector2> positions = new List<Vector2>();
-            List<Vector2> sizes = new List<Vector2>();
+            List<Vector2> positions = new();
+            List<Vector2> sizes = new();
 
             if (Config.ShowManaBar)
             {
@@ -90,7 +91,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawManaBar(Vector2 origin)
         {
             var actor = Plugin.ClientState.LocalPlayer;
-            var darkArtsBuff = Plugin.JobGauges.Get<DRKGauge>().HasDarkArts();
+            var darkArtsBuff = Plugin.JobGauges.Get<DRKGauge>().HasDarkArts;
 
             var posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
             var posY = origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f;
@@ -128,8 +129,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDarkside(Vector2 origin)
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
-            if (target is not Chara && Config.HideDarksideWhenNoTarget)
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            if (target is not Character && Config.HideDarksideWhenNoTarget)
             {
                 return;
             }
@@ -195,8 +196,9 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBuffBar(Vector2 origin)
         {
-            IEnumerable<StatusEffect> bloodWeaponBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 742);
-            IEnumerable<StatusEffect> deliriumBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1972);
+            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
+            IEnumerable<Status> bloodWeaponBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 742);
+            IEnumerable<Status> deliriumBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 1972);
 
             var xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
@@ -205,7 +207,7 @@ namespace DelvUI.Interface.Jobs
 
             if (bloodWeaponBuff.Any())
             {
-                var fightOrFlightDuration = Math.Abs(bloodWeaponBuff.First().Duration);
+                var fightOrFlightDuration = Math.Abs(bloodWeaponBuff.First().RemainingTime);
                 builder.AddInnerBar(fightOrFlightDuration, 10, Config.BloodWeaponColor);
 
                 if (Config.ShowBuffBarText)
@@ -216,7 +218,7 @@ namespace DelvUI.Interface.Jobs
 
             if (deliriumBuff.Any())
             {
-                var deliriumDuration = Math.Abs(deliriumBuff.First().Duration);
+                var deliriumDuration = Math.Abs(deliriumBuff.First().RemainingTime);
                 builder.AddInnerBar(deliriumDuration, 10, Config.DeliriumColor);
 
                 if (Config.ShowBuffBarText)

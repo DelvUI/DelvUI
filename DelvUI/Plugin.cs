@@ -1,67 +1,103 @@
-﻿using Dalamud.Data;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using Dalamud.Data;
+using Dalamud.Game;
 using Dalamud.Game.ClientState;
-using Dalamud.Game.ClientState.Actors;
+using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.ClientState.JobGauge;
+using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.Command;
-using Dalamud.Game.Internal;
-using Dalamud.Game.Internal.Gui;
+using Dalamud.Game.Gui;
 using Dalamud.Interface;
+using Dalamud.Logging;
 using Dalamud.Plugin;
 using DelvUI.Config;
-using DelvUI.Helpers;
 using DelvUI.Interface;
+using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Party;
 using FFXIVClientStructs;
 using ImGuiNET;
-using System;
-using System.IO;
-using System.Reflection;
+using ImGuiScene;
+using SigScanner = Dalamud.Game.SigScanner;
+using Dalamud.Game.ClientState.Party;
 
 namespace DelvUI
 {
     public class Plugin : IDalamudPlugin
     {
-        private HudManager _hudManager;
-        private SystemMenuHook _menuHook;
+        public static ClientState ClientState { get; private set; }
+        public static CommandManager CommandManager { get; private set; }
+        public static Condition Condition { get; private set; }
+        public static DalamudPluginInterface PluginInterface { get; private set; }
+        public static DataManager DataManager { get; private set; }
+        public static Framework Framework { get; private set; }
+        public static GameGui GameGui { get; private set; }
+        public static JobGauges JobGauges { get; private set; }
+        public static ObjectTable ObjectTable { get; private set; }
+        public static SigScanner SigScanner { get; private set; }
+        public static TargetManager TargetManager { get; private set; }
+        public static UiBuilder UiBuilder { get; private set; }
+        public static PartyList PartyList { get; private set; }
 
-        public static ImGuiScene.TextureWrap bannerTexture;
+        public static TextureWrap? BannerTexture;
 
         // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         // ReSharper disable once MemberCanBePrivate.Global
-        public string AssemblyLocation { get; set; } = Assembly.GetExecutingAssembly().Location;
+        public string AssemblyLocation { get; set; }
         public string Name => "DelvUI";
-        public static string Version = "";
 
-        public static ClientState ClientState => PluginInterface.ClientState;
+        public static string Version { get; private set; } = "";
 
-        public static CommandManager CommandManager => PluginInterface.CommandManager;
-        public static Condition Condition => ClientState.Condition;
-        public static DalamudPluginInterface PluginInterface { get; private set; }
-        public static DataManager DataManager => PluginInterface.Data;
-        public static Framework Framework => PluginInterface.Framework;
-        public static GameGui GameGui => Framework.Gui;
-        public static JobGauges JobGauges => ClientState.JobGauges;
-        public static ActorTable ObjectTable => ClientState.Actors;
-        public static Dalamud.Game.SigScanner SigScanner => PluginInterface.TargetModuleScanner;
-        public static Targets TargetManager => ClientState.Targets;
-        public static UiBuilder UiBuilder => PluginInterface.UiBuilder;
+        private bool _fontBuilt;
+        private bool _fontLoadFailed;
+        private HudManager _hudManager;
+        private SystemMenuHook _menuHook;
 
-        public void Initialize(DalamudPluginInterface pluginInterface)
+        public Plugin(
+            ClientState clientState,
+            CommandManager commandManager,
+            Condition condition,
+            DalamudPluginInterface pluginInterface,
+            DataManager dataManager,
+            Framework framework,
+            GameGui gameGui,
+            JobGauges jobGauges,
+            ObjectTable objectTable,
+            SigScanner sigScanner,
+            TargetManager targetManager,
+            PartyList partyList
+        )
         {
+            ClientState = clientState;
+            CommandManager = commandManager;
+            Condition = condition;
             PluginInterface = pluginInterface;
+            DataManager = dataManager;
+            Framework = framework;
+            GameGui = gameGui;
+            JobGauges = jobGauges;
+            ObjectTable = objectTable;
+            SigScanner = sigScanner;
+            TargetManager = targetManager;
+            UiBuilder = PluginInterface.UiBuilder;
+            PartyList = partyList;
 
-            Version = Assembly.GetExecutingAssembly()?.GetName().Version.ToString() ?? "";
+            AssemblyLocation = Assembly.GetExecutingAssembly().Location;
 
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "";
             FontsManager.Initialize(AssemblyLocation);
+
             LoadBanner();
 
             // initialize a not-necessarily-defaults configuration
             ConfigurationManager.Initialize(false);
             FontsManager.Instance.LoadConfig();
 
-            UiBuilder.OnBuildUi += Draw;
-            UiBuilder.OnBuildFonts += BuildFont;
-            UiBuilder.OnOpenConfigUi += OpenConfigUi;
+            UiBuilder.Draw += Draw;
+            UiBuilder.BuildFonts += BuildFont;
+            UiBuilder.OpenConfigUi += OpenConfigUi;
 
             if (!FontsManager.Instance.DefaultFontBuilt)
             {
@@ -77,6 +113,7 @@ namespace DelvUI
                                 + "/delvui show → Shows HUD.\n"
                                 + "/delvui hide → Hides HUD.\n"
                                 + "/delvui reset → Resets HUD to default. This is irreversible!",
+
                     ShowInHelp = true
                 }
             );
@@ -114,7 +151,7 @@ namespace DelvUI
             {
                 try
                 {
-                    bannerTexture = UiBuilder.LoadImage(bannerImage);
+                    BannerTexture = UiBuilder.LoadImage(bannerImage);
                 }
                 catch (Exception ex)
                 {
@@ -197,7 +234,7 @@ namespace DelvUI
             }
         }
 
-        private void OpenConfigUi(object sender, EventArgs e)
+        private void OpenConfigUi()
         {
             ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
         }
@@ -215,12 +252,11 @@ namespace DelvUI
 
             CommandManager.RemoveHandler("/delvui");
             CommandManager.RemoveHandler("/delvuireloadconfig");
-            UiBuilder.OnBuildUi -= Draw;
-            UiBuilder.OnBuildFonts -= BuildFont;
-            UiBuilder.OnOpenConfigUi -= OpenConfigUi;
-            UiBuilder.RebuildFonts();
 
-            PartyManager.Destroy();
+            UiBuilder.Draw -= Draw;
+            UiBuilder.BuildFonts -= BuildFont;
+            UiBuilder.OpenConfigUi -= OpenConfigUi;
+            UiBuilder.RebuildFonts();
         }
     }
 }
