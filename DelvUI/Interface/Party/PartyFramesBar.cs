@@ -106,7 +106,7 @@ namespace DelvUI.Interface.Party
             drawList.AddRectFilled(Position, Position + _config.Size, bgColorMap);
 
             // hp
-            if (isClose)
+            if (isClose && Member.HP > 0)
             {
                 var scale = Member.MaxHP > 0 ? (float)Member.HP / (float)Member.MaxHP : 1;
                 var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), _config.Size.Y);
