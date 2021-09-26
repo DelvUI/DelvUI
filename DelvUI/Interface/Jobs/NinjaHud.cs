@@ -1,7 +1,7 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs;
-using Dalamud.Game.ClientState.Structs.JobGauge;
-using Dalamud.Plugin;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -11,9 +11,9 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -23,7 +23,7 @@ namespace DelvUI.Interface.Jobs
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
-        public NinjaHud(string id, NinjaConfig config, string displayName = null) : base(id, config, displayName)
+        public NinjaHud(string id, NinjaConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -63,11 +63,11 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowMudraCooldown)
             {
-                DrawMudraBars(origin);
+                DrawMudraBars(origin, player);
             }
 
             if (Config.ShowHutonGauge)
@@ -82,11 +82,11 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowTrickBar || Config.ShowSuitonBar)
             {
-                DrawTrickAndSuitonGauge(origin);
+                DrawTrickAndSuitonGauge(origin, player);
             }
         }
 
-        private void DrawMudraBars(Vector2 origin)
+        private void DrawMudraBars(Vector2 origin, PlayerCharacter player)
         {
             float xPos = origin.X + Config.Position.X + Config.MudraBarPosition.X - Config.MudraBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.MudraBarPosition.Y - Config.MudraBarSize.Y / 2f;
@@ -100,17 +100,17 @@ namespace DelvUI.Interface.Jobs
             int mudraStacks = _spellHelper.GetStackCount(2, 2259);
 
             // is the player casting ninjutsu or under kassatsu?
-            StatusEffect? mudraBuff = null, kassatsuBuff = null, tcjBuff = null;
-            foreach (StatusEffect statusEffect in Plugin.ClientState.LocalPlayer.StatusEffects)
+            Status? mudraBuff = null, kassatsuBuff = null, tcjBuff = null;
+            foreach (Status statusEffect in player.StatusList)
             {
-                if (statusEffect.EffectId == 496) { mudraBuff = statusEffect; }
-                if (statusEffect.EffectId == 497) { kassatsuBuff = statusEffect; }
-                if (statusEffect.EffectId == 1186) { tcjBuff = statusEffect; }
+                if (statusEffect.StatusId == 496) { mudraBuff = statusEffect; }
+                if (statusEffect.StatusId == 497) { kassatsuBuff = statusEffect; }
+                if (statusEffect.StatusId == 1186) { tcjBuff = statusEffect; }
             }
 
-            bool haveMudraBuff = mudraBuff.HasValue;
-            bool haveKassatsuBuff = kassatsuBuff.HasValue;
-            bool haveTCJBuff = tcjBuff.HasValue;
+            bool haveMudraBuff = mudraBuff is not null;
+            bool haveKassatsuBuff = kassatsuBuff is not null;
+            bool haveTCJBuff = tcjBuff is not null;
 
             // for some reason (perhaps a slight delay), the mudras may be on cooldown before the "Mudra" buff is applied
             // hence we check for either
@@ -140,19 +140,19 @@ namespace DelvUI.Interface.Jobs
                 // if this ever breaks -- possibly due to a ClientStructs update -- try swapping them
                 if (haveMudraBuff)
                 {
-                    ninjutsuText = GenerateNinjutsuText(mudraBuff.Value.StackCount, haveKassatsuBuff, haveTCJBuff);
+                    ninjutsuText = GenerateNinjutsuText(mudraBuff?.StackCount ?? 0, haveKassatsuBuff, haveTCJBuff);
                 }
 
                 // notice that this approach will never display the third ninjutsu cast under TCJ
                 // as TCJ ends before the third ninjutsu is cast
                 if (haveTCJBuff)
                 {
-                    ninjutsuText = GenerateNinjutsuText(tcjBuff.Value.StackCount, haveKassatsuBuff, haveTCJBuff);
+                    ninjutsuText = GenerateNinjutsuText(tcjBuff?.StackCount ?? 0, haveKassatsuBuff, haveTCJBuff);
                 }
                 PluginConfigColor barColor = haveTCJBuff ? Config.TCJBarColor : (haveKassatsuBuff ? Config.KassatsuBarColor : Config.MudraBarColor);
 
                 float ninjutsuMaxDuration = haveMudraBuff || haveTCJBuff ? 6f : 15f;
-                float duration = haveTCJBuff ? tcjBuff.Value.Duration : haveMudraBuff ? mudraBuff.Value.Duration : haveKassatsuBuff ? kassatsuBuff.Value.Duration : ninjutsuMaxDuration;
+                float duration = haveTCJBuff ? tcjBuff?.RemainingTime ?? 0f : haveMudraBuff ? mudraBuff?.RemainingTime ?? 0f : haveKassatsuBuff ? kassatsuBuff?.RemainingTime ?? 0f : ninjutsuMaxDuration;
 
                 // it seems there is some time before the duration is updated after the buff is obtained
                 if (duration < 0)
@@ -223,7 +223,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawHutonGauge(Vector2 origin)
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
-            int hutonDurationLeft = (int)Math.Ceiling((float)(gauge.HutonTimeLeft / (double)1000));
+            int hutonDurationLeft = (int)Math.Ceiling((float)(gauge.HutonTimer / (double)1000));
 
             float xPos = origin.X + Config.Position.X + Config.HutonGaugePosition.X - Config.HutonGaugeSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.HutonGaugePosition.Y - Config.HutonGaugeSize.Y / 2f;
@@ -287,21 +287,21 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawTrickAndSuitonGauge(Vector2 origin)
+        private void DrawTrickAndSuitonGauge(Vector2 origin, PlayerCharacter player)
         {
             float xPos = origin.X + Config.Position.X + Config.TrickBarPosition.X - Config.TrickBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.TrickBarPosition.Y - Config.TrickBarSize.Y / 2f;
 
-            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float trickDuration = 0f;
             const float trickMaxDuration = 15f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.TrickBarSize.Y, Config.TrickBarSize.X);
 
-            if (target is Chara)
+            if (actor is BattleChara target)
             {
-                StatusEffect trickStatus = target.StatusEffects.FirstOrDefault(o => o.EffectId == 638 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId);
-                trickDuration = Math.Max(trickStatus.Duration, 0);
+                Status? trickStatus = target.StatusList.FirstOrDefault(o => o.StatusId == 638 && o.SourceID == player.ObjectId);
+                trickDuration = Math.Max(trickStatus?.RemainingTime ?? 0f, 0);
             }
 
             if (trickDuration != 0)
@@ -314,11 +314,11 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            IEnumerable<StatusEffect> suitonBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 507);
+            IEnumerable<Status> suitonBuff = player.StatusList.Where(o => o.StatusId == 507);
 
             if (suitonBuff.Any() && Config.ShowSuitonBar)
             {
-                float suitonDuration = Math.Abs(suitonBuff.First().Duration);
+                float suitonDuration = Math.Abs(suitonBuff.First().RemainingTime);
                 builder.AddInnerBar(suitonDuration, 20, Config.SuitonBarColor);
 
                 if (Config.ShowSuitonBarText)
@@ -342,145 +342,148 @@ namespace DelvUI.Interface.Jobs
         public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
 
         #region huton gauge
-        [Checkbox("Show Huton Gauge", separator = true)]
+        [Checkbox("Huton" + "##Huton", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowHutonGauge = true;
 
-        [Checkbox("Show Huton Gauge Text")]
+        [Checkbox("Timer" + "##Huton")]
         [CollapseWith(0, 0)]
         public bool ShowHutonGaugeText = true;
 
-        [DragFloat2("Huton Gauge Size", max = 2000f)]
+        [Checkbox("Border" + "##Huton")]
         [CollapseWith(1, 0)]
-        public Vector2 HutonGaugeSize = new(254, 20);
+        public bool ShowHutonGaugeBorder = true;
 
-        [DragFloat2("Huton Gauge Position", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 0)]
+        [DragFloat2("Position" + "##Huton", min = -4000f, max = 4000f)]
+        [CollapseWith(2, 0)]
         public Vector2 HutonGaugePosition = new(0, -54);
 
-        [ColorEdit4("Huton Gauge Color")]
+        [DragFloat2("Size" + "##Huton", max = 2000f)]
+        [CollapseWith(3, 0)]
+        public Vector2 HutonGaugeSize = new(254, 20);
+
+        [ColorEdit4("Color" + "##Huton")]
         [CollapseWith(10, 0)]
         public PluginConfigColor HutonGaugeColor = new(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f));
 
-        [Checkbox("Show Huton Gauge Expiry")]
+        [Checkbox("Expire" + "##Huton")]
         [CollapseWith(11, 0)]
         public bool ShowHutonGaugeExpiry = true;
 
-        [DragFloat("Huton Gauge Expiry Threshold", min = 1f, max = 70f)]
+        [DragFloat("Expire Threshold" + "##Huton", min = 1f, max = 70f)]
         [CollapseWith(12, 0)]
         public float HutonGaugeExpiryThreshold = 40f;
 
-        [ColorEdit4("Huton Gauge Expiry Color")]
+        [ColorEdit4("Expire Color" + "##Huton")]
         [CollapseWith(13, 0)]
         public PluginConfigColor HutonGaugeExpiryColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
 
-        [Checkbox("Show Huton Gauge Border")]
-        [CollapseWith(15, 0)]
-        public bool ShowHutonGaugeBorder = true;
+
         #endregion
 
         #region ninki gauge
-        [Checkbox("Show Ninki Gauge", separator = true)]
+        [Checkbox("Ninki" + "##Ninki", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowNinkiGauge = true;
 
-        [Checkbox("Show Ninki Gauge Text")]
+        [Checkbox("Text" + "##Ninki")]
         [CollapseWith(0, 1)]
         public bool ShowNinkiGaugeText = true;
 
-        [Checkbox("Chunk Ninki Gauge")]
+        [Checkbox("Border" + "##Ninki")]
         [CollapseWith(5, 1)]
+        public bool ShowNinkiGaugeBorder = true;
+
+        [Checkbox("Split Bar" + "##Ninki")]
+        [CollapseWith(10, 1)]
         public bool ChunkNinkiGauge = true;
 
-        [DragFloat2("Ninki Gauge Size", max = 2000f)]
-        [CollapseWith(10, 1)]
-        public Vector2 NinkiGaugeSize = new(254, 20);
-
-        [DragFloat2("Ninki Gauge Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##Ninki", min = -4000f, max = 4000f)]
         [CollapseWith(15, 1)]
         public Vector2 NinkiGaugePosition = new(0, -32);
 
-        [DragFloat("Ninki Gauge Chunk Padding", min = -4000f, max = 4000f)]
+        [DragFloat2("Size" + "##Ninki", max = 2000f)]
         [CollapseWith(20, 1)]
+        public Vector2 NinkiGaugeSize = new(254, 20);
+
+        [DragFloat("Spacing" + "##Ninki", min = -4000f, max = 4000f)]
+        [CollapseWith(25, 1)]
         public float NinkiGaugeChunkPadding = 2;
 
-        [ColorEdit4("Ninki Gauge Color")]
-        [CollapseWith(25, 1)]
+        [ColorEdit4("Color" + "##Ninki")]
+        [CollapseWith(30, 1)]
         public PluginConfigColor NinkiGaugeColor = new(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f));
 
-        [Checkbox("Show Ninki Gauge Border")]
-        [CollapseWith(30, 1)]
-        public bool ShowNinkiGaugeBorder = true;
         #endregion
 
         #region trick / suiton
-        [Checkbox("Show Trick Bar", separator = true)]
-        [CollapseControl(40, 2)]
+        [DragFloat2("Trick Attack & Suiton Position" + "##TnS", min = -4000f, max = 4000f, separator = true)]
+        [Order(40)]
+        public Vector2 TrickBarPosition = new(0, -10);
+
+        [DragFloat2("Trick Attack & Suiton Size" + "##TnS", max = 2000f)]
+        [Order(45)]
+        public Vector2 TrickBarSize = new(254, 20);
+
+        [Checkbox("Trick Attack" + "##TnS")]
+        [CollapseControl(50, 2)]
         public bool ShowTrickBar = false;
 
-        [Checkbox("Show Trick Bar Text")]
+        [Checkbox("Timer" + "##TnS")]
         [CollapseWith(0, 2)]
         public bool ShowTrickBarText = true;
 
-        [ColorEdit4("Trick Bar Color")]
+        [ColorEdit4("Color" + "##TnS")]
         [CollapseWith(5, 2)]
         public PluginConfigColor TrickBarColor = new(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f));
 
-        [Checkbox("Show Suiton Bar")]
-        [CollapseControl(45, 3)]
+        [Checkbox("Suiton" + "##TnS")]
+        [CollapseControl(55, 3)]
         public bool ShowSuitonBar = false;
 
-        [Checkbox("Show Suiton Bar Text")]
+        [Checkbox("Timer" + "##TnS")]
         [CollapseWith(0, 3)]
         public bool ShowSuitonBarText = true;
 
-        [ColorEdit4("Suiton Bar Color")]
+        [ColorEdit4("Color" + "##TnS")]
         [CollapseWith(5, 3)]
         public PluginConfigColor SuitonBarColor = new(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f));
-
-        [DragFloat2("Trick/Suiton Bar Size", max = 2000f)]
-        [Order(50)]
-        public Vector2 TrickBarSize = new(254, 20);
-
-        [DragFloat2("Trick/Suiton Bar Position", min = -4000f, max = 4000f)]
-        [Order(55)]
-        public Vector2 TrickBarPosition = new(0, -10);
         #endregion
 
         #region mudra
-        [Checkbox("Show Mudra Bars", separator = true)]
+        [Checkbox("Mudra" + "##Mudra", separator = true)]
         [CollapseControl(60, 4)]
         public bool ShowMudraCooldown = true;
 
-        [Checkbox("Show Mudra Bar Timers")]
+        [Checkbox("Timers" + "##Mudra")]
         [CollapseWith(0, 4)]
         public bool ShowMudraBarText = true;
 
-        [Checkbox("Show Ninjutsu Text")]
+        [Checkbox("Ninjutsu Text" + "##Mudra")]
         [CollapseWith(1, 4)]
         public bool ShowNinjutsuText = true;
 
-        [DragFloat2("Mudra Bar Size", max = 2000f)]
+        [DragFloat2("Position" + "##Mudra", min = -4000f, max = 4000f)]
         [CollapseWith(5, 4)]
-        public Vector2 MudraBarSize = new(254, 10);
-
-        [DragFloat2("Mudra Bar Position", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 4)]
         public Vector2 MudraBarPosition = new(0, -73);
 
-        [DragFloat("Mudra Bar Chunk Padding", min = -4000f, max = 4000f)]
+        [DragFloat2("Size" + "##Mudra", max = 2000f)]
+        [CollapseWith(10, 4)]
+        public Vector2 MudraBarSize = new(254, 10);
+
+        [DragFloat("Spacing" + "##Mudra", min = -4000f, max = 4000f)]
         [CollapseWith(15, 4)]
         public float MudraBarChunkPadding = 2;
 
-        [ColorEdit4("Mudra Bar Color")]
+        [ColorEdit4("Mudra" + "##Mudra")]
         [CollapseWith(20, 4)]
         public PluginConfigColor MudraBarColor = new(new Vector4(211 / 255f, 166 / 255f, 75 / 242f, 100f / 100f));
 
-        [ColorEdit4("Kassatsu Bar Color")]
+        [ColorEdit4("Kassatsu" + "##Mudra")]
         [CollapseWith(25, 4)]
         public PluginConfigColor KassatsuBarColor = new(new Vector4(239 / 255f, 123 / 255f, 222 / 242f, 100f / 100f));
 
-        [ColorEdit4("TCJ Bar Color")]
+        [ColorEdit4("Ten Chi Jin" + "##Mudra")]
         [CollapseWith(30, 4)]
         public PluginConfigColor TCJBarColor = new(new Vector4(181 / 255f, 33 / 255f, 41 / 242f, 100f / 100f));
         #endregion

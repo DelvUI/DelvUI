@@ -38,8 +38,8 @@ namespace DelvUI.Interface.GeneralElements
         [JsonIgnore] private int _inputFont = 0;
         [JsonIgnore] private int _inputSize = 23;
 
-        [JsonIgnore] private string[] _fonts;
-        [JsonIgnore] private string[] _sizes;
+        [JsonIgnore] private string[] _fonts = null!;
+        [JsonIgnore] private string[] _sizes = null!;
 
         public FontsConfig()
         {

@@ -1,6 +1,8 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+﻿using Dalamud.Game.ClientState.JobGauge.Enums;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -10,9 +12,9 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -20,7 +22,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DragoonConfig Config => (DragoonConfig)_config;
 
-        public DragoonHud(string id, DragoonConfig config, string displayName = null) : base(id, config, displayName)
+        public DragoonHud(string id, DragoonConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -78,16 +80,16 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowChaosThrustBar)
             {
-                DrawChaosThrustBar(origin);
+                DrawChaosThrustBar(origin, player);
             }
 
             if (Config.ShowDisembowelBar)
             {
-                DrawDisembowelBar(origin);
+                DrawDisembowelBar(origin, player);
             }
 
             if (Config.ShowEyeOfTheDragonBar)
@@ -101,17 +103,15 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawChaosThrustBar(Vector2 origin)
+        private void DrawChaosThrustBar(Vector2 origin, PlayerCharacter player)
         {
-            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float duration = 0f;
 
-            if (target is Chara)
+            if (actor is BattleChara target)
             {
-                StatusEffect chaosThrust = target.StatusEffects.FirstOrDefault(
-                    o => (o.EffectId == 1312 || o.EffectId == 118) && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
-                );
-                duration = Math.Max(0f, chaosThrust.Duration);
+                Status? chaosThrust = target.StatusList.FirstOrDefault(o => o.StatusId is 1312 or 118 && o.SourceID == player.ObjectId);
+                duration = Math.Max(0f, chaosThrust?.RemainingTime ?? 0f);
             }
 
             Vector2 cursorPos = origin + Config.Position + Config.ChaosThrustBarPosition - Config.ChaosThrustBarSize / 2f;
@@ -168,22 +168,22 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawDisembowelBar(Vector2 origin)
+        private void DrawDisembowelBar(Vector2 origin, PlayerCharacter player)
         {
             Vector2 cursorPos = origin + Config.Position + Config.DisembowelBarPosition - Config.DisembowelBarSize / 2f;
-
-            IEnumerable<StatusEffect> disembowelBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1914 or 121);
+            IEnumerable<Status> disembowelBuff = player.StatusList.Where(o => o.StatusId is 1914 or 121);
             float duration = 0f;
+
             if (disembowelBuff.Any())
             {
-                StatusEffect buff = disembowelBuff.First();
-                if (buff.Duration <= 0)
+                Status buff = disembowelBuff.First();
+                if (buff.RemainingTime <= 0)
                 {
                     duration = 0f;
                 }
                 else
                 {
-                    duration = buff.Duration;
+                    duration = buff.RemainingTime;
                 }
             }
 
@@ -210,67 +210,67 @@ namespace DelvUI.Interface.Jobs
         public new static DragoonConfig DefaultConfig() { return new DragoonConfig(); }
 
         #region Chaos Thrust Bar
-        [Checkbox("Show Chaos Thrust Bar", separator = true)]
+        [Checkbox("Chaos Thrust" + "##ChaosThrust", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowChaosThrustBar = true;
 
-        [DragFloat2("Chaos Thrust Bar Size", max = 2000f)]
+        [Checkbox("Timer" + "##ChaosThrust")]
         [CollapseWith(0, 0)]
-        public Vector2 ChaosThrustBarSize = new(254, 20);
-
-        [DragFloat2("Chaos Thrust Bar Position", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 0)]
-        public Vector2 ChaosThrustBarPosition = new(0, -76);
-
-        [Checkbox("Show Chaos Bar Thrust Text")]
-        [CollapseWith(10, 0)]
         public bool ShowChaosThrustBarText = true;
 
-        [ColorEdit4("Chaos Thrust Bar Color")]
+        [DragFloat2("Position" + "##ChaosThrust", min = -4000f, max = 4000f)]
+        [CollapseWith(10, 0)]
+        public Vector2 ChaosThrustBarPosition = new(0, -76);
+
+        [DragFloat2("Size" + "##ChaosThrust", max = 2000f)]
+        [CollapseWith(5, 0)]
+        public Vector2 ChaosThrustBarSize = new(254, 20);
+
+        [ColorEdit4("Color" + "##ChaosThrust")]
         [CollapseWith(15, 0)]
         public PluginConfigColor ChaosThrustBarColor = new(new Vector4(106f / 255f, 82f / 255f, 148f / 255f, 100f / 100f));
         #endregion
 
         #region Disembowel Bar
-        [Checkbox("Show Disembowel Bar", separator = true)]
+        [Checkbox("Disembowel" + "##Disembowel", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowDisembowelBar = true;
 
-        [DragFloat2("Disembowel Bar Size", max = 2000f)]
+        [Checkbox("Timer" + "##Disembowel")]
         [CollapseWith(0, 1)]
-        public Vector2 DisembowelBarSize = new(254, 20);
+        public bool ShowDisembowelBarText = true;
 
-        [DragFloat2("Disembowel Bar Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##Disembowel", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
         public Vector2 DisembowelBarPosition = new(0, -54);
 
-        [Checkbox("Show Disembowel Bar Text")]
+        [DragFloat2("Size" + "##Disembowel", max = 2000f)]
         [CollapseWith(10, 1)]
-        public bool ShowDisembowelBarText = true;
+        public Vector2 DisembowelBarSize = new(254, 20);
 
-        [ColorEdit4("Disembowel Bar Color")]
+        [ColorEdit4("Color" + "##Disembowel")]
         [CollapseWith(15, 1)]
         public PluginConfigColor DisembowelBarColor = new(new Vector4(244f / 255f, 206f / 255f, 191f / 255f, 100f / 100f));
         #endregion
 
         #region Eye Of The Dragon Bar
-        [Checkbox("Show Eye Of The Dragon Bar", separator = true)]
+        [Checkbox("Eye Of The Dragon" + "##EyeOfTheDragon", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowEyeOfTheDragonBar = true;
 
-        [DragFloat2("Eye Of The Dragon Bar Size", max = 2000f)]
+        [DragFloat2("Position" + "##EyeOfTheDragon", min = -4000f, max = 4000f)]
         [CollapseWith(0, 2)]
-        public Vector2 EyeOfTheDragonBarSize = new(254, 20);
-
-        [DragFloat2("Eye Of The Dragon Bar Position", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 2)]
         public Vector2 EyeOfTheDragonBarPosition = new(0, -32);
 
-        [DragInt("Eye Of The Dragon Bar Padding")]
+        [DragFloat2("Size" + "##EyeOfTheDragon", max = 2000f)]
+        [CollapseWith(5, 2)]
+        public Vector2 EyeOfTheDragonBarSize = new(254, 20);
+
+        [DragInt("Spacing" + "##EyeOfTheDragon")]
         [CollapseWith(10, 2)]
         public int EyeOfTheDragonBarPadding = 2;
 
-        [ColorEdit4("Eye Of The Dragon Bar Color")]
+        [ColorEdit4("Color" + "##EyeOfTheDragon")]
         [CollapseWith(15, 2)]
         public PluginConfigColor EyeOfTheDragonColor = new(new Vector4(1f, 182f / 255f, 194f / 255f, 100f / 100f));
         #endregion

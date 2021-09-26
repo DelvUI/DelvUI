@@ -1,6 +1,7 @@
-using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -10,9 +11,9 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -23,15 +24,15 @@ namespace DelvUI.Interface.Jobs
         private new SummonerConfig Config => (SummonerConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public SummonerHud(string id, SummonerConfig config, string displayName = null) : base(id, config, displayName)
+        public SummonerHud(string id, SummonerConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            List<Vector2> positions = new List<Vector2>();
-            List<Vector2> sizes = new List<Vector2>();
+            List<Vector2> positions = new();
+            List<Vector2> sizes = new();
 
             if (Config.ShowAether)
             {
@@ -69,22 +70,36 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            DrawActiveDots(origin);
-            DrawRuinBar(origin);
-            DrawAetherBar(origin);
-            DrawTranceBar(origin);
-            DrawDreadWyrmAether(origin);
+            if (Config.ShowBio || Config.ShowMiasma)
+            {
+                DrawActiveDots(origin, player);
+            }
+
+            if (Config.ShowRuin)
+            {
+                DrawRuinBar(origin, player);
+            }
+
+            if (Config.ShowAether)
+            {
+                DrawAetherBar(origin, player);
+            }
+
+            if (Config.ShowTrance)
+            {
+                DrawTranceBar(origin);
+            }
+
+            if (Config.ShowDreadwyrmAether)
+            {
+                DrawDreadWyrmAether(origin);
+            }
         }
 
         private void DrawTranceBar(Vector2 origin)
         {
-            if (!Config.ShowTrance)
-            {
-                return;
-            }
-
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
 
             PluginConfigColor tranceColor;
@@ -96,7 +111,7 @@ namespace DelvUI.Interface.Jobs
                 _bahamutFinished = true;
             }
 
-            switch (gauge.NumStacks)
+            switch (gauge.AetherFlags)
             {
                 case >= 16:
                     tranceColor = Config.PhoenixColor;
@@ -138,13 +153,8 @@ namespace DelvUI.Interface.Jobs
 
         public void DrawDreadWyrmAether(Vector2 origin)
         {
-            if (!Config.ShowDreadwyrmAether)
-            {
-                return;
-            }
-
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
-            var stacks = gauge.NumStacks;
+            var stacks = gauge.AetherFlags;
             List<Bar> barDrawList = new();
 
             if (Config.ShowDemiIndicator)
@@ -211,16 +221,10 @@ namespace DelvUI.Interface.Jobs
                 }
             }
         }
-        private void DrawActiveDots(Vector2 origin)
+        private void DrawActiveDots(Vector2 origin, PlayerCharacter player)
         {
-            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
-
-            if (!Config.ShowBio && !Config.ShowMiasma)
-            {
-                return;
-            }
-
-            if (target is not Chara)
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            if (actor is not BattleChara target)
             {
                 return;
             }
@@ -232,12 +236,12 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowMiasma)
             {
-                StatusEffect miasma = target.StatusEffects.FirstOrDefault(
-                    o => o.EffectId == 1215 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
-                      || o.EffectId == 180 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                Status? miasma = target.StatusList.FirstOrDefault(
+                    o => o.StatusId == 1215 && o.SourceID == player.ObjectId
+                      || o.StatusId == 180 && o.SourceID == player.ObjectId
                 );
 
-                float miasmaDuration = Math.Abs(miasma.Duration);
+                float miasmaDuration = Math.Abs(miasma?.RemainingTime ?? 0f);
                 PluginConfigColor miasmaColor = miasmaDuration > 5 ? Config.MiasmaColor : Config.ExpireColor;
                 BarBuilder builder = BarBuilder.Create(position, barSize);
 
@@ -251,18 +255,18 @@ namespace DelvUI.Interface.Jobs
                            .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
                 }
                 barDrawList.Add(miasmaBar);
-                
+
             }
 
             if (Config.ShowBio)
             {
-                StatusEffect bio = target.StatusEffects.FirstOrDefault(
-                    o => o.EffectId == 1214 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
-                      || o.EffectId == 179 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
-                      || o.EffectId == 189 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                Status? bio = target.StatusList.FirstOrDefault(
+                    o => o.StatusId == 1214 && o.SourceID == player.ObjectId
+                      || o.StatusId == 179 && o.SourceID == player.ObjectId
+                      || o.StatusId == 189 && o.SourceID == player.ObjectId
                 );
 
-                float bioDuration = Math.Abs(bio.Duration);
+                float bioDuration = Math.Abs(bio?.RemainingTime ?? 0f);
                 PluginConfigColor bioColor = bioDuration > 5 ? Config.BioColor : Config.ExpireColor;
 
                 barSize = Config.BioSize;
@@ -292,22 +296,17 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawRuinBar(Vector2 origin)
+        private void DrawRuinBar(Vector2 origin, PlayerCharacter player)
         {
-            StatusEffect ruinBuff = Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1212);
+            Status? ruinBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 1212);
 
             Vector2 barSize = Config.RuinSize;
             Vector2 position = origin + Config.Position + Config.RuinPosition - barSize / 2f;
 
-            if (!Config.ShowRuin)
-            {
-                return;
-            }
-
             Bar bar = BarBuilder.Create(position, barSize)
                                 .SetChunks(4)
                                 .SetChunkPadding(Config.RuinPadding)
-                                .AddInnerBar(ruinBuff.StackCount, 4, Config.RuinColor)
+                                .AddInnerBar(ruinBuff?.StackCount ?? 0, 4, Config.RuinColor)
                                 .SetBackgroundColor(EmptyColor.Base)
                                 .Build();
 
@@ -315,22 +314,17 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawAetherBar(Vector2 origin)
+        private void DrawAetherBar(Vector2 origin, PlayerCharacter player)
         {
-            StatusEffect aetherFlowBuff = Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
+            Status? aetherFlowBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 304);
 
             Vector2 barSize = Config.AetherSize;
             Vector2 position = origin + Config.Position + Config.AetherPosition - barSize / 2f;
 
-            if (!Config.ShowAether)
-            {
-                return;
-            }
-
             Bar bar = BarBuilder.Create(position, barSize)
                                 .SetChunks(2)
                                 .SetChunkPadding(Config.AetherPadding)
-                                .AddInnerBar(aetherFlowBuff.StackCount, 2, Config.AetherColor)
+                                .AddInnerBar(aetherFlowBuff?.StackCount ?? 0, 2, Config.AetherColor)
                                 .SetBackgroundColor(EmptyColor.Base)
                                 .Build();
 
@@ -345,7 +339,7 @@ namespace DelvUI.Interface.Jobs
     public class SummonerConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.SMN;
-        public new static SummonerConfig DefaultConfig() { return new SummonerConfig(); }
+        public new static SummonerConfig DefaultConfig() => new SummonerConfig();
 
         #region aether
         [Checkbox("Aether Tracker Enabled", separator = true)]
@@ -395,7 +389,7 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Miasma Enabled", separator = true)]
         [CollapseControl(40, 3)]
         public bool ShowMiasma = true;
-        
+
         [Checkbox("Miasma Text")]
         [CollapseWith(0, 3)]
         public bool ShowMiasmaText = true;

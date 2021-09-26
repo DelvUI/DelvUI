@@ -1,6 +1,4 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+﻿using Dalamud.Game.ClientState.Structs;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -10,9 +8,13 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -22,15 +24,15 @@ namespace DelvUI.Interface.Jobs
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
-        public PaladinHud(string id, PaladinConfig config, string displayName = null) : base(id, config, displayName)
+        public PaladinHud(string id, PaladinConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            List<Vector2> positions = new List<Vector2>();
-            List<Vector2> sizes = new List<Vector2>();
+            List<Vector2> positions = new();
+            List<Vector2> sizes = new();
 
             if (Config.ShowManaBar)
             {
@@ -59,11 +61,11 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowManaBar)
             {
-                DrawManaBar(origin);
+                DrawManaBar(origin, player);
             }
 
             if (Config.ShowOathGauge)
@@ -73,24 +75,22 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowBuffBar)
             {
-                DrawBuffBar(origin);
+                DrawBuffBar(origin, player);
             }
 
             if (Config.ShowAtonementBar)
             {
-                DrawAtonementBar(origin);
+                DrawAtonementBar(origin, player);
             }
 
             if (Config.ShowGoringBladeBar)
             {
-                DrawDoTBar(origin);
+                DrawDoTBar(origin, player);
             }
         }
 
-        private void DrawManaBar(Vector2 origin)
+        private void DrawManaBar(Vector2 origin, PlayerCharacter player)
         {
-            PlayerCharacter actor = Plugin.ClientState.LocalPlayer;
-
             float posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
             float posY = origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f;
 
@@ -98,16 +98,16 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ChunkManaBar)
             {
-                builder.SetChunks(5).SetChunkPadding(Config.ManaBarPadding).AddInnerBar(actor.CurrentMp, actor.MaxMp, Config.ManaBarColor, EmptyColor);
+                builder.SetChunks(5).SetChunkPadding(Config.ManaBarPadding).AddInnerBar(player.CurrentMp, player.MaxMp, Config.ManaBarColor, EmptyColor);
             }
             else
             {
-                builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, Config.ManaBarColor);
+                builder.AddInnerBar(player.CurrentMp, player.MaxMp, Config.ManaBarColor);
             }
 
             if (Config.ShowManaBarText)
             {
-                string formattedManaText = TextTags.GenerateFormattedTextFromTags(actor, "[mana:current-short]");
+                string formattedManaText = TextTags.GenerateFormattedTextFromTags(player, "[mana:current-short]");
 
                 builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterLeft, BarTextType.Custom, formattedManaText);
             }
@@ -127,7 +127,7 @@ namespace DelvUI.Interface.Jobs
                                            .SetChunks(2)
                                            .SetChunkPadding(Config.OathGaugePadding)
                                            .SetBackgroundColor(EmptyColor.Base)
-                                           .AddInnerBar(gauge.GaugeAmount, 100, Config.OathGaugeColor, PartialFillColor);
+                                           .AddInnerBar(gauge.OathGauge, 100, Config.OathGaugeColor, PartialFillColor);
 
             if (Config.ShowOathGaugeText)
             {
@@ -138,10 +138,10 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        private void DrawBuffBar(Vector2 origin)
+        private void DrawBuffBar(Vector2 origin, PlayerCharacter player)
         {
-            IEnumerable<StatusEffect> fightOrFlightBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 76);
-            IEnumerable<StatusEffect> requiescatBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1368);
+            IEnumerable<Status> fightOrFlightBuff = player.StatusList.Where(o => o.StatusId == 76);
+            IEnumerable<Status> requiescatBuff = player.StatusList.Where(o => o.StatusId == 1368);
 
             float xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
@@ -150,7 +150,7 @@ namespace DelvUI.Interface.Jobs
 
             if (fightOrFlightBuff.Any())
             {
-                float fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().Duration);
+                float fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().RemainingTime);
                 builder.AddInnerBar(fightOrFlightDuration, 25, Config.FightOrFlightColor);
 
                 if (Config.ShowBuffBarText)
@@ -161,7 +161,7 @@ namespace DelvUI.Interface.Jobs
 
             if (requiescatBuff.Any())
             {
-                float requiescatDuration = Math.Abs(requiescatBuff.First().Duration);
+                float requiescatDuration = Math.Abs(requiescatBuff.First().RemainingTime);
                 builder.AddInnerBar(requiescatDuration, 12, Config.RequiescatColor);
 
                 if (Config.ShowBuffBarText)
@@ -174,9 +174,9 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        private void DrawAtonementBar(Vector2 origin)
+        private void DrawAtonementBar(Vector2 origin, PlayerCharacter player)
         {
-            IEnumerable<StatusEffect> atonementBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1902);
+            IEnumerable<Status> atonementBuff = player.StatusList.Where(o => o.StatusId == 1902);
             int stackCount = atonementBuff.Any() ? atonementBuff.First().StackCount : 0;
 
             float xPos = origin.X + Config.Position.X + Config.AtonementBarPosition.X - Config.AtonementBarSize.X / 2f;
@@ -192,18 +192,17 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        private void DrawDoTBar(Vector2 origin)
+        private void DrawDoTBar(Vector2 origin, PlayerCharacter player)
         {
-            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
-
-            if (target is not Chara)
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            if (actor is not BattleChara target)
             {
                 return;
             }
 
-            StatusEffect goringBlade = target.StatusEffects.FirstOrDefault(o => o.EffectId == 725 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId);
+            Status? goringBlade = target.StatusList.FirstOrDefault(o => o.StatusId == 725 && o.SourceID == player.ObjectId);
 
-            float duration = Math.Abs(goringBlade.Duration);
+            float duration = Math.Abs(goringBlade?.RemainingTime ?? 0f);
 
             float xPos = origin.X + Config.Position.X + Config.GoringBladeBarPosition.X - Config.GoringBladeBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.GoringBladeBarPosition.Y - Config.GoringBladeBarSize.Y / 2f;
@@ -242,11 +241,11 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Split Bar" + "##MP")]
         [CollapseWith(5, 0)]
         public bool ChunkManaBar = true;
-        
+
         [DragFloat2("Position" + "##MP", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
         public Vector2 ManaBarPosition = new(0, -76);
-        
+
         [DragFloat2("Size" + "##MP", max = 2000f)]
         [CollapseWith(15, 0)]
         public Vector2 ManaBarSize = new(254, 20);
@@ -254,7 +253,7 @@ namespace DelvUI.Interface.Jobs
         [DragInt("Spacing" + "##MP", max = 100)]
         [CollapseWith(20, 0)]
         public int ManaBarPadding = 2;
-        
+
         [ColorEdit4("Color" + "##MP")]
         [CollapseWith(25, 0)]
         public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
@@ -268,11 +267,11 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Text" + "##Oath")]
         [CollapseWith(0, 1)]
         public bool ShowOathGaugeText = true;
-        
+
         [DragFloat2("Position" + "##Oath", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
         public Vector2 OathGaugePosition = new(0, -54);
-        
+
         [DragFloat2("Size" + "##Oath", min = -4000f, max = 4000f)]
         [CollapseWith(10, 1)]
         public Vector2 OathGaugeSize = new(254, 20);
@@ -280,7 +279,7 @@ namespace DelvUI.Interface.Jobs
         [DragInt("Spacing" + "##Oath", max = 100)]
         [CollapseWith(15, 1)]
         public int OathGaugePadding = 2;
-        
+
         [ColorEdit4("Color" + "##Oath")]
         [CollapseWith(20, 1)]
         public PluginConfigColor OathGaugeColor = new(new Vector4(24f / 255f, 80f / 255f, 175f / 255f, 100f / 100f));
@@ -291,23 +290,23 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(40, 2)]
         public bool ShowBuffBar = true;
 
-        [Checkbox("Timer")]
+        [Checkbox("Timer" + "##Buff")]
         [CollapseWith(0, 2)]
         public bool ShowBuffBarText = true;
 
-        [DragFloat2("Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##Buff", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]
         public Vector2 BuffBarPosition = new(0, -32);
-        
-        [DragFloat2("Size", min = -4000f, max = 4000f)]
+
+        [DragFloat2("Size" + "##Buff", min = -4000f, max = 4000f)]
         [CollapseWith(10, 2)]
         public Vector2 BuffBarSize = new(254, 20);
 
-        [ColorEdit4("Fight or Flight")]
+        [ColorEdit4("Fight or Flight" + "##Buff")]
         [CollapseWith(15, 2)]
         public PluginConfigColor FightOrFlightColor = new(new Vector4(240f / 255f, 50f / 255f, 0f / 255f, 100f / 100f));
 
-        [ColorEdit4("Requiescat")]
+        [ColorEdit4("Requiescat" + "##Buff")]
         [CollapseWith(20, 2)]
         public PluginConfigColor RequiescatColor = new(new Vector4(61f / 255f, 61f / 255f, 255f / 255f, 100f / 100f));
         #endregion
@@ -316,11 +315,11 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Atonement" + "##Atonement", separator = true)]
         [CollapseControl(45, 3)]
         public bool ShowAtonementBar = true;
-        
+
         [DragFloat2("Position" + "##Atonement", min = -4000f, max = 4000f)]
         [CollapseWith(0, 3)]
         public Vector2 AtonementBarPosition = new(0, -10);
-        
+
         [DragFloat2("Size" + "##Atonement", min = -4000f, max = 4000f)]
         [CollapseWith(5, 3)]
         public Vector2 AtonementBarSize = new(254, 20);
@@ -328,7 +327,7 @@ namespace DelvUI.Interface.Jobs
         [DragInt("Spacing" + "##Atonement", max = 100)]
         [CollapseWith(10, 3)]
         public int AtonementBarPadding = 2;
-        
+
         [ColorEdit4("Color" + "##Atonement")]
         [CollapseWith(15, 3)]
         public PluginConfigColor AtonementColor = new(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f));
@@ -346,11 +345,11 @@ namespace DelvUI.Interface.Jobs
         [DragFloat2("Position" + "##GoringBlade", min = -4000f, max = 4000f)]
         [CollapseWith(5, 4)]
         public Vector2 GoringBladeBarPosition = new(0, -98);
-        
+
         [DragFloat2("Size" + "##GoringBlade", min = -4000f, max = 4000f)]
         [CollapseWith(10, 4)]
         public Vector2 GoringBladeBarSize = new(254, 20);
-        
+
         [ColorEdit4("Color" + "##GoringBlade")]
         [CollapseWith(15, 4)]
         public PluginConfigColor GoringBladeColor = new(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f));

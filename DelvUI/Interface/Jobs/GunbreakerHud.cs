@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.ClientState.Structs.JobGauge;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -6,8 +7,8 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -18,7 +19,7 @@ namespace DelvUI.Interface.Jobs
         private new GunbreakerConfig Config => (GunbreakerConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public GunbreakerHud(string id, GunbreakerConfig config, string displayName = null) : base(id, config, displayName)
+        public GunbreakerHud(string id, GunbreakerConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -43,7 +44,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowPowderGauge)
             {
@@ -52,7 +53,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowNoMercyBar)
             {
-                DrawNoMercyBar(origin);
+                DrawNoMercyBar(origin, player);
             }
         }
 
@@ -65,7 +66,7 @@ namespace DelvUI.Interface.Jobs
 
             builder.SetChunks(2)
                    .SetChunkPadding(Config.PowderGaugeSpacing)
-                   .AddInnerBar(gauge.NumAmmo, 2, Config.PowderGaugeFillColor, null)
+                   .AddInnerBar(gauge.Ammo, 2, Config.PowderGaugeFillColor, null)
                    .SetBackgroundColor(EmptyColor.Base);
 
             var drawList = ImGui.GetWindowDrawList();
@@ -73,17 +74,17 @@ namespace DelvUI.Interface.Jobs
         }
 
 
-        private void DrawNoMercyBar(Vector2 origin)
+        private void DrawNoMercyBar(Vector2 origin, PlayerCharacter player)
         {
             Vector2 position = origin + Config.Position + Config.NoMercyBarPosition - Config.NoMercyBarSize / 2f;
-            var noMercyBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1831);
+            var noMercyBuff = player.StatusList.Where(o => o.StatusId == 1831);
 
             var builder = BarBuilder.Create(position, Config.NoMercyBarSize)
                 .SetBackgroundColor(EmptyColor.Base);
 
             if (noMercyBuff.Any())
             {
-                var duration = noMercyBuff.First().Duration;
+                var duration = noMercyBuff.First().RemainingTime;
 
                 builder.AddInnerBar(duration, 20, Config.NoMercyFillColor, null)
                        .SetTextMode(BarTextMode.EachChunk)

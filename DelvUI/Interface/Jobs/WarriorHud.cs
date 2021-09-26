@@ -1,5 +1,6 @@
-﻿using Dalamud.Game.ClientState.Structs;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -9,6 +10,7 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -19,15 +21,15 @@ namespace DelvUI.Interface.Jobs
         private new WarriorConfig Config => (WarriorConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public WarriorHud(string id, WarriorConfig config, string displayName = null) : base(id, config, displayName)
+        public WarriorHud(string id, WarriorConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            List<Vector2> positions = new List<Vector2>();
-            List<Vector2> sizes = new List<Vector2>();
+            List<Vector2> positions = new();
+            List<Vector2> sizes = new();
 
             if (Config.ShowStormsEye)
             {
@@ -44,23 +46,23 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowStormsEye)
             {
-                DrawStormsEyeBar(origin);
+                DrawStormsEyeBar(origin, player);
             }
 
             if (Config.ShowBeastGauge)
             {
-                DrawBeastGauge(origin);
+                DrawBeastGauge(origin, player);
             }
         }
 
-        private void DrawStormsEyeBar(Vector2 origin)
+        private void DrawStormsEyeBar(Vector2 origin, PlayerCharacter player)
         {
-            IEnumerable<StatusEffect> innerReleaseBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1177);
-            IEnumerable<StatusEffect> stormsEyeBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
+            IEnumerable<Status>? innerReleaseBuff = player.StatusList.Where(o => o.StatusId is 1177 or 86);
+            IEnumerable<Status>? stormsEyeBuff = player.StatusList.Where(o => o.StatusId == 90);
 
             Vector2 position = origin + Config.Position + Config.StormsEyePosition - Config.StormsEyeSize / 2f;
 
@@ -72,12 +74,12 @@ namespace DelvUI.Interface.Jobs
 
             if (innerReleaseBuff.Any())
             {
-                duration = Math.Abs(innerReleaseBuff.First().Duration);
+                duration = Math.Abs(innerReleaseBuff.First().RemainingTime);
                 color = Config.InnerReleaseColor;
             }
             else if (stormsEyeBuff.Any())
             {
-                duration = Math.Abs(stormsEyeBuff.First().Duration);
+                duration = Math.Abs(stormsEyeBuff.First().RemainingTime);
                 maximum = 60f;
                 color = Config.StormsEyeColor;
             }
@@ -93,16 +95,16 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        private void DrawBeastGauge(Vector2 origin)
+        private void DrawBeastGauge(Vector2 origin, PlayerCharacter player)
         {
             WARGauge gauge = Plugin.JobGauges.Get<WARGauge>();
-            IEnumerable<StatusEffect> nascentChaosBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1897);
+            var nascentChaosBuff = player.StatusList.Where(o => o.StatusId == 1897);
 
             Vector2 position = origin + Config.Position + Config.BeastGaugePosition - Config.BeastGaugeSize / 2f;
 
             BarBuilder builder = BarBuilder.Create(position, Config.BeastGaugeSize)
                                            .SetChunks(2)
-                                           .AddInnerBar(gauge.BeastGaugeAmount, 100, Config.BeastGaugeFillColor)
+                                           .AddInnerBar(gauge.BeastGauge, 100, Config.BeastGaugeFillColor)
                                            .SetBackgroundColor(EmptyColor.Base)
                                            .SetChunkPadding(Config.BeastGaugePadding);
 
@@ -145,11 +147,11 @@ namespace DelvUI.Interface.Jobs
         [DragFloat2("Size" + "##StormsEye", min = 1f, max = 4000f)]
         [CollapseWith(10, 0)]
         public Vector2 StormsEyeSize = new(254, 20);
-        
+
         [ColorEdit4("Storm's Eye")]
         [CollapseWith(15, 0)]
         public PluginConfigColor StormsEyeColor = new(new Vector4(255f / 255f, 136f / 255f, 146f / 255f, 100f / 100f));
-        
+
         [ColorEdit4("Inner Release")]
         [CollapseWith(20, 0)]
         public PluginConfigColor InnerReleaseColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
@@ -158,7 +160,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Beast Gauge
-        [Checkbox("Beast Gauge",separator = true)]
+        [Checkbox("Beast Gauge", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowBeastGauge = true;
 

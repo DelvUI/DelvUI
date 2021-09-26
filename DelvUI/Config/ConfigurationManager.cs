@@ -1,4 +1,3 @@
-using Dalamud.Plugin;
 using DelvUI.Config.Tree;
 using DelvUI.Helpers;
 using DelvUI.Interface;
@@ -13,14 +12,17 @@ using System.IO;
 using System.IO.Compression;
 using System.Reflection;
 using System.Text;
+using Dalamud.Logging;
 
 namespace DelvUI.Config
 {
+    public delegate void ConfigurationManagerEventHandler(ConfigurationManager configurationManager);
+
     public class ConfigurationManager
     {
-        private static ConfigurationManager _instance;
+        private static ConfigurationManager _instance = null!;
 
-        public readonly TextureWrap BannerImage;
+        public readonly TextureWrap? BannerImage;
 
         public BaseNode ConfigBaseNode;
 
@@ -50,10 +52,7 @@ namespace DelvUI.Config
 
                 _lockHUD = value;
 
-                if (LockEvent != null)
-                {
-                    LockEvent(this, null);
-                }
+                LockEvent?.Invoke(this);
 
                 if (_lockHUD)
                 {
@@ -64,10 +63,16 @@ namespace DelvUI.Config
 
         public bool ShowHUD = true;
 
-        public event EventHandler ResetEvent;
-        public event EventHandler LockEvent;
+        public event ConfigurationManagerEventHandler? ResetEvent;
+        public event ConfigurationManagerEventHandler? LockEvent;
 
-        public ConfigurationManager(bool defaultConfig, TextureWrap bannerImage, string configDirectory, BaseNode configBaseNode, EventHandler resetEvent = null, EventHandler lockEvent = null)
+        public ConfigurationManager(
+            bool defaultConfig,
+            TextureWrap? bannerImage,
+            string configDirectory,
+            BaseNode configBaseNode,
+            ConfigurationManagerEventHandler? resetEvent = null,
+            ConfigurationManagerEventHandler? lockEvent = null)
         {
             BannerImage = bannerImage;
             ConfigDirectory = configDirectory;
@@ -82,10 +87,7 @@ namespace DelvUI.Config
             LockEvent = lockEvent;
 
             ResetEvent = resetEvent;
-            if (ResetEvent != null)
-            {
-                ResetEvent(this, null);
-            }
+            ResetEvent?.Invoke(this);
         }
 
 
@@ -159,11 +161,11 @@ namespace DelvUI.Config
             foreach (Type type in configObjectTypes)
             {
                 var genericMethod = node.GetType().GetMethod("GetOrAddConfig");
-                var method = genericMethod.MakeGenericMethod(type);
-                method.Invoke(node, null);
+                var method = genericMethod?.MakeGenericMethod(type);
+                method?.Invoke(node, null);
             }
 
-            TextureWrap banner = Plugin.bannerTexture;
+            TextureWrap? banner = Plugin.BannerTexture;
 
             var currentResetEvent = GetInstance()?.ResetEvent;
             var currentLockEvent = GetInstance()?.LockEvent;
@@ -194,12 +196,12 @@ namespace DelvUI.Config
 
         public PluginConfigObject GetConfigObjectForType(Type type)
         {
-            MethodInfo genericMethod = GetType().GetMethod("GetConfigObject");
-            MethodInfo method = genericMethod.MakeGenericMethod(type);
-            return (PluginConfigObject)method.Invoke(this, null);
+            MethodInfo? genericMethod = GetType().GetMethod("GetConfigObject");
+            MethodInfo? method = genericMethod?.MakeGenericMethod(type);
+            return (PluginConfigObject)method?.Invoke(this, null)!;
         }
-        public T GetConfigObject<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigObject<T>();
-        public ConfigPageNode GetConfigPageNode<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigPageNode<T>();
+        public T GetConfigObject<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigObject<T>()!;
+        public ConfigPageNode GetConfigPageNode<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigPageNode<T>()!;
 
         public static string CompressAndBase64Encode(string jsonString)
         {
@@ -249,9 +251,9 @@ namespace DelvUI.Config
         public static void LoadImportedConfiguration(string importString, ConfigPageNode configPageNode)
         {
             // see comments on ConfigPageNode's Load
-            MethodInfo methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
-            MethodInfo function = methodInfo.MakeGenericMethod(configPageNode.ConfigObject.GetType());
-            PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(GetInstance(), new object[] { importString });
+            MethodInfo? methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
+            MethodInfo? function = methodInfo?.MakeGenericMethod(configPageNode.ConfigObject.GetType());
+            PluginConfigObject? importedConfigObject = (PluginConfigObject?)function?.Invoke(GetInstance(), new object[] { importString });
 
             if (importedConfigObject != null)
             {
@@ -261,21 +263,22 @@ namespace DelvUI.Config
                 // but also update the dictionary
                 GetInstance().ConfigBaseNode.configPageNodesMap[configPageNode.ConfigObject.GetType()] = configPageNode;
                 GetInstance().SaveConfigurations();
-                _instance.ResetEvent(_instance, null);
+
+                _instance.ResetEvent?.Invoke(_instance);
             }
             else
             {
-                PluginLog.Log($"Could not load from import string (of type {importedConfigObject.GetType()})");
+                PluginLog.Log($"Could not load from import string (of type {configPageNode.ConfigObject.GetType()})");
             }
         }
 
         public static void LoadTotalConfiguration(string[] importStrings)
         {
             _instance.ConfigBaseNode.LoadBase64String(importStrings);
-            _instance.ResetEvent(_instance, null);
+            _instance.ResetEvent?.Invoke(_instance);
         }
 
-        public static T LoadImportString<T>(string importString) where T : PluginConfigObject
+        public static T? LoadImportString<T>(string importString) where T : PluginConfigObject
         {
             try
             {

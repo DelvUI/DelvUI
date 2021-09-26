@@ -1,10 +1,10 @@
-﻿using Dalamud.Data.LuminaExtensions;
-using ImGuiScene;
+﻿using ImGuiScene;
 using Lumina.Data.Files;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
+using Dalamud.Utility;
 using Action = Lumina.Excel.GeneratedSheets.Action;
 
 namespace DelvUI.Helpers
@@ -20,14 +20,14 @@ namespace DelvUI.Helpers
             [typeof(Companion)] = new Dictionary<uint, TextureWrap>()
         };
 
-        public TextureWrap GetTexture<T>(uint rowId, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
+        public TextureWrap? GetTexture<T>(uint rowId, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
         {
             var sheet = Plugin.DataManager.GetExcelSheet<T>();
 
             return sheet == null ? null : GetTexture<T>(sheet.GetRow(rowId), stackCount, hdIcon);
         }
 
-        public TextureWrap GetTexture<T>(dynamic row, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
+        public TextureWrap? GetTexture<T>(dynamic? row, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
         {
             if (row == null)
             {
@@ -39,7 +39,7 @@ namespace DelvUI.Helpers
             return iconId == null ? null : (TextureWrap)GetTextureFromIconId<T>(iconId, stackCount, hdIcon);
         }
 
-        public TextureWrap GetTextureFromIconId<T>(uint iconId, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
+        public TextureWrap? GetTextureFromIconId<T>(uint iconId, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
         {
             if (_cache.TryGetValue(typeof(T), out var map))
             {
@@ -69,7 +69,7 @@ namespace DelvUI.Helpers
             return newTexture;
         }
 
-        private TexFile LoadIcon(uint id, bool hdIcon)
+        private TexFile? LoadIcon(uint id, bool hdIcon)
         {
             var hdString = hdIcon ? "_hr1" : "";
             var path = $"ui/icon/{id / 1000 * 1000:000000}/{id:000000}{hdString}.tex";
@@ -89,7 +89,7 @@ namespace DelvUI.Helpers
             RemoveTexture<T>(sheet.GetRow(rowId));
         }
 
-        public void RemoveTexture<T>(dynamic row) where T : ExcelRow
+        public void RemoveTexture<T>(dynamic? row) where T : ExcelRow
         {
             if (row == null)
             {
@@ -119,7 +119,7 @@ namespace DelvUI.Helpers
 
         public static void Initialize() { Instance = new TexturesCache(); }
 
-        public static TexturesCache Instance { get; private set; }
+        public static TexturesCache Instance { get; private set; } = null!;
 
         #endregion
     }

@@ -1,4 +1,23 @@
-﻿using System;
+﻿/*
+Copyright(c) 2021 Ottermandias (https://github.com/Ottermandias/GatherBuddy)
+Modifications Copyright(c) 2021 DelvUI
+09/12/2021 - Extracted code to send chat messages and commands.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+using System;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -13,17 +32,17 @@ namespace DelvUI.Helpers
             IntPtr uiModule = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 83 7F ?? 00 48 8B F0");
 
             UiModuleDelegate uiModuleDelegate = Marshal.GetDelegateForFunctionPointer<UiModuleDelegate>(uiModule);
-            _uiModulePtr = (IntPtr)uiModuleDelegate.DynamicInvoke(Marshal.ReadIntPtr(baseUi));
+            _uiModulePtr = (IntPtr?)uiModuleDelegate.DynamicInvoke(Marshal.ReadIntPtr(baseUi));
 
             _chatModulePtr = Plugin.SigScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9");
         }
 
         public static void Initialize() { Instance = new ChatHelper(); }
 
-        public static ChatHelper Instance { get; private set; }
+        public static ChatHelper Instance { get; private set; } = null!;
         #endregion
 
-        private IntPtr _uiModulePtr;
+        private IntPtr? _uiModulePtr;
         private IntPtr _chatModulePtr;
 
         public static void SendChatMessage(string message)
@@ -49,7 +68,7 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            if (_uiModulePtr == IntPtr.Zero || _chatModulePtr == IntPtr.Zero)
+            if (!_uiModulePtr.HasValue || _uiModulePtr == IntPtr.Zero || _chatModulePtr == IntPtr.Zero)
             {
                 return;
             }
@@ -59,7 +78,7 @@ namespace DelvUI.Helpers
             var payload = MessagePayload(text, length);
 
             ChatDelegate chatDelegate = Marshal.GetDelegateForFunctionPointer<ChatDelegate>(_chatModulePtr);
-            chatDelegate.Invoke(_uiModulePtr, payload, IntPtr.Zero, (byte)0);
+            chatDelegate.Invoke(_uiModulePtr.Value, payload, IntPtr.Zero, (byte)0);
 
             Marshal.FreeHGlobal(payload);
             Marshal.FreeHGlobal(text);

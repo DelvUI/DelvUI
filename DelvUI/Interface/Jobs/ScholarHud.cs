@@ -1,6 +1,6 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -10,9 +10,9 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -20,7 +20,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new ScholarConfig Config => (ScholarConfig)_config;
 
-        public ScholarHud(string id, ScholarConfig config, string displayName = null) : base(id, config, displayName)
+        public ScholarHud(string id, ScholarConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -53,7 +53,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowFairy)
             {
@@ -62,18 +62,18 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowBio)
             {
-                DrawBioBar(origin);
+                DrawBioBar(origin, player);
             }
 
             if (Config.ShowAether)
             {
-                DrawAetherBar(origin);
+                DrawAetherBar(origin, player);
             }
         }
 
         private void DrawFairyBar(Vector2 origin)
         {
-            float fairyGauge = Plugin.JobGauges.Get<SCHGauge>().FairyGaugeAmount;
+            float fairyGauge = Plugin.JobGauges.Get<SCHGauge>().FairyGauge;
             float seraphTimer = Plugin.JobGauges.Get<SCHGauge>().SeraphTimer;
             float seraphDuration = Math.Abs(seraphTimer / 1000);
 
@@ -112,9 +112,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawAetherBar(Vector2 origin)
+        private void DrawAetherBar(Vector2 origin, PlayerCharacter player)
         {
-            StatusEffect aetherFlowBuff = Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 304);
+            var aetherFlowBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 304);
             Vector2 barSize = Config.AetherSize;
             Vector2 position = origin + Config.Position + Config.AetherPosition - barSize / 2f;
 
@@ -126,7 +126,7 @@ namespace DelvUI.Interface.Jobs
             Bar bar = BarBuilder.Create(position, barSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.AetherPadding)
-                                .AddInnerBar(aetherFlowBuff.StackCount, 3, Config.AetherColor)
+                                .AddInnerBar(aetherFlowBuff?.StackCount ?? 0, 3, Config.AetherColor)
                                 .SetBackgroundColor(EmptyColor.Background)
                                 .Build();
 
@@ -134,21 +134,21 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawBioBar(Vector2 origin)
+        private void DrawBioBar(Vector2 origin, PlayerCharacter player)
         {
-            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
             float bioDuration = 0;
 
-            if (target is Chara)
+            if (actor is BattleChara target)
             {
-                StatusEffect bio = target.StatusEffects.FirstOrDefault(
-                    o => o.EffectId == 179 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
-                      || o.EffectId == 189 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
-                      || o.EffectId == 1895 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+                var bio = target.StatusList.FirstOrDefault(
+                    o => o.StatusId == 179 && o.SourceID == player.ObjectId
+                      || o.StatusId == 189 && o.SourceID == player.ObjectId
+                      || o.StatusId == 1895 && o.SourceID == player.ObjectId
                 );
 
-                bioDuration = Math.Abs(bio.Duration);
+                bioDuration = Math.Abs(bio?.RemainingTime ?? 0f);
             }
 
             PluginConfigColor bioColor = bioDuration > 5 ? Config.BioColor : Config.ExpireColor;
@@ -188,14 +188,14 @@ namespace DelvUI.Interface.Jobs
         }
 
         #region aether
-        [Checkbox("Aether" + "##Aether",separator = true)]
+        [Checkbox("Aether" + "##Aether", separator = true)]
         [CollapseControl(30, 1)]
         public bool ShowAether = true;
-        
+
         [DragFloat2("Position" + "##Aether", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
         public Vector2 AetherPosition = new(0, -76);
-        
+
         [DragFloat2("Size" + "##Aether", min = 1f, max = 2000f)]
         [CollapseWith(10, 1)]
         public Vector2 AetherSize = new(254, 20);
@@ -210,7 +210,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region fairy
-        [Checkbox("Fairy Gauge" + "##Fairy",separator = true)]
+        [Checkbox("Fairy Gauge" + "##Fairy", separator = true)]
         [CollapseControl(35, 2)]
         public bool ShowFairy = true;
 
@@ -231,23 +231,23 @@ namespace DelvUI.Interface.Jobs
         [ColorEdit4("Color" + "##Fairy")]
         [CollapseWith(25, 2)]
         public PluginConfigColor FairyColor = new(new Vector4(69f / 255f, 199 / 255f, 164f / 255f, 100f / 100f));
-        
+
         [Checkbox("Seraph" + "##Seraph", spacing = true)]
         [CollapseWith(30, 2)]
         public bool ShowSeraph = true;
         //TODO NOT ASSIGNED? ^
-        
+
         [Checkbox("Timer" + "##Seraph")]
         [CollapseWith(35, 2)]
         public bool ShowSeraphText = true;
-        
+
         [ColorEdit4("Color" + "##SeraphColor")]
         [CollapseWith(40, 2)]
         public PluginConfigColor SeraphColor = new(new Vector4(232f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         #region bio
-        [Checkbox("Bio" + "##Bio",separator = true)]
+        [Checkbox("Bio" + "##Bio", separator = true)]
         [CollapseControl(40, 3)]
         public bool ShowBio = true;
 
@@ -262,20 +262,20 @@ namespace DelvUI.Interface.Jobs
         [DragFloat2("Position" + "##Bio", min = -4000f, max = 4000f)]
         [CollapseWith(10, 3)]
         public Vector2 BioPosition = new(0, -32);
-        
+
         [DragFloat2("Size" + "##Bio", max = 2000f)]
         [CollapseWith(15, 3)]
         public Vector2 BioSize = new(254, 20);
-        
+
         [ColorEdit4("Color" + "##Bio")]
         [CollapseWith(20, 3)]
         public PluginConfigColor BioColor = new(new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 1f));
-        
+
         [ColorEdit4("Expire Color" + "##Bio")]
         [CollapseWith(25, 3)]
         public PluginConfigColor ExpireColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
         #endregion
 
-        
+
     }
 }

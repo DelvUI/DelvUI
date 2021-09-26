@@ -8,7 +8,7 @@ namespace DelvUI.Helpers
 {
     public static class DraggablesHelper
     {
-        public static void DrawGrid(GridConfig config, MovablePluginConfigObject selectedElementConfig)
+        public static void DrawGrid(GridConfig config, MovablePluginConfigObject? selectedElementConfig)
         {
             ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
@@ -155,8 +155,10 @@ namespace DelvUI.Helpers
 
             if (!ImGui.Begin("Grid", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
             {
+                ImGui.End();
                 return;
             }
+            ImGui.PopStyleColor();
 
             var changed = false;
             node.Draw(ref changed);

@@ -12,6 +12,8 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface
 {
@@ -19,22 +21,22 @@ namespace DelvUI.Interface
     {
         private Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
 
-        private GridConfig _gridConfig;
-        private DraggableHudElement _selectedElement = null;
+        private GridConfig? _gridConfig;
+        private DraggableHudElement? _selectedElement = null;
 
-        private List<DraggableHudElement> _hudElements;
-        private List<IHudElementWithActor> _hudElementsUsingPlayer;
-        private List<IHudElementWithActor> _hudElementsUsingTarget;
-        private List<IHudElementWithActor> _hudElementsUsingTargetOfTarget;
-        private List<IHudElementWithActor> _hudElementsUsingFocusTarget;
+        private List<DraggableHudElement> _hudElements = null!;
+        private List<IHudElementWithActor> _hudElementsUsingPlayer = null!;
+        private List<IHudElementWithActor> _hudElementsUsingTarget = null!;
+        private List<IHudElementWithActor> _hudElementsUsingTargetOfTarget = null!;
+        private List<IHudElementWithActor> _hudElementsUsingFocusTarget = null!;
 
-        private CustomEffectsListHud _customEffectsHud;
-        private PrimaryResourceHud _primaryResourceHud;
-        private JobHud _jobHud = null;
-        private Dictionary<uint, JobHudTypes> _jobsMap;
-        private Dictionary<uint, Type> _unsupportedJobsMap;
+        private CustomEffectsListHud _customEffectsHud = null!;
+        private PrimaryResourceHud _primaryResourceHud = null!;
+        private JobHud? _jobHud = null;
+        private Dictionary<uint, JobHudTypes> _jobsMap = null!;
+        private Dictionary<uint, Type> _unsupportedJobsMap = null!;
 
-        private HudHelper _helper { get; set; }
+        private HudHelper? _helper { get; set; }
         private bool _prevInEvent = true;
 
         public HudManager()
@@ -56,15 +58,15 @@ namespace DelvUI.Interface
             _hudElementsUsingFocusTarget.Clear();
         }
 
-        private void OnConfigReset(object sender, EventArgs e)
+        private void OnConfigReset(ConfigurationManager sender)
         {
             CreateHudElements();
             _jobHud = null;
         }
 
-        private void OnHUDLockChanged(object sender, EventArgs e)
+        private void OnHUDLockChanged(ConfigurationManager sender)
         {
-            var draggingEnabled = !ConfigurationManager.GetInstance().LockHUD;
+            var draggingEnabled = !sender.LockHUD;
 
             foreach (var element in _hudElements)
             {
@@ -80,7 +82,7 @@ namespace DelvUI.Interface
             _selectedElement = null;
         }
 
-        private void OnDraggableElementSelected(object sender, EventArgs e)
+        private void OnDraggableElementSelected(DraggableHudElement sender)
         {
             foreach (var element in _hudElements)
             {
@@ -92,7 +94,7 @@ namespace DelvUI.Interface
                 _jobHud.Selected = _jobHud == sender;
             }
 
-            _selectedElement = (DraggableHudElement)sender;
+            _selectedElement = sender;
         }
 
         private void CreateHudElements()
@@ -237,6 +239,7 @@ namespace DelvUI.Interface
 
             if (!begin)
             {
+                ImGui.End();
                 return;
             }
 
@@ -253,7 +256,7 @@ namespace DelvUI.Interface
             AssignActors();
 
             // grid
-            if (_gridConfig.Enabled)
+            if (_gridConfig is not null && _gridConfig.Enabled)
             {
                 DraggablesHelper.DrawGrid(_gridConfig, _selectedElement?.GetConfig());
             }
@@ -298,35 +301,44 @@ namespace DelvUI.Interface
                 return false;
             }
 
-            var parameterWidget = (AtkUnitBase*)Plugin.GameGui.GetUiObjectByName("_ParameterWidget", 1);
-            var fadeMiddleWidget = (AtkUnitBase*)Plugin.GameGui.GetUiObjectByName("FadeMiddle", 1);
+            var parameterWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_ParameterWidget", 1);
+            var fadeMiddleWidget = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("FadeMiddle", 1);
 
-            return parameterWidget->IsVisible && !fadeMiddleWidget->IsVisible;
+            var paramenterVisible = parameterWidget != null && parameterWidget->IsVisible;
+            var fadeMiddleVisible = fadeMiddleWidget != null && fadeMiddleWidget->IsVisible;
+
+            return paramenterVisible && !fadeMiddleVisible;
         }
 
         private void UpdateJob()
         {
-            var newJobId = Plugin.ClientState.LocalPlayer.ClassJob.Id;
+            var player = Plugin.ClientState.LocalPlayer;
+            if (player is null)
+            {
+                return;
+            }
+
+            var newJobId = player.ClassJob.Id;
             if (_jobHud != null && _jobHud.Config.JobId == newJobId)
             {
                 _primaryResourceHud.ResourceType = _jobHud.Config.UseDefaultPrimaryResourceBar ? _jobHud.Config.PrimaryResourceType : PrimaryResourceTypes.None;
                 return;
             }
 
-            JobConfig config = null;
+            JobConfig? config = null;
 
             // unsupported jobs
             if (_unsupportedJobsMap.ContainsKey(newJobId) && _unsupportedJobsMap.TryGetValue(newJobId, out var type))
             {
-                config = (JobConfig)Activator.CreateInstance(type);
-                _jobHud = new JobHud(type.FullName, config);
+                config = (JobConfig)Activator.CreateInstance(type)!;
+                _jobHud = new JobHud(type.FullName!, config);
             }
 
             // supported jobs
             if (_jobsMap.TryGetValue(newJobId, out var types))
             {
                 config = (JobConfig)ConfigurationManager.GetInstance().GetConfigObjectForType(types.ConfigType);
-                _jobHud = (JobHud)Activator.CreateInstance(types.HudType, types.HudType.FullName, config, types.DisplayName);
+                _jobHud = (JobHud)Activator.CreateInstance(types.HudType, types.HudType.FullName, config, types.DisplayName)!;
                 _jobHud.SelectEvent += OnDraggableElementSelected;
             }
 
@@ -338,8 +350,6 @@ namespace DelvUI.Interface
 
         private void AssignActors()
         {
-            var pluginInterface = Plugin.PluginInterface;
-
             // player
             var player = Plugin.ClientState.LocalPlayer;
             foreach (var element in _hudElementsUsingPlayer)
@@ -353,7 +363,7 @@ namespace DelvUI.Interface
             }
 
             // target
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             foreach (var element in _hudElementsUsingTarget)
             {
                 element.Actor = target;

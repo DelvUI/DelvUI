@@ -1,5 +1,4 @@
-﻿using Dalamud.Game.ClientState.Structs.JobGauge;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
@@ -8,8 +7,12 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -18,7 +21,7 @@ namespace DelvUI.Interface.Jobs
         private new BlackMageConfig Config => (BlackMageConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public BlackMageHud(string id, BlackMageConfig config, string displayName = null) : base(id, config, displayName)
+        public BlackMageHud(string id, BlackMageConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -52,10 +55,16 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.TriplecastSize);
             }
 
-            if (Config.ShowProcs)
+            if (Config.AlwaysShowFirestarterProcs)
             {
-                positions.Add(Config.Position + Config.ProcsBarPosition);
-                sizes.Add(Config.ProcsBarSize);
+                positions.Add(Config.Position + Config.FirestarterBarPosition);
+                sizes.Add(Config.FirestarterBarSize);
+            }
+
+            if (Config.AlwaysShowFirestarterProcs)
+            {
+                positions.Add(Config.Position + Config.ThundercloudBarPosition);
+                sizes.Add(Config.ThundercloudBarSize);
             }
 
             if (Config.ShowDotBar)
@@ -67,11 +76,11 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowManaBar)
             {
-                DrawManaBar(origin);
+                DrawManaBar(origin, player);
             }
 
             if (Config.ShowUmbralHeart)
@@ -86,35 +95,39 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowTriplecast)
             {
-                DrawTripleCast(origin);
+                DrawTripleCast(origin, player);
             }
 
-            if (Config.ShowProcs)
+            if (Config.ShowFirestarterProcs)
             {
-                DrawProcs(origin);
+                DrawFirestarterProcs(origin, player);
+            }
+
+            if (Config.ShowThundercloudProcs)
+            {
+                DrawThundercloudProcs(origin, player);
             }
 
             if (Config.ShowDotBar)
             {
-                DrawDotTimer(origin);
+                DrawDotTimer(origin, player);
             }
         }
 
-        protected virtual void DrawManaBar(Vector2 origin)
+        protected void DrawManaBar(Vector2 origin, PlayerCharacter player)
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
-            var actor = Plugin.ClientState.LocalPlayer;
 
             var position = origin + Config.Position + Config.ManaBarPosition - Config.ManaBarSize / 2f;
 
-            var color = gauge.InAstralFire() ? Config.ManaBarFireColor : gauge.InUmbralIce() ? Config.ManaBarIceColor : Config.ManaBarNoElementColor;
+            var color = gauge.InAstralFire ? Config.ManaBarFireColor : gauge.InUmbralIce ? Config.ManaBarIceColor : Config.ManaBarNoElementColor;
 
             var builder = BarBuilder.Create(position, Config.ManaBarSize)
-                .AddInnerBar(actor.CurrentMp, actor.MaxMp, color)
+                .AddInnerBar(player.CurrentMp, player.MaxMp, color)
                 .SetBackgroundColor(EmptyColor.Base);
 
             // element timer
-            if (gauge.InAstralFire() || gauge.InUmbralIce())
+            if (gauge.InAstralFire || gauge.InUmbralIce)
             {
                 var time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000 + 1 : 0;
                 builder.SetTextMode(BarTextMode.Single);
@@ -122,7 +135,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             // enochian
-            if (gauge.IsEnoActive())
+            if (gauge.IsEnochianActive)
             {
                 builder.SetGlowSize(2);
                 builder.SetGlowColor(0x88FFFFFF);
@@ -132,7 +145,7 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
 
             // threshold marker
-            if (Config.ShowManaThresholdMarker && gauge.InAstralFire())
+            if (Config.ShowManaThresholdMarker && gauge.InAstralFire)
             {
                 var pos = new Vector2(
                     position.X + Config.ManaThresholdValue / 10000f * Config.ManaBarSize.X,
@@ -153,7 +166,7 @@ namespace DelvUI.Interface.Jobs
             // mana
             if (Config.ShowManaValue)
             {
-                var text = $"{actor.CurrentMp,0}";
+                var text = $"{player.CurrentMp,0}";
                 var textSize = ImGui.CalcTextSize(text);
                 var textPos = new Vector2(
                     position.X + 2,
@@ -163,16 +176,15 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        protected virtual void DrawUmbralHeartStacks(Vector2 origin)
+        protected void DrawUmbralHeartStacks(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
-
             var position = origin + Config.Position + Config.UmbralHeartPosition - Config.UmbralHeartSize / 2f;
 
             var bar = BarBuilder.Create(position, Config.UmbralHeartSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.UmbralHeartPadding)
-                                .AddInnerBar(gauge.NumUmbralHearts, 3, Config.UmbralHeartColor, EmptyColor)
+                                .AddInnerBar(gauge.UmbralHearts, 3, Config.UmbralHeartColor, EmptyColor)
                                 .SetBackgroundColor(EmptyColor.Base)
                                 .Build();
 
@@ -180,7 +192,7 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        protected virtual void DrawPolyglot(Vector2 origin)
+        protected void DrawPolyglot(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
 
@@ -189,15 +201,15 @@ namespace DelvUI.Interface.Jobs
             var barWidth = (int)(Config.PolyglotSize.X - Config.PolyglotPadding) / 2;
             var barSize = new Vector2(barWidth, Config.PolyglotSize.Y);
 
-            var scale = 1 - (gauge.IsEnoActive() ? gauge.TimeUntilNextPolyglot / 30000f : 1);
+            var scale = 1 - (gauge.IsEnochianActive ? gauge.EnochianTimer / 30000f : 1);
             var drawList = ImGui.GetWindowDrawList();
 
             // 1
             var builder = BarBuilder.Create(position, barSize)
-                                    .AddInnerBar(gauge.NumPolyglotStacks < 1 ? scale : 1, 1, Config.PolyglotColor)
+                                    .AddInnerBar(gauge.PolyglotStacks < 1 ? scale : 1, 1, Config.PolyglotColor)
                                     .SetBackgroundColor(EmptyColor.Base);
 
-            if (gauge.NumPolyglotStacks >= 1)
+            if (gauge.PolyglotStacks >= 1)
             {
                 builder.SetGlowColor(0x88FFFFFF);
             }
@@ -207,10 +219,10 @@ namespace DelvUI.Interface.Jobs
             // 2
             position.X += barWidth + Config.PolyglotPadding;
             builder = BarBuilder.Create(position, barSize)
-                                .AddInnerBar(gauge.NumPolyglotStacks == 1 ? scale : gauge.NumPolyglotStacks == 0 ? 0 : 1, 1, Config.PolyglotColor)
+                                .AddInnerBar(gauge.PolyglotStacks == 1 ? scale : gauge.PolyglotStacks == 0 ? 0 : 1, 1, Config.PolyglotColor)
                                 .SetBackgroundColor(EmptyColor.Base);
 
-            if (gauge.NumPolyglotStacks == 2)
+            if (gauge.PolyglotStacks == 2)
             {
                 builder.SetGlowColor(0x88FFFFFF);
             }
@@ -218,16 +230,16 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        protected virtual void DrawTripleCast(Vector2 origin)
+        protected void DrawTripleCast(Vector2 origin, PlayerCharacter player)
         {
-            var tripleStackBuff = Plugin.ClientState.LocalPlayer.StatusEffects.FirstOrDefault(o => o.EffectId == 1211);
+            var tripleStackBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 1211);
 
             var position = origin + Config.Position + Config.TriplecastPosition - Config.TriplecastSize / 2f;
 
             var bar = BarBuilder.Create(position, Config.TriplecastSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.TriplecastPadding)
-                                .AddInnerBar(tripleStackBuff.StackCount, 3, Config.TriplecastColor, EmptyColor)
+                                .AddInnerBar(tripleStackBuff?.StackCount ?? 0, 3, Config.TriplecastColor, EmptyColor)
                                 .SetBackgroundColor(EmptyColor.Base)
                                 .Build();
 
@@ -235,52 +247,72 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        protected virtual void DrawProcs(Vector2 origin)
+        protected void DrawFirestarterProcs(Vector2 origin, PlayerCharacter player)
         {
-            var statusEffects = Plugin.ClientState.LocalPlayer.StatusEffects;
-            var firestarterTimer = Config.ShowFirestarterProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 165).Duration) : 0;
-            var thundercloudTimer = Config.ShowThundercloudProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.EffectId == 164).Duration) : 0;
+            var statusEffects = player.StatusList;
+            var firestarterTimer = Config.ShowFirestarterProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.StatusId == 165)?.RemainingTime ?? 0f) : 0;
 
-            var position = origin + Config.Position + Config.ProcsBarPosition - Config.ProcsBarSize / 2f;
+            DrawProc(
+                origin,
+                Config.FirestarterBarPosition,
+                Config.FirestarterBarSize,
+                firestarterTimer,
+                18f,
+                Config.InvertFirestarterBar,
+                Config.AlwaysShowFirestarterProcs,
+                Config.FirestarterColor
+            );
+        }
 
-            var builder = BarBuilder.Create(position, Config.ProcsBarSize);
+        protected void DrawThundercloudProcs(Vector2 origin, PlayerCharacter player)
+        {
+            var statusEffects = player.StatusList;
+            var thundercloudTimer = Config.ShowThundercloudProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.StatusId == 164)?.RemainingTime ?? 0f) : 0;
 
-            // fire starter
-            if (Config.ShowFirestarterProcs)
+            DrawProc(
+                origin,
+                Config.ThundercloudBarPosition,
+                Config.ThundercloudBarSize,
+                thundercloudTimer,
+                18f,
+                Config.InvertThundercloudBar,
+                Config.AlwaysShowThundercloudProcs,
+                Config.ThundercloudColor
+            );
+        }
+
+        protected void DrawProc(Vector2 origin, Vector2 position, Vector2 size, float timer, float maxDuration, bool invert, bool alwayShow, PluginConfigColor color)
+        {
+            if (timer == 0 && !alwayShow)
             {
-                var scale = firestarterTimer / 18f;
-                builder.AddInnerBar(firestarterTimer, 18f, Config.FirestarterColor);
-                builder.SetFlipDrainDirection(Config.InvertProcsBar);
+                return;
             }
 
-            // thundercloud
-            if (Config.ShowThundercloudProcs)
-            {
-                var scale = thundercloudTimer / 18f;
-                builder.AddInnerBar(thundercloudTimer, 18f, Config.ThundercloudColor);
-                builder.SetFlipDrainDirection(Config.InvertProcsBar);
-            }
+            var pos = origin + Config.Position + position - size / 2f;
+
+            var builder = BarBuilder.Create(pos, size)
+                .AddInnerBar(timer, 18f, color)
+                .SetFlipDrainDirection(invert);
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
         }
 
-        protected virtual void DrawDotTimer(Vector2 origin)
+        protected void DrawDotTimer(Vector2 origin, PlayerCharacter player)
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float timer = 0;
             float maxDuration = 1;
 
-            if (target != null)
+            if (actor is BattleChara target)
             {
                 // thunder 1 to 4
                 int[] dotIDs = { 161, 162, 163, 1210 };
                 float[] dotDurations = { 12, 18, 24, 18 };
-                var player = Plugin.ClientState.LocalPlayer;
 
                 for (var i = 0; i < 4; i++)
                 {
-                    timer = target.StatusEffects.FirstOrDefault(o => o.EffectId == dotIDs[i] && o.OwnerId == player.ActorId).Duration;
+                    timer = target.StatusList.FirstOrDefault(o => o.StatusId == dotIDs[i] && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
 
                     if (timer > 0)
                     {
@@ -414,59 +446,77 @@ namespace DelvUI.Interface.Jobs
         public PluginConfigColor PolyglotColor = new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
         #endregion
 
-        #region procs
-        [Checkbox("Show Procs", separator = true)]
+        #region firestarter
+        [Checkbox("Show Firestarter Proc", separator = true)]
         [CollapseControl(50, 4)]
-        public bool ShowProcs = true;
-
-        [Checkbox("Show Firestarter Procs")]
-        [CollapseWith(0, 4)]
         public bool ShowFirestarterProcs = true;
 
-        [Checkbox("Show Thundercloud Procs")]
+        [Checkbox("Always Show ##Firestarter")]
+        [CollapseWith(0, 4)]
+        public bool AlwaysShowFirestarterProcs = true;
+
+        [DragFloat2("Position ##Firestarter", min = -2000, max = 2000f)]
         [CollapseWith(5, 4)]
+        public Vector2 FirestarterBarPosition = new Vector2(-74, -72);
+
+        [DragFloat2("Size ##Firestarter", max = 2000f)]
+        [CollapseWith(10, 4)]
+        public Vector2 FirestarterBarSize = new Vector2(106, 8);
+
+        [Checkbox("Invert ##Firestarter")]
+        [CollapseWith(15, 4)]
+        public bool InvertFirestarterBar = true;
+
+        [ColorEdit4("Color ##Firestarter")]
+        [CollapseWith(20, 4)]
+        public PluginConfigColor FirestarterColor = new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f));
+        #endregion
+
+        #region thundercloud
+        [Checkbox("Show Thundercloud Proc", separator = true)]
+        [CollapseControl(55, 5)]
         public bool ShowThundercloudProcs = true;
 
-        [Checkbox("Invert Procs Bar")]
-        [CollapseWith(10, 4)]
-        public bool InvertProcsBar = true;
+        [Checkbox("Always Show ##Thundercloud")]
+        [CollapseWith(0, 5)]
+        public bool AlwaysShowThundercloudProcs = true;
 
-        [DragFloat2("Procs Bar Position", min = -2000, max = 2000f)]
-        [CollapseWith(15, 4)]
-        public Vector2 ProcsBarPosition = new Vector2(-74, -67);
+        [DragFloat2("Position ##Thundercloud", min = -2000, max = 2000f)]
+        [CollapseWith(5, 5)]
+        public Vector2 ThundercloudBarPosition = new Vector2(-74, -62);
 
-        [DragFloat2("Procs Bar Size", max = 2000f)]
-        [CollapseWith(20, 4)]
-        public Vector2 ProcsBarSize = new Vector2(106, 18);
+        [DragFloat2("Size ##Thundercloud", max = 2000f)]
+        [CollapseWith(10, 5)]
+        public Vector2 ThundercloudBarSize = new Vector2(106, 8);
 
-        [ColorEdit4("Firestarter Color")]
-        [CollapseWith(25, 4)]
-        public PluginConfigColor FirestarterColor = new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f));
+        [Checkbox("Invert ##Thundercloud")]
+        [CollapseWith(15, 5)]
+        public bool InvertThundercloudBar = true;
 
-        [ColorEdit4("Thundercloud Color")]
-        [CollapseWith(30, 4)]
+        [ColorEdit4("Color ##Thundercloud")]
+        [CollapseWith(20, 5)]
         public PluginConfigColor ThundercloudColor = new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f));
         #endregion
 
         #region thunder dots
         [Checkbox("Show DoT Bar", separator = true)]
-        [CollapseControl(55, 5)]
+        [CollapseControl(55, 6)]
         public bool ShowDotBar = true;
 
         [Checkbox("Invert DoT Bar")]
-        [CollapseWith(0, 5)]
+        [CollapseWith(0, 6)]
         public bool InvertDoTBar = false;
 
         [DragFloat2("DoT Bar Position", min = -2000, max = 2000f)]
-        [CollapseWith(5, 5)]
+        [CollapseWith(5, 6)]
         public Vector2 DoTBarPosition = new Vector2(74, -67);
 
         [DragFloat2("DoT Bar Size", max = 2000f)]
-        [CollapseWith(10, 5)]
+        [CollapseWith(10, 6)]
         public Vector2 DoTBarSize = new Vector2(106, 18);
 
         [ColorEdit4("DoT Color")]
-        [CollapseWith(15, 5)]
+        [CollapseWith(15, 6)]
         public PluginConfigColor DotColor = new PluginConfigColor(new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f));
         #endregion
     }

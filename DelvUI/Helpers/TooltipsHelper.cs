@@ -17,7 +17,7 @@ namespace DelvUI.Helpers
 
         public static void Initialize() { Instance = new TooltipsHelper(); }
 
-        public static TooltipsHelper Instance { get; private set; }
+        public static TooltipsHelper Instance { get; private set; } = null!;
 
         #endregion
 
@@ -26,21 +26,21 @@ namespace DelvUI.Helpers
 
         private TooltipsConfig _config;
 
-        private string _currentTooltipText = null;
+        private string? _currentTooltipText = null;
         private Vector2 _textSize;
-        private string _currentTooltipTitle = null;
+        private string? _currentTooltipTitle = null;
         private Vector2 _titleSize;
-        private string _previousRawText = null;
+        private string? _previousRawText = null;
 
         private Vector2 _position;
         private Vector2 _size;
 
-        public void ShowTooltipOnCursor(string text, string title = null)
+        public void ShowTooltipOnCursor(string text, string? title = null)
         {
             ShowTooltip(text, ImGui.GetMousePos(), title);
         }
 
-        public void ShowTooltip(string text, Vector2 position, string title = null)
+        public void ShowTooltip(string text, Vector2 position, string? title = null)
         {
             if (text == null)
             {

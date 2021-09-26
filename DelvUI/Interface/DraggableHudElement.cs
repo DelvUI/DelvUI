@@ -8,14 +8,16 @@ using System.Numerics;
 
 namespace DelvUI.Interface
 {
+    public delegate void DraggableHudElementSelectHandler(DraggableHudElement element);
+
     public class DraggableHudElement : HudElement
     {
-        public DraggableHudElement(string id, MovablePluginConfigObject config, string displayName = null) : base(id, config)
+        public DraggableHudElement(string id, MovablePluginConfigObject config, string? displayName = null) : base(id, config)
         {
             _displayName = displayName ?? id;
         }
 
-        public event EventHandler SelectEvent;
+        public event DraggableHudElementSelectHandler? SelectEvent;
         public bool Selected = false;
 
         private string _displayName;
@@ -80,13 +82,12 @@ namespace DelvUI.Interface
             if (ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
             {
                 bool cliked = ImGui.IsMouseClicked(ImGuiMouseButton.Left) || ImGui.IsMouseDown(ImGuiMouseButton.Left);
-                if (cliked && !Selected && SelectEvent != null)
+                if (cliked && !Selected)
                 {
-                    SelectEvent(this, null);
+                    SelectEvent?.Invoke(this);
                 }
 
                 // tooltip
-
                 TooltipsHelper.Instance.ShowTooltipOnCursor(tooltipText);
             }
 

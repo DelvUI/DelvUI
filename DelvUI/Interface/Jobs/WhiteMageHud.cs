@@ -1,6 +1,10 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Structs;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+﻿using System;
+using System.Diagnostics;
+using System.Globalization;
+using System.Linq;
+using System.Numerics;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -8,12 +12,8 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Numerics;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -23,15 +23,15 @@ namespace DelvUI.Interface.Jobs
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
-        public WhiteMageHud(string id, WhiteMageConfig config, string displayName = null) : base(id, config, displayName)
+        public WhiteMageHud(string id, WhiteMageConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            List<Vector2> positions = new List<Vector2>();
-            List<Vector2> sizes = new List<Vector2>();
+            List<Vector2> positions = new();
+            List<Vector2> sizes = new();
 
             if (Config.ShowLilyBars)
             {
@@ -50,7 +50,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowLilyBars)
             {
@@ -59,18 +59,18 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowDiaBar)
             {
-                DrawDiaBar(origin);
+                DrawDiaBar(origin, player);
             }
         }
 
-        private void DrawDiaBar(Vector2 origin)
+        private void DrawDiaBar(Vector2 origin, PlayerCharacter player)
         {
-            Actor target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget;
+            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             Vector2 cursorPos = origin + Config.Position + Config.DiaBarPosition - Config.DiaBarSize / 2f;
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
-            if (target is not Chara)
+            if (actor is not BattleChara target)
             {
                 if (Config.HideInactiveDiaBar)
                 {
@@ -83,16 +83,16 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            StatusEffect dia = target.StatusEffects.FirstOrDefault(
-                o => o.EffectId == 1871 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
-                  || o.EffectId == 144 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
-                  || o.EffectId == 143 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId
+            var dia = target.StatusList.FirstOrDefault(
+                o => o.StatusId == 1871 && o.SourceID == player.ObjectId
+                  || o.StatusId == 144 && o.SourceID == player.ObjectId
+                  || o.StatusId == 143 && o.SourceID == player.ObjectId
             );
 
-            float diaCooldown = dia.EffectId == 1871 ? 30f : 18f;
-            float diaDuration = dia.Duration;
+            float diaCooldown = dia?.StatusId == 1871 ? 30f : 18f;
+            float diaDuration = dia?.RemainingTime ?? 0f;
             
-            if (Config.HideInactiveDiaBar && dia.Duration == 0)
+            if (Config.HideInactiveDiaBar && diaDuration == 0)
             {
                 return;
             }
@@ -136,12 +136,9 @@ namespace DelvUI.Interface.Jobs
 
             const float lilyCooldown = 30000f;
 
-            float getScale(int num, float timer, float cooldown)
-            {
-                return num + (timer / lilyCooldown);
-            }
+            float GetScale(int num, float timer) => num + (timer / lilyCooldown);
 
-            float lilyScale = getScale(gauge.NumLilies, gauge.LilyTimer, lilyCooldown);
+            float lilyScale = GetScale(gauge.Lily, gauge.LilyTimer);
 
             var posX = origin.X + Config.Position.X + Config.LilyBarPosition.X - Config.LilyBarSize.X / 2f;
             var posY = origin.Y + Config.Position.Y + Config.LilyBarPosition.Y - Config.LilyBarSize.Y / 2f;
@@ -155,9 +152,9 @@ namespace DelvUI.Interface.Jobs
                 string timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
                 Vector2 size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
                 float lilyChunkSize = (Config.LilyBarSize.X / 3f) + Config.LilyBarPad;
-                float lilyChunkOffset = lilyChunkSize * ((int)gauge.NumLilies + 1);
+                float lilyChunkOffset = lilyChunkSize * (gauge.Lily + 1);
 
-                if (gauge.NumLilies < 3)
+                if (gauge.Lily < 3)
                 {
                     DrawHelper.DrawOutlinedText(timer, new Vector2(
                         posX + lilyChunkOffset - (lilyChunkSize / 2f) - (size.X / 2f),
@@ -173,7 +170,7 @@ namespace DelvUI.Interface.Jobs
 
             builder = BarBuilder.Create(posX, posY, Config.BloodLilyBarSize.Y, Config.BloodLilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
-            builder.SetChunks(3).SetChunkPadding(Config.BloodLilyBarPad).AddInnerBar(gauge.NumBloodLily, 3, Config.BloodLilyColor);
+            builder.SetChunks(3).SetChunkPadding(Config.BloodLilyBarPad).AddInnerBar(gauge.BloodLily, 3, Config.BloodLilyColor);
 
             drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
@@ -201,11 +198,11 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Timer" + "##Lily")]
         [CollapseWith(0, 0)]
         public bool ShowLilyBarTimer = true;
-        
+
         [DragFloat2("Position" + "##Lily", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
         public Vector2 LilyBarPosition = new(-64, -54);
-        
+
         [DragFloat2("Size" + "##Lily", max = 2000f)]
         [CollapseWith(10, 0)]
         public Vector2 LilyBarSize = new(125, 20);
@@ -224,11 +221,11 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Blood Lily Bar
-        
+
         [DragFloat2("Position" + "##BloodLily", min = -4000f, max = 4000f, spacing = true)]
         [CollapseWith(30, 0)]
         public Vector2 BloodLilyBarPosition = new(64, -54);
-        
+
         [DragFloat2("Size" + "##BloodLily", max = 2000f)]
         [CollapseWith(35, 0)]
         public Vector2 BloodLilyBarSize = new(125, 20);

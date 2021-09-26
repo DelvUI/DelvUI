@@ -203,25 +203,25 @@ namespace DelvUI.Interface.StatusEffects
     public class StatusEffectIconConfig : PluginConfigObject
     {
         [DragInt2("Icon Size", min = 1, max = 1000)]
-        [Order(0)]
+        [Order(5)]
         public Vector2 Size = new(40, 40);
 
-        [NestedConfig("Duration", 5)]
+        [NestedConfig("Duration", 10)]
         public LabelConfig DurationLabelConfig;
 
-        [NestedConfig("Stacks", 10)]
+        [NestedConfig("Stacks", 15)]
         public LabelConfig StacksLabelConfig;
 
-        [NestedConfig("Border", 15)]
-        public StatusEffectIconBorderConfig BorderConfig = new StatusEffectIconBorderConfig();
+        [NestedConfig("Border", 20)]
+        public StatusEffectIconBorderConfig BorderConfig = new();
 
-        [NestedConfig("Dispellable Effects Border", 20)]
-        public StatusEffectIconBorderConfig DispellableBorderConfig = new StatusEffectIconBorderConfig(new(new(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f)), 2);
+        [NestedConfig("Dispellable Effects Border", 25)]
+        public StatusEffectIconBorderConfig DispellableBorderConfig = new(new PluginConfigColor(new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f)), 2);
 
-        [NestedConfig("My Effects Border", 25)]
-        public StatusEffectIconBorderConfig OwnedBorderConfig = new StatusEffectIconBorderConfig(new(new(35f / 255f, 179f / 255f, 69f / 255f, 100f / 100f)), 1);
+        [NestedConfig("My Effects Border", 30)]
+        public StatusEffectIconBorderConfig OwnedBorderConfig = new(new PluginConfigColor(new Vector4(35f / 255f, 179f / 255f, 69f / 255f, 100f / 100f)), 1);
 
-        public StatusEffectIconConfig(LabelConfig durationLabelConfig = null, LabelConfig stacksLabelConfig = null)
+        public StatusEffectIconConfig(LabelConfig? durationLabelConfig = null, LabelConfig? stacksLabelConfig = null)
         {
             DurationLabelConfig = durationLabelConfig ?? StatusEffectsListsDefaults.DefaultDurationLabelConfig();
             StacksLabelConfig = stacksLabelConfig ?? StatusEffectsListsDefaults.DefaultStacksLabelConfig();
@@ -232,11 +232,11 @@ namespace DelvUI.Interface.StatusEffects
     public class StatusEffectIconBorderConfig : PluginConfigObject
     {
         [ColorEdit4("Color")]
-        [Order(0)]
+        [Order(5)]
         public PluginConfigColor Color = new(Vector4.UnitW);
 
         [DragInt("Thickness", min = 1, max = 100)]
-        [Order(5)]
+        [Order(10)]
         public int Thickness = 1;
 
         public StatusEffectIconBorderConfig()
@@ -284,7 +284,7 @@ namespace DelvUI.Interface.StatusEffects
             return true;
         }
 
-        public bool AddNewEntry(Status status)
+        public bool AddNewEntry(Status? status)
         {
             if (status != null && !List.ContainsKey(status.Name))
             {
@@ -297,11 +297,11 @@ namespace DelvUI.Interface.StatusEffects
             return false;
         }
 
-        private bool AddNewEntry(string input, ExcelSheet<Status> sheet)
+        private bool AddNewEntry(string input, ExcelSheet<Status>? sheet)
         {
-            if (input.Length > 0)
+            if (input.Length > 0 && sheet != null)
             {
-                Status status = null;
+                Status? status = null;
 
                 // try id
                 if (uint.TryParse(input, out uint uintValue))
@@ -362,7 +362,7 @@ namespace DelvUI.Interface.StatusEffects
             {
                 ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
                 ImGui.SameLine();
-                changed |= ImGui.Checkbox(UseAsWhitelist ? "Whitelist" : "Blacklist", ref UseAsWhitelist);
+                changed |= ImGui.Checkbox("Use as Whitelist", ref UseAsWhitelist);
                 ImGui.NewLine();
 
                 ImGui.Text("\u2002 \u2002");
@@ -405,7 +405,7 @@ namespace DelvUI.Interface.StatusEffects
                     {
                         var id = List.Values[i];
                         var name = List.Keys[i];
-                        var row = sheet.GetRow(id);
+                        var row = sheet?.GetRow(id);
 
                         if (_input != "" && !name.ToUpper().Contains(_input.ToUpper()))
                         {
@@ -493,7 +493,7 @@ namespace DelvUI.Interface.StatusEffects
             // pre-populated white list
             config.BlacklistConfig.UseAsWhitelist = true;
 
-            ExcelSheet<Status> sheet = Plugin.DataManager.GetExcelSheet<Status>();
+            ExcelSheet<Status>? sheet = Plugin.DataManager.GetExcelSheet<Status>();
             if (sheet != null)
             {
                 // Left Eye

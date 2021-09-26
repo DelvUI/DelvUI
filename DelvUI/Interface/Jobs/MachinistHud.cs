@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.ClientState.Structs.JobGauge;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -6,8 +7,8 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -18,7 +19,7 @@ namespace DelvUI.Interface.Jobs
         private readonly float[] _robotDuration = { 12.450f, 13.950f, 15.450f, 16.950f, 18.450f, 19.950f };
         private new MachinistConfig Config => (MachinistConfig)_config;
 
-        public MachinistHud(string id, MachinistConfig config, string displayName = null) : base(id, config, displayName)
+        public MachinistHud(string id, MachinistConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -52,7 +53,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowOverheat)
             {
@@ -71,7 +72,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowWildfire)
             {
-                DrawWildfireBar(origin);
+                DrawWildfireBar(origin, player);
             }
         }
 
@@ -119,9 +120,9 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            if (gauge.IsRobotActive() && Config.ShowBatteryGaugeRobotDuration)
+            if (gauge.IsRobotActive && Config.ShowBatteryGaugeRobotDuration)
             {
-                builder.AddInnerBar(gauge.RobotTimeRemaining / 1000f, _robotDuration[gauge.LastRobotBatteryPower / 10 - 5], Config.RobotFillColor, null);
+                builder.AddInnerBar(gauge.SummonTimeRemaining / 1000f, _robotDuration[gauge.LastSummonBatteryPower / 10 - 5], Config.RobotFillColor, null);
 
                 if (Config.ShowBatteryGaugeRobotDurationText)
                 {
@@ -144,7 +145,7 @@ namespace DelvUI.Interface.Jobs
             var builder = BarBuilder.Create(position, Config.OverheatSize)
                 .SetBackgroundColor(EmptyColor.Background);
 
-            if (gauge.IsOverheated())
+            if (gauge.IsOverheated)
             {
                 builder.AddInnerBar(gauge.OverheatTimeRemaining / 1000f, 8, Config.OverheatFillColor, null);
 
@@ -159,9 +160,9 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        private void DrawWildfireBar(Vector2 origin)
+        private void DrawWildfireBar(Vector2 origin, PlayerCharacter player)
         {
-            var wildfireBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1946);
+            var wildfireBuff = player.StatusList.Where(o => o.StatusId == 1946);
 
             var position = origin + Config.Position + Config.WildfirePosition - Config.WildfireSize / 2f;
 
@@ -169,7 +170,7 @@ namespace DelvUI.Interface.Jobs
 
             if (wildfireBuff.Any())
             {
-                var duration = wildfireBuff.First().Duration;
+                var duration = wildfireBuff.First().RemainingTime;
                 builder.AddInnerBar(duration, 10, Config.WildfireFillColor, null);
 
                 if (Config.ShowWildfireText)

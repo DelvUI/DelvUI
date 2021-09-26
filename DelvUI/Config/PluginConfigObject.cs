@@ -20,7 +20,7 @@ namespace DelvUI.Config
         {
             get
             {
-                PortableAttribute attribute = (PortableAttribute)GetType().GetCustomAttribute(typeof(PortableAttribute), false);
+                PortableAttribute? attribute = (PortableAttribute?)GetType().GetCustomAttribute(typeof(PortableAttribute), false);
                 return attribute == null || attribute.portable;
             }
         }
@@ -30,7 +30,7 @@ namespace DelvUI.Config
         {
             get
             {
-                DisableableAttribute attribute = (DisableableAttribute)GetType().GetCustomAttribute(typeof(DisableableAttribute), false);
+                DisableableAttribute? attribute = (DisableableAttribute?)GetType().GetCustomAttribute(typeof(DisableableAttribute), false);
                 return attribute == null || attribute.disableable;
             }
         }
@@ -51,19 +51,18 @@ namespace DelvUI.Config
 
         public static PluginConfigObject DefaultConfig()
         {
-            Debug.Assert(false, "Static method 'DefaultConfig' not found !!!");
-            return null;
+            return null!;
         }
 
         #region IOnChangeEventArgs
 
         // sending event outside of the config
-        public event EventHandler<OnChangeBaseArgs> onValueChanged;
+        public event ConfigValueChangeEventHandler? ValueChangeEvent;
 
         // received events from the node
-        public void onValueChangedRegisterEvent(OnChangeBaseArgs e)
+        public void OnValueChanged(OnChangeBaseArgs e)
         {
-            onValueChanged?.Invoke(this, e);
+            ValueChangeEvent?.Invoke(this, e);
         }
 
         #endregion
@@ -95,7 +94,7 @@ namespace DelvUI.Config
 
         [JsonIgnore] private Vector4 _vector;
 
-        public PluginConfigColor(Vector4 vector, float[] colorMapRatios = null)
+        public PluginConfigColor(Vector4 vector, float[]? colorMapRatios = null)
         {
             _vector = vector;
 

@@ -16,12 +16,12 @@ namespace DelvUI.GameStructs
         public unsafe bool IsDancing() => stepOrder[0] > 0;
     }
 
-    public enum DNCStep : byte
+    public enum DNCStep : uint
     {
-        None,
-        Emboite,
-        Entrechat,
-        Jete,
-        Pirouette
+        None = 15998,
+        Emboite = 15999,
+        Entrechat = 16000,
+        Jete = 16001,
+        Pirouette = 16002
     }
 }

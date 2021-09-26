@@ -18,13 +18,13 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using Dalamud.Game.ClientState.Actors.Types;
-using Dalamud.Game.ClientState.Actors.Types.NonPlayer;
 using Dalamud.Hooking;
-using Dalamud.Plugin;
 using Lumina.Excel;
 using System;
-using System.Linq;
+using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Logging;
 using Action = Lumina.Excel.GeneratedSheets.Action;
 
 namespace DelvUI.Helpers
@@ -51,7 +51,7 @@ namespace DelvUI.Helpers
 
         public static void Initialize() { Instance = new MouseOverHelper(); }
 
-        public static MouseOverHelper Instance { get; private set; }
+        public static MouseOverHelper Instance { get; private set; } = null!;
         #endregion
 
         private IntPtr _setUIMouseOverActorId;
@@ -60,8 +60,8 @@ namespace DelvUI.Helpers
         private IntPtr _requestAction;
         private Hook<OnRequestAction> _requsetActionHook;
 
-        private ExcelSheet<Action> _sheet;
-        public Actor Target = null;
+        private ExcelSheet<Action>? _sheet;
+        public GameObject? Target = null;
 
         private void HandleUIMouseOverActorId(long arg1, long arg2)
         {
@@ -75,15 +75,15 @@ namespace DelvUI.Helpers
 
             if (IsActionValid(arg3, Target))
             {
-                return _requsetActionHook.Original(arg1, arg2, arg3, Target.ActorId, arg5, arg6, arg7);
+                return _requsetActionHook.Original(arg1, arg2, arg3, Target!.ObjectId, arg5, arg6, arg7);
             }
 
             return _requsetActionHook.Original(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
         }
 
-        private bool IsActionValid(ulong actionID, Actor target)
+        private bool IsActionValid(ulong actionID, GameObject? target)
         {
-            if (target == null || actionID == 0)
+            if (target == null || actionID == 0 || _sheet == null)
             {
                 return false;
             }

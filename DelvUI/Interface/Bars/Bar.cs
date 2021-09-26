@@ -127,8 +127,12 @@ namespace DelvUI.Interface.Bars
                     _ => "ERROR LOADING TEXT, INVALID TYPE"
                 };
 
-                var textPos = text.CalcTextPosition(cursorPos, strText, BarWidth, BarHeight);
+                if (strText == null)
+                {
+                    continue;
+                }
 
+                var textPos = text.CalcTextPosition(cursorPos, strText, BarWidth, BarHeight);
                 DrawHelper.DrawOutlinedText(strText, textPos, text.Color, text.OutlineColor, text.Scale);
             }
         }
@@ -136,16 +140,16 @@ namespace DelvUI.Interface.Bars
 
     public class InnerBar
     {
-        private bool[] _glowChunks;
+        private bool[] _glowChunks = null!;
         private bool _glowChunksSet;
         private uint _glowColor;
         private bool _glowColorSet;
-        public Bar Parent { get; set; }
+        public Bar Parent { get; set; } = null!;
         public int ChildNum { get; set; }
         public float MaximumValue { get; set; }
         public float CurrentValue { get; set; }
-        public PluginConfigColor[] ChunkColors { get; set; }
-        public PluginConfigColor PartialFillColor { get; set; }
+        public PluginConfigColor[] ChunkColors { get; set; } = null!;
+        public PluginConfigColor? PartialFillColor { get; set; }
 
         public uint GlowColor
         {
@@ -170,7 +174,7 @@ namespace DelvUI.Interface.Bars
         public uint GlowSize { get; set; } = 1;
         public bool FlipDrainDirection { get; set; }
         public BarTextMode TextMode { get; set; }
-        public BarText[] Texts { get; set; }
+        public BarText[]? Texts { get; set; }
 
         public virtual void Draw(ImDrawListPtr drawList)
         {
@@ -282,7 +286,7 @@ namespace DelvUI.Interface.Bars
             var barHeight = Parent.Vertical ? Parent.BarHeight + Parent.ChunkPadding : (float)1 / Parent.InnerBars.Count * Parent.BarHeight;
             var cursorPos = new Vector2(Parent.XPosition, Parent.YPosition);
 
-            if (TextMode == BarTextMode.Single)
+            if (TextMode == BarTextMode.Single && Texts?.Length > 0)
             {
                 var textObj = Texts[0];
 
@@ -296,8 +300,12 @@ namespace DelvUI.Interface.Bars
                     _ => "ERROR LOADING TEXT, INVALID TYPE"
                 };
 
-                var textPos = textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, Parent.BarHeight);
+                if (text == null)
+                {
+                    return;
+                }
 
+                var textPos = textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, Parent.BarHeight);
                 DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale);
             }
 
@@ -326,7 +334,7 @@ namespace DelvUI.Interface.Bars
                         currentFill = 0f;
                     }
 
-                    if (TextMode == BarTextMode.EachChunk)
+                    if (TextMode == BarTextMode.EachChunk && Texts?.Length > i)
                     {
                         var textObj = Texts[i];
 
@@ -340,11 +348,14 @@ namespace DelvUI.Interface.Bars
                             _ => "ERROR LOADING TEXT, INVALID TYPE"
                         };
 
-                        var textPos = Parent.Vertical
-                            ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y)
-                            : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
+                        if (text != null)
+                        {
+                            var textPos = Parent.Vertical
+                                ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y)
+                                : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
 
-                        DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale);
+                            DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale);
+                        }
                     }
 
                     i++;
@@ -377,7 +388,7 @@ namespace DelvUI.Interface.Bars
                         currentFill = 0f;
                     }
 
-                    if (TextMode == BarTextMode.EachChunk)
+                    if (TextMode == BarTextMode.EachChunk && Texts?.Length > i)
                     {
                         var textObj = Texts[i];
 
@@ -391,11 +402,14 @@ namespace DelvUI.Interface.Bars
                             _ => "ERROR LOADING TEXT, INVALID TYPE"
                         };
 
-                        var textPos = Parent.Vertical
-                            ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y)
-                            : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
+                        if (text != null)
+                        {
+                            var textPos = Parent.Vertical
+                                ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y)
+                                : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
 
-                        DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale);
+                            DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, textObj.Scale);
+                        }
                     }
 
                     i++;
@@ -406,7 +420,7 @@ namespace DelvUI.Interface.Bars
 
     public class BooleanInnerBar : InnerBar
     {
-        private bool[] _enableArray;
+        private bool[] _enableArray = null!;
 
         public bool[] EnableArray
         {
@@ -459,7 +473,7 @@ namespace DelvUI.Interface.Bars
 
     public class BarText
     {
-        public BarText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string text, float scale)
+        public BarText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string? text, float scale)
         {
             Position = position;
             Type = type;
@@ -469,7 +483,7 @@ namespace DelvUI.Interface.Bars
             Scale = scale;
         }
 
-        public BarText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string text)
+        public BarText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string? text)
         {
             Position = position;
             Type = type;
@@ -479,7 +493,7 @@ namespace DelvUI.Interface.Bars
             Scale = 1.0f;
         }
 
-        public BarText(BarTextPosition position, BarTextType type, string text)
+        public BarText(BarTextPosition position, BarTextType type, string? text)
         {
             Position = position;
             Type = type;
@@ -504,7 +518,7 @@ namespace DelvUI.Interface.Bars
         public BarTextType Type { get; set; }
         public Vector4 Color { get; set; }
         public Vector4 OutlineColor { get; set; }
-        public string Text { get; set; }
+        public string? Text { get; set; }
         public float Scale { get; set; }
 
         public Vector2 CalcTextPosition(Vector2 cursorPos, string text, float barWidth, float barHeight)

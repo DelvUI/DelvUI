@@ -1,13 +1,16 @@
-﻿using Dalamud.Game.ClientState.Actors;
-using Dalamud.Game.ClientState.Structs;
-using DelvUI.Helpers;
+﻿using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Actor = Dalamud.Game.ClientState.Actors.Types.Actor;
+using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Types;
+using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
+using Status = Dalamud.Game.ClientState.Statuses.Status;
+using FFXIVClientStructs.FFXIV.Client.Game;
+using Dalamud.Game.ClientState.Structs;
+using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.StatusEffects
 {
@@ -22,7 +25,7 @@ namespace DelvUI.Interface.StatusEffects
         private LabelHud _durationLabel;
         private LabelHud _stacksLabel;
 
-        public Actor Actor { get; set; } = null;
+        public GameObject? Actor { get; set; } = null;
 
         public StatusEffectsListHud(string id, StatusEffectsListConfig config, string displayName) : base(id, config, displayName)
         {
@@ -73,21 +76,15 @@ namespace DelvUI.Interface.StatusEffects
             return list;
         }
 
-        protected List<StatusEffectData> StatusEffectDataList(Actor actor)
+        protected List<StatusEffectData> StatusEffectDataList(GameObject? actor)
         {
             var list = new List<StatusEffectData>();
-            if (actor == null)
+            if (actor == null || actor is not BattleChara battleChara)
             {
                 return list;
             }
 
-            var effectCount = actor.StatusEffects.Length;
-            if (effectCount == 0)
-            {
-                return list;
-            }
-
-            var sheet = Plugin.DataManager.GetExcelSheet<Status>();
+            var sheet = Plugin.DataManager.GetExcelSheet<LuminaStatus>();
             if (sheet == null)
             {
                 return list;
@@ -95,16 +92,14 @@ namespace DelvUI.Interface.StatusEffects
 
             var player = Plugin.ClientState.LocalPlayer;
 
-            for (var i = 0; i < effectCount; i++)
+            foreach (Status? status in battleChara.StatusList)
             {
-                var status = actor.StatusEffects[i];
-
-                if (status.EffectId <= 0)
+                if (status is null || status.StatusId == 0)
                 {
                     continue;
                 }
 
-                var row = sheet.GetRow((uint)status.EffectId);
+                var row = sheet.GetRow(status.StatusId);
                 if (row == null)
                 {
                     continue;
@@ -129,7 +124,7 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 // only mine
-                if (Config.ShowOnlyMine && player?.ActorId != status.OwnerId)
+                if (Config.ShowOnlyMine && player?.ObjectId != status.SourceID)
                 {
                     continue;
                 }
@@ -156,14 +151,15 @@ namespace DelvUI.Interface.StatusEffects
 
             list.Sort((a, b) =>
             {
-                bool isAFromPlayer = a.StatusEffect.OwnerId == player.ActorId;
-                bool isBFromPlayer = b.StatusEffect.OwnerId == player.ActorId;
+                bool isAFromPlayer = a.Status.SourceID == player.ObjectId;
+                bool isBFromPlayer = b.Status.SourceID == player.ObjectId;
 
                 if (isAFromPlayer && !isBFromPlayer)
                 {
                     return -1;
                 }
-                else if (!isAFromPlayer && isBFromPlayer)
+
+                if (!isAFromPlayer && isBFromPlayer)
                 {
                     return 1;
                 }
@@ -292,7 +288,7 @@ namespace DelvUI.Interface.StatusEffects
                     }
 
                     // remove buff on right click
-                    bool isFromPlayer = statusEffectData.StatusEffect.OwnerId == Plugin.ClientState.LocalPlayer?.ActorId;
+                    bool isFromPlayer = statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId;
 
                     if (statusEffectData.Data.Category == 1 && isFromPlayer && ImGui.GetIO().MouseClicked[1])
                     {
@@ -377,12 +373,12 @@ namespace DelvUI.Interface.StatusEffects
 
     public struct StatusEffectData
     {
-        public StatusEffect StatusEffect;
-        public readonly Status Data;
+        public Status Status;
+        public LuminaStatus Data;
 
-        public StatusEffectData(StatusEffect statusEffect, Status data)
+        public StatusEffectData(Status status, LuminaStatus data)
         {
-            StatusEffect = statusEffect;
+            Status = status;
             Data = data;
         }
     }

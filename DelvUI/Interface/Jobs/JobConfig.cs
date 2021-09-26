@@ -19,9 +19,15 @@ namespace DelvUI.Interface.Jobs
         [JsonIgnore]
         public PrimaryResourceTypes PrimaryResourceType = PrimaryResourceTypes.MP;
 
-        public new static JobConfig DefaultConfig()
+        public new static JobConfig? DefaultConfig()
         {
-            return (JobConfig)Activator.CreateInstance(MethodBase.GetCurrentMethod().DeclaringType);
+            var type = MethodBase.GetCurrentMethod()?.DeclaringType;
+            if (type is null)
+            {
+                return null;
+            }
+
+            return (JobConfig?)Activator.CreateInstance(type);
         }
 
         public JobConfig()
