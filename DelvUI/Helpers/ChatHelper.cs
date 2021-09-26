@@ -32,17 +32,17 @@ namespace DelvUI.Helpers
             IntPtr uiModule = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 83 7F ?? 00 48 8B F0");
 
             UiModuleDelegate uiModuleDelegate = Marshal.GetDelegateForFunctionPointer<UiModuleDelegate>(uiModule);
-            _uiModulePtr = (IntPtr)uiModuleDelegate.DynamicInvoke(Marshal.ReadIntPtr(baseUi));
+            _uiModulePtr = (IntPtr?)uiModuleDelegate.DynamicInvoke(Marshal.ReadIntPtr(baseUi));
 
             _chatModulePtr = Plugin.SigScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9");
         }
 
         public static void Initialize() { Instance = new ChatHelper(); }
 
-        public static ChatHelper Instance { get; private set; }
+        public static ChatHelper Instance { get; private set; } = null!;
         #endregion
 
-        private IntPtr _uiModulePtr;
+        private IntPtr? _uiModulePtr;
         private IntPtr _chatModulePtr;
 
         public static void SendChatMessage(string message)
@@ -68,7 +68,7 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            if (_uiModulePtr == IntPtr.Zero || _chatModulePtr == IntPtr.Zero)
+            if (!_uiModulePtr.HasValue || _uiModulePtr == IntPtr.Zero || _chatModulePtr == IntPtr.Zero)
             {
                 return;
             }
@@ -78,7 +78,7 @@ namespace DelvUI.Helpers
             var payload = MessagePayload(text, length);
 
             ChatDelegate chatDelegate = Marshal.GetDelegateForFunctionPointer<ChatDelegate>(_chatModulePtr);
-            chatDelegate.Invoke(_uiModulePtr, payload, IntPtr.Zero, (byte)0);
+            chatDelegate.Invoke(_uiModulePtr.Value, payload, IntPtr.Zero, (byte)0);
 
             Marshal.FreeHGlobal(payload);
             Marshal.FreeHGlobal(text);

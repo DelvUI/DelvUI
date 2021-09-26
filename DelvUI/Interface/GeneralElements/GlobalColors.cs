@@ -86,11 +86,11 @@ namespace DelvUI.Interface.GeneralElements
             Instance = new GlobalColors();
         }
 
-        public static GlobalColors Instance { get; private set; }
+        public static GlobalColors Instance { get; private set; } = null!;
 
         #endregion
 
-        public PluginConfigColor ColorForJobId(uint jobId)
+        public PluginConfigColor? ColorForJobId(uint jobId)
         {
             if (ColorMap.TryGetValue(jobId, out var color))
             {

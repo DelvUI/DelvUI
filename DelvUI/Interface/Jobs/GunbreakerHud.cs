@@ -19,7 +19,7 @@ namespace DelvUI.Interface.Jobs
         private new GunbreakerConfig Config => (GunbreakerConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public GunbreakerHud(string id, GunbreakerConfig config, string displayName = null) : base(id, config, displayName)
+        public GunbreakerHud(string id, GunbreakerConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }

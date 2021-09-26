@@ -33,10 +33,10 @@ namespace DelvUI.Interface.GeneralElements
     public class LabelConfig : MovablePluginConfigObject
     {
         [JsonIgnore] protected string _text;
-        
+
         [Font]
         [Order(20)]
-        public string FontID = null;
+        public string? FontID = null;
 
         [Anchor("Frame Anchor")]
         [Order(25)]

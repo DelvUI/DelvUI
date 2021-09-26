@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.ClientState.Structs;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.GameStructs;
@@ -12,8 +13,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
-using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -21,7 +20,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DancerConfig Config => (DancerConfig)_config;
 
-        public DancerHud(string id, DancerConfig config, string displayName = null) : base(id, config, displayName)
+        public DancerHud(string id, DancerConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -149,7 +148,7 @@ namespace DelvUI.Interface.Jobs
         private unsafe void DrawStepBar(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<DNCGauge>();
-            
+
             if (!gauge.IsDancing)
             {
                 return;
@@ -293,6 +292,10 @@ namespace DelvUI.Interface.Jobs
         private void DrawProcBar(Vector2 origin)
         {
             var player = Plugin.ClientState.LocalPlayer;
+            if (player is null)
+            {
+                return;
+            }
 
             var timersEnabled = !Config.StaticProcBarsEnabled;
             var procBarSize = new Vector2(Config.ProcBarSize.X / 4f - Config.ProcBarChunkPadding / 4f, Config.ProcBarSize.Y);
@@ -365,14 +368,22 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.StaticProcBarsEnabled)
             {
-                if(cascadeDuration > 0)
+                if (cascadeDuration > 0)
+                {
                     cascadeBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                if(fountainDuration > 0)
+                }
+                if (fountainDuration > 0)
+                {
                     fountainBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                if(windmillDuration > 0)
+                }
+                if (windmillDuration > 0)
+                {
                     windmillBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                if(showerDuration > 0)
+                }
+                if (showerDuration > 0)
+                {
                     showerBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();

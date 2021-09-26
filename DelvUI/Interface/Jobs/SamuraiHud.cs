@@ -20,7 +20,7 @@ namespace DelvUI.Interface.Jobs
         private new SamuraiConfig Config => (SamuraiConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public SamuraiHud(string id, SamuraiConfig config, string displayName = null) : base(id, config, displayName)
+        public SamuraiHud(string id, SamuraiConfig config, string? displayName = null) : base(id, config, displayName)
         {
         }
 
