@@ -1,4 +1,7 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
@@ -10,8 +13,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
-using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -19,7 +20,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new ScholarConfig Config => (ScholarConfig)_config;
 
-        public ScholarHud(string id, ScholarConfig config, string displayName = null) : base(id, config, displayName)
+        public ScholarHud(string id, ScholarConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -52,7 +53,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowFairy)
             {
@@ -61,12 +62,12 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowBio)
             {
-                DrawBioBar(origin);
+                DrawBioBar(origin, player);
             }
 
             if (Config.ShowAether)
             {
-                DrawAetherBar(origin);
+                DrawAetherBar(origin, player);
             }
         }
 
@@ -111,10 +112,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawAetherBar(Vector2 origin)
+        private void DrawAetherBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            var aetherFlowBuff = Plugin.ClientState.LocalPlayer.StatusList.FirstOrDefault(o => o.StatusId == 304);
+            var aetherFlowBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 304);
             Vector2 barSize = Config.AetherSize;
             Vector2 position = origin + Config.Position + Config.AetherPosition - barSize / 2f;
 
@@ -134,9 +134,8 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawBioBar(Vector2 origin)
+        private void DrawBioBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
             var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
             float bioDuration = 0;
@@ -144,9 +143,9 @@ namespace DelvUI.Interface.Jobs
             if (actor is BattleChara target)
             {
                 var bio = target.StatusList.FirstOrDefault(
-                    o => o.StatusId == 179 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
-                      || o.StatusId == 189 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
-                      || o.StatusId == 1895 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
+                    o => o.StatusId == 179 && o.SourceID == player.ObjectId
+                      || o.StatusId == 189 && o.SourceID == player.ObjectId
+                      || o.StatusId == 1895 && o.SourceID == player.ObjectId
                 );
 
                 bioDuration = Math.Abs(bio?.RemainingTime ?? 0f);
@@ -189,14 +188,14 @@ namespace DelvUI.Interface.Jobs
         }
 
         #region aether
-        [Checkbox("Aether" + "##Aether",separator = true)]
+        [Checkbox("Aether" + "##Aether", separator = true)]
         [Order(30)]
         public bool ShowAether = true;
-        
+
         [DragFloat2("Position" + "##Aether", min = -4000f, max = 4000f)]
         [Order(35, collapseWith = nameof(ShowAether))]
         public Vector2 AetherPosition = new(0, -76);
-        
+
         [DragFloat2("Size" + "##Aether", min = 1f, max = 2000f)]
         [Order(40, collapseWith = nameof(ShowAether))]
         public Vector2 AetherSize = new(254, 20);
@@ -211,7 +210,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region fairy
-        [Checkbox("Fairy Gauge" + "##Fairy",separator = true)]
+        [Checkbox("Fairy Gauge" + "##Fairy", separator = true)]
         [Order(55)]
         public bool ShowFairy = true;
 
@@ -230,23 +229,23 @@ namespace DelvUI.Interface.Jobs
         [ColorEdit4("Color" + "##Fairy")]
         [Order(75, collapseWith = nameof(ShowFairy))]
         public PluginConfigColor FairyColor = new(new Vector4(69f / 255f, 199 / 255f, 164f / 255f, 100f / 100f));
-        
+
         [Checkbox("Seraph" + "##Seraph", spacing = true)]
         [Order(80, collapseWith = nameof(ShowFairy))]
         public bool ShowSeraph = true;
         //TODO NOT ASSIGNED? ^
-        
+
         [Checkbox("Timer" + "##Seraph")]
         [Order(85, collapseWith = nameof(ShowSeraph))]
         public bool ShowSeraphText = true;
-        
+
         [ColorEdit4("Color" + "##SeraphColor")]
         [Order(90, collapseWith = nameof(ShowSeraph))]
         public PluginConfigColor SeraphColor = new(new Vector4(232f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         #region bio
-        [Checkbox("Bio" + "##Bio",separator = true)]
+        [Checkbox("Bio" + "##Bio", separator = true)]
         [Order(95)]
         public bool ShowBio = true;
 
@@ -261,20 +260,20 @@ namespace DelvUI.Interface.Jobs
         [DragFloat2("Position" + "##Bio", min = -4000f, max = 4000f)]
         [Order(110, collapseWith = nameof(ShowBio))]
         public Vector2 BioPosition = new(0, -32);
-        
+
         [DragFloat2("Size" + "##Bio", max = 2000f)]
         [Order(115, collapseWith = nameof(ShowBio))]
         public Vector2 BioSize = new(254, 20);
-        
+
         [ColorEdit4("Color" + "##Bio")]
         [Order(120, collapseWith = nameof(ShowBio))]
         public PluginConfigColor BioColor = new(new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 1f));
-        
+
         [ColorEdit4("Expire Color" + "##Bio")]
         [Order(125, collapseWith = nameof(ShowBio))]
         public PluginConfigColor ExpireColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
         #endregion
 
-        
+
     }
 }

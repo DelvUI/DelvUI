@@ -1,4 +1,6 @@
-﻿using Dalamud.Game.ClientState.Structs;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.GameStructs;
@@ -12,8 +14,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
-using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -21,7 +21,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DancerConfig Config => (DancerConfig)_config;
 
-        public DancerHud(string id, DancerConfig config, string displayName = null) : base(id, config, displayName)
+        public DancerHud(string id, DancerConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -67,7 +67,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.EspritGuageEnabled)
             {
@@ -76,17 +76,17 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.FeatherGuageEnabled)
             {
-                DrawFeathersBar(origin);
+                DrawFeathersBar(origin, player);
             }
 
             if (Config.BuffBarEnabled)
             {
-                DrawBuffBar(origin);
+                DrawBuffBar(origin, player);
             }
 
             if (Config.ProcBarEnabled) // Draw procs before steps since they occupy the same space by default.
             {
-                DrawProcBar(origin);
+                DrawProcBar(origin, player);
             }
 
             if (Config.StepBarEnabled)
@@ -96,7 +96,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.StandardBarEnabled)
             {
-                DrawStandardBar(origin);
+                DrawStandardBar(origin, player);
             }
         }
 
@@ -122,10 +122,9 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        private void DrawFeathersBar(Vector2 origin)
+        private void DrawFeathersBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            IEnumerable<Status> flourishingBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId is 1820 or 2021);
+            IEnumerable<Status> flourishingBuff = player.StatusList.Where(o => o.StatusId is 1820 or 2021);
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
 
             var xPos = origin.X + Config.Position.X + Config.FeatherGaugePosition.X - Config.FeatherGaugeSize.X / 2f;
@@ -149,7 +148,7 @@ namespace DelvUI.Interface.Jobs
         private unsafe void DrawStepBar(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<DNCGauge>();
-            
+
             if (!gauge.IsDancing)
             {
                 return;
@@ -202,6 +201,9 @@ namespace DelvUI.Interface.Jobs
                         chunkColors.Add(Config.PirouetteColor);
 
                         break;
+                        //default:
+                        //    chunkColors.Add(EmptyColor);
+                        //    break;
                 }
             }
 
@@ -220,18 +222,18 @@ namespace DelvUI.Interface.Jobs
             }
             else if (Config.StepGlowEnabled)
             {
-                builder.SetGlowChunks(glowChunks.ToArray()).SetGlowColor(Config.CurrentStepGlowColor.Base);
+                builder.SetGlowChunks(glowChunks.ToArray())
+                        .SetGlowColor(Config.CurrentStepGlowColor.Base);
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
         }
 
-        private void DrawBuffBar(Vector2 origin)
+        private void DrawBuffBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            IEnumerable<Status> devilmentBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId is 1825);
-            IEnumerable<Status> technicalFinishBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId is 1822 or 2050);
+            IEnumerable<Status> devilmentBuff = player.StatusList.Where(o => o.StatusId is 1825);
+            IEnumerable<Status> technicalFinishBuff = player.StatusList.Where(o => o.StatusId is 1822 or 2050);
 
             var xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
@@ -266,10 +268,9 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        private void DrawStandardBar(Vector2 origin)
+        private void DrawStandardBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            IEnumerable<Status> standardFinishBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId is 1821 or 2024 or 2105 or 2113);
+            IEnumerable<Status> standardFinishBuff = player.StatusList.Where(o => o.StatusId is 1821 or 2024 or 2105 or 2113);
 
             var xPos = origin.X + Config.Position.X + Config.StandardBarPosition.X - Config.StandardBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.StandardBarPosition.Y - Config.StandardBarSize.Y / 2f;
@@ -290,10 +291,8 @@ namespace DelvUI.Interface.Jobs
             builder.SetBackgroundColor(EmptyColor.Base).Build().Draw(drawList);
         }
 
-        private void DrawProcBar(Vector2 origin)
+        private void DrawProcBar(Vector2 origin, PlayerCharacter player)
         {
-            var player = Plugin.ClientState.LocalPlayer;
-
             var timersEnabled = !Config.StaticProcBarsEnabled;
             var procBarSize = new Vector2(Config.ProcBarSize.X / 4f - Config.ProcBarChunkPadding / 4f, Config.ProcBarSize.Y);
             var order = Config.procsOrder;
@@ -365,10 +364,22 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.StaticProcBarsEnabled)
             {
-                cascadeBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                fountainBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                windmillBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                showerBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                if (cascadeDuration > 0)
+                {
+                    cascadeBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
+                if (fountainDuration > 0)
+                {
+                    fountainBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
+                if (windmillDuration > 0)
+                {
+                    windmillBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
+                if (showerDuration > 0)
+                {
+                    showerBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();

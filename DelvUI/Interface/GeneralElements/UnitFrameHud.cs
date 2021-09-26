@@ -170,8 +170,8 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         private void DrawFriendlyNPC(ImDrawListPtr drawList, Vector2 startPos, Vector2 endPos)
-        {            
-            var color = Config.UseCustomColor ? Config.CustomColor : GlobalColors.Instance.NPCFriendlyColor;            
+        {
+            var color = Config.UseCustomColor ? Config.CustomColor : GlobalColors.Instance.NPCFriendlyColor;
 
             drawList.AddRectFilled(startPos, endPos, GlobalColors.Instance.EmptyUnitFrameColor.Base);
 
@@ -182,11 +182,11 @@ namespace DelvUI.Interface.GeneralElements
 
         private void DrawTankStanceIndicator(ImDrawListPtr drawList, Vector2 startPos)
         {
-            if (Actor is not BattleChara battleChara)
+            if (Actor is not BattleChara battleChara || Config.TankStanceIndicatorConfig == null)
             {
                 return;
             }
-            
+
             var tankStanceBuff = battleChara.StatusList.Where(
                 o => o.StatusId is 79 or 91 or 392 or 393 or 743 or 1396 or 1397 or 1833
             );

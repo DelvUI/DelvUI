@@ -44,7 +44,6 @@ namespace DelvUI.Interface
                 addonPtr->UldManager.UpdateDrawNodeList(); // enable
             }
         }
-
     }
 
     public class HudHelper
@@ -57,12 +56,12 @@ namespace DelvUI.Interface
 
         public HudHelper()
         {
-            Config.onValueChanged += ConfigValueChanged;
+            Config.ValueChangeEvent += ConfigValueChanged;
         }
 
         ~HudHelper()
         {
-            Config.onValueChanged -= ConfigValueChanged;
+            Config.ValueChangeEvent -= ConfigValueChanged;
         }
 
         public unsafe void Configure(bool forceUpdate = false)
@@ -74,7 +73,7 @@ namespace DelvUI.Interface
 
             ConfigureCombatActionBars(_isInitial || forceUpdate);
 
-            HudHelper.ToggleDefaultComponent(delegate (GUIAddon addon)
+            ToggleDefaultComponent(delegate (GUIAddon addon)
             {
                 if (addon.name == "_CastBar")
                 {
@@ -122,9 +121,11 @@ namespace DelvUI.Interface
 
             if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig))
             {
-                Debug.Assert(Plugin.ClientState.LocalPlayer != null, "HudHelper.LocalPlayer is NULL.");
-                PlayerCharacter player = Plugin.ClientState.LocalPlayer;
-                isHidden = isHidden && player.CurrentHp == player.MaxHp;
+                PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+                if (player is not null)
+                {
+                    isHidden = isHidden && player.CurrentHp == player.MaxHp;
+                }
             }
 
             return isHidden;
@@ -175,7 +176,7 @@ namespace DelvUI.Interface
 
         private unsafe void ToggleActionbar(string targetName, bool isHidden)
         {
-            HudHelper.ToggleDefaultComponent(delegate (GUIAddon addon)
+            ToggleDefaultComponent(delegate (GUIAddon addon)
             {
                 string keyCode = GetActionBarName(targetName);
                 if (addon.name == keyCode)
@@ -196,7 +197,7 @@ namespace DelvUI.Interface
 
         private void ConfigureDefaultCastBar()
         {
-            HudHelper.ToggleDefaultComponent(delegate (GUIAddon addon)
+            ToggleDefaultComponent(delegate (GUIAddon addon)
             {
                 if (addon.name == "_CastBar")
                 {
@@ -207,7 +208,7 @@ namespace DelvUI.Interface
 
         private unsafe void ConfigureDefaultJobGauge()
         {
-            HudHelper.ToggleDefaultComponent(delegate (GUIAddon addon)
+            ToggleDefaultComponent(delegate (GUIAddon addon)
             {
                 if (addon.name.StartsWith("JobHud"))
                 {
@@ -239,16 +240,31 @@ namespace DelvUI.Interface
         public static unsafe void ToggleDefaultComponent(Action<GUIAddon> action)
         {
             var stage = AtkStage.GetSingleton();
-            Debug.Assert(stage != null, "stage == null");
+            if (stage == null)
+            {
+                return;
+            }
+
             var loadedUnitsList = &stage->RaptureAtkUnitManager->AtkUnitManager.AllLoadedUnitsList;
-            Debug.Assert(loadedUnitsList != null, "loadedUnitsList == null");
+            if (loadedUnitsList == null)
+            {
+                return;
+            }
+
             var addonList = &loadedUnitsList->AtkUnitEntries;
-            Debug.Assert(addonList != null, "addonList == null");
+            if (addonList == null)
+            {
+                return;
+            }
 
             for (var i = 0; i < loadedUnitsList->Count; i++)
             {
                 AtkUnitBase* addon = addonList[i];
-                Debug.Assert(addon != null, "addon == null");
+                if (addon == null)
+                {
+                    continue;
+                }
+
                 var name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
                 if (name == null)
                 {
@@ -261,7 +277,7 @@ namespace DelvUI.Interface
 
         public static unsafe void RestoreToGameDefaults()
         {
-            HudHelper.ToggleDefaultComponent(delegate (GUIAddon addon)
+            ToggleDefaultComponent(delegate (GUIAddon addon)
             {
                 if (addon.name == "_CastBar"
                     || addon.name.StartsWith("JobHud")

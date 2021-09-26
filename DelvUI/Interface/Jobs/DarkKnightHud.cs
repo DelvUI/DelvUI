@@ -1,3 +1,7 @@
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -10,9 +14,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -20,7 +21,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DarkKnightConfig Config => (DarkKnightConfig)_config;
 
-        public DarkKnightHud(string id, DarkKnightConfig config, string displayName = null) : base(id, config, displayName)
+        public DarkKnightHud(string id, DarkKnightConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -60,11 +61,11 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowManaBar)
             {
-                DrawManaBar(origin);
+                DrawManaBar(origin, player);
             }
 
             if (Config.ShowBloodGauge)
@@ -79,18 +80,17 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowBuffBar)
             {
-                DrawBuffBar(origin);
+                DrawBuffBar(origin, player);
             }
 
             if (Config.ShowLivingShadowBar)
             {
-                DrawLivingShadowBar(origin);
+                DrawLivingShadowBar(origin, player);
             }
         }
 
-        private void DrawManaBar(Vector2 origin)
+        private void DrawManaBar(Vector2 origin, PlayerCharacter player)
         {
-            var actor = Plugin.ClientState.LocalPlayer;
             var darkArtsBuff = Plugin.JobGauges.Get<DRKGauge>().HasDarkArts;
 
             var posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
@@ -100,16 +100,16 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ChunkManaBar)
             {
-                builder.SetChunks(3).SetChunkPadding(Config.ManaBarPadding).AddInnerBar(actor.CurrentMp, 9000, Config.ManaBarColor, PartialFillColor);
+                builder.SetChunks(3).SetChunkPadding(Config.ManaBarPadding).AddInnerBar(player.CurrentMp, 9000, Config.ManaBarColor, PartialFillColor);
             }
             else
             {
-                builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, Config.ManaBarColor);
+                builder.AddInnerBar(player.CurrentMp, player.MaxMp, Config.ManaBarColor);
             }
 
             if (Config.ShowManaBarText)
             {
-                var formattedManaText = TextTags.GenerateFormattedTextFromTags(actor, "[mana:current-short]");
+                var formattedManaText = TextTags.GenerateFormattedTextFromTags(player, "[mana:current-short]");
 
                 builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterLeft, BarTextType.Custom, formattedManaText);
             }
@@ -141,7 +141,7 @@ namespace DelvUI.Interface.Jobs
 
             var posX = origin.X + Config.Position.X + Config.DarksidePosition.X - Config.DarksideSize.X / 2f;
             var posY = origin.Y + Config.Position.Y + Config.DarksidePosition.Y - Config.DarksideSize.Y / 2f;
-                        
+
             if (darksideDuration == 0 && Config.OnlyShowWhenActive)
             {
                 return;
@@ -160,7 +160,7 @@ namespace DelvUI.Interface.Jobs
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
         }
-        
+
         private void DrawBloodGauge(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<DRKGauge>();
@@ -194,11 +194,10 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        private void DrawBuffBar(Vector2 origin)
+        private void DrawBuffBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            IEnumerable<Status> bloodWeaponBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 742);
-            IEnumerable<Status> deliriumBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 1972);
+            IEnumerable<Status> bloodWeaponBuff = player.StatusList.Where(o => o.StatusId == 742);
+            IEnumerable<Status> deliriumBuff = player.StatusList.Where(o => o.StatusId == 1972);
 
             var xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
@@ -231,11 +230,10 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        private void DrawLivingShadowBar(Vector2 origin)
+        private void DrawLivingShadowBar(Vector2 origin, PlayerCharacter player)
         {
-            var actor = Plugin.ClientState.LocalPlayer;
             var shadowTimeRemaining = Plugin.JobGauges.Get<DRKGauge>().ShadowTimeRemaining / 1000;
-            var livingShadow = actor.Level >= 80 && shadowTimeRemaining is > 0 and <= 24;
+            var livingShadow = player.Level >= 80 && shadowTimeRemaining is > 0 and <= 24;
 
             var xPos = origin.X + Config.Position.X + Config.LivingShadowBarPosition.X - Config.LivingShadowBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.LivingShadowBarPosition.Y - Config.LivingShadowBarSize.Y / 2f;
@@ -336,7 +334,7 @@ namespace DelvUI.Interface.Jobs
 
         [Checkbox("Only Show When Active" + "##Darkside")]
         [Order(110, collapseWith = nameof(ShowDarkside))]
-        public bool OnlyShowWhenActive = true;        
+        public bool OnlyShowWhenActive = true;
 
         [DragFloat2("Position" + "##Darkside", min = -4000f, max = 4000f)]
         [Order(115, collapseWith = nameof(ShowDarkside))]

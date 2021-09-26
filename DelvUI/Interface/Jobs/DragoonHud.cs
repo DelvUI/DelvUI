@@ -1,4 +1,8 @@
-﻿using Dalamud.Game.ClientState.Structs;
+﻿using Dalamud.Game.ClientState.JobGauge.Enums;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -11,10 +15,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Enums;
-using Dalamud.Game.ClientState.JobGauge.Types;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -22,7 +22,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DragoonConfig Config => (DragoonConfig)_config;
 
-        public DragoonHud(string id, DragoonConfig config, string displayName = null) : base(id, config, displayName)
+        public DragoonHud(string id, DragoonConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -80,16 +80,16 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowChaosThrustBar)
             {
-                DrawChaosThrustBar(origin);
+                DrawChaosThrustBar(origin, player);
             }
 
             if (Config.ShowDisembowelBar)
             {
-                DrawDisembowelBar(origin);
+                DrawDisembowelBar(origin, player);
             }
 
             if (Config.ShowEyeOfTheDragonBar)
@@ -103,15 +103,14 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawChaosThrustBar(Vector2 origin)
+        private void DrawChaosThrustBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
             GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float duration = 0f;
 
             if (actor is BattleChara target)
             {
-                Status? chaosThrust = target.StatusList.FirstOrDefault(o => o.StatusId is 1312 or 118 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId);
+                Status? chaosThrust = target.StatusList.FirstOrDefault(o => o.StatusId is 1312 or 118 && o.SourceID == player.ObjectId);
                 duration = Math.Max(0f, chaosThrust?.RemainingTime ?? 0f);
             }
 
@@ -169,13 +168,12 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawDisembowelBar(Vector2 origin)
+        private void DrawDisembowelBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
             Vector2 cursorPos = origin + Config.Position + Config.DisembowelBarPosition - Config.DisembowelBarSize / 2f;
-
-            IEnumerable<Status> disembowelBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId is 1914 or 121);
+            IEnumerable<Status> disembowelBuff = player.StatusList.Where(o => o.StatusId is 1914 or 121);
             float duration = 0f;
+
             if (disembowelBuff.Any())
             {
                 Status buff = disembowelBuff.First();
@@ -215,19 +213,19 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Chaos Thrust" + "##ChaosThrust", separator = true)]
         [Order(30)]
         public bool ShowChaosThrustBar = true;
-        
+
         [Checkbox("Timer" + "##ChaosThrust")]
         [Order(35, collapseWith = nameof(ShowChaosThrustBar))]
         public bool ShowChaosThrustBarText = true;
-        
+
         [DragFloat2("Position" + "##ChaosThrust", min = -4000f, max = 4000f)]
         [Order(40, collapseWith = nameof(ShowChaosThrustBar))]
         public Vector2 ChaosThrustBarPosition = new(0, -76);
-        
+
         [DragFloat2("Size" + "##ChaosThrust", max = 2000f)]
         [Order(45, collapseWith = nameof(ShowChaosThrustBar))]
         public Vector2 ChaosThrustBarSize = new(254, 20);
-        
+
         [ColorEdit4("Color" + "##ChaosThrust")]
         [Order(50, collapseWith = nameof(ShowChaosThrustBar))]
         public PluginConfigColor ChaosThrustBarColor = new(new Vector4(106f / 255f, 82f / 255f, 148f / 255f, 100f / 100f));
@@ -237,15 +235,15 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Disembowel" + "##Disembowel", separator = true)]
         [Order(55)]
         public bool ShowDisembowelBar = true;
-        
+
         [Checkbox("Timer" + "##Disembowel")]
         [Order(60, collapseWith = nameof(ShowDisembowelBar))]
         public bool ShowDisembowelBarText = true;
-        
+
         [DragFloat2("Position" + "##Disembowel", min = -4000f, max = 4000f)]
         [Order(75, collapseWith = nameof(ShowDisembowelBar))]
         public Vector2 DisembowelBarPosition = new(0, -54);
-        
+
         [DragFloat2("Size" + "##Disembowel", max = 2000f)]
         [Order(80, collapseWith = nameof(ShowDisembowelBar))]
         public Vector2 DisembowelBarSize = new(254, 20);
@@ -259,7 +257,7 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Eye Of The Dragon" + "##EyeOfTheDragon", separator = true)]
         [Order(90)]
         public bool ShowEyeOfTheDragonBar = true;
-        
+
         [DragFloat2("Position" + "##EyeOfTheDragon", min = -4000f, max = 4000f)]
         [Order(95, collapseWith = nameof(ShowEyeOfTheDragonBar))]
         public Vector2 EyeOfTheDragonBarPosition = new(0, -32);

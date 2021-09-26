@@ -176,7 +176,7 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static TextureWrap GetIconAndTexCoordinates<T>(dynamic row, Vector2 size, out Vector2 uv0, out Vector2 uv1) where T : ExcelRow
+        public static TextureWrap? GetIconAndTexCoordinates<T>(dynamic row, Vector2 size, out Vector2 uv0, out Vector2 uv1) where T : ExcelRow
         {
             uv0 = Vector2.Zero;
             uv1 = Vector2.Zero;
@@ -242,11 +242,11 @@ namespace DelvUI.Helpers
             if (addon->IsVisible)
             {
                 ClipAround(
-                    new Vector2(addon->X+5, addon->Y+5), 
+                    new Vector2(addon->X + 5, addon->Y + 5),
                     new Vector2(
-                        addon->X + addon->WindowNode->AtkResNode.Width - 5, 
+                        addon->X + addon->WindowNode->AtkResNode.Width - 5,
                         addon->Y + addon->WindowNode->AtkResNode.Height - 5
-                    ), 
+                    ),
                     windowName, drawList, drawAction
                 );
             }

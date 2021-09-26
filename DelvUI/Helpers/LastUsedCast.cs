@@ -1,9 +1,8 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Logging;
 using DelvUI.Enums;
 using FFXIVClientStructs.FFXIV.Client.Game;
-using FFXIVClientStructs.FFXIV.Client.Game.Character;
 using ImGuiScene;
+using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using Companion = Lumina.Excel.GeneratedSheets.Companion;
 
@@ -11,22 +10,22 @@ namespace DelvUI.Helpers
 {
     public class LastUsedCast
     {
-        private readonly BattleChara.CastInfo _castInfo;
+        private ExcelRow? _lastUsedAction;
+
+        public readonly bool Interruptible;
         public readonly ActionType ActionType;
         public readonly uint CastId;
-        private dynamic _lastUsedAction;
-        public string ActionText;
-        public DamageType DamageType;
-        public TextureWrap IconTexture;
-        public bool Interruptable;
+        public string ActionText { get; private set; } = "";
+        public DamageType DamageType { get; private set; } = DamageType.Unknown;
+        public TextureWrap? IconTexture { get; private set; } = null;
 
-        public LastUsedCast(uint castId, ActionType actionType, BattleChara.CastInfo castInfo)
+        public LastUsedCast(uint castId, ActionType actionType, bool interruptible)
         {
             CastId = castId;
             ActionType = actionType;
-            _castInfo = castInfo;
+            Interruptible = interruptible;
+
             SetCastProperties();
-            PluginLog.Log("Loaded new icon");
         }
 
         private void SetCastProperties()
@@ -54,8 +53,6 @@ namespace DelvUI.Helpers
             }
 
             _lastUsedAction = null;
-            Interruptable = _castInfo.Interruptible > 0;
-
             if (CastId == 1 && ActionType != ActionType.Mount)
             {
                 ActionText = "Interacting...";
@@ -73,35 +70,43 @@ namespace DelvUI.Helpers
                 case ActionType.PvPAction:
                 case ActionType.CraftAction:
                 case ActionType.Ability:
-                    _lastUsedAction = Plugin.DataManager.GetExcelSheet<Action>()?.GetRow(CastId);
-                    ActionText = _lastUsedAction?.Name.ToString();
-                    IconTexture = TexturesCache.Instance.GetTexture<Action>(_lastUsedAction);
-                    DamageType = GetDamageType(_lastUsedAction);
+                    var action = Plugin.DataManager.GetExcelSheet<Action>()?.GetRow(CastId);
+                    ActionText = action?.Name.ToString() ?? "";
+                    IconTexture = TexturesCache.Instance.GetTexture<Action>(action);
+                    DamageType = GetDamageType(action);
+
+                    _lastUsedAction = action;
 
                     break;
 
                 case ActionType.Mount:
-                    _lastUsedAction = Plugin.DataManager.GetExcelSheet<Mount>()?.GetRow(CastId);
-                    ActionText = _lastUsedAction?.Singular.ToString();
-                    IconTexture = TexturesCache.Instance.GetTexture<Mount>(_lastUsedAction);
+                    var mount = Plugin.DataManager.GetExcelSheet<Mount>()?.GetRow(CastId);
+                    ActionText = mount?.Singular.ToString() ?? "";
+                    IconTexture = TexturesCache.Instance.GetTexture<Mount>(mount);
                     DamageType = DamageType.Unknown;
+
+                    _lastUsedAction = mount;
 
                     break;
 
                 case ActionType.KeyItem:
                 case ActionType.Item:
-                    _lastUsedAction = Plugin.DataManager.GetExcelSheet<Item>()?.GetRow(CastId);
-                    ActionText = _lastUsedAction?.Name.ToString() ?? "Using item...";
-                    IconTexture = TexturesCache.Instance.GetTexture<Item>(_lastUsedAction);
+                    var item = Plugin.DataManager.GetExcelSheet<Item>()?.GetRow(CastId);
+                    ActionText = item?.Name.ToString() ?? "Using item...";
+                    IconTexture = TexturesCache.Instance.GetTexture<Item>(item);
                     DamageType = DamageType.Unknown;
+
+                    _lastUsedAction = item;
 
                     break;
 
                 case ActionType.Companion:
-                    _lastUsedAction = Plugin.DataManager.GetExcelSheet<Companion>()?.GetRow(CastId);
-                    ActionText = _lastUsedAction?.Singular.ToString();
-                    IconTexture = TexturesCache.Instance.GetTexture<Companion>(_lastUsedAction);
+                    var companion = Plugin.DataManager.GetExcelSheet<Companion>()?.GetRow(CastId);
+                    ActionText = companion?.Singular.ToString() ?? "";
+                    IconTexture = TexturesCache.Instance.GetTexture<Companion>(companion);
                     DamageType = DamageType.Unknown;
+
+                    _lastUsedAction = companion;
 
                     break;
 
@@ -133,8 +138,13 @@ namespace DelvUI.Helpers
             }
         }
 
-        private static DamageType GetDamageType(Action action)
+        private static DamageType GetDamageType(Action? action)
         {
+            if (action == null)
+            {
+                return DamageType.Unknown;
+            }
+
             var damageType = (DamageType)action.AttackType.Row;
 
             if (damageType != DamageType.Magic && damageType != DamageType.Darkness && damageType != DamageType.Unknown)

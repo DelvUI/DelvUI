@@ -11,7 +11,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private MPTickerConfig Config => (MPTickerConfig)_config;
 
-        private MPTickHelper _mpTickHelper;
+        private MPTickHelper _mpTickHelper = null!;
         public GameObject? Actor { get; set; } = null;
 
         public MPTickerHud(string ID, MPTickerConfig config, string displayName) : base(ID, config, displayName) { }

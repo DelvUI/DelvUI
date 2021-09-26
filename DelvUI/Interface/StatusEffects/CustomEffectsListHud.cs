@@ -9,7 +9,7 @@ namespace DelvUI.Interface.StatusEffects
         {
         }
 
-        public GameObject TargetActor { get; set; } = null;
+        public GameObject? TargetActor { get; set; } = null!;
 
         protected override List<StatusEffectData> StatusEffectsData()
         {
