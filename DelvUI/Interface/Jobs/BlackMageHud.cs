@@ -447,7 +447,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region firestarter
-        [Checkbox("Show Firestarter Proc")]
+        [Checkbox("Show Firestarter Proc", separator = true)]
         [CollapseControl(50, 4)]
         public bool ShowFirestarterProcs = true;
 
@@ -473,7 +473,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region thundercloud
-        [Checkbox("Show Thundercloud Proc")]
+        [Checkbox("Show Thundercloud Proc", separator = true)]
         [CollapseControl(55, 5)]
         public bool ShowThundercloudProcs = true;
 
