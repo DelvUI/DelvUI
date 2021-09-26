@@ -201,6 +201,9 @@ namespace DelvUI.Interface.Jobs
                         chunkColors.Add(Config.PirouetteColor);
 
                         break;
+                        //default:
+                        //    chunkColors.Add(EmptyColor);
+                        //    break;
                 }
             }
 
@@ -219,7 +222,8 @@ namespace DelvUI.Interface.Jobs
             }
             else if (Config.StepGlowEnabled)
             {
-                builder.SetGlowChunks(glowChunks.ToArray()).SetGlowColor(Config.CurrentStepGlowColor.Base);
+                builder.SetGlowChunks(glowChunks.ToArray())
+                        .SetGlowColor(Config.CurrentStepGlowColor.Base);
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
