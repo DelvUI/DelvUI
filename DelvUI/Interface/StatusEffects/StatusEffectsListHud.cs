@@ -8,6 +8,9 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
 using Status = Dalamud.Game.ClientState.Statuses.Status;
+using FFXIVClientStructs.FFXIV.Client.Game;
+using Dalamud.Game.ClientState.Structs;
+using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.StatusEffects
 {
@@ -81,12 +84,6 @@ namespace DelvUI.Interface.StatusEffects
                 return list;
             }
 
-            var effectCount = battleChara.StatusList.Length;
-            if (effectCount == 0)
-            {
-                return list;
-            }
-
             var sheet = Plugin.DataManager.GetExcelSheet<LuminaStatus>();
             if (sheet == null)
             {
@@ -95,11 +92,9 @@ namespace DelvUI.Interface.StatusEffects
 
             var player = Plugin.ClientState.LocalPlayer;
 
-            for (var i = 0; i < effectCount; i++)
+            foreach (Status? status in battleChara.StatusList)
             {
-                var status = battleChara.StatusList[i];
-
-                if (status is not { StatusId: > 0 })
+                if (status is null || status.StatusId == 0)
                 {
                     continue;
                 }
