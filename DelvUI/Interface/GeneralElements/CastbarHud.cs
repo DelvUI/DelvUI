@@ -187,7 +187,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public override PluginConfigColor Color()
         {
-            if (Config.ShowInterruptableColor && LastUsedCast.Interruptible)
+            if (Config.ShowInterruptableColor && LastUsedCast?.Interruptible == true)
             {
                 return Config.InterruptableColor;
             }
@@ -197,19 +197,22 @@ namespace DelvUI.Interface.GeneralElements
                 return Config.Color;
             }
 
-            switch (LastUsedCast.DamageType)
+            if (LastUsedCast != null)
             {
-                case DamageType.Physical:
-                case DamageType.Blunt:
-                case DamageType.Slashing:
-                case DamageType.Piercing:
-                    return Config.PhysicalDamageColor;
+                switch (LastUsedCast.DamageType)
+                {
+                    case DamageType.Physical:
+                    case DamageType.Blunt:
+                    case DamageType.Slashing:
+                    case DamageType.Piercing:
+                        return Config.PhysicalDamageColor;
 
-                case DamageType.Magic:
-                    return Config.MagicalDamageColor;
+                    case DamageType.Magic:
+                        return Config.MagicalDamageColor;
 
-                case DamageType.Darkness:
-                    return Config.DarknessDamageColor;
+                    case DamageType.Darkness:
+                        return Config.DarknessDamageColor;
+                }
             }
 
             return Config.Color;

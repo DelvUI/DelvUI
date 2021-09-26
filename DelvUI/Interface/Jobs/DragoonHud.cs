@@ -22,7 +22,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DragoonConfig Config => (DragoonConfig)_config;
 
-        public DragoonHud(string id, DragoonConfig config, string displayName = null) : base(id, config, displayName)
+        public DragoonHud(string id, DragoonConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -215,19 +215,19 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Chaos Thrust" + "##ChaosThrust", separator = true)]
         [CollapseControl(30, 0)]
         public bool ShowChaosThrustBar = true;
-        
+
         [Checkbox("Timer" + "##ChaosThrust")]
         [CollapseWith(0, 0)]
         public bool ShowChaosThrustBarText = true;
-        
+
         [DragFloat2("Position" + "##ChaosThrust", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
         public Vector2 ChaosThrustBarPosition = new(0, -76);
-        
+
         [DragFloat2("Size" + "##ChaosThrust", max = 2000f)]
         [CollapseWith(5, 0)]
         public Vector2 ChaosThrustBarSize = new(254, 20);
-        
+
         [ColorEdit4("Color" + "##ChaosThrust")]
         [CollapseWith(15, 0)]
         public PluginConfigColor ChaosThrustBarColor = new(new Vector4(106f / 255f, 82f / 255f, 148f / 255f, 100f / 100f));
@@ -237,15 +237,15 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Disembowel" + "##Disembowel", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowDisembowelBar = true;
-        
+
         [Checkbox("Timer" + "##Disembowel")]
         [CollapseWith(0, 1)]
         public bool ShowDisembowelBarText = true;
-        
+
         [DragFloat2("Position" + "##Disembowel", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
         public Vector2 DisembowelBarPosition = new(0, -54);
-        
+
         [DragFloat2("Size" + "##Disembowel", max = 2000f)]
         [CollapseWith(10, 1)]
         public Vector2 DisembowelBarSize = new(254, 20);
@@ -259,7 +259,7 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Eye Of The Dragon" + "##EyeOfTheDragon", separator = true)]
         [CollapseControl(40, 2)]
         public bool ShowEyeOfTheDragonBar = true;
-        
+
         [DragFloat2("Position" + "##EyeOfTheDragon", min = -4000f, max = 4000f)]
         [CollapseWith(0, 2)]
         public Vector2 EyeOfTheDragonBarPosition = new(0, -32);

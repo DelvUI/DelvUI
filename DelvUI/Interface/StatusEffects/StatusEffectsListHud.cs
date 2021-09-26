@@ -28,7 +28,7 @@ namespace DelvUI.Interface.StatusEffects
 
         public StatusEffectsListHud(string id, StatusEffectsListConfig config, string displayName) : base(id, config, displayName)
         {
-            _config.onValueChanged += OnConfigPropertyChanged;
+            _config.ValueChangeEvent += OnConfigPropertyChanged;
 
             _durationLabel = new LabelHud(id + "_duration", config.IconConfig.DurationLabelConfig);
             _stacksLabel = new LabelHud(id + "_stacks", config.IconConfig.StacksLabelConfig);
@@ -38,7 +38,7 @@ namespace DelvUI.Interface.StatusEffects
 
         ~StatusEffectsListHud()
         {
-            _config.onValueChanged -= OnConfigPropertyChanged;
+            _config.ValueChangeEvent -= OnConfigPropertyChanged;
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()

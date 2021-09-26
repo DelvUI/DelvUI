@@ -284,7 +284,7 @@ namespace DelvUI.Interface.StatusEffects
             return true;
         }
 
-        public bool AddNewEntry(Status status)
+        public bool AddNewEntry(Status? status)
         {
             if (status != null && !List.ContainsKey(status.Name))
             {
@@ -297,11 +297,11 @@ namespace DelvUI.Interface.StatusEffects
             return false;
         }
 
-        private bool AddNewEntry(string input, ExcelSheet<Status> sheet)
+        private bool AddNewEntry(string input, ExcelSheet<Status>? sheet)
         {
-            if (input.Length > 0)
+            if (input.Length > 0 && sheet != null)
             {
-                Status status = null;
+                Status? status = null;
 
                 // try id
                 if (uint.TryParse(input, out uint uintValue))
@@ -405,7 +405,7 @@ namespace DelvUI.Interface.StatusEffects
                     {
                         var id = List.Values[i];
                         var name = List.Keys[i];
-                        var row = sheet.GetRow(id);
+                        var row = sheet?.GetRow(id);
 
                         if (_input != "" && !name.ToUpper().Contains(_input.ToUpper()))
                         {
@@ -493,7 +493,7 @@ namespace DelvUI.Interface.StatusEffects
             // pre-populated white list
             config.BlacklistConfig.UseAsWhitelist = true;
 
-            ExcelSheet<Status> sheet = Plugin.DataManager.GetExcelSheet<Status>();
+            ExcelSheet<Status>? sheet = Plugin.DataManager.GetExcelSheet<Status>();
             if (sheet != null)
             {
                 // Left Eye

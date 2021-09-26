@@ -138,7 +138,7 @@ namespace DelvUI.Interface.GeneralElements
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
         [NestedConfig("Tank Stance", 51)]
-        public TankStanceIndicatorConfig TankStanceIndicatorConfig = null;
+        public TankStanceIndicatorConfig? TankStanceIndicatorConfig = null;
 
         public UnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
         {

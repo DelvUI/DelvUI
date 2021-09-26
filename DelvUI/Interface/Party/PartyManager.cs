@@ -10,10 +10,12 @@ using PartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
 
 namespace DelvUI.Interface.Party
 {
+    public delegate void PartyMembersChangedEventHandler(PartyManager sender);
+
     public unsafe class PartyManager : IDisposable
     {
         #region Singleton
-        private static PartyManager _instance = null;
+        private static PartyManager _instance = null!;
         private PartyFramesConfig _config;
 
         private PartyManager(PartyFramesConfig config)
@@ -21,7 +23,7 @@ namespace DelvUI.Interface.Party
             Plugin.Framework.Update += FrameworkOnOnUpdateEvent;
 
             _config = config;
-            _config.onValueChanged += OnConfigPropertyChanged;
+            _config.ValueChangeEvent += OnConfigPropertyChanged;
 
             UpdatePreview();
         }
@@ -35,7 +37,7 @@ namespace DelvUI.Interface.Party
         public void Dispose()
         {
             Plugin.Framework.Update -= FrameworkOnOnUpdateEvent;
-            _config.onValueChanged -= OnConfigPropertyChanged;
+            _config.ValueChangeEvent -= OnConfigPropertyChanged;
         }
 
         public static PartyManager Instance => _instance;
@@ -45,7 +47,7 @@ namespace DelvUI.Interface.Party
         public IReadOnlyCollection<IPartyFramesMember> GroupMembers => _groupMembers.AsReadOnly();
         public uint MemberCount => (uint)_groupMembers.Count;
 
-        public event EventHandler<EventArgs>? MembersChangedEvent;
+        public event PartyMembersChangedEventHandler? MembersChangedEvent;
 
         public bool isInParty
         {
@@ -120,7 +122,7 @@ namespace DelvUI.Interface.Party
                 {
                     _groupMembers = newMembers;
 
-                    MembersChangedEvent?.Invoke(this, new EventArgs());
+                    MembersChangedEvent?.Invoke(this);
                 }
             }
             catch
@@ -147,7 +149,7 @@ namespace DelvUI.Interface.Party
             if (newMembers.Count != _groupMembers.Count)
             {
                 _groupMembers = newMembers;
-                MembersChangedEvent?.Invoke(this, new EventArgs());
+                MembersChangedEvent?.Invoke(this);
             }
         }
 
@@ -184,14 +186,14 @@ namespace DelvUI.Interface.Party
                 PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortingMode);
             }
 
-            MembersChangedEvent?.Invoke(this, new EventArgs());
+            MembersChangedEvent?.Invoke(this);
         }
 
         private void UpdateSortingMode()
         {
             PartySortingHelper.SortPartyMembers(ref _groupMembers, _config.SortingMode);
 
-            MembersChangedEvent?.Invoke(this, new EventArgs());
+            MembersChangedEvent?.Invoke(this);
         }
     }
 }

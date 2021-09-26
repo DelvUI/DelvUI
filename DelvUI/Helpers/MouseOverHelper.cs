@@ -51,7 +51,7 @@ namespace DelvUI.Helpers
 
         public static void Initialize() { Instance = new MouseOverHelper(); }
 
-        public static MouseOverHelper Instance { get; private set; }
+        public static MouseOverHelper Instance { get; private set; } = null!;
         #endregion
 
         private IntPtr _setUIMouseOverActorId;
@@ -60,7 +60,7 @@ namespace DelvUI.Helpers
         private IntPtr _requestAction;
         private Hook<OnRequestAction> _requsetActionHook;
 
-        private ExcelSheet<Action> _sheet;
+        private ExcelSheet<Action>? _sheet;
         public GameObject? Target = null;
 
         private void HandleUIMouseOverActorId(long arg1, long arg2)
@@ -83,7 +83,7 @@ namespace DelvUI.Helpers
 
         private bool IsActionValid(ulong actionID, GameObject? target)
         {
-            if (target == null || actionID == 0)
+            if (target == null || actionID == 0 || _sheet == null)
             {
                 return false;
             }

@@ -36,9 +36,9 @@ namespace DelvUI.Interface.Party
             var buffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesBuffsConfig>();
             var debuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesDebuffsConfig>();
 
-            config.onValueChanged += OnLayoutPropertyChanged;
-            _healthBarsConfig.onValueChanged += OnLayoutPropertyChanged;
-            _healthBarsConfig.ColorsConfig.onValueChanged += OnLayoutPropertyChanged;
+            config.ValueChangeEvent += OnLayoutPropertyChanged;
+            _healthBarsConfig.ValueChangeEvent += OnLayoutPropertyChanged;
+            _healthBarsConfig.ColorsConfig.ValueChangeEvent += OnLayoutPropertyChanged;
 
             bars = new List<PartyFramesBar>(MaxMemberCount);
             for (int i = 0; i < bars.Capacity; i++)
@@ -54,9 +54,9 @@ namespace DelvUI.Interface.Party
         {
             bars.Clear();
 
-            _config.onValueChanged -= OnLayoutPropertyChanged;
-            _healthBarsConfig.onValueChanged -= OnLayoutPropertyChanged;
-            _healthBarsConfig.ColorsConfig.onValueChanged -= OnLayoutPropertyChanged;
+            _config.ValueChangeEvent -= OnLayoutPropertyChanged;
+            _healthBarsConfig.ValueChangeEvent -= OnLayoutPropertyChanged;
+            _healthBarsConfig.ColorsConfig.ValueChangeEvent -= OnLayoutPropertyChanged;
             PartyManager.Instance.MembersChangedEvent -= OnMembersChanged;
         }
 
@@ -71,7 +71,7 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        private void OnMembersChanged(object sender, EventArgs args)
+        private void OnMembersChanged(PartyManager sender)
         {
             UpdateBars(_origin);
         }

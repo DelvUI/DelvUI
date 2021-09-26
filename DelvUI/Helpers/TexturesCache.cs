@@ -98,7 +98,7 @@ namespace DelvUI.Helpers
 
         public static void Initialize() { Instance = new TexturesCache(); }
 
-        public static TexturesCache Instance { get; private set; }
+        public static TexturesCache Instance { get; private set; } = null!;
 
         #endregion
     }

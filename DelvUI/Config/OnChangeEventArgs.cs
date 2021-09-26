@@ -2,6 +2,7 @@
 
 namespace DelvUI.Config
 {
+    public delegate void ConfigValueChangeEventHandler(PluginConfigObject sender, OnChangeBaseArgs args);
 
     public enum ChangeType
     {
@@ -34,9 +35,9 @@ namespace DelvUI.Config
 
     public interface IOnChangeEventArgs
     {
-        public abstract event EventHandler<OnChangeBaseArgs> onValueChanged;
+        public abstract event ConfigValueChangeEventHandler? ValueChangeEvent;
 
-        public abstract void onValueChangedRegisterEvent(OnChangeBaseArgs e);
+        public abstract void OnValueChanged(OnChangeBaseArgs e);
     }
 
 }

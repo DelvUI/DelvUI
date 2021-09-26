@@ -121,14 +121,14 @@ namespace DelvUI.Helpers
             return tankInvulnBuff.Any();
         }
 
-        public static GameObject? FindTargetOfTarget(GameObject target, GameObject? player, ObjectTable actors)
+        public static GameObject? FindTargetOfTarget(GameObject? target, GameObject? player, ObjectTable actors)
         {
             if (target == null)
             {
                 return null;
             }
 
-            if (target.TargetObjectId == 0 && player.TargetObjectId == 0)
+            if (target.TargetObjectId == 0 && player != null && player.TargetObjectId == 0)
             {
                 return player;
             }

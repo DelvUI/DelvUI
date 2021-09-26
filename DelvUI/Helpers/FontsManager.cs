@@ -21,7 +21,7 @@ namespace DelvUI.Helpers
             Instance = new FontsManager(basePath);
         }
 
-        public static FontsManager Instance { get; private set; }
+        public static FontsManager Instance { get; private set; } = null!;
         private FontsConfig? _config;
 
         public void LoadConfig()
@@ -35,9 +35,9 @@ namespace DelvUI.Helpers
             ConfigurationManager.GetInstance().ResetEvent += OnConfigReset;
         }
 
-        private void OnConfigReset(object sender, EventArgs e)
+        private void OnConfigReset(ConfigurationManager sender)
         {
-            _config = ConfigurationManager.GetInstance().GetConfigObject<FontsConfig>();
+            _config = sender.GetConfigObject<FontsConfig>();
         }
         #endregion
 
@@ -63,7 +63,7 @@ namespace DelvUI.Helpers
 
         public bool PushFont(string? fontId)
         {
-            if (fontId == null || !_config.Fonts.ContainsKey(fontId))
+            if (fontId == null || _config == null || !_config.Fonts.ContainsKey(fontId))
             {
                 return false;
             }

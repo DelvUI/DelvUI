@@ -182,7 +182,7 @@ namespace DelvUI.Helpers
 
         public static void DrawIcon(uint iconId, Vector2 position, Vector2 size, bool drawBorder, ImDrawListPtr drawList)
         {
-            TextureWrap texture = TexturesCache.Instance.GetTextureFromIconId(iconId);
+            TextureWrap? texture = TexturesCache.Instance.GetTextureFromIconId(iconId);
             if (texture == null)
             {
                 return;
@@ -259,11 +259,11 @@ namespace DelvUI.Helpers
             if (addon->IsVisible)
             {
                 ClipAround(
-                    new Vector2(addon->X+5, addon->Y+5), 
+                    new Vector2(addon->X + 5, addon->Y + 5),
                     new Vector2(
-                        addon->X + addon->WindowNode->AtkResNode.Width - 5, 
+                        addon->X + addon->WindowNode->AtkResNode.Width - 5,
                         addon->Y + addon->WindowNode->AtkResNode.Height - 5
-                    ), 
+                    ),
                     windowName, drawList, drawAction
                 );
             }
