@@ -1,4 +1,6 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
@@ -9,7 +11,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -52,7 +53,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowOverheat)
             {
@@ -71,7 +72,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowWildfire)
             {
-                DrawWildfireBar(origin);
+                DrawWildfireBar(origin, player);
             }
         }
 
@@ -159,10 +160,9 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        private void DrawWildfireBar(Vector2 origin)
+        private void DrawWildfireBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            var wildfireBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 1946);
+            var wildfireBuff = player.StatusList.Where(o => o.StatusId == 1946);
 
             var position = origin + Config.Position + Config.WildfirePosition - Config.WildfireSize / 2f;
 

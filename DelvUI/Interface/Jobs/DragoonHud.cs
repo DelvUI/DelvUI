@@ -1,4 +1,8 @@
-﻿using Dalamud.Game.ClientState.Structs;
+﻿using Dalamud.Game.ClientState.JobGauge.Enums;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -11,10 +15,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Enums;
-using Dalamud.Game.ClientState.JobGauge.Types;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -80,16 +80,16 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowChaosThrustBar)
             {
-                DrawChaosThrustBar(origin);
+                DrawChaosThrustBar(origin, player);
             }
 
             if (Config.ShowDisembowelBar)
             {
-                DrawDisembowelBar(origin);
+                DrawDisembowelBar(origin, player);
             }
 
             if (Config.ShowEyeOfTheDragonBar)
@@ -103,15 +103,14 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawChaosThrustBar(Vector2 origin)
+        private void DrawChaosThrustBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
             GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float duration = 0f;
 
             if (actor is BattleChara target)
             {
-                Status? chaosThrust = target.StatusList.FirstOrDefault(o => o.StatusId is 1312 or 118 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId);
+                Status? chaosThrust = target.StatusList.FirstOrDefault(o => o.StatusId is 1312 or 118 && o.SourceID == player.ObjectId);
                 duration = Math.Max(0f, chaosThrust?.RemainingTime ?? 0f);
             }
 
@@ -169,13 +168,12 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawDisembowelBar(Vector2 origin)
+        private void DrawDisembowelBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
             Vector2 cursorPos = origin + Config.Position + Config.DisembowelBarPosition - Config.DisembowelBarSize / 2f;
-
-            IEnumerable<Status> disembowelBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId is 1914 or 121);
+            IEnumerable<Status> disembowelBuff = player.StatusList.Where(o => o.StatusId is 1914 or 121);
             float duration = 0f;
+
             if (disembowelBuff.Any())
             {
                 Status buff = disembowelBuff.First();

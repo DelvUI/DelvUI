@@ -1,16 +1,16 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -44,7 +44,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowPowderGauge)
             {
@@ -53,7 +53,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowNoMercyBar)
             {
-                DrawNoMercyBar(origin);
+                DrawNoMercyBar(origin, player);
             }
         }
 
@@ -74,11 +74,10 @@ namespace DelvUI.Interface.Jobs
         }
 
 
-        private void DrawNoMercyBar(Vector2 origin)
+        private void DrawNoMercyBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
             Vector2 position = origin + Config.Position + Config.NoMercyBarPosition - Config.NoMercyBarSize / 2f;
-            var noMercyBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 1831);
+            var noMercyBuff = player.StatusList.Where(o => o.StatusId == 1831);
 
             var builder = BarBuilder.Create(position, Config.NoMercyBarSize)
                 .SetBackgroundColor(EmptyColor.Base);

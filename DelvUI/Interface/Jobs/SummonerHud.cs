@@ -1,3 +1,7 @@
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -10,9 +14,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -69,91 +70,100 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            DrawActiveDots(origin);
-            DrawRuinBar(origin);
-            DrawAetherBar(origin);
-            DrawTranceBar(origin);
-            DrawDreadWyrmAether(origin);
+            if (Config.ShowBio || Config.ShowMiasma)
+            {
+                DrawActiveDots(origin, player);
+            }
+
+            if (Config.ShowRuin)
+            {
+                DrawRuinBar(origin, player);
+            }
+
+            if (Config.ShowAether)
+            {
+                DrawAetherBar(origin, player);
+            }
+
+            if (Config.ShowTrance)
+            {
+                DrawTranceBar(origin);
+            }
+
+            if (Config.ShowDreadwyrmAether)
+            {
+                DrawDreadWyrmAether(origin);
+            }
         }
 
         private void DrawTranceBar(Vector2 origin)
         {
-            if (!Config.ShowTrance)
-            {
-                return;
-            }
-            
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
-            
+
             PluginConfigColor tranceColor;
             float maxDuration;
             float tranceDuration = gauge.TimerRemaining;
-            
+
             if (!_bahamutFinished && tranceDuration < 1)
             {
                 _bahamutFinished = true;
             }
-            
+
             switch (gauge.AetherFlags)
             {
                 case >= 16:
                     tranceColor = Config.PhoenixColor;
                     maxDuration = 20000f;
-            
+
                     break;
-            
+
                 case >= 8:
                     tranceColor = Config.BahamutColor;
                     maxDuration = 20000f;
                     _bahamutFinished = false;
-            
+
                     break;
-            
+
                 default:
                     // This is needed because as soon as you summon Bahamut the flag goes back to 0-2
                     tranceColor = _bahamutFinished ? Config.DreadwyrmColor : Config.BahamutColor;
                     maxDuration = _bahamutFinished ? 15000f : 20000f;
-            
+
                     break;
             }
-            
+
             Vector2 barSize = Config.TranceSize;
             Vector2 position = origin + Config.Position + Config.TrancePosition - barSize / 2f;
-            
+
             BarBuilder builder = BarBuilder.Create(position, barSize);
-            
+
             Bar bar = builder.AddInnerBar(tranceDuration / 1000f, maxDuration / 1000f, tranceColor).SetBackgroundColor(EmptyColor.Base).Build();
-            
+
             if (Config.ShowTranceText)
             {
                 builder.SetTextMode(BarTextMode.Single)
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
-            
+
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);
         }
 
         public void DrawDreadWyrmAether(Vector2 origin)
         {
-            if (!Config.ShowDreadwyrmAether)
-            {
-                return;
-            }
-            
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             var stacks = gauge.AetherFlags;
             List<Bar> barDrawList = new();
-            
+
             if (Config.ShowDemiIndicator)
             {
                 Vector2 barSize = Config.IndicatorSize;
                 Vector2 position = origin + Config.Position + Config.IndicatorPosition - barSize / 2f;
-            
+
                 BarBuilder builder = BarBuilder.Create(position, barSize);
-            
+
                 if (stacks >= 8 && stacks < 16)
                 {
                     Bar indicatorBar = builder.AddInnerBar(1, 1, Config.BahamutReadyColor)
@@ -175,14 +185,14 @@ namespace DelvUI.Interface.Jobs
                     barDrawList.Add(indicatorBar);
                 }
             }
-            
+
             if (Config.ShowDreadwyrmAetherBars)
             {
                 Vector2 barSize = Config.DreadwyrmAetherBarSize;
                 Vector2 position = origin + Config.Position + Config.DreadwyrmAetherBarPosition - barSize / 2f;
-            
+
                 var filledChunkCount = 0;
-            
+
                 if (stacks >= 4 && stacks < 8)
                 {
                     filledChunkCount = 1;
@@ -191,7 +201,7 @@ namespace DelvUI.Interface.Jobs
                 {
                     filledChunkCount = 2;
                 }
-            
+
                 Bar DreadwyrmAetherBars = BarBuilder.Create(position, barSize)
                                                     .SetChunks(2)
                                                     .SetChunkPadding(Config.DreadwyrmAetherBarPadding)
@@ -200,27 +210,20 @@ namespace DelvUI.Interface.Jobs
                                                     .Build();
                 barDrawList.Add(DreadwyrmAetherBars);
             }
-            
+
             if (barDrawList.Count > 0)
             {
                 ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            
+
                 foreach (Bar bar in barDrawList)
                 {
                     bar.Draw(drawList);
                 }
             }
         }
-        private void DrawActiveDots(Vector2 origin)
+        private void DrawActiveDots(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
             GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-
-            if (!Config.ShowBio && !Config.ShowMiasma)
-            {
-                return;
-            }
-
             if (actor is not BattleChara target)
             {
                 return;
@@ -234,8 +237,8 @@ namespace DelvUI.Interface.Jobs
             if (Config.ShowMiasma)
             {
                 Status? miasma = target.StatusList.FirstOrDefault(
-                    o => o.StatusId == 1215 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
-                      || o.StatusId == 180 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
+                    o => o.StatusId == 1215 && o.SourceID == player.ObjectId
+                      || o.StatusId == 180 && o.SourceID == player.ObjectId
                 );
 
                 float miasmaDuration = Math.Abs(miasma?.RemainingTime ?? 0f);
@@ -252,15 +255,15 @@ namespace DelvUI.Interface.Jobs
                            .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
                 }
                 barDrawList.Add(miasmaBar);
-                
+
             }
 
             if (Config.ShowBio)
             {
                 Status? bio = target.StatusList.FirstOrDefault(
-                    o => o.StatusId == 1214 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
-                      || o.StatusId == 179 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
-                      || o.StatusId == 189 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
+                    o => o.StatusId == 1214 && o.SourceID == player.ObjectId
+                      || o.StatusId == 179 && o.SourceID == player.ObjectId
+                      || o.StatusId == 189 && o.SourceID == player.ObjectId
                 );
 
                 float bioDuration = Math.Abs(bio?.RemainingTime ?? 0f);
@@ -293,18 +296,12 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawRuinBar(Vector2 origin)
+        private void DrawRuinBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            Status? ruinBuff = Plugin.ClientState.LocalPlayer.StatusList.FirstOrDefault(o => o.StatusId == 1212);
+            Status? ruinBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 1212);
 
             Vector2 barSize = Config.RuinSize;
             Vector2 position = origin + Config.Position + Config.RuinPosition - barSize / 2f;
-
-            if (!Config.ShowRuin)
-            {
-                return;
-            }
 
             Bar bar = BarBuilder.Create(position, barSize)
                                 .SetChunks(4)
@@ -317,18 +314,12 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawAetherBar(Vector2 origin)
+        private void DrawAetherBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            Status? aetherFlowBuff = Plugin.ClientState.LocalPlayer.StatusList.FirstOrDefault(o => o.StatusId == 304);
+            Status? aetherFlowBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 304);
 
             Vector2 barSize = Config.AetherSize;
             Vector2 position = origin + Config.Position + Config.AetherPosition - barSize / 2f;
-
-            if (!Config.ShowAether)
-            {
-                return;
-            }
 
             Bar bar = BarBuilder.Create(position, barSize)
                                 .SetChunks(2)
@@ -398,7 +389,7 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Miasma Enabled", separator = true)]
         [CollapseControl(40, 3)]
         public bool ShowMiasma = true;
-        
+
         [Checkbox("Miasma Text")]
         [CollapseWith(0, 3)]
         public bool ShowMiasmaText = true;

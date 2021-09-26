@@ -61,11 +61,11 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowManaBar)
             {
-                DrawManaBar(origin);
+                DrawManaBar(origin, player);
             }
 
             if (Config.ShowOathGauge)
@@ -75,25 +75,22 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowBuffBar)
             {
-                DrawBuffBar(origin);
+                DrawBuffBar(origin, player);
             }
 
             if (Config.ShowAtonementBar)
             {
-                DrawAtonementBar(origin);
+                DrawAtonementBar(origin, player);
             }
 
             if (Config.ShowGoringBladeBar)
             {
-                DrawDoTBar(origin);
+                DrawDoTBar(origin, player);
             }
         }
 
-        private void DrawManaBar(Vector2 origin)
+        private void DrawManaBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            PlayerCharacter actor = Plugin.ClientState.LocalPlayer;
-
             float posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
             float posY = origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f;
 
@@ -101,16 +98,16 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ChunkManaBar)
             {
-                builder.SetChunks(5).SetChunkPadding(Config.ManaBarPadding).AddInnerBar(actor.CurrentMp, actor.MaxMp, Config.ManaBarColor, EmptyColor);
+                builder.SetChunks(5).SetChunkPadding(Config.ManaBarPadding).AddInnerBar(player.CurrentMp, player.MaxMp, Config.ManaBarColor, EmptyColor);
             }
             else
             {
-                builder.AddInnerBar(actor.CurrentMp, actor.MaxMp, Config.ManaBarColor);
+                builder.AddInnerBar(player.CurrentMp, player.MaxMp, Config.ManaBarColor);
             }
 
             if (Config.ShowManaBarText)
             {
-                string formattedManaText = TextTags.GenerateFormattedTextFromTags(actor, "[mana:current-short]");
+                string formattedManaText = TextTags.GenerateFormattedTextFromTags(player, "[mana:current-short]");
 
                 builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterLeft, BarTextType.Custom, formattedManaText);
             }
@@ -141,11 +138,10 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        private void DrawBuffBar(Vector2 origin)
+        private void DrawBuffBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            IEnumerable<Status> fightOrFlightBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 76);
-            IEnumerable<Status> requiescatBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 1368);
+            IEnumerable<Status> fightOrFlightBuff = player.StatusList.Where(o => o.StatusId == 76);
+            IEnumerable<Status> requiescatBuff = player.StatusList.Where(o => o.StatusId == 1368);
 
             float xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
@@ -178,10 +174,9 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        private void DrawAtonementBar(Vector2 origin)
+        private void DrawAtonementBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            IEnumerable<Status> atonementBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 1902);
+            IEnumerable<Status> atonementBuff = player.StatusList.Where(o => o.StatusId == 1902);
             int stackCount = atonementBuff.Any() ? atonementBuff.First().StackCount : 0;
 
             float xPos = origin.X + Config.Position.X + Config.AtonementBarPosition.X - Config.AtonementBarSize.X / 2f;
@@ -197,17 +192,15 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        private void DrawDoTBar(Vector2 origin)
+        private void DrawDoTBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
             GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-
             if (actor is not BattleChara target)
             {
                 return;
             }
 
-            Status? goringBlade = target.StatusList.FirstOrDefault(o => o.StatusId == 725 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId);
+            Status? goringBlade = target.StatusList.FirstOrDefault(o => o.StatusId == 725 && o.SourceID == player.ObjectId);
 
             float duration = Math.Abs(goringBlade?.RemainingTime ?? 0f);
 

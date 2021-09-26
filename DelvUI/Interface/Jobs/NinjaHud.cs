@@ -1,4 +1,7 @@
-﻿using Dalamud.Game.ClientState.Structs;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -11,9 +14,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -63,11 +63,11 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowMudraCooldown)
             {
-                DrawMudraBars(origin);
+                DrawMudraBars(origin, player);
             }
 
             if (Config.ShowHutonGauge)
@@ -82,14 +82,12 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowTrickBar || Config.ShowSuitonBar)
             {
-                DrawTrickAndSuitonGauge(origin);
+                DrawTrickAndSuitonGauge(origin, player);
             }
         }
 
-        private void DrawMudraBars(Vector2 origin)
+        private void DrawMudraBars(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-
             float xPos = origin.X + Config.Position.X + Config.MudraBarPosition.X - Config.MudraBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.MudraBarPosition.Y - Config.MudraBarSize.Y / 2f;
 
@@ -103,7 +101,7 @@ namespace DelvUI.Interface.Jobs
 
             // is the player casting ninjutsu or under kassatsu?
             Status? mudraBuff = null, kassatsuBuff = null, tcjBuff = null;
-            foreach (Status statusEffect in Plugin.ClientState.LocalPlayer.StatusList)
+            foreach (Status statusEffect in player.StatusList)
             {
                 if (statusEffect.StatusId == 496) { mudraBuff = statusEffect; }
                 if (statusEffect.StatusId == 497) { kassatsuBuff = statusEffect; }
@@ -289,14 +287,8 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawTrickAndSuitonGauge(Vector2 origin)
+        private void DrawTrickAndSuitonGauge(Vector2 origin, PlayerCharacter player)
         {
-            var player = Plugin.ClientState.LocalPlayer;
-            if (player is null)
-            {
-                return;
-            }
-
             float xPos = origin.X + Config.Position.X + Config.TrickBarPosition.X - Config.TrickBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.TrickBarPosition.Y - Config.TrickBarSize.Y / 2f;
 
@@ -308,7 +300,6 @@ namespace DelvUI.Interface.Jobs
 
             if (actor is BattleChara target)
             {
-                Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
                 Status? trickStatus = target.StatusList.FirstOrDefault(o => o.StatusId == 638 && o.SourceID == player.ObjectId);
                 trickDuration = Math.Max(trickStatus?.RemainingTime ?? 0f, 0);
             }
@@ -323,8 +314,7 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            IEnumerable<Status> suitonBuff = Plugin.ClientState.LocalPlayer.StatusList.Where(o => o.StatusId == 507);
+            IEnumerable<Status> suitonBuff = player.StatusList.Where(o => o.StatusId == 507);
 
             if (suitonBuff.Any() && Config.ShowSuitonBar)
             {

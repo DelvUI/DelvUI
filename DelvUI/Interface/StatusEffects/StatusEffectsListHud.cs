@@ -1,6 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Structs;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -90,17 +89,11 @@ namespace DelvUI.Interface.StatusEffects
                 return list;
             }
 
-            var effectCount = character.StatusList.Length;
-            if (effectCount == 0)
-            {
-                return list;
-            }
-
             var player = Plugin.ClientState.LocalPlayer;
 
-            foreach (Status status in character.StatusList)
+            foreach (Status? status in character.StatusList)
             {
-                if (status is not { StatusId: > 0 })
+                if (status is null || status.StatusId == 0)
                 {
                     continue;
                 }
