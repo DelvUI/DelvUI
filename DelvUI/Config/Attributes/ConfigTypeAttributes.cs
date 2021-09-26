@@ -1,4 +1,5 @@
 ﻿using Dalamud.Interface;
+using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
@@ -536,6 +537,23 @@ namespace DelvUI.Config.Attributes
         public AnchorAttribute(string friendlyName)
             : base(friendlyName, new string[] { "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight" })
         {
+        }
+
+        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
+        {
+            DrawAnchor? fieldVal = (DrawAnchor?)field.GetValue(config);
+            int intVal = fieldVal.HasValue ? (int)fieldVal.Value : 0;
+
+            if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, options.Length, 4))
+            {
+                field.SetValue(config, (DrawAnchor)intVal);
+
+                TriggerChangeEvent<int>(config, field.Name, intVal);
+
+                return true;
+            }
+
+            return false;
         }
     }
 

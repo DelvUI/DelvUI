@@ -1,3 +1,7 @@
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -10,9 +14,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -78,26 +79,26 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowFormsBar)
             {
-                DrawFormsBar(origin);
+                DrawFormsBar(origin, player);
             }
 
             if (Config.ShowRiddleofEarthBar)
             {
-                DrawRiddleOfEarthBar(origin);
+                DrawRiddleOfEarthBar(origin, player);
             }
 
             if (Config.ShowPerfectBalanceBar)
             {
-                DrawPerfectBalanceBar(origin);
+                DrawPerfectBalanceBar(origin, player);
             }
 
             if (Config.ShowTrueNorthBar)
             {
-                DrawTrueNorthBar(origin);
+                DrawTrueNorthBar(origin, player);
             }
 
             if (Config.ShowChakraBar)
@@ -107,28 +108,26 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowLeadenFistBar)
             {
-                DrawLeadenFistBar(origin);
+                DrawLeadenFistBar(origin, player);
             }
 
             if (Config.ShowTwinSnakesBar)
             {
-                DrawTwinSnakesBar(origin);
+                DrawTwinSnakesBar(origin, player);
             }
 
             if (Config.ShowDemolishBar)
             {
-                DrawDemolishBar(origin);
+                DrawDemolishBar(origin, player);
             }
         }
 
-        private void DrawFormsBar(Vector2 origin)
+        private void DrawFormsBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            var target = Plugin.ClientState.LocalPlayer;
-            var opoOpoForm = target.StatusList.FirstOrDefault(o => o.StatusId == 107);
-            var raptorForm = target.StatusList.FirstOrDefault(o => o.StatusId == 108);
-            var coeurlForm = target.StatusList.FirstOrDefault(o => o.StatusId == 109);
-            var formlessFist = target.StatusList.FirstOrDefault(o => o.StatusId == 2513);
+            var opoOpoForm = player.StatusList.FirstOrDefault(o => o.StatusId == 107);
+            var raptorForm = player.StatusList.FirstOrDefault(o => o.StatusId == 108);
+            var coeurlForm = player.StatusList.FirstOrDefault(o => o.StatusId == 109);
+            var formlessFist = player.StatusList.FirstOrDefault(o => o.StatusId == 2513);
 
             var opoOpoFormDuration = opoOpoForm?.RemainingTime ?? 0f;
             var raptorFormDuration = raptorForm?.RemainingTime ?? 0f;
@@ -198,11 +197,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawTrueNorthBar(Vector2 origin)
+        private void DrawTrueNorthBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            var target = Plugin.ClientState.LocalPlayer;
-            var trueNorth = target.StatusList.FirstOrDefault(o => o.StatusId == 1250);
+            var trueNorth = player.StatusList.FirstOrDefault(o => o.StatusId == 1250);
             var trueNorthDuration = trueNorth?.RemainingTime ?? 0f;
 
             var position = origin + Config.Position + Config.TrueNorthBarPosition - Config.TrueNorthBarSize / 2f;
@@ -231,11 +228,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawPerfectBalanceBar(Vector2 origin)
+        private void DrawPerfectBalanceBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            var target = Plugin.ClientState.LocalPlayer;
-            var perfectBalance = target.StatusList.FirstOrDefault(o => o.StatusId == 110);
+            var perfectBalance = player.StatusList.FirstOrDefault(o => o.StatusId == 110);
             var perfectBalanceDuration = perfectBalance?.StackCount ?? 0;
 
             var position = origin + Config.Position + Config.PerfectBalanceBarPosition - Config.PerfectBalanceBarSize / 2f;
@@ -266,11 +261,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawRiddleOfEarthBar(Vector2 origin)
+        private void DrawRiddleOfEarthBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            var target = Plugin.ClientState.LocalPlayer;
-            var riddleOfEarth = target.StatusList.FirstOrDefault(o => o.StatusId == 1179);
+            var riddleOfEarth = player.StatusList.FirstOrDefault(o => o.StatusId == 1179);
             var riddleOfEarthDuration = riddleOfEarth?.StackCount ?? 0;
 
             var position = origin + Config.Position + Config.RiddleofEarthBarPosition - Config.RiddleofEarthBarSize / 2f;
@@ -317,11 +310,9 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawTwinSnakesBar(Vector2 origin)
+        private void DrawTwinSnakesBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            var target = Plugin.ClientState.LocalPlayer;
-            var twinSnakes = target.StatusList.FirstOrDefault(o => o.StatusId == 101);
+            var twinSnakes = player.StatusList.FirstOrDefault(o => o.StatusId == 101);
             var twinSnakesDuration = twinSnakes?.RemainingTime ?? 0f;
 
             var position = origin + Config.Position + Config.TwinSnakesBarPosition - Config.TwinSnakesBarSize / 2f;
@@ -340,11 +331,9 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawLeadenFistBar(Vector2 origin)
+        private void DrawLeadenFistBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            var target = Plugin.ClientState.LocalPlayer;
-            var leadenFist = target.StatusList.FirstOrDefault(o => o.StatusId == 1861);
+            var leadenFist = player.StatusList.FirstOrDefault(o => o.StatusId == 1861);
             var leadenFistDuration = leadenFist?.RemainingTime ?? 0f;
 
             var position = origin + Config.Position + Config.LeadenFistBarPosition - Config.LeadenFistBarSize / 2f;
@@ -374,16 +363,15 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawDemolishBar(Vector2 origin)
+        private void DrawDemolishBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target ?? Plugin.ClientState.LocalPlayer;
+            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target ?? player;
 
             var demolishDuration = 0f;
 
             if (actor is BattleChara target)
             {
-                Status? demolish = target.StatusList.FirstOrDefault(o => o.StatusId is 246 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId);
+                Status? demolish = target.StatusList.FirstOrDefault(o => o.StatusId is 246 && o.SourceID == player.ObjectId);
                 demolishDuration = demolish?.RemainingTime ?? 0f;
             }
 

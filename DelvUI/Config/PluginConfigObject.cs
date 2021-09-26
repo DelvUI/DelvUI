@@ -51,7 +51,6 @@ namespace DelvUI.Config
 
         public static PluginConfigObject DefaultConfig()
         {
-            Debug.Assert(false, "Static method 'DefaultConfig' not found !!!");
             return null;
         }
 

@@ -1,4 +1,7 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
@@ -10,8 +13,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
-using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -52,7 +53,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowFairy)
             {
@@ -61,12 +62,12 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowBio)
             {
-                DrawBioBar(origin);
+                DrawBioBar(origin, player);
             }
 
             if (Config.ShowAether)
             {
-                DrawAetherBar(origin);
+                DrawAetherBar(origin, player);
             }
         }
 
@@ -111,10 +112,9 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawAetherBar(Vector2 origin)
+        private void DrawAetherBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            var aetherFlowBuff = Plugin.ClientState.LocalPlayer.StatusList.FirstOrDefault(o => o.StatusId == 304);
+            var aetherFlowBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 304);
             Vector2 barSize = Config.AetherSize;
             Vector2 position = origin + Config.Position + Config.AetherPosition - barSize / 2f;
 
@@ -134,9 +134,8 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawBioBar(Vector2 origin)
+        private void DrawBioBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
             var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
             float bioDuration = 0;
@@ -144,9 +143,9 @@ namespace DelvUI.Interface.Jobs
             if (actor is BattleChara target)
             {
                 var bio = target.StatusList.FirstOrDefault(
-                    o => o.StatusId == 179 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
-                      || o.StatusId == 189 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
-                      || o.StatusId == 1895 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
+                    o => o.StatusId == 179 && o.SourceID == player.ObjectId
+                      || o.StatusId == 189 && o.SourceID == player.ObjectId
+                      || o.StatusId == 1895 && o.SourceID == player.ObjectId
                 );
 
                 bioDuration = Math.Abs(bio?.RemainingTime ?? 0f);

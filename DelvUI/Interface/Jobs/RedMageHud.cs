@@ -1,4 +1,6 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
@@ -10,7 +12,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -73,7 +74,7 @@ namespace DelvUI.Interface.Jobs
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowBalanceBar)
             {
@@ -92,22 +93,22 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowAcceleration)
             {
-                DrawAccelerationBar(origin);
+                DrawAccelerationBar(origin, player);
             }
 
             if (Config.ShowDualCast)
             {
-                DrawDualCastBar(origin);
+                DrawDualCastBar(origin, player);
             }
 
             if (Config.ShowVerstoneProcs)
             {
-                DrawVerstoneProc(origin);
+                DrawVerstoneProc(origin, player);
             }
 
             if (Config.ShowVerfireProcs)
             {
-                DrawVerfireProc(origin);
+                DrawVerfireProc(origin, player);
             }
         }
 
@@ -175,10 +176,9 @@ namespace DelvUI.Interface.Jobs
             DrawCustomBar(position, Config.BlackManaBarSize, Config.BlackManaBarColor, gauge, 100, thresholdRatio, Config.BlackManaBarInverted, Config.ShowBlackManaValue);
         }
 
-        private void DrawAccelerationBar(Vector2 origin)
+        private void DrawAccelerationBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            var accelBuff = Plugin.ClientState.LocalPlayer.StatusList.FirstOrDefault(o => o.StatusId == 1238);
+            var accelBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 1238);
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.AccelerationBarPosition.X - Config.AccelerationBarSize.X / 2f,
@@ -196,10 +196,9 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(drawList);
         }
 
-        private void DrawDualCastBar(Vector2 origin)
+        private void DrawDualCastBar(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            var dualCastBuff = Math.Abs(Plugin.ClientState.LocalPlayer.StatusList.FirstOrDefault(o => o.StatusId == 1249)?.RemainingTime ?? 0f);
+            var dualCastBuff = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId == 1249)?.RemainingTime ?? 0f);
             var value = dualCastBuff > 0 ? 1 : 0;
 
             var position = new Vector2(
@@ -215,10 +214,9 @@ namespace DelvUI.Interface.Jobs
             builder.Build().Draw(drawList);
         }
 
-        private void DrawVerstoneProc(Vector2 origin)
+        private void DrawVerstoneProc(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            var duration = (int)Math.Abs(Plugin.ClientState.LocalPlayer.StatusList.FirstOrDefault(o => o.StatusId == 1235)?.RemainingTime ?? 0f);
+            var duration = (int)Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId == 1235)?.RemainingTime ?? 0f);
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.VerstoneBarPosition.X - Config.VerstoneBarSize.X / 2f,
@@ -228,10 +226,9 @@ namespace DelvUI.Interface.Jobs
             DrawCustomBar(position, Config.VerstoneBarSize, Config.VerstoneColor, duration, 30, 0, Config.InvertVerstoneBar, Config.ShowVerstoneText);
         }
 
-        private void DrawVerfireProc(Vector2 origin)
+        private void DrawVerfireProc(Vector2 origin, PlayerCharacter player)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            var duration = (int)Math.Abs(Plugin.ClientState.LocalPlayer.StatusList.FirstOrDefault(o => o.StatusId == 1234)?.RemainingTime ?? 0f);
+            var duration = (int)Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId == 1234)?.RemainingTime ?? 0f);
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.VerfireBarPosition.X - Config.VerfireBarSize.X / 2f,
