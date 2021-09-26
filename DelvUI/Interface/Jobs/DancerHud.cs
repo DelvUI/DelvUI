@@ -202,6 +202,9 @@ namespace DelvUI.Interface.Jobs
                         chunkColors.Add(Config.PirouetteColor);
 
                         break;
+                    default:
+                        chunkColors.Add(EmptyColor);
+                        break;
                 }
             }
 
@@ -220,7 +223,8 @@ namespace DelvUI.Interface.Jobs
             }
             else if (Config.StepGlowEnabled)
             {
-                builder.SetGlowChunks(glowChunks.ToArray()).SetGlowColor(Config.CurrentStepGlowColor.Base);
+                builder.SetGlowChunks(glowChunks.ToArray())
+                        .SetGlowColor(Config.CurrentStepGlowColor.Base);
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -365,14 +369,22 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.StaticProcBarsEnabled)
             {
-                if(cascadeDuration > 0)
+                if (cascadeDuration > 0)
+                {
                     cascadeBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                if(fountainDuration > 0)
+                }
+                if (fountainDuration > 0)
+                {
                     fountainBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                if(windmillDuration > 0)
+                }
+                if (windmillDuration > 0)
+                {
                     windmillBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                if(showerDuration > 0)
+                }
+                if (showerDuration > 0)
+                {
                     showerBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
