@@ -51,7 +51,7 @@ namespace DelvUI.Config
 
         public static PluginConfigObject DefaultConfig()
         {
-            return null;
+            return null!;
         }
 
         #region IOnChangeEventArgs
