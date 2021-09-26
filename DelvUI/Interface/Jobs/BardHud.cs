@@ -1,4 +1,9 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Game.ClientState.JobGauge.Enums;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
@@ -7,13 +12,8 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Enums;
-using Dalamud.Game.ClientState.JobGauge.Types;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -64,7 +64,7 @@ namespace DelvUI.Interface.Jobs
 
             return (positions, sizes);
         }
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             if (Config.ShowCB || Config.ShowSB)
             {
@@ -81,9 +81,13 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawActiveDots(Vector2 origin)
         {
-            Debug.Assert(Plugin.ClientState.LocalPlayer != null, "Plugin.ClientState.LocalPlayer != null");
-            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            var player = Plugin.ClientState.LocalPlayer;
+            if (player == null)
+            {
+                return;
+            }
 
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             if (actor is not BattleChara && !Config.CBNoTarget && !Config.SBNoTarget)
             {
                 return;
@@ -101,8 +105,8 @@ namespace DelvUI.Interface.Jobs
                 if (actor is BattleChara target)
                 {
                     Status? cb = target.StatusList.FirstOrDefault(
-                        o => o.StatusId == 1200 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
-                          || o.StatusId == 124 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
+                        o => o.StatusId == 1200 && o.SourceID == player.ObjectId
+                          || o.StatusId == 124 && o.SourceID == player.ObjectId
                     );
 
                     duration = Math.Abs(cb?.RemainingTime ?? 0f);
@@ -137,8 +141,8 @@ namespace DelvUI.Interface.Jobs
                 if (actor is BattleChara target)
                 {
                     Status? sb = target.StatusList.FirstOrDefault(
-                        o => o.StatusId == 1201 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
-                          || o.StatusId == 129 && o.SourceID == Plugin.ClientState.LocalPlayer.ObjectId
+                        o => o.StatusId == 1201 && o.SourceID == player.ObjectId
+                          || o.StatusId == 129 && o.SourceID == player.ObjectId
                     );
 
                     duration = Math.Abs(sb?.RemainingTime ?? 0f);
