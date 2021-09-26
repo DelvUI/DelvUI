@@ -18,8 +18,7 @@ namespace DelvUI.GameStructs
 
     public enum DNCStep : uint
     {
-        None,
-        TechnicalStep = 15998,
+        None = 15998,
         Emboite = 15999,
         Entrechat = 16000,
         Jete = 16001,

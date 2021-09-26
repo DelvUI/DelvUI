@@ -149,7 +149,7 @@ namespace DelvUI.Interface.Jobs
         private unsafe void DrawStepBar(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<DNCGauge>();
-            
+
             if (!gauge.IsDancing)
             {
                 return;
@@ -202,9 +202,9 @@ namespace DelvUI.Interface.Jobs
                         chunkColors.Add(Config.PirouetteColor);
 
                         break;
-                    default:
-                        chunkColors.Add(EmptyColor);
-                        break;
+                        //default:
+                        //    chunkColors.Add(EmptyColor);
+                        //    break;
                 }
             }
 
