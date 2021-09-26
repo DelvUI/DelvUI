@@ -20,36 +20,36 @@ namespace DelvUI.Interface.GeneralElements
         [Order(30)]
         public bool VerticalMode = false;
         
-        [Checkbox("Circular Mode")]
-        [Order(35)]
-        public bool CircularMode = false;
-        
         [Checkbox("Anchor To Mouse", spacing = true)]
-        [Order(40)]
+        [Order(35)]
         public bool AnchorToMouse = false;
         
-        [Checkbox("Change Position (0,0 = centered with cursor point)")]
-        [Order(45)]
-        public bool OffsetMousePosition = false;
-        
+        [Checkbox("Circular Mode")]
+        [Order(40)]
+        public bool CircularMode = false;
+
         [DragInt("Radius")]
-        [CollapseWith(50,0)]
+        [Order(45, collapseWith = nameof(CircularMode))]
         public int CircleRadius = 40;
         
         [DragInt("Thickness")]
-        [CollapseWith(55,0)]
+        [Order(50, collapseWith = nameof(CircularMode))]
         public int CircleThickness = 10;
+
+        [Checkbox("Change Position (0,0 = centered with cursor point)")]
+        [Order(55)]
+        public bool OffsetMousePosition = false;
 
         [ColorEdit4("Color", spacing = true)]
         [Order(60)]
         public PluginConfigColor Color = new PluginConfigColor(new(220f / 255f, 220f / 255f, 220f / 255f, 100f / 100f));
 
         [Checkbox("Show GCD Queue Indicator")]
-        [Order(70)]
+        [Order(65)]
         public bool ShowGCDQueueIndicator = true;
 
         [ColorEdit4("GCD Queue Color")]
-        [Order(75)]
+        [Order(70, collapseWith = nameof(ShowGCDQueueIndicator))]
         public PluginConfigColor QueueColor = new PluginConfigColor(new(13f / 255f, 207f / 255f, 31f / 255f, 100f / 100f));
 
         public GCDIndicatorConfig(Vector2 position, Vector2 size)

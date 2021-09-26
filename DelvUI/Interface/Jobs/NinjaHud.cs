@@ -347,39 +347,39 @@ namespace DelvUI.Interface.Jobs
 
         #region huton gauge
         [Checkbox("Huton" + "##Huton", separator = true)]
-        [CollapseControl(30, 0)]
+        [Order(30)]
         public bool ShowHutonGauge = true;
 
         [Checkbox("Timer" + "##Huton")]
-        [CollapseWith(0, 0)]
+        [Order(35, collapseWith = nameof(ShowHutonGauge))]
         public bool ShowHutonGaugeText = true;  
         
         [Checkbox("Border" + "##Huton")]
-        [CollapseWith(1, 0)]
+        [Order(40, collapseWith = nameof(ShowHutonGauge))]
         public bool ShowHutonGaugeBorder = true;
         
         [DragFloat2("Position" + "##Huton", min = -4000f, max = 4000f)]
-        [CollapseWith(2, 0)]
+        [Order(45, collapseWith = nameof(ShowHutonGauge))]
         public Vector2 HutonGaugePosition = new(0, -54);
         
         [DragFloat2("Size" + "##Huton", max = 2000f)]
-        [CollapseWith(3, 0)]
+        [Order(50, collapseWith = nameof(ShowHutonGauge))]
         public Vector2 HutonGaugeSize = new(254, 20);
         
         [ColorEdit4("Color" + "##Huton")]
-        [CollapseWith(10, 0)]
+        [Order(55, collapseWith = nameof(ShowHutonGauge))]
         public PluginConfigColor HutonGaugeColor = new(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f));
 
         [Checkbox("Expire" + "##Huton")]
-        [CollapseWith(11, 0)]
+        [Order(60, collapseWith = nameof(ShowHutonGauge))]
         public bool ShowHutonGaugeExpiry = true;
 
         [DragFloat("Expire Threshold" + "##Huton", min = 1f, max = 70f)]
-        [CollapseWith(12, 0)]
+        [Order(65, collapseWith = nameof(ShowHutonGaugeExpiry))]
         public float HutonGaugeExpiryThreshold = 40f;
 
         [ColorEdit4("Expire Color" + "##Huton")]
-        [CollapseWith(13, 0)]
+        [Order(70, collapseWith = nameof(ShowHutonGaugeExpiry))]
         public PluginConfigColor HutonGaugeExpiryColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
 
 
@@ -387,108 +387,108 @@ namespace DelvUI.Interface.Jobs
 
         #region ninki gauge
         [Checkbox("Ninki" + "##Ninki", separator = true)]
-        [CollapseControl(35, 1)]
+        [Order(75)]
         public bool ShowNinkiGauge = true;
 
         [Checkbox("Text" + "##Ninki")]
-        [CollapseWith(0, 1)]
+        [Order(80, collapseWith = nameof(ShowNinkiGauge))]
         public bool ShowNinkiGaugeText = true;
         
         [Checkbox("Border" + "##Ninki")]
-        [CollapseWith(5, 1)]
+        [Order(85, collapseWith = nameof(ShowNinkiGauge))]
         public bool ShowNinkiGaugeBorder = true;
         
         [Checkbox("Split Bar" + "##Ninki")]
-        [CollapseWith(10, 1)]
+        [Order(90, collapseWith = nameof(ShowNinkiGauge))]
         public bool ChunkNinkiGauge = true;
         
         [DragFloat2("Position" + "##Ninki", min = -4000f, max = 4000f)]
-        [CollapseWith(15, 1)]
+        [Order(95, collapseWith = nameof(ShowNinkiGauge))]
         public Vector2 NinkiGaugePosition = new(0, -32);
         
         [DragFloat2("Size" + "##Ninki", max = 2000f)]
-        [CollapseWith(20, 1)]
+        [Order(100, collapseWith = nameof(ShowNinkiGauge))]
         public Vector2 NinkiGaugeSize = new(254, 20);
 
         [DragFloat("Spacing" + "##Ninki", min = -4000f, max = 4000f)]
-        [CollapseWith(25, 1)]
+        [Order(105, collapseWith = nameof(ShowNinkiGauge))]
         public float NinkiGaugeChunkPadding = 2;
 
         [ColorEdit4("Color" + "##Ninki")]
-        [CollapseWith(30, 1)]
+        [Order(110, collapseWith = nameof(ShowNinkiGauge))]
         public PluginConfigColor NinkiGaugeColor = new(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f));
         
         #endregion
 
         #region trick / suiton
         [DragFloat2("Trick Attack & Suiton Position" + "##TnS", min = -4000f, max = 4000f, separator = true)]
-        [Order(40)]
+        [Order(115)]
         public Vector2 TrickBarPosition = new(0, -10);
         
         [DragFloat2("Trick Attack & Suiton Size" + "##TnS", max = 2000f)]
-        [Order(45)]
+        [Order(120)]
         public Vector2 TrickBarSize = new(254, 20);
 
         [Checkbox("Trick Attack" + "##TnS")]
-        [CollapseControl(50, 2)]
+        [Order(125)]
         public bool ShowTrickBar = false;
 
         [Checkbox("Timer" + "##TnS")]
-        [CollapseWith(0, 2)]
+        [Order(130, collapseWith = nameof(ShowTrickBar))]
         public bool ShowTrickBarText = true;
 
         [ColorEdit4("Color" + "##TnS")]
-        [CollapseWith(5, 2)]
+        [Order(135, collapseWith = nameof(ShowTrickBar))]
         public PluginConfigColor TrickBarColor = new(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f));
 
         [Checkbox("Suiton" + "##TnS")]
-        [CollapseControl(55, 3)]
+        [Order(140)]
         public bool ShowSuitonBar = false;
 
         [Checkbox("Timer" + "##TnS")]
-        [CollapseWith(0, 3)]
+        [Order(145, collapseWith = nameof(ShowSuitonBar))]
         public bool ShowSuitonBarText = true;
 
         [ColorEdit4("Color" + "##TnS")]
-        [CollapseWith(5, 3)]
+        [Order(150, collapseWith = nameof(ShowSuitonBar))]
         public PluginConfigColor SuitonBarColor = new(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f));
         #endregion
 
         #region mudra
         [Checkbox("Mudra" + "##Mudra", separator = true)]
-        [CollapseControl(60, 4)]
+        [Order(155)]
         public bool ShowMudraCooldown = true;
 
         [Checkbox("Timers" + "##Mudra")]
-        [CollapseWith(0, 4)]
+        [Order(160, collapseWith = nameof(ShowMudraCooldown))]
         public bool ShowMudraBarText = true;
 
         [Checkbox("Ninjutsu Text" + "##Mudra")]
-        [CollapseWith(1, 4)]
+        [Order(165, collapseWith = nameof(ShowMudraCooldown))]
         public bool ShowNinjutsuText = true;
 
         [DragFloat2("Position" + "##Mudra", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 4)]
+        [Order(170, collapseWith = nameof(ShowMudraCooldown))]
         public Vector2 MudraBarPosition = new(0, -73);
         
         [DragFloat2("Size" + "##Mudra", max = 2000f)]
-        [CollapseWith(10, 4)]
+        [Order(175, collapseWith = nameof(ShowMudraCooldown))]
         public Vector2 MudraBarSize = new(254, 10);
         
         [DragFloat("Spacing" + "##Mudra", min = -4000f, max = 4000f)]
-        [CollapseWith(15, 4)]
+        [Order(180, collapseWith = nameof(ShowMudraCooldown))]
         public float MudraBarChunkPadding = 2;
 
         [ColorEdit4("Mudra" + "##Mudra")]
-        [CollapseWith(20, 4)]
+        [Order(185, collapseWith = nameof(ShowMudraCooldown))]
         public PluginConfigColor MudraBarColor = new(new Vector4(211 / 255f, 166 / 255f, 75 / 242f, 100f / 100f));
 
         [ColorEdit4("Kassatsu" + "##Mudra")]
-        [CollapseWith(25, 4)]
+        [Order(190, collapseWith = nameof(ShowMudraCooldown))]
         public PluginConfigColor KassatsuBarColor = new(new Vector4(239 / 255f, 123 / 255f, 222 / 242f, 100f / 100f));
 
         [ColorEdit4("Ten Chi Jin" + "##Mudra")]
-        [CollapseWith(30, 4)]
+        [Order(195, collapseWith = nameof(ShowMudraCooldown))]
         public PluginConfigColor TCJBarColor = new(new Vector4(181 / 255f, 33 / 255f, 41 / 242f, 100f / 100f));
         #endregion
     }

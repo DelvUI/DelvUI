@@ -239,104 +239,104 @@ namespace DelvUI.Interface.Jobs
 
         #region Kenki
         [Checkbox("Show Kenki Bar")]
-        [CollapseControl(30, 0)]
+        [Order(30)]
         public bool ShowKenkiBar = true;
 
         [DragFloat2("Kenki Bar Size", max = 2000f)]
-        [CollapseWith(0, 0)]
+        [Order(35, collapseWith = nameof(ShowKenkiBar))]
         public Vector2 KenkiBarSize = new Vector2(254, 20);
 
         [DragFloat2("Kenki Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(5, 0)]
+        [Order(40, collapseWith = nameof(ShowKenkiBar))]
         public Vector2 KenkiBarPosition = new Vector2(0, -34);
 
         [Checkbox("Show Kenki Text")]
-        [CollapseWith(10, 0)]
+        [Order(45, collapseWith = nameof(ShowKenkiBar))]
         public bool ShowKenkiText = true;
         #endregion
 
         #region Sen
         [Checkbox("Show Sen Bar")]
-        [CollapseControl(35, 1)]
+        [Order(50)]
         public bool ShowSenBar = true;
 
         [DragInt("Sen Bar Padding", max = 1000)]
-        [CollapseWith(0, 1)]
+        [Order(55, collapseWith = nameof(ShowSenBar))]
         public int SenBarPadding = 2;
 
         [DragFloat2("Sen Bar Size", max = 2000f)]
-        [CollapseWith(5, 1)]
+        [Order(60, collapseWith = nameof(ShowSenBar))]
         public Vector2 SenBarSize = new Vector2(254, 10);
 
         [DragFloat2("Sen Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(10, 1)]
+        [Order(65, collapseWith = nameof(ShowSenBar))]
         public Vector2 SenBarPosition = new Vector2(0, -17);
 
         [DragDropHorizontal("Sen Order", "Setsu", "Getsu", "Ka")]
-        [CollapseWith(15, 1)]
+        [Order(70, collapseWith = nameof(ShowSenBar))]
         public int[] senOrder = new int[] { 0, 1, 2 };
         #endregion
 
         #region Meditation
         [Checkbox("Show Meditation Bar")]
-        [CollapseControl(40, 2)]
+        [Order(75)]
         public bool ShowMeditationBar = true;
 
         [DragInt("Meditation Bar Padding", max = 1000)]
-        [CollapseWith(0, 2)]
+        [Order(80, collapseWith = nameof(ShowMeditationBar))]
         public int MeditationBarPadding = 2;
 
         [DragFloat2("Meditation Bar Size", max = 2000f)]
-        [CollapseWith(5, 2)]
+        [Order(85, collapseWith = nameof(ShowMeditationBar))]
         public Vector2 MeditationBarSize = new Vector2(254, 10);
 
         [DragFloat2("Meditation Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(10, 2)]
+        [Order(90, collapseWith = nameof(ShowMeditationBar))]
         public Vector2 MeditationBarPosition = new Vector2(0, -5);
         #endregion
 
         #region Buffs
         [Checkbox("Show Buffs Bar")]
-        [CollapseControl(45, 3)]
+        [Order(95)]
         public bool ShowBuffsBar = true;
 
         [DragInt("Buffs Bar Padding", max = 1000)]
-        [CollapseWith(0, 3)]
+        [Order(100, collapseWith = nameof(ShowBuffsBar))]
         public int BuffsPadding = 2;
 
         [DragFloat2("Buffs Bar Size", max = 2000f)]
-        [CollapseWith(5, 3)]
+        [Order(105, collapseWith = nameof(ShowBuffsBar))]
         public Vector2 BuffsBarSize = new Vector2(254, 20);
 
         [DragFloat2("Buffs Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(10, 3)]
+        [Order(110, collapseWith = nameof(ShowBuffsBar))]
         public Vector2 BuffsBarPosition = new Vector2(0, -56);
 
         [Checkbox("Show Buffs Bar Text")]
-        [CollapseWith(15, 3)]
+        [Order(115, collapseWith = nameof(ShowBuffsBar))]
         public bool ShowBuffsText = true;
 
         [DragDropHorizontal("Shifu/Jinpu Order", "Shifu", "Jinpu")]
-        [CollapseWith(20, 3)]
+        [Order(120, collapseWith = nameof(ShowBuffsBar))]
         public int[] buffOrder = new int[] { 0, 1 };
 
         #endregion
 
         #region Higanbana
         [Checkbox("Show Higanbana Bar")]
-        [CollapseControl(300, 4)]
+        [Order(125)]
         public bool ShowHiganbanaBar = true;
 
         [DragFloat2("Higanbana Bar Size", max = 2000f)]
-        [CollapseWith(0, 4)]
+        [Order(130, collapseWith = nameof(ShowHiganbanaBar))]
         public Vector2 HiganbanaBarSize = new Vector2(254, 20);
 
         [DragFloat2("Higanbana Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(5, 4)]
+        [Order(135, collapseWith = nameof(ShowHiganbanaBar))]
         public Vector2 HiganbanaBarPosition = new Vector2(0, -78);
 
         [Checkbox("Show Higanbana Text")]
-        [CollapseWith(10, 4)]
+        [Order(140, collapseWith = nameof(ShowHiganbanaBar))]
         public bool ShowHiganbanaText = true;
         #endregion
 

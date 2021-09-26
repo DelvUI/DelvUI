@@ -699,6 +699,7 @@ namespace DelvUI.Config.Tree
     public class ConfigPageNode : SubSectionNode
     {
         private PluginConfigObject _configObject;
+        public bool HasSeparator = true;
 
         public PluginConfigObject ConfigObject
         {
@@ -796,67 +797,66 @@ namespace DelvUI.Config.Tree
         {
             FieldInfo[] fields = ConfigObject.GetType().GetFields();
             List<KeyValuePair<int, object>> drawList = new();
-            List<FieldInfo> collapseWithList = new();
+            List<CategoryField> collapseWithList = new();
 
             foreach (FieldInfo field in fields)
             {
-                bool hasOrderAttribute = false;
+                bool wasAdded = false;
 
                 foreach (object attribute in field.GetCustomAttributes(true))
                 {
                     if (attribute is OrderAttribute orderAttribute)
                     {
-                        drawList.Add(new KeyValuePair<int, object>(orderAttribute.pos, new CategoryField(field, ConfigObject, ID)));
-                        hasOrderAttribute = true;
-                    }
-                    else if (attribute is CollapseControlAttribute collapseControlAtrribute)
-                    {
-                        CategoryField categoryField = new(field, ConfigObject, ID);
-                        categoryField.CategoryId = collapseControlAtrribute.id;
-                        drawList.Add(new KeyValuePair<int, object>(collapseControlAtrribute.pos, categoryField));
-                        hasOrderAttribute = true;
-                    }
-                    else if (attribute is CollapseWithAttribute collapseWithAttribute)
-                    {
-                        collapseWithList.Add(field);
-                        hasOrderAttribute = true;
+                        CategoryField categoryField = new CategoryField(field, ConfigObject, ID);
+
+                        // By default the 'Enabled' checkbox (inherited from PluginConfigObject) is considered the parent of all config items,
+                        // so if the ConfigObject is marked as undisableable, we bypass adding items as children *only* if their parent was the 'Enabled' field.
+                        if (orderAttribute.collapseWith is null || (!ConfigObject.Disableable && orderAttribute.collapseWith.Equals("Enabled")))
+                        {
+                            drawList.Add(new KeyValuePair<int, object>(orderAttribute.pos, categoryField));
+                        }
+                        else
+                        {
+                            collapseWithList.Add(categoryField);
+                        }
+
+                        wasAdded = true;
                     }
                     else if (attribute is NestedConfigAttribute nestedConfigAttribute && _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode node))
                     {
-                        CategoryField categoryField = new(field, ConfigObject);
+                        node.HasSeparator = nestedConfigAttribute.separator;
                         drawList.Add(new KeyValuePair<int, object>(nestedConfigAttribute.pos, node));
-                        hasOrderAttribute = true;
+                        wasAdded = true;
                     }
                 }
 
-                if (!hasOrderAttribute)
+                if (!wasAdded)
                 {
                     drawList.Add(new KeyValuePair<int, object>(int.MaxValue, new CategoryField(field, ConfigObject, ID)));
                 }
             }
 
-            foreach (FieldInfo field in collapseWithList)
+            // Loop through nodes that should have a parent and build those relationships
+            foreach (CategoryField categoryField in collapseWithList)
             {
-                foreach (object attribute in field.GetCustomAttributes(true))
+                foreach (object attribute in categoryField.MainField.GetCustomAttributes(true))
                 {
-                    if (attribute is CollapseWithAttribute collapseWithAttribute)
+                    if (attribute is OrderAttribute orderAttribute && orderAttribute.collapseWith is not null)
                     {
-                        foreach (KeyValuePair<int, object> item in drawList)
+                        FieldInfo? parentField = fields.Where(f => f.Name.Equals(orderAttribute.collapseWith)).FirstOrDefault();
+                        if (parentField is not null)
                         {
-                            if (item.Value is not CategoryField categoryField)
-                            {
-                                continue;
-                            }
+                            // The CategoryField for the parent could either be in the drawList (if it is the root) or the collapseWithList (if there is multi-layered nesting)
+                            IEnumerable<CategoryField> drawListCategoryFields = drawList.Where(kvp => kvp.Value is CategoryField).Select(kvp => kvp.Value as CategoryField);
+                            CategoryField parentCategoryField = drawListCategoryFields.Union(collapseWithList).Where(categoryField => categoryField.MainField == parentField).FirstOrDefault();
 
-                            if (categoryField.CategoryId == collapseWithAttribute.id)
+                            if (parentCategoryField is not null)
                             {
-                                categoryField.AddChild(collapseWithAttribute.pos, field);
-
-                                break;
+                                parentCategoryField.CollapseControl = true;
+                                categoryField.Depth = categoryField.HasSpacing || categoryField.HasSeparator ? 0 : parentCategoryField.Depth + 1;
+                                parentCategoryField.AddChild(orderAttribute.pos, categoryField);
                             }
                         }
-
-                        break;
                     }
                 }
             }
@@ -872,6 +872,11 @@ namespace DelvUI.Config.Tree
                 else if (pair.Value is ConfigPageNode node)
                 {
                     ImGui.BeginGroup();
+                    if (node.HasSeparator)
+                    {
+                        Separator(1, 1);
+                    }
+
                     node.DrawWithID(ref changed, node.Name);
                     ImGui.EndGroup();
                 }
@@ -1030,39 +1035,61 @@ namespace DelvUI.Config.Tree
 
     public class CategoryField : Node
     {
-        public SortedDictionary<int, FieldInfo> Children;
+        public SortedDictionary<int, CategoryField> Children;
         public FieldInfo MainField;
         public PluginConfigObject ConfigObject;
-        public int CategoryId;
+        public bool CollapseControl;
         public string ID;
+        public bool HasSeparator = false;
+        public bool HasSpacing = false;
+        public int Depth = 0;
 
         public CategoryField(FieldInfo mainField, PluginConfigObject configObject, string id = null)
         {
             MainField = mainField;
             ConfigObject = configObject;
-            CategoryId = -1;
-            Children = new SortedDictionary<int, FieldInfo>();
+            Children = new SortedDictionary<int, CategoryField>();
             ID = id;
+            CollapseControl = false;
+
+            ConfigAttribute? configAttribute = GetConfigAttribute(mainField);
+            if (configAttribute is not null)
+            {
+                HasSeparator = configAttribute.separator;
+                HasSpacing = configAttribute.spacing;
+            }
         }
 
-        public void AddChild(int position, FieldInfo field) { Children.Add(position, field); }
+        public void AddChild(int position, CategoryField field) { Children.Add(position, field); }
 
         public void Draw(ref bool changed)
         {
-            DrawStyleProperties(MainField, ID);
+            DrawSeparatorOrSpacing(MainField, ID);
+
+            // Draw the ConfigAttribute
             Draw(ref changed, MainField);
 
-            if (CategoryId != -1 && (bool)MainField.GetValue(ConfigObject))
+            // Draw children
+            if (CollapseControl && Attribute.IsDefined(MainField, typeof(CheckboxAttribute)) && (bool)MainField.GetValue(ConfigObject))
             {
                 ImGui.BeginGroup();
-                ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 0));
+                ImGui.SetCursorPos(ImGui.GetCursorPos());
 
-                foreach (FieldInfo child in Children.Values)
+                foreach (CategoryField child in Children.Values)
                 {
-                    DrawStyleProperties(child, ID);
-                    ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
+                    // This draws the L shaped symbols and padding to the left of config items collapsible under a checkbox.
+                    // If the child has a separator or spacing above it, then we don't want to draw these because this item is the start of a new section.
+                    if (!child.HasSeparator && !child.HasSpacing)
+                    {
+                        // Shift cursor to the right to pad for children with depth more than 1.
+                        // 26 is an arbitrary value I found to be around half the width of a checkbox
+                        // (hopefully this works at other resolutions...)
+                        ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(26, 0) * Math.Max((child.Depth - 1), 0));
+                        ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
+                    }
+
                     ImGui.SameLine();
-                    Draw(ref changed, child);
+                    child.Draw(ref changed);
                 }
 
                 ImGui.EndGroup();
@@ -1080,7 +1107,12 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public void DrawStyleProperties(FieldInfo field, string ID)
+        public ConfigAttribute? GetConfigAttribute(FieldInfo field)
+        {
+            return field.GetCustomAttributes(true).Where(a => a is ConfigAttribute).FirstOrDefault() as ConfigAttribute;
+        }
+
+        public void DrawSeparatorOrSpacing(FieldInfo field, string ID)
         {
             foreach (object attribute in field.GetCustomAttributes(true))
             {
@@ -1090,7 +1122,7 @@ namespace DelvUI.Config.Tree
                     {
                         continue;
                     }
-                    Separator(1, 1);
+                    Separator(2, 1);
                 }
                 else if (attribute is ConfigAttribute { spacing: true })
                 {

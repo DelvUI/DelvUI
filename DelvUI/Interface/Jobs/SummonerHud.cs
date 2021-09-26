@@ -352,178 +352,178 @@ namespace DelvUI.Interface.Jobs
 
         #region aether
         [Checkbox("Aether Tracker Enabled", separator = true)]
-        [CollapseControl(30, 1)]
+        [Order(30)]
         public bool ShowAether = true;
 
         [DragFloat2("Aether Tracker Size", min = 1f, max = 2000f)]
-        [CollapseWith(0, 1)]
+        [Order(35, collapseWith = nameof(ShowAether))]
         public Vector2 AetherSize = new(120, 10);
 
         [DragFloat2("Aether Tracker Position", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 1)]
+        [Order(40, collapseWith = nameof(ShowAether))]
         public Vector2 AetherPosition = new(-67, -6);
 
         [DragInt("Aether Padding", max = 1000)]
-        [CollapseWith(10, 1)]
+        [Order(45, collapseWith = nameof(ShowAether))]
         public int AetherPadding = 2;
 
         [ColorEdit4("Aether Tracker Color")]
-        [CollapseWith(15, 1)]
+        [Order(50, collapseWith = nameof(ShowAether))]
         public PluginConfigColor AetherColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
         #endregion
 
         #region ruin
         [Checkbox("Ruin Enabled", separator = true)]
-        [CollapseControl(35, 2)]
+        [Order(55)]
         public bool ShowRuin = true;
 
         [DragFloat2("Ruin Size", min = 1f, max = 2000f)]
-        [CollapseWith(0, 2)]
+        [Order(60, collapseWith = nameof(ShowRuin))]
         public Vector2 RuinSize = new(254, 20);
 
         [DragFloat2("Ruin Position", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 2)]
+        [Order(65, collapseWith = nameof(ShowRuin))]
         public Vector2 RuinPosition = new(0, -45);
 
         [DragInt("Ruin Padding", max = 1000)]
-        [CollapseWith(10, 2)]
+        [Order(70, collapseWith = nameof(ShowRuin))]
         public int RuinPadding = 2;
 
         [ColorEdit4("Ruin Color")]
-        [CollapseWith(15, 2)]
+        [Order(75, collapseWith = nameof(ShowRuin))]
         public PluginConfigColor RuinColor = new(new Vector4(94f / 255f, 250f / 255f, 154f / 255f, 100f / 100f));
         #endregion
 
         #region miasma
         [Checkbox("Miasma Enabled", separator = true)]
-        [CollapseControl(40, 3)]
+        [Order(80)]
         public bool ShowMiasma = true;
         
         [Checkbox("Miasma Text")]
-        [CollapseWith(0, 3)]
+        [Order(85, collapseWith = nameof(ShowMiasma))]
         public bool ShowMiasmaText = true;
 
         [Checkbox("Miasma Inverted")]
-        [CollapseWith(5, 3)]
+        [Order(90, collapseWith = nameof(ShowMiasma))]
         public bool MiasmaInverted = true;
 
         [DragFloat2("Miasma Size", max = 2000f)]
-        [CollapseWith(10, 3)]
+        [Order(95, collapseWith = nameof(ShowMiasma))]
         public Vector2 MiasmaSize = new(126, 20);
 
         [DragFloat2("Miasma Position", min = -4000f, max = 4000f)]
-        [CollapseWith(15, 3)]
+        [Order(100, collapseWith = nameof(ShowMiasma))]
         public Vector2 MiasmaPosition = new(-64, -67);
 
         [ColorEdit4("Miasma Color")]
-        [CollapseWith(20, 3)]
+        [Order(105, collapseWith = nameof(ShowMiasma))]
         public PluginConfigColor MiasmaColor = new(new Vector4(106f / 255f, 237f / 255f, 241f / 255f, 100f / 100f));
         #endregion
 
         #region bio
         [Checkbox("Bio Enabled", separator = true)]
-        [CollapseControl(45, 4)]
+        [Order(110)]
         public bool ShowBio = true;
 
         [Checkbox("Bio Text")]
-        [CollapseWith(0, 4)]
+        [Order(115, collapseWith = nameof(ShowBio))]
         public bool ShowBioText = true;
 
         [Checkbox("Bio Inverted")]
-        [CollapseWith(5, 4)]
+        [Order(120, collapseWith = nameof(ShowBio))]
         public bool BioInverted = false;
 
         [DragFloat2("Bio Size", max = 2000f)]
-        [CollapseWith(10, 4)]
+        [Order(125, collapseWith = nameof(ShowBio))]
         public Vector2 BioSize = new(126, 20);
 
         [DragFloat2("Bio Position", min = -4000f, max = 4000f)]
-        [CollapseWith(15, 4)]
+        [Order(130, collapseWith = nameof(ShowBio))]
         public Vector2 BioPosition = new(64, -67);
 
         [ColorEdit4("Bio Color")]
-        [CollapseWith(20, 4)]
+        [Order(135, collapseWith = nameof(ShowBio))]
         public PluginConfigColor BioColor = new(new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 100f / 100f));
         #endregion
 
         #region trance
         [Checkbox("Trance Enabled", separator = true)]
-        [CollapseControl(50, 5)]
+        [Order(140)]
         public bool ShowTrance = true;
 
         [Checkbox("Trance Gauge Text")]
-        [CollapseWith(0, 5)]
+        [Order(145, collapseWith = nameof(ShowTrance))]
         public bool ShowTranceText = true;
 
         [DragFloat2("Trance Gauge Position", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 5)]
+        [Order(150, collapseWith = nameof(ShowTrance))]
         public Vector2 TrancePosition = new(0, -23);
 
         [DragFloat2("Trance Gauge Size", min = 1f, max = 2000f)]
-        [CollapseWith(10, 5)]
+        [Order(155, collapseWith = nameof(ShowTrance))]
         public Vector2 TranceSize = new(254, 20);
 
         [ColorEdit4("Trance Dreadwyrm Color")]
-        [CollapseWith(15, 5)]
+        [Order(160, collapseWith = nameof(ShowTrance))]
         public PluginConfigColor DreadwyrmColor = new(new Vector4(255f / 255f, 255f / 255f, 147f / 255f, 100f / 100f));
 
         [ColorEdit4("Trance Bahamut Color")]
-        [CollapseWith(20, 5)]
+        [Order(165, collapseWith = nameof(ShowTrance))]
         public PluginConfigColor BahamutColor = new(new Vector4(128f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [ColorEdit4("Trance Phoenix Color")]
-        [CollapseWith(25, 5)]
+        [Order(170, collapseWith = nameof(ShowTrance))]
         public PluginConfigColor PhoenixColor = new(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f));
         #endregion
 
         #region dreadwyrm
         [Checkbox("Dreadwyrm Trance Tracker Enabled", separator = true)]
-        [CollapseControl(55, 6)]
+        [Order(175)]
         public bool ShowDreadwyrmAether = true;
 
         [Checkbox("Demi Status Indicator Enabled")]
-        [CollapseWith(0, 6)]
+        [Order(180, collapseWith = nameof(ShowDreadwyrmAether))]
         public bool ShowDemiIndicator = true;
 
         [DragFloat2("Demi Status Indicator Position", min = -4000f, max = -4000f)]
-        [CollapseWith(5, 6)]
+        [Order(185, collapseWith = nameof(ShowDreadwyrmAether))]
         public Vector2 IndicatorPosition = new(0, -6);
 
         [DragFloat2("Demi Status Indicator Size", min = 1f, max = 2000f)]
-        [CollapseWith(10, 6)]
+        [Order(190, collapseWith = nameof(ShowDreadwyrmAether))]
         public Vector2 IndicatorSize = new(10, 10);
 
         [ColorEdit4("Demi Status Indicator Bahamut Color")]
-        [CollapseWith(15, 6)]
+        [Order(195, collapseWith = nameof(ShowDreadwyrmAether))]
         public PluginConfigColor BahamutReadyColor = new(new Vector4(128f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [ColorEdit4("Demi Status Indicator Phoenix Color")]
-        [CollapseWith(20, 6)]
+        [Order(200, collapseWith = nameof(ShowDreadwyrmAether))]
         public PluginConfigColor PhoenixReadyColor = new(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f));
 
         [Checkbox("Dreadwyrm Aether Bars Enabled")]
-        [CollapseWith(25, 6)]
+        [Order(205, collapseWith = nameof(ShowDreadwyrmAether))]
         public bool ShowDreadwyrmAetherBars = true;
 
         [DragFloat2("Dreadwyrm Aether Bars Position", min = -4000f, max = -4000f)]
-        [CollapseWith(30, 6)]
+        [Order(210, collapseWith = nameof(ShowDreadwyrmAether))]
         public Vector2 DreadwyrmAetherBarPosition = new(67, -6);
 
         [DragFloat2("Dreadwyrm Aether Bars Size", min = 1f, max = 2000f)]
-        [CollapseWith(35, 6)]
+        [Order(215, collapseWith = nameof(ShowDreadwyrmAether))]
         public Vector2 DreadwyrmAetherBarSize = new(120, 10);
 
         [DragInt("Dreadwyrm Aether Bar Padding", max = 1000)]
-        [CollapseWith(40, 6)]
+        [Order(220, collapseWith = nameof(ShowDreadwyrmAether))]
         public int DreadwyrmAetherBarPadding = 2;
 
         [ColorEdit4("Dreadwyrm Aether Bars Color")]
-        [CollapseWith(45, 6)]
+        [Order(225, collapseWith = nameof(ShowDreadwyrmAether))]
         public PluginConfigColor DreadwyrmAetherBarColor = new(new Vector4(128f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         [ColorEdit4("DoT Expire Color")]
-        [Order(60)]
+        [Order(230)]
         public PluginConfigColor ExpireColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
     }
 }

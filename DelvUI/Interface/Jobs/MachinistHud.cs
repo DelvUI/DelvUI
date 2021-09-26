@@ -196,113 +196,113 @@ namespace DelvUI.Interface.Jobs
 
         #region Overheat
         [Checkbox("Show Overheat Bar", separator = true)]
-        [CollapseControl(30, 0)]
+        [Order(30)]
         public bool ShowOverheat = true;
 
         [Checkbox("Show Text" + "##Overheat")]
-        [CollapseWith(0, 0)]
+        [Order(35, collapseWith = nameof(ShowOverheat))]
         public bool ShowOverheatText = true;
 
         [DragFloat2("Position" + "##Overheat", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 0)]
+        [Order(40, collapseWith = nameof(ShowOverheat))]
         public Vector2 OverheatPosition = new(0, -54);
 
         [DragFloat2("Size" + "##Overheat", min = 0, max = 4000f)]
-        [CollapseWith(10, 0)]
+        [Order(45, collapseWith = nameof(ShowOverheat))]
         public Vector2 OverheatSize = new(254, 20);
 
         [ColorEdit4("Fill Color" + "##Overheat")]
-        [CollapseWith(15, 0)]
+        [Order(50, collapseWith = nameof(ShowOverheat))]
         public PluginConfigColor OverheatFillColor = new(new Vector4(255f / 255f, 239f / 255f, 14f / 255f, 100f / 100f));
         #endregion
 
         #region Heat Gauge
         [Checkbox("Show Heat Gauge", separator = true)]
-        [CollapseControl(35, 1)]
+        [Order(55)]
         public bool ShowHeatGauge = true;
 
         [Checkbox("Show Text" + "##HeatGauge")]
-        [CollapseWith(0, 1)]
+        [Order(60, collapseWith = nameof(ShowHeatGauge))]
         public bool ShowHeatGaugeText = true;
 
         [DragFloat2("Position" + "##HeatGauge", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 1)]
+        [Order(65, collapseWith = nameof(ShowHeatGauge))]
         public Vector2 HeatGaugePosition = new(0, -32);
 
         [DragFloat2("Size" + "##HeatGauge", min = 0, max = 4000f)]
-        [CollapseWith(10, 1)]
+        [Order(70, collapseWith = nameof(ShowHeatGauge))]
         public Vector2 HeatGaugeSize = new(254, 20);
 
         [DragInt("Padding" + "##HeatGauge", min = 0)]
-        [CollapseWith(15, 1)]
+        [Order(75, collapseWith = nameof(ShowHeatGauge))]
         public int HeatGaugePadding = 2;
 
         [ColorEdit4("Fill Color" + "##HeatGauge")]
-        [CollapseWith(20, 1)]
+        [Order(80, collapseWith = nameof(ShowHeatGauge))]
         public PluginConfigColor HeatGaugeFillColor = new(new Vector4(201f / 255f, 13f / 255f, 13f / 255f, 100f / 100f));
         #endregion
 
         #region Battery Gauge
         [Checkbox("Show Battery Gauge", separator = true)]
-        [CollapseControl(40, 2)]
+        [Order(85)]
         public bool ShowBatteryGauge = true;
 
         [Checkbox("Show Battery" + "##BatteryGauge")]
-        [CollapseWith(0, 2)]
+        [Order(90, collapseWith = nameof(ShowBatteryGauge))]
         public bool ShowBatteryGaugeBattery = true;
 
         [Checkbox("Show Battery Text" + "##BatteryGauge")]
-        [CollapseWith(5, 2)]
+        [Order(95, collapseWith = nameof(ShowBatteryGauge))]
         public bool ShowBatteryGaugeBatteryText = false;
 
         [Checkbox("Show Robot Duration" + "##BatteryGauge")]
-        [CollapseWith(10, 2)]
+        [Order(100, collapseWith = nameof(ShowBatteryGauge))]
         public bool ShowBatteryGaugeRobotDuration = true;
 
         [Checkbox("Show Robot Duration Text" + "##BatteryGauge")]
-        [CollapseWith(15, 2)]
+        [Order(105, collapseWith = nameof(ShowBatteryGauge))]
         public bool ShowBatteryGaugeRobotDurationText = true;
 
         [DragFloat2("Position" + "##BatteryGauge", min = -4000f, max = 4000f)]
-        [CollapseWith(20, 2)]
+        [Order(110, collapseWith = nameof(ShowBatteryGauge))]
         public Vector2 BatteryGaugePosition = new(0, -10);
 
         [DragFloat2("Size" + "##BatteryGauge", min = 0, max = 4000f)]
-        [CollapseWith(25, 2)]
+        [Order(115, collapseWith = nameof(ShowBatteryGauge))]
         public Vector2 BatteryGaugeSize = new(254, 20);
 
         [DragInt("Padding" + "##BatteryGauge", min = 0)]
-        [CollapseWith(30, 2)]
+        [Order(120, collapseWith = nameof(ShowBatteryGauge))]
         public int BatteryGaugePadding = 2;
 
         [ColorEdit4("Battery Fill Color" + "##BatteryGauge")]
-        [CollapseWith(35, 2)]
+        [Order(125, collapseWith = nameof(ShowBatteryGauge))]
         public PluginConfigColor BatteryFillColor = new(new Vector4(106f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [ColorEdit4("Robot Fill Color" + "##BatteryGauge")]
-        [CollapseWith(40, 2)]
+        [Order(130, collapseWith = nameof(ShowBatteryGauge))]
         public PluginConfigColor RobotFillColor = new(new Vector4(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         #region Wildfire
         [Checkbox("Show Wildfire", separator = true)]
-        [CollapseControl(45, 3)]
+        [Order(135)]
         public bool ShowWildfire = false;
 
         [Checkbox("Show Text" + "##Wildfire")]
-        [CollapseWith(0, 3)]
+        [Order(140, collapseWith = nameof(ShowWildfire))]
         public bool ShowWildfireText = true;
 
         [DragFloat2("Position" + "##Wildfire", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 3)]
+        [Order(145, collapseWith = nameof(ShowWildfire))]
         public Vector2 WildfirePosition = new(0, -76);
 
         [DragFloat2("Size" + "##Wildfire", min = 0, max = 4000f)]
-        [CollapseWith(10, 3)]
+        [Order(150, collapseWith = nameof(ShowWildfire))]
         public Vector2 WildfireSize = new(254, 20);
 
         [ColorEdit4("Color" + "##Wildfire")]
-        [CollapseWith(15, 3)]
+        [Order(155, collapseWith = nameof(ShowWildfire))]
         public PluginConfigColor WildfireFillColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
         #endregion
     }

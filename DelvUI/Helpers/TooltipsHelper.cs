@@ -200,11 +200,11 @@ namespace DelvUI.Helpers
         public PluginConfigColor TitleColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [ColorEdit4("Text Color")]
-        [Order(10)]
+        [Order(15)]
         public PluginConfigColor TextColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 80f / 100f));
 
         [ColorEdit4("Background Color")]
-        [Order(10)]
+        [Order(20)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 60f / 100f));
     }
 }

@@ -100,44 +100,44 @@ namespace DelvUI.Interface.GeneralElements
 
     public class UnitFrameConfig : AnchorablePluginConfigObject
     {
-        [Checkbox("Custom Frame Color", separator = true)]
-        [CollapseControl(20, 0)]
+        [Checkbox("Custom Frame Color")]
+        [Order(20)]
         public bool UseCustomColor = false;
 
         [ColorEdit4("Color ##CustomFrame")]
-        [CollapseWith(0, 0)]
+        [Order(25, collapseWith = nameof(UseCustomColor))]
         public PluginConfigColor CustomColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
         [Checkbox("Custom Background Color")]
-        [CollapseControl(25, 1)]
+        [Order(30)]
         public bool UseCustomBackgroundColor = false;
 
         [ColorEdit4("Color ##CustomBackground")]
-        [CollapseWith(0, 1)]
+        [Order(35, collapseWith = nameof(UseCustomBackgroundColor))]
         public PluginConfigColor CustomBackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [Checkbox("Tank Invulnerability", spacing = true)]
-        [Order(30)]
+        [Checkbox("Tank Invulnerability")]
+        [Order(40)]
         public bool ShowTankInvulnerability = true;
 
         [Checkbox("Tank Invulnerability Custom Color")]
-        [CollapseControl(35, 2)]
+        [Order(45, collapseWith = nameof(ShowTankInvulnerability))]
         public bool UseCustomInvulnerabilityColor = true;
 
-        [ColorEdit4("Color ##TankInvulnerabilityCustom")]
-        [CollapseWith(0, 2)]
+        [ColorEdit4("Tank Invulnerability Color ##TankInvulnerabilityCustom")]
+        [Order(50, collapseWith = nameof(UseCustomInvulnerabilityColor))]
         public PluginConfigColor CustomInvulnerabilityColor = new PluginConfigColor(new Vector4(100f / 255f, 100f / 255f, 100f / 255f, 100f / 100f));
 
-        [NestedConfig("Left Text", 40)]
+        [NestedConfig("Left Text", 55)]
         public EditableLabelConfig LeftLabelConfig;
 
-        [NestedConfig("Right Text", 45)]
+        [NestedConfig("Right Text", 60)]
         public EditableLabelConfig RightLabelConfig;
 
-        [NestedConfig("Shields", 50)]
+        [NestedConfig("Shields", 65)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
-        [NestedConfig("Tank Stance", 51)]
+        [NestedConfig("Tank Stance", 70)]
         public TankStanceIndicatorConfig TankStanceIndicatorConfig = null;
 
         public UnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)

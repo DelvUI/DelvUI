@@ -107,41 +107,41 @@ namespace DelvUI.Interface.Jobs
 
         #region Powder Gauge
         [Checkbox("Powder Gauge", separator = true)]
-        [CollapseControl(30, 0)]
+        [Order(30)]
         public bool ShowPowderGauge = true;
 
         [DragFloat2("Position" + "##PowderGauge", min = -4000f, max = 4000f)]
-        [CollapseWith(0, 0)]
+        [Order(35, collapseWith = nameof(ShowPowderGauge))]
         public Vector2 PowderGaugeBarPosition = new(0, -32);
 
         [DragFloat2("Size" + "##PowderGauge", min = 1f, max = 4000f)]
-        [CollapseWith(5, 0)]
+        [Order(40, collapseWith = nameof(ShowPowderGauge))]
         public Vector2 PowderGaugeBarSize = new(254, 20);
 
         [DragFloat("Spacing" + "##PowderGauge", min = 0)]
-        [CollapseWith(10, 0)]
+        [Order(45, collapseWith = nameof(ShowPowderGauge))]
         public float PowderGaugeSpacing = 2.0f;
 
         [ColorEdit4("Color" + "##PowderGauge")]
-        [CollapseWith(15, 0)]
+        [Order(50, collapseWith = nameof(ShowPowderGauge))]
         public PluginConfigColor PowderGaugeFillColor = new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 1f));
         #endregion
 
         #region No Mercy
         [Checkbox("No Mercy", separator = true)]
-        [CollapseControl(35, 1)]
+        [Order(55)]
         public bool ShowNoMercyBar = true;
 
         [DragFloat2("Position" + "##NoMercy", min = -4000f, max = 4000f)]
-        [CollapseWith(0, 1)]
+        [Order(60, collapseWith = nameof(ShowNoMercyBar))]
         public Vector2 NoMercyBarPosition = new(0, -10);
 
         [DragFloat2("Size" + "##NoMercy", min = 1f, max = 4000f)]
-        [CollapseWith(5, 1)]
+        [Order(65, collapseWith = nameof(ShowNoMercyBar))]
         public Vector2 NoMercyBarSize = new(254, 20);
 
         [ColorEdit4("Color" + "##NoMercy")]
-        [CollapseWith(10, 1)]
+        [Order(70, collapseWith = nameof(ShowNoMercyBar))]
         public PluginConfigColor NoMercyFillColor = new(new Vector4(252f / 255f, 204f / 255f, 255f / 255f, 1f));
         #endregion
     }

@@ -509,67 +509,67 @@ namespace DelvUI.Interface.Jobs
 
         #region Draw Bar
         [Checkbox("Draw" + "##Draw", separator = true)]
-        [CollapseControl(30, 0)]
+        [Order(30)]
         public bool ShowDrawBar = true;
 
         [DragFloat2("Position" + "##Draw", min = -2000f, max = 2000f)]
-        [CollapseWith(0, 0)]
+        [Order(35, collapseWith = nameof(ShowDrawBar))]
         public Vector2 DrawBarPosition = new(0, -32);
         
         [DragFloat2("Size" + "##Draw", min = 1f, max = 2000f)]
-        [CollapseWith(5, 0)]
+        [Order(40, collapseWith = nameof(ShowDrawBar))]
         public Vector2 DrawBarSize = new(254, 20);
 
         [ColorEdit4("Draw on CD" + "##Draw")]
-        [CollapseWith(10, 0)]
+        [Order(45, collapseWith = nameof(ShowDrawBar))]
         public PluginConfigColor DrawCdColor = new(new Vector4(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f));
 
         [ColorEdit4("Draw Ready" + "##Draw")]
-        [CollapseWith(15, 0)]
+        [Order(50, collapseWith = nameof(ShowDrawBar))]
         public PluginConfigColor DrawCdReadyColor = new(new Vector4(137f / 255f, 26f / 255f, 42f / 255f, 100f / 100f));
 
         [ColorEdit4("Melee Glow" + "##Draw")]
-        [CollapseWith(20, 0)]
+        [Order(55, collapseWith = nameof(ShowDrawBar))]
         public PluginConfigColor DrawMeleeGlowColor = new(new Vector4(83f / 255f, 34f / 255f, 120f / 255f, 100f / 100f));
 
         [ColorEdit4("Ranged Glow" + "##Draw")]
-        [CollapseWith(25, 0)]
+        [Order(60, collapseWith = nameof(ShowDrawBar))]
         public PluginConfigColor DrawRangedGlowColor = new(new Vector4(124f / 255f, 34f / 255f, 120f / 255f, 100f / 100f));
 
         [Checkbox("Card Preferred Target with Glow" + "##Draw", spacing = true)]
-        [CollapseWith(30, 0)]
+        [Order(65, collapseWith = nameof(ShowDrawBar))]
         public bool ShowDrawGlowBar;
 
         [Checkbox("Card Preferred Target with Text" + "##Draw")]
-        [CollapseWith(35, 0)]
+        [Order(70, collapseWith = nameof(ShowDrawBar))]
         public bool ShowDrawTextBar = true;
 
         [Checkbox("Draw Timer" + "##Draw", spacing = true)]
-        [CollapseWith(40, 0)]
+        [Order(75, collapseWith = nameof(ShowDrawBar))]
         public bool ShowDrawCooldownTextBar = true;
 
         [Checkbox("with Decimals" + "##Draw")]
-        [CollapseWith(41, 0)]
+        [Order(80, collapseWith = nameof(ShowDrawBar))]
         public bool EnableDecimalDrawBar;
         
         [Checkbox("Card Drawn Timer" + "##Draw")]
-        [CollapseWith(45, 0)]
+        [Order(85, collapseWith = nameof(ShowDrawBar))]
         public bool ShowDrawCardWhileDrawn;
         
         [Checkbox("Redraw Timer" + "##Redraw", spacing = true)]
-        [CollapseWith(55, 0)]
+        [Order(90, collapseWith = nameof(ShowDrawBar))]
         public bool ShowRedrawCooldownTextBar = true;
         
         [Checkbox("with Decimals" + "##Redraw")]
-        [CollapseWith(60, 0)]
+        [Order(95, collapseWith = nameof(ShowDrawBar))]
         public bool EnableDecimalRedrawBar;
         
         [Checkbox("Redraw Stacks" + "##Redraw")]
-        [CollapseWith(65, 0)]
+        [Order(100, collapseWith = nameof(ShowDrawBar))]
         public bool ShowRedrawTextBar = true;
 
         [Checkbox("Total Redraw Cooldown Instead of Next" + "##Redraw")]
-        [CollapseWith(70, 0)]
+        [Order(105, collapseWith = nameof(ShowDrawBar))]
         public bool EnableRedrawCooldownCumulated;
 
 
@@ -578,137 +578,135 @@ namespace DelvUI.Interface.Jobs
 
         #region Divination Bar
         [Checkbox("Divination" + "##Divination", separator = true)]
-        [CollapseControl(35, 1)]
+        [Order(110)]
         public bool ShowDivinationBar = true;
         
         [DragFloat2("Position" + "##Divination", min = -2000f, max = 2000f)]
-        [CollapseWith(0, 1)]
+        [Order(115, collapseWith = nameof(ShowDivinationBar))]
         public Vector2 DivinationBarPosition = new(0, -71);
 
         [DragFloat2("Size" + "##Divination", min = 1f, max = 2000f)]
-        [CollapseWith(5, 1)]
+        [Order(120, collapseWith = nameof(ShowDivinationBar))]
         public Vector2 DivinationBarSize = new(254, 10);
         
         [DragInt("Spacing" + "##Divination", min = -1000, max = 1000)]
-        [CollapseWith(10, 1)]
+        [Order(125, collapseWith = nameof(ShowDivinationBar))]
         public int DivinationBarPad = 2;
 
         [ColorEdit4("Sun" + "##Divination")]
-        [CollapseWith(15, 1)]
+        [Order(130, collapseWith = nameof(ShowDivinationBar))]
         public PluginConfigColor SealSunColor = new(new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f));
 
         [ColorEdit4("Lunar" + "##Divination")]
-        [CollapseWith(20, 1)]
+        [Order(135, collapseWith = nameof(ShowDivinationBar))]
         public PluginConfigColor SealLunarColor = new(new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f));
 
         [ColorEdit4("Celestial" + "##Divination")]
-        [CollapseWith(25, 1)]
+        [Order(140, collapseWith = nameof(ShowDivinationBar))]
         public PluginConfigColor SealCelestialColor = new(new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f));
         
         [Checkbox("Seal Count Text" + "##Divination", spacing = true)]
-        [CollapseWith(28, 1)]
+        [Order(145, collapseWith = nameof(ShowDivinationBar))]
         public bool ShowDivinationTextBar;
         
         [Checkbox("Seal Count Glow" + "##Divination")]
-        [CollapseWith(30, 1)]
+        [Order(150, collapseWith = nameof(ShowDivinationBar))]
         public bool ShowDivinationGlowBar = true;
         
         [ColorEdit4("Glow" + "##Divination")]
-        [CollapseWith(35, 1)]
+        [Order(155, collapseWith = nameof(ShowDivinationBar))]
         public PluginConfigColor DivinationGlowColor = new(new Vector4(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f));
 
         #endregion
 
         #region Dot Bar
         [Checkbox("Combust" + "##Combust", separator = true)]
-        [CollapseControl(40, 2)]
+        [Order(160)]
         public bool ShowDotBar = true;
 
         [DragFloat2("Size" + "##Combust", min = 1f, max = 2000f)]
-        [CollapseWith(0, 2)]
+        [Order(165, collapseWith = nameof(ShowDotBar))]
         public Vector2 DotBarSize = new(84, 20);
 
         [DragFloat2("Position" + "##Combust", min = -2000f, max = 2000f)]
-        [CollapseWith(5, 2)]
+        [Order(170, collapseWith = nameof(ShowDotBar))]
         public Vector2 DotBarPosition = new(-85, -54);
 
         [ColorEdit4("Color" + "##Combust")]
-        [CollapseWith(10, 2)]
+        [Order(175, collapseWith = nameof(ShowDotBar))]
         public PluginConfigColor DotColor = new(new Vector4(20f / 255f, 80f / 255f, 168f / 255f, 100f / 100f));
 
         [Checkbox("Timer" + "##Combust", spacing = true)]
-        [CollapseWith(15, 2)]
+        [Order(180, collapseWith = nameof(ShowDotBar))]
         public bool ShowDotTextBar = true;
 
         [Checkbox("with Decimals" + "##Combust")]
-        [CollapseWith(20, 2)]
+        [Order(185, collapseWith = nameof(ShowDotBar))]
         public bool EnableDecimalDotBar;
         #endregion
 
         #region Star Bar
         [Checkbox("Star" + "##Star", separator = true)]
-        [CollapseControl(45, 3)]
+        [Order(190)]
         public bool ShowStarBar = true;
 
         [DragFloat2("Position" + "##Star", min = -2000f, max = 2000f)]
-        [CollapseWith(0, 3)]
+        [Order(195, collapseWith = nameof(ShowStarBar))]
         public Vector2 StarBarPosition = new(0, -54);
         
         [DragFloat2("Size" + "##Star", min = 1f, max = 2000f)]
-        [CollapseWith(5, 3)]
+        [Order(200, collapseWith = nameof(ShowStarBar))]
         public Vector2 StarBarSize = new(84, 20);
 
-
         [ColorEdit4("Earthly" + "##Star")]
-        [CollapseWith(10, 3)]
+        [Order(205, collapseWith = nameof(ShowStarBar))]
         public PluginConfigColor StarEarthlyColor = new(new Vector4(37f / 255f, 181f / 255f, 177f / 255f, 100f / 100f));
 
         [ColorEdit4("Giant" + "##Star")]
-        [CollapseWith(15, 3)]
+        [Order(210, collapseWith = nameof(ShowStarBar))]
         public PluginConfigColor StarGiantColor = new(new Vector4(198f / 255f, 154f / 255f, 199f / 255f, 100f / 100f));
 
-
         [Checkbox("Timer" + "##Star", spacing = true)]
-        [CollapseWith(25, 3)]
+        [Order(215, collapseWith = nameof(ShowStarBar))]
         public bool ShowStarTextBar = true;
 
         [Checkbox("with Decimals" + "##Star")]
-        [CollapseWith(30, 3)]
+        [Order(220, collapseWith = nameof(ShowStarBar))]
         public bool EnableDecimalStarBar;
 
         [Checkbox("Giant Dominance Glow" + "##Star", spacing = true)]
-        [CollapseWith(35, 3)]
+        [Order(225, collapseWith = nameof(ShowStarBar))]
         public bool ShowStarGlowBar = true;
         
         [ColorEdit4("Color" + "##Star")]
-        [CollapseWith(40, 3)]
+        [Order(230, collapseWith = nameof(ShowStarBar))]
         public PluginConfigColor StarGlowColor = new(new Vector4(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f));
 
         #endregion
 
         #region Lightspeed Bar
         [Checkbox("Lightspeed" + "##Lightspeed", separator = true)]
-        [CollapseControl(50, 4)]
+        [Order(235)]
         public bool ShowLightspeedBar = true;
         
         [DragFloat2("Position" + "##Lightspeed", min = -2000f, max = 2000f)]
-        [CollapseWith(0, 4)]
+        [Order(240, collapseWith = nameof(ShowLightspeedBar))]
         public Vector2 LightspeedBarPosition = new(85, -54);
         
         [DragFloat2("Size" + "##Lightspeed", min = 1f, max = 2000f)]
-        [CollapseWith(5, 4)]
+        [Order(245, collapseWith = nameof(ShowLightspeedBar))]
         public Vector2 LightspeedBarSize = new(84, 20);
         
         [ColorEdit4("Color" + "##Lightspeed")]
-        [CollapseWith(10, 4)]
+        [Order(250, collapseWith = nameof(ShowLightspeedBar))]
         public PluginConfigColor LightspeedColor = new(new Vector4(255f / 255f, 255f / 255f, 173f / 255f, 100f / 100f));
 
         [Checkbox("Timer" + "##Lightspeed", spacing = true)]
-        [CollapseWith(15, 4)]
+        [Order(255, collapseWith = nameof(ShowLightspeedBar))]
         public bool ShowLightspeedTextBar = true;
 
         [Checkbox("with Decimals" + "##Lightspeed")]
-        [CollapseWith(20, 4)]
+        [Order(260, collapseWith = nameof(ShowLightspeedBar))]
         public bool EnableDecimalLightspeedBar;
         #endregion
     }
