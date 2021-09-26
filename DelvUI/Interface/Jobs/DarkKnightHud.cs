@@ -20,7 +20,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DarkKnightConfig Config => (DarkKnightConfig)_config;
 
-        public DarkKnightHud(string id, DarkKnightConfig config, string displayName = null) : base(id, config, displayName)
+        public DarkKnightHud(string id, DarkKnightConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -91,6 +91,11 @@ namespace DelvUI.Interface.Jobs
         private void DrawManaBar(Vector2 origin)
         {
             var actor = Plugin.ClientState.LocalPlayer;
+            if (actor is null)
+            {
+                return;
+            }
+
             var darkArtsBuff = Plugin.JobGauges.Get<DRKGauge>().HasDarkArts;
 
             var posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
@@ -141,7 +146,7 @@ namespace DelvUI.Interface.Jobs
 
             var posX = origin.X + Config.Position.X + Config.DarksidePosition.X - Config.DarksideSize.X / 2f;
             var posY = origin.Y + Config.Position.Y + Config.DarksidePosition.Y - Config.DarksideSize.Y / 2f;
-                        
+
             if (darksideDuration == 0 && Config.OnlyShowWhenActive)
             {
                 return;
@@ -160,7 +165,7 @@ namespace DelvUI.Interface.Jobs
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
         }
-        
+
         private void DrawBloodGauge(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<DRKGauge>();
@@ -234,6 +239,11 @@ namespace DelvUI.Interface.Jobs
         private void DrawLivingShadowBar(Vector2 origin)
         {
             var actor = Plugin.ClientState.LocalPlayer;
+            if (actor is null)
+            {
+                return;
+            }
+
             var shadowTimeRemaining = Plugin.JobGauges.Get<DRKGauge>().ShadowTimeRemaining / 1000;
             var livingShadow = actor.Level >= 80 && shadowTimeRemaining is > 0 and <= 24;
 
@@ -336,7 +346,7 @@ namespace DelvUI.Interface.Jobs
 
         [Checkbox("Only Show When Active" + "##Darkside")]
         [CollapseWith(0, 2)]
-        public bool OnlyShowWhenActive = true;        
+        public bool OnlyShowWhenActive = true;
 
         [DragFloat2("Position" + "##Darkside", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]

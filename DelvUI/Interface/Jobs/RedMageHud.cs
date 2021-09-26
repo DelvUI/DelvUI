@@ -19,7 +19,7 @@ namespace DelvUI.Interface.Jobs
         private new RedMageConfig Config => (RedMageConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public RedMageHud(string id, RedMageConfig config, string displayName = null) : base(id, config, displayName)
+        public RedMageHud(string id, RedMageConfig config, string? displayName = null) : base(id, config, displayName)
         {
         }
 
@@ -110,7 +110,7 @@ namespace DelvUI.Interface.Jobs
                 DrawVerfireProc(origin);
             }
         }
-        
+
         private void DrawBalanceBar(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<RDMGauge>();

@@ -20,7 +20,7 @@ namespace DelvUI.Interface.Jobs
         private new BlackMageConfig Config => (BlackMageConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public BlackMageHud(string id, BlackMageConfig config, string displayName = null) : base(id, config, displayName)
+        public BlackMageHud(string id, BlackMageConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -106,6 +106,10 @@ namespace DelvUI.Interface.Jobs
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
             var actor = Plugin.ClientState.LocalPlayer;
+            if (actor == null)
+            {
+                return;
+            }
 
             var position = origin + Config.Position + Config.ManaBarPosition - Config.ManaBarSize / 2f;
 

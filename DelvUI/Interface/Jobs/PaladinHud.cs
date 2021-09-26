@@ -24,7 +24,7 @@ namespace DelvUI.Interface.Jobs
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
-        public PaladinHud(string id, PaladinConfig config, string displayName = null) : base(id, config, displayName)
+        public PaladinHud(string id, PaladinConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
@@ -248,11 +248,11 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Split Bar" + "##MP")]
         [CollapseWith(5, 0)]
         public bool ChunkManaBar = true;
-        
+
         [DragFloat2("Position" + "##MP", min = -4000f, max = 4000f)]
         [CollapseWith(10, 0)]
         public Vector2 ManaBarPosition = new(0, -76);
-        
+
         [DragFloat2("Size" + "##MP", max = 2000f)]
         [CollapseWith(15, 0)]
         public Vector2 ManaBarSize = new(254, 20);
@@ -260,7 +260,7 @@ namespace DelvUI.Interface.Jobs
         [DragInt("Spacing" + "##MP", max = 100)]
         [CollapseWith(20, 0)]
         public int ManaBarPadding = 2;
-        
+
         [ColorEdit4("Color" + "##MP")]
         [CollapseWith(25, 0)]
         public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
@@ -274,11 +274,11 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Text" + "##Oath")]
         [CollapseWith(0, 1)]
         public bool ShowOathGaugeText = true;
-        
+
         [DragFloat2("Position" + "##Oath", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
         public Vector2 OathGaugePosition = new(0, -54);
-        
+
         [DragFloat2("Size" + "##Oath", min = -4000f, max = 4000f)]
         [CollapseWith(10, 1)]
         public Vector2 OathGaugeSize = new(254, 20);
@@ -286,7 +286,7 @@ namespace DelvUI.Interface.Jobs
         [DragInt("Spacing" + "##Oath", max = 100)]
         [CollapseWith(15, 1)]
         public int OathGaugePadding = 2;
-        
+
         [ColorEdit4("Color" + "##Oath")]
         [CollapseWith(20, 1)]
         public PluginConfigColor OathGaugeColor = new(new Vector4(24f / 255f, 80f / 255f, 175f / 255f, 100f / 100f));
@@ -304,7 +304,7 @@ namespace DelvUI.Interface.Jobs
         [DragFloat2("Position" + "##Buff", min = -4000f, max = 4000f)]
         [CollapseWith(5, 2)]
         public Vector2 BuffBarPosition = new(0, -32);
-        
+
         [DragFloat2("Size" + "##Buff", min = -4000f, max = 4000f)]
         [CollapseWith(10, 2)]
         public Vector2 BuffBarSize = new(254, 20);
@@ -322,11 +322,11 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Atonement" + "##Atonement", separator = true)]
         [CollapseControl(45, 3)]
         public bool ShowAtonementBar = true;
-        
+
         [DragFloat2("Position" + "##Atonement", min = -4000f, max = 4000f)]
         [CollapseWith(0, 3)]
         public Vector2 AtonementBarPosition = new(0, -10);
-        
+
         [DragFloat2("Size" + "##Atonement", min = -4000f, max = 4000f)]
         [CollapseWith(5, 3)]
         public Vector2 AtonementBarSize = new(254, 20);
@@ -334,7 +334,7 @@ namespace DelvUI.Interface.Jobs
         [DragInt("Spacing" + "##Atonement", max = 100)]
         [CollapseWith(10, 3)]
         public int AtonementBarPadding = 2;
-        
+
         [ColorEdit4("Color" + "##Atonement")]
         [CollapseWith(15, 3)]
         public PluginConfigColor AtonementColor = new(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f));
@@ -352,11 +352,11 @@ namespace DelvUI.Interface.Jobs
         [DragFloat2("Position" + "##GoringBlade", min = -4000f, max = 4000f)]
         [CollapseWith(5, 4)]
         public Vector2 GoringBladeBarPosition = new(0, -98);
-        
+
         [DragFloat2("Size" + "##GoringBlade", min = -4000f, max = 4000f)]
         [CollapseWith(10, 4)]
         public Vector2 GoringBladeBarSize = new(254, 20);
-        
+
         [ColorEdit4("Color" + "##GoringBlade")]
         [CollapseWith(15, 4)]
         public PluginConfigColor GoringBladeColor = new(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f));

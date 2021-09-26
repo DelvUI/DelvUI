@@ -18,7 +18,7 @@ namespace DelvUI.Config.Tree
 {
     public abstract class Node
     {
-        public List<Node> children;
+        public List<Node> children = null!;
 
         public virtual void Save(string path)
         {
@@ -97,14 +97,14 @@ namespace DelvUI.Config.Tree
             configPageNodesMap = new Dictionary<Type, ConfigPageNode>();
         }
 
-        public T GetConfigObject<T>() where T : PluginConfigObject
+        public T? GetConfigObject<T>() where T : PluginConfigObject
         {
             var pageNode = GetConfigPageNode<T>();
 
             return pageNode != null ? (T)pageNode.ConfigObject : null;
         }
 
-        public ConfigPageNode GetConfigPageNode<T>() where T : PluginConfigObject
+        public ConfigPageNode? GetConfigPageNode<T>() where T : PluginConfigObject
         {
             if (configPageNodesMap.TryGetValue(typeof(T), out var node))
             {
@@ -215,7 +215,7 @@ namespace DelvUI.Config.Tree
                 ImGui.End();
                 return;
             }
-            
+
             ImGui.PopStyleColor(3);
             ImGui.PopStyleVar(3);
             PushStyles();
@@ -356,7 +356,7 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public ConfigPageNode GetOrAddConfig<T>() where T : PluginConfigObject
+        public ConfigPageNode? GetOrAddConfig<T>() where T : PluginConfigObject
         {
             object[] attributes = typeof(T).GetCustomAttributes(true);
 
@@ -389,7 +389,7 @@ namespace DelvUI.Config.Tree
         public new List<SubSectionNode> children;
 
         public bool Selected;
-        public string Name;
+        public string Name = null!;
 
         public SectionNode() { children = new List<SubSectionNode>(); }
 
@@ -494,7 +494,7 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public ConfigPageNode GetOrAddConfig<T>() where T : PluginConfigObject
+        public ConfigPageNode? GetOrAddConfig<T>() where T : PluginConfigObject
         {
             object[] attributes = typeof(T).GetCustomAttributes(true);
 
@@ -528,12 +528,12 @@ namespace DelvUI.Config.Tree
 
     public abstract class SubSectionNode : Node
     {
-        public string Name;
+        public string Name = null!;
         public int Depth;
 
         public abstract void Draw(ref bool changed);
 
-        public abstract ConfigPageNode GetOrAddConfig<T>() where T : PluginConfigObject;
+        public abstract ConfigPageNode? GetOrAddConfig<T>() where T : PluginConfigObject;
     }
 
     public class NestedSubSectionNode : SubSectionNode
@@ -594,7 +594,7 @@ namespace DelvUI.Config.Tree
                 }
 
                 ImGui.EndTabBar();
-                
+
                 ImGui.EndChild();
             }
             else
@@ -602,7 +602,7 @@ namespace DelvUI.Config.Tree
                 ImGui.BeginChild("item" + Depth + " view", new Vector2(0, ImGui.GetWindowHeight() - 20)); // Leave room for 1 line below us
 
                 DrawSubConfig(ref changed);
-                
+
                 ImGui.EndChild();
             }
         }
@@ -647,9 +647,14 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public override ConfigPageNode GetOrAddConfig<T>()
+        public override ConfigPageNode? GetOrAddConfig<T>()
         {
             var type = typeof(T);
+            if (type == null)
+            {
+                return null;
+            }
+
             object[] attributes = type.GetCustomAttributes(true);
 
             foreach (object attribute in attributes)
@@ -688,8 +693,9 @@ namespace DelvUI.Config.Tree
 
             ConfigPageNode configPageNode = new();
 
-            configPageNode.ConfigObject = (PluginConfigObject)type.GetMethod("DefaultConfig", BindingFlags.Public | BindingFlags.Static).Invoke(null, null);
-            configPageNode.Name = type.FullName;
+            var method = type.GetMethod("DefaultConfig", BindingFlags.Public | BindingFlags.Static);
+            configPageNode.ConfigObject = (PluginConfigObject)method?.Invoke(null, null)!;
+            configPageNode.Name = type.FullName!;
             children.Add(configPageNode);
 
             return configPageNode;
@@ -698,7 +704,7 @@ namespace DelvUI.Config.Tree
 
     public class ConfigPageNode : SubSectionNode
     {
-        private PluginConfigObject _configObject;
+        private PluginConfigObject _configObject = null!;
 
         public PluginConfigObject ConfigObject
         {
@@ -710,11 +716,10 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        private Dictionary<string, ConfigPageNode> _nestedConfigPageNodes;
+        private Dictionary<string, ConfigPageNode> _nestedConfigPageNodes = null!;
 
         private void GenerateNestedConfigPageNodes()
         {
-
             _nestedConfigPageNodes = new Dictionary<string, ConfigPageNode>();
 
             FieldInfo[] fields = _configObject.GetType().GetFields();
@@ -757,13 +762,18 @@ namespace DelvUI.Config.Tree
             // if type matches, load it
             foreach (string importString in importStrings)
             {
-                Type importedType = null;
+                Type? importedType = null;
 
                 try
                 {
                     // get type from json
                     string jsonString = ConfigurationManager.Base64DecodeAndDecompress(importString);
-                    importedType = Type.GetType((string)JObject.Parse(jsonString)["$type"]);
+
+                    var typeString = (string?)JObject.Parse(jsonString)["$type"];
+                    if (typeString != null)
+                    {
+                        importedType = Type.GetType(typeString);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -774,9 +784,9 @@ namespace DelvUI.Config.Tree
                 if (importedType != null && ConfigObject.GetType().FullName == importedType.FullName)
                 {
                     // see comments on ConfigPageNode's Load
-                    MethodInfo methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
-                    MethodInfo function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
-                    PluginConfigObject importedConfigObject = (PluginConfigObject)function.Invoke(ConfigurationManager.GetInstance(), new object[] { importString });
+                    MethodInfo? methodInfo = typeof(ConfigurationManager)?.GetMethod("LoadImportString");
+                    MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigObject.GetType());
+                    PluginConfigObject? importedConfigObject = (PluginConfigObject?)function?.Invoke(ConfigurationManager.GetInstance(), new object[] { importString });
 
                     if (importedConfigObject != null)
                     {
@@ -784,7 +794,7 @@ namespace DelvUI.Config.Tree
                     }
                     else
                     {
-                        PluginLog.Log($"Could not load from import string (of type {importedConfigObject.GetType()})");
+                        PluginLog.Log($"Could not load from import string (of type {ConfigObject.GetType()})");
                     }
                 }
             }
@@ -792,7 +802,7 @@ namespace DelvUI.Config.Tree
 
         public override void Draw(ref bool changed) { DrawWithID(ref changed); }
 
-        private void DrawWithID(ref bool changed, string ID = null)
+        private void DrawWithID(ref bool changed, string? ID = null)
         {
             FieldInfo[] fields = ConfigObject.GetType().GetFields();
             List<KeyValuePair<int, object>> drawList = new();
@@ -821,7 +831,7 @@ namespace DelvUI.Config.Tree
                         collapseWithList.Add(field);
                         hasOrderAttribute = true;
                     }
-                    else if (attribute is NestedConfigAttribute nestedConfigAttribute && _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode node))
+                    else if (attribute is NestedConfigAttribute nestedConfigAttribute && _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode? node))
                     {
                         CategoryField categoryField = new(field, ConfigObject);
                         drawList.Add(new KeyValuePair<int, object>(nestedConfigAttribute.pos, node));
@@ -886,8 +896,8 @@ namespace DelvUI.Config.Tree
                 }
 
                 // TODO allow the manual draw methods to take parameters
-                bool result = (bool)method.Invoke(ConfigObject, null);
-                changed |= result;
+                bool? result = (bool?)method.Invoke(ConfigObject, null);
+                changed |= (result.HasValue && result.Value);
             }
 
             // if the config object is not marked with [Portable(false)], or is marked with [Portable(true)],
@@ -912,12 +922,17 @@ namespace DelvUI.Config.Tree
                 if (ImGui.Button("Import configuration"))
                 {
                     // get type from json
-                    Type importedType = null;
+                    Type? importedType = null;
 
                     try
                     {
                         string jsonString = ConfigurationManager.Base64DecodeAndDecompress(_importString);
-                        importedType = Type.GetType((string)JObject.Parse(jsonString)["$type"]);
+
+                        var typeString = (string?)JObject.Parse(jsonString)["$type"];
+                        if (typeString != null)
+                        {
+                            importedType = Type.GetType(typeString);
+                        }
                     }
                     catch (Exception ex)
                     {
@@ -1012,20 +1027,20 @@ namespace DelvUI.Config.Tree
             // it fails. In order to fix this we need to specify the specific subclass, in order to do this during runtime we must use reflection to set the generic.
             if (ConfigObject is PluginConfigObject)
             {
-                MethodInfo methodInfo = GetType().GetMethod("LoadForType");
-                MethodInfo function = methodInfo.MakeGenericMethod(ConfigObject.GetType());
-                ConfigObject = (PluginConfigObject)function.Invoke(this, new object[] { finalPath.FullName });
+                MethodInfo? methodInfo = GetType().GetMethod("LoadForType");
+                MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigObject.GetType());
+                ConfigObject = (PluginConfigObject)function?.Invoke(this, new object[] { finalPath.FullName })!;
             }
         }
 
-        public T LoadForType<T>(string path) where T : PluginConfigObject
+        public T? LoadForType<T>(string path) where T : PluginConfigObject
         {
             FileInfo file = new(path);
 
             return JsonConvert.DeserializeObject<T>(File.ReadAllText(file.FullName));
         }
 
-        public override ConfigPageNode GetOrAddConfig<T>() => this;
+        public override ConfigPageNode? GetOrAddConfig<T>() => this;
     }
 
     public class CategoryField : Node
@@ -1034,9 +1049,9 @@ namespace DelvUI.Config.Tree
         public FieldInfo MainField;
         public PluginConfigObject ConfigObject;
         public int CategoryId;
-        public string ID;
+        public string? ID;
 
-        public CategoryField(FieldInfo mainField, PluginConfigObject configObject, string id = null)
+        public CategoryField(FieldInfo mainField, PluginConfigObject configObject, string? id = null)
         {
             MainField = mainField;
             ConfigObject = configObject;
@@ -1052,7 +1067,13 @@ namespace DelvUI.Config.Tree
             DrawStyleProperties(MainField, ID);
             Draw(ref changed, MainField);
 
-            if (CategoryId != -1 && (bool)MainField.GetValue(ConfigObject))
+            var value = MainField.GetValue(ConfigObject);
+            if (value == null || value is not bool boolValue)
+            {
+                return;
+            }
+
+            if (CategoryId != -1 && boolValue)
             {
                 ImGui.BeginGroup();
                 ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(0, 0));
@@ -1080,7 +1101,7 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public void DrawStyleProperties(FieldInfo field, string ID)
+        public void DrawStyleProperties(FieldInfo field, string? ID)
         {
             foreach (object attribute in field.GetCustomAttributes(true))
             {

@@ -25,32 +25,28 @@ namespace DelvUI
 {
     public class Plugin : IDalamudPlugin
     {
-        public static ClientState ClientState { get; private set; }
-        public static CommandManager CommandManager { get; private set; }
-        public static Condition Condition { get; private set; }
-        public static DalamudPluginInterface PluginInterface { get; private set; }
-        public static DataManager DataManager { get; private set; }
-        public static Framework Framework { get; private set; }
-        public static GameGui GameGui { get; private set; }
-        public static JobGauges JobGauges { get; private set; }
-        public static ObjectTable ObjectTable { get; private set; }
-        public static SigScanner SigScanner { get; private set; }
-        public static TargetManager TargetManager { get; private set; }
-        public static UiBuilder UiBuilder { get; private set; }
+        public static ClientState ClientState { get; private set; } = null!;
+        public static CommandManager CommandManager { get; private set; } = null!;
+        public static Condition Condition { get; private set; } = null!;
+        public static DalamudPluginInterface PluginInterface { get; private set; } = null!;
+        public static DataManager DataManager { get; private set; } = null!;
+        public static Framework Framework { get; private set; } = null!;
+        public static GameGui GameGui { get; private set; } = null!;
+        public static JobGauges JobGauges { get; private set; } = null!;
+        public static ObjectTable ObjectTable { get; private set; } = null!;
+        public static SigScanner SigScanner { get; private set; } = null!;
+        public static TargetManager TargetManager { get; private set; } = null!;
+        public static UiBuilder UiBuilder { get; private set; } = null!;
 
         public static TextureWrap? BannerTexture;
 
-        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
-        // ReSharper disable once MemberCanBePrivate.Global
         public string AssemblyLocation { get; }
         public string Name => "DelvUI";
 
         public static string Version { get; private set; } = "";
 
-        private bool _fontBuilt;
-        private bool _fontLoadFailed;
-        private HudManager _hudManager;
-        private SystemMenuHook _menuHook;
+        private HudManager _hudManager = null!;
+        private SystemMenuHook _menuHook = null!;
 
         public Plugin(
             ClientState clientState,

@@ -8,7 +8,7 @@ namespace DelvUI.Helpers
 {
     public static class DraggablesHelper
     {
-        public static void DrawGrid(GridConfig config, MovablePluginConfigObject selectedElementConfig)
+        public static void DrawGrid(GridConfig config, MovablePluginConfigObject? selectedElementConfig)
         {
             ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);

@@ -18,7 +18,7 @@ namespace DelvUI.Interface.Jobs
         private readonly float[] _robotDuration = { 12.450f, 13.950f, 15.450f, 16.950f, 18.450f, 19.950f };
         private new MachinistConfig Config => (MachinistConfig)_config;
 
-        public MachinistHud(string id, MachinistConfig config, string displayName = null) : base(id, config, displayName)
+        public MachinistHud(string id, MachinistConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }

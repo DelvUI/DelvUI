@@ -57,12 +57,12 @@ namespace DelvUI.Interface
 
         public HudHelper()
         {
-            Config.onValueChanged += ConfigValueChanged;
+            Config.ValueChangeEvent += ConfigValueChanged;
         }
 
         ~HudHelper()
         {
-            Config.onValueChanged -= ConfigValueChanged;
+            Config.ValueChangeEvent -= ConfigValueChanged;
         }
 
         public unsafe void Configure(bool forceUpdate = false)

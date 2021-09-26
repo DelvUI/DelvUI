@@ -20,7 +20,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new MonkConfig Config => (MonkConfig)_config;
 
-        public MonkHud(string id, MonkConfig config, string displayName = null) : base(id, config, displayName)
+        public MonkHud(string id, MonkConfig config, string? displayName = null) : base(id, config, displayName)
         {
 
         }
