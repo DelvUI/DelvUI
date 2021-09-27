@@ -141,16 +141,16 @@ namespace DelvUI.Interface.Jobs
             var higanbanaBuilder = BarBuilder.Create(pos, Config.HiganbanaBarSize)
                 .SetBackgroundColor(EmptyColor.Base);
 
-            if (higanbanaDuration > 0 && Config.ShowHiganbanaText)
-            {
-                higanbanaBuilder.AddInnerBar(higanbanaDuration, 60f, higanbanaColor).SetFlipDrainDirection(false)
-                .SetTextMode(BarTextMode.Single)
-                .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-            }
-            else
+            if (higanbanaDuration > 0)
             {
                 higanbanaBuilder.AddInnerBar(higanbanaDuration, 60f, higanbanaColor)
                     .SetFlipDrainDirection(false);
+
+                if (Config.ShowHiganbanaText)
+                {
+                    higanbanaBuilder.SetTextMode(BarTextMode.Single)
+                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
             }
 
             var drawList = ImGui.GetWindowDrawList();
