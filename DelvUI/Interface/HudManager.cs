@@ -248,6 +248,7 @@ namespace DelvUI.Interface
             bool updateByEvent = _prevInEvent != inEvent;
 
             _helper.Configure(updateByEvent);
+            _prevInEvent = inEvent;
 
             UpdateJob();
             AssignActors();
