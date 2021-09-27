@@ -24,13 +24,9 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public bool HideOnlyJobPackHudOutsideOfCombat = false;
 
-        //[Checkbox("Hide Default Job Gauges", isMonitored = true, spacing = true)]
-        //[CollapseControl(20, 0)]
+        [Checkbox("Hide Default Job Gauges", isMonitored = true, spacing = true)]
+        [Order(20)]
         public bool HideDefaultJobGauges = false;
-
-        //[Checkbox("Disable Job Gauge Sounds", isMonitored = true)]
-        //[CollapseWith(0, 0)]
-        public bool DisableJobGaugeSounds = false;
 
         [Checkbox("Hide Default Castbar", isMonitored = true, spacing = true)]
         [Order(25)]
@@ -43,6 +39,9 @@ namespace DelvUI.Interface.GeneralElements
         [DynamicList("Hotbars Shown Only In Combat", "Hotbar 1", "Hotbar 2", "Hotbar 3", "Hotbar 4", "Hotbar 5", "Hotbar 6", "Hotbar 7", "Hotbar 8", "Hotbar 9", "Hotbar 10", isMonitored = true)]
         [CollapseWith(0, 1)]
         public List<string> CombatActionBars = new();
+
+        public Vector2 CastBarOriginalPosition;
+        public Dictionary<string, Vector2> JobGaugeOriginalPosition = new Dictionary<string, Vector2>();
 
         public new static HideHudConfig DefaultConfig() { return new HideHudConfig(); }
     }

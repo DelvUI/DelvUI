@@ -235,7 +235,7 @@ namespace DelvUI
                 return;
             }
 
-            HudHelper.RestoreToGameDefaults();
+            _hudManager.Dispose();
 
             ConfigurationManager.GetInstance().DrawConfigWindow = false;
 
