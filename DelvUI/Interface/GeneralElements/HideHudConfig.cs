@@ -18,7 +18,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [Checkbox("Hide DelvUI in Gold Saucer")]
         [Order(10)]
-        public bool HideInGoldSaucer = true;
+        public bool HideInGoldSaucer = false;
 
         [Checkbox("Hide only JobPack HUD outside of combat")]
         [Order(15)]
@@ -28,7 +28,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(20)]
         public bool HideDefaultJobGauges = false;
 
-        [Checkbox("Hide Default Castbar", isMonitored = true, spacing = true)]
+        [Checkbox("Hide Default Castbar", isMonitored = true)]
         [Order(25)]
         public bool HideDefaultCastbar = false;
 
