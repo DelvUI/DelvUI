@@ -32,7 +32,7 @@ namespace DelvUI.Interface.GeneralElements
         public new static FontsConfig DefaultConfig() { return new FontsConfig(); }
 
         public string FontsPath = "C:\\";
-        public string ValidatedFontsPath => ValidatePath(FontsPath);
+        [JsonIgnore] public string ValidatedFontsPath => ValidatePath(FontsPath);
 
         public SortedList<string, FontData> Fonts = new SortedList<string, FontData>();
         public bool SupportChineseCharacters = false;
