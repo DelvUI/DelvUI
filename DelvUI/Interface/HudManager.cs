@@ -17,7 +17,7 @@ using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface
 {
-    public class HudManager
+    public class HudManager : IDisposable
     {
         private Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
 
@@ -36,8 +36,7 @@ namespace DelvUI.Interface
         private Dictionary<uint, JobHudTypes> _jobsMap = null!;
         private Dictionary<uint, Type> _unsupportedJobsMap = null!;
 
-        private HudHelper? _helper { get; set; }
-        private bool _prevInEvent = true;
+        private HudHelper _hudHelper = new HudHelper();
 
         public HudManager()
         {
@@ -51,11 +50,32 @@ namespace DelvUI.Interface
 
         ~HudManager()
         {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            _hudHelper.Dispose();
+
             _hudElements.Clear();
             _hudElementsUsingPlayer.Clear();
             _hudElementsUsingTarget.Clear();
             _hudElementsUsingTargetOfTarget.Clear();
             _hudElementsUsingFocusTarget.Clear();
+
+            ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
+            ConfigurationManager.Instance.LockEvent -= OnHUDLockChanged;
         }
 
         private void OnConfigReset(ConfigurationManager sender)
@@ -219,7 +239,6 @@ namespace DelvUI.Interface
 
             if (!ShouldBeVisible())
             {
-                _helper = null;
                 return;
             }
 
@@ -243,15 +262,7 @@ namespace DelvUI.Interface
                 return;
             }
 
-            _helper ??= new HudHelper();
-
-            bool inEvent = Plugin.Condition[ConditionFlag.OccupiedInEvent]
-                || Plugin.Condition[ConditionFlag.OccupiedInQuestEvent]
-                || Plugin.Condition[ConditionFlag.UsingHousingFunctions];
-            bool updateByEvent = _prevInEvent != inEvent;
-
-            _helper.Configure(updateByEvent);
-            _prevInEvent = inEvent;
+            _hudHelper.Update();
 
             UpdateJob();
             AssignActors();
@@ -268,7 +279,7 @@ namespace DelvUI.Interface
             // general elements
             foreach (var element in _hudElements)
             {
-                if (element != _selectedElement && !_helper.IsElementHidden(element))
+                if (element != _selectedElement && !_hudHelper.IsElementHidden(element))
                 {
                     element.Draw(_origin);
                 }
@@ -277,7 +288,7 @@ namespace DelvUI.Interface
             // job hud
             if (_jobHud != null && _jobHud.Config.Enabled && _jobHud != _selectedElement)
             {
-                if (!_helper.IsElementHidden(_jobHud))
+                if (!_hudHelper.IsElementHidden(_jobHud))
                 {
                     _jobHud.Draw(_origin);
                 }
@@ -515,7 +526,5 @@ namespace DelvUI.Interface
         [DragInt("Subdivision Count", min = 1, max = 10)]
         [CollapseWith(5, 0)]
         public int GridSubdivisionCount = 4;
-
-
     }
 }
