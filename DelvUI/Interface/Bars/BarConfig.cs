@@ -26,15 +26,15 @@ namespace DelvUI.Interface.Bars
         public bool DrawBorder = true;
 
         [Checkbox("Chunk Bar" + "##Chunk")]
-        [CollapseControl(45, 1)]
+        [Order(45)]
         public bool Chunk = false;
 
         [DragInt("Chunk Number" + "##Chunk", min = 2, max = 10)]
-        [CollapseWith(0, 1)]
+        [Order(50, collapseWith = nameof(Chunk))]
         public int ChunkNum = 2;
 
         [DragInt("Chunk Padding" + "##Chunk", min = 0, max = 4000)]
-        [CollapseWith(5, 1)]
+        [Order(55, collapseWith = nameof(Chunk))]
         public int ChunkPadding = 2;
 
         [NestedConfig("Bar Text", 50)]
