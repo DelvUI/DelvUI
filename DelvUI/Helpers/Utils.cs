@@ -7,6 +7,7 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Enums;
+using Colourful;
 
 namespace DelvUI.Helpers
 {
@@ -86,6 +87,48 @@ namespace DelvUI.Helpers
             }
 
             return t.Seconds.ToString();
+        }
+
+        public static PluginConfigColor ColorByHealthValue(float i, float min, float max, PluginConfigColor fullHealthColor, PluginConfigColor lowHealthColor)
+        {
+            float ratio = i;
+            if (min > 0 || max < 1)
+            {
+                if (i < min)
+                {
+                    ratio = 0;
+                }
+                else if (i > max)
+                {
+                    ratio = 1;
+                }
+                else
+                {
+                    var range = max - min;
+                    ratio = (i - min) / range;
+                }
+            }
+
+            var _rgbToLab = new ConverterBuilder().FromRGB().ToLab().Build();
+            var _labToRgb = new ConverterBuilder().FromLab().ToRGB().Build();
+
+            var rgbFullHealthColor = new RGBColor(fullHealthColor.Vector.X, fullHealthColor.Vector.Y, fullHealthColor.Vector.Z);
+            var rgbLowHealthColor = new RGBColor(lowHealthColor.Vector.X, lowHealthColor.Vector.Y, lowHealthColor.Vector.Z);
+
+            var rgbFullHealthLab = _rgbToLab.Convert(rgbFullHealthColor);
+            var rgbLowHealthLab = _rgbToLab.Convert(rgbLowHealthColor);
+
+            float resultL = (float)((rgbFullHealthLab.L - rgbLowHealthLab.L) * ratio + rgbLowHealthLab.L);
+            float resultA = (float)((rgbFullHealthLab.a - rgbLowHealthLab.a) * ratio + rgbLowHealthLab.a);
+            float resultB = (float)((rgbFullHealthLab.b - rgbLowHealthLab.b) * ratio + rgbLowHealthLab.b);
+
+            var newColorLab = new LabColor(resultL, resultA, resultB);
+            var newColorLab2RGB = _labToRgb.Convert(newColorLab);
+
+            newColorLab2RGB.Clamp();
+
+            PluginConfigColor newColor = new PluginConfigColor(new Vector4((float)newColorLab2RGB.R, (float)newColorLab2RGB.G, (float)newColorLab2RGB.B, 100f / 100f));
+            return newColor;
         }
 
         public static PluginConfigColor ColorForActor(GameObject? actor)

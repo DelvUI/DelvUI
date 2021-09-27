@@ -142,6 +142,11 @@ namespace DelvUI.Interface.GeneralElements
             var color = Config.UseCustomColor ? Config.CustomColor : Utils.ColorForActor(chara);
             var bgColor = BackgroundColor(chara);
 
+            if (Config.UseCustomColor && Config.UseColorBasedOnHealthValue)
+            {
+                color = Utils.ColorByHealthValue(scale, Config.LowHealthColorThreshold / 100f, Config.FullHealthColorThreshold / 100f, Config.FullHealthColor, Config.LowHealthColor);
+            }
+
             // background
             drawList.AddRectFilled(startPos, endPos, bgColor);
 
@@ -218,9 +223,16 @@ namespace DelvUI.Interface.GeneralElements
                 return color;
             }
 
-            if (Config.UseCustomBackgroundColor)
+            if (Config.UseCustomBackgroundColor && chara is BattleChara)
             {
-                return Config.CustomBackgroundColor.Base;
+                if (Config.UseJobColorAsBackgroundColor)
+                {
+                    return GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Base;
+                }
+                else
+                {
+                    return Config.CustomBackgroundColor.Base;
+                }
             }
 
             return GlobalColors.Instance.EmptyUnitFrameColor.Base;

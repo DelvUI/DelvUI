@@ -124,269 +124,311 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawFormsBar(Vector2 origin, PlayerCharacter player)
         {
-            var opoOpoForm = player.StatusList.FirstOrDefault(o => o.StatusId == 107);
-            var raptorForm = player.StatusList.FirstOrDefault(o => o.StatusId == 108);
-            var coeurlForm = player.StatusList.FirstOrDefault(o => o.StatusId == 109);
-            var formlessFist = player.StatusList.FirstOrDefault(o => o.StatusId == 2513);
+            var opoOpoForm = player.StatusList.Where(o => o.StatusId is 107);
+            var raptorForm = player.StatusList.Where(o => o.StatusId is 108);
+            var coeurlForm = player.StatusList.Where(o => o.StatusId is 109);
+            var formlessFist = player.StatusList.Where(o => o.StatusId is 2513);
 
-            var opoOpoFormDuration = opoOpoForm?.RemainingTime ?? 0f;
-            var raptorFormDuration = raptorForm?.RemainingTime ?? 0f;
-            var coeurlFormDuration = coeurlForm?.RemainingTime ?? 0f;
-            var formlessFistDuration = formlessFist?.RemainingTime ?? 0f;
+            var opoOpoFormDuration = 0f;
+            if (opoOpoForm.Any())
+            {
+                opoOpoFormDuration = Math.Abs(opoOpoForm.First().RemainingTime);
+            }
+            var raptorFormDuration = 0f;
+            if (raptorForm.Any())
+            {
+                raptorFormDuration = Math.Abs(raptorForm.First().RemainingTime);
+            }
+            var coeurlFormDuration = 0f;
+            if (coeurlForm.Any())
+            {
+                coeurlFormDuration = Math.Abs(coeurlForm.First().RemainingTime);
+            }
+            var formlessFistDuration = 0f;
+            if (formlessFist.Any())
+            {
+                formlessFistDuration = Math.Abs(formlessFist.First().RemainingTime);
+            }
+
+            if (Config.OnlyShowFormsWhenActive && opoOpoFormDuration == 0 && raptorFormDuration == 0 && coeurlFormDuration == 0 && formlessFistDuration == 0)
+            {
+                return;
+            }
 
             var position = origin + Config.Position + Config.FormsBarPosition - Config.FormsBarSize / 2f;
 
-            var builder = BarBuilder.Create(position, Config.FormsBarSize);
+            var formsBuilder = BarBuilder.Create(position, Config.FormsBarSize)
+                .SetBackgroundColor(EmptyColor.Background);
             var maximum = 15f;
 
             if (opoOpoFormDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(opoOpoFormDuration), maximum, Config.FormsBarFillColor)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Opo-Opo Form")
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
+                formsBuilder.AddInnerBar(Math.Abs(opoOpoFormDuration), maximum, Config.FormsBarFillColor)
+                                 .SetTextMode(BarTextMode.Single)
+                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Opo-Opo Form");
             }
 
-            if (raptorFormDuration > 0)
+            else if (raptorFormDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(raptorFormDuration), maximum, Config.FormsBarFillColor)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Raptor Form")
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
+                formsBuilder.AddInnerBar(Math.Abs(raptorFormDuration), maximum, Config.FormsBarFillColor)
+                                 .SetTextMode(BarTextMode.Single)
+                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Raptor Form");
             }
 
-            if (coeurlFormDuration > 0)
+            else if (coeurlFormDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(coeurlFormDuration), maximum, Config.FormsBarFillColor)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Coeurl Form")
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
+                var bar = formsBuilder.AddInnerBar(Math.Abs(coeurlFormDuration), maximum, Config.FormsBarFillColor)
+                                 .SetTextMode(BarTextMode.Single)
+                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Coeurl Form");
             }
 
-            if (formlessFistDuration > 0)
+            else if (formlessFistDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(formlessFistDuration), maximum, Config.FormsBarFillColor)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Formless Fist")
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
+                var bar = formsBuilder.AddInnerBar(Math.Abs(formlessFistDuration), maximum, Config.FormsBarFillColor)
+                                 .SetTextMode(BarTextMode.Single)
+                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Formless Fist");
             }
-            else
-            {
-                var bar = builder.AddInnerBar(0, maximum, Config.FormsBarFillColor)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
-            }
+            var drawList = ImGui.GetWindowDrawList();
+            formsBuilder.Build().Draw(drawList);
         }
 
         private void DrawTrueNorthBar(Vector2 origin, PlayerCharacter player)
         {
-            var trueNorth = player.StatusList.FirstOrDefault(o => o.StatusId == 1250);
-            var trueNorthDuration = trueNorth?.RemainingTime ?? 0f;
+            var trueNorth = player.StatusList.Where(o => o.StatusId is 1250);
+            var trueNorthDuration = 0f;
+            if (trueNorth.Any())
+            {
+                trueNorthDuration = Math.Abs(trueNorth.First().RemainingTime);
+            }
+
+            if (trueNorthDuration == 0 && Config.OnlyShowTrueNorthWhenActive)
+            {
+                return;
+            }
 
             var position = origin + Config.Position + Config.TrueNorthBarPosition - Config.TrueNorthBarSize / 2f;
-            var builder = BarBuilder.Create(position, Config.TrueNorthBarSize);
+            var trueNorthBuilder = BarBuilder.Create(position, Config.TrueNorthBarSize)
+                .SetBackgroundColor(EmptyColor.Background);
             var maximum = 10f;
 
             if (trueNorthDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, Config.TrueNorthBarFillColor)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
+                trueNorthBuilder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, Config.TrueNorthBarFillColor);
 
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
+                if (Config.ShowTrueNorthText)
+                {
+                    trueNorthBuilder.SetTextMode(BarTextMode.Single)
+                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
             }
-            else
-            {
-                var bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, Config.TrueNorthBarFillColor)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
-            }
+            var drawList = ImGui.GetWindowDrawList();
+            trueNorthBuilder.Build().Draw(drawList);
         }
 
         private void DrawPerfectBalanceBar(Vector2 origin, PlayerCharacter player)
         {
-            var perfectBalance = player.StatusList.FirstOrDefault(o => o.StatusId == 110);
-            var perfectBalanceDuration = perfectBalance?.StackCount ?? 0;
+            var perfectBalance = player.StatusList.Where(o => o.StatusId is 110);
+            var perfectBalanceDuration = 0f;
+            var perfectBalanceStacks = 0;
+            if (perfectBalance.Any())
+            {
+                perfectBalanceStacks = perfectBalance.First().StackCount;
+                perfectBalanceDuration = perfectBalance.First().RemainingTime;
+            }
+
+            if (perfectBalanceDuration == 0 && Config.OnlyShowPerfectBalanceWhenActive)
+            {
+                return;
+            }
 
             var position = origin + Config.Position + Config.PerfectBalanceBarPosition - Config.PerfectBalanceBarSize / 2f;
-            var builder = BarBuilder.Create(position, Config.PerfectBalanceBarSize);
-            var maximum = 6f;
+            var perfectBalanceBuilder = BarBuilder.Create(position, Config.PerfectBalanceBarSize)
+                .SetBackgroundColor(EmptyColor.Background);
+            var maximum = 15f;
 
             if (perfectBalanceDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, Config.PerfectBalanceBarFillColor)
-                                 .SetVertical(true)
+                perfectBalanceBuilder.AddInnerBar(perfectBalanceDuration, maximum, Config.PerfectBalanceBarFillColor)
+                                 .SetVertical(Config.PerfectBalanceVertical)
                                  .SetFlipDrainDirection(Config.PerfectBalanceInverted)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
+                                 .SetTextMode(BarTextMode.Single)
+                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, perfectBalanceStacks.ToString());
             }
-            else
-            {
-                var bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, Config.PerfectBalanceBarFillColor)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
-            }
+            var drawList = ImGui.GetWindowDrawList();
+            perfectBalanceBuilder.Build().Draw(drawList);
         }
 
         private void DrawRiddleOfEarthBar(Vector2 origin, PlayerCharacter player)
         {
-            var riddleOfEarth = player.StatusList.FirstOrDefault(o => o.StatusId == 1179);
-            var riddleOfEarthDuration = riddleOfEarth?.StackCount ?? 0;
+            var riddleOfEarth = player.StatusList.Where(o => o.StatusId is 1179);
+            var riddleOfEarthDuration = 0f;
+            if (riddleOfEarth.Any())
+            {
+                riddleOfEarthDuration = Math.Abs(riddleOfEarth.First().RemainingTime);
+            }
+
+            if (riddleOfEarthDuration == 0 && Config.OnlyShowRiddleOfEarthWhenActive)
+            {
+                return;
+            }
 
             var position = origin + Config.Position + Config.RiddleofEarthBarPosition - Config.RiddleofEarthBarSize / 2f;
-            var builder = BarBuilder.Create(position, Config.RiddleofEarthBarSize);
+            var riddleOfEarthBuilder = BarBuilder.Create(position, Config.RiddleofEarthBarSize)
+                .SetBackgroundColor(EmptyColor.Background);
             var maximum = 3f;
 
             if (riddleOfEarthDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, Config.RiddleofEarthBarFillColor)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .SetFlipDrainDirection(Config.RiddleofEarthInverted)
-                                 .Build();
+                riddleOfEarthBuilder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, Config.RiddleofEarthBarFillColor)
+                                 .SetFlipDrainDirection(Config.RiddleofEarthInverted);
 
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
+                if (Config.ShowRiddleofEarthText)
+                {
+                    riddleOfEarthBuilder.SetTextMode(BarTextMode.Single)
+                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
             }
-            else
-            {
-                var bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, Config.RiddleofEarthBarFillColor)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .SetFlipDrainDirection(Config.RiddleofEarthInverted == false)
-                                 .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
-            }
+            var drawList = ImGui.GetWindowDrawList();
+            riddleOfEarthBuilder.Build().Draw(drawList);
         }
 
         private void DrawChakraGauge(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<MNKGauge>();
 
+            if (gauge.Chakra == 0 && Config.OnlyShowChakraWhenActive)
+            {
+                return;
+            }
+
             var position = origin + Config.Position + Config.ChakraBarPosition - Config.ChakraBarSize / 2f;
-            var bar = BarBuilder.Create(position, Config.ChakraBarSize)
+            var chakraBuilder = BarBuilder.Create(position, Config.ChakraBarSize).SetBackgroundColor(EmptyColor.Background)
                                 .SetChunks(5)
-                                .SetChunkPadding(2)
-                                .AddInnerBar(gauge.Chakra, 5, Config.ChakraBarFillColor, EmptyColor)
-                                .SetBackgroundColor(EmptyColor.Background)
-                                .Build();
+                                .SetChunkPadding(2);
+
+            if (gauge.Chakra > 0)
+            {
+                chakraBuilder.AddInnerBar(gauge.Chakra, 5, Config.ChakraBarFillColor, EmptyColor);
+            }           
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            chakraBuilder.Build().Draw(drawList);
         }
 
         private void DrawTwinSnakesBar(Vector2 origin, PlayerCharacter player)
         {
-            var twinSnakes = player.StatusList.FirstOrDefault(o => o.StatusId == 101);
-            var twinSnakesDuration = twinSnakes?.RemainingTime ?? 0f;
+            var twinSnakes = player.StatusList.Where(o => o.StatusId is 101);
+            var twinSnakesDuration = 0f;
+            if (twinSnakes.Any())
+            {
+                twinSnakesDuration = Math.Abs(twinSnakes.First().RemainingTime);
+            }
+
+            if (twinSnakesDuration == 0 && Config.OnlyShowTwinSnakesWhenActive)
+            {
+                return;
+            }
 
             var position = origin + Config.Position + Config.TwinSnakesBarPosition - Config.TwinSnakesBarSize / 2f;
 
-            var builder = BarBuilder.Create(position, Config.TwinSnakesBarSize);
+            var twinSnakesBuilder = BarBuilder.Create(position, Config.TwinSnakesBarSize)
+                .SetBackgroundColor(EmptyColor.Background);
             var maximum = 15f;
 
-            var bar = builder.AddInnerBar(Math.Abs(twinSnakesDuration), maximum, Config.TwinSnakesBarFillColor)
-                             .SetTextMode(BarTextMode.EachChunk)
-                             .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                             .SetBackgroundColor(EmptyColor.Background)
-                             .SetFlipDrainDirection(Config.TwinSnakesBarInverted)
-                             .Build();
+            if(twinSnakesDuration > 0)
+            {
+                twinSnakesBuilder.AddInnerBar(Math.Abs(twinSnakesDuration), maximum, Config.TwinSnakesBarFillColor)
+                             .SetFlipDrainDirection(Config.TwinSnakesBarInverted);
+
+                if (Config.ShowTwinSnakesText)
+                {
+                    twinSnakesBuilder.SetTextMode(BarTextMode.Single)
+                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
+            }
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            twinSnakesBuilder.Build().Draw(drawList);
         }
 
         private void DrawLeadenFistBar(Vector2 origin, PlayerCharacter player)
         {
-            var leadenFist = player.StatusList.FirstOrDefault(o => o.StatusId == 1861);
-            var leadenFistDuration = leadenFist?.RemainingTime ?? 0f;
+            var leadenFist = player.StatusList.Where(o => o.StatusId is 1861);
+            var leadenFistDuration = 0f;
+            if (leadenFist.Any())
+            {
+                leadenFistDuration = Math.Abs(leadenFist.First().RemainingTime);
+            }
+
+            if (leadenFistDuration == 0 && Config.OnlyShowLeadenFistWhenActive)
+            {
+                return;
+            }
 
             var position = origin + Config.Position + Config.LeadenFistBarPosition - Config.LeadenFistBarSize / 2f;
-            var builder = BarBuilder.Create(position, Config.LeadenFistBarSize);
+            var leadenFistBuilder = BarBuilder.Create(position, Config.LeadenFistBarSize)
+                .SetBackgroundColor(EmptyColor.Background);
             var maximum = 30f;
 
             if (leadenFistDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, Config.LeadenFistBarFillColor)
-                                 .SetVertical(true)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
+                leadenFistBuilder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, Config.LeadenFistBarFillColor)
+                                 .SetVertical(Config.LeadenFistVertical);
 
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
+                if (Config.ShowLeadenFistText)
+                {
+                    leadenFistBuilder.SetTextMode(BarTextMode.Single)
+                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
             }
-            else
-            {
-                var bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, Config.LeadenFistBarFillColor)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
 
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
-            }
+            var drawList = ImGui.GetWindowDrawList();
+            leadenFistBuilder.Build().Draw(drawList);
         }
 
         private void DrawDemolishBar(Vector2 origin, PlayerCharacter player)
         {
             var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target ?? player;
 
-            var demolishDuration = 0f;
+            var demolishDuration = 0f;            
 
             if (actor is BattleChara target)
             {
-                Status? demolish = target.StatusList.FirstOrDefault(o => o.StatusId is 246 && o.SourceID == player.ObjectId);
-                demolishDuration = demolish?.RemainingTime ?? 0f;
+                var demolish = target.StatusList.Where(o => o.StatusId is 246 && o.SourceID == player.ObjectId);
+
+                if (demolish.Any())
+                {
+                    demolishDuration = Math.Abs(demolish.First().RemainingTime);
+                }                
+            }
+
+            if (demolishDuration == 0 && Config.OnlyShowDemolishWhenActive)
+            {
+                return;
             }
 
             var position = origin + Config.Position + Config.DemolishBarPosition - Config.DemolishBarSize / 2f;
-            var builder = BarBuilder.Create(position, Config.DemolishBarSize);
+            var demolishBuilder = BarBuilder.Create(position, Config.DemolishBarSize)
+                .SetBackgroundColor(EmptyColor.Background);
             var maximum = 18f;
 
-            var bar = builder.AddInnerBar(Math.Abs(demolishDuration), maximum, Config.DemolishBarFillColor)
-                             .SetTextMode(BarTextMode.EachChunk)
-                             .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                             .SetBackgroundColor(EmptyColor.Background)
-                             .Build();
+            if (demolishDuration > 0)
+            {
+                demolishBuilder.AddInnerBar(Math.Abs(demolishDuration), maximum, Config.DemolishBarFillColor);
+
+                if (Config.ShowDemolishText)
+                {
+                    demolishBuilder.SetTextMode(BarTextMode.Single)
+                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
+            }
 
             var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            demolishBuilder.Build().Draw(drawList);
         }
     }
 
@@ -403,17 +445,25 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(30, 0)]
         public bool ShowDemolishBar = true;
 
-        [DragFloat2("Position" + "##Demolish", min = -4000f, max = 4000f)]
+        [Checkbox("Only Show When Active" + "##Demolish")]
         [CollapseWith(0, 0)]
+        public bool OnlyShowDemolishWhenActive = false;
+
+        [DragFloat2("Position" + "##Demolish", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 0)]
         public Vector2 DemolishBarPosition = new(71, -10);
 
         [DragFloat2("Size" + "##Demolish", min = 0, max = 4000f)]
-        [CollapseWith(5, 0)]
+        [CollapseWith(10, 0)]
         public Vector2 DemolishBarSize = new(111, 20);
 
         [ColorEdit4("Color" + "##Demolish")]
-        [CollapseWith(10, 0)]
+        [CollapseWith(15, 0)]
         public PluginConfigColor DemolishBarFillColor = new(new Vector4(246f / 255f, 169f / 255f, 255f / 255f, 100f / 100f));
+
+        [Checkbox("Text" + "##Demolish")]
+        [CollapseWith(20, 0)]
+        public bool ShowDemolishText = true;
         #endregion
 
         #region Chakra Bar
@@ -421,16 +471,20 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(35, 1)]
         public bool ShowChakraBar = true;
 
-        [DragFloat2("Position" + "##Chakbra", min = -4000f, max = 4000f)]
+        [Checkbox("Only Show When Active" + "##Chakra")]
         [CollapseWith(0, 1)]
+        public bool OnlyShowChakraWhenActive = false;
+
+        [DragFloat2("Position" + "##Chakra", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 1)]
         public Vector2 ChakraBarPosition = new(0, -32);
 
-        [DragFloat2("Size" + "##Chakbra", min = 0, max = 4000f)]
-        [CollapseWith(5, 1)]
+        [DragFloat2("Size" + "##Chakra", min = 0, max = 4000f)]
+        [CollapseWith(10, 1)]
         public Vector2 ChakraBarSize = new(254, 20);
 
-        [ColorEdit4("Color" + "##Chakbra")]
-        [CollapseWith(10, 1)]
+        [ColorEdit4("Color" + "##Chakra")]
+        [CollapseWith(15, 1)]
         public PluginConfigColor ChakraBarFillColor = new(new Vector4(204f / 255f, 115f / 255f, 0f, 100f / 100f));
         #endregion
 
@@ -439,17 +493,29 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(40, 2)]
         public bool ShowLeadenFistBar = true;
 
-        [DragFloat2("Position" + "##LeadenFist", min = -4000f, max = 4000f)]
+        [Checkbox("Only Show When Active" + "##LeadenFist")]
         [CollapseWith(0, 2)]
+        public bool OnlyShowLeadenFistWhenActive = false;
+
+        [DragFloat2("Position" + "##LeadenFist", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 2)]
         public Vector2 LeadenFistBarPosition = new(0, -10);
 
         [DragFloat2("Size" + "##LeadenFist", min = 0, max = 4000f)]
-        [CollapseWith(5, 2)]
+        [CollapseWith(10, 2)]
         public Vector2 LeadenFistBarSize = new(28, 20);
 
         [ColorEdit4("Color" + "##LeadenFist")]
-        [CollapseWith(10, 2)]
+        [CollapseWith(15, 2)]
         public PluginConfigColor LeadenFistBarFillColor = new(new Vector4(255f / 255f, 0f, 0f, 100f / 100f));
+
+        [Checkbox("Text" + "##LeadenFist")]
+        [CollapseWith(20, 2)]
+        public bool ShowLeadenFistText = false;
+
+        [Checkbox("Vertical" + "##LeadenFist")]
+        [CollapseWith(25, 2)]
+        public bool LeadenFistVertical = true;
         #endregion
 
         #region Twin Snakes Bar
@@ -457,20 +523,28 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(45, 3)]
         public bool ShowTwinSnakesBar = true;
 
-        [DragFloat2("Position" + "##TwinSnakes", min = -4000f, max = 4000f)]
+        [Checkbox("Only Show When Active" + "##TwinSnakes")]
         [CollapseWith(0, 3)]
+        public bool OnlyShowTwinSnakesWhenActive = false;
+
+        [DragFloat2("Position" + "##TwinSnakes", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 3)]
         public Vector2 TwinSnakesBarPosition = new(-71, -10);
 
         [DragFloat2("Size" + "##TwinSnakes", min = 0, max = 4000f)]
-        [CollapseWith(5, 3)]
+        [CollapseWith(10, 3)]
         public Vector2 TwinSnakesBarSize = new(111, 20);
 
         [ColorEdit4("Color" + "##TwinSnakes")]
-        [CollapseWith(10, 3)]
+        [CollapseWith(15, 3)]
         public PluginConfigColor TwinSnakesBarFillColor = new(new Vector4(227f / 255f, 255f / 255f, 64f / 255f, 100f / 100f));
 
+        [Checkbox("Text" + "##TwinSnakes")]
+        [CollapseWith(20, 3)]
+        public bool ShowTwinSnakesText = true;
+
         [Checkbox("Inverted" + "##TwinSnakes")]
-        [CollapseWith(15, 3)]
+        [CollapseWith(25, 3)]
         public bool TwinSnakesBarInverted = true;
         #endregion
 
@@ -479,20 +553,28 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(50, 4)]
         public bool ShowRiddleofEarthBar = true;
 
-        [DragFloat2("Position" + "##RiddleofEarth", min = -4000f, max = 4000f)]
+        [Checkbox("Only Show When Active" + "##RiddleofEarth")]
         [CollapseWith(0, 4)]
+        public bool OnlyShowRiddleOfEarthWhenActive = false;
+
+        [DragFloat2("Position" + "##RiddleofEarth", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 4)]
         public Vector2 RiddleofEarthBarPosition = new(-69, -54);
 
         [DragFloat2("Size" + "##RiddleofEarth", min = 0, max = 4000f)]
-        [CollapseWith(5, 4)]
+        [CollapseWith(10, 4)]
         public Vector2 RiddleofEarthBarSize = new(115, 20);
 
         [ColorEdit4("Color" + "##RiddleofEarth")]
-        [CollapseWith(10, 4)]
+        [CollapseWith(15, 4)]
         public PluginConfigColor RiddleofEarthBarFillColor = new(new Vector4(157f / 255f, 59f / 255f, 255f / 255f, 100f / 100f));
 
+        [Checkbox("Text" + "##RiddleofEarth")]
+        [CollapseWith(20, 4)]
+        public bool ShowRiddleofEarthText = true;
+
         [Checkbox("Inverted" + "##RiddleofEarth")]
-        [CollapseWith(15, 4)]
+        [CollapseWith(25, 4)]
         public bool RiddleofEarthInverted = true;
         #endregion
 
@@ -501,21 +583,29 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(55, 5)]
         public bool ShowPerfectBalanceBar = true;
 
-        [DragFloat2("Position" + "##PerfectBalance", min = -4000f, max = 4000f)]
+        [Checkbox("Only Show When Active" + "##PerfectBalance")]
         [CollapseWith(0, 5)]
+        public bool OnlyShowPerfectBalanceWhenActive = false;
+
+        [DragFloat2("Position" + "##PerfectBalance", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 5)]
         public Vector2 PerfectBalanceBarPosition = new(0, -54);
 
         [DragFloat2("Size" + "##PerfectBalance", min = 0, max = 4000f)]
-        [CollapseWith(5, 5)]
+        [CollapseWith(10, 5)]
         public Vector2 PerfectBalanceBarSize = new(20, 20);
 
         [ColorEdit4("Color" + "##PerfectBalance")]
-        [CollapseWith(10, 5)]
+        [CollapseWith(15, 5)]
         public PluginConfigColor PerfectBalanceBarFillColor = new(new Vector4(150f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [Checkbox("Inverted" + "##PerfectBalance")]
-        [CollapseWith(15, 5)]
+        [CollapseWith(20, 5)]
         public bool PerfectBalanceInverted = true;
+
+        [Checkbox("Vertical" + "##PerfectBalance")]
+        [CollapseWith(25, 5)]
+        public bool PerfectBalanceVertical = true;
         #endregion
 
         #region True North
@@ -523,17 +613,25 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(60, 6)]
         public bool ShowTrueNorthBar = true;
 
-        [DragFloat2("Position" + "##TrueNorth", min = -4000f, max = 4000f)]
+        [Checkbox("Only Show When Active" + "##TrueNorth")]
         [CollapseWith(0, 6)]
+        public bool OnlyShowTrueNorthWhenActive = false;
+
+        [DragFloat2("Position" + "##TrueNorth", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 6)]
         public Vector2 TrueNorthBarPosition = new(69, -54);
 
         [DragFloat2("Size" + "##TrueNorth", min = 0, max = 4000f)]
-        [CollapseWith(5, 6)]
+        [CollapseWith(10, 6)]
         public Vector2 TrueNorthBarSize = new(115, 20);
 
         [ColorEdit4("Color" + "##TrueNorth")]
-        [CollapseWith(10, 6)]
+        [CollapseWith(15, 6)]
         public PluginConfigColor TrueNorthBarFillColor = new(new Vector4(255f / 255f, 225f / 255f, 189f / 255f, 100f / 100f));
+
+        [Checkbox("Text" + "##TrueNorth")]
+        [CollapseWith(20, 6)]
+        public bool ShowTrueNorthText = true;
         #endregion
 
         #region Forms
@@ -541,16 +639,20 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(65, 7)]
         public bool ShowFormsBar = false;
 
-        [DragFloat2("Position" + "##Forms", min = -4000f, max = 4000f)]
+        [Checkbox("Only Show When Active" + "##Forms")]
         [CollapseWith(0, 7)]
+        public bool OnlyShowFormsWhenActive = false;
+
+        [DragFloat2("Position" + "##Forms", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 7)]
         public Vector2 FormsBarPosition = new(0, -76);
 
         [DragFloat2("Size" + "##Forms", min = 0, max = 4000f)]
-        [CollapseWith(5, 7)]
+        [CollapseWith(10, 7)]
         public Vector2 FormsBarSize = new(254, 20);
 
         [ColorEdit4("Color" + "##Forms")]
-        [CollapseWith(10, 7)]
+        [CollapseWith(15, 7)]
         public PluginConfigColor FormsBarFillColor = new(new Vector4(36f / 255f, 131f / 255f, 255f / 255f, 100f / 100f));
         #endregion
     }
