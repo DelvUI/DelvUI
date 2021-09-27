@@ -18,7 +18,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [Checkbox("Hide DelvUI in Gold Saucer")]
         [Order(10)]
-        public bool HideInGoldSaucer = true;
+        public bool HideInGoldSaucer = false;
 
         [Checkbox("Hide only JobPack HUD outside of combat")]
         [Order(15)]
@@ -28,7 +28,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(20)]
         public bool HideDefaultJobGauges = false;
 
-        [Checkbox("Hide Default Castbar", isMonitored = true, spacing = true)]
+        [Checkbox("Hide Default Castbar", isMonitored = true)]
         [Order(25)]
         public bool HideDefaultCastbar = false;
 
@@ -38,7 +38,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [DynamicList("Hotbars Shown Only In Combat", "Hotbar 1", "Hotbar 2", "Hotbar 3", "Hotbar 4", "Hotbar 5", "Hotbar 6", "Hotbar 7", "Hotbar 8", "Hotbar 9", "Hotbar 10", isMonitored = true)]
         [CollapseWith(0, 1)]
-        public List<string> CombatActionBars = new();
+        public List<string> CombatActionBars = new List<string>();
 
         public Vector2 CastBarOriginalPosition;
         public Dictionary<string, Vector2> JobGaugeOriginalPosition = new Dictionary<string, Vector2>();
