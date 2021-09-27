@@ -4,5 +4,6 @@
   "Punchline": "A modern HUD replacement built for customization.",
   "Description": "DelvUI provides a highly configurable HUD replacement and is highly inspired by ElvUI from WoW",
   "RepoUrl": "https://github.com/delvui/delvui",
-  "Tags": ["UI"]
+  "Tags": ["UI"],
+  "DalamudApiLevel": 3
 }
