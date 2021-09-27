@@ -13,7 +13,7 @@ namespace DelvUI.Helpers
         #region Singleton
         private FontsManager(string basePath)
         {
-            FontsPath = Path.GetDirectoryName(basePath) + "\\Media\\Fonts\\";
+            DefaultFontsPath = Path.GetDirectoryName(basePath) + "\\Media\\Fonts\\";
         }
 
         public static void Initialize(string basePath)
@@ -63,7 +63,7 @@ namespace DelvUI.Helpers
         }
         #endregion
 
-        public readonly string FontsPath;
+        public readonly string DefaultFontsPath;
 
         public bool DefaultFontBuilt { get; private set; }
         public ImFontPtr DefaultFont { get; private set; } = null;
@@ -110,10 +110,14 @@ namespace DelvUI.Helpers
 
             foreach (var fontData in config.Fonts)
             {
-                var path = FontsPath + fontData.Value.Name + ".ttf";
+                var path = DefaultFontsPath + fontData.Value.Name + ".ttf";
                 if (!File.Exists(path))
                 {
-                    continue;
+                    path = config.FontsPath + fontData.Value.Name + ".ttf";
+                    if (!File.Exists(path))
+                    {
+                        continue;
+                    }
                 }
 
                 try
