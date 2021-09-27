@@ -38,7 +38,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [DynamicList("Hotbars Shown Only In Combat", "Hotbar 1", "Hotbar 2", "Hotbar 3", "Hotbar 4", "Hotbar 5", "Hotbar 6", "Hotbar 7", "Hotbar 8", "Hotbar 9", "Hotbar 10", isMonitored = true)]
         [CollapseWith(0, 1)]
-        public List<string> CombatActionBars = new();
+        public List<string> CombatActionBars = new List<string>();
 
         public Vector2 CastBarOriginalPosition;
         public Dictionary<string, Vector2> JobGaugeOriginalPosition = new Dictionary<string, Vector2>();

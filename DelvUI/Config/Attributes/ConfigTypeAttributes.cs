@@ -407,14 +407,13 @@ namespace DelvUI.Config.Attributes
             ImGui.Text("Add");
             if (ImGui.Combo("##Add" + idText + friendlyName, ref intVal, addOptions.ToArray(), addOptions.Count, 6))
             {
+                changed = true;
+
                 var change = addOptions[intVal];
                 opts.Add(change);
                 field.SetValue(config, opts);
 
-                if (isMonitored && config is IOnChangeEventArgs eventObject)
-                {
-                    TriggerChangeEvent<string>(config, field.Name, change, ChangeType.ListAdd);
-                }
+                TriggerChangeEvent<string>(config, field.Name, change, ChangeType.ListAdd);
             }
 
             ImGui.Text(friendlyName + ":");
@@ -467,22 +466,16 @@ namespace DelvUI.Config.Attributes
 
             if (indexToRemove >= 0)
             {
+                changed = true;
+
                 var change = opts[indexToRemove];
                 opts.Remove(change);
                 field.SetValue(config, opts);
 
-                if (isMonitored && config is IOnChangeEventArgs eventObject)
-                {
-                    eventObject.OnValueChanged(
-                        new OnChangeEventArgs<string>(field.Name, change, ChangeType.ListRemove)
-                    );
-                }
-
+                TriggerChangeEvent<string>(config, field.Name, change, ChangeType.ListRemove);
             }
 
             ImGui.EndChild();
-
-
 
             return changed;
         }
