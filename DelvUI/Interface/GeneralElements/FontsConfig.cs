@@ -31,8 +31,8 @@ namespace DelvUI.Interface.GeneralElements
     {
         public new static FontsConfig DefaultConfig() { return new FontsConfig(); }
 
-        private string _fontsPath = "C:\\";
-        [JsonIgnore] public string FontsPath => ValidatePath(_fontsPath);
+        public string FontsPath = "C:\\";
+        public string ValidatedFontsPath => ValidatePath(FontsPath);
 
         public SortedList<string, FontData> Fonts = new SortedList<string, FontData>();
         public bool SupportChineseCharacters = false;
@@ -86,6 +86,14 @@ namespace DelvUI.Interface.GeneralElements
                 fonts = new string[0];
             }
 
+            for (int i = 0; i < fonts.Length; i++)
+            {
+                fonts[i] = fonts[i]
+                    .Replace(path, "")
+                    .Replace(".ttf", "")
+                    .Replace(".TTF", "");
+            }
+
             return fonts;
         }
 
@@ -93,26 +101,11 @@ namespace DelvUI.Interface.GeneralElements
         {
             var defaultFontsPath = ValidatePath(FontsManager.Instance.DefaultFontsPath);
             string[] defaultFonts = FontsFromPath(defaultFontsPath);
-            string[] userFonts = FontsFromPath(FontsPath);
+            string[] userFonts = FontsFromPath(ValidatedFontsPath);
 
-            var length = defaultFonts.Length + userFonts.Length;
-            _fonts = new string[length];
-
-            for (int i = 0; i < defaultFonts.Length; i++)
-            {
-                _fonts[i] = defaultFonts[i]
-                    .Replace(defaultFontsPath, "")
-                    .Replace(".ttf", "")
-                    .Replace(".TTF", "");
-            }
-
-            for (int i = 0; i < userFonts.Length; i++)
-            {
-                _fonts[defaultFonts.Length + i] = userFonts[i]
-                    .Replace(FontsPath, "")
-                    .Replace(".ttf", "")
-                    .Replace(".TTF", "");
-            }
+            _fonts = new string[defaultFonts.Length + userFonts.Length];
+            defaultFonts.CopyTo(_fonts, 0);
+            userFonts.CopyTo(_fonts, defaultFonts.Length);
         }
 
         private bool AddNewEntry(int font, int size)
@@ -176,7 +169,7 @@ namespace DelvUI.Interface.GeneralElements
 
                 ImGui.Text("\u2002");
                 ImGui.SameLine();
-                if (ImGui.InputText("Fonts Path", ref _fontsPath, 200, ImGuiInputTextFlags.EnterReturnsTrue))
+                if (ImGui.InputText("Fonts Path", ref FontsPath, 200, ImGuiInputTextFlags.EnterReturnsTrue))
                 {
                     changed = true;
                     ReloadFonts();

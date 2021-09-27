@@ -113,7 +113,7 @@ namespace DelvUI.Helpers
                 var path = DefaultFontsPath + fontData.Value.Name + ".ttf";
                 if (!File.Exists(path))
                 {
-                    path = config.FontsPath + fontData.Value.Name + ".ttf";
+                    path = config.ValidatedFontsPath + fontData.Value.Name + ".ttf";
                     if (!File.Exists(path))
                     {
                         continue;
