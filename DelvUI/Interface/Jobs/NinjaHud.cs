@@ -167,6 +167,10 @@ namespace DelvUI.Interface.Jobs
                            .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, ninjutsuText);
                 }
             }
+            else if ((!inNinjutsu || !haveKassatsuBuff || !haveTCJBuff) && Config.OnlyShowMudraWhenActive)
+            {
+                return;
+            }
             else
             {
                 // if we are neither casting ninjutsu nor in kassatsu nor in TCJ, show the mudra charges and cooldowns
@@ -225,19 +229,27 @@ namespace DelvUI.Interface.Jobs
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
             int hutonDurationLeft = (int)Math.Ceiling((float)(gauge.HutonTimer / (double)1000));
 
+            if (hutonDurationLeft == 0 && Config.OnlyShowHutonWhenActive)
+            {
+                return;
+            }
+
             float xPos = origin.X + Config.Position.X + Config.HutonGaugePosition.X - Config.HutonGaugeSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.HutonGaugePosition.Y - Config.HutonGaugeSize.Y / 2f;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.HutonGaugeSize.Y, Config.HutonGaugeSize.X);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.HutonGaugeSize.Y, Config.HutonGaugeSize.X)
+                .SetBackgroundColor(EmptyColor.Base);
             float maximum = 70f;
 
-            builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, hutonDurationLeft > Config.HutonGaugeExpiryThreshold ? Config.HutonGaugeColor : Config.HutonGaugeExpiryColor)
-                   .SetBackgroundColor(EmptyColor.Base);
-
-            if (Config.ShowHutonGaugeText)
+            if (hutonDurationLeft > 0)
             {
-                builder.SetTextMode(BarTextMode.Single)
-                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, hutonDurationLeft > Config.HutonGaugeExpiryThreshold ? Config.HutonGaugeColor : Config.HutonGaugeExpiryColor);
+
+                if (Config.ShowHutonGaugeText)
+                {
+                    builder.SetTextMode(BarTextMode.Single)
+                           .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                }
             }
 
             if (!Config.ShowHutonGaugeBorder)
@@ -255,10 +267,16 @@ namespace DelvUI.Interface.Jobs
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
 
+            if (gauge.Ninki == 0 && Config.OnlyShowNinkiWhenActive)
+            {
+                return;
+            }
+
             float xPos = origin.X + Config.Position.X + Config.NinkiGaugePosition.X - Config.NinkiGaugeSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.NinkiGaugePosition.Y - Config.NinkiGaugeSize.Y / 2f;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.NinkiGaugeSize.Y, Config.NinkiGaugeSize.X);
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.NinkiGaugeSize.Y, Config.NinkiGaugeSize.X)
+                .SetBackgroundColor(EmptyColor.Base);
 
             if (Config.ChunkNinkiGauge)
             {
@@ -268,8 +286,6 @@ namespace DelvUI.Interface.Jobs
             {
                 builder.AddInnerBar(gauge.Ninki, 100, Config.NinkiGaugeColor);
             }
-
-            builder.SetBackgroundColor(EmptyColor.Base);
 
             if (Config.ShowNinkiGaugeText)
             {
@@ -294,14 +310,18 @@ namespace DelvUI.Interface.Jobs
 
             GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float trickDuration = 0f;
+            float suitonDuration = 0f;
             const float trickMaxDuration = 15f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.TrickBarSize.Y, Config.TrickBarSize.X);
 
             if (actor is BattleChara target)
             {
-                Status? trickStatus = target.StatusList.FirstOrDefault(o => o.StatusId == 638 && o.SourceID == player.ObjectId);
-                trickDuration = Math.Max(trickStatus?.RemainingTime ?? 0f, 0);
+                var trickStatus = target.StatusList.Where(o => o.StatusId is 638 && o.SourceID == player.ObjectId);
+                if (trickStatus.Any() && Config.ShowTrickBar)
+                {
+                    trickDuration = Math.Abs(trickStatus.First().RemainingTime);
+                }
             }
 
             if (trickDuration != 0)
@@ -315,16 +335,22 @@ namespace DelvUI.Interface.Jobs
             }
 
             IEnumerable<Status> suitonBuff = player.StatusList.Where(o => o.StatusId == 507);
-
+                        
             if (suitonBuff.Any() && Config.ShowSuitonBar)
             {
-                float suitonDuration = Math.Abs(suitonBuff.First().RemainingTime);
+                suitonDuration = Math.Abs(suitonBuff.First().RemainingTime);
+
                 builder.AddInnerBar(suitonDuration, 20, Config.SuitonBarColor);
 
                 if (Config.ShowSuitonBarText)
                 {
                     builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.SuitonBarColor.Vector, Vector4.UnitW, null);
                 }
+            }
+
+            if (trickDuration == 0f && suitonDuration == 0f && Config.OnlyShowTnSWhenActive)
+            {
+                return;
             }
 
             Bar bar = builder.Build();
@@ -346,20 +372,24 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(30, 0)]
         public bool ShowHutonGauge = true;
 
-        [Checkbox("Timer" + "##Huton")]
+        [Checkbox("Only Show When Active" + "##Huton")]
         [CollapseWith(0, 0)]
+        public bool OnlyShowHutonWhenActive = false;
+
+        [Checkbox("Timer" + "##Huton")]
+        [CollapseWith(1, 0)]
         public bool ShowHutonGaugeText = true;
 
         [Checkbox("Border" + "##Huton")]
-        [CollapseWith(1, 0)]
+        [CollapseWith(2, 0)]
         public bool ShowHutonGaugeBorder = true;
 
         [DragFloat2("Position" + "##Huton", min = -4000f, max = 4000f)]
-        [CollapseWith(2, 0)]
+        [CollapseWith(3, 0)]
         public Vector2 HutonGaugePosition = new(0, -54);
 
         [DragFloat2("Size" + "##Huton", max = 2000f)]
-        [CollapseWith(3, 0)]
+        [CollapseWith(4, 0)]
         public Vector2 HutonGaugeSize = new(254, 20);
 
         [ColorEdit4("Color" + "##Huton")]
@@ -386,32 +416,36 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(35, 1)]
         public bool ShowNinkiGauge = true;
 
-        [Checkbox("Text" + "##Ninki")]
+        [Checkbox("Only Show When Active" + "##Ninki")]
         [CollapseWith(0, 1)]
+        public bool OnlyShowNinkiWhenActive = false;
+
+        [Checkbox("Text" + "##Ninki")]
+        [CollapseWith(5, 1)]
         public bool ShowNinkiGaugeText = true;
 
         [Checkbox("Border" + "##Ninki")]
-        [CollapseWith(5, 1)]
+        [CollapseWith(10, 1)]
         public bool ShowNinkiGaugeBorder = true;
 
         [Checkbox("Split Bar" + "##Ninki")]
-        [CollapseWith(10, 1)]
+        [CollapseWith(15, 1)]
         public bool ChunkNinkiGauge = true;
 
         [DragFloat2("Position" + "##Ninki", min = -4000f, max = 4000f)]
-        [CollapseWith(15, 1)]
+        [CollapseWith(20, 1)]
         public Vector2 NinkiGaugePosition = new(0, -32);
 
         [DragFloat2("Size" + "##Ninki", max = 2000f)]
-        [CollapseWith(20, 1)]
+        [CollapseWith(25, 1)]
         public Vector2 NinkiGaugeSize = new(254, 20);
 
         [DragFloat("Spacing" + "##Ninki", min = -4000f, max = 4000f)]
-        [CollapseWith(25, 1)]
+        [CollapseWith(30, 1)]
         public float NinkiGaugeChunkPadding = 2;
 
         [ColorEdit4("Color" + "##Ninki")]
-        [CollapseWith(30, 1)]
+        [CollapseWith(35, 1)]
         public PluginConfigColor NinkiGaugeColor = new(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f));
 
         #endregion
@@ -425,28 +459,32 @@ namespace DelvUI.Interface.Jobs
         [Order(45)]
         public Vector2 TrickBarSize = new(254, 20);
 
+        [Checkbox("Only Show When Active" + "##TnS")]
+        [Order(50)]
+        public bool OnlyShowTnSWhenActive = false;
+
         [Checkbox("Trick Attack" + "##TnS")]
-        [CollapseControl(50, 2)]
-        public bool ShowTrickBar = false;
+        [CollapseControl(55, 2)]
+        public bool ShowTrickBar = false;        
 
         [Checkbox("Timer" + "##TnS")]
-        [CollapseWith(0, 2)]
+        [CollapseWith(5, 2)]
         public bool ShowTrickBarText = true;
 
         [ColorEdit4("Color" + "##TnS")]
-        [CollapseWith(5, 2)]
+        [CollapseWith(10, 2)]
         public PluginConfigColor TrickBarColor = new(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f));
 
         [Checkbox("Suiton" + "##TnS")]
-        [CollapseControl(55, 3)]
+        [CollapseControl(60, 3)]
         public bool ShowSuitonBar = false;
 
         [Checkbox("Timer" + "##TnS")]
-        [CollapseWith(0, 3)]
+        [CollapseWith(5, 3)]
         public bool ShowSuitonBarText = true;
 
         [ColorEdit4("Color" + "##TnS")]
-        [CollapseWith(5, 3)]
+        [CollapseWith(10, 3)]
         public PluginConfigColor SuitonBarColor = new(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f));
         #endregion
 
@@ -455,12 +493,16 @@ namespace DelvUI.Interface.Jobs
         [CollapseControl(60, 4)]
         public bool ShowMudraCooldown = true;
 
-        [Checkbox("Timers" + "##Mudra")]
+        [Checkbox("Only Show When Active" + "##Mudra")]
         [CollapseWith(0, 4)]
+        public bool OnlyShowMudraWhenActive = false;
+
+        [Checkbox("Timers" + "##Mudra")]
+        [CollapseWith(1, 4)]
         public bool ShowMudraBarText = true;
 
         [Checkbox("Ninjutsu Text" + "##Mudra")]
-        [CollapseWith(1, 4)]
+        [CollapseWith(2, 4)]
         public bool ShowNinjutsuText = true;
 
         [DragFloat2("Position" + "##Mudra", min = -4000f, max = 4000f)]
