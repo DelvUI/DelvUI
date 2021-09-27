@@ -80,7 +80,7 @@ namespace DelvUI.Interface.Jobs
                 DrawNinkiGauge(origin);
             }
 
-            if (Config.ShowTrickBar || Config.ShowSuitonBar)
+            if (Config.EnableTrickSuitonBar)
             {
                 DrawTrickAndSuitonGauge(origin, player);
             }
