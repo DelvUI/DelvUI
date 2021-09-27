@@ -21,7 +21,7 @@ namespace DelvUI.Interface.GeneralElements
         public bool VerticalMode = false;
         
         [Checkbox("Circular Mode")]
-        [Order(35)]
+        [CollapseControl(35, 0)]
         public bool CircularMode = false;
         
         [Checkbox("Anchor To Mouse", spacing = true)]
