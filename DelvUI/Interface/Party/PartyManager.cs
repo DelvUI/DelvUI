@@ -4,6 +4,7 @@ using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.Game.Group;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using System;
 using System.Collections.Generic;
 using PartyMember = FFXIVClientStructs.FFXIV.Client.Game.Group.PartyMember;
@@ -15,7 +16,7 @@ namespace DelvUI.Interface.Party
     public unsafe class PartyManager : IDisposable
     {
         #region Singleton
-        private static PartyManager _instance = null!;
+        public static PartyManager Instance { get; private set; } = null!;
         private PartyFramesConfig _config;
 
         private PartyManager(PartyFramesConfig config)
@@ -31,16 +32,34 @@ namespace DelvUI.Interface.Party
         public static void Initialize()
         {
             var config = ConfigurationManager.Instance.GetConfigObject<PartyFramesConfig>();
-            _instance = new PartyManager(config);
+            Instance = new PartyManager(config);
+        }
+
+        ~PartyManager()
+        {
+            Dispose(false);
         }
 
         public void Dispose()
         {
-            Plugin.Framework.Update -= FrameworkOnOnUpdateEvent;
-            _config.ValueChangeEvent -= OnConfigPropertyChanged;
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
-        public static PartyManager Instance => _instance;
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            Plugin.Framework.Update -= FrameworkOnOnUpdateEvent;
+            _config.ValueChangeEvent -= OnConfigPropertyChanged;
+
+            Instance = null!;
+        }
+
+
         #endregion Singleton
 
         private List<IPartyFramesMember> _groupMembers = new List<IPartyFramesMember>();

@@ -260,6 +260,7 @@ namespace DelvUI
             TexturesCache.Instance.Dispose();
             TooltipsHelper.Instance.Dispose();
             GlobalColors.Instance.Dispose();
+            PartyManager.Instance.Dispose();
             ConfigurationManager.Instance.Dispose();
         }
     }

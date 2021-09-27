@@ -50,7 +50,7 @@ namespace DelvUI.Interface.Party
             UpdateBars(Vector2.Zero);
         }
 
-        ~PartyFramesHud()
+        protected override void InternalDispose()
         {
             bars.Clear();
 
