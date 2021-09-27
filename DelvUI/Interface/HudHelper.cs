@@ -66,12 +66,12 @@ namespace DelvUI.Interface
 
         public unsafe void Configure(bool forceUpdate = false)
         {
+            ConfigureCombatActionBars(_isInitial || forceUpdate);
+
             if (!_isInitial && !forceUpdate)
             {
                 return;
             }
-
-            ConfigureCombatActionBars(_isInitial || forceUpdate);
 
             ToggleDefaultComponent(delegate (GUIAddon addon)
             {
@@ -79,17 +79,17 @@ namespace DelvUI.Interface
                 {
                     addon.NodeListVisibilityToggle(Config.HideDefaultCastbar);
                 }
-                else if (addon.name.StartsWith("JobHud") && !addon.name.StartsWith("JobHudNotice"))
-                {
-                    bool isHidden = Config.HideDefaultJobGauges;
+                //else if (addon.name.StartsWith("JobHud") && !addon.name.StartsWith("JobHudNotice"))
+                //{
+                //    bool isHidden = Config.HideDefaultJobGauges;
 
-                    addon.NodeListVisibilityToggle(isHidden && Config.DisableJobGaugeSounds);
-                    if (!Config.DisableJobGaugeSounds)
-                    {
-                        addon.VisibilityToggle(isHidden);
+                //    addon.NodeListVisibilityToggle(isHidden && Config.DisableJobGaugeSounds);
+                //    if (!Config.DisableJobGaugeSounds)
+                //    {
+                //        addon.VisibilityToggle(isHidden);
 
-                    }
-                }
+                //    }
+                //}
             });
 
             _isInitial = false;
@@ -137,10 +137,10 @@ namespace DelvUI.Interface
             {
                 ConfigureDefaultCastBar();
             }
-            else if (e.PropertyName == "HideDefaultJobGauges" || e.PropertyName == "DisableJobGaugeSounds")
-            {
-                ConfigureDefaultJobGauge();
-            }
+            //else if (e.PropertyName == "HideDefaultJobGauges" || e.PropertyName == "DisableJobGaugeSounds")
+            //{
+            //    ConfigureDefaultJobGauge();
+            //}
             else if (e.PropertyName == "EnableCombatActionBars")
             {
                 Config.CombatActionBars.ForEach(name => ToggleActionbar(name, Config.EnableCombatActionBars));
@@ -208,6 +208,7 @@ namespace DelvUI.Interface
 
         private unsafe void ConfigureDefaultJobGauge()
         {
+            return;
             ToggleDefaultComponent(delegate (GUIAddon addon)
             {
                 if (addon.name.StartsWith("JobHud"))
@@ -280,7 +281,7 @@ namespace DelvUI.Interface
             ToggleDefaultComponent(delegate (GUIAddon addon)
             {
                 if (addon.name == "_CastBar"
-                    || addon.name.StartsWith("JobHud")
+                    //|| addon.name.StartsWith("JobHud")
                     || addon.name.StartsWith("_ActionBar"))
                 {
                     addon.VisibilityToggle(false);
