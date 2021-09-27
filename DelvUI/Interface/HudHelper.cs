@@ -237,7 +237,7 @@ namespace DelvUI.Interface
                 ConfigurationManager.Instance.SaveConfigurations();
             }
 
-            if (isVisible != Config.HideDefaultCastbar)
+            if (isVisible != Config.HideDefaultCastbar && !forceVisible)
             {
                 return;
             }
