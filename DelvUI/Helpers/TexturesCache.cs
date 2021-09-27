@@ -139,6 +139,18 @@ namespace DelvUI.Helpers
                 return;
             }
 
+            foreach (var dictKey in _cache.Keys)
+            {
+                var dict = _cache[dictKey];
+                foreach (var key in dict.Keys)
+                {
+                    var tex = dict[key];
+                    tex?.Dispose();
+                }
+            }
+
+            _cache.Clear();
+
             Instance = null!;
         }
         #endregion
