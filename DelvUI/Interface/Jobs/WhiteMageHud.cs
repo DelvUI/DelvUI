@@ -103,7 +103,7 @@ namespace DelvUI.Interface.Jobs
                 cursorPos,
                 cursorPos + new Vector2(Config.DiaBarSize.X / diaCooldown * diaDuration, Config.DiaBarSize.Y),
                 Config.ShowDiaRefresh 
-                    ? dia.Duration >= Config.DiaCustomRefresh
+                    ? diaDuration >= Config.DiaCustomRefresh
                         ? Config.DiaColor.BottomGradient 
                         : Config.DiaRefreshColor.BottomGradient 
                     : Config.DiaColor.BottomGradient
