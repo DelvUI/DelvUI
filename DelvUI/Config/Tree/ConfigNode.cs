@@ -706,6 +706,7 @@ namespace DelvUI.Config.Tree
     {
         private PluginConfigObject _configObject = null!;
         public bool HasSeparator = true;
+        public bool HasSpacing = false;
 
         public PluginConfigObject ConfigObject
         {
@@ -835,6 +836,7 @@ namespace DelvUI.Config.Tree
                     else if (attribute is NestedConfigAttribute nestedConfigAttribute && _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode? node))
                     {
                         node.HasSeparator = nestedConfigAttribute.separator;
+                        node.HasSpacing = nestedConfigAttribute.spacing;
                         drawList.Add(new KeyValuePair<int, object>(nestedConfigAttribute.pos, node));
                         wasAdded = true;
                     }
@@ -857,16 +859,19 @@ namespace DelvUI.Config.Tree
                         if (parentField is not null)
                         {
                             // The CategoryField for the parent could either be in the drawList (if it is the root) or the collapseWithList (if there is multi-layered nesting)
-                            IEnumerable<CategoryField?> drawListCategoryFields = drawList.Where(kvp => kvp.Value is CategoryField).Select(kvp => kvp.Value as CategoryField);
-                            CategoryField? parentCategoryField = drawListCategoryFields
+                            // Create a union of the CategoryFields that already exist in the drawList and the collapseWithList, then search for the parent field.
+                            // This looks incredibly gross but it's probably the cleanest way to do it without an extremely heavy refactor of the code above.
+                            CategoryField? parentCategoryField = drawList
+                                .Where(kvp => kvp.Value is CategoryField)
+                                .Select(kvp => kvp.Value as CategoryField)
                                 .Union(collapseWithList)
-                                .Where(categoryField => categoryField is not null && categoryField.MainField == parentField)
+                                .Where(categoryField => categoryField is not null && parentField.Equals(categoryField.MainField))
                                 .FirstOrDefault();
 
                             if (parentCategoryField is not null)
                             {
                                 parentCategoryField.CollapseControl = true;
-                                categoryField.Depth = categoryField.HasSpacing || categoryField.HasSeparator ? 0 : parentCategoryField.Depth + 1;
+                                categoryField.Depth = categoryField.HasSeparator ? 0 : parentCategoryField.Depth + 1;
                                 parentCategoryField.AddChild(orderAttribute.pos, categoryField);
                             }
                         }
@@ -888,6 +893,10 @@ namespace DelvUI.Config.Tree
                     if (node.HasSeparator)
                     {
                         Separator(1, 1);
+                    }
+                    if (node.HasSpacing)
+                    {
+                        Spacing(1);
                     }
 
                     node.DrawWithID(ref changed, node.Name);
@@ -1061,6 +1070,7 @@ namespace DelvUI.Config.Tree
         public bool HasSeparator = false;
         public bool HasSpacing = false;
         public int Depth = 0;
+        public bool IsChild = false;
 
         public CategoryField(FieldInfo mainField, PluginConfigObject configObject, string? id = null)
         {
@@ -1078,11 +1088,18 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public void AddChild(int position, CategoryField field) { Children.Add(position, field); }
+        public void AddChild(int position, CategoryField field) 
+        {
+            field.IsChild = true;
+            Children.Add(position, field); 
+        }
 
         public void Draw(ref bool changed)
         {
-            DrawSeparatorOrSpacing(MainField, ID);
+            if (!IsChild)
+            {
+                DrawSeparatorOrSpacing(MainField, ID);
+            }
 
             // Draw the ConfigAttribute
             Draw(ref changed, MainField);
@@ -1095,18 +1112,19 @@ namespace DelvUI.Config.Tree
 
                 foreach (CategoryField child in Children.Values)
                 {
+                    DrawSeparatorOrSpacing(child.MainField, ID);
+
                     // This draws the L shaped symbols and padding to the left of config items collapsible under a checkbox.
                     // If the child has a separator or spacing above it, then we don't want to draw these because this item is the start of a new section.
-                    if (!child.HasSeparator && !child.HasSpacing)
+                    if (!child.HasSeparator)
                     {
                         // Shift cursor to the right to pad for children with depth more than 1.
                         // 26 is an arbitrary value I found to be around half the width of a checkbox
-                        // (hopefully this works at other resolutions...)
                         ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(26, 0) * Math.Max((child.Depth - 1), 0));
                         ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
+                        ImGui.SameLine();
                     }
 
-                    ImGui.SameLine();
                     child.Draw(ref changed);
                 }
 
@@ -1140,7 +1158,7 @@ namespace DelvUI.Config.Tree
                     {
                         continue;
                     }
-                    Separator(2, 1);
+                    Separator(1, 1);
                 }
                 else if (attribute is ConfigAttribute { spacing: true })
                 {

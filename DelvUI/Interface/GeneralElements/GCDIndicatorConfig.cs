@@ -8,41 +8,41 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("GCD Indicator", 0)]
     public class GCDIndicatorConfig : AnchorablePluginConfigObject
     {
-        [Checkbox("Always Show", separator = true)]
+        [ColorEdit4("Color")]
         [Order(20)]
-        public bool AlwaysShow = false;
+        public PluginConfigColor Color = new PluginConfigColor(new(220f / 255f, 220f / 255f, 220f / 255f, 100f / 100f));
 
         [Checkbox("Show Border")]
         [Order(25)]
         public bool ShowBorder = true;
 
-        [Checkbox("Vertical Mode", spacing = true)]
+        [Checkbox("Always Show")]
         [Order(30)]
+        public bool AlwaysShow = false;
+
+        [Checkbox("Vertical Mode", spacing = true)]
+        [Order(35)]
         public bool VerticalMode = false;
         
         [Checkbox("Anchor To Mouse", spacing = true)]
-        [Order(35)]
-        public bool AnchorToMouse = false;
-        
-        [Checkbox("Circular Mode")]
         [Order(40)]
+        public bool AnchorToMouse = false;
+
+        [DragInt2("Offset from Mouse", min = -4000, max = 4000)]
+        [Order(45, collapseWith = nameof(AnchorToMouse))]
+        public Vector2 MouseOffset = Vector2.Zero;
+
+        [Checkbox("Circular Mode")]
+        [Order(50)]
         public bool CircularMode = false;
 
         [DragInt("Radius")]
-        [Order(45, collapseWith = nameof(CircularMode))]
+        [Order(55, collapseWith = nameof(CircularMode))]
         public int CircleRadius = 40;
         
         [DragInt("Thickness")]
-        [Order(50, collapseWith = nameof(CircularMode))]
+        [Order(60, collapseWith = nameof(CircularMode))]
         public int CircleThickness = 10;
-
-        [Checkbox("Change Position (0,0 = centered with cursor point)")]
-        [Order(55)]
-        public bool OffsetMousePosition = false;
-
-        [ColorEdit4("Color", spacing = true)]
-        [Order(60)]
-        public PluginConfigColor Color = new PluginConfigColor(new(220f / 255f, 220f / 255f, 220f / 255f, 100f / 100f));
 
         [Checkbox("Show GCD Queue Indicator")]
         [Order(65)]

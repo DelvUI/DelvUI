@@ -417,74 +417,78 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region trick / suiton
-        [DragFloat2("Trick Attack & Suiton Position" + "##TnS", min = -4000f, max = 4000f, separator = true)]
+        [Checkbox("Trick Attack & Suiton Bar" + "##TnS", separator = true)]
         [Order(115)]
+        public bool EnableTrickSuitonBar = true;
+
+        [DragFloat2("Trick Attack & Suiton Position" + "##TnS", min = -4000f, max = 4000f)]
+        [Order(120, collapseWith = nameof(EnableTrickSuitonBar))]
         public Vector2 TrickBarPosition = new(0, -10);
 
         [DragFloat2("Trick Attack & Suiton Size" + "##TnS", max = 2000f)]
-        [Order(120)]
+        [Order(125, collapseWith = nameof(EnableTrickSuitonBar))]
         public Vector2 TrickBarSize = new(254, 20);
 
         [Checkbox("Trick Attack" + "##TnS")]
-        [Order(125)]
+        [Order(130, collapseWith = nameof(EnableTrickSuitonBar))]
         public bool ShowTrickBar = false;
 
         [Checkbox("Timer" + "##TnS")]
-        [Order(130, collapseWith = nameof(ShowTrickBar))]
+        [Order(135, collapseWith = nameof(ShowTrickBar))]
         public bool ShowTrickBarText = true;
 
         [ColorEdit4("Color" + "##TnS")]
-        [Order(135, collapseWith = nameof(ShowTrickBar))]
+        [Order(140, collapseWith = nameof(ShowTrickBar))]
         public PluginConfigColor TrickBarColor = new(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f));
 
         [Checkbox("Suiton" + "##TnS")]
-        [Order(140)]
+        [Order(145, collapseWith = nameof(EnableTrickSuitonBar))]
         public bool ShowSuitonBar = false;
 
         [Checkbox("Timer" + "##TnS")]
-        [Order(145, collapseWith = nameof(ShowSuitonBar))]
+        [Order(150, collapseWith = nameof(ShowSuitonBar))]
         public bool ShowSuitonBarText = true;
 
         [ColorEdit4("Color" + "##TnS")]
-        [Order(150, collapseWith = nameof(ShowSuitonBar))]
+        [Order(155, collapseWith = nameof(ShowSuitonBar))]
         public PluginConfigColor SuitonBarColor = new(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f));
         #endregion
 
         #region mudra
         [Checkbox("Mudra" + "##Mudra", separator = true)]
-        [Order(155)]
+        [Order(160)]
         public bool ShowMudraCooldown = true;
 
         [Checkbox("Timers" + "##Mudra")]
-        [Order(160, collapseWith = nameof(ShowMudraCooldown))]
+        [Order(165, collapseWith = nameof(ShowMudraCooldown))]
         public bool ShowMudraBarText = true;
 
         [Checkbox("Ninjutsu Text" + "##Mudra")]
-        [Order(165, collapseWith = nameof(ShowMudraCooldown))]
+        [Order(170, collapseWith = nameof(ShowMudraCooldown))]
         public bool ShowNinjutsuText = true;
 
         [DragFloat2("Position" + "##Mudra", min = -4000f, max = 4000f)]
-        [Order(170, collapseWith = nameof(ShowMudraCooldown))]
+        [Order(175, collapseWith = nameof(ShowMudraCooldown))]
         public Vector2 MudraBarPosition = new(0, -73);
 
         [DragFloat2("Size" + "##Mudra", max = 2000f)]
-        [Order(175, collapseWith = nameof(ShowMudraCooldown))]
+        [Order(180, collapseWith = nameof(ShowMudraCooldown))]
         public Vector2 MudraBarSize = new(254, 10);
 
         [DragFloat("Spacing" + "##Mudra", min = -4000f, max = 4000f)]
-        [Order(180, collapseWith = nameof(ShowMudraCooldown))]
+        [Order(185, collapseWith = nameof(ShowMudraCooldown))]
         public float MudraBarChunkPadding = 2;
 
         [ColorEdit4("Mudra" + "##Mudra")]
-        [Order(185, collapseWith = nameof(ShowMudraCooldown))]
+        [Order(190, collapseWith = nameof(ShowMudraCooldown))]
         public PluginConfigColor MudraBarColor = new(new Vector4(211 / 255f, 166 / 255f, 75 / 242f, 100f / 100f));
 
         [ColorEdit4("Kassatsu" + "##Mudra")]
-        [Order(190, collapseWith = nameof(ShowMudraCooldown))]
+        [Order(195, collapseWith = nameof(ShowMudraCooldown))]
         public PluginConfigColor KassatsuBarColor = new(new Vector4(239 / 255f, 123 / 255f, 222 / 242f, 100f / 100f));
 
         [ColorEdit4("Ten Chi Jin" + "##Mudra")]
-        [Order(195, collapseWith = nameof(ShowMudraCooldown))]
+        [Order(200, collapseWith = nameof(ShowMudraCooldown))]
         public PluginConfigColor TCJBarColor = new(new Vector4(181 / 255f, 33 / 255f, 41 / 242f, 100f / 100f));
         #endregion
     }

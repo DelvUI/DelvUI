@@ -236,7 +236,7 @@ namespace DelvUI.Interface.Jobs
         public new static SamuraiConfig DefaultConfig() { return new SamuraiConfig(); }
 
         #region Kenki
-        [Checkbox("Show Kenki Bar")]
+        [Checkbox("Show Kenki Bar", separator = true)]
         [Order(30)]
         public bool ShowKenkiBar = true;
 
@@ -248,138 +248,132 @@ namespace DelvUI.Interface.Jobs
         [Order(40, collapseWith = nameof(ShowKenkiBar))]
         public Vector2 KenkiBarPosition = new Vector2(0, -34);
 
-        [Checkbox("Show Kenki Text")]
+        [ColorEdit4("Kenki Bar Color")]
         [Order(45, collapseWith = nameof(ShowKenkiBar))]
+        public PluginConfigColor KenkiColor = new PluginConfigColor(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f));
+
+        [Checkbox("Show Kenki Text")]
+        [Order(50, collapseWith = nameof(ShowKenkiBar))]
         public bool ShowKenkiText = true;
         #endregion
 
         #region Sen
-        [Checkbox("Show Sen Bar")]
-        [Order(50)]
+        [Checkbox("Show Sen Bar", separator = true)]
+        [Order(55)]
         public bool ShowSenBar = true;
 
         [DragInt("Sen Bar Padding", max = 1000)]
-        [Order(55, collapseWith = nameof(ShowSenBar))]
+        [Order(60, collapseWith = nameof(ShowSenBar))]
         public int SenBarPadding = 2;
 
         [DragFloat2("Sen Bar Size", max = 2000f)]
-        [Order(60, collapseWith = nameof(ShowSenBar))]
+        [Order(65, collapseWith = nameof(ShowSenBar))]
         public Vector2 SenBarSize = new Vector2(254, 10);
 
         [DragFloat2("Sen Bar Position", min = -2000f, max = 2000f)]
-        [Order(65, collapseWith = nameof(ShowSenBar))]
+        [Order(70, collapseWith = nameof(ShowSenBar))]
         public Vector2 SenBarPosition = new Vector2(0, -17);
 
+        [ColorEdit4("Setsu Color")]
+        [Order(75, collapseWith = nameof(ShowSenBar))]
+        public PluginConfigColor SetsuColor = new PluginConfigColor(new(89f / 255f, 234f / 255f, 247f / 255f, 100f / 100f));
+
+        [ColorEdit4("Getsu Color")]
+        [Order(80, collapseWith = nameof(ShowSenBar))]
+        public PluginConfigColor GetsuColor = new PluginConfigColor(new(89f / 255f, 126f / 255f, 247f / 255f, 100f / 100f));
+
+        [ColorEdit4("Ka Color")]
+        [Order(85, collapseWith = nameof(ShowSenBar))]
+        public PluginConfigColor KaColor = new PluginConfigColor(new(247f / 255f, 89f / 255f, 89f / 255f, 100f / 100f));
+
         [DragDropHorizontal("Sen Order", "Setsu", "Getsu", "Ka")]
-        [Order(70, collapseWith = nameof(ShowSenBar))]
+        [Order(90, collapseWith = nameof(ShowSenBar))]
         public int[] senOrder = new int[] { 0, 1, 2 };
+
         #endregion
 
         #region Meditation
-        [Checkbox("Show Meditation Bar")]
-        [Order(75)]
+        [Checkbox("Show Meditation Bar", separator = true)]
+        [Order(95)]
         public bool ShowMeditationBar = true;
 
         [DragInt("Meditation Bar Padding", max = 1000)]
-        [Order(80, collapseWith = nameof(ShowMeditationBar))]
+        [Order(100, collapseWith = nameof(ShowMeditationBar))]
         public int MeditationBarPadding = 2;
 
         [DragFloat2("Meditation Bar Size", max = 2000f)]
-        [Order(85, collapseWith = nameof(ShowMeditationBar))]
+        [Order(105, collapseWith = nameof(ShowMeditationBar))]
         public Vector2 MeditationBarSize = new Vector2(254, 10);
 
         [DragFloat2("Meditation Bar Position", min = -2000f, max = 2000f)]
-        [Order(90, collapseWith = nameof(ShowMeditationBar))]
+        [Order(110, collapseWith = nameof(ShowMeditationBar))]
         public Vector2 MeditationBarPosition = new Vector2(0, -5);
+
+        [ColorEdit4("Meditation Color")]
+        [Order(115, collapseWith = nameof(ShowMeditationBar))]
+        public PluginConfigColor MeditationColor = new PluginConfigColor(new(247f / 255f, 163f / 255f, 89f / 255f, 100f / 100f));
         #endregion
 
         #region Buffs
-        [Checkbox("Show Buffs Bar")]
-        [Order(95)]
+        [Checkbox("Show Buffs Bar", separator = true)]
+        [Order(120)]
         public bool ShowBuffsBar = true;
 
         [DragInt("Buffs Bar Padding", max = 1000)]
-        [Order(100, collapseWith = nameof(ShowBuffsBar))]
+        [Order(125, collapseWith = nameof(ShowBuffsBar))]
         public int BuffsPadding = 2;
 
         [DragFloat2("Buffs Bar Size", max = 2000f)]
-        [Order(105, collapseWith = nameof(ShowBuffsBar))]
+        [Order(130, collapseWith = nameof(ShowBuffsBar))]
         public Vector2 BuffsBarSize = new Vector2(254, 20);
 
         [DragFloat2("Buffs Bar Position", min = -2000f, max = 2000f)]
-        [Order(110, collapseWith = nameof(ShowBuffsBar))]
+        [Order(135, collapseWith = nameof(ShowBuffsBar))]
         public Vector2 BuffsBarPosition = new Vector2(0, -56);
 
         [Checkbox("Show Buffs Bar Text")]
-        [Order(115, collapseWith = nameof(ShowBuffsBar))]
+        [Order(140, collapseWith = nameof(ShowBuffsBar))]
         public bool ShowBuffsText = true;
 
+        [ColorEdit4("Shifu Color")]
+        [Order(145, collapseWith = nameof(ShowBuffsBar))]
+        public PluginConfigColor ShifuColor = new PluginConfigColor(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f));
+
+        [ColorEdit4("Jinpu Color")]
+        [Order(150, collapseWith = nameof(ShowBuffsBar))]
+        public PluginConfigColor JinpuColor = new PluginConfigColor(new(136f / 255f, 146f / 255f, 219f / 255f, 100f / 100f));
+
         [DragDropHorizontal("Shifu/Jinpu Order", "Shifu", "Jinpu")]
-        [Order(120, collapseWith = nameof(ShowBuffsBar))]
+        [Order(155, collapseWith = nameof(ShowBuffsBar))]
         public int[] buffOrder = new int[] { 0, 1 };
 
         #endregion
 
         #region Higanbana
-        [Checkbox("Show Higanbana Bar")]
-        [Order(125)]
+        [Checkbox("Show Higanbana Bar", separator = true)]
+        [Order(160)]
         public bool ShowHiganbanaBar = true;
 
         [DragFloat2("Higanbana Bar Size", max = 2000f)]
-        [Order(130, collapseWith = nameof(ShowHiganbanaBar))]
+        [Order(175, collapseWith = nameof(ShowHiganbanaBar))]
         public Vector2 HiganbanaBarSize = new Vector2(254, 20);
 
         [DragFloat2("Higanbana Bar Position", min = -2000f, max = 2000f)]
-        [Order(135, collapseWith = nameof(ShowHiganbanaBar))]
+        [Order(180, collapseWith = nameof(ShowHiganbanaBar))]
         public Vector2 HiganbanaBarPosition = new Vector2(0, -78);
 
-        [Checkbox("Show Higanbana Text")]
-        [Order(140, collapseWith = nameof(ShowHiganbanaBar))]
-        public bool ShowHiganbanaText = true;
-        #endregion
-
-        #region BarOrders
-
-
-
-        #endregion
-
-        #region colors
-        [ColorEdit4("Kenki Bar Color")]
-        [Order(55)]
-        public PluginConfigColor KenkiColor = new PluginConfigColor(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f));
-
-        [ColorEdit4("Setsu Color")]
-        [Order(60)]
-        public PluginConfigColor SetsuColor = new PluginConfigColor(new(89f / 255f, 234f / 255f, 247f / 255f, 100f / 100f));
-
-        [ColorEdit4("Getsu Color")]
-        [Order(65)]
-        public PluginConfigColor GetsuColor = new PluginConfigColor(new(89f / 255f, 126f / 255f, 247f / 255f, 100f / 100f));
-
-        [ColorEdit4("Ka Color")]
-        [Order(70)]
-        public PluginConfigColor KaColor = new PluginConfigColor(new(247f / 255f, 89f / 255f, 89f / 255f, 100f / 100f));
-
-        [ColorEdit4("Meditation Color")]
-        [Order(75)]
-        public PluginConfigColor MeditationColor = new PluginConfigColor(new(247f / 255f, 163f / 255f, 89f / 255f, 100f / 100f));
-
-        [ColorEdit4("Shifu Color")]
-        [Order(80)]
-        public PluginConfigColor ShifuColor = new PluginConfigColor(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f));
-
-        [ColorEdit4("Jinpu Color")]
-        [Order(85)]
-        public PluginConfigColor JinpuColor = new PluginConfigColor(new(136f / 255f, 146f / 255f, 219f / 255f, 100f / 100f));
-
         [ColorEdit4("Higanbana Color")]
-        [Order(90)]
+        [Order(185, collapseWith = nameof(ShowHiganbanaBar))]
         public PluginConfigColor HiganbanaColor = new PluginConfigColor(new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f));
 
         [ColorEdit4("Higanbana Expiry Color")]
-        [Order(95)]
+        [Order(190, collapseWith = nameof(ShowHiganbanaBar))]
         public PluginConfigColor HiganbanaExpiryColor = new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
+
+        [Checkbox("Show Higanbana Text")]
+        [Order(195, collapseWith = nameof(ShowHiganbanaBar))]
+        public bool ShowHiganbanaText = true;
         #endregion
+
     }
 }
