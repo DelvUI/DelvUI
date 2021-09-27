@@ -6,24 +6,22 @@ using System.Collections.Generic;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class GlobalColors
+    public class GlobalColors : IDisposable
     {
         #region Singleton
-
-
         private readonly MiscColorConfig _miscColorConfig;
 
         private Dictionary<uint, PluginConfigColor> ColorMap;
 
         private GlobalColors()
         {
-            _miscColorConfig = ConfigurationManager.GetInstance().GetConfigObject<MiscColorConfig>();
+            _miscColorConfig = ConfigurationManager.Instance.GetConfigObject<MiscColorConfig>();
 
-            var tanksColorConfig = ConfigurationManager.GetInstance().GetConfigObject<TanksColorConfig>();
-            var healersColorConfig = ConfigurationManager.GetInstance().GetConfigObject<HealersColorConfig>();
-            var meleeColorConfig = ConfigurationManager.GetInstance().GetConfigObject<MeleeColorConfig>();
-            var rangedColorConfig = ConfigurationManager.GetInstance().GetConfigObject<RangedColorConfig>();
-            var castersColorConfig = ConfigurationManager.GetInstance().GetConfigObject<CastersColorConfig>();
+            var tanksColorConfig = ConfigurationManager.Instance.GetConfigObject<TanksColorConfig>();
+            var healersColorConfig = ConfigurationManager.Instance.GetConfigObject<HealersColorConfig>();
+            var meleeColorConfig = ConfigurationManager.Instance.GetConfigObject<MeleeColorConfig>();
+            var rangedColorConfig = ConfigurationManager.Instance.GetConfigObject<RangedColorConfig>();
+            var castersColorConfig = ConfigurationManager.Instance.GetConfigObject<CastersColorConfig>();
 
             ColorMap = new Dictionary<uint, PluginConfigColor>()
             {
@@ -88,6 +86,26 @@ namespace DelvUI.Interface.GeneralElements
 
         public static GlobalColors Instance { get; private set; } = null!;
 
+        ~GlobalColors()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            Instance = null!;
+        }
         #endregion
 
         public PluginConfigColor? ColorForJobId(uint jobId)

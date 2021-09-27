@@ -48,7 +48,7 @@ namespace DelvUI.Interface
 
     public class HudHelper
     {
-        private HideHudConfig Config => ConfigurationManager.GetInstance().GetConfigObject<HideHudConfig>();
+        private HideHudConfig Config => ConfigurationManager.Instance.GetConfigObject<HideHudConfig>();
 
         private bool _previousCombatState = true;
         private bool _isInitial = true;
@@ -97,9 +97,9 @@ namespace DelvUI.Interface
 
         public bool IsElementHidden(HudElement element)
         {
-            if (!ConfigurationManager.GetInstance().LockHUD)
+            if (!ConfigurationManager.Instance.LockHUD)
             {
-                return ConfigurationManager.GetInstance().LockHUD;
+                return ConfigurationManager.Instance.LockHUD;
             }
 
             if (element.GetType() == typeof(PlayerCastbarHud))

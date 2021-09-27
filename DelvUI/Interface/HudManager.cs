@@ -43,8 +43,8 @@ namespace DelvUI.Interface
         {
             CreateJobsMap();
 
-            ConfigurationManager.GetInstance().ResetEvent += OnConfigReset;
-            ConfigurationManager.GetInstance().LockEvent += OnHUDLockChanged;
+            ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+            ConfigurationManager.Instance.LockEvent += OnHUDLockChanged;
 
             CreateHudElements();
         }
@@ -99,7 +99,7 @@ namespace DelvUI.Interface
 
         private void CreateHudElements()
         {
-            _gridConfig = ConfigurationManager.GetInstance().GetConfigObject<GridConfig>();
+            _gridConfig = ConfigurationManager.Instance.GetConfigObject<GridConfig>();
 
             _hudElements = new List<DraggableHudElement>();
             _hudElementsUsingPlayer = new List<IHudElementWithActor>();
@@ -120,22 +120,22 @@ namespace DelvUI.Interface
 
         private void CreateUnitFrames()
         {
-            var playerUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerUnitFrameConfig>();
+            var playerUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<PlayerUnitFrameConfig>();
             var playerUnitFrame = new UnitFrameHud("playerUnitFrame", playerUnitFrameConfig, "Player");
             _hudElements.Add(playerUnitFrame);
             _hudElementsUsingPlayer.Add(playerUnitFrame);
 
-            var targetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetUnitFrameConfig>();
+            var targetUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<TargetUnitFrameConfig>();
             var targetUnitFrame = new UnitFrameHud("targetUnitFrame", targetUnitFrameConfig, "Target");
             _hudElements.Add(targetUnitFrame);
             _hudElementsUsingTarget.Add(targetUnitFrame);
 
-            var targetOfTargetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetOfTargetUnitFrameConfig>();
+            var targetOfTargetUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<TargetOfTargetUnitFrameConfig>();
             var targetOfTargetUnitFrame = new UnitFrameHud("targetOfTargetUnitFrame", targetOfTargetUnitFrameConfig, "Target of Target");
             _hudElements.Add(targetOfTargetUnitFrame);
             _hudElementsUsingTargetOfTarget.Add(targetOfTargetUnitFrame);
 
-            var focusTargetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<FocusTargetUnitFrameConfig>();
+            var focusTargetUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetUnitFrameConfig>();
             var focusTargetUnitFrame = new UnitFrameHud("focusTargetUnitFrame", focusTargetUnitFrameConfig, "Focus Target");
             _hudElements.Add(focusTargetUnitFrame);
             _hudElementsUsingFocusTarget.Add(focusTargetUnitFrame);
@@ -143,22 +143,22 @@ namespace DelvUI.Interface
 
         private void CreateCastbars()
         {
-            var playerCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerCastbarConfig>();
+            var playerCastbarConfig = ConfigurationManager.Instance.GetConfigObject<PlayerCastbarConfig>();
             var playerCastbar = new PlayerCastbarHud("playerCastbar", playerCastbarConfig, "Player Castbar");
             _hudElements.Add(playerCastbar);
             _hudElementsUsingPlayer.Add(playerCastbar);
 
-            var targetCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetCastbarConfig>();
+            var targetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<TargetCastbarConfig>();
             var targetCastbar = new TargetCastbarHud("targetCastbar", targetCastbarConfig, "Target Castbar");
             _hudElements.Add(targetCastbar);
             _hudElementsUsingTarget.Add(targetCastbar);
 
-            var targetOfTargetCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetOfTargetCastbarConfig>();
+            var targetOfTargetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<TargetOfTargetCastbarConfig>();
             var targetOfTargetCastbar = new CastbarHud("targetOfTargetCastbar", targetOfTargetCastbarConfig, "ToT Castbar");
             _hudElements.Add(targetOfTargetCastbar);
             _hudElementsUsingTargetOfTarget.Add(targetOfTargetCastbar);
 
-            var focusTargetCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<FocusTargetCastbarConfig>();
+            var focusTargetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetCastbarConfig>();
             var focusTargetCastbar = new CastbarHud("focusTargetCastbar", focusTargetCastbarConfig, "Focus Castbar");
             _hudElements.Add(focusTargetCastbar);
             _hudElementsUsingFocusTarget.Add(focusTargetCastbar);
@@ -166,27 +166,27 @@ namespace DelvUI.Interface
 
         private void CreateStatusEffectsLists()
         {
-            var playerBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerBuffsListConfig>();
+            var playerBuffsConfig = ConfigurationManager.Instance.GetConfigObject<PlayerBuffsListConfig>();
             var playerBuffs = new StatusEffectsListHud("playerBuffs", playerBuffsConfig, "Buffs");
             _hudElements.Add(playerBuffs);
             _hudElementsUsingPlayer.Add(playerBuffs);
 
-            var playerDebuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerDebuffsListConfig>();
+            var playerDebuffsConfig = ConfigurationManager.Instance.GetConfigObject<PlayerDebuffsListConfig>();
             var playerDebuffs = new StatusEffectsListHud("playerDebuffs", playerDebuffsConfig, "Debufffs");
             _hudElements.Add(playerDebuffs);
             _hudElementsUsingPlayer.Add(playerDebuffs);
 
-            var targetBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetBuffsListConfig>();
+            var targetBuffsConfig = ConfigurationManager.Instance.GetConfigObject<TargetBuffsListConfig>();
             var targetBuffs = new StatusEffectsListHud("targetBuffs", targetBuffsConfig, "Target Buffs");
             _hudElements.Add(targetBuffs);
             _hudElementsUsingTarget.Add(targetBuffs);
 
-            var targetDebuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetDebuffsListConfig>();
+            var targetDebuffsConfig = ConfigurationManager.Instance.GetConfigObject<TargetDebuffsListConfig>();
             var targetDebuffs = new StatusEffectsListHud("targetDebuffs", targetDebuffsConfig, "Target Debuffs");
             _hudElements.Add(targetDebuffs);
             _hudElementsUsingTarget.Add(targetDebuffs);
 
-            var custonEffectsConfig = ConfigurationManager.GetInstance().GetConfigObject<CustomEffectsListConfig>();
+            var custonEffectsConfig = ConfigurationManager.Instance.GetConfigObject<CustomEffectsListConfig>();
             _customEffectsHud = new CustomEffectsListHud("customEffects", custonEffectsConfig, "Custom Effects");
             _hudElements.Add(_customEffectsHud);
             _hudElementsUsingPlayer.Add(_customEffectsHud);
@@ -195,19 +195,19 @@ namespace DelvUI.Interface
         private void CreateMiscElements()
         {
             // primary resource bar
-            var primaryResourceConfig = ConfigurationManager.GetInstance().GetConfigObject<PrimaryResourceConfig>();
+            var primaryResourceConfig = ConfigurationManager.Instance.GetConfigObject<PrimaryResourceConfig>();
             _primaryResourceHud = new PrimaryResourceHud("primaryResource", primaryResourceConfig, "Primary Resource");
             _hudElements.Add(_primaryResourceHud);
             _hudElementsUsingPlayer.Add(_primaryResourceHud);
 
             // gcd indicator
-            var gcdIndicatorConfig = ConfigurationManager.GetInstance().GetConfigObject<GCDIndicatorConfig>();
+            var gcdIndicatorConfig = ConfigurationManager.Instance.GetConfigObject<GCDIndicatorConfig>();
             var gcdIndicator = new GCDIndicatorHud("gcdIndicator", gcdIndicatorConfig, "GCD Indicator");
             _hudElements.Add(gcdIndicator);
             _hudElementsUsingPlayer.Add(gcdIndicator);
 
             // mp ticker
-            var mpTickerConfig = ConfigurationManager.GetInstance().GetConfigObject<MPTickerConfig>();
+            var mpTickerConfig = ConfigurationManager.Instance.GetConfigObject<MPTickerConfig>();
             var mpTicker = new MPTickerHud("mpTicker", mpTickerConfig, "MP Ticker");
             _hudElements.Add(mpTicker);
             _hudElementsUsingPlayer.Add(mpTicker);
@@ -262,7 +262,7 @@ namespace DelvUI.Interface
                 DraggablesHelper.DrawGrid(_gridConfig, _selectedElement?.GetConfig());
             }
 
-            bool isHudLocked = ConfigurationManager.GetInstance().LockHUD;
+            bool isHudLocked = ConfigurationManager.Instance.LockHUD;
 
 
             // general elements
@@ -297,7 +297,7 @@ namespace DelvUI.Interface
 
         protected unsafe bool ShouldBeVisible()
         {
-            if (!ConfigurationManager.GetInstance().ShowHUD || Plugin.ClientState.LocalPlayer == null)
+            if (!ConfigurationManager.Instance.ShowHUD || Plugin.ClientState.LocalPlayer == null)
             {
                 return false;
             }
@@ -338,7 +338,7 @@ namespace DelvUI.Interface
             // supported jobs
             if (_jobsMap.TryGetValue(newJobId, out var types))
             {
-                config = (JobConfig)ConfigurationManager.GetInstance().GetConfigObjectForType(types.ConfigType);
+                config = (JobConfig)ConfigurationManager.Instance.GetConfigObjectForType(types.ConfigType);
                 _jobHud = (JobHud)Activator.CreateInstance(types.HudType, types.HudType.FullName, config, types.DisplayName)!;
                 _jobHud.SelectEvent += OnDraggableElementSelected;
             }

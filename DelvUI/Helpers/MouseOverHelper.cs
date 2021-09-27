@@ -32,7 +32,7 @@ namespace DelvUI.Helpers
     public delegate void OnSetUIMouseoverActorId(long arg1, long arg2);
     public delegate ulong OnRequestAction(long arg1, uint arg2, ulong arg3, long arg4, uint arg5, uint arg6, int arg7);
 
-    public class MouseOverHelper
+    public class MouseOverHelper : IDisposable
     {
         #region Singleton
         private MouseOverHelper()
@@ -52,6 +52,29 @@ namespace DelvUI.Helpers
         public static void Initialize() { Instance = new MouseOverHelper(); }
 
         public static MouseOverHelper Instance { get; private set; } = null!;
+
+        ~MouseOverHelper()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            _uiMouseOverActorIdHook?.Dispose();
+            _requsetActionHook?.Dispose();
+            Instance = null!;
+        }
         #endregion
 
         private IntPtr _setUIMouseOverActorId;

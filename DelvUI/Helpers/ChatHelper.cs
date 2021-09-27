@@ -23,7 +23,7 @@ using System.Text;
 
 namespace DelvUI.Helpers
 {
-    public class ChatHelper
+    public class ChatHelper : IDisposable
     {
         #region Singleton
         private ChatHelper()
@@ -40,6 +40,27 @@ namespace DelvUI.Helpers
         public static void Initialize() { Instance = new ChatHelper(); }
 
         public static ChatHelper Instance { get; private set; } = null!;
+
+        ~ChatHelper()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            Instance = null!;
+        }
         #endregion
 
         private IntPtr? _uiModulePtr;
