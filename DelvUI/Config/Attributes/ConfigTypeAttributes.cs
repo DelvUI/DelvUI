@@ -495,7 +495,7 @@ namespace DelvUI.Config.Attributes
 
         public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            var fontsConfig = ConfigurationManager.GetInstance().GetConfigObject<FontsConfig>();
+            var fontsConfig = ConfigurationManager.Instance.GetConfigObject<FontsConfig>();
             if (fontsConfig == null)
             {
                 return false;

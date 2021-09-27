@@ -35,7 +35,7 @@ namespace DelvUI.Helpers
 
         public static void DrawGradientFilledRect(Vector2 position, Vector2 size, PluginConfigColor color, ImDrawListPtr drawList)
         {
-            var gradientDirection = ConfigurationManager.GetInstance().GradientDirection;
+            var gradientDirection = ConfigurationManager.Instance.GradientDirection;
             DrawGradientFilledRect(position, size, color, drawList, gradientDirection);
         }
 

@@ -19,19 +19,18 @@ namespace DelvUI.Config
 {
     public delegate void ConfigurationManagerEventHandler(ConfigurationManager configurationManager);
 
-    public class ConfigurationManager
+    public class ConfigurationManager : IDisposable
     {
-        private static ConfigurationManager _instance = null!;
+        public static ConfigurationManager Instance { get; private set; } = null!;
 
         public readonly TextureWrap? BannerImage;
-
         public BaseNode ConfigBaseNode;
 
         public GradientDirection GradientDirection
         {
             get
             {
-                var config = GetInstance().GetConfigObject<MiscColorConfig>();
+                var config = Instance.GetConfigObject<MiscColorConfig>();
                 return config != null ? config.GradientDirection : GradientDirection.None;
             }
         }
@@ -78,7 +77,6 @@ namespace DelvUI.Config
             BannerImage = bannerImage;
             ConfigDirectory = configDirectory;
             ConfigBaseNode = configBaseNode;
-            _instance = this;
 
             if (!defaultConfig)
             {
@@ -91,8 +89,29 @@ namespace DelvUI.Config
             ResetEvent?.Invoke(this);
         }
 
+        ~ConfigurationManager()
+        {
+            Dispose(false);
+        }
 
-        public static ConfigurationManager Initialize(bool defaultConfig)
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            BannerImage?.Dispose();
+            Instance = null!;
+        }
+
+        public static void Initialize(bool defaultConfig)
         {
             Type[] configObjects =
             {
@@ -160,10 +179,10 @@ namespace DelvUI.Config
                 typeof(ImportExportConfig)
             };
 
-            return Initialize(defaultConfig, configObjects);
+            Initialize(defaultConfig, configObjects);
         }
 
-        public static ConfigurationManager Initialize(bool defaultConfig, params Type[] configObjectTypes)
+        public static void Initialize(bool defaultConfig, params Type[] configObjectTypes)
         {
             BaseNode node = new();
 
@@ -176,12 +195,18 @@ namespace DelvUI.Config
 
             TextureWrap? banner = Plugin.BannerTexture;
 
-            var currentResetEvent = GetInstance()?.ResetEvent;
-            var currentLockEvent = GetInstance()?.LockEvent;
-            return new ConfigurationManager(defaultConfig, banner, Plugin.PluginInterface.GetPluginConfigDirectory(), node, currentResetEvent, currentLockEvent);
-        }
+            var currentResetEvent = Instance?.ResetEvent;
+            var currentLockEvent = Instance?.LockEvent;
 
-        public static ConfigurationManager GetInstance() => _instance;
+            Instance = new ConfigurationManager(
+                defaultConfig,
+                banner,
+                Plugin.PluginInterface.GetPluginConfigDirectory(),
+                node,
+                currentResetEvent,
+                currentLockEvent
+            );
+        }
 
         public void Draw()
         {
@@ -262,7 +287,7 @@ namespace DelvUI.Config
             // see comments on ConfigPageNode's Load
             MethodInfo? methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
             MethodInfo? function = methodInfo?.MakeGenericMethod(configPageNode.ConfigObject.GetType());
-            PluginConfigObject? importedConfigObject = (PluginConfigObject?)function?.Invoke(GetInstance(), new object[] { importString });
+            PluginConfigObject? importedConfigObject = (PluginConfigObject?)function?.Invoke(Instance, new object[] { importString });
 
             if (importedConfigObject != null)
             {
@@ -270,10 +295,10 @@ namespace DelvUI.Config
                 // update the tree 
                 configPageNode.ConfigObject = importedConfigObject;
                 // but also update the dictionary
-                GetInstance().ConfigBaseNode.configPageNodesMap[configPageNode.ConfigObject.GetType()] = configPageNode;
-                GetInstance().SaveConfigurations();
+                Instance.ConfigBaseNode.configPageNodesMap[configPageNode.ConfigObject.GetType()] = configPageNode;
+                Instance.SaveConfigurations();
 
-                _instance.ResetEvent?.Invoke(_instance);
+                Instance.ResetEvent?.Invoke(Instance);
             }
             else
             {
@@ -283,8 +308,8 @@ namespace DelvUI.Config
 
         public static void LoadTotalConfiguration(string[] importStrings)
         {
-            _instance.ConfigBaseNode.LoadBase64String(importStrings);
-            _instance.ResetEvent?.Invoke(_instance);
+            Instance.ConfigBaseNode.LoadBase64String(importStrings);
+            Instance.ResetEvent?.Invoke(Instance);
         }
 
         public static T? LoadImportString<T>(string importString) where T : PluginConfigObject

@@ -163,7 +163,7 @@ namespace DelvUI
 
         private void PluginCommand(string command, string arguments)
         {
-            var configManager = ConfigurationManager.GetInstance();
+            var configManager = ConfigurationManager.Instance;
 
             if (configManager.DrawConfigWindow && !configManager.LockHUD)
             {
@@ -174,23 +174,23 @@ namespace DelvUI
                 switch (arguments)
                 {
                     case "toggle":
-                        ConfigurationManager.GetInstance().ShowHUD = !ConfigurationManager.GetInstance().ShowHUD;
+                        ConfigurationManager.Instance.ShowHUD = !ConfigurationManager.Instance.ShowHUD;
 
                         break;
 
                     case "show":
-                        ConfigurationManager.GetInstance().ShowHUD = true;
+                        ConfigurationManager.Instance.ShowHUD = true;
 
                         break;
 
                     case "hide":
-                        ConfigurationManager.GetInstance().ShowHUD = false;
+                        ConfigurationManager.Instance.ShowHUD = false;
 
                         break;
 
                     case "reset":
                         ConfigurationManager.Initialize(true);
-                        ConfigurationManager.GetInstance().SaveConfigurations();
+                        ConfigurationManager.Instance.SaveConfigurations();
 
                         break;
 
@@ -202,7 +202,7 @@ namespace DelvUI
             }
         }
 
-        private void ReloadConfigCommand(string command, string arguments) { ConfigurationManager.GetInstance().LoadConfigurations(); }
+        private void ReloadConfigCommand(string command, string arguments) { ConfigurationManager.Instance.LoadConfigurations(); }
 
         private void Draw()
         {
@@ -215,7 +215,7 @@ namespace DelvUI
 
             UiBuilder.OverrideGameCursor = false;
 
-            ConfigurationManager.GetInstance().Draw();
+            ConfigurationManager.Instance.Draw();
 
             var fontPushed = FontsManager.Instance.PushDefaultFont();
 
@@ -232,7 +232,7 @@ namespace DelvUI
 
         private void OpenConfigUi()
         {
-            ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
+            ConfigurationManager.Instance.DrawConfigWindow = !ConfigurationManager.Instance.DrawConfigWindow;
         }
 
         protected virtual void Dispose(bool disposing)
@@ -242,9 +242,9 @@ namespace DelvUI
                 return;
             }
 
-            HudHelper.RestoreToGameDefaults();
+            _hudManager.Dispose();
 
-            ConfigurationManager.GetInstance().DrawConfigWindow = false;
+            ConfigurationManager.Instance.DrawConfigWindow = false;
 
             CommandManager.RemoveHandler("/delvui");
             CommandManager.RemoveHandler("/delvuireloadconfig");
@@ -253,6 +253,14 @@ namespace DelvUI
             UiBuilder.BuildFonts -= BuildFont;
             UiBuilder.OpenConfigUi -= OpenConfigUi;
             UiBuilder.RebuildFonts();
+
+            ChatHelper.Instance.Dispose();
+            FontsManager.Instance.Dispose();
+            MouseOverHelper.Instance.Dispose();
+            TexturesCache.Instance.Dispose();
+            TooltipsHelper.Instance.Dispose();
+            GlobalColors.Instance.Dispose();
+            ConfigurationManager.Instance.Dispose();
         }
     }
 }

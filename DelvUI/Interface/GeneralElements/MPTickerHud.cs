@@ -16,6 +16,11 @@ namespace DelvUI.Interface.GeneralElements
 
         public MPTickerHud(string ID, MPTickerConfig config, string displayName) : base(ID, config, displayName) { }
 
+        protected override void InternalDispose()
+        {
+            _mpTickHelper.Dispose();
+        }
+
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
             return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });

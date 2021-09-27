@@ -30,7 +30,7 @@ namespace DelvUI.Interface.Party
 
         public static void Initialize()
         {
-            var config = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesConfig>();
+            var config = ConfigurationManager.Instance.GetConfigObject<PartyFramesConfig>();
             _instance = new PartyManager(config);
         }
 

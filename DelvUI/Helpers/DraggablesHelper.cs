@@ -141,7 +141,7 @@ namespace DelvUI.Helpers
 
         public static void DrawGridWindow()
         {
-            var configManager = ConfigurationManager.GetInstance();
+            var configManager = ConfigurationManager.Instance;
             var node = configManager.GetConfigPageNode<GridConfig>();
             if (node == null)
             {

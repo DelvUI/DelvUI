@@ -29,12 +29,12 @@ namespace DelvUI.Interface.Party
 
         public PartyFramesHud(string id, PartyFramesConfig config, string displayName) : base(id, config, displayName)
         {
-            _healthBarsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesHealthBarsConfig>();
-            var manaBarConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesManaBarConfig>();
-            var castbarConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesCastbarConfig>();
-            var roleIconConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesRoleIconConfig>();
-            var buffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesBuffsConfig>();
-            var debuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PartyFramesDebuffsConfig>();
+            _healthBarsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesHealthBarsConfig>();
+            var manaBarConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesManaBarConfig>();
+            var castbarConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesCastbarConfig>();
+            var roleIconConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesRoleIconConfig>();
+            var buffsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesBuffsConfig>();
+            var debuffsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesDebuffsConfig>();
 
             config.ValueChangeEvent += OnLayoutPropertyChanged;
             _healthBarsConfig.ValueChangeEvent += OnLayoutPropertyChanged;

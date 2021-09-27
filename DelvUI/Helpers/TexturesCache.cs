@@ -9,7 +9,7 @@ using Action = Lumina.Excel.GeneratedSheets.Action;
 
 namespace DelvUI.Helpers
 {
-    public class TexturesCache
+    public class TexturesCache : IDisposable
     {
         private Dictionary<uint, TextureWrap> _cache = new();
 
@@ -100,6 +100,34 @@ namespace DelvUI.Helpers
 
         public static TexturesCache Instance { get; private set; } = null!;
 
+        ~TexturesCache()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            foreach (var key in _cache.Keys)
+            {
+                var tex = _cache[key];
+                tex?.Dispose();
+            }
+
+            _cache.Clear();
+
+            Instance = null!;
+        }
         #endregion
     }
 }
