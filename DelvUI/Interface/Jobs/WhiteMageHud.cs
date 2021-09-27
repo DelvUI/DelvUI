@@ -72,6 +72,11 @@ namespace DelvUI.Interface.Jobs
 
             if (actor is not BattleChara target)
             {
+                if (Config.HideInactiveDiaBar)
+                {
+                    return;
+                }
+                
                 drawList.AddRectFilled(cursorPos, cursorPos + Config.DiaBarSize, EmptyColor.Background);
                 drawList.AddRect(cursorPos, cursorPos + Config.DiaBarSize, 0xFF000000);
 
@@ -87,16 +92,30 @@ namespace DelvUI.Interface.Jobs
             float diaCooldown = dia?.StatusId == 1871 ? 30f : 18f;
             float diaDuration = dia?.RemainingTime ?? 0f;
 
+            if (Config.HideInactiveDiaBar && diaDuration == 0)
+            {
+                return;
+            }
+
             drawList.AddRectFilled(cursorPos, cursorPos + Config.DiaBarSize, EmptyColor.Background);
 
             drawList.AddRectFilled(
                 cursorPos,
                 cursorPos + new Vector2(Config.DiaBarSize.X / diaCooldown * diaDuration, Config.DiaBarSize.Y),
-                Config.DiaColor.BottomGradient
+                Config.ShowDiaRefresh 
+                    ? dia.Duration >= Config.DiaCustomRefresh
+                        ? Config.DiaColor.BottomGradient 
+                        : Config.DiaRefreshColor.BottomGradient 
+                    : Config.DiaColor.BottomGradient
             );
 
             drawList.AddRect(cursorPos, cursorPos + Config.DiaBarSize, 0xFF000000);
 
+            if (!Config.ShowDiaTimer)
+            {
+                return;
+            }
+            
             DrawHelper.DrawOutlinedText(
                 string.Format(CultureInfo.InvariantCulture, "{0,2:N0}", diaDuration), // keeps 10 -> 9 from jumping
                 new Vector2(
@@ -223,21 +242,51 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Dia Bar
+        
+        // enable
         [Checkbox("Dia", separator = true)]
         [CollapseControl(35, 1)]
         public bool ShowDiaBar = true;
-
-        [DragFloat2("Size " + "##Dia", max = 2000f)]
+        
+        // show dia timer
+        [Checkbox("Timer")]
         [CollapseWith(0, 1)]
-        public Vector2 DiaBarSize = new(254, 20);
+        public bool ShowDiaTimer = false;
 
+        // pos
         [DragFloat2("Position" + "##Dia", min = -4000f, max = 4000f)]
         [CollapseWith(5, 1)]
         public Vector2 DiaBarPosition = new(0, -32);
-
-        [ColorEdit4("Color" + "##Dia")]
+        
+        // size
+        [DragFloat2("Size " + "##Dia", max = 2000f)]
         [CollapseWith(10, 1)]
+        public Vector2 DiaBarSize = new(254, 20);
+
+        // color
+        [ColorEdit4("Color" + "##Dia")]
+        [CollapseWith(15, 1)]
         public PluginConfigColor DiaColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
+        
+        // refresh reminder enable
+        [Checkbox("Show Refresh Reminder", spacing = true)]
+        [CollapseWith(20, 1)]
+        public bool ShowDiaRefresh = false;
+
+        // refresh reminder value
+        [DragInt("Refresh Reminder", min = 0, max = 30)]
+        [CollapseWith(25, 1)]
+        public int DiaCustomRefresh = 3;
+
+        // refresh reminder color
+        [ColorEdit4("Refresh Color")]
+        [CollapseWith(30, 1)]
+        public PluginConfigColor DiaRefreshColor = new(new(190f / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
+        
+        // hide dia bar if inactive
+        [Checkbox("Hide when effect is not applied", spacing = true)]
+        [CollapseWith(35, 1)]
+        public bool HideInactiveDiaBar = false;
         #endregion
     }
 }
