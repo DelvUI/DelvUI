@@ -24,15 +24,15 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public bool HideOnlyJobPackHudOutsideOfCombat = false;
 
-        [Checkbox("Hide Default Job Gauges", isMonitored = true, spacing = true)]
-        [CollapseControl(20, 0)]
+        //[Checkbox("Hide Default Job Gauges", isMonitored = true, spacing = true)]
+        //[CollapseControl(20, 0)]
         public bool HideDefaultJobGauges = false;
 
-        [Checkbox("Disable Job Gauge Sounds", isMonitored = true)]
-        [CollapseWith(0, 0)]
+        //[Checkbox("Disable Job Gauge Sounds", isMonitored = true)]
+        //[CollapseWith(0, 0)]
         public bool DisableJobGaugeSounds = false;
 
-        [Checkbox("Hide Default Castbar", isMonitored = true)]
+        [Checkbox("Hide Default Castbar", isMonitored = true, spacing = true)]
         [Order(25)]
         public bool HideDefaultCastbar = false;
 
