@@ -223,7 +223,7 @@ namespace DelvUI.Interface.GeneralElements
                 return color;
             }
 
-            if (Config.UseCustomBackgroundColor)
+            if (Config.UseCustomBackgroundColor && chara is BattleChara)
             {
                 if (Config.UseJobColorAsBackgroundColor)
                 {
