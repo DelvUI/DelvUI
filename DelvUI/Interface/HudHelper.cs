@@ -38,7 +38,7 @@ namespace DelvUI.Interface
         private delegate IntPtr GetBaseUIObjectDelegate();
         private delegate byte UpdateAddonPositionDelegate(IntPtr manager, IntPtr addon, byte clicked);
 
-        private HideHudConfig Config => ConfigurationManager.GetInstance().GetConfigObject<HideHudConfig>();
+        private HideHudConfig Config => ConfigurationManager.Instance.GetConfigObject<HideHudConfig>();
 
         private bool _previousCombatState = true;
         private bool _isInitial = true;
@@ -102,9 +102,9 @@ namespace DelvUI.Interface
 
         public bool IsElementHidden(HudElement element)
         {
-            if (!ConfigurationManager.GetInstance().LockHUD)
+            if (!ConfigurationManager.Instance.LockHUD)
             {
-                return ConfigurationManager.GetInstance().LockHUD;
+                return ConfigurationManager.Instance.LockHUD;
             }
 
             if (element.GetType() == typeof(PlayerCastbarHud))
@@ -234,7 +234,7 @@ namespace DelvUI.Interface
 
             if (previousPos != Config.CastBarOriginalPosition)
             {
-                ConfigurationManager.GetInstance().SaveConfigurations();
+                ConfigurationManager.Instance.SaveConfigurations();
             }
 
             if (isVisible != Config.HideDefaultCastbar)
@@ -263,7 +263,7 @@ namespace DelvUI.Interface
                 if (previousPos != pos || !existed)
                 {
                     Config.JobGaugeOriginalPosition[name] = pos;
-                    ConfigurationManager.GetInstance().SaveConfigurations();
+                    ConfigurationManager.Instance.SaveConfigurations();
                 }
 
                 SetAddonVisible((IntPtr)addon, forceVisible || !Config.HideDefaultJobGauges, Config.JobGaugeOriginalPosition[name]);
