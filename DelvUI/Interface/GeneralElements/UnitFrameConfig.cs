@@ -108,6 +108,26 @@ namespace DelvUI.Interface.GeneralElements
         [CollapseWith(0, 0)]
         public PluginConfigColor CustomColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
+        [Checkbox("Color Based On Health Value ##CustomFrame")]
+        [CollapseWith(1, 0)]
+        public bool UseColorBasedOnHealthValue = false;
+
+        [ColorEdit4("Full Health Color ##CustomFrame")]
+        [CollapseWith(2, 0)]
+        public PluginConfigColor FullHealthColor = new PluginConfigColor(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Low Health Color ##CustomFrame")]
+        [CollapseWith(3, 0)]
+        public PluginConfigColor LowHealthColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [DragFloat("Full Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
+        [CollapseWith(4, 0)]
+        public float FullHealthColorThreshold = 75f;
+
+        [DragFloat("Low Health Color Below Health %", min = 0f, max = 50f, velocity = 1f)]
+        [CollapseWith(5, 0)]
+        public float LowHealthColorThreshold = 25f;
+
         [Checkbox("Custom Background Color")]
         [CollapseControl(25, 1)]
         public bool UseCustomBackgroundColor = false;
@@ -115,6 +135,10 @@ namespace DelvUI.Interface.GeneralElements
         [ColorEdit4("Color ##CustomBackground")]
         [CollapseWith(0, 1)]
         public PluginConfigColor CustomBackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [Checkbox("Job Color As Background Color")]
+        [CollapseWith(1, 1)]
+        public bool UseJobColorAsBackgroundColor = false;
 
         [Checkbox("Tank Invulnerability", spacing = true)]
         [Order(30)]
