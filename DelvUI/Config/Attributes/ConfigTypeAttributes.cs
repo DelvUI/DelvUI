@@ -302,8 +302,13 @@ namespace DelvUI.Config.Attributes
 
         public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            int? fieldVal = (int?)field.GetValue(config);
-            int intVal = fieldVal.HasValue ? fieldVal.Value : 0;
+            object? fieldVal = field.GetValue(config);
+
+            int intVal = 0;
+            if (fieldVal != null)
+            {
+                intVal = (int)fieldVal;
+            }
 
             if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, options.Length, 4))
             {
@@ -537,23 +542,6 @@ namespace DelvUI.Config.Attributes
         public AnchorAttribute(string friendlyName)
             : base(friendlyName, new string[] { "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight" })
         {
-        }
-
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
-        {
-            DrawAnchor? fieldVal = (DrawAnchor?)field.GetValue(config);
-            int intVal = fieldVal.HasValue ? (int)fieldVal.Value : 0;
-
-            if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, options.Length, 4))
-            {
-                field.SetValue(config, (DrawAnchor)intVal);
-
-                TriggerChangeEvent<int>(config, field.Name, intVal);
-
-                return true;
-            }
-
-            return false;
         }
     }
 
