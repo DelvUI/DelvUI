@@ -95,9 +95,14 @@ namespace DelvUI.Interface.Party
             bool isHovering = ImGui.IsMouseHoveringRect(Position, Position + _config.Size);
             var character = Member.Character;
 
-            if (isHovering && ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+            if (isHovering && character != null)
             {
-                Plugin.TargetManager.SetTarget(character);
+                MouseOverHelper.Instance.Target = character;
+
+                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                {
+                    Plugin.TargetManager.SetTarget(character);
+                }
             }
 
             // bg
