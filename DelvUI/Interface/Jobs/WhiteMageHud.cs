@@ -508,22 +508,22 @@ namespace DelvUI.Interface.Jobs
 
         // enable
         [Checkbox("Asylum", separator = true)]
-        [CollapseControl(40, 2)]
+        [Order(130)]
         public bool ShowAsylumBar = false;
         
         // pos
         [DragFloat2("Position" + "##Asylum", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 2)]
+        [Order(135, collapseWith = nameof(ShowAsylumBar))]
         public Vector2 AsylumPosition = new(-96, -74);
         
         // size
         [DragFloat2("Size " + "##Asylum", max = 2000f)]
-        [CollapseWith(10, 2)]
+        [Order(140, collapseWith = nameof(ShowAsylumBar))]
         public Vector2 AsylumSize = new(62, 15);
 
         // color
         [ColorEdit4("Color" + "##Asylum")]
-        [CollapseWith(15, 2)]
+        [Order(145, collapseWith = nameof(ShowAsylumBar))]
         public PluginConfigColor AsylumColor = new(new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f));
 
         #endregion
@@ -532,22 +532,22 @@ namespace DelvUI.Interface.Jobs
 
         // enable
         [Checkbox("Presence of Mind", separator = true)]
-        [CollapseControl(45, 3)]
+        [Order(150)]
         public bool ShowPresenceOfMindBar = false;
         
         // pos
         [DragFloat2("Position" + "##PresenceOfMind", min = -4000f, max = 4000f)]
-        [CollapseWith(0, 3)]
+        [Order(155, collapseWith = nameof(ShowPresenceOfMindBar))]
         public Vector2 PresenceOfMindPosition = new(-32, -74);
         
         // size
         [DragFloat2("Size " + "##PresenceOfMind", max = 2000f)]
-        [CollapseWith(5, 3)]
+        [Order(160, collapseWith = nameof(ShowPresenceOfMindBar))]
         public Vector2 PresenceOfMindSize = new(62, 15);
 
         // color
         [ColorEdit4("Color" + "##PresenceOfMind")]
-        [CollapseWith(10, 3)]
+        [Order(165, collapseWith = nameof(ShowPresenceOfMindBar))]
         public PluginConfigColor PresenceOfMindColor = new(new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f));
 
         #endregion
@@ -556,22 +556,22 @@ namespace DelvUI.Interface.Jobs
         
         // enable
         [Checkbox("Plenary Indulgence", separator = true)]
-        [CollapseControl(45, 4)]
+        [Order(170)]
         public bool ShowPlenaryBar = false;
         
         // pos
         [DragFloat2("Position" + "##Plenary", min = -4000f, max = 4000f)]
-        [CollapseWith(0, 4)]
+        [Order(175, collapseWith = nameof(ShowPlenaryBar))]
         public Vector2 PlenaryPosition = new(32, -74);
         
         // size
         [DragFloat2("Size " + "##Plenary", max = 2000f)]
-        [CollapseWith(5, 4)]
+        [Order(180, collapseWith = nameof(ShowPlenaryBar))]
         public Vector2 PlenarySize = new(62, 15);
 
         // color
         [ColorEdit4("Color" + "##Plenary")]
-        [CollapseWith(10, 4)]
+        [Order(185, collapseWith = nameof(ShowPlenaryBar))]
         public PluginConfigColor PlenaryColor = new(new Vector4(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f));
         
         #endregion
@@ -580,22 +580,22 @@ namespace DelvUI.Interface.Jobs
 
         // enable
         [Checkbox("Temperance", separator = true)]
-        [CollapseControl(45, 5)]
+        [Order(190)]
         public bool ShowTemperanceBar = false;
         
         // pos
         [DragFloat2("Position" + "##Temperance", min = -4000f, max = 4000f)]
-        [CollapseWith(0, 5)]
+        [Order(195, collapseWith = nameof(ShowTemperanceBar))]
         public Vector2 TemperancePosition = new(96, -74);
         
         // size
         [DragFloat2("Size " + "##Temperance", max = 2000f)]
-        [CollapseWith(5, 5)]
+        [Order(200, collapseWith = nameof(ShowTemperanceBar))]
         public Vector2 TemperanceSize = new(62, 15);
 
         // color
         [ColorEdit4("Color" + "##Temperance")]
-        [CollapseWith(10, 5)]
+        [Order(205, collapseWith = nameof(ShowTemperanceBar))]
         public PluginConfigColor TemperanceColor = new(new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f));
 
         #endregion
