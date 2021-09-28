@@ -31,7 +31,7 @@ namespace DelvUI.Interface.Party
         [Order(40)]
         public DrawAnchor BarsAnchor = DrawAnchor.TopLeft;
 
-        [Checkbox("Show When Solo", separator = true)]
+        [Checkbox("Show When Solo", spacing = true)]
         [Order(50)]
         public bool ShowWhenSolo = false;
 
@@ -39,7 +39,7 @@ namespace DelvUI.Interface.Party
         [Order(55)]
         public bool ShowChocobo = true;
 
-        [Checkbox("Fill Rows First", isMonitored = true, separator = true)]
+        [Checkbox("Fill Rows First", isMonitored = true, spacing = true)]
         [Order(60)]
         public bool FillRowsFirst = true;
 
@@ -320,8 +320,8 @@ namespace DelvUI.Interface.Party
     {
         public new static PartyFramesCastbarConfig DefaultConfig()
         {
-            var size = new Vector2(180, 10);
-            var pos = Vector2.Zero;
+            var size = new Vector2(182, 10);
+            var pos = new Vector2(-1, 0);
 
             var castNameConfig = new LabelConfig(new Vector2(5, 0), "", DrawAnchor.Left, DrawAnchor.Left);
             var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
