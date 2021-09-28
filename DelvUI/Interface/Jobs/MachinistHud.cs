@@ -80,6 +80,11 @@ namespace DelvUI.Interface.Jobs
         {
             var gauge = Plugin.JobGauges.Get<MCHGauge>();
 
+            if (gauge.Heat == 0 && Config.OnlyShowHeatGaugeWhenActive)
+            {
+                return;
+            }
+
             var position = origin + Config.Position + Config.HeatGaugePosition - Config.HeatGaugeSize / 2f;
 
             var builder = BarBuilder.Create(position, Config.HeatGaugeSize)
@@ -87,7 +92,7 @@ namespace DelvUI.Interface.Jobs
                                     .SetChunkPadding(Config.HeatGaugePadding)
                                     .AddInnerBar(gauge.Heat, 100, Config.HeatGaugeFillColor, PartialFillColor);
 
-            if (Config.ShowHeatGaugeText)
+            if (Config.ShowHeatGaugeText && gauge.Heat != 0)
             {
                 builder.SetTextMode(BarTextMode.EachChunk)
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
@@ -113,7 +118,7 @@ namespace DelvUI.Interface.Jobs
             {
                 builder.AddInnerBar(gauge.Battery, 100, Config.BatteryFillColor, PartialFillColor);
 
-                if (Config.ShowBatteryGaugeBatteryText)
+                if (Config.ShowBatteryGaugeBatteryText && gauge.Battery != 0)
                 {
                     builder.SetTextMode(BarTextMode.Single)
                            .SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.BatteryFillColor.Vector, Vector4.UnitW, null);
@@ -124,11 +129,16 @@ namespace DelvUI.Interface.Jobs
             {
                 builder.AddInnerBar(gauge.SummonTimeRemaining / 1000f, _robotDuration[gauge.LastSummonBatteryPower / 10 - 5], Config.RobotFillColor, null);
 
-                if (Config.ShowBatteryGaugeRobotDurationText)
+                if (Config.ShowBatteryGaugeRobotDurationText && gauge.SummonTimeRemaining != 0)
                 {
                     builder.SetTextMode(BarTextMode.Single)
                            .SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.RobotFillColor.Vector, Vector4.UnitW, null);
                 }
+            }
+
+            if (gauge.Battery == 0 && gauge.SummonTimeRemaining == 0 && Config.OnlyShowBatteryGaugeWhenActive)
+            {
+                return;
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -139,6 +149,11 @@ namespace DelvUI.Interface.Jobs
         private void DrawOverheatBar(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<MCHGauge>();
+
+            if (!gauge.IsOverheated && Config.OnlyShowOverheatWhenActive)
+            {
+                return;
+            }
 
             var position = origin + Config.Position + Config.OverheatPosition - Config.OverheatSize / 2f;
 
@@ -163,22 +178,28 @@ namespace DelvUI.Interface.Jobs
         private void DrawWildfireBar(Vector2 origin, PlayerCharacter player)
         {
             var wildfireBuff = player.StatusList.Where(o => o.StatusId == 1946);
+            float duration = 0f;
 
             var position = origin + Config.Position + Config.WildfirePosition - Config.WildfireSize / 2f;
 
-            var builder = BarBuilder.Create(position, Config.WildfireSize);
+            var builder = BarBuilder.Create(position, Config.WildfireSize).SetBackgroundColor(EmptyColor.Background);
 
             if (wildfireBuff.Any())
             {
-                var duration = wildfireBuff.First().RemainingTime;
+                duration = wildfireBuff.First().RemainingTime;                
+
                 builder.AddInnerBar(duration, 10, Config.WildfireFillColor, null);
 
                 if (Config.ShowWildfireText)
                 {
                     builder.SetTextMode(BarTextMode.EachChunk)
-                           .SetBackgroundColor(EmptyColor.Background)
                            .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
                 }
+            }
+
+            if (duration == 0 && Config.OnlyShowWildfireWhenActive)
+            {
+                return;
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -195,11 +216,15 @@ namespace DelvUI.Interface.Jobs
         public new static MachinistConfig DefaultConfig() { return new MachinistConfig(); }
 
         #region Overheat
-        [Checkbox("Show Overheat Bar", separator = true)]
+        [Checkbox("Overheat", separator = true)]
         [Order(30)]
         public bool ShowOverheat = true;
 
-        [Checkbox("Show Text" + "##Overheat")]
+        [Checkbox("Only Show When Active" + "##Overheat")]
+        [Order(31, collapseWith = nameof(ShowOverheat))]
+        public bool OnlyShowOverheatWhenActive = false;
+
+        [Checkbox("Text" + "##Overheat")]
         [Order(35, collapseWith = nameof(ShowOverheat))]
         public bool ShowOverheatText = true;
 
@@ -211,7 +236,7 @@ namespace DelvUI.Interface.Jobs
         [Order(45, collapseWith = nameof(ShowOverheat))]
         public Vector2 OverheatSize = new(254, 20);
 
-        [ColorEdit4("Fill Color" + "##Overheat")]
+        [ColorEdit4("Color" + "##Overheat")]
         [Order(50, collapseWith = nameof(ShowOverheat))]
         public PluginConfigColor OverheatFillColor = new(new Vector4(255f / 255f, 239f / 255f, 14f / 255f, 100f / 100f));
         #endregion
@@ -221,7 +246,11 @@ namespace DelvUI.Interface.Jobs
         [Order(55)]
         public bool ShowHeatGauge = true;
 
-        [Checkbox("Show Text" + "##HeatGauge")]
+        [Checkbox("Only Show When Active" + "##HeatGauge")]
+        [Order(56, collapseWith = nameof(ShowHeatGauge))]
+        public bool OnlyShowHeatGaugeWhenActive = false;
+
+        [Checkbox("Text" + "##HeatGauge")]
         [Order(60, collapseWith = nameof(ShowHeatGauge))]
         public bool ShowHeatGaugeText = true;
 
@@ -233,34 +262,38 @@ namespace DelvUI.Interface.Jobs
         [Order(70, collapseWith = nameof(ShowHeatGauge))]
         public Vector2 HeatGaugeSize = new(254, 20);
 
-        [DragInt("Padding" + "##HeatGauge", min = 0)]
+        [DragInt("Spacing" + "##HeatGauge", min = 0)]
         [Order(75, collapseWith = nameof(ShowHeatGauge))]
         public int HeatGaugePadding = 2;
 
-        [ColorEdit4("Fill Color" + "##HeatGauge")]
+        [ColorEdit4("Color" + "##HeatGauge")]
         [Order(80, collapseWith = nameof(ShowHeatGauge))]
         public PluginConfigColor HeatGaugeFillColor = new(new Vector4(201f / 255f, 13f / 255f, 13f / 255f, 100f / 100f));
         #endregion
 
         #region Battery Gauge
-        [Checkbox("Show Battery Gauge", separator = true)]
+        [Checkbox("Battery", separator = true)]
         [Order(85)]
         public bool ShowBatteryGauge = true;
 
-        [Checkbox("Show Battery" + "##BatteryGauge")]
+        [Checkbox("Only Show When Active" + "##BatteryGauge")]
+        [Order(86, collapseWith = nameof(ShowBatteryGauge))]
+        public bool OnlyShowBatteryGaugeWhenActive = false;
+
+        [Checkbox("Battery" + "##BatteryGauge")]
         [Order(90, collapseWith = nameof(ShowBatteryGauge))]
         public bool ShowBatteryGaugeBattery = true;
 
-        [Checkbox("Show Battery Text" + "##BatteryGauge")]
-        [Order(95, collapseWith = nameof(ShowBatteryGauge))]
+        [Checkbox("Text" + "##BatteryGauge")]
+        [Order(95, collapseWith = nameof(ShowBatteryGaugeBattery))]
         public bool ShowBatteryGaugeBatteryText = false;
 
-        [Checkbox("Show Robot Duration" + "##BatteryGauge")]
+        [Checkbox("Robot" + "##BatteryGauge")]
         [Order(100, collapseWith = nameof(ShowBatteryGauge))]
         public bool ShowBatteryGaugeRobotDuration = true;
 
-        [Checkbox("Show Robot Duration Text" + "##BatteryGauge")]
-        [Order(105, collapseWith = nameof(ShowBatteryGauge))]
+        [Checkbox("Timer" + "##Robot")]
+        [Order(105, collapseWith = nameof(ShowBatteryGaugeRobotDuration))]
         public bool ShowBatteryGaugeRobotDurationText = true;
 
         [DragFloat2("Position" + "##BatteryGauge", min = -4000f, max = 4000f)]
@@ -271,25 +304,29 @@ namespace DelvUI.Interface.Jobs
         [Order(115, collapseWith = nameof(ShowBatteryGauge))]
         public Vector2 BatteryGaugeSize = new(254, 20);
 
-        [DragInt("Padding" + "##BatteryGauge", min = 0)]
+        [DragInt("Spacing" + "##BatteryGauge", min = 0)]
         [Order(120, collapseWith = nameof(ShowBatteryGauge))]
         public int BatteryGaugePadding = 2;
 
-        [ColorEdit4("Battery Fill Color" + "##BatteryGauge")]
+        [ColorEdit4("Battery" + "##BatteryGauge")]
         [Order(125, collapseWith = nameof(ShowBatteryGauge))]
         public PluginConfigColor BatteryFillColor = new(new Vector4(106f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
-        [ColorEdit4("Robot Fill Color" + "##BatteryGauge")]
+        [ColorEdit4("Robot" + "##BatteryGauge")]
         [Order(130, collapseWith = nameof(ShowBatteryGauge))]
         public PluginConfigColor RobotFillColor = new(new Vector4(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         #region Wildfire
-        [Checkbox("Show Wildfire", separator = true)]
+        [Checkbox("Wildfire", separator = true)]
         [Order(135)]
         public bool ShowWildfire = false;
 
-        [Checkbox("Show Text" + "##Wildfire")]
+        [Checkbox("Only Show When Active" + "##Wildfire")]
+        [Order(136, collapseWith = nameof(ShowWildfire))]
+        public bool OnlyShowWildfireWhenActive = false;
+
+        [Checkbox("Text" + "##Wildfire")]
         [Order(140, collapseWith = nameof(ShowWildfire))]
         public bool ShowWildfireText = true;
 
