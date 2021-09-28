@@ -98,27 +98,30 @@ namespace DelvUI.Interface.Jobs
 
             List<Bar> barDrawList = new();
 
+            float cbDuration = 0f;
+            float sbDuration = 0f;
+            
             if (Config.ShowCB)
             {
-                float duration = 0;
-
                 if (actor is BattleChara target)
                 {
-                    Status? cb = target.StatusList.FirstOrDefault(
-                        o => o.StatusId == 1200 && o.SourceID == player.ObjectId
-                          || o.StatusId == 124 && o.SourceID == player.ObjectId
+                    var cb = target.StatusList.Where(
+                        o => o.StatusId is 1200 or 124 && o.SourceID == player.ObjectId
                     );
 
-                    duration = Math.Abs(cb?.RemainingTime ?? 0f);
+                    if (cb.Any())
+                    {
+                        cbDuration = Math.Abs(cb.First().RemainingTime);
+                    }
                 }
 
-                PluginConfigColor color = duration <= 5 ? Config.ExpireColor : Config.CBColor;
+                PluginConfigColor color = cbDuration <= 5 ? Config.ExpireColor : Config.CBColor;
 
                 BarBuilder builder = BarBuilder.Create(position, barSize);
 
-                Bar cbBar = builder.AddInnerBar(duration, 30f, color).SetFlipDrainDirection(Config.CBInverted).SetBackgroundColor(EmptyColor.Base).Build();
+                Bar cbBar = builder.AddInnerBar(cbDuration, 30f, color).SetFlipDrainDirection(Config.CBInverted).SetBackgroundColor(EmptyColor.Base).Build();
 
-                if (Config.CBValue)
+                if (Config.CBValue && cbDuration != 0)
                 {
                     BarTextPosition textPos = Config.CBInverted ? BarTextPosition.CenterRight : BarTextPosition.CenterLeft;
                     builder.SetTextMode(BarTextMode.Single);
@@ -136,25 +139,25 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowSB)
             {
-                float duration = 0;
-
                 if (actor is BattleChara target)
                 {
-                    Status? sb = target.StatusList.FirstOrDefault(
-                        o => o.StatusId == 1201 && o.SourceID == player.ObjectId
-                          || o.StatusId == 129 && o.SourceID == player.ObjectId
+                    var sb = target.StatusList.Where(
+                        o => o.StatusId is 1201 or 129 && o.SourceID == player.ObjectId
                     );
 
-                    duration = Math.Abs(sb?.RemainingTime ?? 0f);
+                    if (sb.Any())
+                    {
+                        sbDuration = Math.Abs(sb.First().RemainingTime);
+                    }                    
                 }
 
-                PluginConfigColor color = duration <= 5 ? Config.ExpireColor : Config.SBColor;
+                PluginConfigColor color = sbDuration <= 5 ? Config.ExpireColor : Config.SBColor;
 
                 BarBuilder builder = BarBuilder.Create(position, barSize);
 
-                Bar sbBar = builder.AddInnerBar(duration, 30f, color).SetFlipDrainDirection(Config.SBInverted).SetBackgroundColor(EmptyColor.Base).Build();
+                Bar sbBar = builder.AddInnerBar(sbDuration, 30f, color).SetFlipDrainDirection(Config.SBInverted).SetBackgroundColor(EmptyColor.Base).Build();
 
-                if (Config.SBValue)
+                if (Config.SBValue && sbDuration != 0)
                 {
                     BarTextPosition textPos = Config.SBInverted ? BarTextPosition.CenterRight : BarTextPosition.CenterLeft;
                     builder.SetTextMode(BarTextMode.Single);
@@ -167,7 +170,7 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            if (barDrawList.Count <= 0)
+            if (barDrawList.Count <= 0 || (Config.OnlyShowDoTsWhenActive && sbDuration == 0 && cbDuration == 0))
             {
                 return;
             }
@@ -286,19 +289,32 @@ namespace DelvUI.Interface.Jobs
 
             short duration = Math.Abs(songTimer);
 
-            Bar bar = builder.AddInnerBar(duration / 1000f, 30f, songColor)
-                             .SetTextMode(BarTextMode.EachChunk)
-                             .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                             .SetBackgroundColor(EmptyColor.Base)
-                             .Build();
+            if (duration == 0 && Config.OnlyShowSongGaugeWhenActive)
+            {
+                return;
+            }
+
+            builder.AddInnerBar(duration / 1000f, 30f, songColor)
+                             .SetBackgroundColor(EmptyColor.Base);
+
+            if (Config.ShowSongTimer && duration != 0)
+            {
+                builder.SetTextMode(BarTextMode.EachChunk)
+                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+            }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            builder.Build().Draw(drawList);
         }
 
         private void DrawSoulVoiceBar(Vector2 origin)
         {
             byte soulVoice = Plugin.JobGauges.Get<BRDGauge>().SoulVoice;
+
+            if (soulVoice == 0 && Config.OnlyShowSoulGaugeWhenActive)
+            {
+                return;
+            }
 
             Vector2 barSize = Config.SoulGaugeSize;
             Vector2 position = origin + Config.Position + Config.SoulGaugePosition - barSize / 2f;
@@ -350,165 +366,181 @@ namespace DelvUI.Interface.Jobs
         public new static BardConfig DefaultConfig() { return new BardConfig(); }
 
         #region song gauge
-        [Checkbox("Song Gauge Enabled", separator = true)]
+        [Checkbox("Song Gauge", separator = true)]
         [Order(30)]
         public bool ShowSongGauge = true;
 
-        [DragFloat2("Song Gauge Size", min = 1f, max = 2000f)]
-        [Order(35, collapseWith = nameof(ShowSongGauge))]
-        public Vector2 SongGaugeSize = new(254, 20);
+        [Checkbox("Only Show When Active" + "##Song")]
+        [Order(31, collapseWith = nameof(ShowSongGauge))]
+        public bool OnlyShowSongGaugeWhenActive = false;
 
-        [DragFloat2("Song Gauge Position", min = -4000f, max = 4000f)]
-        [Order(40, collapseWith = nameof(ShowSongGauge))]
+        [Checkbox("Timer" + "##Song")]
+        [Order(32, collapseWith = nameof(ShowSongGauge))]
+        public bool ShowSongTimer = true;
+
+        [DragFloat2("Position" + "##Song", min = -4000f, max = 4000f)]
+        [Order(35, collapseWith = nameof(ShowSongGauge))]
         public Vector2 SongGaugePosition = new(0, -22);
 
-        [ColorEdit4("Wanderer's Minuet Color")]
+        [DragFloat2("Size" + "##Song", min = 1f, max = 2000f)]
+        [Order(40, collapseWith = nameof(ShowSongGauge))]
+        public Vector2 SongGaugeSize = new(254, 20);
+
+        [ColorEdit4("Wanderer's Minuet" + "##Song")]
         [Order(45, collapseWith = nameof(ShowSongGauge))]
         public PluginConfigColor WMColor = new(new Vector4(158f / 255f, 157f / 255f, 36f / 255f, 100f / 100f));
 
-        [ColorEdit4("Mage's Ballad Color")]
+        [ColorEdit4("Mage's Ballad" + "##Song")]
         [Order(50, collapseWith = nameof(ShowSongGauge))]
         public PluginConfigColor MBColor = new(new Vector4(143f / 255f, 90f / 255f, 143f / 255f, 100f / 100f));
 
-        [ColorEdit4("Army's Paeon Color")]
+        [ColorEdit4("Army's Paeon" + "##Song")]
         [Order(55, collapseWith = nameof(ShowSongGauge))]
         public PluginConfigColor APColor = new(new Vector4(207f / 255f, 205f / 255f, 52f / 255f, 100f / 100f));
         #endregion
 
         #region soul gauge
-        [Checkbox("Soul Gauge Enabled", separator = true)]
+        [Checkbox("Soul Gauge", separator = true)]
         [Order(60)]
         public bool ShowSoulGauge = true;
 
-        [Checkbox("Soul Gauge Full Glow Enabled")]
+        [Checkbox("Only Show When Active" + "##Soul")]
+        [Order(61, collapseWith = nameof(ShowSoulGauge))]
+        public bool OnlyShowSoulGaugeWhenActive = false;
+
+        [Checkbox("Soul Gauge Full Glow" + "##Soul")]
         [Order(65, collapseWith = nameof(ShowSoulGauge))]
         public bool ShowSoulGaugeGlow = false;
 
-        [DragFloat2("Soul Gauge Size", min = 1f, max = 2000f)]
+        [DragFloat2("Position" + "##Soul", min = -4000f, max = 4000f)]
         [Order(70, collapseWith = nameof(ShowSoulGauge))]
-        public Vector2 SoulGaugeSize = new(254, 10);
-
-        [DragFloat2("Soul Gauge Position", min = -4000f, max = 4000f)]
-        [Order(75, collapseWith = nameof(ShowSoulGauge))]
         public Vector2 SoulGaugePosition = new(0, -5);
 
-        [ColorEdit4("Soul Gauge Color")]
+        [DragFloat2("Size" + "##Soul", min = 1f, max = 2000f)]
+        [Order(75, collapseWith = nameof(ShowSoulGauge))]
+        public Vector2 SoulGaugeSize = new(254, 10);
+
+        [ColorEdit4("Color" + "##Soul")]
         [Order(80, collapseWith = nameof(ShowSoulGauge))]
         public PluginConfigColor SoulGaugeColor = new(new Vector4(248f / 255f, 227f / 255f, 0f / 255f, 100f / 100f));
         #endregion
 
         #region Song Procs / Stacks
-        [Checkbox("Wanderer's Minuet Stacks Enabled", separator = true)]
+        [Checkbox("Wanderer's Minuet Stacks", separator = true)]
         [Order(85)]
         public bool ShowWMStacks = true;
 
-        [Checkbox("Wanderer's Minuet Stacks Glow Enabled")]
+        [Checkbox("Wanderer's Minuet Stacks Glow" + "##Stacks")]
         [Order(90)]
         public bool ShowWMStacksGlow = false;
 
-        [Checkbox("Mage's Ballad Proc Enabled")]
+        [Checkbox("Mage's Ballad Proc" + "##Stacks")]
         [Order(95)]
         public bool ShowMBProc = true;
 
-        [Checkbox("Mage's Ballad Proc Glow Enabled")]
+        [Checkbox("Mage's Ballad Proc Glow" + "##Stacks")]
         [Order(100)]
         public bool ShowMBProcGlow = false;
 
-        [Checkbox("Army's Paeon Stacks Enabled")]
+        [Checkbox("Army's Paeon Stacks" + "##Stacks")]
         [Order(105)]
         public bool ShowAPStacks = true;
 
-        [Checkbox("Show Empty Stack Area")]
+        [Checkbox("Show Empty Stack Area" + "##Stacks")]
         [Order(110)]
         public bool ShowEmptyStacks = true;
 
-        [DragFloat2("Stack Size", min = 1f, max = 2000f)]
+        [DragFloat2("Position" + "##Stacks", min = -4000f, max = 4000f)]
         [Order(115)]
-        public Vector2 StackSize = new(254, 10);
-
-        [DragFloat2("Stack Position", min = -4000f, max = 4000f)]
-        [Order(120)]
         public Vector2 StackPosition = new(0, -39);
 
-        [DragInt("Stack Padding", max = 1000)]
+        [DragFloat2("Size" + "##Stacks", min = 1f, max = 2000f)]
+        [Order(120)]
+        public Vector2 StackSize = new(254, 10);
+
+        [DragInt("Spacing" + "##Stacks", max = 1000)]
         [Order(125)]
         public int StackPadding = 2;
 
-        [ColorEdit4("Wanderer's Minuet Stack Color")]
+        [ColorEdit4("Wanderer's Minuet Stack" + "##Stacks")]
         [Order(130)]
         public PluginConfigColor WMStackColor = new(new Vector4(150f / 255f, 215f / 255f, 232f / 255f, 100f / 100f));
 
-        [ColorEdit4("Mage's Ballad Proc Color")]
+        [ColorEdit4("Mage's Ballad Proc" + "##Stacks")]
         [Order(135)]
         public PluginConfigColor MBProcColor = new(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
 
-        [ColorEdit4("Army's Paeon Stack Color")]
+        [ColorEdit4("Army's Paeon Stack" + "##Stacks")]
         [Order(140)]
         public PluginConfigColor APStackColor = new(new Vector4(0f / 255f, 222f / 255f, 177f / 255f, 100f / 100f));
 
-        [ColorEdit4("DoT Expire Color")]
+        [ColorEdit4("DoT Expire" + "##Stacks")]
         [Order(145)]
         public PluginConfigColor ExpireColor = new(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
         #endregion
 
         #region caustic bite
-        [Checkbox("Caustic Bite Enabled", separator = true)]
+        [Checkbox("Caustic Bite", separator = true)]
         [Order(150)]
         public bool ShowCB = true;
 
-        [Checkbox("Show Caustic Bite On No Target")]
+        [Checkbox("Show On No Target" + "##CB")]
         [Order(155, collapseWith = nameof(ShowCB))]
         public bool CBNoTarget = true;
 
-        [Checkbox("Caustic Bite Value")]
+        [Checkbox("Timer" + "##CB")]
         [Order(160, collapseWith = nameof(ShowCB))]
         public bool CBValue = true;
 
-        [Checkbox("Caustic Bite Inverted")]
+        [Checkbox("Inverted" + "##CB")]
         [Order(165, collapseWith = nameof(ShowCB))]
         public bool CBInverted = true;
 
-        [DragFloat2("Caustic Bite Size", max = 2000f)]
+        [DragFloat2("Position" + "##CB", min = -4000f, max = 4000f)]
         [Order(170, collapseWith = nameof(ShowCB))]
-        public Vector2 CBSize = new(126, 10);
-
-        [DragFloat2("Caustic Bite Position", min = -4000f, max = 4000f)]
-        [Order(175, collapseWith = nameof(ShowCB))]
         public Vector2 CBPosition = new(-64, -51);
 
-        [ColorEdit4("Caustic Bite Color")]
+        [DragFloat2("Size" + "##CB", max = 2000f)]
+        [Order(175, collapseWith = nameof(ShowCB))]
+        public Vector2 CBSize = new(126, 10);
+
+        [ColorEdit4("Color" + "##CB")]
         [Order(180, collapseWith = nameof(ShowCB))]
         public PluginConfigColor CBColor = new(new Vector4(182f / 255f, 68f / 255f, 235f / 255f, 100f / 100f));
         #endregion
 
         #region stormbite
-        [Checkbox("Stormbite Enabled", separator = true)]
+        [Checkbox("Stormbite", separator = true)]
         [Order(185)]
         public bool ShowSB = true;
 
-        [Checkbox("Show Stormbite On No Target")]
+        [Checkbox("Show On No Target" + "##SB")]
         [Order(190, collapseWith = nameof(ShowSB))]
         public bool SBNoTarget = true;
 
-        [Checkbox("Stormbite Value")]
+        [Checkbox("Timer" + "##SB")]
         [Order(195, collapseWith = nameof(ShowSB))]
         public bool SBValue = true;
 
-        [Checkbox("Stormbite Inverted")]
+        [Checkbox("Inverted" + "##SB")]
         [Order(200, collapseWith = nameof(ShowSB))]
         public bool SBInverted = false;
 
-        [DragFloat2("Stormbite Size", max = 2000f)]
+        [DragFloat2("Position" + "##SB", min = -4000f, max = 4000f)]
         [Order(205, collapseWith = nameof(ShowSB))]
-        public Vector2 SBSize = new(126, 10);
-
-        [DragFloat2("Stormbite Position", min = -4000f, max = 4000f)]
-        [Order(210, collapseWith = nameof(ShowSB))]
         public Vector2 SBPosition = new(64, -51);
 
-        [ColorEdit4("Stormbite Color")]
+        [DragFloat2("Size" + "##SB", max = 2000f)]
+        [Order(210, collapseWith = nameof(ShowSB))]
+        public Vector2 SBSize = new(126, 10);
+
+        [ColorEdit4("Color" + "##SB")]
         [Order(215, collapseWith = nameof(ShowSB))]
         public PluginConfigColor SBColor = new(new Vector4(72f / 255f, 117f / 255f, 202f / 255f, 100f / 100f));
+
+        [Checkbox("Only Show DoTs When Active" + "##DoTs", spacing = true)]
+        [Order(220)]
+        public bool OnlyShowDoTsWhenActive = false;
         #endregion
     }
 }

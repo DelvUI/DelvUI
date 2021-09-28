@@ -72,7 +72,7 @@ namespace DelvUI.Interface.Jobs
 
             if (actor is not BattleChara target)
             {
-                if (Config.HideInactiveDiaBar)
+                if (Config.OnlyShowDiaWhenActive)
                 {
                     return;
                 }
@@ -83,16 +83,20 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var dia = target.StatusList.FirstOrDefault(
-                o => o.StatusId == 1871 && o.SourceID == player.ObjectId
-                  || o.StatusId == 144 && o.SourceID == player.ObjectId
-                  || o.StatusId == 143 && o.SourceID == player.ObjectId
+            var dia = target.StatusList.Where(
+                o => o.StatusId is 1871 or 144 or 143 && o.SourceID == player.ObjectId
             );
 
-            float diaCooldown = dia?.StatusId == 1871 ? 30f : 18f;
-            float diaDuration = dia?.RemainingTime ?? 0f;
+            float diaCooldown = 0f;
+            float diaDuration = 0f;
 
-            if (Config.HideInactiveDiaBar && diaDuration == 0)
+            if (dia.Any())
+            {
+                diaCooldown = dia.First().StatusId == 1871 ? 30f : 18f;
+                diaDuration = Math.Abs(dia.First().RemainingTime);
+            }
+
+            if (Config.OnlyShowDiaWhenActive && diaDuration == 0)
             {
                 return;
             }
@@ -141,6 +145,11 @@ namespace DelvUI.Interface.Jobs
             float GetScale(int num, float timer) => num + (timer / lilyCooldown);
 
             float lilyScale = GetScale(gauge.Lily, gauge.LilyTimer);
+
+            if (lilyScale == 0 && Config.OnlyShowLilyWhenActive)
+            {
+                return;
+            }
 
             var posX = origin.X + Config.Position.X + Config.LilyBarPosition.X - Config.LilyBarSize.X / 2f;
             var posY = origin.Y + Config.Position.Y + Config.LilyBarPosition.Y - Config.LilyBarSize.Y / 2f;
@@ -197,6 +206,11 @@ namespace DelvUI.Interface.Jobs
         [Order(30)]
         public bool ShowLilyBars = true;
 
+        // hide lily bar if inactive
+        [Checkbox("Only Show When Active" + "##Lily")]
+        [Order(31, collapseWith = nameof(ShowLilyBars))]
+        public bool OnlyShowLilyWhenActive = false;
+
         [Checkbox("Timer" + "##Lily")]
         [Order(35, collapseWith = nameof(ShowLilyBars))]
         public bool ShowLilyBarTimer = true;
@@ -244,12 +258,17 @@ namespace DelvUI.Interface.Jobs
         #region Dia Bar
         
         // enable
-        [Checkbox("Dia", separator = true)]
+        [Checkbox("Dia" + "##Dia", separator = true)]
         [Order(85)]
         public bool ShowDiaBar = true;
-        
+
+        // hide dia bar if inactive
+        [Checkbox("Only Show When Active" + "##Dia")]
+        [Order(86, collapseWith = nameof(ShowDiaBar))]
+        public bool OnlyShowDiaWhenActive = false;
+
         // show dia timer
-        [Checkbox("Timer")]
+        [Checkbox("Timer" + "##Dia")]
         [Order(90, collapseWith = nameof(ShowDiaBar))]
         public bool ShowDiaTimer = false;
 
@@ -269,24 +288,19 @@ namespace DelvUI.Interface.Jobs
         public PluginConfigColor DiaColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
         
         // refresh reminder enable
-        [Checkbox("Show Refresh Reminder", spacing = true)]
+        [Checkbox("Show Refresh Reminder" + "##Dia", spacing = true)]
         [Order(110, collapseWith = nameof(ShowDiaBar))]
         public bool ShowDiaRefresh = false;
 
         // refresh reminder value
-        [DragInt("Refresh Reminder", min = 0, max = 30)]
+        [DragInt("Refresh Reminder" + "##Dia", min = 0, max = 30)]
         [Order(115, collapseWith = nameof(ShowDiaBar))]
         public int DiaCustomRefresh = 3;
 
         // refresh reminder color
-        [ColorEdit4("Refresh Color")]
+        [ColorEdit4("Refresh Color" + "##Dia")]
         [Order(120, collapseWith = nameof(ShowDiaBar))]
         public PluginConfigColor DiaRefreshColor = new(new(190f / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
-        
-        // hide dia bar if inactive
-        [Checkbox("Hide when effect is not applied", spacing = true)]
-        [Order(125, collapseWith = nameof(ShowDiaBar))]
-        public bool HideInactiveDiaBar = false;
         #endregion
     }
 }

@@ -74,8 +74,13 @@ namespace DelvUI.Interface.Jobs
         private void DrawFairyBar(Vector2 origin)
         {
             float fairyGauge = Plugin.JobGauges.Get<SCHGauge>().FairyGauge;
-            float seraphTimer = Plugin.JobGauges.Get<SCHGauge>().SeraphTimer;
+            short seraphTimer = Plugin.JobGauges.Get<SCHGauge>().SeraphTimer;
             float seraphDuration = Math.Abs(seraphTimer / 1000);
+
+            if (fairyGauge == 0f && seraphDuration == 0f && Config.OnlyShowFairyWhenActive)
+            {
+                return;
+            }
 
             Vector2 barSize = Config.FairySize;
             Vector2 position = origin + Config.Position + Config.FairyPosition - barSize / 2f;
@@ -114,11 +119,18 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAetherBar(Vector2 origin, PlayerCharacter player)
         {
-            var aetherFlowBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 304);
+            var aetherFlow = player.StatusList.Where(o => o.StatusId is 304);
+            var aetherFlowStacks = 0;
+
+            if (aetherFlow.Any())
+            {
+                aetherFlowStacks = aetherFlow.First().StackCount;
+            }
+
             Vector2 barSize = Config.AetherSize;
             Vector2 position = origin + Config.Position + Config.AetherPosition - barSize / 2f;
 
-            if (!Config.ShowAether)
+            if (!Config.ShowAether || (Config.OnlyShowAetherWhenActive && aetherFlowStacks == 0))
             {
                 return;
             }
@@ -126,7 +138,7 @@ namespace DelvUI.Interface.Jobs
             Bar bar = BarBuilder.Create(position, barSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.AetherPadding)
-                                .AddInnerBar(aetherFlowBuff?.StackCount ?? 0, 3, Config.AetherColor)
+                                .AddInnerBar(aetherFlowStacks, 3, Config.AetherColor)
                                 .SetBackgroundColor(EmptyColor.Background)
                                 .Build();
 
@@ -138,17 +150,23 @@ namespace DelvUI.Interface.Jobs
         {
             var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            float bioDuration = 0;
+            float bioDuration = 0f;
 
             if (actor is BattleChara target)
             {
-                var bio = target.StatusList.FirstOrDefault(
-                    o => o.StatusId == 179 && o.SourceID == player.ObjectId
-                      || o.StatusId == 189 && o.SourceID == player.ObjectId
-                      || o.StatusId == 1895 && o.SourceID == player.ObjectId
+                var bio = target.StatusList.Where(
+                    o => o.StatusId is 179 or 189 or 1895 && o.SourceID == player.ObjectId
                 );
 
-                bioDuration = Math.Abs(bio?.RemainingTime ?? 0f);
+                if (bio.Any())
+                {
+                    bioDuration = Math.Abs(bio.First().RemainingTime);
+                }
+            }
+
+            if (bioDuration == 0f && Config.OnlyShowBioWhenActive)
+            {
+                return;
             }
 
             PluginConfigColor bioColor = bioDuration > 5 ? Config.BioColor : Config.ExpireColor;
@@ -156,8 +174,7 @@ namespace DelvUI.Interface.Jobs
             Vector2 barSize = Config.BioSize;
             Vector2 position = origin + Config.Position + Config.BioPosition - barSize / 2f;
 
-
-            BarBuilder builder = BarBuilder.Create(position, barSize);
+            BarBuilder builder = BarBuilder.Create(position, barSize).SetBackgroundColor(EmptyColor.Background);
 
             Bar bioBar = builder.AddInnerBar(bioDuration, 30f, bioColor)
                                 .SetFlipDrainDirection(Config.BioInverted)
@@ -192,20 +209,24 @@ namespace DelvUI.Interface.Jobs
         [Order(30)]
         public bool ShowAether = true;
 
-        [DragFloat2("Position" + "##Aether", min = -4000f, max = 4000f)]
+        [Checkbox("Only Show When Active" + "##Aether")]
         [Order(35, collapseWith = nameof(ShowAether))]
+        public bool OnlyShowAetherWhenActive = false;
+
+        [DragFloat2("Position" + "##Aether", min = -4000f, max = 4000f)]
+        [Order(40, collapseWith = nameof(ShowAether))]
         public Vector2 AetherPosition = new(0, -76);
 
         [DragFloat2("Size" + "##Aether", min = 1f, max = 2000f)]
-        [Order(40, collapseWith = nameof(ShowAether))]
+        [Order(45, collapseWith = nameof(ShowAether))]
         public Vector2 AetherSize = new(254, 20);
 
         [DragInt("Spacing" + "##Aether", max = 1000)]
-        [Order(45, collapseWith = nameof(ShowAether))]
+        [Order(50, collapseWith = nameof(ShowAether))]
         public int AetherPadding = 2;
 
         [ColorEdit4("Color" + "##Aether")]
-        [Order(50, collapseWith = nameof(ShowAether))]
+        [Order(55, collapseWith = nameof(ShowAether))]
         public PluginConfigColor AetherColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
         #endregion
 
@@ -214,33 +235,37 @@ namespace DelvUI.Interface.Jobs
         [Order(55)]
         public bool ShowFairy = true;
 
-        [Checkbox("Text" + "##Fairy")]
+        [Checkbox("Only Show When Active" + "##Fairy")]
         [Order(60, collapseWith = nameof(ShowFairy))]
+        public bool OnlyShowFairyWhenActive = false;
+
+        [Checkbox("Text" + "##Fairy")]
+        [Order(65, collapseWith = nameof(ShowFairy))]
         public bool ShowFairyText = true;
 
         [DragFloat2("Position" + "##Fairy", min = -4000f, max = 4000f)]
-        [Order(65, collapseWith = nameof(ShowFairy))]
+        [Order(70, collapseWith = nameof(ShowFairy))]
         public Vector2 FairyPosition = new(0, -54);
 
         [DragFloat2("Size" + "##Fairy", min = 1f, max = 2000f)]
-        [Order(70, collapseWith = nameof(ShowFairy))]
+        [Order(75, collapseWith = nameof(ShowFairy))]
         public Vector2 FairySize = new(254, 20);
 
         [ColorEdit4("Color" + "##Fairy")]
-        [Order(75, collapseWith = nameof(ShowFairy))]
+        [Order(80, collapseWith = nameof(ShowFairy))]
         public PluginConfigColor FairyColor = new(new Vector4(69f / 255f, 199 / 255f, 164f / 255f, 100f / 100f));
 
         [Checkbox("Seraph" + "##Seraph", spacing = true)]
-        [Order(80, collapseWith = nameof(ShowFairy))]
+        [Order(85, collapseWith = nameof(ShowFairy))]
         public bool ShowSeraph = true;
         //TODO NOT ASSIGNED? ^
 
         [Checkbox("Timer" + "##Seraph")]
-        [Order(85, collapseWith = nameof(ShowSeraph))]
+        [Order(90, collapseWith = nameof(ShowSeraph))]
         public bool ShowSeraphText = true;
 
         [ColorEdit4("Color" + "##SeraphColor")]
-        [Order(90, collapseWith = nameof(ShowSeraph))]
+        [Order(95, collapseWith = nameof(ShowSeraph))]
         public PluginConfigColor SeraphColor = new(new Vector4(232f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
@@ -249,31 +274,33 @@ namespace DelvUI.Interface.Jobs
         [Order(95)]
         public bool ShowBio = true;
 
-        [Checkbox("Timer" + "##Bio")]
+        [Checkbox("Only Show When Active" + "##Bio")]
         [Order(100, collapseWith = nameof(ShowBio))]
+        public bool OnlyShowBioWhenActive = false;
+
+        [Checkbox("Timer" + "##Bio")]
+        [Order(105, collapseWith = nameof(ShowBio))]
         public bool ShowBioText = true;
 
         [Checkbox("Invert Growth" + "##Bio")]
-        [Order(105, collapseWith = nameof(ShowBio))]
+        [Order(110, collapseWith = nameof(ShowBio))]
         public bool BioInverted = false;
 
         [DragFloat2("Position" + "##Bio", min = -4000f, max = 4000f)]
-        [Order(110, collapseWith = nameof(ShowBio))]
+        [Order(115, collapseWith = nameof(ShowBio))]
         public Vector2 BioPosition = new(0, -32);
 
         [DragFloat2("Size" + "##Bio", max = 2000f)]
-        [Order(115, collapseWith = nameof(ShowBio))]
+        [Order(120, collapseWith = nameof(ShowBio))]
         public Vector2 BioSize = new(254, 20);
 
         [ColorEdit4("Color" + "##Bio")]
-        [Order(120, collapseWith = nameof(ShowBio))]
+        [Order(125, collapseWith = nameof(ShowBio))]
         public PluginConfigColor BioColor = new(new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 1f));
 
         [ColorEdit4("Expire Color" + "##Bio")]
-        [Order(125, collapseWith = nameof(ShowBio))]
+        [Order(130, collapseWith = nameof(ShowBio))]
         public PluginConfigColor ExpireColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
         #endregion
-
-
     }
 }

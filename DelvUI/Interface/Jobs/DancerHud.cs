@@ -104,16 +104,29 @@ namespace DelvUI.Interface.Jobs
         {
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
 
+            if (gauge.Esprit == 0 && Config.OnlyShowEspritWhenActive)
+            {
+                return;
+            }
+
             var xPos = origin.X + Config.Position.X + Config.EspritGaugePosition.X - Config.EspritGaugeSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.EspritGaugePosition.Y - Config.EspritGaugeSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.EspritGaugeSize.Y, Config.EspritGaugeSize.X)
-                                           .SetChunks(2)
-                                           .SetChunkPadding(Config.EspritGaugeChunkPadding)
-                                           .SetBackgroundColor(EmptyColor.Base)
-                                           .AddInnerBar(gauge.Esprit, 100, Config.EspritGaugeColor, PartialFillColor);
+                .SetBackgroundColor(EmptyColor.Base);
 
-            if (Config.EspritTextEnabled)
+            if (Config.ChunkEspritGauge)
+            {
+                builder.SetChunks(2)
+                    .SetChunkPadding(Config.EspritGaugeChunkPadding)
+                    .AddInnerBar(gauge.Esprit, 100, Config.EspritGaugeColor, PartialFillColor);
+            }
+            else
+            {
+                builder.AddInnerBar(gauge.Esprit, 100, Config.EspritGaugeColor);
+            }
+            
+            if (Config.EspritTextEnabled && gauge.Esprit != 0)
             {
                 builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
@@ -126,6 +139,11 @@ namespace DelvUI.Interface.Jobs
         {
             IEnumerable<Status> flourishingBuff = player.StatusList.Where(o => o.StatusId is 1820 or 2021);
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
+
+            if (!flourishingBuff.Any() && Config.OnlyShowFeatherWhenActive)
+            {
+                return;
+            }
 
             var xPos = origin.X + Config.Position.X + Config.FeatherGaugePosition.X - Config.FeatherGaugeSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.FeatherGaugePosition.Y - Config.FeatherGaugeSize.Y / 2f;
@@ -235,6 +253,11 @@ namespace DelvUI.Interface.Jobs
             IEnumerable<Status> devilmentBuff = player.StatusList.Where(o => o.StatusId is 1825);
             IEnumerable<Status> technicalFinishBuff = player.StatusList.Where(o => o.StatusId is 1822 or 2050);
 
+            if (!technicalFinishBuff.Any() && !devilmentBuff.Any() && Config.OnlyShowBuffBarWhenActive)
+            {
+                return;
+            }
+
             var xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
 
@@ -272,6 +295,11 @@ namespace DelvUI.Interface.Jobs
         {
             IEnumerable<Status> standardFinishBuff = player.StatusList.Where(o => o.StatusId is 1821 or 2024 or 2105 or 2113);
 
+            if (!standardFinishBuff.Any() && Config.OnlyShowStandardBarWhenActive)
+            {
+                return;
+            }
+
             var xPos = origin.X + Config.Position.X + Config.StandardBarPosition.X - Config.StandardBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.StandardBarPosition.Y - Config.StandardBarSize.Y / 2f;
 
@@ -293,100 +321,69 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawProcBar(Vector2 origin, PlayerCharacter player)
         {
-            var timersEnabled = !Config.StaticProcBarsEnabled;
-            var procBarSize = new Vector2(Config.ProcBarSize.X / 4f - Config.ProcBarChunkPadding / 4f, Config.ProcBarSize.Y);
+            IEnumerable<Status> cascadeBuff = player.StatusList.Where(o => o.StatusId is 1814);
+            IEnumerable<Status> fountainBuff = player.StatusList.Where(o => o.StatusId is 1815);
+            IEnumerable<Status> windmillBuff = player.StatusList.Where(o => o.StatusId is 1816);
+            IEnumerable<Status> showerBuff = player.StatusList.Where(o => o.StatusId is 1817);
+
+            float cascadeTimer = 0f;
+            float fountainTimer = 0f;
+            float windmillTimer = 0f;
+            float showerTimer = 0f;
+
+            if (cascadeBuff.Any())
+            {
+                cascadeTimer = Math.Abs(cascadeBuff.First().RemainingTime);
+            }
+            if (fountainBuff.Any())
+            {
+                fountainTimer = Math.Abs(fountainBuff.First().RemainingTime);
+            }
+            if (windmillBuff.Any())
+            {
+                windmillTimer = Math.Abs(windmillBuff.First().RemainingTime);
+            }
+            if (showerBuff.Any())
+            {
+                showerTimer = Math.Abs(showerBuff.First().RemainingTime);
+            }
+
+            if (cascadeTimer == 0 && fountainTimer == 0 && windmillTimer == 0 && showerTimer == 0 && Config.OnlyShowProcsWhenActive)
+            {
+                return;
+            }
+
+            var procBarWidth = (Config.ProcBarSize.X - Config.ProcBarChunkPadding * 3) / 4f;
+            var procBarSize = new Vector2(procBarWidth, Config.ProcBarSize.Y);
+
+            var cursorPos = new Vector2(
+                origin.X + Config.Position.X + Config.ProcBarPosition.X - Config.ProcBarSize.X / 2f,
+                origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarSize.Y / 2f
+            );
+
+            var drawList = ImGui.GetWindowDrawList();
+
             var order = Config.procsOrder;
+            var procTimers = new float[] { cascadeTimer, fountainTimer, windmillTimer, showerTimer };
+            var colors = new PluginConfigColor[] { Config.FlourishingCascadeColor, Config.FlourishingFountainColor, Config.FlourishingWindmillColor, Config.FlourishingShowerColor };
 
-            // Flourishing Cascade
-            var flourishingCascadeBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 1814);
-            var cascadeDuration = flourishingCascadeBuff?.RemainingTime ?? 0f;
-            var cascadeStart = timersEnabled ? cascadeDuration : 20;
-            var cascadePos = new Vector2(
-                origin.X + Config.Position.X + Config.ProcBarPosition.X + (2 * order[0] - 2) * Config.ProcBarSize.X / 4f - order[0] * procBarSize.X,
-                origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarPosition.Y / 2f
-            );
-
-            var cascadeBuilder = BarBuilder.Create(cascadePos, procBarSize)
-            .SetBackgroundColor(EmptyColor.Base);
-
-            if (cascadeDuration > 0)
+            for (int i = 0; i < 4; i++)
             {
-                cascadeBuilder.AddInnerBar(cascadeStart, 20f, Config.FlourishingCascadeColor);
-            }
-
-            // Flourishing Fountain            
-            var flourishingFountainBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 1815);
-            var fountainDuration = flourishingFountainBuff?.RemainingTime ?? 0f;
-            var fountainStart = timersEnabled ? fountainDuration : 20;
-            var fountainPos = new Vector2(
-                origin.X + Config.Position.X + Config.ProcBarPosition.X + (2 * order[1] - 2) * Config.ProcBarSize.X / 4f - order[1] * procBarSize.X,
-                origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarPosition.Y / 2f
-            );
-            var fountainBuilder = BarBuilder.Create(fountainPos, procBarSize)
-                .SetBackgroundColor(EmptyColor.Base);
-
-            if (fountainDuration > 0)
-            {
-                fountainBuilder.AddInnerBar(fountainStart, 20f, Config.FlourishingFountainColor);
-            }
-
-            // Flourishing Windmill
-            var flourishingWindmillBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 1816);
-            var windmillDuration = flourishingWindmillBuff?.RemainingTime ?? 0f;
-            var windmillStart = timersEnabled ? windmillDuration : 20;
-            var windmillPos = new Vector2(
-                origin.X + Config.Position.X + Config.ProcBarPosition.X + (2 * order[2] - 2) * Config.ProcBarSize.X / 4f - order[2] * procBarSize.X,
-                origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarPosition.Y / 2f
-            );
-            var windmillBuilder = BarBuilder.Create(windmillPos, procBarSize)
-                .SetBackgroundColor(EmptyColor.Base);
-
-            if (windmillDuration > 0)
-            {
-                windmillBuilder.AddInnerBar(windmillStart, 20f, Config.FlourishingWindmillColor);
-            }
-
-            // Flourishing Shower
-            var flourishingShowerBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 1817);
-            var showerDuration = flourishingShowerBuff?.RemainingTime ?? 0f;
-            var showerStart = timersEnabled ? showerDuration : 20;
-            var showerPos = new Vector2(
-                origin.X + Config.Position.X + Config.ProcBarPosition.X + (2 * order[3] - 2) * Config.ProcBarSize.X / 4f - order[3] * procBarSize.X,
-                origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarPosition.Y / 2f
-            );
-            var showerBuilder = BarBuilder.Create(showerPos, procBarSize)
-                .SetBackgroundColor(EmptyColor.Base);
-
-            if (showerDuration > 0)
-            {
-                showerBuilder.AddInnerBar(showerStart, 20f, Config.FlourishingShowerColor);
-            }
-
-            if (!Config.StaticProcBarsEnabled)
-            {
-                if (cascadeDuration > 0)
+                if (Config.StaticProcBarsEnabled)
                 {
-                    cascadeBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                    var builder = BarBuilder.Create(cursorPos, procBarSize).SetBackgroundColor(EmptyColor.Background)
+                        .AddInnerBar(procTimers[order[i]] > 0 ? 1 : 0, 1, colors[order[i]]);
+                    builder.Build().Draw(drawList);
                 }
-                if (fountainDuration > 0)
+                else
                 {
-                    fountainBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                    var builder = BarBuilder.Create(cursorPos, procBarSize).SetBackgroundColor(EmptyColor.Background)
+                        .AddInnerBar(procTimers[order[i]], 20f, colors[order[i]]);
+                    builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                    builder.Build().Draw(drawList);
                 }
-                if (windmillDuration > 0)
-                {
-                    windmillBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                }
-                if (showerDuration > 0)
-                {
-                    showerBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                }
+                cursorPos.X += procBarWidth + Config.ProcBarChunkPadding;
             }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            cascadeBuilder.Build().Draw(drawList);
-            fountainBuilder.Build().Draw(drawList);
-            windmillBuilder.Build().Draw(drawList);
-            showerBuilder.Build().Draw(drawList);
         }
     }
 
@@ -398,212 +395,236 @@ namespace DelvUI.Interface.Jobs
         [JsonIgnore] public override uint JobId => JobIDs.DNC;
         public new static DancerConfig DefaultConfig() { return new DancerConfig(); }
 
-        #region espirit
-        [Checkbox("Show Esprit Guage", separator = true)]
+        #region esprit
+        [Checkbox("Esprit", separator = true)]
         [Order(30)]
         public bool EspritGuageEnabled = true;
 
-        [Checkbox("Show Esprit Guage Text")]
+        [Checkbox("Only Show When Active" + "##Esprit")]
         [Order(35, collapseWith = nameof(EspritGuageEnabled))]
+        public bool OnlyShowEspritWhenActive = false;
+
+        [Checkbox("Text" + "##Esprit")]
+        [Order(40, collapseWith = nameof(EspritGuageEnabled))]
         public bool EspritTextEnabled = true;
 
-        [DragFloat2("Esprit Gauge Size", min = 1f, max = 2000f)]
-        [Order(40, collapseWith = nameof(EspritGuageEnabled))]
-        public Vector2 EspritGaugeSize = new(254, 20);
+        [Checkbox("Split Bar" + "##Esprit")]
+        [Order(41, collapseWith = nameof(EspritGuageEnabled))]
+        public bool ChunkEspritGauge = true;
 
-        [DragFloat2("Esprit Gauge Position", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##Esprit", min = -4000f, max = 4000f)]
         [Order(45, collapseWith = nameof(EspritGuageEnabled))]
         public Vector2 EspritGaugePosition = new(0, -54);
 
-        [DragFloat("Esprit Gauge Chunk Padding", min = -4000f, max = 4000f)]
+        [DragFloat2("Size" + "##Esprit", min = 1f, max = 2000f)]
         [Order(50, collapseWith = nameof(EspritGuageEnabled))]
+        public Vector2 EspritGaugeSize = new(254, 20);
+
+        [DragFloat("Spacing" + "##Esprit", min = -4000f, max = 4000f)]
+        [Order(55, collapseWith = nameof(EspritGuageEnabled))]
         public float EspritGaugeChunkPadding = 2;
 
-        [ColorEdit4("Esprit Guage Color")]
-        [Order(55, collapseWith = nameof(EspritGuageEnabled))]
+        [ColorEdit4("Color" + "##Esprit")]
+        [Order(60, collapseWith = nameof(EspritGuageEnabled))]
         public PluginConfigColor EspritGaugeColor = new(new Vector4(72f / 255f, 20f / 255f, 99f / 255f, 100f / 100f));
         #endregion
 
         #region feathers
-        [Checkbox("Show Feather Guage", separator = true)]
-        [Order(60)]
+        [Checkbox("Feathers", separator = true)]
+        [Order(65)]
         public bool FeatherGuageEnabled = true;
 
-        [Checkbox("Enable Flourishing Finish Glow")]
-        [Order(65, collapseWith = nameof(FeatherGuageEnabled))]
+        [Checkbox("Only Show When Active" + "##Feather")]
+        [Order(70, collapseWith = nameof(FeatherGuageEnabled))]
+        public bool OnlyShowFeatherWhenActive = false;
+
+        [Checkbox("Flourishing Finish Glow" + "##Feather")]
+        [Order(75, collapseWith = nameof(FeatherGuageEnabled))]
         public bool FlourishingGlowEnabled = true;
 
-        [DragFloat2("Feather Guage Size", min = 1f, max = 2000f)]
-        [Order(70, collapseWith = nameof(FeatherGuageEnabled))]
-        public Vector2 FeatherGaugeSize = new(254, 10);
-
-        [DragFloat2("Feather Gauge Position", min = -4000f, max = 4000f)]
-        [Order(75, collapseWith = nameof(FeatherGuageEnabled))]
+        [DragFloat2("Position" + "##Feather", min = -4000f, max = 4000f)]
+        [Order(80, collapseWith = nameof(FeatherGuageEnabled))]
         public Vector2 FeatherGaugePosition = new(0, -71);
 
-        [DragFloat("Feather Gauge Chunk Padding", min = -4000f, max = 4000f)]
-        [Order(80, collapseWith = nameof(FeatherGuageEnabled))]
+        [DragFloat2("Size" + "##Feather", min = 1f, max = 2000f)]
+        [Order(85, collapseWith = nameof(FeatherGuageEnabled))]
+        public Vector2 FeatherGaugeSize = new(254, 10);
+
+        [DragFloat("Spacing" + "##Feather", min = -4000f, max = 4000f)]
+        [Order(90, collapseWith = nameof(FeatherGuageEnabled))]
         public float FeatherGaugeChunkPadding = 2;
 
-        [ColorEdit4("Feather Guage Color")]
-        [Order(85, collapseWith = nameof(FeatherGuageEnabled))]
+        [ColorEdit4("Color" + "##Feather")]
+        [Order(95, collapseWith = nameof(FeatherGuageEnabled))]
         public PluginConfigColor FeatherGaugeColor = new(new Vector4(175f / 255f, 229f / 255f, 29f / 255f, 100f / 100f));
 
-        [ColorEdit4("Flourishing Finish Glow Color")]
-        [Order(90, collapseWith = nameof(FeatherGuageEnabled))]
+        [ColorEdit4("Glow" + "##Feather")]
+        [Order(100, collapseWith = nameof(FeatherGuageEnabled))]
         public PluginConfigColor FlourishingProcColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
         #endregion
 
         #region buff bars
-        [Checkbox("Show Buff Bar", separator = true)]
-        [Order(95)]
+        [Checkbox("Buffs", separator = true)]
+        [Order(105)]
         public bool BuffBarEnabled = true;
 
-        [Checkbox("Show Technical Finish Bar")]
-        [Order(100, collapseWith = nameof(BuffBarEnabled))]
-        public bool TechnicalBarEnabled = true;
-
-        [Checkbox("Show Technical Finish Bar Text")]
-        [Order(105, collapseWith = nameof(BuffBarEnabled))]
-        public bool TechnicalTextEnabled = true;
-
-        [Checkbox("Show Devilment Bar")]
+        [DragFloat2("Buffs Position" + "##Buff", min = -4000f, max = 4000f)]
         [Order(110, collapseWith = nameof(BuffBarEnabled))]
-        public bool DevilmentBarEnabled = true;
-
-        [Checkbox("Show Devilment Bar Text")]
-        [Order(115, collapseWith = nameof(BuffBarEnabled))]
-        public bool DevilmentTextEnabled = true;
-
-        [DragFloat2("Buff Bars Size", min = 1f, max = 2000f)]
-        [Order(120, collapseWith = nameof(BuffBarEnabled))]
-        public Vector2 BuffBarSize = new(254, 20);
-
-        [DragFloat2("Buff Bars Position", min = -4000f, max = 4000f)]
-        [Order(125, collapseWith = nameof(BuffBarEnabled))]
         public Vector2 BuffBarPosition = new(0, -32);
 
-        [ColorEdit4("Technical Finish Bar Color")]
-        [Order(130, collapseWith = nameof(BuffBarEnabled))]
+        [DragFloat2("Buffs Size" + "##Buff", min = 1f, max = 2000f)]
+        [Order(115, collapseWith = nameof(BuffBarEnabled))]
+        public Vector2 BuffBarSize = new(254, 20);
+
+        [Checkbox("Only Show When Active" + "##Buff")]
+        [Order(120, collapseWith = nameof(BuffBarEnabled))]
+        public bool OnlyShowBuffBarWhenActive = false;
+
+        [Checkbox("Technical Finish" + "##Buff")]
+        [Order(125, collapseWith = nameof(BuffBarEnabled))]
+        public bool TechnicalBarEnabled = true;
+
+        [Checkbox("Timer" + "##Buff")]
+        [Order(130, collapseWith = nameof(TechnicalBarEnabled))]
+        public bool TechnicalTextEnabled = true;
+
+        [Checkbox("Devilment" + "##Buff")]
+        [Order(135, collapseWith = nameof(BuffBarEnabled))]
+        public bool DevilmentBarEnabled = true;
+
+        [Checkbox("Timer" + "##Buff")]
+        [Order(140, collapseWith = nameof(DevilmentBarEnabled))]
+        public bool DevilmentTextEnabled = true;
+
+        [ColorEdit4("Color" + "##Buff")]
+        [Order(145, collapseWith = nameof(TechnicalBarEnabled))]
         public PluginConfigColor TechnicalFinishBarColor = new(new Vector4(255f / 255f, 9f / 255f, 102f / 255f, 100f / 100f));
 
-        [ColorEdit4("Devilment Bar Color")]
-        [Order(135, collapseWith = nameof(BuffBarEnabled))]
+        [ColorEdit4("Color" + "##Buff")]
+        [Order(150, collapseWith = nameof(DevilmentBarEnabled))]
         public PluginConfigColor DevilmentBarColor = new(new Vector4(52f / 255f, 78f / 255f, 29f / 255f, 100f / 100f));
         #endregion
 
         #region standard finish
-        [Checkbox("Show Standard Finish Bar", separator = true)]
-        [Order(140)]
+        [Checkbox("Standard Finish", separator = true)]
+        [Order(155)]
         public bool StandardBarEnabled = true;
 
-        [Checkbox("Show Standard Finish Bar Text")]
-        [Order(145, collapseWith = nameof(StandardBarEnabled))]
+        [Checkbox("Only Show When Active" + "##Standard")]
+        [Order(160, collapseWith = nameof(StandardBarEnabled))]
+        public bool OnlyShowStandardBarWhenActive = false;
+
+        [Checkbox("Timer" + "##Standard")]
+        [Order(165, collapseWith = nameof(StandardBarEnabled))]
         public bool StandardTextEnabled = true;
 
-        [DragFloat2("Standard Finish Bar Size", min = 1f, max = 2000f)]
-        [Order(150, collapseWith = nameof(StandardBarEnabled))]
-        public Vector2 StandardBarSize = new(254, 20);
-
-        [DragFloat2("Standard Finish Bar Position", min = -4000f, max = 4000f)]
-        [Order(155, collapseWith = nameof(StandardBarEnabled))]
+        [DragFloat2("Position" + "##Standard", min = -4000f, max = 4000f)]
+        [Order(170, collapseWith = nameof(StandardBarEnabled))]
         public Vector2 StandardBarPosition = new(0, -10);
 
-        [ColorEdit4("Standard Finish Bar Color")]
-        [Order(160, collapseWith = nameof(StandardBarEnabled))]
+        [DragFloat2("Size" + "##Standard", min = 1f, max = 2000f)]
+        [Order(175, collapseWith = nameof(StandardBarEnabled))]
+        public Vector2 StandardBarSize = new(254, 20);
+
+        [ColorEdit4("Color" + "##Standard")]
+        [Order(180, collapseWith = nameof(StandardBarEnabled))]
         public PluginConfigColor StandardFinishBarColor = new(new Vector4(0f / 255f, 193f / 255f, 95f / 255f, 100f / 100f));
         #endregion
 
         #region steps
-        [Checkbox("Show Step Bars", separator = true)]
-        [Order(165)]
-        public bool StepBarEnabled = true;
+        [Checkbox("Steps", separator = true)]
+        [Order(185)]
+        public bool StepBarEnabled = true;        
 
-        [Checkbox("Show Step Glow")]
-        [Order(170, collapseWith = nameof(StepBarEnabled))]
+        [Checkbox("Step Glow" + "##Step")]
+        [Order(195, collapseWith = nameof(StepBarEnabled))]
         public bool StepGlowEnabled = true;
 
-        [Checkbox("Show Dance Ready Glow")]
-        [Order(175, collapseWith = nameof(StepBarEnabled))]
+        [Checkbox("Dance Ready Glow" + "##Step")]
+        [Order(200, collapseWith = nameof(StepBarEnabled))]
         public bool DanceReadyGlowEnabled = true;
 
-        [DragFloat2("Step Bars Size", min = 1f, max = 2000f)]
-        [Order(180, collapseWith = nameof(StepBarEnabled))]
-        public Vector2 StepBarSize = new(254, 10);
-
-        [DragFloat2("Step Bars Position", min = -4000f, max = 4000f)]
-        [Order(185, collapseWith = nameof(StepBarEnabled))]
+        [DragFloat2("Position" + "##Step", min = -4000f, max = 4000f)]
+        [Order(205, collapseWith = nameof(StepBarEnabled))]
         public Vector2 StepBarPosition = new(0, -93);
 
-        [DragFloat("Step Bar Chunk Padding", min = -4000f, max = 4000f)]
-        [Order(190, collapseWith = nameof(StepBarEnabled))]
+        [DragFloat2("Size" + "##Step", min = 1f, max = 2000f)]
+        [Order(210, collapseWith = nameof(StepBarEnabled))]
+        public Vector2 StepBarSize = new(254, 10);
+
+        [DragFloat("Spacing" + "##Step", min = -4000f, max = 4000f)]
+        [Order(215, collapseWith = nameof(StepBarEnabled))]
         public float StepBarChunkPadding = 2;
 
-        [ColorEdit4("Current Step Glow Color")]
-        [Order(195, collapseWith = nameof(StepBarEnabled))]
+        [ColorEdit4("Step Glow" + "##Step")]
+        [Order(220, collapseWith = nameof(StepBarEnabled))]
         public PluginConfigColor CurrentStepGlowColor = new(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
-        [ColorEdit4("Emboite Color")]
-        [Order(200, collapseWith = nameof(StepBarEnabled))]
+        [ColorEdit4("Dance Ready Glow" + "##Step")]
+        [Order(225, collapseWith = nameof(StepBarEnabled))]
+        public PluginConfigColor DanceReadyColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Emboite" + "##Step")]
+        [Order(230, collapseWith = nameof(StepBarEnabled))]
         public PluginConfigColor EmboiteColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [ColorEdit4("Entrechat Color")]
-        [Order(205, collapseWith = nameof(StepBarEnabled))]
+        [ColorEdit4("Entrechat" + "##Step")]
+        [Order(235, collapseWith = nameof(StepBarEnabled))]
         public PluginConfigColor EntrechatColor = new(new Vector4(0f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
 
-        [ColorEdit4("Jete Color")]
-        [Order(210, collapseWith = nameof(StepBarEnabled))]
+        [ColorEdit4("Jete" + "##Step")]
+        [Order(240, collapseWith = nameof(StepBarEnabled))]
         public PluginConfigColor JeteColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
-        [ColorEdit4("Pirouette Color")]
-        [Order(215, collapseWith = nameof(StepBarEnabled))]
+        [ColorEdit4("Pirouette" + "##Step")]
+        [Order(245, collapseWith = nameof(StepBarEnabled))]
         public PluginConfigColor PirouetteColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
-
-        [ColorEdit4("Dance Ready Color")]
-        [Order(220, collapseWith = nameof(StepBarEnabled))]
-        public PluginConfigColor DanceReadyColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
         #endregion
 
         #region procs
-        [Checkbox("Show Proc Bars", separator = true)]
-        [Order(225)]
+        [Checkbox("Procs", separator = true)]
+        [Order(250)]
         public bool ProcBarEnabled = true;
 
-        [Checkbox("Use Static Proc Bars")]
-        [Order(230, collapseWith = nameof(ProcBarEnabled))]
+        [Checkbox("Only Show When Active" + "##Procs")]
+        [Order(255, collapseWith = nameof(ProcBarEnabled))]
+        public bool OnlyShowProcsWhenActive = false;
+
+        [Checkbox("Static Bars" + "##Procs")]
+        [Order(260, collapseWith = nameof(ProcBarEnabled))]
         public bool StaticProcBarsEnabled = true;
 
-        [DragFloat2("Proc Bars Size", min = 1f, max = 2000f)]
-        [Order(235, collapseWith = nameof(ProcBarEnabled))]
-        public Vector2 ProcBarSize = new(254, 10);
-
-        [DragFloat2("Proc Bars Position", min = -4000f, max = 4000f)]
-        [Order(240, collapseWith = nameof(ProcBarEnabled))]
+        [DragFloat2("Position" + "##Procs", min = -4000f, max = 4000f)]
+        [Order(265, collapseWith = nameof(ProcBarEnabled))]
         public Vector2 ProcBarPosition = new(0, -83);
 
-        [DragFloat("Proc Bar Chunk Padding", min = -4000f, max = 4000f)]
-        [Order(245, collapseWith = nameof(ProcBarEnabled))]
-        public float ProcBarChunkPadding = 2;
+        [DragFloat2("Size" + "##Procs", min = 1f, max = 2000f)]
+        [Order(270, collapseWith = nameof(ProcBarEnabled))]
+        public Vector2 ProcBarSize = new(254, 10);
 
-        [DragDropHorizontal("Procs Order", "Cascade", "Fountain", "Windmill", "Shower")]
-        [Order(250, collapseWith = nameof(ProcBarEnabled))]
-        public int[] procsOrder = new int[] { 0, 1, 2, 3 };
+        [DragFloat("Spacing" + "##Procs", min = -4000f, max = 4000f)]
+        [Order(275, collapseWith = nameof(ProcBarEnabled))]
+        public float ProcBarChunkPadding = 2;        
 
-        [ColorEdit4("Flourishing Cascade Color")]
-        [Order(255, collapseWith = nameof(ProcBarEnabled))]
+        [ColorEdit4("Flourishing Cascade" + "##Procs")]
+        [Order(280, collapseWith = nameof(ProcBarEnabled))]
         public PluginConfigColor FlourishingCascadeColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
-        [ColorEdit4("Flourishing Fountain Color")]
-        [Order(260, collapseWith = nameof(ProcBarEnabled))]
+        [ColorEdit4("Flourishing Fountain" + "##Procs")]
+        [Order(285, collapseWith = nameof(ProcBarEnabled))]
         public PluginConfigColor FlourishingFountainColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
 
-        [ColorEdit4("Flourishing Windmill Color")]
-        [Order(265, collapseWith = nameof(ProcBarEnabled))]
+        [ColorEdit4("Flourishing Windmill" + "##Procs")]
+        [Order(290, collapseWith = nameof(ProcBarEnabled))]
         public PluginConfigColor FlourishingWindmillColor = new(new Vector4(0f / 255f, 215f / 255f, 215f / 255f, 100f / 100f));
 
-        [ColorEdit4("Flourishing Shower Color")]
-        [Order(270, collapseWith = nameof(ProcBarEnabled))]
+        [ColorEdit4("Flourishing Shower" + "##Procs")]
+        [Order(295, collapseWith = nameof(ProcBarEnabled))]
         public PluginConfigColor FlourishingShowerColor = new(new Vector4(255f / 255f, 100f / 255f, 0f / 255f, 100f / 100f));
+
+        [DragDropHorizontal("Order", "Cascade", "Fountain", "Windmill", "Shower" + "##Procs")]
+        [Order(300, collapseWith = nameof(ProcBarEnabled))]
+        public int[] procsOrder = new int[] { 0, 1, 2, 3 };
         #endregion
     }
 }
