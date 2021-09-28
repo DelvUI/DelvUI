@@ -104,6 +104,11 @@ namespace DelvUI.Interface.Jobs
         {
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
 
+            if (gauge.Esprit == 0 && Config.OnlyShowEspritWhenActive)
+            {
+                return;
+            }
+
             var xPos = origin.X + Config.Position.X + Config.EspritGaugePosition.X - Config.EspritGaugeSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.EspritGaugePosition.Y - Config.EspritGaugeSize.Y / 2f;
 
@@ -134,6 +139,11 @@ namespace DelvUI.Interface.Jobs
         {
             IEnumerable<Status> flourishingBuff = player.StatusList.Where(o => o.StatusId is 1820 or 2021);
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
+
+            if (!flourishingBuff.Any() && Config.OnlyShowFeatherWhenActive)
+            {
+                return;
+            }
 
             var xPos = origin.X + Config.Position.X + Config.FeatherGaugePosition.X - Config.FeatherGaugeSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.FeatherGaugePosition.Y - Config.FeatherGaugeSize.Y / 2f;
@@ -243,6 +253,11 @@ namespace DelvUI.Interface.Jobs
             IEnumerable<Status> devilmentBuff = player.StatusList.Where(o => o.StatusId is 1825);
             IEnumerable<Status> technicalFinishBuff = player.StatusList.Where(o => o.StatusId is 1822 or 2050);
 
+            if (!technicalFinishBuff.Any() && !devilmentBuff.Any() && Config.OnlyShowBuffBarWhenActive)
+            {
+                return;
+            }
+
             var xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
 
@@ -279,6 +294,11 @@ namespace DelvUI.Interface.Jobs
         private void DrawStandardBar(Vector2 origin, PlayerCharacter player)
         {
             IEnumerable<Status> standardFinishBuff = player.StatusList.Where(o => o.StatusId is 1821 or 2024 or 2105 or 2113);
+
+            if (!standardFinishBuff.Any() && Config.OnlyShowStandardBarWhenActive)
+            {
+                return;
+            }
 
             var xPos = origin.X + Config.Position.X + Config.StandardBarPosition.X - Config.StandardBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.StandardBarPosition.Y - Config.StandardBarSize.Y / 2f;
@@ -514,11 +534,7 @@ namespace DelvUI.Interface.Jobs
         #region steps
         [Checkbox("Steps", separator = true)]
         [Order(185)]
-        public bool StepBarEnabled = true;
-
-        [Checkbox("Only Show When Active" + "##Step")]
-        [Order(190, collapseWith = nameof(StepBarEnabled))]
-        public bool OnlyShowStepsWhenActive = false;
+        public bool StepBarEnabled = true;        
 
         [Checkbox("Step Glow" + "##Step")]
         [Order(195, collapseWith = nameof(StepBarEnabled))]
@@ -588,27 +604,27 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat("Spacing" + "##Procs", min = -4000f, max = 4000f)]
         [Order(275, collapseWith = nameof(ProcBarEnabled))]
-        public float ProcBarChunkPadding = 2;
-
-        [DragDropHorizontal("Order", "Cascade", "Fountain", "Windmill", "Shower" + "##Procs")]
-        [Order(280, collapseWith = nameof(ProcBarEnabled))]
-        public int[] procsOrder = new int[] { 0, 1, 2, 3 };
+        public float ProcBarChunkPadding = 2;        
 
         [ColorEdit4("Flourishing Cascade" + "##Procs")]
-        [Order(285, collapseWith = nameof(ProcBarEnabled))]
+        [Order(280, collapseWith = nameof(ProcBarEnabled))]
         public PluginConfigColor FlourishingCascadeColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Flourishing Fountain" + "##Procs")]
-        [Order(290, collapseWith = nameof(ProcBarEnabled))]
+        [Order(285, collapseWith = nameof(ProcBarEnabled))]
         public PluginConfigColor FlourishingFountainColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Flourishing Windmill" + "##Procs")]
-        [Order(295, collapseWith = nameof(ProcBarEnabled))]
+        [Order(290, collapseWith = nameof(ProcBarEnabled))]
         public PluginConfigColor FlourishingWindmillColor = new(new Vector4(0f / 255f, 215f / 255f, 215f / 255f, 100f / 100f));
 
         [ColorEdit4("Flourishing Shower" + "##Procs")]
-        [Order(300, collapseWith = nameof(ProcBarEnabled))]
+        [Order(295, collapseWith = nameof(ProcBarEnabled))]
         public PluginConfigColor FlourishingShowerColor = new(new Vector4(255f / 255f, 100f / 255f, 0f / 255f, 100f / 100f));
+
+        [DragDropHorizontal("Order", "Cascade", "Fountain", "Windmill", "Shower" + "##Procs")]
+        [Order(300, collapseWith = nameof(ProcBarEnabled))]
+        public int[] procsOrder = new int[] { 0, 1, 2, 3 };
         #endregion
     }
 }
