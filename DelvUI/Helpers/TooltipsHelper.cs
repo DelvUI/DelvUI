@@ -7,18 +7,38 @@ using System.Text.RegularExpressions;
 
 namespace DelvUI.Helpers
 {
-    public class TooltipsHelper
+    public class TooltipsHelper : IDisposable
     {
         #region Singleton
         private TooltipsHelper()
         {
-            _config = ConfigurationManager.GetInstance().GetConfigObject<TooltipsConfig>();
+            _config = ConfigurationManager.Instance.GetConfigObject<TooltipsConfig>();
         }
 
         public static void Initialize() { Instance = new TooltipsHelper(); }
 
         public static TooltipsHelper Instance { get; private set; } = null!;
 
+        ~TooltipsHelper()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            Instance = null!;
+        }
         #endregion
 
         private static float MaxWidth = 300;

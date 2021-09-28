@@ -25,7 +25,7 @@ using Dalamud.Game;
 
 namespace DelvUI.Helpers
 {
-    internal class MPTickHelper
+    internal class MPTickHelper : IDisposable
     {
         public const double ServerTickRate = 3;
         protected const float PollingRate = 1 / 30f;
@@ -89,6 +89,9 @@ namespace DelvUI.Helpers
             GC.SuppressFinalize(this);
         }
 
-        ~MPTickHelper() { Dispose(true); }
+        ~MPTickHelper()
+        {
+            Dispose(false);
+        }
     }
 }

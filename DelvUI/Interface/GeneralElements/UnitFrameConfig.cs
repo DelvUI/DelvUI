@@ -108,36 +108,60 @@ namespace DelvUI.Interface.GeneralElements
         [Order(25, collapseWith = nameof(UseCustomColor))]
         public PluginConfigColor CustomColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
+        [Checkbox("Color Based On Health Value ##CustomFrame")]
+        [Order(30, collapseWith = nameof(UseCustomColor))]
+        public bool UseColorBasedOnHealthValue = false;
+
+        [ColorEdit4("Full Health Color ##CustomFrame")]
+        [Order(35, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        public PluginConfigColor FullHealthColor = new PluginConfigColor(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Low Health Color ##CustomFrame")]
+        [Order(40, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        public PluginConfigColor LowHealthColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [DragFloat("Full Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
+        [Order(45, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        public float FullHealthColorThreshold = 75f;
+
+        [DragFloat("Low Health Color Below Health %", min = 0f, max = 50f, velocity = 1f)]
+        [Order(50, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        public float LowHealthColorThreshold = 25f;
+
         [Checkbox("Custom Background Color")]
-        [Order(30)]
+        [Order(55)]
         public bool UseCustomBackgroundColor = false;
 
         [ColorEdit4("Color ##CustomBackground")]
-        [Order(35, collapseWith = nameof(UseCustomBackgroundColor))]
+        [Order(60, collapseWith = nameof(UseCustomBackgroundColor))]
         public PluginConfigColor CustomBackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
+        [Checkbox("Job Color As Background Color")]
+        [Order(65, collapseWith = nameof(UseCustomBackgroundColor))]
+        public bool UseJobColorAsBackgroundColor = false;
+
         [Checkbox("Tank Invulnerability")]
-        [Order(40)]
+        [Order(70)]
         public bool ShowTankInvulnerability = true;
 
         [Checkbox("Tank Invulnerability Custom Color")]
-        [Order(45, collapseWith = nameof(ShowTankInvulnerability))]
+        [Order(75, collapseWith = nameof(ShowTankInvulnerability))]
         public bool UseCustomInvulnerabilityColor = true;
 
         [ColorEdit4("Tank Invulnerability Color ##TankInvulnerabilityCustom")]
-        [Order(50, collapseWith = nameof(UseCustomInvulnerabilityColor))]
+        [Order(80, collapseWith = nameof(UseCustomInvulnerabilityColor))]
         public PluginConfigColor CustomInvulnerabilityColor = new PluginConfigColor(new Vector4(100f / 255f, 100f / 255f, 100f / 255f, 100f / 100f));
 
-        [NestedConfig("Left Text", 55)]
+        [NestedConfig("Left Text", 85)]
         public EditableLabelConfig LeftLabelConfig;
 
-        [NestedConfig("Right Text", 60)]
+        [NestedConfig("Right Text", 90)]
         public EditableLabelConfig RightLabelConfig;
 
-        [NestedConfig("Shields", 65)]
+        [NestedConfig("Shields", 95)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
-        [NestedConfig("Tank Stance", 70)]
+        [NestedConfig("Tank Stance", 100)]
         public TankStanceIndicatorConfig? TankStanceIndicatorConfig = null;
 
         public UnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)

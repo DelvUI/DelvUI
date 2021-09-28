@@ -59,7 +59,7 @@ namespace DelvUI.Interface
 
                 if (ImGui.Button("Export configuration"))
                 {
-                    _exportString = ConfigurationManager.GetInstance().ConfigBaseNode.GetBase64String();
+                    _exportString = ConfigurationManager.Instance.ConfigBaseNode.GetBase64String();
                 }
 
                 ImGui.SameLine();

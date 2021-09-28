@@ -24,7 +24,7 @@ namespace DelvUI.Config.Tree
         {
             foreach (Node child in children)
             {
-                child.Save(ConfigurationManager.GetInstance().ConfigDirectory);
+                child.Save(ConfigurationManager.Instance.ConfigDirectory);
             }
         }
 
@@ -32,7 +32,7 @@ namespace DelvUI.Config.Tree
         {
             foreach (Node child in children)
             {
-                child.Load(ConfigurationManager.GetInstance().ConfigDirectory);
+                child.Load(ConfigurationManager.Instance.ConfigDirectory);
             }
         }
 
@@ -227,7 +227,7 @@ namespace DelvUI.Config.Tree
                 ImGui.BeginGroup(); // Left
 
                 {
-                    TextureWrap? delvUiBanner = ConfigurationManager.GetInstance().BannerImage;
+                    TextureWrap? delvUiBanner = ConfigurationManager.Instance.BannerImage;
 
                     if (delvUiBanner != null)
                     {
@@ -282,17 +282,17 @@ namespace DelvUI.Config.Tree
             ImGui.PopStyleColor();
 
             ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
-            if (ImGui.Button((ConfigurationManager.GetInstance().ShowHUD ? "Hide" : "Show") + " HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
+            if (ImGui.Button((ConfigurationManager.Instance.ShowHUD ? "Hide" : "Show") + " HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
-                ConfigurationManager.GetInstance().ShowHUD = !ConfigurationManager.GetInstance().ShowHUD;
+                ConfigurationManager.Instance.ShowHUD = !ConfigurationManager.Instance.ShowHUD;
             }
             ImGui.PopStyleVar();
             ImGui.SameLine();
             ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
 
-            if (ImGui.Button((ConfigurationManager.GetInstance().LockHUD ? "Unlock" : "Lock") + " HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
+            if (ImGui.Button((ConfigurationManager.Instance.LockHUD ? "Unlock" : "Lock") + " HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
-                ConfigurationManager.GetInstance().LockHUD = !ConfigurationManager.GetInstance().LockHUD;
+                ConfigurationManager.Instance.LockHUD = !ConfigurationManager.Instance.LockHUD;
             }
             ImGui.PopStyleVar();
 
@@ -336,7 +336,7 @@ namespace DelvUI.Config.Tree
 
             if (changed)
             {
-                ConfigurationManager.GetInstance().SaveConfigurations();
+                ConfigurationManager.Instance.SaveConfigurations();
             }
         }
 
@@ -467,7 +467,7 @@ namespace DelvUI.Config.Tree
                     ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f));
                     if (ImGui.Button(FontAwesomeIcon.Times.ToIconString(), new Vector2(20, 20)))
                     {
-                        ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
+                        ConfigurationManager.Instance.DrawConfigWindow = !ConfigurationManager.Instance.DrawConfigWindow;
                     }
                     ImGui.PopStyleColor();
                     ImGui.PopFont();
@@ -788,7 +788,7 @@ namespace DelvUI.Config.Tree
                     // see comments on ConfigPageNode's Load
                     MethodInfo? methodInfo = typeof(ConfigurationManager)?.GetMethod("LoadImportString");
                     MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigObject.GetType());
-                    PluginConfigObject? importedConfigObject = (PluginConfigObject?)function?.Invoke(ConfigurationManager.GetInstance(), new object[] { importString });
+                    PluginConfigObject? importedConfigObject = (PluginConfigObject?)function?.Invoke(ConfigurationManager.Instance, new object[] { importString });
 
                     if (importedConfigObject != null)
                     {

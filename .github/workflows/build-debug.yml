@@ -74,5 +74,5 @@ jobs:
         with:
           name: DelvUI-debug-${{ github.sha }}
           path: |
-            DelvUI/bin/Debug.ILMerge
-            !DelvUI/bin/Debug.ILMerge/DelvUI
+            DelvUI/bin/x64/Debug
+            !DelvUI/bin/x64/Debug/DelvUI

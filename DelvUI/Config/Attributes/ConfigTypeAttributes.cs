@@ -302,8 +302,13 @@ namespace DelvUI.Config.Attributes
 
         public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            int? fieldVal = (int?)field.GetValue(config);
-            int intVal = fieldVal.HasValue ? fieldVal.Value : 0;
+            object? fieldVal = field.GetValue(config);
+
+            int intVal = 0;
+            if (fieldVal != null)
+            {
+                intVal = (int)fieldVal;
+            }
 
             if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, options.Length, 4))
             {
@@ -402,14 +407,13 @@ namespace DelvUI.Config.Attributes
             ImGui.Text("Add");
             if (ImGui.Combo("##Add" + idText + friendlyName, ref intVal, addOptions.ToArray(), addOptions.Count, 6))
             {
+                changed = true;
+
                 var change = addOptions[intVal];
                 opts.Add(change);
                 field.SetValue(config, opts);
 
-                if (isMonitored && config is IOnChangeEventArgs eventObject)
-                {
-                    TriggerChangeEvent<string>(config, field.Name, change, ChangeType.ListAdd);
-                }
+                TriggerChangeEvent<string>(config, field.Name, change, ChangeType.ListAdd);
             }
 
             ImGui.Text(friendlyName + ":");
@@ -462,22 +466,16 @@ namespace DelvUI.Config.Attributes
 
             if (indexToRemove >= 0)
             {
+                changed = true;
+
                 var change = opts[indexToRemove];
                 opts.Remove(change);
                 field.SetValue(config, opts);
 
-                if (isMonitored && config is IOnChangeEventArgs eventObject)
-                {
-                    eventObject.OnValueChanged(
-                        new OnChangeEventArgs<string>(field.Name, change, ChangeType.ListRemove)
-                    );
-                }
-
+                TriggerChangeEvent<string>(config, field.Name, change, ChangeType.ListRemove);
             }
 
             ImGui.EndChild();
-
-
 
             return changed;
         }
@@ -490,7 +488,7 @@ namespace DelvUI.Config.Attributes
 
         public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            var fontsConfig = ConfigurationManager.GetInstance().GetConfigObject<FontsConfig>();
+            var fontsConfig = ConfigurationManager.Instance.GetConfigObject<FontsConfig>();
             if (fontsConfig == null)
             {
                 return false;
@@ -537,23 +535,6 @@ namespace DelvUI.Config.Attributes
         public AnchorAttribute(string friendlyName)
             : base(friendlyName, new string[] { "Center", "Left", "Right", "Top", "TopLeft", "TopRight", "Bottom", "BottomLeft", "BottomRight" })
         {
-        }
-
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
-        {
-            DrawAnchor? fieldVal = (DrawAnchor?)field.GetValue(config);
-            int intVal = fieldVal.HasValue ? (int)fieldVal.Value : 0;
-
-            if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, options.Length, 4))
-            {
-                field.SetValue(config, (DrawAnchor)intVal);
-
-                TriggerChangeEvent<int>(config, field.Name, intVal);
-
-                return true;
-            }
-
-            return false;
         }
     }
 

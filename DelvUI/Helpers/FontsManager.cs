@@ -8,7 +8,7 @@ using Dalamud.Logging;
 
 namespace DelvUI.Helpers
 {
-    public class FontsManager
+    public class FontsManager : IDisposable
     {
         #region Singleton
         private FontsManager(string basePath)
@@ -31,18 +31,39 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            _config = ConfigurationManager.GetInstance().GetConfigObject<FontsConfig>();
-            ConfigurationManager.GetInstance().ResetEvent += OnConfigReset;
+            _config = ConfigurationManager.Instance.GetConfigObject<FontsConfig>();
+            ConfigurationManager.Instance.ResetEvent += OnConfigReset;
         }
 
         private void OnConfigReset(ConfigurationManager sender)
         {
             _config = sender.GetConfigObject<FontsConfig>();
         }
+
+        ~FontsManager()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
+            Instance = null!;
+        }
         #endregion
 
         public readonly string FontsPath;
-
 
         public bool DefaultFontBuilt { get; private set; }
         public ImFontPtr DefaultFont { get; private set; } = null;
@@ -83,7 +104,7 @@ namespace DelvUI.Helpers
             _fonts.Clear();
             DefaultFontBuilt = false;
 
-            var config = ConfigurationManager.GetInstance().GetConfigObject<FontsConfig>();
+            var config = ConfigurationManager.Instance.GetConfigObject<FontsConfig>();
             ImGuiIOPtr io = ImGui.GetIO();
             var ranges = GetCharacterRanges(config, io);
 
