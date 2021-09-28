@@ -206,19 +206,19 @@ namespace DelvUI.Interface.StatusEffects
         [Order(5)]
         public Vector2 Size = new(40, 40);
 
-        [NestedConfig("Duration", 10)]
+        [NestedConfig("Duration", 10, separator = false, spacing = true)]
         public LabelConfig DurationLabelConfig;
 
-        [NestedConfig("Stacks", 15)]
+        [NestedConfig("Stacks", 15, separator = false, spacing = true)]
         public LabelConfig StacksLabelConfig;
 
-        [NestedConfig("Border", 20)]
+        [NestedConfig("Border", 20, separator = false, spacing = true)]
         public StatusEffectIconBorderConfig BorderConfig = new();
 
-        [NestedConfig("Dispellable Effects Border", 25)]
+        [NestedConfig("Dispellable Effects Border", 25, separator = false, spacing = true)]
         public StatusEffectIconBorderConfig DispellableBorderConfig = new(new PluginConfigColor(new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f)), 2);
 
-        [NestedConfig("My Effects Border", 30)]
+        [NestedConfig("My Effects Border", 30, separator = false, spacing = true)]
         public StatusEffectIconBorderConfig OwnedBorderConfig = new(new PluginConfigColor(new Vector4(35f / 255f, 179f / 255f, 69f / 255f, 100f / 100f)), 1);
 
         public StatusEffectIconConfig(LabelConfig? durationLabelConfig = null, LabelConfig? stacksLabelConfig = null)

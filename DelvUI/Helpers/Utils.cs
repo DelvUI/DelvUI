@@ -125,9 +125,11 @@ namespace DelvUI.Helpers
             var newColorLab = new LabColor(resultL, resultA, resultB);
             var newColorLab2RGB = _labToRgb.Convert(newColorLab);
 
+            float alpha = (fullHealthColor.Vector.W - lowHealthColor.Vector.W) * ratio + lowHealthColor.Vector.W;
+
             newColorLab2RGB.Clamp();
 
-            PluginConfigColor newColor = new PluginConfigColor(new Vector4((float)newColorLab2RGB.R, (float)newColorLab2RGB.G, (float)newColorLab2RGB.B, 100f / 100f));
+            PluginConfigColor newColor = new PluginConfigColor(new Vector4((float)newColorLab2RGB.R, (float)newColorLab2RGB.G, (float)newColorLab2RGB.B, alpha));
             return newColor;
         }
 

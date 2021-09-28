@@ -400,209 +400,209 @@ namespace DelvUI.Interface.Jobs
 
         #region espirit
         [Checkbox("Show Esprit Guage", separator = true)]
-        [CollapseControl(30, 0)]
+        [Order(30)]
         public bool EspritGuageEnabled = true;
 
         [Checkbox("Show Esprit Guage Text")]
-        [CollapseWith(0, 0)]
+        [Order(35, collapseWith = nameof(EspritGuageEnabled))]
         public bool EspritTextEnabled = true;
 
         [DragFloat2("Esprit Gauge Size", min = 1f, max = 2000f)]
-        [CollapseWith(5, 0)]
+        [Order(40, collapseWith = nameof(EspritGuageEnabled))]
         public Vector2 EspritGaugeSize = new(254, 20);
 
         [DragFloat2("Esprit Gauge Position", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 0)]
+        [Order(45, collapseWith = nameof(EspritGuageEnabled))]
         public Vector2 EspritGaugePosition = new(0, -54);
 
         [DragFloat("Esprit Gauge Chunk Padding", min = -4000f, max = 4000f)]
-        [CollapseWith(15, 0)]
+        [Order(50, collapseWith = nameof(EspritGuageEnabled))]
         public float EspritGaugeChunkPadding = 2;
 
         [ColorEdit4("Esprit Guage Color")]
-        [CollapseWith(20, 0)]
+        [Order(55, collapseWith = nameof(EspritGuageEnabled))]
         public PluginConfigColor EspritGaugeColor = new(new Vector4(72f / 255f, 20f / 255f, 99f / 255f, 100f / 100f));
         #endregion
 
         #region feathers
         [Checkbox("Show Feather Guage", separator = true)]
-        [CollapseControl(35, 1)]
+        [Order(60)]
         public bool FeatherGuageEnabled = true;
 
         [Checkbox("Enable Flourishing Finish Glow")]
-        [CollapseWith(0, 1)]
+        [Order(65, collapseWith = nameof(FeatherGuageEnabled))]
         public bool FlourishingGlowEnabled = true;
 
         [DragFloat2("Feather Guage Size", min = 1f, max = 2000f)]
-        [CollapseWith(5, 1)]
+        [Order(70, collapseWith = nameof(FeatherGuageEnabled))]
         public Vector2 FeatherGaugeSize = new(254, 10);
 
         [DragFloat2("Feather Gauge Position", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 1)]
+        [Order(75, collapseWith = nameof(FeatherGuageEnabled))]
         public Vector2 FeatherGaugePosition = new(0, -71);
 
         [DragFloat("Feather Gauge Chunk Padding", min = -4000f, max = 4000f)]
-        [CollapseWith(15, 1)]
+        [Order(80, collapseWith = nameof(FeatherGuageEnabled))]
         public float FeatherGaugeChunkPadding = 2;
 
         [ColorEdit4("Feather Guage Color")]
-        [CollapseWith(20, 1)]
+        [Order(85, collapseWith = nameof(FeatherGuageEnabled))]
         public PluginConfigColor FeatherGaugeColor = new(new Vector4(175f / 255f, 229f / 255f, 29f / 255f, 100f / 100f));
 
         [ColorEdit4("Flourishing Finish Glow Color")]
-        [CollapseWith(25, 1)]
+        [Order(90, collapseWith = nameof(FeatherGuageEnabled))]
         public PluginConfigColor FlourishingProcColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
         #endregion
 
         #region buff bars
         [Checkbox("Show Buff Bar", separator = true)]
-        [CollapseControl(40, 2)]
+        [Order(95)]
         public bool BuffBarEnabled = true;
 
         [Checkbox("Show Technical Finish Bar")]
-        [CollapseWith(0, 2)]
+        [Order(100, collapseWith = nameof(BuffBarEnabled))]
         public bool TechnicalBarEnabled = true;
 
         [Checkbox("Show Technical Finish Bar Text")]
-        [CollapseWith(5, 2)]
+        [Order(105, collapseWith = nameof(BuffBarEnabled))]
         public bool TechnicalTextEnabled = true;
 
         [Checkbox("Show Devilment Bar")]
-        [CollapseWith(10, 2)]
+        [Order(110, collapseWith = nameof(BuffBarEnabled))]
         public bool DevilmentBarEnabled = true;
 
         [Checkbox("Show Devilment Bar Text")]
-        [CollapseWith(15, 2)]
+        [Order(115, collapseWith = nameof(BuffBarEnabled))]
         public bool DevilmentTextEnabled = true;
 
         [DragFloat2("Buff Bars Size", min = 1f, max = 2000f)]
-        [CollapseWith(20, 2)]
+        [Order(120, collapseWith = nameof(BuffBarEnabled))]
         public Vector2 BuffBarSize = new(254, 20);
 
         [DragFloat2("Buff Bars Position", min = -4000f, max = 4000f)]
-        [CollapseWith(25, 2)]
+        [Order(125, collapseWith = nameof(BuffBarEnabled))]
         public Vector2 BuffBarPosition = new(0, -32);
 
         [ColorEdit4("Technical Finish Bar Color")]
-        [CollapseWith(30, 2)]
+        [Order(130, collapseWith = nameof(BuffBarEnabled))]
         public PluginConfigColor TechnicalFinishBarColor = new(new Vector4(255f / 255f, 9f / 255f, 102f / 255f, 100f / 100f));
 
         [ColorEdit4("Devilment Bar Color")]
-        [CollapseWith(35, 2)]
+        [Order(135, collapseWith = nameof(BuffBarEnabled))]
         public PluginConfigColor DevilmentBarColor = new(new Vector4(52f / 255f, 78f / 255f, 29f / 255f, 100f / 100f));
         #endregion
 
         #region standard finish
         [Checkbox("Show Standard Finish Bar", separator = true)]
-        [CollapseControl(45, 3)]
+        [Order(140)]
         public bool StandardBarEnabled = true;
 
         [Checkbox("Show Standard Finish Bar Text")]
-        [CollapseWith(0, 3)]
+        [Order(145, collapseWith = nameof(StandardBarEnabled))]
         public bool StandardTextEnabled = true;
 
         [DragFloat2("Standard Finish Bar Size", min = 1f, max = 2000f)]
-        [CollapseWith(5, 3)]
+        [Order(150, collapseWith = nameof(StandardBarEnabled))]
         public Vector2 StandardBarSize = new(254, 20);
 
         [DragFloat2("Standard Finish Bar Position", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 3)]
+        [Order(155, collapseWith = nameof(StandardBarEnabled))]
         public Vector2 StandardBarPosition = new(0, -10);
 
         [ColorEdit4("Standard Finish Bar Color")]
-        [CollapseWith(15, 3)]
+        [Order(160, collapseWith = nameof(StandardBarEnabled))]
         public PluginConfigColor StandardFinishBarColor = new(new Vector4(0f / 255f, 193f / 255f, 95f / 255f, 100f / 100f));
         #endregion
 
         #region steps
         [Checkbox("Show Step Bars", separator = true)]
-        [CollapseControl(50, 4)]
+        [Order(165)]
         public bool StepBarEnabled = true;
 
         [Checkbox("Show Step Glow")]
-        [CollapseWith(0, 4)]
+        [Order(170, collapseWith = nameof(StepBarEnabled))]
         public bool StepGlowEnabled = true;
 
         [Checkbox("Show Dance Ready Glow")]
-        [CollapseWith(5, 4)]
+        [Order(175, collapseWith = nameof(StepBarEnabled))]
         public bool DanceReadyGlowEnabled = true;
 
         [DragFloat2("Step Bars Size", min = 1f, max = 2000f)]
-        [CollapseWith(10, 4)]
+        [Order(180, collapseWith = nameof(StepBarEnabled))]
         public Vector2 StepBarSize = new(254, 10);
 
         [DragFloat2("Step Bars Position", min = -4000f, max = 4000f)]
-        [CollapseWith(15, 4)]
+        [Order(185, collapseWith = nameof(StepBarEnabled))]
         public Vector2 StepBarPosition = new(0, -93);
 
         [DragFloat("Step Bar Chunk Padding", min = -4000f, max = 4000f)]
-        [CollapseWith(20, 4)]
+        [Order(190, collapseWith = nameof(StepBarEnabled))]
         public float StepBarChunkPadding = 2;
 
         [ColorEdit4("Current Step Glow Color")]
-        [CollapseWith(25, 4)]
+        [Order(195, collapseWith = nameof(StepBarEnabled))]
         public PluginConfigColor CurrentStepGlowColor = new(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [ColorEdit4("Emboite Color")]
-        [CollapseWith(30, 4)]
+        [Order(200, collapseWith = nameof(StepBarEnabled))]
         public PluginConfigColor EmboiteColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Entrechat Color")]
-        [CollapseWith(35, 4)]
+        [Order(205, collapseWith = nameof(StepBarEnabled))]
         public PluginConfigColor EntrechatColor = new(new Vector4(0f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
 
         [ColorEdit4("Jete Color")]
-        [CollapseWith(40, 4)]
+        [Order(210, collapseWith = nameof(StepBarEnabled))]
         public PluginConfigColor JeteColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Pirouette Color")]
-        [CollapseWith(45, 4)]
+        [Order(215, collapseWith = nameof(StepBarEnabled))]
         public PluginConfigColor PirouetteColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Dance Ready Color")]
-        [CollapseWith(50, 4)]
+        [Order(220, collapseWith = nameof(StepBarEnabled))]
         public PluginConfigColor DanceReadyColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
         #endregion
 
         #region procs
         [Checkbox("Show Proc Bars", separator = true)]
-        [CollapseControl(55, 5)]
+        [Order(225)]
         public bool ProcBarEnabled = true;
 
         [Checkbox("Use Static Proc Bars")]
-        [CollapseWith(0, 5)]
+        [Order(230, collapseWith = nameof(ProcBarEnabled))]
         public bool StaticProcBarsEnabled = true;
 
         [DragFloat2("Proc Bars Size", min = 1f, max = 2000f)]
-        [CollapseWith(10, 5)]
+        [Order(235, collapseWith = nameof(ProcBarEnabled))]
         public Vector2 ProcBarSize = new(254, 10);
 
         [DragFloat2("Proc Bars Position", min = -4000f, max = 4000f)]
-        [CollapseWith(15, 5)]
+        [Order(240, collapseWith = nameof(ProcBarEnabled))]
         public Vector2 ProcBarPosition = new(0, -83);
 
         [DragFloat("Proc Bar Chunk Padding", min = -4000f, max = 4000f)]
-        [CollapseWith(20, 5)]
+        [Order(245, collapseWith = nameof(ProcBarEnabled))]
         public float ProcBarChunkPadding = 2;
 
         [DragDropHorizontal("Procs Order", "Cascade", "Fountain", "Windmill", "Shower")]
-        [CollapseWith(25, 5)]
+        [Order(250, collapseWith = nameof(ProcBarEnabled))]
         public int[] procsOrder = new int[] { 0, 1, 2, 3 };
 
         [ColorEdit4("Flourishing Cascade Color")]
-        [CollapseWith(30, 5)]
+        [Order(255, collapseWith = nameof(ProcBarEnabled))]
         public PluginConfigColor FlourishingCascadeColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Flourishing Fountain Color")]
-        [CollapseWith(35, 5)]
+        [Order(260, collapseWith = nameof(ProcBarEnabled))]
         public PluginConfigColor FlourishingFountainColor = new(new Vector4(255f / 255f, 215f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Flourishing Windmill Color")]
-        [CollapseWith(40, 5)]
+        [Order(265, collapseWith = nameof(ProcBarEnabled))]
         public PluginConfigColor FlourishingWindmillColor = new(new Vector4(0f / 255f, 215f / 255f, 215f / 255f, 100f / 100f));
 
         [ColorEdit4("Flourishing Shower Color")]
-        [CollapseWith(45, 5)]
+        [Order(270, collapseWith = nameof(ProcBarEnabled))]
         public PluginConfigColor FlourishingShowerColor = new(new Vector4(255f / 255f, 100f / 255f, 0f / 255f, 100f / 100f));
         #endregion
     }

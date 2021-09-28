@@ -89,39 +89,39 @@ namespace DelvUI.Interface.Party
     public class PartyFramesColorsConfig : PluginConfigObject
     {
         [Checkbox("Use Role Colors", isMonitored = true)]
-        [CollapseControl(0, 0)]
+        [Order(5)]
         public bool UseRoleColors = false;
 
         [ColorEdit4("Tank Role Color")]
-        [CollapseWith(0, 0)]
+        [Order(10, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor TankRoleColor = new PluginConfigColor(new Vector4(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f));
 
         [ColorEdit4("DPS Role Color")]
-        [CollapseWith(5, 0)]
+        [Order(15, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor DPSRoleColor = new PluginConfigColor(new Vector4(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f));
 
         [ColorEdit4("Healer Role Color")]
-        [CollapseWith(10, 0)]
+        [Order(20, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor HealerRoleColor = new PluginConfigColor(new Vector4(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f));
 
         [ColorEdit4("Generic Role Color")]
-        [CollapseWith(15, 0)]
+        [Order(25, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor GenericRoleColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
         [Checkbox("Highlight When Hovering With Cursor")]
-        [CollapseControl(5, 1)]
+        [Order(30)]
         public bool ShowHighlight = true;
 
         [ColorEdit4("Highlight Color")]
-        [CollapseWith(0, 1)]
+        [Order(35, collapseWith = nameof(ShowHighlight))]
         public PluginConfigColor HighlightColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 5f / 100f));
 
         [ColorEdit4("Background Color")]
-        [Order(10)]
+        [Order(40, collapseWith = nameof(ShowHighlight))]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 70f / 100f));
 
         [ColorEdit4("Out of Reach Color")]
-        [Order(15)]
+        [Order(45, collapseWith = nameof(ShowHighlight))]
         public PluginConfigColor UnreachableColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 30f / 100f));
     }
 
@@ -137,15 +137,15 @@ namespace DelvUI.Interface.Party
         public float Alpha = 25;
 
         [Checkbox("Use Additional Range Check")]
-        [CollapseControl(15, 0)]
+        [Order(15)]
         public bool UseAdditionalRangeCheck = false;
 
         [DragInt("Additional Range (yalms)", min = 1, max = 500)]
-        [CollapseWith(0, 0)]
+        [Order(20, collapseWith = nameof(UseAdditionalRangeCheck))]
         public int AdditionalRange = 15;
 
         [DragFloat("Additional Alpha", min = 1, max = 100)]
-        [CollapseWith(5, 0)]
+        [Order(25, collapseWith = nameof(UseAdditionalRangeCheck))]
         public float AdditionalAlpha = 60;
 
         public float AlphaForDistance(int distance)
@@ -231,11 +231,11 @@ namespace DelvUI.Interface.Party
         public int Style = 0;
 
         [Checkbox("Use Role Icons")]
-        [CollapseControl(40, 0)]
+        [Order(40)]
         public bool UseRoleIcons = false;
 
         [Checkbox("Use Specific DPS Role Icons")]
-        [CollapseWith(0, 0)]
+        [Order(45, collapseWith = nameof(UseRoleIcons))]
         public bool UseSpecificDPSRoleIcons = false;
     }
 

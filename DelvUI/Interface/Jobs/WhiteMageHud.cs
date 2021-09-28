@@ -194,50 +194,50 @@ namespace DelvUI.Interface.Jobs
 
         #region Lily Bar
         [Checkbox("Lily" + "##Lily", separator = true)]
-        [CollapseControl(30, 0)]
+        [Order(30)]
         public bool ShowLilyBars = true;
 
         [Checkbox("Timer" + "##Lily")]
-        [CollapseWith(0, 0)]
+        [Order(35, collapseWith = nameof(ShowLilyBars))]
         public bool ShowLilyBarTimer = true;
 
         [DragFloat2("Position" + "##Lily", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 0)]
+        [Order(40, collapseWith = nameof(ShowLilyBars))]
         public Vector2 LilyBarPosition = new(-64, -54);
 
         [DragFloat2("Size" + "##Lily", max = 2000f)]
-        [CollapseWith(10, 0)]
+        [Order(45, collapseWith = nameof(ShowLilyBars))]
         public Vector2 LilyBarSize = new(125, 20);
 
         [DragInt("Spacing" + "##Lily", min = 0, max = 1000)]
-        [CollapseWith(15, 0)]
+        [Order(50, collapseWith = nameof(ShowLilyBars))]
         public int LilyBarPad = 2;
 
         [ColorEdit4("Color" + "##Lily")]
-        [CollapseWith(20, 0)]
+        [Order(55, collapseWith = nameof(ShowLilyBars))]
         public PluginConfigColor LilyColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
 
         [ColorEdit4("Charging Color" + "##Lily")] //TODO CHANGE TO GLOBAL PARTIALLY FILLED COLOR?
-        [CollapseWith(25, 0)]
+        [Order(60, collapseWith = nameof(ShowLilyBars))]
         public PluginConfigColor LilyChargingColor = new(new Vector4(141f / 255f, 141f / 255f, 141f / 255f, 1f));
         #endregion
 
         #region Blood Lily Bar
 
         [DragFloat2("Position" + "##BloodLily", min = -4000f, max = 4000f, spacing = true)]
-        [CollapseWith(30, 0)]
+        [Order(65, collapseWith = nameof(ShowLilyBars))]
         public Vector2 BloodLilyBarPosition = new(64, -54);
 
         [DragFloat2("Size" + "##BloodLily", max = 2000f)]
-        [CollapseWith(35, 0)]
+        [Order(70, collapseWith = nameof(ShowLilyBars))]
         public Vector2 BloodLilyBarSize = new(125, 20);
 
         [DragInt("Spacing" + "##BloodLily", min = 0, max = 1000)]
-        [CollapseWith(40, 0)]
+        [Order(75, collapseWith = nameof(ShowLilyBars))]
         public int BloodLilyBarPad = 2;
 
         [ColorEdit4("Color" + "##BloodLily")]
-        [CollapseWith(45, 0)]
+        [Order(80, collapseWith = nameof(ShowLilyBars))]
         public PluginConfigColor BloodLilyColor = new(new Vector4(199f / 255f, 40f / 255f, 9f / 255f, 1f));
         #endregion
 
@@ -245,47 +245,47 @@ namespace DelvUI.Interface.Jobs
         
         // enable
         [Checkbox("Dia", separator = true)]
-        [CollapseControl(35, 1)]
+        [Order(85)]
         public bool ShowDiaBar = true;
         
         // show dia timer
         [Checkbox("Timer")]
-        [CollapseWith(0, 1)]
+        [Order(90, collapseWith = nameof(ShowDiaBar))]
         public bool ShowDiaTimer = false;
 
         // pos
         [DragFloat2("Position" + "##Dia", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 1)]
+        [Order(95, collapseWith = nameof(ShowDiaBar))]
         public Vector2 DiaBarPosition = new(0, -32);
         
         // size
         [DragFloat2("Size " + "##Dia", max = 2000f)]
-        [CollapseWith(10, 1)]
+        [Order(100, collapseWith = nameof(ShowDiaBar))]
         public Vector2 DiaBarSize = new(254, 20);
 
         // color
         [ColorEdit4("Color" + "##Dia")]
-        [CollapseWith(15, 1)]
+        [Order(105, collapseWith = nameof(ShowDiaBar))]
         public PluginConfigColor DiaColor = new(new Vector4(0f / 255f, 64f / 255f, 1f, 1f));
         
         // refresh reminder enable
         [Checkbox("Show Refresh Reminder", spacing = true)]
-        [CollapseWith(20, 1)]
+        [Order(110, collapseWith = nameof(ShowDiaBar))]
         public bool ShowDiaRefresh = false;
 
         // refresh reminder value
         [DragInt("Refresh Reminder", min = 0, max = 30)]
-        [CollapseWith(25, 1)]
+        [Order(115, collapseWith = nameof(ShowDiaBar))]
         public int DiaCustomRefresh = 3;
 
         // refresh reminder color
         [ColorEdit4("Refresh Color")]
-        [CollapseWith(30, 1)]
+        [Order(120, collapseWith = nameof(ShowDiaBar))]
         public PluginConfigColor DiaRefreshColor = new(new(190f / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
         
         // hide dia bar if inactive
         [Checkbox("Hide when effect is not applied", spacing = true)]
-        [CollapseWith(35, 1)]
+        [Order(125, collapseWith = nameof(ShowDiaBar))]
         public bool HideInactiveDiaBar = false;
         #endregion
     }

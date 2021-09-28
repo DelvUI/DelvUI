@@ -11,8 +11,8 @@ namespace DelvUI.Config
 {
     public abstract class PluginConfigObject : IOnChangeEventArgs
     {
-        [Checkbox("Enabled", separator = true)]
-        [Order(0)]
+        [Checkbox("Enabled")]
+        [Order(0, collapseWith = null)]
         public bool Enabled = true;
 
         [JsonIgnore]

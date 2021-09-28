@@ -231,127 +231,127 @@ namespace DelvUI.Interface.Jobs
 
         #region mana bar
         [Checkbox("Mana", separator = true)]
-        [CollapseControl(30, 0)]
+        [Order(30)]
         public bool ShowManaBar = true;
 
         [Checkbox("Text" + "##MP")]
-        [CollapseWith(0, 0)]
+        [Order(35, collapseWith = nameof(ShowManaBar))]
         public bool ShowManaBarText = true;
 
         [Checkbox("Split Bar" + "##MP")]
-        [CollapseWith(5, 0)]
+        [Order(40, collapseWith = nameof(ShowManaBar))]
         public bool ChunkManaBar = true;
 
         [DragFloat2("Position" + "##MP", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 0)]
+        [Order(45, collapseWith = nameof(ShowManaBar))]
         public Vector2 ManaBarPosition = new(0, -76);
 
         [DragFloat2("Size" + "##MP", max = 2000f)]
-        [CollapseWith(15, 0)]
+        [Order(50, collapseWith = nameof(ShowManaBar))]
         public Vector2 ManaBarSize = new(254, 20);
 
         [DragInt("Spacing" + "##MP", max = 100)]
-        [CollapseWith(20, 0)]
+        [Order(55, collapseWith = nameof(ShowManaBar))]
         public int ManaBarPadding = 2;
 
         [ColorEdit4("Color" + "##MP")]
-        [CollapseWith(25, 0)]
+        [Order(60, collapseWith = nameof(ShowManaBar))]
         public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
         #endregion
 
         #region oath gauge
         [Checkbox("Oath Gauge", separator = true)]
-        [CollapseControl(35, 1)]
+        [Order(65)]
         public bool ShowOathGauge = true;
 
         [Checkbox("Text" + "##Oath")]
-        [CollapseWith(0, 1)]
+        [Order(70, collapseWith = nameof(ShowOathGauge))]
         public bool ShowOathGaugeText = true;
 
         [DragFloat2("Position" + "##Oath", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 1)]
+        [Order(75, collapseWith = nameof(ShowOathGauge))]
         public Vector2 OathGaugePosition = new(0, -54);
 
         [DragFloat2("Size" + "##Oath", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 1)]
+        [Order(80, collapseWith = nameof(ShowOathGauge))]
         public Vector2 OathGaugeSize = new(254, 20);
 
         [DragInt("Spacing" + "##Oath", max = 100)]
-        [CollapseWith(15, 1)]
+        [Order(85, collapseWith = nameof(ShowOathGauge))]
         public int OathGaugePadding = 2;
 
         [ColorEdit4("Color" + "##Oath")]
-        [CollapseWith(20, 1)]
+        [Order(90, collapseWith = nameof(ShowOathGauge))]
         public PluginConfigColor OathGaugeColor = new(new Vector4(24f / 255f, 80f / 255f, 175f / 255f, 100f / 100f));
         #endregion
 
         #region buff
         [Checkbox("Fight or Flight & Requiescat", separator = true)]
-        [CollapseControl(40, 2)]
+        [Order(95)]
         public bool ShowBuffBar = true;
 
         [Checkbox("Timer" + "##Buff")]
-        [CollapseWith(0, 2)]
+        [Order(100, collapseWith = nameof(ShowBuffBar))]
         public bool ShowBuffBarText = true;
 
         [DragFloat2("Position" + "##Buff", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 2)]
+        [Order(105, collapseWith = nameof(ShowBuffBar))]
         public Vector2 BuffBarPosition = new(0, -32);
 
         [DragFloat2("Size" + "##Buff", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 2)]
+        [Order(110, collapseWith = nameof(ShowBuffBar))]
         public Vector2 BuffBarSize = new(254, 20);
 
         [ColorEdit4("Fight or Flight" + "##Buff")]
-        [CollapseWith(15, 2)]
+        [Order(115, collapseWith = nameof(ShowBuffBar))]
         public PluginConfigColor FightOrFlightColor = new(new Vector4(240f / 255f, 50f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Requiescat" + "##Buff")]
-        [CollapseWith(20, 2)]
+        [Order(120, collapseWith = nameof(ShowBuffBar))]
         public PluginConfigColor RequiescatColor = new(new Vector4(61f / 255f, 61f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         #region atonement
         [Checkbox("Atonement" + "##Atonement", separator = true)]
-        [CollapseControl(45, 3)]
+        [Order(125)]
         public bool ShowAtonementBar = true;
 
         [DragFloat2("Position" + "##Atonement", min = -4000f, max = 4000f)]
-        [CollapseWith(0, 3)]
+        [Order(130, collapseWith = nameof(ShowAtonementBar))]
         public Vector2 AtonementBarPosition = new(0, -10);
 
         [DragFloat2("Size" + "##Atonement", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 3)]
+        [Order(135, collapseWith = nameof(ShowAtonementBar))]
         public Vector2 AtonementBarSize = new(254, 20);
 
         [DragInt("Spacing" + "##Atonement", max = 100)]
-        [CollapseWith(10, 3)]
+        [Order(140, collapseWith = nameof(ShowAtonementBar))]
         public int AtonementBarPadding = 2;
 
         [ColorEdit4("Color" + "##Atonement")]
-        [CollapseWith(15, 3)]
+        [Order(145, collapseWith = nameof(ShowAtonementBar))]
         public PluginConfigColor AtonementColor = new(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f));
         #endregion
 
         #region goring blade
         [Checkbox("Goring Blade" + "##GoringBlade", separator = true)]
-        [CollapseControl(50, 4)]
+        [Order(150)]
         public bool ShowGoringBladeBar = true;
 
         [Checkbox("Timer" + "##GoringBlade")]
-        [CollapseWith(0, 4)]
+        [Order(155, collapseWith = nameof(ShowGoringBladeBar))]
         public bool ShowGoringBladeBarText = true;
 
         [DragFloat2("Position" + "##GoringBlade", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 4)]
+        [Order(160, collapseWith = nameof(ShowGoringBladeBar))]
         public Vector2 GoringBladeBarPosition = new(0, -98);
 
         [DragFloat2("Size" + "##GoringBlade", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 4)]
+        [Order(165, collapseWith = nameof(ShowGoringBladeBar))]
         public Vector2 GoringBladeBarSize = new(254, 20);
 
         [ColorEdit4("Color" + "##GoringBlade")]
-        [CollapseWith(15, 4)]
+        [Order(170, collapseWith = nameof(ShowGoringBladeBar))]
         public PluginConfigColor GoringBladeColor = new(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f));
         #endregion
     }

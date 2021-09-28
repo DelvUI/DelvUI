@@ -299,163 +299,163 @@ namespace DelvUI.Interface.Jobs
 
         #region balance bar
         [Checkbox("Show Balance Bar", separator = true)]
-        [CollapseControl(30, 0)]
+        [Order(30)]
         public bool ShowBalanceBar = true;
 
         [DragFloat2("Balance Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(0, 0)]
+        [Order(35, collapseWith = nameof(ShowBalanceBar))]
         public Vector2 BalanceBarPosition = new Vector2(0, -32);
 
         [DragFloat2("Balance Bar Size", max = 2000f)]
-        [CollapseWith(5, 0)]
+        [Order(40, collapseWith = nameof(ShowBalanceBar))]
         public Vector2 BalanceBarSize = new Vector2(22, 20);
 
         [ColorEdit4("Balance Bar Color")]
-        [CollapseWith(10, 0)]
+        [Order(45, collapseWith = nameof(ShowBalanceBar))]
         public PluginConfigColor BalanceBarColor = new PluginConfigColor(new(195f / 255f, 35f / 255f, 35f / 255f, 100f / 100f));
         #endregion
 
         #region white mana bar
         [Checkbox("Show White Mana Bar", separator = true)]
-        [CollapseControl(35, 1)]
+        [Order(50)]
         public bool ShowWhiteManaBar = true;
 
         [DragFloat2("White Mana Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(0, 1)]
+        [Order(55, collapseWith = nameof(ShowWhiteManaBar))]
         public Vector2 WhiteManaBarPosition = new Vector2(-70, -32);
 
         [DragFloat2("White Mana Bar Size", max = 2000f)]
-        [CollapseWith(5, 1)]
+        [Order(60, collapseWith = nameof(ShowWhiteManaBar))]
         public Vector2 WhiteManaBarSize = new Vector2(114, 20);
 
         [Checkbox("Show White Mana Value")]
-        [CollapseWith(10, 1)]
+        [Order(65, collapseWith = nameof(ShowWhiteManaBar))]
         public bool ShowWhiteManaValue = true;
 
         [Checkbox("Invert White Mana Bar")]
-        [CollapseWith(15, 1)]
+        [Order(70, collapseWith = nameof(ShowWhiteManaBar))]
         public bool WhiteManaBarInverted = true;
 
         [ColorEdit4("White Mana Bar Color")]
-        [CollapseWith(20, 1)]
+        [Order(75, collapseWith = nameof(ShowWhiteManaBar))]
         public PluginConfigColor WhiteManaBarColor = new PluginConfigColor(new(221f / 255f, 212f / 255f, 212f / 255f, 100f / 100f));
         #endregion
 
         #region black mana bar
         [Checkbox("Show Black Mana Bar", separator = true)]
-        [CollapseControl(40, 2)]
+        [Order(80)]
         public bool ShowBlackManaBar = true;
 
         [DragFloat2("Black Mana Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(0, 2)]
+        [Order(85, collapseWith = nameof(ShowBlackManaBar))]
         public Vector2 BlackManaBarPosition = new Vector2(70, -32);
 
         [DragFloat2("Black Mana Bar Size", max = 2000f)]
-        [CollapseWith(5, 2)]
+        [Order(90, collapseWith = nameof(ShowBlackManaBar))]
         public Vector2 BlackManaBarSize = new Vector2(114, 20);
 
         [Checkbox("Show Black Mana Value")]
-        [CollapseWith(10, 2)]
+        [Order(95, collapseWith = nameof(ShowBlackManaBar))]
         public bool ShowBlackManaValue = true;
 
         [Checkbox("Invert Black Mana Bar")]
-        [CollapseWith(15, 2)]
+        [Order(100, collapseWith = nameof(ShowBlackManaBar))]
         public bool BlackManaBarInverted = false;
 
         [ColorEdit4("Black Mana Bar Color")]
-        [CollapseWith(20, 2)]
+        [Order(105, collapseWith = nameof(ShowBlackManaBar))]
         public PluginConfigColor BlackManaBarColor = new PluginConfigColor(new(60f / 255f, 81f / 255f, 197f / 255f, 100f / 100f));
         #endregion
 
         #region acceleration
         [Checkbox("Show Acceleration Bar", separator = true)]
-        [CollapseControl(45, 3)]
+        [Order(110)]
         public bool ShowAcceleration = true;
 
         [DragFloat2("Acceleration Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(0, 3)]
+        [Order(115, collapseWith = nameof(ShowAcceleration))]
         public Vector2 AccelerationBarPosition = new Vector2(0, -50);
 
         [DragFloat2("Acceleration Size", max = 2000f)]
-        [CollapseWith(5, 3)]
+        [Order(120, collapseWith = nameof(ShowAcceleration))]
         public Vector2 AccelerationBarSize = new Vector2(254, 12);
 
         [DragInt("Acceleration Padding", max = 1000)]
-        [CollapseWith(10, 3)]
+        [Order(125, collapseWith = nameof(ShowAcceleration))]
         public int AccelerationBarPadding = 2;
 
         [ColorEdit4("Acceleration Bar Color")]
-        [CollapseWith(15, 3)]
+        [Order(130, collapseWith = nameof(ShowAcceleration))]
         public PluginConfigColor AccelerationBarColor = new PluginConfigColor(new(194f / 255f, 74f / 255f, 74f / 255f, 100f / 100f));
         #endregion
 
         #region dualcast
         [Checkbox("Show Dualcast", separator = true)]
-        [CollapseControl(50, 4)]
+        [Order(140)]
         public bool ShowDualCast = true;
 
         [DragFloat2("Dualcast Position", min = -2000f, max = 2000f)]
-        [CollapseWith(0, 4)]
+        [Order(145, collapseWith = nameof(ShowDualCast))]
         public Vector2 DualCastPosition = new Vector2(0, -66);
 
         [DragFloat2("Dualcast Size", max = 2000f)]
-        [CollapseWith(5, 4)]
+        [Order(150, collapseWith = nameof(ShowDualCast))]
         public Vector2 DualCastSize = new Vector2(18, 16);
 
         [ColorEdit4("Dualcast Color")]
-        [CollapseWith(10, 4)]
+        [Order(155, collapseWith = nameof(ShowDualCast))]
         public PluginConfigColor DualCastColor = new PluginConfigColor(new(204f / 255f, 17f / 255f, 255f / 95f, 100f / 100f));
         #endregion
 
         #region verstone
         [Checkbox("Show Verstone Procs", separator = true)]
-        [CollapseControl(55, 5)]
+        [Order(160)]
         public bool ShowVerstoneProcs = true;
 
         [Checkbox("Show Verstone Text")]
-        [CollapseWith(0, 5)]
+        [Order(165, collapseWith = nameof(ShowVerstoneProcs))]
         public bool ShowVerstoneText = true;
 
         [Checkbox("Invert Verstone Bar")]
-        [CollapseWith(5, 5)]
+        [Order(170, collapseWith = nameof(ShowVerstoneProcs))]
         public bool InvertVerstoneBar = true;
 
         [DragFloat2("Verstone Bar Position", min = -2000, max = 2000f)]
-        [CollapseWith(10, 5)]
+        [Order(175, collapseWith = nameof(ShowVerstoneProcs))]
         public Vector2 VerstoneBarPosition = new Vector2(-69, -66);
 
         [DragFloat2("Verstone Bar Size", max = 2000f)]
-        [CollapseWith(15, 5)]
+        [Order(180, collapseWith = nameof(ShowVerstoneProcs))]
         public Vector2 VerstoneBarSize = new Vector2(116, 16);
 
         [ColorEdit4("Verstone Color")]
-        [CollapseWith(20, 5)]
+        [Order(185, collapseWith = nameof(ShowVerstoneProcs))]
         public PluginConfigColor VerstoneColor = new PluginConfigColor(new(228f / 255f, 188f / 255f, 145 / 255f, 90f / 100f));
         #endregion
 
         #region verfire
         [Checkbox("Show Verfire Procs", separator = true)]
-        [CollapseControl(130, 6)]
+        [Order(190)]
         public bool ShowVerfireProcs = true;
 
         [Checkbox("Show Verfire Text")]
-        [CollapseWith(0, 6)]
+        [Order(195, collapseWith = nameof(ShowVerfireProcs))]
         public bool ShowVerfireText = true;
 
         [Checkbox("Invert Verfire Bar")]
-        [CollapseWith(5, 6)]
+        [Order(200, collapseWith = nameof(ShowVerfireProcs))]
         public bool InvertVerfireBar = false;
 
         [DragFloat2("Verfire Bar Position", min = -2000, max = 2000f)]
-        [CollapseWith(10, 6)]
+        [Order(205, collapseWith = nameof(ShowVerfireProcs))]
         public Vector2 VerfireBarPosition = new Vector2(69, -66);
 
         [DragFloat2("Verfire Bar Size", max = 2000f)]
-        [CollapseWith(15, 6)]
+        [Order(210, collapseWith = nameof(ShowVerfireProcs))]
         public Vector2 VerfireBarSize = new Vector2(116, 16);
 
         [ColorEdit4("Verfire Color")]
-        [CollapseWith(20, 6)]
+        [Order(215, collapseWith = nameof(ShowVerfireProcs))]
         public PluginConfigColor VerfireColor = new PluginConfigColor(new(238f / 255f, 119f / 255f, 17 / 255f, 90f / 100f));
         #endregion
     }
