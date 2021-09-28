@@ -14,6 +14,7 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -22,6 +23,7 @@ namespace DelvUI.Interface.Jobs
         private new WhiteMageConfig Config => (WhiteMageConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
+        private readonly SpellHelper _spellHelper = new();
 
         public WhiteMageHud(string id, WhiteMageConfig config, string? displayName = null) : base(id, config, displayName)
         {
@@ -52,15 +54,58 @@ namespace DelvUI.Interface.Jobs
 
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            if (Config.ShowLilyBars)
+            if (Config.ShowLilyBars) { DrawLilyBars(origin); }
+            if (Config.ShowDiaBar) { DrawDiaBar(origin, player); }
+            if (Config.ShowAsylumBar) { DrawAsylumBar(origin, player); }
+            if (Config.ShowPresenceOfMindBar) { DrawPresenceOfMindBar(origin, player); }
+            if (Config.ShowPlenaryBar) { DrawPlenaryBar(origin, player); }
+            if (Config.ShowTemperanceBar) { DrawTemperanceBar(origin, player); }
+        }
+        
+                private void DrawLilyBars(Vector2 origin)
+        {
+            WHMGauge gauge = Plugin.JobGauges.Get<WHMGauge>();
+
+            const float lilyCooldown = 30000f;
+
+            float GetScale(int num, float timer) => num + (timer / lilyCooldown);
+
+            float lilyScale = GetScale(gauge.Lily, gauge.LilyTimer);
+
+            var posX = origin.X + Config.Position.X + Config.LilyBarPosition.X - Config.LilyBarSize.X / 2f;
+            var posY = origin.Y + Config.Position.Y + Config.LilyBarPosition.Y - Config.LilyBarSize.Y / 2f;
+
+            BarBuilder builder = BarBuilder.Create(posX, posY, Config.LilyBarSize.Y, Config.LilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
+
+            builder.SetChunks(3).SetChunkPadding(Config.LilyBarPad).AddInnerBar(lilyScale, 3, Config.LilyColor, PartialFillColor);
+
+            if (Config.ShowLilyBarTimer)
             {
-                DrawLilyBars(origin);
+                string timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
+                Vector2 size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
+                float lilyChunkSize = (Config.LilyBarSize.X / 3f) + Config.LilyBarPad;
+                float lilyChunkOffset = lilyChunkSize * (gauge.Lily + 1);
+
+                if (gauge.Lily < 3)
+                {
+                    DrawHelper.DrawOutlinedText(timer, new Vector2(
+                        posX + lilyChunkOffset - (lilyChunkSize / 2f) - (size.X / 2f),
+                        posY - Config.LilyBarSize.Y - 4f));
+                }
             }
 
-            if (Config.ShowDiaBar)
-            {
-                DrawDiaBar(origin, player);
-            }
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            builder.Build().Draw(drawList);
+
+            posX = origin.X + Config.Position.X + Config.BloodLilyBarPosition.X - Config.BloodLilyBarSize.X / 2f;
+            posY = origin.Y + Config.Position.Y + Config.BloodLilyBarPosition.Y - Config.BloodLilyBarSize.Y / 2f;
+
+            builder = BarBuilder.Create(posX, posY, Config.BloodLilyBarSize.Y, Config.BloodLilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
+
+            builder.SetChunks(3).SetChunkPadding(Config.BloodLilyBarPad).AddInnerBar(gauge.BloodLily, 3, Config.BloodLilyColor);
+
+            drawList = ImGui.GetWindowDrawList();
+            builder.Build().Draw(drawList);
         }
 
         private void DrawDiaBar(Vector2 origin, PlayerCharacter player)
@@ -132,49 +177,219 @@ namespace DelvUI.Interface.Jobs
             );
         }
 
-        private void DrawLilyBars(Vector2 origin)
+        private void DrawAsylumBar(Vector2 origin, PlayerCharacter player)
         {
-            WHMGauge gauge = Plugin.JobGauges.Get<WHMGauge>();
-
-            const float lilyCooldown = 30000f;
-
-            float GetScale(int num, float timer) => num + (timer / lilyCooldown);
-
-            float lilyScale = GetScale(gauge.Lily, gauge.LilyTimer);
-
-            var posX = origin.X + Config.Position.X + Config.LilyBarPosition.X - Config.LilyBarSize.X / 2f;
-            var posY = origin.Y + Config.Position.Y + Config.LilyBarPosition.Y - Config.LilyBarSize.Y / 2f;
-
-            BarBuilder builder = BarBuilder.Create(posX, posY, Config.LilyBarSize.Y, Config.LilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
-
-            builder.SetChunks(3).SetChunkPadding(Config.LilyBarPad).AddInnerBar(lilyScale, 3, Config.LilyColor, PartialFillColor);
-
-            if (Config.ShowLilyBarTimer)
-            {
-                string timer = (lilyCooldown / 1000f - gauge.LilyTimer / 1000f).ToString("0.0");
-                Vector2 size = ImGui.CalcTextSize((lilyCooldown / 1000).ToString("0.0"));
-                float lilyChunkSize = (Config.LilyBarSize.X / 3f) + Config.LilyBarPad;
-                float lilyChunkOffset = lilyChunkSize * (gauge.Lily + 1);
-
-                if (gauge.Lily < 3)
-                {
-                    DrawHelper.DrawOutlinedText(timer, new Vector2(
-                        posX + lilyChunkOffset - (lilyChunkSize / 2f) - (size.X / 2f),
-                        posY - Config.LilyBarSize.Y - 4f));
-                }
-            }
-
+            // draw list
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            
+            // status effect
+            const int spellStatus = 1911; // Asylum Status
+            const int spellAction = 3569; // Asylum Action
+            List<Status> asylumBuff = player.StatusList.Where(o => o.StatusId == spellStatus).ToList();
+            
+            // get duration
+            float duration = 0f;
+            const float maxDuration = 24f;
+            
+            // get cooldown
+            float cooldown = _spellHelper.GetSpellCooldown(spellAction);
+            const float maxCooldown = 90f;
+            
+            // positions
+            float xPos = origin.X + Config.Position.X + Config.AsylumPosition.X - Config.AsylumSize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.AsylumPosition.Y - Config.AsylumSize.Y / 2f;
+
+            // select first
+            if (asylumBuff.Any()) { duration = Math.Abs(asylumBuff.First().RemainingTime); }
+            
+            // create asylum bar
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.AsylumSize.Y, Config.AsylumSize.X);
+            
+            // inner bar config
+            var currentValue = cooldown >= 0 && duration <= 0  ? maxCooldown - cooldown : duration;
+            var maximumValue = cooldown >= 0 && duration <= 0  ? maxCooldown : maxDuration;
+            var color = Config.AsylumColor;
+            
+            // text
+            var positon = BarTextPosition.CenterMiddle;
+            var type = BarTextType.Custom;
+            var mode = BarTextMode.Single;
+
+            var text = cooldown >= 0 && duration <= 0
+                    ? cooldown == 0
+                        ? "Ready"
+                        : cooldown.ToString("N0")
+
+                    : duration == 0
+                        ? ""
+                        : duration.ToString("N0")
+                ;
+           
+            builder.AddInnerBar(currentValue, maximumValue, color);
+            builder.SetText(positon, type, text);
+            builder.SetTextMode(mode);
             builder.Build().Draw(drawList);
+        }
 
-            posX = origin.X + Config.Position.X + Config.BloodLilyBarPosition.X - Config.BloodLilyBarSize.X / 2f;
-            posY = origin.Y + Config.Position.Y + Config.BloodLilyBarPosition.Y - Config.BloodLilyBarSize.Y / 2f;
+        private void DrawPresenceOfMindBar(Vector2 origin, PlayerCharacter player)
+        {
+            // draw list
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            
+            // status effect
+            const int spellStatus = 157; // Presence of Mind Status
+            const int spellAction = 136; // Presence of Mind Action
+            List<Status> presenceOfMindBuff = player.StatusList.Where(o => o.StatusId == spellStatus).ToList();
+            
+            // get duration
+            float duration = 0f;
+            const float maxDuration = 15f;
+            
+            // get cooldown
+            float cooldown = _spellHelper.GetSpellCooldown(spellAction);
+            const float maxCooldown = 150f;
+            
+            // positions
+            float xPos = origin.X + Config.Position.X + Config.PresenceOfMindPosition.X - Config.PresenceOfMindSize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.PresenceOfMindPosition.Y - Config.PresenceOfMindSize.Y / 2f;
 
-            builder = BarBuilder.Create(posX, posY, Config.BloodLilyBarSize.Y, Config.BloodLilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
+            // select first
+            if (presenceOfMindBuff.Any()) { duration = Math.Abs(presenceOfMindBuff.First().RemainingTime); }
+            
+            // create presence of mind bar
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.PresenceOfMindSize.Y, Config.PresenceOfMindSize.X);
+            
+            // inner bar config
+            var currentValue = cooldown >= 0 && duration <= 0  ? maxCooldown - cooldown : duration;
+            var maximumValue = cooldown >= 0 && duration <= 0  ? maxCooldown : maxDuration;
+            var color = Config.PresenceOfMindColor;
+            
+            // text
+            var positon = BarTextPosition.CenterMiddle;
+            var type = BarTextType.Custom;
+            var mode = BarTextMode.Single;
 
-            builder.SetChunks(3).SetChunkPadding(Config.BloodLilyBarPad).AddInnerBar(gauge.BloodLily, 3, Config.BloodLilyColor);
+            var text = cooldown >= 0 && duration <= 0
+                    ? cooldown == 0
+                        ? "Ready"
+                        : cooldown.ToString("N0")
 
-            drawList = ImGui.GetWindowDrawList();
+                    : duration == 0
+                        ? ""
+                        : duration.ToString("N0")
+                ;
+           
+            builder.AddInnerBar(currentValue, maximumValue, color);
+            builder.SetText(positon, type, text);
+            builder.SetTextMode(mode);
+            builder.Build().Draw(drawList);
+        }
+        
+        private void DrawPlenaryBar(Vector2 origin, PlayerCharacter player)
+        {
+            // draw list
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            
+            // status effect
+            const int spellStatus = 1219; // Plenary Indulgence Status
+            const int spellAction = 7433; // Plenary Indulgence Action
+            List<Status> plenaryIndulgence = player.StatusList.Where(o => o.StatusId == spellStatus).ToList();
+            
+            // get duration
+            float duration = 0f;
+            const float maxDuration = 10f;
+            
+            // get cooldown
+            float cooldown = _spellHelper.GetSpellCooldown(spellAction);
+            const float maxCooldown = 60f;
+            
+            // positions
+            float xPos = origin.X + Config.Position.X + Config.PlenaryPosition.X - Config.PlenarySize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.PlenaryPosition.Y - Config.PlenarySize.Y / 2f;
+
+            // select first
+            if (plenaryIndulgence.Any()) { duration = Math.Abs(plenaryIndulgence.First().RemainingTime); }
+            
+            // create plenary indulgence bar
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.PlenarySize.Y, Config.PlenarySize.X);
+            
+            // inner bar config
+            var currentValue = cooldown >= 0 && duration <= 0  ? maxCooldown - cooldown : duration;
+            var maximumValue = cooldown >= 0 && duration <= 0  ? maxCooldown : maxDuration;
+            var color = Config.PlenaryColor;
+            
+            // text
+            var positon = BarTextPosition.CenterMiddle;
+            var type = BarTextType.Custom;
+            var mode = BarTextMode.Single;
+
+            var text = cooldown >= 0 && duration <= 0
+                    ? cooldown == 0
+                        ? "Ready"
+                        : cooldown.ToString("N0")
+
+                    : duration == 0
+                        ? ""
+                        : duration.ToString("N0")
+                ;
+           
+            builder.AddInnerBar(currentValue, maximumValue, color);
+            builder.SetText(positon, type, text);
+            builder.SetTextMode(mode);
+            builder.Build().Draw(drawList);
+        }
+        
+        private void DrawTemperanceBar(Vector2 origin, PlayerCharacter player)
+        {
+            // draw list
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            
+            // status effect
+            const int spellStatus = 1872; // Temperance Status
+            const int spellAction = 16536; // Temperance Action
+            List<Status> temperanceBuff = player.StatusList.Where(o => o.StatusId == spellStatus).ToList();
+            
+            // get duration
+            float duration = 0f;
+            const float maxDuration = 20f;
+            
+            // get cooldown
+            float cooldown = _spellHelper.GetSpellCooldown(spellAction);
+            const float maxCooldown = 120f;
+            
+            // positions
+            float xPos = origin.X + Config.Position.X + Config.TemperancePosition.X - Config.TemperanceSize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.TemperancePosition.Y - Config.TemperanceSize.Y / 2f;
+
+            // select first
+            if (temperanceBuff.Any()) { duration = Math.Abs(temperanceBuff.First().RemainingTime); }
+            
+            // create temperance bar
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.TemperanceSize.Y, Config.TemperanceSize.X);
+            
+            // inner bar config
+            var currentValue = cooldown >= 0 && duration <= 0  ? maxCooldown - cooldown : duration;
+            var maximumValue = cooldown >= 0 && duration <= 0  ? maxCooldown : maxDuration;
+            var color = Config.TemperanceColor;
+            
+            // text
+            var positon = BarTextPosition.CenterMiddle;
+            var type = BarTextType.Custom;
+            var mode = BarTextMode.Single;
+
+            var text = cooldown >= 0 && duration <= 0
+                    ? cooldown == 0
+                        ? "Ready"
+                        : cooldown.ToString("N0")
+
+                    : duration == 0
+                        ? ""
+                        : duration.ToString("N0")
+                ;
+           
+            builder.AddInnerBar(currentValue, maximumValue, color);
+            builder.SetText(positon, type, text);
+            builder.SetTextMode(mode);
             builder.Build().Draw(drawList);
         }
     }
@@ -199,7 +414,7 @@ namespace DelvUI.Interface.Jobs
 
         [Checkbox("Timer" + "##Lily")]
         [CollapseWith(0, 0)]
-        public bool ShowLilyBarTimer = true;
+        public bool ShowLilyBarTimer = false;
 
         [DragFloat2("Position" + "##Lily", min = -4000f, max = 4000f)]
         [CollapseWith(5, 0)]
@@ -249,7 +464,7 @@ namespace DelvUI.Interface.Jobs
         public bool ShowDiaBar = true;
         
         // show dia timer
-        [Checkbox("Timer")]
+        [Checkbox("Timer" + "##Dia")]
         [CollapseWith(0, 1)]
         public bool ShowDiaTimer = false;
 
@@ -287,6 +502,102 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Hide when effect is not applied", spacing = true)]
         [CollapseWith(35, 1)]
         public bool HideInactiveDiaBar = false;
+        #endregion
+
+        #region Asylum Bar
+
+        // enable
+        [Checkbox("Asylum", separator = true)]
+        [CollapseControl(40, 2)]
+        public bool ShowAsylumBar = false;
+        
+        // pos
+        [DragFloat2("Position" + "##Asylum", min = -4000f, max = 4000f)]
+        [CollapseWith(5, 2)]
+        public Vector2 AsylumPosition = new(-96, -74);
+        
+        // size
+        [DragFloat2("Size " + "##Asylum", max = 2000f)]
+        [CollapseWith(10, 2)]
+        public Vector2 AsylumSize = new(62, 15);
+
+        // color
+        [ColorEdit4("Color" + "##Asylum")]
+        [CollapseWith(15, 2)]
+        public PluginConfigColor AsylumColor = new(new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f));
+
+        #endregion
+
+        #region Presence of Mind
+
+        // enable
+        [Checkbox("Presence of Mind", separator = true)]
+        [CollapseControl(45, 3)]
+        public bool ShowPresenceOfMindBar = false;
+        
+        // pos
+        [DragFloat2("Position" + "##PresenceOfMind", min = -4000f, max = 4000f)]
+        [CollapseWith(0, 3)]
+        public Vector2 PresenceOfMindPosition = new(-32, -74);
+        
+        // size
+        [DragFloat2("Size " + "##PresenceOfMind", max = 2000f)]
+        [CollapseWith(5, 3)]
+        public Vector2 PresenceOfMindSize = new(62, 15);
+
+        // color
+        [ColorEdit4("Color" + "##PresenceOfMind")]
+        [CollapseWith(10, 3)]
+        public PluginConfigColor PresenceOfMindColor = new(new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f));
+
+        #endregion
+
+        #region Plenary
+        
+        // enable
+        [Checkbox("Plenary Indulgence", separator = true)]
+        [CollapseControl(45, 4)]
+        public bool ShowPlenaryBar = false;
+        
+        // pos
+        [DragFloat2("Position" + "##Plenary", min = -4000f, max = 4000f)]
+        [CollapseWith(0, 4)]
+        public Vector2 PlenaryPosition = new(32, -74);
+        
+        // size
+        [DragFloat2("Size " + "##Plenary", max = 2000f)]
+        [CollapseWith(5, 4)]
+        public Vector2 PlenarySize = new(62, 15);
+
+        // color
+        [ColorEdit4("Color" + "##Plenary")]
+        [CollapseWith(10, 4)]
+        public PluginConfigColor PlenaryColor = new(new Vector4(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f));
+        
+        #endregion
+
+        #region Temperance
+
+        // enable
+        [Checkbox("Temperance", separator = true)]
+        [CollapseControl(45, 5)]
+        public bool ShowTemperanceBar = false;
+        
+        // pos
+        [DragFloat2("Position" + "##Temperance", min = -4000f, max = 4000f)]
+        [CollapseWith(0, 5)]
+        public Vector2 TemperancePosition = new(96, -74);
+        
+        // size
+        [DragFloat2("Size " + "##Temperance", max = 2000f)]
+        [CollapseWith(5, 5)]
+        public Vector2 TemperanceSize = new(62, 15);
+
+        // color
+        [ColorEdit4("Color" + "##Temperance")]
+        [CollapseWith(10, 5)]
+        public PluginConfigColor TemperanceColor = new(new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f));
+
         #endregion
     }
 }
