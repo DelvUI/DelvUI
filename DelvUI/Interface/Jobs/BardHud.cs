@@ -351,163 +351,163 @@ namespace DelvUI.Interface.Jobs
 
         #region song gauge
         [Checkbox("Song Gauge Enabled", separator = true)]
-        [CollapseControl(30, 0)]
+        [Order(30)]
         public bool ShowSongGauge = true;
 
         [DragFloat2("Song Gauge Size", min = 1f, max = 2000f)]
-        [CollapseWith(0, 0)]
+        [Order(35, collapseWith = nameof(ShowSongGauge))]
         public Vector2 SongGaugeSize = new(254, 20);
 
         [DragFloat2("Song Gauge Position", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 0)]
+        [Order(40, collapseWith = nameof(ShowSongGauge))]
         public Vector2 SongGaugePosition = new(0, -22);
 
         [ColorEdit4("Wanderer's Minuet Color")]
-        [CollapseWith(10, 0)]
+        [Order(45, collapseWith = nameof(ShowSongGauge))]
         public PluginConfigColor WMColor = new(new Vector4(158f / 255f, 157f / 255f, 36f / 255f, 100f / 100f));
 
         [ColorEdit4("Mage's Ballad Color")]
-        [CollapseWith(15, 0)]
+        [Order(50, collapseWith = nameof(ShowSongGauge))]
         public PluginConfigColor MBColor = new(new Vector4(143f / 255f, 90f / 255f, 143f / 255f, 100f / 100f));
 
         [ColorEdit4("Army's Paeon Color")]
-        [CollapseWith(20, 0)]
+        [Order(55, collapseWith = nameof(ShowSongGauge))]
         public PluginConfigColor APColor = new(new Vector4(207f / 255f, 205f / 255f, 52f / 255f, 100f / 100f));
         #endregion
 
         #region soul gauge
         [Checkbox("Soul Gauge Enabled", separator = true)]
-        [CollapseControl(35, 1)]
+        [Order(60)]
         public bool ShowSoulGauge = true;
 
         [Checkbox("Soul Gauge Full Glow Enabled")]
-        [CollapseWith(0, 1)]
+        [Order(65, collapseWith = nameof(ShowSoulGauge))]
         public bool ShowSoulGaugeGlow = false;
 
         [DragFloat2("Soul Gauge Size", min = 1f, max = 2000f)]
-        [CollapseWith(5, 1)]
+        [Order(70, collapseWith = nameof(ShowSoulGauge))]
         public Vector2 SoulGaugeSize = new(254, 10);
 
         [DragFloat2("Soul Gauge Position", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 1)]
+        [Order(75, collapseWith = nameof(ShowSoulGauge))]
         public Vector2 SoulGaugePosition = new(0, -5);
 
         [ColorEdit4("Soul Gauge Color")]
-        [CollapseWith(15, 1)]
+        [Order(80, collapseWith = nameof(ShowSoulGauge))]
         public PluginConfigColor SoulGaugeColor = new(new Vector4(248f / 255f, 227f / 255f, 0f / 255f, 100f / 100f));
         #endregion
 
         #region Song Procs / Stacks
         [Checkbox("Wanderer's Minuet Stacks Enabled", separator = true)]
-        [Order(40)]
+        [Order(85)]
         public bool ShowWMStacks = true;
 
         [Checkbox("Wanderer's Minuet Stacks Glow Enabled")]
-        [Order(45)]
+        [Order(90)]
         public bool ShowWMStacksGlow = false;
 
         [Checkbox("Mage's Ballad Proc Enabled")]
-        [Order(50)]
+        [Order(95)]
         public bool ShowMBProc = true;
 
         [Checkbox("Mage's Ballad Proc Glow Enabled")]
-        [Order(55)]
+        [Order(100)]
         public bool ShowMBProcGlow = false;
 
         [Checkbox("Army's Paeon Stacks Enabled")]
-        [Order(60)]
+        [Order(105)]
         public bool ShowAPStacks = true;
 
         [Checkbox("Show Empty Stack Area")]
-        [Order(65)]
+        [Order(110)]
         public bool ShowEmptyStacks = true;
 
         [DragFloat2("Stack Size", min = 1f, max = 2000f)]
-        [Order(70)]
+        [Order(115)]
         public Vector2 StackSize = new(254, 10);
 
         [DragFloat2("Stack Position", min = -4000f, max = 4000f)]
-        [Order(75)]
+        [Order(120)]
         public Vector2 StackPosition = new(0, -39);
 
         [DragInt("Stack Padding", max = 1000)]
-        [Order(80)]
+        [Order(125)]
         public int StackPadding = 2;
 
         [ColorEdit4("Wanderer's Minuet Stack Color")]
-        [Order(85)]
+        [Order(130)]
         public PluginConfigColor WMStackColor = new(new Vector4(150f / 255f, 215f / 255f, 232f / 255f, 100f / 100f));
 
         [ColorEdit4("Mage's Ballad Proc Color")]
-        [Order(90)]
+        [Order(135)]
         public PluginConfigColor MBProcColor = new(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
 
         [ColorEdit4("Army's Paeon Stack Color")]
-        [Order(95)]
+        [Order(140)]
         public PluginConfigColor APStackColor = new(new Vector4(0f / 255f, 222f / 255f, 177f / 255f, 100f / 100f));
 
         [ColorEdit4("DoT Expire Color")]
-        [Order(100)]
+        [Order(145)]
         public PluginConfigColor ExpireColor = new(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
         #endregion
 
         #region caustic bite
         [Checkbox("Caustic Bite Enabled", separator = true)]
-        [CollapseControl(105, 2)]
+        [Order(150)]
         public bool ShowCB = true;
 
         [Checkbox("Show Caustic Bite On No Target")]
-        [CollapseWith(0, 2)]
+        [Order(155, collapseWith = nameof(ShowCB))]
         public bool CBNoTarget = true;
 
         [Checkbox("Caustic Bite Value")]
-        [CollapseWith(5, 2)]
+        [Order(160, collapseWith = nameof(ShowCB))]
         public bool CBValue = true;
 
         [Checkbox("Caustic Bite Inverted")]
-        [CollapseWith(10, 2)]
+        [Order(165, collapseWith = nameof(ShowCB))]
         public bool CBInverted = true;
 
         [DragFloat2("Caustic Bite Size", max = 2000f)]
-        [CollapseWith(15, 2)]
+        [Order(170, collapseWith = nameof(ShowCB))]
         public Vector2 CBSize = new(126, 10);
 
         [DragFloat2("Caustic Bite Position", min = -4000f, max = 4000f)]
-        [CollapseWith(20, 2)]
+        [Order(175, collapseWith = nameof(ShowCB))]
         public Vector2 CBPosition = new(-64, -51);
 
         [ColorEdit4("Caustic Bite Color")]
-        [CollapseWith(25, 2)]
+        [Order(180, collapseWith = nameof(ShowCB))]
         public PluginConfigColor CBColor = new(new Vector4(182f / 255f, 68f / 255f, 235f / 255f, 100f / 100f));
         #endregion
 
         #region stormbite
         [Checkbox("Stormbite Enabled", separator = true)]
-        [CollapseControl(110, 3)]
+        [Order(185)]
         public bool ShowSB = true;
 
         [Checkbox("Show Stormbite On No Target")]
-        [CollapseWith(0, 3)]
+        [Order(190, collapseWith = nameof(ShowSB))]
         public bool SBNoTarget = true;
 
         [Checkbox("Stormbite Value")]
-        [CollapseWith(5, 3)]
+        [Order(195, collapseWith = nameof(ShowSB))]
         public bool SBValue = true;
 
         [Checkbox("Stormbite Inverted")]
-        [CollapseWith(10, 3)]
+        [Order(200, collapseWith = nameof(ShowSB))]
         public bool SBInverted = false;
 
         [DragFloat2("Stormbite Size", max = 2000f)]
-        [CollapseWith(15, 3)]
+        [Order(205, collapseWith = nameof(ShowSB))]
         public Vector2 SBSize = new(126, 10);
 
         [DragFloat2("Stormbite Position", min = -4000f, max = 4000f)]
-        [CollapseWith(20, 3)]
+        [Order(210, collapseWith = nameof(ShowSB))]
         public Vector2 SBPosition = new(64, -51);
 
         [ColorEdit4("Stormbite Color")]
-        [CollapseWith(25, 3)]
+        [Order(215, collapseWith = nameof(ShowSB))]
         public PluginConfigColor SBColor = new(new Vector4(72f / 255f, 117f / 255f, 202f / 255f, 100f / 100f));
         #endregion
     }

@@ -189,90 +189,88 @@ namespace DelvUI.Interface.Jobs
 
         #region aether
         [Checkbox("Aether" + "##Aether", separator = true)]
-        [CollapseControl(30, 1)]
+        [Order(30)]
         public bool ShowAether = true;
 
         [DragFloat2("Position" + "##Aether", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 1)]
+        [Order(35, collapseWith = nameof(ShowAether))]
         public Vector2 AetherPosition = new(0, -76);
 
         [DragFloat2("Size" + "##Aether", min = 1f, max = 2000f)]
-        [CollapseWith(10, 1)]
+        [Order(40, collapseWith = nameof(ShowAether))]
         public Vector2 AetherSize = new(254, 20);
 
         [DragInt("Spacing" + "##Aether", max = 1000)]
-        [CollapseWith(15, 1)]
+        [Order(45, collapseWith = nameof(ShowAether))]
         public int AetherPadding = 2;
 
         [ColorEdit4("Color" + "##Aether")]
-        [CollapseWith(20, 1)]
+        [Order(50, collapseWith = nameof(ShowAether))]
         public PluginConfigColor AetherColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
         #endregion
 
         #region fairy
         [Checkbox("Fairy Gauge" + "##Fairy", separator = true)]
-        [CollapseControl(35, 2)]
+        [Order(55)]
         public bool ShowFairy = true;
 
         [Checkbox("Text" + "##Fairy")]
-        [CollapseWith(0, 2)]
+        [Order(60, collapseWith = nameof(ShowFairy))]
         public bool ShowFairyText = true;
 
-
-
         [DragFloat2("Position" + "##Fairy", min = -4000f, max = 4000f)]
-        [CollapseWith(15, 2)]
+        [Order(65, collapseWith = nameof(ShowFairy))]
         public Vector2 FairyPosition = new(0, -54);
 
         [DragFloat2("Size" + "##Fairy", min = 1f, max = 2000f)]
-        [CollapseWith(20, 2)]
+        [Order(70, collapseWith = nameof(ShowFairy))]
         public Vector2 FairySize = new(254, 20);
 
         [ColorEdit4("Color" + "##Fairy")]
-        [CollapseWith(25, 2)]
+        [Order(75, collapseWith = nameof(ShowFairy))]
         public PluginConfigColor FairyColor = new(new Vector4(69f / 255f, 199 / 255f, 164f / 255f, 100f / 100f));
 
         [Checkbox("Seraph" + "##Seraph", spacing = true)]
-        [CollapseWith(30, 2)]
+        [Order(80, collapseWith = nameof(ShowFairy))]
         public bool ShowSeraph = true;
         //TODO NOT ASSIGNED? ^
 
         [Checkbox("Timer" + "##Seraph")]
-        [CollapseWith(35, 2)]
+        [Order(85, collapseWith = nameof(ShowSeraph))]
         public bool ShowSeraphText = true;
 
         [ColorEdit4("Color" + "##SeraphColor")]
-        [CollapseWith(40, 2)]
+        [Order(90, collapseWith = nameof(ShowSeraph))]
         public PluginConfigColor SeraphColor = new(new Vector4(232f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         #region bio
         [Checkbox("Bio" + "##Bio", separator = true)]
-        [CollapseControl(40, 3)]
+        [Order(95)]
         public bool ShowBio = true;
 
         [Checkbox("Timer" + "##Bio")]
-        [CollapseWith(0, 3)]
+        [Order(100, collapseWith = nameof(ShowBio))]
         public bool ShowBioText = true;
 
         [Checkbox("Invert Growth" + "##Bio")]
-        [CollapseWith(5, 3)]
+        [Order(105, collapseWith = nameof(ShowBio))]
         public bool BioInverted = false;
 
         [DragFloat2("Position" + "##Bio", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 3)]
+        [Order(110, collapseWith = nameof(ShowBio))]
         public Vector2 BioPosition = new(0, -32);
 
         [DragFloat2("Size" + "##Bio", max = 2000f)]
-        [CollapseWith(15, 3)]
+        [Order(115, collapseWith = nameof(ShowBio))]
         public Vector2 BioSize = new(254, 20);
 
         [ColorEdit4("Color" + "##Bio")]
-        [CollapseWith(20, 3)]
+        [Order(120, collapseWith = nameof(ShowBio))]
         public PluginConfigColor BioColor = new(new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 1f));
 
         [ColorEdit4("Expire Color" + "##Bio")]
-        [CollapseWith(25, 3)]
+        [Order(125, collapseWith = nameof(ShowBio))]
         public PluginConfigColor ExpireColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
         #endregion
 

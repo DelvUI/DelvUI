@@ -542,6 +542,7 @@ namespace DelvUI.Config.Attributes
     public class OrderAttribute : Attribute
     {
         public int pos;
+        public string? collapseWith = "Enabled";
 
         public OrderAttribute(int pos)
         {
@@ -551,39 +552,13 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class CollapseControlAttribute : Attribute
-    {
-        public int pos;
-        public int id;
-
-
-        public CollapseControlAttribute(int pos, int id)
-        {
-            this.pos = pos;
-            this.id = id;
-
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Field)]
-    public class CollapseWithAttribute : Attribute
-    {
-        public int pos;
-        public int id;
-
-        public CollapseWithAttribute(int pos, int id)
-        {
-            this.pos = pos;
-            this.id = id;
-
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Field)]
     public class NestedConfigAttribute : Attribute
     {
         public string friendlyName;
         public int pos;
+        public bool separator = true;
+        public bool spacing = false;
+        public string? collapseWith = null;
 
         public NestedConfigAttribute(string friendlyName, int pos)
         {

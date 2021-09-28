@@ -29,15 +29,15 @@ namespace DelvUI.Interface.GeneralElements
         public bool HideDefaultJobGauges = false;
 
         [Checkbox("Hide Default Castbar", isMonitored = true)]
-        [Order(25)]
+        [Order(30)]
         public bool HideDefaultCastbar = false;
 
         [Checkbox("Enable Combat Hotbars", isMonitored = true, spacing = true)]
-        [CollapseControl(30, 1)]
+        [Order(35)]
         public bool EnableCombatActionBars = false;
 
         [DynamicList("Hotbars Shown Only In Combat", "Hotbar 1", "Hotbar 2", "Hotbar 3", "Hotbar 4", "Hotbar 5", "Hotbar 6", "Hotbar 7", "Hotbar 8", "Hotbar 9", "Hotbar 10", isMonitored = true)]
-        [CollapseWith(0, 1)]
+        [Order(40, collapseWith = nameof(EnableCombatActionBars))]
         public List<string> CombatActionBars = new List<string>();
 
         public Vector2 CastBarOriginalPosition;

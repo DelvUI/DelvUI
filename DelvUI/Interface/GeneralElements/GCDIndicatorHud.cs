@@ -46,12 +46,7 @@ namespace DelvUI.Interface.GeneralElements
 
             if (Config.AnchorToMouse)
             {
-                startPos = Utils.GetAnchoredPosition(ImGui.GetMousePos(), Config.Size, Config.Anchor);
-
-                if (Config.OffsetMousePosition)
-                {
-                    startPos += Config.Position;
-                }
+                startPos = Utils.GetAnchoredPosition(ImGui.GetMousePos() + Config.MouseOffset, Config.Size, Config.Anchor);
             }
 
             if (Config.CircularMode)

@@ -265,155 +265,155 @@ namespace DelvUI.Interface.Jobs
 
         #region Mana Bar
         [Checkbox("Mana", separator = true)]
-        [CollapseControl(30, 0)]
+        [Order(30)]
         public bool ShowManaBar = true;
 
         [Checkbox("Text" + "##DRKManaBar")]
-        [CollapseWith(0, 0)]
+        [Order(35, collapseWith = nameof(ShowManaBar))]
         public bool ShowManaBarText = false;
 
         [Checkbox("Split Bar")]
-        [CollapseWith(5, 0)]
+        [Order(40, collapseWith = nameof(ShowManaBar))]
         public bool ChunkManaBar = true;
 
         [DragFloat2("Position" + "##DRKManaBar", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 0)]
+        [Order(45, collapseWith = nameof(ShowManaBar))]
         public Vector2 ManaBarPosition = new Vector2(0, -61);
 
         [DragFloat2("Size" + "##DRKManaBar", min = 0, max = 4000f)]
-        [CollapseWith(15, 0)]
+        [Order(50, collapseWith = nameof(ShowManaBar))]
         public Vector2 ManaBarSize = new Vector2(254, 10);
 
         [DragInt("Spacing" + "##DRKManaBar", min = 0)]
-        [CollapseWith(20, 0)]
+        [Order(55, collapseWith = nameof(ShowManaBar))]
         public int ManaBarPadding = 1;
 
-        [CollapseWith(25, 0)]
+        [Order(60, collapseWith = nameof(ShowManaBar))]
         [ColorEdit4("Mana" + "##DRKManaBar")]
         public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
 
         [ColorEdit4("Dark Arts Proc" + "##DRKManaBar")]
-        [CollapseWith(30, 0)]
+        [Order(65, collapseWith = nameof(ShowManaBar))]
         public PluginConfigColor DarkArtsColor = new(new Vector4(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
         #endregion
 
         #region Blood Gauge
         [Checkbox("Blood Gauge" + "##BloodGauge", separator = true)]
-        [CollapseControl(35, 1)]
+        [Order(70)]
         public bool ShowBloodGauge = true;
 
         [Checkbox("Split Bar" + "##BloodGauge")]
-        [CollapseWith(0, 1)]
+        [Order(75, collapseWith = nameof(ShowBloodGauge))]
         public bool ChunkBloodGauge = true;
 
         [DragFloat2("Position" + "##BloodGauge", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 1)]
+        [Order(80, collapseWith = nameof(ShowBloodGauge))]
         public Vector2 BloodGaugePosition = new Vector2(0, -49);
 
         [DragFloat2("Size" + "##BloodGauge", min = 0, max = 4000f)]
-        [CollapseWith(15, 1)]
+        [Order(85, collapseWith = nameof(ShowBloodGauge))]
         public Vector2 BloodGaugeSize = new Vector2(254, 10);
 
         [DragInt("Spacing" + "##BloodGauge", min = 0)]
-        [CollapseWith(20, 1)]
+        [Order(90, collapseWith = nameof(ShowBloodGauge))]
         public int BloodGaugePadding = 2;
 
         [ColorEdit4("Color Left" + "##BloodGauge")]
-        [CollapseWith(25, 1)]
+        [Order(95, collapseWith = nameof(ShowBloodGauge))]
         public PluginConfigColor BloodColor = new(new Vector4(196f / 255f, 20f / 255f, 122f / 255f, 100f / 100f));
 
         [ColorEdit4("Color Filled" + "##BloodGauge")]
-        [CollapseWith(30, 1)]
+        [Order(100, collapseWith = nameof(ShowBloodGauge))]
         public PluginConfigColor BloodColorFull = new(new Vector4(216f / 255f, 0f / 255f, 73f / 255f, 100f / 100f));
         #endregion
 
         #region Darkside
         [Checkbox("Darkside" + "##Darkside", separator = true)]
-        [CollapseControl(40, 2)]
+        [Order(105)]
         public bool ShowDarkside = true;
 
         [Checkbox("Only Show When Active" + "##Darkside")]
-        [CollapseWith(0, 2)]
+        [Order(110, collapseWith = nameof(ShowDarkside))]
         public bool OnlyShowWhenActive = true;
 
         [DragFloat2("Position" + "##Darkside", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 2)]
+        [Order(115, collapseWith = nameof(ShowDarkside))]
         public Vector2 DarksidePosition = new Vector2(0, -73);
 
         [DragFloat2("Size" + "##Darkside", min = 0, max = 4000f)]
-        [CollapseWith(10, 2)]
+        [Order(120, collapseWith = nameof(ShowDarkside))]
         public Vector2 DarksideSize = new Vector2(254, 10);
 
         [ColorEdit4("Darkside" + "##Darkside")]
-        [CollapseWith(15, 2)]
+        [Order(125, collapseWith = nameof(ShowDarkside))]
         public PluginConfigColor DarksideColor = new(new Vector4(209 / 255f, 38f / 255f, 204f / 255f, 100f / 100f));
 
         [ColorEdit4("Darkside Expiry" + "##Darkside")]
-        [CollapseWith(20, 2)]
+        [Order(130, collapseWith = nameof(ShowDarkside))]
         public PluginConfigColor DarksideExpiryColor = new(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [Checkbox("Show Darkside Text" + "##Darkside")]
-        [CollapseWith(25, 2)]
+        [Order(135, collapseWith = nameof(ShowDarkside))]
         public bool ShowDarksideText = true;
 
         [Checkbox("Hide When No Target" + "##Darkside")]
-        [CollapseWith(30, 2)]
+        [Order(140, collapseWith = nameof(ShowDarkside))]
         public bool HideDarksideWhenNoTarget = false;
         #endregion
 
         #region Buff Bar
         [Checkbox("Blood Weapon & Delirium", separator = true)]
-        [CollapseControl(45, 3)]
+        [Order(145)]
         public bool ShowBuffBar = false;
 
         [Checkbox("Timer" + "##DRKBuffBar")]
-        [CollapseWith(0, 3)]
+        [Order(150, collapseWith = nameof(ShowBuffBar))]
         public bool ShowBuffBarText = true;
 
         [DragFloat2("Position" + "##DRKBuffBar", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 3)]
+        [Order(155, collapseWith = nameof(ShowBuffBar))]
         public Vector2 BuffBarPosition = new Vector2(0, -32);
 
         [DragFloat2("Size" + "##DRKBuffBar", min = 0, max = 4000f)]
-        [CollapseWith(10, 3)]
+        [Order(160, collapseWith = nameof(ShowBuffBar))]
         public Vector2 BuffBarSize = new Vector2(254, 20);
 
         [DragInt("Spacing" + "##DRKBuffBar", min = 0)]
-        [CollapseWith(15, 3)]
+        [Order(165, collapseWith = nameof(ShowBuffBar))]
         public int BuffBarPadding = 2;
 
         [ColorEdit4("Blood Weapon" + "##DRKBuffBar")]
-        [CollapseWith(20, 3)]
+        [Order(170, collapseWith = nameof(ShowBuffBar))]
         public PluginConfigColor BloodWeaponColor = new(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Delirium" + "##DRKBuffBar")]
-        [CollapseWith(25, 3)]
+        [Order(175, collapseWith = nameof(ShowBuffBar))]
         public PluginConfigColor DeliriumColor = new(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         #region Living Shadow
         [Checkbox("Living Shadow", separator = true)]
-        [CollapseControl(50, 4)]
+        [Order(180)]
         public bool ShowLivingShadowBar = false;
 
         [Checkbox("Timer" + "##DRKLivingShadow")]
-        [CollapseWith(0, 4)]
+        [Order(185, collapseWith = nameof(ShowLivingShadowBar))]
         public bool ShowLivingShadowBarText = true;
 
         [DragFloat2("Position" + "##DRKLivingShadow", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 4)]
+        [Order(190, collapseWith = nameof(ShowLivingShadowBar))]
         public Vector2 LivingShadowBarPosition = new Vector2(0, -10);
 
         [DragFloat2("Size" + "##DRKLivingShadow", min = 0, max = 4000f)]
-        [CollapseWith(10, 4)]
+        [Order(195, collapseWith = nameof(ShowLivingShadowBar))]
         public Vector2 LivingShadowBarSize = new Vector2(254, 20);
 
         [DragInt("Spacing" + "##DRKLivingShadow", min = 0)]
-        [CollapseWith(15, 4)]
+        [Order(200, collapseWith = nameof(ShowLivingShadowBar))]
         public int LivingShadowPadding = 2;
 
         [ColorEdit4("Color" + "##DRKLivingShadow")]
-        [CollapseWith(20, 4)]
+        [Order(205, collapseWith = nameof(ShowLivingShadowBar))]
         public PluginConfigColor LivingShadowColor = new(new Vector4(225f / 255f, 105f / 255f, 205f / 255f, 100f / 100f));
         #endregion
     }
