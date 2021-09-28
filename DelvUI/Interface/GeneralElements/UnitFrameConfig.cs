@@ -100,68 +100,68 @@ namespace DelvUI.Interface.GeneralElements
 
     public class UnitFrameConfig : AnchorablePluginConfigObject
     {
-        [Checkbox("Custom Frame Color", separator = true)]
-        [CollapseControl(20, 0)]
+        [Checkbox("Custom Frame Color")]
+        [Order(20)]
         public bool UseCustomColor = false;
 
         [ColorEdit4("Color ##CustomFrame")]
-        [CollapseWith(0, 0)]
+        [Order(25, collapseWith = nameof(UseCustomColor))]
         public PluginConfigColor CustomColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
         [Checkbox("Color Based On Health Value ##CustomFrame")]
-        [CollapseWith(1, 0)]
+        [Order(30, collapseWith = nameof(UseCustomColor))]
         public bool UseColorBasedOnHealthValue = false;
 
         [ColorEdit4("Full Health Color ##CustomFrame")]
-        [CollapseWith(2, 0)]
+        [Order(35, collapseWith = nameof(UseColorBasedOnHealthValue))]
         public PluginConfigColor FullHealthColor = new PluginConfigColor(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Low Health Color ##CustomFrame")]
-        [CollapseWith(3, 0)]
+        [Order(40, collapseWith = nameof(UseColorBasedOnHealthValue))]
         public PluginConfigColor LowHealthColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [DragFloat("Full Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
-        [CollapseWith(4, 0)]
+        [Order(45, collapseWith = nameof(UseColorBasedOnHealthValue))]
         public float FullHealthColorThreshold = 75f;
 
         [DragFloat("Low Health Color Below Health %", min = 0f, max = 50f, velocity = 1f)]
-        [CollapseWith(5, 0)]
+        [Order(50, collapseWith = nameof(UseColorBasedOnHealthValue))]
         public float LowHealthColorThreshold = 25f;
 
         [Checkbox("Custom Background Color")]
-        [CollapseControl(25, 1)]
+        [Order(55)]
         public bool UseCustomBackgroundColor = false;
 
         [ColorEdit4("Color ##CustomBackground")]
-        [CollapseWith(0, 1)]
+        [Order(60, collapseWith = nameof(UseCustomBackgroundColor))]
         public PluginConfigColor CustomBackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [Checkbox("Job Color As Background Color")]
-        [CollapseWith(1, 1)]
+        [Order(65, collapseWith = nameof(UseCustomBackgroundColor))]
         public bool UseJobColorAsBackgroundColor = false;
 
-        [Checkbox("Tank Invulnerability", spacing = true)]
-        [Order(30)]
+        [Checkbox("Tank Invulnerability")]
+        [Order(70)]
         public bool ShowTankInvulnerability = true;
 
         [Checkbox("Tank Invulnerability Custom Color")]
-        [CollapseControl(35, 2)]
+        [Order(75, collapseWith = nameof(ShowTankInvulnerability))]
         public bool UseCustomInvulnerabilityColor = true;
 
-        [ColorEdit4("Color ##TankInvulnerabilityCustom")]
-        [CollapseWith(0, 2)]
+        [ColorEdit4("Tank Invulnerability Color ##TankInvulnerabilityCustom")]
+        [Order(80, collapseWith = nameof(UseCustomInvulnerabilityColor))]
         public PluginConfigColor CustomInvulnerabilityColor = new PluginConfigColor(new Vector4(100f / 255f, 100f / 255f, 100f / 255f, 100f / 100f));
 
-        [NestedConfig("Left Text", 40)]
+        [NestedConfig("Left Text", 85)]
         public EditableLabelConfig LeftLabelConfig;
 
-        [NestedConfig("Right Text", 45)]
+        [NestedConfig("Right Text", 90)]
         public EditableLabelConfig RightLabelConfig;
 
-        [NestedConfig("Shields", 50)]
+        [NestedConfig("Shields", 95)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
-        [NestedConfig("Tank Stance", 51)]
+        [NestedConfig("Tank Stance", 100)]
         public TankStanceIndicatorConfig? TankStanceIndicatorConfig = null;
 
         public UnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)

@@ -504,7 +504,7 @@ namespace DelvUI.Interface
             return config;
         }
 
-        [DragFloat("Background Alpha", min = 0, max = 1, velocity = .05f, spacing = true)]
+        [DragFloat("Background Alpha", min = 0, max = 1, velocity = .05f)]
         [Order(10)]
         public float BackgroundAlpha = 0.3f;
 
@@ -516,15 +516,15 @@ namespace DelvUI.Interface
 
         public bool ShowAnchorPoints = true;
         [Checkbox("Grid Divisions", spacing = true)]
-        [CollapseControl(25, 0)]
+        [Order(25)]
         public bool ShowGrid = true;
 
         [DragInt("Divisions Distance", min = 50, max = 500)]
-        [CollapseWith(0, 0)]
+        [Order(30, collapseWith = nameof(ShowGrid))]
         public int GridDivisionsDistance = 50;
 
         [DragInt("Subdivision Count", min = 1, max = 10)]
-        [CollapseWith(5, 0)]
+        [Order(35, collapseWith = nameof(ShowGrid))]
         public int GridSubdivisionCount = 4;
     }
 }

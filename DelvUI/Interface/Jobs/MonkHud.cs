@@ -442,217 +442,217 @@ namespace DelvUI.Interface.Jobs
 
         #region Demolish Bar
         [Checkbox("Demolish", separator = true)]
-        [CollapseControl(30, 0)]
+        [Order(30)]
         public bool ShowDemolishBar = true;
 
         [Checkbox("Only Show When Active" + "##Demolish")]
-        [CollapseWith(0, 0)]
+        [Order(35, collapseWith = nameof(ShowDemolishBar))]
         public bool OnlyShowDemolishWhenActive = false;
 
         [DragFloat2("Position" + "##Demolish", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 0)]
+        [Order(40, collapseWith = nameof(ShowDemolishBar))]
         public Vector2 DemolishBarPosition = new(71, -10);
 
         [DragFloat2("Size" + "##Demolish", min = 0, max = 4000f)]
-        [CollapseWith(10, 0)]
+        [Order(45, collapseWith = nameof(ShowDemolishBar))]
         public Vector2 DemolishBarSize = new(111, 20);
 
         [ColorEdit4("Color" + "##Demolish")]
-        [CollapseWith(15, 0)]
+        [Order(50, collapseWith = nameof(ShowDemolishBar))]
         public PluginConfigColor DemolishBarFillColor = new(new Vector4(246f / 255f, 169f / 255f, 255f / 255f, 100f / 100f));
 
         [Checkbox("Text" + "##Demolish")]
-        [CollapseWith(20, 0)]
+        [Order(55, collapseWith = nameof(ShowDemolishBar))]
         public bool ShowDemolishText = true;
         #endregion
 
         #region Chakra Bar
         [Checkbox("Chakra", separator = true)]
-        [CollapseControl(35, 1)]
+        [Order(60)]
         public bool ShowChakraBar = true;
 
         [Checkbox("Only Show When Active" + "##Chakra")]
-        [CollapseWith(0, 1)]
+        [Order(65, collapseWith = nameof(ShowChakraBar))]
         public bool OnlyShowChakraWhenActive = false;
 
         [DragFloat2("Position" + "##Chakra", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 1)]
+        [Order(70, collapseWith = nameof(ShowChakraBar))]
         public Vector2 ChakraBarPosition = new(0, -32);
 
         [DragFloat2("Size" + "##Chakra", min = 0, max = 4000f)]
-        [CollapseWith(10, 1)]
+        [Order(75, collapseWith = nameof(ShowChakraBar))]
         public Vector2 ChakraBarSize = new(254, 20);
 
         [ColorEdit4("Color" + "##Chakra")]
-        [CollapseWith(15, 1)]
+        [Order(80, collapseWith = nameof(ShowChakraBar))]
         public PluginConfigColor ChakraBarFillColor = new(new Vector4(204f / 255f, 115f / 255f, 0f, 100f / 100f));
         #endregion
 
         #region Leaden Fist Bar
         [Checkbox("Leaden Fist", separator = true)]
-        [CollapseControl(40, 2)]
+        [Order(85)]
         public bool ShowLeadenFistBar = true;
 
         [Checkbox("Only Show When Active" + "##LeadenFist")]
-        [CollapseWith(0, 2)]
+        [Order(90, collapseWith = nameof(ShowLeadenFistBar))]
         public bool OnlyShowLeadenFistWhenActive = false;
 
         [DragFloat2("Position" + "##LeadenFist", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 2)]
+        [Order(95, collapseWith = nameof(ShowLeadenFistBar))]
         public Vector2 LeadenFistBarPosition = new(0, -10);
 
         [DragFloat2("Size" + "##LeadenFist", min = 0, max = 4000f)]
-        [CollapseWith(10, 2)]
+        [Order(100, collapseWith = nameof(ShowLeadenFistBar))]
         public Vector2 LeadenFistBarSize = new(28, 20);
 
         [ColorEdit4("Color" + "##LeadenFist")]
-        [CollapseWith(15, 2)]
+        [Order(105, collapseWith = nameof(ShowLeadenFistBar))]
         public PluginConfigColor LeadenFistBarFillColor = new(new Vector4(255f / 255f, 0f, 0f, 100f / 100f));
 
         [Checkbox("Text" + "##LeadenFist")]
-        [CollapseWith(20, 2)]
+        [Order(110, collapseWith = nameof(ShowLeadenFistBar))]
         public bool ShowLeadenFistText = false;
 
         [Checkbox("Vertical" + "##LeadenFist")]
-        [CollapseWith(25, 2)]
+        [Order(115, collapseWith = nameof(ShowLeadenFistBar))]
         public bool LeadenFistVertical = true;
         #endregion
 
         #region Twin Snakes Bar
         [Checkbox("Twin Snakes", separator = true)]
-        [CollapseControl(45, 3)]
+        [Order(120)]
         public bool ShowTwinSnakesBar = true;
 
         [Checkbox("Only Show When Active" + "##TwinSnakes")]
-        [CollapseWith(0, 3)]
+        [Order(125, collapseWith = nameof(ShowTwinSnakesBar))]
         public bool OnlyShowTwinSnakesWhenActive = false;
 
         [DragFloat2("Position" + "##TwinSnakes", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 3)]
+        [Order(130, collapseWith = nameof(ShowTwinSnakesBar))]
         public Vector2 TwinSnakesBarPosition = new(-71, -10);
 
         [DragFloat2("Size" + "##TwinSnakes", min = 0, max = 4000f)]
-        [CollapseWith(10, 3)]
+        [Order(135, collapseWith = nameof(ShowTwinSnakesBar))]
         public Vector2 TwinSnakesBarSize = new(111, 20);
 
         [ColorEdit4("Color" + "##TwinSnakes")]
-        [CollapseWith(15, 3)]
+        [Order(140, collapseWith = nameof(ShowTwinSnakesBar))]
         public PluginConfigColor TwinSnakesBarFillColor = new(new Vector4(227f / 255f, 255f / 255f, 64f / 255f, 100f / 100f));
 
         [Checkbox("Text" + "##TwinSnakes")]
-        [CollapseWith(20, 3)]
+        [Order(145, collapseWith = nameof(ShowTwinSnakesBar))]
         public bool ShowTwinSnakesText = true;
 
         [Checkbox("Inverted" + "##TwinSnakes")]
-        [CollapseWith(25, 3)]
+        [Order(150, collapseWith = nameof(ShowTwinSnakesBar))]
         public bool TwinSnakesBarInverted = true;
         #endregion
 
         #region Riddle of Earth
         [Checkbox("Riddle of Earth", separator = true)]
-        [CollapseControl(50, 4)]
+        [Order(155)]
         public bool ShowRiddleofEarthBar = true;
 
         [Checkbox("Only Show When Active" + "##RiddleofEarth")]
-        [CollapseWith(0, 4)]
+        [Order(160, collapseWith = nameof(ShowRiddleofEarthBar))]
         public bool OnlyShowRiddleOfEarthWhenActive = false;
 
         [DragFloat2("Position" + "##RiddleofEarth", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 4)]
+        [Order(165, collapseWith = nameof(ShowRiddleofEarthBar))]
         public Vector2 RiddleofEarthBarPosition = new(-69, -54);
 
         [DragFloat2("Size" + "##RiddleofEarth", min = 0, max = 4000f)]
-        [CollapseWith(10, 4)]
+        [Order(170, collapseWith = nameof(ShowRiddleofEarthBar))]
         public Vector2 RiddleofEarthBarSize = new(115, 20);
 
         [ColorEdit4("Color" + "##RiddleofEarth")]
-        [CollapseWith(15, 4)]
+        [Order(175, collapseWith = nameof(ShowRiddleofEarthBar))]
         public PluginConfigColor RiddleofEarthBarFillColor = new(new Vector4(157f / 255f, 59f / 255f, 255f / 255f, 100f / 100f));
 
         [Checkbox("Text" + "##RiddleofEarth")]
-        [CollapseWith(20, 4)]
+        [Order(180, collapseWith = nameof(ShowRiddleofEarthBar))]
         public bool ShowRiddleofEarthText = true;
 
         [Checkbox("Inverted" + "##RiddleofEarth")]
-        [CollapseWith(25, 4)]
+        [Order(185, collapseWith = nameof(ShowRiddleofEarthBar))]
         public bool RiddleofEarthInverted = true;
         #endregion
 
         #region Perfect Balance
         [Checkbox("Perfect Balance", separator = true)]
-        [CollapseControl(55, 5)]
+        [Order(190)]
         public bool ShowPerfectBalanceBar = true;
 
         [Checkbox("Only Show When Active" + "##PerfectBalance")]
-        [CollapseWith(0, 5)]
+        [Order(195, collapseWith = nameof(ShowPerfectBalanceBar))]
         public bool OnlyShowPerfectBalanceWhenActive = false;
 
         [DragFloat2("Position" + "##PerfectBalance", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 5)]
+        [Order(200, collapseWith = nameof(ShowPerfectBalanceBar))]
         public Vector2 PerfectBalanceBarPosition = new(0, -54);
 
         [DragFloat2("Size" + "##PerfectBalance", min = 0, max = 4000f)]
-        [CollapseWith(10, 5)]
+        [Order(205, collapseWith = nameof(ShowPerfectBalanceBar))]
         public Vector2 PerfectBalanceBarSize = new(20, 20);
 
         [ColorEdit4("Color" + "##PerfectBalance")]
-        [CollapseWith(15, 5)]
+        [Order(210, collapseWith = nameof(ShowPerfectBalanceBar))]
         public PluginConfigColor PerfectBalanceBarFillColor = new(new Vector4(150f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [Checkbox("Inverted" + "##PerfectBalance")]
-        [CollapseWith(20, 5)]
+        [Order(215, collapseWith = nameof(ShowPerfectBalanceBar))]
         public bool PerfectBalanceInverted = true;
 
         [Checkbox("Vertical" + "##PerfectBalance")]
-        [CollapseWith(25, 5)]
+        [Order(220, collapseWith = nameof(ShowPerfectBalanceBar))]
         public bool PerfectBalanceVertical = true;
         #endregion
 
         #region True North
         [Checkbox("True North", separator = true)]
-        [CollapseControl(60, 6)]
+        [Order(225)]
         public bool ShowTrueNorthBar = true;
 
         [Checkbox("Only Show When Active" + "##TrueNorth")]
-        [CollapseWith(0, 6)]
+        [Order(230, collapseWith = nameof(ShowTrueNorthBar))]
         public bool OnlyShowTrueNorthWhenActive = false;
 
         [DragFloat2("Position" + "##TrueNorth", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 6)]
+        [Order(235, collapseWith = nameof(ShowTrueNorthBar))]
         public Vector2 TrueNorthBarPosition = new(69, -54);
 
         [DragFloat2("Size" + "##TrueNorth", min = 0, max = 4000f)]
-        [CollapseWith(10, 6)]
+        [Order(240, collapseWith = nameof(ShowTrueNorthBar))]
         public Vector2 TrueNorthBarSize = new(115, 20);
 
         [ColorEdit4("Color" + "##TrueNorth")]
-        [CollapseWith(15, 6)]
+        [Order(245, collapseWith = nameof(ShowTrueNorthBar))]
         public PluginConfigColor TrueNorthBarFillColor = new(new Vector4(255f / 255f, 225f / 255f, 189f / 255f, 100f / 100f));
 
         [Checkbox("Text" + "##TrueNorth")]
-        [CollapseWith(20, 6)]
+        [Order(250, collapseWith = nameof(ShowTrueNorthBar))]
         public bool ShowTrueNorthText = true;
         #endregion
 
         #region Forms
         [Checkbox("Forms" + "##Forms", separator = true)]
-        [CollapseControl(65, 7)]
+        [Order(265)]
         public bool ShowFormsBar = false;
 
         [Checkbox("Only Show When Active" + "##Forms")]
-        [CollapseWith(0, 7)]
+        [Order(270, collapseWith = nameof(ShowFormsBar))]
         public bool OnlyShowFormsWhenActive = false;
 
         [DragFloat2("Position" + "##Forms", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 7)]
+        [Order(275, collapseWith = nameof(ShowFormsBar))]
         public Vector2 FormsBarPosition = new(0, -76);
 
         [DragFloat2("Size" + "##Forms", min = 0, max = 4000f)]
-        [CollapseWith(10, 7)]
+        [Order(280, collapseWith = nameof(ShowFormsBar))]
         public Vector2 FormsBarSize = new(254, 20);
 
         [ColorEdit4("Color" + "##Forms")]
-        [CollapseWith(15, 7)]
+        [Order(285, collapseWith = nameof(ShowFormsBar))]
         public PluginConfigColor FormsBarFillColor = new(new Vector4(36f / 255f, 131f / 255f, 255f / 255f, 100f / 100f));
         #endregion
     }

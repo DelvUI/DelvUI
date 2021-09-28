@@ -4,6 +4,7 @@ using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using ImGuiNET;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
@@ -29,6 +30,9 @@ namespace DelvUI.Interface.GeneralElements
     public class FontsConfig : PluginConfigObject
     {
         public new static FontsConfig DefaultConfig() { return new FontsConfig(); }
+
+        public string FontsPath = "C:\\";
+        [JsonIgnore] public string ValidatedFontsPath => ValidatePath(FontsPath);
 
         public SortedList<string, FontData> Fonts = new SortedList<string, FontData>();
         public bool SupportChineseCharacters = false;
@@ -60,16 +64,48 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
-        private void ReloadFonts()
+        private string ValidatePath(string path)
         {
-            var fontsPath = FontsManager.Instance.FontsPath;
-            var fonts = Directory.GetFiles(fontsPath, "*.ttf");
+            if (path.EndsWith("\\") || path.EndsWith("/"))
+            {
+                return path;
+            }
 
-            _fonts = new string[fonts.Length];
+            return path + "\\";
+        }
+
+        private string[] FontsFromPath(string path)
+        {
+            string[] fonts;
+            try
+            {
+                fonts = Directory.GetFiles(path, "*.ttf");
+            }
+            catch
+            {
+                fonts = new string[0];
+            }
+
             for (int i = 0; i < fonts.Length; i++)
             {
-                _fonts[i] = fonts[i].Replace(fontsPath, "").Replace(".ttf", "").Replace(".TTF", "");
+                fonts[i] = fonts[i]
+                    .Replace(path, "")
+                    .Replace(".ttf", "")
+                    .Replace(".TTF", "");
             }
+
+            return fonts;
+        }
+
+        private void ReloadFonts()
+        {
+            var defaultFontsPath = ValidatePath(FontsManager.Instance.DefaultFontsPath);
+            string[] defaultFonts = FontsFromPath(defaultFontsPath);
+            string[] userFonts = FontsFromPath(ValidatedFontsPath);
+
+            _fonts = new string[defaultFonts.Length + userFonts.Length];
+            defaultFonts.CopyTo(_fonts, 0);
+            userFonts.CopyTo(_fonts, defaultFonts.Length);
         }
 
         private bool AddNewEntry(int font, int size)
@@ -125,14 +161,19 @@ namespace DelvUI.Interface.GeneralElements
                 {
                     ImGui.Text("\u2002");
                     ImGui.SameLine();
-                    ImGui.Text("Please add a font file in the Media/Fonts directory of DelvUI");
+                    ImGui.Text("Default font not found in \"%appdata%/Roaming/XIVLauncher/InstalledPlugins/DelvUI/Media/Fonts/big-noodle-too.ttf\"");
                     return false;
                 }
 
                 ImGui.NewLine();
+
                 ImGui.Text("\u2002");
                 ImGui.SameLine();
-                ImGui.Text("Select a font and size to add:");
+                if (ImGui.InputText("Fonts Path", ref FontsPath, 200, ImGuiInputTextFlags.EnterReturnsTrue))
+                {
+                    changed = true;
+                    ReloadFonts();
+                }
 
                 ImGui.Text("\u2002");
                 ImGui.SameLine();

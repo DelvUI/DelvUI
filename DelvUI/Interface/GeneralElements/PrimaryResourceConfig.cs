@@ -21,11 +21,11 @@ namespace DelvUI.Interface.GeneralElements
         public LabelConfig ValueLabelConfig;
 
         [Checkbox("Threshold Marker", spacing = true)]
-        [CollapseControl(35, 0)]
+        [Order(35)]
         public bool ShowThresholdMarker = false;
 
         [DragInt("Value", min = 1, max = 10000)]
-        [CollapseWith(0, 0)]
+        [Order(40, collapseWith = nameof(ShowThresholdMarker))]
         public int ThresholdMarkerValue = 7000;
         //TODO ADD BELOW THRESHOLD COLOR
 
