@@ -88,7 +88,7 @@ namespace DelvUI.Interface.Jobs
 
             builder.AddInnerBar(duration, maximum, color);
 
-            if (Config.ShowStormsEyeText)
+            if (Config.ShowStormsEyeText && duration != 0)
             {
                 builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
@@ -117,7 +117,7 @@ namespace DelvUI.Interface.Jobs
                 builder.SetChunksColors(Config.NascentChaosColor);
             }
 
-            if (Config.ShowBeastGaugeText)
+            if (Config.ShowBeastGaugeText && gauge.BeastGauge != 0)
             {
                 builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }

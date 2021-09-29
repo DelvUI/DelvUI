@@ -133,7 +133,7 @@ namespace DelvUI.Interface.Jobs
                                            .SetBackgroundColor(EmptyColor.Base)
                                            .AddInnerBar(gauge.OathGauge, 100, Config.OathGaugeColor, PartialFillColor);
 
-            if (Config.ShowOathGaugeText)
+            if (Config.ShowOathGaugeText && gauge.OathGauge != 0)
             {
                 builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }

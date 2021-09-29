@@ -11,7 +11,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -148,7 +147,7 @@ namespace DelvUI.Interface.Jobs
                 .SetBackgroundColor(EmptyColor.Background)
                 .AddInnerBar(darksideDuration, max, darksideColor);
 
-            if (Config.ShowDarksideText)
+            if (Config.ShowDarksideText && darksideDuration != 0)
             {
                 builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
