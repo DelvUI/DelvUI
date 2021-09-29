@@ -140,7 +140,7 @@ namespace DelvUI.Interface.Jobs
             IEnumerable<Status> flourishingBuff = player.StatusList.Where(o => o.StatusId is 1820 or 2021);
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
 
-            if (!flourishingBuff.Any() && Config.OnlyShowFeatherWhenActive)
+            if (gauge.Feathers == 0 && !flourishingBuff.Any() && Config.OnlyShowFeatherWhenActive)
             {
                 return;
             }
@@ -250,8 +250,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBuffBar(Vector2 origin, PlayerCharacter player)
         {
-            IEnumerable<Status> devilmentBuff = player.StatusList.Where(o => o.StatusId is 1825);
-            IEnumerable<Status> technicalFinishBuff = player.StatusList.Where(o => o.StatusId is 1822 or 2050);
+            IEnumerable<Status> devilmentBuff = player.StatusList.Where(o => o.StatusId is 1825 && o.SourceID == player.ObjectId);
+            IEnumerable<Status> technicalFinishBuff = player.StatusList.Where(o => o.StatusId is 1822 or 2050 && o.SourceID == player.ObjectId);
 
             if (!technicalFinishBuff.Any() && !devilmentBuff.Any() && Config.OnlyShowBuffBarWhenActive)
             {
