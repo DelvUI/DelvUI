@@ -201,16 +201,27 @@ namespace DelvUI.Interface.Party
                 ImGuiWindowFlags.NoBringToFrontOnFocus |
                 ImGuiWindowFlags.NoBackground;
 
-            if (Config.Lock)
+            bool canDrag = !Config.Lock && !DraggingEnabled;
+            if (!canDrag)
             {
-                windowFlags |= ImGuiWindowFlags.NoMove | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoNav;
+                windowFlags |= ImGuiWindowFlags.NoMove;
+            }
+
+            if (Config.Lock || DraggingEnabled)
+            {
+                ImGui.SetNextWindowPos(origin + Config.Position);
+                windowFlags |= ImGuiWindowFlags.NoResize;
             }
 
             ImGui.Begin("delvui_partyFrames", windowFlags);
             var windowPos = ImGui.GetWindowPos();
             var windowSize = ImGui.GetWindowSize();
-            Config.Position = windowPos;
             Config.Size = windowSize;
+
+            if (canDrag)
+            {
+                Config.Position = windowPos - origin;
+            }
 
             // recalculate layout on settings or size change
             var contentStartPos = windowPos + _contentMargin;
