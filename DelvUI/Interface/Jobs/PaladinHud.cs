@@ -94,6 +94,8 @@ namespace DelvUI.Interface.Jobs
             float posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
             float posY = origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f;
 
+            if (Config.HideManaWhenFull && player.CurrentMp is 10000) { return; }
+
             BarBuilder builder = BarBuilder.Create(posX, posY, Config.ManaBarSize.Y, Config.ManaBarSize.X).SetBackgroundColor(EmptyColor.Base);
 
             if (Config.ChunkManaBar)
@@ -120,6 +122,8 @@ namespace DelvUI.Interface.Jobs
         {
             PLDGauge gauge = Plugin.JobGauges.Get<PLDGauge>();
 
+            if (Config.OnlyShowOathGaugeWhenActive && gauge.OathGauge is 0) { return; }
+
             float xPos = origin.X + Config.Position.X + Config.OathGaugePosition.X - Config.OathGaugeSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.OathGaugePosition.Y - Config.OathGaugeSize.Y / 2f;
 
@@ -129,7 +133,7 @@ namespace DelvUI.Interface.Jobs
                                            .SetBackgroundColor(EmptyColor.Base)
                                            .AddInnerBar(gauge.OathGauge, 100, Config.OathGaugeColor, PartialFillColor);
 
-            if (Config.ShowOathGaugeText)
+            if (Config.ShowOathGaugeText && gauge.OathGauge != 0)
             {
                 builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
@@ -142,6 +146,8 @@ namespace DelvUI.Interface.Jobs
         {
             IEnumerable<Status> fightOrFlightBuff = player.StatusList.Where(o => o.StatusId == 76);
             IEnumerable<Status> requiescatBuff = player.StatusList.Where(o => o.StatusId == 1368);
+
+            if (Config.OnlyShowBuffBarWhenActive && !requiescatBuff.Any() && !fightOrFlightBuff.Any()) { return; }
 
             float xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
@@ -179,6 +185,8 @@ namespace DelvUI.Interface.Jobs
             IEnumerable<Status> atonementBuff = player.StatusList.Where(o => o.StatusId == 1902);
             int stackCount = atonementBuff.Any() ? atonementBuff.First().StackCount : 0;
 
+            if (Config.OnlyShowAtonementWhenActive && stackCount is 0) { return; }
+
             float xPos = origin.X + Config.Position.X + Config.AtonementBarPosition.X - Config.AtonementBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.AtonementBarPosition.Y - Config.AtonementBarSize.Y / 2f;
 
@@ -195,14 +203,20 @@ namespace DelvUI.Interface.Jobs
         private void DrawDoTBar(Vector2 origin, PlayerCharacter player)
         {
             GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            if (actor is not BattleChara target)
+            if (actor is not BattleChara && Config.HideGoringBladeWhenNoTarget) { return; }
+
+            float duration = 0f;
+
+            if (actor is BattleChara target)
             {
-                return;
+                var goringBlade = target.StatusList.Where(o => o.StatusId is 725 && o.SourceID == player.ObjectId);
+                if (goringBlade.Any())
+                {
+                    duration = Math.Abs(goringBlade.First().RemainingTime);
+                }
             }
 
-            Status? goringBlade = target.StatusList.FirstOrDefault(o => o.StatusId == 725 && o.SourceID == player.ObjectId);
-
-            float duration = Math.Abs(goringBlade?.RemainingTime ?? 0f);
+            if (Config.OnlyShowGoringBladeWhenActive && duration is 0) { return; }
 
             float xPos = origin.X + Config.Position.X + Config.GoringBladeBarPosition.X - Config.GoringBladeBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.GoringBladeBarPosition.Y - Config.GoringBladeBarSize.Y / 2f;
@@ -234,6 +248,10 @@ namespace DelvUI.Interface.Jobs
         [Order(30)]
         public bool ShowManaBar = true;
 
+        [Checkbox("Hide When Full" + "##MP")]
+        [Order(31, collapseWith = nameof(ShowManaBar))]
+        public bool HideManaWhenFull = false;
+
         [Checkbox("Text" + "##MP")]
         [Order(35, collapseWith = nameof(ShowManaBar))]
         public bool ShowManaBarText = true;
@@ -264,6 +282,10 @@ namespace DelvUI.Interface.Jobs
         [Order(65)]
         public bool ShowOathGauge = true;
 
+        [Checkbox("Only Show When Active" + "##Oath")]
+        [Order(66, collapseWith = nameof(ShowOathGauge))]
+        public bool OnlyShowOathGaugeWhenActive = false;
+
         [Checkbox("Text" + "##Oath")]
         [Order(70, collapseWith = nameof(ShowOathGauge))]
         public bool ShowOathGaugeText = true;
@@ -289,6 +311,10 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Fight or Flight & Requiescat", separator = true)]
         [Order(95)]
         public bool ShowBuffBar = true;
+
+        [Checkbox("Only Show When Active" + "##Buff")]
+        [Order(96, collapseWith = nameof(ShowBuffBar))]
+        public bool OnlyShowBuffBarWhenActive = false;
 
         [Checkbox("Timer" + "##Buff")]
         [Order(100, collapseWith = nameof(ShowBuffBar))]
@@ -316,6 +342,10 @@ namespace DelvUI.Interface.Jobs
         [Order(125)]
         public bool ShowAtonementBar = true;
 
+        [Checkbox("Only Show When Active" + "##Atonement")]
+        [Order(126, collapseWith = nameof(ShowAtonementBar))]
+        public bool OnlyShowAtonementWhenActive = false;
+
         [DragFloat2("Position" + "##Atonement", min = -4000f, max = 4000f)]
         [Order(130, collapseWith = nameof(ShowAtonementBar))]
         public Vector2 AtonementBarPosition = new(0, -10);
@@ -337,6 +367,14 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Goring Blade" + "##GoringBlade", separator = true)]
         [Order(150)]
         public bool ShowGoringBladeBar = true;
+
+        [Checkbox("Only Show When Active" + "##GoringBlade")]
+        [Order(151, collapseWith = nameof(ShowGoringBladeBar))]
+        public bool OnlyShowGoringBladeWhenActive = false;
+
+        [Checkbox("Hide When No Target" + "##Darkside")]
+        [Order(152, collapseWith = nameof(ShowGoringBladeBar))]
+        public bool HideGoringBladeWhenNoTarget = true;
 
         [Checkbox("Timer" + "##GoringBlade")]
         [Order(155, collapseWith = nameof(ShowGoringBladeBar))]

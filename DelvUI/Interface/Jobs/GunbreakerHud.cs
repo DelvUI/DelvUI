@@ -64,6 +64,8 @@ namespace DelvUI.Interface.Jobs
 
             var gauge = Plugin.JobGauges.Get<GNBGauge>();
 
+            if (Config.OnlyShowPowderGaugeWhenActive && gauge.Ammo is 0) { return; }
+
             builder.SetChunks(2)
                    .SetChunkPadding(Config.PowderGaugeSpacing)
                    .AddInnerBar(gauge.Ammo, 2, Config.PowderGaugeFillColor, null)
@@ -78,18 +80,20 @@ namespace DelvUI.Interface.Jobs
         {
             Vector2 position = origin + Config.Position + Config.NoMercyBarPosition - Config.NoMercyBarSize / 2f;
             var noMercyBuff = player.StatusList.Where(o => o.StatusId == 1831);
+            float duration = 0f;
 
             var builder = BarBuilder.Create(position, Config.NoMercyBarSize)
                 .SetBackgroundColor(EmptyColor.Base);
 
             if (noMercyBuff.Any())
             {
-                var duration = noMercyBuff.First().RemainingTime;
+                duration = noMercyBuff.First().RemainingTime;
 
                 builder.AddInnerBar(duration, 20, Config.NoMercyFillColor, null)
                        .SetTextMode(BarTextMode.EachChunk)
                        .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
+            if (Config.OnlyShowNoMercyWhenActive && duration is 0) { return; }
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
@@ -109,38 +113,46 @@ namespace DelvUI.Interface.Jobs
         [Order(30)]
         public bool ShowPowderGauge = true;
 
-        [DragFloat2("Position" + "##PowderGauge", min = -4000f, max = 4000f)]
+        [Checkbox("Only Show When Active" + "##PowderGauge")]
         [Order(35, collapseWith = nameof(ShowPowderGauge))]
+        public bool OnlyShowPowderGaugeWhenActive = false;
+
+        [DragFloat2("Position" + "##PowderGauge", min = -4000f, max = 4000f)]
+        [Order(40, collapseWith = nameof(ShowPowderGauge))]
         public Vector2 PowderGaugeBarPosition = new(0, -32);
 
         [DragFloat2("Size" + "##PowderGauge", min = 1f, max = 4000f)]
-        [Order(40, collapseWith = nameof(ShowPowderGauge))]
+        [Order(45, collapseWith = nameof(ShowPowderGauge))]
         public Vector2 PowderGaugeBarSize = new(254, 20);
 
         [DragFloat("Spacing" + "##PowderGauge", min = 0)]
-        [Order(45, collapseWith = nameof(ShowPowderGauge))]
+        [Order(50, collapseWith = nameof(ShowPowderGauge))]
         public float PowderGaugeSpacing = 2.0f;
 
         [ColorEdit4("Color" + "##PowderGauge")]
-        [Order(50, collapseWith = nameof(ShowPowderGauge))]
+        [Order(55, collapseWith = nameof(ShowPowderGauge))]
         public PluginConfigColor PowderGaugeFillColor = new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 1f));
         #endregion
 
         #region No Mercy
         [Checkbox("No Mercy", separator = true)]
-        [Order(55)]
+        [Order(60)]
         public bool ShowNoMercyBar = true;
 
+        [Checkbox("Only Show When Active" + "##NoMercy")]
+        [Order(65, collapseWith = nameof(ShowNoMercyBar))]
+        public bool OnlyShowNoMercyWhenActive = false;
+
         [DragFloat2("Position" + "##NoMercy", min = -4000f, max = 4000f)]
-        [Order(60, collapseWith = nameof(ShowNoMercyBar))]
+        [Order(70, collapseWith = nameof(ShowNoMercyBar))]
         public Vector2 NoMercyBarPosition = new(0, -10);
 
         [DragFloat2("Size" + "##NoMercy", min = 1f, max = 4000f)]
-        [Order(65, collapseWith = nameof(ShowNoMercyBar))]
+        [Order(75, collapseWith = nameof(ShowNoMercyBar))]
         public Vector2 NoMercyBarSize = new(254, 20);
 
         [ColorEdit4("Color" + "##NoMercy")]
-        [Order(70, collapseWith = nameof(ShowNoMercyBar))]
+        [Order(80, collapseWith = nameof(ShowNoMercyBar))]
         public PluginConfigColor NoMercyFillColor = new(new Vector4(252f / 255f, 204f / 255f, 255f / 255f, 1f));
         #endregion
     }
