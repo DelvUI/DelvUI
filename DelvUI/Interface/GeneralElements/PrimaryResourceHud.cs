@@ -36,15 +36,17 @@ namespace DelvUI.Interface.GeneralElements
             int max = 0;
 
             GetResources(ref current, ref max, chara);
+            if (Config.HidePrimaryResourceWhenFull && current == max) { return; }
 
             var scale = (float)current / max;
+
             var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
 
             // bar
             var drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(startPos, startPos + Config.Size, 0x88000000);
-            
-            var color = Color(Actor);
+
+            var color = Config.ShowThresholdMarker && current < Config.ThresholdMarkerValue ? Config.BelowThresholdColor : Color(Actor);
             DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X * scale, Config.Size.Y), color, drawList);
 
             drawList.AddRect(startPos, startPos + Config.Size, 0xFF000000);
