@@ -552,15 +552,19 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class NestedConfigAttribute : OrderAttribute
+    public class NestedConfigAttribute : Attribute
     {
         public string friendlyName;
+        public int pos;
         public bool separator = true;
         public bool spacing = false;
+        public string? collapseWith = "Enabled";
 
-        public NestedConfigAttribute(string friendlyName, int pos) : base(pos)
+        public NestedConfigAttribute(string friendlyName, int pos)
         {
             this.friendlyName = friendlyName;
+            this.pos = pos;
+
         }
     }
 

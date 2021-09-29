@@ -824,20 +824,7 @@ namespace DelvUI.Config.Tree
 
                     foreach (object attribute in field.GetCustomAttributes(true))
                     {
-                        if (attribute is NestedConfigAttribute nestedConfigAttribute && _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode? node))
-                        {
-                            node.HasSeparator = nestedConfigAttribute.separator;
-                            node.HasSpacing = nestedConfigAttribute.spacing;
-                            if (nestedConfigAttribute.collapseWith is not null)
-                            {
-                                node.ParentCollapseField = fields.Where(f => f.Name.Equals(nestedConfigAttribute.collapseWith)).FirstOrDefault();
-                                node.ParentConfigObject = ConfigObject;
-                            }
-
-                            DrawList.Add(new KeyValuePair<int, object>(nestedConfigAttribute.pos, node));
-                            wasAdded = true;
-                        }
-                        else if (attribute is OrderAttribute orderAttribute)
+                        if (attribute is OrderAttribute orderAttribute)
                         {
                             CategoryField categoryField = new CategoryField(field, ConfigObject, ID);
 
@@ -854,9 +841,22 @@ namespace DelvUI.Config.Tree
 
                             wasAdded = true;
                         }
+                        else if (attribute is NestedConfigAttribute nestedConfigAttribute && _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode? node))
+                        {
+                            node.HasSeparator = nestedConfigAttribute.separator;
+                            node.HasSpacing = nestedConfigAttribute.spacing;
+                            if (nestedConfigAttribute.collapseWith is not null)
+                            {
+                                node.ParentCollapseField = fields.Where(f => f.Name.Equals(nestedConfigAttribute.collapseWith)).FirstOrDefault();
+                                node.ParentConfigObject = ConfigObject;
+                            }
+
+                            DrawList.Add(new KeyValuePair<int, object>(nestedConfigAttribute.pos, node));
+                            wasAdded = true;
+                        }
                     }
 
-                    if (!wasAdded)
+                    if (!wasAdded && Attribute.IsDefined(field, typeof(ConfigAttribute), true))
                     {
                         DrawList.Add(new KeyValuePair<int, object>(int.MaxValue, new CategoryField(field, ConfigObject, ID)));
                     }
@@ -1090,6 +1090,7 @@ namespace DelvUI.Config.Tree
         public bool HasSpacing = false;
         public int Depth = 0;
         public bool IsChild = false;
+        public ConfigAttribute? ConfigAttribute;
 
         public CategoryField(FieldInfo mainField, PluginConfigObject configObject, string? id = null)
         {
@@ -1099,11 +1100,11 @@ namespace DelvUI.Config.Tree
             ID = id;
             CollapseControl = false;
 
-            ConfigAttribute? configAttribute = GetConfigAttribute(mainField);
-            if (configAttribute is not null)
+            ConfigAttribute = GetConfigAttribute(mainField);
+            if (ConfigAttribute is not null)
             {
-                HasSeparator = configAttribute.separator;
-                HasSpacing = configAttribute.spacing;
+                HasSeparator = ConfigAttribute.separator;
+                HasSpacing = ConfigAttribute.spacing;
             }
         }
 
@@ -1127,7 +1128,6 @@ namespace DelvUI.Config.Tree
             if (CollapseControl && Attribute.IsDefined(MainField, typeof(CheckboxAttribute)) && (MainField.GetValue(ConfigObject) as bool? ?? false))
             {
                 ImGui.BeginGroup();
-                ImGui.SetCursorPos(ImGui.GetCursorPos());
 
                 foreach (CategoryField child in Children.Values)
                 {
@@ -1156,12 +1156,9 @@ namespace DelvUI.Config.Tree
 
         public void Draw(ref bool changed, FieldInfo field)
         {
-            foreach (object attribute in field.GetCustomAttributes(true))
+            if (ConfigAttribute is not null)
             {
-                if (attribute is ConfigAttribute configAttribute)
-                {
-                    changed |= configAttribute.Draw(field, ConfigObject, ID);
-                }
+                changed |= ConfigAttribute.Draw(field, ConfigObject, ID);
             }
         }
 
