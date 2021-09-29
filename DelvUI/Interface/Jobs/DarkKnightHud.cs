@@ -11,7 +11,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -93,6 +92,8 @@ namespace DelvUI.Interface.Jobs
         {
             var darkArtsBuff = Plugin.JobGauges.Get<DRKGauge>().HasDarkArts;
 
+            if (Config.HideManaWhenFull && !darkArtsBuff && player.CurrentMp is 10000) { return; }
+
             var posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
             var posY = origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f;
 
@@ -129,11 +130,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDarkside(Vector2 origin)
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            if (target is not Character && Config.HideDarksideWhenNoTarget)
-            {
-                return;
-            }
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            if (Config.HideDarksideWhenNoTarget && actor is not BattleChara) { return; }
 
             float darksideTimer = Plugin.JobGauges.Get<DRKGauge>().DarksideTimeRemaining;
             float darksideDuration = Math.Abs(darksideTimer / 1000);
@@ -142,17 +140,14 @@ namespace DelvUI.Interface.Jobs
             var posX = origin.X + Config.Position.X + Config.DarksidePosition.X - Config.DarksideSize.X / 2f;
             var posY = origin.Y + Config.Position.Y + Config.DarksidePosition.Y - Config.DarksideSize.Y / 2f;
 
-            if (darksideDuration == 0 && Config.OnlyShowWhenActive)
-            {
-                return;
-            }
+            if (Config.OnlyShowDarksideWhenActive && darksideDuration == 0) { return; }
 
             var darksideColor = darksideDuration > 5 ? Config.DarksideColor : Config.DarksideExpiryColor;
             BarBuilder builder = BarBuilder.Create(posX, posY, Config.DarksideSize.Y, Config.DarksideSize.X)
                 .SetBackgroundColor(EmptyColor.Background)
                 .AddInnerBar(darksideDuration, max, darksideColor);
 
-            if (Config.ShowDarksideText)
+            if (Config.ShowDarksideText && darksideDuration != 0)
             {
                 builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
@@ -164,6 +159,8 @@ namespace DelvUI.Interface.Jobs
         private void DrawBloodGauge(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<DRKGauge>();
+
+            if (Config.OnlyShowWBloodGaugeWhenActive && gauge.Blood == 0) { return; }
 
             var posX = origin.X + Config.Position.X + Config.BloodGaugePosition.X - Config.BloodGaugeSize.X / 2f;
             var posY = origin.Y + Config.Position.Y + Config.BloodGaugePosition.Y - Config.BloodGaugeSize.Y / 2f;
@@ -199,6 +196,9 @@ namespace DelvUI.Interface.Jobs
             IEnumerable<Status> bloodWeaponBuff = player.StatusList.Where(o => o.StatusId == 742);
             IEnumerable<Status> deliriumBuff = player.StatusList.Where(o => o.StatusId == 1972);
 
+            float bloodWeaponDuration = 0f;
+            float deliriumDuration = 0f;
+
             var xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
 
@@ -206,8 +206,8 @@ namespace DelvUI.Interface.Jobs
 
             if (bloodWeaponBuff.Any())
             {
-                var fightOrFlightDuration = Math.Abs(bloodWeaponBuff.First().RemainingTime);
-                builder.AddInnerBar(fightOrFlightDuration, 10, Config.BloodWeaponColor);
+                bloodWeaponDuration = Math.Abs(bloodWeaponBuff.First().RemainingTime);
+                builder.AddInnerBar(bloodWeaponDuration, 10, Config.BloodWeaponColor);
 
                 if (Config.ShowBuffBarText)
                 {
@@ -217,7 +217,7 @@ namespace DelvUI.Interface.Jobs
 
             if (deliriumBuff.Any())
             {
-                var deliriumDuration = Math.Abs(deliriumBuff.First().RemainingTime);
+                deliriumDuration = Math.Abs(deliriumBuff.First().RemainingTime);
                 builder.AddInnerBar(deliriumDuration, 10, Config.DeliriumColor);
 
                 if (Config.ShowBuffBarText)
@@ -225,6 +225,8 @@ namespace DelvUI.Interface.Jobs
                     builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.DeliriumColor.Vector, Vector4.UnitW, null);
                 }
             }
+
+            if (Config.OnlyShowWBuffBarWhenActive && bloodWeaponDuration is 0 && deliriumDuration is 0) { return; }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
@@ -234,6 +236,8 @@ namespace DelvUI.Interface.Jobs
         {
             var shadowTimeRemaining = Plugin.JobGauges.Get<DRKGauge>().ShadowTimeRemaining / 1000;
             var livingShadow = player.Level >= 80 && shadowTimeRemaining is > 0 and <= 24;
+
+            if (Config.OnlyShowWLivingShadowWhenActive && !livingShadow) { return; }
 
             var xPos = origin.X + Config.Position.X + Config.LivingShadowBarPosition.X - Config.LivingShadowBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.LivingShadowBarPosition.Y - Config.LivingShadowBarSize.Y / 2f;
@@ -267,6 +271,10 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Mana", separator = true)]
         [Order(30)]
         public bool ShowManaBar = true;
+
+        [Checkbox("Hide When Full" + "##DRKManaBar")]
+        [Order(31, collapseWith = nameof(ShowManaBar))]
+        public bool HideManaWhenFull = false;
 
         [Checkbox("Text" + "##DRKManaBar")]
         [Order(35, collapseWith = nameof(ShowManaBar))]
@@ -302,6 +310,10 @@ namespace DelvUI.Interface.Jobs
         [Order(70)]
         public bool ShowBloodGauge = true;
 
+        [Checkbox("Only Show When Active" + "##BloodGauge")]
+        [Order(71, collapseWith = nameof(ShowBloodGauge))]
+        public bool OnlyShowWBloodGaugeWhenActive = false;
+
         [Checkbox("Split Bar" + "##BloodGauge")]
         [Order(75, collapseWith = nameof(ShowBloodGauge))]
         public bool ChunkBloodGauge = true;
@@ -334,37 +346,42 @@ namespace DelvUI.Interface.Jobs
 
         [Checkbox("Only Show When Active" + "##Darkside")]
         [Order(110, collapseWith = nameof(ShowDarkside))]
-        public bool OnlyShowWhenActive = true;
+        public bool OnlyShowDarksideWhenActive = false;
+
+        [Checkbox("Hide When No Target" + "##Darkside")]
+        [Order(115, collapseWith = nameof(ShowDarkside))]
+        public bool HideDarksideWhenNoTarget = true;
+
+        [Checkbox("Timer" + "##Darkside")]
+        [Order(120, collapseWith = nameof(ShowDarkside))]
+        public bool ShowDarksideText = true;
 
         [DragFloat2("Position" + "##Darkside", min = -4000f, max = 4000f)]
-        [Order(115, collapseWith = nameof(ShowDarkside))]
+        [Order(125, collapseWith = nameof(ShowDarkside))]
         public Vector2 DarksidePosition = new Vector2(0, -73);
 
         [DragFloat2("Size" + "##Darkside", min = 0, max = 4000f)]
-        [Order(120, collapseWith = nameof(ShowDarkside))]
+        [Order(130, collapseWith = nameof(ShowDarkside))]
         public Vector2 DarksideSize = new Vector2(254, 10);
 
         [ColorEdit4("Darkside" + "##Darkside")]
-        [Order(125, collapseWith = nameof(ShowDarkside))]
+        [Order(135, collapseWith = nameof(ShowDarkside))]
         public PluginConfigColor DarksideColor = new(new Vector4(209 / 255f, 38f / 255f, 204f / 255f, 100f / 100f));
 
         [ColorEdit4("Darkside Expiry" + "##Darkside")]
-        [Order(130, collapseWith = nameof(ShowDarkside))]
+        [Order(140, collapseWith = nameof(ShowDarkside))]
         public PluginConfigColor DarksideExpiryColor = new(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [Checkbox("Show Darkside Text" + "##Darkside")]
-        [Order(135, collapseWith = nameof(ShowDarkside))]
-        public bool ShowDarksideText = true;
-
-        [Checkbox("Hide When No Target" + "##Darkside")]
-        [Order(140, collapseWith = nameof(ShowDarkside))]
-        public bool HideDarksideWhenNoTarget = false;
         #endregion
 
         #region Buff Bar
         [Checkbox("Blood Weapon & Delirium", separator = true)]
         [Order(145)]
         public bool ShowBuffBar = false;
+
+        [Checkbox("Only Show When Active" + "##DRKBuffBar")]
+        [Order(146, collapseWith = nameof(ShowBuffBar))]
+        public bool OnlyShowWBuffBarWhenActive = false;
 
         [Checkbox("Timer" + "##DRKBuffBar")]
         [Order(150, collapseWith = nameof(ShowBuffBar))]
@@ -395,6 +412,10 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Living Shadow", separator = true)]
         [Order(180)]
         public bool ShowLivingShadowBar = false;
+
+        [Checkbox("Only Show When Active" + "##DRKLivingShadow")]
+        [Order(181, collapseWith = nameof(ShowLivingShadowBar))]
+        public bool OnlyShowWLivingShadowWhenActive = false;
 
         [Checkbox("Timer" + "##DRKLivingShadow")]
         [Order(185, collapseWith = nameof(ShowLivingShadowBar))]

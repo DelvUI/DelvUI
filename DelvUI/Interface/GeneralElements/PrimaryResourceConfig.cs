@@ -27,8 +27,14 @@ namespace DelvUI.Interface.GeneralElements
         [DragInt("Value", min = 1, max = 10000)]
         [Order(40, collapseWith = nameof(ShowThresholdMarker))]
         public int ThresholdMarkerValue = 7000;
-        //TODO ADD BELOW THRESHOLD COLOR
 
+        [ColorEdit4("Color" + "##Threshold")]
+        [Order(45, collapseWith = nameof(ShowThresholdMarker))]
+        public PluginConfigColor BelowThresholdColor = new(new Vector4(190 / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
+
+        [Checkbox("Hide When Full", spacing = true)]
+        [Order(50)]
+        public bool HidePrimaryResourceWhenFull = false;
 
         public PrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
         {
