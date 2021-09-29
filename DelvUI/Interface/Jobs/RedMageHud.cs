@@ -142,6 +142,8 @@ namespace DelvUI.Interface.Jobs
                 value = 1;
             }
 
+            if (Config.OnlyShowBalanceWhenActive && value is 0) { return; }
+
             var drawList = ImGui.GetWindowDrawList();
             var builder = BarBuilder.Create(position, Config.BalanceBarSize)
                 .AddInnerBar(value, 1, color)
@@ -153,6 +155,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawWhiteManaBar(Vector2 origin)
         {
             var gauge = (int)Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
+            if (Config.OnlyShowWhiteManaWhenActive && gauge is 0) { return; }
             var thresholdRatio = Config.WhiteManaBarInverted ? 0.2f : 0.8f;
 
             var position = new Vector2(
@@ -160,12 +163,13 @@ namespace DelvUI.Interface.Jobs
                 origin.Y + Config.Position.Y + Config.WhiteManaBarPosition.Y - Config.WhiteManaBarSize.Y / 2f
             );
 
-            DrawCustomBar(position, Config.WhiteManaBarSize, Config.WhiteManaBarColor, gauge, 100, thresholdRatio, Config.WhiteManaBarInverted, Config.ShowWhiteManaValue);
+            DrawCustomBar(position, Config.WhiteManaBarSize, Config.WhiteManaBarColor, gauge, 100, thresholdRatio, Config.WhiteManaBarInverted, gauge > 0 ? Config.ShowWhiteManaValue : false);
         }
 
         private void DrawBlackManaBar(Vector2 origin)
         {
             var gauge = (int)Plugin.JobGauges.Get<RDMGauge>().BlackMana;
+            if(Config.OnlyShowBlackManaWhenActive && gauge is 0) { return; }
             var thresholdRatio = Config.BlackManaBarInverted ? 0.2f : 0.8f;
 
             var position = new Vector2(
@@ -173,12 +177,16 @@ namespace DelvUI.Interface.Jobs
                 origin.Y + Config.Position.Y + Config.BlackManaBarPosition.Y - Config.BlackManaBarSize.Y / 2f
             );
 
-            DrawCustomBar(position, Config.BlackManaBarSize, Config.BlackManaBarColor, gauge, 100, thresholdRatio, Config.BlackManaBarInverted, Config.ShowBlackManaValue);
+            DrawCustomBar(position, Config.BlackManaBarSize, Config.BlackManaBarColor, gauge, 100, thresholdRatio, Config.BlackManaBarInverted, gauge > 0 ? Config.ShowBlackManaValue : false);
         }
 
         private void DrawAccelerationBar(Vector2 origin, PlayerCharacter player)
         {
-            var accelBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 1238);
+            var accelBuff = player.StatusList.Where(o => o.StatusId == 1238);
+            var stackCount = 0;
+
+            if (accelBuff.Any()) { stackCount = accelBuff.First().StackCount; }
+            if (Config.OnlyShowAccelerationWhenActive && stackCount is 0) { return; }
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.AccelerationBarPosition.X - Config.AccelerationBarSize.X / 2f,
@@ -188,7 +196,7 @@ namespace DelvUI.Interface.Jobs
             var bar = BarBuilder.Create(position, Config.AccelerationBarSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.AccelerationBarPadding)
-                                .AddInnerBar(accelBuff?.StackCount ?? 0, 3, Config.AccelerationBarColor, EmptyColor)
+                                .AddInnerBar(stackCount, 3, Config.AccelerationBarColor, EmptyColor)
                                 .SetBackgroundColor(EmptyColor.Base)
                                 .Build();
 
@@ -198,8 +206,10 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDualCastBar(Vector2 origin, PlayerCharacter player)
         {
-            var dualCastBuff = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId == 1249)?.RemainingTime ?? 0f);
-            var value = dualCastBuff > 0 ? 1 : 0;
+            var dualCastBuff = player.StatusList.Where(o => o.StatusId is 1249);
+            var dualCastDuration = 0f;
+            if (dualCastBuff.Any()) { dualCastDuration = Math.Abs(dualCastBuff.First().RemainingTime); }
+            if (Config.OnlyShowDualcastWhenActive && dualCastDuration is 0) { return; }
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.DualCastPosition.X - Config.DualCastSize.X / 2f,
@@ -208,15 +218,24 @@ namespace DelvUI.Interface.Jobs
 
             var drawList = ImGui.GetWindowDrawList();
             var builder = BarBuilder.Create(position, Config.DualCastSize)
-                .AddInnerBar(value, 1, Config.DualCastColor)
-                .SetBackgroundColor(EmptyColor.Base);
+                .AddInnerBar(dualCastDuration, 15f, Config.DualCastColor)
+                .SetBackgroundColor(EmptyColor.Base)
+                .SetVertical(Config.SetVerticalDualCastBar)
+                .SetFlipDrainDirection(Config.SetInvertedDualCastBar);
 
             builder.Build().Draw(drawList);
         }
 
         private void DrawVerstoneProc(Vector2 origin, PlayerCharacter player)
         {
-            var duration = (int)Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId == 1235)?.RemainingTime ?? 0f);
+            var duration = 0;
+            var verstone = player.StatusList.Where(o => o.StatusId is 1235);
+
+            if (verstone.Any())
+            {
+                duration = (int)Math.Abs(verstone.First().RemainingTime);
+            }
+            if (Config.OnlyShowVerstoneWhenActive && duration is 0) { return; }
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.VerstoneBarPosition.X - Config.VerstoneBarSize.X / 2f,
@@ -228,7 +247,14 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawVerfireProc(Vector2 origin, PlayerCharacter player)
         {
-            var duration = (int)Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId == 1234)?.RemainingTime ?? 0f);
+            var duration = 0;
+            var verfire = player.StatusList.Where(o => o.StatusId is 1234);
+
+            if (verfire.Any())
+            {
+                duration = (int)Math.Abs(verfire.First().RemainingTime);
+            }
+            if (Config.OnlyShowVerfireWhenActive && duration is 0) { return; }
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.VerfireBarPosition.X - Config.VerfireBarSize.X / 2f,
@@ -250,7 +276,8 @@ namespace DelvUI.Interface.Jobs
         {
             var builder = BarBuilder.Create(position, size)
                 .AddInnerBar(value, max, color)
-                .SetFlipDrainDirection(inverted);
+                .SetFlipDrainDirection(inverted)
+                .SetBackgroundColor(EmptyColor.Background);
 
             if (showText)
             {
@@ -298,163 +325,199 @@ namespace DelvUI.Interface.Jobs
         }
 
         #region balance bar
-        [Checkbox("Show Balance Bar", separator = true)]
+        [Checkbox("Balance", separator = true)]
         [Order(30)]
         public bool ShowBalanceBar = true;
 
-        [DragFloat2("Balance Bar Position", min = -2000f, max = 2000f)]
+        [Checkbox("Only Show When Active" + "##Balance")]
+        [Order(31, collapseWith = nameof(ShowBalanceBar))]
+        public bool OnlyShowBalanceWhenActive = false;
+
+        [DragFloat2("Position" + "##Balance", min = -2000f, max = 2000f)]
         [Order(35, collapseWith = nameof(ShowBalanceBar))]
         public Vector2 BalanceBarPosition = new Vector2(0, -32);
 
-        [DragFloat2("Balance Bar Size", max = 2000f)]
+        [DragFloat2("Size" + "##Balance", max = 2000f)]
         [Order(40, collapseWith = nameof(ShowBalanceBar))]
         public Vector2 BalanceBarSize = new Vector2(22, 20);
 
-        [ColorEdit4("Balance Bar Color")]
+        [ColorEdit4("Color" + "##Balance")]
         [Order(45, collapseWith = nameof(ShowBalanceBar))]
         public PluginConfigColor BalanceBarColor = new PluginConfigColor(new(195f / 255f, 35f / 255f, 35f / 255f, 100f / 100f));
         #endregion
 
         #region white mana bar
-        [Checkbox("Show White Mana Bar", separator = true)]
+        [Checkbox("White Mana", separator = true)]
         [Order(50)]
         public bool ShowWhiteManaBar = true;
 
-        [DragFloat2("White Mana Bar Position", min = -2000f, max = 2000f)]
+        [Checkbox("Only Show When Active" + "##WhiteMana")]
+        [Order(51, collapseWith = nameof(ShowWhiteManaBar))]
+        public bool OnlyShowWhiteManaWhenActive = false;
+
+        [Checkbox("Text" + "##WhiteMana")]
         [Order(55, collapseWith = nameof(ShowWhiteManaBar))]
-        public Vector2 WhiteManaBarPosition = new Vector2(-70, -32);
-
-        [DragFloat2("White Mana Bar Size", max = 2000f)]
-        [Order(60, collapseWith = nameof(ShowWhiteManaBar))]
-        public Vector2 WhiteManaBarSize = new Vector2(114, 20);
-
-        [Checkbox("Show White Mana Value")]
-        [Order(65, collapseWith = nameof(ShowWhiteManaBar))]
         public bool ShowWhiteManaValue = true;
 
-        [Checkbox("Invert White Mana Bar")]
-        [Order(70, collapseWith = nameof(ShowWhiteManaBar))]
+        [Checkbox("Invert" + "##WhiteMana")]
+        [Order(60, collapseWith = nameof(ShowWhiteManaBar))]
         public bool WhiteManaBarInverted = true;
 
-        [ColorEdit4("White Mana Bar Color")]
+        [DragFloat2("Position" + "##WhiteMana", min = -2000f, max = 2000f)]
+        [Order(65, collapseWith = nameof(ShowWhiteManaBar))]
+        public Vector2 WhiteManaBarPosition = new Vector2(-70, -32);
+
+        [DragFloat2("Size" + "##WhiteMana", max = 2000f)]
+        [Order(70, collapseWith = nameof(ShowWhiteManaBar))]
+        public Vector2 WhiteManaBarSize = new Vector2(114, 20);
+
+        [ColorEdit4("Color" + "##WhiteMana")]
         [Order(75, collapseWith = nameof(ShowWhiteManaBar))]
         public PluginConfigColor WhiteManaBarColor = new PluginConfigColor(new(221f / 255f, 212f / 255f, 212f / 255f, 100f / 100f));
         #endregion
 
         #region black mana bar
-        [Checkbox("Show Black Mana Bar", separator = true)]
+        [Checkbox("Black Mana", separator = true)]
         [Order(80)]
         public bool ShowBlackManaBar = true;
 
-        [DragFloat2("Black Mana Bar Position", min = -2000f, max = 2000f)]
+        [Checkbox("Only Show When Active" + "##BlackMana")]
+        [Order(81, collapseWith = nameof(ShowBlackManaBar))]
+        public bool OnlyShowBlackManaWhenActive = false;
+
+        [Checkbox("Text" + "##BlackMana")]
         [Order(85, collapseWith = nameof(ShowBlackManaBar))]
-        public Vector2 BlackManaBarPosition = new Vector2(70, -32);
-
-        [DragFloat2("Black Mana Bar Size", max = 2000f)]
-        [Order(90, collapseWith = nameof(ShowBlackManaBar))]
-        public Vector2 BlackManaBarSize = new Vector2(114, 20);
-
-        [Checkbox("Show Black Mana Value")]
-        [Order(95, collapseWith = nameof(ShowBlackManaBar))]
         public bool ShowBlackManaValue = true;
 
-        [Checkbox("Invert Black Mana Bar")]
-        [Order(100, collapseWith = nameof(ShowBlackManaBar))]
+        [Checkbox("Invert" + "##BlackMana")]
+        [Order(90, collapseWith = nameof(ShowBlackManaBar))]
         public bool BlackManaBarInverted = false;
 
-        [ColorEdit4("Black Mana Bar Color")]
+        [DragFloat2("Position" + "##BlackMana", min = -2000f, max = 2000f)]
+        [Order(95, collapseWith = nameof(ShowBlackManaBar))]
+        public Vector2 BlackManaBarPosition = new Vector2(70, -32);
+
+        [DragFloat2("Size" + "##BlackMana", max = 2000f)]
+        [Order(100, collapseWith = nameof(ShowBlackManaBar))]
+        public Vector2 BlackManaBarSize = new Vector2(114, 20);
+
+        [ColorEdit4("Color" + "##BlackMana")]
         [Order(105, collapseWith = nameof(ShowBlackManaBar))]
         public PluginConfigColor BlackManaBarColor = new PluginConfigColor(new(60f / 255f, 81f / 255f, 197f / 255f, 100f / 100f));
         #endregion
 
         #region acceleration
-        [Checkbox("Show Acceleration Bar", separator = true)]
+        [Checkbox("Acceleration", separator = true)]
         [Order(110)]
         public bool ShowAcceleration = true;
 
-        [DragFloat2("Acceleration Bar Position", min = -2000f, max = 2000f)]
+        [Checkbox("Only Show When Active" + "##Acceleration")]
+        [Order(111, collapseWith = nameof(ShowAcceleration))]
+        public bool OnlyShowAccelerationWhenActive = false;
+
+        [DragFloat2("Position" + "##Acceleration", min = -2000f, max = 2000f)]
         [Order(115, collapseWith = nameof(ShowAcceleration))]
         public Vector2 AccelerationBarPosition = new Vector2(0, -50);
 
-        [DragFloat2("Acceleration Size", max = 2000f)]
+        [DragFloat2("Size" + "##Acceleration", max = 2000f)]
         [Order(120, collapseWith = nameof(ShowAcceleration))]
         public Vector2 AccelerationBarSize = new Vector2(254, 12);
 
-        [DragInt("Acceleration Padding", max = 1000)]
+        [DragInt("Spacing" + "##Acceleration", max = 1000)]
         [Order(125, collapseWith = nameof(ShowAcceleration))]
         public int AccelerationBarPadding = 2;
 
-        [ColorEdit4("Acceleration Bar Color")]
+        [ColorEdit4("Color" + "##Acceleration")]
         [Order(130, collapseWith = nameof(ShowAcceleration))]
         public PluginConfigColor AccelerationBarColor = new PluginConfigColor(new(194f / 255f, 74f / 255f, 74f / 255f, 100f / 100f));
         #endregion
 
         #region dualcast
-        [Checkbox("Show Dualcast", separator = true)]
+        [Checkbox("Dualcast", separator = true)]
         [Order(140)]
         public bool ShowDualCast = true;
 
-        [DragFloat2("Dualcast Position", min = -2000f, max = 2000f)]
+        [Checkbox("Only Show When Active" + "##DualCast")]
+        [Order(141, collapseWith = nameof(ShowDualCast))]
+        public bool OnlyShowDualcastWhenActive = false;
+
+        [Checkbox("Inverted" + "##DualCast")]
+        [Order(142, collapseWith = nameof(ShowDualCast))]
+        public bool SetInvertedDualCastBar = false;
+
+        [Checkbox("Vertical" + "##DualCast")]
+        [Order(143, collapseWith = nameof(ShowDualCast))]
+        public bool SetVerticalDualCastBar = false;
+
+        [DragFloat2("Position" + "##DualCast", min = -2000f, max = 2000f)]
         [Order(145, collapseWith = nameof(ShowDualCast))]
         public Vector2 DualCastPosition = new Vector2(0, -66);
 
-        [DragFloat2("Dualcast Size", max = 2000f)]
+        [DragFloat2("Size" + "##DualCast", max = 2000f)]
         [Order(150, collapseWith = nameof(ShowDualCast))]
         public Vector2 DualCastSize = new Vector2(18, 16);
 
-        [ColorEdit4("Dualcast Color")]
+        [ColorEdit4("Color" + "##DualCast")]
         [Order(155, collapseWith = nameof(ShowDualCast))]
         public PluginConfigColor DualCastColor = new PluginConfigColor(new(204f / 255f, 17f / 255f, 255f / 95f, 100f / 100f));
         #endregion
 
         #region verstone
-        [Checkbox("Show Verstone Procs", separator = true)]
+        [Checkbox("Verstone", separator = true)]
         [Order(160)]
         public bool ShowVerstoneProcs = true;
 
-        [Checkbox("Show Verstone Text")]
+        [Checkbox("Only Show When Active" + "##Verstone")]
+        [Order(161, collapseWith = nameof(ShowVerstoneProcs))]
+        public bool OnlyShowVerstoneWhenActive = false;
+
+        [Checkbox("Timer" + "##Verstone")]
         [Order(165, collapseWith = nameof(ShowVerstoneProcs))]
         public bool ShowVerstoneText = true;
 
-        [Checkbox("Invert Verstone Bar")]
+        [Checkbox("Invert" + "##Verstone")]
         [Order(170, collapseWith = nameof(ShowVerstoneProcs))]
         public bool InvertVerstoneBar = true;
 
-        [DragFloat2("Verstone Bar Position", min = -2000, max = 2000f)]
+        [DragFloat2("Position" + "##Verstone", min = -2000, max = 2000f)]
         [Order(175, collapseWith = nameof(ShowVerstoneProcs))]
         public Vector2 VerstoneBarPosition = new Vector2(-69, -66);
 
-        [DragFloat2("Verstone Bar Size", max = 2000f)]
+        [DragFloat2("Size" + "##Verstone", max = 2000f)]
         [Order(180, collapseWith = nameof(ShowVerstoneProcs))]
         public Vector2 VerstoneBarSize = new Vector2(116, 16);
 
-        [ColorEdit4("Verstone Color")]
+        [ColorEdit4("Color" + "##Verstone")]
         [Order(185, collapseWith = nameof(ShowVerstoneProcs))]
         public PluginConfigColor VerstoneColor = new PluginConfigColor(new(228f / 255f, 188f / 255f, 145 / 255f, 90f / 100f));
         #endregion
 
         #region verfire
-        [Checkbox("Show Verfire Procs", separator = true)]
+        [Checkbox("Verfire", separator = true)]
         [Order(190)]
         public bool ShowVerfireProcs = true;
 
-        [Checkbox("Show Verfire Text")]
+        [Checkbox("Only Show When Active" + "##Verfire")]
+        [Order(191, collapseWith = nameof(ShowVerfireProcs))]
+        public bool OnlyShowVerfireWhenActive = false;
+
+        [Checkbox("Timer" + "##Verfire")]
         [Order(195, collapseWith = nameof(ShowVerfireProcs))]
         public bool ShowVerfireText = true;
 
-        [Checkbox("Invert Verfire Bar")]
+        [Checkbox("Invert" + "##Verfire")]
         [Order(200, collapseWith = nameof(ShowVerfireProcs))]
         public bool InvertVerfireBar = false;
 
-        [DragFloat2("Verfire Bar Position", min = -2000, max = 2000f)]
+        [DragFloat2("Position" + "##Verfire", min = -2000, max = 2000f)]
         [Order(205, collapseWith = nameof(ShowVerfireProcs))]
         public Vector2 VerfireBarPosition = new Vector2(69, -66);
 
-        [DragFloat2("Verfire Bar Size", max = 2000f)]
+        [DragFloat2("Size" + "##Verfire", max = 2000f)]
         [Order(210, collapseWith = nameof(ShowVerfireProcs))]
         public Vector2 VerfireBarSize = new Vector2(116, 16);
 
-        [ColorEdit4("Verfire Color")]
+        [ColorEdit4("Color" + "##Verfire")]
         [Order(215, collapseWith = nameof(ShowVerfireProcs))]
         public PluginConfigColor VerfireColor = new PluginConfigColor(new(238f / 255f, 119f / 255f, 17 / 255f, 90f / 100f));
         #endregion
