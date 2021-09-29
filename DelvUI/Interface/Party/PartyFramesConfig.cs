@@ -24,12 +24,24 @@ namespace DelvUI.Interface.Party
         public bool Preview = false;
 
         [DragInt2("Size", isMonitored = true)]
-        [Order(30)]
+        [Order(10)]
         public Vector2 Size = new Vector2(650, 150);
 
-        [Anchor("Bars Anchor", isMonitored = true)]
-        [Order(40)]
+        [Anchor("Bars Anchor", isMonitored = true, spacing = true)]
+        [Order(15)]
         public DrawAnchor BarsAnchor = DrawAnchor.TopLeft;
+
+        [Checkbox("Fill Rows First", isMonitored = true)]
+        [Order(20)]
+        public bool FillRowsFirst = true;
+
+        [Checkbox("Player Order Override Enabled (Tip: Ctrl+Alt+Shift Click on a bar to set your desired spot in the frames)", spacing = true)]
+        [Order(25)]
+        public bool PlayerOrderOverrideEnabled = false;
+
+        [Combo("Player Position", "1", "2", "3", "4", "5", "6", "7", "8", isMonitored = true)]
+        [Order(25, collapseWith = nameof(PlayerOrderOverrideEnabled))]
+        public int PlayerOrder = 1;
 
         [Checkbox("Show When Solo", spacing = true)]
         [Order(50)]
@@ -38,22 +50,6 @@ namespace DelvUI.Interface.Party
         [Checkbox("Show Chocobo")]
         [Order(55)]
         public bool ShowChocobo = true;
-
-        [Checkbox("Fill Rows First", isMonitored = true, spacing = true)]
-        [Order(60)]
-        public bool FillRowsFirst = true;
-
-        [Combo("Sorting Mode",
-            "Tank => DPS => Healer",
-            "Tank => Healer => DPS",
-            "DPS => Tank => Healer",
-            "DPS => Healer => Tank",
-            "Healer => Tank => DPS",
-            "Healer => DPS => Tank",
-            isMonitored = true
-        )]
-        [Order(65)]
-        public PartySortingMode SortingMode = PartySortingMode.Tank_Healer_DPS;
     }
 
     [Disableable(false)]
@@ -74,13 +70,16 @@ namespace DelvUI.Interface.Party
         [NestedConfig("Name Label", 40)]
         public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:first-initial]. [name:last-initial].", DrawAnchor.Center, DrawAnchor.Center);
 
-        [NestedConfig("Colors", 45)]
+        [NestedConfig("Order Position Label", 45)]
+        public LabelConfig OrderLabelConfig = new LabelConfig(new Vector2(2, 4), "[name:first-initial]. [name:last-initial].", DrawAnchor.TopLeft, DrawAnchor.TopLeft);
+
+        [NestedConfig("Colors", 50)]
         public PartyFramesColorsConfig ColorsConfig = new PartyFramesColorsConfig();
 
-        [NestedConfig("Shield", 50)]
+        [NestedConfig("Shield", 55)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
-        [NestedConfig("Change Alpha Based on Range", 55)]
+        [NestedConfig("Change Alpha Based on Range", 60)]
         public PartyFramesRangeConfig RangeConfig = new PartyFramesRangeConfig();
     }
 
@@ -212,7 +211,13 @@ namespace DelvUI.Interface.Party
     [SubSection("Role-Job Icon", 0)]
     public class PartyFramesRoleIconConfig : MovablePluginConfigObject
     {
-        public new static PartyFramesRoleIconConfig DefaultConfig() { return new PartyFramesRoleIconConfig(); }
+        public new static PartyFramesRoleIconConfig DefaultConfig()
+        {
+            var config = new PartyFramesRoleIconConfig();
+            config.Position = new Vector2(20, 0);
+
+            return config;
+        }
 
         [DragInt2("Size", min = 1, max = 1000)]
         [Order(20)]

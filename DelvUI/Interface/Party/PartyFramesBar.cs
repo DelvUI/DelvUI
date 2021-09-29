@@ -11,6 +11,9 @@ namespace DelvUI.Interface.Party
 {
     public class PartyFramesBar
     {
+        public delegate void MovePlayerOrderHandler(PartyFramesBar bar);
+        public MovePlayerOrderHandler? MovePlayerEvent;
+
         private PartyFramesHealthBarsConfig _config;
         private PartyFramesManaBarConfig _manaBarConfig;
         private PartyFramesCastbarConfig _castbarConfig;
@@ -18,8 +21,9 @@ namespace DelvUI.Interface.Party
         private PartyFramesBuffsConfig _buffsConfig;
         private PartyFramesDebuffsConfig _debuffsConfig;
 
-        private LabelHud _labelHud;
+        private LabelHud _nameLabelHud;
         private LabelHud _manaLabelHud;
+        private LabelHud _orderLabelHud;
         private CastbarHud _castbarHud;
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
@@ -45,8 +49,9 @@ namespace DelvUI.Interface.Party
             _buffsConfig = buffsConfig;
             _debuffsConfig = debuffsConfig;
 
-            _labelHud = new LabelHud("partyFramesBar_label_" + id, config.NameLabelConfig);
+            _nameLabelHud = new LabelHud("partyFramesBar_nameLabel_" + id, config.NameLabelConfig);
             _manaLabelHud = new LabelHud("partyFramesBar_manaLabel_" + id, _manaBarConfig.ValueLabelConfig);
+            _orderLabelHud = new LabelHud("partyFramesBar_orderLabel_" + id, config.OrderLabelConfig);
             _castbarHud = new CastbarHud("partyFramesBar_castbar_" + id, _castbarConfig, "");
             _buffsListHud = new StatusEffectsListHud("partyFramesBar_Buffs_" + id, buffsConfig, "");
             _debuffsListHud = new StatusEffectsListHud("partyFramesBar_Debuffs_" + id, debuffsConfig, "");
@@ -91,6 +96,12 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
+            var player = Plugin.ClientState.LocalPlayer;
+            if (player == null)
+            {
+                return;
+            }
+
             // click
             bool isHovering = ImGui.IsMouseHoveringRect(Position, Position + _config.Size);
             var character = Member.Character;
@@ -99,7 +110,13 @@ namespace DelvUI.Interface.Party
             {
                 MouseOverHelper.Instance.Target = character;
 
-                if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                // move player bar to this spot on ctrl+alt+shift click
+                if (ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && ImGui.GetIO().MouseClicked[0])
+                {
+                    MovePlayerEvent?.Invoke(this);
+                }
+                // target
+                else if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
                 {
                     Plugin.TargetManager.SetTarget(character);
                 }
@@ -184,7 +201,7 @@ namespace DelvUI.Interface.Party
 
             if (character != null)
             {
-                _labelHud.Draw(Position, _config.Size, character);
+                _nameLabelHud.Draw(Position, _config.Size, character);
             }
             else
             {
@@ -199,11 +216,19 @@ namespace DelvUI.Interface.Party
                     _config.NameLabelConfig.OutlineColor = new(_config.NameLabelConfig.OutlineColor.Vector.AdjustColorAlpha(-.3f));
                 }
 
-                _labelHud.Draw(Position, _config.Size);
+                _nameLabelHud.Draw(Position, _config.Size);
 
                 _config.NameLabelConfig.SetText(previousText);
                 _config.NameLabelConfig.Color = previousColor;
                 _config.NameLabelConfig.OutlineColor = previousOutlineColor;
+            }
+
+            // order
+            if (character != null && character.ObjectKind != ObjectKind.BattleNpc)
+            {
+                var order = Member.ObjectId == player.ObjectId ? 1 : Member.Order;
+                _config.OrderLabelConfig.SetText("[" + order + "]");
+                _orderLabelHud.Draw(Position, _config.Size);
             }
 
             // icon

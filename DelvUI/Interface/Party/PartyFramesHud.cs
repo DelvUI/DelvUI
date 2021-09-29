@@ -15,7 +15,7 @@ namespace DelvUI.Interface.Party
         private PartyFramesHealthBarsConfig _healthBarsConfig;
 
         private Vector2 _contentMargin = new Vector2(40, 40);
-        private static int MaxMemberCount = 16; // 8 players + 8 chocobos
+        private static readonly int MaxMemberCount = 9; // 8 players + chocobo
 
         // layout
         private Vector2 _origin;
@@ -24,7 +24,7 @@ namespace DelvUI.Interface.Party
         private uint _memberCount = 0;
         private bool _layoutDirty = true;
 
-        private List<PartyFramesBar> bars;
+        private readonly List<PartyFramesBar> bars;
 
 
         public PartyFramesHud(string id, PartyFramesConfig config, string displayName) : base(id, config, displayName)
@@ -43,7 +43,10 @@ namespace DelvUI.Interface.Party
             bars = new List<PartyFramesBar>(MaxMemberCount);
             for (int i = 0; i < bars.Capacity; i++)
             {
-                bars.Add(new PartyFramesBar(i.ToString(), _healthBarsConfig, manaBarConfig, castbarConfig, roleIconConfig, buffsConfig, debuffsConfig));
+                var bar = new PartyFramesBar(i.ToString(), _healthBarsConfig, manaBarConfig, castbarConfig, roleIconConfig, buffsConfig, debuffsConfig);
+                bar.MovePlayerEvent += OnMovePlayer;
+
+                bars.Add(bar);
             }
 
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
@@ -58,6 +61,16 @@ namespace DelvUI.Interface.Party
             _healthBarsConfig.ValueChangeEvent -= OnLayoutPropertyChanged;
             _healthBarsConfig.ColorsConfig.ValueChangeEvent -= OnLayoutPropertyChanged;
             PartyManager.Instance.MembersChangedEvent -= OnMembersChanged;
+        }
+
+        private void OnMovePlayer(PartyFramesBar bar)
+        {
+            if (Config.PlayerOrderOverrideEnabled && bar.Member != null)
+            {
+                var offset = bar.Member.Order - 1 > Config.PlayerOrder ? -1 : -2;
+                Config.PlayerOrder = Math.Max(0, Math.Min(7, bar.Member.Order + offset));
+                PartyManager.Instance.OnPlayerOrderChange();
+            }
         }
 
         private void OnLayoutPropertyChanged(object sender, OnChangeBaseArgs args)
