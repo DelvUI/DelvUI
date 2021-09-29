@@ -79,7 +79,7 @@ namespace DelvUI.Interface.GeneralElements
                     {
                         current = (int)actor.CurrentMp;
                         max = (int)actor.MaxMp;
-                        percent = (int)Math.Round((double)(100 * current / max));
+                        if (max != 0) { percent = (int)Math.Round((double)(100 * current / max)); }
                     }
 
                     break;
@@ -88,7 +88,7 @@ namespace DelvUI.Interface.GeneralElements
                     {
                         current = (int)actor.CurrentCp;
                         max = (int)actor.MaxCp;
-                        percent = (int)Math.Round((double)(100 * current / max));
+                        if (max != 0) { percent = (int)Math.Round((double)(100 * current / max)); }
                     }
 
                     break;
@@ -97,7 +97,7 @@ namespace DelvUI.Interface.GeneralElements
                     {
                         current = (int)actor.CurrentGp;
                         max = (int)actor.MaxGp;
-                        percent = (int)Math.Round((double)(100 * current / max));
+                        if (max != 0) { percent = (int)Math.Round((double)(100 * current / max)); }
                     }
 
                     break;
