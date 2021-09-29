@@ -711,7 +711,7 @@ namespace DelvUI.Config.Tree
         public FieldInfo? ParentCollapseField = null;
         public PluginConfigObject? ParentConfigObject = null;
 
-        private List<KeyValuePair<int, object>> DrawList = null;
+        private List<KeyValuePair<int, object>>? DrawList = null;
 
         public PluginConfigObject ConfigObject
         {
@@ -812,7 +812,7 @@ namespace DelvUI.Config.Tree
         private void DrawWithID(ref bool changed, string? ID = null)
         {
             // Only do this stuff the first time the config page is loaded
-            if (DrawList == null)
+            if (DrawList is null)
             {
                 DrawList = new List<KeyValuePair<int, object>>();
                 FieldInfo[] fields = ConfigObject.GetType().GetFields();
@@ -881,7 +881,7 @@ namespace DelvUI.Config.Tree
                         if (parentCategoryField is not null)
                         {
                             parentCategoryField.CollapseControl = true;
-                            categoryField.Depth = categoryField.HasSeparator ? 0 : parentCategoryField.Depth + 1;
+                            categoryField.Depth = parentCategoryField.Depth + 1;
                             parentCategoryField.AddChild(orderAttribute.pos, categoryField);
                         }
                     }
@@ -1113,7 +1113,7 @@ namespace DelvUI.Config.Tree
             Children.Add(position, field); 
         }
 
-        public void Draw(ref bool changed)
+        public void Draw(ref bool changed, bool separatorDrawn = false)
         {
             if (!IsChild)
             {
@@ -1132,19 +1132,22 @@ namespace DelvUI.Config.Tree
                 foreach (CategoryField child in Children.Values)
                 {
                     DrawSeparatorOrSpacing(child.MainField, ID);
+                    separatorDrawn |= child.HasSeparator;
+
+                    // Shift everything left if a separator was drawn
+                    var depth = separatorDrawn ? child.Depth - 1 : child.Depth;
 
                     // This draws the L shaped symbols and padding to the left of config items collapsible under a checkbox.
-                    // If the child has a separator or spacing above it, then we don't want to draw these because this item is the start of a new section.
-                    if (!child.HasSeparator)
+                    if (depth > 0)
                     {
                         // Shift cursor to the right to pad for children with depth more than 1.
                         // 26 is an arbitrary value I found to be around half the width of a checkbox
-                        ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(26, 0) * Math.Max((child.Depth - 1), 0));
+                        ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(26, 0) * Math.Max((depth - 1), 0));
                         ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
                         ImGui.SameLine();
                     }
 
-                    child.Draw(ref changed);
+                    child.Draw(ref changed, separatorDrawn);
                 }
 
                 ImGui.EndGroup();
