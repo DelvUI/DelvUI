@@ -137,7 +137,8 @@ namespace DelvUI.Interface.Party
                 {
                     foreach (var member in _groupMembers)
                     {
-                        member.Update(EnmityForIndex(member.Order - 1));
+                        var isPlayer = member.ObjectId == player.ObjectId;
+                        member.Update(EnmityForIndex(isPlayer ? 0 : member.Order - 1));
                     }
 
                     return;
@@ -169,7 +170,7 @@ namespace DelvUI.Interface.Party
                         order = IndexForPartyMember(partyMember) ?? 9;
                     }
 
-                    var member = new PartyFramesMember(partyMember, order, EnmityForIndex(order - 1));
+                    var member = new PartyFramesMember(partyMember, order, EnmityForIndex(isPlayer ? 0 : order - 1));
                     _groupMembers.Add(member);
 
                     // player's chocobo (always last)
