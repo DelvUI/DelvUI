@@ -255,16 +255,50 @@ namespace DelvUI.Interface.Party
 
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             var targetIndex = -1;
+            var enmityLeaderIndex = -1;
+            var enmitySecondIndex = -1;
 
             // bars
             for (int i = 0; i < count; i++)
             {
                 bars[i].Draw(origin, drawList);
-                var member = bars[i].Member;
 
-                if (target != null && member != null && member.ObjectId == target.ObjectId)
+                var member = bars[i].Member;
+                if (member != null)
                 {
-                    targetIndex = i;
+                    if (target != null && member.ObjectId == target.ObjectId)
+                    {
+                        targetIndex = i;
+                    }
+
+                    if (member.EnmityLevel == EnmityLevel.Leader)
+                    {
+                        enmityLeaderIndex = i;
+                    }
+                    else if (member.EnmityLevel == EnmityLevel.Second)
+                    {
+                        enmitySecondIndex = i;
+                    }
+                }
+            }
+
+            var borderSize = _healthBarsConfig.Size + Vector2.One * 2;
+
+            if (_healthBarsConfig.ColorsConfig.ShowEnmityBorderColors)
+            {
+                // enmity leader border
+                if (enmityLeaderIndex >= 0)
+                {
+                    var borderPos = bars[enmityLeaderIndex].Position - Vector2.One;
+                    drawList.AddRect(borderPos, borderPos + borderSize, _healthBarsConfig.ColorsConfig.EnmityLeaderBordercolor.Base);
+                }
+
+                // enmity second border
+                if (enmitySecondIndex >= 0 && _healthBarsConfig.ColorsConfig.ShowSecondEnmity &&
+                    (count > 4 || !_healthBarsConfig.ColorsConfig.HideSecondEnmityInLightParties))
+                {
+                    var borderPos = bars[enmitySecondIndex].Position - Vector2.One;
+                    drawList.AddRect(borderPos, borderPos + borderSize, _healthBarsConfig.ColorsConfig.EnmitySecondBordercolor.Base);
                 }
             }
 
@@ -272,8 +306,7 @@ namespace DelvUI.Interface.Party
             if (targetIndex >= 0)
             {
                 var borderPos = bars[targetIndex].Position - Vector2.One;
-                var borderSize = _healthBarsConfig.Size + Vector2.One * 2;
-                drawList.AddRect(borderPos, borderPos + borderSize, 0xFFFFFFFF);
+                drawList.AddRect(borderPos, borderPos + borderSize, _healthBarsConfig.ColorsConfig.TargetBordercolor.Base);
             }
 
             ImGui.End();

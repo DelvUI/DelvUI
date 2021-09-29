@@ -6,6 +6,13 @@ using System;
 
 namespace DelvUI.Interface.Party
 {
+    public enum EnmityLevel : byte
+    {
+        Leader = 1,
+        Second = 2,
+        Last = 255
+    }
+
     public unsafe class PartyFramesMember : IPartyFramesMember
     {
         protected PartyMember? _partyMember = null;
@@ -23,11 +30,13 @@ namespace DelvUI.Interface.Party
         public uint MP => _partyMember != null ? _partyMember.CurrentMP : JobsHelper.CurrentPrimaryResource(Character!);
         public uint MaxMP => _partyMember != null ? _partyMember.MaxMP : JobsHelper.MaxPrimaryResource(Character!);
         public float Shield => Utils.ActorShieldValue(Character);
+        public EnmityLevel EnmityLevel { get; private set; }
 
-        public PartyFramesMember(PartyMember partyMember, int order)
+        public PartyFramesMember(PartyMember partyMember, int order, EnmityLevel enmityLevel)
         {
-            Order = order;
             _partyMember = partyMember;
+            Order = order;
+            EnmityLevel = enmityLevel;
 
             var gameObject = partyMember.GameObject;
             if (gameObject is Character character)
@@ -36,15 +45,19 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        public PartyFramesMember(Character character, int order)
+        public PartyFramesMember(Character character, int order, EnmityLevel enmityLevel)
         {
             Order = order;
+            EnmityLevel = enmityLevel;
+
             _objectID = character.ObjectId;
             Character = character;
         }
 
-        public void Update()
+        public void Update(EnmityLevel enmityLevel)
         {
+            EnmityLevel = enmityLevel;
+
             if (ObjectId == 0)
             {
                 Character = null;
@@ -72,6 +85,7 @@ namespace DelvUI.Interface.Party
         public uint MP { get; private set; }
         public uint MaxMP { get; private set; }
         public float Shield { get; private set; }
+        public EnmityLevel EnmityLevel { get; private set; }
 
         public FakePartyFramesMember(int order)
         {
@@ -83,9 +97,12 @@ namespace DelvUI.Interface.Party
             MaxMP = 10000;
             MP = (uint)(MaxMP * RNG.Next(100) / 100f);
             Shield = RNG.Next(30) / 100f;
+
+            byte value = (byte)RNG.Next(1, 3);
+            EnmityLevel = value == 3 ? EnmityLevel.Last : (EnmityLevel)value;
         }
 
-        public void Update()
+        public void Update(EnmityLevel enmityLevel)
         {
 
         }
@@ -105,7 +122,8 @@ namespace DelvUI.Interface.Party
         public uint MP { get; }
         public uint MaxMP { get; }
         public float Shield { get; }
+        public EnmityLevel EnmityLevel { get; }
 
-        public void Update();
+        public void Update(EnmityLevel enmityLevel);
     }
 }

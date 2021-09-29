@@ -5,7 +5,7 @@ using Dalamud.Game.ClientState.Party;
 using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Helpers;
-//using FFXIVClientStructs.FFXIV.Client.Game.Group;
+using FFXIVClientStructs.FFXIV.Client.UI;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,6 +21,7 @@ namespace DelvUI.Interface.Party
         public static PartyManager Instance { get; private set; } = null!;
         private PartyFramesConfig _config;
 
+        private AddonPartyList* _partyListAddon = null;
         private IntPtr _hudAgent = IntPtr.Zero;
 
         private PartyManager(PartyFramesConfig config)
@@ -81,10 +82,10 @@ namespace DelvUI.Interface.Party
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
             // find party list hud agent
-            if (_hudAgent == IntPtr.Zero)
+            if (_hudAgent == IntPtr.Zero || _partyListAddon == null)
             {
-                var addon = Plugin.GameGui.GetAddonByName("_PartyList", 1);
-                _hudAgent = Plugin.GameGui.FindAgentInterface(addon);
+                _partyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1);
+                _hudAgent = Plugin.GameGui.FindAgentInterface(_partyListAddon);
 
                 PluginLog.Log($"_PartyList Hud Angent found at: 0x{_hudAgent.ToInt64():X16}");
             }
@@ -101,20 +102,19 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
-            // solo
-            var memberCount = Plugin.PartyList.Length;
-            if (_config.ShowWhenSolo && memberCount == 0)
-            {
-                UpdateSoloParty(player);
-                return;
-            }
-
-            // party
             try
             {
+                // solo
+                var memberCount = Plugin.PartyList.Length;
+                if (_config.ShowWhenSolo && memberCount == 0)
+                {
+                    UpdateSoloParty(player);
+                    return;
+                }
+
+                // party
                 bool partyChanged = _playerOrderChanged || _partyMembersInfo == null || _groupMembers.Count != memberCount;
 
-                // get data from default party list 
                 if (_hudAgent != IntPtr.Zero)
                 {
                     List<PartyListMemberInfo> newInfo = new List<PartyListMemberInfo>(8);
@@ -137,7 +137,7 @@ namespace DelvUI.Interface.Party
                 {
                     foreach (var member in _groupMembers)
                     {
-                        member.Update();
+                        member.Update(EnmityForIndex(member.Order - 1));
                     }
 
                     return;
@@ -169,7 +169,7 @@ namespace DelvUI.Interface.Party
                         order = IndexForPartyMember(partyMember) ?? 9;
                     }
 
-                    var member = new PartyFramesMember(partyMember, order);
+                    var member = new PartyFramesMember(partyMember, order, EnmityForIndex(order - 1));
                     _groupMembers.Add(member);
 
                     // player's chocobo (always last)
@@ -178,7 +178,7 @@ namespace DelvUI.Interface.Party
                         var companion = Utils.GetBattleChocobo(player);
                         if (companion is Character companionCharacter)
                         {
-                            _groupMembers.Add(new PartyFramesMember(companionCharacter, 10));
+                            _groupMembers.Add(new PartyFramesMember(companionCharacter, 10, EnmityLevel.Last));
                         }
                     }
                 }
@@ -194,6 +194,22 @@ namespace DelvUI.Interface.Party
             {
                 PluginLog.LogError("ERROR getting party data: " + e.Message);
             }
+        }
+
+        private EnmityLevel EnmityForIndex(int index)
+        {
+            if (_partyListAddon == null || index < 0 || index > 7)
+            {
+                return EnmityLevel.Last;
+            }
+
+            EnmityLevel enmityLevel = (EnmityLevel)_partyListAddon->PartyMember[index].EmnityByte;
+            if (enmityLevel == EnmityLevel.Leader && _partyListAddon->EnmityLeaderIndex != index)
+            {
+                enmityLevel = EnmityLevel.Last;
+            }
+
+            return enmityLevel;
         }
 
         private int? IndexForPartyMember(PartyMember member)
@@ -241,23 +257,49 @@ namespace DelvUI.Interface.Party
 
         private void UpdateSoloParty(PlayerCharacter player)
         {
-            List<IPartyFramesMember> newMembers = new List<IPartyFramesMember>();
-
-            newMembers.Add(new PartyFramesMember(player, 1));
-
+            Character? chocobo = null;
             if (_config.ShowChocobo)
             {
-                var companion = Utils.GetBattleChocobo(player);
-                if (companion is Character companionCharacter)
+                var gameObject = Utils.GetBattleChocobo(player);
+                if (gameObject != null && gameObject is Character)
                 {
-                    newMembers.Add(new PartyFramesMember(companionCharacter, 2));
+                    chocobo = (Character)gameObject;
                 }
             }
 
-            if (newMembers.Count != _groupMembers.Count)
+            bool needsUpdate = _groupMembers.Count == 0 ||
+                (_groupMembers.Count == 1 && _config.ShowChocobo) ||
+                (_groupMembers.Count > 1 && !_config.ShowChocobo) ||
+                (_groupMembers.Count > 1 && chocobo == null);
+
+            EnmityLevel playerEnmity = _partyListAddon->EnmityLeaderIndex == 0 ? EnmityLevel.Leader : EnmityLevel.Last;
+
+            // for some reason chocobos never get a proper enmity value even though they have aggro
+            // if the player enmity is set to first, but the "leader index" is invalid
+            // we can pretty much deduce that the chocobo is the one with aggro
+            // this might fail on some cases when there are other players not in party hitting the same thing
+            // but the edge case is so minor we should be fine
+            EnmityLevel chocoboEnmity = _partyListAddon->EnmityLeaderIndex == -1 && _partyListAddon->PartyMember[0].EmnityByte == 1 ? EnmityLevel.Leader : EnmityLevel.Last;
+
+            if (needsUpdate)
             {
-                _groupMembers = newMembers;
+                _groupMembers.Clear();
+
+                _groupMembers.Add(new PartyFramesMember(player, 1, playerEnmity));
+
+                if (chocobo != null)
+                {
+                    _groupMembers.Add(new PartyFramesMember(chocobo, 2, chocoboEnmity));
+                }
+
                 MembersChangedEvent?.Invoke(this);
+            }
+            else
+            {
+                for (int i = 0; i < _groupMembers.Count; i++)
+                {
+                    _groupMembers[i].Update(i == 0 ? playerEnmity : chocoboEnmity);
+                }
             }
         }
 

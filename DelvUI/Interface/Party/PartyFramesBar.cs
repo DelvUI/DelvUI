@@ -60,7 +60,7 @@ namespace DelvUI.Interface.Party
         public PluginConfigColor GetColor()
         {
             var color = _config.ColorsConfig.GenericRoleColor;
-            if (Member != null)
+            if (Member != null && Member.Character != null && Member.Character.ObjectKind != ObjectKind.BattleNpc)
             {
                 if (_config.ColorsConfig.UseRoleColors)
                 {
