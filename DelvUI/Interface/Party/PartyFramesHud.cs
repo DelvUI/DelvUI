@@ -33,6 +33,7 @@ namespace DelvUI.Interface.Party
             var manaBarConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesManaBarConfig>();
             var castbarConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesCastbarConfig>();
             var roleIconConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesRoleIconConfig>();
+            var leaderIconConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesLeaderIconConfig>();
             var buffsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesBuffsConfig>();
             var debuffsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesDebuffsConfig>();
 
@@ -43,7 +44,7 @@ namespace DelvUI.Interface.Party
             bars = new List<PartyFramesBar>(MaxMemberCount);
             for (int i = 0; i < bars.Capacity; i++)
             {
-                var bar = new PartyFramesBar(i.ToString(), _healthBarsConfig, manaBarConfig, castbarConfig, roleIconConfig, buffsConfig, debuffsConfig);
+                var bar = new PartyFramesBar(i.ToString(), _healthBarsConfig, manaBarConfig, castbarConfig, roleIconConfig, leaderIconConfig, buffsConfig, debuffsConfig);
                 bar.MovePlayerEvent += OnMovePlayer;
 
                 bars.Add(bar);
@@ -261,52 +262,51 @@ namespace DelvUI.Interface.Party
             // bars
             for (int i = 0; i < count; i++)
             {
-                bars[i].Draw(origin, drawList);
-
                 var member = bars[i].Member;
+
                 if (member != null)
                 {
                     if (target != null && member.ObjectId == target.ObjectId)
                     {
                         targetIndex = i;
+                        continue;
                     }
 
-                    if (member.EnmityLevel == EnmityLevel.Leader)
+                    if (_healthBarsConfig.ColorsConfig.ShowEnmityBorderColors)
                     {
-                        enmityLeaderIndex = i;
-                    }
-                    else if (member.EnmityLevel == EnmityLevel.Second)
-                    {
-                        enmitySecondIndex = i;
+                        if (member.EnmityLevel == EnmityLevel.Leader)
+                        {
+                            enmityLeaderIndex = i;
+                            continue;
+                        }
+                        else if (_healthBarsConfig.ColorsConfig.ShowSecondEnmity && member.EnmityLevel == EnmityLevel.Second &&
+                            (count > 4 || !_healthBarsConfig.ColorsConfig.HideSecondEnmityInLightParties))
+                        {
+                            enmitySecondIndex = i;
+                            continue;
+                        }
                     }
                 }
+
+                bars[i].Draw(origin, drawList);
             }
 
-            var borderSize = _healthBarsConfig.Size + Vector2.One * 2;
-
-            if (_healthBarsConfig.ColorsConfig.ShowEnmityBorderColors)
+            // 2nd enmity
+            if (enmitySecondIndex >= 0)
             {
-                // enmity leader border
-                if (enmityLeaderIndex >= 0)
-                {
-                    var borderPos = bars[enmityLeaderIndex].Position - Vector2.One;
-                    drawList.AddRect(borderPos, borderPos + borderSize, _healthBarsConfig.ColorsConfig.EnmityLeaderBordercolor.Base);
-                }
-
-                // enmity second border
-                if (enmitySecondIndex >= 0 && _healthBarsConfig.ColorsConfig.ShowSecondEnmity &&
-                    (count > 4 || !_healthBarsConfig.ColorsConfig.HideSecondEnmityInLightParties))
-                {
-                    var borderPos = bars[enmitySecondIndex].Position - Vector2.One;
-                    drawList.AddRect(borderPos, borderPos + borderSize, _healthBarsConfig.ColorsConfig.EnmitySecondBordercolor.Base);
-                }
+                bars[enmitySecondIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.EnmitySecondBordercolor);
             }
 
-            // target border
+            // 1st enmity
+            if (enmityLeaderIndex >= 0)
+            {
+                bars[enmityLeaderIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.EnmityLeaderBordercolor);
+            }
+
+            // target
             if (targetIndex >= 0)
             {
-                var borderPos = bars[targetIndex].Position - Vector2.One;
-                drawList.AddRect(borderPos, borderPos + borderSize, _healthBarsConfig.ColorsConfig.TargetBordercolor.Base);
+                bars[targetIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.TargetBordercolor);
             }
 
             ImGui.End();

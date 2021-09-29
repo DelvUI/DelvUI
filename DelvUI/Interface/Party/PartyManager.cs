@@ -137,8 +137,8 @@ namespace DelvUI.Interface.Party
                 {
                     foreach (var member in _groupMembers)
                     {
-                        var isPlayer = member.ObjectId == player.ObjectId;
-                        member.Update(EnmityForIndex(isPlayer ? 0 : member.Order - 1));
+                        var index = member.ObjectId == player.ObjectId ? 0 : member.Order - 1;
+                        member.Update(EnmityForIndex(index), IsLeader(member));
                     }
 
                     return;
@@ -170,7 +170,10 @@ namespace DelvUI.Interface.Party
                         order = IndexForPartyMember(partyMember) ?? 9;
                     }
 
-                    var member = new PartyFramesMember(partyMember, order, EnmityForIndex(isPlayer ? 0 : order - 1));
+                    var enmity = EnmityForIndex(isPlayer ? 0 : order - 1);
+                    var isPartyLeader = i == Plugin.PartyList.PartyLeaderIndex;
+
+                    var member = new PartyFramesMember(partyMember, order, enmity, isPartyLeader);
                     _groupMembers.Add(member);
 
                     // player's chocobo (always last)
@@ -179,7 +182,7 @@ namespace DelvUI.Interface.Party
                         var companion = Utils.GetBattleChocobo(player);
                         if (companion is Character companionCharacter)
                         {
-                            _groupMembers.Add(new PartyFramesMember(companionCharacter, 10, EnmityLevel.Last));
+                            _groupMembers.Add(new PartyFramesMember(companionCharacter, 10, EnmityLevel.Last, false));
                         }
                     }
                 }
@@ -211,6 +214,27 @@ namespace DelvUI.Interface.Party
             }
 
             return enmityLevel;
+        }
+
+        private bool IsLeader(IPartyFramesMember member)
+        {
+            var partyList = Plugin.PartyList;
+
+            for (int i = 0; i < partyList.Length; i++)
+            {
+                var m = partyList[i];
+                if (m == null)
+                {
+                    continue;
+                }
+
+                if (m.ObjectId == member.ObjectId || m.Name.ToString() == member.Name)
+                {
+                    return i == partyList.PartyLeaderIndex;
+                }
+            }
+
+            return false;
         }
 
         private int? IndexForPartyMember(PartyMember member)
@@ -286,11 +310,11 @@ namespace DelvUI.Interface.Party
             {
                 _groupMembers.Clear();
 
-                _groupMembers.Add(new PartyFramesMember(player, 1, playerEnmity));
+                _groupMembers.Add(new PartyFramesMember(player, 1, playerEnmity, true));
 
                 if (chocobo != null)
                 {
-                    _groupMembers.Add(new PartyFramesMember(chocobo, 2, chocoboEnmity));
+                    _groupMembers.Add(new PartyFramesMember(chocobo, 2, chocoboEnmity, false));
                 }
 
                 MembersChangedEvent?.Invoke(this);
@@ -299,7 +323,7 @@ namespace DelvUI.Interface.Party
             {
                 for (int i = 0; i < _groupMembers.Count; i++)
                 {
-                    _groupMembers[i].Update(i == 0 ? playerEnmity : chocoboEnmity);
+                    _groupMembers[i].Update(i == 0 ? playerEnmity : chocoboEnmity, i == 0);
                 }
             }
         }
@@ -331,7 +355,10 @@ namespace DelvUI.Interface.Party
             {
                 for (int i = 0; i < 8; i++)
                 {
-                    _groupMembers.Add(new FakePartyFramesMember(i));
+                    EnmityLevel enmityLevel = i <= 1 ? (EnmityLevel)i + 1 : EnmityLevel.Last;
+                    bool isPartyLeader = i == 0;
+
+                    _groupMembers.Add(new FakePartyFramesMember(i, enmityLevel, isPartyLeader));
                 }
             }
 

@@ -1,11 +1,11 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
+using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
 using System;
 using System.Numerics;
-using Dalamud.Game.ClientState.Objects.Enums;
 
 namespace DelvUI.Interface.Party
 {
@@ -18,6 +18,7 @@ namespace DelvUI.Interface.Party
         private PartyFramesManaBarConfig _manaBarConfig;
         private PartyFramesCastbarConfig _castbarConfig;
         private PartyFramesRoleIconConfig _roleIconConfig;
+        private PartyFramesLeaderIconConfig _leaderIconConfig;
         private PartyFramesBuffsConfig _buffsConfig;
         private PartyFramesDebuffsConfig _debuffsConfig;
 
@@ -38,6 +39,7 @@ namespace DelvUI.Interface.Party
             PartyFramesManaBarConfig manaBarConfig,
             PartyFramesCastbarConfig castbarConfig,
             PartyFramesRoleIconConfig roleIconConfig,
+            PartyFramesLeaderIconConfig leaderIconConfig,
             PartyFramesBuffsConfig buffsConfig,
             PartyFramesDebuffsConfig debuffsConfig
         )
@@ -46,6 +48,7 @@ namespace DelvUI.Interface.Party
             _manaBarConfig = manaBarConfig;
             _castbarConfig = castbarConfig;
             _roleIconConfig = roleIconConfig;
+            _leaderIconConfig = leaderIconConfig;
             _buffsConfig = buffsConfig;
             _debuffsConfig = debuffsConfig;
 
@@ -60,7 +63,8 @@ namespace DelvUI.Interface.Party
         public PluginConfigColor GetColor()
         {
             var color = _config.ColorsConfig.GenericRoleColor;
-            if (Member != null && Member.Character != null && Member.Character.ObjectKind != ObjectKind.BattleNpc)
+
+            if (Member != null && Member.Character?.ObjectKind != ObjectKind.BattleNpc)
             {
                 if (_config.ColorsConfig.UseRoleColors)
                 {
@@ -89,7 +93,7 @@ namespace DelvUI.Interface.Party
             return _config.ColorsConfig.GenericRoleColor;
         }
 
-        public void Draw(Vector2 origin, ImDrawListPtr drawList)
+        public void Draw(Vector2 origin, ImDrawListPtr drawList, PluginConfigColor? borderColor = null)
         {
             if (!Visible || Member is null)
             {
@@ -132,15 +136,15 @@ namespace DelvUI.Interface.Party
             {
                 var scale = Member.MaxHP > 0 ? (float)Member.HP / (float)Member.MaxHP : 1;
                 var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), _config.Size.Y);
-                var color = GetColor();
+                var hpColor = GetColor();
 
                 if (_config.RangeConfig.Enabled && character != null)
                 {
                     var alpha = _config.RangeConfig.AlphaForDistance(character.YalmDistanceX) / 100f;
-                    color = new(color.Vector.WithNewAlpha(alpha));
+                    hpColor = new(hpColor.Vector.WithNewAlpha(alpha));
                 }
 
-                DrawHelper.DrawGradientFilledRect(Position, fillSize, color, drawList);
+                DrawHelper.DrawGradientFilledRect(Position, fillSize, hpColor, drawList);
             }
 
             // shield
@@ -163,7 +167,8 @@ namespace DelvUI.Interface.Party
             // border
             var borderPos = Position - Vector2.One;
             var borderSize = _config.Size + Vector2.One * 2;
-            drawList.AddRect(borderPos, borderPos + borderSize, 0xFF000000);
+            var color = borderColor != null ? borderColor.Base : _config.ColorsConfig.BorderColor.Base;
+            drawList.AddRect(borderPos, borderPos + borderSize, color);
 
             // buffs / debuffs
             var buffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _buffsConfig.HealthBarAnchor);
@@ -231,7 +236,7 @@ namespace DelvUI.Interface.Party
                 _orderLabelHud.Draw(Position, _config.Size);
             }
 
-            // icon
+            // role/job icon
             if (_roleIconConfig.Enabled && isClose)
             {
                 uint iconId;
@@ -258,12 +263,20 @@ namespace DelvUI.Interface.Party
                 }
             }
 
+            // leader icon
+            if (_leaderIconConfig.Enabled && Member.IsPartyLeader)
+            {
+                var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _leaderIconConfig.HealthBarAnchor);
+                var iconPos = Utils.GetAnchoredPosition(parentPos + _leaderIconConfig.Position, _leaderIconConfig.Size, _leaderIconConfig.Anchor);
+
+                DrawHelper.DrawIcon(61521, iconPos, _leaderIconConfig.Size, false, drawList);
+            }
+
             // highlight
             if (_config.ColorsConfig.ShowHighlight && isHovering)
             {
                 drawList.AddRectFilled(Position, Position + _config.Size, _config.ColorsConfig.HighlightColor.Base);
             }
-
         }
     }
 }

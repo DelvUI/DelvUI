@@ -87,64 +87,68 @@ namespace DelvUI.Interface.Party
     [Portable(false)]
     public class PartyFramesColorsConfig : PluginConfigObject
     {
-        [ColorEdit4("Target Border Color")]
+        [ColorEdit4("Border Color")]
         [Order(5)]
+        public PluginConfigColor BorderColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Target Border Color")]
+        [Order(10)]
         public PluginConfigColor TargetBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [ColorEdit4("Background Color")]
-        [Order(20)]
+        [Order(15)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 70f / 100f));
 
         [ColorEdit4("Out of Reach Color")]
-        [Order(15)]
+        [Order(20)]
         public PluginConfigColor UnreachableColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 30f / 100f));
 
         [Checkbox("Use Role Colors", isMonitored = true, spacing = true)]
-        [Order(20)]
+        [Order(25)]
         public bool UseRoleColors = false;
 
         [ColorEdit4("Tank Role Color")]
-        [Order(25, collapseWith = nameof(UseRoleColors))]
+        [Order(30, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor TankRoleColor = new PluginConfigColor(new Vector4(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f));
 
         [ColorEdit4("DPS Role Color")]
-        [Order(30, collapseWith = nameof(UseRoleColors))]
+        [Order(35, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor DPSRoleColor = new PluginConfigColor(new Vector4(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f));
 
         [ColorEdit4("Healer Role Color")]
-        [Order(35, collapseWith = nameof(UseRoleColors))]
+        [Order(40, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor HealerRoleColor = new PluginConfigColor(new Vector4(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f));
 
         [ColorEdit4("Generic Role Color")]
-        [Order(40, collapseWith = nameof(UseRoleColors))]
+        [Order(45, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor GenericRoleColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
         [Checkbox("Highlight When Hovering With Cursor", spacing = true)]
-        [Order(45)]
+        [Order(50)]
         public bool ShowHighlight = true;
 
         [ColorEdit4("Highlight Color")]
-        [Order(50, collapseWith = nameof(ShowHighlight))]
+        [Order(55, collapseWith = nameof(ShowHighlight))]
         public PluginConfigColor HighlightColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 5f / 100f));
 
         [Checkbox("Show Enmity Border Colors", spacing = true)]
-        [Order(55)]
+        [Order(60)]
         public bool ShowEnmityBorderColors = true;
 
         [ColorEdit4("Enmity Leader Color")]
-        [Order(60, collapseWith = nameof(ShowEnmityBorderColors))]
+        [Order(65, collapseWith = nameof(ShowEnmityBorderColors))]
         public PluginConfigColor EnmityLeaderBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
 
         [Checkbox("Show Second Enmity")]
-        [Order(65, collapseWith = nameof(ShowEnmityBorderColors))]
+        [Order(70, collapseWith = nameof(ShowEnmityBorderColors))]
         public bool ShowSecondEnmity = true;
 
         [Checkbox("Hide Second Enmity in Light Parties")]
-        [Order(70, collapseWith = nameof(ShowSecondEnmity))]
+        [Order(75, collapseWith = nameof(ShowSecondEnmity))]
         public bool HideSecondEnmityInLightParties = true;
 
         [ColorEdit4("Enmity Second Color")]
-        [Order(75, collapseWith = nameof(ShowSecondEnmity))]
+        [Order(80, collapseWith = nameof(ShowSecondEnmity))]
         public PluginConfigColor EnmitySecondBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 175f / 255f, 40f / 255f, 100f / 100f));
     }
 
@@ -266,6 +270,31 @@ namespace DelvUI.Interface.Party
         [Checkbox("Use Specific DPS Role Icons")]
         [Order(45, collapseWith = nameof(UseRoleIcons))]
         public bool UseSpecificDPSRoleIcons = false;
+    }
+
+    [Section("Party Frames")]
+    [SubSection("Party Leader Icon", 0)]
+    public class PartyFramesLeaderIconConfig : MovablePluginConfigObject
+    {
+        public new static PartyFramesLeaderIconConfig DefaultConfig()
+        {
+            var config = new PartyFramesLeaderIconConfig();
+            config.Position = new Vector2(-12, -12);
+
+            return config;
+        }
+
+        [DragInt2("Size", min = 1, max = 1000)]
+        [Order(20)]
+        public Vector2 Size = new(24, 24);
+
+        [Anchor("Health Bar Anchor")]
+        [Order(25)]
+        public DrawAnchor HealthBarAnchor = DrawAnchor.TopLeft;
+
+        [Anchor("Anchor")]
+        [Order(30)]
+        public DrawAnchor Anchor = DrawAnchor.TopLeft;
     }
 
     [Section("Party Frames")]
