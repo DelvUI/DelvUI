@@ -16,22 +16,24 @@ namespace DelvUI.Interface.Party
     public unsafe class PartyFramesMember : IPartyFramesMember
     {
         protected PartyMember? _partyMember = null;
-
+        private string _name = "";
+        private uint _jobId = 0;
         private uint _objectID = 0;
+
         public uint ObjectId => _partyMember != null ? _partyMember.ObjectId : _objectID;
         public Character? Character { get; private set; }
 
         public int Order { get; private set; }
-        public string Name => _partyMember != null ? _partyMember.Name.ToString() : Character!.Name.ToString();
-        public uint Level => _partyMember != null ? _partyMember.Level : Character!.Level;
-        public uint JobId => _partyMember != null ? _partyMember.ClassJob.Id : Character!.ClassJob.Id;
-        public uint HP => _partyMember != null ? _partyMember.CurrentHP : Character!.CurrentHp;
-        public uint MaxHP => _partyMember != null ? _partyMember.MaxHP : Character!.MaxHp;
-        public uint MP => _partyMember != null ? _partyMember.CurrentMP : JobsHelper.CurrentPrimaryResource(Character!);
-        public uint MaxMP => _partyMember != null ? _partyMember.MaxMP : JobsHelper.MaxPrimaryResource(Character!);
+        public string Name => _partyMember != null ? _partyMember.Name.ToString() : (Character != null ? Character.Name.ToString() : _name);
+        public uint Level => _partyMember != null ? _partyMember.Level : (Character != null ? Character.Level : (uint)0);
+        public uint JobId => _partyMember != null ? _partyMember.ClassJob.Id : (Character != null ? Character.ClassJob.Id : _jobId);
+        public uint HP => _partyMember != null ? _partyMember.CurrentHP : (Character != null ? Character.CurrentHp : (uint)0);
+        public uint MaxHP => _partyMember != null ? _partyMember.MaxHP : (Character != null ? Character.MaxHp : (uint)0);
+        public uint MP => _partyMember != null ? _partyMember.CurrentMP : JobsHelper.CurrentPrimaryResource(Character);
+        public uint MaxMP => _partyMember != null ? _partyMember.MaxMP : JobsHelper.MaxPrimaryResource(Character);
         public float Shield => Utils.ActorShieldValue(Character);
-        public EnmityLevel EnmityLevel { get; private set; }
-        public bool IsPartyLeader { get; private set; }
+        public EnmityLevel EnmityLevel { get; private set; } = EnmityLevel.Last;
+        public bool IsPartyLeader { get; private set; } = false;
 
         public PartyFramesMember(PartyMember partyMember, int order, EnmityLevel enmityLevel, bool isPartyLeader)
         {
@@ -57,10 +59,19 @@ namespace DelvUI.Interface.Party
             Character = character;
         }
 
-        public void Update(EnmityLevel enmityLevel, bool isPartyLeader)
+        public PartyFramesMember(string? name, int order, uint jobId, bool isPartyLeader)
+        {
+            Order = order;
+            IsPartyLeader = isPartyLeader;
+            _name = name ?? "";
+            _jobId = jobId;
+        }
+
+        public void Update(EnmityLevel enmityLevel, bool isPartyLeader, uint jobId)
         {
             EnmityLevel = enmityLevel;
             IsPartyLeader = isPartyLeader;
+            _jobId = jobId;
 
             if (ObjectId == 0)
             {
@@ -106,7 +117,7 @@ namespace DelvUI.Interface.Party
             IsPartyLeader = isPartyLeader;
         }
 
-        public void Update(EnmityLevel enmityLevel, bool isPartyLeader)
+        public void Update(EnmityLevel enmityLevel, bool isPartyLeader, uint jobId)
         {
 
         }
@@ -129,6 +140,6 @@ namespace DelvUI.Interface.Party
         public EnmityLevel EnmityLevel { get; }
         public bool IsPartyLeader { get; }
 
-        public void Update(EnmityLevel enmityLevel, bool isPartyLeader);
+        public void Update(EnmityLevel enmityLevel, bool isPartyLeader, uint jobId);
     }
 }

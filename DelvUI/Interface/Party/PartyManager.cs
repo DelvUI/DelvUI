@@ -21,9 +21,6 @@ namespace DelvUI.Interface.Party
         public static PartyManager Instance { get; private set; } = null!;
         private PartyFramesConfig _config;
 
-        private AddonPartyList* _partyListAddon = null;
-        private IntPtr _hudAgent = IntPtr.Zero;
-
         private PartyManager(PartyFramesConfig config)
         {
             Plugin.Framework.Update += FrameworkOnOnUpdateEvent;
@@ -67,8 +64,16 @@ namespace DelvUI.Interface.Party
 
         #endregion Singleton
 
+        private AddonPartyList* _partyListAddon = null;
+        private IntPtr _hudAgent = IntPtr.Zero;
+
         private const int PartyListInfoOffset = 0x0B50;
         private const int PartyListMemberRawInfoSize = 0x18;
+        private const int PartyJobIconIdsOffset = 0x0F20;
+
+        private const int PartyCrossWorldNameOffset = 0x0E52;
+        private const int PartyCrossWorldEntrySize = 0xD8;
+
         private List<PartyListMemberInfo> _partyMembersInfo = null!;
         private bool _playerOrderChanged = false;
 
@@ -96,6 +101,13 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
+            Update();
+        }
+
+        private int _realMemberCount => _partyListAddon != null ? _partyListAddon->MemberCount : Plugin.PartyList.Length;
+
+        private void Update()
+        {
             var player = Plugin.ClientState.LocalPlayer;
             if (player is null || player is not PlayerCharacter)
             {
@@ -105,32 +117,14 @@ namespace DelvUI.Interface.Party
             try
             {
                 // solo
-                var memberCount = Plugin.PartyList.Length;
-                if (_config.ShowWhenSolo && memberCount == 0)
+                if (_config.ShowWhenSolo && _realMemberCount == 0)
                 {
                     UpdateSoloParty(player);
                     return;
                 }
 
-                // party
-                bool partyChanged = _playerOrderChanged || _partyMembersInfo == null || _groupMembers.Count != memberCount;
-
-                if (_hudAgent != IntPtr.Zero)
-                {
-                    List<PartyListMemberInfo> newInfo = new List<PartyListMemberInfo>(8);
-
-                    for (int i = 0; i < 8; i++)
-                    {
-                        PartyListMemberRawInfo* info = (PartyListMemberRawInfo*)(_hudAgent + (PartyListInfoOffset + PartyListMemberRawInfoSize * i));
-                        newInfo.Add(new PartyListMemberInfo(info));
-                    }
-
-                    if (!partyChanged && _partyMembersInfo != null)
-                    {
-                        partyChanged = !newInfo.SequenceEqual(_partyMembersInfo);
-                    }
-                    _partyMembersInfo = newInfo;
-                }
+                // parse raw data and detect changes
+                bool partyChanged = ParseRawData();
 
                 // if party is the same, just update actor references
                 if (!partyChanged)
@@ -138,146 +132,26 @@ namespace DelvUI.Interface.Party
                     foreach (var member in _groupMembers)
                     {
                         var index = member.ObjectId == player.ObjectId ? 0 : member.Order - 1;
-                        member.Update(EnmityForIndex(index), IsLeader(member));
+                        member.Update(EnmityForIndex(index), IsLeader(index), JobIdForIndex(index));
                     }
 
                     return;
                 }
 
-                PluginLog.Log("Setup party");
-
-                // create new members array with dalamud's data
-                _groupMembers.Clear();
-
-                for (int i = 0; i < memberCount; i++)
+                // cross world party
+                if (Plugin.PartyList.Length < _realMemberCount)
                 {
-                    var partyMember = Plugin.PartyList[i];
-                    if (partyMember == null)
-                    {
-                        continue;
-                    }
-
-                    var isPlayer = partyMember.ObjectId == player.ObjectId;
-
-                    // player order override
-                    int order;
-                    if (isPlayer && _config.PlayerOrderOverrideEnabled)
-                    {
-                        order = _config.PlayerOrder + 1;
-                    }
-                    else
-                    {
-                        order = IndexForPartyMember(partyMember) ?? 9;
-                    }
-
-                    var enmity = EnmityForIndex(isPlayer ? 0 : order - 1);
-                    var isPartyLeader = i == Plugin.PartyList.PartyLeaderIndex;
-
-                    var member = new PartyFramesMember(partyMember, order, enmity, isPartyLeader);
-                    _groupMembers.Add(member);
-
-                    // player's chocobo (always last)
-                    if (_config.ShowChocobo && member.ObjectId == player.ObjectId)
-                    {
-                        var companion = Utils.GetBattleChocobo(player);
-                        if (companion is Character companionCharacter)
-                        {
-                            _groupMembers.Add(new PartyFramesMember(companionCharacter, 10, EnmityLevel.Last, false));
-                        }
-                    }
+                    UpdateCrossWorldParty(player);
+                    return;
                 }
 
-                // sort according to default party list
-                SortGroupMembers(player);
-                _playerOrderChanged = false;
-
-                // fire event
-                MembersChangedEvent?.Invoke(this);
+                // regular party
+                UpdateRegularParty(player);
             }
             catch (Exception e)
             {
                 PluginLog.LogError("ERROR getting party data: " + e.Message);
             }
-        }
-
-        private EnmityLevel EnmityForIndex(int index)
-        {
-            if (_partyListAddon == null || index < 0 || index > 7)
-            {
-                return EnmityLevel.Last;
-            }
-
-            EnmityLevel enmityLevel = (EnmityLevel)_partyListAddon->PartyMember[index].EmnityByte;
-            if (enmityLevel == EnmityLevel.Leader && _partyListAddon->EnmityLeaderIndex != index)
-            {
-                enmityLevel = EnmityLevel.Last;
-            }
-
-            return enmityLevel;
-        }
-
-        private bool IsLeader(IPartyFramesMember member)
-        {
-            var partyList = Plugin.PartyList;
-
-            for (int i = 0; i < partyList.Length; i++)
-            {
-                var m = partyList[i];
-                if (m == null)
-                {
-                    continue;
-                }
-
-                if (m.ObjectId == member.ObjectId || m.Name.ToString() == member.Name)
-                {
-                    return i == partyList.PartyLeaderIndex;
-                }
-            }
-
-            return false;
-        }
-
-        private int? IndexForPartyMember(PartyMember member)
-        {
-            if (_partyMembersInfo == null || _partyMembersInfo.Count == 0)
-            {
-                return null;
-            }
-
-            var name = member.Name.ToString();
-            return _partyMembersInfo.FindIndex(o => o.ObjectId == member.ObjectId || o.Name == name) + 1;
-        }
-
-        public void OnPlayerOrderChange()
-        {
-            _playerOrderChanged = true;
-        }
-
-        private void SortGroupMembers(PlayerCharacter player)
-        {
-            _groupMembers.Sort((a, b) =>
-            {
-                if (a.Order == b.Order)
-                {
-                    if (a.ObjectId == player.ObjectId)
-                    {
-                        return 1;
-                    }
-                    else if (b.ObjectId == player.ObjectId)
-                    {
-                        return -1;
-                    }
-
-                    return a.Name.CompareTo(b.Name);
-                }
-
-                if (a.Order < b.Order)
-                {
-                    return -1;
-                }
-
-                return 1;
-            });
         }
 
         private void UpdateSoloParty(PlayerCharacter player)
@@ -323,9 +197,227 @@ namespace DelvUI.Interface.Party
             {
                 for (int i = 0; i < _groupMembers.Count; i++)
                 {
-                    _groupMembers[i].Update(i == 0 ? playerEnmity : chocoboEnmity, i == 0);
+                    _groupMembers[i].Update(i == 0 ? playerEnmity : chocoboEnmity, i == 0, i == 0 ? player.ClassJob.Id : 0);
                 }
             }
+        }
+
+        private bool ParseRawData()
+        {
+            bool partyChanged = _playerOrderChanged || _partyMembersInfo == null || _groupMembers.Count != _realMemberCount;
+
+            if (_hudAgent != IntPtr.Zero)
+            {
+                List<PartyListMemberInfo> newInfo = new List<PartyListMemberInfo>(_realMemberCount);
+
+                for (int i = 0; i < _realMemberCount; i++)
+                {
+                    PartyListMemberRawInfo* info = (PartyListMemberRawInfo*)(_hudAgent + (PartyListInfoOffset + PartyListMemberRawInfoSize * i));
+                    newInfo.Add(new PartyListMemberInfo(info, NameForIndex(i), JobIdForIndex(i)));
+                }
+
+                if (!partyChanged && _partyMembersInfo != null)
+                {
+                    partyChanged = !newInfo.SequenceEqual(_partyMembersInfo);
+                }
+                _partyMembersInfo = newInfo;
+            }
+
+            return partyChanged;
+        }
+
+        private void UpdateCrossWorldParty(PlayerCharacter player)
+        {
+            // create new members array with cross world data
+            _groupMembers.Clear();
+
+            for (int i = 0; i < _realMemberCount; i++)
+            {
+                bool isPlayer = i == 0;
+
+                int order;
+                if (isPlayer && _config.PlayerOrderOverrideEnabled)
+                {
+                    order = _config.PlayerOrder + 1;
+                }
+                else
+                {
+                    order = i + 1;
+                }
+
+                var enmity = EnmityForIndex(isPlayer ? 0 : order - 1);
+                var isPartyLeader = IsLeader(i);
+
+                var member = isPlayer ?
+                    new PartyFramesMember(player, order, enmity, isPartyLeader) :
+                    new PartyFramesMember(NameForIndex(i), order, JobIdForIndex(i), isPartyLeader);
+
+                _groupMembers.Add(member);
+            }
+
+            // sort according to default party list
+            SortGroupMembers(player);
+            _playerOrderChanged = false;
+
+            // fire event
+            MembersChangedEvent?.Invoke(this);
+        }
+
+        private void UpdateRegularParty(PlayerCharacter player)
+        {
+            // create new members array with dalamud's data
+            _groupMembers.Clear();
+
+            for (int i = 0; i < Plugin.PartyList.Length; i++)
+            {
+                var partyMember = Plugin.PartyList[i];
+                if (partyMember == null)
+                {
+                    continue;
+                }
+
+                var isPlayer = partyMember.ObjectId == player.ObjectId;
+
+                // player order override
+                int order;
+                if (isPlayer && _config.PlayerOrderOverrideEnabled)
+                {
+                    order = _config.PlayerOrder + 1;
+                }
+                else
+                {
+                    order = IndexForPartyMember(partyMember) ?? 9;
+                }
+
+                var enmity = EnmityForIndex(isPlayer ? 0 : order - 1);
+                var isPartyLeader = i == Plugin.PartyList.PartyLeaderIndex;
+
+                var member = new PartyFramesMember(partyMember, order, enmity, isPartyLeader);
+                _groupMembers.Add(member);
+
+                // player's chocobo (always last)
+                if (_config.ShowChocobo && member.ObjectId == player.ObjectId)
+                {
+                    var companion = Utils.GetBattleChocobo(player);
+                    if (companion is Character companionCharacter)
+                    {
+                        _groupMembers.Add(new PartyFramesMember(companionCharacter, 10, EnmityLevel.Last, false));
+                    }
+                }
+            }
+
+            // sort according to default party list
+            SortGroupMembers(player);
+            _playerOrderChanged = false;
+
+            // fire event
+            MembersChangedEvent?.Invoke(this);
+        }
+
+        #region utils
+        private string? NameForIndex(int index)
+        {
+            if (_hudAgent == IntPtr.Zero || index < 0 || index > 7)
+            {
+                return null;
+            }
+
+            IntPtr namePtr = (_hudAgent + (PartyCrossWorldNameOffset + PartyCrossWorldEntrySize * index));
+            return Marshal.PtrToStringAnsi(namePtr);
+        }
+
+        private uint JobIdForIndex(int index)
+        {
+            if (_partyListAddon == null || index < 0 || index > 7)
+            {
+                return 0;
+            }
+
+            // since we don't get the job info in a nice way when another player is out of reach
+            // we infer it from the icon id in the party list
+            int* ptr = (int*)(new IntPtr(_partyListAddon) + PartyJobIconIdsOffset + (4 * index));
+            int iconId = *ptr;
+
+            return (uint)(Math.Max(0, iconId - 62100));
+        }
+
+        private EnmityLevel EnmityForIndex(int index)
+        {
+            if (_partyListAddon == null || index < 0 || index > 7)
+            {
+                return EnmityLevel.Last;
+            }
+
+            EnmityLevel enmityLevel = (EnmityLevel)_partyListAddon->PartyMember[index].EmnityByte;
+            if (enmityLevel == EnmityLevel.Leader && _partyListAddon->EnmityLeaderIndex != index)
+            {
+                enmityLevel = EnmityLevel.Last;
+            }
+
+            return enmityLevel;
+        }
+
+        private bool IsLeader(int index)
+        {
+            var partyLeadIndex = Plugin.PartyList.PartyLeaderIndex;
+            if (partyLeadIndex >= 0 && partyLeadIndex < 8)
+            {
+                return index == partyLeadIndex;
+            }
+
+            if (_partyListAddon == null)
+            {
+                return false;
+            }
+
+            // we use the icon Y coordinate in the party list to know the index (lmao)
+            partyLeadIndex = (uint)_partyListAddon->LeaderMarkResNode->ChildNode->Y / 40;
+            return index == partyLeadIndex;
+        }
+
+        private int? IndexForPartyMember(PartyMember member)
+        {
+            if (_partyMembersInfo == null || _partyMembersInfo.Count == 0)
+            {
+                return null;
+            }
+
+            var name = member.Name.ToString();
+            return _partyMembersInfo.FindIndex(o => o.ObjectId == member.ObjectId || o.Name == name) + 1;
+        }
+
+        private void SortGroupMembers(PlayerCharacter player)
+        {
+            _groupMembers.Sort((a, b) =>
+            {
+                if (a.Order == b.Order)
+                {
+                    if (a.ObjectId == player.ObjectId)
+                    {
+                        return 1;
+                    }
+                    else if (b.ObjectId == player.ObjectId)
+                    {
+                        return -1;
+                    }
+
+                    return a.Name.CompareTo(b.Name);
+                }
+
+                if (a.Order < b.Order)
+                {
+                    return -1;
+                }
+
+                return 1;
+            });
+        }
+        #endregion
+
+        #region events
+        public void OnPlayerOrderChange()
+        {
+            _playerOrderChanged = true;
         }
 
         private void OnConfigPropertyChanged(object sender, OnChangeBaseArgs args)
@@ -365,18 +457,22 @@ namespace DelvUI.Interface.Party
             MembersChangedEvent?.Invoke(this);
         }
 
+        #endregion
+
         #region raw party info
         internal unsafe class PartyListMemberInfo : IEquatable<PartyListMemberInfo>
         {
             public readonly string Name;
             public readonly uint ObjectId;
             public readonly byte Type;
+            public readonly uint JobId;
 
-            public PartyListMemberInfo(PartyListMemberRawInfo* info)
+            public PartyListMemberInfo(PartyListMemberRawInfo* info, string? crossWorldName, uint jobId)
             {
-                Name = Marshal.PtrToStringAnsi(new IntPtr(info->NamePtr)) ?? "";
+                Name = crossWorldName ?? (Marshal.PtrToStringAnsi(new IntPtr(info->NamePtr)) ?? "");
                 ObjectId = info->ObjectId;
                 Type = info->Type;
+                JobId = jobId;
             }
 
             public bool Equals(PartyListMemberInfo? other)

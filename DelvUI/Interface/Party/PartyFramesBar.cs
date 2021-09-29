@@ -110,7 +110,7 @@ namespace DelvUI.Interface.Party
             bool isHovering = ImGui.IsMouseHoveringRect(Position, Position + _config.Size);
             var character = Member.Character;
 
-            if (isHovering && character != null)
+            if (isHovering)
             {
                 MouseOverHelper.Instance.Target = character;
 
@@ -120,32 +120,28 @@ namespace DelvUI.Interface.Party
                     MovePlayerEvent?.Invoke(this);
                 }
                 // target
-                else if (ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                else if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && character != null)
                 {
                     Plugin.TargetManager.SetTarget(character);
                 }
             }
 
             // bg
-            var isClose = Member.MaxHP > 0;
-            var bgColorMap = isClose ? _config.ColorsConfig.BackgroundColor.Base : _config.ColorsConfig.UnreachableColor.Base;
-            drawList.AddRectFilled(Position, Position + _config.Size, bgColorMap);
+            drawList.AddRectFilled(Position, Position + _config.Size, _config.ColorsConfig.BackgroundColor.Base);
 
             // hp
-            if (isClose && Member.HP > 0)
+            var hpScale = Member.MaxHP > 0 ? (float)Member.HP / (float)Member.MaxHP : 1;
+            var hpFillSize = new Vector2(Math.Max(1, _config.Size.X * hpScale), _config.Size.Y);
+            var hpColor = GetColor();
+
+            var distance = character != null ? character.YalmDistanceX : byte.MaxValue;
+            if (_config.RangeConfig.Enabled)
             {
-                var scale = Member.MaxHP > 0 ? (float)Member.HP / (float)Member.MaxHP : 1;
-                var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), _config.Size.Y);
-                var hpColor = GetColor();
-
-                if (_config.RangeConfig.Enabled && character != null)
-                {
-                    var alpha = _config.RangeConfig.AlphaForDistance(character.YalmDistanceX) / 100f;
-                    hpColor = new(hpColor.Vector.WithNewAlpha(alpha));
-                }
-
-                DrawHelper.DrawGradientFilledRect(Position, fillSize, hpColor, drawList);
+                var alpha = _config.RangeConfig.AlphaForDistance(distance) / 100f;
+                hpColor = new(hpColor.Vector.WithNewAlpha(alpha));
             }
+
+            DrawHelper.DrawGradientFilledRect(Position, hpFillSize, hpColor, drawList);
 
             // shield
             if (_config.ShieldConfig.Enabled)
@@ -202,34 +198,10 @@ namespace DelvUI.Interface.Party
             _castbarHud.Draw(castbarPos);
 
             // name
-            var name = Member.Name ?? "";
-
-            if (character != null)
-            {
-                _nameLabelHud.Draw(Position, _config.Size, character);
-            }
-            else
-            {
-                var previousText = _config.NameLabelConfig.GetText();
-                _config.NameLabelConfig.SetText(name);
-
-                var previousColor = _config.NameLabelConfig.Color;
-                var previousOutlineColor = _config.NameLabelConfig.OutlineColor;
-                if (Member is not FakePartyFramesMember)
-                {
-                    _config.NameLabelConfig.Color = new(_config.NameLabelConfig.Color.Vector.AdjustColorAlpha(-.3f));
-                    _config.NameLabelConfig.OutlineColor = new(_config.NameLabelConfig.OutlineColor.Vector.AdjustColorAlpha(-.3f));
-                }
-
-                _nameLabelHud.Draw(Position, _config.Size);
-
-                _config.NameLabelConfig.SetText(previousText);
-                _config.NameLabelConfig.Color = previousColor;
-                _config.NameLabelConfig.OutlineColor = previousOutlineColor;
-            }
+            _nameLabelHud.Draw(Position, _config.Size, character, Member.Name);
 
             // order
-            if (character != null && character.ObjectKind != ObjectKind.BattleNpc)
+            if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)
             {
                 var order = Member.ObjectId == player.ObjectId ? 1 : Member.Order;
                 _config.OrderLabelConfig.SetText("[" + order + "]");
@@ -237,7 +209,7 @@ namespace DelvUI.Interface.Party
             }
 
             // role/job icon
-            if (_roleIconConfig.Enabled && isClose)
+            if (_roleIconConfig.Enabled && Member.JobId > 0)
             {
                 uint iconId;
 

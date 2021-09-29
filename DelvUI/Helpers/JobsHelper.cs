@@ -68,8 +68,13 @@ namespace DelvUI.Helpers
             return IsJobARole(jobId, JobRoles.Gatherer);
         }
 
-        public static uint CurrentPrimaryResource(Character character)
+        public static uint CurrentPrimaryResource(Character? character)
         {
+            if (character == null)
+            {
+                return 0;
+            }
+
             uint jobId = character.ClassJob.Id;
 
             if (IsJobGatherer(jobId))
@@ -85,8 +90,13 @@ namespace DelvUI.Helpers
             return character.CurrentMp;
         }
 
-        public static uint MaxPrimaryResource(Character character)
+        public static uint MaxPrimaryResource(Character? character)
         {
+            if (character == null)
+            {
+                return 0;
+            }
+
             uint jobId = character.ClassJob.Id;
 
             if (IsJobGatherer(jobId))
