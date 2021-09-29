@@ -126,7 +126,7 @@ namespace DelvUI.Helpers
                 case JobRoles.Tank: return 62581;
                 case JobRoles.Healer: return 62582;
                 case JobRoles.DPS:
-                    if (specificDPSIcons && SpecifigDPSIcons.TryGetValue(jobId, out var iconId))
+                    if (specificDPSIcons && SpecificDPSIcons.TryGetValue(jobId, out var iconId))
                     {
                         return iconId;
                     }
@@ -254,7 +254,7 @@ namespace DelvUI.Helpers
             [JobIDs.FSH] = "FSH",
         };
 
-        public static Dictionary<uint, uint> SpecifigDPSIcons = new Dictionary<uint, uint>()
+        public static Dictionary<uint, uint> SpecificDPSIcons = new Dictionary<uint, uint>()
         {
             // melee dps
             [JobIDs.PGL] = 62584,
