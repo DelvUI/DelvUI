@@ -71,6 +71,8 @@ namespace DelvUI.Interface.Party
                 var offset = bar.Member.Order - 1 > Config.PlayerOrder ? -1 : -2;
                 Config.PlayerOrder = Math.Max(0, Math.Min(7, bar.Member.Order + offset));
                 PartyManager.Instance.OnPlayerOrderChange();
+
+                ConfigurationManager.Instance.SaveConfigurations();
             }
         }
 
