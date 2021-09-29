@@ -131,11 +131,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDarkside(Vector2 origin)
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            if (target is not Character && Config.HideDarksideWhenNoTarget)
-            {
-                return;
-            }
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            if (Config.HideDarksideWhenNoTarget && actor is not BattleChara) { return; }
 
             float darksideTimer = Plugin.JobGauges.Get<DRKGauge>().DarksideTimeRemaining;
             float darksideDuration = Math.Abs(darksideTimer / 1000);
@@ -352,29 +349,30 @@ namespace DelvUI.Interface.Jobs
         [Order(110, collapseWith = nameof(ShowDarkside))]
         public bool OnlyShowDarksideWhenActive = false;
 
-        [DragFloat2("Position" + "##Darkside", min = -4000f, max = 4000f)]
+        [Checkbox("Hide When No Target" + "##Darkside")]
         [Order(115, collapseWith = nameof(ShowDarkside))]
+        public bool HideDarksideWhenNoTarget = true;
+
+        [Checkbox("Timer" + "##Darkside")]
+        [Order(120, collapseWith = nameof(ShowDarkside))]
+        public bool ShowDarksideText = true;
+
+        [DragFloat2("Position" + "##Darkside", min = -4000f, max = 4000f)]
+        [Order(125, collapseWith = nameof(ShowDarkside))]
         public Vector2 DarksidePosition = new Vector2(0, -73);
 
         [DragFloat2("Size" + "##Darkside", min = 0, max = 4000f)]
-        [Order(120, collapseWith = nameof(ShowDarkside))]
+        [Order(130, collapseWith = nameof(ShowDarkside))]
         public Vector2 DarksideSize = new Vector2(254, 10);
 
         [ColorEdit4("Darkside" + "##Darkside")]
-        [Order(125, collapseWith = nameof(ShowDarkside))]
+        [Order(135, collapseWith = nameof(ShowDarkside))]
         public PluginConfigColor DarksideColor = new(new Vector4(209 / 255f, 38f / 255f, 204f / 255f, 100f / 100f));
 
         [ColorEdit4("Darkside Expiry" + "##Darkside")]
-        [Order(130, collapseWith = nameof(ShowDarkside))]
+        [Order(140, collapseWith = nameof(ShowDarkside))]
         public PluginConfigColor DarksideExpiryColor = new(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [Checkbox("Show Darkside Text" + "##Darkside")]
-        [Order(135, collapseWith = nameof(ShowDarkside))]
-        public bool ShowDarksideText = true;
-
-        [Checkbox("Hide When No Target" + "##Darkside")]
-        [Order(140, collapseWith = nameof(ShowDarkside))]
-        public bool HideDarksideWhenNoTarget = false;
         #endregion
 
         #region Buff Bar
