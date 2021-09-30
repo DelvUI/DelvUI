@@ -136,12 +136,13 @@ namespace DelvUI.Interface.Party
             // hp
             var hpScale = Member.MaxHP > 0 ? (float)Member.HP / (float)Member.MaxHP : 1;
             var hpFillSize = new Vector2(Math.Max(1, _config.Size.X * hpScale), _config.Size.Y);
-            var hpColor = GetColor(hpScale);
+            PluginConfigColor? hpColor = GetColor(hpScale);
 
             var distance = character != null ? character.YalmDistanceX : byte.MaxValue;
             if (_config.RangeConfig.Enabled)
             {
-                var alpha = _config.RangeConfig.AlphaForDistance(distance) / 100f;
+                var currentAlpha = hpColor.Vector.W * 100f;
+                var alpha = _config.RangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
                 hpColor = new(hpColor.Vector.WithNewAlpha(alpha));
             }
 

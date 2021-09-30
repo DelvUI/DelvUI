@@ -189,7 +189,7 @@ namespace DelvUI.Interface.Party
         [Order(25, collapseWith = nameof(UseAdditionalRangeCheck))]
         public float AdditionalAlpha = 60;
 
-        public float AlphaForDistance(int distance)
+        public float AlphaForDistance(int distance, float alpha = 100f)
         {
             if (!Enabled)
             {
@@ -198,15 +198,15 @@ namespace DelvUI.Interface.Party
 
             if (!UseAdditionalRangeCheck)
             {
-                return distance > Range ? Alpha : 100f;
+                return distance > Range ? Alpha : alpha;
             }
 
             if (Range > AdditionalRange)
             {
-                return distance > Range ? Alpha : (distance > AdditionalRange ? AdditionalAlpha : 100f);
+                return distance > Range ? Alpha : (distance > AdditionalRange ? AdditionalAlpha : alpha);
             }
 
-            return distance > AdditionalRange ? AdditionalAlpha : (distance > Range ? Alpha : 100f);
+            return distance > AdditionalRange ? AdditionalAlpha : (distance > Range ? Alpha : alpha);
         }
     }
 
