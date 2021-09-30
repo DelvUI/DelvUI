@@ -255,13 +255,14 @@ namespace DelvUI
             UiBuilder.RebuildFonts();
 
             ChatHelper.Instance.Dispose();
-            ConfigurationManager.Instance.Dispose();
             FontsManager.Instance.Dispose();
             GlobalColors.Instance.Dispose();
             MouseOverHelper.Instance.Dispose();
             PartyManager.Instance.Dispose();
             TexturesCache.Instance.Dispose();
             TooltipsHelper.Instance.Dispose();
+
+            ConfigurationManager.Instance.Dispose();
         }
     }
 }
