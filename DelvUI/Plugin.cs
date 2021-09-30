@@ -96,11 +96,6 @@ namespace DelvUI
             UiBuilder.BuildFonts += BuildFont;
             UiBuilder.OpenConfigUi += OpenConfigUi;
 
-            if (!FontsManager.Instance.DefaultFontBuilt)
-            {
-                UiBuilder.RebuildFonts();
-            }
-
             CommandManager.AddHandler(
                 "/delvui",
                 new CommandInfo(PluginCommand)
@@ -262,7 +257,7 @@ namespace DelvUI
             TexturesCache.Instance.Dispose();
             TooltipsHelper.Instance.Dispose();
 
-            
+
             // This needs to remain last to avoid race conditions
             ConfigurationManager.Instance.Dispose();
         }

@@ -242,6 +242,11 @@ namespace DelvUI.Interface
 
         public void Draw()
         {
+            if (!FontsManager.Instance.DefaultFontBuilt)
+            {
+                Plugin.UiBuilder.RebuildFonts();
+            }
+
             MouseOverHelper.Instance.Target = null;
 
             if (!ShouldBeVisible())

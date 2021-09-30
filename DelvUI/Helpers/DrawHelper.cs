@@ -1,10 +1,10 @@
-﻿using ImGuiNET;
+﻿using DelvUI.Config;
+using FFXIVClientStructs.FFXIV.Component.GUI;
+using ImGuiNET;
+using ImGuiScene;
 using Lumina.Excel;
 using System;
 using System.Numerics;
-using DelvUI.Config;
-using FFXIVClientStructs.FFXIV.Component.GUI;
-using ImGuiScene;
 
 namespace DelvUI.Helpers
 {
@@ -66,30 +66,12 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static void DrawOutlinedText(string text, Vector2 pos, float fontScale)
-        {
-            DrawOutlinedText(text, pos, Vector4.One, Vector4.UnitW, fontScale);
-        }
-
-        public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor, float fontScale)
-        {
-            DrawOutlinedText(text, pos, color, outlineColor, fontScale, FontsManager.Instance.DefaultFont);
-        }
-
-        public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor, float fontScale, ImFontPtr fontPtr)
-        {
-            var originalScale = fontPtr.Scale;
-            fontPtr.Scale = fontScale;
-            ImGui.PushFont(fontPtr);
-            DrawOutlinedText(text, pos, color, outlineColor);
-            ImGui.PopFont();
-            fontPtr.Scale = originalScale;
-        }
-
         public static void DrawOutlinedText(string text, Vector2 pos) { DrawOutlinedText(text, pos, Vector4.One, Vector4.UnitW); }
 
         public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor)
         {
+            var fontPushed = FontsManager.Instance.PushDefaultFont();
+
             ImGui.SetCursorPos(new Vector2(pos.X - 1, pos.Y + 1));
             ImGui.TextColored(outlineColor, text);
 
@@ -116,6 +98,11 @@ namespace DelvUI.Helpers
 
             ImGui.SetCursorPos(new Vector2(pos.X, pos.Y));
             ImGui.TextColored(color, text);
+
+            if (fontPushed)
+            {
+                ImGui.PopFont();
+            }
         }
 
         public static void DrawOutlinedText(string text, Vector2 pos, ImDrawListPtr drawList, int thickness = 1)
