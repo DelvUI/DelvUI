@@ -117,9 +117,18 @@ namespace DelvUI.Interface.Party
             try
             {
                 // solo
-                if (_config.ShowWhenSolo && _realMemberCount == 0)
+                if (_realMemberCount <= 1)
                 {
-                    UpdateSoloParty(player);
+                    if (_config.ShowWhenSolo)
+                    {
+                        UpdateSoloParty(player);
+                    }
+                    else if (_groupMembers.Count > 0)
+                    {
+                        _groupMembers.Clear();
+                        MembersChangedEvent?.Invoke(this);
+                    }
+
                     return;
                 }
 
