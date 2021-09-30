@@ -262,6 +262,8 @@ namespace DelvUI
             TexturesCache.Instance.Dispose();
             TooltipsHelper.Instance.Dispose();
 
+            
+            // This needs to remain last to avoid race conditions
             ConfigurationManager.Instance.Dispose();
         }
     }
