@@ -103,41 +103,41 @@ namespace DelvUI.Interface.Party
         [Order(20)]
         public bool UseRoleColors = false;
 
-        [Checkbox("Color Based On Health Value", isMonitored = true)]
-        [Order(25)]
-        public bool UseColorBasedOnHealthValue = false;
-
-        [ColorEdit4("Full Health Color")]
-        [Order(30, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public PluginConfigColor FullHealthColor = new PluginConfigColor(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
-
-        [ColorEdit4("Low Health Color")]
-        [Order(35, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public PluginConfigColor LowHealthColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
-
-        [DragFloat("Full Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
-        [Order(40, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public float FullHealthColorThreshold = 75f;
-
-        [DragFloat("Low Health Color Below Health %", min = 0f, max = 50f, velocity = 1f)]
-        [Order(45, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public float LowHealthColorThreshold = 25f;
-
         [ColorEdit4("Tank Role Color")]
-        [Order(50, collapseWith = nameof(UseRoleColors))]
+        [Order(25, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor TankRoleColor = new PluginConfigColor(new Vector4(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f));
 
         [ColorEdit4("DPS Role Color")]
-        [Order(55, collapseWith = nameof(UseRoleColors))]
+        [Order(30, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor DPSRoleColor = new PluginConfigColor(new Vector4(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f));
 
         [ColorEdit4("Healer Role Color")]
-        [Order(60, collapseWith = nameof(UseRoleColors))]
+        [Order(35, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor HealerRoleColor = new PluginConfigColor(new Vector4(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f));
 
         [ColorEdit4("Generic Role Color")]
-        [Order(65, collapseWith = nameof(UseRoleColors))]
+        [Order(40, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor GenericRoleColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
+
+        [Checkbox("Color Based On Health Value" , isMonitored = true)]
+        [Order(45)]
+        public bool UseColorBasedOnHealthValue = false;
+
+        [ColorEdit4("Full Health Color")]
+        [Order(50, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        public PluginConfigColor FullHealthColor = new PluginConfigColor(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Low Health Color")]
+        [Order(55, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        public PluginConfigColor LowHealthColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [DragFloat("Full Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
+        [Order(60, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        public float FullHealthColorThreshold = 75f;
+
+        [DragFloat("Low Health Color Below Health %", min = 0f, max = 50f, velocity = 1f)]
+        [Order(65, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        public float LowHealthColorThreshold = 25f;
 
         [Checkbox("Highlight When Hovering With Cursor", spacing = true)]
         [Order(70)]
