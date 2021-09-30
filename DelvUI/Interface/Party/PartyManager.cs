@@ -91,8 +91,6 @@ namespace DelvUI.Interface.Party
             {
                 _partyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1);
                 _hudAgent = Plugin.GameGui.FindAgentInterface(_partyListAddon);
-
-                PluginLog.Log($"_PartyList Hud Angent found at: 0x{_hudAgent.ToInt64():X16}");
             }
 
             // no need to update on preview mode

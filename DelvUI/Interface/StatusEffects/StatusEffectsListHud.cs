@@ -8,7 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Numerics;
 using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
-using Status = Dalamud.Game.ClientState.Statuses.Status;
+using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
 namespace DelvUI.Interface.StatusEffects
 {
@@ -18,7 +18,9 @@ namespace DelvUI.Interface.StatusEffects
 
         private LayoutInfo _layoutInfo;
         private bool _showingTooltip = false;
-        //private List<Status>? _fakeEffects = null;
+
+        internal static int StatusEffectListsSize = 30;
+        private StatusStruct[]? _fakeEffects = null;
 
         private LabelHud _durationLabel;
         private LabelHud _stacksLabel;
@@ -80,25 +82,71 @@ namespace DelvUI.Interface.StatusEffects
             return list;
         }
 
-        protected List<StatusEffectData> StatusEffectDataList(GameObject? actor)
+        protected unsafe List<StatusEffectData> StatusEffectDataList(GameObject? actor)
         {
             var list = new List<StatusEffectData>();
 
-            if (actor == null || actor is not BattleChara character)
+            BattleChara? character = null;
+
+            if (_fakeEffects == null)
             {
-                return list;
+                if (actor == null || actor is not BattleChara)
+                {
+                    return list;
+                }
+
+                character = (BattleChara)actor;
             }
 
             var player = Plugin.ClientState.LocalPlayer;
-
-            foreach (Status? status in character.StatusList)
+            var count = StatusEffectListsSize;
+            if (_fakeEffects != null)
             {
-                if (status is null || status.StatusId == 0)
+                count = Config.Limit == -1 ? _fakeEffects.Length : Math.Min(Config.Limit, _fakeEffects.Length);
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                // status
+                StatusStruct* status = null;
+
+                if (_fakeEffects != null)
+                {
+                    var fakeStruct = _fakeEffects![i];
+                    status = &fakeStruct;
+                }
+                else
+                {
+                    status = (StatusStruct*)character!.StatusList[i]?.Address;
+                }
+
+                if (status == null || status->StatusID == 0)
                 {
                     continue;
                 }
 
-                var data = status.GameData;
+                // data
+                LuminaStatus? data = null;
+
+                if (_fakeEffects != null)
+                {
+                    data = Plugin.DataManager.GetExcelSheet<LuminaStatus>()?.GetRow(status->StatusID);
+                }
+                else
+                {
+                    data = character!.StatusList[i]?.GameData;
+                }
+                if (data == null)
+                {
+                    continue;
+                }
+
+                // dont filter anything on preview mode
+                if (_fakeEffects != null)
+                {
+                    list.Add(new StatusEffectData(*status, data));
+                    continue;
+                }
 
                 // buffs
                 if (!Config.ShowBuffs && data.Category == 1)
@@ -119,7 +167,7 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 // only mine
-                if (Config.ShowOnlyMine && player?.ObjectId != status.SourceID)
+                if (Config.ShowOnlyMine && player?.ObjectId != status->SourceID)
                 {
                     continue;
                 }
@@ -130,7 +178,7 @@ namespace DelvUI.Interface.StatusEffects
                     continue;
                 }
 
-                list.Add(new StatusEffectData(status, data));
+                list.Add(new StatusEffectData(*status, data));
             }
 
             return list;
@@ -170,7 +218,7 @@ namespace DelvUI.Interface.StatusEffects
                 return;
             }
 
-            if (Actor == null || Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc)
+            if (_fakeEffects == null && (Actor == null || Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc))
             {
                 return;
             }
@@ -374,35 +422,36 @@ namespace DelvUI.Interface.StatusEffects
             }
         }
 
-        private void UpdatePreview()
+        private unsafe void UpdatePreview()
         {
-            //if (!Config.Preview)
-            //{
-            //    _fakeEffects = null;
-            //    return;
-            //}
+            if (!Config.Preview)
+            {
+                _fakeEffects = null;
+                return;
+            }
 
-            //var RNG = new Random((int)ImGui.GetTime());
-            //_fakeEffects = new List<Status>(20);
+            var RNG = new Random((int)ImGui.GetTime());
+            _fakeEffects = new StatusStruct[StatusEffectListsSize];
 
-            //for (int i = 0; i < 20; i++)
-            //{
-            //    var fakeEffect = new StatusEffect();
-            //    fakeEffect.Duration = RNG.Next(1, 30);
-            //    fakeEffect.EffectId = (short)RNG.Next(1, 200);
-            //    fakeEffect.StackCount = (byte)RNG.Next(0, 3);
+            for (int i = 0; i < StatusEffectListsSize; i++)
+            {
+                var fakeStruct = new StatusStruct();
+                fakeStruct.RemainingTime = RNG.Next(1, 30);
+                fakeStruct.StatusID = (ushort)RNG.Next(1, 200);
+                fakeStruct.StackCount = (byte)RNG.Next(0, 3);
+                fakeStruct.SourceID = 0;
 
-            //    _fakeEffects.Add(new Status(&fakeEffect));
-            //}
+                _fakeEffects[i] = fakeStruct;
+            }
         }
     }
 
     public struct StatusEffectData
     {
-        public Status Status;
+        public StatusStruct Status;
         public LuminaStatus Data;
 
-        public StatusEffectData(Status status, LuminaStatus data)
+        public StatusEffectData(StatusStruct status, LuminaStatus data)
         {
             Status = status;
             Data = data;
