@@ -23,8 +23,6 @@ namespace DelvUI.Interface.Party
         [Order(4)]
         public bool Preview = false;
 
-        [DragInt2("Size", isMonitored = true)]
-        [Order(10)]
         public Vector2 Size = new Vector2(650, 150);
 
         [Anchor("Bars Anchor", isMonitored = true, spacing = true)]
