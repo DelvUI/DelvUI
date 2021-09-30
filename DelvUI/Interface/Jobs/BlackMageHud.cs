@@ -298,7 +298,8 @@ namespace DelvUI.Interface.Jobs
 
             var builder = BarBuilder.Create(pos, size)
                 .AddInnerBar(timer, 18f, color)
-                .SetFlipDrainDirection(invert);
+                .SetFlipDrainDirection(invert)
+                .SetBackgroundColor(EmptyColor.Base);
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
@@ -336,7 +337,14 @@ namespace DelvUI.Interface.Jobs
 
             var builder = BarBuilder.Create(position, Config.DoTBarSize)
                 .AddInnerBar(timer, maxDuration, Config.DotColor)
-                .SetFlipDrainDirection(Config.InvertDoTBar);
+                .SetFlipDrainDirection(Config.InvertDoTBar)
+                .SetBackgroundColor(EmptyColor.Base);
+
+            if (Config.ShowDoTBarTimer && timer != 0)
+            {
+                builder.SetTextMode(BarTextMode.Single)
+                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+            }
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
@@ -531,6 +539,10 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Only Show When Active" + "##Dot")]
         [Order(211, collapseWith = nameof(ShowDotBar))]
         public bool OnlyShowDotWhenActive = false;
+
+        [Checkbox("Timer" + "##Dot")]
+        [Order(212, collapseWith = nameof(ShowDotBar))]
+        public bool ShowDoTBarTimer = false;
 
         [Checkbox("Inverted" + "##Dot")]
         [Order(215, collapseWith = nameof(ShowDotBar))]
