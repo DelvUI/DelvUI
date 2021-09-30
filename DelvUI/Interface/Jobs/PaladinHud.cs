@@ -209,11 +209,8 @@ namespace DelvUI.Interface.Jobs
 
             if (actor is BattleChara target)
             {
-                var goringBlade = target.StatusList.Where(o => o.StatusId is 725 && o.SourceID == player.ObjectId);
-                if (goringBlade.Any())
-                {
-                    duration = Math.Abs(goringBlade.First().RemainingTime);
-                }
+                IEnumerable<Status> goringBlade = target.StatusList.Where(o => o.StatusId is 725 && o.SourceID == player.ObjectId);
+                duration = goringBlade.Any() ? Math.Abs(goringBlade.First().RemainingTime) : 0f;
             }
 
             if (Config.OnlyShowGoringBladeWhenActive && duration is 0) { return; }

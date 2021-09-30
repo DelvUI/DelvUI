@@ -194,7 +194,7 @@ namespace DelvUI.Interface.Jobs
 
             if (disembowelBuff.Any())
             {
-                duration = Math.Abs(disembowelBuff.First().RemainingTime);                
+                duration = Math.Abs(disembowelBuff.First().RemainingTime);
             }
 
             if (duration == 0f && Config.OnlyShowDisembowelWhenActive)
@@ -303,7 +303,7 @@ namespace DelvUI.Interface.Jobs
         #endregion
 
         #region Blood Bar
-        [Checkbox("Show Blood Bar", separator = true)]
+        [Checkbox("Blood of the Dragon", separator = true)]
         [Order(120)]
         public bool ShowBloodBar = true;
 
@@ -311,23 +311,23 @@ namespace DelvUI.Interface.Jobs
         [Order(125, collapseWith = nameof(ShowBloodBar))]
         public bool OnlyShowBloodBarWhenActive = false;
 
-        [DragFloat2("Blood Bar Size" + "##Blood", max = 2000f)]
+        [Checkbox("Timer" + "##Blood")]
         [Order(130, collapseWith = nameof(ShowBloodBar))]
-        public Vector2 BloodBarSize = new(254, 20);
+        public bool ShowBloodBarText = true;
 
-        [DragFloat2("Blood Bar Position" + "##Blood", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##Blood", min = -4000f, max = 4000f)]
         [Order(135, collapseWith = nameof(ShowBloodBar))]
         public Vector2 BloodBarPosition = new(0, -10);
 
-        [Checkbox("Show Blood Bar Text" + "##Blood")]
+        [DragFloat2("Size" + "##Blood", max = 2000f)]
         [Order(140, collapseWith = nameof(ShowBloodBar))]
-        public bool ShowBloodBarText = true;
+        public Vector2 BloodBarSize = new(254, 20);
 
-        [ColorEdit4("Blood Of The Dragon Bar Color" + "##Blood")]
+        [ColorEdit4("Blood of the Dragon" + "##Blood")]
         [Order(145, collapseWith = nameof(ShowBloodBar))]
         public PluginConfigColor BloodOfTheDragonColor = new(new Vector4(78f / 255f, 198f / 255f, 238f / 255f, 100f / 100f));
 
-        [ColorEdit4("Life Of The Dragon Bar Color" + "##Blood")]
+        [ColorEdit4("Life of the Dragon" + "##Blood")]
         [Order(150, collapseWith = nameof(ShowBloodBar))]
         public PluginConfigColor LifeOfTheDragonColor = new(new Vector4(139f / 255f, 24f / 255f, 24f / 255f, 100f / 100f));
         #endregion
