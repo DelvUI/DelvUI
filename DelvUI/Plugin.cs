@@ -61,9 +61,9 @@ namespace DelvUI
             GameGui gameGui,
             JobGauges jobGauges,
             ObjectTable objectTable,
+            PartyList partyList,
             SigScanner sigScanner,
-            TargetManager targetManager,
-            PartyList partyList
+            TargetManager targetManager
         )
         {
             ClientState = clientState;
@@ -75,10 +75,11 @@ namespace DelvUI
             GameGui = gameGui;
             JobGauges = jobGauges;
             ObjectTable = objectTable;
+            PartyList = partyList;
             SigScanner = sigScanner;
             TargetManager = targetManager;
             UiBuilder = PluginInterface.UiBuilder;
-            PartyList = partyList;
+
 
             AssemblyLocation = Assembly.GetExecutingAssembly().Location;
 
@@ -116,13 +117,12 @@ namespace DelvUI
 
             _menuHook = new SystemMenuHook(PluginInterface);
 
-            Resolver.Initialize();
-            TexturesCache.Initialize();
-            GlobalColors.Initialize();
-            TooltipsHelper.Initialize();
             ChatHelper.Initialize();
+            GlobalColors.Initialize();
             MouseOverHelper.Initialize();
             PartyManager.Initialize();
+            TexturesCache.Initialize();
+            TooltipsHelper.Initialize();
 
             _hudManager = new HudManager();
         }
@@ -255,13 +255,13 @@ namespace DelvUI
             UiBuilder.RebuildFonts();
 
             ChatHelper.Instance.Dispose();
+            ConfigurationManager.Instance.Dispose();
             FontsManager.Instance.Dispose();
+            GlobalColors.Instance.Dispose();
             MouseOverHelper.Instance.Dispose();
+            PartyManager.Instance.Dispose();
             TexturesCache.Instance.Dispose();
             TooltipsHelper.Instance.Dispose();
-            GlobalColors.Instance.Dispose();
-            PartyManager.Instance.Dispose();
-            ConfigurationManager.Instance.Dispose();
         }
     }
 }
