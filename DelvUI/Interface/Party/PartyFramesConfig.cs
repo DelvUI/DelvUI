@@ -103,48 +103,68 @@ namespace DelvUI.Interface.Party
         [Order(20)]
         public bool UseRoleColors = false;
 
+        [Checkbox("Color Based On Health Value", isMonitored = true)]
+        [Order(25)]
+        public bool UseColorBasedOnHealthValue = false;
+
+        [ColorEdit4("Full Health Color")]
+        [Order(30, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        public PluginConfigColor FullHealthColor = new PluginConfigColor(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Low Health Color")]
+        [Order(35, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        public PluginConfigColor LowHealthColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [DragFloat("Full Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
+        [Order(40, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        public float FullHealthColorThreshold = 75f;
+
+        [DragFloat("Low Health Color Below Health %", min = 0f, max = 50f, velocity = 1f)]
+        [Order(45, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        public float LowHealthColorThreshold = 25f;
+
         [ColorEdit4("Tank Role Color")]
-        [Order(25, collapseWith = nameof(UseRoleColors))]
+        [Order(50, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor TankRoleColor = new PluginConfigColor(new Vector4(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f));
 
         [ColorEdit4("DPS Role Color")]
-        [Order(30, collapseWith = nameof(UseRoleColors))]
+        [Order(55, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor DPSRoleColor = new PluginConfigColor(new Vector4(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f));
 
         [ColorEdit4("Healer Role Color")]
-        [Order(35, collapseWith = nameof(UseRoleColors))]
+        [Order(60, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor HealerRoleColor = new PluginConfigColor(new Vector4(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f));
 
         [ColorEdit4("Generic Role Color")]
-        [Order(40, collapseWith = nameof(UseRoleColors))]
+        [Order(65, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor GenericRoleColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
         [Checkbox("Highlight When Hovering With Cursor", spacing = true)]
-        [Order(45)]
+        [Order(70)]
         public bool ShowHighlight = true;
 
         [ColorEdit4("Highlight Color")]
-        [Order(50, collapseWith = nameof(ShowHighlight))]
+        [Order(75, collapseWith = nameof(ShowHighlight))]
         public PluginConfigColor HighlightColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 5f / 100f));
 
         [Checkbox("Show Enmity Border Colors", spacing = true)]
-        [Order(55)]
+        [Order(80)]
         public bool ShowEnmityBorderColors = true;
 
         [ColorEdit4("Enmity Leader Color")]
-        [Order(60, collapseWith = nameof(ShowEnmityBorderColors))]
+        [Order(85, collapseWith = nameof(ShowEnmityBorderColors))]
         public PluginConfigColor EnmityLeaderBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
 
         [Checkbox("Show Second Enmity")]
-        [Order(65, collapseWith = nameof(ShowEnmityBorderColors))]
+        [Order(90, collapseWith = nameof(ShowEnmityBorderColors))]
         public bool ShowSecondEnmity = true;
 
         [Checkbox("Hide Second Enmity in Light Parties")]
-        [Order(70, collapseWith = nameof(ShowSecondEnmity))]
+        [Order(95, collapseWith = nameof(ShowSecondEnmity))]
         public bool HideSecondEnmityInLightParties = true;
 
         [ColorEdit4("Enmity Second Color")]
-        [Order(75, collapseWith = nameof(ShowSecondEnmity))]
+        [Order(100, collapseWith = nameof(ShowSecondEnmity))]
         public PluginConfigColor EnmitySecondBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 175f / 255f, 40f / 255f, 100f / 100f));
     }
 

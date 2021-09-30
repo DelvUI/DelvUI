@@ -60,7 +60,7 @@ namespace DelvUI.Interface.Party
             _debuffsListHud = new StatusEffectsListHud("partyFramesBar_Debuffs_" + id, debuffsConfig, "");
         }
 
-        public PluginConfigColor GetColor()
+        public PluginConfigColor GetColor(float scale)
         {
             var color = _config.ColorsConfig.GenericRoleColor;
 
@@ -69,6 +69,10 @@ namespace DelvUI.Interface.Party
                 if (_config.ColorsConfig.UseRoleColors)
                 {
                     color = ColorForJob(Member.JobId);
+                }
+                else if (_config.ColorsConfig.UseColorBasedOnHealthValue)
+                {
+                    color = Utils.ColorByHealthValue(scale, _config.ColorsConfig.LowHealthColorThreshold / 100f, _config.ColorsConfig.FullHealthColorThreshold / 100f, _config.ColorsConfig.FullHealthColor, _config.ColorsConfig.LowHealthColor);
                 }
                 else
                 {
@@ -132,7 +136,7 @@ namespace DelvUI.Interface.Party
             // hp
             var hpScale = Member.MaxHP > 0 ? (float)Member.HP / (float)Member.MaxHP : 1;
             var hpFillSize = new Vector2(Math.Max(1, _config.Size.X * hpScale), _config.Size.Y);
-            var hpColor = GetColor();
+            var hpColor = GetColor(hpScale);
 
             var distance = character != null ? character.YalmDistanceX : byte.MaxValue;
             if (_config.RangeConfig.Enabled)
