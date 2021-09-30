@@ -708,6 +708,11 @@ namespace DelvUI.Config.Tree
         public bool HasSeparator = true;
         public bool HasSpacing = false;
 
+        public FieldInfo? ParentCollapseField = null;
+        public PluginConfigObject? ParentConfigObject = null;
+
+        private List<KeyValuePair<int, object>>? DrawList = null;
+
         public PluginConfigObject ConfigObject
         {
             get => _configObject;
@@ -806,82 +811,86 @@ namespace DelvUI.Config.Tree
 
         private void DrawWithID(ref bool changed, string? ID = null)
         {
-            FieldInfo[] fields = ConfigObject.GetType().GetFields();
-            List<KeyValuePair<int, object>> drawList = new();
-            List<CategoryField> collapseWithList = new();
-
-            foreach (FieldInfo field in fields)
+            // Only do this stuff the first time the config page is loaded
+            if (DrawList is null)
             {
-                bool wasAdded = false;
+                DrawList = new List<KeyValuePair<int, object>>();
+                FieldInfo[] fields = ConfigObject.GetType().GetFields();
+                List<CategoryField> collapseWithList = new();
 
-                foreach (object attribute in field.GetCustomAttributes(true))
+                foreach (FieldInfo field in fields)
                 {
-                    if (attribute is OrderAttribute orderAttribute)
+                    bool wasAdded = false;
+
+                    foreach (object attribute in field.GetCustomAttributes(true))
                     {
-                        CategoryField categoryField = new CategoryField(field, ConfigObject, ID);
-
-                        // By default the 'Enabled' checkbox (inherited from PluginConfigObject) is considered the parent of all config items,
-                        // so if the ConfigObject is marked as undisableable, we bypass adding items as children *only* if their parent was the 'Enabled' field.
-                        if (orderAttribute.collapseWith is null || (!ConfigObject.Disableable && orderAttribute.collapseWith.Equals("Enabled")))
+                        if (attribute is OrderAttribute orderAttribute)
                         {
-                            drawList.Add(new KeyValuePair<int, object>(orderAttribute.pos, categoryField));
-                        }
-                        else
-                        {
-                            collapseWithList.Add(categoryField);
-                        }
+                            CategoryField categoryField = new CategoryField(field, ConfigObject, ID);
 
-                        wasAdded = true;
-                    }
-                    else if (attribute is NestedConfigAttribute nestedConfigAttribute && _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode? node))
-                    {
-                        node.HasSeparator = nestedConfigAttribute.separator;
-                        node.HasSpacing = nestedConfigAttribute.spacing;
-                        drawList.Add(new KeyValuePair<int, object>(nestedConfigAttribute.pos, node));
-                        wasAdded = true;
-                    }
-                }
-
-                if (!wasAdded)
-                {
-                    drawList.Add(new KeyValuePair<int, object>(int.MaxValue, new CategoryField(field, ConfigObject, ID)));
-                }
-            }
-
-            // Loop through nodes that should have a parent and build those relationships
-            foreach (CategoryField categoryField in collapseWithList)
-            {
-                foreach (object attribute in categoryField.MainField.GetCustomAttributes(true))
-                {
-                    if (attribute is OrderAttribute orderAttribute && orderAttribute.collapseWith is not null)
-                    {
-                        FieldInfo? parentField = fields.Where(f => f.Name.Equals(orderAttribute.collapseWith)).FirstOrDefault();
-                        if (parentField is not null)
-                        {
-                            // The CategoryField for the parent could either be in the drawList (if it is the root) or the collapseWithList (if there is multi-layered nesting)
-                            // Create a union of the CategoryFields that already exist in the drawList and the collapseWithList, then search for the parent field.
-                            // This looks incredibly gross but it's probably the cleanest way to do it without an extremely heavy refactor of the code above.
-                            CategoryField? parentCategoryField = drawList
-                                .Where(kvp => kvp.Value is CategoryField)
-                                .Select(kvp => kvp.Value as CategoryField)
-                                .Union(collapseWithList)
-                                .Where(categoryField => categoryField is not null && parentField.Equals(categoryField.MainField))
-                                .FirstOrDefault();
-
-                            if (parentCategoryField is not null)
+                            // By default the 'Enabled' checkbox (inherited from PluginConfigObject) is considered the parent of all config items,
+                            // so if the ConfigObject is marked as undisableable, we bypass adding items as children *only* if their parent was the 'Enabled' field.
+                            if (orderAttribute.collapseWith is null || (!ConfigObject.Disableable && orderAttribute.collapseWith.Equals("Enabled")))
                             {
-                                parentCategoryField.CollapseControl = true;
-                                categoryField.Depth = categoryField.HasSeparator ? 0 : parentCategoryField.Depth + 1;
-                                parentCategoryField.AddChild(orderAttribute.pos, categoryField);
+                                DrawList.Add(new KeyValuePair<int, object>(orderAttribute.pos, categoryField));
                             }
+                            else
+                            {
+                                collapseWithList.Add(categoryField);
+                            }
+
+                            wasAdded = true;
+                        }
+                        else if (attribute is NestedConfigAttribute nestedConfigAttribute && _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode? node))
+                        {
+                            node.HasSeparator = nestedConfigAttribute.separator;
+                            node.HasSpacing = nestedConfigAttribute.spacing;
+                            if (nestedConfigAttribute.collapseWith is not null)
+                            {
+                                node.ParentCollapseField = fields.Where(f => f.Name.Equals(nestedConfigAttribute.collapseWith)).FirstOrDefault();
+                                node.ParentConfigObject = ConfigObject;
+                            }
+
+                            DrawList.Add(new KeyValuePair<int, object>(nestedConfigAttribute.pos, node));
+                            wasAdded = true;
+                        }
+                    }
+
+                    if (!wasAdded && Attribute.IsDefined(field, typeof(ConfigAttribute), true))
+                    {
+                        DrawList.Add(new KeyValuePair<int, object>(int.MaxValue, new CategoryField(field, ConfigObject, ID)));
+                    }
+                }
+
+                // Loop through nodes that should have a parent and build those relationships
+                foreach (CategoryField categoryField in collapseWithList)
+                {
+                    OrderAttribute? orderAttribute = categoryField.MainField.GetCustomAttributes(false).Where(a => a is OrderAttribute).FirstOrDefault() as OrderAttribute;
+                    if (orderAttribute is not null && orderAttribute.collapseWith is not null)
+                    {
+                        // The CategoryField for the parent could either be in the drawList (if it is the root) or the collapseWithList (if there is multi-layered nesting)
+                        // Create a union of the CategoryFields that already exist in the drawList and the collapseWithList, then search for the parent field.
+                        // This looks incredibly gross but it's probably the cleanest way to do it without an extremely heavy refactor of the code above.
+                        CategoryField? parentCategoryField = DrawList
+                            .Where(kvp => kvp.Value is CategoryField)
+                            .Select(kvp => kvp.Value as CategoryField)
+                            .Union(collapseWithList)
+                            .Where(categoryField => categoryField is not null && orderAttribute.collapseWith.Equals(categoryField.MainField.Name))
+                            .FirstOrDefault();
+
+                        if (parentCategoryField is not null)
+                        {
+                            parentCategoryField.CollapseControl = true;
+                            categoryField.Depth = parentCategoryField.Depth + 1;
+                            parentCategoryField.AddChild(orderAttribute.pos, categoryField);
                         }
                     }
                 }
+
+                DrawList.Sort((x, y) => x.Key - y.Key);
             }
 
-            drawList.Sort((x, y) => x.Key - y.Key);
-
-            foreach (KeyValuePair<int, object> pair in drawList)
+            foreach (KeyValuePair<int, object> pair in DrawList)
             {
                 if (pair.Value is CategoryField categoryField)
                 {
@@ -889,6 +898,16 @@ namespace DelvUI.Config.Tree
                 }
                 else if (pair.Value is ConfigPageNode node)
                 {
+                    // If the parent checkbox of this nested config is disabled, don't draw this nestedconfig
+                    if (node.ParentCollapseField is not null && node.ParentConfigObject is not null)
+                    {
+                        if (!(Attribute.IsDefined(node.ParentCollapseField, typeof(CheckboxAttribute)) && 
+                            (node.ParentCollapseField.GetValue(node.ParentConfigObject) as bool? ?? false)))
+                        {
+                            continue;
+                        }
+                    }
+
                     ImGui.BeginGroup();
                     if (node.HasSeparator)
                     {
@@ -1071,6 +1090,7 @@ namespace DelvUI.Config.Tree
         public bool HasSpacing = false;
         public int Depth = 0;
         public bool IsChild = false;
+        public ConfigAttribute? ConfigAttribute;
 
         public CategoryField(FieldInfo mainField, PluginConfigObject configObject, string? id = null)
         {
@@ -1080,11 +1100,11 @@ namespace DelvUI.Config.Tree
             ID = id;
             CollapseControl = false;
 
-            ConfigAttribute? configAttribute = GetConfigAttribute(mainField);
-            if (configAttribute is not null)
+            ConfigAttribute = GetConfigAttribute(mainField);
+            if (ConfigAttribute is not null)
             {
-                HasSeparator = configAttribute.separator;
-                HasSpacing = configAttribute.spacing;
+                HasSeparator = ConfigAttribute.separator;
+                HasSpacing = ConfigAttribute.spacing;
             }
         }
 
@@ -1094,7 +1114,7 @@ namespace DelvUI.Config.Tree
             Children.Add(position, field); 
         }
 
-        public void Draw(ref bool changed)
+        public void Draw(ref bool changed, bool separatorDrawn = false)
         {
             if (!IsChild)
             {
@@ -1108,24 +1128,26 @@ namespace DelvUI.Config.Tree
             if (CollapseControl && Attribute.IsDefined(MainField, typeof(CheckboxAttribute)) && (MainField.GetValue(ConfigObject) as bool? ?? false))
             {
                 ImGui.BeginGroup();
-                ImGui.SetCursorPos(ImGui.GetCursorPos());
 
                 foreach (CategoryField child in Children.Values)
                 {
                     DrawSeparatorOrSpacing(child.MainField, ID);
+                    separatorDrawn |= child.HasSeparator;
+
+                    // Shift everything left if a separator was drawn
+                    var depth = separatorDrawn ? child.Depth - 1 : child.Depth;
 
                     // This draws the L shaped symbols and padding to the left of config items collapsible under a checkbox.
-                    // If the child has a separator or spacing above it, then we don't want to draw these because this item is the start of a new section.
-                    if (!child.HasSeparator)
+                    if (depth > 0)
                     {
                         // Shift cursor to the right to pad for children with depth more than 1.
                         // 26 is an arbitrary value I found to be around half the width of a checkbox
-                        ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(26, 0) * Math.Max((child.Depth - 1), 0));
+                        ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(26, 0) * Math.Max((depth - 1), 0));
                         ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
                         ImGui.SameLine();
                     }
 
-                    child.Draw(ref changed);
+                    child.Draw(ref changed, separatorDrawn);
                 }
 
                 ImGui.EndGroup();
@@ -1134,12 +1156,9 @@ namespace DelvUI.Config.Tree
 
         public void Draw(ref bool changed, FieldInfo field)
         {
-            foreach (object attribute in field.GetCustomAttributes(true))
+            if (ConfigAttribute is not null)
             {
-                if (attribute is ConfigAttribute configAttribute)
-                {
-                    changed |= configAttribute.Draw(field, ConfigObject, ID);
-                }
+                changed |= ConfigAttribute.Draw(field, ConfigObject, ID);
             }
         }
 
