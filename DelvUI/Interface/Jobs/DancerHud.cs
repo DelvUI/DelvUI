@@ -104,10 +104,7 @@ namespace DelvUI.Interface.Jobs
         {
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
 
-            if (gauge.Esprit == 0 && Config.OnlyShowEspritWhenActive)
-            {
-                return;
-            }
+            if (gauge.Esprit == 0 && Config.OnlyShowEspritWhenActive) { return; }
 
             var xPos = origin.X + Config.Position.X + Config.EspritGaugePosition.X - Config.EspritGaugeSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.EspritGaugePosition.Y - Config.EspritGaugeSize.Y / 2f;
@@ -125,7 +122,7 @@ namespace DelvUI.Interface.Jobs
             {
                 builder.AddInnerBar(gauge.Esprit, 100, Config.EspritGaugeColor);
             }
-            
+
             if (Config.EspritTextEnabled && gauge.Esprit != 0)
             {
                 builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
@@ -167,10 +164,7 @@ namespace DelvUI.Interface.Jobs
         {
             var gauge = Plugin.JobGauges.Get<DNCGauge>();
 
-            if (!gauge.IsDancing)
-            {
-                return;
-            }
+            if (!gauge.IsDancing) { return; }
 
             byte chunkCount = 0;
             List<PluginConfigColor> chunkColors = new List<PluginConfigColor>();
@@ -295,10 +289,7 @@ namespace DelvUI.Interface.Jobs
         {
             IEnumerable<Status> standardFinishBuff = player.StatusList.Where(o => o.StatusId is 1821 or 2024 or 2105 or 2113);
 
-            if (!standardFinishBuff.Any() && Config.OnlyShowStandardBarWhenActive)
-            {
-                return;
-            }
+            if (!standardFinishBuff.Any() && Config.OnlyShowStandardBarWhenActive) { return; }
 
             var xPos = origin.X + Config.Position.X + Config.StandardBarPosition.X - Config.StandardBarSize.X / 2f;
             var yPos = origin.Y + Config.Position.Y + Config.StandardBarPosition.Y - Config.StandardBarSize.Y / 2f;
@@ -326,27 +317,10 @@ namespace DelvUI.Interface.Jobs
             IEnumerable<Status> windmillBuff = player.StatusList.Where(o => o.StatusId is 1816);
             IEnumerable<Status> showerBuff = player.StatusList.Where(o => o.StatusId is 1817);
 
-            float cascadeTimer = 0f;
-            float fountainTimer = 0f;
-            float windmillTimer = 0f;
-            float showerTimer = 0f;
-
-            if (cascadeBuff.Any())
-            {
-                cascadeTimer = Math.Abs(cascadeBuff.First().RemainingTime);
-            }
-            if (fountainBuff.Any())
-            {
-                fountainTimer = Math.Abs(fountainBuff.First().RemainingTime);
-            }
-            if (windmillBuff.Any())
-            {
-                windmillTimer = Math.Abs(windmillBuff.First().RemainingTime);
-            }
-            if (showerBuff.Any())
-            {
-                showerTimer = Math.Abs(showerBuff.First().RemainingTime);
-            }
+            float cascadeTimer = cascadeBuff.Any() ? Math.Abs(cascadeBuff.First().RemainingTime) : 0f;
+            float fountainTimer = fountainBuff.Any() ? Math.Abs(fountainBuff.First().RemainingTime) : 0f;
+            float windmillTimer = windmillBuff.Any() ? Math.Abs(windmillBuff.First().RemainingTime) : 0f;
+            float showerTimer = showerBuff.Any() ? Math.Abs(showerBuff.First().RemainingTime) : 0f;            
 
             if (cascadeTimer == 0 && fountainTimer == 0 && windmillTimer == 0 && showerTimer == 0 && Config.OnlyShowProcsWhenActive)
             {
@@ -468,11 +442,11 @@ namespace DelvUI.Interface.Jobs
         [Order(105)]
         public bool BuffBarEnabled = true;
 
-        [DragFloat2("Buffs Position" + "##Buff", min = -4000f, max = 4000f)]
+        [DragFloat2("Position" + "##Buff", min = -4000f, max = 4000f)]
         [Order(110, collapseWith = nameof(BuffBarEnabled))]
         public Vector2 BuffBarPosition = new(0, -32);
 
-        [DragFloat2("Buffs Size" + "##Buff", min = 1f, max = 2000f)]
+        [DragFloat2("Size" + "##Buff", min = 1f, max = 2000f)]
         [Order(115, collapseWith = nameof(BuffBarEnabled))]
         public Vector2 BuffBarSize = new(254, 20);
 
@@ -534,7 +508,7 @@ namespace DelvUI.Interface.Jobs
         #region steps
         [Checkbox("Steps", separator = true)]
         [Order(185)]
-        public bool StepBarEnabled = true;        
+        public bool StepBarEnabled = true;
 
         [Checkbox("Step Glow" + "##Step")]
         [Order(195, collapseWith = nameof(StepBarEnabled))]
@@ -604,7 +578,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat("Spacing" + "##Procs", min = -4000f, max = 4000f)]
         [Order(275, collapseWith = nameof(ProcBarEnabled))]
-        public float ProcBarChunkPadding = 2;        
+        public float ProcBarChunkPadding = 2;
 
         [ColorEdit4("Flourishing Cascade" + "##Procs")]
         [Order(280, collapseWith = nameof(ProcBarEnabled))]

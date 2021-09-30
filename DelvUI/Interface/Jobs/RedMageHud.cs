@@ -169,7 +169,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawBlackManaBar(Vector2 origin)
         {
             var gauge = (int)Plugin.JobGauges.Get<RDMGauge>().BlackMana;
-            if(Config.OnlyShowBlackManaWhenActive && gauge is 0) { return; }
+            if (Config.OnlyShowBlackManaWhenActive && gauge is 0) { return; }
             var thresholdRatio = Config.BlackManaBarInverted ? 0.2f : 0.8f;
 
             var position = new Vector2(
@@ -183,9 +183,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawAccelerationBar(Vector2 origin, PlayerCharacter player)
         {
             var accelBuff = player.StatusList.Where(o => o.StatusId == 1238);
-            var stackCount = 0;
-
-            if (accelBuff.Any()) { stackCount = accelBuff.First().StackCount; }
+            int stackCount = accelBuff.Any() ? accelBuff.First().StackCount : 0;
             if (Config.OnlyShowAccelerationWhenActive && stackCount is 0) { return; }
 
             var position = new Vector2(
@@ -207,8 +205,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawDualCastBar(Vector2 origin, PlayerCharacter player)
         {
             var dualCastBuff = player.StatusList.Where(o => o.StatusId is 1249);
-            var dualCastDuration = 0f;
-            if (dualCastBuff.Any()) { dualCastDuration = Math.Abs(dualCastBuff.First().RemainingTime); }
+            var dualCastDuration = dualCastBuff.Any() ? Math.Abs(dualCastBuff.First().RemainingTime) : 0;
             if (Config.OnlyShowDualcastWhenActive && dualCastDuration is 0) { return; }
 
             var position = new Vector2(
@@ -228,13 +225,9 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawVerstoneProc(Vector2 origin, PlayerCharacter player)
         {
-            var duration = 0;
             var verstone = player.StatusList.Where(o => o.StatusId is 1235);
+            int duration = verstone.Any() ? (int)Math.Abs(verstone.First().RemainingTime) : 0;
 
-            if (verstone.Any())
-            {
-                duration = (int)Math.Abs(verstone.First().RemainingTime);
-            }
             if (Config.OnlyShowVerstoneWhenActive && duration is 0) { return; }
 
             var position = new Vector2(
@@ -247,13 +240,9 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawVerfireProc(Vector2 origin, PlayerCharacter player)
         {
-            var duration = 0;
             var verfire = player.StatusList.Where(o => o.StatusId is 1234);
+            int duration = verfire.Any() ? (int)Math.Abs(verfire.First().RemainingTime) : 0;
 
-            if (verfire.Any())
-            {
-                duration = (int)Math.Abs(verfire.First().RemainingTime);
-            }
             if (Config.OnlyShowVerfireWhenActive && duration is 0) { return; }
 
             var position = new Vector2(
@@ -359,7 +348,7 @@ namespace DelvUI.Interface.Jobs
         [Order(55, collapseWith = nameof(ShowWhiteManaBar))]
         public bool ShowWhiteManaValue = true;
 
-        [Checkbox("Invert" + "##WhiteMana")]
+        [Checkbox("Inverted" + "##WhiteMana")]
         [Order(60, collapseWith = nameof(ShowWhiteManaBar))]
         public bool WhiteManaBarInverted = true;
 
@@ -389,7 +378,7 @@ namespace DelvUI.Interface.Jobs
         [Order(85, collapseWith = nameof(ShowBlackManaBar))]
         public bool ShowBlackManaValue = true;
 
-        [Checkbox("Invert" + "##BlackMana")]
+        [Checkbox("Inverted" + "##BlackMana")]
         [Order(90, collapseWith = nameof(ShowBlackManaBar))]
         public bool BlackManaBarInverted = false;
 
@@ -475,7 +464,7 @@ namespace DelvUI.Interface.Jobs
         [Order(165, collapseWith = nameof(ShowVerstoneProcs))]
         public bool ShowVerstoneText = true;
 
-        [Checkbox("Invert" + "##Verstone")]
+        [Checkbox("Inverted" + "##Verstone")]
         [Order(170, collapseWith = nameof(ShowVerstoneProcs))]
         public bool InvertVerstoneBar = true;
 
@@ -505,7 +494,7 @@ namespace DelvUI.Interface.Jobs
         [Order(195, collapseWith = nameof(ShowVerfireProcs))]
         public bool ShowVerfireText = true;
 
-        [Checkbox("Invert" + "##Verfire")]
+        [Checkbox("Inverted" + "##Verfire")]
         [Order(200, collapseWith = nameof(ShowVerfireProcs))]
         public bool InvertVerfireBar = false;
 
