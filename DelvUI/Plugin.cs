@@ -13,6 +13,7 @@ using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.Party;
 using FFXIVClientStructs;
 using ImGuiNET;
 using ImGuiScene;
@@ -20,6 +21,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using SigScanner = Dalamud.Game.SigScanner;
+using Dalamud.Game.ClientState.Party;
 
 namespace DelvUI
 {
@@ -37,6 +39,7 @@ namespace DelvUI
         public static SigScanner SigScanner { get; private set; } = null!;
         public static TargetManager TargetManager { get; private set; } = null!;
         public static UiBuilder UiBuilder { get; private set; } = null!;
+        public static PartyList PartyList { get; private set; } = null!;
 
         public static TextureWrap? BannerTexture;
 
@@ -58,6 +61,7 @@ namespace DelvUI
             GameGui gameGui,
             JobGauges jobGauges,
             ObjectTable objectTable,
+            PartyList partyList,
             SigScanner sigScanner,
             TargetManager targetManager
         )
@@ -71,9 +75,12 @@ namespace DelvUI
             GameGui = gameGui;
             JobGauges = jobGauges;
             ObjectTable = objectTable;
+            PartyList = partyList;
             SigScanner = sigScanner;
             TargetManager = targetManager;
             UiBuilder = PluginInterface.UiBuilder;
+
+
             AssemblyLocation = Assembly.GetExecutingAssembly().Location;
 
             Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "";
@@ -110,12 +117,12 @@ namespace DelvUI
 
             _menuHook = new SystemMenuHook(PluginInterface);
 
-            TexturesCache.Initialize();
-            GlobalColors.Initialize();
-            TooltipsHelper.Initialize();
             ChatHelper.Initialize();
+            GlobalColors.Initialize();
             MouseOverHelper.Initialize();
-            Resolver.Initialize();
+            PartyManager.Initialize();
+            TexturesCache.Initialize();
+            TooltipsHelper.Initialize();
 
             _hudManager = new HudManager();
         }
@@ -248,12 +255,13 @@ namespace DelvUI
             UiBuilder.RebuildFonts();
 
             ChatHelper.Instance.Dispose();
+            ConfigurationManager.Instance.Dispose();
             FontsManager.Instance.Dispose();
+            GlobalColors.Instance.Dispose();
             MouseOverHelper.Instance.Dispose();
+            PartyManager.Instance.Dispose();
             TexturesCache.Instance.Dispose();
             TooltipsHelper.Instance.Dispose();
-            GlobalColors.Instance.Dispose();
-            ConfigurationManager.Instance.Dispose();
         }
     }
 }

@@ -1,5 +1,5 @@
 using Dalamud.Interface;
-using Dalamud.Plugin;
+using Dalamud.Logging;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
 using ImGuiScene;
@@ -12,7 +12,6 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using Dalamud.Logging;
 
 namespace DelvUI.Config.Tree
 {
@@ -1108,10 +1107,10 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public void AddChild(int position, CategoryField field) 
+        public void AddChild(int position, CategoryField field)
         {
             field.IsChild = true;
-            Children.Add(position, field); 
+            Children.Add(position, field);
         }
 
         public void Draw(ref bool changed, bool separatorDrawn = false)

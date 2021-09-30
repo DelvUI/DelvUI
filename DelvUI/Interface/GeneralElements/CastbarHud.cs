@@ -1,14 +1,14 @@
-﻿using DelvUI.Enums;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Types;
+using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Helpers;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
-using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Game.ClientState.Objects.Types;
-using DelvUI.Config;
-using BattleChara = FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -35,33 +35,21 @@ namespace DelvUI.Interface.GeneralElements
 
         public override unsafe void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || Actor == null || Actor is not Character)
+            if (!Config.Enabled)
             {
                 return;
             }
 
-            if (Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc)
+            if (!Config.Preview &&
+                (Actor == null || Actor is not Character || Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc))
             {
                 return;
             }
 
-            var battleChara = (BattleChara*)Actor.Address;
-            var castInfo = battleChara->SpellCastInfo;
-            var isCasting = castInfo.IsCasting > 0;
-
-            if (castInfo.IsCasting <= 0 && !Config.Preview)
+            UpdateCurrentCast(out var currentCastTime, out var totalCastTime);
+            if (totalCastTime == 0)
             {
                 return;
-            }
-
-            var currentCastId = castInfo.ActionID;
-            var currentCastType = castInfo.ActionType;
-            var currentCastTime = castInfo.CurrentCastTime;
-            var totalCastTime = castInfo.TotalCastTime;
-
-            if (LastUsedCast == null || LastUsedCast.CastId != currentCastId || LastUsedCast.ActionType != currentCastType)
-            {
-                LastUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo.Interruptible > 0);
             }
 
             var castPercent = 100f / totalCastTime * currentCastTime;
@@ -88,7 +76,7 @@ namespace DelvUI.Interface.GeneralElements
             var iconSize = Vector2.Zero;
             if (Config.ShowIcon)
             {
-                if (LastUsedCast.IconTexture != null)
+                if (LastUsedCast != null && LastUsedCast.IconTexture != null)
                 {
                     ImGui.SetCursorPos(startPos);
                     iconSize = new Vector2(Config.Size.Y, Config.Size.Y);
@@ -102,13 +90,40 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             // cast name
-            Config.CastNameConfig.SetText(Config.Preview ? "Name" : LastUsedCast.ActionText);
+            Config.CastNameConfig.SetText(Config.Preview ? "Cast Name" : (LastUsedCast != null ? LastUsedCast.ActionText : ""));
             _castNameLabel.Draw(startPos + new Vector2(iconSize.X, 0), Config.Size, Actor);
 
             // cast time
-            var text = Config.Preview ? "Time" : Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
+            var text = Config.Preview ? "Cast Time" : Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
             Config.CastTimeConfig.SetText(text);
             _castTimeLabel.Draw(startPos, Config.Size, Actor);
+        }
+
+        private unsafe void UpdateCurrentCast(out float currentCastTime, out float totalCastTime)
+        {
+            currentCastTime = Config.Preview ? 0.5f : 0f;
+            totalCastTime = 1f;
+
+            if (Config.Preview || Actor is not BattleChara battleChara)
+            {
+                return;
+            }
+
+            totalCastTime = 0;
+            if (!battleChara.IsCasting)
+            {
+                return;
+            }
+
+            var currentCastId = battleChara.CastActionId;
+            var currentCastType = (ActionType)battleChara.CastActionType;
+            currentCastTime = battleChara.CurrentCastTime;
+            totalCastTime = battleChara.TotalCastTime;
+
+            if (LastUsedCast == null || LastUsedCast.CastId != currentCastId || LastUsedCast.ActionType != currentCastType)
+            {
+                LastUsedCast = new LastUsedCast(currentCastId, currentCastType, battleChara.IsCastInterruptible);
+            }
         }
 
         public virtual void DrawExtras(Vector2 castbarPos, float totalCastTime)

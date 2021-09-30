@@ -20,14 +20,17 @@ namespace DelvUI.Interface.GeneralElements
             Draw(origin);
         }
 
-        public void Draw(Vector2 origin, Vector2? parentSize = null, GameObject? actor = null)
+        public void Draw(Vector2 origin, Vector2? parentSize = null, GameObject? actor = null, string? actorName = null)
         {
             if (!Config.Enabled || Config.GetText() == null)
             {
                 return;
             }
 
-            var text = actor != null ? TextTags.GenerateFormattedTextFromTags(actor, Config.GetText()) : Config.GetText();
+            var text = actor == null && actorName == null ? 
+                Config.GetText() :
+                TextTags.GenerateFormattedTextFromTags(actor, Config.GetText(), actorName);
+
             var size = parentSize ?? Vector2.Zero;
 
             DrawLabel(text, origin, size, actor);
@@ -59,7 +62,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public virtual PluginConfigColor Color(GameObject? actor = null)
         {
-            if (!Config.UseJobColor)
+            if (!Config.UseJobColor || actor == null)
             {
                 return Config.Color;
             }

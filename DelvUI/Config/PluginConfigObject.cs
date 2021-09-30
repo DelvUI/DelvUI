@@ -75,7 +75,6 @@ namespace DelvUI.Config
         public Vector2 Position = Vector2.Zero;
     }
 
-    [Serializable]
     public abstract class AnchorablePluginConfigObject : MovablePluginConfigObject
     {
         [DragInt2("Size", min = 1, max = 4000)]
@@ -87,7 +86,6 @@ namespace DelvUI.Config
         public DrawAnchor Anchor = DrawAnchor.Center;
     }
 
-    [Serializable]
     public class PluginConfigColor
     {
         [JsonIgnore] private float[] _colorMapRatios = { -.8f, -.3f, .1f };

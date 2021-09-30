@@ -3,6 +3,7 @@ using DelvUI.Helpers;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
+using DelvUI.Interface.Party;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
 using ImGuiScene;
@@ -118,6 +119,15 @@ namespace DelvUI.Config
                 typeof(TargetUnitFrameConfig),
                 typeof(TargetOfTargetUnitFrameConfig),
                 typeof(FocusTargetUnitFrameConfig),
+
+                typeof(PartyFramesConfig),
+                typeof(PartyFramesHealthBarsConfig),
+                typeof(PartyFramesManaBarConfig),
+                typeof(PartyFramesCastbarConfig),
+                typeof(PartyFramesRoleIconConfig),
+                typeof(PartyFramesLeaderIconConfig),
+                typeof(PartyFramesBuffsConfig),
+                typeof(PartyFramesDebuffsConfig),
 
                 typeof(PlayerCastbarConfig),
                 typeof(TargetCastbarConfig),

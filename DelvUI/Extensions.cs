@@ -32,6 +32,25 @@ namespace DelvUI
             return splits.Length > 1 ? splits[^1] : "";
         }
 
+        public static string Initials(this SeString str)
+        {
+            var initials = "";
+            var firstName = FirstName(str);
+            var lastName = LastName(str);
+
+            if (firstName.Length > 0)
+            {
+                initials = firstName[0] + ".";
+            }
+
+            if (lastName.Length > 0)
+            {
+                initials += " " + lastName[0] + ".";
+            }
+
+            return initials;
+        }
+
         public static Vector4 AdjustColor(this Vector4 vec, float correctionFactor)
         {
             float red = vec.X;
@@ -53,6 +72,16 @@ namespace DelvUI
             }
 
             return new Vector4(red, green, blue, vec.W);
+        }
+
+        public static Vector4 AdjustColorAlpha(this Vector4 vec, float correctionFactor)
+        {
+            return new Vector4(vec.X, vec.Y, vec.Z, Math.Min(1, Math.Max(0, vec.W + 1 * correctionFactor)));
+        }
+
+        public static Vector4 WithNewAlpha(this Vector4 vec, float alpha)
+        {
+            return new Vector4(vec.X, vec.Y, vec.Z, alpha);
         }
 
         public static unsafe string GetString(this Utf8String utf8String)
