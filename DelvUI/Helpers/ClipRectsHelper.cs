@@ -48,6 +48,8 @@ namespace DelvUI.Helpers
             "ItemDetail", // tooltip
             "ActionDetail", // tooltip
             "AreaMap",
+            "JournalAccept",
+            "Talk",
             "Teleport",
             "ActionMenu",
             "Character",
