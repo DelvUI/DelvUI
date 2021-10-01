@@ -14,7 +14,7 @@ namespace DelvUI.Interface.StatusEffects
 {
     public class StatusEffectsListHud : DraggableHudElement, IHudElementWithActor
     {
-        protected StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
+        protected new StatusEffectsListConfig Config => (StatusEffectsListConfig)base.Config;
 
         private LayoutInfo _layoutInfo;
         private bool _showingTooltip = false;
@@ -22,14 +22,14 @@ namespace DelvUI.Interface.StatusEffects
         internal static int StatusEffectListsSize = 30;
         private StatusStruct[]? _fakeEffects = null;
 
-        private LabelHud _durationLabel;
-        private LabelHud _stacksLabel;
+        private readonly LabelHud _durationLabel;
+        private readonly LabelHud _stacksLabel;
 
         public GameObject? Actor { get; set; } = null;
 
         public StatusEffectsListHud(string id, StatusEffectsListConfig config, string displayName) : base(id, config, displayName)
         {
-            _config.ValueChangeEvent += OnConfigPropertyChanged;
+            base.Config.ValueChangeEvent += OnConfigPropertyChanged;
 
             _durationLabel = new LabelHud(id + "_duration", config.IconConfig.DurationLabelConfig);
             _stacksLabel = new LabelHud(id + "_stacks", config.IconConfig.StacksLabelConfig);
@@ -37,21 +37,27 @@ namespace DelvUI.Interface.StatusEffects
             UpdatePreview();
         }
 
-        ~StatusEffectsListHud()
+        protected override void Dispose(bool disposing)
         {
-            _config.ValueChangeEvent -= OnConfigPropertyChanged;
+            base.Dispose(disposing);
+            
+            if (!disposing)
+            {
+                base.Config.ValueChangeEvent -= OnConfigPropertyChanged;
+                return;
+            }
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            var pos = CalculateStartPosition(Config.Position, Config.Size, Config.GetGrowthDirections());
+            Vector2 pos = CalculateStartPosition(Config.Position, Config.Size, Config.GetGrowthDirections());
             return (new List<Vector2>() { pos + Config.Size / 2f }, new List<Vector2>() { Config.Size });
         }
 
         private uint CalculateLayout(List<StatusEffectData> list)
         {
-            var effectCount = (uint)list.Count;
-            var count = Config.Limit >= 0 ? Math.Min((uint)Config.Limit, effectCount) : effectCount;
+            uint effectCount = (uint)list.Count;
+            uint count = Config.Limit >= 0 ? Math.Min((uint)Config.Limit, effectCount) : effectCount;
 
             if (count <= 0)
             {
@@ -71,7 +77,7 @@ namespace DelvUI.Interface.StatusEffects
 
         protected virtual List<StatusEffectData> StatusEffectsData()
         {
-            var list = StatusEffectDataList(Actor);
+            List<StatusEffectData>? list = StatusEffectDataList(Actor);
 
             // show mine first
             if (Config.ShowMineFirst)
@@ -98,8 +104,8 @@ namespace DelvUI.Interface.StatusEffects
                 character = (BattleChara)actor;
             }
 
-            var player = Plugin.ClientState.LocalPlayer;
-            var count = StatusEffectListsSize;
+            Dalamud.Game.ClientState.Objects.SubKinds.PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            int count = StatusEffectListsSize;
             if (_fakeEffects != null)
             {
                 count = Config.Limit == -1 ? _fakeEffects.Length : Math.Min(Config.Limit, _fakeEffects.Length);
@@ -112,7 +118,7 @@ namespace DelvUI.Interface.StatusEffects
 
                 if (_fakeEffects != null)
                 {
-                    var fakeStruct = _fakeEffects![i];
+                    StatusStruct fakeStruct = _fakeEffects![i];
                     status = &fakeStruct;
                 }
                 else
@@ -186,7 +192,7 @@ namespace DelvUI.Interface.StatusEffects
 
         protected void OrderByMineFirst(List<StatusEffectData> list)
         {
-            var player = Plugin.ClientState.LocalPlayer;
+            Dalamud.Game.ClientState.Objects.SubKinds.PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player == null)
             {
                 return;
@@ -224,13 +230,13 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             // calculate layout
-            var list = StatusEffectsData();
+            List<StatusEffectData>? list = StatusEffectsData();
 
             // area
-            var growthDirections = Config.GetGrowthDirections();
-            var position = origin + Config.Position;
-            var areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
-            var drawList = ImGui.GetWindowDrawList();
+            GrowthDirections growthDirections = Config.GetGrowthDirections();
+            Vector2 position = origin + Config.Position;
+            Vector2 areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
             if (Config.Preview)
             {
@@ -244,17 +250,17 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             // calculate icon positions
-            var count = CalculateLayout(list);
+            uint count = CalculateLayout(list);
             var iconPositions = new List<Vector2>();
             var minPos = new Vector2(float.MaxValue, float.MaxValue);
-            var maxPos = Vector2.Zero;
+            Vector2 maxPos = Vector2.Zero;
 
-            var row = 0;
-            var col = 0;
+            int row = 0;
+            int col = 0;
 
-            for (var i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
-                CalculateAxisDirections(growthDirections, row, count, out var direction, out var offset);
+                CalculateAxisDirections(growthDirections, row, count, out Vector2 direction, out Vector2 offset);
 
                 var pos = new Vector2(
                     position.X + offset.X + Config.IconConfig.Size.X * col * direction.X + Config.IconPadding.X * col * direction.X,
@@ -303,8 +309,8 @@ namespace DelvUI.Interface.StatusEffects
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
             var margin = new Vector2(14, 10);
-            var windowPos = minPos - margin;
-            var windowSize = maxPos - minPos;
+            Vector2 windowPos = minPos - margin;
+            Vector2 windowSize = maxPos - minPos;
             ImGui.SetNextWindowPos(windowPos, ImGuiCond.Always);
             ImGui.SetNextWindowSize(windowSize + margin * 2);
 
@@ -313,12 +319,12 @@ namespace DelvUI.Interface.StatusEffects
 
             // draw
             drawList = ImGui.GetWindowDrawList();
-            var showingTooltip = false;
+            bool showingTooltip = false;
 
-            for (var i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
-                var iconPos = iconPositions[i];
-                var statusEffectData = list[i];
+                Vector2 iconPos = iconPositions[i];
+                StatusEffectData statusEffectData = list[i];
 
                 StatusEffectIconDrawHelper.DrawStatusEffectIcon(drawList, iconPos, statusEffectData, Config.IconConfig, _durationLabel, _stacksLabel);
 
@@ -363,8 +369,8 @@ namespace DelvUI.Interface.StatusEffects
         {
             if ((growthDirections & GrowthDirections.Centered) != 0)
             {
-                var elementsPerRow = (int)(Config.Size.X / (Config.IconConfig.Size.X + Config.IconPadding.X));
-                var elementsInRow = Math.Min(elementsPerRow, elementCount - (elementsPerRow * row));
+                int elementsPerRow = (int)(Config.Size.X / (Config.IconConfig.Size.X + Config.IconPadding.X));
+                long elementsInRow = Math.Min(elementsPerRow, elementCount - (elementsPerRow * row));
 
                 direction.X = 1;
                 direction.Y = (growthDirections & GrowthDirections.Down) != 0 ? 1 : -1;
@@ -382,7 +388,7 @@ namespace DelvUI.Interface.StatusEffects
 
         private Vector2 CalculateStartPosition(Vector2 position, Vector2 size, GrowthDirections growthDirections)
         {
-            var area = size;
+            Vector2 area = size;
             if ((growthDirections & GrowthDirections.Left) != 0)
             {
                 area.X = -area.X;
@@ -393,13 +399,13 @@ namespace DelvUI.Interface.StatusEffects
                 area.Y = -area.Y;
             }
 
-            var startPos = position;
+            Vector2 startPos = position;
             if ((growthDirections & GrowthDirections.Centered) != 0)
             {
                 startPos.X = position.X - size.X / 2f;
             }
 
-            var endPos = position + area;
+            Vector2 endPos = position + area;
 
             if (endPos.X < position.X)
             {

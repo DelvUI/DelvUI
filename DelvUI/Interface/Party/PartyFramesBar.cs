@@ -14,20 +14,20 @@ namespace DelvUI.Interface.Party
         public delegate void MovePlayerOrderHandler(PartyFramesBar bar);
         public MovePlayerOrderHandler? MovePlayerEvent;
 
-        private PartyFramesHealthBarsConfig _config;
-        private PartyFramesManaBarConfig _manaBarConfig;
-        private PartyFramesCastbarConfig _castbarConfig;
-        private PartyFramesRoleIconConfig _roleIconConfig;
-        private PartyFramesLeaderIconConfig _leaderIconConfig;
-        private PartyFramesBuffsConfig _buffsConfig;
-        private PartyFramesDebuffsConfig _debuffsConfig;
+        private readonly PartyFramesHealthBarsConfig _config;
+        private readonly PartyFramesManaBarConfig _manaBarConfig;
+        private readonly PartyFramesCastbarConfig _castbarConfig;
+        private readonly PartyFramesRoleIconConfig _roleIconConfig;
+        private readonly PartyFramesLeaderIconConfig _leaderIconConfig;
+        private readonly PartyFramesBuffsConfig _buffsConfig;
+        private readonly PartyFramesDebuffsConfig _debuffsConfig;
 
-        private LabelHud _nameLabelHud;
-        private LabelHud _manaLabelHud;
-        private LabelHud _orderLabelHud;
-        private CastbarHud _castbarHud;
-        private StatusEffectsListHud _buffsListHud;
-        private StatusEffectsListHud _debuffsListHud;
+        private readonly LabelHud _nameLabelHud;
+        private readonly LabelHud _manaLabelHud;
+        private readonly LabelHud _orderLabelHud;
+        private readonly CastbarHud _castbarHud;
+        private readonly StatusEffectsListHud _buffsListHud;
+        private readonly StatusEffectsListHud _debuffsListHud;
 
         public IPartyFramesMember? Member;
         public bool Visible = false;
@@ -62,7 +62,7 @@ namespace DelvUI.Interface.Party
 
         public PluginConfigColor GetColor(float scale)
         {
-            var color = _config.ColorsConfig.GenericRoleColor;
+            PluginConfigColor? color = _config.ColorsConfig.GenericRoleColor;
 
             if (Member != null && Member.Character?.ObjectKind != ObjectKind.BattleNpc)
             {
@@ -85,7 +85,7 @@ namespace DelvUI.Interface.Party
 
         private PluginConfigColor ColorForJob(uint jodId)
         {
-            var role = JobsHelper.RoleForJob(jodId);
+            JobRoles role = JobsHelper.RoleForJob(jodId);
 
             switch (role)
             {
@@ -104,7 +104,7 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
-            var player = Plugin.ClientState.LocalPlayer;
+            Dalamud.Game.ClientState.Objects.SubKinds.PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player == null)
             {
                 return;
@@ -112,7 +112,7 @@ namespace DelvUI.Interface.Party
 
             // click
             bool isHovering = ImGui.IsMouseHoveringRect(Position, Position + _config.Size);
-            var character = Member.Character;
+            Dalamud.Game.ClientState.Objects.Types.Character? character = Member.Character;
 
             if (isHovering)
             {
@@ -134,15 +134,15 @@ namespace DelvUI.Interface.Party
             drawList.AddRectFilled(Position, Position + _config.Size, _config.ColorsConfig.BackgroundColor.Base);
 
             // hp
-            var hpScale = Member.MaxHP > 0 ? (float)Member.HP / (float)Member.MaxHP : 1;
+            float hpScale = Member.MaxHP > 0 ? (float)Member.HP / (float)Member.MaxHP : 1;
             var hpFillSize = new Vector2(Math.Max(1, _config.Size.X * hpScale), _config.Size.Y);
             PluginConfigColor? hpColor = GetColor(hpScale);
 
-            var distance = character != null ? character.YalmDistanceX : byte.MaxValue;
+            byte distance = character != null ? character.YalmDistanceX : byte.MaxValue;
             if (_config.RangeConfig.Enabled)
             {
-                var currentAlpha = hpColor.Vector.W * 100f;
-                var alpha = _config.RangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
+                float currentAlpha = hpColor.Vector.W * 100f;
+                float alpha = _config.RangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
                 hpColor = new(hpColor.Vector.WithNewAlpha(alpha));
             }
 
@@ -166,17 +166,17 @@ namespace DelvUI.Interface.Party
             }
 
             // border
-            var borderPos = Position - Vector2.One;
-            var borderSize = _config.Size + Vector2.One * 2;
-            var color = borderColor != null ? borderColor.Base : _config.ColorsConfig.BorderColor.Base;
+            Vector2 borderPos = Position - Vector2.One;
+            Vector2 borderSize = _config.Size + Vector2.One * 2;
+            uint color = borderColor != null ? borderColor.Base : _config.ColorsConfig.BorderColor.Base;
             drawList.AddRect(borderPos, borderPos + borderSize, color);
 
             // buffs / debuffs
-            var buffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _buffsConfig.HealthBarAnchor);
+            Vector2 buffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _buffsConfig.HealthBarAnchor);
             _buffsListHud.Actor = character;
             _buffsListHud.Draw(buffsPos);
 
-            var debuffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _debuffsConfig.HealthBarAnchor);
+            Vector2 debuffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _debuffsConfig.HealthBarAnchor);
             _debuffsListHud.Actor = character;
             _debuffsListHud.Draw(debuffsPos);
 
@@ -184,12 +184,12 @@ namespace DelvUI.Interface.Party
             if (_manaBarConfig.Enabled && Member.MaxHP > 0 &&
                 (!_manaBarConfig.ShowOnlyForHealers || JobsHelper.IsJobHealer(Member.JobId)))
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _manaBarConfig.HealthBarAnchor);
-                var manaBarPos = Utils.GetAnchoredPosition(parentPos + _manaBarConfig.Position, _manaBarConfig.Size, _manaBarConfig.Anchor);
+                Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _manaBarConfig.HealthBarAnchor);
+                Vector2 manaBarPos = Utils.GetAnchoredPosition(parentPos + _manaBarConfig.Position, _manaBarConfig.Size, _manaBarConfig.Anchor);
 
                 drawList.AddRectFilled(manaBarPos, manaBarPos + _manaBarConfig.Size, _manaBarConfig.BackgroundColor.Base);
 
-                var scale = (float)Member.MP / (float)Member.MaxMP;
+                float scale = (float)Member.MP / (float)Member.MaxMP;
                 var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), _manaBarConfig.Size.Y);
 
                 DrawHelper.DrawGradientFilledRect(manaBarPos, fillSize, _manaBarConfig.Color, drawList);
@@ -198,7 +198,7 @@ namespace DelvUI.Interface.Party
             }
 
             // castbar
-            var castbarPos = Utils.GetAnchoredPosition(Position, -_config.Size, _castbarConfig.HealthBarAnchor);
+            Vector2 castbarPos = Utils.GetAnchoredPosition(Position, -_config.Size, _castbarConfig.HealthBarAnchor);
             _castbarHud.Actor = character;
             _castbarHud.Draw(castbarPos);
 
@@ -208,7 +208,7 @@ namespace DelvUI.Interface.Party
             // order
             if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)
             {
-                var order = Member.ObjectId == player.ObjectId ? 1 : Member.Order;
+                int order = Member.ObjectId == player.ObjectId ? 1 : Member.Order;
                 _config.OrderLabelConfig.SetText("[" + order + "]");
                 _orderLabelHud.Draw(Position, _config.Size);
             }
@@ -233,8 +233,8 @@ namespace DelvUI.Interface.Party
 
                 if (iconId > 0)
                 {
-                    var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _roleIconConfig.HealthBarAnchor);
-                    var iconPos = Utils.GetAnchoredPosition(parentPos + _roleIconConfig.Position, _roleIconConfig.Size, _roleIconConfig.Anchor);
+                    Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _roleIconConfig.HealthBarAnchor);
+                    Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + _roleIconConfig.Position, _roleIconConfig.Size, _roleIconConfig.Anchor);
 
                     DrawHelper.DrawIcon(iconId, iconPos, _roleIconConfig.Size, false, drawList);
                 }
@@ -243,8 +243,8 @@ namespace DelvUI.Interface.Party
             // leader icon
             if (_leaderIconConfig.Enabled && Member.IsPartyLeader)
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _leaderIconConfig.HealthBarAnchor);
-                var iconPos = Utils.GetAnchoredPosition(parentPos + _leaderIconConfig.Position, _leaderIconConfig.Size, _leaderIconConfig.Anchor);
+                Vector2 parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _leaderIconConfig.HealthBarAnchor);
+                Vector2 iconPos = Utils.GetAnchoredPosition(parentPos + _leaderIconConfig.Position, _leaderIconConfig.Size, _leaderIconConfig.Anchor);
 
                 DrawHelper.DrawIcon(61521, iconPos, _leaderIconConfig.Size, false, drawList);
             }

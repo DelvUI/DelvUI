@@ -1,4 +1,4 @@
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Helpers;
 using ImGuiNET;
 using System.Collections.Generic;
@@ -10,14 +10,14 @@ namespace DelvUI.Interface.GeneralElements
 {
     public class PrimaryResourceHud : DraggableHudElement, IHudElementWithActor
     {
-        private PrimaryResourceConfig Config => (PrimaryResourceConfig)_config;
-        private LabelHud _valueLabel;
+        private new PrimaryResourceConfig Config => (PrimaryResourceConfig)base.Config;
+        private readonly LabelHud _valueLabel;
         public GameObject? Actor { get; set; } = null;
         public PrimaryResourceTypes ResourceType = PrimaryResourceTypes.MP;
 
-        public PrimaryResourceHud(string ID, PrimaryResourceConfig config, string displayName) : base(ID, config, displayName)
+        public PrimaryResourceHud(string iD, PrimaryResourceConfig config, string displayName) : base(iD, config, displayName)
         {
-            _valueLabel = new LabelHud(ID + "_valueLabel", config.ValueLabelConfig);
+            _valueLabel = new LabelHud(iD + "_valueLabel", config.ValueLabelConfig);
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -40,15 +40,15 @@ namespace DelvUI.Interface.GeneralElements
             GetResources(ref current, ref max, ref percent, chara);
             if (Config.HidePrimaryResourceWhenFull && current == max) { return; }
 
-            var scale = (float)current / max;
+            float scale = (float)current / max;
 
-            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
+            Vector2 startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
 
             // bar
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(startPos, startPos + Config.Size, 0x88000000);
 
-            var color = Config.ShowThresholdMarker && percent < Config.ThresholdMarkerValue / 100 ? Config.BelowThresholdColor : Color(Actor);
+            PluginConfigColor? color = Config.ShowThresholdMarker && percent < Config.ThresholdMarkerValue / 100 ? Config.BelowThresholdColor : Color(Actor);
 
             DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X * scale, Config.Size.Y), color, drawList);
 

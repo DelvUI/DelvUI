@@ -11,7 +11,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -19,7 +18,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class NinjaHud : JobHud
     {
-        private new NinjaConfig Config => (NinjaConfig)_config;
+        private new NinjaConfig Config => (NinjaConfig)Config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
@@ -192,9 +191,7 @@ namespace DelvUI.Interface.Jobs
                         charges[1] = new BarText(BarTextPosition.CenterMiddle, BarTextType.Custom, "");
                     }
 
-                    BarText[] barTexts = { };
-                    builder.AddInnerBar(maxMudraCooldown - mudraCooldownInfo, maxMudraCooldown, chunkColors, PartialFillColor,
-                        BarTextMode.EachChunk, charges);
+                    builder.AddInnerBar(maxMudraCooldown - mudraCooldownInfo, maxMudraCooldown, chunkColors, PartialFillColor, BarTextMode.EachChunk, charges);
                 }
                 else
                 {
@@ -317,7 +314,7 @@ namespace DelvUI.Interface.Jobs
 
             if (actor is BattleChara target)
             {
-                var trickStatus = target.StatusList.Where(o => o.StatusId is 638 && o.SourceID == player.ObjectId);
+                IEnumerable<Status>? trickStatus = target.StatusList.Where(o => o.StatusId is 638 && o.SourceID == player.ObjectId);
                 if (trickStatus.Any() && Config.ShowTrickBar)
                 {
                     trickDuration = Math.Abs(trickStatus.First().RemainingTime);
@@ -335,7 +332,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             IEnumerable<Status> suitonBuff = player.StatusList.Where(o => o.StatusId == 507);
-                        
+
             if (suitonBuff.Any() && Config.ShowSuitonBar)
             {
                 suitonDuration = Math.Abs(suitonBuff.First().RemainingTime);
@@ -365,7 +362,7 @@ namespace DelvUI.Interface.Jobs
     public class NinjaConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.NIN;
-        public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
+        public static new NinjaConfig DefaultConfig() { return new NinjaConfig(); }
 
         #region huton gauge
         [Checkbox("Huton" + "##Huton", separator = true)]
@@ -379,7 +376,7 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Timer" + "##Huton")]
         [Order(40, collapseWith = nameof(ShowHutonGauge))]
         public bool ShowHutonGaugeText = true;
-        
+
         [Checkbox("Border" + "##Huton")]
         [Order(45, collapseWith = nameof(ShowHutonGauge))]
         public bool ShowHutonGaugeBorder = true;

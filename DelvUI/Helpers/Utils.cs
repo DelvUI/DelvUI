@@ -22,9 +22,9 @@ namespace DelvUI.Helpers
 
             // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
             // we do a step of 2 because its always an actor followed by its companion
-            for (var i = 0; i < 200; i += 2)
+            for (int i = 0; i < 200; i += 2)
             {
-                var gameObject = Plugin.ObjectTable[i];
+                GameObject? gameObject = Plugin.ObjectTable[i];
 
                 if (gameObject == null || gameObject is not BattleNpc battleNpc)
                 {
@@ -104,26 +104,26 @@ namespace DelvUI.Helpers
                 }
                 else
                 {
-                    var range = max - min;
+                    float range = max - min;
                     ratio = (i - min) / range;
                 }
             }
 
-            var _rgbToLab = new ConverterBuilder().FromRGB().ToLab().Build();
-            var _labToRgb = new ConverterBuilder().FromLab().ToRGB().Build();
+            IColorConverter<RGBColor, LabColor>? _rgbToLab = new ConverterBuilder().FromRGB().ToLab().Build();
+            IColorConverter<LabColor, RGBColor>? _labToRgb = new ConverterBuilder().FromLab().ToRGB().Build();
 
             var rgbFullHealthColor = new RGBColor(fullHealthColor.Vector.X, fullHealthColor.Vector.Y, fullHealthColor.Vector.Z);
             var rgbLowHealthColor = new RGBColor(lowHealthColor.Vector.X, lowHealthColor.Vector.Y, lowHealthColor.Vector.Z);
 
-            var rgbFullHealthLab = _rgbToLab.Convert(rgbFullHealthColor);
-            var rgbLowHealthLab = _rgbToLab.Convert(rgbLowHealthColor);
+            LabColor rgbFullHealthLab = _rgbToLab.Convert(rgbFullHealthColor);
+            LabColor rgbLowHealthLab = _rgbToLab.Convert(rgbLowHealthColor);
 
             float resultL = (float)((rgbFullHealthLab.L - rgbLowHealthLab.L) * ratio + rgbLowHealthLab.L);
             float resultA = (float)((rgbFullHealthLab.a - rgbLowHealthLab.a) * ratio + rgbLowHealthLab.a);
             float resultB = (float)((rgbFullHealthLab.b - rgbLowHealthLab.b) * ratio + rgbLowHealthLab.b);
 
             var newColorLab = new LabColor(resultL, resultA, resultB);
-            var newColorLab2RGB = _labToRgb.Convert(newColorLab);
+            RGBColor newColorLab2RGB = _labToRgb.Convert(newColorLab);
 
             float alpha = (fullHealthColor.Vector.W - lowHealthColor.Vector.W) * ratio + lowHealthColor.Vector.W;
 
@@ -162,7 +162,7 @@ namespace DelvUI.Helpers
 
         public static bool HasTankInvulnerability(BattleChara actor)
         {
-            var tankInvulnBuff = actor.StatusList.Where(o => o.StatusId is 810 or 1302 or 409 or 1836);
+            System.Collections.Generic.IEnumerable<Dalamud.Game.ClientState.Statuses.Status>? tankInvulnBuff = actor.StatusList.Where(o => o.StatusId is 810 or 1302 or 409 or 1836);
             return tankInvulnBuff.Any();
         }
 
@@ -180,9 +180,9 @@ namespace DelvUI.Helpers
 
             // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
             // we do a step of 2 because its always an actor followed by its companion
-            for (var i = 0; i < 200; i += 2)
+            for (int i = 0; i < 200; i += 2)
             {
-                var actor = actors[i];
+                GameObject? actor = actors[i];
                 if (actor?.ObjectId == target.TargetObjectId)
                 {
                     return actor;

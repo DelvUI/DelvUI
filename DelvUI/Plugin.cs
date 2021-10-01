@@ -14,7 +14,6 @@ using DelvUI.Helpers;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Party;
-using FFXIVClientStructs;
 using ImGuiNET;
 using ImGuiScene;
 using System;
@@ -48,8 +47,8 @@ namespace DelvUI
 
         public static string Version { get; private set; } = "";
 
-        private HudManager _hudManager = null!;
-        private SystemMenuHook _menuHook = null!;
+        private readonly HudManager _hudManager = null!;
+        private readonly SystemMenuHook _menuHook = null!;
 
         public Plugin(
             ClientState clientState,
@@ -124,7 +123,6 @@ namespace DelvUI
 
         public void Dispose()
         {
-            _menuHook.Dispose();
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -158,7 +156,7 @@ namespace DelvUI
 
         private void PluginCommand(string command, string arguments)
         {
-            var configManager = ConfigurationManager.Instance;
+            ConfigurationManager? configManager = ConfigurationManager.Instance;
 
             if (configManager.DrawConfigWindow && !configManager.LockHUD)
             {
@@ -212,7 +210,7 @@ namespace DelvUI
 
             ConfigurationManager.Instance.Draw();
 
-            var fontPushed = FontsManager.Instance.PushDefaultFont();
+            bool fontPushed = FontsManager.Instance.PushDefaultFont();
 
             if (!hudState)
             {
@@ -236,7 +234,8 @@ namespace DelvUI
             {
                 return;
             }
-
+            
+            _menuHook.Dispose();
             _hudManager.Dispose();
 
             ConfigurationManager.Instance.DrawConfigWindow = false;

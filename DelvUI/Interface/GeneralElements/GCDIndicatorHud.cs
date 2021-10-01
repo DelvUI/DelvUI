@@ -12,10 +12,10 @@ namespace DelvUI.Interface.GeneralElements
 {
     public class GCDIndicatorHud : DraggableHudElement, IHudElementWithActor
     {
-        private GCDIndicatorConfig Config => (GCDIndicatorConfig)_config;
+        private new GCDIndicatorConfig Config => (GCDIndicatorConfig)base.Config;
         public GameObject? Actor { get; set; } = null;
 
-        public GCDIndicatorHud(string ID, GCDIndicatorConfig config, string displayName) : base(ID, config, displayName) { }
+        public GCDIndicatorHud(string iD, GCDIndicatorConfig config, string displayName) : base(iD, config, displayName) { }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
@@ -29,20 +29,20 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            GCDHelper.GetGCDInfo((PlayerCharacter)Actor, out var elapsed, out var total);
+            GCDHelper.GetGCDInfo((PlayerCharacter)Actor, out float elapsed, out float total);
 
             if (!Config.AlwaysShow && total == 0)
             {
                 return;
             }
 
-            var scale = elapsed / total;
+            float scale = elapsed / total;
             if (scale <= 0)
             {
                 return;
             }
 
-            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
+            Vector2 startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
 
             if (Config.AnchorToMouse)
             {
@@ -104,11 +104,11 @@ namespace DelvUI.Interface.GeneralElements
 
         private void DrawNormalBar(Vector2 position, float current, float total)
         {
-            var size = !Config.VerticalMode ? Config.Size : new Vector2(Config.Size.Y, -Config.Size.X);
+            Vector2 size = !Config.VerticalMode ? Config.Size : new Vector2(Config.Size.Y, -Config.Size.X);
 
-            var percentNonQueue = total != 0 ? 1F - (500f / 1000f) / total : 0;
+            float percentNonQueue = total != 0 ? 1F - (500f / 1000f) / total : 0;
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             var builder = BarBuilder.Create(position, size);
 
             if (percentNonQueue > 0 && Config.ShowGCDQueueIndicator)

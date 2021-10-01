@@ -35,13 +35,13 @@ namespace DelvUI.Helpers
 
         public static void DrawGradientFilledRect(Vector2 position, Vector2 size, PluginConfigColor color, ImDrawListPtr drawList)
         {
-            var gradientDirection = ConfigurationManager.Instance.GradientDirection;
+            GradientDirection gradientDirection = ConfigurationManager.Instance.GradientDirection;
             DrawGradientFilledRect(position, size, color, drawList, gradientDirection);
         }
 
         public static void DrawGradientFilledRect(Vector2 position, Vector2 size, PluginConfigColor color, ImDrawListPtr drawList, GradientDirection gradientDirection = GradientDirection.Down)
         {
-            var colorArray = ColorArray(color, gradientDirection);
+            uint[]? colorArray = ColorArray(color, gradientDirection);
 
             if (gradientDirection == GradientDirection.CenteredHorizonal)
             {
@@ -51,7 +51,7 @@ namespace DelvUI.Helpers
                     colorArray[0], colorArray[1], colorArray[2], colorArray[3]
                 );
 
-                var pos = position + new Vector2(0, halfSize.Y);
+                Vector2 pos = position + new Vector2(0, halfSize.Y);
                 drawList.AddRectFilledMultiColor(
                     pos, pos + halfSize,
                     colorArray[3], colorArray[2], colorArray[1], colorArray[0]
@@ -70,7 +70,7 @@ namespace DelvUI.Helpers
 
         public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor)
         {
-            var fontPushed = FontsManager.Instance.PushDefaultFont();
+            bool fontPushed = FontsManager.Instance.PushDefaultFont();
 
             ImGui.SetCursorPos(new Vector2(pos.X - 1, pos.Y + 1));
             ImGui.TextColored(outlineColor, text);
@@ -144,7 +144,7 @@ namespace DelvUI.Helpers
 
             if (drawBorder)
             {
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 drawList.AddRect(position, position + size, 0xFF000000);
             }
         }
@@ -204,7 +204,7 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            var h = !useRatioForHeight ? barSize.Y / 100 * height : height;
+            float h = !useRatioForHeight ? barSize.Y / 100 * height : height;
 
             DrawGradientFilledRect(cursorPos, new Vector2(Math.Max(1, barSize.X * shield), h), color, drawList);
         }
@@ -224,10 +224,10 @@ namespace DelvUI.Helpers
             }
 
             // hp portion
-            var h = !useRatioForHeight ? barSize.Y / 100 * Math.Min(100, height) : height;
-            var missingHPRatio = 1 - hp;
-            var s = Math.Min(shield, missingHPRatio);
-            var shieldStartPos = cursorPos + new Vector2(Math.Max(1, barSize.X * hp), 0);
+            float h = !useRatioForHeight ? barSize.Y / 100 * Math.Min(100, height) : height;
+            float missingHPRatio = 1 - hp;
+            float s = Math.Min(shield, missingHPRatio);
+            Vector2 shieldStartPos = cursorPos + new Vector2(Math.Max(1, barSize.X * hp), 0);
             DrawGradientFilledRect(shieldStartPos, new Vector2(Math.Max(1, barSize.X * s), barSize.Y), color, drawList);
 
 
@@ -262,8 +262,8 @@ namespace DelvUI.Helpers
 
         public static void ClipAround(Vector2 min, Vector2 max, string windowName, ImDrawListPtr drawList, Action<ImDrawListPtr, string> drawAction)
         {
-            var maxX = ImGui.GetMainViewport().Size.X;
-            var maxY = ImGui.GetMainViewport().Size.Y;
+            float maxX = ImGui.GetMainViewport().Size.X;
+            float maxY = ImGui.GetMainViewport().Size.Y;
             var aboveMin = new Vector2(0, 0);
             var aboveMax = new Vector2(maxX, min.Y);
             var leftMin = new Vector2(0, min.Y);
@@ -274,7 +274,7 @@ namespace DelvUI.Helpers
             var belowMin = new Vector2(min.X, max.Y);
             var belowMax = new Vector2(maxX, maxY);
 
-            for (var i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
                 Vector2 clipMin;
                 Vector2 clipMax;

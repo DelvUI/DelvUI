@@ -18,7 +18,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Color")]
         [Order(30)]
-        public PluginConfigColor Color = new PluginConfigColor(new(240f / 255f, 92f / 255f, 232f / 255f, 100f / 100f));
+        public PluginConfigColor Color = new(new(240f / 255f, 92f / 255f, 232f / 255f, 100f / 100f));
 
         public MPTickerConfig(Vector2 position, Vector2 size)
         {
@@ -26,7 +26,7 @@ namespace DelvUI.Interface.GeneralElements
             Size = size;
         }
 
-        public new static MPTickerConfig DefaultConfig()
+        public static new MPTickerConfig DefaultConfig()
         {
             var size = new Vector2(254, 4);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY + 27);

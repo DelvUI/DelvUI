@@ -14,9 +14,9 @@ namespace DelvUI.Interface.GeneralElements
 {
     public class CastbarHud : DraggableHudElement, IHudElementWithActor
     {
-        private CastbarConfig Config => (CastbarConfig)_config;
-        private LabelHud _castNameLabel;
-        private LabelHud _castTimeLabel;
+        private new CastbarConfig Config => (CastbarConfig)base.Config;
+        private readonly LabelHud _castNameLabel;
+        private readonly LabelHud _castTimeLabel;
 
         protected LastUsedCast? LastUsedCast;
 
@@ -46,18 +46,18 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            UpdateCurrentCast(out var currentCastTime, out var totalCastTime);
+            UpdateCurrentCast(out float currentCastTime, out float totalCastTime);
             if (totalCastTime == 0)
             {
                 return;
             }
 
-            var castPercent = 100f / totalCastTime * currentCastTime;
-            var castScale = castPercent / 100f;
-            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
-            var endPos = startPos + Config.Size;
+            float castPercent = 100f / totalCastTime * currentCastTime;
+            float castScale = castPercent / 100f;
+            Vector2 startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
+            Vector2 endPos = startPos + Config.Size;
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
             // bg
             drawList.AddRectFilled(startPos, endPos, 0x88000000);
@@ -66,14 +66,14 @@ namespace DelvUI.Interface.GeneralElements
             DrawExtras(startPos, totalCastTime);
 
             // cast bar
-            var color = Color();
+            PluginConfigColor? color = Color();
             DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X * castScale, Config.Size.Y), color, drawList);
 
             // border
             drawList.AddRect(startPos, endPos, 0xFF000000);
 
             // icon
-            var iconSize = Vector2.Zero;
+            Vector2 iconSize = Vector2.Zero;
             if (Config.ShowIcon)
             {
                 if (LastUsedCast != null && LastUsedCast.IconTexture != null)
@@ -94,7 +94,7 @@ namespace DelvUI.Interface.GeneralElements
             _castNameLabel.Draw(startPos + new Vector2(iconSize.X, 0), Config.Size, Actor);
 
             // cast time
-            var text = Config.Preview ? "Cast Time" : Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
+            string? text = Config.Preview ? "Cast Time" : Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
             Config.CastTimeConfig.SetText(text);
             _castTimeLabel.Draw(startPos, Config.Size, Actor);
         }
@@ -115,7 +115,7 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var currentCastId = battleChara.CastActionId;
+            uint currentCastId = battleChara.CastActionId;
             var currentCastType = (ActionType)battleChara.CastActionType;
             currentCastTime = battleChara.CurrentCastTime;
             totalCastTime = battleChara.TotalCastTime;
@@ -139,7 +139,7 @@ namespace DelvUI.Interface.GeneralElements
 
     public class PlayerCastbarHud : CastbarHud
     {
-        private PlayerCastbarConfig Config => (PlayerCastbarConfig)_config;
+        private new PlayerCastbarConfig Config => (PlayerCastbarConfig)base.Config;
 
         public PlayerCastbarHud(string id, PlayerCastbarConfig config, string displayName) : base(id, config, displayName)
         {
@@ -153,12 +153,12 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
-            var slideCastWidth = Math.Min(Config.Size.X, (Config.SlideCastTime / 1000f) * Config.Size.X / totalCastTime);
+            float slideCastWidth = Math.Min(Config.Size.X, (Config.SlideCastTime / 1000f) * Config.Size.X / totalCastTime);
             var startPos = new Vector2(castbarPos.X + Config.Size.X - slideCastWidth, castbarPos.Y);
-            var endPos = startPos + new Vector2(slideCastWidth, Config.Size.Y);
-            var color = Config.SlideCastColor;
+            Vector2 endPos = startPos + new Vector2(slideCastWidth, Config.Size.Y);
+            PluginConfigColor? color = Config.SlideCastColor;
 
             DrawHelper.DrawGradientFilledRect(startPos, new Vector2(slideCastWidth, Config.Size.Y), color, drawList);
         }
@@ -171,14 +171,14 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             var chara = (Character)Actor;
-            var color = GlobalColors.Instance.ColorForJobId(chara.ClassJob.Id);
-            return color != null ? color : Config.Color;
+            PluginConfigColor? color = GlobalColors.Instance.ColorForJobId(chara.ClassJob.Id);
+            return color ?? Config.Color;
         }
     }
 
     public class TargetCastbarHud : CastbarHud
     {
-        private TargetCastbarConfig Config => (TargetCastbarConfig)_config;
+        private new TargetCastbarConfig Config => (TargetCastbarConfig)base.Config;
 
         public TargetCastbarHud(string id, TargetCastbarConfig config, string displayName) : base(id, config, displayName)
         {

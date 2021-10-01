@@ -11,7 +11,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -19,7 +18,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class MonkHud : JobHud
     {
-        private new MonkConfig Config => (MonkConfig)_config;
+        private new MonkConfig Config => (MonkConfig)Config;
 
         public MonkHud(string id, MonkConfig config, string? displayName = null) : base(id, config, displayName)
         {
@@ -124,27 +123,27 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawFormsBar(Vector2 origin, PlayerCharacter player)
         {
-            var opoOpoForm = player.StatusList.Where(o => o.StatusId is 107);
-            var raptorForm = player.StatusList.Where(o => o.StatusId is 108);
-            var coeurlForm = player.StatusList.Where(o => o.StatusId is 109);
-            var formlessFist = player.StatusList.Where(o => o.StatusId is 2513);
+            IEnumerable<Status>? opoOpoForm = player.StatusList.Where(o => o.StatusId is 107);
+            IEnumerable<Status>? raptorForm = player.StatusList.Where(o => o.StatusId is 108);
+            IEnumerable<Status>? coeurlForm = player.StatusList.Where(o => o.StatusId is 109);
+            IEnumerable<Status>? formlessFist = player.StatusList.Where(o => o.StatusId is 2513);
 
-            var opoOpoFormDuration = 0f;
+            float opoOpoFormDuration = 0f;
             if (opoOpoForm.Any())
             {
                 opoOpoFormDuration = Math.Abs(opoOpoForm.First().RemainingTime);
             }
-            var raptorFormDuration = 0f;
+            float raptorFormDuration = 0f;
             if (raptorForm.Any())
             {
                 raptorFormDuration = Math.Abs(raptorForm.First().RemainingTime);
             }
-            var coeurlFormDuration = 0f;
+            float coeurlFormDuration = 0f;
             if (coeurlForm.Any())
             {
                 coeurlFormDuration = Math.Abs(coeurlForm.First().RemainingTime);
             }
-            var formlessFistDuration = 0f;
+            float formlessFistDuration = 0f;
             if (formlessFist.Any())
             {
                 formlessFistDuration = Math.Abs(formlessFist.First().RemainingTime);
@@ -155,11 +154,11 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var position = origin + Config.Position + Config.FormsBarPosition - Config.FormsBarSize / 2f;
+            Vector2 position = origin + Config.Position + Config.FormsBarPosition - Config.FormsBarSize / 2f;
 
-            var formsBuilder = BarBuilder.Create(position, Config.FormsBarSize)
+            BarBuilder? formsBuilder = BarBuilder.Create(position, Config.FormsBarSize)
                 .SetBackgroundColor(EmptyColor.Background);
-            var maximum = 15f;
+            float maximum = 15f;
 
             if (opoOpoFormDuration > 0)
             {
@@ -177,26 +176,26 @@ namespace DelvUI.Interface.Jobs
 
             else if (coeurlFormDuration > 0)
             {
-                var bar = formsBuilder.AddInnerBar(Math.Abs(coeurlFormDuration), maximum, Config.FormsBarFillColor)
+                BarBuilder? bar = formsBuilder.AddInnerBar(Math.Abs(coeurlFormDuration), maximum, Config.FormsBarFillColor)
                                  .SetTextMode(BarTextMode.Single)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Coeurl Form");
             }
 
             else if (formlessFistDuration > 0)
             {
-                var bar = formsBuilder.AddInnerBar(Math.Abs(formlessFistDuration), maximum, Config.FormsBarFillColor)
+                BarBuilder? bar = formsBuilder.AddInnerBar(Math.Abs(formlessFistDuration), maximum, Config.FormsBarFillColor)
                                  .SetTextMode(BarTextMode.Single)
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Formless Fist");
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             formsBuilder.Build().Draw(drawList);
         }
 
         private void DrawTrueNorthBar(Vector2 origin, PlayerCharacter player)
         {
-            var trueNorth = player.StatusList.Where(o => o.StatusId is 1250);
-            var trueNorthDuration = 0f;
+            IEnumerable<Status>? trueNorth = player.StatusList.Where(o => o.StatusId is 1250);
+            float trueNorthDuration = 0f;
             if (trueNorth.Any())
             {
                 trueNorthDuration = Math.Abs(trueNorth.First().RemainingTime);
@@ -207,10 +206,10 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var position = origin + Config.Position + Config.TrueNorthBarPosition - Config.TrueNorthBarSize / 2f;
-            var trueNorthBuilder = BarBuilder.Create(position, Config.TrueNorthBarSize)
+            Vector2 position = origin + Config.Position + Config.TrueNorthBarPosition - Config.TrueNorthBarSize / 2f;
+            BarBuilder? trueNorthBuilder = BarBuilder.Create(position, Config.TrueNorthBarSize)
                 .SetBackgroundColor(EmptyColor.Background);
-            var maximum = 10f;
+            float maximum = 10f;
 
             if (trueNorthDuration > 0)
             {
@@ -223,15 +222,15 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             trueNorthBuilder.Build().Draw(drawList);
         }
 
         private void DrawPerfectBalanceBar(Vector2 origin, PlayerCharacter player)
         {
-            var perfectBalance = player.StatusList.Where(o => o.StatusId is 110);
-            var perfectBalanceDuration = 0f;
-            var perfectBalanceStacks = 0;
+            IEnumerable<Status>? perfectBalance = player.StatusList.Where(o => o.StatusId is 110);
+            float perfectBalanceDuration = 0f;
+            int perfectBalanceStacks = 0;
             if (perfectBalance.Any())
             {
                 perfectBalanceStacks = perfectBalance.First().StackCount;
@@ -243,10 +242,10 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var position = origin + Config.Position + Config.PerfectBalanceBarPosition - Config.PerfectBalanceBarSize / 2f;
-            var perfectBalanceBuilder = BarBuilder.Create(position, Config.PerfectBalanceBarSize)
+            Vector2 position = origin + Config.Position + Config.PerfectBalanceBarPosition - Config.PerfectBalanceBarSize / 2f;
+            BarBuilder? perfectBalanceBuilder = BarBuilder.Create(position, Config.PerfectBalanceBarSize)
                 .SetBackgroundColor(EmptyColor.Background);
-            var maximum = 15f;
+            float maximum = 15f;
 
             if (perfectBalanceDuration > 0)
             {
@@ -257,14 +256,14 @@ namespace DelvUI.Interface.Jobs
                                  .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, perfectBalanceStacks.ToString());
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             perfectBalanceBuilder.Build().Draw(drawList);
         }
 
         private void DrawRiddleOfEarthBar(Vector2 origin, PlayerCharacter player)
         {
-            var riddleOfEarth = player.StatusList.Where(o => o.StatusId is 1179);
-            var riddleOfEarthDuration = 0f;
+            IEnumerable<Status>? riddleOfEarth = player.StatusList.Where(o => o.StatusId is 1179);
+            float riddleOfEarthDuration = 0f;
             if (riddleOfEarth.Any())
             {
                 riddleOfEarthDuration = Math.Abs(riddleOfEarth.First().RemainingTime);
@@ -275,10 +274,10 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var position = origin + Config.Position + Config.RiddleofEarthBarPosition - Config.RiddleofEarthBarSize / 2f;
-            var riddleOfEarthBuilder = BarBuilder.Create(position, Config.RiddleofEarthBarSize)
+            Vector2 position = origin + Config.Position + Config.RiddleofEarthBarPosition - Config.RiddleofEarthBarSize / 2f;
+            BarBuilder? riddleOfEarthBuilder = BarBuilder.Create(position, Config.RiddleofEarthBarSize)
                 .SetBackgroundColor(EmptyColor.Background);
-            var maximum = 3f;
+            float maximum = 3f;
 
             if (riddleOfEarthDuration > 0)
             {
@@ -292,37 +291,37 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             riddleOfEarthBuilder.Build().Draw(drawList);
         }
 
         private void DrawChakraGauge(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<MNKGauge>();
+            MNKGauge? gauge = Plugin.JobGauges.Get<MNKGauge>();
 
             if (gauge.Chakra == 0 && Config.OnlyShowChakraWhenActive)
             {
                 return;
             }
 
-            var position = origin + Config.Position + Config.ChakraBarPosition - Config.ChakraBarSize / 2f;
-            var chakraBuilder = BarBuilder.Create(position, Config.ChakraBarSize).SetBackgroundColor(EmptyColor.Background)
+            Vector2 position = origin + Config.Position + Config.ChakraBarPosition - Config.ChakraBarSize / 2f;
+            BarBuilder? chakraBuilder = BarBuilder.Create(position, Config.ChakraBarSize).SetBackgroundColor(EmptyColor.Background)
                                 .SetChunks(5)
                                 .SetChunkPadding(2);
 
             if (gauge.Chakra > 0)
             {
                 chakraBuilder.AddInnerBar(gauge.Chakra, 5, Config.ChakraBarFillColor, EmptyColor);
-            }           
+            }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             chakraBuilder.Build().Draw(drawList);
         }
 
         private void DrawTwinSnakesBar(Vector2 origin, PlayerCharacter player)
         {
-            var twinSnakes = player.StatusList.Where(o => o.StatusId is 101);
-            var twinSnakesDuration = 0f;
+            IEnumerable<Status>? twinSnakes = player.StatusList.Where(o => o.StatusId is 101);
+            float twinSnakesDuration = 0f;
             if (twinSnakes.Any())
             {
                 twinSnakesDuration = Math.Abs(twinSnakes.First().RemainingTime);
@@ -333,13 +332,13 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var position = origin + Config.Position + Config.TwinSnakesBarPosition - Config.TwinSnakesBarSize / 2f;
+            Vector2 position = origin + Config.Position + Config.TwinSnakesBarPosition - Config.TwinSnakesBarSize / 2f;
 
-            var twinSnakesBuilder = BarBuilder.Create(position, Config.TwinSnakesBarSize)
+            BarBuilder? twinSnakesBuilder = BarBuilder.Create(position, Config.TwinSnakesBarSize)
                 .SetBackgroundColor(EmptyColor.Background);
-            var maximum = 15f;
+            float maximum = 15f;
 
-            if(twinSnakesDuration > 0)
+            if (twinSnakesDuration > 0)
             {
                 twinSnakesBuilder.AddInnerBar(Math.Abs(twinSnakesDuration), maximum, Config.TwinSnakesBarFillColor)
                              .SetFlipDrainDirection(Config.TwinSnakesBarInverted);
@@ -351,14 +350,14 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             twinSnakesBuilder.Build().Draw(drawList);
         }
 
         private void DrawLeadenFistBar(Vector2 origin, PlayerCharacter player)
         {
-            var leadenFist = player.StatusList.Where(o => o.StatusId is 1861);
-            var leadenFistDuration = 0f;
+            IEnumerable<Status>? leadenFist = player.StatusList.Where(o => o.StatusId is 1861);
+            float leadenFistDuration = 0f;
             if (leadenFist.Any())
             {
                 leadenFistDuration = Math.Abs(leadenFist.First().RemainingTime);
@@ -369,10 +368,10 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var position = origin + Config.Position + Config.LeadenFistBarPosition - Config.LeadenFistBarSize / 2f;
-            var leadenFistBuilder = BarBuilder.Create(position, Config.LeadenFistBarSize)
+            Vector2 position = origin + Config.Position + Config.LeadenFistBarPosition - Config.LeadenFistBarSize / 2f;
+            BarBuilder? leadenFistBuilder = BarBuilder.Create(position, Config.LeadenFistBarSize)
                 .SetBackgroundColor(EmptyColor.Background);
-            var maximum = 30f;
+            float maximum = 30f;
 
             if (leadenFistDuration > 0)
             {
@@ -386,24 +385,24 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             leadenFistBuilder.Build().Draw(drawList);
         }
 
         private void DrawDemolishBar(Vector2 origin, PlayerCharacter player)
         {
-            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target ?? player;
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target ?? player;
 
-            var demolishDuration = 0f;            
+            float demolishDuration = 0f;
 
             if (actor is BattleChara target)
             {
-                var demolish = target.StatusList.Where(o => o.StatusId is 246 && o.SourceID == player.ObjectId);
+                IEnumerable<Status>? demolish = target.StatusList.Where(o => o.StatusId is 246 && o.SourceID == player.ObjectId);
 
                 if (demolish.Any())
                 {
                     demolishDuration = Math.Abs(demolish.First().RemainingTime);
-                }                
+                }
             }
 
             if (demolishDuration == 0 && Config.OnlyShowDemolishWhenActive)
@@ -411,10 +410,10 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var position = origin + Config.Position + Config.DemolishBarPosition - Config.DemolishBarSize / 2f;
-            var demolishBuilder = BarBuilder.Create(position, Config.DemolishBarSize)
+            Vector2 position = origin + Config.Position + Config.DemolishBarPosition - Config.DemolishBarSize / 2f;
+            BarBuilder? demolishBuilder = BarBuilder.Create(position, Config.DemolishBarSize)
                 .SetBackgroundColor(EmptyColor.Background);
-            var maximum = 18f;
+            float maximum = 18f;
 
             if (demolishDuration > 0)
             {
@@ -427,7 +426,7 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             demolishBuilder.Build().Draw(drawList);
         }
     }
@@ -438,7 +437,7 @@ namespace DelvUI.Interface.Jobs
     public class MonkConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.MNK;
-        public new static MonkConfig DefaultConfig() { return new MonkConfig(); }
+        public static new MonkConfig DefaultConfig() { return new MonkConfig(); }
 
         #region Demolish Bar
         [Checkbox("Demolish", separator = true)]

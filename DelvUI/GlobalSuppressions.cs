@@ -1,0 +1,42 @@
+﻿// This file is used by Code Analysis to maintain SuppressMessage
+// attributes that are applied to this project.
+// Project-level suppressions either have no target or are given
+// a specific target and scoped to a namespace, type, member, etc.
+
+using System.Diagnostics.CodeAnalysis;
+
+[assembly: SuppressMessage("Style", "IDE0029:Use coalesce expression", Justification = "<Pending>", Scope = "member", Target = "~M:DelvUI.Config.Tree.ConfigPageNode.DrawImportExportGeneralConfig")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.PortableAttribute.portable")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DisableableAttribute.disableable")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.ConfigAttribute.friendlyName")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.ConfigAttribute.isMonitored")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.ConfigAttribute.separator")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.ConfigAttribute.spacing")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DragFloatAttribute.min")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DragFloatAttribute.max")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DragFloatAttribute.velocity")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DragIntAttribute.min")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DragIntAttribute.max")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DragIntAttribute.velocity")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DragFloat2Attribute.min")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DragFloat2Attribute.max")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DragFloat2Attribute.velocity")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DragInt2Attribute.min")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DragInt2Attribute.max")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DragInt2Attribute.velocity")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.InputTextAttribute.maxLength")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.ComboAttribute.options")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DragDropHorizontalAttribute.names")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.DynamicListAttribute.options")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.OrderAttribute.pos")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.OrderAttribute.collapseWith")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.NestedConfigAttribute.friendlyName")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.NestedConfigAttribute.pos")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.NestedConfigAttribute.separator")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.NestedConfigAttribute.spacing")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Config.Attributes.NestedConfigAttribute.collapseWith")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Helpers.GCDHelper.JobActionIDs")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Helpers.TooltipsHelper.MaxWidth")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Helpers.TooltipsHelper.Margin")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Interface.Party.PartyFramesHud.MaxMemberCount")]
+[assembly: SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>", Scope = "member", Target = "~F:DelvUI.Interface.Party.FakePartyFramesMember.RNG")]

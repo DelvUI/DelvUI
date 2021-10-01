@@ -52,7 +52,7 @@ namespace DelvUI.Helpers
             GC.SuppressFinalize(this);
         }
 
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposing)
             {
@@ -63,8 +63,8 @@ namespace DelvUI.Helpers
         }
         #endregion
 
-        private IntPtr? _uiModulePtr;
-        private IntPtr _chatModulePtr;
+        private readonly IntPtr? _uiModulePtr;
+        private readonly IntPtr _chatModulePtr;
 
         public static void SendChatMessage(string message)
         {
@@ -95,8 +95,8 @@ namespace DelvUI.Helpers
             }
 
             // encode message
-            var (text, length) = EncodeMessage(message);
-            var payload = MessagePayload(text, length);
+            (IntPtr text, long length) = EncodeMessage(message);
+            IntPtr payload = MessagePayload(text, length);
 
             ChatDelegate chatDelegate = Marshal.GetDelegateForFunctionPointer<ChatDelegate>(_chatModulePtr);
             chatDelegate.Invoke(_uiModulePtr.Value, payload, IntPtr.Zero, (byte)0);
@@ -107,8 +107,8 @@ namespace DelvUI.Helpers
 
         private static (IntPtr, long) EncodeMessage(string message)
         {
-            var bytes = Encoding.UTF8.GetBytes(message);
-            var mem = Marshal.AllocHGlobal(bytes.Length + 30);
+            byte[]? bytes = Encoding.UTF8.GetBytes(message);
+            IntPtr mem = Marshal.AllocHGlobal(bytes.Length + 30);
             Marshal.Copy(bytes, 0, mem, bytes.Length);
             Marshal.WriteByte(mem + bytes.Length, 0);
             return (mem, bytes.Length + 1);
@@ -116,7 +116,7 @@ namespace DelvUI.Helpers
 
         private static IntPtr MessagePayload(IntPtr message, long length)
         {
-            var mem = Marshal.AllocHGlobal(400);
+            IntPtr mem = Marshal.AllocHGlobal(400);
             Marshal.WriteInt64(mem, message.ToInt64());
             Marshal.WriteInt64(mem + 0x8, 64);
             Marshal.WriteInt64(mem + 0x10, length);

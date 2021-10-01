@@ -34,9 +34,9 @@ namespace DelvUI
 
         public static string Initials(this SeString str)
         {
-            var initials = "";
-            var firstName = FirstName(str);
-            var lastName = LastName(str);
+            string? initials = "";
+            string? firstName = FirstName(str);
+            string? lastName = LastName(str);
 
             if (firstName.Length > 0)
             {

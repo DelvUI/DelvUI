@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
@@ -20,7 +19,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class WhiteMageHud : JobHud
     {
-        private new WhiteMageConfig Config => (WhiteMageConfig)_config;
+        private new WhiteMageConfig Config => (WhiteMageConfig)Config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
         private readonly SpellHelper _spellHelper = new();
@@ -65,7 +64,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDiaBar(Vector2 origin, PlayerCharacter player)
         {
-            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             Vector2 cursorPos = origin + Config.Position + Config.DiaBarPosition - Config.DiaBarSize / 2f;
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -83,7 +82,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var dia = target.StatusList.Where(
+            IEnumerable<Status>? dia = target.StatusList.Where(
                 o => o.StatusId is 1871 or 144 or 143 && o.SourceID == player.ObjectId
             );
 
@@ -151,8 +150,8 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var posX = origin.X + Config.Position.X + Config.LilyBarPosition.X - Config.LilyBarSize.X / 2f;
-            var posY = origin.Y + Config.Position.Y + Config.LilyBarPosition.Y - Config.LilyBarSize.Y / 2f;
+            float posX = origin.X + Config.Position.X + Config.LilyBarPosition.X - Config.LilyBarSize.X / 2f;
+            float posY = origin.Y + Config.Position.Y + Config.LilyBarPosition.Y - Config.LilyBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(posX, posY, Config.LilyBarSize.Y, Config.LilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
@@ -217,7 +216,7 @@ namespace DelvUI.Interface.Jobs
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.AsylumSize.Y, Config.AsylumSize.X).SetBackgroundColor(EmptyColor.Background);
 
             // inner bar config
-            var color = duration > 3 ? Config.AsylumColor : Config.AsylumCoooldownColor;
+            PluginConfigColor? color = duration > 3 ? Config.AsylumColor : Config.AsylumCoooldownColor;
 
             if (Config.TrackAsylumCooldown)
             {
@@ -236,13 +235,13 @@ namespace DelvUI.Interface.Jobs
             // text
             if (Config.ShowAsylumText)
             {
-                var positon = BarTextPosition.CenterMiddle;
-                var type = BarTextType.Custom;
-                var mode = BarTextMode.Single;
+                BarTextPosition positon = BarTextPosition.CenterMiddle;
+                BarTextType type = BarTextType.Custom;
+                BarTextMode mode = BarTextMode.Single;
 
                 if (Config.TrackAsylumCooldown)
                 {
-                    var text = cooldown >= 0 && duration <= 0
+                    string? text = cooldown >= 0 && duration <= 0
                         ? cooldown == 0
                             ? "Ready"
                             : cooldown.ToString("N0")
@@ -295,12 +294,12 @@ namespace DelvUI.Interface.Jobs
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.PresenceOfMindSize.Y, Config.PresenceOfMindSize.X).SetBackgroundColor(EmptyColor.Background);
 
             // inner bar config            
-            var color = duration > 3 ? Config.PresenceOfMindColor : Config.PresenceOfMindCooldownColor;
+            PluginConfigColor? color = duration > 3 ? Config.PresenceOfMindColor : Config.PresenceOfMindCooldownColor;
 
             if (Config.TrackPoMCooldown)
             {
-                var currentValue = cooldown >= 0 && duration <= 0 ? maxCooldown - cooldown : duration;
-                var maximumValue = cooldown >= 0 && duration <= 0 ? maxCooldown : maxDuration;
+                float currentValue = cooldown >= 0 && duration <= 0 ? maxCooldown - cooldown : duration;
+                float maximumValue = cooldown >= 0 && duration <= 0 ? maxCooldown : maxDuration;
 
                 color = duration != 0 || (duration == 0 && cooldown == 0) ? Config.PresenceOfMindColor : Config.PresenceOfMindCooldownColor;
 
@@ -314,13 +313,13 @@ namespace DelvUI.Interface.Jobs
             // text
             if (Config.ShowPoMText)
             {
-                var positon = BarTextPosition.CenterMiddle;
-                var type = BarTextType.Custom;
-                var mode = BarTextMode.Single;
+                BarTextPosition positon = BarTextPosition.CenterMiddle;
+                BarTextType type = BarTextType.Custom;
+                BarTextMode mode = BarTextMode.Single;
 
                 if (Config.TrackPoMCooldown)
                 {
-                    var text = cooldown >= 0 && duration <= 0
+                    string? text = cooldown >= 0 && duration <= 0
                         ? cooldown == 0
                             ? "Ready"
                             : cooldown.ToString("N0")
@@ -372,12 +371,12 @@ namespace DelvUI.Interface.Jobs
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.PlenarySize.Y, Config.PlenarySize.X).SetBackgroundColor(EmptyColor.Background);
 
             // inner bar config            
-            var color = duration > 3 ? Config.PlenaryColor : Config.PlenaryCooldownColor;
+            PluginConfigColor? color = duration > 3 ? Config.PlenaryColor : Config.PlenaryCooldownColor;
 
             if (Config.TrackPlenaryCooldown)
             {
-                var currentValue = cooldown >= 0 && duration <= 0 ? maxCooldown - cooldown : duration;
-                var maximumValue = cooldown >= 0 && duration <= 0 ? maxCooldown : maxDuration;
+                float currentValue = cooldown >= 0 && duration <= 0 ? maxCooldown - cooldown : duration;
+                float maximumValue = cooldown >= 0 && duration <= 0 ? maxCooldown : maxDuration;
 
                 color = duration != 0 || (duration == 0 && cooldown == 0) ? Config.PlenaryColor : Config.PlenaryCooldownColor;
 
@@ -391,13 +390,13 @@ namespace DelvUI.Interface.Jobs
             // text
             if (Config.ShowPlenaryText)
             {
-                var positon = BarTextPosition.CenterMiddle;
-                var type = BarTextType.Custom;
-                var mode = BarTextMode.Single;
+                BarTextPosition positon = BarTextPosition.CenterMiddle;
+                BarTextType type = BarTextType.Custom;
+                BarTextMode mode = BarTextMode.Single;
 
                 if (Config.TrackPlenaryCooldown)
                 {
-                    var text = cooldown >= 0 && duration <= 0
+                    string? text = cooldown >= 0 && duration <= 0
                         ? cooldown == 0
                             ? "Ready"
                             : cooldown.ToString("N0")
@@ -449,12 +448,12 @@ namespace DelvUI.Interface.Jobs
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.TemperanceSize.Y, Config.TemperanceSize.X).SetBackgroundColor(EmptyColor.Background);
 
             // inner bar config
-            var color = duration > 3 ? Config.TemperanceColor : Config.TemperanceCooldownColor;
+            PluginConfigColor? color = duration > 3 ? Config.TemperanceColor : Config.TemperanceCooldownColor;
 
             if (Config.TrackTemperanceCooldown)
             {
-                var currentValue = cooldown >= 0 && duration <= 0 ? maxCooldown - cooldown : duration;
-                var maximumValue = cooldown >= 0 && duration <= 0 ? maxCooldown : maxDuration;
+                float currentValue = cooldown >= 0 && duration <= 0 ? maxCooldown - cooldown : duration;
+                float maximumValue = cooldown >= 0 && duration <= 0 ? maxCooldown : maxDuration;
 
                 color = duration != 0 || (duration == 0 && cooldown == 0) ? Config.TemperanceColor : Config.TemperanceCooldownColor;
 
@@ -468,13 +467,13 @@ namespace DelvUI.Interface.Jobs
             // text
             if (Config.ShowTemperanceText)
             {
-                var positon = BarTextPosition.CenterMiddle;
-                var type = BarTextType.Custom;
-                var mode = BarTextMode.Single;
+                BarTextPosition positon = BarTextPosition.CenterMiddle;
+                BarTextType type = BarTextType.Custom;
+                BarTextMode mode = BarTextMode.Single;
 
                 if (Config.TrackTemperanceCooldown)
                 {
-                    var text = cooldown >= 0 && duration <= 0
+                    string? text = cooldown >= 0 && duration <= 0
                         ? cooldown == 0
                             ? "Ready"
                             : cooldown.ToString("N0")
@@ -506,7 +505,7 @@ namespace DelvUI.Interface.Jobs
     public class WhiteMageConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.WHM;
-        public new static WhiteMageConfig DefaultConfig()
+        public static new WhiteMageConfig DefaultConfig()
         {
             var config = new WhiteMageConfig();
             config.UseDefaultPrimaryResourceBar = true;

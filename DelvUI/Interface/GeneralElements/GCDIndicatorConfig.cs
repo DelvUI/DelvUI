@@ -10,7 +10,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         [ColorEdit4("Color")]
         [Order(20)]
-        public PluginConfigColor Color = new PluginConfigColor(new(220f / 255f, 220f / 255f, 220f / 255f, 100f / 100f));
+        public PluginConfigColor Color = new(new(220f / 255f, 220f / 255f, 220f / 255f, 100f / 100f));
 
         [Checkbox("Show Border")]
         [Order(25)]
@@ -23,7 +23,7 @@ namespace DelvUI.Interface.GeneralElements
         [Checkbox("Vertical Mode", spacing = true)]
         [Order(35)]
         public bool VerticalMode = false;
-        
+
         [Checkbox("Anchor To Mouse", spacing = true)]
         [Order(40)]
         public bool AnchorToMouse = false;
@@ -39,7 +39,7 @@ namespace DelvUI.Interface.GeneralElements
         [DragInt("Radius")]
         [Order(55, collapseWith = nameof(CircularMode))]
         public int CircleRadius = 40;
-        
+
         [DragInt("Thickness")]
         [Order(60, collapseWith = nameof(CircularMode))]
         public int CircleThickness = 10;
@@ -50,7 +50,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("GCD Queue Color")]
         [Order(70, collapseWith = nameof(ShowGCDQueueIndicator))]
-        public PluginConfigColor QueueColor = new PluginConfigColor(new(13f / 255f, 207f / 255f, 31f / 255f, 100f / 100f));
+        public PluginConfigColor QueueColor = new(new(13f / 255f, 207f / 255f, 31f / 255f, 100f / 100f));
 
         public GCDIndicatorConfig(Vector2 position, Vector2 size)
         {
@@ -58,7 +58,7 @@ namespace DelvUI.Interface.GeneralElements
             Size = size;
         }
 
-        public new static GCDIndicatorConfig DefaultConfig()
+        public static new GCDIndicatorConfig DefaultConfig()
         {
             var size = new Vector2(254, 8);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY + 21);

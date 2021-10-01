@@ -20,10 +20,10 @@ namespace DelvUI.Interface
         public event DraggableHudElementSelectHandler? SelectEvent;
         public bool Selected = false;
 
-        private string _displayName;
+        private readonly string _displayName;
         private bool _windowPositionSet = false;
         private Vector2 _positionOffset;
-        private Vector2 _contentMargin = new Vector2(4, 0);
+        private Vector2 _contentMargin = new(4, 0);
 
         private bool _draggingEnabled = false;
         public bool DraggingEnabled
@@ -52,14 +52,14 @@ namespace DelvUI.Interface
                 return;
             }
 
-            var windowFlags = ImGuiWindowFlags.NoScrollbar
+            ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoScrollbar
             | ImGuiWindowFlags.NoTitleBar
             | ImGuiWindowFlags.NoResize
             | ImGuiWindowFlags.NoBackground
             | ImGuiWindowFlags.NoDecoration;
 
             // always update size
-            var size = MaxPos - MinPos + _contentMargin * 2;
+            Vector2 size = MaxPos - MinPos + _contentMargin * 2;
             ImGui.SetNextWindowSize(size, ImGuiCond.Always);
 
             // set initial position
@@ -68,16 +68,16 @@ namespace DelvUI.Interface
                 ImGui.SetNextWindowPos(origin + MinPos - _contentMargin);
                 _windowPositionSet = true;
 
-                _positionOffset = _config.Position - MinPos + _contentMargin;
+                _positionOffset = Config.Position - MinPos + _contentMargin;
             }
 
             // update config object position
             ImGui.Begin("dragArea " + ID, windowFlags);
-            var windowPos = ImGui.GetWindowPos();
-            _config.Position = windowPos + _positionOffset - origin;
+            Vector2 windowPos = ImGui.GetWindowPos();
+            Config.Position = windowPos + _positionOffset - origin;
 
             // check selection
-            var tooltipText = "x: " + _config.Position.X.ToString() + "    y: " + _config.Position.Y.ToString();
+            string? tooltipText = "x: " + Config.Position.X.ToString() + "    y: " + Config.Position.Y.ToString();
 
             if (ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
             {
@@ -92,14 +92,14 @@ namespace DelvUI.Interface
             }
 
             // draw window
-            var drawList = ImGui.GetWindowDrawList();
-            var contentPos = windowPos + _contentMargin;
-            var contentSize = size - _contentMargin * 2;
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            Vector2 contentPos = windowPos + _contentMargin;
+            Vector2 contentSize = size - _contentMargin * 2;
 
             // draw draggable indicators
             drawList.AddRectFilled(contentPos, contentPos + contentSize, 0x88444444, 3);
 
-            var lineColor = Selected ? 0xEEFFFFFF : 0x66FFFFFF;
+            uint lineColor = Selected ? 0xEEFFFFFF : 0x66FFFFFF;
             drawList.AddRect(contentPos, contentPos + contentSize, lineColor, 3, ImDrawFlags.None, 2);
             drawList.AddLine(contentPos + new Vector2(contentSize.X / 2f, 0), contentPos + new Vector2(contentSize.X / 2, contentSize.Y), lineColor);
             drawList.AddLine(contentPos + new Vector2(0, contentSize.Y / 2f), contentPos + new Vector2(contentSize.X, contentSize.Y / 2), lineColor);
@@ -109,19 +109,19 @@ namespace DelvUI.Interface
             // arrows
             if (Selected)
             {
-                if (DraggablesHelper.DrawArrows(windowPos, size, tooltipText, out var movement))
+                if (DraggablesHelper.DrawArrows(windowPos, size, tooltipText, out Vector2 movement))
                 {
                     _minPos = null;
                     _maxPos = null;
-                    _config.Position += movement;
+                    Config.Position += movement;
                     _windowPositionSet = false;
                 }
             }
 
             // element name
-            var textSize = ImGui.CalcTextSize(_displayName);
-            var textColor = Selected ? 0xFFFFFFFF : 0xEEFFFFFF;
-            var textOutlineColor = Selected ? 0xFF000000 : 0xEE000000;
+            Vector2 textSize = ImGui.CalcTextSize(_displayName);
+            uint textColor = Selected ? 0xFFFFFFFF : 0xEEFFFFFF;
+            uint textOutlineColor = Selected ? 0xFF000000 : 0xEE000000;
             DrawHelper.DrawOutlinedText(_displayName, contentPos + contentSize / 2f - textSize / 2f, textColor, textOutlineColor, drawList);
         }
 
@@ -138,7 +138,7 @@ namespace DelvUI.Interface
                     return (Vector2)_minPos;
                 }
 
-                var (positions, sizes) = ChildrenPositionsAndSizes();
+                (List<Vector2> positions, List<Vector2> sizes) = ChildrenPositionsAndSizes();
                 if (positions.Count == 0 || sizes.Count == 0)
                 {
                     return Vector2.Zero;
@@ -147,10 +147,10 @@ namespace DelvUI.Interface
                 float minX = float.MaxValue;
                 float minY = float.MaxValue;
 
-                var anchorConfig = _config as AnchorablePluginConfigObject;
+                var anchorConfig = Config as AnchorablePluginConfigObject;
                 for (int i = 0; i < positions.Count; i++)
                 {
-                    var pos = Utils.GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center);
+                    Vector2 pos = Utils.GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center);
                     minX = Math.Min(minX, pos.X);
                     minY = Math.Min(minY, pos.Y);
                 }
@@ -170,7 +170,7 @@ namespace DelvUI.Interface
                     return (Vector2)_maxPos;
                 }
 
-                var (positions, sizes) = ChildrenPositionsAndSizes();
+                (List<Vector2> positions, List<Vector2> sizes) = ChildrenPositionsAndSizes();
                 if (positions.Count == 0 || sizes.Count == 0)
                 {
                     return Vector2.Zero;
@@ -179,10 +179,10 @@ namespace DelvUI.Interface
                 float maxX = float.MinValue;
                 float maxY = float.MinValue;
 
-                var anchorConfig = _config as AnchorablePluginConfigObject;
+                var anchorConfig = Config as AnchorablePluginConfigObject;
                 for (int i = 0; i < positions.Count; i++)
                 {
-                    var pos = Utils.GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center) + sizes[i];
+                    Vector2 pos = Utils.GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center) + sizes[i];
                     maxX = Math.Max(maxX, pos.X);
                     maxY = Math.Max(maxY, pos.Y);
                 }

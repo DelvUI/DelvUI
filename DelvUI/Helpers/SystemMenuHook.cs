@@ -19,9 +19,6 @@ namespace DelvUI.Helpers
         private readonly Hook<UiModuleRequestMainCommand> _hookUiModuleRequestMainCommand;
 
 
-        // This hook overrides Dalamuds one (or comes after so the Dalamud changes don't go through) change this for Dalamud 5 
-        // https://github.com/goatcorp/Dalamud/blob/7ac46ed869a5f31ffb21c74eec30f43ca185ac46/Dalamud/Game/Internal/DalamudAtkTweaks.cs#L190
-
         public SystemMenuHook(DalamudPluginInterface pluginInterface)
         {
             IntPtr openSystemMenuAddress = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 32 C0 4C 8B AC 24 ?? ?? ?? ?? 48 8B 8D ?? ?? ?? ??");

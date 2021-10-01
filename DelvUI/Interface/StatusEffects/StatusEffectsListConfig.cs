@@ -17,9 +17,9 @@ namespace DelvUI.Interface.StatusEffects
     [SubSection("Player Buffs", 0)]
     public class PlayerBuffsListConfig : StatusEffectsListConfig
     {
-        public new static PlayerBuffsListConfig DefaultConfig()
+        public static new PlayerBuffsListConfig DefaultConfig()
         {
-            var screenSize = ImGui.GetMainViewport().Size;
+            Vector2 screenSize = ImGui.GetMainViewport().Size;
             var pos = new Vector2(screenSize.X * 0.38f, -screenSize.Y * 0.45f);
             var iconConfig = new StatusEffectIconConfig();
             iconConfig.DispellableBorderConfig.Enabled = false;
@@ -38,9 +38,9 @@ namespace DelvUI.Interface.StatusEffects
     [SubSection("Player Debuffs", 0)]
     public class PlayerDebuffsListConfig : StatusEffectsListConfig
     {
-        public new static PlayerDebuffsListConfig DefaultConfig()
+        public static new PlayerDebuffsListConfig DefaultConfig()
         {
-            var screenSize = ImGui.GetMainViewport().Size;
+            Vector2 screenSize = ImGui.GetMainViewport().Size;
             var pos = new Vector2(screenSize.X * 0.38f, -screenSize.Y * 0.45f + HUDConstants.DefaultStatusEffectsListSize.Y);
             var iconConfig = new StatusEffectIconConfig();
 
@@ -58,7 +58,7 @@ namespace DelvUI.Interface.StatusEffects
     [SubSection("Target Buffs", 0)]
     public class TargetBuffsListConfig : StatusEffectsListConfig
     {
-        public new static TargetBuffsListConfig DefaultConfig()
+        public static new TargetBuffsListConfig DefaultConfig()
         {
             var pos = new Vector2(HUDConstants.UnitFramesOffsetX, HUDConstants.BaseHUDOffsetY - 50);
             var iconConfig = new StatusEffectIconConfig();
@@ -78,7 +78,7 @@ namespace DelvUI.Interface.StatusEffects
     [SubSection("Target Debuffs", 0)]
     public class TargetDebuffsListConfig : StatusEffectsListConfig
     {
-        public new static TargetDebuffsListConfig DefaultConfig()
+        public static new TargetDebuffsListConfig DefaultConfig()
         {
             var pos = new Vector2(HUDConstants.UnitFramesOffsetX, HUDConstants.BaseHUDOffsetY - HUDConstants.DefaultStatusEffectsListSize.Y - 50);
             var iconConfig = new StatusEffectIconConfig();
@@ -150,7 +150,7 @@ namespace DelvUI.Interface.StatusEffects
         public StatusEffectIconConfig IconConfig;
 
         [NestedConfig("Filter Status Effects", 65)]
-        public StatusEffectsBlacklistConfig BlacklistConfig = new StatusEffectsBlacklistConfig();
+        public StatusEffectsBlacklistConfig BlacklistConfig = new();
 
 
         public StatusEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
@@ -169,7 +169,7 @@ namespace DelvUI.Interface.StatusEffects
 
         private void SetGrowthDirections(GrowthDirections growthDirections)
         {
-            var index = DirectionOptionsValues.FindIndex(d => d == growthDirections);
+            int index = DirectionOptionsValues.FindIndex(d => d == growthDirections);
             if (index > 0)
             {
                 Directions = index;
@@ -187,7 +187,7 @@ namespace DelvUI.Interface.StatusEffects
         }
 
         [JsonIgnore]
-        internal List<GrowthDirections> DirectionOptionsValues = new List<GrowthDirections>()
+        internal List<GrowthDirections> DirectionOptionsValues = new()
         {
             GrowthDirections.Right | GrowthDirections.Down,
             GrowthDirections.Right | GrowthDirections.Up,
@@ -271,11 +271,11 @@ namespace DelvUI.Interface.StatusEffects
     public class StatusEffectsBlacklistConfig : PluginConfigObject
     {
         public bool UseAsWhitelist = false;
-        public SortedList<string, uint> List = new SortedList<string, uint>();
+        public SortedList<string, uint> List = new();
 
         public bool StatusAllowed(Status status)
         {
-            var inList = List.ContainsKey(status.Name + "[" + status.RowId.ToString() + "]");
+            bool inList = List.ContainsKey(status.Name + "[" + status.RowId.ToString() + "]");
             if ((inList && !UseAsWhitelist) || (!inList && UseAsWhitelist))
             {
                 return false;
@@ -315,7 +315,7 @@ namespace DelvUI.Interface.StatusEffects
                 // try name
                 if (status == null)
                 {
-                    var enumerator = sheet.GetEnumerator();
+                    IEnumerator<Status>? enumerator = sheet.GetEnumerator();
 
                     while (enumerator.MoveNext())
                     {
@@ -345,7 +345,7 @@ namespace DelvUI.Interface.StatusEffects
                 return false;
             }
 
-            var flags =
+            ImGuiTableFlags flags =
                 ImGuiTableFlags.RowBg |
                 ImGuiTableFlags.Borders |
                 ImGuiTableFlags.BordersOuter |
@@ -353,10 +353,10 @@ namespace DelvUI.Interface.StatusEffects
                 ImGuiTableFlags.ScrollY |
                 ImGuiTableFlags.SizingFixedSame;
 
-            var changed = false;
-            var sheet = Plugin.DataManager.GetExcelSheet<Status>();
+            bool changed = false;
+            ExcelSheet<Status>? sheet = Plugin.DataManager.GetExcelSheet<Status>();
             var iconSize = new Vector2(30, 30);
-            var indexToRemove = -1;
+            int indexToRemove = -1;
 
             if (ImGui.BeginChild("Filter Effects", new Vector2(0, 360), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
@@ -403,11 +403,11 @@ namespace DelvUI.Interface.StatusEffects
 
                     for (int i = 0; i < List.Count; i++)
                     {
-                        var id = List.Values[i];
-                        var name = List.Keys[i];
-                        var row = sheet?.GetRow(id);
+                        uint id = List.Values[i];
+                        string? name = List.Keys[i];
+                        Status? row = sheet?.GetRow(id);
 
-                        if (_input != "" && !name.ToUpper().Contains(_input.ToUpper()))
+                        if (!string.IsNullOrEmpty(_input) && !name.ToUpper().Contains(_input.ToUpper()))
                         {
                             continue;
                         }
@@ -433,7 +433,7 @@ namespace DelvUI.Interface.StatusEffects
                         // name
                         if (ImGui.TableSetColumnIndex(2))
                         {
-                            var displayName = row != null ? row.Name : name;
+                            string? displayName = row != null ? row.Name : name;
                             ImGui.Text(displayName);
                         }
 
@@ -478,7 +478,7 @@ namespace DelvUI.Interface.StatusEffects
     [SubSection("Custom Effects", 0)]
     public class CustomEffectsListConfig : StatusEffectsListConfig
     {
-        public new static CustomEffectsListConfig DefaultConfig()
+        public static new CustomEffectsListConfig DefaultConfig()
         {
             var iconConfig = new StatusEffectIconConfig();
             iconConfig.DispellableBorderConfig.Enabled = false;

@@ -16,7 +16,7 @@ namespace DelvUI.Interface
         private string _importString = "";
         private string _exportString = "";
 
-        public new static ImportExportConfig DefaultConfig() { return new ImportExportConfig(); }
+        public static new ImportExportConfig DefaultConfig() { return new ImportExportConfig(); }
 
         [ManualDraw]
         public bool DrawFullImportExport()
@@ -27,7 +27,7 @@ namespace DelvUI.Interface
                 ImGui.Text("Import string:");
                 ImGui.InputText("", ref _importString, maxLength);
 
-                if (ImGui.Button("Import configuration") && _importString != "")
+                if (ImGui.Button("Import configuration") && !string.IsNullOrEmpty(_importString))
                 {
                     string[] importStrings = _importString.Trim().Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries);
                     ConfigurationManager.LoadTotalConfiguration(importStrings);
@@ -64,7 +64,7 @@ namespace DelvUI.Interface
 
                 ImGui.SameLine();
 
-                if (ImGui.Button("Copy to clipboard") && _exportString != "")
+                if (ImGui.Button("Copy to clipboard") && !string.IsNullOrEmpty(_exportString))
                 {
                     try
                     {

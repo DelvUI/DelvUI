@@ -15,34 +15,34 @@ namespace DelvUI.Interface.Party
 
     public unsafe class PartyFramesMember : IPartyFramesMember
     {
-        protected PartyMember? _partyMember = null;
-        private string _name = "";
+        protected PartyMember? PartyMember = null;
+        private readonly string _name = "";
         private uint _jobId = 0;
-        private uint _objectID = 0;
+        private readonly uint _objectID = 0;
 
-        public uint ObjectId => _partyMember != null ? _partyMember.ObjectId : _objectID;
+        public uint ObjectId => PartyMember != null ? PartyMember.ObjectId : _objectID;
         public Character? Character { get; private set; }
 
         public int Order { get; private set; }
-        public string Name => _partyMember != null ? _partyMember.Name.ToString() : (Character != null ? Character.Name.ToString() : _name);
-        public uint Level => _partyMember != null ? _partyMember.Level : (Character != null ? Character.Level : (uint)0);
-        public uint JobId => _partyMember != null ? _partyMember.ClassJob.Id : (Character != null ? Character.ClassJob.Id : _jobId);
-        public uint HP => _partyMember != null ? _partyMember.CurrentHP : (Character != null ? Character.CurrentHp : (uint)0);
-        public uint MaxHP => _partyMember != null ? _partyMember.MaxHP : (Character != null ? Character.MaxHp : (uint)0);
-        public uint MP => _partyMember != null ? _partyMember.CurrentMP : JobsHelper.CurrentPrimaryResource(Character);
-        public uint MaxMP => _partyMember != null ? _partyMember.MaxMP : JobsHelper.MaxPrimaryResource(Character);
+        public string Name => PartyMember != null ? PartyMember.Name.ToString() : (Character != null ? Character.Name.ToString() : _name);
+        public uint Level => PartyMember != null ? PartyMember.Level : (Character != null ? Character.Level : (uint)0);
+        public uint JobId => PartyMember != null ? PartyMember.ClassJob.Id : (Character != null ? Character.ClassJob.Id : _jobId);
+        public uint HP => PartyMember != null ? PartyMember.CurrentHP : (Character != null ? Character.CurrentHp : (uint)0);
+        public uint MaxHP => PartyMember != null ? PartyMember.MaxHP : (Character != null ? Character.MaxHp : (uint)0);
+        public uint MP => PartyMember != null ? PartyMember.CurrentMP : JobsHelper.CurrentPrimaryResource(Character);
+        public uint MaxMP => PartyMember != null ? PartyMember.MaxMP : JobsHelper.MaxPrimaryResource(Character);
         public float Shield => Utils.ActorShieldValue(Character);
         public EnmityLevel EnmityLevel { get; private set; } = EnmityLevel.Last;
         public bool IsPartyLeader { get; private set; } = false;
 
         public PartyFramesMember(PartyMember partyMember, int order, EnmityLevel enmityLevel, bool isPartyLeader)
         {
-            _partyMember = partyMember;
+            PartyMember = partyMember;
             Order = order;
             EnmityLevel = enmityLevel;
             IsPartyLeader = isPartyLeader;
 
-            var gameObject = partyMember.GameObject;
+            GameObject? gameObject = partyMember.GameObject;
             if (gameObject is Character character)
             {
                 Character = character;
@@ -79,14 +79,14 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
-            var gameObject = Plugin.ObjectTable.SearchById(ObjectId);
-            Character = gameObject is Character ? (Character)gameObject : null;
+            GameObject? gameObject = Plugin.ObjectTable.SearchById(ObjectId);
+            Character = gameObject is Character character ? character : null;
         }
     }
 
     public class FakePartyFramesMember : IPartyFramesMember
     {
-        private static readonly Random RNG = new Random((int)ImGui.GetTime());
+        private static readonly Random RNG = new((int)ImGui.GetTime());
 
         public uint ObjectId => GameObject.InvalidGameObjectId;
         public Character? Character => null;

@@ -21,7 +21,7 @@ namespace DelvUI.Interface.StatusEffects
             DrawHelper.DrawIcon<Status>(statusEffectData.Data, position, config.Size, false, drawList);
 
             // border
-            var borderConfig = GetBorderConfig(config, statusEffectData);
+            StatusEffectIconBorderConfig? borderConfig = GetBorderConfig(config, statusEffectData);
             if (borderConfig != null)
             {
                 drawList.AddRect(position, position + config.Size, borderConfig.Color.Base, 0, ImDrawFlags.None, borderConfig.Thickness);
@@ -30,7 +30,7 @@ namespace DelvUI.Interface.StatusEffects
             // duration
             if (config.DurationLabelConfig.Enabled && !statusEffectData.Data.IsPermanent && !statusEffectData.Data.IsFcBuff)
             {
-                var duration = Math.Round(Math.Abs(statusEffectData.Status.RemainingTime));
+                double duration = Math.Round(Math.Abs(statusEffectData.Status.RemainingTime));
                 config.DurationLabelConfig.SetText(Utils.DurationToString(duration));
 
                 durationLabel.Draw(position, config.Size);
@@ -39,7 +39,7 @@ namespace DelvUI.Interface.StatusEffects
             // stacks
             if (config.StacksLabelConfig.Enabled && statusEffectData.Data.MaxStacks > 0 && statusEffectData.Status.StackCount > 0 && !statusEffectData.Data.IsFcBuff)
             {
-                var text = $"{statusEffectData.Status.StackCount}";
+                string? text = $"{statusEffectData.Status.StackCount}";
                 config.StacksLabelConfig.SetText(text);
 
                 stacksLabel.Draw(position, config.Size);

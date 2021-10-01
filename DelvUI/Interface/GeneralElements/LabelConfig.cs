@@ -11,7 +11,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         [InputText("Text")]
         [Order(10)]
-        public string Text;
+        public new string Text;
 
         public EditableLabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor) : base(position, text, frameAnchor, textAnchor)
         {
@@ -32,7 +32,7 @@ namespace DelvUI.Interface.GeneralElements
     [Portable(false)]
     public class LabelConfig : MovablePluginConfigObject
     {
-        [JsonIgnore] protected string _text;
+        [JsonIgnore] protected string Text;
 
         [Font]
         [Order(15)]
@@ -48,7 +48,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Color ##Text")]
         [Order(30)]
-        public PluginConfigColor Color = new PluginConfigColor(Vector4.One);
+        public PluginConfigColor Color = new(Vector4.One);
 
         [Checkbox("Outline")]
         [Order(35)]
@@ -56,7 +56,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Color ##Outline")]
         [Order(40, collapseWith = nameof(ShowOutline))]
-        public PluginConfigColor OutlineColor = new PluginConfigColor(Vector4.UnitW);
+        public PluginConfigColor OutlineColor = new(Vector4.UnitW);
 
         [Checkbox("Use Job Color")]
         [Order(45)]
@@ -65,7 +65,7 @@ namespace DelvUI.Interface.GeneralElements
         public LabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor)
         {
             Position = position;
-            _text = text;
+            Text = text;
             FrameAnchor = frameAnchor;
             TextAnchor = textAnchor;
             Position = position;
@@ -73,12 +73,12 @@ namespace DelvUI.Interface.GeneralElements
 
         public virtual string GetText()
         {
-            return _text;
+            return Text;
         }
 
         public virtual void SetText(string text)
         {
-            _text = text;
+            Text = text;
         }
     }
 }

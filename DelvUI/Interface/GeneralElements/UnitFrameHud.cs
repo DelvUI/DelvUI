@@ -13,9 +13,9 @@ namespace DelvUI.Interface.GeneralElements
 {
     public unsafe class UnitFrameHud : DraggableHudElement, IHudElementWithActor
     {
-        private UnitFrameConfig Config => (UnitFrameConfig)_config;
-        private LabelHud _leftLabel;
-        private LabelHud _rightLabel;
+        private new UnitFrameConfig Config => (UnitFrameConfig)base.Config;
+        private readonly LabelHud _leftLabel;
+        private readonly LabelHud _rightLabel;
 
         private ImGuiWindowFlags _childFlags = 0;
         private readonly OpenContextMenuFromTarget _openContextMenuFromTarget;
@@ -58,10 +58,10 @@ namespace DelvUI.Interface.GeneralElements
             windowFlags |= ImGuiWindowFlags.NoDecoration;
             windowFlags |= ImGuiWindowFlags.NoInputs;
 
-            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
-            var endPos = startPos + Config.Size;
+            Vector2 startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
+            Vector2 endPos = startPos + Config.Size;
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("ContextMenu", 1);
 
             DrawHelper.ClipAround(addon, ID, drawList, (drawListPtr, windowName) =>
@@ -137,10 +137,10 @@ namespace DelvUI.Interface.GeneralElements
                 DrawTankStanceIndicator(drawList, startPos);
             }
 
-            var endPos = startPos + Config.Size;
-            var scale = (float)chara.CurrentHp / Math.Max(1, chara.MaxHp);
-            var color = Config.UseCustomColor ? Config.CustomColor : Utils.ColorForActor(chara);
-            var bgColor = BackgroundColor(chara);
+            Vector2 endPos = startPos + Config.Size;
+            float scale = (float)chara.CurrentHp / Math.Max(1, chara.MaxHp);
+            Config.PluginConfigColor? color = Config.UseCustomColor ? Config.CustomColor : Utils.ColorForActor(chara);
+            uint bgColor = BackgroundColor(chara);
 
             if (Config.UseCustomColor && Config.UseColorBasedOnHealthValue)
             {
@@ -156,7 +156,7 @@ namespace DelvUI.Interface.GeneralElements
             // shield
             if (Config.ShieldConfig.Enabled)
             {
-                var shield = Utils.ActorShieldValue(Actor);
+                float shield = Utils.ActorShieldValue(Actor);
 
                 if (Config.ShieldConfig.FillHealthFirst)
                 {
@@ -176,7 +176,7 @@ namespace DelvUI.Interface.GeneralElements
 
         private void DrawFriendlyNPC(ImDrawListPtr drawList, Vector2 startPos, Vector2 endPos)
         {
-            var color = Config.UseCustomColor ? Config.CustomColor : GlobalColors.Instance.NPCFriendlyColor;
+            Config.PluginConfigColor? color = Config.UseCustomColor ? Config.CustomColor : GlobalColors.Instance.NPCFriendlyColor;
 
             drawList.AddRectFilled(startPos, endPos, GlobalColors.Instance.EmptyUnitFrameColor.Base);
 
@@ -192,15 +192,15 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var tankStanceBuff = battleChara.StatusList.Where(
+            IEnumerable<Dalamud.Game.ClientState.Statuses.Status>? tankStanceBuff = battleChara.StatusList.Where(
                 o => o.StatusId is 79 or 91 or 392 or 393 or 743 or 1396 or 1397 or 1833
             );
 
-            var thickness = Config.TankStanceIndicatorConfig.Thickness + 1;
+            int thickness = Config.TankStanceIndicatorConfig.Thickness + 1;
             var barSize = new Vector2(Config.Size.Y > Config.Size.X ? Config.Size.X : Config.Size.Y, Config.Size.Y);
-            var cursorPos = startPos + new Vector2(-thickness, thickness);
+            Vector2 cursorPos = startPos + new Vector2(-thickness, thickness);
 
-            var color = !tankStanceBuff.Any() ? Config.TankStanceIndicatorConfig.InactiveColor : Config.TankStanceIndicatorConfig.ActiveColor;
+            Config.PluginConfigColor? color = !tankStanceBuff.Any() ? Config.TankStanceIndicatorConfig.InactiveColor : Config.TankStanceIndicatorConfig.ActiveColor;
 
             drawList.AddRectFilled(cursorPos, cursorPos + barSize, color.Base);
             drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);

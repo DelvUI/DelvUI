@@ -24,9 +24,9 @@ namespace DelvUI.Helpers
               | ImGuiWindowFlags.NoDecoration
             );
 
-            var drawList = ImGui.GetWindowDrawList();
-            var screenSize = ImGui.GetMainViewport().Size;
-            var center = screenSize / 2f;
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            Vector2 screenSize = ImGui.GetMainViewport().Size;
+            Vector2 center = screenSize / 2f;
 
             // grid
             if (config.ShowGrid)
@@ -35,7 +35,7 @@ namespace DelvUI.Helpers
 
                 for (int i = 0; i < count; i++)
                 {
-                    var step = i * config.GridDivisionsDistance;
+                    int step = i * config.GridDivisionsDistance;
 
                     drawList.AddLine(new Vector2(center.X + step, 0), new Vector2(center.X + step, screenSize.Y), 0x88888888);
                     drawList.AddLine(new Vector2(center.X - step, 0), new Vector2(center.X - step, screenSize.Y), 0x88888888);
@@ -47,7 +47,7 @@ namespace DelvUI.Helpers
                     {
                         for (int j = 1; j < config.GridSubdivisionCount; j++)
                         {
-                            var subStep = j * (config.GridDivisionsDistance / config.GridSubdivisionCount);
+                            int subStep = j * (config.GridDivisionsDistance / config.GridSubdivisionCount);
 
                             drawList.AddLine(new Vector2(center.X + step + subStep, 0), new Vector2(center.X + step + subStep, screenSize.Y), 0x44888888);
                             drawList.AddLine(new Vector2(center.X - step - subStep, 0), new Vector2(center.X - step - subStep, screenSize.Y), 0x44888888);
@@ -69,7 +69,7 @@ namespace DelvUI.Helpers
             // anchor
             if (config.ShowAnchorPoints && selectedElementConfig != null)
             {
-                var anchorPos = center + selectedElementConfig.Position;
+                Vector2 anchorPos = center + selectedElementConfig.Position;
                 drawList.AddLine(center, anchorPos, 0xAAFFFFFF, 2);
 
                 var anchorSize = new Vector2(10, 10);
@@ -83,7 +83,7 @@ namespace DelvUI.Helpers
         {
             offset = Vector2.Zero;
 
-            var windowFlags = ImGuiWindowFlags.NoScrollbar
+            ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoScrollbar
                 | ImGuiWindowFlags.NoTitleBar
                 | ImGuiWindowFlags.NoResize
                 | ImGuiWindowFlags.NoBackground
@@ -91,7 +91,7 @@ namespace DelvUI.Helpers
 
             var arrowSize = new Vector2(40, 40);
             var margin = new Vector2(4, 0);
-            var windowSize = arrowSize + margin * 2;
+            Vector2 windowSize = arrowSize + margin * 2;
 
             // left, right, up, down
             var positions = new Vector2[]
@@ -111,7 +111,7 @@ namespace DelvUI.Helpers
 
             for (int i = 0; i < 4; i++)
             {
-                var pos = positions[i] - margin;
+                Vector2 pos = positions[i] - margin;
 
                 ImGui.SetNextWindowSize(windowSize, ImGuiCond.Always);
                 ImGui.SetNextWindowPos(pos);
@@ -141,8 +141,8 @@ namespace DelvUI.Helpers
 
         public static void DrawGridWindow()
         {
-            var configManager = ConfigurationManager.Instance;
-            var node = configManager.GetConfigPageNode<GridConfig>();
+            ConfigurationManager? configManager = ConfigurationManager.Instance;
+            Config.Tree.ConfigPageNode? node = configManager.GetConfigPageNode<GridConfig>();
             if (node == null)
             {
                 return;
@@ -160,7 +160,7 @@ namespace DelvUI.Helpers
             }
             ImGui.PopStyleColor();
 
-            var changed = false;
+            bool changed = false;
             node.Draw(ref changed);
 
             ImGui.NewLine();

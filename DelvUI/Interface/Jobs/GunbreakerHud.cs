@@ -8,7 +8,6 @@ using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -16,7 +15,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class GunbreakerHud : JobHud
     {
-        private new GunbreakerConfig Config => (GunbreakerConfig)_config;
+        private new GunbreakerConfig Config => (GunbreakerConfig)Config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public GunbreakerHud(string id, GunbreakerConfig config, string? displayName = null) : base(id, config, displayName)
@@ -62,7 +61,7 @@ namespace DelvUI.Interface.Jobs
             Vector2 position = origin + Config.Position + Config.PowderGaugeBarPosition - Config.PowderGaugeBarSize / 2f;
             var builder = BarBuilder.Create(position, Config.PowderGaugeBarSize);
 
-            var gauge = Plugin.JobGauges.Get<GNBGauge>();
+            GNBGauge? gauge = Plugin.JobGauges.Get<GNBGauge>();
 
             if (Config.OnlyShowPowderGaugeWhenActive && gauge.Ammo is 0) { return; }
 
@@ -71,7 +70,7 @@ namespace DelvUI.Interface.Jobs
                    .AddInnerBar(gauge.Ammo, 2, Config.PowderGaugeFillColor, null)
                    .SetBackgroundColor(EmptyColor.Base);
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
         }
 
@@ -79,10 +78,10 @@ namespace DelvUI.Interface.Jobs
         private void DrawNoMercyBar(Vector2 origin, PlayerCharacter player)
         {
             Vector2 position = origin + Config.Position + Config.NoMercyBarPosition - Config.NoMercyBarSize / 2f;
-            var noMercyBuff = player.StatusList.Where(o => o.StatusId == 1831);
+            IEnumerable<Dalamud.Game.ClientState.Statuses.Status>? noMercyBuff = player.StatusList.Where(o => o.StatusId == 1831);
             float duration = 0f;
 
-            var builder = BarBuilder.Create(position, Config.NoMercyBarSize)
+            BarBuilder? builder = BarBuilder.Create(position, Config.NoMercyBarSize)
                 .SetBackgroundColor(EmptyColor.Base);
 
             if (noMercyBuff.Any())
@@ -95,7 +94,7 @@ namespace DelvUI.Interface.Jobs
             }
             if (Config.OnlyShowNoMercyWhenActive && duration is 0) { return; }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
         }
     }
@@ -106,7 +105,7 @@ namespace DelvUI.Interface.Jobs
     public class GunbreakerConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.GNB;
-        public new static GunbreakerConfig DefaultConfig() { return new GunbreakerConfig(); }
+        public static new GunbreakerConfig DefaultConfig() { return new GunbreakerConfig(); }
 
         #region Powder Gauge
         [Checkbox("Powder Gauge", separator = true)]

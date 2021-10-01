@@ -1,4 +1,4 @@
-using DelvUI.Config.Tree;
+﻿using DelvUI.Config.Tree;
 using DelvUI.Helpers;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
@@ -30,7 +30,7 @@ namespace DelvUI.Config
         {
             get
             {
-                var config = Instance.GetConfigObject<MiscColorConfig>();
+                MiscColorConfig? config = Instance.GetConfigObject<MiscColorConfig>();
                 return config != null ? config.GradientDirection : GradientDirection.None;
             }
         }
@@ -100,7 +100,7 @@ namespace DelvUI.Config
             GC.SuppressFinalize(this);
         }
 
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposing)
             {
@@ -189,15 +189,15 @@ namespace DelvUI.Config
 
             foreach (Type type in configObjectTypes)
             {
-                var genericMethod = node.GetType().GetMethod("GetOrAddConfig");
-                var method = genericMethod?.MakeGenericMethod(type);
+                MethodInfo? genericMethod = node.GetType().GetMethod("GetOrAddConfig");
+                MethodInfo? method = genericMethod?.MakeGenericMethod(type);
                 method?.Invoke(node, null);
             }
 
             TextureWrap? banner = Plugin.BannerTexture;
 
-            var currentResetEvent = Instance?.ResetEvent;
-            var currentLockEvent = Instance?.LockEvent;
+            ConfigurationManagerEventHandler? currentResetEvent = Instance?.ResetEvent;
+            ConfigurationManagerEventHandler? currentLockEvent = Instance?.LockEvent;
 
             Instance = new ConfigurationManager(
                 defaultConfig,
@@ -253,19 +253,19 @@ namespace DelvUI.Config
 
         public static string Base64DecodeAndDecompress(string base64String)
         {
-            var base64EncodedBytes = Convert.FromBase64String(base64String);
+            byte[]? base64EncodedBytes = Convert.FromBase64String(base64String);
 
             using MemoryStream inputStream = new(base64EncodedBytes);
             using DeflateStream gzip = new(inputStream, CompressionMode.Decompress);
             using StreamReader reader = new(gzip, Encoding.UTF8);
-            var decodedString = reader.ReadToEnd();
+            string? decodedString = reader.ReadToEnd();
 
             return decodedString;
         }
 
         public static string GenerateExportString(PluginConfigObject configObject)
         {
-            var jsonString = JsonConvert.SerializeObject(configObject, Formatting.Indented,
+            string? jsonString = JsonConvert.SerializeObject(configObject, Formatting.Indented,
                 new JsonSerializerSettings { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects });
 
             return CompressAndBase64Encode(jsonString);
@@ -278,7 +278,7 @@ namespace DelvUI.Config
                 TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
                 TypeNameHandling = TypeNameHandling.Objects
             };
-            var jsonString = JsonConvert.SerializeObject(baseNode, Formatting.Indented, settings);
+            string? jsonString = JsonConvert.SerializeObject(baseNode, Formatting.Indented, settings);
             ImGui.SetClipboardText(jsonString);
             return CompressAndBase64Encode(jsonString);
         }
@@ -296,7 +296,7 @@ namespace DelvUI.Config
                 // update the tree 
                 configPageNode.ConfigObject = importedConfigObject;
                 // but also update the dictionary
-                Instance.ConfigBaseNode.configPageNodesMap[configPageNode.ConfigObject.GetType()] = configPageNode;
+                Instance.ConfigBaseNode.ConfigPageNodesMap[configPageNode.ConfigObject.GetType()] = configPageNode;
                 Instance.SaveConfigurations();
 
                 Instance.ResetEvent?.Invoke(Instance);
@@ -317,7 +317,7 @@ namespace DelvUI.Config
         {
             try
             {
-                var jsonString = Base64DecodeAndDecompress(importString);
+                string? jsonString = Base64DecodeAndDecompress(importString);
                 return JsonConvert.DeserializeObject<T>(jsonString);
             }
             catch (Exception ex)

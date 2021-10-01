@@ -25,7 +25,7 @@ namespace DelvUI.Helpers
     {
         public static JobRoles RoleForJob(uint jobId)
         {
-            if (JobRolesMap.TryGetValue(jobId, out var role))
+            if (JobRolesMap.TryGetValue(jobId, out JobRoles role))
             {
                 return role;
             }
@@ -35,7 +35,7 @@ namespace DelvUI.Helpers
 
         public static bool IsJobARole(uint jobId, JobRoles role)
         {
-            if (JobRolesMap.TryGetValue(jobId, out var r))
+            if (JobRolesMap.TryGetValue(jobId, out JobRoles r))
             {
                 return r == role;
             }
@@ -119,14 +119,14 @@ namespace DelvUI.Helpers
 
         public static uint RoleIconIDForJob(uint jobId, bool specificDPSIcons = false)
         {
-            var role = RoleForJob(jobId);
+            JobRoles role = RoleForJob(jobId);
 
             switch (role)
             {
                 case JobRoles.Tank: return 62581;
                 case JobRoles.Healer: return 62582;
                 case JobRoles.DPS:
-                    if (specificDPSIcons && SpecificDPSIcons.TryGetValue(jobId, out var iconId))
+                    if (specificDPSIcons && SpecificDPSIcons.TryGetValue(jobId, out uint iconId))
                     {
                         return iconId;
                     }
@@ -144,7 +144,7 @@ namespace DelvUI.Helpers
 
         public static uint RoleIconIDForBattleCompanion => 62039;
 
-        public static Dictionary<uint, JobRoles> JobRolesMap = new Dictionary<uint, JobRoles>()
+        public static Dictionary<uint, JobRoles> JobRolesMap = new()
         {
             // tanks
             [JobIDs.GLD] = JobRoles.Tank,
@@ -199,7 +199,7 @@ namespace DelvUI.Helpers
             [JobIDs.FSH] = JobRoles.Gatherer,
         };
 
-        public static Dictionary<uint, string> JobNames = new Dictionary<uint, string>()
+        public static Dictionary<uint, string> JobNames = new()
         {
             // tanks
             [JobIDs.GLD] = "GLD",
@@ -254,7 +254,7 @@ namespace DelvUI.Helpers
             [JobIDs.FSH] = "FSH",
         };
 
-        public static Dictionary<uint, uint> SpecificDPSIcons = new Dictionary<uint, uint>()
+        public static Dictionary<uint, uint> SpecificDPSIcons = new()
         {
             // melee dps
             [JobIDs.PGL] = 62584,

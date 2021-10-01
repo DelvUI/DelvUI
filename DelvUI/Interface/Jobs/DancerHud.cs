@@ -11,7 +11,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -19,7 +18,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class DancerHud : JobHud
     {
-        private new DancerConfig Config => (DancerConfig)_config;
+        private new DancerConfig Config => (DancerConfig)Config;
 
         public DancerHud(string id, DancerConfig config, string? displayName = null) : base(id, config, displayName)
         {
@@ -106,8 +105,8 @@ namespace DelvUI.Interface.Jobs
 
             if (gauge.Esprit == 0 && Config.OnlyShowEspritWhenActive) { return; }
 
-            var xPos = origin.X + Config.Position.X + Config.EspritGaugePosition.X - Config.EspritGaugeSize.X / 2f;
-            var yPos = origin.Y + Config.Position.Y + Config.EspritGaugePosition.Y - Config.EspritGaugeSize.Y / 2f;
+            float xPos = origin.X + Config.Position.X + Config.EspritGaugePosition.X - Config.EspritGaugeSize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.EspritGaugePosition.Y - Config.EspritGaugeSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.EspritGaugeSize.Y, Config.EspritGaugeSize.X)
                 .SetBackgroundColor(EmptyColor.Base);
@@ -142,8 +141,8 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var xPos = origin.X + Config.Position.X + Config.FeatherGaugePosition.X - Config.FeatherGaugeSize.X / 2f;
-            var yPos = origin.Y + Config.Position.Y + Config.FeatherGaugePosition.Y - Config.FeatherGaugeSize.Y / 2f;
+            float xPos = origin.X + Config.Position.X + Config.FeatherGaugePosition.X - Config.FeatherGaugeSize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.FeatherGaugePosition.Y - Config.FeatherGaugeSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.FeatherGaugeSize.Y, Config.FeatherGaugeSize.X)
                                            .SetChunks(4)
@@ -162,16 +161,16 @@ namespace DelvUI.Interface.Jobs
 
         private unsafe void DrawStepBar(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<DNCGauge>();
+            DNCGauge? gauge = Plugin.JobGauges.Get<DNCGauge>();
 
             if (!gauge.IsDancing) { return; }
 
             byte chunkCount = 0;
             List<PluginConfigColor> chunkColors = new List<PluginConfigColor>();
             List<bool> glowChunks = new List<bool>();
-            var danceReady = true;
+            bool danceReady = true;
 
-            for (var i = 0; i < 4; i++)
+            for (int i = 0; i < 4; i++)
             {
                 DNCStep step = (DNCStep)gauge.Steps[i];
 
@@ -219,8 +218,8 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            var xPos = origin.X + Config.Position.X + Config.StepBarPosition.X - Config.StepBarSize.X / 2f;
-            var yPos = origin.Y + Config.Position.Y + Config.StepBarPosition.Y - Config.StepBarSize.Y / 2f;
+            float xPos = origin.X + Config.Position.X + Config.StepBarPosition.X - Config.StepBarSize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.StepBarPosition.Y - Config.StepBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.StepBarSize.Y, Config.StepBarSize.X)
                                            .SetChunks(chunkCount)
@@ -252,8 +251,8 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
-            var yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
+            float xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.BuffBarSize.Y, Config.BuffBarSize.X).SetBackgroundColor(EmptyColor.Base);
 
@@ -291,8 +290,8 @@ namespace DelvUI.Interface.Jobs
 
             if (!standardFinishBuff.Any() && Config.OnlyShowStandardBarWhenActive) { return; }
 
-            var xPos = origin.X + Config.Position.X + Config.StandardBarPosition.X - Config.StandardBarSize.X / 2f;
-            var yPos = origin.Y + Config.Position.Y + Config.StandardBarPosition.Y - Config.StandardBarSize.Y / 2f;
+            float xPos = origin.X + Config.Position.X + Config.StandardBarPosition.X - Config.StandardBarSize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.StandardBarPosition.Y - Config.StandardBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.StandardBarSize.Y, Config.StandardBarSize.X);
 
@@ -320,14 +319,14 @@ namespace DelvUI.Interface.Jobs
             float cascadeTimer = cascadeBuff.Any() ? Math.Abs(cascadeBuff.First().RemainingTime) : 0f;
             float fountainTimer = fountainBuff.Any() ? Math.Abs(fountainBuff.First().RemainingTime) : 0f;
             float windmillTimer = windmillBuff.Any() ? Math.Abs(windmillBuff.First().RemainingTime) : 0f;
-            float showerTimer = showerBuff.Any() ? Math.Abs(showerBuff.First().RemainingTime) : 0f;            
+            float showerTimer = showerBuff.Any() ? Math.Abs(showerBuff.First().RemainingTime) : 0f;
 
             if (cascadeTimer == 0 && fountainTimer == 0 && windmillTimer == 0 && showerTimer == 0 && Config.OnlyShowProcsWhenActive)
             {
                 return;
             }
 
-            var procBarWidth = (Config.ProcBarSize.X - Config.ProcBarChunkPadding * 3) / 4f;
+            float procBarWidth = (Config.ProcBarSize.X - Config.ProcBarChunkPadding * 3) / 4f;
             var procBarSize = new Vector2(procBarWidth, Config.ProcBarSize.Y);
 
             var cursorPos = new Vector2(
@@ -335,23 +334,23 @@ namespace DelvUI.Interface.Jobs
                 origin.Y + Config.Position.Y + Config.ProcBarPosition.Y - Config.ProcBarSize.Y / 2f
             );
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
-            var order = Config.procsOrder;
-            var procTimers = new float[] { cascadeTimer, fountainTimer, windmillTimer, showerTimer };
+            int[]? order = Config.ProcsOrder;
+            float[]? procTimers = new float[] { cascadeTimer, fountainTimer, windmillTimer, showerTimer };
             var colors = new PluginConfigColor[] { Config.FlourishingCascadeColor, Config.FlourishingFountainColor, Config.FlourishingWindmillColor, Config.FlourishingShowerColor };
 
             for (int i = 0; i < 4; i++)
             {
                 if (Config.StaticProcBarsEnabled)
                 {
-                    var builder = BarBuilder.Create(cursorPos, procBarSize).SetBackgroundColor(EmptyColor.Background)
+                    BarBuilder? builder = BarBuilder.Create(cursorPos, procBarSize).SetBackgroundColor(EmptyColor.Background)
                         .AddInnerBar(procTimers[order[i]] > 0 ? 1 : 0, 1, colors[order[i]]);
                     builder.Build().Draw(drawList);
                 }
                 else
                 {
-                    var builder = BarBuilder.Create(cursorPos, procBarSize).SetBackgroundColor(EmptyColor.Background)
+                    BarBuilder? builder = BarBuilder.Create(cursorPos, procBarSize).SetBackgroundColor(EmptyColor.Background)
                         .AddInnerBar(procTimers[order[i]], 20f, colors[order[i]]);
                     builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
                     builder.Build().Draw(drawList);
@@ -367,7 +366,7 @@ namespace DelvUI.Interface.Jobs
     public class DancerConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.DNC;
-        public new static DancerConfig DefaultConfig() { return new DancerConfig(); }
+        public static new DancerConfig DefaultConfig() { return new DancerConfig(); }
 
         #region esprit
         [Checkbox("Esprit", separator = true)]
@@ -598,7 +597,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragDropHorizontal("Order", "Cascade", "Fountain", "Windmill", "Shower" + "##Procs")]
         [Order(300, collapseWith = nameof(ProcBarEnabled))]
-        public int[] procsOrder = new int[] { 0, 1, 2, 3 };
+        public int[] ProcsOrder = new int[] { 0, 1, 2, 3 };
         #endregion
     }
 }

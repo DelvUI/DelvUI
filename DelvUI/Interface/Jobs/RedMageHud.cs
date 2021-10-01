@@ -9,7 +9,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -17,7 +16,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class RedMageHud : JobHud
     {
-        private new RedMageConfig Config => (RedMageConfig)_config;
+        private new RedMageConfig Config => (RedMageConfig)Config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public RedMageHud(string id, RedMageConfig config, string? displayName = null) : base(id, config, displayName)
@@ -114,10 +113,10 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBalanceBar(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<RDMGauge>();
-            var whiteGauge = (float)Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
-            var blackGauge = (float)Plugin.JobGauges.Get<RDMGauge>().BlackMana;
-            var scale = gauge.WhiteMana - gauge.BlackMana;
+            RDMGauge? gauge = Plugin.JobGauges.Get<RDMGauge>();
+            float whiteGauge = (float)Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
+            float blackGauge = (float)Plugin.JobGauges.Get<RDMGauge>().BlackMana;
+            int scale = gauge.WhiteMana - gauge.BlackMana;
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.BalanceBarPosition.X - Config.BalanceBarSize.X / 2f,
@@ -125,7 +124,7 @@ namespace DelvUI.Interface.Jobs
             );
 
             PluginConfigColor color = Config.BalanceBarColor;
-            var value = 0;
+            int value = 0;
 
             if (whiteGauge >= 80 && blackGauge >= 80)
             {
@@ -144,8 +143,8 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.OnlyShowBalanceWhenActive && value is 0) { return; }
 
-            var drawList = ImGui.GetWindowDrawList();
-            var builder = BarBuilder.Create(position, Config.BalanceBarSize)
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            BarBuilder? builder = BarBuilder.Create(position, Config.BalanceBarSize)
                 .AddInnerBar(value, 1, color)
                 .SetBackgroundColor(EmptyColor.Base);
 
@@ -154,9 +153,9 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawWhiteManaBar(Vector2 origin)
         {
-            var gauge = (int)Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
+            int gauge = (int)Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
             if (Config.OnlyShowWhiteManaWhenActive && gauge is 0) { return; }
-            var thresholdRatio = Config.WhiteManaBarInverted ? 0.2f : 0.8f;
+            float thresholdRatio = Config.WhiteManaBarInverted ? 0.2f : 0.8f;
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.WhiteManaBarPosition.X - Config.BlackManaBarSize.X / 2f,
@@ -168,9 +167,9 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBlackManaBar(Vector2 origin)
         {
-            var gauge = (int)Plugin.JobGauges.Get<RDMGauge>().BlackMana;
+            int gauge = (int)Plugin.JobGauges.Get<RDMGauge>().BlackMana;
             if (Config.OnlyShowBlackManaWhenActive && gauge is 0) { return; }
-            var thresholdRatio = Config.BlackManaBarInverted ? 0.2f : 0.8f;
+            float thresholdRatio = Config.BlackManaBarInverted ? 0.2f : 0.8f;
 
             var position = new Vector2(
                 origin.X + Config.Position.X + Config.BlackManaBarPosition.X - Config.BlackManaBarSize.X / 2f,
@@ -182,7 +181,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAccelerationBar(Vector2 origin, PlayerCharacter player)
         {
-            var accelBuff = player.StatusList.Where(o => o.StatusId == 1238);
+            IEnumerable<Dalamud.Game.ClientState.Statuses.Status>? accelBuff = player.StatusList.Where(o => o.StatusId == 1238);
             int stackCount = accelBuff.Any() ? accelBuff.First().StackCount : 0;
             if (Config.OnlyShowAccelerationWhenActive && stackCount is 0) { return; }
 
@@ -191,21 +190,21 @@ namespace DelvUI.Interface.Jobs
                 origin.Y + Config.Position.Y + Config.AccelerationBarPosition.Y - Config.AccelerationBarSize.Y / 2f
             );
 
-            var bar = BarBuilder.Create(position, Config.AccelerationBarSize)
+            Bar? bar = BarBuilder.Create(position, Config.AccelerationBarSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.AccelerationBarPadding)
                                 .AddInnerBar(stackCount, 3, Config.AccelerationBarColor, EmptyColor)
                                 .SetBackgroundColor(EmptyColor.Base)
                                 .Build();
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);
         }
 
         private void DrawDualCastBar(Vector2 origin, PlayerCharacter player)
         {
-            var dualCastBuff = player.StatusList.Where(o => o.StatusId is 1249);
-            var dualCastDuration = dualCastBuff.Any() ? Math.Abs(dualCastBuff.First().RemainingTime) : 0;
+            IEnumerable<Dalamud.Game.ClientState.Statuses.Status>? dualCastBuff = player.StatusList.Where(o => o.StatusId is 1249);
+            float dualCastDuration = dualCastBuff.Any() ? Math.Abs(dualCastBuff.First().RemainingTime) : 0;
             if (Config.OnlyShowDualcastWhenActive && dualCastDuration is 0) { return; }
 
             var position = new Vector2(
@@ -213,8 +212,8 @@ namespace DelvUI.Interface.Jobs
                 origin.Y + Config.Position.Y + Config.DualCastPosition.Y - Config.DualCastSize.Y / 2f
             );
 
-            var drawList = ImGui.GetWindowDrawList();
-            var builder = BarBuilder.Create(position, Config.DualCastSize)
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            BarBuilder? builder = BarBuilder.Create(position, Config.DualCastSize)
                 .AddInnerBar(dualCastDuration, 15f, Config.DualCastColor)
                 .SetBackgroundColor(EmptyColor.Base)
                 .SetVertical(Config.SetVerticalDualCastBar)
@@ -225,7 +224,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawVerstoneProc(Vector2 origin, PlayerCharacter player)
         {
-            var verstone = player.StatusList.Where(o => o.StatusId is 1235);
+            IEnumerable<Dalamud.Game.ClientState.Statuses.Status>? verstone = player.StatusList.Where(o => o.StatusId is 1235);
             int duration = verstone.Any() ? (int)Math.Abs(verstone.First().RemainingTime) : 0;
 
             if (Config.OnlyShowVerstoneWhenActive && duration is 0) { return; }
@@ -240,7 +239,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawVerfireProc(Vector2 origin, PlayerCharacter player)
         {
-            var verfire = player.StatusList.Where(o => o.StatusId is 1234);
+            IEnumerable<Dalamud.Game.ClientState.Statuses.Status>? verfire = player.StatusList.Where(o => o.StatusId is 1234);
             int duration = verfire.Any() ? (int)Math.Abs(verfire.First().RemainingTime) : 0;
 
             if (Config.OnlyShowVerfireWhenActive && duration is 0) { return; }
@@ -263,19 +262,19 @@ namespace DelvUI.Interface.Jobs
             bool inverted,
             bool showText)
         {
-            var builder = BarBuilder.Create(position, size)
+            BarBuilder? builder = BarBuilder.Create(position, size)
                 .AddInnerBar(value, max, color)
                 .SetFlipDrainDirection(inverted)
                 .SetBackgroundColor(EmptyColor.Background);
 
             if (showText)
             {
-                var textPos = inverted ? BarTextPosition.CenterRight : BarTextPosition.CenterLeft;
+                BarTextPosition textPos = inverted ? BarTextPosition.CenterRight : BarTextPosition.CenterLeft;
                 builder.SetTextMode(BarTextMode.Single);
                 builder.SetText(textPos, BarTextType.Current);
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
 
             // threshold marker
@@ -306,7 +305,7 @@ namespace DelvUI.Interface.Jobs
     public class RedMageConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.RDM;
-        public new static RedMageConfig DefaultConfig()
+        public static new RedMageConfig DefaultConfig()
         {
             var config = new RedMageConfig();
             config.UseDefaultPrimaryResourceBar = true;
@@ -324,15 +323,15 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Balance", min = -2000f, max = 2000f)]
         [Order(35, collapseWith = nameof(ShowBalanceBar))]
-        public Vector2 BalanceBarPosition = new Vector2(0, -32);
+        public Vector2 BalanceBarPosition = new(0, -32);
 
         [DragFloat2("Size" + "##Balance", max = 2000f)]
         [Order(40, collapseWith = nameof(ShowBalanceBar))]
-        public Vector2 BalanceBarSize = new Vector2(22, 20);
+        public Vector2 BalanceBarSize = new(22, 20);
 
         [ColorEdit4("Color" + "##Balance")]
         [Order(45, collapseWith = nameof(ShowBalanceBar))]
-        public PluginConfigColor BalanceBarColor = new PluginConfigColor(new(195f / 255f, 35f / 255f, 35f / 255f, 100f / 100f));
+        public PluginConfigColor BalanceBarColor = new(new(195f / 255f, 35f / 255f, 35f / 255f, 100f / 100f));
         #endregion
 
         #region white mana bar
@@ -354,15 +353,15 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##WhiteMana", min = -2000f, max = 2000f)]
         [Order(65, collapseWith = nameof(ShowWhiteManaBar))]
-        public Vector2 WhiteManaBarPosition = new Vector2(-70, -32);
+        public Vector2 WhiteManaBarPosition = new(-70, -32);
 
         [DragFloat2("Size" + "##WhiteMana", max = 2000f)]
         [Order(70, collapseWith = nameof(ShowWhiteManaBar))]
-        public Vector2 WhiteManaBarSize = new Vector2(114, 20);
+        public Vector2 WhiteManaBarSize = new(114, 20);
 
         [ColorEdit4("Color" + "##WhiteMana")]
         [Order(75, collapseWith = nameof(ShowWhiteManaBar))]
-        public PluginConfigColor WhiteManaBarColor = new PluginConfigColor(new(221f / 255f, 212f / 255f, 212f / 255f, 100f / 100f));
+        public PluginConfigColor WhiteManaBarColor = new(new(221f / 255f, 212f / 255f, 212f / 255f, 100f / 100f));
         #endregion
 
         #region black mana bar
@@ -384,15 +383,15 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##BlackMana", min = -2000f, max = 2000f)]
         [Order(95, collapseWith = nameof(ShowBlackManaBar))]
-        public Vector2 BlackManaBarPosition = new Vector2(70, -32);
+        public Vector2 BlackManaBarPosition = new(70, -32);
 
         [DragFloat2("Size" + "##BlackMana", max = 2000f)]
         [Order(100, collapseWith = nameof(ShowBlackManaBar))]
-        public Vector2 BlackManaBarSize = new Vector2(114, 20);
+        public Vector2 BlackManaBarSize = new(114, 20);
 
         [ColorEdit4("Color" + "##BlackMana")]
         [Order(105, collapseWith = nameof(ShowBlackManaBar))]
-        public PluginConfigColor BlackManaBarColor = new PluginConfigColor(new(60f / 255f, 81f / 255f, 197f / 255f, 100f / 100f));
+        public PluginConfigColor BlackManaBarColor = new(new(60f / 255f, 81f / 255f, 197f / 255f, 100f / 100f));
         #endregion
 
         #region acceleration
@@ -406,11 +405,11 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Acceleration", min = -2000f, max = 2000f)]
         [Order(115, collapseWith = nameof(ShowAcceleration))]
-        public Vector2 AccelerationBarPosition = new Vector2(0, -50);
+        public Vector2 AccelerationBarPosition = new(0, -50);
 
         [DragFloat2("Size" + "##Acceleration", max = 2000f)]
         [Order(120, collapseWith = nameof(ShowAcceleration))]
-        public Vector2 AccelerationBarSize = new Vector2(254, 12);
+        public Vector2 AccelerationBarSize = new(254, 12);
 
         [DragInt("Spacing" + "##Acceleration", max = 1000)]
         [Order(125, collapseWith = nameof(ShowAcceleration))]
@@ -418,7 +417,7 @@ namespace DelvUI.Interface.Jobs
 
         [ColorEdit4("Color" + "##Acceleration")]
         [Order(130, collapseWith = nameof(ShowAcceleration))]
-        public PluginConfigColor AccelerationBarColor = new PluginConfigColor(new(194f / 255f, 74f / 255f, 74f / 255f, 100f / 100f));
+        public PluginConfigColor AccelerationBarColor = new(new(194f / 255f, 74f / 255f, 74f / 255f, 100f / 100f));
         #endregion
 
         #region dualcast
@@ -440,15 +439,15 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##DualCast", min = -2000f, max = 2000f)]
         [Order(145, collapseWith = nameof(ShowDualCast))]
-        public Vector2 DualCastPosition = new Vector2(0, -66);
+        public Vector2 DualCastPosition = new(0, -66);
 
         [DragFloat2("Size" + "##DualCast", max = 2000f)]
         [Order(150, collapseWith = nameof(ShowDualCast))]
-        public Vector2 DualCastSize = new Vector2(18, 16);
+        public Vector2 DualCastSize = new(18, 16);
 
         [ColorEdit4("Color" + "##DualCast")]
         [Order(155, collapseWith = nameof(ShowDualCast))]
-        public PluginConfigColor DualCastColor = new PluginConfigColor(new(204f / 255f, 17f / 255f, 255f / 95f, 100f / 100f));
+        public PluginConfigColor DualCastColor = new(new(204f / 255f, 17f / 255f, 255f / 95f, 100f / 100f));
         #endregion
 
         #region verstone
@@ -470,15 +469,15 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Verstone", min = -2000, max = 2000f)]
         [Order(175, collapseWith = nameof(ShowVerstoneProcs))]
-        public Vector2 VerstoneBarPosition = new Vector2(-69, -66);
+        public Vector2 VerstoneBarPosition = new(-69, -66);
 
         [DragFloat2("Size" + "##Verstone", max = 2000f)]
         [Order(180, collapseWith = nameof(ShowVerstoneProcs))]
-        public Vector2 VerstoneBarSize = new Vector2(116, 16);
+        public Vector2 VerstoneBarSize = new(116, 16);
 
         [ColorEdit4("Color" + "##Verstone")]
         [Order(185, collapseWith = nameof(ShowVerstoneProcs))]
-        public PluginConfigColor VerstoneColor = new PluginConfigColor(new(228f / 255f, 188f / 255f, 145 / 255f, 90f / 100f));
+        public PluginConfigColor VerstoneColor = new(new(228f / 255f, 188f / 255f, 145 / 255f, 90f / 100f));
         #endregion
 
         #region verfire
@@ -500,15 +499,15 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Verfire", min = -2000, max = 2000f)]
         [Order(205, collapseWith = nameof(ShowVerfireProcs))]
-        public Vector2 VerfireBarPosition = new Vector2(69, -66);
+        public Vector2 VerfireBarPosition = new(69, -66);
 
         [DragFloat2("Size" + "##Verfire", max = 2000f)]
         [Order(210, collapseWith = nameof(ShowVerfireProcs))]
-        public Vector2 VerfireBarSize = new Vector2(116, 16);
+        public Vector2 VerfireBarSize = new(116, 16);
 
         [ColorEdit4("Color" + "##Verfire")]
         [Order(215, collapseWith = nameof(ShowVerfireProcs))]
-        public PluginConfigColor VerfireColor = new PluginConfigColor(new(238f / 255f, 119f / 255f, 17 / 255f, 90f / 100f));
+        public PluginConfigColor VerfireColor = new(new(238f / 255f, 119f / 255f, 17 / 255f, 90f / 100f));
         #endregion
     }
 }

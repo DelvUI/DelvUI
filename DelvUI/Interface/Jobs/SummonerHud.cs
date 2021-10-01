@@ -11,7 +11,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -21,7 +20,7 @@ namespace DelvUI.Interface.Jobs
     {
         private bool _bahamutFinished = true;
 
-        private new SummonerConfig Config => (SummonerConfig)_config;
+        private new SummonerConfig Config => (SummonerConfig)Config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public SummonerHud(string id, SummonerConfig config, string? displayName = null) : base(id, config, displayName)
@@ -156,7 +155,7 @@ namespace DelvUI.Interface.Jobs
         public void DrawDreadWyrmAether(Vector2 origin)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
-            var stacks = gauge.AetherFlags;
+            byte stacks = gauge.AetherFlags;
 
             if (Config.OnlyShowDreadwyrmAetherWhenActive && stacks == 0) { return; }
 
@@ -196,7 +195,7 @@ namespace DelvUI.Interface.Jobs
                 Vector2 barSize = Config.DreadwyrmAetherBarSize;
                 Vector2 position = origin + Config.Position + Config.DreadwyrmAetherBarPosition - barSize / 2f;
 
-                var filledChunkCount = 0;
+                int filledChunkCount = 0;
 
                 if (stacks >= 4 && stacks < 8)
                 {
@@ -349,7 +348,7 @@ namespace DelvUI.Interface.Jobs
     public class SummonerConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.SMN;
-        public new static SummonerConfig DefaultConfig() => new SummonerConfig();
+        public static new SummonerConfig DefaultConfig() => new();
 
         #region aether
         [Checkbox("Aether", separator = true)]

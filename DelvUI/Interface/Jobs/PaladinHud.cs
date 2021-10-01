@@ -1,5 +1,4 @@
-﻿using Dalamud.Game.ClientState.Structs;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
@@ -8,7 +7,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.JobGauge.Types;
@@ -20,7 +18,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class PaladinHud : JobHud
     {
-        private new PaladinConfig Config => (PaladinConfig)_config;
+        private new PaladinConfig Config => (PaladinConfig)Config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
         private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
@@ -238,7 +236,7 @@ namespace DelvUI.Interface.Jobs
     public class PaladinConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.PLD;
-        public new static PaladinConfig DefaultConfig() { return new PaladinConfig(); }
+        public static new PaladinConfig DefaultConfig() { return new PaladinConfig(); }
 
         #region mana bar
         [Checkbox("Mana", separator = true)]

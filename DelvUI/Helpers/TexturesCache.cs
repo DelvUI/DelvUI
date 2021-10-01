@@ -1,21 +1,19 @@
 ﻿using ImGuiScene;
 using Lumina.Data.Files;
 using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using Dalamud.Utility;
-using Action = Lumina.Excel.GeneratedSheets.Action;
 
 namespace DelvUI.Helpers
 {
     public class TexturesCache : IDisposable
     {
-        private Dictionary<uint, TextureWrap> _cache = new();
+        private readonly Dictionary<uint, TextureWrap> _cache = new();
 
         public TextureWrap? GetTexture<T>(uint rowId, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
         {
-            var sheet = Plugin.DataManager.GetExcelSheet<T>();
+            ExcelSheet<T>? sheet = Plugin.DataManager.GetExcelSheet<T>();
 
             return sheet == null ? null : GetTexture<T>(sheet.GetRow(rowId), stackCount, hdIcon);
         }
@@ -27,26 +25,26 @@ namespace DelvUI.Helpers
                 return null;
             }
 
-            var iconId = row.Icon;
+            dynamic iconId = row.Icon;
             return GetTextureFromIconId(iconId);
         }
 
         public TextureWrap? GetTextureFromIconId(uint iconId, uint stackCount = 0, bool hdIcon = true)
         {
-            if (_cache.TryGetValue(iconId + stackCount, out var texture))
+            if (_cache.TryGetValue(iconId + stackCount, out TextureWrap? texture))
             {
                 return texture;
             }
 
-            var iconFile = LoadIcon(iconId + stackCount, hdIcon);
+            TexFile? iconFile = LoadIcon(iconId + stackCount, hdIcon);
 
             if (iconFile == null)
             {
                 return null;
             }
 
-            var builder = Plugin.UiBuilder;
-            var newTexture = builder.LoadImageRaw(iconFile.GetRgbaImageData(), iconFile.Header.Width, iconFile.Header.Height, 4);
+            Dalamud.Interface.UiBuilder? builder = Plugin.UiBuilder;
+            TextureWrap? newTexture = builder.LoadImageRaw(iconFile.GetRgbaImageData(), iconFile.Header.Width, iconFile.Header.Height, 4);
             _cache.Add(iconId + stackCount, newTexture);
 
             return newTexture;
@@ -54,15 +52,15 @@ namespace DelvUI.Helpers
 
         private TexFile? LoadIcon(uint id, bool hdIcon)
         {
-            var hdString = hdIcon ? "_hr1" : "";
-            var path = $"ui/icon/{id / 1000 * 1000:000000}/{id:000000}{hdString}.tex";
+            string? hdString = hdIcon ? "_hr1" : "";
+            string? path = $"ui/icon/{id / 1000 * 1000:000000}/{id:000000}{hdString}.tex";
 
             return Plugin.DataManager.GetFile<TexFile>(path);
         }
 
         private void RemoveTexture<T>(uint rowId) where T : ExcelRow
         {
-            var sheet = Plugin.DataManager.GetExcelSheet<T>();
+            ExcelSheet<T>? sheet = Plugin.DataManager.GetExcelSheet<T>();
 
             if (sheet == null)
             {
@@ -79,7 +77,7 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            var iconId = row!.Icon;
+            dynamic iconId = row!.Icon;
             RemoveTexture(iconId);
         }
 
@@ -111,16 +109,16 @@ namespace DelvUI.Helpers
             GC.SuppressFinalize(this);
         }
 
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposing)
             {
                 return;
             }
 
-            foreach (var key in _cache.Keys)
+            foreach (uint key in _cache.Keys)
             {
-                var tex = _cache[key];
+                TextureWrap? tex = _cache[key];
                 tex?.Dispose();
             }
 

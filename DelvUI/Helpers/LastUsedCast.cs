@@ -30,8 +30,8 @@ namespace DelvUI.Helpers
 
         private void SetCastProperties()
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            var targetKind = target?.ObjectKind;
+            Dalamud.Game.ClientState.Objects.Types.GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            ObjectKind? targetKind = target?.ObjectKind;
 
             switch (targetKind)
             {
@@ -70,7 +70,7 @@ namespace DelvUI.Helpers
                 case ActionType.PvPAction:
                 case ActionType.CraftAction:
                 case ActionType.Ability:
-                    var action = Plugin.DataManager.GetExcelSheet<Action>()?.GetRow(CastId);
+                    Action? action = Plugin.DataManager.GetExcelSheet<Action>()?.GetRow(CastId);
                     ActionText = action?.Name.ToString() ?? "";
                     IconTexture = TexturesCache.Instance.GetTexture<Action>(action);
                     DamageType = GetDamageType(action);
@@ -80,7 +80,7 @@ namespace DelvUI.Helpers
                     break;
 
                 case ActionType.Mount:
-                    var mount = Plugin.DataManager.GetExcelSheet<Mount>()?.GetRow(CastId);
+                    Mount? mount = Plugin.DataManager.GetExcelSheet<Mount>()?.GetRow(CastId);
                     ActionText = mount?.Singular.ToString() ?? "";
                     IconTexture = TexturesCache.Instance.GetTexture<Mount>(mount);
                     DamageType = DamageType.Unknown;
@@ -91,7 +91,7 @@ namespace DelvUI.Helpers
 
                 case ActionType.KeyItem:
                 case ActionType.Item:
-                    var item = Plugin.DataManager.GetExcelSheet<Item>()?.GetRow(CastId);
+                    Item? item = Plugin.DataManager.GetExcelSheet<Item>()?.GetRow(CastId);
                     ActionText = item?.Name.ToString() ?? "Using item...";
                     IconTexture = TexturesCache.Instance.GetTexture<Item>(item);
                     DamageType = DamageType.Unknown;
@@ -101,7 +101,7 @@ namespace DelvUI.Helpers
                     break;
 
                 case ActionType.Companion:
-                    var companion = Plugin.DataManager.GetExcelSheet<Companion>()?.GetRow(CastId);
+                    Companion? companion = Plugin.DataManager.GetExcelSheet<Companion>()?.GetRow(CastId);
                     ActionText = companion?.Singular.ToString() ?? "";
                     IconTexture = TexturesCache.Instance.GetTexture<Companion>(companion);
                     DamageType = DamageType.Unknown;

@@ -20,7 +20,7 @@ namespace DelvUI.Interface.Jobs
     public class BardHud : JobHud
     {
         private readonly SpellHelper _spellHelper = new();
-        private new BardConfig Config => (BardConfig)_config;
+        private new BardConfig Config => (BardConfig)Config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public BardHud(string id, BardConfig config, string? displayName = null) : base(id, config, displayName)
@@ -81,7 +81,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawActiveDots(Vector2 origin)
         {
-            var player = Plugin.ClientState.LocalPlayer;
+            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player == null)
             {
                 return;
@@ -100,12 +100,12 @@ namespace DelvUI.Interface.Jobs
 
             float cbDuration = 0f;
             float sbDuration = 0f;
-            
+
             if (Config.ShowCB)
             {
                 if (actor is BattleChara target)
                 {
-                    var cb = target.StatusList.Where(
+                    IEnumerable<Status>? cb = target.StatusList.Where(
                         o => o.StatusId is 1200 or 124 && o.SourceID == player.ObjectId
                     );
 
@@ -141,14 +141,14 @@ namespace DelvUI.Interface.Jobs
             {
                 if (actor is BattleChara target)
                 {
-                    var sb = target.StatusList.Where(
+                    IEnumerable<Status>? sb = target.StatusList.Where(
                         o => o.StatusId is 1201 or 129 && o.SourceID == player.ObjectId
                     );
 
                     if (sb.Any())
                     {
                         sbDuration = Math.Abs(sb.First().RemainingTime);
-                    }                    
+                    }
                 }
 
                 PluginConfigColor color = sbDuration <= 5 ? Config.ExpireColor : Config.SBColor;
@@ -363,7 +363,7 @@ namespace DelvUI.Interface.Jobs
     public class BardConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.BRD;
-        public new static BardConfig DefaultConfig() { return new BardConfig(); }
+        public static new BardConfig DefaultConfig() { return new BardConfig(); }
 
         #region song gauge
         [Checkbox("Song Gauge", separator = true)]

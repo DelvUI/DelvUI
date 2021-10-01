@@ -64,7 +64,7 @@ namespace DelvUI.Helpers
             GC.SuppressFinalize(this);
         }
 
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposing)
             {
@@ -77,13 +77,13 @@ namespace DelvUI.Helpers
         }
         #endregion
 
-        private IntPtr _setUIMouseOverActorId;
-        private Hook<OnSetUIMouseoverActorId> _uiMouseOverActorIdHook;
+        private readonly IntPtr _setUIMouseOverActorId;
+        private readonly Hook<OnSetUIMouseoverActorId> _uiMouseOverActorIdHook;
 
-        private IntPtr _requestAction;
-        private Hook<OnRequestAction> _requsetActionHook;
+        private readonly IntPtr _requestAction;
+        private readonly Hook<OnRequestAction> _requsetActionHook;
 
-        private ExcelSheet<Action>? _sheet;
+        private readonly ExcelSheet<Action>? _sheet;
         public GameObject? Target = null;
 
         private void HandleUIMouseOverActorId(long arg1, long arg2)
@@ -111,7 +111,7 @@ namespace DelvUI.Helpers
                 return false;
             }
 
-            var action = _sheet.GetRow((uint)actionID);
+            Action? action = _sheet.GetRow((uint)actionID);
             if (action == null)
             {
                 return false;

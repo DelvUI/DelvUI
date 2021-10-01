@@ -19,7 +19,7 @@ namespace DelvUI.Interface.Party
     {
         #region Singleton
         public static PartyManager Instance { get; private set; } = null!;
-        private PartyFramesConfig _config;
+        private readonly PartyFramesConfig _config;
 
         private PartyManager(PartyFramesConfig config)
         {
@@ -33,7 +33,7 @@ namespace DelvUI.Interface.Party
 
         public static void Initialize()
         {
-            var config = ConfigurationManager.Instance.GetConfigObject<PartyFramesConfig>();
+            PartyFramesConfig? config = ConfigurationManager.Instance.GetConfigObject<PartyFramesConfig>();
             Instance = new PartyManager(config);
         }
 
@@ -48,7 +48,7 @@ namespace DelvUI.Interface.Party
             GC.SuppressFinalize(this);
         }
 
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposing)
             {
@@ -77,7 +77,7 @@ namespace DelvUI.Interface.Party
         private List<PartyListMemberInfo> _partyMembersInfo = null!;
         private bool _playerOrderChanged = false;
 
-        private List<IPartyFramesMember> _groupMembers = new List<IPartyFramesMember>();
+        private readonly List<IPartyFramesMember> _groupMembers = new();
         public IReadOnlyCollection<IPartyFramesMember> GroupMembers => _groupMembers.AsReadOnly();
         public uint MemberCount => (uint)_groupMembers.Count;
 
@@ -106,7 +106,7 @@ namespace DelvUI.Interface.Party
 
         private void Update()
         {
-            var player = Plugin.ClientState.LocalPlayer;
+            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player is null || player is not PlayerCharacter)
             {
                 return;
@@ -136,9 +136,9 @@ namespace DelvUI.Interface.Party
                 // if party is the same, just update actor references
                 if (!partyChanged)
                 {
-                    foreach (var member in _groupMembers)
+                    foreach (IPartyFramesMember? member in _groupMembers)
                     {
-                        var index = member.ObjectId == player.ObjectId ? 0 : member.Order - 1;
+                        int index = member.ObjectId == player.ObjectId ? 0 : member.Order - 1;
                         member.Update(EnmityForIndex(index), IsLeader(index), JobIdForIndex(index));
                     }
 
@@ -166,10 +166,10 @@ namespace DelvUI.Interface.Party
             Character? chocobo = null;
             if (_config.ShowChocobo)
             {
-                var gameObject = Utils.GetBattleChocobo(player);
-                if (gameObject != null && gameObject is Character)
+                GameObject? gameObject = Utils.GetBattleChocobo(player);
+                if (gameObject != null && gameObject is Character character)
                 {
-                    chocobo = (Character)gameObject;
+                    chocobo = character;
                 }
             }
 
@@ -252,10 +252,10 @@ namespace DelvUI.Interface.Party
                     order = i + 1;
                 }
 
-                var enmity = EnmityForIndex(isPlayer ? 0 : order - 1);
-                var isPartyLeader = IsLeader(i);
+                EnmityLevel enmity = EnmityForIndex(isPlayer ? 0 : order - 1);
+                bool isPartyLeader = IsLeader(i);
 
-                var member = isPlayer ?
+                PartyFramesMember? member = isPlayer ?
                     new PartyFramesMember(player, order, enmity, isPartyLeader) :
                     new PartyFramesMember(NameForIndex(i), order, JobIdForIndex(i), isPartyLeader);
 
@@ -277,13 +277,13 @@ namespace DelvUI.Interface.Party
 
             for (int i = 0; i < Plugin.PartyList.Length; i++)
             {
-                var partyMember = Plugin.PartyList[i];
+                PartyMember? partyMember = Plugin.PartyList[i];
                 if (partyMember == null)
                 {
                     continue;
                 }
 
-                var isPlayer = partyMember.ObjectId == player.ObjectId;
+                bool isPlayer = partyMember.ObjectId == player.ObjectId;
 
                 // player order override
                 int order;
@@ -296,8 +296,8 @@ namespace DelvUI.Interface.Party
                     order = IndexForPartyMember(partyMember) ?? 9;
                 }
 
-                var enmity = EnmityForIndex(isPlayer ? 0 : order - 1);
-                var isPartyLeader = i == Plugin.PartyList.PartyLeaderIndex;
+                EnmityLevel enmity = EnmityForIndex(isPlayer ? 0 : order - 1);
+                bool isPartyLeader = i == Plugin.PartyList.PartyLeaderIndex;
 
                 var member = new PartyFramesMember(partyMember, order, enmity, isPartyLeader);
                 _groupMembers.Add(member);
@@ -305,7 +305,7 @@ namespace DelvUI.Interface.Party
                 // player's chocobo (always last)
                 if (_config.ShowChocobo && member.ObjectId == player.ObjectId)
                 {
-                    var companion = Utils.GetBattleChocobo(player);
+                    GameObject? companion = Utils.GetBattleChocobo(player);
                     if (companion is Character companionCharacter)
                     {
                         _groupMembers.Add(new PartyFramesMember(companionCharacter, 10, EnmityLevel.Last, false));
@@ -366,7 +366,7 @@ namespace DelvUI.Interface.Party
 
         private bool IsLeader(int index)
         {
-            var partyLeadIndex = Plugin.PartyList.PartyLeaderIndex;
+            uint partyLeadIndex = Plugin.PartyList.PartyLeaderIndex;
             if (partyLeadIndex >= 0 && partyLeadIndex < 8)
             {
                 return index == partyLeadIndex;
@@ -389,7 +389,7 @@ namespace DelvUI.Interface.Party
                 return null;
             }
 
-            var name = member.Name.ToString();
+            string? name = member.Name.ToString();
             return _partyMembersInfo.FindIndex(o => o.ObjectId == member.ObjectId || o.Name == name) + 1;
         }
 

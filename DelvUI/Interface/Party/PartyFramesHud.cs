@@ -11,10 +11,10 @@ namespace DelvUI.Interface.Party
 {
     public class PartyFramesHud : DraggableHudElement
     {
-        private PartyFramesConfig Config => (PartyFramesConfig)_config;
-        private PartyFramesHealthBarsConfig _healthBarsConfig;
+        private new PartyFramesConfig Config => (PartyFramesConfig)base.Config;
+        private readonly PartyFramesHealthBarsConfig _healthBarsConfig;
 
-        private Vector2 _contentMargin = new Vector2(40, 40);
+        private Vector2 _contentMargin = new(40, 40);
         private static readonly int MaxMemberCount = 9; // 8 players + chocobo
 
         // layout
@@ -24,30 +24,30 @@ namespace DelvUI.Interface.Party
         private uint _memberCount = 0;
         private bool _layoutDirty = true;
 
-        private readonly List<PartyFramesBar> bars;
+        private readonly List<PartyFramesBar> _bars;
 
 
         public PartyFramesHud(string id, PartyFramesConfig config, string displayName) : base(id, config, displayName)
         {
             _healthBarsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesHealthBarsConfig>();
-            var manaBarConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesManaBarConfig>();
-            var castbarConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesCastbarConfig>();
-            var roleIconConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesRoleIconConfig>();
-            var leaderIconConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesLeaderIconConfig>();
-            var buffsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesBuffsConfig>();
-            var debuffsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesDebuffsConfig>();
+            PartyFramesManaBarConfig? manaBarConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesManaBarConfig>();
+            PartyFramesCastbarConfig? castbarConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesCastbarConfig>();
+            PartyFramesRoleIconConfig? roleIconConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesRoleIconConfig>();
+            PartyFramesLeaderIconConfig? leaderIconConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesLeaderIconConfig>();
+            PartyFramesBuffsConfig? buffsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesBuffsConfig>();
+            PartyFramesDebuffsConfig? debuffsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesDebuffsConfig>();
 
             config.ValueChangeEvent += OnLayoutPropertyChanged;
             _healthBarsConfig.ValueChangeEvent += OnLayoutPropertyChanged;
             _healthBarsConfig.ColorsConfig.ValueChangeEvent += OnLayoutPropertyChanged;
 
-            bars = new List<PartyFramesBar>(MaxMemberCount);
-            for (int i = 0; i < bars.Capacity; i++)
+            _bars = new List<PartyFramesBar>(MaxMemberCount);
+            for (int i = 0; i < _bars.Capacity; i++)
             {
                 var bar = new PartyFramesBar(i.ToString(), _healthBarsConfig, manaBarConfig, castbarConfig, roleIconConfig, leaderIconConfig, buffsConfig, debuffsConfig);
                 bar.MovePlayerEvent += OnMovePlayer;
 
-                bars.Add(bar);
+                _bars.Add(bar);
             }
 
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
@@ -56,9 +56,9 @@ namespace DelvUI.Interface.Party
 
         protected override void InternalDispose()
         {
-            bars.Clear();
+            _bars.Clear();
 
-            _config.ValueChangeEvent -= OnLayoutPropertyChanged;
+            base.Config.ValueChangeEvent -= OnLayoutPropertyChanged;
             _healthBarsConfig.ValueChangeEvent -= OnLayoutPropertyChanged;
             _healthBarsConfig.ColorsConfig.ValueChangeEvent -= OnLayoutPropertyChanged;
             PartyManager.Instance.MembersChangedEvent -= OnMembersChanged;
@@ -68,7 +68,7 @@ namespace DelvUI.Interface.Party
         {
             if (Config.PlayerOrderOverrideEnabled && bar.Member != null)
             {
-                var offset = bar.Member.Order - 1 > Config.PlayerOrder ? -1 : -2;
+                int offset = bar.Member.Order - 1 > Config.PlayerOrder ? -1 : -2;
                 Config.PlayerOrder = Math.Max(0, Math.Min(7, bar.Member.Order + offset));
                 PartyManager.Instance.OnPlayerOrderChange();
 
@@ -94,14 +94,14 @@ namespace DelvUI.Interface.Party
 
         public void UpdateBars(Vector2 origin)
         {
-            var memberCount = PartyManager.Instance.MemberCount;
+            uint memberCount = PartyManager.Instance.MemberCount;
             uint row = 0;
             uint col = 0;
-            var spaceSize = Config.Size - _contentMargin * 2;
+            Vector2 spaceSize = Config.Size - _contentMargin * 2;
 
-            for (int i = 0; i < bars.Count; i++)
+            for (int i = 0; i < _bars.Count; i++)
             {
-                PartyFramesBar bar = bars[i];
+                PartyFramesBar bar = _bars[i];
                 if (i >= memberCount)
                 {
                     bar.Visible = false;
@@ -114,7 +114,7 @@ namespace DelvUI.Interface.Party
                 bar.Visible = true;
 
                 // anchor and position
-                CalculateBarPosition(origin, spaceSize, out var x, out var y);
+                CalculateBarPosition(origin, spaceSize, out float x, out float y);
                 bar.Position = new Vector2(
                     x + _healthBarsConfig.Size.X * col + _healthBarsConfig.Padding.X * col,
                     y + _healthBarsConfig.Size.Y * row + _healthBarsConfig.Padding.Y * row
@@ -176,7 +176,7 @@ namespace DelvUI.Interface.Party
 
         private void UpdateBarsPosition(Vector2 delta)
         {
-            foreach (var bar in bars)
+            foreach (PartyFramesBar? bar in _bars)
             {
                 bar.Position = bar.Position + delta;
             }
@@ -189,7 +189,7 @@ namespace DelvUI.Interface.Party
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (!_config.Enabled)
+            if (!base.Config.Enabled)
             {
                 return;
             }
@@ -198,7 +198,7 @@ namespace DelvUI.Interface.Party
             ImGui.SetNextWindowPos(Config.Position - _contentMargin, ImGuiCond.FirstUseEver);
             ImGui.SetNextWindowSize(Config.Size + _contentMargin * 2, ImGuiCond.FirstUseEver);
 
-            var windowFlags = ImGuiWindowFlags.NoScrollbar |
+            ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoBringToFrontOnFocus |
                 ImGuiWindowFlags.NoBackground;
@@ -216,8 +216,8 @@ namespace DelvUI.Interface.Party
             }
 
             ImGui.Begin("delvui_partyFrames", windowFlags);
-            var windowPos = ImGui.GetWindowPos();
-            var windowSize = ImGui.GetWindowSize();
+            Vector2 windowPos = ImGui.GetWindowPos();
+            Vector2 windowSize = ImGui.GetWindowSize();
             Config.Size = windowSize;
 
             if (canDrag)
@@ -226,11 +226,11 @@ namespace DelvUI.Interface.Party
             }
 
             // recalculate layout on settings or size change
-            var contentStartPos = windowPos + _contentMargin;
-            var maxSize = windowSize - _contentMargin * 2;
+            Vector2 contentStartPos = windowPos + _contentMargin;
+            Vector2 maxSize = windowSize - _contentMargin * 2;
 
             // preview
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             if (!Config.Lock)
             {
                 var margin = new Vector2(4, 0);
@@ -238,7 +238,7 @@ namespace DelvUI.Interface.Party
                 drawList.AddRect(windowPos + margin, windowPos + windowSize - margin * 2, 0x88000000, 3, ImDrawFlags.None, 2);
             }
 
-            var count = PartyManager.Instance.MemberCount;
+            uint count = PartyManager.Instance.MemberCount;
             if (count < 1)
             {
                 ImGui.End();
@@ -267,15 +267,15 @@ namespace DelvUI.Interface.Party
             _memberCount = count;
             _size = maxSize;
 
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            var targetIndex = -1;
-            var enmityLeaderIndex = -1;
-            var enmitySecondIndex = -1;
+            Dalamud.Game.ClientState.Objects.Types.GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            int targetIndex = -1;
+            int enmityLeaderIndex = -1;
+            int enmitySecondIndex = -1;
 
             // bars
             for (int i = 0; i < count; i++)
             {
-                var member = bars[i].Member;
+                IPartyFramesMember? member = _bars[i].Member;
 
                 if (member != null)
                 {
@@ -301,25 +301,25 @@ namespace DelvUI.Interface.Party
                     }
                 }
 
-                bars[i].Draw(origin, drawList);
+                _bars[i].Draw(origin, drawList);
             }
 
             // 2nd enmity
             if (enmitySecondIndex >= 0)
             {
-                bars[enmitySecondIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.EnmitySecondBordercolor);
+                _bars[enmitySecondIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.EnmitySecondBordercolor);
             }
 
             // 1st enmity
             if (enmityLeaderIndex >= 0)
             {
-                bars[enmityLeaderIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.EnmityLeaderBordercolor);
+                _bars[enmityLeaderIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.EnmityLeaderBordercolor);
             }
 
             // target
             if (targetIndex >= 0)
             {
-                bars[targetIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.TargetBordercolor);
+                _bars[targetIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.TargetBordercolor);
             }
 
             ImGui.End();

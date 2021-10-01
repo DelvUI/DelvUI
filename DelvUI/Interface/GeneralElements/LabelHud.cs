@@ -8,7 +8,7 @@ namespace DelvUI.Interface.GeneralElements
 {
     public class LabelHud : HudElement
     {
-        private LabelConfig Config => (LabelConfig)_config;
+        private new LabelConfig Config => (LabelConfig)base.Config;
 
         public LabelHud(string id, LabelConfig config) : base(id, config)
         {
@@ -27,23 +27,23 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var text = actor == null && actorName == null ? 
+            string? text = actor == null && actorName == null ?
                 Config.GetText() :
                 TextTags.GenerateFormattedTextFromTags(actor, Config.GetText(), actorName);
 
-            var size = parentSize ?? Vector2.Zero;
+            Vector2 size = parentSize ?? Vector2.Zero;
 
             DrawLabel(text, origin, size, actor);
         }
 
         private void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
         {
-            var fontPushed = FontsManager.Instance.PushFont(Config.FontID);
+            bool fontPushed = FontsManager.Instance.PushFont(Config.FontID);
 
-            var textSize = ImGui.CalcTextSize(text);
-            var textPos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), textSize, Config.TextAnchor);
-            var drawList = ImGui.GetWindowDrawList();
-            var color = Color(actor);
+            Vector2 textSize = ImGui.CalcTextSize(text);
+            Vector2 textPos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), textSize, Config.TextAnchor);
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            PluginConfigColor? color = Color(actor);
 
             if (Config.ShowOutline)
             {

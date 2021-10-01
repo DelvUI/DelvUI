@@ -42,13 +42,13 @@ namespace DelvUI.Helpers
 
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
-            var player = Plugin.ClientState.LocalPlayer;
+            Dalamud.Game.ClientState.Objects.SubKinds.PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player is null)
             {
                 return;
             }
 
-            var now = ImGui.GetTime();
+            double now = ImGui.GetTime();
             if (now - LastUpdate < PollingRate)
             {
                 return;
@@ -56,10 +56,10 @@ namespace DelvUI.Helpers
 
             LastUpdate = now;
 
-            var mp = player.CurrentMp;
+            uint mp = player.CurrentMp;
 
             // account for lucid dreaming screwing up mp calculations
-            var lucidDreamingActive = player.StatusList.Any(e => e.StatusId == 1204);
+            bool lucidDreamingActive = player.StatusList.Any(e => e.StatusId == 1204);
 
             if (!lucidDreamingActive && _lastMpValue < mp)
             {

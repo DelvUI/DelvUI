@@ -1,7 +1,5 @@
-﻿using System;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -38,11 +36,11 @@ namespace DelvUI.Interface.GeneralElements
 
         [DynamicList("Hotbars Shown Only In Combat", "Hotbar 1", "Hotbar 2", "Hotbar 3", "Hotbar 4", "Hotbar 5", "Hotbar 6", "Hotbar 7", "Hotbar 8", "Hotbar 9", "Hotbar 10", isMonitored = true)]
         [Order(40, collapseWith = nameof(EnableCombatActionBars))]
-        public List<string> CombatActionBars = new List<string>();
+        public List<string> CombatActionBars = new();
 
         public Vector2 CastBarOriginalPosition;
-        public Dictionary<string, Vector2> JobGaugeOriginalPosition = new Dictionary<string, Vector2>();
+        public Dictionary<string, Vector2> JobGaugeOriginalPosition = new();
 
-        public new static HideHudConfig DefaultConfig() { return new HideHudConfig(); }
+        public static new HideHudConfig DefaultConfig() { return new HideHudConfig(); }
     }
 }

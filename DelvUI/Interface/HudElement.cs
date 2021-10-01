@@ -7,14 +7,14 @@ namespace DelvUI.Interface
 {
     public abstract class HudElement : IDisposable
     {
-        protected MovablePluginConfigObject _config;
-        public MovablePluginConfigObject GetConfig() { return _config; }
+        protected MovablePluginConfigObject Config;
+        public MovablePluginConfigObject GetConfig() { return Config; }
 
         public string ID { get; private set; }
 
         public HudElement(string id, MovablePluginConfigObject config)
         {
-            _config = config;
+            Config = config;
             ID = id;
         }
 
@@ -31,7 +31,7 @@ namespace DelvUI.Interface
             GC.SuppressFinalize(this);
         }
 
-        private void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposing)
             {

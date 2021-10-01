@@ -10,7 +10,7 @@ namespace DelvUI.Helpers
     {
         private static string ReplaceTagWithString(string tag, GameObject? actor, string? name = null)
         {
-            var n = actor != null ? actor.Name : name ?? "";
+            Dalamud.Game.Text.SeStringHandling.SeString? n = actor != null ? actor.Name : name ?? "";
 
             switch (tag)
             {
@@ -156,7 +156,7 @@ namespace DelvUI.Helpers
                         return character.Level.ToString();
 
                     case "[job]":
-                        return JobsHelper.JobNames.TryGetValue(character.ClassJob.Id, out var jobName) ? jobName : "";
+                        return JobsHelper.JobNames.TryGetValue(character.ClassJob.Id, out string? jobName) ? jobName : "";
                 }
             }
 

@@ -4,11 +4,9 @@ using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using ImGuiNET;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
-using System.Reflection;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -29,12 +27,12 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Fonts", 0)]
     public class FontsConfig : PluginConfigObject
     {
-        public new static FontsConfig DefaultConfig() { return new FontsConfig(); }
+        public static new FontsConfig DefaultConfig() { return new FontsConfig(); }
 
         public string FontsPath = "C:\\";
         [JsonIgnore] public string ValidatedFontsPath => ValidatePath(FontsPath);
 
-        public SortedList<string, FontData> Fonts = new SortedList<string, FontData>();
+        public SortedList<string, FontData> Fonts = new();
         public bool SupportChineseCharacters = false;
         public bool SupportKoreanCharacters = false;
 
@@ -43,7 +41,7 @@ namespace DelvUI.Interface.GeneralElements
         [JsonIgnore] private int _inputSize = 23;
 
         [JsonIgnore] private string[] _fonts = null!;
-        [JsonIgnore] private string[] _sizes = null!;
+        [JsonIgnore] private readonly string[] _sizes = null!;
 
         public FontsConfig()
         {
@@ -83,7 +81,7 @@ namespace DelvUI.Interface.GeneralElements
             }
             catch
             {
-                fonts = new string[0];
+                fonts = System.Array.Empty<string>();
             }
 
             for (int i = 0; i < fonts.Length; i++)
@@ -99,7 +97,7 @@ namespace DelvUI.Interface.GeneralElements
 
         private void ReloadFonts()
         {
-            var defaultFontsPath = ValidatePath(FontsManager.Instance.DefaultFontsPath);
+            string? defaultFontsPath = ValidatePath(FontsManager.Instance.DefaultFontsPath);
             string[] defaultFonts = FontsFromPath(defaultFontsPath);
             string[] userFonts = FontsFromPath(ValidatedFontsPath);
 
@@ -120,8 +118,8 @@ namespace DelvUI.Interface.GeneralElements
                 return false;
             }
 
-            var fontName = _fonts[font];
-            var key = fontName + "_" + size.ToString();
+            string? fontName = _fonts[font];
+            string? key = fontName + "_" + size.ToString();
 
             if (Fonts.ContainsKey(key))
             {
@@ -144,7 +142,7 @@ namespace DelvUI.Interface.GeneralElements
                 return false;
             }
 
-            var flags =
+            ImGuiTableFlags flags =
                 ImGuiTableFlags.RowBg |
                 ImGuiTableFlags.Borders |
                 ImGuiTableFlags.BordersOuter |
@@ -152,8 +150,8 @@ namespace DelvUI.Interface.GeneralElements
                 ImGuiTableFlags.ScrollY |
                 ImGuiTableFlags.SizingFixedSame;
 
-            var changed = false;
-            var indexToRemove = -1;
+            bool changed = false;
+            int indexToRemove = -1;
 
             if (ImGui.BeginChild("Fonts", new Vector2(400, 400), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
@@ -213,8 +211,8 @@ namespace DelvUI.Interface.GeneralElements
 
                     for (int i = 0; i < Fonts.Count; i++)
                     {
-                        var key = Fonts.Keys[i];
-                        var fontData = Fonts.Values[i];
+                        string? key = Fonts.Keys[i];
+                        FontData fontData = Fonts.Values[i];
 
                         ImGui.PushID(i.ToString());
                         ImGui.TableNextRow(ImGuiTableRowFlags.None);

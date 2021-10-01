@@ -2,8 +2,6 @@
 using DelvUI.Enums;
 using ImGuiNET;
 using Newtonsoft.Json;
-using System;
-using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
 
@@ -37,7 +35,7 @@ namespace DelvUI.Config
 
         protected bool ColorEdit4(string label, ref PluginConfigColor color)
         {
-            var vector = color.Vector;
+            Vector4 vector = color.Vector;
 
             if (ImGui.ColorEdit4(label, ref vector))
             {
@@ -88,7 +86,7 @@ namespace DelvUI.Config
 
     public class PluginConfigColor
     {
-        [JsonIgnore] private float[] _colorMapRatios = { -.8f, -.3f, .1f };
+        [JsonIgnore] private readonly float[] _colorMapRatios = { -.8f, -.3f, .1f };
 
         [JsonIgnore] private Vector4 _vector;
 

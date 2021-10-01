@@ -11,7 +11,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         [ColorEdit4("Color")]
         [Order(20)]
-        public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
+        public PluginConfigColor Color = new(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
 
         [Checkbox("Use Job Color")]
         [Order(25)]
@@ -43,7 +43,7 @@ namespace DelvUI.Interface.GeneralElements
             ValueLabelConfig = valueLabelConfig;
         }
 
-        public new static PrimaryResourceConfig DefaultConfig()
+        public static new PrimaryResourceConfig DefaultConfig()
         {
             var size = new Vector2(254, 20);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY - 37);

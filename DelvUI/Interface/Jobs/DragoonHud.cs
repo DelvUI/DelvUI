@@ -12,7 +12,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -20,7 +19,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class DragoonHud : JobHud
     {
-        private new DragoonConfig Config => (DragoonConfig)_config;
+        private new DragoonConfig Config => (DragoonConfig)Config;
 
         public DragoonHud(string id, DragoonConfig config, string? displayName = null) : base(id, config, displayName)
         {
@@ -110,7 +109,7 @@ namespace DelvUI.Interface.Jobs
 
             if (actor is BattleChara target)
             {
-                var chaosThrust = target.StatusList.Where(o => o.StatusId is 1312 or 118 && o.SourceID == player.ObjectId);
+                IEnumerable<Status>? chaosThrust = target.StatusList.Where(o => o.StatusId is 1312 or 118 && o.SourceID == player.ObjectId);
                 if (chaosThrust.Any())
                 {
                     duration = Math.Abs(chaosThrust.First().RemainingTime);
@@ -222,7 +221,7 @@ namespace DelvUI.Interface.Jobs
     public class DragoonConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.DRG;
-        public new static DragoonConfig DefaultConfig() { return new DragoonConfig(); }
+        public static new DragoonConfig DefaultConfig() { return new DragoonConfig(); }
 
         #region Chaos Thrust Bar
         [Checkbox("Chaos Thrust" + "##ChaosThrust", separator = true)]

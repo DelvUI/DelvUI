@@ -9,12 +9,12 @@ namespace DelvUI.Interface.GeneralElements
 {
     public class MPTickerHud : DraggableHudElement, IHudElementWithActor
     {
-        private MPTickerConfig Config => (MPTickerConfig)_config;
+        private new MPTickerConfig Config => (MPTickerConfig)base.Config;
 
         private MPTickHelper _mpTickHelper = null!;
         public GameObject? Actor { get; set; } = null;
 
-        public MPTickerHud(string ID, MPTickerConfig config, string displayName) : base(ID, config, displayName) { }
+        public MPTickerHud(string iD, MPTickerConfig config, string displayName) : base(iD, config, displayName) { }
 
         protected override void InternalDispose()
         {
@@ -44,8 +44,8 @@ namespace DelvUI.Interface.GeneralElements
 
             _mpTickHelper ??= new MPTickHelper();
 
-            var now = ImGui.GetTime();
-            var scale = (float)((now - _mpTickHelper.LastTick) / MPTickHelper.ServerTickRate);
+            double now = ImGui.GetTime();
+            float scale = (float)((now - _mpTickHelper.LastTick) / MPTickHelper.ServerTickRate);
 
             if (scale <= 0)
             {
@@ -58,9 +58,9 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             var barSize = new Vector2(Math.Max(1f, Config.Size.X * scale), Config.Size.Y);
-            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
+            Vector2 startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             drawList.AddRectFilled(startPos, startPos + Config.Size, 0x88000000);
 
             drawList.AddRectFilledMultiColor(

@@ -9,10 +9,10 @@ namespace DelvUI.Interface.Jobs
     {
         protected DalamudPluginInterface PluginInterface => Plugin.PluginInterface;
 
-        public JobConfig Config => (JobConfig)_config;
+        public new JobConfig Config => (JobConfig)base.Config;
 
         public GameObject? Actor { get; set; } = null;
-        protected PlayerCharacter? Player => Actor is PlayerCharacter ? (PlayerCharacter)Actor : null;
+        protected PlayerCharacter? Player => Actor is PlayerCharacter character ? character : null;
 
         public JobHud(string id, JobConfig config, string? displayName = null) : base(id, config, displayName)
         {

@@ -42,23 +42,23 @@ namespace DelvUI.Interface
 
         private bool _previousCombatState = true;
         private bool _isInitial = true;
-        private uint[] GoldSaucerIDs = new uint[] { 144, 388, 389, 390, 391, 579, 792, 899, 941 };
+        private readonly uint[] _goldSaucerIDs = new uint[] { 144, 388, 389, 390, 391, 579, 792, 899, 941 };
 
-        private GetBaseUIObjectDelegate? _getBaseUIObject;
-        private SetPositionDelegate? _setPosition;
-        private UpdateAddonPositionDelegate? _updateAddonPosition;
+        private readonly GetBaseUIObjectDelegate? _getBaseUIObject;
+        private readonly SetPositionDelegate? _setPosition;
+        private readonly UpdateAddonPositionDelegate? _updateAddonPosition;
 
         public HudHelper()
         {
             Config.ValueChangeEvent += ConfigValueChanged;
 
-            var getBaseUiObjectPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 41 B8 01 00 00 00 48 8D 15 ?? ?? ?? ?? 48 8B 48 20 E8 ?? ?? ?? ?? 48 8B CF");
+            IntPtr getBaseUiObjectPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 41 B8 01 00 00 00 48 8D 15 ?? ?? ?? ?? 48 8B 48 20 E8 ?? ?? ?? ?? 48 8B CF");
             _getBaseUIObject = Marshal.GetDelegateForFunctionPointer<GetBaseUIObjectDelegate>(getBaseUiObjectPtr);
 
-            var setPositionPtr = Plugin.SigScanner.ScanText("4C 8B 89 ?? ?? ?? ?? 41 0F BF C0");
+            IntPtr setPositionPtr = Plugin.SigScanner.ScanText("4C 8B 89 ?? ?? ?? ?? 41 0F BF C0");
             _setPosition = Marshal.GetDelegateForFunctionPointer<SetPositionDelegate>(setPositionPtr);
 
-            var updateAddonPositionPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? 33 D2 48 8B 01 FF 90 ?? ?? ?? ??");
+            IntPtr updateAddonPositionPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? 33 D2 48 8B 01 FF 90 ?? ?? ?? ??");
             _updateAddonPosition = Marshal.GetDelegateForFunctionPointer<UpdateAddonPositionDelegate>(updateAddonPositionPtr);
         }
 
@@ -73,7 +73,7 @@ namespace DelvUI.Interface
             GC.SuppressFinalize(this);
         }
 
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposing)
             {
@@ -113,7 +113,7 @@ namespace DelvUI.Interface
             }
 
             // hide in gold saucer
-            if (Config.HideInGoldSaucer && GoldSaucerIDs.Where(id => id == Plugin.ClientState.TerritoryType).Count() > 0)
+            if (Config.HideInGoldSaucer && _goldSaucerIDs.Where(id => id == Plugin.ClientState.TerritoryType).Count() > 0)
             {
                 return true;
             }
@@ -171,7 +171,7 @@ namespace DelvUI.Interface
                 return;
             }
 
-            var currentCombatState = IsInCombat();
+            bool currentCombatState = IsInCombat();
             if (_previousCombatState != currentCombatState && Config.CombatActionBars.Count > 0 || forceUpdate)
             {
                 Config.CombatActionBars.ForEach(name => ToggleActionbar(name, !currentCombatState));
@@ -182,8 +182,8 @@ namespace DelvUI.Interface
         private unsafe void ToggleActionbar(string targetName, bool isHidden)
         {
             string[] splits = targetName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            var hotbarNumber = splits.Last();
-            var toggleText = isHidden ? "off" : "on";
+            string? hotbarNumber = splits.Last();
+            string? toggleText = isHidden ? "off" : "on";
 
             ChatHelper.SendChatMessage("/hotbar display " + hotbarNumber + " " + toggleText);
         }
@@ -195,8 +195,8 @@ namespace DelvUI.Interface
                 return;
             }
 
-            var baseUi = _getBaseUIObject();
-            var manager = Marshal.ReadIntPtr(baseUi + 0x20);
+            IntPtr baseUi = _getBaseUIObject();
+            IntPtr manager = Marshal.ReadIntPtr(baseUi + 0x20);
 
             short x = visible ? (short)originalPosition.X : (short)32000;
             short y = visible ? (short)originalPosition.Y : (short)32000;
@@ -229,8 +229,8 @@ namespace DelvUI.Interface
         {
             var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_CastBar", 1);
 
-            var previousPos = Config.CastBarOriginalPosition;
-            var isVisible = UpdateAddonOriginalPosition(addon, ref Config.CastBarOriginalPosition);
+            Vector2 previousPos = Config.CastBarOriginalPosition;
+            bool isVisible = UpdateAddonOriginalPosition(addon, ref Config.CastBarOriginalPosition);
 
             if (previousPos != Config.CastBarOriginalPosition)
             {
@@ -247,12 +247,12 @@ namespace DelvUI.Interface
 
         private unsafe void UpdateJobGauges(bool forceVisible = false)
         {
-            var (addons, names) = FindAddonsStartingWith("JobHud");
+            (List<IntPtr> addons, List<string> names) = FindAddonsStartingWith("JobHud");
 
             for (int i = 0; i < addons.Count; i++)
             {
                 var addon = (AtkUnitBase*)addons[i];
-                var name = names[i];
+                string? name = names[i];
 
                 Vector2 pos = Vector2.Zero;
                 bool existed = Config.JobGaugeOriginalPosition.TryGetValue(name, out pos);
@@ -275,25 +275,25 @@ namespace DelvUI.Interface
             var addons = new List<IntPtr>();
             var names = new List<string>();
 
-            var stage = AtkStage.GetSingleton();
+            AtkStage* stage = AtkStage.GetSingleton();
             if (stage == null)
             {
                 return (addons, names);
             }
 
-            var loadedUnitsList = &stage->RaptureAtkUnitManager->AtkUnitManager.AllLoadedUnitsList;
+            AtkUnitList* loadedUnitsList = &stage->RaptureAtkUnitManager->AtkUnitManager.AllLoadedUnitsList;
             if (loadedUnitsList == null)
             {
                 return (addons, names);
             }
 
-            var addonList = &loadedUnitsList->AtkUnitEntries;
+            AtkUnitBase** addonList = &loadedUnitsList->AtkUnitEntries;
             if (addonList == null)
             {
                 return (addons, names);
             }
 
-            for (var i = 0; i < loadedUnitsList->Count; i++)
+            for (int i = 0; i < loadedUnitsList->Count; i++)
             {
                 AtkUnitBase* addon = addonList[i];
                 if (addon == null)
@@ -301,7 +301,7 @@ namespace DelvUI.Interface
                     continue;
                 }
 
-                var name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
+                string? name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
                 if (name == null || !name.StartsWith(startingWith))
                 {
                     continue;

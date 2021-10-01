@@ -10,7 +10,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -18,7 +17,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class WarriorHud : JobHud
     {
-        private new WarriorConfig Config => (WarriorConfig)_config;
+        private new WarriorConfig Config => (WarriorConfig)Config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public WarriorHud(string id, WarriorConfig config, string? displayName = null) : base(id, config, displayName)
@@ -68,8 +67,8 @@ namespace DelvUI.Interface.Jobs
 
             BarBuilder builder = BarBuilder.Create(position, Config.StormsEyeSize).SetBackgroundColor(EmptyColor.Base);
 
-            var duration = 0f;
-            var maximum = 10f;
+            float duration = 0f;
+            float maximum = 10f;
             PluginConfigColor color = EmptyColor;
 
             if (innerReleaseBuff.Any())
@@ -100,7 +99,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawBeastGauge(Vector2 origin, PlayerCharacter player)
         {
             WARGauge gauge = Plugin.JobGauges.Get<WARGauge>();
-            var nascentChaosBuff = player.StatusList.Where(o => o.StatusId == 1897);
+            IEnumerable<Status>? nascentChaosBuff = player.StatusList.Where(o => o.StatusId == 1897);
 
             if (Config.OnlyShowBeastGaugeWhenActive && !nascentChaosBuff.Any() && gauge.BeastGauge is 0) { return; }
 
@@ -133,7 +132,7 @@ namespace DelvUI.Interface.Jobs
     public class WarriorConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.WAR;
-        public new static WarriorConfig DefaultConfig() { return new WarriorConfig(); }
+        public static new WarriorConfig DefaultConfig() { return new WarriorConfig(); }
 
         #region Storm's Eye
         [Checkbox("Storm's Eye", separator = true)]

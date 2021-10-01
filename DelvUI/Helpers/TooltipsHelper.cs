@@ -30,7 +30,7 @@ namespace DelvUI.Helpers
             GC.SuppressFinalize(this);
         }
 
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposing)
             {
@@ -41,10 +41,10 @@ namespace DelvUI.Helpers
         }
         #endregion
 
-        private static float MaxWidth = 300;
-        private static float Margin = 5;
+        private static readonly float MaxWidth = 300;
+        private static readonly float Margin = 5;
 
-        private TooltipsConfig _config;
+        private readonly TooltipsConfig _config;
 
         private string? _currentTooltipText = null;
         private Vector2 _textSize;
@@ -120,7 +120,7 @@ namespace DelvUI.Helpers
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
             var windowMargin = new Vector2(4, 0);
-            var windowPos = _position - windowMargin;
+            Vector2 windowPos = _position - windowMargin;
 
             ImGui.SetNextWindowPos(windowPos, ImGuiCond.Always);
             ImGui.SetNextWindowSize(_size + windowMargin * 2);
@@ -128,7 +128,7 @@ namespace DelvUI.Helpers
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
             ImGui.Begin("delvui_tooltip", windowFlags);
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
             drawList.AddRectFilled(_position, _position + _size, _config.BackgroundColor.Base);
 
@@ -151,8 +151,8 @@ namespace DelvUI.Helpers
             else
             {
                 // text
-                var cursorPos = windowMargin + new Vector2(Margin, Margin);
-                var textWidth = _size.X - Margin * 2;
+                Vector2 cursorPos = windowMargin + new Vector2(Margin, Margin);
+                float textWidth = _size.X - Margin * 2;
 
                 ImGui.SetCursorPos(cursorPos);
                 ImGui.PushTextWrapPos(cursorPos.X + textWidth);
@@ -170,7 +170,7 @@ namespace DelvUI.Helpers
         {
             // some data comes with unicode characters i couldn't figure out how to get rid of
             // so im doing a pretty aggressive replace to keep only "nice" characters
-            var result = Regex.Replace(text, @"[^a-zA-Z0-9 -\:\.\,\?\!\(\)%]", "");
+            string? result = Regex.Replace(text, @"[^a-zA-Z0-9 -\:\.\,\?\!\(\)%]", "");
 
             // after that there's still some leftovers characters that need to be removed
             Regex regex = new Regex("HI(.*?)IH");
@@ -189,7 +189,7 @@ namespace DelvUI.Helpers
 
         private Vector2 ConstrainPosition(Vector2 position, Vector2 size)
         {
-            var screenSize = ImGui.GetWindowViewport().Size;
+            Vector2 screenSize = ImGui.GetWindowViewport().Size;
 
             if (position.X < 0)
             {
@@ -213,18 +213,18 @@ namespace DelvUI.Helpers
     [SubSection("Tooltips", 0)]
     public class TooltipsConfig : PluginConfigObject
     {
-        public new static TooltipsConfig DefaultConfig() { return new TooltipsConfig(); }
+        public static new TooltipsConfig DefaultConfig() { return new TooltipsConfig(); }
 
         [ColorEdit4("Title Color")]
         [Order(10)]
-        public PluginConfigColor TitleColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        public PluginConfigColor TitleColor = new(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [ColorEdit4("Text Color")]
         [Order(15)]
-        public PluginConfigColor TextColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 80f / 100f));
+        public PluginConfigColor TextColor = new(new(255f / 255f, 255f / 255f, 255f / 255f, 80f / 100f));
 
         [ColorEdit4("Background Color")]
         [Order(20)]
-        public PluginConfigColor BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 60f / 100f));
+        public PluginConfigColor BackgroundColor = new(new(0f / 255f, 0f / 255f, 0f / 255f, 60f / 100f));
     }
 }

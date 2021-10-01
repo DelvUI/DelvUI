@@ -10,7 +10,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -18,7 +17,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class ScholarHud : JobHud
     {
-        private new ScholarConfig Config => (ScholarConfig)_config;
+        private new ScholarConfig Config => (ScholarConfig)Config;
 
         public ScholarHud(string id, ScholarConfig config, string? displayName = null) : base(id, config, displayName)
         {
@@ -98,7 +97,7 @@ namespace DelvUI.Interface.Jobs
                         .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
                 }
 
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 builder.Build().Draw(drawList);
             }
             else
@@ -119,8 +118,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAetherBar(Vector2 origin, PlayerCharacter player)
         {
-            var aetherFlow = player.StatusList.Where(o => o.StatusId is 304);
-            var aetherFlowStacks = 0;
+            IEnumerable<Dalamud.Game.ClientState.Statuses.Status>? aetherFlow = player.StatusList.Where(o => o.StatusId is 304);
+            int aetherFlowStacks = 0;
 
             if (aetherFlow.Any())
             {
@@ -148,13 +147,13 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBioBar(Vector2 origin, PlayerCharacter player)
         {
-            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
             float bioDuration = 0f;
 
             if (actor is BattleChara target)
             {
-                var bio = target.StatusList.Where(
+                IEnumerable<Dalamud.Game.ClientState.Statuses.Status>? bio = target.StatusList.Where(
                     o => o.StatusId is 179 or 189 or 1895 && o.SourceID == player.ObjectId
                 );
 
@@ -197,7 +196,7 @@ namespace DelvUI.Interface.Jobs
     public class ScholarConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.SCH;
-        public new static ScholarConfig DefaultConfig()
+        public static new ScholarConfig DefaultConfig()
         {
             var config = new ScholarConfig();
             config.UseDefaultPrimaryResourceBar = true;

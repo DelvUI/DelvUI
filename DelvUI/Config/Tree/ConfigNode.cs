@@ -1,4 +1,4 @@
-using Dalamud.Interface;
+﻿using Dalamud.Interface;
 using Dalamud.Logging;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
@@ -17,11 +17,11 @@ namespace DelvUI.Config.Tree
 {
     public abstract class Node
     {
-        public List<Node> children = null!;
+        public List<Node> Children = null!;
 
         public virtual void Save(string path)
         {
-            foreach (Node child in children)
+            foreach (Node child in Children)
             {
                 child.Save(ConfigurationManager.Instance.ConfigDirectory);
             }
@@ -29,7 +29,7 @@ namespace DelvUI.Config.Tree
 
         public virtual void Load(string path)
         {
-            foreach (Node child in children)
+            foreach (Node child in Children)
             {
                 child.Load(ConfigurationManager.Instance.ConfigDirectory);
             }
@@ -37,18 +37,18 @@ namespace DelvUI.Config.Tree
 
         public virtual string GetBase64String()
         {
-            if (children == null)
+            if (Children == null)
             {
                 return "";
             }
 
             string base64String = "";
 
-            foreach (Node child in children)
+            foreach (Node child in Children)
             {
                 string childString = child.GetBase64String();
 
-                if (childString != "")
+                if (!string.IsNullOrEmpty(childString))
                 {
                     base64String += "|" + childString;
                 }
@@ -59,12 +59,12 @@ namespace DelvUI.Config.Tree
 
         public virtual void LoadBase64String(string[] importStrings)
         {
-            if (children == null)
+            if (Children == null)
             {
                 return;
             }
 
-            foreach (Node child in children)
+            foreach (Node child in Children)
             {
                 child.LoadBase64String(importStrings);
             }
@@ -87,34 +87,34 @@ namespace DelvUI.Config.Tree
     }
     public class BaseNode : Node
     {
-        public new List<SectionNode> children;
-        public Dictionary<Type, ConfigPageNode> configPageNodesMap;
+        public new List<SectionNode> Children;
+        public Dictionary<Type, ConfigPageNode> ConfigPageNodesMap;
 
         public BaseNode()
         {
-            children = new List<SectionNode>();
-            configPageNodesMap = new Dictionary<Type, ConfigPageNode>();
+            Children = new List<SectionNode>();
+            ConfigPageNodesMap = new Dictionary<Type, ConfigPageNode>();
         }
 
         public T? GetConfigObject<T>() where T : PluginConfigObject
         {
-            var pageNode = GetConfigPageNode<T>();
+            ConfigPageNode? pageNode = GetConfigPageNode<T>();
 
             return pageNode != null ? (T)pageNode.ConfigObject : null;
         }
 
         public ConfigPageNode? GetConfigPageNode<T>() where T : PluginConfigObject
         {
-            if (configPageNodesMap.TryGetValue(typeof(T), out var node))
+            if (ConfigPageNodesMap.TryGetValue(typeof(T), out ConfigPageNode? node))
             {
                 return node;
             }
 
-            var configPageNode = GetOrAddConfig<T>();
+            ConfigPageNode? configPageNode = GetOrAddConfig<T>();
 
             if (configPageNode != null && configPageNode.ConfigObject != null)
             {
-                configPageNodesMap.Add(typeof(T), configPageNode);
+                ConfigPageNodesMap.Add(typeof(T), configPageNode);
 
                 return configPageNode;
             }
@@ -124,18 +124,18 @@ namespace DelvUI.Config.Tree
 
         public override string GetBase64String()
         {
-            if (children == null)
+            if (Children == null)
             {
                 return "";
             }
 
             string base64String = "";
 
-            foreach (Node child in children)
+            foreach (Node child in Children)
             {
                 string childString = child.GetBase64String();
 
-                if (childString != "")
+                if (!string.IsNullOrEmpty(childString))
                 {
                     base64String += "|" + childString;
                 }
@@ -146,12 +146,12 @@ namespace DelvUI.Config.Tree
 
         public override void LoadBase64String(string[] importStrings)
         {
-            if (children == null)
+            if (Children == null)
             {
                 return;
             }
 
-            foreach (Node child in children)
+            foreach (Node child in Children)
             {
                 child.LoadBase64String(importStrings);
             }
@@ -236,18 +236,18 @@ namespace DelvUI.Config.Tree
                     ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing() - 15), true);
 
                     // if no section is selected, select the first
-                    if (children.Any() && children.All(o => !o.Selected))
+                    if (Children.Any() && Children.All(o => !o.Selected))
                     {
-                        children[0].Selected = true;
+                        Children[0].Selected = true;
                     }
 
-                    foreach (SectionNode selectionNode in children)
+                    foreach (SectionNode selectionNode in Children)
                     {
                         if (ImGui.Selectable(selectionNode.Name, selectionNode.Selected))
                         {
                             selectionNode.Selected = true;
 
-                            foreach (SectionNode otherNode in children.FindAll(x => x != selectionNode))
+                            foreach (SectionNode otherNode in Children.FindAll(x => x != selectionNode))
                             {
                                 otherNode.Selected = false;
                             }
@@ -264,7 +264,7 @@ namespace DelvUI.Config.Tree
                 ImGui.BeginGroup(); // Right
 
                 {
-                    foreach (SectionNode selectionNode in children)
+                    foreach (SectionNode selectionNode in Children)
                     {
                         selectionNode.Draw(ref changed);
                     }
@@ -341,7 +341,7 @@ namespace DelvUI.Config.Tree
 
         public override void Load(string path)
         {
-            foreach (SectionNode child in children)
+            foreach (SectionNode child in Children)
             {
                 child.Load(path);
             }
@@ -349,7 +349,7 @@ namespace DelvUI.Config.Tree
 
         public override void Save(string path)
         {
-            foreach (SectionNode child in children)
+            foreach (SectionNode child in Children)
             {
                 child.Save(path);
             }
@@ -363,7 +363,7 @@ namespace DelvUI.Config.Tree
             {
                 if (attribute is SectionAttribute sectionAttribute)
                 {
-                    foreach (SectionNode sectionNode in children)
+                    foreach (SectionNode sectionNode in Children)
                     {
                         if (sectionNode.Name == sectionAttribute.SectionName)
                         {
@@ -373,7 +373,7 @@ namespace DelvUI.Config.Tree
 
                     SectionNode newNode = new();
                     newNode.Name = sectionAttribute.SectionName;
-                    children.Add(newNode);
+                    Children.Add(newNode);
 
                     return newNode.GetOrAddConfig<T>();
                 }
@@ -385,27 +385,27 @@ namespace DelvUI.Config.Tree
 
     public class SectionNode : Node
     {
-        public new List<SubSectionNode> children;
+        public new List<SubSectionNode> Children;
 
         public bool Selected;
         public string Name = null!;
 
-        public SectionNode() { children = new List<SubSectionNode>(); }
+        public SectionNode() { Children = new List<SubSectionNode>(); }
 
         public override string GetBase64String()
         {
-            if (children == null)
+            if (Children == null)
             {
                 return "";
             }
 
             string base64String = "";
 
-            foreach (Node child in children)
+            foreach (Node child in Children)
             {
                 string childString = child.GetBase64String();
 
-                if (childString != "")
+                if (!string.IsNullOrEmpty(childString))
                 {
                     base64String += "|" + childString;
                 }
@@ -416,12 +416,12 @@ namespace DelvUI.Config.Tree
 
         public override void LoadBase64String(string[] importStrings)
         {
-            if (children == null)
+            if (Children == null)
             {
                 return;
             }
 
-            foreach (Node child in children)
+            foreach (Node child in Children)
             {
                 child.LoadBase64String(importStrings);
             }
@@ -444,7 +444,7 @@ namespace DelvUI.Config.Tree
             {
                 if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
                 {
-                    foreach (SubSectionNode subSectionNode in children)
+                    foreach (SubSectionNode subSectionNode in Children)
                     {
                         if (!ImGui.BeginTabItem(subSectionNode.Name))
                         {
@@ -479,7 +479,7 @@ namespace DelvUI.Config.Tree
 
         public override void Save(string path)
         {
-            foreach (SubSectionNode child in children)
+            foreach (SubSectionNode child in Children)
             {
                 child.Save(Path.Combine(path, Name));
             }
@@ -487,7 +487,7 @@ namespace DelvUI.Config.Tree
 
         public override void Load(string path)
         {
-            foreach (SubSectionNode child in children)
+            foreach (SubSectionNode child in Children)
             {
                 child.Load(Path.Combine(path, Name));
             }
@@ -501,7 +501,7 @@ namespace DelvUI.Config.Tree
             {
                 if (attribute is SubSectionAttribute subSectionAttribute)
                 {
-                    foreach (SubSectionNode subSectionNode in children)
+                    foreach (SubSectionNode subSectionNode in Children)
                     {
                         if (subSectionNode.Name == subSectionAttribute.SubSectionName)
                         {
@@ -514,7 +514,7 @@ namespace DelvUI.Config.Tree
                         NestedSubSectionNode newNode = new();
                         newNode.Name = subSectionAttribute.SubSectionName;
                         newNode.Depth = 0;
-                        children.Add(newNode);
+                        Children.Add(newNode);
 
                         return newNode.GetOrAddConfig<T>();
                     }
@@ -537,24 +537,24 @@ namespace DelvUI.Config.Tree
 
     public class NestedSubSectionNode : SubSectionNode
     {
-        public new List<SubSectionNode> children;
+        public new List<SubSectionNode> Children;
 
-        public NestedSubSectionNode() { children = new List<SubSectionNode>(); }
+        public NestedSubSectionNode() { Children = new List<SubSectionNode>(); }
 
         public override string GetBase64String()
         {
-            if (children == null)
+            if (Children == null)
             {
                 return "";
             }
 
             string base64String = "";
 
-            foreach (Node child in children)
+            foreach (Node child in Children)
             {
                 string childString = child.GetBase64String();
 
-                if (childString != "")
+                if (!string.IsNullOrEmpty(childString))
                 {
                     base64String += "|" + childString;
                 }
@@ -565,12 +565,12 @@ namespace DelvUI.Config.Tree
 
         public override void LoadBase64String(string[] importStrings)
         {
-            if (children == null)
+            if (Children == null)
             {
                 return;
             }
 
-            foreach (Node child in children)
+            foreach (Node child in Children)
             {
                 child.LoadBase64String(importStrings);
             }
@@ -578,7 +578,7 @@ namespace DelvUI.Config.Tree
 
         public override void Draw(ref bool changed)
         {
-            if (children.Count > 1)
+            if (Children.Count > 1)
             {
                 ImGui.BeginChild(
                     "item" + Depth + " view",
@@ -608,7 +608,7 @@ namespace DelvUI.Config.Tree
 
         public void DrawSubConfig(ref bool changed)
         {
-            foreach (SubSectionNode subSectionNode in children)
+            foreach (SubSectionNode subSectionNode in Children)
             {
                 if (subSectionNode is NestedSubSectionNode)
                 {
@@ -632,7 +632,7 @@ namespace DelvUI.Config.Tree
 
         public override void Save(string path)
         {
-            foreach (SubSectionNode child in children)
+            foreach (SubSectionNode child in Children)
             {
                 child.Save(Path.Combine(path, Name));
             }
@@ -640,7 +640,7 @@ namespace DelvUI.Config.Tree
 
         public override void Load(string path)
         {
-            foreach (SubSectionNode child in children)
+            foreach (SubSectionNode child in Children)
             {
                 child.Load(Path.Combine(path, Name));
             }
@@ -648,7 +648,7 @@ namespace DelvUI.Config.Tree
 
         public override ConfigPageNode? GetOrAddConfig<T>()
         {
-            var type = typeof(T);
+            Type? type = typeof(T);
             if (type == null)
             {
                 return null;
@@ -665,7 +665,7 @@ namespace DelvUI.Config.Tree
                         continue;
                     }
 
-                    foreach (SubSectionNode subSectionNode in children)
+                    foreach (SubSectionNode subSectionNode in Children)
                     {
                         if (subSectionNode.Name == subSectionAttribute.SubSectionName)
                         {
@@ -676,13 +676,13 @@ namespace DelvUI.Config.Tree
                     NestedSubSectionNode nestedSubSectionNode = new();
                     nestedSubSectionNode.Name = subSectionAttribute.SubSectionName;
                     nestedSubSectionNode.Depth = Depth + 1;
-                    children.Add(nestedSubSectionNode);
+                    Children.Add(nestedSubSectionNode);
 
                     return nestedSubSectionNode.GetOrAddConfig<T>();
                 }
             }
 
-            foreach (SubSectionNode subSectionNode in children)
+            foreach (SubSectionNode subSectionNode in Children)
             {
                 if (subSectionNode.Name == type.FullName && subSectionNode is ConfigPageNode node)
                 {
@@ -692,10 +692,10 @@ namespace DelvUI.Config.Tree
 
             ConfigPageNode configPageNode = new();
 
-            var method = type.GetMethod("DefaultConfig", BindingFlags.Public | BindingFlags.Static);
+            MethodInfo? method = type.GetMethod("DefaultConfig", BindingFlags.Public | BindingFlags.Static);
             configPageNode.ConfigObject = (PluginConfigObject)method?.Invoke(null, null)!;
             configPageNode.Name = type.FullName!;
-            children.Add(configPageNode);
+            Children.Add(configPageNode);
 
             return configPageNode;
         }
@@ -710,7 +710,7 @@ namespace DelvUI.Config.Tree
         public FieldInfo? ParentCollapseField = null;
         public PluginConfigObject? ParentConfigObject = null;
 
-        private List<KeyValuePair<int, object>>? DrawList = null;
+        private List<KeyValuePair<int, object>>? _drawList = null;
 
         public PluginConfigObject ConfigObject
         {
@@ -730,16 +730,16 @@ namespace DelvUI.Config.Tree
 
             FieldInfo[] fields = _configObject.GetType().GetFields();
 
-            foreach (var field in fields)
+            foreach (FieldInfo? field in fields)
             {
-                foreach (var attribute in field.GetCustomAttributes(true))
+                foreach (object? attribute in field.GetCustomAttributes(true))
                 {
                     if (attribute is not NestedConfigAttribute nestedConfigAttribute)
                     {
                         continue;
                     }
 
-                    var value = field.GetValue(_configObject);
+                    object? value = field.GetValue(_configObject);
 
                     if (value is not PluginConfigObject nestedConfig)
                     {
@@ -775,7 +775,7 @@ namespace DelvUI.Config.Tree
                     // get type from json
                     string jsonString = ConfigurationManager.Base64DecodeAndDecompress(importString);
 
-                    var typeString = (string?)JObject.Parse(jsonString)["$type"];
+                    string? typeString = (string?)JObject.Parse(jsonString)["$type"];
                     if (typeString != null)
                     {
                         importedType = Type.GetType(typeString);
@@ -808,12 +808,12 @@ namespace DelvUI.Config.Tree
 
         public override void Draw(ref bool changed) { DrawWithID(ref changed); }
 
-        private void DrawWithID(ref bool changed, string? ID = null)
+        private void DrawWithID(ref bool changed, string? iD = null)
         {
             // Only do this stuff the first time the config page is loaded
-            if (DrawList is null)
+            if (_drawList is null)
             {
-                DrawList = new List<KeyValuePair<int, object>>();
+                _drawList = new List<KeyValuePair<int, object>>();
                 FieldInfo[] fields = ConfigObject.GetType().GetFields();
                 List<CategoryField> collapseWithList = new();
 
@@ -825,13 +825,13 @@ namespace DelvUI.Config.Tree
                     {
                         if (attribute is OrderAttribute orderAttribute)
                         {
-                            CategoryField categoryField = new CategoryField(field, ConfigObject, ID);
+                            CategoryField categoryField = new CategoryField(field, ConfigObject, iD);
 
                             // By default the 'Enabled' checkbox (inherited from PluginConfigObject) is considered the parent of all config items,
                             // so if the ConfigObject is marked as undisableable, we bypass adding items as children *only* if their parent was the 'Enabled' field.
                             if (orderAttribute.collapseWith is null || (!ConfigObject.Disableable && orderAttribute.collapseWith.Equals("Enabled")))
                             {
-                                DrawList.Add(new KeyValuePair<int, object>(orderAttribute.pos, categoryField));
+                                _drawList.Add(new KeyValuePair<int, object>(orderAttribute.pos, categoryField));
                             }
                             else
                             {
@@ -850,14 +850,14 @@ namespace DelvUI.Config.Tree
                                 node.ParentConfigObject = ConfigObject;
                             }
 
-                            DrawList.Add(new KeyValuePair<int, object>(nestedConfigAttribute.pos, node));
+                            _drawList.Add(new KeyValuePair<int, object>(nestedConfigAttribute.pos, node));
                             wasAdded = true;
                         }
                     }
 
                     if (!wasAdded && Attribute.IsDefined(field, typeof(ConfigAttribute), true))
                     {
-                        DrawList.Add(new KeyValuePair<int, object>(int.MaxValue, new CategoryField(field, ConfigObject, ID)));
+                        _drawList.Add(new KeyValuePair<int, object>(int.MaxValue, new CategoryField(field, ConfigObject, iD)));
                     }
                 }
 
@@ -870,7 +870,7 @@ namespace DelvUI.Config.Tree
                         // The CategoryField for the parent could either be in the drawList (if it is the root) or the collapseWithList (if there is multi-layered nesting)
                         // Create a union of the CategoryFields that already exist in the drawList and the collapseWithList, then search for the parent field.
                         // This looks incredibly gross but it's probably the cleanest way to do it without an extremely heavy refactor of the code above.
-                        CategoryField? parentCategoryField = DrawList
+                        CategoryField? parentCategoryField = _drawList
                             .Where(kvp => kvp.Value is CategoryField)
                             .Select(kvp => kvp.Value as CategoryField)
                             .Union(collapseWithList)
@@ -886,10 +886,10 @@ namespace DelvUI.Config.Tree
                     }
                 }
 
-                DrawList.Sort((x, y) => x.Key - y.Key);
+                _drawList.Sort((x, y) => x.Key - y.Key);
             }
 
-            foreach (KeyValuePair<int, object> pair in DrawList)
+            foreach (KeyValuePair<int, object> pair in _drawList)
             {
                 if (pair.Value is CategoryField categoryField)
                 {
@@ -900,7 +900,7 @@ namespace DelvUI.Config.Tree
                     // If the parent checkbox of this nested config is disabled, don't draw this nestedconfig
                     if (node.ParentCollapseField is not null && node.ParentConfigObject is not null)
                     {
-                        if (!(Attribute.IsDefined(node.ParentCollapseField, typeof(CheckboxAttribute)) && 
+                        if (!(Attribute.IsDefined(node.ParentCollapseField, typeof(CheckboxAttribute)) &&
                             (node.ParentCollapseField.GetValue(node.ParentConfigObject) as bool? ?? false)))
                         {
                             continue;
@@ -963,7 +963,7 @@ namespace DelvUI.Config.Tree
                     {
                         string jsonString = ConfigurationManager.Base64DecodeAndDecompress(_importString);
 
-                        var typeString = (string?)JObject.Parse(jsonString)["$type"];
+                        string? typeString = (string?)JObject.Parse(jsonString)["$type"];
                         if (typeString != null)
                         {
                             importedType = Type.GetType(typeString);
@@ -1016,7 +1016,7 @@ namespace DelvUI.Config.Tree
 
                 ImGui.SameLine();
 
-                if (ImGui.Button("Copy to clipboard") && _exportString != "")
+                if (ImGui.Button("Copy to clipboard") && !string.IsNullOrEmpty(_exportString))
                 {
                     try
                     {
@@ -1080,7 +1080,7 @@ namespace DelvUI.Config.Tree
 
     public class CategoryField : Node
     {
-        public SortedDictionary<int, CategoryField> Children;
+        public new SortedDictionary<int, CategoryField> Children;
         public FieldInfo MainField;
         public PluginConfigObject ConfigObject;
         public bool CollapseControl;
@@ -1134,7 +1134,7 @@ namespace DelvUI.Config.Tree
                     separatorDrawn |= child.HasSeparator;
 
                     // Shift everything left if a separator was drawn
-                    var depth = separatorDrawn ? child.Depth - 1 : child.Depth;
+                    int depth = separatorDrawn ? child.Depth - 1 : child.Depth;
 
                     // This draws the L shaped symbols and padding to the left of config items collapsible under a checkbox.
                     if (depth > 0)
@@ -1166,13 +1166,13 @@ namespace DelvUI.Config.Tree
             return field.GetCustomAttributes(true).Where(a => a is ConfigAttribute).FirstOrDefault() as ConfigAttribute;
         }
 
-        public void DrawSeparatorOrSpacing(FieldInfo field, string? ID)
+        public void DrawSeparatorOrSpacing(FieldInfo field, string? iD)
         {
             foreach (object attribute in field.GetCustomAttributes(true))
             {
                 if (attribute is ConfigAttribute { separator: true })
                 {
-                    if (attribute is CheckboxAttribute checkboxAttribute && (checkboxAttribute.friendlyName != "Enabled" || ID is null) && checkboxAttribute.friendlyName == "Enabled")
+                    if (attribute is CheckboxAttribute checkboxAttribute && (checkboxAttribute.friendlyName != "Enabled" || iD is null) && checkboxAttribute.friendlyName == "Enabled")
                     {
                         continue;
                     }

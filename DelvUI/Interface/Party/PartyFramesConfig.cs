@@ -3,8 +3,6 @@ using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
-using Newtonsoft.Json;
-using System;
 using System.Numerics;
 
 namespace DelvUI.Interface.Party
@@ -13,7 +11,7 @@ namespace DelvUI.Interface.Party
     [SubSection("General", 0)]
     public class PartyFramesConfig : MovablePluginConfigObject
     {
-        public new static PartyFramesConfig DefaultConfig() { return new PartyFramesConfig(); }
+        public static new PartyFramesConfig DefaultConfig() { return new PartyFramesConfig(); }
 
         [Checkbox("Lock")]
         [Order(3)]
@@ -23,7 +21,7 @@ namespace DelvUI.Interface.Party
         [Order(4)]
         public bool Preview = false;
 
-        public Vector2 Size = new Vector2(650, 150);
+        public Vector2 Size = new(650, 150);
 
         [Anchor("Bars Anchor", isMonitored = true, spacing = true)]
         [Order(15)]
@@ -55,30 +53,30 @@ namespace DelvUI.Interface.Party
     [SubSection("Health Bar", 0)]
     public class PartyFramesHealthBarsConfig : PluginConfigObject
     {
-        public new static PartyFramesHealthBarsConfig DefaultConfig() { return new PartyFramesHealthBarsConfig(); }
+        public static new PartyFramesHealthBarsConfig DefaultConfig() { return new PartyFramesHealthBarsConfig(); }
 
         [DragInt2("Size", isMonitored = true)]
         [Order(30)]
-        public Vector2 Size = new Vector2(180, 80);
+        public Vector2 Size = new(180, 80);
 
         [DragInt2("Padding", isMonitored = true)]
         [Order(35)]
-        public Vector2 Padding = new Vector2(1, 1);
+        public Vector2 Padding = new(1, 1);
 
         [NestedConfig("Name Label", 40)]
-        public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:first-initial]. [name:last-initial].", DrawAnchor.Center, DrawAnchor.Center);
+        public EditableLabelConfig NameLabelConfig = new(Vector2.Zero, "[name:first-initial]. [name:last-initial].", DrawAnchor.Center, DrawAnchor.Center);
 
         [NestedConfig("Order Position Label", 45)]
-        public LabelConfig OrderLabelConfig = new LabelConfig(new Vector2(2, 4), "[name:first-initial]. [name:last-initial].", DrawAnchor.TopLeft, DrawAnchor.TopLeft);
+        public LabelConfig OrderLabelConfig = new(new Vector2(2, 4), "[name:first-initial]. [name:last-initial].", DrawAnchor.TopLeft, DrawAnchor.TopLeft);
 
         [NestedConfig("Colors", 50)]
-        public PartyFramesColorsConfig ColorsConfig = new PartyFramesColorsConfig();
+        public PartyFramesColorsConfig ColorsConfig = new();
 
         [NestedConfig("Shield", 55)]
-        public ShieldConfig ShieldConfig = new ShieldConfig();
+        public ShieldConfig ShieldConfig = new();
 
         [NestedConfig("Change Alpha Based on Range", 60)]
-        public PartyFramesRangeConfig RangeConfig = new PartyFramesRangeConfig();
+        public PartyFramesRangeConfig RangeConfig = new();
     }
 
     [Disableable(false)]
@@ -87,15 +85,15 @@ namespace DelvUI.Interface.Party
     {
         [ColorEdit4("Border Color")]
         [Order(5)]
-        public PluginConfigColor BorderColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor BorderColor = new(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Target Border Color")]
         [Order(10)]
-        public PluginConfigColor TargetBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        public PluginConfigColor TargetBordercolor = new(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [ColorEdit4("Background Color")]
         [Order(15)]
-        public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 70f / 100f));
+        public PluginConfigColor BackgroundColor = new(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 70f / 100f));
 
         [Checkbox("Use Role Colors", isMonitored = true, spacing = true)]
         [Order(20)]
@@ -103,31 +101,31 @@ namespace DelvUI.Interface.Party
 
         [ColorEdit4("Tank Role Color")]
         [Order(25, collapseWith = nameof(UseRoleColors))]
-        public PluginConfigColor TankRoleColor = new PluginConfigColor(new Vector4(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f));
+        public PluginConfigColor TankRoleColor = new(new Vector4(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f));
 
         [ColorEdit4("DPS Role Color")]
         [Order(30, collapseWith = nameof(UseRoleColors))]
-        public PluginConfigColor DPSRoleColor = new PluginConfigColor(new Vector4(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f));
+        public PluginConfigColor DPSRoleColor = new(new Vector4(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f));
 
         [ColorEdit4("Healer Role Color")]
         [Order(35, collapseWith = nameof(UseRoleColors))]
-        public PluginConfigColor HealerRoleColor = new PluginConfigColor(new Vector4(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f));
+        public PluginConfigColor HealerRoleColor = new(new Vector4(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f));
 
         [ColorEdit4("Generic Role Color")]
         [Order(40, collapseWith = nameof(UseRoleColors))]
-        public PluginConfigColor GenericRoleColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
+        public PluginConfigColor GenericRoleColor = new(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
-        [Checkbox("Color Based On Health Value" , isMonitored = true)]
+        [Checkbox("Color Based On Health Value", isMonitored = true)]
         [Order(45)]
         public bool UseColorBasedOnHealthValue = false;
 
         [ColorEdit4("Full Health Color")]
         [Order(50, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public PluginConfigColor FullHealthColor = new PluginConfigColor(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor FullHealthColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Low Health Color")]
         [Order(55, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public PluginConfigColor LowHealthColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor LowHealthColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [DragFloat("Full Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
         [Order(60, collapseWith = nameof(UseColorBasedOnHealthValue))]
@@ -143,7 +141,7 @@ namespace DelvUI.Interface.Party
 
         [ColorEdit4("Highlight Color")]
         [Order(75, collapseWith = nameof(ShowHighlight))]
-        public PluginConfigColor HighlightColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 5f / 100f));
+        public PluginConfigColor HighlightColor = new(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 5f / 100f));
 
         [Checkbox("Show Enmity Border Colors", spacing = true)]
         [Order(80)]
@@ -151,7 +149,7 @@ namespace DelvUI.Interface.Party
 
         [ColorEdit4("Enmity Leader Color")]
         [Order(85, collapseWith = nameof(ShowEnmityBorderColors))]
-        public PluginConfigColor EnmityLeaderBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
+        public PluginConfigColor EnmityLeaderBordercolor = new(new Vector4(255f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
 
         [Checkbox("Show Second Enmity")]
         [Order(90, collapseWith = nameof(ShowEnmityBorderColors))]
@@ -163,7 +161,7 @@ namespace DelvUI.Interface.Party
 
         [ColorEdit4("Enmity Second Color")]
         [Order(100, collapseWith = nameof(ShowSecondEnmity))]
-        public PluginConfigColor EnmitySecondBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 175f / 255f, 40f / 255f, 100f / 100f));
+        public PluginConfigColor EnmitySecondBordercolor = new(new Vector4(255f / 255f, 175f / 255f, 40f / 255f, 100f / 100f));
     }
 
     [Portable(false)]
@@ -214,7 +212,7 @@ namespace DelvUI.Interface.Party
     [SubSection("Mana Bar", 0)]
     public class PartyFramesManaBarConfig : MovablePluginConfigObject
     {
-        public new static PartyFramesManaBarConfig DefaultConfig()
+        public static new PartyFramesManaBarConfig DefaultConfig()
         {
             var config = new PartyFramesManaBarConfig();
             config.ValueLabelConfig.Enabled = false;
@@ -239,21 +237,21 @@ namespace DelvUI.Interface.Party
 
         [ColorEdit4("Color")]
         [Order(40)]
-        public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
+        public PluginConfigColor Color = new(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
 
         [ColorEdit4("Background Color")]
         [Order(45)]
-        public PluginConfigColor BackgroundColor = new PluginConfigColor(new(0 / 255f, 20f / 255f, 100f / 255f, 100f / 100f));
+        public PluginConfigColor BackgroundColor = new(new(0 / 255f, 20f / 255f, 100f / 255f, 100f / 100f));
 
         [NestedConfig("Label", 50)]
-        public EditableLabelConfig ValueLabelConfig = new EditableLabelConfig(Vector2.Zero, "[mana:current-short]", DrawAnchor.Center, DrawAnchor.Center);
+        public EditableLabelConfig ValueLabelConfig = new(Vector2.Zero, "[mana:current-short]", DrawAnchor.Center, DrawAnchor.Center);
     }
 
     [Section("Party Frames")]
     [SubSection("Role-Job Icon", 0)]
     public class PartyFramesRoleIconConfig : MovablePluginConfigObject
     {
-        public new static PartyFramesRoleIconConfig DefaultConfig()
+        public static new PartyFramesRoleIconConfig DefaultConfig()
         {
             var config = new PartyFramesRoleIconConfig();
             config.Position = new Vector2(20, 0);
@@ -290,7 +288,7 @@ namespace DelvUI.Interface.Party
     [SubSection("Party Leader Icon", 0)]
     public class PartyFramesLeaderIconConfig : MovablePluginConfigObject
     {
-        public new static PartyFramesLeaderIconConfig DefaultConfig()
+        public static new PartyFramesLeaderIconConfig DefaultConfig()
         {
             var config = new PartyFramesLeaderIconConfig();
             config.Position = new Vector2(-12, -12);
@@ -315,7 +313,7 @@ namespace DelvUI.Interface.Party
     [SubSection("Buffs", 0)]
     public class PartyFramesBuffsConfig : PartyFramesStatusEffectsListConfig
     {
-        public new static PartyFramesBuffsConfig DefaultConfig()
+        public static new PartyFramesBuffsConfig DefaultConfig()
         {
             var durationConfig = new LabelConfig(new Vector2(0, -4), "", DrawAnchor.Bottom, DrawAnchor.Center);
             var stacksConfig = new LabelConfig(new Vector2(-3, 4), "", DrawAnchor.TopRight, DrawAnchor.Center);
@@ -346,7 +344,7 @@ namespace DelvUI.Interface.Party
     [SubSection("Debuffs", 0)]
     public class PartyFramesDebuffsConfig : PartyFramesStatusEffectsListConfig
     {
-        public new static PartyFramesDebuffsConfig DefaultConfig()
+        public static new PartyFramesDebuffsConfig DefaultConfig()
         {
             var durationConfig = new LabelConfig(new Vector2(0, -4), "", DrawAnchor.Bottom, DrawAnchor.Center);
             var stacksConfig = new LabelConfig(new Vector2(-3, 4), "", DrawAnchor.TopRight, DrawAnchor.Center);
@@ -390,7 +388,7 @@ namespace DelvUI.Interface.Party
     [SubSection("Castbars", 0)]
     public class PartyFramesCastbarConfig : CastbarConfig
     {
-        public new static PartyFramesCastbarConfig DefaultConfig()
+        public static new PartyFramesCastbarConfig DefaultConfig()
         {
             var size = new Vector2(182, 10);
             var pos = new Vector2(-1, 0);

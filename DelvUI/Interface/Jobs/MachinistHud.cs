@@ -8,7 +8,6 @@ using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -17,7 +16,7 @@ namespace DelvUI.Interface.Jobs
     public class MachinistHud : JobHud
     {
         private readonly float[] _robotDuration = { 12.450f, 13.950f, 15.450f, 16.950f, 18.450f, 19.950f };
-        private new MachinistConfig Config => (MachinistConfig)_config;
+        private new MachinistConfig Config => (MachinistConfig)Config;
 
         public MachinistHud(string id, MachinistConfig config, string? displayName = null) : base(id, config, displayName)
         {
@@ -78,16 +77,16 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawHeatGauge(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<MCHGauge>();
+            MCHGauge? gauge = Plugin.JobGauges.Get<MCHGauge>();
 
             if (gauge.Heat == 0 && Config.OnlyShowHeatGaugeWhenActive)
             {
                 return;
             }
 
-            var position = origin + Config.Position + Config.HeatGaugePosition - Config.HeatGaugeSize / 2f;
+            Vector2 position = origin + Config.Position + Config.HeatGaugePosition - Config.HeatGaugeSize / 2f;
 
-            var builder = BarBuilder.Create(position, Config.HeatGaugeSize)
+            BarBuilder? builder = BarBuilder.Create(position, Config.HeatGaugeSize)
                                     .SetChunks(2)
                                     .SetChunkPadding(Config.HeatGaugePadding)
                                     .AddInnerBar(gauge.Heat, 100, Config.HeatGaugeFillColor, PartialFillColor);
@@ -105,11 +104,11 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBatteryGauge(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<MCHGauge>();
+            MCHGauge? gauge = Plugin.JobGauges.Get<MCHGauge>();
 
-            var position = origin + Config.Position + Config.BatteryGaugePosition - Config.BatteryGaugeSize / 2f;
+            Vector2 position = origin + Config.Position + Config.BatteryGaugePosition - Config.BatteryGaugeSize / 2f;
 
-            var builder = BarBuilder.Create(position, Config.BatteryGaugeSize)
+            BarBuilder? builder = BarBuilder.Create(position, Config.BatteryGaugeSize)
                                     .SetChunks(new[] { .5f, .1f, .1f, .1f, .1f, .1f })
                                     .SetChunkPadding(Config.BatteryGaugePadding)
                                     .SetBackgroundColor(EmptyColor.Background);
@@ -142,22 +141,22 @@ namespace DelvUI.Interface.Jobs
             }
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            var bar = builder.Build();
+            Bar? bar = builder.Build();
             bar.Draw(drawList);
         }
 
         private void DrawOverheatBar(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<MCHGauge>();
+            MCHGauge? gauge = Plugin.JobGauges.Get<MCHGauge>();
 
             if (!gauge.IsOverheated && Config.OnlyShowOverheatWhenActive)
             {
                 return;
             }
 
-            var position = origin + Config.Position + Config.OverheatPosition - Config.OverheatSize / 2f;
+            Vector2 position = origin + Config.Position + Config.OverheatPosition - Config.OverheatSize / 2f;
 
-            var builder = BarBuilder.Create(position, Config.OverheatSize)
+            BarBuilder? builder = BarBuilder.Create(position, Config.OverheatSize)
                 .SetBackgroundColor(EmptyColor.Background);
 
             if (gauge.IsOverheated)
@@ -171,22 +170,22 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
         }
 
         private void DrawWildfireBar(Vector2 origin, PlayerCharacter player)
         {
-            var wildfireBuff = player.StatusList.Where(o => o.StatusId == 1946);
+            IEnumerable<Dalamud.Game.ClientState.Statuses.Status>? wildfireBuff = player.StatusList.Where(o => o.StatusId == 1946);
             float duration = 0f;
 
-            var position = origin + Config.Position + Config.WildfirePosition - Config.WildfireSize / 2f;
+            Vector2 position = origin + Config.Position + Config.WildfirePosition - Config.WildfireSize / 2f;
 
-            var builder = BarBuilder.Create(position, Config.WildfireSize).SetBackgroundColor(EmptyColor.Background);
+            BarBuilder? builder = BarBuilder.Create(position, Config.WildfireSize).SetBackgroundColor(EmptyColor.Background);
 
             if (wildfireBuff.Any())
             {
-                duration = wildfireBuff.First().RemainingTime;                
+                duration = wildfireBuff.First().RemainingTime;
 
                 builder.AddInnerBar(duration, 10, Config.WildfireFillColor, null);
 
@@ -213,7 +212,7 @@ namespace DelvUI.Interface.Jobs
     public class MachinistConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.MCH;
-        public new static MachinistConfig DefaultConfig() { return new MachinistConfig(); }
+        public static new MachinistConfig DefaultConfig() { return new MachinistConfig(); }
 
         #region Overheat
         [Checkbox("Overheat", separator = true)]

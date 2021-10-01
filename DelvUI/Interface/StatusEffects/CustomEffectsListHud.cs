@@ -13,7 +13,7 @@ namespace DelvUI.Interface.StatusEffects
 
         protected override List<StatusEffectData> StatusEffectsData()
         {
-            var list = StatusEffectDataList(TargetActor);
+            List<StatusEffectData>? list = StatusEffectDataList(TargetActor);
             list.AddRange(StatusEffectDataList(Actor));
 
             // show mine first

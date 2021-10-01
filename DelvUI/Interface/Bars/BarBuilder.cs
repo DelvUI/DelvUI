@@ -75,10 +75,10 @@ namespace DelvUI.Interface.Bars
                 throw new InvalidOperationException("You cannot set the chunk count once an inner bar has been added");
             }
 
-            var size = (float)1 / count;
-            var sizes = new float[count];
+            float size = (float)1 / count;
+            float[]? sizes = new float[count];
 
-            for (var i = 0; i < count; i++)
+            for (int i = 0; i < count; i++)
             {
                 sizes[i] = size;
             }
@@ -127,7 +127,7 @@ namespace DelvUI.Interface.Bars
         {
             var colors = new PluginConfigColor[_bar.ChunkSizes.Length];
 
-            for (var i = 0; i < colors.Length; i++)
+            for (int i = 0; i < colors.Length; i++)
             {
                 colors[i] = color;
             }
@@ -173,7 +173,7 @@ namespace DelvUI.Interface.Bars
         {
             var colors = new PluginConfigColor[_bar.ChunkSizes.Length];
 
-            for (var i = 0; i < colors.Length; i++)
+            for (int i = 0; i < colors.Length; i++)
             {
                 colors[i] = color;
             }
@@ -268,7 +268,7 @@ namespace DelvUI.Interface.Bars
         {
             var colors = new PluginConfigColor[_bar.ChunkSizes.Length];
 
-            for (var i = 0; i < colors.Length; i++)
+            for (int i = 0; i < colors.Length; i++)
             {
                 colors[i] = color;
             }
@@ -333,7 +333,7 @@ namespace DelvUI.Interface.Bars
 
             var texts = new BarText[_bar.ChunkSizes.Length];
 
-            for (var i = 0; i < texts.Length; i++)
+            for (int i = 0; i < texts.Length; i++)
             {
                 texts[i] = text;
             }

@@ -23,7 +23,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Color ##SlidecastColor")]
         [Order(50, collapseWith = nameof(ShowSlideCast))]
-        public PluginConfigColor SlideCastColor = new PluginConfigColor(new(190f / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
+        public PluginConfigColor SlideCastColor = new(new(190f / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
 
         public PlayerCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
             : base(position, size, castNameConfig, castTimeConfig)
@@ -31,7 +31,7 @@ namespace DelvUI.Interface.GeneralElements
 
         }
 
-        public new static PlayerCastbarConfig DefaultConfig()
+        public static new PlayerCastbarConfig DefaultConfig()
         {
             var size = new Vector2(254, 24);
             var pos = new Vector2(0, HUDConstants.PlayerCastbarY);
@@ -53,7 +53,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Interruptable")]
         [Order(40, collapseWith = nameof(ShowInterruptableColor))]
-        public PluginConfigColor InterruptableColor = new PluginConfigColor(new(255f / 255f, 87f / 255f, 113f / 255f, 100f / 100f));
+        public PluginConfigColor InterruptableColor = new(new(255f / 255f, 87f / 255f, 113f / 255f, 100f / 100f));
 
         [Checkbox("Damage Type Colors", spacing = true)]
         [Order(45)]
@@ -61,22 +61,22 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Physical")]
         [Order(50, collapseWith = nameof(UseColorForDamageTypes))]
-        public PluginConfigColor PhysicalDamageColor = new PluginConfigColor(new(190f / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
+        public PluginConfigColor PhysicalDamageColor = new(new(190f / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
 
         [ColorEdit4("Magical")]
         [Order(55, collapseWith = nameof(UseColorForDamageTypes))]
-        public PluginConfigColor MagicalDamageColor = new PluginConfigColor(new(0f / 255f, 72f / 255f, 179f / 255f, 100f / 100f));
+        public PluginConfigColor MagicalDamageColor = new(new(0f / 255f, 72f / 255f, 179f / 255f, 100f / 100f));
 
         [ColorEdit4("Darkness")]
         [Order(60, collapseWith = nameof(UseColorForDamageTypes))]
-        public PluginConfigColor DarknessDamageColor = new PluginConfigColor(new(188f / 255f, 19f / 255f, 254f / 255f, 100f / 100f));
+        public PluginConfigColor DarknessDamageColor = new(new(188f / 255f, 19f / 255f, 254f / 255f, 100f / 100f));
 
         public TargetCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
             : base(position, size, castNameConfig, castTimeConfig)
         {
 
         }
-        public new static TargetCastbarConfig DefaultConfig()
+        public static new TargetCastbarConfig DefaultConfig()
         {
             var size = new Vector2(254, 24);
             var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY / 2f - size.Y / 2);
@@ -97,7 +97,7 @@ namespace DelvUI.Interface.GeneralElements
         {
 
         }
-        public new static TargetOfTargetCastbarConfig DefaultConfig()
+        public static new TargetOfTargetCastbarConfig DefaultConfig()
         {
             var size = new Vector2(120, 24);
             var pos = new Vector2(
@@ -121,7 +121,7 @@ namespace DelvUI.Interface.GeneralElements
         {
 
         }
-        public new static FocusTargetCastbarConfig DefaultConfig()
+        public static new FocusTargetCastbarConfig DefaultConfig()
         {
             var size = new Vector2(120, 24);
             var pos = new Vector2(
@@ -140,7 +140,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         [ColorEdit4("Color ##Castbar")]
         [Order(20)]
-        public PluginConfigColor Color = new PluginConfigColor(new(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
+        public PluginConfigColor Color = new(new(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
 
         [Checkbox("Show Ability Icon")]
         [Order(25)]

@@ -8,7 +8,7 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Grid", 0)]
     public class GridConfig : PluginConfigObject
     {
-        public new static GridConfig DefaultConfig()
+        public static new GridConfig DefaultConfig()
         {
             var config = new GridConfig();
             config.Enabled = false;

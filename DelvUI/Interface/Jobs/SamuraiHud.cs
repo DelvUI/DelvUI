@@ -10,7 +10,6 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -18,7 +17,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class SamuraiHud : JobHud
     {
-        private new SamuraiConfig Config => (SamuraiConfig)_config;
+        private new SamuraiConfig Config => (SamuraiConfig)Config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public SamuraiHud(string id, SamuraiConfig config, string? displayName = null) : base(id, config, displayName)
@@ -87,7 +86,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawKenkiBar(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<SAMGauge>();
+            SAMGauge? gauge = Plugin.JobGauges.Get<SAMGauge>();
             var pos = new Vector2(
                 origin.X + Config.Position.X + Config.KenkiBarPosition.X - Config.KenkiBarSize.X / 2f,
                 origin.Y + Config.Position.Y + Config.KenkiBarPosition.Y - Config.KenkiBarSize.Y / 2f
@@ -95,7 +94,7 @@ namespace DelvUI.Interface.Jobs
 
             if (gauge.Kenki == 0 && Config.OnlyShowKenkiWhenActive) { return; }
 
-            var kenkiBuilder = BarBuilder.Create(pos, Config.KenkiBarSize)
+            BarBuilder? kenkiBuilder = BarBuilder.Create(pos, Config.KenkiBarSize)
                 .SetBackgroundColor(EmptyColor.Base)
                 .AddInnerBar(gauge.Kenki, 100, Config.KenkiColor);
 
@@ -104,31 +103,31 @@ namespace DelvUI.Interface.Jobs
                 kenkiBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             kenkiBuilder.Build().Draw(drawList);
         }
 
         private void DrawHiganbanaBar(Vector2 origin, PlayerCharacter player)
         {
-            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             if (actor is not BattleChara target)
             {
                 return;
             }
 
-            var actorId = player.ObjectId;
-            var higanbana = target.StatusList.Where(o => o.StatusId is 1228 or 1319 && o.SourceID == actorId);
-            var higanbanaDuration = higanbana.Any() ? Math.Abs(higanbana.First().RemainingTime) : 0f;
+            uint actorId = player.ObjectId;
+            IEnumerable<Dalamud.Game.ClientState.Statuses.Status>? higanbana = target.StatusList.Where(o => o.StatusId is 1228 or 1319 && o.SourceID == actorId);
+            float higanbanaDuration = higanbana.Any() ? Math.Abs(higanbana.First().RemainingTime) : 0f;
 
             if (higanbanaDuration == 0 && Config.OnlyShowHiganbanaWhenActive) { return; }
 
-            var higanbanaColor = higanbanaDuration > 5 ? Config.HiganbanaColor : Config.HiganbanaExpiryColor;
+            PluginConfigColor? higanbanaColor = higanbanaDuration > 5 ? Config.HiganbanaColor : Config.HiganbanaExpiryColor;
             var pos = new Vector2(
                 origin.X + Config.Position.X + Config.HiganbanaBarPosition.X - Config.HiganbanaBarSize.X / 2f,
                 origin.Y + Config.Position.Y + Config.HiganbanaBarPosition.Y - Config.HiganbanaBarSize.Y / 2f
             );
 
-            var higanbanaBuilder = BarBuilder.Create(pos, Config.HiganbanaBarSize)
+            BarBuilder? higanbanaBuilder = BarBuilder.Create(pos, Config.HiganbanaBarSize)
                 .SetBackgroundColor(EmptyColor.Base);
 
             if (higanbanaDuration > 0)
@@ -143,24 +142,24 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             higanbanaBuilder.Build().Draw(drawList);
         }
 
         private void DrawActiveBuffs(Vector2 origin, PlayerCharacter player)
         {
             var buffsSize = new Vector2(Config.BuffsBarSize.X / 2f - Config.BuffsPadding / 2f, Config.BuffsBarSize.Y);
-            var order = Config.buffOrder;
+            int[]? order = Config.BuffOrder;
 
             // shifu
             var shifu = player.StatusList.Where(o => o.StatusId is 1299).ToList();
-            var shifuDuration = shifu.Any() ? Math.Abs(shifu.First().RemainingTime) : 0f;
+            float shifuDuration = shifu.Any() ? Math.Abs(shifu.First().RemainingTime) : 0f;
 
             var shifuPos = new Vector2(
                 origin.X + Config.Position.X + Config.BuffsBarPosition.X + (2 * order[0] - 1) * Config.BuffsBarSize.X / 2f - order[0] * buffsSize.X,
                 origin.Y + Config.Position.Y + Config.BuffsBarPosition.Y - Config.BuffsBarSize.Y / 2f
             );
-            var shifuBuilder = BarBuilder.Create(shifuPos, buffsSize)
+            BarBuilder? shifuBuilder = BarBuilder.Create(shifuPos, buffsSize)
                 .SetBackgroundColor(EmptyColor.Base);
 
             if (shifuDuration > 0)
@@ -176,14 +175,14 @@ namespace DelvUI.Interface.Jobs
 
             // jinpu
             var jinpu = player.StatusList.Where(o => o.StatusId is 1298).ToList();
-            var jinpuDuration = jinpu.Any() ? Math.Abs(jinpu.First().RemainingTime) : 0f;
+            float jinpuDuration = jinpu.Any() ? Math.Abs(jinpu.First().RemainingTime) : 0f;
 
             var jinpuPos = new Vector2(
                 origin.X + Config.Position.X + Config.BuffsBarPosition.X + (2 * order[1] - 1) * Config.BuffsBarSize.X / 2f - order[1] * buffsSize.X,
                 origin.Y + Config.Position.Y + Config.BuffsBarPosition.Y - Config.BuffsBarSize.Y / 2f
             );
 
-            var jinpuBuilder = BarBuilder.Create(jinpuPos, buffsSize)
+            BarBuilder? jinpuBuilder = BarBuilder.Create(jinpuPos, buffsSize)
                 .SetBackgroundColor(EmptyColor.Base);
 
             if (jinpuDuration > 0)
@@ -202,34 +201,34 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             shifuBuilder.Build().Draw(drawList);
             jinpuBuilder.Build().Draw(drawList);
         }
 
         private void DrawSenResourceBar(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<SAMGauge>();
+            SAMGauge? gauge = Plugin.JobGauges.Get<SAMGauge>();
 
             if (Config.OnlyShowSenWhenActive && !gauge.HasKa && !gauge.HasGetsu && !gauge.HasSetsu) { return; }
 
-            var senBarWidth = (Config.SenBarSize.X - Config.SenBarPadding * 2) / 3f;
+            float senBarWidth = (Config.SenBarSize.X - Config.SenBarPadding * 2) / 3f;
             var senBarSize = new Vector2(senBarWidth, Config.SenBarSize.Y);
 
             var cursorPos = new Vector2(
                 origin.X + Config.Position.X + Config.SenBarPosition.X - Config.SenBarSize.X / 2f,
                 origin.Y + Config.Position.Y + Config.SenBarPosition.Y - Config.SenBarSize.Y / 2f
             );
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
             // setsu, getsu, ka
-            var order = Config.senOrder;
-            var hasSen = new[] { gauge.HasSetsu ? 1 : 0, gauge.HasGetsu ? 1 : 0, gauge.HasKa ? 1 : 0 };
-            var colors = new[] { Config.SetsuColor, Config.GetsuColor, Config.KaColor };
+            int[]? order = Config.SenOrder;
+            int[]? hasSen = new[] { gauge.HasSetsu ? 1 : 0, gauge.HasGetsu ? 1 : 0, gauge.HasKa ? 1 : 0 };
+            PluginConfigColor[]? colors = new[] { Config.SetsuColor, Config.GetsuColor, Config.KaColor };
 
             for (int i = 0; i < 3; i++)
             {
-                var builder = BarBuilder.Create(cursorPos, senBarSize).
+                BarBuilder? builder = BarBuilder.Create(cursorPos, senBarSize).
                     AddInnerBar(hasSen[order[i]], 1, colors[order[i]]);
 
                 builder.Build().Draw(drawList);
@@ -239,7 +238,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawMeditationResourceBar(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<SAMGauge>();
+            SAMGauge? gauge = Plugin.JobGauges.Get<SAMGauge>();
 
             if (Config.OnlyShowMeditationWhenActive && gauge.MeditationStacks == 0) { return; }
 
@@ -248,7 +247,7 @@ namespace DelvUI.Interface.Jobs
                 origin.Y + Config.Position.Y + Config.MeditationBarPosition.Y - Config.MeditationBarSize.Y / 2f
             );
 
-            var meditationBuilder = BarBuilder.Create(pos, Config.MeditationBarSize).SetBackgroundColor(EmptyColor.Base)
+            BarBuilder? meditationBuilder = BarBuilder.Create(pos, Config.MeditationBarSize).SetBackgroundColor(EmptyColor.Base)
                 .SetChunks(3)
                 .SetChunkPadding(Config.MeditationBarPadding);
 
@@ -257,7 +256,7 @@ namespace DelvUI.Interface.Jobs
                 meditationBuilder.AddInnerBar(gauge.MeditationStacks, 3, Config.MeditationColor);
             }
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             meditationBuilder.Build().Draw(drawList);
         }
     }
@@ -268,7 +267,7 @@ namespace DelvUI.Interface.Jobs
     public class SamuraiConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.SAM;
-        public new static SamuraiConfig DefaultConfig() { return new SamuraiConfig(); }
+        public static new SamuraiConfig DefaultConfig() { return new SamuraiConfig(); }
 
         #region Kenki
         [Checkbox("Kenki", separator = true)]
@@ -285,15 +284,15 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Kenki", min = -2000f, max = 2000f)]
         [Order(45, collapseWith = nameof(ShowKenkiBar))]
-        public Vector2 KenkiBarPosition = new Vector2(0, -34);
+        public Vector2 KenkiBarPosition = new(0, -34);
 
         [DragFloat2("Size" + "##Kenki", max = 2000f)]
         [Order(50, collapseWith = nameof(ShowKenkiBar))]
-        public Vector2 KenkiBarSize = new Vector2(254, 20);
+        public Vector2 KenkiBarSize = new(254, 20);
 
         [ColorEdit4("Color" + "##Kenki")]
         [Order(55, collapseWith = nameof(ShowKenkiBar))]
-        public PluginConfigColor KenkiColor = new PluginConfigColor(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f));
+        public PluginConfigColor KenkiColor = new(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f));
         #endregion
 
         #region Sen
@@ -307,11 +306,11 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Sen", min = -2000f, max = 2000f)]
         [Order(70, collapseWith = nameof(ShowSenBar))]
-        public Vector2 SenBarPosition = new Vector2(0, -17);
+        public Vector2 SenBarPosition = new(0, -17);
 
         [DragFloat2("Size" + "##Sen", max = 2000f)]
         [Order(75, collapseWith = nameof(ShowSenBar))]
-        public Vector2 SenBarSize = new Vector2(254, 10);
+        public Vector2 SenBarSize = new(254, 10);
 
         [DragInt("Spacing" + "##Sen", max = 1000)]
         [Order(80, collapseWith = nameof(ShowSenBar))]
@@ -319,19 +318,19 @@ namespace DelvUI.Interface.Jobs
 
         [ColorEdit4("Setsu" + "##Sen")]
         [Order(85, collapseWith = nameof(ShowSenBar))]
-        public PluginConfigColor SetsuColor = new PluginConfigColor(new(89f / 255f, 234f / 255f, 247f / 255f, 100f / 100f));
+        public PluginConfigColor SetsuColor = new(new(89f / 255f, 234f / 255f, 247f / 255f, 100f / 100f));
 
         [ColorEdit4("Getsu" + "##Sen")]
         [Order(90, collapseWith = nameof(ShowSenBar))]
-        public PluginConfigColor GetsuColor = new PluginConfigColor(new(89f / 255f, 126f / 255f, 247f / 255f, 100f / 100f));
+        public PluginConfigColor GetsuColor = new(new(89f / 255f, 126f / 255f, 247f / 255f, 100f / 100f));
 
         [ColorEdit4("Ka" + "##Sen")]
         [Order(95, collapseWith = nameof(ShowSenBar))]
-        public PluginConfigColor KaColor = new PluginConfigColor(new(247f / 255f, 89f / 255f, 89f / 255f, 100f / 100f));
+        public PluginConfigColor KaColor = new(new(247f / 255f, 89f / 255f, 89f / 255f, 100f / 100f));
 
         [DragDropHorizontal("Order", "Setsu", "Getsu", "Ka" + "##Sen")]
         [Order(100, collapseWith = nameof(ShowSenBar))]
-        public int[] senOrder = new int[] { 0, 1, 2 };
+        public int[] SenOrder = new int[] { 0, 1, 2 };
         #endregion
 
         #region Meditation
@@ -345,11 +344,11 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Meditation", min = -2000f, max = 2000f)]
         [Order(115, collapseWith = nameof(ShowMeditationBar))]
-        public Vector2 MeditationBarPosition = new Vector2(0, -5);
+        public Vector2 MeditationBarPosition = new(0, -5);
 
         [DragFloat2("Size" + "##Meditation", max = 2000f)]
         [Order(120, collapseWith = nameof(ShowMeditationBar))]
-        public Vector2 MeditationBarSize = new Vector2(254, 10);
+        public Vector2 MeditationBarSize = new(254, 10);
 
         [DragInt("Spacing" + "##Meditation", max = 1000)]
         [Order(125, collapseWith = nameof(ShowMeditationBar))]
@@ -357,7 +356,7 @@ namespace DelvUI.Interface.Jobs
 
         [ColorEdit4("Color" + "##Meditation")]
         [Order(130, collapseWith = nameof(ShowMeditationBar))]
-        public PluginConfigColor MeditationColor = new PluginConfigColor(new(247f / 255f, 163f / 255f, 89f / 255f, 100f / 100f));
+        public PluginConfigColor MeditationColor = new(new(247f / 255f, 163f / 255f, 89f / 255f, 100f / 100f));
         #endregion
 
         #region Buffs
@@ -375,11 +374,11 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Buffs", min = -2000f, max = 2000f)]
         [Order(150, collapseWith = nameof(ShowBuffsBar))]
-        public Vector2 BuffsBarPosition = new Vector2(0, -56);
+        public Vector2 BuffsBarPosition = new(0, -56);
 
         [DragFloat2("Size" + "##Buffs", max = 2000f)]
         [Order(155, collapseWith = nameof(ShowBuffsBar))]
-        public Vector2 BuffsBarSize = new Vector2(254, 20);
+        public Vector2 BuffsBarSize = new(254, 20);
 
         [DragInt("Spacing" + "##Buffs", max = 1000)]
         [Order(160, collapseWith = nameof(ShowBuffsBar))]
@@ -387,15 +386,15 @@ namespace DelvUI.Interface.Jobs
 
         [ColorEdit4("Shifu" + "##Buffs")]
         [Order(165, collapseWith = nameof(ShowBuffsBar))]
-        public PluginConfigColor ShifuColor = new PluginConfigColor(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f));
+        public PluginConfigColor ShifuColor = new(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f));
 
         [ColorEdit4("Jinpu" + "##Buffs")]
         [Order(170, collapseWith = nameof(ShowBuffsBar))]
-        public PluginConfigColor JinpuColor = new PluginConfigColor(new(136f / 255f, 146f / 255f, 219f / 255f, 100f / 100f));
+        public PluginConfigColor JinpuColor = new(new(136f / 255f, 146f / 255f, 219f / 255f, 100f / 100f));
 
         [DragDropHorizontal("Order", "Shifu", "Jinpu" + "##Buffs")]
         [Order(175, collapseWith = nameof(ShowBuffsBar))]
-        public int[] buffOrder = new int[] { 0, 1 };
+        public int[] BuffOrder = new int[] { 0, 1 };
         #endregion
 
         #region Higanbana
@@ -413,19 +412,19 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Higanbana", min = -2000f, max = 2000f)]
         [Order(195, collapseWith = nameof(ShowHiganbanaBar))]
-        public Vector2 HiganbanaBarPosition = new Vector2(0, -78);
+        public Vector2 HiganbanaBarPosition = new(0, -78);
 
         [DragFloat2("Size" + "##Higanbana", max = 2000f)]
         [Order(200, collapseWith = nameof(ShowHiganbanaBar))]
-        public Vector2 HiganbanaBarSize = new Vector2(254, 20);
+        public Vector2 HiganbanaBarSize = new(254, 20);
 
         [ColorEdit4("Color" + "##Higanbana")]
         [Order(205, collapseWith = nameof(ShowHiganbanaBar))]
-        public PluginConfigColor HiganbanaColor = new PluginConfigColor(new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f));
+        public PluginConfigColor HiganbanaColor = new(new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f));
 
         [ColorEdit4("Expiry Color" + "##Higanbana")]
         [Order(210, collapseWith = nameof(ShowHiganbanaBar))]
-        public PluginConfigColor HiganbanaExpiryColor = new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
+        public PluginConfigColor HiganbanaExpiryColor = new(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
         #endregion
 
     }

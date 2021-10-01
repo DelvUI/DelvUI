@@ -51,7 +51,7 @@ namespace DelvUI.Helpers
             GC.SuppressFinalize(this);
         }
 
-        protected void Dispose(bool disposing)
+        protected virtual void Dispose(bool disposing)
         {
             if (!disposing)
             {
@@ -68,7 +68,7 @@ namespace DelvUI.Helpers
         public bool DefaultFontBuilt { get; private set; }
         public ImFontPtr DefaultFont { get; private set; } = null;
 
-        private List<ImFontPtr> _fonts = new List<ImFontPtr>();
+        private readonly List<ImFontPtr> _fonts = new();
         public IReadOnlyCollection<ImFontPtr> Fonts => _fonts.AsReadOnly();
 
         public bool PushDefaultFont()
@@ -89,7 +89,7 @@ namespace DelvUI.Helpers
                 return false;
             }
 
-            var index = _config.Fonts.IndexOfKey(fontId);
+            int index = _config.Fonts.IndexOfKey(fontId);
             if (index < 0 || index >= _fonts.Count)
             {
                 return false;
@@ -104,13 +104,13 @@ namespace DelvUI.Helpers
             _fonts.Clear();
             DefaultFontBuilt = false;
 
-            var config = ConfigurationManager.Instance.GetConfigObject<FontsConfig>();
+            FontsConfig? config = ConfigurationManager.Instance.GetConfigObject<FontsConfig>();
             ImGuiIOPtr io = ImGui.GetIO();
-            var ranges = GetCharacterRanges(config, io);
+            ImVector? ranges = GetCharacterRanges(config, io);
 
-            foreach (var fontData in config.Fonts)
+            foreach (KeyValuePair<string, FontData> fontData in config.Fonts)
             {
-                var path = DefaultFontsPath + fontData.Value.Name + ".ttf";
+                string? path = DefaultFontsPath + fontData.Value.Name + ".ttf";
                 if (!File.Exists(path))
                 {
                     path = config.ValidatedFontsPath + fontData.Value.Name + ".ttf";

@@ -18,7 +18,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class DarkKnightHud : JobHud
     {
-        private new DarkKnightConfig Config => (DarkKnightConfig)_config;
+        private new DarkKnightConfig Config => (DarkKnightConfig)Config;
 
         public DarkKnightHud(string id, DarkKnightConfig config, string? displayName = null) : base(id, config, displayName)
         {
@@ -90,12 +90,12 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawManaBar(Vector2 origin, PlayerCharacter player)
         {
-            var darkArtsBuff = Plugin.JobGauges.Get<DRKGauge>().HasDarkArts;
+            bool darkArtsBuff = Plugin.JobGauges.Get<DRKGauge>().HasDarkArts;
 
             if (Config.HideManaWhenFull && !darkArtsBuff && player.CurrentMp is 10000) { return; }
 
-            var posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
-            var posY = origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f;
+            float posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
+            float posY = origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(posX, posY, Config.ManaBarSize.Y, Config.ManaBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
@@ -110,7 +110,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ShowManaBarText)
             {
-                var formattedManaText = TextTags.GenerateFormattedTextFromTags(player, "[mana:current-short]");
+                string? formattedManaText = TextTags.GenerateFormattedTextFromTags(player, "[mana:current-short]");
 
                 builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterLeft, BarTextType.Custom, formattedManaText);
             }
@@ -135,14 +135,14 @@ namespace DelvUI.Interface.Jobs
 
             float darksideTimer = Plugin.JobGauges.Get<DRKGauge>().DarksideTimeRemaining;
             float darksideDuration = Math.Abs(darksideTimer / 1000);
-            var max = 60f;
+            float max = 60f;
 
-            var posX = origin.X + Config.Position.X + Config.DarksidePosition.X - Config.DarksideSize.X / 2f;
-            var posY = origin.Y + Config.Position.Y + Config.DarksidePosition.Y - Config.DarksideSize.Y / 2f;
+            float posX = origin.X + Config.Position.X + Config.DarksidePosition.X - Config.DarksideSize.X / 2f;
+            float posY = origin.Y + Config.Position.Y + Config.DarksidePosition.Y - Config.DarksideSize.Y / 2f;
 
             if (Config.OnlyShowDarksideWhenActive && darksideDuration == 0) { return; }
 
-            var darksideColor = darksideDuration > 5 ? Config.DarksideColor : Config.DarksideExpiryColor;
+            PluginConfigColor? darksideColor = darksideDuration > 5 ? Config.DarksideColor : Config.DarksideExpiryColor;
             BarBuilder builder = BarBuilder.Create(posX, posY, Config.DarksideSize.Y, Config.DarksideSize.X)
                 .SetBackgroundColor(EmptyColor.Background)
                 .AddInnerBar(darksideDuration, max, darksideColor);
@@ -158,12 +158,12 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBloodGauge(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<DRKGauge>();
+            DRKGauge? gauge = Plugin.JobGauges.Get<DRKGauge>();
 
             if (Config.OnlyShowWBloodGaugeWhenActive && gauge.Blood == 0) { return; }
 
-            var posX = origin.X + Config.Position.X + Config.BloodGaugePosition.X - Config.BloodGaugeSize.X / 2f;
-            var posY = origin.Y + Config.Position.Y + Config.BloodGaugePosition.Y - Config.BloodGaugeSize.Y / 2f;
+            float posX = origin.X + Config.Position.X + Config.BloodGaugePosition.X - Config.BloodGaugeSize.X / 2f;
+            float posY = origin.Y + Config.Position.Y + Config.BloodGaugePosition.Y - Config.BloodGaugeSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(posX, posY, Config.BloodGaugeSize.Y, Config.BloodGaugeSize.X).SetBackgroundColor(EmptyColor.Background);
 
@@ -199,8 +199,8 @@ namespace DelvUI.Interface.Jobs
             float bloodWeaponDuration = 0f;
             float deliriumDuration = 0f;
 
-            var xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
-            var yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
+            float xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.BuffBarSize.Y, Config.BuffBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
@@ -234,13 +234,13 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawLivingShadowBar(Vector2 origin, PlayerCharacter player)
         {
-            var shadowTimeRemaining = Plugin.JobGauges.Get<DRKGauge>().ShadowTimeRemaining / 1000;
-            var livingShadow = player.Level >= 80 && shadowTimeRemaining is > 0 and <= 24;
+            int shadowTimeRemaining = Plugin.JobGauges.Get<DRKGauge>().ShadowTimeRemaining / 1000;
+            bool livingShadow = player.Level >= 80 && shadowTimeRemaining is > 0 and <= 24;
 
             if (Config.OnlyShowWLivingShadowWhenActive && !livingShadow) { return; }
 
-            var xPos = origin.X + Config.Position.X + Config.LivingShadowBarPosition.X - Config.LivingShadowBarSize.X / 2f;
-            var yPos = origin.Y + Config.Position.Y + Config.LivingShadowBarPosition.Y - Config.LivingShadowBarSize.Y / 2f;
+            float xPos = origin.X + Config.Position.X + Config.LivingShadowBarPosition.X - Config.LivingShadowBarSize.X / 2f;
+            float yPos = origin.Y + Config.Position.Y + Config.LivingShadowBarPosition.Y - Config.LivingShadowBarSize.Y / 2f;
 
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.LivingShadowBarSize.Y, Config.LivingShadowBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
@@ -265,7 +265,7 @@ namespace DelvUI.Interface.Jobs
     public class DarkKnightConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.DRK;
-        public new static DarkKnightConfig DefaultConfig() { return new DarkKnightConfig(); }
+        public static new DarkKnightConfig DefaultConfig() { return new DarkKnightConfig(); }
 
         #region Mana Bar
         [Checkbox("Mana", separator = true)]
@@ -286,11 +286,11 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##DRKManaBar", min = -4000f, max = 4000f)]
         [Order(45, collapseWith = nameof(ShowManaBar))]
-        public Vector2 ManaBarPosition = new Vector2(0, -61);
+        public Vector2 ManaBarPosition = new(0, -61);
 
         [DragFloat2("Size" + "##DRKManaBar", min = 0, max = 4000f)]
         [Order(50, collapseWith = nameof(ShowManaBar))]
-        public Vector2 ManaBarSize = new Vector2(254, 10);
+        public Vector2 ManaBarSize = new(254, 10);
 
         [DragInt("Spacing" + "##DRKManaBar", min = 0)]
         [Order(55, collapseWith = nameof(ShowManaBar))]
@@ -320,11 +320,11 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##BloodGauge", min = -4000f, max = 4000f)]
         [Order(80, collapseWith = nameof(ShowBloodGauge))]
-        public Vector2 BloodGaugePosition = new Vector2(0, -49);
+        public Vector2 BloodGaugePosition = new(0, -49);
 
         [DragFloat2("Size" + "##BloodGauge", min = 0, max = 4000f)]
         [Order(85, collapseWith = nameof(ShowBloodGauge))]
-        public Vector2 BloodGaugeSize = new Vector2(254, 10);
+        public Vector2 BloodGaugeSize = new(254, 10);
 
         [DragInt("Spacing" + "##BloodGauge", min = 0)]
         [Order(90, collapseWith = nameof(ShowBloodGauge))]
@@ -358,11 +358,11 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Darkside", min = -4000f, max = 4000f)]
         [Order(125, collapseWith = nameof(ShowDarkside))]
-        public Vector2 DarksidePosition = new Vector2(0, -73);
+        public Vector2 DarksidePosition = new(0, -73);
 
         [DragFloat2("Size" + "##Darkside", min = 0, max = 4000f)]
         [Order(130, collapseWith = nameof(ShowDarkside))]
-        public Vector2 DarksideSize = new Vector2(254, 10);
+        public Vector2 DarksideSize = new(254, 10);
 
         [ColorEdit4("Darkside" + "##Darkside")]
         [Order(135, collapseWith = nameof(ShowDarkside))]
@@ -389,11 +389,11 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##DRKBuffBar", min = -4000f, max = 4000f)]
         [Order(155, collapseWith = nameof(ShowBuffBar))]
-        public Vector2 BuffBarPosition = new Vector2(0, -32);
+        public Vector2 BuffBarPosition = new(0, -32);
 
         [DragFloat2("Size" + "##DRKBuffBar", min = 0, max = 4000f)]
         [Order(160, collapseWith = nameof(ShowBuffBar))]
-        public Vector2 BuffBarSize = new Vector2(254, 20);
+        public Vector2 BuffBarSize = new(254, 20);
 
         [DragInt("Spacing" + "##DRKBuffBar", min = 0)]
         [Order(165, collapseWith = nameof(ShowBuffBar))]
@@ -423,11 +423,11 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##DRKLivingShadow", min = -4000f, max = 4000f)]
         [Order(190, collapseWith = nameof(ShowLivingShadowBar))]
-        public Vector2 LivingShadowBarPosition = new Vector2(0, -10);
+        public Vector2 LivingShadowBarPosition = new(0, -10);
 
         [DragFloat2("Size" + "##DRKLivingShadow", min = 0, max = 4000f)]
         [Order(195, collapseWith = nameof(ShowLivingShadowBar))]
-        public Vector2 LivingShadowBarSize = new Vector2(254, 20);
+        public Vector2 LivingShadowBarSize = new(254, 20);
 
         [DragInt("Spacing" + "##DRKLivingShadow", min = 0)]
         [Order(200, collapseWith = nameof(ShowLivingShadowBar))]

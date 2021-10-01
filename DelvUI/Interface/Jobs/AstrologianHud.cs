@@ -21,7 +21,7 @@ namespace DelvUI.Interface.Jobs
     public class AstrologianHud : JobHud
     {
         private readonly SpellHelper _spellHelper = new();
-        private new AstrologianConfig Config => (AstrologianConfig)_config;
+        private new AstrologianConfig Config => (AstrologianConfig)Config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public AstrologianHud(string id, AstrologianConfig config, string? displayName = null) : base(id, config, displayName)
@@ -292,7 +292,7 @@ namespace DelvUI.Interface.Jobs
             float redrawCastInfo = _spellHelper.GetSpellCooldown(3593);
             int redrawStacks = _spellHelper.GetStackCount(3, 3593);
 
-            if (cardJob != "")
+            if (!string.IsNullOrEmpty(cardJob))
             {
                 cardPresent = 1f;
                 cardMax = 1f;
@@ -384,7 +384,7 @@ namespace DelvUI.Interface.Jobs
                 {
                     return;
                 }
-                
+
                 Bar barNoTarget = builder.AddInnerBar(0, 30f, Config.DotColor)
                                          .SetBackgroundColor(EmptyColor.Base)
                                          .Build();
@@ -523,7 +523,7 @@ namespace DelvUI.Interface.Jobs
     public class AstrologianConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.AST;
-        public new static AstrologianConfig DefaultConfig()
+        public static new AstrologianConfig DefaultConfig()
         {
             AstrologianConfig? config = new() { UseDefaultPrimaryResourceBar = true };
 

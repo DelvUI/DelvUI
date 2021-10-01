@@ -60,7 +60,7 @@ namespace DelvUI.Helpers
 
         public static unsafe bool GetGCDInfo(PlayerCharacter player, out float timeElapsed, out float timeTotal, ActionType actionType = ActionType.Spell)
         {
-            if (player is null || !JobActionIDs.TryGetValue(player.ClassJob.Id, out var actionId))
+            if (player is null || !JobActionIDs.TryGetValue(player.ClassJob.Id, out uint actionId))
             {
                 timeElapsed = 0;
                 timeTotal = 0;
@@ -68,8 +68,8 @@ namespace DelvUI.Helpers
                 return false;
             }
 
-            var actionManager = ActionManager.Instance();
-            var adjustedId = actionManager->GetAdjustedActionId(actionId);
+            ActionManager* actionManager = ActionManager.Instance();
+            uint adjustedId = actionManager->GetAdjustedActionId(actionId);
             timeElapsed = actionManager->GetRecastTimeElapsed(actionType, adjustedId);
             timeTotal = actionManager->GetRecastTime(actionType, adjustedId);
 
