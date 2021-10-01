@@ -231,7 +231,7 @@ namespace DelvUI.Interface.Jobs
             Bar2 hutonBar = new Bar2(Config.HutonBarConfig);
             hutonBar.SetBarText(((int)hutonDurationLeft).ToString());
 
-            hutonBar.Draw(origin + Config.Position, hutonDurationLeft, 70f, 40f);
+            hutonBar.Draw(origin + Config.Position, hutonDurationLeft, 70f);
         }
 
         private void DrawNinkiGauge(Vector2 origin)
@@ -312,22 +312,14 @@ namespace DelvUI.Interface.Jobs
                                                 new(0, -32),
                                                 new(254, 20),
                                                 new PluginConfigColor(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f)),
-                                                new PluginConfigColor(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)));
-
-        //[Checkbox("Expire" + "##Huton")]
-        //[Order(60, collapseWith = nameof(ShowHutonGauge))]
-        //public bool ShowHutonGaugeExpiry = true;
-
-        //[DragFloat("Expire Threshold" + "##Huton", min = 1f, max = 70f)]
-        //[Order(65, collapseWith = nameof(ShowHutonGaugeExpiry))]
-        //public float HutonGaugeExpiryThreshold = 40f;
-
-        //[ColorEdit4("Expire Color" + "##Huton")]
-        //[Order(70, collapseWith = nameof(ShowHutonGaugeExpiry))]
-        //public PluginConfigColor HutonGaugeExpiryColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
+                                                new PluginConfigColor(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
+                                                40f);
 
         [NestedConfig("Ninki Bar", 75, separator = true)]
-        public BarConfig NinkiBarConfig = new BarConfig(new(0, -32), new(254, 20), new PluginConfigColor(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f)));
+        public BarConfig NinkiBarConfig = new BarConfig(
+                                                new(0, -32), 
+                                                new(254, 20), 
+                                                new PluginConfigColor(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f)));
 
         #region trick / suiton
         [Checkbox("Trick Attack & Suiton Bar" + "##TnS", separator = true)]

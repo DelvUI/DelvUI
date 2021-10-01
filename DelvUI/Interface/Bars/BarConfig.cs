@@ -29,51 +29,75 @@ namespace DelvUI.Interface.Bars
         [Order(40)]
         public bool HideWhenInactive = false;
 
-        [Checkbox("Below Threshold Color", spacing = true)]
+        [Checkbox("Threshold")]
         [Order(45)]
+        public bool Threshold = false;
+
+        [DragFloat("Threshold Value", min = 0f, max = 10000f)]
+        [Order(50, collapseWith = nameof(Threshold))]
+        public float ThresholdValue = 0f;
+
+        [Checkbox("Threshold Color")]
+        [Order(55, collapseWith = nameof(Threshold))]
         public bool UseThresholdColor = false;
 
+        [Combo("Activate Above/Below Threshold", "Above", "Below")]
+        [Order(60, collapseWith = nameof(UseThresholdColor))]
+        public ThresholdType ThresholdType = ThresholdType.Below;
+
         [ColorEdit4("Threshold Color")]
-        [Order(50, collapseWith = nameof(UseThresholdColor))]
+        [Order(65, collapseWith = nameof(UseThresholdColor))]
         public PluginConfigColor ThresholdColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [Checkbox("Show Threshold Marker")]
-        [Order(55)]
+        [Order(70, collapseWith = nameof(Threshold))]
         public bool DrawThresholdMarker = false;
 
         [ColorEdit4("Threshold Marker Color")]
-        [Order(50, collapseWith = nameof(DrawThresholdMarker))]
+        [Order(75, collapseWith = nameof(DrawThresholdMarker))]
         public PluginConfigColor ThresholdMarkerColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [Checkbox("Chunk Bar", spacing = true)]
-        [Order(60)]
+        [Checkbox("Chunk Bar")]
+        [Order(80)]
         public bool Chunk = false;
 
         [DragInt("Chunk Number", min = 2, max = 10)]
-        [Order(65, collapseWith = nameof(Chunk))]
+        [Order(85, collapseWith = nameof(Chunk))]
         public int ChunkNum = 2;
 
         [DragInt("Chunk Padding", min = 0, max = 4000)]
-        [Order(70, collapseWith = nameof(Chunk))]
+        [Order(90, collapseWith = nameof(Chunk))]
         public int ChunkPadding = 2;
 
-        [NestedConfig("Bar Text", 75, separator = false, spacing = true)]
+        [NestedConfig("Bar Text", 95, separator = false, spacing = true)]
         public LabelConfig BarLabelConfig;
 
-        public BarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor, PluginConfigColor? threshHoldColor = null)
+        public BarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor, PluginConfigColor? threshHoldColor = null, float threshold = 0f)
         {
             Position = position;
             Size = size;
             BarLabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
             FillColor = fillColor;
             ThresholdColor = threshHoldColor ?? fillColor;
+            ThresholdValue = threshold;
+        }
+
+        public PluginConfigColor GetBarColor(float current)
+        {
+            return IsThresholdActive(current) && UseThresholdColor ? ThresholdColor : FillColor;
+        }
+
+        public bool IsThresholdActive(float current)
+        {
+            return ThresholdType == ThresholdType.Below && current < ThresholdValue ||
+                    ThresholdType == ThresholdType.Above && current > ThresholdValue;
         }
     }
 
-    public enum BarChunkDirection
+    public enum ThresholdType
     {
-        Horizontal,
-        Vertical
+        Above,
+        Below
     }
 
     public enum BarDirection

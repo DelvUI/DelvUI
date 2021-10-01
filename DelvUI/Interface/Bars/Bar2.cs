@@ -1,4 +1,5 @@
-﻿using DelvUI.Helpers;
+﻿using DelvUI.Config;
+using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
@@ -23,9 +24,9 @@ namespace DelvUI.Interface.Bars
             Config.BarLabelConfig.SetText(text);
         }
 
-        public void Draw(Vector2 origin, float current, float max, float threshold = 0f)
+        public void Draw(Vector2 origin, float current, float max)
         {
-            if (current <= 0 && Config.HideWhenInactive)
+            if (current <= 0f && Config.HideWhenInactive)
             {
                 return;
             }
@@ -34,9 +35,6 @@ namespace DelvUI.Interface.Bars
             float progressPercent = current / max;
             int chunks = Config.Chunk ? Config.ChunkNum : 1;
             float percentPerChunk = 1f / chunks;
-
-            var thresholdPos = new Vector2(barPos.X + threshold / max * Config.Size.X, barPos.Y);
-            var thresholdMarkerSize = new Vector2(2, Config.Size.Y);
 
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             for (int i = 0; i < chunks; i++)
@@ -58,33 +56,25 @@ namespace DelvUI.Interface.Bars
                     chunkFillSize = new Vector2(chunkSize.X, chunkSize.Y * chunkProgress);
                 }
 
-                Vector2 chunkFillOffset = Config.FillDirection switch
+                Vector2 chunkFillPos = chunkPos + Config.FillDirection switch
                 {
                     BarDirection.Left => new Vector2(chunkSize.X - chunkFillSize.X, 0),
                     BarDirection.Up => new Vector2(0, chunkSize.Y - chunkFillSize.Y),
                     _ => Vector2.Zero
                 };
 
-                var chunkFillPos = chunkPos + chunkFillOffset;
-
                 // Draw bar background
                 drawList.AddRectFilled(chunkPos, chunkPos + chunkSize, Config.BackgroundColor.Base);
 
                 // Draw inner bar
-                var barColor = Config.UseThresholdColor && current < threshold ? Config.ThresholdColor.Base : Config.FillColor.Base;
-                drawList.AddRectFilled(chunkFillPos, chunkFillPos + chunkFillSize, barColor);
+                PluginConfigColor barColor = Config.GetBarColor(current);
+                drawList.AddRectFilled(chunkFillPos, chunkFillPos + chunkFillSize, barColor.Base);
 
                 // Draw border
                 if (Config.DrawBorder)
                 {
                     drawList.AddRect(chunkPos, chunkPos + chunkSize, 0xFF000000);
                 }
-            }
-
-            // Draw threshold marker
-            if (current > threshold && Config.DrawThresholdMarker)
-            {
-                drawList.AddRectFilled(thresholdPos, thresholdPos + thresholdMarkerSize, Config.ThresholdMarkerColor.Base);
             }
 
             // Draw label
