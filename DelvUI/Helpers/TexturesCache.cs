@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using Dalamud.Utility;
 using Action = Lumina.Excel.GeneratedSheets.Action;
+using Dalamud.Plugin.Ipc;
 
 namespace DelvUI.Helpers
 {
@@ -57,7 +58,9 @@ namespace DelvUI.Helpers
             var hdString = hdIcon ? "_hr1" : "";
             var path = $"ui/icon/{id / 1000 * 1000:000000}/{id:000000}{hdString}.tex";
 
-            return Plugin.DataManager.GetFile<TexFile>(path);
+            var resolvedPath = _penumbraPathResolver.InvokeFunc(path);
+
+            return Plugin.DataManager.GetFile<TexFile>(resolvedPath ?? path);
         }
 
         private void RemoveTexture<T>(uint rowId) where T : ExcelRow
@@ -94,7 +97,12 @@ namespace DelvUI.Helpers
         public void Clear() { _cache.Clear(); }
 
         #region Singleton
-        private TexturesCache() { }
+        private ICallGateSubscriber<string, string> _penumbraPathResolver;
+
+        private TexturesCache()
+        {
+            _penumbraPathResolver = Plugin.PluginInterface.GetIpcSubscriber<string, string>("Penumbra.ResolveDefaultPath");
+        }
 
         public static void Initialize() { Instance = new TexturesCache(); }
 
