@@ -182,9 +182,6 @@ namespace DelvUI.Helpers
         public readonly Vector2 Min;
         public readonly Vector2 Max;
 
-        public Vector2 TopRight => new Vector2(Max.X, Min.Y);
-        public Vector2 BottomLeft => new Vector2(Min.X, Max.Y);
-
         private readonly Rectangle Rectangle;
 
         public ClipRect(Vector2 min, Vector2 max)
