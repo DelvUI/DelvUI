@@ -52,12 +52,12 @@ namespace DelvUI.Interface.Party
             _buffsConfig = buffsConfig;
             _debuffsConfig = debuffsConfig;
 
-            _nameLabelHud = new LabelHud("DelvUI_partyFramesBar_nameLabel_" + id, config.NameLabelConfig);
-            _manaLabelHud = new LabelHud("DelvUI_partyFramesBar_manaLabel_" + id, _manaBarConfig.ValueLabelConfig);
-            _orderLabelHud = new LabelHud("DelvUI_partyFramesBar_orderLabel_" + id, config.OrderLabelConfig);
-            _castbarHud = new CastbarHud("DelvUI_partyFramesBar_castbar_" + id, _castbarConfig, "");
-            _buffsListHud = new StatusEffectsListHud("DelvUI_partyFramesBar_Buffs_" + id, buffsConfig, "");
-            _debuffsListHud = new StatusEffectsListHud("DelvUI_partyFramesBar_Debuffs_" + id, debuffsConfig, "");
+            _nameLabelHud = new LabelHud(id + "_nameLabel", config.NameLabelConfig);
+            _manaLabelHud = new LabelHud(id + "_manaLabel", _manaBarConfig.ValueLabelConfig);
+            _orderLabelHud = new LabelHud(id + "_orderLabel", config.OrderLabelConfig);
+            _castbarHud = new CastbarHud(id + "_castbar", _castbarConfig, "");
+            _buffsListHud = new StatusEffectsListHud(id + "_buffs", buffsConfig, "");
+            _debuffsListHud = new StatusEffectsListHud(id + "_debebuffs", debuffsConfig, "");
         }
 
         public PluginConfigColor GetColor(float scale)

@@ -44,7 +44,7 @@ namespace DelvUI.Interface.Party
             bars = new List<PartyFramesBar>(MaxMemberCount);
             for (int i = 0; i < bars.Capacity; i++)
             {
-                var bar = new PartyFramesBar(i.ToString(), _healthBarsConfig, manaBarConfig, castbarConfig, roleIconConfig, leaderIconConfig, buffsConfig, debuffsConfig);
+                var bar = new PartyFramesBar("DelvUI_partyFramesBar" + i, _healthBarsConfig, manaBarConfig, castbarConfig, roleIconConfig, leaderIconConfig, buffsConfig, debuffsConfig);
                 bar.MovePlayerEvent += OnMovePlayer;
 
                 bars.Add(bar);
