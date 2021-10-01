@@ -126,11 +126,14 @@ namespace DelvUI.Helpers
                     continue;
                 }
 
+                var margin = 5 * addon->Scale;
+                var bottomMargin = 13 * addon->Scale;
+
                 var clipRect = new ClipRect(
-                    new Vector2(addon->X + 5, addon->Y + 5),
+                    new Vector2(addon->X + margin, addon->Y + margin),
                     new Vector2(
-                        addon->X + addon->WindowNode->AtkResNode.Width - 5,
-                        addon->Y + addon->WindowNode->AtkResNode.Height - 13
+                        addon->X + addon->WindowNode->AtkResNode.Width * addon->Scale - margin,
+                        addon->Y + addon->WindowNode->AtkResNode.Height * addon->Scale - bottomMargin
                     )
                 );
 
