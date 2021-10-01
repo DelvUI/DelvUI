@@ -335,7 +335,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             IEnumerable<Status> suitonBuff = player.StatusList.Where(o => o.StatusId == 507);
-                        
+
             if (suitonBuff.Any() && Config.ShowSuitonBar)
             {
                 suitonDuration = Math.Abs(suitonBuff.First().RemainingTime);
@@ -344,7 +344,7 @@ namespace DelvUI.Interface.Jobs
 
                 if (Config.ShowSuitonBarText)
                 {
-                    builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.SuitonBarColor.Vector, Vector4.UnitW, null);
+                    builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.SuitonBarColor.Base, 0xFF000000, null);
                 }
             }
 
@@ -379,7 +379,7 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Timer" + "##Huton")]
         [Order(40, collapseWith = nameof(ShowHutonGauge))]
         public bool ShowHutonGaugeText = true;
-        
+
         [Checkbox("Border" + "##Huton")]
         [Order(45, collapseWith = nameof(ShowHutonGauge))]
         public bool ShowHutonGaugeBorder = true;

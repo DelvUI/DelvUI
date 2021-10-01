@@ -254,6 +254,8 @@ namespace DelvUI.Interface
                 return;
             }
 
+            ClipRectsHelper.Instance.Update();
+
             ImGuiHelpers.ForceNextWindowMainViewport();
             ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);

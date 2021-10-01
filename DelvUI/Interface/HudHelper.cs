@@ -91,11 +91,7 @@ namespace DelvUI.Interface
         {
             UpdateCombatActionBars(_isInitial);
             UpdateJobGauges();
-
-            if (_isInitial)
-            {
-                UpdateDefaultCastBar();
-            }
+            UpdateDefaultCastBar();
 
             _isInitial = false;
         }
@@ -208,6 +204,11 @@ namespace DelvUI.Interface
 
         private unsafe bool UpdateAddonOriginalPosition(AtkUnitBase* addon, ref Vector2 originalPosition)
         {
+            if (addon == null)
+            {
+                return false;
+            }
+
             const float outOfScreen = 30000f;
             var addonPosition = new Vector2(addon->X, addon->Y);
 
@@ -228,6 +229,10 @@ namespace DelvUI.Interface
         private unsafe void UpdateDefaultCastBar(bool forceVisible = false)
         {
             var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_CastBar", 1);
+            if (addon == null)
+            {
+                return;
+            }
 
             var previousPos = Config.CastBarOriginalPosition;
             var isVisible = UpdateAddonOriginalPosition(addon, ref Config.CastBarOriginalPosition);

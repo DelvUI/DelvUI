@@ -51,83 +51,50 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            ImGuiWindowFlags windowFlags = 0;
-            windowFlags |= ImGuiWindowFlags.NoBackground;
-            windowFlags |= ImGuiWindowFlags.NoTitleBar;
-            windowFlags |= ImGuiWindowFlags.NoMove;
-            windowFlags |= ImGuiWindowFlags.NoDecoration;
-            windowFlags |= ImGuiWindowFlags.NoInputs;
-
             var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
             var endPos = startPos + Config.Size;
 
-            var drawList = ImGui.GetWindowDrawList();
-            var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("ContextMenu", 1);
-
-            DrawHelper.ClipAround(addon, ID, drawList, (drawListPtr, windowName) =>
+            DrawHelper.DrawInWindow(ID, startPos, Config.Size, true, false, (drawList) =>
             {
-                ImGui.SetNextWindowPos(startPos);
-                ImGui.SetNextWindowSize(Config.Size);
-
-                ImGui.Begin(windowName, windowFlags);
-
-                UpdateChildFlags(addon);
-
-                if (ImGui.BeginChild(windowName, Config.Size, default, _childFlags))
+                // health bar
+                if (Actor is not Character)
                 {
-                    // health bar
-                    if (Actor is not Character)
-                    {
-                        DrawFriendlyNPC(drawListPtr, startPos, endPos);
-                    }
-                    else
-                    {
-                        DrawChara(drawListPtr, startPos, (Character)Actor);
-                    }
-
-                    // Check if mouse is hovering over the box properly
-                    if (ImGui.IsMouseHoveringRect(startPos, endPos) && !DraggingEnabled)
-                    {
-                        if (ImGui.GetIO().MouseClicked[0])
-                        {
-                            Plugin.TargetManager.SetTarget(Actor);
-                        }
-                        else if (ImGui.GetIO().MouseClicked[1])
-                        {
-                            var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
-                            _openContextMenuFromTarget(agentHud, Actor.Address);
-                        }
-
-                        MouseOverHelper.Instance.Target = Actor;
-                    }
-                }
-
-                ImGui.EndChild();
-                ImGui.End();
-
-                // labels
-                _leftLabel.Draw(startPos, Config.Size, Actor);
-                _rightLabel.Draw(startPos, Config.Size, Actor);
-            });
-        }
-
-        private void UpdateChildFlags(AtkUnitBase* addon)
-        {
-            if (!addon->IsVisible)
-            {
-                _childFlags &= ~ImGuiWindowFlags.NoInputs;
-            }
-            else
-            {
-                if (ImGui.IsMouseHoveringRect(new Vector2(addon->X, addon->Y), new Vector2(addon->X + addon->WindowNode->AtkResNode.Width, addon->Y + addon->WindowNode->AtkResNode.Height)))
-                {
-                    _childFlags |= ImGuiWindowFlags.NoInputs;
+                    DrawFriendlyNPC(drawList, startPos, endPos);
                 }
                 else
                 {
-                    _childFlags &= ~ImGuiWindowFlags.NoInputs;
+                    DrawChara(drawList, startPos, (Character)Actor);
                 }
-            }
+
+                // Check if mouse is hovering over the box properly
+                if (ImGui.IsMouseHoveringRect(startPos, endPos) && !DraggingEnabled)
+                {
+                    if (ImGui.GetIO().MouseClicked[0])
+                    {
+                        Plugin.TargetManager.SetTarget(Actor);
+                    }
+                    else if (ImGui.GetIO().MouseClicked[1])
+                    {
+                        var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
+                        _openContextMenuFromTarget(agentHud, Actor.Address);
+                    }
+
+                    MouseOverHelper.Instance.Target = Actor;
+                }
+            });
+
+            // labels
+            var (pos, size) = _leftLabel.Precalculate(startPos, Config.Size, Actor);
+            DrawHelper.DrawInWindow(_leftLabel.ID, pos, size, false, true, (drawList) =>
+            {
+                _leftLabel.Draw(startPos, Config.Size, Actor);
+            });
+
+            (pos, size) = _rightLabel.Precalculate(startPos, Config.Size, Actor);
+            DrawHelper.DrawInWindow(_leftLabel.ID, pos, size, false, true, (drawList) =>
+            {
+                _rightLabel.Draw(startPos, Config.Size, Actor);
+            });
         }
 
         private void DrawChara(ImDrawListPtr drawList, Vector2 startPos, Character chara)

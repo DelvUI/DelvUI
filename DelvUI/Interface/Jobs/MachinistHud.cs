@@ -121,7 +121,7 @@ namespace DelvUI.Interface.Jobs
                 if (Config.ShowBatteryGaugeBatteryText && gauge.Battery != 0)
                 {
                     builder.SetTextMode(BarTextMode.Single)
-                           .SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.BatteryFillColor.Vector, Vector4.UnitW, null);
+                           .SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.BatteryFillColor.Base, 0xFF000000, null);
                 }
             }
 
@@ -132,7 +132,7 @@ namespace DelvUI.Interface.Jobs
                 if (Config.ShowBatteryGaugeRobotDurationText && gauge.SummonTimeRemaining != 0)
                 {
                     builder.SetTextMode(BarTextMode.Single)
-                           .SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.RobotFillColor.Vector, Vector4.UnitW, null);
+                           .SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.RobotFillColor.Base, 0xFF000000, null);
                 }
             }
 
@@ -186,7 +186,7 @@ namespace DelvUI.Interface.Jobs
 
             if (wildfireBuff.Any())
             {
-                duration = wildfireBuff.First().RemainingTime;                
+                duration = wildfireBuff.First().RemainingTime;
 
                 builder.AddInnerBar(duration, 10, Config.WildfireFillColor, null);
 

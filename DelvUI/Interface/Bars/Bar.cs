@@ -133,7 +133,7 @@ namespace DelvUI.Interface.Bars
                 }
 
                 var textPos = text.CalcTextPosition(cursorPos, strText, BarWidth, BarHeight);
-                DrawHelper.DrawOutlinedText(strText, textPos, text.Color, text.OutlineColor);
+                DrawHelper.DrawOutlinedText(strText, textPos, text.Color, text.OutlineColor, drawList);
             }
         }
     }
@@ -306,7 +306,7 @@ namespace DelvUI.Interface.Bars
                 }
 
                 var textPos = textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, Parent.BarHeight);
-                DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor);
+                DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, drawList);
             }
 
             var currentFill = CurrentValue / MaximumValue;
@@ -354,7 +354,7 @@ namespace DelvUI.Interface.Bars
                                 ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y)
                                 : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
 
-                            DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor);
+                            DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, drawList);
                         }
                     }
 
@@ -408,7 +408,7 @@ namespace DelvUI.Interface.Bars
                                 ? textObj.CalcTextPosition(cursorPos, text, Parent.BarWidth, barSize.Y)
                                 : textObj.CalcTextPosition(cursorPos, text, barSize.X, Parent.BarHeight);
 
-                            DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor);
+                            DrawHelper.DrawOutlinedText(text, textPos, textObj.Color, textObj.OutlineColor, drawList);
                         }
                     }
 
@@ -473,7 +473,7 @@ namespace DelvUI.Interface.Bars
 
     public class BarText
     {
-        public BarText(BarTextPosition position, BarTextType type, Vector4 color, Vector4 outlineColor, string? text)
+        public BarText(BarTextPosition position, BarTextType type, uint color, uint outlineColor, string? text)
         {
             Position = position;
             Type = type;
@@ -487,8 +487,8 @@ namespace DelvUI.Interface.Bars
             Position = position;
             Type = type;
             Text = text;
-            Color = Vector4.One;
-            OutlineColor = new Vector4(0f, 0f, 0f, 1f);
+            Color = 0xFFFFFFFF;
+            OutlineColor = 0xFF000000;
         }
 
         public BarText(BarTextPosition position, BarTextType type)
@@ -496,15 +496,15 @@ namespace DelvUI.Interface.Bars
             Position = position;
             Type = type;
             Text = null;
-            Color = Vector4.One;
-            OutlineColor = new Vector4(0f, 0f, 0f, 1f);
+            Color = 0xFFFFFFFF;
+            OutlineColor = 0xFF000000;
         }
 
         // TODO: Proper text tags
         public BarTextPosition Position { get; set; }
         public BarTextType Type { get; set; }
-        public Vector4 Color { get; set; }
-        public Vector4 OutlineColor { get; set; }
+        public uint Color { get; set; }
+        public uint OutlineColor { get; set; }
         public string? Text { get; set; }
 
         public Vector2 CalcTextPosition(Vector2 cursorPos, string text, float barWidth, float barHeight)

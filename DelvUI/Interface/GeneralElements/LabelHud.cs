@@ -10,6 +10,10 @@ namespace DelvUI.Interface.GeneralElements
     {
         private LabelConfig Config => (LabelConfig)_config;
 
+        private string? _text = null;
+        private Vector2 _pos;
+        private Vector2 _size;
+
         public LabelHud(string id, LabelConfig config) : base(id, config)
         {
 
@@ -20,6 +24,31 @@ namespace DelvUI.Interface.GeneralElements
             Draw(origin);
         }
 
+        public (Vector2, Vector2) Precalculate(Vector2 origin, Vector2? parentSize = null, GameObject? actor = null, string? actorName = null)
+        {
+            _text = null;
+            _pos = Vector2.Zero;
+            _size = Vector2.Zero;
+
+            if (!Config.Enabled || Config.GetText() == null)
+            {
+                return (_pos, _size);
+            }
+
+            var fontPushed = FontsManager.Instance.PushFont(Config.FontID);
+
+            _text = actor == null && actorName == null ? Config.GetText() : TextTags.GenerateFormattedTextFromTags(actor, Config.GetText(), actorName);
+            _size = ImGui.CalcTextSize(_text);
+            _pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(origin + Config.Position, -parentSize ?? Vector2.Zero, Config.FrameAnchor), _size, Config.TextAnchor);
+
+            if (fontPushed)
+            {
+                ImGui.PopFont();
+            }
+
+            return (_pos, _size);
+        }
+
         public void Draw(Vector2 origin, Vector2? parentSize = null, GameObject? actor = null, string? actorName = null)
         {
             if (!Config.Enabled || Config.GetText() == null)
@@ -27,21 +56,30 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var text = actor == null && actorName == null ? 
+            var size = parentSize ?? Vector2.Zero;
+            if (_text != null)
+            {
+                DrawLabel(_text, _pos, _size, origin, size, actor);
+            }
+
+            var text = actor == null && actorName == null ?
                 Config.GetText() :
                 TextTags.GenerateFormattedTextFromTags(actor, Config.GetText(), actorName);
-
-            var size = parentSize ?? Vector2.Zero;
 
             DrawLabel(text, origin, size, actor);
         }
 
         private void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
         {
-            var fontPushed = FontsManager.Instance.PushFont(Config.FontID);
-
             var textSize = ImGui.CalcTextSize(text);
             var textPos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), textSize, Config.TextAnchor);
+
+            DrawLabel(text, textPos, textSize, parentPos, parentSize, actor);
+        }
+
+        private void DrawLabel(string text, Vector2 textPos, Vector2 textSize, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
+        {
+            var fontPushed = FontsManager.Instance.PushFont(Config.FontID);
             var drawList = ImGui.GetWindowDrawList();
             var color = Color(actor);
 

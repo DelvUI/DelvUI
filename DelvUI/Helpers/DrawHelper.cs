@@ -1,5 +1,4 @@
 ﻿using DelvUI.Config;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using ImGuiScene;
 using Lumina.Excel;
@@ -63,45 +62,6 @@ namespace DelvUI.Helpers
                     position, position + size,
                     colorArray[0], colorArray[1], colorArray[2], colorArray[3]
                 );
-            }
-        }
-
-        public static void DrawOutlinedText(string text, Vector2 pos) { DrawOutlinedText(text, pos, Vector4.One, Vector4.UnitW); }
-
-        public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor)
-        {
-            var fontPushed = FontsManager.Instance.PushDefaultFont();
-
-            ImGui.SetCursorPos(new Vector2(pos.X - 1, pos.Y + 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X, pos.Y + 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X + 1, pos.Y + 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X - 1, pos.Y));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X + 1, pos.Y));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X - 1, pos.Y - 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X, pos.Y - 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X + 1, pos.Y - 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X, pos.Y));
-            ImGui.TextColored(color, text);
-
-            if (fontPushed)
-            {
-                ImGui.PopFont();
             }
         }
 
@@ -230,7 +190,6 @@ namespace DelvUI.Helpers
             var shieldStartPos = cursorPos + new Vector2(Math.Max(1, barSize.X * hp), 0);
             DrawGradientFilledRect(shieldStartPos, new Vector2(Math.Max(1, barSize.X * s), barSize.Y), color, drawList);
 
-
             // overshield
             shield = shield - s;
             if (shield <= 0)
@@ -241,74 +200,80 @@ namespace DelvUI.Helpers
             DrawGradientFilledRect(cursorPos, new Vector2(Math.Max(1, barSize.X * shield), h), color, drawList);
         }
 
-        public static unsafe void ClipAround(AtkUnitBase* addon, string windowName, ImDrawListPtr drawList, Action<ImDrawListPtr, string> drawAction)
+        public static void DrawInWindow(string name, Vector2 pos, Vector2 size, bool needsInput, bool needsFocus, Action<ImDrawListPtr> drawAction)
         {
-            if (addon->IsVisible)
+            ImGuiWindowFlags windowFlags =
+                ImGuiWindowFlags.NoTitleBar |
+                ImGuiWindowFlags.NoScrollbar |
+                ImGuiWindowFlags.AlwaysAutoResize |
+                ImGuiWindowFlags.NoBackground;
+
+            if (!needsInput)
             {
-                ClipAround(
-                    new Vector2(addon->X + 5, addon->Y + 5),
-                    new Vector2(
-                        addon->X + addon->WindowNode->AtkResNode.Width - 5,
-                        addon->Y + addon->WindowNode->AtkResNode.Height - 5
-                    ),
-                    windowName, drawList, drawAction
-                );
+                windowFlags |= ImGuiWindowFlags.NoInputs;
             }
-            else
+
+            if (!needsFocus)
             {
-                drawAction(drawList, windowName);
+                windowFlags |= ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoBringToFrontOnFocus;
             }
-        }
 
-        public static void ClipAround(Vector2 min, Vector2 max, string windowName, ImDrawListPtr drawList, Action<ImDrawListPtr, string> drawAction)
-        {
-            var maxX = ImGui.GetMainViewport().Size.X;
-            var maxY = ImGui.GetMainViewport().Size.Y;
-            var aboveMin = new Vector2(0, 0);
-            var aboveMax = new Vector2(maxX, min.Y);
-            var leftMin = new Vector2(0, min.Y);
-            var leftMax = new Vector2(min.X, maxY);
+            ClipRect? clipRect = ClipRectsHelper.Instance.GetClipRectForArea(pos, size);
 
-            var rightMin = new Vector2(max.X, min.Y);
-            var rightMax = new Vector2(maxX, max.Y);
-            var belowMin = new Vector2(min.X, max.Y);
-            var belowMax = new Vector2(maxX, maxY);
-
-            for (var i = 0; i < 4; i++)
+            // no clipping needed
+            if (!clipRect.HasValue)
             {
-                Vector2 clipMin;
-                Vector2 clipMax;
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
-                switch (i)
+                if (!needsInput)
                 {
-                    default:
-                        clipMin = aboveMin;
-                        clipMax = aboveMax;
-
-                        break;
-
-                    case 1:
-                        clipMin = leftMin;
-                        clipMax = leftMax;
-
-                        break;
-
-                    case 2:
-                        clipMin = rightMin;
-                        clipMax = rightMax;
-
-                        break;
-
-                    case 3:
-                        clipMin = belowMin;
-                        clipMax = belowMax;
-
-                        break;
+                    drawAction(drawList);
+                    return;
                 }
 
-                ImGui.PushClipRect(clipMin, clipMax, false);
-                drawAction(drawList, windowName + "_" + i);
-                ImGui.PopClipRect();
+                ImGui.SetNextWindowPos(pos);
+                ImGui.SetNextWindowSize(size);
+
+                var begin = ImGui.Begin(name, windowFlags);
+                if (!begin)
+                {
+                    ImGui.End();
+                    return;
+                }
+
+                drawAction(drawList);
+
+                ImGui.End();
+            }
+
+            // clip around game's window
+            else
+            {
+                var flags = windowFlags;
+                if (needsInput && clipRect.Value.IsPointInside(ImGui.GetMousePos()))
+                {
+                    flags |= ImGuiWindowFlags.NoInputs;
+                }
+
+                var invertedClipRects = ClipRectsHelper.GetInvertedClipRects(clipRect.Value);
+                for (int i = 0; i < invertedClipRects.Length; i++)
+                {
+                    ImGui.SetNextWindowPos(pos);
+                    ImGui.SetNextWindowSize(size);
+
+                    var begin = ImGui.Begin(name + "_" + i, flags);
+                    if (!begin)
+                    {
+                        ImGui.End();
+                        continue;
+                    }
+
+                    ImGui.PushClipRect(invertedClipRects[i].Min, invertedClipRects[i].Max, false);
+                    drawAction(ImGui.GetWindowDrawList());
+                    ImGui.PopClipRect();
+
+                    ImGui.End();
+                }
             }
         }
     }
