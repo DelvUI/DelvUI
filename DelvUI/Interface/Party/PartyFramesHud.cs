@@ -238,7 +238,6 @@ namespace DelvUI.Interface.Party
                 var count = PartyManager.Instance.MemberCount;
                 if (count < 1)
                 {
-                    ImGui.End();
                     return;
                 }
 
