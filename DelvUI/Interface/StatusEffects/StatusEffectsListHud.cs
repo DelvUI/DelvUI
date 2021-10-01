@@ -294,7 +294,7 @@ namespace DelvUI.Interface.StatusEffects
             windowFlags |= ImGuiWindowFlags.NoMove;
             windowFlags |= ImGuiWindowFlags.NoDecoration;
             windowFlags |= ImGuiWindowFlags.NoBackground;
-            windowFlags |= ImGuiWindowFlags.NoBackground;
+
             if (!Config.ShowBuffs)
             {
                 windowFlags |= ImGuiWindowFlags.NoInputs;
@@ -309,7 +309,7 @@ namespace DelvUI.Interface.StatusEffects
             ImGui.SetNextWindowSize(windowSize + margin * 2);
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
-            ImGui.Begin("statusEffectList " + ID, windowFlags);
+            ImGui.Begin(ID, windowFlags);
 
             // draw
             drawList = ImGui.GetWindowDrawList();

@@ -205,9 +205,23 @@ namespace DelvUI.Helpers
             ImGuiWindowFlags windowFlags =
                 ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoScrollbar |
-                ImGuiWindowFlags.AlwaysAutoResize |
-                ImGuiWindowFlags.NoBackground;
+                ImGuiWindowFlags.NoBackground |
+                ImGuiWindowFlags.NoMove |
+                ImGuiWindowFlags.NoResize;
 
+            DrawInWindow(name, pos, size, needsInput, needsFocus, false, windowFlags, drawAction);
+        }
+
+        public static void DrawInWindow(
+            string name,
+            Vector2 pos,
+            Vector2 size,
+            bool needsInput,
+            bool needsFocus,
+            bool needsRefresh,
+            ImGuiWindowFlags windowFlags,
+            Action<ImDrawListPtr> drawAction)
+        {
             if (!needsInput)
             {
                 windowFlags |= ImGuiWindowFlags.NoInputs;
@@ -250,7 +264,7 @@ namespace DelvUI.Helpers
             else
             {
                 var flags = windowFlags;
-                if (needsInput && clipRect.Value.IsPointInside(ImGui.GetMousePos()))
+                if (needsInput && clipRect.Value.Contains(ImGui.GetMousePos()))
                 {
                     flags |= ImGuiWindowFlags.NoInputs;
                 }

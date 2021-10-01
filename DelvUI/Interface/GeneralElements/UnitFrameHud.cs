@@ -84,17 +84,8 @@ namespace DelvUI.Interface.GeneralElements
             });
 
             // labels
-            var (pos, size) = _leftLabel.Precalculate(startPos, Config.Size, Actor);
-            DrawHelper.DrawInWindow(_leftLabel.ID, pos, size, false, true, (drawList) =>
-            {
-                _leftLabel.Draw(startPos, Config.Size, Actor);
-            });
-
-            (pos, size) = _rightLabel.Precalculate(startPos, Config.Size, Actor);
-            DrawHelper.DrawInWindow(_leftLabel.ID, pos, size, false, true, (drawList) =>
-            {
-                _rightLabel.Draw(startPos, Config.Size, Actor);
-            });
+            _leftLabel.Draw(startPos, Config.Size, Actor);
+            _rightLabel.Draw(startPos, Config.Size, Actor);
         }
 
         private void DrawChara(ImDrawListPtr drawList, Vector2 startPos, Character chara)

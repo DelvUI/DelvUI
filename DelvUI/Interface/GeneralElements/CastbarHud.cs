@@ -94,22 +94,12 @@ namespace DelvUI.Interface.GeneralElements
             var iconSize = Config.ShowIcon ? Config.Size.Y : 0;
             var castNamePos = startPos + new Vector2(iconSize, 0);
             Config.CastNameConfig.SetText(Config.Preview ? "Cast Name" : (LastUsedCast != null ? LastUsedCast.ActionText : ""));
-            var (pos, size) = _castNameLabel.Precalculate(castNamePos, Config.Size, Actor);
-
-            DrawHelper.DrawInWindow(_castNameLabel.ID, pos, size, false, true, (drawList) =>
-            {
-                _castNameLabel.Draw(startPos + new Vector2(iconSize, 0), Config.Size, Actor);
-            });
+            _castNameLabel.Draw(startPos + new Vector2(iconSize, 0), Config.Size, Actor);
 
             // cast time
             var text = Config.Preview ? "Cast Time" : Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
             Config.CastTimeConfig.SetText(text);
-            (pos, size) = _castTimeLabel.Precalculate(startPos, Config.Size, Actor);
-
-            DrawHelper.DrawInWindow(_castTimeLabel.ID, pos, size, false, true, (drawList) =>
-            {
-                _castTimeLabel.Draw(startPos, Config.Size, Actor);
-            });
+            _castTimeLabel.Draw(startPos, Config.Size, Actor);
         }
 
         private unsafe void UpdateCurrentCast(out float currentCastTime, out float totalCastTime)

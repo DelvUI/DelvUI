@@ -127,7 +127,7 @@ namespace DelvUI.Helpers
             ImGui.SetNextWindowFocus();
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
-            ImGui.Begin("delvui_tooltip", windowFlags);
+            ImGui.Begin("DelvUI_tooltip", windowFlags);
             var drawList = ImGui.GetWindowDrawList();
 
             drawList.AddRectFilled(_position, _position + _size, _config.BackgroundColor.Base);

@@ -52,12 +52,12 @@ namespace DelvUI.Interface.Party
             _buffsConfig = buffsConfig;
             _debuffsConfig = debuffsConfig;
 
-            _nameLabelHud = new LabelHud("partyFramesBar_nameLabel_" + id, config.NameLabelConfig);
-            _manaLabelHud = new LabelHud("partyFramesBar_manaLabel_" + id, _manaBarConfig.ValueLabelConfig);
-            _orderLabelHud = new LabelHud("partyFramesBar_orderLabel_" + id, config.OrderLabelConfig);
-            _castbarHud = new CastbarHud("partyFramesBar_castbar_" + id, _castbarConfig, "");
-            _buffsListHud = new StatusEffectsListHud("partyFramesBar_Buffs_" + id, buffsConfig, "");
-            _debuffsListHud = new StatusEffectsListHud("partyFramesBar_Debuffs_" + id, debuffsConfig, "");
+            _nameLabelHud = new LabelHud("DelvUI_partyFramesBar_nameLabel_" + id, config.NameLabelConfig);
+            _manaLabelHud = new LabelHud("DelvUI_partyFramesBar_manaLabel_" + id, _manaBarConfig.ValueLabelConfig);
+            _orderLabelHud = new LabelHud("DelvUI_partyFramesBar_orderLabel_" + id, config.OrderLabelConfig);
+            _castbarHud = new CastbarHud("DelvUI_partyFramesBar_castbar_" + id, _castbarConfig, "");
+            _buffsListHud = new StatusEffectsListHud("DelvUI_partyFramesBar_Buffs_" + id, buffsConfig, "");
+            _debuffsListHud = new StatusEffectsListHud("DelvUI_partyFramesBar_Debuffs_" + id, debuffsConfig, "");
         }
 
         public PluginConfigColor GetColor(float scale)
@@ -100,12 +100,6 @@ namespace DelvUI.Interface.Party
         public void Draw(Vector2 origin, ImDrawListPtr drawList, PluginConfigColor? borderColor = null)
         {
             if (!Visible || Member is null)
-            {
-                return;
-            }
-
-            var player = Plugin.ClientState.LocalPlayer;
-            if (player == null)
             {
                 return;
             }
@@ -171,18 +165,8 @@ namespace DelvUI.Interface.Party
             var color = borderColor != null ? borderColor.Base : _config.ColorsConfig.BorderColor.Base;
             drawList.AddRect(borderPos, borderPos + borderSize, color);
 
-            // buffs / debuffs
-            var buffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _buffsConfig.HealthBarAnchor);
-            _buffsListHud.Actor = character;
-            _buffsListHud.Draw(buffsPos);
-
-            var debuffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _debuffsConfig.HealthBarAnchor);
-            _debuffsListHud.Actor = character;
-            _debuffsListHud.Draw(debuffsPos);
-
             // mana
-            if (_manaBarConfig.Enabled && Member.MaxHP > 0 &&
-                (!_manaBarConfig.ShowOnlyForHealers || JobsHelper.IsJobHealer(Member.JobId)))
+            if (ShowMana())
             {
                 var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _manaBarConfig.HealthBarAnchor);
                 var manaBarPos = Utils.GetAnchoredPosition(parentPos + _manaBarConfig.Position, _manaBarConfig.Size, _manaBarConfig.Anchor);
@@ -195,22 +179,6 @@ namespace DelvUI.Interface.Party
                 DrawHelper.DrawGradientFilledRect(manaBarPos, fillSize, _manaBarConfig.Color, drawList);
 
                 _manaLabelHud.Draw(manaBarPos, _manaBarConfig.Size, character);
-            }
-
-            // castbar
-            var castbarPos = Utils.GetAnchoredPosition(Position, -_config.Size, _castbarConfig.HealthBarAnchor);
-            _castbarHud.Actor = character;
-            _castbarHud.Draw(castbarPos);
-
-            // name
-            _nameLabelHud.Draw(Position, _config.Size, character, Member.Name);
-
-            // order
-            if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)
-            {
-                var order = Member.ObjectId == player.ObjectId ? 1 : Member.Order;
-                _config.OrderLabelConfig.SetText("[" + order + "]");
-                _orderLabelHud.Draw(Position, _config.Size);
             }
 
             // role/job icon
@@ -254,6 +222,67 @@ namespace DelvUI.Interface.Party
             {
                 drawList.AddRectFilled(Position, Position + _config.Size, _config.ColorsConfig.HighlightColor.Base);
             }
+        }
+
+        // need to separate elements that have their own window so clipping doesn't get messy
+        public void DrawElements(Vector2 origin)
+        {
+            if (!Visible || Member is null)
+            {
+                return;
+            }
+
+            var player = Plugin.ClientState.LocalPlayer;
+            if (player == null)
+            {
+                return;
+            }
+
+            var character = Member.Character;
+
+            // mana
+            if (ShowMana())
+            {
+                var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _manaBarConfig.HealthBarAnchor);
+                var manaBarPos = Utils.GetAnchoredPosition(parentPos + _manaBarConfig.Position, _manaBarConfig.Size, _manaBarConfig.Anchor);
+                _manaLabelHud.Draw(manaBarPos, _manaBarConfig.Size, character);
+            }
+
+            // buffs / debuffs
+            var buffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _buffsConfig.HealthBarAnchor);
+            _buffsListHud.Actor = character;
+            _buffsListHud.Draw(buffsPos);
+
+            var debuffsPos = Utils.GetAnchoredPosition(Position, -_config.Size, _debuffsConfig.HealthBarAnchor);
+            _debuffsListHud.Actor = character;
+            _debuffsListHud.Draw(debuffsPos);
+
+            // castbar
+            var castbarPos = Utils.GetAnchoredPosition(Position, -_config.Size, _castbarConfig.HealthBarAnchor);
+            _castbarHud.Actor = character;
+            _castbarHud.Draw(castbarPos);
+
+            // name
+            _nameLabelHud.Draw(Position, _config.Size, character, Member.Name);
+
+            // order
+            if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)
+            {
+                var order = Member.ObjectId == player.ObjectId ? 1 : Member.Order;
+                _config.OrderLabelConfig.SetText("[" + order + "]");
+                _orderLabelHud.Draw(Position, _config.Size);
+            }
+        }
+
+        private bool ShowMana()
+        {
+            if (Member == null)
+            {
+                return false;
+            }
+
+            return (_manaBarConfig.Enabled && Member.MaxHP > 0 &&
+                (!_manaBarConfig.ShowOnlyForHealers || JobsHelper.IsJobHealer(Member.JobId)));
         }
     }
 }

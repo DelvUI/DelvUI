@@ -15,7 +15,7 @@ namespace DelvUI.Helpers
 
             ImGui.SetNextWindowBgAlpha(config.BackgroundAlpha);
 
-            ImGui.Begin("DelvUI_draggables",
+            ImGui.Begin("DelvUI_grid",
                 ImGuiWindowFlags.NoTitleBar
               | ImGuiWindowFlags.NoScrollbar
               | ImGuiWindowFlags.AlwaysAutoResize
@@ -116,7 +116,7 @@ namespace DelvUI.Helpers
                 ImGui.SetNextWindowSize(windowSize, ImGuiCond.Always);
                 ImGui.SetNextWindowPos(pos);
 
-                ImGui.Begin("arrow " + i.ToString(), windowFlags);
+                ImGui.Begin("DelvUI_draggablesArrow " + i.ToString(), windowFlags);
 
                 // fake button
                 ImGui.ArrowButton("arrow button " + i.ToString(), (ImGuiDir)i);
@@ -153,7 +153,7 @@ namespace DelvUI.Helpers
             ImGui.SetNextWindowSize(new Vector2(420, 324), ImGuiCond.Appearing);
             ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
 
-            if (!ImGui.Begin("Grid", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
+            if (!ImGui.Begin("DelvUI_gridSettings", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 ImGui.End();
                 return;

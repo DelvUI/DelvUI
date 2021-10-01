@@ -75,7 +75,7 @@ namespace DelvUI.Interface
             }
 
             // update config object position
-            ImGui.Begin("dragArea " + ID, windowFlags);
+            ImGui.Begin(ID + "_dragArea", windowFlags);
             var windowPos = ImGui.GetWindowPos();
             _config.Position = windowPos + _positionOffset - origin;
 

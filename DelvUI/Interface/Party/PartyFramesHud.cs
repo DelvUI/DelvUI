@@ -194,14 +194,11 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
-            // size and position
-            ImGui.SetNextWindowPos(Config.Position - _contentMargin, ImGuiCond.FirstUseEver);
-            ImGui.SetNextWindowSize(Config.Size + _contentMargin * 2, ImGuiCond.FirstUseEver);
-
             var windowFlags = ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoTitleBar |
-                ImGuiWindowFlags.NoBringToFrontOnFocus |
-                ImGuiWindowFlags.NoBackground;
+                ImGuiWindowFlags.NoBackground |
+                ImGuiWindowFlags.NoFocusOnAppearing |
+                ImGuiWindowFlags.NoBringToFrontOnFocus;
 
             bool canDrag = !Config.Lock && !DraggingEnabled;
             if (!canDrag)
@@ -215,114 +212,146 @@ namespace DelvUI.Interface.Party
                 windowFlags |= ImGuiWindowFlags.NoResize;
             }
 
-            ImGui.Begin("delvui_partyFrames", windowFlags);
-            var windowPos = ImGui.GetWindowPos();
-            var windowSize = ImGui.GetWindowSize();
-            Config.Size = windowSize;
-
-            if (canDrag)
+            Action<ImDrawListPtr> drawBarsAction = (drawList) =>
             {
-                Config.Position = windowPos - origin;
-            }
+                var windowPos = ImGui.GetWindowPos();
+                var windowSize = ImGui.GetWindowSize();
+                Config.Size = windowSize;
 
-            // recalculate layout on settings or size change
-            var contentStartPos = windowPos + _contentMargin;
-            var maxSize = windowSize - _contentMargin * 2;
-
-            // preview
-            var drawList = ImGui.GetWindowDrawList();
-            if (!Config.Lock)
-            {
-                var margin = new Vector2(4, 0);
-                drawList.AddRectFilled(contentStartPos, contentStartPos + maxSize, 0x66000000);
-                drawList.AddRect(windowPos + margin, windowPos + windowSize - margin * 2, 0x88000000, 3, ImDrawFlags.None, 2);
-            }
-
-            var count = PartyManager.Instance.MemberCount;
-            if (count < 1)
-            {
-                ImGui.End();
-                return;
-            }
-
-            if (_layoutDirty || _size != maxSize || _memberCount != count)
-            {
-                _layoutInfo = LayoutHelper.CalculateLayout(
-                    maxSize,
-                    _healthBarsConfig.Size,
-                    count,
-                    _healthBarsConfig.Padding,
-                    Config.FillRowsFirst
-                );
-
-                UpdateBars(contentStartPos);
-            }
-            else if (_origin != contentStartPos)
-            {
-                UpdateBarsPosition(contentStartPos - _origin);
-            }
-
-            _layoutDirty = false;
-            _origin = contentStartPos;
-            _memberCount = count;
-            _size = maxSize;
-
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            var targetIndex = -1;
-            var enmityLeaderIndex = -1;
-            var enmitySecondIndex = -1;
-
-            // bars
-            for (int i = 0; i < count; i++)
-            {
-                var member = bars[i].Member;
-
-                if (member != null)
+                if (canDrag)
                 {
-                    if (target != null && member.ObjectId == target.ObjectId)
-                    {
-                        targetIndex = i;
-                        continue;
-                    }
-
-                    if (_healthBarsConfig.ColorsConfig.ShowEnmityBorderColors)
-                    {
-                        if (member.EnmityLevel == EnmityLevel.Leader)
-                        {
-                            enmityLeaderIndex = i;
-                            continue;
-                        }
-                        else if (_healthBarsConfig.ColorsConfig.ShowSecondEnmity && member.EnmityLevel == EnmityLevel.Second &&
-                            (count > 4 || !_healthBarsConfig.ColorsConfig.HideSecondEnmityInLightParties))
-                        {
-                            enmitySecondIndex = i;
-                            continue;
-                        }
-                    }
+                    Config.Position = windowPos - origin;
                 }
 
-                bars[i].Draw(origin, drawList);
-            }
+                // recalculate layout on settings or size change
+                var contentStartPos = windowPos + _contentMargin;
+                var maxSize = windowSize - _contentMargin * 2;
 
-            // 2nd enmity
-            if (enmitySecondIndex >= 0)
+                // preview
+                if (!Config.Lock)
+                {
+                    var margin = new Vector2(4, 0);
+                    drawList.AddRectFilled(contentStartPos, contentStartPos + maxSize, 0x66000000);
+                    drawList.AddRect(windowPos + margin, windowPos + windowSize - margin * 2, 0x88000000, 3, ImDrawFlags.None, 2);
+                }
+
+                var count = PartyManager.Instance.MemberCount;
+                if (count < 1)
+                {
+                    ImGui.End();
+                    return;
+                }
+
+                if (_layoutDirty || _size != maxSize || _memberCount != count)
+                {
+                    _layoutInfo = LayoutHelper.CalculateLayout(
+                        maxSize,
+                        _healthBarsConfig.Size,
+                        count,
+                        _healthBarsConfig.Padding,
+                        Config.FillRowsFirst
+                    );
+
+                    UpdateBars(contentStartPos);
+                }
+                else if (_origin != contentStartPos)
+                {
+                    UpdateBarsPosition(contentStartPos - _origin);
+                }
+
+                _layoutDirty = false;
+                _origin = contentStartPos;
+                _memberCount = count;
+                _size = maxSize;
+
+                var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+                var targetIndex = -1;
+                var enmityLeaderIndex = -1;
+                var enmitySecondIndex = -1;
+
+                // bars
+                for (int i = 0; i < count; i++)
+                {
+                    var member = bars[i].Member;
+
+                    if (member != null)
+                    {
+                        if (target != null && member.ObjectId == target.ObjectId)
+                        {
+                            targetIndex = i;
+                            continue;
+                        }
+
+                        if (_healthBarsConfig.ColorsConfig.ShowEnmityBorderColors)
+                        {
+                            if (member.EnmityLevel == EnmityLevel.Leader)
+                            {
+                                enmityLeaderIndex = i;
+                                continue;
+                            }
+                            else if (_healthBarsConfig.ColorsConfig.ShowSecondEnmity && member.EnmityLevel == EnmityLevel.Second &&
+                                (count > 4 || !_healthBarsConfig.ColorsConfig.HideSecondEnmityInLightParties))
+                            {
+                                enmitySecondIndex = i;
+                                continue;
+                            }
+                        }
+                    }
+
+                    bars[i].Draw(origin, drawList);
+                }
+
+                // 2nd enmity
+                if (enmitySecondIndex >= 0)
+                {
+                    bars[enmitySecondIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.EnmitySecondBordercolor);
+                }
+
+                // 1st enmity
+                if (enmityLeaderIndex >= 0)
+                {
+                    bars[enmityLeaderIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.EnmityLeaderBordercolor);
+                }
+
+                // target
+                if (targetIndex >= 0)
+                {
+                    bars[targetIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.TargetBordercolor);
+                }
+            };
+
+            Action drawElementsAction = () =>
             {
-                bars[enmitySecondIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.EnmitySecondBordercolor);
-            }
+                foreach (var bar in bars)
+                {
+                    bar.DrawElements(origin);
+                }
+            };
 
-            // 1st enmity
-            if (enmityLeaderIndex >= 0)
+            // no clipping when unlocked, creates way too many issues
+            if (canDrag)
             {
-                bars[enmityLeaderIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.EnmityLeaderBordercolor);
-            }
+                // size and position
+                ImGui.SetNextWindowPos(Config.Position - _contentMargin, ImGuiCond.FirstUseEver);
+                ImGui.SetNextWindowSize(Config.Size + _contentMargin * 2, ImGuiCond.FirstUseEver);
 
-            // target
-            if (targetIndex >= 0)
+                bool begin = ImGui.Begin(ID, windowFlags);
+                if (!begin)
+                {
+                    ImGui.End();
+                    return;
+                }
+
+                drawBarsAction(ImGui.GetWindowDrawList());
+                drawElementsAction();
+
+                ImGui.End();
+            }
+            else
             {
-                bars[targetIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.TargetBordercolor);
+                DrawHelper.DrawInWindow(ID, origin + Config.Position, Config.Size, true, false, false, windowFlags, drawBarsAction);
+                drawElementsAction();
             }
-
-            ImGui.End();
         }
     }
 }

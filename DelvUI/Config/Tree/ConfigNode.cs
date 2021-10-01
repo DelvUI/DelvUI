@@ -209,7 +209,7 @@ namespace DelvUI.Config.Tree
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 1);
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
 
-            if (!ImGui.Begin("titlebarnew", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
+            if (!ImGui.Begin("DelvUI_settings", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 ImGui.End();
                 return;
@@ -900,7 +900,7 @@ namespace DelvUI.Config.Tree
                     // If the parent checkbox of this nested config is disabled, don't draw this nestedconfig
                     if (node.ParentCollapseField is not null && node.ParentConfigObject is not null)
                     {
-                        if (!(Attribute.IsDefined(node.ParentCollapseField, typeof(CheckboxAttribute)) && 
+                        if (!(Attribute.IsDefined(node.ParentCollapseField, typeof(CheckboxAttribute)) &&
                             (node.ParentCollapseField.GetValue(node.ParentConfigObject) as bool? ?? false)))
                         {
                             continue;

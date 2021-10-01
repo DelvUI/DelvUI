@@ -69,12 +69,7 @@ namespace DelvUI.Interface.GeneralElements
             if (Config.ValueLabelConfig.Enabled)
             {
                 Config.ValueLabelConfig.SetText($"{current,0}");
-                var (pos, size) = _valueLabel.Precalculate(startPos, Config.Size, Actor);
-
-                DrawHelper.DrawInWindow(_valueLabel.ID, pos, size, false, true, (drawList) =>
-                {
-                    _valueLabel.Draw(startPos, Config.Size, Actor);
-                });
+                _valueLabel.Draw(startPos, Config.Size, Actor);
             }
         }
 

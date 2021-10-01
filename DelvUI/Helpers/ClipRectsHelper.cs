@@ -2,6 +2,7 @@
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Numerics;
 
 namespace DelvUI.Helpers
@@ -142,7 +143,7 @@ namespace DelvUI.Helpers
             foreach (ClipRect clipRect in _clipRects)
             {
                 var area = new ClipRect(pos, pos + size);
-                if (clipRect.Intersects(area))
+                if (clipRect.IntersectsWith(area))
                 {
                     return clipRect;
                 }
@@ -178,28 +179,32 @@ namespace DelvUI.Helpers
 
     public struct ClipRect
     {
-        public Vector2 Min;
-        public Vector2 Max;
+        public readonly Vector2 Min;
+        public readonly Vector2 Max;
 
         public Vector2 TopRight => new Vector2(Max.X, Min.Y);
         public Vector2 BottomLeft => new Vector2(Min.X, Max.Y);
+
+        private readonly Rectangle Rectangle;
 
         public ClipRect(Vector2 min, Vector2 max)
         {
             Min = min;
             Max = max;
+
+            var size = Max - Min;
+
+            Rectangle = new Rectangle((int)Min.X, (int)Min.Y, (int)size.X, (int)size.Y);
         }
 
-        public bool IsPointInside(Vector2 point)
+        public bool Contains(Vector2 point)
         {
-            return (point.X >= Min.X && point.X <= Max.X) && (point.Y >= Min.Y && point.Y <= Max.Y);
+            return Rectangle.Contains((int)point.X, (int)point.Y);
         }
 
-        public bool Intersects(ClipRect other)
+        public bool IntersectsWith(ClipRect other)
         {
-            return
-                IsPointInside(other.Min) || IsPointInside(other.Max) || IsPointInside(other.TopRight) || IsPointInside(other.BottomLeft) ||
-                other.IsPointInside(Min) || other.IsPointInside(Max) || other.IsPointInside(TopRight) || other.IsPointInside(BottomLeft);
+            return Rectangle.IntersectsWith(other.Rectangle);
         }
     }
 }
