@@ -36,12 +36,13 @@ namespace DelvUI.Interface.GeneralElements
 
         private void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
         {
+            var fontPushed = FontsManager.Instance.PushFont(Config.FontID);
+
             var size = ImGui.CalcTextSize(text);
             var pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
 
             DrawHelper.DrawInWindow(ID, pos, size, false, true, (drawList) =>
             {
-                var fontPushed = FontsManager.Instance.PushFont(Config.FontID);
                 var color = Color(actor);
 
                 if (Config.ShowOutline)
@@ -52,12 +53,12 @@ namespace DelvUI.Interface.GeneralElements
                 {
                     drawList.AddText(pos, color.Base, text);
                 }
-
-                if (fontPushed)
-                {
-                    ImGui.PopFont();
-                }
             });
+
+            if (fontPushed)
+            {
+                ImGui.PopFont();
+            }
         }
 
         public virtual PluginConfigColor Color(GameObject? actor = null)
