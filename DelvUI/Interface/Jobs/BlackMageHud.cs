@@ -13,6 +13,7 @@ using System.Numerics;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -122,6 +123,8 @@ namespace DelvUI.Interface.Jobs
 
             var color = gauge.InAstralFire ? Config.ManaBarFireColor : gauge.InUmbralIce ? Config.ManaBarIceColor : Config.ManaBarNoElementColor;
 
+            if (Config.HideManaWhenFull && !gauge.InAstralFire && !gauge.InUmbralIce && player.CurrentMp is 10000) { return; }
+
             var builder = BarBuilder.Create(position, Config.ManaBarSize)
                 .AddInnerBar(player.CurrentMp, player.MaxMp, color)
                 .SetBackgroundColor(EmptyColor.Base);
@@ -179,6 +182,7 @@ namespace DelvUI.Interface.Jobs
         protected void DrawUmbralHeartStacks(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
+            if (Config.OnlyShowUmbralHeartWhenActive && gauge.UmbralHearts is 0) { return; }
             var position = origin + Config.Position + Config.UmbralHeartPosition - Config.UmbralHeartSize / 2f;
 
             var bar = BarBuilder.Create(position, Config.UmbralHeartSize)
@@ -195,6 +199,7 @@ namespace DelvUI.Interface.Jobs
         protected void DrawPolyglot(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
+            if (Config.OnlyShowPolyglotWhenActive && !gauge.IsEnochianActive && gauge.PolyglotStacks is 0) { return; }
 
             var position = origin + Config.Position + Config.PolyglotPosition - Config.PolyglotSize / 2f;
 
@@ -232,25 +237,26 @@ namespace DelvUI.Interface.Jobs
 
         protected void DrawTripleCast(Vector2 origin, PlayerCharacter player)
         {
-            var tripleStackBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 1211);
+            IEnumerable<Status> tripleStackBuff = player.StatusList.Where(o => o.StatusId is 1211);
+            int stackCount = tripleStackBuff.Any() ? tripleStackBuff.First().StackCount : 0;
 
-            var position = origin + Config.Position + Config.TriplecastPosition - Config.TriplecastSize / 2f;
+            Vector2 position = origin + Config.Position + Config.TriplecastPosition - Config.TriplecastSize / 2f;
 
-            var bar = BarBuilder.Create(position, Config.TriplecastSize)
+            Bar bar = BarBuilder.Create(position, Config.TriplecastSize)
                                 .SetChunks(3)
                                 .SetChunkPadding(Config.TriplecastPadding)
-                                .AddInnerBar(tripleStackBuff?.StackCount ?? 0, 3, Config.TriplecastColor, EmptyColor)
+                                .AddInnerBar(stackCount, 3, Config.TriplecastColor, EmptyColor)
                                 .SetBackgroundColor(EmptyColor.Base)
                                 .Build();
 
-            var drawList = ImGui.GetWindowDrawList();
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             bar.Draw(drawList);
         }
 
         protected void DrawFirestarterProcs(Vector2 origin, PlayerCharacter player)
         {
-            var statusEffects = player.StatusList;
-            var firestarterTimer = Config.ShowFirestarterProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.StatusId == 165)?.RemainingTime ?? 0f) : 0;
+            IEnumerable<Status> fireStarterBuff = player.StatusList.Where(o => o.StatusId is 165);
+            float firestarterTimer = Config.ShowFirestarterProcs ? fireStarterBuff.Any() ? Math.Abs(fireStarterBuff.First().RemainingTime) : 0f : 0;
 
             DrawProc(
                 origin,
@@ -266,8 +272,8 @@ namespace DelvUI.Interface.Jobs
 
         protected void DrawThundercloudProcs(Vector2 origin, PlayerCharacter player)
         {
-            var statusEffects = player.StatusList;
-            var thundercloudTimer = Config.ShowThundercloudProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.StatusId == 164)?.RemainingTime ?? 0f) : 0;
+            IEnumerable<Status> thundercloudBuff = player.StatusList.Where(o => o.StatusId is 164);
+            float thundercloudTimer = Config.ShowThundercloudProcs ? thundercloudBuff.Any() ? Math.Abs(thundercloudBuff.First().RemainingTime) : 0f : 0;
 
             DrawProc(
                 origin,
@@ -292,7 +298,8 @@ namespace DelvUI.Interface.Jobs
 
             var builder = BarBuilder.Create(pos, size)
                 .AddInnerBar(timer, 18f, color)
-                .SetFlipDrainDirection(invert);
+                .SetFlipDrainDirection(invert)
+                .SetBackgroundColor(EmptyColor.Base);
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
@@ -301,18 +308,19 @@ namespace DelvUI.Interface.Jobs
         protected void DrawDotTimer(Vector2 origin, PlayerCharacter player)
         {
             var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            float timer = 0;
+            float timer = 0f;
             float maxDuration = 1;
 
             if (actor is BattleChara target)
             {
                 // thunder 1 to 4
                 int[] dotIDs = { 161, 162, 163, 1210 };
-                float[] dotDurations = { 12, 18, 24, 18 };
+                float[] dotDurations = { 18, 12, 24, 18 };
 
                 for (var i = 0; i < 4; i++)
                 {
-                    timer = target.StatusList.FirstOrDefault(o => o.StatusId == dotIDs[i] && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+                    IEnumerable<Status> dot = target.StatusList.Where(o => o.StatusId == dotIDs[i]);
+                    timer = dot.Any() ? Math.Abs(dot.First().RemainingTime) : 0f;
 
                     if (timer > 0)
                     {
@@ -323,11 +331,20 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
+            if (Config.OnlyShowDotWhenActive && timer is 0) { return; }
+
             var position = origin + Config.Position + Config.DoTBarPosition - Config.DoTBarSize / 2f;
 
             var builder = BarBuilder.Create(position, Config.DoTBarSize)
                 .AddInnerBar(timer, maxDuration, Config.DotColor)
-                .SetFlipDrainDirection(Config.InvertDoTBar);
+                .SetFlipDrainDirection(Config.InvertDoTBar)
+                .SetBackgroundColor(EmptyColor.Base);
+
+            if (Config.ShowDoTBarTimer && timer != 0)
+            {
+                builder.SetTextMode(BarTextMode.Single)
+                    .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+            }
 
             var drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
@@ -343,179 +360,203 @@ namespace DelvUI.Interface.Jobs
         public new static BlackMageConfig DefaultConfig() { return new BlackMageConfig(); }
 
         #region mana bar
-        [Checkbox("Show Mana Bar", separator = true)]
+        [Checkbox("Mana", separator = true)]
         [Order(30)]
         public bool ShowManaBar = true;
 
-        [DragFloat2("Mana Bar Position", min = -2000, max = 2000f)]
+        [Checkbox("Hide When Full" + "##MP")]
+        [Order(31, collapseWith = nameof(ShowManaBar))]
+        public bool HideManaWhenFull = false;
+
+        [Checkbox("Text" + "##MP")]
         [Order(35, collapseWith = nameof(ShowManaBar))]
-        public Vector2 ManaBarPosition = new Vector2(0, -10);
-
-        [DragFloat2("Mana Bar Size", max = 2000f)]
-        [Order(40, collapseWith = nameof(ShowManaBar))]
-        public Vector2 ManaBarSize = new Vector2(254, 20);
-
-        [Checkbox("Show Mana Value")]
-        [Order(45, collapseWith = nameof(ShowManaBar))]
         public bool ShowManaValue = false;
 
-        [Checkbox("Show Mana Threshold Marker During Astral Fire")]
+        [DragFloat2("Position" + "##MP", min = -2000, max = 2000f)]
+        [Order(40, collapseWith = nameof(ShowManaBar))]
+        public Vector2 ManaBarPosition = new Vector2(0, -10);
+
+        [DragFloat2("Size" + "##MP", max = 2000f)]
+        [Order(45, collapseWith = nameof(ShowManaBar))]
+        public Vector2 ManaBarSize = new Vector2(254, 20);
+
+        [Checkbox("Astral Fire Threshold Marker" + "##MP")]
         [Order(50, collapseWith = nameof(ShowManaBar))]
         public bool ShowManaThresholdMarker = true;
 
-        [DragInt("Mana Threshold Marker Value", max = 10000)]
-        [Order(55, collapseWith = nameof(ShowManaBar))]
+        [DragInt("Value" + "##MP", max = 10000)]
+        [Order(55, collapseWith = nameof(ShowManaThresholdMarker))]
         public int ManaThresholdValue = 2400;
 
-        [ColorEdit4("Mana Bar Color")]
+        [ColorEdit4("Color" + "##MP")]
         [Order(60, collapseWith = nameof(ShowManaBar))]
         public PluginConfigColor ManaBarNoElementColor = new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
 
-        [ColorEdit4("Mana Bar Ice Color")]
+        [ColorEdit4("Ice Color" + "##MP")]
         [Order(65, collapseWith = nameof(ShowManaBar))]
         public PluginConfigColor ManaBarIceColor = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
 
-        [ColorEdit4("Mana Bar Fire Color")]
+        [ColorEdit4("Fire Color" + "##MP")]
         [Order(70, collapseWith = nameof(ShowManaBar))]
         public PluginConfigColor ManaBarFireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
         #endregion
 
         #region umbral heart
-        [Checkbox("Show Umbral Heart Bar", separator = true)]
+        [Checkbox("Umbral Heart", separator = true)]
         [Order(75)]
         public bool ShowUmbralHeart = true;
 
-        [DragFloat2("Umbral Heart Bar Position", min = -2000, max = 2000f)]
+        [Checkbox("Only Show When Active" + "##Umbral")]
+        [Order(76, collapseWith = nameof(ShowUmbralHeart))]
+        public bool OnlyShowUmbralHeartWhenActive = false;
+
+        [DragFloat2("Position" + "##Umbral", min = -2000, max = 2000f)]
         [Order(80, collapseWith = nameof(ShowUmbralHeart))]
         public Vector2 UmbralHeartPosition = new Vector2(0, -30);
 
-        [DragFloat2("Umbral Heart Bar Size", max = 2000f)]
+        [DragFloat2("Size" + "##Umbral", max = 2000f)]
         [Order(85, collapseWith = nameof(ShowUmbralHeart))]
         public Vector2 UmbralHeartSize = new Vector2(254, 16);
 
-        [DragInt("Umbral Heart Padding", min = -100, max = 100)]
+        [DragInt("Spacing" + "##Umbral", min = -100, max = 100)]
         [Order(90, collapseWith = nameof(ShowUmbralHeart))]
         public int UmbralHeartPadding = 2;
 
-        [ColorEdit4("Umbral Heart Color")]
+        [ColorEdit4("Color" + "##Umbral")]
         [Order(95, collapseWith = nameof(ShowUmbralHeart))]
         public PluginConfigColor UmbralHeartColor = new PluginConfigColor(new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f));
         #endregion
 
         #region triple cast
-        [Checkbox("Show Triplecast", separator = true)]
+        [Checkbox("Triplecast", separator = true)]
         [Order(100)]
         public bool ShowTriplecast = true;
 
-        [DragFloat2("Triplecast Position", min = -2000, max = 2000f)]
+        [Checkbox("Only Show When Active" + "##TripleCast")]
+        [Order(101, collapseWith = nameof(ShowUmbralHeart))]
+        public bool OnlyShowTriplecastWhenActive = false;
+
+        [DragFloat2("Position" + "##TripleCast", min = -2000, max = 2000f)]
         [Order(105, collapseWith = nameof(ShowTriplecast))]
         public Vector2 TriplecastPosition = new Vector2(0, -48);
 
-        [DragFloat2("Triplecast Size", max = 2000)]
+        [DragFloat2("Size" + "##TripleCast", max = 2000)]
         [Order(110, collapseWith = nameof(ShowTriplecast))]
         public Vector2 TriplecastSize = new Vector2(254, 16);
 
-        [DragInt("Trioplecast Padding", min = -100, max = 100)]
+        [DragInt("Spacing" + "##TripleCast", min = -100, max = 100)]
         [Order(115, collapseWith = nameof(ShowTriplecast))]
         public int TriplecastPadding = 2;
 
-        [ColorEdit4("Triplecast Color")]
+        [ColorEdit4("Color" + "##TripleCast")]
         [Order(120, collapseWith = nameof(ShowTriplecast))]
         public PluginConfigColor TriplecastColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
         #endregion
 
         #region polyglot
-        [Checkbox("Show Polyglot Stacks", separator = true)]
+        [Checkbox("Polyglot", separator = true)]
         [Order(125)]
         public bool ShowPolyglot = true;
 
-        [DragFloat2("Polyglot Position", min = -2000, max = 2000f)]
+        [Checkbox("Only Show When Active" + "##Polyglot")]
+        [Order(126, collapseWith = nameof(ShowPolyglot))]
+        public bool OnlyShowPolyglotWhenActive = false;
+
+        [DragFloat2("Position" + "##Polyglot", min = -2000, max = 2000f)]
         [Order(130, collapseWith = nameof(ShowPolyglot))]
         public Vector2 PolyglotPosition = new Vector2(0, -67);
 
-        [DragFloat2("Polyglot Size", max = 2000f)]
+        [DragFloat2("Size" + "##Polyglot", max = 2000f)]
         [Order(135, collapseWith = nameof(ShowPolyglot))]
         public Vector2 PolyglotSize = new Vector2(38, 18);
 
-        [DragInt("Polyglot Padding", min = -100, max = 100)]
+        [DragInt("Spacing" + "##Polyglot", min = -100, max = 100)]
         [Order(140, collapseWith = nameof(ShowPolyglot))]
         public int PolyglotPadding = 2;
 
-        [ColorEdit4("Polyglot Color")]
+        [ColorEdit4("Color" + "##Polyglot")]
         [Order(145, collapseWith = nameof(ShowPolyglot))]
         public PluginConfigColor PolyglotColor = new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
         #endregion
 
         #region firestarter
-        [Checkbox("Show Firestarter Proc", separator = true)]
+        [Checkbox("Firestarter", separator = true)]
         [Order(150)]
         public bool ShowFirestarterProcs = true;
 
-        [Checkbox("Always Show ##Firestarter")]
-        [Order(155, collapseWith = nameof(ShowFirestarterProcs))]
+        [Checkbox("Always Show" + "##Firestarter")]
+        [Order(156, collapseWith = nameof(ShowFirestarterProcs))]
         public bool AlwaysShowFirestarterProcs = true;
 
-        [DragFloat2("Position ##Firestarter", min = -2000, max = 2000f)]
+        [DragFloat2("Position" + "##Firestarter", min = -2000, max = 2000f)]
         [Order(160, collapseWith = nameof(ShowFirestarterProcs))]
         public Vector2 FirestarterBarPosition = new Vector2(-74, -72);
 
-        [DragFloat2("Size ##Firestarter", max = 2000f)]
+        [DragFloat2("Size" + "##Firestarter", max = 2000f)]
         [Order(165, collapseWith = nameof(ShowFirestarterProcs))]
         public Vector2 FirestarterBarSize = new Vector2(106, 8);
 
-        [Checkbox("Invert ##Firestarter")]
+        [Checkbox("Inverted" + "##Firestarter")]
         [Order(170, collapseWith = nameof(ShowFirestarterProcs))]
         public bool InvertFirestarterBar = true;
 
-        [ColorEdit4("Color ##Firestarter")]
+        [ColorEdit4("Color" + "##Firestarter")]
         [Order(175, collapseWith = nameof(ShowFirestarterProcs))]
         public PluginConfigColor FirestarterColor = new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f));
         #endregion
 
         #region thundercloud
-        [Checkbox("Show Thundercloud Proc", separator = true)]
+        [Checkbox("Thundercloud", separator = true)]
         [Order(180)]
         public bool ShowThundercloudProcs = true;
 
-        [Checkbox("Always Show ##Thundercloud")]
+        [Checkbox("Always Show" + "##Thundercloud")]
         [Order(185, collapseWith = nameof(ShowThundercloudProcs))]
         public bool AlwaysShowThundercloudProcs = true;
 
-        [DragFloat2("Position ##Thundercloud", min = -2000, max = 2000f)]
+        [DragFloat2("Position" + "##Thundercloud", min = -2000, max = 2000f)]
         [Order(190, collapseWith = nameof(ShowThundercloudProcs))]
         public Vector2 ThundercloudBarPosition = new Vector2(-74, -62);
 
-        [DragFloat2("Size ##Thundercloud", max = 2000f)]
+        [DragFloat2("Size" + "##Thundercloud", max = 2000f)]
         [Order(195, collapseWith = nameof(ShowThundercloudProcs))]
         public Vector2 ThundercloudBarSize = new Vector2(106, 8);
 
-        [Checkbox("Invert ##Thundercloud")]
+        [Checkbox("Inverted" + "##Thundercloud")]
         [Order(200, collapseWith = nameof(ShowThundercloudProcs))]
         public bool InvertThundercloudBar = true;
 
-        [ColorEdit4("Color ##Thundercloud")]
+        [ColorEdit4("Color" + "##Thundercloud")]
         [Order(205, collapseWith = nameof(ShowThundercloudProcs))]
         public PluginConfigColor ThundercloudColor = new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f));
         #endregion
 
         #region thunder dots
-        [Checkbox("Show DoT Bar", separator = true)]
+        [Checkbox("Thunder", separator = true)]
         [Order(210)]
         public bool ShowDotBar = true;
 
-        [Checkbox("Invert DoT Bar")]
+        [Checkbox("Only Show When Active" + "##Dot")]
+        [Order(211, collapseWith = nameof(ShowDotBar))]
+        public bool OnlyShowDotWhenActive = false;
+
+        [Checkbox("Timer" + "##Dot")]
+        [Order(212, collapseWith = nameof(ShowDotBar))]
+        public bool ShowDoTBarTimer = false;
+
+        [Checkbox("Inverted" + "##Dot")]
         [Order(215, collapseWith = nameof(ShowDotBar))]
         public bool InvertDoTBar = false;
 
-        [DragFloat2("DoT Bar Position", min = -2000, max = 2000f)]
+        [DragFloat2("Position" + "##Dot", min = -2000, max = 2000f)]
         [Order(220, collapseWith = nameof(ShowDotBar))]
         public Vector2 DoTBarPosition = new Vector2(74, -67);
 
-        [DragFloat2("DoT Bar Size", max = 2000f)]
+        [DragFloat2("Size" + "##Dot", max = 2000f)]
         [Order(225, collapseWith = nameof(ShowDotBar))]
         public Vector2 DoTBarSize = new Vector2(106, 18);
 
-        [ColorEdit4("DoT Color")]
+        [ColorEdit4("Color" + "##Dot")]
         [Order(230, collapseWith = nameof(ShowDotBar))]
         public PluginConfigColor DotColor = new PluginConfigColor(new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f));
         #endregion
