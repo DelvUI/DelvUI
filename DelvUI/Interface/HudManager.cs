@@ -248,6 +248,7 @@ namespace DelvUI.Interface
             }
 
             MouseOverHelper.Instance.Target = null;
+            TooltipsHelper.Instance.RemoveTooltip(); // remove tooltip from previous frame
 
             if (!ShouldBeVisible())
             {

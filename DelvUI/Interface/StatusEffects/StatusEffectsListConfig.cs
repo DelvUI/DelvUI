@@ -273,9 +273,14 @@ namespace DelvUI.Interface.StatusEffects
         public bool UseAsWhitelist = false;
         public SortedList<string, uint> List = new SortedList<string, uint>();
 
+        private string KeyName(Status status)
+        {
+            return status.Name + "[" + status.RowId.ToString() + "]";
+        }
+
         public bool StatusAllowed(Status status)
         {
-            var inList = List.ContainsKey(status.Name + "[" + status.RowId.ToString() + "]");
+            var inList = List.ContainsKey(KeyName(status));
             if ((inList && !UseAsWhitelist) || (!inList && UseAsWhitelist))
             {
                 return false;
@@ -286,9 +291,9 @@ namespace DelvUI.Interface.StatusEffects
 
         public bool AddNewEntry(Status? status)
         {
-            if (status != null && !List.ContainsKey(status.Name))
+            if (status != null && !List.ContainsKey(KeyName(status)))
             {
-                List.Add(status.Name + "[" + status.RowId.ToString() + "]", status.RowId);
+                List.Add(KeyName(status), status.RowId);
                 _input = "";
 
                 return true;

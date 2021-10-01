@@ -4,6 +4,7 @@ using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
+using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -17,7 +18,6 @@ namespace DelvUI.Interface.StatusEffects
         protected StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
 
         private LayoutInfo _layoutInfo;
-        private bool _showingTooltip = false;
 
         internal static int StatusEffectListsSize = 30;
         private StatusStruct[]? _fakeEffects = null;
@@ -232,11 +232,6 @@ namespace DelvUI.Interface.StatusEffects
             var areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
             var drawList = ImGui.GetWindowDrawList();
 
-            if (Config.Preview)
-            {
-                drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
-            }
-
             // no need to do anything else if there are no effects
             if (list.Count == 0)
             {
@@ -290,73 +285,90 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             // window
-            ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoTitleBar;
-            windowFlags |= ImGuiWindowFlags.NoMove;
-            windowFlags |= ImGuiWindowFlags.NoDecoration;
-            windowFlags |= ImGuiWindowFlags.NoBackground;
-
-            if (!Config.ShowBuffs)
-            {
-                windowFlags |= ImGuiWindowFlags.NoInputs;
-            }
-
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
             var margin = new Vector2(14, 10);
             var windowPos = minPos - margin;
             var windowSize = maxPos - minPos;
-            ImGui.SetNextWindowPos(windowPos, ImGuiCond.Always);
-            ImGui.SetNextWindowSize(windowSize + margin * 2);
 
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
-            ImGui.Begin(ID, windowFlags);
+            DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, Config.ShowBuffs, false, (drawList) =>
+            {
+                for (var i = 0; i < count; i++)
+                {
+                    var iconPos = iconPositions[i];
+                    var statusEffectData = list[i];
 
-            // draw
-            drawList = ImGui.GetWindowDrawList();
-            var showingTooltip = false;
+                    // area
+                    if (Config.Preview)
+                    {
+                        drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x11000000);
+                    }
 
+                    // icon
+                    DrawHelper.DrawIcon<LuminaStatus>(statusEffectData.Data, iconPos, Config.IconConfig.Size, false, drawList);
+
+                    // border
+                    var borderConfig = GetBorderConfig(statusEffectData);
+                    if (borderConfig != null)
+                    {
+                        drawList.AddRect(iconPos, iconPos + Config.IconConfig.Size, borderConfig.Color.Base, 0, ImDrawFlags.None, borderConfig.Thickness);
+                    }
+
+                    if (Actor != null && ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
+                    {
+                        // tooltip
+                        if (Config.ShowTooltips)
+                        {
+                            TooltipsHelper.Instance.ShowTooltipOnCursor(statusEffectData.Data.Description, statusEffectData.Data.Name);
+                        }
+
+                        // remove buff on right click
+                        bool isFromPlayer = statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId;
+
+                        if (statusEffectData.Data.Category == 1 && isFromPlayer && ImGui.GetIO().MouseClicked[1])
+                        {
+                            ChatHelper.SendChatMessage("/statusoff \"" + statusEffectData.Data.Name + "\"");
+                        }
+
+                        // automatic add to black list with ctrl+alt+shift click
+                        if (Config.BlacklistConfig.Enabled &&
+                            ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && ImGui.GetIO().MouseClicked[0])
+                        {
+                            Config.BlacklistConfig.AddNewEntry(statusEffectData.Data);
+                        }
+                    }
+                }
+            });
+
+            // labels need to be drawn separated since they have their own window for clipping
             for (var i = 0; i < count; i++)
             {
                 var iconPos = iconPositions[i];
                 var statusEffectData = list[i];
 
-                StatusEffectIconDrawHelper.DrawStatusEffectIcon(drawList, iconPos, statusEffectData, Config.IconConfig, _durationLabel, _stacksLabel);
-
-                if (Actor != null && ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
+                // duration
+                if (Config.IconConfig.DurationLabelConfig.Enabled &&
+                    !statusEffectData.Data.IsPermanent &&
+                    !statusEffectData.Data.IsFcBuff)
                 {
-                    // tooltip
-                    if (Config.ShowTooltips)
-                    {
-                        TooltipsHelper.Instance.ShowTooltipOnCursor(statusEffectData.Data.Description, statusEffectData.Data.Name);
-                        showingTooltip = true;
-                    }
+                    var duration = Math.Round(Math.Abs(statusEffectData.Status.RemainingTime));
+                    Config.IconConfig.DurationLabelConfig.SetText(Utils.DurationToString(duration));
 
-                    // remove buff on right click
-                    bool isFromPlayer = statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId;
-
-                    if (statusEffectData.Data.Category == 1 && isFromPlayer && ImGui.GetIO().MouseClicked[1])
-                    {
-                        ChatHelper.SendChatMessage("/statusoff \"" + statusEffectData.Data.Name + "\"");
-                    }
-
-                    // automatic add to black list with ctrl+alt+shift click
-                    if (Config.BlacklistConfig.Enabled &&
-                        ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && ImGui.GetIO().MouseClicked[0])
-                    {
-                        Config.BlacklistConfig.AddNewEntry(statusEffectData.Data);
-                    }
+                    _durationLabel.Draw(iconPos, Config.IconConfig.Size);
                 }
 
-            }
+                // stacks
+                if (Config.IconConfig.StacksLabelConfig.Enabled &&
+                    statusEffectData.Data.MaxStacks > 0 &&
+                    statusEffectData.Status.StackCount > 0 &&
+                    !statusEffectData.Data.IsFcBuff)
+                {
+                    var text = $"{statusEffectData.Status.StackCount}";
+                    Config.IconConfig.StacksLabelConfig.SetText(text);
 
-            ImGui.End();
-            ImGui.PopStyleVar();
-
-            if (_showingTooltip && !showingTooltip)
-            {
-                TooltipsHelper.Instance.RemoveTooltip();
+                    _stacksLabel.Draw(iconPos, Config.IconConfig.Size);
+                }
             }
-            _showingTooltip = showingTooltip;
         }
 
         private void CalculateAxisDirections(GrowthDirections growthDirections, int row, uint elementCount, out Vector2 direction, out Vector2 offset)
@@ -412,6 +424,26 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             return startPos;
+        }
+
+        public StatusEffectIconBorderConfig? GetBorderConfig(StatusEffectData statusEffectData)
+        {
+            StatusEffectIconBorderConfig? borderConfig = null;
+
+            if (Config.IconConfig.OwnedBorderConfig.Enabled && statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId)
+            {
+                borderConfig = Config.IconConfig.OwnedBorderConfig;
+            }
+            else if (Config.IconConfig.DispellableBorderConfig.Enabled && statusEffectData.Data.CanDispel)
+            {
+                borderConfig = Config.IconConfig.DispellableBorderConfig;
+            }
+            else if (Config.IconConfig.BorderConfig.Enabled)
+            {
+                borderConfig = Config.IconConfig.BorderConfig;
+            }
+
+            return borderConfig;
         }
 
         private void OnConfigPropertyChanged(object? sender, OnChangeBaseArgs args)

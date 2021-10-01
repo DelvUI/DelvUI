@@ -55,6 +55,8 @@ namespace DelvUI.Helpers
         private Vector2 _position;
         private Vector2 _size;
 
+        private bool _dataIsValid = false;
+
         public void ShowTooltipOnCursor(string text, string? title = null)
         {
             ShowTooltip(text, ImGui.GetMousePos(), title);
@@ -93,18 +95,18 @@ namespace DelvUI.Helpers
 
             // correct tooltips off screen
             _position = ConstrainPosition(position, _size);
+
+            _dataIsValid = true;
         }
 
         public void RemoveTooltip()
         {
-            _currentTooltipText = null;
-            _currentTooltipTitle = null;
-            _previousRawText = null;
+            _dataIsValid = false;
         }
 
         public void Draw()
         {
-            if (_currentTooltipText == null)
+            if (!_dataIsValid)
             {
                 return;
             }
