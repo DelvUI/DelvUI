@@ -750,6 +750,11 @@ namespace DelvUI.Config.Tree
                     configPageNode.ConfigObject = nestedConfig;
                     configPageNode.Name = nestedConfigAttribute.friendlyName;
 
+                    if (nestedConfig.Disableable)
+                    {
+                        configPageNode.Name += "##" + nestedConfig.GetHashCode();
+                    }
+
                     _nestedConfigPageNodes.Add(field.Name, configPageNode);
                 }
             }

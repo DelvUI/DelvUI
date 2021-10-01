@@ -36,16 +36,16 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new List<Vector2>();
             List<Vector2> sizes = new List<Vector2>();
 
-            if (Config.ShowHutonGauge)
+            if (Config.HutonBarConfig.Enabled)
             {
-                positions.Add(Config.Position + Config.HutonGaugePosition);
-                sizes.Add(Config.HutonGaugeSize);
+                positions.Add(Config.Position + Config.HutonBarConfig.Position);
+                sizes.Add(Config.HutonBarConfig.Size);
             }
 
-            if (Config.ShowNinkiGauge)
+            if (Config.NinkiBarConfig.Enabled)
             {
-                positions.Add(Config.Position + Config.NinkiGaugePosition);
-                sizes.Add(Config.NinkiGaugeSize);
+                positions.Add(Config.Position + Config.NinkiBarConfig.Position);
+                sizes.Add(Config.NinkiBarConfig.Size);
             }
 
             if (Config.ShowTrickBar || Config.ShowSuitonBar)
@@ -70,12 +70,12 @@ namespace DelvUI.Interface.Jobs
                 DrawMudraBars(origin, player);
             }
 
-            if (Config.ShowHutonGauge)
+            if (Config.HutonBarConfig.Enabled)
             {
                 DrawHutonGauge(origin);
             }
 
-            if (Config.ShowNinkiGauge)
+            if (Config.NinkiBarConfig.Enabled)
             {
                 DrawNinkiGauge(origin);
             }
@@ -227,80 +227,20 @@ namespace DelvUI.Interface.Jobs
         private void DrawHutonGauge(Vector2 origin)
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
-            int hutonDurationLeft = (int)Math.Ceiling((float)(gauge.HutonTimer / (double)1000));
+            float hutonDurationLeft = gauge.HutonTimer / 1000f;
+            Bar2 hutonBar = new Bar2(Config.HutonBarConfig);
+            hutonBar.SetBarText(((int)hutonDurationLeft).ToString());
 
-            if (hutonDurationLeft == 0 && Config.OnlyShowHutonWhenActive)
-            {
-                return;
-            }
-
-            float xPos = origin.X + Config.Position.X + Config.HutonGaugePosition.X - Config.HutonGaugeSize.X / 2f;
-            float yPos = origin.Y + Config.Position.Y + Config.HutonGaugePosition.Y - Config.HutonGaugeSize.Y / 2f;
-
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.HutonGaugeSize.Y, Config.HutonGaugeSize.X)
-                .SetBackgroundColor(EmptyColor.Base);
-            float maximum = 70f;
-
-            if (hutonDurationLeft > 0)
-            {
-                builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, hutonDurationLeft > Config.HutonGaugeExpiryThreshold ? Config.HutonGaugeColor : Config.HutonGaugeExpiryColor);
-
-                if (Config.ShowHutonGaugeText)
-                {
-                    builder.SetTextMode(BarTextMode.Single)
-                           .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                }
-            }
-
-            if (!Config.ShowHutonGaugeBorder)
-            {
-                builder.SetDrawBorder(false);
-            }
-
-            Bar bar = builder.Build();
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            hutonBar.Draw(origin + Config.Position, hutonDurationLeft, 70f, 40f);
         }
 
         private void DrawNinkiGauge(Vector2 origin)
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
+            Bar2 ninkiBar = new Bar2(Config.NinkiBarConfig);
+            ninkiBar.SetBarText(((int)gauge.Ninki).ToString());
 
-            if (gauge.Ninki == 0 && Config.OnlyShowNinkiWhenActive)
-            {
-                return;
-            }
-
-            float xPos = origin.X + Config.Position.X + Config.NinkiGaugePosition.X - Config.NinkiGaugeSize.X / 2f;
-            float yPos = origin.Y + Config.Position.Y + Config.NinkiGaugePosition.Y - Config.NinkiGaugeSize.Y / 2f;
-
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.NinkiGaugeSize.Y, Config.NinkiGaugeSize.X)
-                .SetBackgroundColor(EmptyColor.Base);
-
-            if (Config.ChunkNinkiGauge)
-            {
-                builder.SetChunks(2).SetChunkPadding(Config.NinkiGaugeChunkPadding).AddInnerBar(gauge.Ninki, 100, Config.NinkiGaugeColor, PartialFillColor);
-            }
-            else
-            {
-                builder.AddInnerBar(gauge.Ninki, 100, Config.NinkiGaugeColor);
-            }
-
-            if (Config.ShowNinkiGaugeText)
-            {
-                builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-            }
-
-            if (!Config.ShowNinkiGaugeBorder)
-            {
-                builder.SetDrawBorder(false);
-            }
-
-            Bar bar = builder.Build();
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            ninkiBar.Draw(origin + Config.Position, gauge.Ninki, 100f);
         }
 
         private void DrawTrickAndSuitonGauge(Vector2 origin, PlayerCharacter player)
@@ -367,88 +307,27 @@ namespace DelvUI.Interface.Jobs
         [JsonIgnore] public override uint JobId => JobIDs.NIN;
         public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
 
-        #region huton gauge
-        [Checkbox("Huton" + "##Huton", separator = true)]
-        [Order(30)]
-        public bool ShowHutonGauge = true;
+        [NestedConfig("Huton Bar", 30, separator = true)]
+        public BarConfig HutonBarConfig = new BarConfig(
+                                                new(0, -32),
+                                                new(254, 20),
+                                                new PluginConfigColor(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f)),
+                                                new PluginConfigColor(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)));
 
-        [Checkbox("Only Show When Active" + "##Huton")]
-        [Order(35, collapseWith = nameof(ShowHutonGauge))]
-        public bool OnlyShowHutonWhenActive = false;
+        //[Checkbox("Expire" + "##Huton")]
+        //[Order(60, collapseWith = nameof(ShowHutonGauge))]
+        //public bool ShowHutonGaugeExpiry = true;
 
-        [Checkbox("Timer" + "##Huton")]
-        [Order(40, collapseWith = nameof(ShowHutonGauge))]
-        public bool ShowHutonGaugeText = true;
-        
-        [Checkbox("Border" + "##Huton")]
-        [Order(45, collapseWith = nameof(ShowHutonGauge))]
-        public bool ShowHutonGaugeBorder = true;
+        //[DragFloat("Expire Threshold" + "##Huton", min = 1f, max = 70f)]
+        //[Order(65, collapseWith = nameof(ShowHutonGaugeExpiry))]
+        //public float HutonGaugeExpiryThreshold = 40f;
 
-        [DragFloat2("Position" + "##Huton", min = -4000f, max = 4000f)]
-        [Order(50, collapseWith = nameof(ShowHutonGauge))]
-        public Vector2 HutonGaugePosition = new(0, -54);
+        //[ColorEdit4("Expire Color" + "##Huton")]
+        //[Order(70, collapseWith = nameof(ShowHutonGaugeExpiry))]
+        //public PluginConfigColor HutonGaugeExpiryColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
 
-        [DragFloat2("Size" + "##Huton", max = 2000f)]
-        [Order(55, collapseWith = nameof(ShowHutonGauge))]
-        public Vector2 HutonGaugeSize = new(254, 20);
-
-        [ColorEdit4("Color" + "##Huton")]
-        [Order(60, collapseWith = nameof(ShowHutonGauge))]
-        public PluginConfigColor HutonGaugeColor = new(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f));
-
-        [Checkbox("Expire" + "##Huton")]
-        [Order(65, collapseWith = nameof(ShowHutonGauge))]
-        public bool ShowHutonGaugeExpiry = true;
-
-        [DragFloat("Expire Threshold" + "##Huton", min = 1f, max = 70f)]
-        [Order(70, collapseWith = nameof(ShowHutonGaugeExpiry))]
-        public float HutonGaugeExpiryThreshold = 40f;
-
-        [ColorEdit4("Expire Color" + "##Huton")]
-        [Order(75, collapseWith = nameof(ShowHutonGaugeExpiry))]
-        public PluginConfigColor HutonGaugeExpiryColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
-
-
-        #endregion
-
-        #region ninki gauge
-        [Checkbox("Ninki" + "##Ninki", separator = true)]
-        [Order(80)]
-        public bool ShowNinkiGauge = true;
-
-        [Checkbox("Only Show When Active" + "##Ninki")]
-        [Order(85, collapseWith = nameof(ShowNinkiGauge))]
-        public bool OnlyShowNinkiWhenActive = false;
-
-        [Checkbox("Text" + "##Ninki")]
-        [Order(90, collapseWith = nameof(ShowNinkiGauge))]
-        public bool ShowNinkiGaugeText = true;
-
-        [Checkbox("Border" + "##Ninki")]
-        [Order(95, collapseWith = nameof(ShowNinkiGauge))]
-        public bool ShowNinkiGaugeBorder = true;
-
-        [Checkbox("Split Bar" + "##Ninki")]
-        [Order(100, collapseWith = nameof(ShowNinkiGauge))]
-        public bool ChunkNinkiGauge = true;
-
-        [DragFloat2("Position" + "##Ninki", min = -4000f, max = 4000f)]
-        [Order(105, collapseWith = nameof(ShowNinkiGauge))]
-        public Vector2 NinkiGaugePosition = new(0, -32);
-
-        [DragFloat2("Size" + "##Ninki", max = 2000f)]
-        [Order(110, collapseWith = nameof(ShowNinkiGauge))]
-        public Vector2 NinkiGaugeSize = new(254, 20);
-
-        [DragFloat("Spacing" + "##Ninki", min = -4000f, max = 4000f)]
-        [Order(115, collapseWith = nameof(ShowNinkiGauge))]
-        public float NinkiGaugeChunkPadding = 2;
-
-        [ColorEdit4("Color" + "##Ninki")]
-        [Order(120, collapseWith = nameof(ShowNinkiGauge))]
-        public PluginConfigColor NinkiGaugeColor = new(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f));
-
-        #endregion
+        [NestedConfig("Ninki Bar", 75, separator = true)]
+        public BarConfig NinkiBarConfig = new BarConfig(new(0, -32), new(254, 20), new PluginConfigColor(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f)));
 
         #region trick / suiton
         [Checkbox("Trick Attack & Suiton Bar" + "##TnS", separator = true)]

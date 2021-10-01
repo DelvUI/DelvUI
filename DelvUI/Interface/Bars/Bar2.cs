@@ -15,25 +15,36 @@ namespace DelvUI.Interface.Bars
         public Bar2(BarConfig config)
         {
             Config = config;
-            _barLabel = new LabelHud("_barLabel" + config.GetHashCode().ToString(), Config.BarLabelConfig);
+            _barLabel = new LabelHud("_barLabel", Config.BarLabelConfig);
         }
 
-        public void Draw(ImDrawListPtr drawList, Vector2 origin, float current, float max)
+        public void SetBarText(string text)
         {
+            Config.BarLabelConfig.SetText(text);
+        }
+
+        public void Draw(Vector2 origin, float current, float max, float threshold = 0f)
+        {
+            if (current <= 0 && Config.HideWhenInactive)
+            {
+                return;
+            }
+
             var barPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
-            float progress = current / max;
+            float progressPercent = current / max;
             int chunks = Config.Chunk ? Config.ChunkNum : 1;
             float percentPerChunk = 1f / chunks;
 
-            Vector2 chunkSize;
-            Vector2 chunkPos;
+            var thresholdPos = new Vector2(barPos.X + threshold / max * Config.Size.X, barPos.Y);
+            var thresholdMarkerSize = new Vector2(2, Config.Size.Y);
 
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             for (int i = 0; i < chunks; i++)
             {
-                Vector2 chunkFillSize;
-                float chunkProgress = Math.Min(Math.Max(progress - (percentPerChunk * i), 0) / percentPerChunk, 1f);
+                float chunkProgress = Math.Clamp((progressPercent - percentPerChunk * i) / percentPerChunk, 0f, 1f);
                 int barIndex = (Config.FillDirection == BarDirection.Left || Config.FillDirection == BarDirection.Up) ? chunks - i - 1 : i;
 
+                Vector2 chunkPos, chunkSize, chunkFillSize;
                 if (Config.FillDirection == BarDirection.Right || Config.FillDirection == BarDirection.Left)
                 {
                     chunkSize = new Vector2((Config.Size.X - Config.ChunkPadding * (chunks - 1)) / chunks, Config.Size.Y);
@@ -60,17 +71,24 @@ namespace DelvUI.Interface.Bars
                 drawList.AddRectFilled(chunkPos, chunkPos + chunkSize, Config.BackgroundColor.Base);
 
                 // Draw inner bar
-                drawList.AddRectFilled(chunkFillPos, chunkFillPos + chunkFillSize, Config.FillColor.Base);
+                var barColor = Config.UseThresholdColor && current < threshold ? Config.ThresholdColor.Base : Config.FillColor.Base;
+                drawList.AddRectFilled(chunkFillPos, chunkFillPos + chunkFillSize, barColor);
 
                 // Draw border
                 if (Config.DrawBorder)
                 {
                     drawList.AddRect(chunkPos, chunkPos + chunkSize, 0xFF000000);
                 }
-
-                // Draw label
-                _barLabel.Draw(barPos, Config.Size);
             }
+
+            // Draw threshold marker
+            if (current > threshold && Config.DrawThresholdMarker)
+            {
+                drawList.AddRectFilled(thresholdPos, thresholdPos + thresholdMarkerSize, Config.ThresholdMarkerColor.Base);
+            }
+
+            // Draw label
+            _barLabel.Draw(barPos, Config.Size);
         }
     }
 }

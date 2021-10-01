@@ -25,28 +25,55 @@ namespace DelvUI.Interface.Bars
         [Order(35)]
         public bool DrawBorder = true;
 
-        [Checkbox("Chunk Bar" + "##Chunk")]
+        [Checkbox("Hide when inactive")]
+        [Order(40)]
+        public bool HideWhenInactive = false;
+
+        [Checkbox("Below Threshold Color", spacing = true)]
         [Order(45)]
+        public bool UseThresholdColor = false;
+
+        [ColorEdit4("Threshold Color")]
+        [Order(50, collapseWith = nameof(UseThresholdColor))]
+        public PluginConfigColor ThresholdColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+
+        [Checkbox("Show Threshold Marker")]
+        [Order(55)]
+        public bool DrawThresholdMarker = false;
+
+        [ColorEdit4("Threshold Marker Color")]
+        [Order(50, collapseWith = nameof(DrawThresholdMarker))]
+        public PluginConfigColor ThresholdMarkerColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [Checkbox("Chunk Bar", spacing = true)]
+        [Order(60)]
         public bool Chunk = false;
 
-        [DragInt("Chunk Number" + "##Chunk", min = 2, max = 10)]
-        [Order(50, collapseWith = nameof(Chunk))]
+        [DragInt("Chunk Number", min = 2, max = 10)]
+        [Order(65, collapseWith = nameof(Chunk))]
         public int ChunkNum = 2;
 
-        [DragInt("Chunk Padding" + "##Chunk", min = 0, max = 4000)]
-        [Order(55, collapseWith = nameof(Chunk))]
+        [DragInt("Chunk Padding", min = 0, max = 4000)]
+        [Order(70, collapseWith = nameof(Chunk))]
         public int ChunkPadding = 2;
 
-        [NestedConfig("Bar Text", 50)]
+        [NestedConfig("Bar Text", 75, separator = false, spacing = true)]
         public LabelConfig BarLabelConfig;
 
-        public BarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+        public BarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor, PluginConfigColor? threshHoldColor = null)
         {
             Position = position;
             Size = size;
-            BarLabelConfig = new LabelConfig(position, "", DrawAnchor.Center, DrawAnchor.Center);
+            BarLabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
             FillColor = fillColor;
+            ThresholdColor = threshHoldColor ?? fillColor;
         }
+    }
+
+    public enum BarChunkDirection
+    {
+        Horizontal,
+        Vertical
     }
 
     public enum BarDirection
