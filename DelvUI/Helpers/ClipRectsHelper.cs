@@ -186,8 +186,10 @@ namespace DelvUI.Helpers
 
         public ClipRect(Vector2 min, Vector2 max)
         {
-            Min = min;
-            Max = max;
+            var screenSize = ImGui.GetMainViewport().Size;
+
+            Min = Clamp(min, Vector2.Zero, screenSize);
+            Max = Clamp(max, Vector2.Zero, screenSize);
 
             var size = Max - Min;
 
@@ -202,6 +204,11 @@ namespace DelvUI.Helpers
         public bool IntersectsWith(ClipRect other)
         {
             return Rectangle.IntersectsWith(other.Rectangle);
+        }
+
+        private static Vector2 Clamp(Vector2 vector, Vector2 min, Vector2 max)
+        {
+            return new Vector2(Math.Max(min.X, Math.Min(max.X, vector.X)), Math.Max(min.Y, Math.Min(max.Y, vector.Y)));
         }
     }
 }
