@@ -1,5 +1,5 @@
 using Dalamud.Interface;
-using Dalamud.Plugin;
+using Dalamud.Logging;
 using DelvUI.Config.Attributes;
 using ImGuiNET;
 using ImGuiScene;
@@ -12,7 +12,6 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using Dalamud.Logging;
 
 namespace DelvUI.Config.Tree
 {

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Dalamud.Game.ClientState.Objects.Types;
+using System.Collections.Generic;
 
 namespace DelvUI.Helpers
 {
@@ -66,6 +67,82 @@ namespace DelvUI.Helpers
         {
             return IsJobARole(jobId, JobRoles.Gatherer);
         }
+
+        public static uint CurrentPrimaryResource(Character? character)
+        {
+            if (character == null)
+            {
+                return 0;
+            }
+
+            uint jobId = character.ClassJob.Id;
+
+            if (IsJobGatherer(jobId))
+            {
+                return character.CurrentGp;
+            }
+
+            if (IsJobCrafter(jobId))
+            {
+                return character.CurrentCp;
+            }
+
+            return character.CurrentMp;
+        }
+
+        public static uint MaxPrimaryResource(Character? character)
+        {
+            if (character == null)
+            {
+                return 0;
+            }
+
+            uint jobId = character.ClassJob.Id;
+
+            if (IsJobGatherer(jobId))
+            {
+                return character.MaxGp;
+            }
+
+            if (IsJobCrafter(jobId))
+            {
+                return character.MaxCp;
+            }
+
+            return character.MaxMp;
+        }
+
+        public static uint IconIDForJob(uint jobId)
+        {
+            return jobId + 62000;
+        }
+
+        public static uint RoleIconIDForJob(uint jobId, bool specificDPSIcons = false)
+        {
+            var role = RoleForJob(jobId);
+
+            switch (role)
+            {
+                case JobRoles.Tank: return 62581;
+                case JobRoles.Healer: return 62582;
+                case JobRoles.DPS:
+                    if (specificDPSIcons && SpecificDPSIcons.TryGetValue(jobId, out var iconId))
+                    {
+                        return iconId;
+                    }
+                    else
+                    {
+                        return 62583;
+                    }
+                case JobRoles.Gatherer:
+                case JobRoles.Crafter:
+                    return IconIDForJob(jobId);
+            }
+
+            return 0;
+        }
+
+        public static uint RoleIconIDForBattleCompanion => 62039;
 
         public static Dictionary<uint, JobRoles> JobRolesMap = new Dictionary<uint, JobRoles>()
         {
@@ -175,6 +252,32 @@ namespace DelvUI.Helpers
             [JobIDs.MIN] = "MIN",
             [JobIDs.BOT] = "BOT",
             [JobIDs.FSH] = "FSH",
+        };
+
+        public static Dictionary<uint, uint> SpecificDPSIcons = new Dictionary<uint, uint>()
+        {
+            // melee dps
+            [JobIDs.PGL] = 62584,
+            [JobIDs.LNC] = 62584,
+            [JobIDs.ROG] = 62584,
+            [JobIDs.MNK] = 62584,
+            [JobIDs.DRG] = 62584,
+            [JobIDs.NIN] = 62584,
+            [JobIDs.SAM] = 62584,
+
+            // ranged phys dps
+            [JobIDs.ARC] = 62586,
+            [JobIDs.BRD] = 62586,
+            [JobIDs.MCH] = 62586,
+            [JobIDs.DNC] = 62586,
+
+            // ranged magic dps
+            [JobIDs.THM] = 62587,
+            [JobIDs.ACN] = 62587,
+            [JobIDs.BLM] = 62587,
+            [JobIDs.SMN] = 62587,
+            [JobIDs.RDM] = 62587,
+            [JobIDs.BLU] = 62587
         };
     }
 

@@ -6,6 +6,7 @@ using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
+using DelvUI.Interface.Party;
 using DelvUI.Interface.StatusEffects;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
@@ -33,6 +34,8 @@ namespace DelvUI.Interface
         private CustomEffectsListHud _customEffectsHud = null!;
         private PrimaryResourceHud _primaryResourceHud = null!;
         private JobHud? _jobHud = null;
+        private PartyFramesHud _partyFramesHud = null!;
+
         private Dictionary<uint, JobHudTypes> _jobsMap = null!;
         private Dictionary<uint, Type> _unsupportedJobsMap = null!;
 
@@ -159,6 +162,10 @@ namespace DelvUI.Interface
             var focusTargetUnitFrame = new UnitFrameHud("focusTargetUnitFrame", focusTargetUnitFrameConfig, "Focus Target");
             _hudElements.Add(focusTargetUnitFrame);
             _hudElementsUsingFocusTarget.Add(focusTargetUnitFrame);
+
+            var partyFramesConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesConfig>();
+            _partyFramesHud = new PartyFramesHud("partyFrames", partyFramesConfig, "Party Frames");
+            _hudElements.Add(_partyFramesHud);
         }
 
         private void CreateCastbars()
@@ -235,6 +242,11 @@ namespace DelvUI.Interface
 
         public void Draw()
         {
+            if (!FontsManager.Instance.DefaultFontBuilt)
+            {
+                Plugin.UiBuilder.RebuildFonts();
+            }
+
             MouseOverHelper.Instance.Target = null;
 
             if (!ShouldBeVisible())
@@ -489,42 +501,5 @@ namespace DelvUI.Interface
         internal static Vector2 DefaultBigUnitFrameSize = new Vector2(270, 50);
         internal static Vector2 DefaultSmallUnitFrameSize = new Vector2(120, 20);
         internal static Vector2 DefaultStatusEffectsListSize = new Vector2(292, 82);
-    }
-
-    [Portable(false)]
-    [Section("Misc")]
-    [SubSection("Grid", 0)]
-    public class GridConfig : PluginConfigObject
-    {
-        public new static GridConfig DefaultConfig()
-        {
-            var config = new GridConfig();
-            config.Enabled = false;
-
-            return config;
-        }
-
-        [DragFloat("Background Alpha", min = 0, max = 1, velocity = .05f)]
-        [Order(10)]
-        public float BackgroundAlpha = 0.3f;
-
-        [Checkbox("Show Center Lines")]
-        [Order(15)]
-        public bool ShowCenterLines = true;
-        [Checkbox("Show Anchor Points")]
-        [Order(20)]
-
-        public bool ShowAnchorPoints = true;
-        [Checkbox("Grid Divisions", spacing = true)]
-        [Order(25)]
-        public bool ShowGrid = true;
-
-        [DragInt("Divisions Distance", min = 50, max = 500)]
-        [Order(30, collapseWith = nameof(ShowGrid))]
-        public int GridDivisionsDistance = 50;
-
-        [DragInt("Subdivision Count", min = 1, max = 10)]
-        [Order(35, collapseWith = nameof(ShowGrid))]
-        public int GridSubdivisionCount = 4;
     }
 }

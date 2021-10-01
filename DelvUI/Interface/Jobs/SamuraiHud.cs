@@ -93,16 +93,13 @@ namespace DelvUI.Interface.Jobs
                 origin.Y + Config.Position.Y + Config.KenkiBarPosition.Y - Config.KenkiBarSize.Y / 2f
             );
 
-            if (gauge.Kenki == 0 && Config.OnlyShowKenkiWhenActive)
-            {
-                return;
-            }
+            if (gauge.Kenki == 0 && Config.OnlyShowKenkiWhenActive) { return; }
 
             var kenkiBuilder = BarBuilder.Create(pos, Config.KenkiBarSize)
                 .SetBackgroundColor(EmptyColor.Base)
                 .AddInnerBar(gauge.Kenki, 100, Config.KenkiColor);
 
-            if (Config.ShowKenkiText)
+            if (Config.ShowKenkiText && gauge.Kenki != 0)
             {
                 kenkiBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
             }
@@ -121,16 +118,9 @@ namespace DelvUI.Interface.Jobs
 
             var actorId = player.ObjectId;
             var higanbana = target.StatusList.Where(o => o.StatusId is 1228 or 1319 && o.SourceID == actorId);
-            var higanbanaDuration = 0f;
-            if (higanbana.Any())
-            {
-                higanbanaDuration = Math.Abs(higanbana.First().RemainingTime);
-            }
+            var higanbanaDuration = higanbana.Any() ? Math.Abs(higanbana.First().RemainingTime) : 0f;
 
-            if (higanbanaDuration == 0 && Config.OnlyShowHiganbanaWhenActive)
-            {
-                return;
-            }
+            if (higanbanaDuration == 0 && Config.OnlyShowHiganbanaWhenActive) { return; }
 
             var higanbanaColor = higanbanaDuration > 5 ? Config.HiganbanaColor : Config.HiganbanaExpiryColor;
             var pos = new Vector2(
@@ -164,12 +154,8 @@ namespace DelvUI.Interface.Jobs
 
             // shifu
             var shifu = player.StatusList.Where(o => o.StatusId is 1299).ToList();
-            var shifuDuration = 0f;
-            if (shifu.Any())
-            {
-                shifuDuration = Math.Abs(shifu.First().RemainingTime);
-            }
-            
+            var shifuDuration = shifu.Any() ? Math.Abs(shifu.First().RemainingTime) : 0f;
+
             var shifuPos = new Vector2(
                 origin.X + Config.Position.X + Config.BuffsBarPosition.X + (2 * order[0] - 1) * Config.BuffsBarSize.X / 2f - order[0] * buffsSize.X,
                 origin.Y + Config.Position.Y + Config.BuffsBarPosition.Y - Config.BuffsBarSize.Y / 2f
@@ -181,20 +167,16 @@ namespace DelvUI.Interface.Jobs
             {
                 shifuBuilder.AddInnerBar(shifuDuration, 40f, Config.ShifuColor)
                 .SetFlipDrainDirection(true);
-                
+
                 if (Config.ShowBuffsText)
                 {
-                    shifuBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);                    
+                    shifuBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
                 }
             }
 
             // jinpu
             var jinpu = player.StatusList.Where(o => o.StatusId is 1298).ToList();
-            var jinpuDuration = 0f;
-            if (jinpu.Any())
-            {
-                jinpuDuration = Math.Abs(jinpu.First().RemainingTime);
-            }
+            var jinpuDuration = jinpu.Any() ? Math.Abs(jinpu.First().RemainingTime) : 0f;
 
             var jinpuPos = new Vector2(
                 origin.X + Config.Position.X + Config.BuffsBarPosition.X + (2 * order[1] - 1) * Config.BuffsBarSize.X / 2f - order[1] * buffsSize.X,
@@ -208,9 +190,9 @@ namespace DelvUI.Interface.Jobs
             {
                 jinpuBuilder.AddInnerBar(jinpuDuration, 40f, Config.JinpuColor)
                     .SetFlipDrainDirection(false);
-                
+
                 if (Config.ShowBuffsText)
-                {                    
+                {
                     jinpuBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
                 }
             }
@@ -229,10 +211,7 @@ namespace DelvUI.Interface.Jobs
         {
             var gauge = Plugin.JobGauges.Get<SAMGauge>();
 
-            if (Config.OnlyShowSenWhenActive && !gauge.HasKa && !gauge.HasGetsu && !gauge.HasSetsu)
-            {
-                return;
-            }
+            if (Config.OnlyShowSenWhenActive && !gauge.HasKa && !gauge.HasGetsu && !gauge.HasSetsu) { return; }
 
             var senBarWidth = (Config.SenBarSize.X - Config.SenBarPadding * 2) / 3f;
             var senBarSize = new Vector2(senBarWidth, Config.SenBarSize.Y);
@@ -262,10 +241,7 @@ namespace DelvUI.Interface.Jobs
         {
             var gauge = Plugin.JobGauges.Get<SAMGauge>();
 
-            if (Config.OnlyShowMeditationWhenActive && gauge.MeditationStacks == 0)
-            {
-                return;
-            }
+            if (Config.OnlyShowMeditationWhenActive && gauge.MeditationStacks == 0) { return; }
 
             var pos = new Vector2(
                 origin.X + Config.Position.X + Config.MeditationBarPosition.X - Config.MeditationBarSize.X / 2f,
@@ -317,7 +293,7 @@ namespace DelvUI.Interface.Jobs
 
         [ColorEdit4("Color" + "##Kenki")]
         [Order(55, collapseWith = nameof(ShowKenkiBar))]
-        public PluginConfigColor KenkiColor = new PluginConfigColor(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f));        
+        public PluginConfigColor KenkiColor = new PluginConfigColor(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f));
         #endregion
 
         #region Sen
@@ -449,7 +425,7 @@ namespace DelvUI.Interface.Jobs
 
         [ColorEdit4("Expiry Color" + "##Higanbana")]
         [Order(210, collapseWith = nameof(ShowHiganbanaBar))]
-        public PluginConfigColor HiganbanaExpiryColor = new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));        
+        public PluginConfigColor HiganbanaExpiryColor = new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
         #endregion
 
     }

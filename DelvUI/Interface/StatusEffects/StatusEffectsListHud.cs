@@ -1,16 +1,14 @@
-﻿using DelvUI.Helpers;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Types;
+using DelvUI.Config;
+using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Game.ClientState.Objects.Types;
 using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
-using Status = Dalamud.Game.ClientState.Statuses.Status;
-using FFXIVClientStructs.FFXIV.Client.Game;
-using Dalamud.Game.ClientState.Structs;
-using System.Runtime.InteropServices;
+using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
 namespace DelvUI.Interface.StatusEffects
 {
@@ -18,9 +16,11 @@ namespace DelvUI.Interface.StatusEffects
     {
         protected StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
 
-        private uint _rowCount;
-        private uint _colCount;
+        private LayoutInfo _layoutInfo;
         private bool _showingTooltip = false;
+
+        internal static int StatusEffectListsSize = 30;
+        private StatusStruct[]? _fakeEffects = null;
 
         private LabelHud _durationLabel;
         private LabelHud _stacksLabel;
@@ -29,8 +29,17 @@ namespace DelvUI.Interface.StatusEffects
 
         public StatusEffectsListHud(string id, StatusEffectsListConfig config, string displayName) : base(id, config, displayName)
         {
+            _config.ValueChangeEvent += OnConfigPropertyChanged;
+
             _durationLabel = new LabelHud(id + "_duration", config.IconConfig.DurationLabelConfig);
             _stacksLabel = new LabelHud(id + "_stacks", config.IconConfig.StacksLabelConfig);
+
+            UpdatePreview();
+        }
+
+        ~StatusEffectsListHud()
+        {
+            _config.ValueChangeEvent -= OnConfigPropertyChanged;
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -44,20 +53,17 @@ namespace DelvUI.Interface.StatusEffects
             var effectCount = (uint)list.Count;
             var count = Config.Limit >= 0 ? Math.Min((uint)Config.Limit, effectCount) : effectCount;
 
-            if (Actor == null || count <= 0)
+            if (count <= 0)
             {
                 return 0;
             }
 
-            LayoutHelper.CalculateLayout(
+            _layoutInfo = LayoutHelper.CalculateLayout(
                 Config.Size,
                 Config.IconConfig.Size,
                 count,
-                (int)Config.IconPadding.X,
-                (int)Config.IconPadding.Y,
-                Config.FillRowsFirst,
-                out _rowCount,
-                out _colCount
+                Config.IconPadding,
+                Config.FillRowsFirst
             );
 
             return count;
@@ -76,66 +82,103 @@ namespace DelvUI.Interface.StatusEffects
             return list;
         }
 
-        protected List<StatusEffectData> StatusEffectDataList(GameObject? actor)
+        protected unsafe List<StatusEffectData> StatusEffectDataList(GameObject? actor)
         {
             var list = new List<StatusEffectData>();
-            if (actor == null || actor is not BattleChara battleChara)
-            {
-                return list;
-            }
 
-            var sheet = Plugin.DataManager.GetExcelSheet<LuminaStatus>();
-            if (sheet == null)
+            BattleChara? character = null;
+
+            if (_fakeEffects == null)
             {
-                return list;
+                if (actor == null || actor is not BattleChara)
+                {
+                    return list;
+                }
+
+                character = (BattleChara)actor;
             }
 
             var player = Plugin.ClientState.LocalPlayer;
-
-            foreach (Status? status in battleChara.StatusList)
+            var count = StatusEffectListsSize;
+            if (_fakeEffects != null)
             {
-                if (status is null || status.StatusId == 0)
+                count = Config.Limit == -1 ? _fakeEffects.Length : Math.Min(Config.Limit, _fakeEffects.Length);
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                // status
+                StatusStruct* status = null;
+
+                if (_fakeEffects != null)
+                {
+                    var fakeStruct = _fakeEffects![i];
+                    status = &fakeStruct;
+                }
+                else
+                {
+                    status = (StatusStruct*)character!.StatusList[i]?.Address;
+                }
+
+                if (status == null || status->StatusID == 0)
                 {
                     continue;
                 }
 
-                var row = sheet.GetRow(status.StatusId);
-                if (row == null)
+                // data
+                LuminaStatus? data = null;
+
+                if (_fakeEffects != null)
                 {
+                    data = Plugin.DataManager.GetExcelSheet<LuminaStatus>()?.GetRow(status->StatusID);
+                }
+                else
+                {
+                    data = character!.StatusList[i]?.GameData;
+                }
+                if (data == null)
+                {
+                    continue;
+                }
+
+                // dont filter anything on preview mode
+                if (_fakeEffects != null)
+                {
+                    list.Add(new StatusEffectData(*status, data));
                     continue;
                 }
 
                 // buffs
-                if (!Config.ShowBuffs && row.Category == 1)
+                if (!Config.ShowBuffs && data.Category == 1)
                 {
                     continue;
                 }
 
                 // debuffs
-                if (!Config.ShowDebuffs && row.Category != 1)
+                if (!Config.ShowDebuffs && data.Category != 1)
                 {
                     continue;
                 }
 
                 // permanent
-                if (!Config.ShowPermanentEffects && row.IsPermanent)
+                if (!Config.ShowPermanentEffects && data.IsPermanent)
                 {
                     continue;
                 }
 
                 // only mine
-                if (Config.ShowOnlyMine && player?.ObjectId != status.SourceID)
+                if (Config.ShowOnlyMine && player?.ObjectId != status->SourceID)
                 {
                     continue;
                 }
 
                 // blacklist
-                if (Config.BlacklistConfig.Enabled && !Config.BlacklistConfig.StatusAllowed(row))
+                if (Config.BlacklistConfig.Enabled && !Config.BlacklistConfig.StatusAllowed(data))
                 {
                     continue;
                 }
 
-                list.Add(new StatusEffectData(status, row));
+                list.Add(new StatusEffectData(*status, data));
             }
 
             return list;
@@ -170,12 +213,12 @@ namespace DelvUI.Interface.StatusEffects
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || Actor == null)
+            if (!Config.Enabled)
             {
                 return;
             }
 
-            if (Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc)
+            if (_fakeEffects == null && (Actor == null || Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc))
             {
                 return;
             }
@@ -189,7 +232,7 @@ namespace DelvUI.Interface.StatusEffects
             var areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
             var drawList = ImGui.GetWindowDrawList();
 
-            if (Config.ShowArea)
+            if (Config.Preview)
             {
                 drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
             }
@@ -229,7 +272,7 @@ namespace DelvUI.Interface.StatusEffects
                 if (Config.FillRowsFirst || (growthDirections & GrowthDirections.Centered) != 0)
                 {
                     col += 1;
-                    if (col >= _colCount)
+                    if (col >= _layoutInfo.TotalColCount)
                     {
                         col = 0;
                         row += 1;
@@ -238,7 +281,7 @@ namespace DelvUI.Interface.StatusEffects
                 else
                 {
                     row += 1;
-                    if (row >= _rowCount)
+                    if (row >= _layoutInfo.TotalRowCount)
                     {
                         row = 0;
                         col += 1;
@@ -250,6 +293,7 @@ namespace DelvUI.Interface.StatusEffects
             ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoTitleBar;
             windowFlags |= ImGuiWindowFlags.NoMove;
             windowFlags |= ImGuiWindowFlags.NoDecoration;
+            windowFlags |= ImGuiWindowFlags.NoBackground;
             windowFlags |= ImGuiWindowFlags.NoBackground;
             if (!Config.ShowBuffs)
             {
@@ -278,7 +322,7 @@ namespace DelvUI.Interface.StatusEffects
 
                 StatusEffectIconDrawHelper.DrawStatusEffectIcon(drawList, iconPos, statusEffectData, Config.IconConfig, _durationLabel, _stacksLabel);
 
-                if (ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
+                if (Actor != null && ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
                 {
                     // tooltip
                     if (Config.ShowTooltips)
@@ -369,14 +413,45 @@ namespace DelvUI.Interface.StatusEffects
 
             return startPos;
         }
+
+        private void OnConfigPropertyChanged(object? sender, OnChangeBaseArgs args)
+        {
+            if (args.PropertyName == "Preview")
+            {
+                UpdatePreview();
+            }
+        }
+
+        private unsafe void UpdatePreview()
+        {
+            if (!Config.Preview)
+            {
+                _fakeEffects = null;
+                return;
+            }
+
+            var RNG = new Random((int)ImGui.GetTime());
+            _fakeEffects = new StatusStruct[StatusEffectListsSize];
+
+            for (int i = 0; i < StatusEffectListsSize; i++)
+            {
+                var fakeStruct = new StatusStruct();
+                fakeStruct.RemainingTime = RNG.Next(1, 30);
+                fakeStruct.StatusID = (ushort)RNG.Next(1, 200);
+                fakeStruct.StackCount = (byte)RNG.Next(0, 3);
+                fakeStruct.SourceID = 0;
+
+                _fakeEffects[i] = fakeStruct;
+            }
+        }
     }
 
     public struct StatusEffectData
     {
-        public Status Status;
+        public StatusStruct Status;
         public LuminaStatus Data;
 
-        public StatusEffectData(Status status, LuminaStatus data)
+        public StatusEffectData(StatusStruct status, LuminaStatus data)
         {
             Status = status;
             Data = data;

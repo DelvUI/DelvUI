@@ -107,9 +107,9 @@ namespace DelvUI.Interface.StatusEffects
         [Order(16)]
         public Vector2 IconPadding = new(2, 2);
 
-        [Checkbox("Preview")]
+        [Checkbox("Preview", isMonitored = true)]
         [Order(20)]
-        public bool ShowArea;
+        public bool Preview;
 
         [Checkbox("Fill Rows First", separator = true)]
         [Order(25)]
@@ -473,7 +473,7 @@ namespace DelvUI.Interface.StatusEffects
             return changed;
         }
     }
-    /**/
+
     [Section("Buffs and Debuffs")]
     [SubSection("Custom Effects", 0)]
     public class CustomEffectsListConfig : StatusEffectsListConfig
