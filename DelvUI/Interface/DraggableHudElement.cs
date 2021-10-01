@@ -44,14 +44,17 @@ namespace DelvUI.Interface
 
         public sealed override void Draw(Vector2 origin)
         {
-
-            DrawChildren(origin);
-
-            if (!_draggingEnabled)
+            if (_draggingEnabled)
             {
+                DrawDraggableArea(origin);
                 return;
             }
 
+            DrawChildren(origin);
+        }
+
+        private void DrawDraggableArea(Vector2 origin)
+        {
             var windowFlags = ImGuiWindowFlags.NoScrollbar
             | ImGuiWindowFlags.NoTitleBar
             | ImGuiWindowFlags.NoResize
@@ -72,7 +75,7 @@ namespace DelvUI.Interface
             }
 
             // update config object position
-            ImGui.Begin("dragArea " + ID, windowFlags);
+            ImGui.Begin(ID + "_dragArea", windowFlags);
             var windowPos = ImGui.GetWindowPos();
             _config.Position = windowPos + _positionOffset - origin;
 

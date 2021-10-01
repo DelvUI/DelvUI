@@ -275,7 +275,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             IEnumerable<Status> suitonBuff = player.StatusList.Where(o => o.StatusId == 507);
-                        
+
             if (suitonBuff.Any() && Config.ShowSuitonBar)
             {
                 suitonDuration = Math.Abs(suitonBuff.First().RemainingTime);
@@ -284,7 +284,7 @@ namespace DelvUI.Interface.Jobs
 
                 if (Config.ShowSuitonBarText)
                 {
-                    builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.SuitonBarColor.Vector, Vector4.UnitW, null);
+                    builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.SuitonBarColor.Base, 0xFF000000, null);
                 }
             }
 

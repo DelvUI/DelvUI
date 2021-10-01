@@ -113,6 +113,7 @@ namespace DelvUI
             _menuHook = new SystemMenuHook(PluginInterface);
 
             ChatHelper.Initialize();
+            ClipRectsHelper.Initialize();
             GlobalColors.Initialize();
             MouseOverHelper.Initialize();
             PartyManager.Initialize();
@@ -250,13 +251,13 @@ namespace DelvUI
             UiBuilder.RebuildFonts();
 
             ChatHelper.Instance.Dispose();
+            ClipRectsHelper.Instance.Dispose();
             FontsManager.Instance.Dispose();
             GlobalColors.Instance.Dispose();
             MouseOverHelper.Instance.Dispose();
             PartyManager.Instance.Dispose();
             TexturesCache.Instance.Dispose();
             TooltipsHelper.Instance.Dispose();
-
 
             // This needs to remain last to avoid race conditions
             ConfigurationManager.Instance.Dispose();

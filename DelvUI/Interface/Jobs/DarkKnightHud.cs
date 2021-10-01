@@ -211,7 +211,7 @@ namespace DelvUI.Interface.Jobs
 
                 if (Config.ShowBuffBarText)
                 {
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.BloodWeaponColor.Vector, Vector4.UnitW, null);
+                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.BloodWeaponColor.Base, 0xFF000000, null);
                 }
             }
 
@@ -222,7 +222,7 @@ namespace DelvUI.Interface.Jobs
 
                 if (Config.ShowBuffBarText)
                 {
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.DeliriumColor.Vector, Vector4.UnitW, null);
+                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.DeliriumColor.Base, 0xFF000000, null);
                 }
             }
 
@@ -250,7 +250,7 @@ namespace DelvUI.Interface.Jobs
 
                 if (Config.ShowLivingShadowBarText)
                 {
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.LivingShadowColor.Vector, Vector4.UnitW, null);
+                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.LivingShadowColor.Base, 0xFF000000, null);
                 }
             }
 
