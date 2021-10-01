@@ -1,11 +1,13 @@
 ﻿using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.Party
 {
@@ -13,6 +15,9 @@ namespace DelvUI.Interface.Party
     {
         private PartyFramesConfig Config => (PartyFramesConfig)_config;
         private PartyFramesHealthBarsConfig _healthBarsConfig;
+
+        private delegate void OpenContextMenu(IntPtr agentHud, IntPtr gameObject);
+        private readonly OpenContextMenu _openContextMenu;
 
         private Vector2 _contentMargin = new Vector2(40, 40);
         private static readonly int MaxMemberCount = 9; // 8 players + chocobo
@@ -46,12 +51,16 @@ namespace DelvUI.Interface.Party
             {
                 var bar = new PartyFramesBar("DelvUI_partyFramesBar" + i, _healthBarsConfig, manaBarConfig, castbarConfig, roleIconConfig, leaderIconConfig, buffsConfig, debuffsConfig);
                 bar.MovePlayerEvent += OnMovePlayer;
+                bar.OpenContextMenuEvent += OnOpenContextMenu;
 
                 bars.Add(bar);
             }
 
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
             UpdateBars(Vector2.Zero);
+
+            _openContextMenu =
+                Marshal.GetDelegateForFunctionPointer<OpenContextMenu>(Plugin.SigScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
         }
 
         protected override void InternalDispose()
@@ -74,6 +83,17 @@ namespace DelvUI.Interface.Party
 
                 ConfigurationManager.Instance.SaveConfigurations();
             }
+        }
+
+        private unsafe void OnOpenContextMenu(PartyFramesBar bar)
+        {
+            if (bar.Member == null || bar.Member.Character == null)
+            {
+                return;
+            }
+
+            var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
+            _openContextMenu.Invoke(agentHud, bar.Member.Character.Address);
         }
 
         private void OnLayoutPropertyChanged(object sender, OnChangeBaseArgs args)

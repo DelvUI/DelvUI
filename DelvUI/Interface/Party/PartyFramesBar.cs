@@ -11,8 +11,9 @@ namespace DelvUI.Interface.Party
 {
     public class PartyFramesBar
     {
-        public delegate void MovePlayerOrderHandler(PartyFramesBar bar);
-        public MovePlayerOrderHandler? MovePlayerEvent;
+        public delegate void PartyFramesBarEventHandler(PartyFramesBar bar);
+        public PartyFramesBarEventHandler? MovePlayerEvent;
+        public PartyFramesBarEventHandler? OpenContextMenuEvent;
 
         private PartyFramesHealthBarsConfig _config;
         private PartyFramesManaBarConfig _manaBarConfig;
@@ -121,6 +122,11 @@ namespace DelvUI.Interface.Party
                 else if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && character != null)
                 {
                     Plugin.TargetManager.SetTarget(character);
+                }
+                // context menu
+                else if (ImGui.IsMouseClicked(ImGuiMouseButton.Right) && character != null)
+                {
+                    OpenContextMenuEvent?.Invoke(this);
                 }
             }
 

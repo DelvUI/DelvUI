@@ -17,7 +17,6 @@ namespace DelvUI.Interface.GeneralElements
         private LabelHud _leftLabel;
         private LabelHud _rightLabel;
 
-        private ImGuiWindowFlags _childFlags = 0;
         private readonly OpenContextMenuFromTarget _openContextMenuFromTarget;
 
         public GameObject? Actor { get; set; } = null;
@@ -31,12 +30,6 @@ namespace DelvUI.Interface.GeneralElements
             // interaction stuff
             _openContextMenuFromTarget =
                 Marshal.GetDelegateForFunctionPointer<OpenContextMenuFromTarget>(Plugin.SigScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
-
-            _childFlags |= ImGuiWindowFlags.NoTitleBar;
-            _childFlags |= ImGuiWindowFlags.NoScrollbar;
-            _childFlags |= ImGuiWindowFlags.AlwaysAutoResize;
-            _childFlags |= ImGuiWindowFlags.NoBackground;
-            _childFlags |= ImGuiWindowFlags.NoBringToFrontOnFocus;
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
