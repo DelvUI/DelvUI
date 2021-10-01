@@ -433,7 +433,7 @@ namespace DelvUI.Interface.Jobs
         public bool ShowTriplecast = true;
 
         [Checkbox("Only Show When Active" + "##TripleCast")]
-        [Order(101, collapseWith = nameof(ShowUmbralHeart))]
+        [Order(101, collapseWith = nameof(ShowTriplecast))]
         public bool OnlyShowTriplecastWhenActive = false;
 
         [DragFloat2("Position" + "##TripleCast", min = -2000, max = 2000f)]
