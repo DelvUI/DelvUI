@@ -132,7 +132,8 @@ namespace DelvUI.Interface.Jobs
                             ? 20
                             : diaDuration * (20f / 3f)),
                     cursorPos.Y + Config.DiaBarSize.Y / 2 - 12
-                )
+                ),
+                drawList
             );
         }
 
@@ -154,6 +155,8 @@ namespace DelvUI.Interface.Jobs
             var posX = origin.X + Config.Position.X + Config.LilyBarPosition.X - Config.LilyBarSize.X / 2f;
             var posY = origin.Y + Config.Position.Y + Config.LilyBarPosition.Y - Config.LilyBarSize.Y / 2f;
 
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+
             BarBuilder builder = BarBuilder.Create(posX, posY, Config.LilyBarSize.Y, Config.LilyBarSize.X).SetBackgroundColor(EmptyColor.Background);
 
             builder.SetChunks(3).SetChunkPadding(Config.LilyBarPad).AddInnerBar(lilyScale, 3, Config.LilyColor, PartialFillColor);
@@ -169,11 +172,10 @@ namespace DelvUI.Interface.Jobs
                 {
                     DrawHelper.DrawOutlinedText(timer, new Vector2(
                         posX + lilyChunkOffset - (lilyChunkSize / 2f) - (size.X / 2f),
-                        posY - Config.LilyBarSize.Y - 4f));
+                        posY - Config.LilyBarSize.Y - 4f), drawList);
                 }
             }
 
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
             builder.Build().Draw(drawList);
 
             posX = origin.X + Config.Position.X + Config.BloodLilyBarPosition.X - Config.BloodLilyBarSize.X / 2f;

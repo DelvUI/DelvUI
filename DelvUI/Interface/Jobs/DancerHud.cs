@@ -265,7 +265,7 @@ namespace DelvUI.Interface.Jobs
                 {
                     BarTextPosition position = Config.DevilmentTextEnabled && Config.DevilmentBarEnabled ? BarTextPosition.CenterLeft : BarTextPosition.CenterMiddle;
 
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(position, BarTextType.Current, Config.TechnicalFinishBarColor.Vector, Vector4.UnitW, null);
+                    builder.SetTextMode(BarTextMode.EachChunk).SetText(position, BarTextType.Current, Config.TechnicalFinishBarColor.Base, 0xFF000000, null);
                 }
             }
 
@@ -277,7 +277,7 @@ namespace DelvUI.Interface.Jobs
                 {
                     BarTextPosition position = Config.TechnicalTextEnabled && Config.TechnicalBarEnabled ? BarTextPosition.CenterRight : BarTextPosition.CenterMiddle;
 
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(position, BarTextType.Current, Config.DevilmentBarColor.Vector, Vector4.UnitW, null);
+                    builder.SetTextMode(BarTextMode.EachChunk).SetText(position, BarTextType.Current, Config.DevilmentBarColor.Base, 0xFF000000, null);
                 }
             }
 
@@ -320,7 +320,7 @@ namespace DelvUI.Interface.Jobs
             float cascadeTimer = cascadeBuff.Any() ? Math.Abs(cascadeBuff.First().RemainingTime) : 0f;
             float fountainTimer = fountainBuff.Any() ? Math.Abs(fountainBuff.First().RemainingTime) : 0f;
             float windmillTimer = windmillBuff.Any() ? Math.Abs(windmillBuff.First().RemainingTime) : 0f;
-            float showerTimer = showerBuff.Any() ? Math.Abs(showerBuff.First().RemainingTime) : 0f;            
+            float showerTimer = showerBuff.Any() ? Math.Abs(showerBuff.First().RemainingTime) : 0f;
 
             if (cascadeTimer == 0 && fountainTimer == 0 && windmillTimer == 0 && showerTimer == 0 && Config.OnlyShowProcsWhenActive)
             {

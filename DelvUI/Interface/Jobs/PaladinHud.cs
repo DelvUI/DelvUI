@@ -161,7 +161,7 @@ namespace DelvUI.Interface.Jobs
 
                 if (Config.ShowBuffBarText)
                 {
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.FightOrFlightColor.Vector, Vector4.UnitW, null);
+                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.FightOrFlightColor.Base, 0xFF000000, null);
                 }
             }
 
@@ -172,7 +172,7 @@ namespace DelvUI.Interface.Jobs
 
                 if (Config.ShowBuffBarText)
                 {
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.RequiescatColor.Vector, Vector4.UnitW, null);
+                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.RequiescatColor.Base, 0xFF000000, null);
                 }
             }
 

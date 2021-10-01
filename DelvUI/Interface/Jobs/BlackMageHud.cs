@@ -175,7 +175,7 @@ namespace DelvUI.Interface.Jobs
                     position.X + 2,
                     position.Y + Config.ManaBarSize.Y / 2f - textSize.Y / 2f
                 );
-                DrawHelper.DrawOutlinedText(text, textPos);
+                DrawHelper.DrawOutlinedText(text, textPos, drawList);
             }
         }
 

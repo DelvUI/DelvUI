@@ -60,22 +60,24 @@ namespace DelvUI.Interface.GeneralElements
             var barSize = new Vector2(Math.Max(1f, Config.Size.X * scale), Config.Size.Y);
             var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
 
-            var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(startPos, startPos + Config.Size, 0x88000000);
-
-            drawList.AddRectFilledMultiColor(
-                startPos,
-                startPos + barSize,
-                Config.Color.TopGradient,
-                Config.Color.TopGradient,
-                Config.Color.BottomGradient,
-                Config.Color.BottomGradient
-            );
-
-            if (Config.ShowBorder)
+            DrawHelper.DrawInWindow(ID, startPos, barSize, false, false, (drawList) =>
             {
-                drawList.AddRect(startPos, startPos + Config.Size, 0xFF000000);
-            }
+                drawList.AddRectFilled(startPos, startPos + Config.Size, 0x88000000);
+
+                drawList.AddRectFilledMultiColor(
+                    startPos,
+                    startPos + barSize,
+                    Config.Color.TopGradient,
+                    Config.Color.TopGradient,
+                    Config.Color.BottomGradient,
+                    Config.Color.BottomGradient
+                );
+
+                if (Config.ShowBorder)
+                {
+                    drawList.AddRect(startPos, startPos + Config.Size, 0xFF000000);
+                }
+            });
         }
     }
 }

@@ -27,32 +27,33 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var text = actor == null && actorName == null ? 
+            var text = actor == null && actorName == null ?
                 Config.GetText() :
                 TextTags.GenerateFormattedTextFromTags(actor, Config.GetText(), actorName);
 
-            var size = parentSize ?? Vector2.Zero;
-
-            DrawLabel(text, origin, size, actor);
+            DrawLabel(text, origin, parentSize ?? Vector2.Zero, actor);
         }
 
         private void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
         {
             var fontPushed = FontsManager.Instance.PushFont(Config.FontID);
 
-            var textSize = ImGui.CalcTextSize(text);
-            var textPos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), textSize, Config.TextAnchor);
-            var drawList = ImGui.GetWindowDrawList();
-            var color = Color(actor);
+            var size = ImGui.CalcTextSize(text);
+            var pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
 
-            if (Config.ShowOutline)
+            DrawHelper.DrawInWindow(ID, pos, size, false, true, (drawList) =>
             {
-                DrawHelper.DrawOutlinedText(text, textPos, color.Base, Config.OutlineColor.Base, drawList);
-            }
-            else
-            {
-                drawList.AddText(textPos, color.Base, text);
-            }
+                var color = Color(actor);
+
+                if (Config.ShowOutline)
+                {
+                    DrawHelper.DrawOutlinedText(text, pos, color.Base, Config.OutlineColor.Base, drawList);
+                }
+                else
+                {
+                    drawList.AddText(pos, color.Base, text);
+                }
+            });
 
             if (fontPushed)
             {

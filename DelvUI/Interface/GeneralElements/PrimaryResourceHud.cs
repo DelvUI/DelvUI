@@ -44,23 +44,26 @@ namespace DelvUI.Interface.GeneralElements
 
             var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
 
-            // bar
-            var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(startPos, startPos + Config.Size, 0x88000000);
-
-            var color = Config.ShowThresholdMarker && percent < Config.ThresholdMarkerValue / 100 ? Config.BelowThresholdColor : Color(Actor);
-
-            DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X * scale, Config.Size.Y), color, drawList);
-
-            drawList.AddRect(startPos, startPos + Config.Size, 0xFF000000);
-
-            // threshold
-            if (Config.ShowThresholdMarker)
+            DrawHelper.DrawInWindow(ID, startPos, Config.Size, false, false, (drawList) =>
             {
-                var position = new Vector2(startPos.X + Config.ThresholdMarkerValue / 10000f * Config.Size.X - 2, startPos.Y);
-                var size = new Vector2(2, Config.Size.Y);
-                drawList.AddRect(position, position + size, 0xFF000000);
-            }
+                // bar
+                drawList.AddRectFilled(startPos, startPos + Config.Size, 0x88000000);
+
+                var color = Config.ShowThresholdMarker && percent < Config.ThresholdMarkerValue / 100 ? Config.BelowThresholdColor : Color(Actor);
+
+                DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X * scale, Config.Size.Y), color, drawList);
+
+                drawList.AddRect(startPos, startPos + Config.Size, 0xFF000000);
+
+                // threshold
+                if (Config.ShowThresholdMarker)
+                {
+                    var position = new Vector2(startPos.X + Config.ThresholdMarkerValue / 10000f * Config.Size.X - 2, startPos.Y);
+                    var size = new Vector2(2, Config.Size.Y);
+                    drawList.AddRect(position, position + size, 0xFF000000);
+                }
+            });
+
 
             // label
             if (Config.ValueLabelConfig.Enabled)
@@ -68,7 +71,6 @@ namespace DelvUI.Interface.GeneralElements
                 Config.ValueLabelConfig.SetText($"{current,0}");
                 _valueLabel.Draw(startPos, Config.Size, Actor);
             }
-
         }
 
         private void GetResources(ref int current, ref int max, ref int percent, Character actor)
