@@ -23,6 +23,8 @@ namespace DelvUI.Interface.Party
 
         private PartyManager(PartyFramesConfig config)
         {
+            _raiseTracker = new PartyFramesRaiseTracker();
+
             Plugin.Framework.Update += FrameworkOnOnUpdateEvent;
 
             _config = config;
@@ -81,6 +83,8 @@ namespace DelvUI.Interface.Party
         public IReadOnlyCollection<IPartyFramesMember> GroupMembers => _groupMembers.AsReadOnly();
         public uint MemberCount => (uint)_groupMembers.Count;
 
+        private PartyFramesRaiseTracker _raiseTracker;
+
         public event PartyMembersChangedEventHandler? MembersChangedEvent;
 
 
@@ -127,6 +131,7 @@ namespace DelvUI.Interface.Party
                         MembersChangedEvent?.Invoke(this);
                     }
 
+                    _raiseTracker.Update(_groupMembers);
                     return;
                 }
 
@@ -141,19 +146,20 @@ namespace DelvUI.Interface.Party
                         var index = member.ObjectId == player.ObjectId ? 0 : member.Order - 1;
                         member.Update(EnmityForIndex(index), IsLeader(index), JobIdForIndex(index));
                     }
-
-                    return;
                 }
-
                 // cross world party
-                if (Plugin.PartyList.Length < _realMemberCount)
+                else if (Plugin.PartyList.Length < _realMemberCount)
                 {
                     UpdateCrossWorldParty(player);
-                    return;
+
+                }
+                // regular party
+                else
+                {
+                    UpdateRegularParty(player);
                 }
 
-                // regular party
-                UpdateRegularParty(player);
+                _raiseTracker.Update(_groupMembers);
             }
             catch (Exception e)
             {

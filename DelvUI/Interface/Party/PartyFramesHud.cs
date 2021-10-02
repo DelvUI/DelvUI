@@ -41,6 +41,7 @@ namespace DelvUI.Interface.Party
             var leaderIconConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesLeaderIconConfig>();
             var buffsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesBuffsConfig>();
             var debuffsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesDebuffsConfig>();
+            var raiseTrackerConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesRaiseTrackerConfig>();
 
             config.ValueChangeEvent += OnLayoutPropertyChanged;
             _healthBarsConfig.ValueChangeEvent += OnLayoutPropertyChanged;
@@ -49,7 +50,18 @@ namespace DelvUI.Interface.Party
             bars = new List<PartyFramesBar>(MaxMemberCount);
             for (int i = 0; i < bars.Capacity; i++)
             {
-                var bar = new PartyFramesBar("DelvUI_partyFramesBar" + i, _healthBarsConfig, manaBarConfig, castbarConfig, roleIconConfig, leaderIconConfig, buffsConfig, debuffsConfig);
+                var bar = new PartyFramesBar(
+                    "DelvUI_partyFramesBar" + i,
+                    _healthBarsConfig,
+                    manaBarConfig,
+                    castbarConfig,
+                    roleIconConfig,
+                    leaderIconConfig,
+                    buffsConfig,
+                    debuffsConfig,
+                    raiseTrackerConfig
+                );
+
                 bar.MovePlayerEvent += OnMovePlayer;
                 bar.OpenContextMenuEvent += OnOpenContextMenu;
 
