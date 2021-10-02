@@ -15,6 +15,7 @@ namespace DelvUI.Interface.Party
     {
         private PartyFramesConfig Config => (PartyFramesConfig)_config;
         private PartyFramesHealthBarsConfig _healthBarsConfig;
+        private PartyFramesRaiseTrackerConfig _raiseTrackerConfig;
 
         private delegate void OpenContextMenu(IntPtr agentHud, int parentAddonId, int index);
         private readonly OpenContextMenu _openContextMenu;
@@ -35,13 +36,14 @@ namespace DelvUI.Interface.Party
         public PartyFramesHud(string id, PartyFramesConfig config, string displayName) : base(id, config, displayName)
         {
             _healthBarsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesHealthBarsConfig>();
+            _raiseTrackerConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesRaiseTrackerConfig>();
+
             var manaBarConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesManaBarConfig>();
             var castbarConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesCastbarConfig>();
             var roleIconConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesRoleIconConfig>();
             var leaderIconConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesLeaderIconConfig>();
             var buffsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesBuffsConfig>();
             var debuffsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesDebuffsConfig>();
-            var raiseTrackerConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesRaiseTrackerConfig>();
 
             config.ValueChangeEvent += OnLayoutPropertyChanged;
             _healthBarsConfig.ValueChangeEvent += OnLayoutPropertyChanged;
@@ -59,7 +61,7 @@ namespace DelvUI.Interface.Party
                     leaderIconConfig,
                     buffsConfig,
                     debuffsConfig,
-                    raiseTrackerConfig
+                    _raiseTrackerConfig
                 );
 
                 bar.MovePlayerEvent += OnMovePlayer;
@@ -306,6 +308,7 @@ namespace DelvUI.Interface.Party
                 var targetIndex = -1;
                 var enmityLeaderIndex = -1;
                 var enmitySecondIndex = -1;
+                List<int> raisedIndexes = new List<int>();
 
                 // bars
                 for (int i = 0; i < count; i++)
@@ -317,6 +320,12 @@ namespace DelvUI.Interface.Party
                         if (target != null && member.ObjectId == target.ObjectId)
                         {
                             targetIndex = i;
+                            continue;
+                        }
+
+                        if (_raiseTrackerConfig.Enabled && _raiseTrackerConfig.ChangeBorderColorWhenRaised && member.RaiseTime.HasValue)
+                        {
+                            raisedIndexes.Add(i);
                             continue;
                         }
 
@@ -339,6 +348,8 @@ namespace DelvUI.Interface.Party
                     bars[i].Draw(origin, drawList);
                 }
 
+                // special colors for borders
+
                 // 2nd enmity
                 if (enmitySecondIndex >= 0)
                 {
@@ -349,6 +360,12 @@ namespace DelvUI.Interface.Party
                 if (enmityLeaderIndex >= 0)
                 {
                     bars[enmityLeaderIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.EnmityLeaderBordercolor);
+                }
+
+                // raise
+                foreach (int index in raisedIndexes)
+                {
+                    bars[index].Draw(origin, drawList, _raiseTrackerConfig.BorderColor);
                 }
 
                 // target
