@@ -25,6 +25,7 @@ namespace DelvUI.Interface.Party
         private PartyFramesRaiseTrackerConfig _raiseTrackerConfig;
 
         private LabelHud _nameLabelHud;
+        private LabelHud _healthLabelHud;
         private LabelHud _manaLabelHud;
         private LabelHud _orderLabelHud;
         private LabelHud _raiseLabelHud;
@@ -58,6 +59,7 @@ namespace DelvUI.Interface.Party
             _raiseTrackerConfig = raiseTrackerConfig;
 
             _nameLabelHud = new LabelHud(id + "_nameLabel", config.NameLabelConfig);
+            _healthLabelHud = new LabelHud(id + "_healthLabel", config.HealthLabelConfig);
             _manaLabelHud = new LabelHud(id + "_manaLabel", _manaBarConfig.ValueLabelConfig);
             _orderLabelHud = new LabelHud(id + "_orderLabel", config.OrderLabelConfig);
             _raiseLabelHud = new LabelHud(id + "_raiseLabel", _raiseTrackerConfig.LabelConfig);
@@ -293,6 +295,9 @@ namespace DelvUI.Interface.Party
             {
                 _nameLabelHud.Draw(Position, _config.Size, character, Member.Name);
             }
+
+            // health label
+            _healthLabelHud.Draw(Position, _config.Size, character, Member.HP.ToString());
 
             // order
             if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)

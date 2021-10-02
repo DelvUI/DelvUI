@@ -68,16 +68,19 @@ namespace DelvUI.Interface.Party
         [NestedConfig("Name Label", 40)]
         public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:first-initial]. [name:last-initial].", DrawAnchor.Center, DrawAnchor.Center);
 
-        [NestedConfig("Order Position Label", 45)]
+        [NestedConfig("Health Label", 45)]
+        public EditableLabelConfig HealthLabelConfig = new EditableLabelConfig(Vector2.Zero, "[health:current-short]", DrawAnchor.Right, DrawAnchor.Right);
+
+        [NestedConfig("Order Position Label", 50)]
         public LabelConfig OrderLabelConfig = new LabelConfig(new Vector2(2, 4), "[name:first-initial]. [name:last-initial].", DrawAnchor.TopLeft, DrawAnchor.TopLeft);
 
-        [NestedConfig("Colors", 50)]
+        [NestedConfig("Colors", 55)]
         public PartyFramesColorsConfig ColorsConfig = new PartyFramesColorsConfig();
 
-        [NestedConfig("Shield", 55)]
+        [NestedConfig("Shield", 60)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
-        [NestedConfig("Change Alpha Based on Range", 60)]
+        [NestedConfig("Change Alpha Based on Range", 65)]
         public PartyFramesRangeConfig RangeConfig = new PartyFramesRangeConfig();
     }
 
