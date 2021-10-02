@@ -68,16 +68,19 @@ namespace DelvUI.Interface.Party
         [NestedConfig("Name Label", 40)]
         public EditableLabelConfig NameLabelConfig = new EditableLabelConfig(Vector2.Zero, "[name:first-initial]. [name:last-initial].", DrawAnchor.Center, DrawAnchor.Center);
 
-        [NestedConfig("Order Position Label", 45)]
+        [NestedConfig("Health Label", 45)]
+        public EditableLabelConfig HealthLabelConfig = new EditableLabelConfig(Vector2.Zero, "[health:current-short]", DrawAnchor.Right, DrawAnchor.Right);
+
+        [NestedConfig("Order Position Label", 50)]
         public LabelConfig OrderLabelConfig = new LabelConfig(new Vector2(2, 4), "[name:first-initial]. [name:last-initial].", DrawAnchor.TopLeft, DrawAnchor.TopLeft);
 
-        [NestedConfig("Colors", 50)]
+        [NestedConfig("Colors", 55)]
         public PartyFramesColorsConfig ColorsConfig = new PartyFramesColorsConfig();
 
-        [NestedConfig("Shield", 55)]
+        [NestedConfig("Shield", 60)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
-        [NestedConfig("Change Alpha Based on Range", 60)]
+        [NestedConfig("Change Alpha Based on Range", 65)]
         public PartyFramesRangeConfig RangeConfig = new PartyFramesRangeConfig();
     }
 
@@ -117,7 +120,7 @@ namespace DelvUI.Interface.Party
         [Order(40, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor GenericRoleColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
-        [Checkbox("Color Based On Health Value" , isMonitored = true)]
+        [Checkbox("Color Based On Health Value", isMonitored = true)]
         [Order(45)]
         public bool UseColorBasedOnHealthValue = false;
 
@@ -417,5 +420,51 @@ namespace DelvUI.Interface.Party
         {
 
         }
+    }
+
+    [Section("Party Frames")]
+    [SubSection("Raise Tracker", 0)]
+    public class PartyFramesRaiseTrackerConfig : MovablePluginConfigObject
+    {
+        public new static PartyFramesRaiseTrackerConfig DefaultConfig() { return new PartyFramesRaiseTrackerConfig(); }
+
+        [DragInt2("Icon Size", min = 1, max = 1000)]
+        [Order(10)]
+        public Vector2 IconSize = new(50, 50);
+
+        [Anchor("Health Bar Anchor")]
+        [Order(15)]
+        public DrawAnchor HealthBarAnchor = DrawAnchor.Center;
+
+        [Anchor("Anchor")]
+        [Order(20)]
+        public DrawAnchor Anchor = DrawAnchor.Center;
+
+        [Checkbox("Hide Name When Raised", spacing = true)]
+        [Order(25)]
+        public bool HideNameWhenRaised = true;
+
+        [Checkbox("Keep Icon After Cast Finishes")]
+        [Order(30)]
+        public bool KeepIconAfterCastFinishes = true;
+
+        [Checkbox("Change Background Color When Raised", spacing = true)]
+        [Order(35)]
+        public bool ChangeBackgroundColorWhenRaised = true;
+
+        [ColorEdit4("Raise Backround Color")]
+        [Order(40, collapseWith = nameof(ChangeBackgroundColorWhenRaised))]
+        public PluginConfigColor BackgroundColor = new(new Vector4(211f / 255f, 235f / 255f, 215f / 245f, 50f / 100f));
+
+        [Checkbox("Change Border Color When Raised", spacing = true)]
+        [Order(45)]
+        public bool ChangeBorderColorWhenRaised = true;
+
+        [ColorEdit4("Raise Border Color")]
+        [Order(50, collapseWith = nameof(ChangeBorderColorWhenRaised))]
+        public PluginConfigColor BorderColor = new(new Vector4(47f / 255f, 169f / 255f, 215f / 255f, 100f / 100f));
+
+        [NestedConfig("Label", 55)]
+        public LabelConfig LabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
     }
 }
