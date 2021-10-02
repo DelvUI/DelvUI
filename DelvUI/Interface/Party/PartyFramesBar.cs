@@ -5,6 +5,7 @@ using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
 using System;
+using System.Globalization;
 using System.Numerics;
 
 namespace DelvUI.Interface.Party
@@ -311,7 +312,7 @@ namespace DelvUI.Interface.Party
             if (showingRaise)
             {
                 var duration = Math.Abs(Member.RaiseTime!.Value);
-                var text = duration < 10 ? duration.ToString("N1") : Utils.DurationToString(duration);
+                var text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
                 _raiseTrackerConfig.LabelConfig.SetText(text);
                 _raiseLabelHud.Draw(Position, _config.Size);
             }
