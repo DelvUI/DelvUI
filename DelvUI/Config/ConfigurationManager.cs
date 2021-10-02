@@ -173,6 +173,7 @@ namespace DelvUI.Config
                 typeof(HideHudConfig),
                 typeof(PrimaryResourceConfig),
                 typeof(TooltipsConfig),
+                typeof(ExperienceBarConfig),
                 typeof(GCDIndicatorConfig),
                 typeof(MPTickerConfig),
                 typeof(GridConfig),

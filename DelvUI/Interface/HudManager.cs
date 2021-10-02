@@ -238,6 +238,12 @@ namespace DelvUI.Interface
             var mpTicker = new MPTickerHud("DelvUI_mpTicker", mpTickerConfig, "MP Ticker");
             _hudElements.Add(mpTicker);
             _hudElementsUsingPlayer.Add(mpTicker);
+
+            //exp bar
+            var expBarConfig = ConfigurationManager.Instance.GetConfigObject<ExperienceBarConfig>();
+            var expBarHud = new ExperienceBarHud("DelvUI_expBar", expBarConfig, "Experience Bar");
+            _hudElements.Add(expBarHud);
+            _hudElementsUsingPlayer.Add(expBarHud);
         }
 
         public void Draw()

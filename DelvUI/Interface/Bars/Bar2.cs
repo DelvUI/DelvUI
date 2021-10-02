@@ -1,4 +1,5 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Logging;
+using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
