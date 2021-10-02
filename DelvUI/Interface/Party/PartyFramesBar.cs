@@ -124,7 +124,7 @@ namespace DelvUI.Interface.Party
                     Plugin.TargetManager.SetTarget(character);
                 }
                 // context menu
-                else if (ImGui.IsMouseClicked(ImGuiMouseButton.Right) && character != null)
+                else if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
                 {
                     OpenContextMenuEvent?.Invoke(this);
                 }

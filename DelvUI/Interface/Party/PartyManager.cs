@@ -64,8 +64,8 @@ namespace DelvUI.Interface.Party
 
         #endregion Singleton
 
-        private AddonPartyList* _partyListAddon = null;
-        private IntPtr _hudAgent = IntPtr.Zero;
+        public AddonPartyList* PartyListAddon { get; private set; } = null;
+        public IntPtr HudAgent { get; private set; } = IntPtr.Zero;
 
         private const int PartyListInfoOffset = 0x0B50;
         private const int PartyListMemberRawInfoSize = 0x18;
@@ -87,10 +87,10 @@ namespace DelvUI.Interface.Party
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
             // find party list hud agent
-            if (_hudAgent == IntPtr.Zero || _partyListAddon == null)
+            if (HudAgent == IntPtr.Zero || PartyListAddon == null)
             {
-                _partyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1);
-                _hudAgent = Plugin.GameGui.FindAgentInterface(_partyListAddon);
+                PartyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1);
+                HudAgent = Plugin.GameGui.FindAgentInterface(PartyListAddon);
             }
 
             // no need to update on preview mode
@@ -102,7 +102,7 @@ namespace DelvUI.Interface.Party
             Update();
         }
 
-        private int _realMemberCount => _partyListAddon != null ? _partyListAddon->MemberCount : Plugin.PartyList.Length;
+        private int _realMemberCount => PartyListAddon != null ? PartyListAddon->MemberCount : Plugin.PartyList.Length;
 
         private void Update()
         {
@@ -178,14 +178,14 @@ namespace DelvUI.Interface.Party
                 (_groupMembers.Count > 1 && !_config.ShowChocobo) ||
                 (_groupMembers.Count > 1 && chocobo == null);
 
-            EnmityLevel playerEnmity = _partyListAddon->EnmityLeaderIndex == 0 ? EnmityLevel.Leader : EnmityLevel.Last;
+            EnmityLevel playerEnmity = PartyListAddon->EnmityLeaderIndex == 0 ? EnmityLevel.Leader : EnmityLevel.Last;
 
             // for some reason chocobos never get a proper enmity value even though they have aggro
             // if the player enmity is set to first, but the "leader index" is invalid
             // we can pretty much deduce that the chocobo is the one with aggro
             // this might fail on some cases when there are other players not in party hitting the same thing
             // but the edge case is so minor we should be fine
-            EnmityLevel chocoboEnmity = _partyListAddon->EnmityLeaderIndex == -1 && _partyListAddon->PartyMember[0].EmnityByte == 1 ? EnmityLevel.Leader : EnmityLevel.Last;
+            EnmityLevel chocoboEnmity = PartyListAddon->EnmityLeaderIndex == -1 && PartyListAddon->PartyMember[0].EmnityByte == 1 ? EnmityLevel.Leader : EnmityLevel.Last;
 
             if (needsUpdate)
             {
@@ -213,13 +213,13 @@ namespace DelvUI.Interface.Party
         {
             bool partyChanged = _playerOrderChanged || _partyMembersInfo == null || _groupMembers.Count != _realMemberCount;
 
-            if (_hudAgent != IntPtr.Zero)
+            if (HudAgent != IntPtr.Zero)
             {
                 List<PartyListMemberInfo> newInfo = new List<PartyListMemberInfo>(_realMemberCount);
 
                 for (int i = 0; i < _realMemberCount; i++)
                 {
-                    PartyListMemberRawInfo* info = (PartyListMemberRawInfo*)(_hudAgent + (PartyListInfoOffset + PartyListMemberRawInfoSize * i));
+                    PartyListMemberRawInfo* info = (PartyListMemberRawInfo*)(HudAgent + (PartyListInfoOffset + PartyListMemberRawInfoSize * i));
                     newInfo.Add(new PartyListMemberInfo(info, NameForIndex(i), JobIdForIndex(i)));
                 }
 
@@ -324,25 +324,25 @@ namespace DelvUI.Interface.Party
         #region utils
         private string? NameForIndex(int index)
         {
-            if (_hudAgent == IntPtr.Zero || index < 0 || index > 7)
+            if (HudAgent == IntPtr.Zero || index < 0 || index > 7)
             {
                 return null;
             }
 
-            IntPtr namePtr = (_hudAgent + (PartyCrossWorldNameOffset + PartyCrossWorldEntrySize * index));
+            IntPtr namePtr = (HudAgent + (PartyCrossWorldNameOffset + PartyCrossWorldEntrySize * index));
             return Marshal.PtrToStringAnsi(namePtr);
         }
 
         private uint JobIdForIndex(int index)
         {
-            if (_partyListAddon == null || index < 0 || index > 7)
+            if (PartyListAddon == null || index < 0 || index > 7)
             {
                 return 0;
             }
 
             // since we don't get the job info in a nice way when another player is out of reach
             // we infer it from the icon id in the party list
-            int* ptr = (int*)(new IntPtr(_partyListAddon) + PartyJobIconIdsOffset + (4 * index));
+            int* ptr = (int*)(new IntPtr(PartyListAddon) + PartyJobIconIdsOffset + (4 * index));
             int iconId = *ptr;
 
             return (uint)(Math.Max(0, iconId - 62100));
@@ -350,13 +350,13 @@ namespace DelvUI.Interface.Party
 
         private EnmityLevel EnmityForIndex(int index)
         {
-            if (_partyListAddon == null || index < 0 || index > 7)
+            if (PartyListAddon == null || index < 0 || index > 7)
             {
                 return EnmityLevel.Last;
             }
 
-            EnmityLevel enmityLevel = (EnmityLevel)_partyListAddon->PartyMember[index].EmnityByte;
-            if (enmityLevel == EnmityLevel.Leader && _partyListAddon->EnmityLeaderIndex != index)
+            EnmityLevel enmityLevel = (EnmityLevel)PartyListAddon->PartyMember[index].EmnityByte;
+            if (enmityLevel == EnmityLevel.Leader && PartyListAddon->EnmityLeaderIndex != index)
             {
                 enmityLevel = EnmityLevel.Last;
             }
@@ -372,13 +372,13 @@ namespace DelvUI.Interface.Party
                 return index == partyLeadIndex;
             }
 
-            if (_partyListAddon == null)
+            if (PartyListAddon == null)
             {
                 return false;
             }
 
             // we use the icon Y coordinate in the party list to know the index (lmao)
-            partyLeadIndex = (uint)_partyListAddon->LeaderMarkResNode->ChildNode->Y / 40;
+            partyLeadIndex = (uint)PartyListAddon->LeaderMarkResNode->ChildNode->Y / 40;
             return index == partyLeadIndex;
         }
 
