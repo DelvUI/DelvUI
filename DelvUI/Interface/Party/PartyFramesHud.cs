@@ -16,7 +16,7 @@ namespace DelvUI.Interface.Party
         private PartyFramesConfig Config => (PartyFramesConfig)_config;
         private PartyFramesHealthBarsConfig _healthBarsConfig;
 
-        private delegate void OpenContextMenu(IntPtr agentHud, IntPtr gameObject);
+        private delegate void OpenContextMenu(IntPtr agentHud, int parentAddonId, int index);
         private readonly OpenContextMenu _openContextMenu;
 
         private Vector2 _contentMargin = new Vector2(40, 40);
@@ -60,7 +60,7 @@ namespace DelvUI.Interface.Party
             UpdateBars(Vector2.Zero);
 
             _openContextMenu =
-                Marshal.GetDelegateForFunctionPointer<OpenContextMenu>(Plugin.SigScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
+                Marshal.GetDelegateForFunctionPointer<OpenContextMenu>(Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? EB 50 83 FB 01"));
         }
 
         protected override void InternalDispose()
@@ -87,13 +87,20 @@ namespace DelvUI.Interface.Party
 
         private unsafe void OnOpenContextMenu(PartyFramesBar bar)
         {
-            if (bar.Member == null || bar.Member.Character == null)
+            if (bar.Member == null || Plugin.ClientState.LocalPlayer == null)
             {
                 return;
             }
 
-            var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
-            _openContextMenu.Invoke(agentHud, bar.Member.Character.Address);
+            if (PartyManager.Instance.PartyListAddon == null || PartyManager.Instance.HudAgent == IntPtr.Zero)
+            {
+                return;
+            }
+
+            int addonId = PartyManager.Instance.PartyListAddon->AtkUnitBase.ID;
+            int index = bar.Member.Character?.ObjectId == Plugin.ClientState.LocalPlayer.ObjectId ? 0 : bar.Member.Order - 1;
+
+            _openContextMenu.Invoke(PartyManager.Instance.HudAgent, addonId, index);
         }
 
         private void OnLayoutPropertyChanged(object sender, OnChangeBaseArgs args)
