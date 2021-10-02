@@ -1,12 +1,8 @@
-﻿using ImGuiScene;
-using Lumina.Data.Files;
+﻿using Dalamud.Plugin.Ipc;
+using ImGuiScene;
 using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
-using Dalamud.Utility;
-using Action = Lumina.Excel.GeneratedSheets.Action;
-using Dalamud.Plugin.Ipc;
 
 namespace DelvUI.Helpers
 {
@@ -39,28 +35,30 @@ namespace DelvUI.Helpers
                 return texture;
             }
 
-            var iconFile = LoadIcon(iconId + stackCount, hdIcon);
-
-            if (iconFile == null)
+            var newTexture = LoadTexture(iconId + stackCount, hdIcon);
+            if (newTexture == null)
             {
                 return null;
             }
 
-            var builder = Plugin.UiBuilder;
-            var newTexture = builder.LoadImageRaw(iconFile.GetRgbaImageData(), iconFile.Header.Width, iconFile.Header.Height, 4);
             _cache.Add(iconId + stackCount, newTexture);
 
             return newTexture;
         }
 
-        private TexFile? LoadIcon(uint id, bool hdIcon)
+        private unsafe TextureWrap? LoadTexture(uint id, bool hdIcon)
         {
             var hdString = hdIcon ? "_hr1" : "";
             var path = $"ui/icon/{id / 1000 * 1000:000000}/{id:000000}{hdString}.tex";
 
             var resolvedPath = _penumbraPathResolver.InvokeFunc(path);
 
-            return Plugin.DataManager.GetFile<TexFile>(resolvedPath ?? path);
+            if (resolvedPath != null && resolvedPath != path)
+            {
+                return TextureLoader.LoadTexture(resolvedPath, true);
+            }
+
+            return TextureLoader.LoadTexture(path, false);
         }
 
         private void RemoveTexture<T>(uint rowId) where T : ExcelRow
