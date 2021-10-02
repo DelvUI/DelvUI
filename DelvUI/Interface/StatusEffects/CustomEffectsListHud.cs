@@ -16,6 +16,11 @@ namespace DelvUI.Interface.StatusEffects
             var list = StatusEffectDataList(TargetActor);
             list.AddRange(StatusEffectDataList(Actor));
 
+            // cull duplicate statuses from the same source
+            list = list.GroupBy(s => new { s.Status.StatusID, s.Status.SourceID })
+                .Select(status => status.First())
+                .ToList();
+
             // show mine first
             if (Config.ShowMineFirst)
             {
