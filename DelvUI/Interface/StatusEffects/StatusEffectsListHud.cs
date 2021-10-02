@@ -293,16 +293,16 @@ namespace DelvUI.Interface.StatusEffects
 
             DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, Config.ShowBuffs, false, (drawList) =>
             {
+                // area
+                if (Config.Preview)
+                {
+                    drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
+                }
+
                 for (var i = 0; i < count; i++)
                 {
                     var iconPos = iconPositions[i];
                     var statusEffectData = list[i];
-
-                    // area
-                    if (Config.Preview)
-                    {
-                        drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x11000000);
-                    }
 
                     // icon
                     DrawHelper.DrawIcon<LuminaStatus>(statusEffectData.Data, iconPos, Config.IconConfig.Size, false, drawList);
