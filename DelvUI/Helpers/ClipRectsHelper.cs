@@ -76,6 +76,7 @@ namespace DelvUI.Helpers
             "Buddy",
             "Currency",
             "Macro",
+            "PcSearchDetail",
             "Social",
             "LookingForGroup",
             "Marker",
