@@ -128,6 +128,7 @@ namespace DelvUI.Config
                 typeof(PartyFramesLeaderIconConfig),
                 typeof(PartyFramesBuffsConfig),
                 typeof(PartyFramesDebuffsConfig),
+                typeof(PartyFramesRaiseTrackerConfig),
 
                 typeof(PlayerCastbarConfig),
                 typeof(TargetCastbarConfig),

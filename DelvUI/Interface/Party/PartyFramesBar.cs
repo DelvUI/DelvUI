@@ -22,10 +22,12 @@ namespace DelvUI.Interface.Party
         private PartyFramesLeaderIconConfig _leaderIconConfig;
         private PartyFramesBuffsConfig _buffsConfig;
         private PartyFramesDebuffsConfig _debuffsConfig;
+        private PartyFramesRaiseTrackerConfig _raiseTrackerConfig;
 
         private LabelHud _nameLabelHud;
         private LabelHud _manaLabelHud;
         private LabelHud _orderLabelHud;
+        private LabelHud _raiseLabelHud;
         private CastbarHud _castbarHud;
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
@@ -42,7 +44,8 @@ namespace DelvUI.Interface.Party
             PartyFramesRoleIconConfig roleIconConfig,
             PartyFramesLeaderIconConfig leaderIconConfig,
             PartyFramesBuffsConfig buffsConfig,
-            PartyFramesDebuffsConfig debuffsConfig
+            PartyFramesDebuffsConfig debuffsConfig,
+            PartyFramesRaiseTrackerConfig raiseTrackerConfig
         )
         {
             _config = config;
@@ -52,10 +55,13 @@ namespace DelvUI.Interface.Party
             _leaderIconConfig = leaderIconConfig;
             _buffsConfig = buffsConfig;
             _debuffsConfig = debuffsConfig;
+            _raiseTrackerConfig = raiseTrackerConfig;
 
             _nameLabelHud = new LabelHud(id + "_nameLabel", config.NameLabelConfig);
             _manaLabelHud = new LabelHud(id + "_manaLabel", _manaBarConfig.ValueLabelConfig);
             _orderLabelHud = new LabelHud(id + "_orderLabel", config.OrderLabelConfig);
+            _raiseLabelHud = new LabelHud(id + "_raiseLabel", _raiseTrackerConfig.LabelConfig);
+
             _castbarHud = new CastbarHud(id + "_castbar", _castbarConfig, "");
             _buffsListHud = new StatusEffectsListHud(id + "_buffs", buffsConfig, "");
             _debuffsListHud = new StatusEffectsListHud(id + "_debebuffs", debuffsConfig, "");
@@ -131,11 +137,15 @@ namespace DelvUI.Interface.Party
             }
 
             // bg
-            drawList.AddRectFilled(Position, Position + _config.Size, _config.ColorsConfig.BackgroundColor.Base);
+            var bgColor = Member.RaiseTime != null && _raiseTrackerConfig.Enabled && _raiseTrackerConfig.ChangeBackgroundColorWhenRaised ?
+                _raiseTrackerConfig.BackgroundColor :
+                _config.ColorsConfig.BackgroundColor;
+
+            drawList.AddRectFilled(Position, Position + _config.Size, bgColor.Base);
 
             // hp
             var hpScale = Member.MaxHP > 0 ? (float)Member.HP / (float)Member.MaxHP : 1;
-            var hpFillSize = new Vector2(Math.Max(1, _config.Size.X * hpScale), _config.Size.Y);
+            var hpFillSize = new Vector2(_config.Size.X * hpScale, _config.Size.Y);
             PluginConfigColor? hpColor = GetColor(hpScale);
 
             var distance = character != null ? character.YalmDistanceX : byte.MaxValue;
@@ -223,6 +233,14 @@ namespace DelvUI.Interface.Party
                 DrawHelper.DrawIcon(61521, iconPos, _leaderIconConfig.Size, false, drawList);
             }
 
+            // raise icon
+            if (ShowingRaise())
+            {
+                var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _raiseTrackerConfig.HealthBarAnchor);
+                var iconPos = Utils.GetAnchoredPosition(parentPos + _raiseTrackerConfig.Position, _raiseTrackerConfig.IconSize, _raiseTrackerConfig.Anchor);
+                DrawHelper.DrawIcon(411, iconPos, _raiseTrackerConfig.IconSize, true, drawList);
+            }
+
             // highlight
             if (_config.ColorsConfig.ShowHighlight && isHovering)
             {
@@ -269,7 +287,12 @@ namespace DelvUI.Interface.Party
             _castbarHud.Draw(castbarPos);
 
             // name
-            _nameLabelHud.Draw(Position, _config.Size, character, Member.Name);
+            var showingRaise = ShowingRaise();
+
+            if (!showingRaise || !_raiseTrackerConfig.HideNameWhenRaised)
+            {
+                _nameLabelHud.Draw(Position, _config.Size, character, Member.Name);
+            }
 
             // order
             if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)
@@ -278,6 +301,21 @@ namespace DelvUI.Interface.Party
                 _config.OrderLabelConfig.SetText("[" + order + "]");
                 _orderLabelHud.Draw(Position, _config.Size);
             }
+
+            // raise label
+            if (showingRaise)
+            {
+                var duration = Math.Abs(Member.RaiseTime!.Value);
+                var text = duration < 10 ? duration.ToString("N1") : Utils.DurationToString(duration);
+                _raiseTrackerConfig.LabelConfig.SetText(text);
+                _raiseLabelHud.Draw(Position, _config.Size);
+            }
+        }
+
+        private bool ShowingRaise()
+        {
+            return Member != null && Member.RaiseTime.HasValue && _raiseTrackerConfig.Enabled &&
+                (Member.RaiseTime.Value > 0 || _raiseTrackerConfig.KeepIconAfterCastFinishes);
         }
 
         private bool ShowMana()
