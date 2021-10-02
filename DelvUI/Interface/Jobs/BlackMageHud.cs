@@ -240,6 +240,8 @@ namespace DelvUI.Interface.Jobs
             IEnumerable<Status> tripleStackBuff = player.StatusList.Where(o => o.StatusId is 1211);
             int stackCount = tripleStackBuff.Any() ? tripleStackBuff.First().StackCount : 0;
 
+            if (Config.OnlyShowTriplecastWhenActive && stackCount is 0) { return; }
+
             Vector2 position = origin + Config.Position + Config.TriplecastPosition - Config.TriplecastSize / 2f;
 
             Bar bar = BarBuilder.Create(position, Config.TriplecastSize)
