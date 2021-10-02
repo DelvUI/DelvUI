@@ -59,7 +59,7 @@ namespace DelvUI.Interface.Party
             _raiseTrackerConfig = raiseTrackerConfig;
 
             _nameLabelHud = new LabelHud(id + "_nameLabel", config.NameLabelConfig);
-            _healthLabelHud = new LabelHud(id + "_nameLabel", config.HealthLabelConfig);
+            _healthLabelHud = new LabelHud(id + "_healthLabel", config.HealthLabelConfig);
             _manaLabelHud = new LabelHud(id + "_manaLabel", _manaBarConfig.ValueLabelConfig);
             _orderLabelHud = new LabelHud(id + "_orderLabel", config.OrderLabelConfig);
             _raiseLabelHud = new LabelHud(id + "_raiseLabel", _raiseTrackerConfig.LabelConfig);
