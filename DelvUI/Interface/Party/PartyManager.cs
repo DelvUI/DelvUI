@@ -450,6 +450,7 @@ namespace DelvUI.Interface.Party
             if (!_config.Preview)
             {
                 _groupMembers.Clear();
+                MembersChangedEvent?.Invoke(this);
                 return;
             }
 
