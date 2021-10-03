@@ -110,6 +110,7 @@ namespace DelvUI.Helpers
             "GoldSaucerInfo",
             "Achievement",
             "RecommendList",
+            "JournalDetail",
             "ContentsFinder",
             "ContentsFinderSetting",
             "ContentsInfo",
