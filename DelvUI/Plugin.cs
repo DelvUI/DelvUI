@@ -4,6 +4,7 @@ using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.JobGauge;
 using Dalamud.Game.ClientState.Objects;
+using Dalamud.Game.ClientState.Party;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
 using Dalamud.Interface;
@@ -14,14 +15,12 @@ using DelvUI.Helpers;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Party;
-using FFXIVClientStructs;
 using ImGuiNET;
 using ImGuiScene;
 using System;
 using System.IO;
 using System.Reflection;
 using SigScanner = Dalamud.Game.SigScanner;
-using Dalamud.Game.ClientState.Party;
 
 namespace DelvUI
 {
@@ -202,12 +201,14 @@ namespace DelvUI
 
         private void Draw()
         {
-            bool hudState = Condition[ConditionFlag.WatchingCutscene]
-                         || Condition[ConditionFlag.WatchingCutscene78]
-                         || Condition[ConditionFlag.OccupiedInCutSceneEvent]
-                         || Condition[ConditionFlag.CreatingCharacter]
-                         || Condition[ConditionFlag.BetweenAreas]
-                         || Condition[ConditionFlag.BetweenAreas51];
+            bool hudState =
+                Condition[ConditionFlag.WatchingCutscene] ||
+                Condition[ConditionFlag.WatchingCutscene78] ||
+                Condition[ConditionFlag.OccupiedInCutSceneEvent] ||
+                Condition[ConditionFlag.CreatingCharacter] ||
+                Condition[ConditionFlag.BetweenAreas] ||
+                Condition[ConditionFlag.BetweenAreas51] ||
+                Condition[ConditionFlag.OccupiedSummoningBell];
 
             UiBuilder.OverrideGameCursor = false;
 

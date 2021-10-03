@@ -1,8 +1,6 @@
-using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Interface;
-using Dalamud.Plugin;
 using DelvUI.Config;
-using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
@@ -13,8 +11,6 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface
 {
@@ -31,6 +27,7 @@ namespace DelvUI.Interface
         private List<IHudElementWithActor> _hudElementsUsingTargetOfTarget = null!;
         private List<IHudElementWithActor> _hudElementsUsingFocusTarget = null!;
 
+        private PlayerCastbarHud _playerCastbarHud = null!;
         private CustomEffectsListHud _customEffectsHud = null!;
         private PrimaryResourceHud _primaryResourceHud = null!;
         private JobHud? _jobHud = null;
@@ -38,6 +35,8 @@ namespace DelvUI.Interface
 
         private Dictionary<uint, JobHudTypes> _jobsMap = null!;
         private Dictionary<uint, Type> _unsupportedJobsMap = null!;
+
+        private double _occupiedInQuestStartTime = -1;
 
         private HudHelper _hudHelper = new HudHelper();
 
@@ -171,9 +170,9 @@ namespace DelvUI.Interface
         private void CreateCastbars()
         {
             var playerCastbarConfig = ConfigurationManager.Instance.GetConfigObject<PlayerCastbarConfig>();
-            var playerCastbar = new PlayerCastbarHud("DelvUI_playerCastbar", playerCastbarConfig, "Player Castbar");
-            _hudElements.Add(playerCastbar);
-            _hudElementsUsingPlayer.Add(playerCastbar);
+            _playerCastbarHud = new PlayerCastbarHud("DelvUI_playerCastbar", playerCastbarConfig, "Player Castbar");
+            _hudElements.Add(_playerCastbarHud);
+            _hudElementsUsingPlayer.Add(_playerCastbarHud);
 
             var targetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<TargetCastbarConfig>();
             var targetCastbar = new TargetCastbarHud("DelvUI_targetCastbar", targetCastbarConfig, "Target Castbar");
@@ -282,6 +281,15 @@ namespace DelvUI.Interface
             UpdateJob();
             AssignActors();
 
+            // show only castbar during quest events
+            if (ShouldOnlyShowCastbar())
+            {
+                _playerCastbarHud?.Draw(_origin);
+
+                ImGui.End();
+                return;
+            }
+
             // grid
             if (_gridConfig is not null && _gridConfig.Enabled)
             {
@@ -335,6 +343,37 @@ namespace DelvUI.Interface
             var fadeMiddleVisible = fadeMiddleWidget != null && fadeMiddleWidget->IsVisible;
 
             return paramenterVisible && !fadeMiddleVisible;
+        }
+
+        protected bool ShouldOnlyShowCastbar()
+        {
+            // when in quest dialogs and events, hide everything except castbars
+            // this includes talking to npcs or interacting with quest related stuff
+            if (Plugin.Condition[ConditionFlag.OccupiedInQuestEvent] ||
+                Plugin.Condition[ConditionFlag.OccupiedInEvent])
+            {
+                // we have to wait a bit to avoid weird flickering when clicking shiny stuff
+                // we hide delvui after half a second passed in this state
+                // interestingly enough, default hotbars seem to do something similar
+                var time = ImGui.GetTime();
+                if (_occupiedInQuestStartTime > 0)
+                {
+                    if (time - _occupiedInQuestStartTime > 0.5)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    _occupiedInQuestStartTime = time;
+                }
+            }
+            else
+            {
+                _occupiedInQuestStartTime = -1;
+            }
+
+            return false;
         }
 
         private void UpdateJob()
