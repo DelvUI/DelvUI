@@ -78,6 +78,8 @@ namespace DelvUI.Helpers
             "Macro",
             "PcSearchDetail",
             "Social",
+            "SocialDetailA",
+            "SocialDetailB",
             "LookingForGroup",
             "Marker",
             "FieldMarker",
