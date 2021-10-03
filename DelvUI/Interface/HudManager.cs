@@ -36,6 +36,8 @@ namespace DelvUI.Interface
         private Dictionary<uint, JobHudTypes> _jobsMap = null!;
         private Dictionary<uint, Type> _unsupportedJobsMap = null!;
 
+        private double _occupiedInQuestStartTime = -1;
+
         private HudHelper _hudHelper = new HudHelper();
 
         public HudManager()
@@ -279,9 +281,8 @@ namespace DelvUI.Interface
             UpdateJob();
             AssignActors();
 
-            // when in quest dialogs and events, hide everything except castbars
-            // this includes talking to npcs or interacting with quest related stuff
-            if (Plugin.Condition[ConditionFlag.OccupiedInQuestEvent])
+            // show only castbar during quest events
+            if (ShouldOnlyShowCastbar())
             {
                 _playerCastbarHud?.Draw(_origin);
 
@@ -342,6 +343,36 @@ namespace DelvUI.Interface
             var fadeMiddleVisible = fadeMiddleWidget != null && fadeMiddleWidget->IsVisible;
 
             return paramenterVisible && !fadeMiddleVisible;
+        }
+
+        protected bool ShouldOnlyShowCastbar()
+        {
+            // when in quest dialogs and events, hide everything except castbars
+            // this includes talking to npcs or interacting with quest related stuff
+            if (Plugin.Condition[ConditionFlag.OccupiedInQuestEvent])
+            {
+                // we have to wait a bit to avoid weird flickering when clicking shiny stuff
+                // we hide delvui after half a second passed in this state
+                // interestingly enough, default hotbars seem to do something similar
+                var time = ImGui.GetTime();
+                if (_occupiedInQuestStartTime > 0)
+                {
+                    if (time - _occupiedInQuestStartTime > 0.5)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    _occupiedInQuestStartTime = time;
+                }
+            }
+            else
+            {
+                _occupiedInQuestStartTime = -1;
+            }
+
+            return false;
         }
 
         private void UpdateJob()
