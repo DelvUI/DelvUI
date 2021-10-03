@@ -51,12 +51,16 @@ namespace DelvUI.Helpers
             var hdString = hdIcon ? "_hr1" : "";
             var path = $"ui/icon/{id / 1000 * 1000:000000}/{id:000000}{hdString}.tex";
 
-            var resolvedPath = _penumbraPathResolver.InvokeFunc(path);
-
-            if (resolvedPath != null && resolvedPath != path)
+            try
             {
-                return TextureLoader.LoadTexture(resolvedPath, true);
+                var resolvedPath = _penumbraPathResolver.InvokeFunc(path);
+
+                if (resolvedPath != null && resolvedPath != path)
+                {
+                    return TextureLoader.LoadTexture(resolvedPath, true);
+                }
             }
+            catch { }
 
             return TextureLoader.LoadTexture(path, false);
         }
