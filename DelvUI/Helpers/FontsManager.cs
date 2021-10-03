@@ -50,11 +50,14 @@ namespace DelvUI.Helpers
         private List<ImFontPtr> _fonts = new List<ImFontPtr>();
         public IReadOnlyCollection<ImFontPtr> Fonts => _fonts.AsReadOnly();
 
-        public bool PushDefaultFont()
+        public bool PushFonts()
         {
             if (DefaultFontBuilt)
             {
-                ImGui.PushFont(DefaultFont);
+                foreach (var fontPtr in Fonts)
+                {
+                    ImGui.PushFont(fontPtr);
+                }
                 return true;
             }
 
@@ -97,7 +100,7 @@ namespace DelvUI.Helpers
 
                 try
                 {
-                    ImFontPtr font = ranges == null ? io.Fonts.AddFontFromFileTTF(path, fontData.Value.Size)
+                    ImFontPtr font = (ranges == null) ? io.Fonts.AddFontFromFileTTF(path, fontData.Value.Size)
                         : io.Fonts.AddFontFromFileTTF(path, fontData.Value.Size, null, ranges.Value.Data);
                     _fonts.Add(font);
 

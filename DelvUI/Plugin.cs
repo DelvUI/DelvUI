@@ -182,7 +182,7 @@ namespace DelvUI
 
             ConfigurationManager.GetInstance().Draw();
 
-            var fontPushed = FontsManager.Instance.PushDefaultFont();
+            var fontPushed = FontsManager.Instance.PushFonts();
 
             if (!hudState)
             {
@@ -191,7 +191,10 @@ namespace DelvUI
 
             if (fontPushed)
             {
-                ImGui.PopFont();
+                foreach (var _ in FontsManager.Instance.Fonts)
+                {
+                    ImGui.PopFont();
+                }
             }
         }
 

@@ -4,6 +4,7 @@ using ImGuiNET;
 using ImGuiScene;
 using Lumina.Excel;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace DelvUI.Helpers
@@ -71,19 +72,24 @@ namespace DelvUI.Helpers
             DrawOutlinedText(text, pos, Vector4.One, Vector4.UnitW, fontScale);
         }
 
+
         public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor, float fontScale)
         {
-            DrawOutlinedText(text, pos, color, outlineColor, fontScale, FontsManager.Instance.DefaultFont);
-        }
-
-        public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor, float fontScale, ImFontPtr fontPtr)
-        {
-            var originalScale = fontPtr.Scale;
-            fontPtr.Scale = fontScale;
-            ImGui.PushFont(fontPtr);
+            List<float> originalScales = new();
+            foreach (var fontPtr in FontsManager.Instance.Fonts)
+            {
+                originalScales.Add(fontPtr.Scale);
+                fontPtr.Scale = fontScale;
+                ImGui.PushFont(fontPtr);
+            }
             DrawOutlinedText(text, pos, color, outlineColor);
-            ImGui.PopFont();
-            fontPtr.Scale = originalScale;
+            int i = 0;
+            foreach (var fontPtr in FontsManager.Instance.Fonts)
+            {
+                ImGui.PopFont();
+                fontPtr.Scale = originalScales[i++];
+            }
+            
         }
 
         public static void DrawOutlinedText(string text, Vector2 pos) { DrawOutlinedText(text, pos, Vector4.One, Vector4.UnitW); }
