@@ -1,17 +1,26 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class ExperienceBarHud : DraggableHudElement, IHudElementWithActor
+    public unsafe class ExperienceBarHud : DraggableHudElement, IHudElementWithActor
     {
         private ExperienceBarConfig Config => (ExperienceBarConfig)_config;
 
         public GameObject? Actor { get; set; } = null;
 
-        public ExperienceBarHud(string ID, ExperienceBarConfig config, string displayName) : base(ID, config, displayName) { }
+        private Bar2 ExpBar { get; set; }
+
+        public ExperienceBarHud(string ID, ExperienceBarConfig config, string displayName) : base(ID, config, displayName)
+        {
+            ExpBar = new Bar2(Config);
+        }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
@@ -20,16 +29,36 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || Actor == null || Actor is not Character)
+            if (!Config.Enabled)
             {
                 return;
             }
 
-            Bar2 expBar = new Bar2(Config);
-            float current = 3175757f;
-            float max = 13881000f;
-            expBar.SetBarText(string.Format("{0} Lv{1}\tEXP {2}/{3}", "MNK", 71, "3,175,757", "13,881,000"));
-            expBar.Draw(origin, current, max);
+            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            var addonExp = (AddonExp*)Plugin.GameGui.GetAddonByName("_Exp", 1);
+
+            uint current = addonExp->CurrentExp;
+            uint max = addonExp->RequiredExp;
+            uint rested = addonExp->RestedExp;
+            string level = player?.Level.ToString() ?? "??";
+            string jobLabel = player is not null ? JobsHelper.JobNames[player.ClassJob.Id] : "???";
+
+            ExpBar.SetBarText(string.Format("{0}  Lv{1}  {2:n0}/{3:n0}", jobLabel, level, current, max));
+            ExpBar.Draw(origin, current, max);
         }
+    }
+
+    [StructLayout(LayoutKind.Explicit, Size = 0x290)]
+    public struct AddonExp
+    {
+        [FieldOffset(0x0)] public AtkUnitBase AtkUnitBase;
+
+        [FieldOffset(0x270)] public byte ClassJob;
+
+        [FieldOffset(0x278)] public uint CurrentExp;
+        [FieldOffset(0x27C)] public uint RequiredExp;
+        [FieldOffset(0x280)] public uint RestedExp;
+
+        public float CurrentExpPercent => (float)CurrentExp / RequiredExp * 100;
     }
 }
