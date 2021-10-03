@@ -349,7 +349,8 @@ namespace DelvUI.Interface
         {
             // when in quest dialogs and events, hide everything except castbars
             // this includes talking to npcs or interacting with quest related stuff
-            if (Plugin.Condition[ConditionFlag.OccupiedInQuestEvent])
+            if (Plugin.Condition[ConditionFlag.OccupiedInQuestEvent] ||
+                Plugin.Condition[ConditionFlag.OccupiedInEvent])
             {
                 // we have to wait a bit to avoid weird flickering when clicking shiny stuff
                 // we hide delvui after half a second passed in this state
