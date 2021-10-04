@@ -1,3 +1,4 @@
+using Dalamud.Logging;
 using DelvUI.Config.Tree;
 using DelvUI.Helpers;
 using DelvUI.Interface;
@@ -13,7 +14,6 @@ using System.IO;
 using System.IO.Compression;
 using System.Reflection;
 using System.Text;
-using Dalamud.Logging;
 
 namespace DelvUI.Config
 {
@@ -77,6 +77,7 @@ namespace DelvUI.Config
             BannerImage = bannerImage;
             ConfigDirectory = configDirectory;
             ConfigBaseNode = configBaseNode;
+            ConfigBaseNode.ConfigObjectResetEvent += OnConfigObjectReset;
 
             if (!defaultConfig)
             {
@@ -107,6 +108,7 @@ namespace DelvUI.Config
                 return;
             }
 
+            ConfigBaseNode.ConfigObjectResetEvent -= OnConfigObjectReset;
             BannerImage?.Dispose();
             Instance = null!;
         }
@@ -178,7 +180,7 @@ namespace DelvUI.Config
                 typeof(MPTickerConfig),
                 typeof(GridConfig),
 
-                typeof(ImportExportConfig)
+                typeof(ImportConfig)
             };
 
             Initialize(defaultConfig, configObjects);
@@ -197,8 +199,8 @@ namespace DelvUI.Config
 
             TextureWrap? banner = Plugin.BannerTexture;
 
-            var currentResetEvent = Instance?.ResetEvent;
-            var currentLockEvent = Instance?.LockEvent;
+            var currentResetEvent = (ConfigurationManagerEventHandler?)Instance?.ResetEvent?.Clone();
+            var currentLockEvent = (ConfigurationManagerEventHandler?)Instance?.LockEvent?.Clone();
 
             Instance = new ConfigurationManager(
                 defaultConfig,
@@ -208,6 +210,11 @@ namespace DelvUI.Config
                 currentResetEvent,
                 currentLockEvent
             );
+        }
+
+        private void OnConfigObjectReset(BaseNode sender)
+        {
+            ResetEvent?.Invoke(this);
         }
 
         public void Draw()
@@ -237,7 +244,16 @@ namespace DelvUI.Config
             return (PluginConfigObject)method?.Invoke(this, null)!;
         }
         public T GetConfigObject<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigObject<T>()!;
+
+        public static PluginConfigObject GetDefaultConfigObjectForType(Type type)
+        {
+            MethodInfo? method = type.GetMethod("DefaultConfig", BindingFlags.Public | BindingFlags.Static);
+            return (PluginConfigObject)method?.Invoke(null, null)!;
+        }
+
         public ConfigPageNode GetConfigPageNode<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigPageNode<T>()!;
+
+        public void SetConfigObject(PluginConfigObject configObject) => ConfigBaseNode.SetConfigObject(configObject);
 
         public static string CompressAndBase64Encode(string jsonString)
         {

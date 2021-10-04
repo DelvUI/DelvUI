@@ -61,6 +61,11 @@ namespace DelvUI.Config.Tree
                     configPageNode.ConfigObject = nestedConfig;
                     configPageNode.Name = nestedConfigAttribute.friendlyName;
 
+                    if (nestedConfig.Disableable)
+                    {
+                        configPageNode.Name += "##" + nestedConfig.GetHashCode();
+                    }
+
                     _nestedConfigPageNodes.Add(field.Name, configPageNode);
                 }
             }
@@ -69,9 +74,14 @@ namespace DelvUI.Config.Tree
         private string _importString = "";
         private string _exportString = "";
 
-        public override string GetBase64String()
+        public override string? GetBase64String()
         {
-            return ConfigObject.Portable ? ConfigurationManager.GenerateExportString(ConfigObject) : "";
+            return AllowExport() ? ConfigurationManager.GenerateExportString(ConfigObject) : null;
+        }
+
+        protected override bool AllowExport()
+        {
+            return ConfigObject.Portable;
         }
 
         public override void LoadBase64String(string[] importStrings)
@@ -118,10 +128,12 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public override void Draw(ref bool changed) { DrawWithID(ref changed); }
+        public override bool Draw(ref bool changed) { return DrawWithID(ref changed); }
 
-        private void DrawWithID(ref bool changed, string? ID = null)
+        private bool DrawWithID(ref bool changed, string? ID = null)
         {
+            bool didReset = false;
+
             // Only do this stuff the first time the config page is loaded
             if (_drawList is null)
             {
@@ -149,11 +161,11 @@ namespace DelvUI.Config.Tree
                     ImGui.BeginGroup();
                     if (node._hasSeparator)
                     {
-                        DrawHelper.DrawImGuiSeparator(1, 1);
+                        ImGuiHelper.DrawSeparator(1, 1);
                     }
                     if (node._hasSpacing)
                     {
-                        DrawHelper.DrawImGuiSpacing(1);
+                        ImGuiHelper.DrawSpacing(1);
                     }
 
                     node.DrawWithID(ref changed, node.Name);
@@ -170,8 +182,12 @@ namespace DelvUI.Config.Tree
                 }
 
                 // TODO allow the manual draw methods to take parameters
-                bool? result = (bool?)method.Invoke(ConfigObject, null);
-                changed |= (result.HasValue && result.Value);
+                object[] args = new object[] { false };
+                bool? result = (bool?)method.Invoke(ConfigObject, args);
+
+                bool arg = (bool)args[0];
+                changed |= arg;
+                didReset |= (result.HasValue && result.Value);
             }
 
             // if the config object is not marked with [Portable(false)], or is marked with [Portable(true)],
@@ -180,6 +196,8 @@ namespace DelvUI.Config.Tree
             {
                 DrawImportExportGeneralConfig();
             }
+
+            return didReset;
         }
 
         private void GenerateDrawList(string? ID = null)
@@ -262,7 +280,7 @@ namespace DelvUI.Config.Tree
 
         private void DrawImportExportGeneralConfig()
         {
-            DrawHelper.DrawImGuiSeparator(2, 1);
+            ImGuiHelper.DrawSeparator(2, 1);
 
             uint maxLength = 40000;
             ImGui.BeginChild("importpane", new Vector2(0, ImGui.GetWindowHeight() / 6), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
@@ -393,6 +411,11 @@ namespace DelvUI.Config.Tree
             FileInfo file = new(path);
 
             return JsonConvert.DeserializeObject<T>(File.ReadAllText(file.FullName));
+        }
+
+        public override void Reset()
+        {
+            ConfigObject = ConfigurationManager.GetDefaultConfigObjectForType(ConfigObject.GetType());
         }
 
         public override ConfigPageNode? GetOrAddConfig<T>() => this;

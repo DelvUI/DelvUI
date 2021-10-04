@@ -50,6 +50,7 @@ namespace DelvUI.Interface.Party
         public bool ShowChocobo = true;
     }
 
+    [Portable(false)]
     [Disableable(false)]
     [Section("Party Frames")]
     [SubSection("Health Bar", 0)]
@@ -213,6 +214,7 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    [Portable(false)]
     [Section("Party Frames")]
     [SubSection("Mana Bar", 0)]
     public class PartyFramesManaBarConfig : MovablePluginConfigObject
@@ -252,6 +254,7 @@ namespace DelvUI.Interface.Party
         public EditableLabelConfig ValueLabelConfig = new EditableLabelConfig(Vector2.Zero, "[mana:current-short]", DrawAnchor.Center, DrawAnchor.Center);
     }
 
+    [Portable(false)]
     [Section("Party Frames")]
     [SubSection("Role-Job Icon", 0)]
     public class PartyFramesRoleIconConfig : MovablePluginConfigObject
@@ -289,6 +292,7 @@ namespace DelvUI.Interface.Party
         public bool UseSpecificDPSRoleIcons = false;
     }
 
+    [Portable(false)]
     [Section("Party Frames")]
     [SubSection("Party Leader Icon", 0)]
     public class PartyFramesLeaderIconConfig : MovablePluginConfigObject
@@ -314,6 +318,7 @@ namespace DelvUI.Interface.Party
         public DrawAnchor Anchor = DrawAnchor.TopLeft;
     }
 
+    [Portable(false)]
     [Section("Party Frames")]
     [SubSection("Buffs", 0)]
     public class PartyFramesBuffsConfig : PartyFramesStatusEffectsListConfig
@@ -345,6 +350,7 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    [Portable(false)]
     [Section("Party Frames")]
     [SubSection("Debuffs", 0)]
     public class PartyFramesDebuffsConfig : PartyFramesStatusEffectsListConfig
@@ -389,6 +395,7 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    [Portable(false)]
     [Section("Party Frames")]
     [SubSection("Castbars", 0)]
     public class PartyFramesCastbarConfig : CastbarConfig
@@ -422,6 +429,7 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    [Portable(false)]
     [Section("Party Frames")]
     [SubSection("Raise Tracker", 0)]
     public class PartyFramesRaiseTrackerConfig : MovablePluginConfigObject

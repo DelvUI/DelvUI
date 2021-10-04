@@ -11,7 +11,7 @@ namespace DelvUI.Config.Tree
         public string Name = null!;
         public int Depth;
 
-        public abstract void Draw(ref bool changed);
+        public abstract bool Draw(ref bool changed);
 
         public abstract ConfigPageNode? GetOrAddConfig<T>() where T : PluginConfigObject;
     }
@@ -20,8 +20,10 @@ namespace DelvUI.Config.Tree
     {
         public NestedSubSectionNode() { }
 
-        public override void Draw(ref bool changed)
+        public override bool Draw(ref bool changed)
         {
+            bool didReset = false;
+
             if (_children.Count > 1)
             {
                 ImGui.BeginChild(
@@ -33,7 +35,7 @@ namespace DelvUI.Config.Tree
 
                 if (ImGui.BeginTabBar("##tabs" + Depth, ImGuiTabBarFlags.None))
                 {
-                    DrawSubConfig(ref changed);
+                    didReset |= DrawSubConfig(ref changed);
                 }
 
                 ImGui.EndTabBar();
@@ -44,14 +46,18 @@ namespace DelvUI.Config.Tree
             {
                 ImGui.BeginChild("item" + Depth + " view", new Vector2(0, ImGui.GetWindowHeight() - 20)); // Leave room for 1 line below us
 
-                DrawSubConfig(ref changed);
+                didReset |= DrawSubConfig(ref changed);
 
                 ImGui.EndChild();
             }
+
+            return didReset;
         }
 
-        public void DrawSubConfig(ref bool changed)
+        public bool DrawSubConfig(ref bool changed)
         {
+            bool didReset = false;
+
             foreach (SubSectionNode subSectionNode in _children)
             {
                 if (subSectionNode is NestedSubSectionNode)
@@ -61,17 +67,23 @@ namespace DelvUI.Config.Tree
                         continue;
                     }
 
+                    DrawExportResetContextMenu(subSectionNode, subSectionNode.Name);
+
                     ImGui.BeginChild("subconfig" + Depth + " value", new Vector2(0, ImGui.GetWindowHeight()));
-                    subSectionNode.Draw(ref changed);
+                    didReset |= subSectionNode.Draw(ref changed);
                     ImGui.EndChild();
 
                     ImGui.EndTabItem();
                 }
                 else
                 {
-                    subSectionNode.Draw(ref changed);
+                    didReset |= subSectionNode.Draw(ref changed);
                 }
             }
+
+            didReset |= DrawResetModal();
+
+            return didReset;
         }
 
         public override void Save(string path)
@@ -135,9 +147,7 @@ namespace DelvUI.Config.Tree
             }
 
             ConfigPageNode configPageNode = new();
-
-            var method = type.GetMethod("DefaultConfig", BindingFlags.Public | BindingFlags.Static);
-            configPageNode.ConfigObject = (PluginConfigObject)method?.Invoke(null, null)!;
+            configPageNode.ConfigObject = ConfigurationManager.GetDefaultConfigObjectForType(type);
             configPageNode.Name = type.FullName!;
             _children.Add(configPageNode);
 

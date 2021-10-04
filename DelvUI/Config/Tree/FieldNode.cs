@@ -108,11 +108,11 @@ namespace DelvUI.Config.Tree
                         continue;
                     }
 
-                    DrawHelper.DrawImGuiSeparator(1, 1);
+                    ImGuiHelper.DrawSeparator(1, 1);
                 }
                 else if (attribute is ConfigAttribute { spacing: true })
                 {
-                    DrawHelper.DrawImGuiSpacing(1);
+                    ImGuiHelper.DrawSpacing(1);
                 }
             }
         }

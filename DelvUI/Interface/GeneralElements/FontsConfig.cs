@@ -25,6 +25,7 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Disableable(false)]
+    [Portable(false)]
     [Section("Misc")]
     [SubSection("Fonts", 0)]
     public class FontsConfig : PluginConfigObject
@@ -137,7 +138,7 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         [ManualDraw]
-        public bool Draw()
+        public bool Draw(ref bool changed)
         {
             if (!Enabled)
             {
@@ -152,7 +153,6 @@ namespace DelvUI.Interface.GeneralElements
                 ImGuiTableFlags.ScrollY |
                 ImGuiTableFlags.SizingFixedSame;
 
-            var changed = false;
             var indexToRemove = -1;
 
             if (ImGui.BeginChild("Fonts", new Vector2(400, 400), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
@@ -280,7 +280,7 @@ namespace DelvUI.Interface.GeneralElements
 
             ImGui.EndChild();
 
-            return changed;
+            return false;
         }
     }
 }

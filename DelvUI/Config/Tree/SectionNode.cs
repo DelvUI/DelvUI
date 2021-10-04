@@ -1,5 +1,6 @@
 ﻿using Dalamud.Interface;
 using DelvUI.Config.Attributes;
+using DelvUI.Helpers;
 using ImGuiNET;
 using System;
 using System.IO;
@@ -14,12 +15,14 @@ namespace DelvUI.Config.Tree
 
         public SectionNode() { }
 
-        public void Draw(ref bool changed)
+        public bool Draw(ref bool changed)
         {
             if (!Selected)
             {
-                return;
+                return false;
             }
+
+            bool didReset = false;
 
             ImGui.BeginChild(
                 "item view",
@@ -38,8 +41,10 @@ namespace DelvUI.Config.Tree
                             continue;
                         }
 
+                        DrawExportResetContextMenu(subSectionNode, subSectionNode.Name);
+
                         ImGui.BeginChild("subconfig value", new Vector2(0, 0), true);
-                        subSectionNode.Draw(ref changed);
+                        didReset |= subSectionNode.Draw(ref changed);
                         ImGui.EndChild();
 
                         ImGui.EndTabItem();
@@ -59,9 +64,13 @@ namespace DelvUI.Config.Tree
                     ImGui.PopFont();
                     ImGui.SetCursorPos(pos);
                 }
+
+                didReset |= DrawResetModal();
             }
 
             ImGui.EndChild();
+
+            return didReset;
         }
 
         public override void Save(string path)

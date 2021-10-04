@@ -1,4 +1,6 @@
-﻿using DelvUI.Config.Attributes;
+﻿using Dalamud.Logging;
+using DelvUI.Config.Attributes;
+using DelvUI.Helpers;
 using ImGuiNET;
 using ImGuiScene;
 using System;
@@ -9,8 +11,12 @@ using System.Numerics;
 
 namespace DelvUI.Config.Tree
 {
+    public delegate void ConfigObjectResetEventHandler(BaseNode sender);
+
     public class BaseNode : Node
     {
+        public event ConfigObjectResetEventHandler? ConfigObjectResetEvent;
+
         private Dictionary<Type, ConfigPageNode> _configPageNodesMap;
 
         public BaseNode()
@@ -52,6 +58,14 @@ namespace DelvUI.Config.Tree
             }
 
             _configPageNodesMap[configPageNode.ConfigObject.GetType()] = configPageNode;
+        }
+
+        public void SetConfigObject(PluginConfigObject configObject)
+        {
+            if (_configPageNodesMap.TryGetValue(configObject.GetType(), out ConfigPageNode? configPageNode))
+            {
+                configPageNode.ConfigObject = configObject;
+            }
         }
 
         private void PushStyles()
@@ -96,6 +110,7 @@ namespace DelvUI.Config.Tree
         public void Draw()
         {
             bool changed = false;
+            bool didReset = false;
 
             ImGui.SetNextWindowSize(new Vector2(1050, 750), ImGuiCond.Appearing);
             ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 1f));
@@ -150,12 +165,16 @@ namespace DelvUI.Config.Tree
                                 otherNode.Selected = false;
                             }
                         }
+
+                        DrawExportResetContextMenu(selectionNode, selectionNode.Name);
                     }
 
                     ImGui.EndChild();
                 }
 
                 ImGui.EndGroup(); // Left
+
+                didReset |= DrawResetModal();
 
                 ImGui.SameLine();
 
@@ -164,7 +183,7 @@ namespace DelvUI.Config.Tree
                 {
                     foreach (SectionNode selectionNode in _children)
                     {
-                        selectionNode.Draw(ref changed);
+                        didReset |= selectionNode.Draw(ref changed);
                     }
                 }
 
@@ -231,7 +250,12 @@ namespace DelvUI.Config.Tree
             PopStyles();
             ImGui.End();
 
-            if (changed)
+            if (didReset)
+            {
+                ConfigObjectResetEvent?.Invoke(this);
+            }
+
+            if (changed || didReset)
             {
                 ConfigurationManager.Instance.SaveConfigurations();
             }
