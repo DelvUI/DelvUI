@@ -27,7 +27,7 @@ namespace DelvUI.Interface.Bars
 
         public void Draw(Vector2 origin, float current, float max, float mid = 0, int chunks = 1, int chunkPadding = 2)
         {
-            if (current <= 0f && Config.HideWhenInactive)
+            if (Config.HideWhenInactive && !Config.IsActive(current))
             {
                 return;
             }
@@ -83,12 +83,12 @@ namespace DelvUI.Interface.Bars
                         };
 
                         PluginConfigColor midBarColor = Config.GetBarColor(mid, Actor);
-                        drawList.AddRectFilled(midFillPos, midFillPos + midFillSize, midBarColor.Base);
+                        DrawHelper.DrawGradientFilledRect(midFillPos, midFillSize, midBarColor, drawList);
                     }
 
                     // Draw inner bar
                     PluginConfigColor barColor = Config.GetBarColor(current, Actor);
-                    drawList.AddRectFilled(chunkFillPos, chunkFillPos + chunkFillSize, barColor.Base);
+                    DrawHelper.DrawGradientFilledRect(chunkFillPos, chunkFillSize, barColor, drawList);
 
                     // Draw border
                     if (Config.DrawBorder)
@@ -96,6 +96,7 @@ namespace DelvUI.Interface.Bars
                         drawList.AddRect(chunkPos, chunkPos + chunkSize, 0xFF000000);
                     }
 
+                    // Draw labels on active chunk
                     if (progressPercent < percentPerChunk * (i + 1) && progressPercent >= percentPerChunk * i)
                     {
                         foreach (LabelHud labelHud in Labels)

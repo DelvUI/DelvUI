@@ -45,6 +45,11 @@ namespace DelvUI.Interface.GeneralElements
             return new ExperienceBarConfig(); 
         }
 
+        public override bool IsActive(float current)
+        {
+            return (Plugin.ClientState.LocalPlayer?.Level ?? 0) != 80;
+        }
+
         public override PluginConfigColor GetBarColor(float current, GameObject? actor = null)
         {
             if (current == ExperienceHelper.Instance.RestedExp)
@@ -52,7 +57,7 @@ namespace DelvUI.Interface.GeneralElements
                 return RestedExpColor;
             }
 
-            return UseJobColor ? Utils.ColorForActor(Plugin.ClientState.LocalPlayer) : base.GetBarColor(current);
+            return UseJobColor ? Utils.ColorForActor(actor) : base.GetBarColor(current);
         }
     }
 }

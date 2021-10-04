@@ -12,9 +12,9 @@ namespace DelvUI.Interface.GeneralElements
 
         public GameObject? Actor { get; set; } = null;
 
-        public ExperienceBarHud(string ID, ExperienceBarConfig config, string displayName) : base(ID, config, displayName)
-        {
-        }
+        private BarHud? ExpBar { get; set; }
+
+        public ExperienceBarHud(string ID, ExperienceBarConfig config, string displayName) : base(ID, config, displayName) { }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
@@ -28,13 +28,11 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            BarHud expBar = new BarHud(Config, Actor, Config.LeftLabelConfig, Config.RightLabelConfig);
-
+            ExpBar ??= new BarHud(Config, Actor, Config.LeftLabelConfig, Config.RightLabelConfig);
             uint current = ExperienceHelper.Instance.CurrentExp;
             uint max = ExperienceHelper.Instance.RequiredExp;
             uint rested = Config.ShowRestedExp ? ExperienceHelper.Instance.RestedExp : 0;
-
-            expBar.Draw(origin, current, max, rested);
+            ExpBar.Draw(origin, current, max, rested);
         }
     }
 

@@ -35,6 +35,11 @@ namespace DelvUI.Interface.Bars
             FillColor = fillColor;
         }
 
+        public virtual bool IsActive(float current)
+        {
+            return current > 0f;
+        }
+
         public virtual PluginConfigColor GetBarColor(float current, GameObject? actor = null)
         {
             return FillColor;

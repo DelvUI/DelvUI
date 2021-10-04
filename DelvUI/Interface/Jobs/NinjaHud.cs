@@ -20,12 +20,17 @@ namespace DelvUI.Interface.Jobs
     {
         private new NinjaConfig Config => (NinjaConfig)_config;
 
-        public NinjaHud(string id, NinjaConfig config, string? displayName = null) : base(id, config, displayName)
-        {
+        private BarHud? MudraBar { get; set; }
 
-        }
+        private BarHud? HutonBar { get; set; }
 
-        private float _oldMudraCooldownInfo;
+        private BarHud? NinkiBar { get; set; }
+
+        private BarHud? TrickAttackBar { get; set; }
+
+        private BarHud? SuitonBar { get; set; }
+
+        public NinjaHud(string id, NinjaConfig config, string? displayName = null) : base(id, config, displayName) { }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
@@ -95,16 +100,24 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawMudraBars(Vector2 origin, PlayerCharacter player)
         {
+            MudraBar ??= new BarHud(Config.MudraBarConfig, player, Config.MudraBarConfig.MudraLabelConfig);
+
             var (hasNinjutsuBuff, hasKassatsuBuff, hasTCJBuff) =
                 Config.MudraBarConfig.GetMudraBuffs(player, out Status? ninjutsuBuff, out Status? kassatsuBuff, out Status? tcjBuff);
 
-            BarHud mudraBar = new BarHud(Config.MudraBarConfig, player, Config.MudraBarConfig.MudraLabelConfig);
+            int mudraStacks = SpellHelper.Instance.GetStackCount(2, 2259);
+            float mudraCooldown = SpellHelper.Instance.GetSpellCooldown(2259);
+
             float current = 0f;
             float mid = 0f;
             float max = 0f;
             int chunks = 1;
 
-            if (hasTCJBuff || hasKassatsuBuff || hasNinjutsuBuff)
+            // For some reason, the mudras may be on cooldown before the "Mudra" buff is applied.
+            // Mudra stack count is set to -2 when a mudra is in the middle of its re-cast timer, so we can check for that instead.
+            bool inNinjutsu = mudraStacks == -2 || hasNinjutsuBuff;
+
+            if (hasTCJBuff || hasKassatsuBuff || inNinjutsu)
             { 
                 if (hasTCJBuff)
                 {
@@ -119,7 +132,7 @@ namespace DelvUI.Interface.Jobs
                     Config.MudraBarConfig.MudraLabelConfig.SetText("KASSATSU");
                 }
 
-                if (hasNinjutsuBuff)
+                if (inNinjutsu)
                 {
                     max = 6f;
                     current = ninjutsuBuff is null || ninjutsuBuff.RemainingTime < 0 ? max : ninjutsuBuff.RemainingTime;
@@ -129,13 +142,57 @@ namespace DelvUI.Interface.Jobs
             else
             {
                 max = 40f;
-                mid = max - SpellHelper.Instance.GetSpellCooldown(2259);
+                mid = max - mudraCooldown;
                 current = (float)Math.Floor(mid / 20f) * 20f;
                 chunks = 2;
                 Config.MudraBarConfig.MudraLabelConfig.SetText(((max - mid) % 20).ToString("N0"));
             }
 
-            mudraBar.Draw(origin + Config.Position, current, max, mid, chunks, Config.MudraBarConfig.MudraBarChunkPadding);
+            MudraBar.Draw(origin + Config.Position, current, max, mid, chunks, Config.MudraBarConfig.MudraBarChunkPadding);
+        }
+
+        private void DrawHutonGauge(Vector2 origin)
+        {
+            HutonBar ??= new BarHud(Config.HutonBarConfig, Config.HutonBarConfig.LabelConfig);
+            NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
+            float hutonDurationLeft = gauge.HutonTimer / 1000f;
+            Config.HutonBarConfig.LabelConfig.SetText(hutonDurationLeft.ToString("N0"));
+            HutonBar.Draw(origin + Config.Position, hutonDurationLeft, 70f);
+        }
+
+        private void DrawNinkiGauge(Vector2 origin)
+        {
+            NinkiBar ??= new BarHud(Config.NinkiBarConfig, Config.NinkiBarConfig.LabelConfig);
+            NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
+            Config.NinkiBarConfig.LabelConfig.SetText(gauge.Ninki.ToString("N0"));
+            NinkiBar.Draw(origin + Config.Position, gauge.Ninki, 100f);
+        }
+
+        private void DrawTrickAttackBar(Vector2 origin, PlayerCharacter player)
+        {
+            TrickAttackBar ??= new BarHud(Config.TrickAttackBarConfig, Config.TrickAttackBarConfig.LabelConfig);
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            float trickDuration = 0f;
+            const float trickMaxDuration = 15f;
+
+            if (actor is BattleChara target)
+            {
+                trickDuration = target.StatusList
+                    .Where(o => o.StatusId is 638 && o.SourceID == player.ObjectId)
+                    .Select(o => Math.Abs(o.RemainingTime))
+                    .FirstOrDefault();
+            }
+
+            Config.TrickAttackBarConfig.LabelConfig.SetText(trickDuration.ToString("N0"));
+            TrickAttackBar.Draw(origin + Config.Position, trickDuration, trickMaxDuration);
+        }
+
+        private void DrawSuitonBar(Vector2 origin, PlayerCharacter player)
+        {
+            SuitonBar ??= new BarHud(Config.SuitonBarConfig, Config.SuitonBarConfig.LabelConfig);
+            float suitonDuration = player.StatusList.Where(o => o.StatusId == 507).Select(o => Math.Abs(o.RemainingTime)).FirstOrDefault();
+            Config.SuitonBarConfig.LabelConfig.SetText(suitonDuration.ToString("N0"));
+            SuitonBar.Draw(origin + Config.Position, suitonDuration, 20f);
         }
 
         private string GenerateNinjutsuText(byte param, bool haveKassatsuBuff, bool haveTCJBuff)
@@ -151,50 +208,6 @@ namespace DelvUI.Interface.Jobs
                 54 or 57 => "SUITON",
                 _ => haveTCJBuff ? "TEN CHI JIN" : "",
             };
-        }
-
-        private void DrawHutonGauge(Vector2 origin)
-        {
-            NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
-            float hutonDurationLeft = gauge.HutonTimer / 1000f;
-            BarHud hutonBar = new BarHud(Config.HutonBarConfig, Config.HutonBarConfig.LabelConfig);
-            Config.HutonBarConfig.LabelConfig.SetText(hutonDurationLeft.ToString("N0"));
-            hutonBar.Draw(origin + Config.Position, hutonDurationLeft, 70f);
-        }
-
-        private void DrawNinkiGauge(Vector2 origin)
-        {
-            NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
-            BarHud ninkiBar = new BarHud(Config.NinkiBarConfig, Config.NinkiBarConfig.LabelConfig);
-            Config.NinkiBarConfig.LabelConfig.SetText(gauge.Ninki.ToString("N0"));
-            ninkiBar.Draw(origin + Config.Position, gauge.Ninki, 100f);
-        }
-
-        private void DrawTrickAttackBar(Vector2 origin, PlayerCharacter player)
-        {
-            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            float trickDuration = 0f;
-            const float trickMaxDuration = 15f;
-
-            if (actor is BattleChara target)
-            {
-                trickDuration = target.StatusList
-                    .Where(o => o.StatusId is 638 && o.SourceID == player.ObjectId)
-                    .Select(o => Math.Abs(o.RemainingTime))
-                    .FirstOrDefault();
-            }
-
-            BarHud trickBar = new BarHud(Config.TrickAttackBarConfig, Config.TrickAttackBarConfig.LabelConfig);
-            Config.TrickAttackBarConfig.LabelConfig.SetText(trickDuration.ToString("N0"));
-            trickBar.Draw(origin + Config.Position, trickDuration, trickMaxDuration);
-        }
-
-        private void DrawSuitonBar(Vector2 origin, PlayerCharacter player)
-        {
-            float suitonDuration = player.StatusList.Where(o => o.StatusId == 507).Select(o => Math.Abs(o.RemainingTime)).FirstOrDefault();
-            BarHud suitonBar = new BarHud(Config.SuitonBarConfig, Config.SuitonBarConfig.LabelConfig);
-            Config.SuitonBarConfig.LabelConfig.SetText(suitonDuration.ToString("N0"));
-            suitonBar.Draw(origin + Config.Position, suitonDuration, 20f);
         }
     }
 
@@ -253,7 +266,6 @@ namespace DelvUI.Interface.Jobs
     [Portable(false)]
     public class MudraBarConfig : BarConfig
     {
-
         [DragInt("Split Bar Spacing", min = 0, max = 4000, spacing = true)]
         [Order(50)]
         public int MudraBarChunkPadding = 2;
@@ -274,6 +286,11 @@ namespace DelvUI.Interface.Jobs
             MudraLabelConfig = new LabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center);
         }
 
+        public override bool IsActive(float current)
+        {
+            return current < 40f && current >= 0f;
+        }
+
         public override PluginConfigColor GetBarColor(float current, GameObject? actor = null)
         {
             if (actor is not PlayerCharacter player)
@@ -282,6 +299,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             var (hasNinjutsuBuff, hasKassatsuBuff, hasTCJBuff) = GetMudraBuffs(player, out Status? mudraBuff, out Status? kassatsuBuff, out Status? tcjBuff);
+            bool inNinjutsu = SpellHelper.Instance.GetStackCount(2, 2259) == -2 || hasNinjutsuBuff;
 
             if (hasTCJBuff)
             {
@@ -293,7 +311,7 @@ namespace DelvUI.Interface.Jobs
                 return KassatsuBarColor;
             }
 
-            if (hasNinjutsuBuff)
+            if (inNinjutsu)
             {
                 return FillColor;
             }
