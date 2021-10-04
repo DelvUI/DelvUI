@@ -5,9 +5,39 @@ namespace DelvUI.Helpers
 {
     internal class SpellHelper
     {
+        #region Singleton
+        private static Lazy<SpellHelper> _lazyInstance = new Lazy<SpellHelper>(() => new SpellHelper());
+
+        public static SpellHelper Instance => _lazyInstance.Value;
+
+        ~SpellHelper()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            _lazyInstance = new Lazy<SpellHelper>(() => new SpellHelper());
+        }
+        #endregion
+
         private readonly unsafe ActionManager* _actionManager;
 
-        public unsafe SpellHelper() { _actionManager = ActionManager.Instance(); }
+        public unsafe SpellHelper() 
+        { 
+            _actionManager = ActionManager.Instance(); 
+        }
 
         public unsafe uint GetSpellActionId(uint actionId) => _actionManager->GetAdjustedActionId(actionId);
 

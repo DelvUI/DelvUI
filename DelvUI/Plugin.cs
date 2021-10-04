@@ -258,6 +258,8 @@ namespace DelvUI
             PartyManager.Instance.Dispose();
             TexturesCache.Instance.Dispose();
             TooltipsHelper.Instance.Dispose();
+            ExperienceHelper.Instance.Dispose();
+            SpellHelper.Instance.Dispose();
 
             // This needs to remain last to avoid race conditions
             ConfigurationManager.Instance.Dispose();

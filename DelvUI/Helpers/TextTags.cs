@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Dalamud.Game.ClientState.Objects.Enums;
@@ -11,6 +12,30 @@ namespace DelvUI.Helpers
         private static string ReplaceTagWithString(string tag, GameObject? actor, string? name = null)
         {
             var n = actor != null ? actor.Name : name ?? "";
+
+            switch (tag)
+            {
+                case "[exp:current-short]":
+                    return ExperienceHelper.Instance.CurrentExp.KiloFormat();
+
+                case "[exp:required-short]":
+                    return ExperienceHelper.Instance.RequiredExp.KiloFormat();
+
+                case "[exp:rested-short]":
+                    return ExperienceHelper.Instance.RestedExp.KiloFormat();
+
+                case "[exp:current]":
+                    return ExperienceHelper.Instance.CurrentExp.ToString("N0", CultureInfo.InvariantCulture);
+
+                case "[exp:required]":
+                    return ExperienceHelper.Instance.RequiredExp.ToString("N0", CultureInfo.InvariantCulture);
+
+                case "[exp:rested]":
+                    return ExperienceHelper.Instance.RestedExp.ToString("N0", CultureInfo.InvariantCulture);
+
+                case "[exp:percent]":
+                    return ExperienceHelper.Instance.PercentExp.ToString("N1", CultureInfo.InvariantCulture);
+            }
 
             switch (tag)
             {

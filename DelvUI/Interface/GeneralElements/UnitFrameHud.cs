@@ -1,4 +1,5 @@
-﻿using DelvUI.Helpers;
+﻿using Dalamud.Game.ClientState.Objects.Types;
+using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
 using System;
@@ -6,8 +7,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using Dalamud.Game.ClientState.Objects.Types;
-using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace DelvUI.Interface.GeneralElements
 {
