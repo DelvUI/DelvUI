@@ -218,7 +218,7 @@ namespace DelvUI.Helpers
             Vector2 size,
             bool needsInput,
             bool needsFocus,
-            bool needsRefresh,
+            bool needsWindow,
             ImGuiWindowFlags windowFlags,
             Action<ImDrawListPtr> drawAction)
         {
@@ -239,7 +239,7 @@ namespace DelvUI.Helpers
             {
                 ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
-                if (!needsInput)
+                if (!needsInput && !needsWindow)
                 {
                     drawAction(drawList);
                     return;

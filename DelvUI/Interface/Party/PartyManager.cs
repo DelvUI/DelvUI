@@ -430,7 +430,10 @@ namespace DelvUI.Interface.Party
         #region events
         public void OnPlayerOrderChange()
         {
-            _playerOrderChanged = true;
+            if (_config.PlayerOrderOverrideEnabled)
+            {
+                _playerOrderChanged = true;
+            }
         }
 
         private void OnConfigPropertyChanged(object sender, OnChangeBaseArgs args)
@@ -439,7 +442,7 @@ namespace DelvUI.Interface.Party
             {
                 UpdatePreview();
             }
-            else if (args.PropertyName == "PlayerOrder")
+            else if (args.PropertyName == "PlayerOrder" || args.PropertyName == "PlayerOrderOverrideEnabled")
             {
                 OnPlayerOrderChange();
             }
@@ -450,6 +453,7 @@ namespace DelvUI.Interface.Party
             if (!_config.Preview)
             {
                 _groupMembers.Clear();
+                MembersChangedEvent?.Invoke(this);
                 return;
             }
 

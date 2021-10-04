@@ -13,6 +13,7 @@ using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Numerics;
 
@@ -456,7 +457,7 @@ namespace DelvUI.Interface.Jobs
                                  BarTextPosition.CenterMiddle,
                                  BarTextType.Custom,
                                  Config.ShowLightspeedTextBar && lightspeedDuration != 0
-                                     ? Config.EnableDecimalLightspeedBar ? Math.Abs(lightspeedDuration).ToString("N1") : lightspeedDuration.ToString("N0")
+                                     ? Config.EnableDecimalLightspeedBar ? Math.Abs(lightspeedDuration).ToString("N1", CultureInfo.InvariantCulture) : lightspeedDuration.ToString("N0")
                                      : ""
                              )
                              .Build();
@@ -503,7 +504,7 @@ namespace DelvUI.Interface.Jobs
                                         BarTextPosition.CenterMiddle,
                                         BarTextType.Custom,
                                         Config.ShowStarTextBar && starDuration != 0
-                                            ? Config.EnableDecimalStarBar ? Math.Abs(starDuration).ToString("N1") : starDuration.ToString("N0")
+                                            ? Config.EnableDecimalStarBar ? Math.Abs(starDuration).ToString("N1", CultureInfo.InvariantCulture) : starDuration.ToString("N0")
                                             : ""
                                     );
 

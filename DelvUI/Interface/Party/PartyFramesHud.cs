@@ -20,7 +20,7 @@ namespace DelvUI.Interface.Party
         private delegate void OpenContextMenu(IntPtr agentHud, int parentAddonId, int index);
         private readonly OpenContextMenu _openContextMenu;
 
-        private Vector2 _contentMargin = new Vector2(40, 40);
+        private Vector2 _contentMargin = new Vector2(2, 2);
         private static readonly int MaxMemberCount = 9; // 8 players + chocobo
 
         // layout
@@ -273,7 +273,6 @@ namespace DelvUI.Interface.Party
                 {
                     var margin = new Vector2(4, 0);
                     drawList.AddRectFilled(contentStartPos, contentStartPos + maxSize, 0x66000000);
-                    drawList.AddRect(windowPos + margin, windowPos + windowSize - margin * 2, 0x88000000, 3, ImDrawFlags.None, 2);
                 }
 
                 var count = PartyManager.Instance.MemberCount;
@@ -398,15 +397,35 @@ namespace DelvUI.Interface.Party
                 }
 
                 drawBarsAction(ImGui.GetWindowDrawList());
-                drawElementsAction();
-
                 ImGui.End();
+
+                drawElementsAction();
             }
             else
             {
-                DrawHelper.DrawInWindow(ID, origin + Config.Position, Config.Size, true, false, false, windowFlags, drawBarsAction);
+                bool needsInput = CalculateNeedsInput();
+                DrawHelper.DrawInWindow(ID, origin + Config.Position, Config.Size, needsInput, false, true, windowFlags, drawBarsAction);
                 drawElementsAction();
             }
+        }
+
+        protected bool CalculateNeedsInput()
+        {
+            if (!Config.Lock)
+            {
+                return true;
+            }
+
+            for (int i = 0; i < PartyManager.Instance.MemberCount; i++)
+            {
+                var bar = bars[i];
+                if (ImGui.IsMouseHoveringRect(bar.Position, bar.Position + _healthBarsConfig.Size))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
