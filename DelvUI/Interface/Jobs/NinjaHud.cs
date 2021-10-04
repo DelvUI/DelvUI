@@ -224,7 +224,6 @@ namespace DelvUI.Interface.Jobs
             TrickAttackBarConfig.Enabled = false;
             SuitonBarConfig.Enabled = false;
             HutonBarConfig.Threshold = true;
-            HutonBarConfig.UseThresholdColor = true;
         }
 
         public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }

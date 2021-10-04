@@ -18,25 +18,13 @@ namespace DelvUI.Interface.Bars
         [Order(50, collapseWith = nameof(Threshold))]
         public float ThresholdValue = 0f;
 
-        [Checkbox("Threshold Color")]
-        [Order(55, collapseWith = nameof(Threshold))]
-        public bool UseThresholdColor = false;
-
         [Combo("Activate Above/Below Threshold", "Above", "Below")]
-        [Order(60, collapseWith = nameof(UseThresholdColor))]
+        [Order(60, collapseWith = nameof(Threshold))]
         public ThresholdType ThresholdType = ThresholdType.Below;
 
         [ColorEdit4("Threshold Color")]
-        [Order(65, collapseWith = nameof(UseThresholdColor))]
+        [Order(65, collapseWith = nameof(Threshold))]
         public PluginConfigColor ThresholdColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
-
-        [Checkbox("Show Threshold Marker")]
-        [Order(70, collapseWith = nameof(Threshold))]
-        public bool DrawThresholdMarker = false;
-
-        [ColorEdit4("Threshold Marker Color")]
-        [Order(75, collapseWith = nameof(DrawThresholdMarker))]
-        public PluginConfigColor ThresholdMarkerColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [NestedConfig("Bar Text", 80, separator = false, spacing = true)]
         public LabelConfig LabelConfig;
@@ -55,7 +43,7 @@ namespace DelvUI.Interface.Bars
 
         public override PluginConfigColor GetBarColor(float current, GameObject? actor = null)
         {
-            return IsThresholdActive(current) && UseThresholdColor ? ThresholdColor : FillColor;
+            return Threshold && IsThresholdActive(current) ? ThresholdColor : FillColor;
         }
 
         public bool IsThresholdActive(float current)
