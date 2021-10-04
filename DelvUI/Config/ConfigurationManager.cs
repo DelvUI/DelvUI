@@ -297,7 +297,7 @@ namespace DelvUI.Config
                 // update the tree 
                 configPageNode.ConfigObject = importedConfigObject;
                 // but also update the dictionary
-                Instance.ConfigBaseNode.configPageNodesMap[configPageNode.ConfigObject.GetType()] = configPageNode;
+                Instance.ConfigBaseNode.SetConfigPageNode(configPageNode);
                 Instance.SaveConfigurations();
 
                 Instance.ResetEvent?.Invoke(Instance);

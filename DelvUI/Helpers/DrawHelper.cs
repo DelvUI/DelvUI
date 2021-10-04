@@ -290,5 +290,20 @@ namespace DelvUI.Helpers
                 }
             }
         }
+
+        public static void DrawImGuiSeparator(int topSpacing, int bottomSpacing)
+        {
+            DrawImGuiSpacing(topSpacing);
+            ImGui.Separator();
+            DrawImGuiSpacing(bottomSpacing);
+        }
+
+        public static void DrawImGuiSpacing(int spacingSize)
+        {
+            for (int i = 0; i < spacingSize; i++)
+            {
+                ImGui.NewLine();
+            }
+        }
     }
 }

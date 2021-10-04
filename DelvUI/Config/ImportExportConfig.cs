@@ -9,7 +9,7 @@ namespace DelvUI.Interface
 {
     [Disableable(false)]
     [Portable(false)]
-    [Section("Import/Export")]
+    [Section("Import")]
     [SubSection("General", 0)]
     public class ImportExportConfig : PluginConfigObject
     {

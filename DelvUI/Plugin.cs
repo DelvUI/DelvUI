@@ -79,12 +79,10 @@ namespace DelvUI
             TargetManager = targetManager;
             UiBuilder = PluginInterface.UiBuilder;
 
-
             AssemblyLocation = Assembly.GetExecutingAssembly().Location;
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.2.1.1";
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "";
             FontsManager.Initialize(AssemblyLocation);
-
             LoadBanner();
 
             // initialize a not-necessarily-defaults configuration
