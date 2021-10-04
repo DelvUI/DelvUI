@@ -180,15 +180,7 @@ namespace DelvUI.Interface
                 }
 
                 ConfigType = type;
-
-                var name = type.Name.Replace("Config", "");
-                var regex = new Regex(@"
-                    (?<=[A-Z])(?=[A-Z][a-z]) |
-                    (?<=[^A-Z])(?=[A-Z]) |
-                    (?<=[A-Za-z])(?=[^A-Za-z])",
-                    RegexOptions.IgnorePatternWhitespace);
-
-                Name = regex.Replace(name, " ");
+                Name = Utils.UserFriendlyConfigName(type.Name);
             }
 
             public PluginConfigObject? GetObject()

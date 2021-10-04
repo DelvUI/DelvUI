@@ -86,7 +86,7 @@ namespace DelvUI.Config.Tree
         }
         #endregion
 
-        #region import export
+        #region export
         public virtual string? GetBase64String()
         {
             if (_children == null)
@@ -107,19 +107,6 @@ namespace DelvUI.Config.Tree
             }
 
             return base64String;
-        }
-
-        public virtual void LoadBase64String(string[] importStrings)
-        {
-            if (_children == null)
-            {
-                return;
-            }
-
-            foreach (Node child in _children)
-            {
-                child.LoadBase64String(importStrings);
-            }
         }
         #endregion
     }

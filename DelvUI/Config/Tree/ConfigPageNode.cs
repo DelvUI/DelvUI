@@ -71,9 +71,6 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        private string _importString = "";
-        private string _exportString = "";
-
         public override string? GetBase64String()
         {
             return AllowExport() ? ConfigurationManager.GenerateExportString(ConfigObject) : null;
@@ -82,50 +79,6 @@ namespace DelvUI.Config.Tree
         protected override bool AllowExport()
         {
             return ConfigObject.Portable;
-        }
-
-        public override void LoadBase64String(string[] importStrings)
-        {
-            // go through and check types
-            // if type matches, load it
-            foreach (string importString in importStrings)
-            {
-                Type? importedType = null;
-
-                try
-                {
-                    // get type from json
-                    string jsonString = ConfigurationManager.Base64DecodeAndDecompress(importString);
-
-                    var typeString = (string?)JObject.Parse(jsonString)["$type"];
-                    if (typeString != null)
-                    {
-                        importedType = Type.GetType(typeString);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    PluginLog.Log($"Error parsing import string!\n{ex.StackTrace}");
-                }
-
-                // abort import if the import string is for the wrong type
-                if (importedType != null && ConfigObject.GetType().FullName == importedType.FullName)
-                {
-                    // see comments on ConfigPageNode's Loadd
-                    MethodInfo? methodInfo = typeof(ConfigurationManager)?.GetMethod("LoadImportString");
-                    MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigObject.GetType());
-                    PluginConfigObject? importedConfigObject = (PluginConfigObject?)function?.Invoke(ConfigurationManager.Instance, new object[] { importString });
-
-                    if (importedConfigObject != null)
-                    {
-                        ConfigObject = importedConfigObject;
-                    }
-                    else
-                    {
-                        PluginLog.Log($"Could not load from import string (of type {ConfigObject.GetType()})");
-                    }
-                }
-            }
         }
 
         public override bool Draw(ref bool changed) { return DrawWithID(ref changed); }
@@ -190,12 +143,7 @@ namespace DelvUI.Config.Tree
                 didReset |= (result.HasValue && result.Value);
             }
 
-            // if the config object is not marked with [Portable(false)], or is marked with [Portable(true)],
-            // draw the import/export UI
-            if (ConfigObject.Portable)
-            {
-                DrawImportExportGeneralConfig();
-            }
+            didReset |= DrawPortableSection();
 
             return didReset;
         }
@@ -278,93 +226,34 @@ namespace DelvUI.Config.Tree
             _drawList.Sort((x, y) => x.Key - y.Key);
         }
 
-        private void DrawImportExportGeneralConfig()
+        private bool DrawPortableSection()
         {
+            if (!AllowExport())
+            {
+                return false;
+            }
+
             ImGuiHelper.DrawSeparator(2, 1);
 
-            uint maxLength = 40000;
-            ImGui.BeginChild("importpane", new Vector2(0, ImGui.GetWindowHeight() / 6), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
+            const float buttonWidth = 120;
 
+            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowContentRegionWidth() / 2f - buttonWidth - 5, ImGui.GetCursorPosY()));
+
+            if (ImGui.Button("Export", new Vector2(120, 24)))
             {
-                ImGui.Text("Import string:");
-                ImGui.InputText("", ref _importString, maxLength);
-
-                if (ImGui.Button("Import configuration"))
-                {
-                    // get type from json 
-                    Type? importedType = null;
-
-                    try
-                    {
-                        string jsonString = ConfigurationManager.Base64DecodeAndDecompress(_importString);
-
-                        var typeString = (string?)JObject.Parse(jsonString)["$type"];
-                        if (typeString != null)
-                        {
-                            importedType = Type.GetType(typeString);
-                        }
-                    }
-                    catch (Exception ex)
-                    {
-                        PluginLog.Log($"Error parsing import string!\n{ex.StackTrace}");
-                    }
-
-                    // abort import if the import string is for the wrong type
-                    if (importedType != null && ConfigObject.GetType().FullName == importedType.FullName)
-                    {
-                        ConfigurationManager.LoadImportedConfiguration(_importString, this);
-                    }
-                    else
-                    {
-                        PluginLog.Log($"Could not convert {(importedType == null ? "null" : importedType)} to {ConfigObject.GetType()}! Aborting import.");
-                    }
-                }
-
-                ImGui.SameLine();
-
-                if (ImGui.Button("Paste from clipboard"))
-                {
-                    try
-                    {
-                        _importString = ImGui.GetClipboardText();
-                    }
-                    catch (Exception ex)
-                    {
-                        PluginLog.Log("Could not get clipboard text:\n" + ex.StackTrace);
-                    }
-                }
+                var exportString = ConfigurationManager.GenerateExportString(ConfigObject);
+                ImGui.SetClipboardText(exportString);
             }
 
-            ImGui.EndChild();
+            ImGui.SameLine();
 
-            ImGui.BeginChild("exportpane", new Vector2(0, ImGui.GetWindowHeight() / 6), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse);
-
+            if (ImGui.Button("Reset", new Vector2(120, 24)))
             {
-                ImGui.Text("Export string:");
-                ImGui.InputText("", ref _exportString, maxLength, ImGuiInputTextFlags.ReadOnly);
-
-                if (ImGui.Button("Export configuration"))
-                {
-                    _exportString = ConfigurationManager.GenerateExportString(ConfigObject);
-                    PluginLog.Log($"Exported type {ConfigObject.GetType()}");
-                }
-
-                ImGui.SameLine();
-
-                if (ImGui.Button("Copy to clipboard") && _exportString != "")
-                {
-                    try
-                    {
-                        ImGui.SetClipboardText(_exportString);
-                    }
-                    catch (Exception ex)
-                    {
-                        PluginLog.Log("Could not set clipboard text:\n" + ex.StackTrace);
-                    }
-                }
+                _nodeToReset = this;
+                _nodeToResetName = Utils.UserFriendlyConfigName(ConfigObject.GetType().Name);
             }
 
-            ImGui.EndChild();
+            return DrawResetModal();
         }
 
         public override void Save(string path)

@@ -324,12 +324,6 @@ namespace DelvUI.Config
             }
         }
 
-        public static void LoadTotalConfiguration(string[] importStrings)
-        {
-            Instance.ConfigBaseNode.LoadBase64String(importStrings);
-            Instance.ResetEvent?.Invoke(Instance);
-        }
-
         public static T? LoadImportString<T>(string importString) where T : PluginConfigObject
         {
             try
