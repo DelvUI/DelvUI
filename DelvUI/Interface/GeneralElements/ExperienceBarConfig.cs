@@ -10,7 +10,7 @@ namespace DelvUI.Interface.GeneralElements
 {
     [Section("Misc")]
     [SubSection("Experience Bar", 0)]
-    public class ExperienceBarConfig : BarConfig
+    public class ExperienceBarConfig : BarConfigBase
     {
         [Checkbox("Use Job Color")]
         [Order(45)]
@@ -45,19 +45,26 @@ namespace DelvUI.Interface.GeneralElements
             return new ExperienceBarConfig(); 
         }
 
-        public override bool IsActive(float current)
+        public override bool IsActive(float current, float max, float min)
         {
             return (Plugin.ClientState.LocalPlayer?.Level ?? 0) != 80;
         }
 
-        public override PluginConfigColor GetBarColor(float current, GameObject? actor = null)
+        public override Bar2[] GetBars(float current, float max, float min = 0f, GameObject? actor = null)
         {
-            if (current == ExperienceHelper.Instance.RestedExp)
-            {
-                return RestedExpColor;
-            }
+            Rect background = new Rect(Vector2.Zero, Size, BackgroundColor);
 
-            return UseJobColor ? Utils.ColorForActor(actor) : base.GetBarColor(current);
+            // Exp progress bar
+            PluginConfigColor expFillColor = UseJobColor ? Utils.ColorForActor(actor) : FillColor;
+            Rect expBar = Rect.GetFillRect(Vector2.Zero, Size, FillDirection, expFillColor, current, max, min);
+
+            // Rested exp bar
+            uint rested = ShowRestedExp ? ExperienceHelper.Instance.RestedExp : 0;
+            var restedPos = (FillDirection == BarDirection.Right || FillDirection == BarDirection.Down) ? Rect.GetFillDirectionOffset(expBar.Size, FillDirection) : Vector2.Zero;
+            var restedSize = Size - Rect.GetFillDirectionOffset(expBar.Size, FillDirection);
+            Rect restedBar = Rect.GetFillRect(restedPos, restedSize, FillDirection, RestedExpColor, rested, max, min);
+
+            return new Bar2[] { new Bar2(background, new[] { expBar, restedBar }, new[] { LeftLabelConfig, RightLabelConfig }) };
         }
     }
 }

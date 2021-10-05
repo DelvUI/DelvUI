@@ -28,11 +28,8 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            ExpBar ??= new BarHud(Config, Actor, Config.LeftLabelConfig, Config.RightLabelConfig);
-            uint current = ExperienceHelper.Instance.CurrentExp;
-            uint max = ExperienceHelper.Instance.RequiredExp;
-            uint rested = Config.ShowRestedExp ? ExperienceHelper.Instance.RestedExp : 0;
-            ExpBar.Draw(origin, current, max, rested);
+            ExpBar ??= new BarHud(Config, Actor);
+            ExpBar.Draw(origin, ExperienceHelper.Instance.CurrentExp, ExperienceHelper.Instance.RequiredExp);
         }
     }
 

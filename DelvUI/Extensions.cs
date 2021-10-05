@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Numerics;
 using System.Text;
 using Dalamud.Game.Text.SeStringHandling;
+using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 
 namespace DelvUI

@@ -8,7 +8,7 @@ using System.Numerics;
 namespace DelvUI.Interface.Bars
 {
     [Portable(false)]
-    public class ThresholdBarConfig : BarConfig
+    public class ThresholdBarConfig : BarConfigBase
     {
         [Checkbox("Threshold")]
         [Order(45)]
@@ -41,15 +41,23 @@ namespace DelvUI.Interface.Bars
             ThresholdValue = threshold;
         }
 
-        public override PluginConfigColor GetBarColor(float current, GameObject? actor = null)
+        public override Bar2[] GetBars(float current, float max, float min = 0f, GameObject? actor = null)
         {
-            return Threshold && IsThresholdActive(current) ? ThresholdColor : FillColor;
+            Rect background = new Rect(Vector2.Zero, Size, BackgroundColor);
+            PluginConfigColor fillColor = IsThresholdActive(current) ? ThresholdColor : FillColor;
+            Rect foreground = Rect.GetFillRect(Vector2.Zero, Size, FillDirection, fillColor, current, max, min);
+            return new Bar2[] { new Bar2(background, new[] { foreground }, new[] { LabelConfig }) };
+        }
+
+        public override bool IsActive(float current, float max, float min)
+        {
+            return current > min;
         }
 
         public bool IsThresholdActive(float current)
         {
-            return ThresholdType == ThresholdType.Below && current < ThresholdValue ||
-                    ThresholdType == ThresholdType.Above && current > ThresholdValue;
+            return Threshold && (ThresholdType == ThresholdType.Below && current < ThresholdValue ||
+                                 ThresholdType == ThresholdType.Above && current > ThresholdValue);
         }
     }
 

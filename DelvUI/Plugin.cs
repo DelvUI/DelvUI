@@ -253,14 +253,14 @@ namespace DelvUI
 
             ChatHelper.Instance.Dispose();
             ClipRectsHelper.Instance.Dispose();
+            ExperienceHelper.Instance.Dispose();
             FontsManager.Instance.Dispose();
             GlobalColors.Instance.Dispose();
             MouseOverHelper.Instance.Dispose();
             PartyManager.Instance.Dispose();
+            SpellHelper.Instance.Dispose();
             TexturesCache.Instance.Dispose();
             TooltipsHelper.Instance.Dispose();
-            ExperienceHelper.Instance.Dispose();
-            SpellHelper.Instance.Dispose();
 
             // This needs to remain last to avoid race conditions
             ConfigurationManager.Instance.Dispose();
