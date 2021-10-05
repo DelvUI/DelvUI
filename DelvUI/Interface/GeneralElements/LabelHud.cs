@@ -31,7 +31,7 @@ namespace DelvUI.Interface.GeneralElements
                 Config.GetText() :
                 TextTags.GenerateFormattedTextFromTags(actor, Config.GetText(), actorName);
 
-            DrawLabel(actorName != null ? actorName : text, origin, parentSize ?? Vector2.Zero, actor);
+            DrawLabel(text, origin, parentSize ?? Vector2.Zero, actor);
         }
 
         private void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
