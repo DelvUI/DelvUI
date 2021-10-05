@@ -90,14 +90,14 @@ namespace DelvUI.Config.Tree
             // Only do this stuff the first time the config page is loaded
             if (_drawList is null)
             {
-                GenerateDrawList();
+                GenerateDrawList(ID);
             }
 
             foreach (KeyValuePair<int, object> pair in _drawList!)
             {
-                if (pair.Value is FieldNode categoryField)
+                if (pair.Value is FieldNode fieldNode)
                 {
-                    categoryField.Draw(ref changed);
+                    fieldNode.Draw(ref changed);
                 }
                 else if (pair.Value is ConfigPageNode node)
                 {
