@@ -13,7 +13,7 @@ using System.Text.RegularExpressions;
 namespace DelvUI.Interface
 {
     [Disableable(false)]
-    [Portable(false)]
+    [Exportable(false)]
     [Section("Import")]
     [SubSection("General", 0)]
     public class ImportConfig : PluginConfigObject
@@ -153,47 +153,47 @@ namespace DelvUI.Interface
 
             return null;
         }
+    }
 
-        internal struct ImportData
+    public struct ImportData
+    {
+        public readonly Type ConfigType;
+        public readonly string Name;
+
+        public readonly string ImportString;
+        public readonly string JsonString;
+
+        public ImportData(string base64String)
         {
-            public readonly Type ConfigType;
-            public readonly string Name;
+            ImportString = base64String;
+            JsonString = ConfigurationManager.Base64DecodeAndDecompress(base64String);
 
-            public readonly string ImportString;
-            public readonly string JsonString;
-
-            public ImportData(string base64String)
+            var typeString = (string?)JObject.Parse(JsonString)["$type"];
+            if (typeString == null)
             {
-                ImportString = base64String;
-                JsonString = ConfigurationManager.Base64DecodeAndDecompress(base64String);
-
-                var typeString = (string?)JObject.Parse(JsonString)["$type"];
-                if (typeString == null)
-                {
-                    throw new ArgumentException("Invalid type");
-                }
-
-                Type? type = Type.GetType(typeString);
-                if (type == null)
-                {
-                    throw new ArgumentException("Invalid type: \"" + typeString + "\"");
-                }
-
-                ConfigType = type;
-                Name = Utils.UserFriendlyConfigName(type.Name);
+                throw new ArgumentException("Invalid type");
             }
 
-            public PluginConfigObject? GetObject()
+            Type? type = Type.GetType(typeString);
+            if (type == null)
             {
-                MethodInfo? methodInfo = GetType().GetMethod("DeserializeObject", BindingFlags.Public | BindingFlags.Static);
-                MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigType);
-                return (PluginConfigObject?)function?.Invoke(this, new object[] { JsonString })!;
+                throw new ArgumentException("Invalid type: \"" + typeString + "\"");
             }
 
-            public static T? DeserializeObject<T>(string jsonString)
-            {
-                return JsonConvert.DeserializeObject<T>(jsonString);
-            }
+            ConfigType = type;
+            Name = Utils.UserFriendlyConfigName(type.Name);
+        }
+
+        public PluginConfigObject? GetObject()
+        {
+            MethodInfo? methodInfo = GetType().GetMethod("DeserializeObject", BindingFlags.Public | BindingFlags.Static);
+            MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigType);
+            return (PluginConfigObject?)function?.Invoke(this, new object[] { JsonString })!;
+        }
+
+        public static T? DeserializeObject<T>(string jsonString)
+        {
+            return JsonConvert.DeserializeObject<T>(jsonString);
         }
     }
 }

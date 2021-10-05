@@ -1,5 +1,4 @@
 ﻿using Dalamud.Interface;
-using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
@@ -12,13 +11,13 @@ namespace DelvUI.Config.Attributes
 {
     #region class attributes
     [AttributeUsage(AttributeTargets.Class)]
-    public class PortableAttribute : Attribute
+    public class ExportableAttribute : Attribute
     {
-        public bool portable;
+        public bool exportable;
 
-        public PortableAttribute(bool portable)
+        public ExportableAttribute(bool exportable)
         {
-            this.portable = portable;
+            this.exportable = exportable;
         }
     }
 
@@ -30,6 +29,17 @@ namespace DelvUI.Config.Attributes
         public DisableableAttribute(bool disableable)
         {
             this.disableable = disableable;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class ProfileShareableAttribute : Attribute
+    {
+        public bool profileShareable;
+
+        public ProfileShareableAttribute(bool profileShareable)
+        {
+            this.profileShareable = profileShareable;
         }
     }
     #endregion

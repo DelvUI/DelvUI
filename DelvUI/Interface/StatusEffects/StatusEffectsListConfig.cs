@@ -198,7 +198,7 @@ namespace DelvUI.Interface.StatusEffects
         };
     }
 
-    [Portable(false)]
+    [Exportable(false)]
     [Disableable(false)]
     public class StatusEffectIconConfig : PluginConfigObject
     {
@@ -228,7 +228,7 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 
-    [Portable(false)]
+    [Exportable(false)]
     public class StatusEffectIconBorderConfig : PluginConfigObject
     {
         [ColorEdit4("Color")]
@@ -267,7 +267,7 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 
-    [Portable(false)]
+    [Exportable(false)]
     public class StatusEffectsBlacklistConfig : PluginConfigObject
     {
         public bool UseAsWhitelist = false;

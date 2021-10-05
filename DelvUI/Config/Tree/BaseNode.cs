@@ -19,6 +19,9 @@ namespace DelvUI.Config.Tree
 
         private Dictionary<Type, ConfigPageNode> _configPageNodesMap;
 
+        public bool NeedsSave = false;
+        public string? SelectedOptionName = null;
+
         public BaseNode()
         {
             _configPageNodesMap = new Dictionary<Type, ConfigPageNode>();
@@ -150,8 +153,18 @@ namespace DelvUI.Config.Tree
                     // if no section is selected, select the first
                     if (_children.Any() && _children.Find(o => o is SectionNode sectionNode && sectionNode.Selected) == null)
                     {
-                        SectionNode node = (SectionNode)_children[0];
-                        node.Selected = true;
+                        SectionNode? selectedSection = (SectionNode?)_children.Find(o => o is SectionNode sectionNode && sectionNode.Name == SelectedOptionName);
+                        if (selectedSection != null)
+                        {
+                            selectedSection.Selected = true;
+                            SelectedOptionName = selectedSection.Name;
+                        }
+                        else if (_children.Count > 0)
+                        {
+                            SectionNode node = (SectionNode)_children[0];
+                            node.Selected = true;
+                            SelectedOptionName = node.Name;
+                        }
                     }
 
                     foreach (SectionNode selectionNode in _children)
@@ -159,6 +172,7 @@ namespace DelvUI.Config.Tree
                         if (ImGui.Selectable(selectionNode.Name, selectionNode.Selected))
                         {
                             selectionNode.Selected = true;
+                            SelectedOptionName = selectionNode.Name;
 
                             foreach (SectionNode otherNode in _children.FindAll(x => x != selectionNode))
                             {
@@ -255,10 +269,7 @@ namespace DelvUI.Config.Tree
                 ConfigObjectResetEvent?.Invoke(this);
             }
 
-            if (changed || didReset)
-            {
-                ConfigurationManager.Instance.SaveConfigurations();
-            }
+            NeedsSave |= changed | didReset;
         }
 
         public ConfigPageNode? GetOrAddConfig<T>() where T : PluginConfigObject

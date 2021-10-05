@@ -73,12 +73,12 @@ namespace DelvUI.Config.Tree
 
         public override string? GetBase64String()
         {
-            return AllowExport() ? ConfigurationManager.GenerateExportString(ConfigObject) : null;
+            return ConfigurationManager.GenerateExportString(ConfigObject);
         }
 
         protected override bool AllowExport()
         {
-            return ConfigObject.Portable;
+            return ConfigObject.Exportable;
         }
 
         public override bool Draw(ref bool changed) { return DrawWithID(ref changed); }
@@ -258,6 +258,11 @@ namespace DelvUI.Config.Tree
 
         public override void Save(string path)
         {
+            if (!ConfigObject.ProfileShareable)
+            {
+                return;
+            }
+
             string[] splits = path.Split("\\", StringSplitOptions.RemoveEmptyEntries);
             string directory = path.Replace(splits.Last(), "");
             Directory.CreateDirectory(directory);
@@ -276,6 +281,11 @@ namespace DelvUI.Config.Tree
 
         public override void Load(string path)
         {
+            if (!ConfigObject.ProfileShareable)
+            {
+                return;
+            }
+
             FileInfo finalPath = new(path + ".json");
 
             if (!finalPath.Exists)

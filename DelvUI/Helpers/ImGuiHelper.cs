@@ -26,6 +26,18 @@ namespace DelvUI.Helpers
             }
         }
 
+        public static void NewLineAndTab()
+        {
+            ImGui.NewLine();
+            Tab();
+        }
+
+        public static void Tab()
+        {
+            ImGui.Text("\u2002");
+            ImGui.SameLine();
+        }
+
         public static Node? DrawExportResetContextMenu(Node node, bool canExport)
         {
             Node? nodeToReset = null;
@@ -48,6 +60,11 @@ namespace DelvUI.Helpers
             }
 
             return nodeToReset;
+        }
+
+        public static (bool, bool) DrawConfirmationModal(string title, string message)
+        {
+            return DrawConfirmationModal(title, new string[] { message });
         }
 
         public static (bool, bool) DrawConfirmationModal(string title, IEnumerable<string> textLines)

@@ -86,7 +86,7 @@ namespace DelvUI
             LoadBanner();
 
             // initialize a not-necessarily-defaults configuration
-            ConfigurationManager.Initialize(false);
+            ConfigurationManager.Initialize();
             FontsManager.Instance.LoadConfig();
 
             UiBuilder.Draw += Draw;
@@ -168,23 +168,14 @@ namespace DelvUI
                 {
                     case "toggle":
                         ConfigurationManager.Instance.ShowHUD = !ConfigurationManager.Instance.ShowHUD;
-
                         break;
 
                     case "show":
                         ConfigurationManager.Instance.ShowHUD = true;
-
                         break;
 
                     case "hide":
                         ConfigurationManager.Instance.ShowHUD = false;
-
-                        break;
-
-                    case "reset":
-                        ConfigurationManager.Initialize(true);
-                        ConfigurationManager.Instance.SaveConfigurations();
-
                         break;
 
                     default:
