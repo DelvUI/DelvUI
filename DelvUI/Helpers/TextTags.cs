@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -173,6 +173,9 @@ namespace DelvUI.Helpers
 
                     case "[mana:deficit-short]":
                         return $"-{(character.MaxMp - character.CurrentMp).KiloFormat()}";
+
+                    case "[distance]":
+                        return (character.YalmDistanceX + 1).ToString();
 
                     case "[company]":
                         return character.CompanyTag.ToString();
