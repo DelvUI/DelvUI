@@ -51,13 +51,23 @@ namespace DelvUI.Config
 
                 _drawConfigWindow = value;
 
-                if (!_drawConfigWindow && ConfigBaseNode.NeedsSave)
+                if (!_drawConfigWindow)
                 {
-                    SaveConfigurations();
+                    if (ConfigBaseNode.NeedsSave)
+                    {
+                        SaveConfigurations();
+                    }
+
+                    if (_needsProfileUpdate)
+                    {
+                        UpdateCurrentProfile();
+                        _needsProfileUpdate = false;
+                    }
                 }
             }
         }
 
+        private bool _needsProfileUpdate = false;
         private bool _lockHUD = true;
 
         public bool LockHUD
@@ -217,6 +227,19 @@ namespace DelvUI.Config
         {
             var profilesConfig = GetConfigObject<ProfilesConfig>();
             profilesConfig.SaveCurrentProfile(ExportCurrentConfigs());
+        }
+
+        public void UpdateCurrentProfile()
+        {
+            // dont update the profile on job change when the config window is opened
+            if (_drawConfigWindow)
+            {
+                _needsProfileUpdate = true;
+                return;
+            }
+
+            var profilesConfig = GetConfigObject<ProfilesConfig>();
+            profilesConfig.UpdateCurrentProfile();
         }
 
         public PluginConfigObject GetConfigObjectForType(Type type)

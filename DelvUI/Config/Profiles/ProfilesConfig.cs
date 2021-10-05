@@ -130,6 +130,47 @@ namespace DelvUI.Config.Profiles
             return false;
         }
 
+        public void UpdateCurrentProfile()
+        {
+            var player = Plugin.ClientState.LocalPlayer;
+            if (player == null)
+            {
+                return;
+            }
+
+            uint jobId = player.ClassJob.Id;
+            Profile currentProfile = CurrentProfile();
+            JobRoles role = JobsHelper.RoleForJob(jobId);
+            int index = JobsHelper.JobsByRole[role].IndexOf(jobId);
+
+            if (index < 0)
+            {
+                return;
+            }
+
+            // current profile is enabled for this job, do nothing
+            if (currentProfile.AutoSwitchEnabled && currentProfile.AutoSwitchData.Map[role][index])
+            {
+                return;
+            }
+
+            // find a profile that is enabled for this job
+            foreach (Profile profile in Profiles.Values)
+            {
+                if (!profile.AutoSwitchEnabled || profile == currentProfile)
+                {
+                    continue;
+                }
+
+                // found a valid profile, switch to it
+                if (profile.AutoSwitchData.Map[role][index])
+                {
+                    SwitchToProfile(profile.Name);
+                    return;
+                }
+            }
+        }
+
         private string? SwitchToProfile(string profile, bool save = true)
         {
             // save if needed before switching
@@ -268,7 +309,7 @@ namespace DelvUI.Config.Profiles
         {
             string[] profiles = Profiles.Keys.ToArray();
 
-            if (ImGui.BeginChild("Profiles", new Vector2(800, 800), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            if (ImGui.BeginChild("Profiles", new Vector2(800, 600), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 if (Profiles.Count == 0)
                 {
@@ -303,8 +344,7 @@ namespace DelvUI.Config.Profiles
                 ImGui.PopFont();
 
                 ImGuiHelper.NewLineAndTab();
-                changed |= ImGui.Checkbox("Auto-Switch For Specific Jobs", ref CurrentProfile().AutoSwitchEnabled);
-
+                DrawAutoSwitchSettings(ref changed);
 
                 ImGuiHelper.DrawSeparator(1, 1);
                 ImGuiHelper.Tab();
@@ -385,6 +425,65 @@ namespace DelvUI.Config.Profiles
             }
 
             return false;
+        }
+
+        private void DrawAutoSwitchSettings(ref bool changed)
+        {
+            Profile profile = CurrentProfile();
+
+            changed |= ImGui.Checkbox("Auto-Switch For Specific Jobs", ref profile.AutoSwitchEnabled);
+
+            if (!profile.AutoSwitchEnabled)
+            {
+                return;
+            }
+
+            AutoSwitchData data = profile.AutoSwitchData;
+            Vector2 cursorPos = ImGui.GetCursorPos() + new Vector2(14, 14);
+            Vector2 originalPos = cursorPos;
+            float maxY = 0;
+
+            JobRoles[] roles = (JobRoles[])Enum.GetValues(typeof(JobRoles));
+
+            foreach (JobRoles role in roles)
+            {
+                if (role == JobRoles.Unknown) { continue; }
+
+                bool roleValue = data.GetRoleEnabled(role);
+                string roleName = JobsHelper.RoleNames[role];
+
+                ImGui.SetCursorPos(cursorPos);
+                if (ImGui.Checkbox(roleName, ref roleValue))
+                {
+                    data.SetRoleEnabled(role, roleValue);
+                    changed = true;
+                }
+
+                cursorPos.Y += 40;
+                int jobCount = data.Map[role].Count;
+
+                for (int i = 0; i < jobCount; i++)
+                {
+                    maxY = Math.Max(cursorPos.Y, maxY);
+                    uint jobId = JobsHelper.JobsByRole[role][i];
+                    bool jobValue = data.Map[role][i];
+                    string jobName = JobsHelper.JobNames[jobId];
+
+                    ImGui.SetCursorPos(cursorPos);
+                    if (ImGui.Checkbox(jobName, ref jobValue))
+                    {
+                        data.Map[role][i] = jobValue;
+                        changed = true;
+                    }
+
+                    cursorPos.Y += 30;
+                }
+
+                cursorPos.X += 100;
+                cursorPos.Y = originalPos.Y;
+            }
+
+            ImGui.SetCursorPos(new Vector2(originalPos.X, maxY + 30));
         }
     }
 }

@@ -100,8 +100,12 @@ namespace DelvUI.Interface.Party
             switch (role)
             {
                 case JobRoles.Tank: return _config.ColorsConfig.TankRoleColor;
-                case JobRoles.DPS: return _config.ColorsConfig.DPSRoleColor;
                 case JobRoles.Healer: return _config.ColorsConfig.HealerRoleColor;
+
+                case JobRoles.DPSMelee:
+                case JobRoles.DPSRanged:
+                case JobRoles.DPSCaster:
+                    return _config.ColorsConfig.DPSRoleColor;
             }
 
             return _config.ColorsConfig.GenericRoleColor;
