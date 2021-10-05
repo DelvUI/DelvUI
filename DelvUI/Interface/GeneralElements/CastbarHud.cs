@@ -93,7 +93,9 @@ namespace DelvUI.Interface.GeneralElements
             // cast name
             var iconSize = Config.ShowIcon ? Config.Size.Y : 0;
             var castNamePos = startPos + new Vector2(iconSize, 0);
-            Config.CastNameConfig.SetText(Config.Preview ? "Cast Name" : (LastUsedCast != null ? LastUsedCast.ActionText : ""));
+            string? castName = LastUsedCast?.ActionText.CheckForUpperCase();
+
+            Config.CastNameConfig.SetText(Config.Preview ? "Cast Name" : (castName != null ? castName : ""));
             _castNameLabel.Draw(startPos + new Vector2(iconSize, 0), Config.Size, Actor);
 
             // cast time
