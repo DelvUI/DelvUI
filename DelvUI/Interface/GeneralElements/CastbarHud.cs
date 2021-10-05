@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
+using static System.Globalization.CultureInfo;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -93,7 +94,16 @@ namespace DelvUI.Interface.GeneralElements
             // cast name
             var iconSize = Config.ShowIcon ? Config.Size.Y : 0;
             var castNamePos = startPos + new Vector2(iconSize, 0);
-            Config.CastNameConfig.SetText(Config.Preview ? "Cast Name" : (LastUsedCast != null ? LastUsedCast.ActionText : ""));
+
+            var culture = CurrentCulture.TextInfo;
+            string? castName = LastUsedCast?.ActionText;
+
+            if (!string.IsNullOrEmpty(castName) && char.IsLetter(castName[0]) && !char.IsUpper(castName[0]))
+            {
+                castName = culture.ToTitleCase(castName);
+            }
+
+            Config.CastNameConfig.SetText(Config.Preview ? "Cast Name" : (castName != null ? castName : ""));
             _castNameLabel.Draw(startPos + new Vector2(iconSize, 0), Config.Size, Actor);
 
             // cast time

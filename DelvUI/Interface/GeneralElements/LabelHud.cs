@@ -1,7 +1,6 @@
 ﻿using DelvUI.Helpers;
 using ImGuiNET;
 using System.Numerics;
-using static System.Globalization.CultureInfo;
 using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 
@@ -28,17 +27,11 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var culture = CurrentCulture.TextInfo;
             var text = actor == null && actorName == null ?
                 Config.GetText() :
                 TextTags.GenerateFormattedTextFromTags(actor, Config.GetText(), actorName);
 
-            if (!string.IsNullOrEmpty(text) && char.IsLetter(text[0]) && !char.IsUpper(text[0]))
-            {
-                text = culture.ToTitleCase(text);
-            }
-
-            DrawLabel(text, origin, parentSize ?? Vector2.Zero, actor);
+            DrawLabel(actorName != null ? actorName : text, origin, parentSize ?? Vector2.Zero, actor);
         }
 
         private void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)

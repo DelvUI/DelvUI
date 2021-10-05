@@ -7,7 +7,7 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using Dalamud.Game.ClientState.Objects.Types;
-using FFXIVClientStructs.FFXIV.Component.GUI;
+using static System.Globalization.CultureInfo;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -77,8 +77,19 @@ namespace DelvUI.Interface.GeneralElements
             });
 
             // labels
-            _leftLabel.Draw(startPos, Config.Size, Actor);
-            _rightLabel.Draw(startPos, Config.Size, Actor);
+            var culture = CurrentCulture.TextInfo;
+            string actorName = Actor.Name.ToString();
+            if (!string.IsNullOrEmpty(actorName) && char.IsLetter(actorName[0]) && !char.IsUpper(actorName[0]))
+            {
+                actorName = culture.ToTitleCase(actorName);
+                _leftLabel.Draw(startPos, Config.Size, Actor, actorName);
+                _rightLabel.Draw(startPos, Config.Size, Actor, actorName);
+            }
+            else
+            {
+                _leftLabel.Draw(startPos, Config.Size, Actor);
+                _rightLabel.Draw(startPos, Config.Size, Actor);
+            }
         }
 
         private void DrawChara(ImDrawListPtr drawList, Vector2 startPos, Character chara)
