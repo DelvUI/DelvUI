@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
@@ -13,7 +14,7 @@ using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
 namespace DelvUI.Interface.StatusEffects
 {
-    public class StatusEffectsListHud : DraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
+    public class StatusEffectsListHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
     {
         protected StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
 
@@ -26,7 +27,9 @@ namespace DelvUI.Interface.StatusEffects
         private LabelHud _stacksLabel;
 
         public GameObject? Actor { get; set; } = null;
-        public AnchorablePluginConfigObject? ParentConfig { get; set; }
+
+        protected override bool AnchorToParent => Config is UnitFrameStatusEffectsListConfig config ? config.AnchorToUnitFrame : false;
+        protected override DrawAnchor ParentAnchor => Config is UnitFrameStatusEffectsListConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
 
         public StatusEffectsListHud(string id, StatusEffectsListConfig config, string displayName) : base(id, config, displayName)
         {
@@ -229,15 +232,7 @@ namespace DelvUI.Interface.StatusEffects
 
             // area
             GrowthDirections growthDirections = Config.GetGrowthDirections();
-            Vector2 parentPos = origin;
-
-            if (Config is UnitFrameStatusEffectsListConfig unitFrameListConfig && unitFrameListConfig.AnchorToUnitFrame && ParentConfig != null)
-            {
-                parentPos = Utils.GetAnchoredPosition(origin + ParentConfig.Position, -ParentConfig.Size, unitFrameListConfig.UnitFrameAnchor);
-                parentPos -= ParentConfig.Size / 2f;
-            }
-
-            Vector2 position = parentPos + Config.Position;
+            Vector2 position = origin + GetAnchoredPosition(Config.Position, Config.Size, DrawAnchor.TopLeft);
             Vector2 areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
 
             var drawList = ImGui.GetWindowDrawList();

@@ -153,7 +153,7 @@ namespace DelvUI.Interface
                 var anchorConfig = _config as AnchorablePluginConfigObject;
                 for (int i = 0; i < positions.Count; i++)
                 {
-                    var pos = Utils.GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center);
+                    var pos = GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center);
                     minX = Math.Min(minX, pos.X);
                     minY = Math.Min(minY, pos.Y);
                 }
@@ -185,7 +185,7 @@ namespace DelvUI.Interface
                 var anchorConfig = _config as AnchorablePluginConfigObject;
                 for (int i = 0; i < positions.Count; i++)
                 {
-                    var pos = Utils.GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center) + sizes[i];
+                    var pos = GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center) + sizes[i];
                     maxX = Math.Max(maxX, pos.X);
                     maxY = Math.Max(maxY, pos.Y);
                 }
@@ -201,10 +201,38 @@ namespace DelvUI.Interface
             _maxPos = null;
         }
 
+        protected virtual Vector2 GetAnchoredPosition(Vector2 position, Vector2 size, DrawAnchor anchor)
+        {
+            return Utils.GetAnchoredPosition(position, size, anchor);
+        }
+
         protected virtual (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
             return (new List<Vector2>(), new List<Vector2>());
         }
         #endregion
+    }
+
+    public abstract class ParentAnchoredDraggableHudElement : DraggableHudElement
+    {
+        public ParentAnchoredDraggableHudElement(string id, MovablePluginConfigObject config, string? displayName = null)
+            : base(id, config, displayName)
+        {
+        }
+
+        protected virtual bool AnchorToParent { get; }
+        protected virtual DrawAnchor ParentAnchor { get; }
+        public AnchorablePluginConfigObject? ParentConfig { get; set; }
+
+        protected override Vector2 GetAnchoredPosition(Vector2 position, Vector2 size, DrawAnchor anchor)
+        {
+            if (!AnchorToParent || ParentConfig == null)
+            {
+                return base.GetAnchoredPosition(position, size, anchor);
+            }
+
+            Vector2 parentPos = Utils.GetAnchoredPosition(ParentConfig.Position, -ParentConfig.Size, ParentAnchor);
+            return Utils.GetAnchoredPosition(parentPos + position - ParentConfig.Size / 2f, size, anchor);
+        }
     }
 }

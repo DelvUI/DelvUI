@@ -22,7 +22,10 @@ namespace DelvUI.Interface.GeneralElements
 
             var labelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
 
-            return new PlayerPrimaryResourceConfig(pos, size, labelConfig);
+            var config = new PlayerPrimaryResourceConfig(pos, size, labelConfig);
+            config.Anchor = DrawAnchor.Bottom;
+
+            return config;
         }
     }
 
@@ -43,7 +46,10 @@ namespace DelvUI.Interface.GeneralElements
 
             var labelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
 
-            return new TargetPrimaryResourceConfig(pos, size, labelConfig);
+            var config = new TargetPrimaryResourceConfig(pos, size, labelConfig);
+            config.Anchor = DrawAnchor.Bottom;
+
+            return config;
         }
     }
 
@@ -64,7 +70,10 @@ namespace DelvUI.Interface.GeneralElements
 
             var labelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
 
-            return new TargetOfTargetPrimaryResourceConfig(pos, size, labelConfig);
+            var config = new TargetOfTargetPrimaryResourceConfig(pos, size, labelConfig);
+            config.Anchor = DrawAnchor.Bottom;
+
+            return config;
         }
     }
 
@@ -85,7 +94,10 @@ namespace DelvUI.Interface.GeneralElements
 
             var labelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
 
-            return new FocusTargetPrimaryResourceConfig(pos, size, labelConfig);
+            var config = new FocusTargetPrimaryResourceConfig(pos, size, labelConfig);
+            config.Anchor = DrawAnchor.Bottom;
+
+            return config;
         }
     }
 

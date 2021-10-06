@@ -12,7 +12,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class CastbarHud : DraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
+    public class CastbarHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
     {
         private CastbarConfig Config => (CastbarConfig)_config;
         private LabelHud _castNameLabel;
@@ -21,7 +21,9 @@ namespace DelvUI.Interface.GeneralElements
         protected LastUsedCast? LastUsedCast;
 
         public GameObject? Actor { get; set; }
-        public AnchorablePluginConfigObject? ParentConfig { get; set; }
+
+        protected override bool AnchorToParent => Config is UnitFrameCastbarConfig config ? config.AnchorToUnitFrame : false;
+        protected override DrawAnchor ParentAnchor => Config is UnitFrameCastbarConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
 
         public CastbarHud(string id, CastbarConfig config, string displayName) : base(id, config, displayName)
         {
@@ -56,18 +58,7 @@ namespace DelvUI.Interface.GeneralElements
             var castPercent = 100f / totalCastTime * currentCastTime;
             var castScale = castPercent / 100f;
 
-            Vector2 startPos;
-
-            if (Config is UnitFrameCastbarConfig unitFrameCastbarConfig && unitFrameCastbarConfig.AnchorToUnitFrame && ParentConfig != null)
-            {
-                Vector2 parentPos = Utils.GetAnchoredPosition(origin + ParentConfig.Position, -ParentConfig.Size, unitFrameCastbarConfig.UnitFrameAnchor);
-                startPos = Utils.GetAnchoredPosition(parentPos + Config.Position - ParentConfig.Size / 2f, Config.Size, Config.Anchor);
-            }
-            else
-            {
-                startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
-            }
-
+            Vector2 startPos = origin + GetAnchoredPosition(Config.Position, Config.Size, Config.Anchor);
             Vector2 endPos = startPos + Config.Size;
 
             DrawHelper.DrawInWindow(ID, startPos, Config.Size, false, false, (drawList) =>

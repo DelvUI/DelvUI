@@ -6,10 +6,11 @@ using System.Numerics;
 using Dalamud.Game.ClientState.Objects.Types;
 using System;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using DelvUI.Enums;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class PrimaryResourceHud : DraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
+    public class PrimaryResourceHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
     {
         private PrimaryResourceConfig Config => (PrimaryResourceConfig)_config;
         private LabelHud _valueLabel;
@@ -41,7 +42,9 @@ namespace DelvUI.Interface.GeneralElements
                 }
             }
         }
-        public AnchorablePluginConfigObject? ParentConfig { get; set; }
+
+        protected override bool AnchorToParent => Config is UnitFramePrimaryResourceConfig config ? config.AnchorToUnitFrame : false;
+        protected override DrawAnchor ParentAnchor => Config is UnitFramePrimaryResourceConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
 
         public PrimaryResourceHud(string ID, PrimaryResourceConfig config, string displayName) : base(ID, config, displayName)
         {
@@ -69,21 +72,7 @@ namespace DelvUI.Interface.GeneralElements
             if (Config.HidePrimaryResourceWhenFull && current == max) { return; }
 
             var scale = (float)current / max;
-
-
-            Vector2 startPos;
-
-            if (Config is UnitFramePrimaryResourceConfig unitFramePrimaryResourceConfig &&
-                unitFramePrimaryResourceConfig.AnchorToUnitFrame &&
-                ParentConfig != null)
-            {
-                Vector2 parentPos = Utils.GetAnchoredPosition(origin + ParentConfig.Position, -ParentConfig.Size, unitFramePrimaryResourceConfig.UnitFrameAnchor);
-                startPos = Utils.GetAnchoredPosition(parentPos + Config.Position - ParentConfig.Size / 2f, Config.Size, Config.Anchor);
-            }
-            else
-            {
-                startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
-            }
+            Vector2 startPos = origin + GetAnchoredPosition(Config.Position, Config.Size, Config.Anchor);
 
             DrawHelper.DrawInWindow(ID, startPos, Config.Size, false, false, (drawList) =>
             {
