@@ -7,7 +7,7 @@ namespace DelvUI.Interface.GeneralElements
 {
     [Section("Castbars")]
     [SubSection("Player", 0)]
-    public class PlayerCastbarConfig : CastbarConfig
+    public class PlayerCastbarConfig : UnitFrameCastbarConfig
     {
         [Checkbox("Use Job Color")]
         [Order(35)]
@@ -45,7 +45,7 @@ namespace DelvUI.Interface.GeneralElements
 
     [Section("Castbars")]
     [SubSection("Target", 0)]
-    public class TargetCastbarConfig : CastbarConfig
+    public class TargetCastbarConfig : UnitFrameCastbarConfig
     {
         [Checkbox("Interruptable Color", spacing = true)]
         [Order(35)]
@@ -100,15 +100,16 @@ namespace DelvUI.Interface.GeneralElements
         public new static TargetOfTargetCastbarConfig DefaultConfig()
         {
             var size = new Vector2(120, 24);
-            var pos = new Vector2(
-                HUDConstants.UnitFramesOffsetX + HUDConstants.DefaultBigUnitFrameSize.X + 6 + size.X / 2f,
-                HUDConstants.BaseHUDOffsetY + 5
-            );
+            var pos = new Vector2(0, -1);
 
             var castNameConfig = new LabelConfig(new Vector2(5, 0), "", DrawAnchor.Left, DrawAnchor.Left);
             var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
 
-            return new TargetOfTargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
+            var config = new TargetOfTargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
+            config.Anchor = DrawAnchor.Top;
+            config.AnchorToUnitFrame = true;
+
+            return config;
         }
     }
 
@@ -124,15 +125,33 @@ namespace DelvUI.Interface.GeneralElements
         public new static FocusTargetCastbarConfig DefaultConfig()
         {
             var size = new Vector2(120, 24);
-            var pos = new Vector2(
-                -HUDConstants.UnitFramesOffsetX - HUDConstants.DefaultBigUnitFrameSize.X - 6 - size.X / 2f,
-                HUDConstants.BaseHUDOffsetY + 5
-            );
+            var pos = new Vector2(0, -1);
 
             var castNameConfig = new LabelConfig(new Vector2(5, 0), "", DrawAnchor.Left, DrawAnchor.Left);
             var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
 
-            return new FocusTargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
+            var config = new FocusTargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
+            config.Anchor = DrawAnchor.Top;
+            config.AnchorToUnitFrame = true;
+
+            return config;
+        }
+    }
+
+    public abstract class UnitFrameCastbarConfig : CastbarConfig
+    {
+        [Checkbox("Anchor to Unit Frame")]
+        [Order(16)]
+        public bool AnchorToUnitFrame = false;
+
+        [Anchor("Unit Frame Anchor")]
+        [Order(17, collapseWith = nameof(AnchorToUnitFrame))]
+        public DrawAnchor UnitFrameAnchor = DrawAnchor.Bottom;
+
+        public UnitFrameCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
+            : base(position, size, castNameConfig, castTimeConfig)
+        {
+
         }
     }
 

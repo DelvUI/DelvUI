@@ -12,7 +12,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class CastbarHud : DraggableHudElement, IHudElementWithActor
+    public class CastbarHud : DraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
     {
         private CastbarConfig Config => (CastbarConfig)_config;
         private LabelHud _castNameLabel;
@@ -21,6 +21,7 @@ namespace DelvUI.Interface.GeneralElements
         protected LastUsedCast? LastUsedCast;
 
         public GameObject? Actor { get; set; }
+        public AnchorablePluginConfigObject? ParentConfig { get; set; }
 
         public CastbarHud(string id, CastbarConfig config, string displayName) : base(id, config, displayName)
         {
@@ -54,8 +55,21 @@ namespace DelvUI.Interface.GeneralElements
 
             var castPercent = 100f / totalCastTime * currentCastTime;
             var castScale = castPercent / 100f;
-            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
-            var endPos = startPos + Config.Size;
+
+            Vector2 parentPos = origin;
+            Vector2 startPos;
+
+            if (Config is UnitFrameCastbarConfig unitFrameCastbarConfig && unitFrameCastbarConfig.AnchorToUnitFrame && ParentConfig != null)
+            {
+                parentPos = Utils.GetAnchoredPosition(origin + ParentConfig.Position, -ParentConfig.Size, unitFrameCastbarConfig.UnitFrameAnchor);
+                startPos = Utils.GetAnchoredPosition(parentPos + Config.Position - ParentConfig.Size / 2f, Config.Size, Config.Anchor);
+            }
+            else
+            {
+                startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
+            }
+
+            Vector2 endPos = startPos + Config.Size;
 
             DrawHelper.DrawInWindow(ID, startPos, Config.Size, false, false, (drawList) =>
             {
