@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Numerics;
 using System.Text;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Text.SeStringHandling;
 using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.String;
@@ -120,6 +121,14 @@ namespace DelvUI
             }
 
             return str.Length <= maxLength ? str : str[..maxLength];
+        }
+
+        public static void DrawBars(this BarHud[] bars, Vector2 origin)
+        {
+            foreach (BarHud bar in bars)
+            {
+                bar.Draw(origin);
+            }
         }
     }
 }

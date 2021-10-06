@@ -50,21 +50,21 @@ namespace DelvUI.Interface.GeneralElements
             return (Plugin.ClientState.LocalPlayer?.Level ?? 0) != 80;
         }
 
-        public override Bar2[] GetBars(float current, float max, float min = 0f, GameObject? actor = null)
+        public override BarHud[] GetBars(float current, float max, float min = 0f, GameObject? actor = null)
         {
-            Rect background = new Rect(Vector2.Zero, Size, BackgroundColor);
+            Rect background = new Rect(Position, Size, BackgroundColor);
 
             // Exp progress bar
             PluginConfigColor expFillColor = UseJobColor ? Utils.ColorForActor(actor) : FillColor;
-            Rect expBar = Rect.GetFillRect(Vector2.Zero, Size, FillDirection, expFillColor, current, max, min);
+            Rect expBar = Rect.GetFillRect(Position, Size, FillDirection, expFillColor, current, max, min);
 
             // Rested exp bar
             uint rested = ShowRestedExp ? ExperienceHelper.Instance.RestedExp : 0;
-            var restedPos = (FillDirection == BarDirection.Right || FillDirection == BarDirection.Down) ? Rect.GetFillDirectionOffset(expBar.Size, FillDirection) : Vector2.Zero;
+            var restedPos = Position + ((FillDirection == BarDirection.Right || FillDirection == BarDirection.Down) ? Rect.GetFillDirectionOffset(expBar.Size, FillDirection) : Vector2.Zero);
             var restedSize = Size - Rect.GetFillDirectionOffset(expBar.Size, FillDirection);
             Rect restedBar = Rect.GetFillRect(restedPos, restedSize, FillDirection, RestedExpColor, rested, max, min);
 
-            return new Bar2[] { new Bar2(background, new[] { expBar, restedBar }, new[] { LeftLabelConfig, RightLabelConfig }) };
+            return new BarHud[] { new BarHud(background, new[] { expBar, restedBar }, DrawBorder, Anchor, new[] { LeftLabelConfig, RightLabelConfig }, actor) };
         }
     }
 }

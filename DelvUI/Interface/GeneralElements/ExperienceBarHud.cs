@@ -28,8 +28,7 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            ExpBar ??= new BarHud(Config, Actor);
-            ExpBar.Draw(origin, ExperienceHelper.Instance.CurrentExp, ExperienceHelper.Instance.RequiredExp);
+            Config.GetBars(ExperienceHelper.Instance.CurrentExp, ExperienceHelper.Instance.RequiredExp, 0f, Actor).DrawBars(origin);
         }
     }
 

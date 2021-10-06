@@ -20,7 +20,7 @@ namespace DelvUI.Interface.Bars
         [Order(30)]
         public BarDirection FillDirection = BarDirection.Right;
 
-        [Checkbox("Draw Border")]
+        [Checkbox("Show Border")]
         [Order(35)]
         public bool DrawBorder = true;
 
@@ -37,7 +37,7 @@ namespace DelvUI.Interface.Bars
 
         public abstract bool IsActive(float current, float max, float min);
 
-        public abstract Bar2[] GetBars(float current, float max, float min = 0f, GameObject? actor = null);
+        public abstract BarHud[] GetBars(float current, float max, float min = 0f, GameObject? actor = null);
     }
 
     public enum BarDirection

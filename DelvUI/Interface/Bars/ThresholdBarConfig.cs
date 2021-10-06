@@ -3,6 +3,7 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
+using System;
 using System.Numerics;
 
 namespace DelvUI.Interface.Bars
@@ -41,12 +42,17 @@ namespace DelvUI.Interface.Bars
             ThresholdValue = threshold;
         }
 
-        public override Bar2[] GetBars(float current, float max, float min = 0f, GameObject? actor = null)
+        public override BarHud[] GetBars(float current, float max, float min = 0f, GameObject? actor = null)
         {
-            Rect background = new Rect(Vector2.Zero, Size, BackgroundColor);
+            if (HideWhenInactive && current <= min)
+            {
+                return Array.Empty<BarHud>();
+            }
+
+            Rect background = new Rect(Position, Size, BackgroundColor);
             PluginConfigColor fillColor = IsThresholdActive(current) ? ThresholdColor : FillColor;
-            Rect foreground = Rect.GetFillRect(Vector2.Zero, Size, FillDirection, fillColor, current, max, min);
-            return new Bar2[] { new Bar2(background, new[] { foreground }, new[] { LabelConfig }) };
+            Rect foreground = Rect.GetFillRect(Position, Size, FillDirection, fillColor, current, max, min);
+            return new BarHud[] { new BarHud(background, new[] { foreground }, DrawBorder, Anchor, new[] { LabelConfig }, actor) };
         }
 
         public override bool IsActive(float current, float max, float min)

@@ -20,16 +20,6 @@ namespace DelvUI.Interface.Jobs
     {
         private new NinjaConfig Config => (NinjaConfig)_config;
 
-        private BarHud? MudraBar { get; set; }
-
-        private BarHud? HutonBar { get; set; }
-
-        private BarHud? NinkiBar { get; set; }
-
-        private BarHud? TrickAttackBar { get; set; }
-
-        private BarHud? SuitonBar { get; set; }
-
         public NinjaHud(string id, NinjaConfig config, string? displayName = null) : base(id, config, displayName) { }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -37,34 +27,34 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new List<Vector2>();
             List<Vector2> sizes = new List<Vector2>();
 
-            if (Config.HutonBarConfig.Enabled)
+            if (Config.HutonBar.Enabled)
             {
-                positions.Add(Config.Position + Config.HutonBarConfig.Position);
-                sizes.Add(Config.HutonBarConfig.Size);
+                positions.Add(Config.Position + Config.HutonBar.Position);
+                sizes.Add(Config.HutonBar.Size);
             }
 
-            if (Config.NinkiBarConfig.Enabled)
+            if (Config.NinkiBar.Enabled)
             {
-                positions.Add(Config.Position + Config.NinkiBarConfig.Position);
-                sizes.Add(Config.NinkiBarConfig.Size);
+                positions.Add(Config.Position + Config.NinkiBar.Position);
+                sizes.Add(Config.NinkiBar.Size);
             }
 
-            if (Config.TrickAttackBarConfig.Enabled)
+            if (Config.TrickAttackBar.Enabled)
             {
-                positions.Add(Config.Position + Config.TrickAttackBarConfig.Position);
-                sizes.Add(Config.TrickAttackBarConfig.Size);
+                positions.Add(Config.Position + Config.TrickAttackBar.Position);
+                sizes.Add(Config.TrickAttackBar.Size);
             }
 
-            if (Config.SuitonBarConfig.Enabled)
+            if (Config.SuitonBar.Enabled)
             {
-                positions.Add(Config.Position + Config.SuitonBarConfig.Position);
-                sizes.Add(Config.SuitonBarConfig.Size);
+                positions.Add(Config.Position + Config.SuitonBar.Position);
+                sizes.Add(Config.SuitonBar.Size);
             }
 
-            if (Config.MudraBarConfig.Enabled)
+            if (Config.MudraBar.Enabled)
             {
-                positions.Add(Config.Position + Config.MudraBarConfig.Position);
-                sizes.Add(Config.MudraBarConfig.Size);
+                positions.Add(Config.Position + Config.MudraBar.Position);
+                sizes.Add(Config.MudraBar.Size);
             }
 
             return (positions, sizes);
@@ -72,27 +62,27 @@ namespace DelvUI.Interface.Jobs
 
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            if (Config.MudraBarConfig.Enabled)
+            if (Config.MudraBar.Enabled)
             {
                 DrawMudraBars(origin, player);
             }
 
-            if (Config.HutonBarConfig.Enabled)
+            if (Config.HutonBar.Enabled)
             {
                 DrawHutonGauge(origin, player);
             }
 
-            if (Config.NinkiBarConfig.Enabled)
+            if (Config.NinkiBar.Enabled)
             {
                 DrawNinkiGauge(origin, player);
             }
 
-            if (Config.TrickAttackBarConfig.Enabled)
+            if (Config.TrickAttackBar.Enabled)
             {
                 DrawTrickAttackBar(origin, player);
             }
 
-            if (Config.SuitonBarConfig.Enabled)
+            if (Config.SuitonBar.Enabled)
             {
                 DrawSuitonBar(origin, player);
             }
@@ -100,10 +90,8 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawMudraBars(Vector2 origin, PlayerCharacter player)
         {
-            MudraBar ??= new BarHud(Config.MudraBarConfig, player);
-
             var (hasNinjutsuBuff, hasKassatsuBuff, hasTCJBuff) =
-                Config.MudraBarConfig.GetMudraBuffs(player, out Status? ninjutsuBuff, out Status? kassatsuBuff, out Status? tcjBuff);
+                Config.MudraBar.GetMudraBuffs(player, out Status? ninjutsuBuff, out Status? kassatsuBuff, out Status? tcjBuff);
 
             int mudraStacks = SpellHelper.Instance.GetStackCount(2, 2259);
             float mudraCooldown = SpellHelper.Instance.GetSpellCooldown(2259);
@@ -121,52 +109,50 @@ namespace DelvUI.Interface.Jobs
                 {
                     max = 6f;
                     current = tcjBuff is null || tcjBuff.RemainingTime < 0 ? max : tcjBuff.RemainingTime;
-                    Config.MudraBarConfig.MudraLabelConfig.SetText(GenerateNinjutsuText(tcjBuff?.StackCount ?? 0, hasKassatsuBuff, hasTCJBuff));
+                    Config.MudraBar.MudraLabelConfig.SetText(GenerateNinjutsuText(tcjBuff?.StackCount ?? 0, hasKassatsuBuff, hasTCJBuff));
                 }
                 else if (hasKassatsuBuff)
                 {
                     max = 15f;
                     current = kassatsuBuff is null || kassatsuBuff.RemainingTime < 0 ? max : kassatsuBuff.RemainingTime;
-                    Config.MudraBarConfig.MudraLabelConfig.SetText("KASSATSU");
+                    Config.MudraBar.MudraLabelConfig.SetText("KASSATSU");
                 }
 
                 if (inNinjutsu)
                 {
                     max = 6f;
                     current = ninjutsuBuff is null || ninjutsuBuff.RemainingTime < 0 ? max : ninjutsuBuff.RemainingTime;
-                    Config.MudraBarConfig.MudraLabelConfig.SetText(GenerateNinjutsuText(ninjutsuBuff?.StackCount ?? 0, hasKassatsuBuff, hasTCJBuff));
+                    Config.MudraBar.MudraLabelConfig.SetText(GenerateNinjutsuText(ninjutsuBuff?.StackCount ?? 0, hasKassatsuBuff, hasTCJBuff));
                 }
             }
             else
             {
                 max = 40f;
                 current = max - mudraCooldown;
-                Config.MudraBarConfig.MudraLabelConfig.SetText(((max - current) % 20).ToString("N0"));
+                Config.MudraBar.MudraLabelConfig.SetText(((max - current) % 20).ToString("N0"));
             }
 
-            MudraBar.Draw(origin + Config.Position, current, max);
+            Config.MudraBar.GetBars(current, max, 0f, player).DrawBars(origin + Config.Position);
         }
 
         private void DrawHutonGauge(Vector2 origin, PlayerCharacter player)
         {
-            HutonBar ??= new BarHud(Config.HutonBarConfig, player);
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
             float hutonDurationLeft = gauge.HutonTimer / 1000f;
-            Config.HutonBarConfig.LabelConfig.SetText(hutonDurationLeft.ToString("N0"));
-            HutonBar.Draw(origin + Config.Position, hutonDurationLeft, 70f);
+            Config.HutonBar.LabelConfig.SetText(hutonDurationLeft.ToString("N0"));
+            Config.HutonBar.GetBars(hutonDurationLeft, 70f, 0f, player).DrawBars(origin + Config.Position);
         }
+
 
         private void DrawNinkiGauge(Vector2 origin, PlayerCharacter player)
         {
-            NinkiBar ??= new BarHud(Config.NinkiBarConfig, player);
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
-            Config.NinkiBarConfig.LabelConfig.SetText(gauge.Ninki.ToString("N0"));
-            NinkiBar.Draw(origin + Config.Position, gauge.Ninki, 100f);
+            Config.NinkiBar.LabelConfig.SetText(gauge.Ninki.ToString("N0"));
+            Config.NinkiBar.GetBars(gauge.Ninki, 100f, 0f, player).DrawBars(origin + Config.Position);
         }
 
         private void DrawTrickAttackBar(Vector2 origin, PlayerCharacter player)
         {
-            TrickAttackBar ??= new BarHud(Config.TrickAttackBarConfig, player);
             GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float trickDuration = 0f;
             const float trickMaxDuration = 15f;
@@ -179,16 +165,15 @@ namespace DelvUI.Interface.Jobs
                     .FirstOrDefault();
             }
 
-            Config.TrickAttackBarConfig.LabelConfig.SetText(trickDuration.ToString("N0"));
-            TrickAttackBar.Draw(origin + Config.Position, trickDuration, trickMaxDuration);
+            Config.TrickAttackBar.LabelConfig.SetText(trickDuration.ToString("N0"));
+            Config.TrickAttackBar.GetBars(trickDuration, trickMaxDuration, 0f, player).DrawBars(origin + Config.Position);
         }
 
         private void DrawSuitonBar(Vector2 origin, PlayerCharacter player)
         {
-            SuitonBar ??= new BarHud(Config.SuitonBarConfig, player);
             float suitonDuration = player.StatusList.Where(o => o.StatusId == 507).Select(o => Math.Abs(o.RemainingTime)).FirstOrDefault();
-            Config.SuitonBarConfig.LabelConfig.SetText(suitonDuration.ToString("N0"));
-            SuitonBar.Draw(origin + Config.Position, suitonDuration, 20f);
+            Config.SuitonBar.LabelConfig.SetText(suitonDuration.ToString("N0"));
+            Config.SuitonBar.GetBars(suitonDuration, 20f, 0f, player).DrawBars(origin + Config.Position);
         }
 
         private string GenerateNinjutsuText(byte param, bool haveKassatsuBuff, bool haveTCJBuff)
@@ -217,22 +202,22 @@ namespace DelvUI.Interface.Jobs
         public NinjaConfig()
         {
             // Setup initial bar config
-            TrickAttackBarConfig.Enabled = false;
-            SuitonBarConfig.Enabled = false;
-            HutonBarConfig.Threshold = true;
+            TrickAttackBar.Enabled = false;
+            SuitonBar.Enabled = false;
+            HutonBar.Threshold = true;
         }
 
         public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
 
 
         [NestedConfig("Mudra Bar", 30)]
-        public MudraBarConfig MudraBarConfig = new MudraBarConfig(
+        public MudraBarConfig MudraBar = new MudraBarConfig(
                                                             new(0, -50),
                                                             new(254, 10),
                                                             new PluginConfigColor(new Vector4(211 / 255f, 166 / 255f, 75 / 242f, 100f / 100f)));
 
         [NestedConfig("Huton Bar", 35, separator = true)]
-        public ThresholdBarConfig HutonBarConfig = new ThresholdBarConfig(
+        public ThresholdBarConfig HutonBar = new ThresholdBarConfig(
                                                             new(0, -10),
                                                             new(254, 20),
                                                             new PluginConfigColor(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f)),
@@ -240,19 +225,19 @@ namespace DelvUI.Interface.Jobs
                                                             40f);
 
         [NestedConfig("Ninki Bar", 40, separator = true)]
-        public ThresholdBarConfig NinkiBarConfig = new ThresholdBarConfig(
+        public ThresholdBarConfig NinkiBar = new ThresholdBarConfig(
                                                             new(0, -32), 
                                                             new(254, 20), 
                                                             new PluginConfigColor(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f)));
 
         [NestedConfig("Trick Attack Bar", 45, separator = true)]
-        public ThresholdBarConfig TrickAttackBarConfig = new ThresholdBarConfig(
+        public ThresholdBarConfig TrickAttackBar = new ThresholdBarConfig(
                                                             new(0, -63),
                                                             new(254, 10),
                                                             new PluginConfigColor(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f)));
 
         [NestedConfig("Suiton Bar", 50, separator = true)]
-        public ThresholdBarConfig SuitonBarConfig = new ThresholdBarConfig(
+        public ThresholdBarConfig SuitonBar = new ThresholdBarConfig(
                                                             new(0, -75),
                                                             new(254, 10),
                                                             new PluginConfigColor(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f)));
@@ -286,34 +271,36 @@ namespace DelvUI.Interface.Jobs
             return current < max && current >= min;
         }
 
-        public override Bar2[] GetBars(float current, float max, float min = 0f, GameObject? actor = null)
+        public override BarHud[] GetBars(float current, float max, float min = 0f, GameObject? actor = null)
         {
             if (actor is not PlayerCharacter player)
             {
-                return Array.Empty<Bar2>();
+                return Array.Empty<BarHud>();
             }
 
             var (hasNinjutsuBuff, hasKassatsuBuff, hasTCJBuff) = GetMudraBuffs(player, out Status? mudraBuff, out Status? kassatsuBuff, out Status? tcjBuff);
             bool inNinjutsu = SpellHelper.Instance.GetStackCount(2, 2259) == -2 || hasNinjutsuBuff;
 
-            Bar2[] bars;
+            BarHud[] bars;
             if (hasTCJBuff || hasKassatsuBuff || inNinjutsu)
             {
                 PluginConfigColor fillColor = hasTCJBuff ? TCJBarColor : hasKassatsuBuff ? KassatsuBarColor : FillColor;
-                Rect background = new Rect(Vector2.Zero, Size, BackgroundColor);
-                Rect foreground = Rect.GetFillRect(Vector2.Zero, Size, FillDirection, fillColor, current, max, min);
-                return new Bar2[] { new Bar2(background, new[] { foreground }, new[] { MudraLabelConfig }) };
+                Rect background = new Rect(Position, Size, BackgroundColor);
+                Rect foreground = Rect.GetFillRect(Position, Size, FillDirection, fillColor, current, max, min);
+                return new BarHud[] { new BarHud(background, new[] { foreground }, DrawBorder, Anchor, new[] { MudraLabelConfig }, actor) };
             }
             else
             {
-                bars = Bar2.GetChunkedBars(
+                bars = BarHud.GetChunkedBars(
                                     2,
                                     MudraBarChunkPadding,
                                     Size,
-                                    FillDirection,
                                     current,
                                     max,
                                     min,
+                                    DrawBorder,
+                                    Anchor,
+                                    FillDirection,
                                     MudraLabelConfig,
                                     BackgroundColor,
                                     GlobalColors.Instance.PartialFillColor,
