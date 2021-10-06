@@ -15,46 +15,46 @@ namespace DelvUI.Helpers
             switch (tag)
             {
                 case "[name]":
-                    return n.ToString();
+                    return n.ToString().CheckForUpperCase();
 
                 case "[name:first]":
-                    return n.FirstName();
+                    return n.FirstName().CheckForUpperCase();
 
                 case "[name:first-initial]":
-                    return n.FirstName().Length == 0 ? "" : n.FirstName()[..1];
+                    return n.FirstName().CheckForUpperCase().Length == 0 ? "" : n.FirstName().CheckForUpperCase()[..1];
 
                 case "[name:first-npcmedium]":
-                    return actor?.ObjectKind == ObjectKind.Player ? n.FirstName() : n.Truncate(15);
+                    return actor?.ObjectKind == ObjectKind.Player ? n.FirstName().CheckForUpperCase() : n.Truncate(15).CheckForUpperCase();
 
                 case "[name:first-npclong]":
-                    return actor?.ObjectKind == ObjectKind.Player ? n.FirstName() : n.Truncate(20);
+                    return actor?.ObjectKind == ObjectKind.Player ? n.FirstName().CheckForUpperCase() : n.Truncate(20).CheckForUpperCase();
 
                 case "[name:first-npcfull]":
-                    return actor?.ObjectKind == ObjectKind.Player ? n.FirstName() : n.ToString();
+                    return actor?.ObjectKind == ObjectKind.Player ? n.FirstName().CheckForUpperCase() : n.ToString().CheckForUpperCase();
 
                 case "[name:last]":
-                    return n.LastName();
+                    return n.LastName().CheckForUpperCase();
 
                 case "[name:last-initial]":
-                    return n.LastName().Length == 0 ? "" : n.LastName()[..1];
+                    return n.LastName().CheckForUpperCase().Length == 0 ? "" : n.LastName().CheckForUpperCase()[..1];
 
                 case "[name:initials]":
-                    return n.Initials();
+                    return n.Initials().CheckForUpperCase();
 
                 case "[name:abbreviate]":
-                    return n.Abbreviate();
+                    return n.Abbreviate().CheckForUpperCase();
 
                 case "[name:veryshort]":
-                    return n.Truncate(5);
+                    return n.Truncate(5).CheckForUpperCase();
 
                 case "[name:short]":
-                    return n.Truncate(10);
+                    return n.Truncate(10).CheckForUpperCase();
 
                 case "[name:medium]":
-                    return n.Truncate(15);
+                    return n.Truncate(15).CheckForUpperCase();
 
                 case "[name:long]":
-                    return n.Truncate(20);
+                    return n.Truncate(20).CheckForUpperCase();
             }
 
             if (actor is Character character)

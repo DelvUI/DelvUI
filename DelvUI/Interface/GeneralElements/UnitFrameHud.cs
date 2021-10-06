@@ -76,10 +76,9 @@ namespace DelvUI.Interface.GeneralElements
                 }
             });
 
-            // labels            
-            string actorName = Actor.Name.ToString().CheckForUpperCase();
-            _leftLabel.Draw(startPos, Config.Size, Actor, actorName);
-            _rightLabel.Draw(startPos, Config.Size, Actor, actorName);
+            // labels                        
+            _leftLabel.Draw(startPos, Config.Size, Actor);
+            _rightLabel.Draw(startPos, Config.Size, Actor);
         }
 
         private void DrawChara(ImDrawListPtr drawList, Vector2 startPos, Character chara)
