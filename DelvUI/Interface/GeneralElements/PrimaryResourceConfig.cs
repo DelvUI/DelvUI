@@ -5,9 +5,108 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Section("Misc")]
-    [SubSection("Primary Resource Bar", 0)]
-    public class PrimaryResourceConfig : AnchorablePluginConfigObject
+    [Section("Mana Bars")]
+    [SubSection("Player", 0)]
+    public class PlayerPrimaryResourceConfig : UnitFramePrimaryResourceConfig
+    {
+        public PlayerPrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
+            : base(position, size, valueLabelConfig)
+        {
+
+        }
+
+        public new static PlayerPrimaryResourceConfig DefaultConfig()
+        {
+            var size = new Vector2(HUDConstants.DefaultBigUnitFrameSize.X, 10);
+            var pos = new Vector2(0, 0);
+
+            var labelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+
+            return new PlayerPrimaryResourceConfig(pos, size, labelConfig);
+        }
+    }
+
+    [Section("Mana Bars")]
+    [SubSection("Target", 0)]
+    public class TargetPrimaryResourceConfig : UnitFramePrimaryResourceConfig
+    {
+        public TargetPrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
+            : base(position, size, valueLabelConfig)
+        {
+
+        }
+
+        public new static TargetPrimaryResourceConfig DefaultConfig()
+        {
+            var size = new Vector2(HUDConstants.DefaultBigUnitFrameSize.X, 10);
+            var pos = new Vector2(0, 0);
+
+            var labelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+
+            return new TargetPrimaryResourceConfig(pos, size, labelConfig);
+        }
+    }
+
+    [Section("Mana Bars")]
+    [SubSection("Target of Target", 0)]
+    public class TargetOfTargetPrimaryResourceConfig : UnitFramePrimaryResourceConfig
+    {
+        public TargetOfTargetPrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
+            : base(position, size, valueLabelConfig)
+        {
+
+        }
+
+        public new static TargetOfTargetPrimaryResourceConfig DefaultConfig()
+        {
+            var size = new Vector2(HUDConstants.DefaultSmallUnitFrameSize.X, 10);
+            var pos = new Vector2(0, 0);
+
+            var labelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+
+            return new TargetOfTargetPrimaryResourceConfig(pos, size, labelConfig);
+        }
+    }
+
+    [Section("Mana Bars")]
+    [SubSection("Focus Target", 0)]
+    public class FocusTargetPrimaryResourceConfig : UnitFramePrimaryResourceConfig
+    {
+        public FocusTargetPrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
+            : base(position, size, valueLabelConfig)
+        {
+
+        }
+
+        public new static FocusTargetPrimaryResourceConfig DefaultConfig()
+        {
+            var size = new Vector2(HUDConstants.DefaultSmallUnitFrameSize.X, 10);
+            var pos = new Vector2(0, 0);
+
+            var labelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+
+            return new FocusTargetPrimaryResourceConfig(pos, size, labelConfig);
+        }
+    }
+
+    public abstract class UnitFramePrimaryResourceConfig : PrimaryResourceConfig
+    {
+        [Checkbox("Anchor to Unit Frame")]
+        [Order(16)]
+        public bool AnchorToUnitFrame = true;
+
+        [Anchor("Unit Frame Anchor")]
+        [Order(17, collapseWith = nameof(AnchorToUnitFrame))]
+        public DrawAnchor UnitFrameAnchor = DrawAnchor.Bottom;
+
+        public UnitFramePrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
+            : base(position, size, valueLabelConfig)
+        {
+
+        }
+    }
+
+    public abstract class PrimaryResourceConfig : AnchorablePluginConfigObject
     {
         [ColorEdit4("Color")]
         [Order(20)]
@@ -41,16 +140,6 @@ namespace DelvUI.Interface.GeneralElements
             Position = position;
             Size = size;
             ValueLabelConfig = valueLabelConfig;
-        }
-
-        public new static PrimaryResourceConfig DefaultConfig()
-        {
-            var size = new Vector2(254, 20);
-            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY - 37);
-
-            var labelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
-
-            return new PrimaryResourceConfig(pos, size, labelConfig);
         }
     }
 }

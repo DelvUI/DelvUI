@@ -385,7 +385,7 @@ namespace DelvUI.Interface.Jobs
                 {
                     return;
                 }
-                
+
                 Bar barNoTarget = builder.AddInnerBar(0, 30f, Config.DotColor)
                                          .SetBackgroundColor(EmptyColor.Base)
                                          .Build();
@@ -542,7 +542,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Draw", min = -2000f, max = 2000f)]
         [Order(40, collapseWith = nameof(ShowDrawBar))]
-        public Vector2 DrawBarPosition = new(0, -32);
+        public Vector2 DrawBarPosition = new(0, -10);
 
         [DragFloat2("Size" + "##Draw", min = 1f, max = 2000f)]
         [Order(45, collapseWith = nameof(ShowDrawBar))]
@@ -599,9 +599,6 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Total Redraw Cooldown Instead of Next" + "##Redraw")]
         [Order(110, collapseWith = nameof(ShowDrawBar))]
         public bool EnableRedrawCooldownCumulated;
-
-
-
         #endregion
 
         #region Divination Bar
@@ -615,7 +612,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Divination", min = -2000f, max = 2000f)]
         [Order(120, collapseWith = nameof(ShowDivinationBar))]
-        public Vector2 DivinationBarPosition = new(0, -71);
+        public Vector2 DivinationBarPosition = new(0, -49);
 
         [DragFloat2("Size" + "##Divination", min = 1f, max = 2000f)]
         [Order(125, collapseWith = nameof(ShowDivinationBar))]
@@ -648,7 +645,6 @@ namespace DelvUI.Interface.Jobs
         [ColorEdit4("Glow" + "##Divination")]
         [Order(160, collapseWith = nameof(ShowDivinationBar))]
         public PluginConfigColor DivinationGlowColor = new(new Vector4(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f));
-
         #endregion
 
         #region Dot Bar
@@ -666,7 +662,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Combust", min = -2000f, max = 2000f)]
         [Order(180, collapseWith = nameof(ShowDotBar))]
-        public Vector2 DotBarPosition = new(-85, -54);
+        public Vector2 DotBarPosition = new(-85, -32);
 
         [ColorEdit4("Color" + "##Combust")]
         [Order(185, collapseWith = nameof(ShowDotBar))]
@@ -692,7 +688,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Star", min = -2000f, max = 2000f)]
         [Order(210, collapseWith = nameof(ShowStarBar))]
-        public Vector2 StarBarPosition = new(0, -54);
+        public Vector2 StarBarPosition = new(0, -32);
 
         [DragFloat2("Size" + "##Star", min = 1f, max = 2000f)]
         [Order(215, collapseWith = nameof(ShowStarBar))]
@@ -721,7 +717,6 @@ namespace DelvUI.Interface.Jobs
         [ColorEdit4("Color" + "##Star")]
         [Order(245, collapseWith = nameof(ShowStarBar))]
         public PluginConfigColor StarGlowColor = new(new Vector4(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f));
-
         #endregion
 
         #region Lightspeed Bar
@@ -735,7 +730,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Lightspeed", min = -2000f, max = 2000f)]
         [Order(260, collapseWith = nameof(ShowLightspeedBar))]
-        public Vector2 LightspeedBarPosition = new(85, -54);
+        public Vector2 LightspeedBarPosition = new(85, -32);
 
         [DragFloat2("Size" + "##Lightspeed", min = 1f, max = 2000f)]
         [Order(265, collapseWith = nameof(ShowLightspeedBar))]

@@ -5,15 +5,43 @@ using System.Collections.Generic;
 using System.Numerics;
 using Dalamud.Game.ClientState.Objects.Types;
 using System;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class PrimaryResourceHud : DraggableHudElement, IHudElementWithActor
+    public class PrimaryResourceHud : DraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
     {
         private PrimaryResourceConfig Config => (PrimaryResourceConfig)_config;
         private LabelHud _valueLabel;
-        public GameObject? Actor { get; set; } = null;
+
         public PrimaryResourceTypes ResourceType = PrimaryResourceTypes.MP;
+
+        private GameObject? _actor;
+        public GameObject? Actor
+        {
+            get => _actor;
+            set
+            {
+                if (_actor == value)
+                {
+                    return;
+                }
+
+                if (value is PlayerCharacter chara)
+                {
+                    _actor = value;
+
+                    JobRoles role = JobsHelper.RoleForJob(chara.ClassJob.Id);
+                    ResourceType = JobsHelper.PrimaryResourceTypesByRole[role];
+                }
+                else
+                {
+                    _actor = null;
+                    ResourceType = PrimaryResourceTypes.None;
+                }
+            }
+        }
+        public AnchorablePluginConfigObject? ParentConfig { get; set; }
 
         public PrimaryResourceHud(string ID, PrimaryResourceConfig config, string displayName) : base(ID, config, displayName)
         {
@@ -27,7 +55,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || ResourceType == PrimaryResourceTypes.None || Actor == null || Actor is not Character)
+            if (!Config.Enabled || ResourceType == PrimaryResourceTypes.None || Actor == null || Actor is not PlayerCharacter)
             {
                 return;
             }
@@ -42,7 +70,20 @@ namespace DelvUI.Interface.GeneralElements
 
             var scale = (float)current / max;
 
-            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
+
+            Vector2 startPos;
+
+            if (Config is UnitFramePrimaryResourceConfig unitFramePrimaryResourceConfig &&
+                unitFramePrimaryResourceConfig.AnchorToUnitFrame &&
+                ParentConfig != null)
+            {
+                Vector2 parentPos = Utils.GetAnchoredPosition(origin + ParentConfig.Position, -ParentConfig.Size, unitFramePrimaryResourceConfig.UnitFrameAnchor);
+                startPos = Utils.GetAnchoredPosition(parentPos + Config.Position - ParentConfig.Size / 2f, Config.Size, Config.Anchor);
+            }
+            else
+            {
+                startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
+            }
 
             DrawHelper.DrawInWindow(ID, startPos, Config.Size, false, false, (drawList) =>
             {

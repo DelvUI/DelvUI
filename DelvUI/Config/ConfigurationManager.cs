@@ -120,6 +120,11 @@ namespace DelvUI.Config
                 typeof(TargetOfTargetUnitFrameConfig),
                 typeof(FocusTargetUnitFrameConfig),
 
+                typeof(PlayerPrimaryResourceConfig),
+                typeof(TargetPrimaryResourceConfig),
+                typeof(TargetOfTargetPrimaryResourceConfig),
+                typeof(FocusTargetPrimaryResourceConfig),
+
                 typeof(PartyFramesConfig),
                 typeof(PartyFramesHealthBarsConfig),
                 typeof(PartyFramesManaBarConfig),
@@ -172,7 +177,6 @@ namespace DelvUI.Config
 
                 typeof(FontsConfig),
                 typeof(HideHudConfig),
-                typeof(PrimaryResourceConfig),
                 typeof(TooltipsConfig),
                 typeof(GCDIndicatorConfig),
                 typeof(MPTickerConfig),

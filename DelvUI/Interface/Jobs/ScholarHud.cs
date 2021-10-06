@@ -215,7 +215,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Aether", min = -4000f, max = 4000f)]
         [Order(40, collapseWith = nameof(ShowAether))]
-        public Vector2 AetherPosition = new(0, -76);
+        public Vector2 AetherPosition = new(0, -54);
 
         [DragFloat2("Size" + "##Aether", min = 1f, max = 2000f)]
         [Order(45, collapseWith = nameof(ShowAether))]
@@ -245,7 +245,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Fairy", min = -4000f, max = 4000f)]
         [Order(70, collapseWith = nameof(ShowFairy))]
-        public Vector2 FairyPosition = new(0, -54);
+        public Vector2 FairyPosition = new(0, -32);
 
         [DragFloat2("Size" + "##Fairy", min = 1f, max = 2000f)]
         [Order(75, collapseWith = nameof(ShowFairy))]
@@ -288,7 +288,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Bio", min = -4000f, max = 4000f)]
         [Order(115, collapseWith = nameof(ShowBio))]
-        public Vector2 BioPosition = new(0, -32);
+        public Vector2 BioPosition = new(0, -10);
 
         [DragFloat2("Size" + "##Bio", max = 2000f)]
         [Order(120, collapseWith = nameof(ShowBio))]

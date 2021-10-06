@@ -110,7 +110,7 @@ namespace DelvUI.Interface.StatusEffects
 
         [Anchor("Unit Frame Anchor")]
         [Order(17, collapseWith = nameof(AnchorToUnitFrame))]
-        public DrawAnchor UnitFrameAnchor = DrawAnchor.Bottom;
+        public DrawAnchor UnitFrameAnchor = DrawAnchor.TopLeft;
 
         public UnitFrameStatusEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
             GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)

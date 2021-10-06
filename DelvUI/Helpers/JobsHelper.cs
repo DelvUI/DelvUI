@@ -279,6 +279,16 @@ namespace DelvUI.Helpers
             [JobIDs.RDM] = 62587,
             [JobIDs.BLU] = 62587
         };
+
+        public static Dictionary<JobRoles, PrimaryResourceTypes> PrimaryResourceTypesByRole = new Dictionary<JobRoles, PrimaryResourceTypes>()
+        {
+            [JobRoles.Tank] = PrimaryResourceTypes.MP,
+            [JobRoles.Healer] = PrimaryResourceTypes.MP,
+            [JobRoles.DPS] = PrimaryResourceTypes.MP,
+            [JobRoles.Crafter] = PrimaryResourceTypes.CP,
+            [JobRoles.Gatherer] = PrimaryResourceTypes.GP,
+            [JobRoles.Unknown] = PrimaryResourceTypes.MP
+        };
     }
 
     public static class JobIDs

@@ -34,7 +34,7 @@ namespace DelvUI.Interface
 
         private PlayerCastbarHud _playerCastbarHud = null!;
         private CustomEffectsListHud _customEffectsHud = null!;
-        private PrimaryResourceHud _primaryResourceHud = null!;
+        private PrimaryResourceHud _playerManaBarHud = null!;
         private JobHud? _jobHud = null;
         private PartyFramesHud _partyFramesHud = null!;
 
@@ -135,6 +135,7 @@ namespace DelvUI.Interface
             _hudElementsUsingFocusTarget = new List<IHudElementWithActor>();
 
             CreateUnitFrames();
+            CreateManaBars();
             CreateCastbars();
             CreateStatusEffectsLists();
             CreateMiscElements();
@@ -170,6 +171,33 @@ namespace DelvUI.Interface
             var partyFramesConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesConfig>();
             _partyFramesHud = new PartyFramesHud("DelvUI_partyFrames", partyFramesConfig, "Party Frames");
             _hudElements.Add(_partyFramesHud);
+        }
+
+        private void CreateManaBars()
+        {
+            var playerManaBarConfig = ConfigurationManager.Instance.GetConfigObject<PlayerPrimaryResourceConfig>();
+            _playerManaBarHud = new PrimaryResourceHud("DelvUI_playerManaBar", playerManaBarConfig, "Player Mana Bar");
+            _playerManaBarHud.ParentConfig = _playerUnitFrameHud.Config;
+            _hudElements.Add(_playerManaBarHud);
+            _hudElementsUsingPlayer.Add(_playerManaBarHud);
+
+            var targetManaBarConfig = ConfigurationManager.Instance.GetConfigObject<TargetPrimaryResourceConfig>();
+            var targetManaBarHud = new PrimaryResourceHud("DelvUI_targetManaBar", targetManaBarConfig, "Target Mana Bar");
+            targetManaBarHud.ParentConfig = _targetUnitFrameHud.Config;
+            _hudElements.Add(targetManaBarHud);
+            _hudElementsUsingTarget.Add(targetManaBarHud);
+
+            var totManaBarConfig = ConfigurationManager.Instance.GetConfigObject<TargetOfTargetPrimaryResourceConfig>();
+            var totManaBarHud = new PrimaryResourceHud("DelvUI_totManaBar", totManaBarConfig, "ToT Mana Bar");
+            totManaBarHud.ParentConfig = _totUnitFrameHud.Config;
+            _hudElements.Add(totManaBarHud);
+            _hudElementsUsingTargetOfTarget.Add(totManaBarHud);
+
+            var focusManaBarConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetPrimaryResourceConfig>();
+            var focusManaBarHud = new PrimaryResourceHud("DelvUI_focusManaBar", focusManaBarConfig, "Focus Mana Bar");
+            focusManaBarHud.ParentConfig = _focusTargetUnitFrameHud.Config;
+            _hudElements.Add(focusManaBarHud);
+            _hudElementsUsingFocusTarget.Add(focusManaBarHud);
         }
 
         private void CreateCastbars()
@@ -233,12 +261,6 @@ namespace DelvUI.Interface
 
         private void CreateMiscElements()
         {
-            // primary resource bar
-            var primaryResourceConfig = ConfigurationManager.Instance.GetConfigObject<PrimaryResourceConfig>();
-            _primaryResourceHud = new PrimaryResourceHud("DelvUI_primaryResource", primaryResourceConfig, "Primary Resource");
-            _hudElements.Add(_primaryResourceHud);
-            _hudElementsUsingPlayer.Add(_primaryResourceHud);
-
             // gcd indicator
             var gcdIndicatorConfig = ConfigurationManager.Instance.GetConfigObject<GCDIndicatorConfig>();
             var gcdIndicator = new GCDIndicatorHud("DelvUI_gcdIndicator", gcdIndicatorConfig, "GCD Indicator");
@@ -398,9 +420,8 @@ namespace DelvUI.Interface
             }
 
             var newJobId = player.ClassJob.Id;
-            if (_jobHud != null && _primaryResourceHud != null && _jobHud.Config.JobId == newJobId)
+            if (_jobHud != null && _jobHud.Config.JobId == newJobId)
             {
-                _primaryResourceHud.ResourceType = _jobHud.Config.UseDefaultPrimaryResourceBar ? _jobHud.Config.PrimaryResourceType : PrimaryResourceTypes.None;
                 return;
             }
 
@@ -419,11 +440,6 @@ namespace DelvUI.Interface
                 config = (JobConfig)ConfigurationManager.Instance.GetConfigObjectForType(types.ConfigType);
                 _jobHud = (JobHud)Activator.CreateInstance(types.HudType, types.HudType.FullName, config, types.DisplayName)!;
                 _jobHud.SelectEvent += OnDraggableElementSelected;
-            }
-
-            if (config != null && _primaryResourceHud != null)
-            {
-                _primaryResourceHud.ResourceType = config.UseDefaultPrimaryResourceBar ? config.PrimaryResourceType : PrimaryResourceTypes.None;
             }
         }
 
@@ -465,6 +481,12 @@ namespace DelvUI.Interface
             foreach (var element in _hudElementsUsingFocusTarget)
             {
                 element.Actor = focusTarget;
+            }
+
+            // player mana bar
+            if (_jobHud != null && _playerManaBarHud != null && !_jobHud.Config.UseDefaultPrimaryResourceBar)
+            {
+                _playerManaBarHud.ResourceType = PrimaryResourceTypes.None;
             }
         }
 
