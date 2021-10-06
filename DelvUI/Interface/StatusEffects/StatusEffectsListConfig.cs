@@ -15,7 +15,7 @@ namespace DelvUI.Interface.StatusEffects
 {
     [Section("Buffs and Debuffs")]
     [SubSection("Player Buffs", 0)]
-    public class PlayerBuffsListConfig : StatusEffectsListConfig
+    public class PlayerBuffsListConfig : UnitFrameStatusEffectsListConfig
     {
         public new static PlayerBuffsListConfig DefaultConfig()
         {
@@ -36,7 +36,7 @@ namespace DelvUI.Interface.StatusEffects
 
     [Section("Buffs and Debuffs")]
     [SubSection("Player Debuffs", 0)]
-    public class PlayerDebuffsListConfig : StatusEffectsListConfig
+    public class PlayerDebuffsListConfig : UnitFrameStatusEffectsListConfig
     {
         public new static PlayerDebuffsListConfig DefaultConfig()
         {
@@ -56,15 +56,19 @@ namespace DelvUI.Interface.StatusEffects
 
     [Section("Buffs and Debuffs")]
     [SubSection("Target Buffs", 0)]
-    public class TargetBuffsListConfig : StatusEffectsListConfig
+    public class TargetBuffsListConfig : UnitFrameStatusEffectsListConfig
     {
         public new static TargetBuffsListConfig DefaultConfig()
         {
-            var pos = new Vector2(HUDConstants.UnitFramesOffsetX, HUDConstants.BaseHUDOffsetY - 50);
+            var pos = new Vector2(0, -1);
             var iconConfig = new StatusEffectIconConfig();
             iconConfig.DispellableBorderConfig.Enabled = false;
 
-            return new TargetBuffsListConfig(pos, HUDConstants.DefaultStatusEffectsListSize, true, false, true, GrowthDirections.Right | GrowthDirections.Up, iconConfig);
+            var config = new TargetBuffsListConfig(pos, HUDConstants.DefaultStatusEffectsListSize, true, false, true, GrowthDirections.Right | GrowthDirections.Up, iconConfig);
+            config.AnchorToUnitFrame = true;
+            config.UnitFrameAnchor = DrawAnchor.TopLeft;
+
+            return config;
         }
 
         public TargetBuffsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
@@ -76,18 +80,39 @@ namespace DelvUI.Interface.StatusEffects
 
     [Section("Buffs and Debuffs")]
     [SubSection("Target Debuffs", 0)]
-    public class TargetDebuffsListConfig : StatusEffectsListConfig
+    public class TargetDebuffsListConfig : UnitFrameStatusEffectsListConfig
     {
         public new static TargetDebuffsListConfig DefaultConfig()
         {
-            var pos = new Vector2(HUDConstants.UnitFramesOffsetX, HUDConstants.BaseHUDOffsetY - HUDConstants.DefaultStatusEffectsListSize.Y - 50);
+            var pos = new Vector2(0, -85);
             var iconConfig = new StatusEffectIconConfig();
             iconConfig.DispellableBorderConfig.Enabled = false;
 
-            return new TargetDebuffsListConfig(pos, HUDConstants.DefaultStatusEffectsListSize, false, true, true, GrowthDirections.Right | GrowthDirections.Up, iconConfig);
+            var config = new TargetDebuffsListConfig(pos, HUDConstants.DefaultStatusEffectsListSize, false, true, true, GrowthDirections.Right | GrowthDirections.Up, iconConfig);
+            config.AnchorToUnitFrame = true;
+            config.UnitFrameAnchor = DrawAnchor.TopLeft;
+
+            return config;
         }
 
         public TargetDebuffsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
+            GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
+            : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
+        {
+        }
+    }
+
+    public abstract class UnitFrameStatusEffectsListConfig : StatusEffectsListConfig
+    {
+        [Checkbox("Anchor to Unit Frame")]
+        [Order(16)]
+        public bool AnchorToUnitFrame = false;
+
+        [Anchor("Unit Frame Anchor")]
+        [Order(17, collapseWith = nameof(AnchorToUnitFrame))]
+        public DrawAnchor UnitFrameAnchor = DrawAnchor.Bottom;
+
+        public UnitFrameStatusEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
             GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
             : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
         {
@@ -104,7 +129,7 @@ namespace DelvUI.Interface.StatusEffects
         public Vector2 Size;
 
         [DragInt2("Icon Padding", min = 0, max = 100)]
-        [Order(16)]
+        [Order(19)]
         public Vector2 IconPadding = new(2, 2);
 
         [Checkbox("Preview", isMonitored = true)]
@@ -489,11 +514,12 @@ namespace DelvUI.Interface.StatusEffects
             iconConfig.DispellableBorderConfig.Enabled = false;
             iconConfig.Size = new Vector2(30, 30);
 
-            var pos = new Vector2(-HUDConstants.UnitFramesOffsetX - HUDConstants.DefaultBigUnitFrameSize.X / 2f, HUDConstants.BaseHUDOffsetY - 50);
-            var size = new Vector2(iconConfig.Size.X * 5 + 10, iconConfig.Size.Y * 3 + 10);
+            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY);
+            var size = new Vector2(250, iconConfig.Size.Y * 3 + 10);
 
             var config = new CustomEffectsListConfig(pos, size, true, true, false, GrowthDirections.Centered | GrowthDirections.Up, iconConfig);
             config.Enabled = false;
+            config.Directions = 5;
 
             // pre-populated white list
             config.BlacklistConfig.UseAsWhitelist = true;

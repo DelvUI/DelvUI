@@ -203,21 +203,25 @@ namespace DelvUI.Interface
         {
             var playerBuffsConfig = ConfigurationManager.Instance.GetConfigObject<PlayerBuffsListConfig>();
             var playerBuffs = new StatusEffectsListHud("DelvUI_playerBuffs", playerBuffsConfig, "Buffs");
+            playerBuffs.ParentConfig = _playerUnitFrameHud.Config;
             _hudElements.Add(playerBuffs);
             _hudElementsUsingPlayer.Add(playerBuffs);
 
             var playerDebuffsConfig = ConfigurationManager.Instance.GetConfigObject<PlayerDebuffsListConfig>();
             var playerDebuffs = new StatusEffectsListHud("DelvUI_playerDebuffs", playerDebuffsConfig, "Debufffs");
+            playerDebuffs.ParentConfig = _playerUnitFrameHud.Config;
             _hudElements.Add(playerDebuffs);
             _hudElementsUsingPlayer.Add(playerDebuffs);
 
             var targetBuffsConfig = ConfigurationManager.Instance.GetConfigObject<TargetBuffsListConfig>();
             var targetBuffs = new StatusEffectsListHud("DelvUI_targetBuffs", targetBuffsConfig, "Target Buffs");
+            targetBuffs.ParentConfig = _targetUnitFrameHud.Config;
             _hudElements.Add(targetBuffs);
             _hudElementsUsingTarget.Add(targetBuffs);
 
             var targetDebuffsConfig = ConfigurationManager.Instance.GetConfigObject<TargetDebuffsListConfig>();
             var targetDebuffs = new StatusEffectsListHud("DelvUI_targetDebuffs", targetDebuffsConfig, "Target Debuffs");
+            targetDebuffs.ParentConfig = _targetUnitFrameHud.Config;
             _hudElements.Add(targetDebuffs);
             _hudElementsUsingTarget.Add(targetDebuffs);
 

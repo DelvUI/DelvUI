@@ -56,12 +56,11 @@ namespace DelvUI.Interface.GeneralElements
             var castPercent = 100f / totalCastTime * currentCastTime;
             var castScale = castPercent / 100f;
 
-            Vector2 parentPos = origin;
             Vector2 startPos;
 
             if (Config is UnitFrameCastbarConfig unitFrameCastbarConfig && unitFrameCastbarConfig.AnchorToUnitFrame && ParentConfig != null)
             {
-                parentPos = Utils.GetAnchoredPosition(origin + ParentConfig.Position, -ParentConfig.Size, unitFrameCastbarConfig.UnitFrameAnchor);
+                Vector2 parentPos = Utils.GetAnchoredPosition(origin + ParentConfig.Position, -ParentConfig.Size, unitFrameCastbarConfig.UnitFrameAnchor);
                 startPos = Utils.GetAnchoredPosition(parentPos + Config.Position - ParentConfig.Size / 2f, Config.Size, Config.Anchor);
             }
             else
