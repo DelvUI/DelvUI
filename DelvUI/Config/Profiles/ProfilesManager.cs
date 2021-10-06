@@ -341,6 +341,7 @@ namespace DelvUI.Config.Profiles
                 }
             );
 
+            Directory.CreateDirectory(ProfilesPath);
             File.WriteAllText(JsonPath, jsonString);
         }
 

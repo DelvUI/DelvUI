@@ -1,3 +1,4 @@
+using Dalamud.Logging;
 using DelvUI.Config.Profiles;
 using DelvUI.Config.Tree;
 using DelvUI.Helpers;
@@ -108,7 +109,7 @@ namespace DelvUI.Config
             ConfigBaseNode = configBaseNode;
             ConfigBaseNode.ConfigObjectResetEvent += OnConfigObjectReset;
 
-            LoadConfigurations();
+            LoadOrInitializeFiles();
 
             LockEvent = lockEvent;
 
@@ -215,6 +216,26 @@ namespace DelvUI.Config
         #endregion
 
         #region load / save / profiles
+        private void LoadOrInitializeFiles()
+        {
+            try
+            {
+                // detect if we need to create the config files (fresh install)
+                if (Directory.GetDirectories(ConfigDirectory).Length == 0)
+                {
+                    SaveConfigurations(true);
+                }
+                else
+                {
+                    LoadConfigurations();
+                }
+            }
+            catch
+            {
+                PluginLog.Error("Error initializing configurations!");
+            }
+        }
+
         public void LoadConfigurations()
         {
             ConfigBaseNode.Load(ConfigDirectory);
@@ -228,7 +249,11 @@ namespace DelvUI.Config
             }
 
             ConfigBaseNode.Save(ConfigDirectory);
-            ProfilesManager.Instance.SaveCurrentProfile();
+
+            if (ProfilesManager.Instance != null)
+            {
+                ProfilesManager.Instance.SaveCurrentProfile();
+            }
 
             ConfigBaseNode.NeedsSave = false;
         }
