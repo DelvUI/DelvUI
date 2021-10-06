@@ -102,12 +102,14 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(120, 24);
             var pos = new Vector2(0, -1);
 
-            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", DrawAnchor.Left, DrawAnchor.Left);
+            var castNameConfig = new LabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center);
             var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
+            castTimeConfig.Enabled = false;
 
             var config = new TargetOfTargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
             config.Anchor = DrawAnchor.Top;
             config.AnchorToUnitFrame = true;
+            config.ShowIcon = false;
 
             return config;
         }
@@ -127,12 +129,14 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(120, 24);
             var pos = new Vector2(0, -1);
 
-            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", DrawAnchor.Left, DrawAnchor.Left);
+            var castNameConfig = new LabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center);
             var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
+            castTimeConfig.Enabled = false;
 
             var config = new FocusTargetCastbarConfig(pos, size, castNameConfig, castTimeConfig);
             config.Anchor = DrawAnchor.Top;
             config.AnchorToUnitFrame = true;
+            config.ShowIcon = false;
 
             return config;
         }
