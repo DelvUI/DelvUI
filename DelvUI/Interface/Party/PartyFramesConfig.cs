@@ -3,6 +3,7 @@ using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
+using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Numerics;
@@ -13,7 +14,13 @@ namespace DelvUI.Interface.Party
     [SubSection("General", 0)]
     public class PartyFramesConfig : MovablePluginConfigObject
     {
-        public new static PartyFramesConfig DefaultConfig() { return new PartyFramesConfig(); }
+        public new static PartyFramesConfig DefaultConfig()
+        {
+            var config = new PartyFramesConfig();
+            config.Position = new Vector2(-ImGui.GetMainViewport().Size.X / 3 - config.Size.X / 2, -config.Size.Y / 2);
+
+            return config;
+        }
 
         [Checkbox("Lock")]
         [Order(3)]
@@ -23,7 +30,7 @@ namespace DelvUI.Interface.Party
         [Order(4)]
         public bool Preview = false;
 
-        public Vector2 Size = new Vector2(650, 150);
+        public Vector2 Size = new Vector2(380, 340);
 
         [Anchor("Bars Anchor", isMonitored = true, spacing = true)]
         [Order(15)]
