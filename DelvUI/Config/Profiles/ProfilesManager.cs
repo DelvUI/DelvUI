@@ -1,6 +1,7 @@
 ﻿using Dalamud.Interface;
 using Dalamud.Logging;
 using DelvUI.Config.Attributes;
+using DelvUI.Config.Tree;
 using DelvUI.Helpers;
 using ImGuiNET;
 using Newtonsoft.Json;
@@ -12,13 +13,83 @@ using System.Numerics;
 
 namespace DelvUI.Config.Profiles
 {
-    [Disableable(false)]
-    [Exportable(false)]
-    [ProfileShareable(false)]
-    [Section("Profiles")]
-    [SubSection("General", 0)]
-    public class ProfilesConfig : PluginConfigObject
+    public class ProfilesManager
     {
+        #region Singleton
+        public readonly SectionNode ProfilesNode;
+
+        private ProfilesManager()
+        {
+            // fake nodes
+            ProfilesNode = new SectionNode();
+            ProfilesNode.Name = "Profiles";
+
+            NestedSubSectionNode subSectionNode = new NestedSubSectionNode();
+            subSectionNode.Name = "General";
+            subSectionNode.Depth = 0;
+
+            ProfilesConfigPageNode configPageNode = new ProfilesConfigPageNode();
+
+            subSectionNode.Add(configPageNode);
+            ProfilesNode.Add(subSectionNode);
+
+            ConfigurationManager.Instance.AddExtraSectionNode(ProfilesNode);
+
+            // default profile
+            if (!Profiles.ContainsKey(DefaultProfileName))
+            {
+                var defaultProfile = new Profile(DefaultProfileName);
+                Profiles.Add(DefaultProfileName, defaultProfile);
+            }
+
+            // make sure default profile file is created the first time this runs
+            if (!File.Exists(CurrentProfilePath()))
+            {
+                SaveCurrentProfile();
+            }
+        }
+
+        public static void Initialize()
+        {
+            try
+            {
+                string jsonString = File.ReadAllText(JsonPath);
+                ProfilesManager? instance = JsonConvert.DeserializeObject<ProfilesManager>(jsonString);
+                if (instance != null)
+                {
+                    Instance = instance;
+                }
+            }
+            catch
+            {
+                Instance = new ProfilesManager();
+            }
+        }
+
+        public static ProfilesManager Instance { get; private set; } = null!;
+
+        ~ProfilesManager()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            Instance = null!;
+        }
+        #endregion
+
         private string _currentProfileName = "Default";
         public string CurrentProfileName
         {
@@ -42,7 +113,7 @@ namespace DelvUI.Config.Profiles
         }
 
         [JsonIgnore] private static string ProfilesPath => Path.Combine(ConfigurationManager.Instance.ConfigDirectory, "Profiles");
-        [JsonIgnore] private static string GeneralJsonPath => Path.Combine(ProfilesPath, "General.json");
+        [JsonIgnore] private static string JsonPath => Path.Combine(ProfilesPath, "Profiles.json");
 
         [JsonIgnore] private readonly string DefaultProfileName = "Default";
         [JsonIgnore] private string _newProfileName = "";
@@ -53,28 +124,6 @@ namespace DelvUI.Config.Profiles
         [JsonIgnore] private string? _resetingProfileName = null;
 
         public SortedList<string, Profile> Profiles = new SortedList<string, Profile>();
-
-        public new static ProfilesConfig DefaultConfig() { return new ProfilesConfig(); }
-
-
-        public ProfilesConfig()
-        {
-            // default profile
-            if (!Profiles.ContainsKey(DefaultProfileName))
-            {
-                var defaultProfile = new Profile(DefaultProfileName);
-                Profiles.Add(DefaultProfileName, defaultProfile);
-            }
-        }
-
-        public void Initialize()
-        {
-            // make sure default profile file is created the first time this runs
-            if (!File.Exists(CurrentProfilePath()))
-            {
-                SaveCurrentProfile();
-            }
-        }
 
         public Profile CurrentProfile()
         {
@@ -93,7 +142,15 @@ namespace DelvUI.Config.Profiles
                 return;
             }
 
-            SaveCurrentProfile(ConfigurationManager.Instance.ExportCurrentConfigs());
+            try
+            {
+                Save();
+                SaveCurrentProfile(ConfigurationManager.Instance.ExportCurrentConfigs());
+            }
+            catch
+            {
+
+            }
         }
 
         public void SaveCurrentProfile(string? exportString)
@@ -284,27 +341,9 @@ namespace DelvUI.Config.Profiles
                 }
             );
 
-            File.WriteAllText(GeneralJsonPath, jsonString);
+            File.WriteAllText(JsonPath, jsonString);
         }
 
-        public static ProfilesConfig? Load()
-        {
-            ProfilesConfig? config;
-
-            try
-            {
-                string jsonString = File.ReadAllText(GeneralJsonPath);
-                config = JsonConvert.DeserializeObject<ProfilesConfig>(jsonString);
-            }
-            catch
-            {
-                return null;
-            }
-
-            return config;
-        }
-
-        [ManualDraw]
         public bool Draw(ref bool changed)
         {
             string[] profiles = Profiles.Keys.ToArray();
@@ -484,6 +523,26 @@ namespace DelvUI.Config.Profiles
             }
 
             ImGui.SetCursorPos(new Vector2(originalPos.X, maxY + 30));
+        }
+    }
+
+    // fake config object
+    public class ProfilesConfig : PluginConfigObject
+    {
+        public new static ProfilesConfig DefaultConfig() { return new ProfilesConfig(); }
+    }
+
+    // fake config page node
+    public class ProfilesConfigPageNode : ConfigPageNode
+    {
+        public ProfilesConfigPageNode()
+        {
+            ConfigObject = new ProfilesConfig();
+        }
+
+        public override bool Draw(ref bool changed)
+        {
+            return ProfilesManager.Instance.Draw(ref changed);
         }
     }
 }

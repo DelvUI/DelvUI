@@ -1,5 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Config.Profiles;
 using DelvUI.Helpers;
 using ImGuiNET;
 using Newtonsoft.Json;
@@ -166,7 +167,7 @@ namespace DelvUI.Interface
         public ImportData(string base64String)
         {
             ImportString = base64String;
-            JsonString = ConfigurationManager.Base64DecodeAndDecompress(base64String);
+            JsonString = ImportExportHelper.Base64DecodeAndDecompress(base64String);
 
             var typeString = (string?)JObject.Parse(JsonString)["$type"];
             if (typeString == null)

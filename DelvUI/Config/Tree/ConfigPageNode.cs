@@ -1,5 +1,6 @@
 using Dalamud.Logging;
 using DelvUI.Config.Attributes;
+using DelvUI.Config.Profiles;
 using DelvUI.Helpers;
 using ImGuiNET;
 using Newtonsoft.Json;
@@ -73,7 +74,7 @@ namespace DelvUI.Config.Tree
 
         public override string? GetBase64String()
         {
-            return ConfigurationManager.GenerateExportString(ConfigObject);
+            return ImportExportHelper.GenerateExportString(ConfigObject);
         }
 
         protected override bool AllowExport()
@@ -241,7 +242,7 @@ namespace DelvUI.Config.Tree
 
             if (ImGui.Button("Export", new Vector2(120, 24)))
             {
-                var exportString = ConfigurationManager.GenerateExportString(ConfigObject);
+                var exportString = ImportExportHelper.GenerateExportString(ConfigObject);
                 ImGui.SetClipboardText(exportString);
             }
 
@@ -258,11 +259,6 @@ namespace DelvUI.Config.Tree
 
         public override void Save(string path)
         {
-            if (!ConfigObject.ProfileShareable)
-            {
-                return;
-            }
-
             string[] splits = path.Split("\\", StringSplitOptions.RemoveEmptyEntries);
             string directory = path.Replace(splits.Last(), "");
             Directory.CreateDirectory(directory);
@@ -281,10 +277,6 @@ namespace DelvUI.Config.Tree
 
         public override void Load(string path)
         {
-            if (!ConfigObject.ProfileShareable)
-            {
-                return;
-            }
 
             FileInfo finalPath = new(path + ".json");
 

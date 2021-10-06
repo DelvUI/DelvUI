@@ -31,17 +31,6 @@ namespace DelvUI.Config.Attributes
             this.disableable = disableable;
         }
     }
-
-    [AttributeUsage(AttributeTargets.Class)]
-    public class ProfileShareableAttribute : Attribute
-    {
-        public bool profileShareable;
-
-        public ProfileShareableAttribute(bool profileShareable)
-        {
-            this.profileShareable = profileShareable;
-        }
-    }
     #endregion
 
     #region method attributes

@@ -37,16 +37,6 @@ namespace DelvUI.Config
             }
         }
 
-        [JsonIgnore]
-        public bool ProfileShareable
-        {
-            get
-            {
-                ProfileShareableAttribute? attribute = (ProfileShareableAttribute?)GetType().GetCustomAttribute(typeof(ProfileShareableAttribute), false);
-                return attribute == null || attribute.profileShareable;
-            }
-        }
-
         protected bool ColorEdit4(string label, ref PluginConfigColor color)
         {
             var vector = color.Vector;

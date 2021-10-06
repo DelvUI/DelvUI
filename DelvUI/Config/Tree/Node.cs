@@ -7,6 +7,11 @@ namespace DelvUI.Config.Tree
     {
         protected List<Node> _children = new List<Node>();
 
+        public void Add(Node node)
+        {
+            _children.Add(node);
+        }
+
         #region reset
         protected Node? _nodeToReset = null;
         protected string? _nodeToResetName = null;

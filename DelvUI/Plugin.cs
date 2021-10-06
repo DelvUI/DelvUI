@@ -11,6 +11,7 @@ using Dalamud.Interface;
 using Dalamud.Logging;
 using Dalamud.Plugin;
 using DelvUI.Config;
+using DelvUI.Config.Profiles;
 using DelvUI.Helpers;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
@@ -114,6 +115,7 @@ namespace DelvUI
             GlobalColors.Initialize();
             MouseOverHelper.Initialize();
             PartyManager.Initialize();
+            ProfilesManager.Initialize();
             TexturesCache.Initialize();
             TooltipsHelper.Initialize();
 
@@ -246,6 +248,7 @@ namespace DelvUI
             GlobalColors.Instance.Dispose();
             MouseOverHelper.Instance.Dispose();
             PartyManager.Instance.Dispose();
+            ProfilesManager.Instance.Dispose();
             TexturesCache.Instance.Dispose();
             TooltipsHelper.Instance.Dispose();
 

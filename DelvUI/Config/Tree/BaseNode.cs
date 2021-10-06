@@ -22,9 +22,18 @@ namespace DelvUI.Config.Tree
         public bool NeedsSave = false;
         public string? SelectedOptionName = null;
 
+        private List<Node> _extraNodes = new List<Node>();
+        private List<Node>? _nodes = null;
+
         public BaseNode()
         {
             _configPageNodesMap = new Dictionary<Type, ConfigPageNode>();
+        }
+
+        public void AddExtraSectionNode(SectionNode node)
+        {
+            _extraNodes.Add(node);
+            _nodes = null;
         }
 
         public T? GetConfigObject<T>() where T : PluginConfigObject
@@ -110,8 +119,26 @@ namespace DelvUI.Config.Tree
             ImGui.PopStyleVar(6);
         }
 
+        private void CreateNodesIfNeeded()
+        {
+            if (_nodes != null)
+            {
+                return;
+            }
+
+            _nodes = new List<Node>();
+            _nodes.AddRange(_children);
+            _nodes.AddRange(_extraNodes);
+        }
+
         public void Draw()
         {
+            CreateNodesIfNeeded();
+            if (_nodes == null)
+            {
+                return;
+            }
+
             bool changed = false;
             bool didReset = false;
 
@@ -151,30 +178,30 @@ namespace DelvUI.Config.Tree
                     ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing() - 15), true);
 
                     // if no section is selected, select the first
-                    if (_children.Any() && _children.Find(o => o is SectionNode sectionNode && sectionNode.Selected) == null)
+                    if (_nodes.Any() && _nodes.Find(o => o is SectionNode sectionNode && sectionNode.Selected) == null)
                     {
-                        SectionNode? selectedSection = (SectionNode?)_children.Find(o => o is SectionNode sectionNode && sectionNode.Name == SelectedOptionName);
+                        SectionNode? selectedSection = (SectionNode?)_nodes.Find(o => o is SectionNode sectionNode && sectionNode.Name == SelectedOptionName);
                         if (selectedSection != null)
                         {
                             selectedSection.Selected = true;
                             SelectedOptionName = selectedSection.Name;
                         }
-                        else if (_children.Count > 0)
+                        else if (_nodes.Count > 0)
                         {
-                            SectionNode node = (SectionNode)_children[0];
+                            SectionNode node = (SectionNode)_nodes[0];
                             node.Selected = true;
                             SelectedOptionName = node.Name;
                         }
                     }
 
-                    foreach (SectionNode selectionNode in _children)
+                    foreach (SectionNode selectionNode in _nodes)
                     {
                         if (ImGui.Selectable(selectionNode.Name, selectionNode.Selected))
                         {
                             selectionNode.Selected = true;
                             SelectedOptionName = selectionNode.Name;
 
-                            foreach (SectionNode otherNode in _children.FindAll(x => x != selectionNode))
+                            foreach (SectionNode otherNode in _nodes.FindAll(x => x != selectionNode))
                             {
                                 otherNode.Selected = false;
                             }
@@ -195,7 +222,7 @@ namespace DelvUI.Config.Tree
                 ImGui.BeginGroup(); // Right
 
                 {
-                    foreach (SectionNode selectionNode in _children)
+                    foreach (SectionNode selectionNode in _nodes)
                     {
                         didReset |= selectionNode.Draw(ref changed);
                     }

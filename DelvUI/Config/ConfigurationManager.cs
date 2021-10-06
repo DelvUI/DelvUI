@@ -160,22 +160,6 @@ namespace DelvUI.Config
                 currentResetEvent,
                 currentLockEvent
             );
-
-            // ProfilesConfig is special because its not loaded and saved like other configs
-            // and its not stored in the profile's data
-            // its loading and saving is handled by the config itself
-            // so we need to make sure we load the "real" config once the nodes are loaded
-            var profilesConfig = ProfilesConfig.Load();
-            if (profilesConfig != null)
-            {
-                Instance.SetConfigObject(profilesConfig);
-            }
-            else
-            {
-                profilesConfig = Instance.GetConfigObject<ProfilesConfig>();
-            }
-
-            profilesConfig?.Initialize();
         }
 
         private void OnConfigObjectReset(BaseNode sender)
@@ -186,7 +170,7 @@ namespace DelvUI.Config
         private void OnLogout(object? sender, EventArgs? args)
         {
             SaveConfigurations();
-            SaveCurrentProfile();
+            ProfilesManager.Instance.SaveCurrentProfile();
         }
 
         public void Draw()
@@ -205,43 +189,12 @@ namespace DelvUI.Config
             }
         }
 
-        public void LoadConfigurations()
+        public void AddExtraSectionNode(SectionNode node)
         {
-            ConfigBaseNode.Load(ConfigDirectory);
+            ConfigBaseNode.AddExtraSectionNode(node);
         }
 
-        public void SaveConfigurations(bool forced = false)
-        {
-            if (!forced && !ConfigBaseNode.NeedsSave)
-            {
-                return;
-            }
-
-            ConfigBaseNode.Save(ConfigDirectory);
-            SaveCurrentProfile();
-
-            ConfigBaseNode.NeedsSave = false;
-        }
-
-        private void SaveCurrentProfile()
-        {
-            var profilesConfig = GetConfigObject<ProfilesConfig>();
-            profilesConfig.SaveCurrentProfile(ExportCurrentConfigs());
-        }
-
-        public void UpdateCurrentProfile()
-        {
-            // dont update the profile on job change when the config window is opened
-            if (_drawConfigWindow)
-            {
-                _needsProfileUpdate = true;
-                return;
-            }
-
-            var profilesConfig = GetConfigObject<ProfilesConfig>();
-            profilesConfig.UpdateCurrentProfile();
-        }
-
+        #region config getters and setters
         public PluginConfigObject GetConfigObjectForType(Type type)
         {
             MethodInfo? genericMethod = GetType().GetMethod("GetConfigObject");
@@ -259,43 +212,37 @@ namespace DelvUI.Config
         public ConfigPageNode GetConfigPageNode<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigPageNode<T>()!;
 
         public void SetConfigObject(PluginConfigObject configObject) => ConfigBaseNode.SetConfigObject(configObject);
+        #endregion
 
-        #region export
-        public static string CompressAndBase64Encode(string jsonString)
+        #region load / save / profiles
+        public void LoadConfigurations()
         {
-            using MemoryStream output = new();
+            ConfigBaseNode.Load(ConfigDirectory);
+        }
 
-            using (DeflateStream gzip = new(output, CompressionLevel.Optimal))
+        public void SaveConfigurations(bool forced = false)
+        {
+            if (!forced && !ConfigBaseNode.NeedsSave)
             {
-                using StreamWriter writer = new(gzip, Encoding.UTF8);
-                writer.Write(jsonString);
+                return;
             }
 
-            return Convert.ToBase64String(output.ToArray());
+            ConfigBaseNode.Save(ConfigDirectory);
+            ProfilesManager.Instance.SaveCurrentProfile();
+
+            ConfigBaseNode.NeedsSave = false;
         }
 
-        public static string Base64DecodeAndDecompress(string base64String)
+        public void UpdateCurrentProfile()
         {
-            var base64EncodedBytes = Convert.FromBase64String(base64String);
-
-            using MemoryStream inputStream = new(base64EncodedBytes);
-            using DeflateStream gzip = new(inputStream, CompressionMode.Decompress);
-            using StreamReader reader = new(gzip, Encoding.UTF8);
-            var decodedString = reader.ReadToEnd();
-
-            return decodedString;
-        }
-
-        public static string GenerateExportString(object obj)
-        {
-            JsonSerializerSettings settings = new JsonSerializerSettings
+            // dont update the profile on job change when the config window is opened
+            if (_drawConfigWindow)
             {
-                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-                TypeNameHandling = TypeNameHandling.Objects
-            };
+                _needsProfileUpdate = true;
+                return;
+            }
 
-            var jsonString = JsonConvert.SerializeObject(obj, Formatting.Indented, settings);
-            return CompressAndBase64Encode(jsonString);
+            ProfilesManager.Instance.UpdateCurrentProfile();
         }
 
         public string? ExportCurrentConfigs()
@@ -308,7 +255,6 @@ namespace DelvUI.Config
             List<string> importStrings = new List<string>(rawString.Trim().Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries));
             ImportData[] imports = importStrings.Select(str => new ImportData(str)).ToArray();
 
-            ProfilesConfig profilesConfig = GetConfigObject<ProfilesConfig>();
             BaseNode node = new BaseNode();
             InitializeBaseNode(node);
 
@@ -334,9 +280,9 @@ namespace DelvUI.Config
 
             string? oldSelection = ConfigBaseNode.SelectedOptionName;
             node.SelectedOptionName = oldSelection;
-            ConfigBaseNode = node;
-            SetConfigObject(profilesConfig); // dont overwrite profiles config
+            node.AddExtraSectionNode(ProfilesManager.Instance.ProfilesNode);
 
+            ConfigBaseNode = node;
             ResetEvent?.Invoke(this);
 
             return true;
@@ -344,13 +290,12 @@ namespace DelvUI.Config
 
         public void ResetConfig()
         {
-            ProfilesConfig profilesConfig = GetConfigObject<ProfilesConfig>();
             ConfigBaseNode.Reset();
-            SetConfigObject(profilesConfig); // dont overwrite profiles config
-
             ResetEvent?.Invoke(this);
         }
+        #endregion
 
+        #region initialization
         private static void InitializeBaseNode(BaseNode node)
         {
             // creates node tree in the right order...
@@ -427,8 +372,7 @@ namespace DelvUI.Config
             typeof(MPTickerConfig),
             typeof(GridConfig),
 
-            typeof(ImportConfig),
-            typeof(ProfilesConfig)
+            typeof(ImportConfig)
         };
         #endregion
     }
