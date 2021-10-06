@@ -125,16 +125,6 @@ namespace DelvUI.Config
                 typeof(TargetOfTargetPrimaryResourceConfig),
                 typeof(FocusTargetPrimaryResourceConfig),
 
-                typeof(PartyFramesConfig),
-                typeof(PartyFramesHealthBarsConfig),
-                typeof(PartyFramesManaBarConfig),
-                typeof(PartyFramesCastbarConfig),
-                typeof(PartyFramesRoleIconConfig),
-                typeof(PartyFramesLeaderIconConfig),
-                typeof(PartyFramesBuffsConfig),
-                typeof(PartyFramesDebuffsConfig),
-                typeof(PartyFramesRaiseTrackerConfig),
-
                 typeof(PlayerCastbarConfig),
                 typeof(TargetCastbarConfig),
                 typeof(TargetOfTargetCastbarConfig),
@@ -167,6 +157,16 @@ namespace DelvUI.Config
                 typeof(BlackMageConfig),
                 typeof(SummonerConfig),
                 typeof(RedMageConfig),
+
+                typeof(PartyFramesConfig),
+                typeof(PartyFramesHealthBarsConfig),
+                typeof(PartyFramesManaBarConfig),
+                typeof(PartyFramesCastbarConfig),
+                typeof(PartyFramesRoleIconConfig),
+                typeof(PartyFramesLeaderIconConfig),
+                typeof(PartyFramesBuffsConfig),
+                typeof(PartyFramesDebuffsConfig),
+                typeof(PartyFramesRaiseTrackerConfig),
 
                 typeof(TanksColorConfig),
                 typeof(HealersColorConfig),
