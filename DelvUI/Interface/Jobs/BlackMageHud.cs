@@ -347,8 +347,7 @@ namespace DelvUI.Interface.Jobs
 
                 for (var i = 0; i < 4; i++)
                 {
-                    IEnumerable<Status> dot = target.StatusList.Where(o => o.StatusId == dotIDs[i]);
-                    timer = dot.Any() ? Math.Abs(dot.First().RemainingTime) : 0f;
+                    timer = target.StatusList.FirstOrDefault(o => o.StatusId == dotIDs[i] && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
 
                     if (timer > 0)
                     {
