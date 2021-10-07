@@ -146,7 +146,7 @@ namespace DelvUI.Interface.Jobs
 
                 PluginConfigColor fillColor = hasTCJBuff ? Config.MudraBar.TCJBarColor : hasKassatsuBuff ? Config.MudraBar.KassatsuBarColor : Config.MudraBar.FillColor;
                 Rect foreground = BarUtilities.GetFillRect(Config.MudraBar.Position, Config.MudraBar.Size, Config.MudraBar.FillDirection, fillColor, current, max);
-                var bar = new BarHud(Config.MudraBar, player).Foreground(foreground).Labels(Config.MudraBar.Label);
+                var bar = new BarHud(nameof(Config.MudraBar), Config.MudraBar, player).Foreground(foreground).Labels(Config.MudraBar.Label);
                 bar.Draw(pos);
             }
             else
@@ -157,7 +157,7 @@ namespace DelvUI.Interface.Jobs
                 if (!Config.MudraBar.HideWhenInactive || current < max)
                 {
                     Config.MudraBar.Label.SetText(Math.Truncate((max - current) % 20).ToString());
-                    BarUtilities.GetChunkedProgressBars(Config.MudraBar, 2, current, max, 0f, player, Config.MudraBar.Label).Draw(pos);
+                    BarUtilities.GetChunkedProgressBars(nameof(Config.MudraBar), Config.MudraBar, 2, current, max, 0f, player, Config.MudraBar.Label).Draw(pos);
                 }
             }
         }
@@ -169,7 +169,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.HutonBar.HideWhenInactive || hutonDurationLeft > 0)
             {
                 Config.HutonBar.Label.SetText(Math.Truncate(hutonDurationLeft).ToString());
-                BarUtilities.GetProgressBar(Config.HutonBar, hutonDurationLeft, 70f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(nameof(Config.HutonBar), Config.HutonBar, hutonDurationLeft, 70f, 0f, player).Draw(pos);
             }
         }
 
@@ -180,7 +180,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.NinkiBar.HideWhenInactive || gauge.Ninki > 0)
             {
                 Config.NinkiBar.Label.SetText(gauge.Ninki.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.NinkiBar, gauge.Ninki, 100f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(nameof(Config.NinkiBar), Config.NinkiBar, gauge.Ninki, 100f, 0f, player).Draw(pos);
             }
         }
 
@@ -197,7 +197,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.TrickAttackBar.HideWhenInactive || trickDuration > 0)
             {
                 Config.TrickAttackBar.Label.SetText(Math.Truncate(trickDuration).ToString());
-                BarUtilities.GetProgressBar(Config.TrickAttackBar, trickDuration, 15f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(nameof(Config.TrickAttackBar), Config.TrickAttackBar, trickDuration, 15f, 0f, player).Draw(pos);
             }
         }
 
@@ -208,7 +208,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.SuitonBar.HideWhenInactive || suitonDuration > 0)
             {
                 Config.SuitonBar.Label.SetText(Math.Truncate(suitonDuration).ToString("N0"));
-                BarUtilities.GetProgressBar(Config.SuitonBar, suitonDuration, 20f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(nameof(Config.SuitonBar), Config.SuitonBar, suitonDuration, 20f, 0f, player).Draw(pos);
             }
         }
 
