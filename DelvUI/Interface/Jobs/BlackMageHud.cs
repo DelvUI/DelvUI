@@ -4,6 +4,7 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
@@ -31,10 +32,10 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new List<Vector2>();
             List<Vector2> sizes = new List<Vector2>();
 
-            if (Config.ShowManaBar)
+            if (Config.ManaBarConfig.Enabled)
             {
-                positions.Add(Config.Position + Config.ManaBarPosition);
-                sizes.Add(Config.ManaBarSize);
+                positions.Add(Config.Position + Config.ManaBarConfig.Position);
+                sizes.Add(Config.ManaBarConfig.Size);
             }
 
             if (Config.ShowUmbralHeart)
@@ -78,9 +79,9 @@ namespace DelvUI.Interface.Jobs
 
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            if (Config.ShowManaBar)
+            if (Config.ManaBarConfig.Enabled)
             {
-                DrawManaBar(origin, player);
+                DrawManaBar(origin + Config.Position, player);
             }
 
             if (Config.ShowUmbralHeart)
@@ -116,59 +117,42 @@ namespace DelvUI.Interface.Jobs
 
         protected void DrawManaBar(Vector2 origin, PlayerCharacter player)
         {
+            BlackMageManaBarConfig config = Config.ManaBarConfig;
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
 
-            var position = origin + Config.Position + Config.ManaBarPosition - Config.ManaBarSize / 2f;
+            if (config.HideWhenInactive && !gauge.InAstralFire && !gauge.InUmbralIce && player.CurrentMp == player.MaxMp)
+            {
+                return;
+            }
 
-            var color = gauge.InAstralFire ? Config.ManaBarFireColor : gauge.InUmbralIce ? Config.ManaBarIceColor : Config.ManaBarNoElementColor;
-
-            if (Config.HideManaWhenFull && !gauge.InAstralFire && !gauge.InUmbralIce && player.CurrentMp is 10000) { return; }
-
-            var builder = BarBuilder.Create(position, Config.ManaBarSize)
-                .AddInnerBar(player.CurrentMp, player.MaxMp, color)
-                .SetBackgroundColor(EmptyColor.Base);
+            // value
+            config.ValueLabelConfig.SetText($"{player.CurrentMp,0}");
 
             // element timer
             if (gauge.InAstralFire || gauge.InUmbralIce)
             {
                 var time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000 + 1 : 0;
-                builder.SetTextMode(BarTextMode.Single);
-                builder.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, $"{time,0}");
+                config.ElementTimerLabelConfig.SetText($"{time,0}");
             }
-
-            // enochian
-            if (Config.ShowEnochianGlow && gauge.IsEnochianActive)
+            else
             {
-                builder.SetGlowSize(2);
-                builder.SetGlowColor(Config.ManaBarGlowColor.Base);
+                config.ElementTimerLabelConfig.SetText("");
             }
 
-            var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            BarHud bar = BarUtilities.GetProgressBar(
+                ID + "_manaBar",
+                config,
+                config.ThresholdConfig,
+                new LabelConfig[] { config.ValueLabelConfig, config.ElementTimerLabelConfig },
+                player.CurrentMp,
+                player.MaxMp,
+                0,
+                gauge.InAstralFire ? config.FireColor : gauge.InUmbralIce ? config.IceColor : config.FillColor,
+                player,
+                gauge.IsEnochianActive && config.GlowConfig.Enabled ? config.GlowConfig : null
+            );
 
-            // threshold marker
-            if (Config.ShowManaThresholdMarker && gauge.InAstralFire)
-            {
-                var pos = new Vector2(
-                    position.X + Config.ManaThresholdValue / 10000f * Config.ManaBarSize.X,
-                    position.Y + Config.ManaBarSize.Y - 1
-                );
-                var size = new Vector2(2, Config.ManaBarSize.Y - 2);
-
-                drawList.AddRectFilled(pos, pos - size, Config.ThresholdMarkerColor.Base);
-            }
-
-            // mana
-            if (Config.ShowManaValue)
-            {
-                var text = $"{player.CurrentMp,0}";
-                var textSize = ImGui.CalcTextSize(text);
-                var textPos = new Vector2(
-                    position.X + 2,
-                    position.Y + Config.ManaBarSize.Y / 2f - textSize.Y / 2f
-                );
-                DrawHelper.DrawOutlinedText(text, textPos, drawList);
-            }
+            bar.Draw(origin);
         }
 
         protected void DrawUmbralHeartStacks(Vector2 origin)
@@ -386,59 +370,12 @@ namespace DelvUI.Interface.Jobs
         [JsonIgnore] public override uint JobId => JobIDs.BLM;
         public new static BlackMageConfig DefaultConfig() { return new BlackMageConfig(); }
 
-        #region mana bar
-        [Checkbox("Mana", separator = true)]
-        [Order(30)]
-        public bool ShowManaBar = true;
-
-        [Checkbox("Hide When Full" + "##MP")]
-        [Order(31, collapseWith = nameof(ShowManaBar))]
-        public bool HideManaWhenFull = false;
-
-        [Checkbox("Text" + "##MP")]
-        [Order(32, collapseWith = nameof(ShowManaBar))]
-        public bool ShowManaValue = false;
-
-        [DragFloat2("Position" + "##MP", min = -2000, max = 2000f)]
-        [Order(33, collapseWith = nameof(ShowManaBar))]
-        public Vector2 ManaBarPosition = new Vector2(0, -10);
-
-        [DragFloat2("Size" + "##MP", max = 2000f)]
-        [Order(34, collapseWith = nameof(ShowManaBar))]
-        public Vector2 ManaBarSize = new Vector2(254, 20);
-
-        [Checkbox("Astral Fire Threshold Marker" + "##MP")]
-        [Order(35, collapseWith = nameof(ShowManaBar))]
-        public bool ShowManaThresholdMarker = true;
-
-        [DragInt("Value" + "##MP", max = 10000)]
-        [Order(36, collapseWith = nameof(ShowManaThresholdMarker))]
-        public int ManaThresholdValue = 2400;
-
-        [ColorEdit4("Threshold Marker Color" + "##MP")]
-        [Order(37, collapseWith = nameof(ShowManaThresholdMarker))]
-        public PluginConfigColor ThresholdMarkerColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
-
-        [ColorEdit4("Color" + "##MP")]
-        [Order(38, collapseWith = nameof(ShowManaBar))]
-        public PluginConfigColor ManaBarNoElementColor = new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
-
-        [ColorEdit4("Ice Color" + "##MP")]
-        [Order(39, collapseWith = nameof(ShowManaBar))]
-        public PluginConfigColor ManaBarIceColor = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
-
-        [ColorEdit4("Fire Color" + "##MP")]
-        [Order(40, collapseWith = nameof(ShowManaBar))]
-        public PluginConfigColor ManaBarFireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
-
-        [Checkbox("Show Glow When Enochian is Active")]
-        [Order(41, collapseWith = nameof(ShowManaBar))]
-        public bool ShowEnochianGlow = true;
-
-        [ColorEdit4("Enochian Glow Color" + "##MP")]
-        [Order(42, collapseWith = nameof(ShowEnochianGlow))]
-        public PluginConfigColor ManaBarGlowColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 50f / 100f));
-        #endregion
+        [NestedConfig("Mana Bar", 21)]
+        public BlackMageManaBarConfig ManaBarConfig = new BlackMageManaBarConfig(
+            new Vector2(0, -10),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f))
+        );
 
         #region umbral heart
         [Checkbox("Umbral Heart", separator = true)]
@@ -623,5 +560,51 @@ namespace DelvUI.Interface.Jobs
         [Order(116, collapseWith = nameof(ShowDotBar))]
         public PluginConfigColor DotColor = new PluginConfigColor(new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f));
         #endregion
+    }
+
+    [Exportable(false)]
+    public class BlackMageManaBarConfig : BarConfig
+    {
+        [ColorEdit4("Ice Color" + "##MP")]
+        [Order(26)]
+        public PluginConfigColor IceColor = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
+
+        [ColorEdit4("Fire Color" + "##MP")]
+        [Order(27)]
+        public PluginConfigColor FireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
+
+        [NestedConfig("Value Label", 45, separator = false, spacing = true)]
+        public LabelConfig ValueLabelConfig = new LabelConfig(new Vector2(2, 0), "", DrawAnchor.Left, DrawAnchor.Left);
+
+        [NestedConfig("Element Timer Label", 50, separator = false, spacing = true)]
+        public LabelConfig ElementTimerLabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+
+        [NestedConfig("Glow When Enochian Is Active", 55)]
+        public BarGlowConfig GlowConfig = new BarGlowConfig();
+
+        [NestedConfig("Threshold", 65, separator = false, spacing = true)]
+        public BlackMakeManaBarThresholdConfig ThresholdConfig = new BlackMakeManaBarThresholdConfig();
+
+        public BlackMageManaBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+        }
+    }
+
+    [Exportable(false)]
+    public class BlackMakeManaBarThresholdConfig : ThresholdConfig
+    {
+        [Checkbox("Show Only During Astral Fire")]
+        [Order(5)]
+        public bool ShowOnlyDuringAstralFire = true;
+
+        public BlackMakeManaBarThresholdConfig()
+        {
+            Enabled = true;
+            Value = 2400;
+            Color = new PluginConfigColor(new Vector4(240f / 255f, 120f / 255f, 10f / 255f, 100f / 100f));
+            ShowMarker = true;
+            MarkerColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        }
     }
 }

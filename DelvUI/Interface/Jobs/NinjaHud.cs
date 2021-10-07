@@ -123,7 +123,7 @@ namespace DelvUI.Interface.Jobs
             bool inNinjutsu = mudraStacks == -2 || hasNinjutsuBuff;
 
             if (hasTCJBuff || hasKassatsuBuff || inNinjutsu)
-            { 
+            {
                 if (hasTCJBuff)
                 {
                     max = 6f;
@@ -146,7 +146,10 @@ namespace DelvUI.Interface.Jobs
 
                 PluginConfigColor fillColor = hasTCJBuff ? Config.MudraBar.TCJBarColor : hasKassatsuBuff ? Config.MudraBar.KassatsuBarColor : Config.MudraBar.FillColor;
                 Rect foreground = BarUtilities.GetFillRect(Config.MudraBar.Position, Config.MudraBar.Size, Config.MudraBar.FillDirection, fillColor, current, max);
-                var bar = new BarHud(Config.MudraBar, player).Foreground(foreground).Labels(Config.MudraBar.Label);
+
+                BarHud bar = new BarHud(ID + "_mudraBar", Config.MudraBar, player)
+                    .AddForegrounds(foreground)
+                    .AddLabels(Config.MudraBar.Label);
                 bar.Draw(pos);
             }
             else
@@ -157,7 +160,8 @@ namespace DelvUI.Interface.Jobs
                 if (!Config.MudraBar.HideWhenInactive || current < max)
                 {
                     Config.MudraBar.Label.SetText(Math.Truncate((max - current) % 20).ToString());
-                    BarUtilities.GetChunkedProgressBars(Config.MudraBar, 2, current, max, 0f, player, Config.MudraBar.Label).Draw(pos);
+                    BarUtilities.GetChunkedProgressBars(ID + "_mudraBar", Config.MudraBar, 2, current, max, 0f, player, Config.MudraBar.Label)
+                        .Draw(pos);
                 }
             }
         }
@@ -169,7 +173,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.HutonBar.HideWhenInactive || hutonDurationLeft > 0)
             {
                 Config.HutonBar.Label.SetText(Math.Truncate(hutonDurationLeft).ToString());
-                BarUtilities.GetProgressBar(Config.HutonBar, hutonDurationLeft, 70f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(ID + "_hutonBar", Config.HutonBar, hutonDurationLeft, 70f, 0f, player).Draw(pos);
             }
         }
 
@@ -180,7 +184,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.NinkiBar.HideWhenInactive || gauge.Ninki > 0)
             {
                 Config.NinkiBar.Label.SetText(gauge.Ninki.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.NinkiBar, gauge.Ninki, 100f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(ID + "_ninkiBar", Config.NinkiBar, gauge.Ninki, 100f, 0f, player).Draw(pos);
             }
         }
 
@@ -197,7 +201,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.TrickAttackBar.HideWhenInactive || trickDuration > 0)
             {
                 Config.TrickAttackBar.Label.SetText(Math.Truncate(trickDuration).ToString());
-                BarUtilities.GetProgressBar(Config.TrickAttackBar, trickDuration, 15f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(ID + "_trickAttackBar", Config.TrickAttackBar, trickDuration, 15f, 0f, player).Draw(pos);
             }
         }
 
@@ -208,7 +212,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.SuitonBar.HideWhenInactive || suitonDuration > 0)
             {
                 Config.SuitonBar.Label.SetText(Math.Truncate(suitonDuration).ToString("N0"));
-                BarUtilities.GetProgressBar(Config.SuitonBar, suitonDuration, 20f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(ID + "_suitonBar", Config.SuitonBar, suitonDuration, 20f, 0f, player).Draw(pos);
             }
         }
 
@@ -239,7 +243,7 @@ namespace DelvUI.Interface.Jobs
         {
             TrickAttackBar.Enabled = false;
             SuitonBar.Enabled = false;
-            HutonBar.Threshold = true;
+            HutonBar.ThresholdConfig.Enabled = true;
         }
 
         public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
@@ -261,8 +265,8 @@ namespace DelvUI.Interface.Jobs
 
         [NestedConfig("Ninki Bar", 40)]
         public ProgressBarConfig NinkiBar = new ProgressBarConfig(
-                                                            new(0, -32), 
-                                                            new(254, 20), 
+                                                            new(0, -32),
+                                                            new(254, 20),
                                                             new PluginConfigColor(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f)));
 
         [NestedConfig("Trick Attack Bar", 45)]

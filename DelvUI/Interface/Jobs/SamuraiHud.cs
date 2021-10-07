@@ -104,9 +104,9 @@ namespace DelvUI.Interface.Jobs
         {
             var gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.KenkiBar.HideWhenInactive || gauge.Kenki > 0)
-            { 
+            {
                 Config.KenkiBar.Label.SetText(gauge.Kenki.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.KenkiBar, gauge.Kenki, 100f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(ID + "_kenkiBar", Config.KenkiBar, gauge.Kenki, 100f, 0f, player).Draw(pos);
             }
         }
 
@@ -116,7 +116,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.ShifuBar.HideWhenInactive || shifuDuration > 0)
             {
                 Config.ShifuBar.Label.SetText(Math.Truncate(shifuDuration).ToString());
-                BarUtilities.GetProgressBar(Config.ShifuBar, shifuDuration, 40f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(ID + "_shifuBar", Config.ShifuBar, shifuDuration, 40f, 0f, player).Draw(pos);
             }
         }
 
@@ -126,7 +126,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.JinpuBar.HideWhenInactive || jinpuDuration > 0)
             {
                 Config.JinpuBar.Label.SetText(Math.Truncate(jinpuDuration).ToString());
-                BarUtilities.GetProgressBar(Config.JinpuBar, jinpuDuration, 40f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(ID + "_jinpuBar", Config.JinpuBar, jinpuDuration, 40f, 0f, player).Draw(pos);
             }
         }
 
@@ -139,7 +139,7 @@ namespace DelvUI.Interface.Jobs
                 if (!Config.HiganbanaBar.HideWhenInactive || higanbanaDuration > 0)
                 {
                     Config.HiganbanaBar.Label.SetText(Math.Truncate(higanbanaDuration).ToString());
-                    BarUtilities.GetProgressBar(Config.HiganbanaBar, higanbanaDuration, 60f, 0f, player).Draw(pos);
+                    BarUtilities.GetProgressBar(ID + "_higanbanaBar", Config.HiganbanaBar, higanbanaDuration, 60f, 0f, player).Draw(pos);
                 }
             }
         }
@@ -159,7 +159,7 @@ namespace DelvUI.Interface.Jobs
                     sen[i] = new Tuple<PluginConfigColor, float, LabelConfig?>(colors[order[i]], hasSen[order[i]], null);
                 }
 
-                BarUtilities.GetChunkedBars(Config.SenBar, player, sen).Draw(pos);
+                BarUtilities.GetChunkedBars(ID + "_senBar", Config.SenBar, player, sen).Draw(pos);
             }
         }
 
@@ -168,7 +168,7 @@ namespace DelvUI.Interface.Jobs
             var gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.MeditationBar.HideWhenInactive || gauge.MeditationStacks > 0)
             {
-                BarUtilities.GetChunkedProgressBars(Config.MeditationBar, 3, gauge.MeditationStacks, 3f).Draw(pos);
+                BarUtilities.GetChunkedProgressBars(ID + "_meditationBar", Config.MeditationBar, 3, gauge.MeditationStacks, 3f).Draw(pos);
             }
         }
     }
@@ -183,21 +183,21 @@ namespace DelvUI.Interface.Jobs
         public SamuraiConfig()
         {
             // Setup initial bar config
-            HiganbanaBar.Threshold = true;
+            HiganbanaBar.ThresholdConfig.Enabled = true;
         }
 
         public new static SamuraiConfig DefaultConfig() { return new SamuraiConfig(); }
 
         [NestedConfig("Sen Bar", 40)]
         public SenBarConfig SenBar = new SenBarConfig(
-                                                    new (0, -17),
-                                                    new (254, 10),
+                                                    new(0, -17),
+                                                    new(254, 10),
                                                     new PluginConfigColor(new Vector4(0, 0, 0, 0)));
 
         [NestedConfig("Shifu Bar", 45)]
         public ProgressBarConfig ShifuBar = new ProgressBarConfig(
-                                                    new (-64, -56),
-                                                    new (126, 20),
+                                                    new(-64, -56),
+                                                    new(126, 20),
                                                     new PluginConfigColor(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f)));
 
         [NestedConfig("Jinpu Bar", 50)]
@@ -215,8 +215,8 @@ namespace DelvUI.Interface.Jobs
 
         [NestedConfig("Higanbana Bar", 60)]
         public ProgressBarConfig HiganbanaBar = new ProgressBarConfig(
-                                                    new (0, -78),
-                                                    new (254, 20),
+                                                    new(0, -78),
+                                                    new(254, 20),
                                                     new PluginConfigColor(new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f)),
                                                     new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
                                                     15f);
