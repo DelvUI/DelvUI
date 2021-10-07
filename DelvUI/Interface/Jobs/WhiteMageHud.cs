@@ -83,17 +83,15 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            var dia = target.StatusList.Where(
-                o => o.StatusId is 1871 or 144 or 143 && o.SourceID == player.ObjectId
-            );
+            Status? dia = target.StatusList.FirstOrDefault(o => o.StatusId is 1871 or 144 or 143 && o.SourceID == player.ObjectId);
 
             float diaCooldown = 0f;
             float diaDuration = 0f;
 
-            if (dia.Any())
+            if (dia != null)
             {
-                diaCooldown = dia.First().StatusId == 1871 ? 30f : 18f;
-                diaDuration = Math.Abs(dia.First().RemainingTime);
+                diaCooldown = dia.StatusId == 1871 ? 30f : 18f;
+                diaDuration = Math.Abs(dia.RemainingTime);
             }
 
             if (Config.OnlyShowDiaWhenActive && diaDuration == 0)
@@ -191,34 +189,22 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAsylumBar(Vector2 origin, PlayerCharacter player)
         {
-            // draw list
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
-            // status effect
-            const int spellStatus = 1911; // Asylum Status
             const int spellAction = 3569; // Asylum Action
-            List<Status> asylumBuff = player.StatusList.Where(o => o.StatusId == spellStatus).ToList();
 
-            // get duration
-            float duration = 0f;
+            float duration = player.StatusList.FirstOrDefault(o => o.StatusId is 739 or 1911 or 1912 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+            if (duration == 0 && Config.OnlyShowAsylumWhenActive) { return; }
+
             const float maxDuration = 24f;
 
-            // get cooldown            
             float cooldown = _spellHelper.GetSpellCooldown(spellAction);
             const float maxCooldown = 90f;
 
-            // positions
             float xPos = origin.X + Config.Position.X + Config.AsylumPosition.X - Config.AsylumSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.AsylumPosition.Y - Config.AsylumSize.Y / 2f;
 
-            // select first
-            if (asylumBuff.Any()) { duration = Math.Abs(asylumBuff.First().RemainingTime); }
-            if (duration == 0 && Config.OnlyShowAsylumWhenActive) { return; }
-
-            // create asylum bar
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.AsylumSize.Y, Config.AsylumSize.X).SetBackgroundColor(EmptyColor.Background);
-
-            // inner bar config
             var color = duration > 3 ? Config.AsylumColor : Config.AsylumCoooldownColor;
 
             if (Config.TrackAsylumCooldown)
@@ -235,7 +221,6 @@ namespace DelvUI.Interface.Jobs
                 builder.AddInnerBar(duration, maxDuration, color);
             }
 
-            // text
             if (Config.ShowAsylumText)
             {
                 var positon = BarTextPosition.CenterMiddle;
@@ -269,34 +254,23 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawPresenceOfMindBar(Vector2 origin, PlayerCharacter player)
         {
-            // draw list
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
-            // status effect
             const int spellStatus = 157; // Presence of Mind Status
-            const int spellAction = 136; // Presence of Mind Action
-            List<Status> presenceOfMindBuff = player.StatusList.Where(o => o.StatusId == spellStatus).ToList();
+            const int spellAction = 136; // Presence of Mind Action            
 
-            // get duration
-            float duration = 0f;
+            float duration = player.StatusList.FirstOrDefault(o => o.StatusId == spellStatus)?.RemainingTime ?? 0f;
+            if (duration == 0 && Config.OnlyShowPoMWhenActive) { return; }
+
             const float maxDuration = 15f;
 
-            // get cooldown
             float cooldown = _spellHelper.GetSpellCooldown(spellAction);
             const float maxCooldown = 150f;
 
-            // positions
             float xPos = origin.X + Config.Position.X + Config.PresenceOfMindPosition.X - Config.PresenceOfMindSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.PresenceOfMindPosition.Y - Config.PresenceOfMindSize.Y / 2f;
 
-            // select first
-            if (presenceOfMindBuff.Any()) { duration = Math.Abs(presenceOfMindBuff.First().RemainingTime); }
-            if (duration == 0 && Config.OnlyShowPoMWhenActive) { return; }
-
-            // create presence of mind bar
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.PresenceOfMindSize.Y, Config.PresenceOfMindSize.X).SetBackgroundColor(EmptyColor.Background);
-
-            // inner bar config            
+            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.PresenceOfMindSize.Y, Config.PresenceOfMindSize.X).SetBackgroundColor(EmptyColor.Base);
             var color = duration > 3 ? Config.PresenceOfMindColor : Config.PresenceOfMindCooldownColor;
 
             if (Config.TrackPoMCooldown)
@@ -313,7 +287,6 @@ namespace DelvUI.Interface.Jobs
                 builder.AddInnerBar(duration, maxDuration, color);
             }
 
-            // text
             if (Config.ShowPoMText)
             {
                 var positon = BarTextPosition.CenterMiddle;
@@ -346,34 +319,26 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawPlenaryBar(Vector2 origin, PlayerCharacter player)
         {
-            // draw list
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
-            // status effect
             const int spellStatus = 1219; // Plenary Indulgence Status
-            const int spellAction = 7433; // Plenary Indulgence Action
-            List<Status> plenaryIndulgence = player.StatusList.Where(o => o.StatusId == spellStatus).ToList();
+            const int spellAction = 7433; // Plenary Indulgence Action            
 
-            // get duration
-            float duration = 0f;
+            float duration = player.StatusList.FirstOrDefault(o => o.StatusId == spellStatus)?.RemainingTime ?? 0f;
+            if (duration == 0 && Config.OnlyShowPlenaryWhenActive) { return; }
+
             const float maxDuration = 10f;
 
-            // get cooldown
             float cooldown = _spellHelper.GetSpellCooldown(spellAction);
             const float maxCooldown = 60f;
 
-            // positions
             float xPos = origin.X + Config.Position.X + Config.PlenaryPosition.X - Config.PlenarySize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.PlenaryPosition.Y - Config.PlenarySize.Y / 2f;
 
-            // select first
-            if (plenaryIndulgence.Any()) { duration = Math.Abs(plenaryIndulgence.First().RemainingTime); }
-            if (duration == 0 && Config.OnlyShowPlenaryWhenActive) { return; }
 
-            // create plenary indulgence bar
+
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.PlenarySize.Y, Config.PlenarySize.X).SetBackgroundColor(EmptyColor.Background);
 
-            // inner bar config            
             var color = duration > 3 ? Config.PlenaryColor : Config.PlenaryCooldownColor;
 
             if (Config.TrackPlenaryCooldown)
@@ -390,7 +355,6 @@ namespace DelvUI.Interface.Jobs
                 builder.AddInnerBar(duration, maxDuration, color);
             }
 
-            // text
             if (Config.ShowPlenaryText)
             {
                 var positon = BarTextPosition.CenterMiddle;
@@ -423,34 +387,24 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawTemperanceBar(Vector2 origin, PlayerCharacter player)
         {
-            // draw list
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
-            // status effect
             const int spellStatus = 1872; // Temperance Status
-            const int spellAction = 16536; // Temperance Action
-            List<Status> temperanceBuff = player.StatusList.Where(o => o.StatusId == spellStatus).ToList();
+            const int spellAction = 16536; // Temperance Action            
 
-            // get duration
-            float duration = 0f;
+            float duration = player.StatusList.FirstOrDefault(o => o.StatusId == spellStatus)?.RemainingTime ?? 0f;
+            if (duration == 0 && Config.OnlyShowTemperanceWhenActive) { return; }
+
             const float maxDuration = 20f;
 
-            // get cooldown
             float cooldown = _spellHelper.GetSpellCooldown(spellAction);
             const float maxCooldown = 120f;
 
-            // positions
             float xPos = origin.X + Config.Position.X + Config.TemperancePosition.X - Config.TemperanceSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.TemperancePosition.Y - Config.TemperanceSize.Y / 2f;
 
-            // select first
-            if (temperanceBuff.Any()) { duration = Math.Abs(temperanceBuff.First().RemainingTime); }
-            if (duration == 0 && Config.OnlyShowTemperanceWhenActive) { return; }
-
-            // create temperance bar
             BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.TemperanceSize.Y, Config.TemperanceSize.X).SetBackgroundColor(EmptyColor.Background);
 
-            // inner bar config
             var color = duration > 3 ? Config.TemperanceColor : Config.TemperanceCooldownColor;
 
             if (Config.TrackTemperanceCooldown)
@@ -467,7 +421,6 @@ namespace DelvUI.Interface.Jobs
                 builder.AddInnerBar(duration, maxDuration, color);
             }
 
-            // text
             if (Config.ShowTemperanceText)
             {
                 var positon = BarTextPosition.CenterMiddle;
