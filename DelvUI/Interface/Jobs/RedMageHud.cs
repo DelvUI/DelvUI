@@ -226,7 +226,6 @@ namespace DelvUI.Interface.Jobs
             config.WhiteManaBar.ThresholdConfig.Enabled = true;
             config.WhiteManaBar.ThresholdConfig.ChangeColor = false;
             config.WhiteManaBar.ThresholdConfig.ShowMarker = true;
-            config.WhiteManaBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.WhiteManaBar.Label.TextAnchor = DrawAnchor.Right;
             config.WhiteManaBar.Label.FrameAnchor = DrawAnchor.Right;
             config.WhiteManaBar.Label.Position = new Vector2(-2, 0);
@@ -234,7 +233,6 @@ namespace DelvUI.Interface.Jobs
             config.BlackManaBar.ThresholdConfig.Enabled = true;
             config.BlackManaBar.ThresholdConfig.ChangeColor = false;
             config.BlackManaBar.ThresholdConfig.ShowMarker = true;
-            config.BlackManaBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.BlackManaBar.Label.TextAnchor = DrawAnchor.Left;
             config.BlackManaBar.Label.FrameAnchor = DrawAnchor.Left;
             config.BlackManaBar.Label.Position = new Vector2(2, 0);
