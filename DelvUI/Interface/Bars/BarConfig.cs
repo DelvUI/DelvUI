@@ -4,7 +4,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.Bars
 {
-    [Portable(false)]
     public class BarConfig : AnchorablePluginConfigObject
     {
         [ColorEdit4("Background Color")]

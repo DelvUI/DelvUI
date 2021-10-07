@@ -278,7 +278,6 @@ namespace DelvUI.Interface.Jobs
                                                             new PluginConfigColor(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f)));
     }
 
-    [Portable(false)]
     public class MudraBarConfig : ChunkedBarConfig
     {
         [ColorEdit4("Kassatsu Color", spacing = true)]

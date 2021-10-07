@@ -50,6 +50,7 @@ namespace DelvUI.Interface.Party
         public bool ShowChocobo = true;
     }
 
+    [Exportable(false)]
     [Disableable(false)]
     [Section("Party Frames")]
     [SubSection("Health Bar", 0)]
@@ -85,7 +86,7 @@ namespace DelvUI.Interface.Party
     }
 
     [Disableable(false)]
-    [Portable(false)]
+    [Exportable(false)]
     public class PartyFramesColorsConfig : PluginConfigObject
     {
         [ColorEdit4("Border Color")]
@@ -169,7 +170,7 @@ namespace DelvUI.Interface.Party
         public PluginConfigColor EnmitySecondBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 175f / 255f, 40f / 255f, 100f / 100f));
     }
 
-    [Portable(false)]
+    [Exportable(false)]
     public class PartyFramesRangeConfig : PluginConfigObject
     {
         [DragInt("Range (yalms)", min = 1, max = 500)]
@@ -213,6 +214,7 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    [Exportable(false)]
     [Section("Party Frames")]
     [SubSection("Mana Bar", 0)]
     public class PartyFramesManaBarConfig : MovablePluginConfigObject
@@ -252,6 +254,7 @@ namespace DelvUI.Interface.Party
         public EditableLabelConfig ValueLabelConfig = new EditableLabelConfig(Vector2.Zero, "[mana:current-short]", DrawAnchor.Center, DrawAnchor.Center);
     }
 
+    [Exportable(false)]
     [Section("Party Frames")]
     [SubSection("Role-Job Icon", 0)]
     public class PartyFramesRoleIconConfig : MovablePluginConfigObject
@@ -289,6 +292,7 @@ namespace DelvUI.Interface.Party
         public bool UseSpecificDPSRoleIcons = false;
     }
 
+    [Exportable(false)]
     [Section("Party Frames")]
     [SubSection("Party Leader Icon", 0)]
     public class PartyFramesLeaderIconConfig : MovablePluginConfigObject
@@ -314,6 +318,7 @@ namespace DelvUI.Interface.Party
         public DrawAnchor Anchor = DrawAnchor.TopLeft;
     }
 
+    [Exportable(false)]
     [Section("Party Frames")]
     [SubSection("Buffs", 0)]
     public class PartyFramesBuffsConfig : PartyFramesStatusEffectsListConfig
@@ -345,6 +350,7 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    [Exportable(false)]
     [Section("Party Frames")]
     [SubSection("Debuffs", 0)]
     public class PartyFramesDebuffsConfig : PartyFramesStatusEffectsListConfig
@@ -389,6 +395,7 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    [Exportable(false)]
     [Section("Party Frames")]
     [SubSection("Castbars", 0)]
     public class PartyFramesCastbarConfig : CastbarConfig
@@ -422,6 +429,7 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    [Exportable(false)]
     [Section("Party Frames")]
     [SubSection("Raise Tracker", 0)]
     public class PartyFramesRaiseTrackerConfig : MovablePluginConfigObject
