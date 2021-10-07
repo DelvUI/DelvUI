@@ -1,40 +1,130 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using System;
+using System.Linq;
 using System.Numerics;
 
 namespace DelvUI.Interface.Bars
 {
     public class BarUtilities
     {
-        public static BarHud GetProgressBar(ProgressBarConfig config, float current, float max, float min = 0f, GameObject? actor = null)
+        public static BarHud GetProgressBar(string id, ProgressBarConfig config, float current, float max, float min = 0f, GameObject? actor = null, PluginConfigColor? fillColor = null)
         {
-            var bar = new BarHud(config, actor);
-            PluginConfigColor fillColor = config.IsThresholdActive(current) ? config.ThresholdColor : config.FillColor;
-            Rect foreground = GetFillRect(config.Position, config.Size, config.FillDirection, fillColor, current, max, min);
-            bar.Foreground(foreground);
+            return GetProgressBar(id, config, config.ThresholdConfig, new LabelConfig[] { config.Label }, current, max, min, fillColor, actor);
+        }
 
-            if (config.ThresholdMarker)
+        public static BarHud GetProgressBar(
+            string id,
+            BarConfig config,
+            ThresholdConfig? thresholdConfig,
+            LabelConfig[] labelConfigs,
+            float current,
+            float max,
+            float min = 0f,
+            PluginConfigColor? fillColor = null,
+            GameObject? actor = null,
+            BarGlowConfig? glowConfig = null
+        )
+        {
+            BarHud bar = new BarHud(id, config, actor, glowConfig);
+            PluginConfigColor color = thresholdConfig?.IsActive(current) == true ? thresholdConfig.Color : (fillColor ?? config.FillColor);
+            Rect foreground = GetFillRect(config.Position, config.Size, config.FillDirection, color, current, max, min);
+            bar.AddForegrounds(foreground);
+            bar.AddLabels(labelConfigs);
+
+            AddThresholdMarker(bar, config, thresholdConfig, max, min);
+
+            return bar;
+        }
+
+        public static BarHud? GetProcBar(
+            string id,
+            ProgressBarConfig config,
+            PlayerCharacter player,
+            uint statusId,
+            float maxDuration)
+        {
+            float duration = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId == statusId)?.RemainingTime ?? 0);
+
+            if (duration == 0 && config.HideWhenInactive)
             {
-                var thresholdPercent = Math.Clamp(config.ThresholdValue / (max - min), 0f, 1f);
-                var offset = GetFillDirectionOffset(new Vector2(config.Size.X * thresholdPercent, config.Size.Y * thresholdPercent), config.FillDirection);
-                var markerSize = config.FillDirection.IsHorizontal() ? new Vector2(config.ThresholdMarkerSize, config.Size.Y) : new Vector2(config.Size.X, config.ThresholdMarkerSize);
-                var markerPos = config.FillDirection.IsInverted() ? config.Position + GetFillDirectionOffset(config.Size, config.FillDirection) - offset : config.Position + offset;
-                var anchoredPos = Utils.GetAnchoredPosition(markerPos, markerSize, config.FillDirection.IsHorizontal() ? DrawAnchor.Top : DrawAnchor.Left);
-                Rect marker = new Rect(anchoredPos, markerSize, config.ThresholdMarkerColor);
-                bar.Foreground(marker);
+                return null;
             }
 
-            return bar.Labels(config.Label);
+            config.Label.SetText($"{(int)duration,0}");
+            return GetProgressBar(id, config, duration, maxDuration, 0);
+        }
+
+        public static BarHud? GetDoTBar(
+            string id,
+            ProgressBarConfig config,
+            PlayerCharacter player,
+            GameObject? target,
+            uint statusId,
+            float maxDuration,
+            bool ignoreHideWhenInactive = false)
+        {
+            float duration = 0;
+
+            if (target != null && target is BattleChara targetChara)
+            {
+                duration = Math.Abs(targetChara.StatusList.FirstOrDefault(o => o.StatusId == statusId && o.SourceID == player.ObjectId)?.RemainingTime ?? 0);
+            }
+
+            if (duration == 0 && (ignoreHideWhenInactive || config.HideWhenInactive))
+            {
+                return null;
+            }
+
+            config.Label.SetText($"{(int)duration,0}");
+            return GetProgressBar(id, config, duration, maxDuration, 0);
+        }
+
+        private static void AddThresholdMarker(BarHud bar, BarConfig config, ThresholdConfig? thresholdConfig, float max, float min)
+        {
+            if (thresholdConfig == null || !thresholdConfig.Enabled || !thresholdConfig.ShowMarker)
+            {
+                return;
+            }
+
+            float thresholdPercent = Math.Clamp(thresholdConfig.Value / (max - min), 0f, 1f);
+            Vector2 offset = GetFillDirectionOffset(
+                new Vector2(config.Size.X * thresholdPercent, config.Size.Y * thresholdPercent),
+                config.FillDirection
+            );
+
+            Vector2 markerSize = config.FillDirection.IsHorizontal() ?
+                new Vector2(thresholdConfig.MarkerSize, config.Size.Y) :
+                new Vector2(config.Size.X, thresholdConfig.MarkerSize);
+
+            Vector2 markerPos = config.FillDirection.IsInverted() ?
+                config.Position + GetFillDirectionOffset(config.Size, config.FillDirection) - offset :
+                config.Position + offset;
+
+            Vector2 anchoredPos = Utils.GetAnchoredPosition(markerPos, markerSize, config.FillDirection.IsHorizontal() ? DrawAnchor.Top : DrawAnchor.Left);
+            Rect marker = new Rect(anchoredPos, markerSize, thresholdConfig.MarkerColor);
+            bar.AddForegrounds(marker);
         }
 
         // Tuple is <foregroundColor, percent fill, labels>
         public static BarHud[] GetChunkedBars(
+            string id,
             ChunkedBarConfig config,
             GameObject? actor,
+            params Tuple<PluginConfigColor, float, LabelConfig?>[] chunks)
+        {
+            return GetChunkedBars(id, config, actor, null, chunks);
+        }
+
+        public static BarHud[] GetChunkedBars(
+            string id,
+            ChunkedBarConfig config,
+            GameObject? actor,
+            BarGlowConfig? glowConfig = null,
             params Tuple<PluginConfigColor, float, LabelConfig?>[] chunks)
         {
             BarHud[] bars = new BarHud[chunks.Length];
@@ -56,13 +146,16 @@ namespace DelvUI.Interface.Bars
 
                 Rect background = new Rect(chunkPos, chunkSize, config.BackgroundColor);
                 Rect foreground = GetFillRect(chunkPos, chunkSize, config.FillDirection, chunks[i].Item1, chunks[i].Item2, 1f, 0f);
+                BarGlowConfig? glow = chunks[i].Item2 >= 1 ? glowConfig : null;
 
-                bars[i] = new BarHud(config.DrawBorder, actor: actor).Background(background).Foreground(foreground);
+                bars[i] = new BarHud(id + i, config.DrawBorder, actor: actor, glowColor: glow?.Color, glowSize: glow?.Size)
+                    .SetBackground(background)
+                    .AddForegrounds(foreground);
 
                 var label = chunks[i].Item3;
                 if (label is not null)
                 {
-                    bars[i].Labels(label);
+                    bars[i].AddLabels(label);
                 }
             }
 
@@ -70,13 +163,15 @@ namespace DelvUI.Interface.Bars
         }
 
         public static BarHud[] GetChunkedProgressBars(
+            string id,
             ChunkedBarConfig config,
             int chunks,
             float current,
             float max,
             float min = 0f,
             GameObject? actor = null,
-            LabelConfig? label = null)
+            LabelConfig? label = null,
+            BarGlowConfig? glowConfig = null)
         {
             float chunkRange = (max - min) / chunks;
 
@@ -91,13 +186,21 @@ namespace DelvUI.Interface.Bars
                 barChunks[barIndex] = new Tuple<PluginConfigColor, float, LabelConfig?>(chunkColor, chunkPercent, chunkPercent < 1f ? label : null);
             }
 
-            return GetChunkedBars(config, actor, barChunks);
+            return GetChunkedBars(id, config, actor, glowConfig, barChunks);
         }
 
-        public static BarHud GetBar(BarConfig Config, float current, float max, float min = 0f, GameObject? actor = null, params LabelConfig[] labels)
+        public static BarHud GetBar(
+            string id,
+            BarConfig Config,
+            float current,
+            float max,
+            float min = 0f,
+            GameObject? actor = null,
+            BarGlowConfig? glowConfig = null,
+            params LabelConfig[] labels)
         {
             Rect foreground = GetFillRect(Config.Position, Config.Size, Config.FillDirection, Config.FillColor, current, max, min);
-            return new BarHud(Config, actor).Foreground(foreground).Labels(labels);
+            return new BarHud(id, Config, actor, glowConfig).AddForegrounds(foreground).AddLabels(labels);
         }
 
         /// <summary>

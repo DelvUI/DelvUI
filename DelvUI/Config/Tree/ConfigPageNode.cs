@@ -135,7 +135,6 @@ namespace DelvUI.Config.Tree
                     continue;
                 }
 
-                // TODO allow the manual draw methods to take parameters
                 object[] args = new object[] { false };
                 bool? result = (bool?)method.Invoke(ConfigObject, args);
 
@@ -238,6 +237,8 @@ namespace DelvUI.Config.Tree
 
             const float buttonWidth = 120;
 
+            ImGui.BeginGroup();
+
             ImGui.SetCursorPos(new Vector2(ImGui.GetWindowContentRegionWidth() / 2f - buttonWidth - 5, ImGui.GetCursorPosY()));
 
             if (ImGui.Button("Export", new Vector2(120, 24)))
@@ -253,6 +254,8 @@ namespace DelvUI.Config.Tree
                 _nodeToReset = this;
                 _nodeToResetName = Utils.UserFriendlyConfigName(ConfigObject.GetType().Name);
             }
+
+            ImGui.EndGroup();
 
             return DrawResetModal();
         }

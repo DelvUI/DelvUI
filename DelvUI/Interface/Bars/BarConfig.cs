@@ -4,6 +4,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.Bars
 {
+    [Exportable(false)]
     public class BarConfig : AnchorablePluginConfigObject
     {
         [ColorEdit4("Background Color")]
@@ -32,6 +33,18 @@ namespace DelvUI.Interface.Bars
             Size = size;
             FillColor = fillColor;
         }
+    }
+
+    [Exportable(false)]
+    public class BarGlowConfig : PluginConfigObject
+    {
+        [ColorEdit4("Color")]
+        [Order(5)]
+        public PluginConfigColor Color = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 50f / 100f));
+
+        [DragInt("Size", min = 1, max = 100)]
+        [Order(25)]
+        public int Size = 1;
     }
 
     public enum BarDirection
