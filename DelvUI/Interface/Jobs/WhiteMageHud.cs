@@ -76,29 +76,15 @@ namespace DelvUI.Interface.Jobs
             if (Config.TemperanceBar.Enabled) { DrawTemperanceBar(pos, player); }
         }
 
+        private static List<uint> DiaIDs = new List<uint> { 143, 144, 1871 };
+        private static List<float> DiaDurations = new List<float> { 18, 18, 30 };
+
         private void DrawDiaBar(Vector2 origin, PlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            uint[] dotIDs = { 143, 144, 1871 };
-            float[] dotDurations = { 18, 18, 30 };
-
-            for (var i = 0; i < 3; i++)
-            {
-                BarHud? bar = BarUtilities.GetDoTBar(ID + "_diaBar", Config.DiaBar, player, target, dotIDs[i], dotDurations[i], true);
-                if (bar != null)
-                {
-                    bar.Draw(origin);
-                    return;
-                }
-            }
-
-            if (Config.DiaBar.HideWhenInactive)
-            {
-                return;
-            }
-
-            BarUtilities.GetProgressBar(ID + "_diaBar", Config.DiaBar, 0, 1).Draw(origin);
+            BarUtilities.GetDoTBar(ID + "_diaBar", Config.DiaBar, player, target, DiaIDs, DiaDurations)?.
+                Draw(origin);
         }
 
         private void DrawLilyBar(Vector2 origin, PlayerCharacter player)
