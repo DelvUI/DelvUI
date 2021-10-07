@@ -13,11 +13,8 @@ namespace DelvUI.Interface.Bars
         public static BarHud GetProgressBar(ProgressBarConfig config, float current, float max, float min = 0f, GameObject? actor = null)
         {
             var bar = new BarHud(config, actor);
-            Rect background = new Rect(config.Position, config.Size, config.BackgroundColor);
             PluginConfigColor fillColor = config.IsThresholdActive(current) ? config.ThresholdColor : config.FillColor;
             Rect foreground = GetFillRect(config.Position, config.Size, config.FillDirection, fillColor, current, max, min);
-
-            bar.Background(background);
             bar.Foreground(foreground);
 
             if (config.ThresholdMarker)
@@ -34,55 +31,38 @@ namespace DelvUI.Interface.Bars
             return bar.Labels(config.Label);
         }
 
-        public static BarHud[] GetChunkedProgressBars(
-            Vector2 position,
-            Vector2 size,
-            int chunks,
-            int padding,
-            float current,
-            float max,
-            float min,
-            bool drawBorder,
-            DrawAnchor anchor,
-            BarDirection fillDirection,
-            LabelConfig? activeChunkLabel,
-            PluginConfigColor backgroundColor,
-            PluginConfigColor fillColor,
-            PluginConfigColor? partialFillColor = null,
-            GameObject? actor = null)
+        // Tuple is <foregroundColor, percent fill, labels>
+        public static BarHud[] GetChunkedBars(
+            ChunkedBarConfig config,
+            GameObject? actor,
+            params Tuple<PluginConfigColor, float, LabelConfig?>[] chunks)
         {
-            BarHud[] bars = new BarHud[chunks];
-            float chunkRange = (max - min) / chunks;
-            var pos = Utils.GetAnchoredPosition(position, size, anchor);
+            BarHud[] bars = new BarHud[chunks.Length];
+            var pos = Utils.GetAnchoredPosition(config.Position, config.Size, config.Anchor);
 
-            for (int i = 0; i < chunks; i++)
+            for (int i = 0; i < chunks.Length; i++)
             {
-                int barIndex = (fillDirection.IsInverted()) ? chunks - i - 1 : i;
-
                 Vector2 chunkPos, chunkSize;
-                if (fillDirection.IsHorizontal())
+                if (config.FillDirection.IsHorizontal())
                 {
-                    chunkSize = new Vector2((size.X - padding * (chunks - 1)) / chunks, size.Y);
-                    chunkPos = pos + new Vector2((chunkSize.X + padding) * barIndex, 0);
+                    chunkSize = new Vector2((config.Size.X - config.Padding * (chunks.Length - 1)) / chunks.Length, config.Size.Y);
+                    chunkPos = pos + new Vector2((chunkSize.X + config.Padding) * i, 0);
                 }
                 else
                 {
-                    chunkSize = new Vector2(size.X, (size.Y - padding * (chunks - 1)) / chunks);
-                    chunkPos = pos + new Vector2(0, (chunkSize.Y + padding) * barIndex);
+                    chunkSize = new Vector2(config.Size.X, (config.Size.Y - config.Padding * (chunks.Length - 1)) / chunks.Length);
+                    chunkPos = pos + new Vector2(0, (chunkSize.Y + config.Padding) * i);
                 }
 
-                Rect background = new Rect(chunkPos, chunkSize, backgroundColor);
+                Rect background = new Rect(chunkPos, chunkSize, config.BackgroundColor);
+                Rect foreground = GetFillRect(chunkPos, chunkSize, config.FillDirection, chunks[i].Item1, chunks[i].Item2, 1f, 0f);
 
-                float chunkMin = min + chunkRange * i;
-                float chunkMax = min + chunkRange * (i + 1);
-                PluginConfigColor chunkColor = partialFillColor is not null && current < chunkMax ? partialFillColor : fillColor;
-                Rect foreground = GetFillRect(chunkPos, chunkSize, fillDirection, chunkColor, current, chunkMax, chunkMin);
+                bars[i] = new BarHud(config.DrawBorder, actor: actor).Background(background).Foreground(foreground);
 
-                bars[i] = new BarHud(drawBorder, DrawAnchor.TopLeft, actor).Background(background).Foreground(foreground);
-
-                if (activeChunkLabel is not null && current >= chunkMin && current < chunkMax)
+                var label = chunks[i].Item3;
+                if (label is not null)
                 {
-                    bars[i].Labels(activeChunkLabel);
+                    bars[i].Labels(label);
                 }
             }
 
@@ -90,32 +70,34 @@ namespace DelvUI.Interface.Bars
         }
 
         public static BarHud[] GetChunkedProgressBars(
-            BarConfig config,
-            PluginConfigColor partialFillColor,
+            ChunkedBarConfig config,
             int chunks,
-            int padding,
             float current,
             float max,
             float min = 0f,
-            LabelConfig? activeChunkLabel = null,
-            GameObject? actor = null)
+            GameObject? actor = null,
+            LabelConfig? label = null)
         {
-            return GetChunkedProgressBars(
-                config.Position,
-                config.Size,
-                chunks,
-                padding,
-                current,
-                max,
-                min,
-                config.DrawBorder,
-                config.Anchor,
-                config.FillDirection,
-                activeChunkLabel,
-                config.BackgroundColor,
-                config.FillColor,
-                partialFillColor,
-                actor);
+            float chunkRange = (max - min) / chunks;
+
+            var barChunks = new Tuple<PluginConfigColor, float, LabelConfig?>[chunks];
+            for (int i = 0; i < chunks; i++)
+            {
+                int barIndex = config.FillDirection.IsInverted() ? chunks - i - 1 : i;
+                float chunkMin = min + chunkRange * i;
+                float chunkMax = min + chunkRange * (i + 1);
+                float chunkPercent = Math.Clamp((current - chunkMin) / (chunkMax - chunkMin), 0f, 1f);
+                PluginConfigColor chunkColor = config.UsePartialFillColor && config.PartialFillColor is not null && current < chunkMax ? config.PartialFillColor : config.FillColor;
+                barChunks[barIndex] = new Tuple<PluginConfigColor, float, LabelConfig?>(chunkColor, chunkPercent, chunkPercent < 1f ? label : null);
+            }
+
+            return GetChunkedBars(config, actor, barChunks);
+        }
+
+        public static BarHud GetBar(BarConfig Config, float current, float max, float min = 0f, GameObject? actor = null, params LabelConfig[] labels)
+        {
+            Rect foreground = GetFillRect(Config.Position, Config.Size, Config.FillDirection, Config.FillColor, current, max, min);
+            return new BarHud(Config, actor).Foreground(foreground).Labels(labels);
         }
 
         /// <summary>
@@ -126,17 +108,6 @@ namespace DelvUI.Interface.Bars
             return fillDirection.IsHorizontal() ? new(size.X, 0) : new(0, size.Y);
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="pos"></param>
-        /// <param name="size"></param>
-        /// <param name="fillDirection"></param>
-        /// <param name="color"></param>
-        /// <param name="current"></param>
-        /// <param name="max"></param>
-        /// <param name="min"></param>
-        /// <returns></returns>
         public static Rect GetFillRect(Vector2 pos, Vector2 size, BarDirection fillDirection, PluginConfigColor color, float current, float max, float min = 0f)
         {
             float fillPercent = Math.Clamp((current - min) / (max - min), 0f, 1f);

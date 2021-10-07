@@ -29,12 +29,9 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            //Config.GetBars(ExperienceHelper.Instance.CurrentExp, ExperienceHelper.Instance.RequiredExp, 0f, Actor).Draw(origin);
             uint current = ExperienceHelper.Instance.CurrentExp;
             uint required = ExperienceHelper.Instance.RequiredExp;
             uint rested = Config.ShowRestedExp ? ExperienceHelper.Instance.RestedExp : 0;
-
-            Rect background = new Rect(Config.Position, Config.Size, Config.BackgroundColor);
 
             // Exp progress bar
             PluginConfigColor expFillColor = Config.UseJobColor ? Utils.ColorForActor(Actor) : Config.FillColor;
@@ -45,7 +42,7 @@ namespace DelvUI.Interface.GeneralElements
             var restedSize = Config.Size - BarUtilities.GetFillDirectionOffset(expBar.Size, Config.FillDirection);
             Rect restedBar = BarUtilities.GetFillRect(restedPos, restedSize, Config.FillDirection, Config.RestedExpColor, rested, required);
 
-            var bar = new BarHud(Config, Actor).Background(background).Foreground(expBar, restedBar).Labels(Config.LeftLabel, Config.RightLabel);
+            var bar = new BarHud(Config, Actor).Foreground(expBar, restedBar).Labels(Config.LeftLabel, Config.RightLabel);
             bar.Draw(origin);
         }
     }

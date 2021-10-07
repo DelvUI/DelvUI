@@ -10,17 +10,17 @@ namespace DelvUI.Interface.Bars
 {
     public class BarHud
     {
-        public Rect BackgroundRect { get; private set; } = new Rect();
+        private Rect BackgroundRect { get; set; } = new Rect();
 
-        public  List<Rect> ForegroundRects { get;  set; } = new List<Rect>();
+        private List<Rect> ForegroundRects { get; set; } = new List<Rect>();
 
-        public List<LabelHud> LabelHuds { get; private set; } = new List<LabelHud>();
+        private List<LabelHud> LabelHuds { get; set; } = new List<LabelHud>();
 
-        public bool DrawBorder { get; private set; }
+        private bool DrawBorder { get; set; }
 
-        public DrawAnchor Anchor { get; private set; }
+        private DrawAnchor Anchor { get; set; }
 
-        public GameObject? Actor { get; private set; }
+        private GameObject? Actor { get; set; }
 
         public BarHud(bool drawBorder = true, DrawAnchor anchor = DrawAnchor.TopLeft, GameObject? actor = null)
         {
@@ -29,7 +29,10 @@ namespace DelvUI.Interface.Bars
             Actor = actor;
         }
 
-        public BarHud(BarConfig config, GameObject? actor = null) : this(config.DrawBorder, config.Anchor, actor) {}
+        public BarHud(BarConfig config, GameObject? actor = null) : this(config.DrawBorder, config.Anchor, actor)
+        {
+            BackgroundRect = new Rect(config.Position, config.Size, config.BackgroundColor);
+        }
 
         public BarHud Background(Rect rect)
         {
@@ -45,7 +48,7 @@ namespace DelvUI.Interface.Bars
 
         public BarHud Labels(params LabelConfig[] labels)
         {
-            LabelHuds = labels.Select(c => new LabelHud("_barLabel", c)).ToList();
+            LabelHuds.AddRange(labels.Select(c => new LabelHud("_barLabel", c)));
             return this;
         }
 
