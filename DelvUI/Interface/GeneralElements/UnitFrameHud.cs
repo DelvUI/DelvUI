@@ -16,19 +16,13 @@ namespace DelvUI.Interface.GeneralElements
     public unsafe class UnitFrameHud : DraggableHudElement, IHudElementWithActor
     {
         private UnitFrameConfig Config => (UnitFrameConfig)_config;
-        private LabelHud _leftLabel;
-        private LabelHud _rightLabel;
 
         private readonly OpenContextMenuFromTarget _openContextMenuFromTarget;
 
         public GameObject? Actor { get; set; } = null;
 
         public UnitFrameHud(string id, UnitFrameConfig config, string displayName) : base(id, config, displayName)
-        {
-            // labels
-            _leftLabel = new LabelHud(id + "_leftLabel", Config.LeftLabelConfig);
-            _rightLabel = new LabelHud(id + "_rightLabel", Config.RightLabelConfig);
-
+        { 
             // interaction stuff
             _openContextMenuFromTarget =
                 Marshal.GetDelegateForFunctionPointer<OpenContextMenuFromTarget>(Plugin.SigScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
