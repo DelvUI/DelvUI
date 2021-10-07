@@ -13,7 +13,7 @@ namespace DelvUI.Interface.GeneralElements
 {
     public unsafe class UnitFrameHud : DraggableHudElement, IHudElementWithActor
     {
-        private UnitFrameConfig Config => (UnitFrameConfig)_config;
+        public UnitFrameConfig Config => (UnitFrameConfig)_config;
         private LabelHud _leftLabel;
         private LabelHud _rightLabel;
 

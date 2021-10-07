@@ -484,7 +484,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Lily", min = -4000f, max = 4000f)]
         [Order(40, collapseWith = nameof(ShowLilyBars))]
-        public Vector2 LilyBarPosition = new(-64, -54);
+        public Vector2 LilyBarPosition = new(-64, -32);
 
         [DragFloat2("Size" + "##Lily", max = 2000f)]
         [Order(45, collapseWith = nameof(ShowLilyBars))]
@@ -507,7 +507,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##BloodLily", min = -4000f, max = 4000f, spacing = true)]
         [Order(65, collapseWith = nameof(ShowLilyBars))]
-        public Vector2 BloodLilyBarPosition = new(64, -54);
+        public Vector2 BloodLilyBarPosition = new(64, -32);
 
         [DragFloat2("Size" + "##BloodLily", max = 2000f)]
         [Order(70, collapseWith = nameof(ShowLilyBars))]
@@ -542,7 +542,7 @@ namespace DelvUI.Interface.Jobs
         // pos
         [DragFloat2("Position" + "##Dia", min = -4000f, max = 4000f)]
         [Order(95, collapseWith = nameof(ShowDiaBar))]
-        public Vector2 DiaBarPosition = new(0, -32);
+        public Vector2 DiaBarPosition = new(0, -10);
 
         // size
         [DragFloat2("Size " + "##Dia", max = 2000f)]
@@ -591,7 +591,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Asylum", min = -4000f, max = 4000f)]
         [Order(150, collapseWith = nameof(ShowAsylumBar))]
-        public Vector2 AsylumPosition = new(-96, -74);
+        public Vector2 AsylumPosition = new(-96, -52);
 
         [DragFloat2("Size " + "##Asylum", max = 2000f)]
         [Order(155, collapseWith = nameof(ShowAsylumBar))]
@@ -629,7 +629,7 @@ namespace DelvUI.Interface.Jobs
         // pos
         [DragFloat2("Position" + "##PresenceOfMind", min = -4000f, max = 4000f)]
         [Order(175, collapseWith = nameof(ShowPresenceOfMindBar))]
-        public Vector2 PresenceOfMindPosition = new(-32, -74);
+        public Vector2 PresenceOfMindPosition = new(-32, -52);
 
         // size
         [DragFloat2("Size " + "##PresenceOfMind", max = 2000f)]
@@ -669,7 +669,7 @@ namespace DelvUI.Interface.Jobs
         // pos
         [DragFloat2("Position" + "##Plenary", min = -4000f, max = 4000f)]
         [Order(195, collapseWith = nameof(ShowPlenaryBar))]
-        public Vector2 PlenaryPosition = new(32, -74);
+        public Vector2 PlenaryPosition = new(32, -52);
 
         // size
         [DragFloat2("Size " + "##Plenary", max = 2000f)]
@@ -708,7 +708,7 @@ namespace DelvUI.Interface.Jobs
         // pos
         [DragFloat2("Position" + "##Temperance", min = -4000f, max = 4000f)]
         [Order(225, collapseWith = nameof(ShowTemperanceBar))]
-        public Vector2 TemperancePosition = new(96, -74);
+        public Vector2 TemperancePosition = new(96, -52);
 
         // size
         [DragFloat2("Size " + "##Temperance", max = 2000f)]

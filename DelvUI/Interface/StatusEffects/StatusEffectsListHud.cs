@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
@@ -13,7 +14,7 @@ using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
 namespace DelvUI.Interface.StatusEffects
 {
-    public class StatusEffectsListHud : DraggableHudElement, IHudElementWithActor
+    public class StatusEffectsListHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
     {
         protected StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
 
@@ -26,6 +27,9 @@ namespace DelvUI.Interface.StatusEffects
         private LabelHud _stacksLabel;
 
         public GameObject? Actor { get; set; } = null;
+
+        protected override bool AnchorToParent => Config is UnitFrameStatusEffectsListConfig config ? config.AnchorToUnitFrame : false;
+        protected override DrawAnchor ParentAnchor => Config is UnitFrameStatusEffectsListConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
 
         public StatusEffectsListHud(string id, StatusEffectsListConfig config, string displayName) : base(id, config, displayName)
         {
@@ -227,9 +231,10 @@ namespace DelvUI.Interface.StatusEffects
             var list = StatusEffectsData();
 
             // area
-            var growthDirections = Config.GetGrowthDirections();
-            var position = origin + Config.Position;
-            var areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
+            GrowthDirections growthDirections = Config.GetGrowthDirections();
+            Vector2 position = origin + GetAnchoredPosition(Config.Position, Config.Size, DrawAnchor.TopLeft);
+            Vector2 areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
+
             var drawList = ImGui.GetWindowDrawList();
 
             // no need to do anything else if there are no effects

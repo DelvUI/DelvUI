@@ -12,7 +12,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class CastbarHud : DraggableHudElement, IHudElementWithActor
+    public class CastbarHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
     {
         private CastbarConfig Config => (CastbarConfig)_config;
         private LabelHud _castNameLabel;
@@ -21,6 +21,9 @@ namespace DelvUI.Interface.GeneralElements
         protected LastUsedCast? LastUsedCast;
 
         public GameObject? Actor { get; set; }
+
+        protected override bool AnchorToParent => Config is UnitFrameCastbarConfig config ? config.AnchorToUnitFrame : false;
+        protected override DrawAnchor ParentAnchor => Config is UnitFrameCastbarConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
 
         public CastbarHud(string id, CastbarConfig config, string displayName) : base(id, config, displayName)
         {
@@ -54,8 +57,9 @@ namespace DelvUI.Interface.GeneralElements
 
             var castPercent = 100f / totalCastTime * currentCastTime;
             var castScale = castPercent / 100f;
-            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
-            var endPos = startPos + Config.Size;
+
+            Vector2 startPos = origin + GetAnchoredPosition(Config.Position, Config.Size, Config.Anchor);
+            Vector2 endPos = startPos + Config.Size;
 
             DrawHelper.DrawInWindow(ID, startPos, Config.Size, false, false, (drawList) =>
             {

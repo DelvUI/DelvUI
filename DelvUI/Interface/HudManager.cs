@@ -27,9 +27,14 @@ namespace DelvUI.Interface
         private List<IHudElementWithActor> _hudElementsUsingTargetOfTarget = null!;
         private List<IHudElementWithActor> _hudElementsUsingFocusTarget = null!;
 
+        private UnitFrameHud _playerUnitFrameHud = null!;
+        private UnitFrameHud _targetUnitFrameHud = null!;
+        private UnitFrameHud _totUnitFrameHud = null!;
+        private UnitFrameHud _focusTargetUnitFrameHud = null!;
+
         private PlayerCastbarHud _playerCastbarHud = null!;
         private CustomEffectsListHud _customEffectsHud = null!;
-        private PrimaryResourceHud _primaryResourceHud = null!;
+        private PrimaryResourceHud _playerManaBarHud = null!;
         private JobHud? _jobHud = null;
         private PartyFramesHud _partyFramesHud = null!;
 
@@ -130,6 +135,7 @@ namespace DelvUI.Interface
             _hudElementsUsingFocusTarget = new List<IHudElementWithActor>();
 
             CreateUnitFrames();
+            CreateManaBars();
             CreateCastbars();
             CreateStatusEffectsLists();
             CreateMiscElements();
@@ -143,49 +149,80 @@ namespace DelvUI.Interface
         private void CreateUnitFrames()
         {
             var playerUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<PlayerUnitFrameConfig>();
-            var playerUnitFrame = new UnitFrameHud("DelvUI_playerUnitFrame", playerUnitFrameConfig, "Player");
-            _hudElements.Add(playerUnitFrame);
-            _hudElementsUsingPlayer.Add(playerUnitFrame);
+            _playerUnitFrameHud = new UnitFrameHud("DelvUI_playerUnitFrame", playerUnitFrameConfig, "Player");
+            _hudElements.Add(_playerUnitFrameHud);
+            _hudElementsUsingPlayer.Add(_playerUnitFrameHud);
 
             var targetUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<TargetUnitFrameConfig>();
-            var targetUnitFrame = new UnitFrameHud("DelvUI_targetUnitFrame", targetUnitFrameConfig, "Target");
-            _hudElements.Add(targetUnitFrame);
-            _hudElementsUsingTarget.Add(targetUnitFrame);
+            _targetUnitFrameHud = new UnitFrameHud("DelvUI_targetUnitFrame", targetUnitFrameConfig, "Target");
+            _hudElements.Add(_targetUnitFrameHud);
+            _hudElementsUsingTarget.Add(_targetUnitFrameHud);
 
             var targetOfTargetUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<TargetOfTargetUnitFrameConfig>();
-            var targetOfTargetUnitFrame = new UnitFrameHud("DelvUI_targetOfTargetUnitFrame", targetOfTargetUnitFrameConfig, "Target of Target");
-            _hudElements.Add(targetOfTargetUnitFrame);
-            _hudElementsUsingTargetOfTarget.Add(targetOfTargetUnitFrame);
+            _totUnitFrameHud = new UnitFrameHud("DelvUI_targetOfTargetUnitFrame", targetOfTargetUnitFrameConfig, "Target of Target");
+            _hudElements.Add(_totUnitFrameHud);
+            _hudElementsUsingTargetOfTarget.Add(_totUnitFrameHud);
 
             var focusTargetUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetUnitFrameConfig>();
-            var focusTargetUnitFrame = new UnitFrameHud("DelvUI_focusTargetUnitFrame", focusTargetUnitFrameConfig, "Focus Target");
-            _hudElements.Add(focusTargetUnitFrame);
-            _hudElementsUsingFocusTarget.Add(focusTargetUnitFrame);
+            _focusTargetUnitFrameHud = new UnitFrameHud("DelvUI_focusTargetUnitFrame", focusTargetUnitFrameConfig, "Focus Target");
+            _hudElements.Add(_focusTargetUnitFrameHud);
+            _hudElementsUsingFocusTarget.Add(_focusTargetUnitFrameHud);
 
             var partyFramesConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesConfig>();
             _partyFramesHud = new PartyFramesHud("DelvUI_partyFrames", partyFramesConfig, "Party Frames");
             _hudElements.Add(_partyFramesHud);
         }
 
+        private void CreateManaBars()
+        {
+            var playerManaBarConfig = ConfigurationManager.Instance.GetConfigObject<PlayerPrimaryResourceConfig>();
+            _playerManaBarHud = new PrimaryResourceHud("DelvUI_playerManaBar", playerManaBarConfig, "Player Mana Bar");
+            _playerManaBarHud.ParentConfig = _playerUnitFrameHud.Config;
+            _hudElements.Add(_playerManaBarHud);
+            _hudElementsUsingPlayer.Add(_playerManaBarHud);
+
+            var targetManaBarConfig = ConfigurationManager.Instance.GetConfigObject<TargetPrimaryResourceConfig>();
+            var targetManaBarHud = new PrimaryResourceHud("DelvUI_targetManaBar", targetManaBarConfig, "Target Mana Bar");
+            targetManaBarHud.ParentConfig = _targetUnitFrameHud.Config;
+            _hudElements.Add(targetManaBarHud);
+            _hudElementsUsingTarget.Add(targetManaBarHud);
+
+            var totManaBarConfig = ConfigurationManager.Instance.GetConfigObject<TargetOfTargetPrimaryResourceConfig>();
+            var totManaBarHud = new PrimaryResourceHud("DelvUI_totManaBar", totManaBarConfig, "ToT Mana Bar");
+            totManaBarHud.ParentConfig = _totUnitFrameHud.Config;
+            _hudElements.Add(totManaBarHud);
+            _hudElementsUsingTargetOfTarget.Add(totManaBarHud);
+
+            var focusManaBarConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetPrimaryResourceConfig>();
+            var focusManaBarHud = new PrimaryResourceHud("DelvUI_focusManaBar", focusManaBarConfig, "Focus Mana Bar");
+            focusManaBarHud.ParentConfig = _focusTargetUnitFrameHud.Config;
+            _hudElements.Add(focusManaBarHud);
+            _hudElementsUsingFocusTarget.Add(focusManaBarHud);
+        }
+
         private void CreateCastbars()
         {
             var playerCastbarConfig = ConfigurationManager.Instance.GetConfigObject<PlayerCastbarConfig>();
             _playerCastbarHud = new PlayerCastbarHud("DelvUI_playerCastbar", playerCastbarConfig, "Player Castbar");
+            _playerCastbarHud.ParentConfig = _playerUnitFrameHud.Config;
             _hudElements.Add(_playerCastbarHud);
             _hudElementsUsingPlayer.Add(_playerCastbarHud);
 
             var targetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<TargetCastbarConfig>();
             var targetCastbar = new TargetCastbarHud("DelvUI_targetCastbar", targetCastbarConfig, "Target Castbar");
+            targetCastbar.ParentConfig = _targetUnitFrameHud.Config;
             _hudElements.Add(targetCastbar);
             _hudElementsUsingTarget.Add(targetCastbar);
 
             var targetOfTargetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<TargetOfTargetCastbarConfig>();
             var targetOfTargetCastbar = new CastbarHud("DelvUI_targetOfTargetCastbar", targetOfTargetCastbarConfig, "ToT Castbar");
+            targetOfTargetCastbar.ParentConfig = _totUnitFrameHud.Config;
             _hudElements.Add(targetOfTargetCastbar);
             _hudElementsUsingTargetOfTarget.Add(targetOfTargetCastbar);
 
             var focusTargetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetCastbarConfig>();
             var focusTargetCastbar = new CastbarHud("DelvUI_focusTargetCastbar", focusTargetCastbarConfig, "Focus Castbar");
+            focusTargetCastbar.ParentConfig = _focusTargetUnitFrameHud.Config;
             _hudElements.Add(focusTargetCastbar);
             _hudElementsUsingFocusTarget.Add(focusTargetCastbar);
         }
@@ -194,21 +231,25 @@ namespace DelvUI.Interface
         {
             var playerBuffsConfig = ConfigurationManager.Instance.GetConfigObject<PlayerBuffsListConfig>();
             var playerBuffs = new StatusEffectsListHud("DelvUI_playerBuffs", playerBuffsConfig, "Buffs");
+            playerBuffs.ParentConfig = _playerUnitFrameHud.Config;
             _hudElements.Add(playerBuffs);
             _hudElementsUsingPlayer.Add(playerBuffs);
 
             var playerDebuffsConfig = ConfigurationManager.Instance.GetConfigObject<PlayerDebuffsListConfig>();
             var playerDebuffs = new StatusEffectsListHud("DelvUI_playerDebuffs", playerDebuffsConfig, "Debufffs");
+            playerDebuffs.ParentConfig = _playerUnitFrameHud.Config;
             _hudElements.Add(playerDebuffs);
             _hudElementsUsingPlayer.Add(playerDebuffs);
 
             var targetBuffsConfig = ConfigurationManager.Instance.GetConfigObject<TargetBuffsListConfig>();
             var targetBuffs = new StatusEffectsListHud("DelvUI_targetBuffs", targetBuffsConfig, "Target Buffs");
+            targetBuffs.ParentConfig = _targetUnitFrameHud.Config;
             _hudElements.Add(targetBuffs);
             _hudElementsUsingTarget.Add(targetBuffs);
 
             var targetDebuffsConfig = ConfigurationManager.Instance.GetConfigObject<TargetDebuffsListConfig>();
             var targetDebuffs = new StatusEffectsListHud("DelvUI_targetDebuffs", targetDebuffsConfig, "Target Debuffs");
+            targetDebuffs.ParentConfig = _targetUnitFrameHud.Config;
             _hudElements.Add(targetDebuffs);
             _hudElementsUsingTarget.Add(targetDebuffs);
 
@@ -220,12 +261,6 @@ namespace DelvUI.Interface
 
         private void CreateMiscElements()
         {
-            // primary resource bar
-            var primaryResourceConfig = ConfigurationManager.Instance.GetConfigObject<PrimaryResourceConfig>();
-            _primaryResourceHud = new PrimaryResourceHud("DelvUI_primaryResource", primaryResourceConfig, "Primary Resource");
-            _hudElements.Add(_primaryResourceHud);
-            _hudElementsUsingPlayer.Add(_primaryResourceHud);
-
             // gcd indicator
             var gcdIndicatorConfig = ConfigurationManager.Instance.GetConfigObject<GCDIndicatorConfig>();
             var gcdIndicator = new GCDIndicatorHud("DelvUI_gcdIndicator", gcdIndicatorConfig, "GCD Indicator");
@@ -394,9 +429,8 @@ namespace DelvUI.Interface
             }
 
             var newJobId = player.ClassJob.Id;
-            if (_jobHud != null && _primaryResourceHud != null && _jobHud.Config.JobId == newJobId)
+            if (_jobHud != null && _jobHud.Config.JobId == newJobId)
             {
-                _primaryResourceHud.ResourceType = _jobHud.Config.UseDefaultPrimaryResourceBar ? _jobHud.Config.PrimaryResourceType : PrimaryResourceTypes.None;
                 return false;
             }
 
@@ -415,11 +449,6 @@ namespace DelvUI.Interface
                 config = (JobConfig)ConfigurationManager.Instance.GetConfigObjectForType(types.ConfigType);
                 _jobHud = (JobHud)Activator.CreateInstance(types.HudType, types.HudType.FullName, config, types.DisplayName)!;
                 _jobHud.SelectEvent += OnDraggableElementSelected;
-            }
-
-            if (config != null && _primaryResourceHud != null)
-            {
-                _primaryResourceHud.ResourceType = config.UseDefaultPrimaryResourceBar ? config.PrimaryResourceType : PrimaryResourceTypes.None;
             }
 
             return true;
@@ -463,6 +492,12 @@ namespace DelvUI.Interface
             foreach (var element in _hudElementsUsingFocusTarget)
             {
                 element.Actor = focusTarget;
+            }
+
+            // player mana bar
+            if (_jobHud != null && _playerManaBarHud != null && !_jobHud.Config.UseDefaultPrimaryResourceBar)
+            {
+                _playerManaBarHud.ResourceType = PrimaryResourceTypes.None;
             }
         }
 

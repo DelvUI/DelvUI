@@ -324,7 +324,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Balance", min = -2000f, max = 2000f)]
         [Order(35, collapseWith = nameof(ShowBalanceBar))]
-        public Vector2 BalanceBarPosition = new Vector2(0, -32);
+        public Vector2 BalanceBarPosition = new Vector2(0, -10);
 
         [DragFloat2("Size" + "##Balance", max = 2000f)]
         [Order(40, collapseWith = nameof(ShowBalanceBar))]
@@ -354,7 +354,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##WhiteMana", min = -2000f, max = 2000f)]
         [Order(65, collapseWith = nameof(ShowWhiteManaBar))]
-        public Vector2 WhiteManaBarPosition = new Vector2(-70, -32);
+        public Vector2 WhiteManaBarPosition = new Vector2(-70, -10);
 
         [DragFloat2("Size" + "##WhiteMana", max = 2000f)]
         [Order(70, collapseWith = nameof(ShowWhiteManaBar))]
@@ -384,7 +384,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##BlackMana", min = -2000f, max = 2000f)]
         [Order(95, collapseWith = nameof(ShowBlackManaBar))]
-        public Vector2 BlackManaBarPosition = new Vector2(70, -32);
+        public Vector2 BlackManaBarPosition = new Vector2(70, -10);
 
         [DragFloat2("Size" + "##BlackMana", max = 2000f)]
         [Order(100, collapseWith = nameof(ShowBlackManaBar))]
@@ -406,7 +406,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Acceleration", min = -2000f, max = 2000f)]
         [Order(115, collapseWith = nameof(ShowAcceleration))]
-        public Vector2 AccelerationBarPosition = new Vector2(0, -50);
+        public Vector2 AccelerationBarPosition = new Vector2(0, -28);
 
         [DragFloat2("Size" + "##Acceleration", max = 2000f)]
         [Order(120, collapseWith = nameof(ShowAcceleration))]
@@ -440,7 +440,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##DualCast", min = -2000f, max = 2000f)]
         [Order(145, collapseWith = nameof(ShowDualCast))]
-        public Vector2 DualCastPosition = new Vector2(0, -66);
+        public Vector2 DualCastPosition = new Vector2(0, -44);
 
         [DragFloat2("Size" + "##DualCast", max = 2000f)]
         [Order(150, collapseWith = nameof(ShowDualCast))]
@@ -470,7 +470,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Verstone", min = -2000, max = 2000f)]
         [Order(175, collapseWith = nameof(ShowVerstoneProcs))]
-        public Vector2 VerstoneBarPosition = new Vector2(-69, -66);
+        public Vector2 VerstoneBarPosition = new Vector2(-69, -44);
 
         [DragFloat2("Size" + "##Verstone", max = 2000f)]
         [Order(180, collapseWith = nameof(ShowVerstoneProcs))]
@@ -500,7 +500,7 @@ namespace DelvUI.Interface.Jobs
 
         [DragFloat2("Position" + "##Verfire", min = -2000, max = 2000f)]
         [Order(205, collapseWith = nameof(ShowVerfireProcs))]
-        public Vector2 VerfireBarPosition = new Vector2(69, -66);
+        public Vector2 VerfireBarPosition = new Vector2(69, -44);
 
         [DragFloat2("Size" + "##Verfire", max = 2000f)]
         [Order(210, collapseWith = nameof(ShowVerfireProcs))]
