@@ -206,7 +206,7 @@ namespace DelvUI.Interface.Jobs
                                                     new(126, 20),
                                                     new PluginConfigColor(new(136f / 255f, 146f / 255f, 219f / 255f, 100f / 100f)));
 
-        [NestedConfig("Ninki Bar", 55)]
+        [NestedConfig("Kenki Bar", 55)]
         public ProgressBarConfig KenkiBar = new ProgressBarConfig(
                                                     new(0, -34),
                                                     new(254, 20),
