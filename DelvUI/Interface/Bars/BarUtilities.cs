@@ -1,26 +1,18 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using System;
+using System.Linq;
 using System.Numerics;
 
 namespace DelvUI.Interface.Bars
 {
     public class BarUtilities
     {
-        public static BarHud GetProgressBar(string id, ProgressBarConfig config, float current, float max, float min = 0f)
-        {
-            return GetProgressBar(id, config, current, max, min, null, null);
-        }
-
-        public static BarHud GetProgressBar(string id, ProgressBarConfig config, float current, float max, float min = 0f, GameObject? actor = null)
-        {
-            return GetProgressBar(id, config, current, max, min, null, actor);
-        }
-
-        public static BarHud GetProgressBar(string id, ProgressBarConfig config, float current, float max, float min = 0f, PluginConfigColor? fillColor = null, GameObject? actor = null)
+        public static BarHud GetProgressBar(string id, ProgressBarConfig config, float current, float max, float min = 0f, GameObject? actor = null, PluginConfigColor? fillColor = null)
         {
             return GetProgressBar(id, config, config.ThresholdConfig, new LabelConfig[] { config.Label }, current, max, min, fillColor, actor);
         }
@@ -47,6 +39,49 @@ namespace DelvUI.Interface.Bars
             AddThresholdMarker(bar, config, thresholdConfig, max, min);
 
             return bar;
+        }
+
+        public static BarHud? GetProcBar(
+            string id,
+            ProgressBarConfig config,
+            PlayerCharacter player,
+            uint statusId,
+            float maxDuration)
+        {
+            float duration = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId == statusId)?.RemainingTime ?? 0);
+
+            if (duration == 0 && config.HideWhenInactive)
+            {
+                return null;
+            }
+
+            config.Label.SetText($"{(int)duration,0}");
+            return GetProgressBar(id, config, duration, maxDuration, 0);
+        }
+
+        public static BarHud? GetDoTBar(
+            string id,
+            ProgressBarConfig config,
+            PlayerCharacter player,
+            GameObject? target,
+            uint statusId,
+            float maxDuration,
+            bool ignoreHideWhenInactive = false)
+        {
+            float duration = 0;
+
+            if (target != null && target is BattleChara targetChara)
+            {
+                duration = Math.Abs(targetChara.StatusList.FirstOrDefault(o => o.StatusId == statusId && o.SourceID == player.ObjectId)?.RemainingTime ?? 0);
+            }
+
+            if (duration == 0 && (ignoreHideWhenInactive || config.HideWhenInactive))
+            {
+                return null;
+            }
+
+            config.Label.SetText($"{(int)duration,0}");
+            return GetProgressBar(id, config, duration, maxDuration, 0);
         }
 
         private static void AddThresholdMarker(BarHud bar, BarConfig config, ThresholdConfig? thresholdConfig, float max, float min)
