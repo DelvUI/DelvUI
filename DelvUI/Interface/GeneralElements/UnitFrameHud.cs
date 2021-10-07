@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
@@ -74,16 +75,24 @@ namespace DelvUI.Interface.GeneralElements
 
         private void DrawCharacter(Vector2 pos, Character character)
         {
+            float currentHp = character.CurrentHp;
+            float maxHp = character.MaxHp;
+
+            if (Config.TankStanceIndicatorConfig is { Enabled: true } && JobsHelper.IsJobTank(character.ClassJob.Id))
+            {
+                DrawTankStanceIndicator(pos);
+            }
+
             PluginConfigColor fillColor = Config.UseJobColor ? Utils.ColorForActor(character) : Config.FillColor;
 
             if (Config.UseColorBasedOnHealthValue)
             {
-                var scale = (float)character.CurrentHp / Math.Max(1, character.MaxHp);
+                var scale = currentHp / Math.Max(1, maxHp);
                 fillColor = Utils.ColorByHealthValue(scale, Config.LowHealthColorThreshold / 100f, Config.FullHealthColorThreshold / 100f, Config.FullHealthColor, Config.LowHealthColor);
             }
 
             var background = new Rect(Config.Position, Config.Size, BackgroundColor(character));
-            var healthFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, character.CurrentHp, character.MaxHp);
+            var healthFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentHp, maxHp);
             var bar = new BarHud(Config, character).Background(background).Foreground(healthFill).Labels(Config.LeftLabelConfig, Config.RightLabelConfig);
 
             if (Config.UseMissingHealthBar)
@@ -95,11 +104,18 @@ namespace DelvUI.Interface.GeneralElements
 
             if (Config.ShieldConfig.Enabled)
             {
-                float shield = Utils.ActorShieldValue(Actor);
-                var shieldPos = Config.FillDirection.IsInverted() ? Config.Position : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
-                var shieldSize = Config.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
-                Rect shieldFill = BarUtilities.GetFillRect(shieldPos, shieldSize, Config.FillDirection, Config.ShieldConfig.Color, shield, character.MaxHp, character.CurrentHp);
-                bar.Foreground(shieldFill);
+                float shield = Utils.ActorShieldValue(Actor) * maxHp;
+                float overshield = Config.ShieldConfig.FillHealthFirst ? Math.Max(shield + currentHp - maxHp, 0f) : shield;
+                Rect overshieldFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, Config.ShieldConfig.Color, overshield, maxHp);
+                bar.Foreground(overshieldFill);
+
+                if (Config.ShieldConfig.FillHealthFirst && currentHp < maxHp)
+                {
+                    var shieldPos = Config.FillDirection.IsInverted() ? Config.Position : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
+                    var shieldSize = Config.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
+                    Rect shieldFill = BarUtilities.GetFillRect(shieldPos, shieldSize, Config.FillDirection, Config.ShieldConfig.Color, shield - overshield, maxHp - currentHp, 0f);
+                    bar.Foreground(shieldFill);
+                }
             }
 
             bar.Draw(pos);
@@ -113,7 +129,7 @@ namespace DelvUI.Interface.GeneralElements
             bar.Draw(pos);
         }
 
-        private void DrawTankStanceIndicator(ImDrawListPtr drawList, Vector2 startPos)
+        private void DrawTankStanceIndicator(Vector2 pos)
         {
             if (Actor is not BattleChara battleChara || Config.TankStanceIndicatorConfig == null)
             {
@@ -125,13 +141,12 @@ namespace DelvUI.Interface.GeneralElements
             );
 
             var thickness = Config.TankStanceIndicatorConfig.Thickness + 1;
-            var barSize = new Vector2(Config.Size.Y > Config.Size.X ? Config.Size.X : Config.Size.Y, Config.Size.Y);
-            var cursorPos = startPos + new Vector2(-thickness, thickness);
+            var barSize = new Vector2(Math.Min(Config.Size.X, Config.Size.Y), Config.Size.Y);
+            var cursorPos = Utils.GetAnchoredPosition(Config.Position + new Vector2(-thickness, thickness), Config.Size, Config.Anchor);
 
             var color = !tankStanceBuff.Any() ? Config.TankStanceIndicatorConfig.InactiveColor : Config.TankStanceIndicatorConfig.ActiveColor;
-
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, color.Base);
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
+            var bar = new BarHud("DelvUI_TankStance").Background(new Rect(cursorPos, barSize)).Foreground(new Rect(cursorPos, barSize, color));
+            bar.Draw(pos);
         }
 
         private PluginConfigColor BackgroundColor(Character? chara)
