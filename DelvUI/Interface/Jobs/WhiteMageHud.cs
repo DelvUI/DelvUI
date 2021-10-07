@@ -70,10 +70,10 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.LilyBar.Enabled) { DrawLilyBar(pos, player); }
             if (Config.DiaBar.Enabled) { DrawDiaBar(pos, player); }
-            if (Config.AsylumBar.Enabled) { DrawAsylumBar(origin, player); }
-            if (Config.PresenceOfMindBar.Enabled) { DrawPresenceOfMindBar(origin, player); }
-            if (Config.PlenaryBar.Enabled) { DrawPlenaryBar(origin, player); }
-            if (Config.TemperanceBar.Enabled) { DrawTemperanceBar(origin, player); }
+            if (Config.AsylumBar.Enabled) { DrawAsylumBar(pos, player); }
+            if (Config.PresenceOfMindBar.Enabled) { DrawPresenceOfMindBar(pos, player); }
+            if (Config.PlenaryBar.Enabled) { DrawPlenaryBar(pos, player); }
+            if (Config.TemperanceBar.Enabled) { DrawTemperanceBar(pos, player); }
         }
 
         private void DrawDiaBar(Vector2 origin, PlayerCharacter player)
