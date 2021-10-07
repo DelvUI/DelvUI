@@ -48,7 +48,7 @@ namespace DelvUI.Interface.Bars
 
         public BarHud Labels(params LabelConfig[] labels)
         {
-            LabelHuds.AddRange(labels.Select(c => new LabelHud("_barLabel", c)));
+            LabelHuds.AddRange(labels.Select(c => new LabelHud($"_barLabel", c)));
             return this;
         }
 
@@ -57,7 +57,7 @@ namespace DelvUI.Interface.Bars
             var barPos = Utils.GetAnchoredPosition(origin, BackgroundRect.Size, Anchor);
             var backgroundPos = barPos + BackgroundRect.Position;
 
-            DrawHelper.DrawInWindow($"DelvUI_Bar", backgroundPos, BackgroundRect.Size, false, false, (drawList) =>
+            DrawHelper.DrawInWindow($"DelvUI_Bar", backgroundPos, BackgroundRect.Size, true, false, (drawList) =>
             {
                 // Draw background
                 DrawHelper.DrawGradientFilledRect(backgroundPos, BackgroundRect.Size, BackgroundRect.Color, drawList);
@@ -73,13 +73,13 @@ namespace DelvUI.Interface.Bars
                 {
                     drawList.AddRect(backgroundPos, backgroundPos + BackgroundRect.Size, 0xFF000000);
                 }
-
-                // Draw Labels
-                foreach (LabelHud label in LabelHuds)
-                {
-                    label.Draw(backgroundPos, BackgroundRect.Size, Actor);
-                }
             });
+
+            // Draw Labels
+            foreach (LabelHud label in LabelHuds)
+            {
+                label.Draw(backgroundPos, BackgroundRect.Size, Actor);
+            }
         }
     }
 }
