@@ -242,31 +242,14 @@ namespace DelvUI.Interface.Jobs
                 .Draw(origin);
         }
 
+        private static List<uint> ThunderDoTIDs = new List<uint> { 161, 162, 163, 1210 };
+        private static List<float> ThunderDoTDurations = new List<float> { 18, 12, 24, 18 };
+
         protected void DrawThunderDoTBar(Vector2 origin, PlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            // thunder 1 to 4
-            uint[] dotIDs = { 161, 162, 163, 1210 };
-            float[] dotDurations = { 18, 12, 24, 18 };
-
-            for (var i = 0; i < 4; i++)
-            {
-                BarHud? bar = BarUtilities.GetDoTBar(ID + "_thunderDoTBar", Config.ThunderDoTBar, player, target, dotIDs[i], dotDurations[i], true);
-                if (bar != null)
-                {
-                    bar.Draw(origin);
-                    return;
-                }
-            }
-
-            // if no dot is found, draw empty bar if needed
-            if (Config.ThunderDoTBar.HideWhenInactive)
-            {
-                return;
-            }
-
-            BarUtilities.GetProgressBar(ID + "_thunderDoTBar", Config.ThunderDoTBar, 0, 1).
+            BarUtilities.GetDoTBar(ID + "_thunderDoTBar", Config.ThunderDoTBar, player, target, ThunderDoTIDs, ThunderDoTDurations)?.
                 Draw(origin);
         }
     }

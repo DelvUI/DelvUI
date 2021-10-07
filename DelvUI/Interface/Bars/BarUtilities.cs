@@ -1,10 +1,12 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 
@@ -71,20 +73,36 @@ namespace DelvUI.Interface.Bars
             PlayerCharacter player,
             GameObject? target,
             uint statusId,
-            float maxDuration,
-            bool ignoreHideWhenInactive = false)
+            float maxDuration)
         {
-            float duration = 0;
+            return GetDoTBar(id, config, player, target, new List<uint> { statusId }, new List<float> { maxDuration });
+        }
+
+        public static BarHud? GetDoTBar(
+            string id,
+            ProgressBarConfig config,
+            PlayerCharacter player,
+            GameObject? target,
+            List<uint> statusIDs,
+            List<float> maxDurations)
+        {
+            if (statusIDs.Count == 0 || maxDurations.Count == 0) { return null; }
+
+            Status? status = null;
 
             if (target != null && target is BattleChara targetChara)
             {
-                duration = Math.Abs(targetChara.StatusList.FirstOrDefault(o => o.StatusId == statusId && o.SourceID == player.ObjectId)?.RemainingTime ?? 0);
+                status = targetChara.StatusList.FirstOrDefault(o => o.SourceID == player.ObjectId && statusIDs.Contains(o.StatusId));
             }
 
-            if (duration == 0 && (ignoreHideWhenInactive || config.HideWhenInactive))
+            if (status == null && config.HideWhenInactive)
             {
                 return null;
             }
+
+            int index = status != null ? statusIDs.IndexOf(status.StatusId) : 0;
+            float duration = Math.Abs(status?.RemainingTime ?? 0);
+            float maxDuration = maxDurations[index];
 
             config.Label.SetText($"{(int)duration,0}");
             return GetProgressBar(id, config, duration, maxDuration, 0);
