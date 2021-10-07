@@ -16,6 +16,7 @@ namespace DelvUI.Interface.GeneralElements
         private GlobalColors()
         {
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+            OnConfigReset(ConfigurationManager.Instance);
         }
 
         private void OnConfigReset(ConfigurationManager sender)
