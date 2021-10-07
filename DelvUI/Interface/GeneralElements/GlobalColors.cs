@@ -9,19 +9,25 @@ namespace DelvUI.Interface.GeneralElements
     public class GlobalColors : IDisposable
     {
         #region Singleton
-        private readonly MiscColorConfig _miscColorConfig;
+        private MiscColorConfig _miscColorConfig = null!;
 
-        private Dictionary<uint, PluginConfigColor> ColorMap;
+        private Dictionary<uint, PluginConfigColor> ColorMap = null!;
 
         private GlobalColors()
         {
-            _miscColorConfig = ConfigurationManager.Instance.GetConfigObject<MiscColorConfig>();
+            ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+            OnConfigReset(ConfigurationManager.Instance);
+        }
 
-            var tanksColorConfig = ConfigurationManager.Instance.GetConfigObject<TanksColorConfig>();
-            var healersColorConfig = ConfigurationManager.Instance.GetConfigObject<HealersColorConfig>();
-            var meleeColorConfig = ConfigurationManager.Instance.GetConfigObject<MeleeColorConfig>();
-            var rangedColorConfig = ConfigurationManager.Instance.GetConfigObject<RangedColorConfig>();
-            var castersColorConfig = ConfigurationManager.Instance.GetConfigObject<CastersColorConfig>();
+        private void OnConfigReset(ConfigurationManager sender)
+        {
+            _miscColorConfig = sender.GetConfigObject<MiscColorConfig>();
+
+            var tanksColorConfig = sender.GetConfigObject<TanksColorConfig>();
+            var healersColorConfig = sender.GetConfigObject<HealersColorConfig>();
+            var meleeColorConfig = sender.GetConfigObject<MeleeColorConfig>();
+            var rangedColorConfig = sender.GetConfigObject<RangedColorConfig>();
+            var castersColorConfig = sender.GetConfigObject<CastersColorConfig>();
 
             ColorMap = new Dictionary<uint, PluginConfigColor>()
             {
@@ -104,6 +110,7 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
+            ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
             Instance = null!;
         }
         #endregion
