@@ -113,7 +113,7 @@ namespace DelvUI.Interface.Bars
             float fillPercent = Math.Clamp((current - min) / (max - min), 0f, 1f);
 
             Vector2 fillPos = Vector2.Zero;
-            Vector2 fillSize = fillDirection.IsHorizontal() ? new(size.X * fillPercent, size.Y) : new(size.X * fillPercent, size.Y);
+            Vector2 fillSize = fillDirection.IsHorizontal() ? new(size.X * fillPercent, size.Y) : new(size.X, size.Y * fillPercent);
             if (fillDirection == BarDirection.Left)
             {
                 fillPos = Utils.GetAnchoredPosition(new(size.X, 0), fillSize, DrawAnchor.TopRight);
