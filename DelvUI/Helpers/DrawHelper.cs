@@ -290,5 +290,6 @@ namespace DelvUI.Helpers
                 }
             }
         }
+
     }
 }

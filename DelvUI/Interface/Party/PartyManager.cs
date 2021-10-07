@@ -19,17 +19,16 @@ namespace DelvUI.Interface.Party
     {
         #region Singleton
         public static PartyManager Instance { get; private set; } = null!;
-        private PartyFramesConfig _config;
+        private PartyFramesConfig _config = null!;
 
         private PartyManager(PartyFramesConfig config)
         {
             _raiseTracker = new PartyFramesRaiseTracker();
 
             Plugin.Framework.Update += FrameworkOnOnUpdateEvent;
+            ConfigurationManager.Instance.ResetEvent += OnConfigReset;
 
-            _config = config;
-            _config.ValueChangeEvent += OnConfigPropertyChanged;
-
+            OnConfigReset(ConfigurationManager.Instance);
             UpdatePreview();
         }
 
@@ -63,6 +62,16 @@ namespace DelvUI.Interface.Party
             Instance = null!;
         }
 
+        private void OnConfigReset(ConfigurationManager sender)
+        {
+            if (_config != null)
+            {
+                _config.ValueChangeEvent -= OnConfigPropertyChanged;
+            }
+
+            _config = sender.GetConfigObject<PartyFramesConfig>();
+            _config.ValueChangeEvent += OnConfigPropertyChanged;
+        }
 
         #endregion Singleton
 

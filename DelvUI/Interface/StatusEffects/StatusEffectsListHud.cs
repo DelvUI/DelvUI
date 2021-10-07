@@ -324,7 +324,11 @@ namespace DelvUI.Interface.StatusEffects
                         // tooltip
                         if (Config.ShowTooltips)
                         {
-                            TooltipsHelper.Instance.ShowTooltipOnCursor(statusEffectData.Data.Description, statusEffectData.Data.Name);
+                            TooltipsHelper.Instance.ShowTooltipOnCursor(
+                                statusEffectData.Data.Description,
+                                statusEffectData.Data.Name,
+                                statusEffectData.Status.StatusID
+                            );
                         }
 
                         // remove buff on right click

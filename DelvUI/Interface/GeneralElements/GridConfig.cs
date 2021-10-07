@@ -3,7 +3,7 @@ using DelvUI.Config.Attributes;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Portable(false)]
+    [Exportable(false)]
     [Section("Misc")]
     [SubSection("Grid", 0)]
     public class GridConfig : PluginConfigObject

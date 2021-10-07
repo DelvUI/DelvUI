@@ -57,12 +57,12 @@ namespace DelvUI.Helpers
 
         private bool _dataIsValid = false;
 
-        public void ShowTooltipOnCursor(string text, string? title = null)
+        public void ShowTooltipOnCursor(string text, string? title = null, uint id = 0)
         {
-            ShowTooltip(text, ImGui.GetMousePos(), title);
+            ShowTooltip(text, ImGui.GetMousePos(), title, id);
         }
 
-        public void ShowTooltip(string text, Vector2 position, string? title = null)
+        public void ShowTooltip(string text, Vector2 position, string? title = null, uint id = 0)
         {
             if (text == null)
             {
@@ -81,7 +81,13 @@ namespace DelvUI.Helpers
             if (title != null)
             {
                 _currentTooltipTitle = title;
-                _titleSize = ImGui.CalcTextSize(title, MaxWidth);
+
+                if (_config.ShowStatusIDs)
+                {
+                    _currentTooltipTitle += " (ID: " + id + ")";
+                }
+
+                _titleSize = ImGui.CalcTextSize(_currentTooltipTitle, MaxWidth);
                 _titleSize.Y += Margin;
             }
 
@@ -228,5 +234,9 @@ namespace DelvUI.Helpers
         [ColorEdit4("Background Color")]
         [Order(20)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 60f / 100f));
+
+        [Checkbox("Show Status Effects IDs")]
+        [Order(25)]
+        public bool ShowStatusIDs = false;
     }
 }

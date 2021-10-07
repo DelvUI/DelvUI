@@ -223,7 +223,7 @@ namespace DelvUI.Interface.StatusEffects
         };
     }
 
-    [Portable(false)]
+    [Exportable(false)]
     [Disableable(false)]
     public class StatusEffectIconConfig : PluginConfigObject
     {
@@ -253,7 +253,7 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 
-    [Portable(false)]
+    [Exportable(false)]
     public class StatusEffectIconBorderConfig : PluginConfigObject
     {
         [ColorEdit4("Color")]
@@ -292,7 +292,7 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 
-    [Portable(false)]
+    [Exportable(false)]
     public class StatusEffectsBlacklistConfig : PluginConfigObject
     {
         public bool UseAsWhitelist = false;
@@ -368,7 +368,7 @@ namespace DelvUI.Interface.StatusEffects
         private string _input = "";
 
         [ManualDraw]
-        public bool Draw()
+        public bool Draw(ref bool changed)
         {
             if (!Enabled)
             {
@@ -383,7 +383,6 @@ namespace DelvUI.Interface.StatusEffects
                 ImGuiTableFlags.ScrollY |
                 ImGuiTableFlags.SizingFixedSame;
 
-            var changed = false;
             var sheet = Plugin.DataManager.GetExcelSheet<Status>();
             var iconSize = new Vector2(30, 30);
             var indexToRemove = -1;
@@ -500,7 +499,7 @@ namespace DelvUI.Interface.StatusEffects
 
             ImGui.EndChild();
 
-            return changed;
+            return false;
         }
     }
 
