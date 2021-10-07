@@ -32,28 +32,34 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new List<Vector2>();
             List<Vector2> sizes = new List<Vector2>();
 
-            if (Config.ManaBarConfig.Enabled)
+            if (Config.ManaBar.Enabled)
             {
-                positions.Add(Config.Position + Config.ManaBarConfig.Position);
-                sizes.Add(Config.ManaBarConfig.Size);
+                positions.Add(Config.Position + Config.ManaBar.Position);
+                sizes.Add(Config.ManaBar.Size);
             }
 
-            if (Config.ShowUmbralHeart)
+            if (Config.UmbralHeartBar.Enabled)
             {
-                positions.Add(Config.Position + Config.UmbralHeartPosition);
-                sizes.Add(Config.UmbralHeartSize);
+                positions.Add(Config.Position + Config.UmbralHeartBar.Position);
+                sizes.Add(Config.UmbralHeartBar.Size);
             }
 
-            if (Config.ShowPolyglot)
+            if (Config.TriplecastBar.Enabled)
             {
-                positions.Add(Config.Position + Config.PolyglotPosition);
-                sizes.Add(Config.PolyglotSize);
+                positions.Add(Config.Position + Config.TriplecastBar.Position);
+                sizes.Add(Config.TriplecastBar.Size);
             }
 
-            if (Config.ShowTriplecast)
+            if (Config.EnochianBar.Enabled)
             {
-                positions.Add(Config.Position + Config.TriplecastPosition);
-                sizes.Add(Config.TriplecastSize);
+                positions.Add(Config.Position + Config.EnochianBar.Position);
+                sizes.Add(Config.EnochianBar.Size);
+            }
+
+            if (Config.PolyglotBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.PolyglotBar.Position);
+                sizes.Add(Config.PolyglotBar.Size);
             }
 
             if (Config.AlwaysShowFirestarterProcs)
@@ -79,24 +85,31 @@ namespace DelvUI.Interface.Jobs
 
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            if (Config.ManaBarConfig.Enabled)
+            Vector2 pos = origin + Config.Position;
+
+            if (Config.ManaBar.Enabled)
             {
-                DrawManaBar(origin + Config.Position, player);
+                DrawManaBar(pos, player);
             }
 
-            if (Config.ShowUmbralHeart)
+            if (Config.UmbralHeartBar.Enabled)
             {
-                DrawUmbralHeartStacks(origin);
+                DrawUmbralHeartBar(pos);
             }
 
-            if (Config.ShowPolyglot)
+            if (Config.TriplecastBar.Enabled)
             {
-                DrawPolyglot(origin);
+                DrawTripleCastBar(pos, player);
             }
 
-            if (Config.ShowTriplecast)
+            if (Config.EnochianBar.Enabled)
             {
-                DrawTripleCast(origin, player);
+                DrawEnochianBar(pos);
+            }
+
+            if (Config.PolyglotBar.Enabled)
+            {
+                DrawPolyglotBar(pos, player);
             }
 
             if (Config.ShowFirestarterProcs)
@@ -117,7 +130,7 @@ namespace DelvUI.Interface.Jobs
 
         protected void DrawManaBar(Vector2 origin, PlayerCharacter player)
         {
-            BlackMageManaBarConfig config = Config.ManaBarConfig;
+            BlackMageManaBarConfig config = Config.ManaBar;
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
 
             if (config.HideWhenInactive && !gauge.InAstralFire && !gauge.InUmbralIce && player.CurrentMp == player.MaxMp)
@@ -139,10 +152,12 @@ namespace DelvUI.Interface.Jobs
                 config.ElementTimerLabelConfig.SetText("");
             }
 
+            bool drawTreshold = gauge.InAstralFire || !config.ThresholdConfig.ShowOnlyDuringAstralFire;
+
             BarHud bar = BarUtilities.GetProgressBar(
                 ID + "_manaBar",
                 config,
-                config.ThresholdConfig,
+                drawTreshold ? config.ThresholdConfig : null,
                 new LabelConfig[] { config.ValueLabelConfig, config.ElementTimerLabelConfig },
                 player.CurrentMp,
                 player.MaxMp,
@@ -155,114 +170,69 @@ namespace DelvUI.Interface.Jobs
             bar.Draw(origin);
         }
 
-        protected void DrawUmbralHeartStacks(Vector2 origin)
+        protected void DrawUmbralHeartBar(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
-            if (Config.OnlyShowUmbralHeartWhenActive && gauge.UmbralHearts is 0) { return; }
-            var position = origin + Config.Position + Config.UmbralHeartPosition - Config.UmbralHeartSize / 2f;
+            if (Config.UmbralHeartBar.HideWhenInactive && gauge.UmbralHearts == 0)
+            {
+                return;
+            };
 
-            var bar = BarBuilder.Create(position, Config.UmbralHeartSize)
-                                .SetChunks(3)
-                                .SetChunkPadding(Config.UmbralHeartPadding)
-                                .AddInnerBar(gauge.UmbralHearts, 3, Config.UmbralHeartColor, EmptyColor)
-                                .SetBackgroundColor(EmptyColor.Base)
-                                .Build();
-
-            var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            BarUtilities.GetChunkedProgressBars(ID + "_umbralHeartBar", Config.UmbralHeartBar, 3, gauge.UmbralHearts, 3f)
+                .Draw(origin);
         }
 
-        protected void DrawPolyglot(Vector2 origin)
+        protected void DrawEnochianBar(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
 
-            // stacks
-            if (!Config.OnlyShowPolyglotWhenActive ||
-                gauge.PolyglotStacks > 0 ||
-                (!Config.ShowTimerOutsideOfStacks && gauge.IsEnochianActive))
+            if (Config.EnochianBar.HideWhenInactive && !gauge.IsEnochianActive)
             {
-                var drawList = ImGui.GetWindowDrawList();
-                var position = origin + Config.Position + Config.PolyglotPosition - Config.PolyglotSize / 2f;
-                var barWidth = (int)(Config.PolyglotSize.X - Config.PolyglotPadding) / 2;
-                var barSize = new Vector2(barWidth, Config.PolyglotSize.Y);
-
-                var scale = 1 - (gauge.IsEnochianActive ? gauge.EnochianTimer / 30000f : 1);
-                if (Config.ShowTimerOutsideOfStacks)
-                {
-                    scale = gauge.PolyglotStacks >= 1 ? 1 : 0;
-                }
-
-                // 1
-                var builder = BarBuilder.Create(position, barSize)
-                                        .AddInnerBar(scale, 1, Config.PolyglotColor)
-                                        .SetBackgroundColor(EmptyColor.Base);
-
-                if (Config.ShowPolyglot && gauge.PolyglotStacks >= 1)
-                {
-                    builder.SetGlowColor(Config.PolyglotGlowColor.Base);
-                }
-
-                builder.Build().Draw(drawList);
-
-                // 2
-                scale = gauge.PolyglotStacks == 1 ? scale : gauge.PolyglotStacks == 0 ? 0 : 1;
-                if (Config.ShowTimerOutsideOfStacks)
-                {
-                    scale = gauge.PolyglotStacks == 2 ? 1 : 0;
-                }
-
-                position.X += barWidth + Config.PolyglotPadding;
-                builder = BarBuilder.Create(position, barSize)
-                                    .AddInnerBar(scale, 1, Config.PolyglotColor)
-                                    .SetBackgroundColor(EmptyColor.Base);
-
-                if (Config.ShowPolyglot && gauge.PolyglotStacks == 2)
-                {
-                    builder.SetGlowColor(Config.PolyglotGlowColor.Base);
-                }
-
-                builder.Build().Draw(drawList);
+                return;
             }
 
-            if (Config.ShowTimerOutsideOfStacks && (gauge.IsEnochianActive || !Config.OnlyShowPolyglotWhenActive))
+            int timer = gauge.IsEnochianActive ? (30000 - gauge.EnochianTimer) / 1000 : 0;
+            Config.EnochianBar.Label.SetText($"{timer,0}");
+            BarUtilities.GetProgressBar(ID + "_enochianBar", Config.EnochianBar, timer, 30, 0f)
+                .Draw(origin);
+        }
+
+        protected void DrawPolyglotBar(Vector2 origin, PlayerCharacter player)
+        {
+            var gauge = Plugin.JobGauges.Get<BLMGauge>();
+
+            if (Config.PolyglotBar.HideWhenInactive && gauge.PolyglotStacks == 0)
             {
-                DrawEnochianTimer(origin);
+                return;
+            }
+
+            // only 1 stack before level 80
+            if (player.Level < 80)
+            {
+                var glow = gauge.PolyglotStacks == 1 ? Config.PolyglotBar.GlowConfig : null;
+                BarUtilities.GetBar(ID + "_polyglotBar", Config.PolyglotBar, gauge.PolyglotStacks, 1, 0, null, glow)
+                    .Draw(origin);
+            }
+            // 2 stacks for level 80+
+            else
+            {
+                BarUtilities.GetChunkedProgressBars(ID + "_polyglotBar", Config.PolyglotBar, 2, gauge.PolyglotStacks, 2f, 0, null, null, Config.PolyglotBar.GlowConfig)
+                    .Draw(origin);
             }
         }
 
-        protected void DrawEnochianTimer(Vector2 origin)
+
+        protected void DrawTripleCastBar(Vector2 origin, PlayerCharacter player)
         {
-            var gauge = Plugin.JobGauges.Get<BLMGauge>();
+            byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId is 1211)?.StackCount ?? 0;
 
-            var position = origin + Config.Position + Config.PolyglotTimerPosition - Config.PolyglotTimerSize / 2f;
-            var scale = 1 - (gauge.IsEnochianActive ? gauge.EnochianTimer / 30000f : 1);
-            var drawList = ImGui.GetWindowDrawList();
+            if (Config.TriplecastBar.HideWhenInactive && stackCount == 0)
+            {
+                return;
+            };
 
-            var builder = BarBuilder.Create(position, Config.PolyglotTimerSize)
-                                    .AddInnerBar(scale, 1, Config.PolyglotTimerColor)
-                                    .SetBackgroundColor(EmptyColor.Base);
-
-            builder.Build().Draw(drawList);
-        }
-
-        protected void DrawTripleCast(Vector2 origin, PlayerCharacter player)
-        {
-            IEnumerable<Status> tripleStackBuff = player.StatusList.Where(o => o.StatusId is 1211);
-            int stackCount = tripleStackBuff.Any() ? tripleStackBuff.First().StackCount : 0;
-
-            if (Config.OnlyShowTriplecastWhenActive && stackCount is 0) { return; }
-
-            Vector2 position = origin + Config.Position + Config.TriplecastPosition - Config.TriplecastSize / 2f;
-
-            Bar bar = BarBuilder.Create(position, Config.TriplecastSize)
-                                .SetChunks(3)
-                                .SetChunkPadding(Config.TriplecastPadding)
-                                .AddInnerBar(stackCount, 3, Config.TriplecastColor, EmptyColor)
-                                .SetBackgroundColor(EmptyColor.Base)
-                                .Build();
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            BarUtilities.GetChunkedProgressBars(ID + "_triplecastBar", Config.TriplecastBar, 3, stackCount, 3f)
+                .Draw(origin);
         }
 
         protected void DrawFirestarterProcs(Vector2 origin, PlayerCharacter player)
@@ -368,66 +338,49 @@ namespace DelvUI.Interface.Jobs
     public class BlackMageConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.BLM;
-        public new static BlackMageConfig DefaultConfig() { return new BlackMageConfig(); }
 
-        [NestedConfig("Mana Bar", 21)]
-        public BlackMageManaBarConfig ManaBarConfig = new BlackMageManaBarConfig(
+        public new static BlackMageConfig DefaultConfig()
+        {
+            var config = new BlackMageConfig();
+            config.EnochianBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+
+            return config;
+        }
+
+        [NestedConfig("Mana Bar", 30)]
+        public BlackMageManaBarConfig ManaBar = new BlackMageManaBarConfig(
             new Vector2(0, -10),
             new Vector2(254, 20),
             new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f))
         );
 
-        #region umbral heart
-        [Checkbox("Umbral Heart", separator = true)]
-        [Order(50)]
-        public bool ShowUmbralHeart = true;
+        [NestedConfig("Umbreal Heart Bar", 35)]
+        public ChunkedBarConfig UmbralHeartBar = new ChunkedBarConfig(
+            new(0, -28),
+            new(254, 12),
+            new PluginConfigColor(new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f))
+        );
 
-        [Checkbox("Only Show When Active" + "##Umbral")]
-        [Order(51, collapseWith = nameof(ShowUmbralHeart))]
-        public bool OnlyShowUmbralHeartWhenActive = false;
+        [NestedConfig("Triplecast Bar", 40)]
+        public ChunkedBarConfig TriplecastBar = new ChunkedBarConfig(
+            new(0, -41),
+            new(254, 10),
+            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
+        );
 
-        [DragFloat2("Position" + "##Umbral", min = -2000, max = 2000f)]
-        [Order(52, collapseWith = nameof(ShowUmbralHeart))]
-        public Vector2 UmbralHeartPosition = new Vector2(0, -28);
+        [NestedConfig("Enochian Bar", 45)]
+        public ProgressBarConfig EnochianBar = new ProgressBarConfig(
+            new(0, -52),
+            new(254, 8),
+            new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f))
+        );
 
-        [DragFloat2("Size" + "##Umbral", max = 2000f)]
-        [Order(53, collapseWith = nameof(ShowUmbralHeart))]
-        public Vector2 UmbralHeartSize = new Vector2(254, 12);
-
-        [DragInt("Spacing" + "##Umbral", min = -100, max = 100)]
-        [Order(54, collapseWith = nameof(ShowUmbralHeart))]
-        public int UmbralHeartPadding = 2;
-
-        [ColorEdit4("Color" + "##Umbral")]
-        [Order(55, collapseWith = nameof(ShowUmbralHeart))]
-        public PluginConfigColor UmbralHeartColor = new PluginConfigColor(new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f));
-        #endregion
-
-        #region triple cast
-        [Checkbox("Triplecast", separator = true)]
-        [Order(60)]
-        public bool ShowTriplecast = true;
-
-        [Checkbox("Only Show When Active" + "##TripleCast")]
-        [Order(61, collapseWith = nameof(ShowTriplecast))]
-        public bool OnlyShowTriplecastWhenActive = false;
-
-        [DragFloat2("Position" + "##TripleCast", min = -2000, max = 2000f)]
-        [Order(62, collapseWith = nameof(ShowTriplecast))]
-        public Vector2 TriplecastPosition = new Vector2(0, -41);
-
-        [DragFloat2("Size" + "##TripleCast", max = 2000)]
-        [Order(63, collapseWith = nameof(ShowTriplecast))]
-        public Vector2 TriplecastSize = new Vector2(254, 10);
-
-        [DragInt("Spacing" + "##TripleCast", min = -100, max = 100)]
-        [Order(64, collapseWith = nameof(ShowTriplecast))]
-        public int TriplecastPadding = 2;
-
-        [ColorEdit4("Color" + "##TripleCast")]
-        [Order(65, collapseWith = nameof(ShowTriplecast))]
-        public PluginConfigColor TriplecastColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
-        #endregion
+        [NestedConfig("Polyglot Bar", 50)]
+        public BlackMagePolyglotBarConfig PolyglotBar = new BlackMagePolyglotBarConfig(
+            new(0, -67),
+            new(38, 18),
+            new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f))
+        );
 
         #region polyglot
         [Checkbox("Polyglot", separator = true)]
@@ -605,6 +558,18 @@ namespace DelvUI.Interface.Jobs
             Color = new PluginConfigColor(new Vector4(240f / 255f, 120f / 255f, 10f / 255f, 100f / 100f));
             ShowMarker = true;
             MarkerColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        }
+    }
+
+    [Exportable(false)]
+    public class BlackMagePolyglotBarConfig : ChunkedBarConfig
+    {
+        [NestedConfig("Show Glow", 60)]
+        public BarGlowConfig GlowConfig = new BarGlowConfig();
+
+        public BlackMagePolyglotBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
         }
     }
 }
