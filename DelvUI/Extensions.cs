@@ -6,6 +6,7 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Text.SeStringHandling;
 using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.String;
+using static System.Globalization.CultureInfo;
 
 namespace DelvUI
 {
@@ -139,6 +140,17 @@ namespace DelvUI
             {
                 bar.Draw(origin);
             }
+        }
+        
+        public static string CheckForUpperCase(this string str)
+        {            
+            var culture = CurrentCulture.TextInfo;
+            if (!string.IsNullOrEmpty(str) && char.IsLetter(str[0]) && !char.IsUpper(str[0]))
+            {
+                str = culture.ToTitleCase(str);
+            }
+
+            return str;
         }
     }
 }

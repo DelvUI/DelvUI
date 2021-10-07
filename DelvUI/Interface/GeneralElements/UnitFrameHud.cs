@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Dalamud.Game.ClientState.Objects.Types;
+using static System.Globalization.CultureInfo;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -75,7 +77,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
             });
 
-            // labels
+            // labels                        
             _leftLabel.Draw(startPos, Config.Size, Actor);
             _rightLabel.Draw(startPos, Config.Size, Actor);
         }
