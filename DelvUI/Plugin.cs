@@ -11,6 +11,7 @@ using Dalamud.Interface;
 using Dalamud.Logging;
 using Dalamud.Plugin;
 using DelvUI.Config;
+using DelvUI.Config.Profiles;
 using DelvUI.Helpers;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
@@ -79,16 +80,14 @@ namespace DelvUI
             TargetManager = targetManager;
             UiBuilder = PluginInterface.UiBuilder;
 
-
             AssemblyLocation = Assembly.GetExecutingAssembly().Location;
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.2.1.1";
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "";
             FontsManager.Initialize(AssemblyLocation);
-
             LoadBanner();
 
             // initialize a not-necessarily-defaults configuration
-            ConfigurationManager.Initialize(false);
+            ConfigurationManager.Initialize();
             FontsManager.Instance.LoadConfig();
 
             UiBuilder.Draw += Draw;
@@ -116,6 +115,7 @@ namespace DelvUI
             GlobalColors.Initialize();
             MouseOverHelper.Initialize();
             PartyManager.Initialize();
+            ProfilesManager.Initialize();
             TexturesCache.Initialize();
             TooltipsHelper.Initialize();
 
@@ -170,23 +170,14 @@ namespace DelvUI
                 {
                     case "toggle":
                         ConfigurationManager.Instance.ShowHUD = !ConfigurationManager.Instance.ShowHUD;
-
                         break;
 
                     case "show":
                         ConfigurationManager.Instance.ShowHUD = true;
-
                         break;
 
                     case "hide":
                         ConfigurationManager.Instance.ShowHUD = false;
-
-                        break;
-
-                    case "reset":
-                        ConfigurationManager.Initialize(true);
-                        ConfigurationManager.Instance.SaveConfigurations();
-
                         break;
 
                     default:
@@ -258,6 +249,7 @@ namespace DelvUI
             GlobalColors.Instance.Dispose();
             MouseOverHelper.Instance.Dispose();
             PartyManager.Instance.Dispose();
+            ProfilesManager.Instance.Dispose();
             SpellHelper.Instance.Dispose();
             TexturesCache.Instance.Dispose();
             TooltipsHelper.Instance.Dispose();

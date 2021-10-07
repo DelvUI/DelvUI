@@ -172,7 +172,7 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Portable(false)]
+    [Exportable(false)]
     public class ShieldConfig : PluginConfigObject
     {
         [DragInt("Thickness")]
@@ -192,7 +192,7 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor Color = new PluginConfigColor(new Vector4(198f / 255f, 210f / 255f, 255f / 255f, 70f / 100f));
     }
 
-    [Portable(false)]
+    [Exportable(false)]
     public class TankStanceIndicatorConfig : PluginConfigObject
     {
         [DragInt("Thickness")]

@@ -4,7 +4,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.Bars
 {
-    [Portable(false)]
     public class ChunkedBarConfig : BarConfig
     {
         [DragInt("Padding", min = 0, max = 10000, spacing = true)]

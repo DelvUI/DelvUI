@@ -6,7 +6,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.Bars
 {
-    [Portable(false)]
     public class ProgressBarConfig : BarConfig
     {
         [Checkbox("Threshold")]

@@ -8,6 +8,7 @@ using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Enums;
 using Colourful;
+using System.Text.RegularExpressions;
 
 namespace DelvUI.Helpers
 {
@@ -208,6 +209,24 @@ namespace DelvUI.Helpers
             }
 
             return position;
+        }
+
+        public static string UserFriendlyConfigName(string configTypeName)
+        {
+            return UserFriendlyString(configTypeName, "Config");
+        }
+
+        public static string UserFriendlyString(string str, string? remove)
+        {
+            var s = remove != null ? str.Replace(remove, "") : str;
+
+            var regex = new Regex(@"
+                    (?<=[A-Z])(?=[A-Z][a-z]) |
+                    (?<=[^A-Z])(?=[A-Z]) |
+                    (?<=[A-Za-z])(?=[^A-Za-z])",
+                RegexOptions.IgnorePatternWhitespace);
+
+            return regex.Replace(s, " ");
         }
     }
 }

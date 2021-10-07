@@ -228,7 +228,6 @@ namespace DelvUI.Interface.Jobs
                                                     new PluginConfigColor(new(247f / 255f, 163f / 255f, 89f / 255f, 100f / 100f)));
     }
 
-    [Portable(false)]
     public class SenBarConfig : ChunkedBarConfig
     {
         [ColorEdit4("Setsu", spacing = true)]
