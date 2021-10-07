@@ -23,11 +23,6 @@ namespace DelvUI.Interface.GeneralElements
             get => _actor;
             set
             {
-                if (_actor == value)
-                {
-                    return;
-                }
-
                 if (value is PlayerCharacter chara)
                 {
                     _actor = value;
