@@ -19,8 +19,9 @@ namespace DelvUI.Interface.Bars
             Vector2 position,
             Vector2 size,
             PluginConfigColor fillColor,
+            BarDirection fillDirection = BarDirection.Right,
             PluginConfigColor? threshHoldColor = null,
-            float threshold = 0f) : base(position, size, fillColor)
+            float threshold = 0f) : base(position, size, fillColor, fillDirection)
         {
             Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
             ThresholdConfig.Color = threshHoldColor ?? ThresholdConfig.Color;
@@ -35,24 +36,28 @@ namespace DelvUI.Interface.Bars
         [Order(10)]
         public float Value = 0f;
 
-        [Combo("Activate Above/Below Threshold", "Above", "Below")]
+        [Checkbox("Change Color")]
         [Order(15)]
+        public bool ChangeColor = true;
+
+        [Combo("Activate Above/Below Threshold", "Above", "Below")]
+        [Order(20, collapseWith = nameof(ChangeColor))]
         public ThresholdType ThresholdType = ThresholdType.Below;
 
         [ColorEdit4("Color")]
-        [Order(20)]
+        [Order(25, collapseWith = nameof(ChangeColor))]
         public PluginConfigColor Color = new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
 
         [Checkbox("Show Threshold Marker")]
-        [Order(25)]
+        [Order(30)]
         public bool ShowMarker = false;
 
         [DragInt("Threshold Marker Size", min = 0, max = 10000)]
-        [Order(30, collapseWith = nameof(ShowMarker))]
+        [Order(35, collapseWith = nameof(ShowMarker))]
         public int MarkerSize = 2;
 
         [ColorEdit4("Threshold Marker Color")]
-        [Order(35, collapseWith = nameof(ShowMarker))]
+        [Order(40, collapseWith = nameof(ShowMarker))]
         public PluginConfigColor MarkerColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         public bool IsActive(float current)

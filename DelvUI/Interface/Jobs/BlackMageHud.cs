@@ -1,16 +1,12 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -162,8 +158,8 @@ namespace DelvUI.Interface.Jobs
                 player.CurrentMp,
                 player.MaxMp,
                 0,
-                gauge.InAstralFire ? config.FireColor : gauge.InUmbralIce ? config.IceColor : config.FillColor,
                 player,
+                gauge.InAstralFire ? config.FireColor : gauge.InUmbralIce ? config.IceColor : config.FillColor,
                 gauge.IsEnochianActive && config.GlowConfig.Enabled ? config.GlowConfig : null
             );
 
@@ -223,7 +219,7 @@ namespace DelvUI.Interface.Jobs
             if (player.Level < 80)
             {
                 var glow = gauge.PolyglotStacks == 1 ? Config.PolyglotBar.GlowConfig : null;
-                BarUtilities.GetBar(ID + "_polyglotBar", Config.PolyglotBar, gauge.PolyglotStacks, 1, 0, null, glow)
+                BarUtilities.GetBar(ID + "_polyglotBar", Config.PolyglotBar, gauge.PolyglotStacks, 1, 0, glowConfig: glow)
                     .Draw(origin);
             }
             // 2 stacks for level 80+
@@ -291,7 +287,6 @@ namespace DelvUI.Interface.Jobs
             config.EnochianBar.Label.FrameAnchor = DrawAnchor.Left;
             config.EnochianBar.Label.Position = new Vector2(2, 0);
 
-            config.ThundercloudBar.FillDirection = BarDirection.Left;
             config.ThundercloudBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.ThundercloudBar.Label.TextAnchor = DrawAnchor.Right;
             config.ThundercloudBar.Label.FrameAnchor = DrawAnchor.Right;
@@ -349,7 +344,8 @@ namespace DelvUI.Interface.Jobs
         public ProgressBarConfig ThundercloudBar = new ProgressBarConfig(
             new(-64, -69),
             new(126, 14),
-            new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f))
+            new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f)),
+            BarDirection.Left
         );
 
         [NestedConfig("Thunder DoT Bar", 60)]

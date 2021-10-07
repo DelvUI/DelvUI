@@ -17,7 +17,7 @@ namespace DelvUI.Interface.Bars
 
         [Combo("Fill Direction", new string[] { "Left", "Right", "Up", "Down" })]
         [Order(30)]
-        public BarDirection FillDirection = BarDirection.Right;
+        public BarDirection FillDirection;
 
         [Checkbox("Show Border")]
         [Order(35)]
@@ -27,11 +27,12 @@ namespace DelvUI.Interface.Bars
         [Order(40)]
         public bool HideWhenInactive = false;
 
-        public BarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+        public BarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor, BarDirection fillDirection = BarDirection.Right)
         {
             Position = position;
             Size = size;
             FillColor = fillColor;
+            FillDirection = fillDirection;
         }
     }
 

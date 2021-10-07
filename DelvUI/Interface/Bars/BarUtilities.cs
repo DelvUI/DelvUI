@@ -14,7 +14,7 @@ namespace DelvUI.Interface.Bars
     {
         public static BarHud GetProgressBar(string id, ProgressBarConfig config, float current, float max, float min = 0f, GameObject? actor = null, PluginConfigColor? fillColor = null)
         {
-            return GetProgressBar(id, config, config.ThresholdConfig, new LabelConfig[] { config.Label }, current, max, min, fillColor, actor);
+            return GetProgressBar(id, config, config.ThresholdConfig, new LabelConfig[] { config.Label }, current, max, min, actor, fillColor);
         }
 
         public static BarHud GetProgressBar(
@@ -25,13 +25,19 @@ namespace DelvUI.Interface.Bars
             float current,
             float max,
             float min = 0f,
-            PluginConfigColor? fillColor = null,
             GameObject? actor = null,
+            PluginConfigColor? fillColor = null,
             BarGlowConfig? glowConfig = null
         )
         {
             BarHud bar = new BarHud(id, config, actor, glowConfig);
-            PluginConfigColor color = thresholdConfig?.IsActive(current) == true ? thresholdConfig.Color : (fillColor ?? config.FillColor);
+
+            PluginConfigColor color = fillColor ?? config.FillColor;
+            if (thresholdConfig != null)
+            {
+                color = thresholdConfig.ChangeColor && thresholdConfig.IsActive(current) ? thresholdConfig.Color : color;
+            }
+
             Rect foreground = GetFillRect(config.Position, config.Size, config.FillDirection, color, current, max, min);
             bar.AddForegrounds(foreground);
             bar.AddLabels(labelConfigs);
@@ -196,10 +202,11 @@ namespace DelvUI.Interface.Bars
             float max,
             float min = 0f,
             GameObject? actor = null,
+            PluginConfigColor? fillColor = null,
             BarGlowConfig? glowConfig = null,
             params LabelConfig[] labels)
         {
-            Rect foreground = GetFillRect(Config.Position, Config.Size, Config.FillDirection, Config.FillColor, current, max, min);
+            Rect foreground = GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor ?? Config.FillColor, current, max, min);
             return new BarHud(id, Config, actor, glowConfig).AddForegrounds(foreground).AddLabels(labels);
         }
 
