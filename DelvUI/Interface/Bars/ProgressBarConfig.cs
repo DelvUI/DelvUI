@@ -47,7 +47,7 @@ namespace DelvUI.Interface.Bars
             float threshold = 0f) : base(position, size, fillColor)
         {
             Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
-            ThresholdColor = threshHoldColor ?? fillColor;
+            ThresholdColor = threshHoldColor ?? new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
             ThresholdValue = threshold;
         }
 
