@@ -6,7 +6,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [Portable(false)]
+    [Exportable(false)]
     public class EditableLabelConfig : LabelConfig
     {
         [InputText("Text")]
@@ -29,7 +29,7 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [Portable(false)]
+    [Exportable(false)]
     public class LabelConfig : MovablePluginConfigObject
     {
         [JsonIgnore] protected string _text;

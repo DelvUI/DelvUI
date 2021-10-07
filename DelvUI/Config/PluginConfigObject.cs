@@ -11,17 +11,19 @@ namespace DelvUI.Config
 {
     public abstract class PluginConfigObject : IOnChangeEventArgs
     {
+        public string Version => Plugin.Version;
+
         [Checkbox("Enabled")]
         [Order(0, collapseWith = null)]
         public bool Enabled = true;
 
         [JsonIgnore]
-        public bool Portable
+        public bool Exportable
         {
             get
             {
-                PortableAttribute? attribute = (PortableAttribute?)GetType().GetCustomAttribute(typeof(PortableAttribute), false);
-                return attribute == null || attribute.portable;
+                ExportableAttribute? attribute = (ExportableAttribute?)GetType().GetCustomAttribute(typeof(ExportableAttribute), false);
+                return attribute == null || attribute.exportable;
             }
         }
 

@@ -4,11 +4,9 @@ using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using ImGuiNET;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
-using System.Reflection;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -25,6 +23,7 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Disableable(false)]
+    [Exportable(false)]
     [Section("Misc")]
     [SubSection("Fonts", 0)]
     public class FontsConfig : PluginConfigObject
@@ -137,13 +136,8 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         [ManualDraw]
-        public bool Draw()
+        public bool Draw(ref bool changed)
         {
-            if (!Enabled)
-            {
-                return false;
-            }
-
             var flags =
                 ImGuiTableFlags.RowBg |
                 ImGuiTableFlags.Borders |
@@ -152,31 +146,25 @@ namespace DelvUI.Interface.GeneralElements
                 ImGuiTableFlags.ScrollY |
                 ImGuiTableFlags.SizingFixedSame;
 
-            var changed = false;
             var indexToRemove = -1;
 
             if (ImGui.BeginChild("Fonts", new Vector2(400, 400), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 if (_fonts.Length == 0)
                 {
-                    ImGui.Text("\u2002");
-                    ImGui.SameLine();
+                    ImGuiHelper.Tab();
                     ImGui.Text("Default font not found in \"%appdata%/Roaming/XIVLauncher/InstalledPlugins/DelvUI/Media/Fonts/big-noodle-too.ttf\"");
                     return false;
                 }
 
-                ImGui.NewLine();
-
-                ImGui.Text("\u2002");
-                ImGui.SameLine();
+                ImGuiHelper.NewLineAndTab();
                 if (ImGui.InputText("Fonts Path", ref FontsPath, 200, ImGuiInputTextFlags.EnterReturnsTrue))
                 {
                     changed = true;
                     ReloadFonts();
                 }
 
-                ImGui.Text("\u2002");
-                ImGui.SameLine();
+                ImGuiHelper.Tab();
                 ImGui.Combo("Font ##font", ref _inputFont, _fonts, _fonts.Length, 10);
 
                 ImGui.SameLine();
@@ -187,8 +175,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
                 ImGui.PopFont();
 
-                ImGui.Text("\u2002");
-                ImGui.SameLine();
+                ImGuiHelper.Tab();
                 ImGui.Combo("Size  ##size", ref _inputSize, _sizes, _sizes.Length, 10);
 
                 ImGui.SameLine();
@@ -199,9 +186,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
                 ImGui.PopFont();
 
-                ImGui.NewLine();
-                ImGui.Text("\u2002");
-                ImGui.SameLine();
+                ImGuiHelper.NewLineAndTab();
                 if (ImGui.BeginTable("table", 3, flags, new Vector2(326, 150)))
                 {
                     ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 0, 0);
@@ -255,9 +240,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
 
                 ImGui.NewLine();
-                ImGui.NewLine();
-                ImGui.Text("\u2002");
-                ImGui.SameLine();
+                ImGuiHelper.NewLineAndTab();
                 if (ImGui.Checkbox("Support Chinese", ref SupportChineseCharacters))
                 {
                     changed = true;
@@ -280,7 +263,7 @@ namespace DelvUI.Interface.GeneralElements
 
             ImGui.EndChild();
 
-            return changed;
+            return false;
         }
     }
 }

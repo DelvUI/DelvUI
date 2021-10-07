@@ -278,7 +278,16 @@ namespace DelvUI.Interface
 
             _hudHelper.Update();
 
-            UpdateJob();
+            if (UpdateJob())
+            {
+                // not the cleanest way of doing this
+                // we should probably have some class that checks for the 
+                // player's job changing and then firing an event
+                // however i didn't want to deal with possible race conditions
+                // on the hud manager so for now i'm taking the lazy apporach
+                ConfigurationManager.Instance.UpdateCurrentProfile();
+            }
+
             AssignActors();
 
             // show only castbar during quest events
@@ -376,19 +385,19 @@ namespace DelvUI.Interface
             return false;
         }
 
-        private void UpdateJob()
+        private bool UpdateJob()
         {
             var player = Plugin.ClientState.LocalPlayer;
             if (player is null)
             {
-                return;
+                return false;
             }
 
             var newJobId = player.ClassJob.Id;
             if (_jobHud != null && _primaryResourceHud != null && _jobHud.Config.JobId == newJobId)
             {
                 _primaryResourceHud.ResourceType = _jobHud.Config.UseDefaultPrimaryResourceBar ? _jobHud.Config.PrimaryResourceType : PrimaryResourceTypes.None;
-                return;
+                return false;
             }
 
             JobConfig? config = null;
@@ -412,6 +421,8 @@ namespace DelvUI.Interface
             {
                 _primaryResourceHud.ResourceType = config.UseDefaultPrimaryResourceBar ? config.PrimaryResourceType : PrimaryResourceTypes.None;
             }
+
+            return true;
         }
 
         private void AssignActors()
