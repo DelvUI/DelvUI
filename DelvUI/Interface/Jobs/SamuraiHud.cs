@@ -218,6 +218,7 @@ namespace DelvUI.Interface.Jobs
                                                     new(0, -78),
                                                     new(254, 20),
                                                     new PluginConfigColor(new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f)),
+                                                    BarDirection.Right,
                                                     new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
                                                     15f);
 
