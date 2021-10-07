@@ -10,9 +10,9 @@ namespace DelvUI.Interface.Bars
 {
     public class BarUtilities
     {
-        public static BarHud GetProgressBar(string ID, ProgressBarConfig config, float current, float max, float min = 0f, GameObject? actor = null)
+        public static BarHud GetProgressBar(ProgressBarConfig config, float current, float max, float min = 0f, GameObject? actor = null)
         {
-            var bar = new BarHud(ID, config, actor);
+            var bar = new BarHud(config, actor);
             PluginConfigColor fillColor = config.IsThresholdActive(current) ? config.ThresholdColor : config.FillColor;
             Rect foreground = GetFillRect(config.Position, config.Size, config.FillDirection, fillColor, current, max, min);
             bar.Foreground(foreground);
@@ -33,7 +33,6 @@ namespace DelvUI.Interface.Bars
 
         // Tuple is <foregroundColor, percent fill, labels>
         public static BarHud[] GetChunkedBars(
-            string ID,
             ChunkedBarConfig config,
             GameObject? actor,
             params Tuple<PluginConfigColor, float, LabelConfig?>[] chunks)
@@ -58,7 +57,7 @@ namespace DelvUI.Interface.Bars
                 Rect background = new Rect(chunkPos, chunkSize, config.BackgroundColor);
                 Rect foreground = GetFillRect(chunkPos, chunkSize, config.FillDirection, chunks[i].Item1, chunks[i].Item2, 1f, 0f);
 
-                bars[i] = new BarHud(ID, config.DrawBorder, actor: actor).Background(background).Foreground(foreground);
+                bars[i] = new BarHud(config.ID, config.DrawBorder, actor: actor).Background(background).Foreground(foreground);
 
                 var label = chunks[i].Item3;
                 if (label is not null)
@@ -71,7 +70,6 @@ namespace DelvUI.Interface.Bars
         }
 
         public static BarHud[] GetChunkedProgressBars(
-            string ID,
             ChunkedBarConfig config,
             int chunks,
             float current,
@@ -93,13 +91,13 @@ namespace DelvUI.Interface.Bars
                 barChunks[barIndex] = new Tuple<PluginConfigColor, float, LabelConfig?>(chunkColor, chunkPercent, chunkPercent < 1f ? label : null);
             }
 
-            return GetChunkedBars(ID, config, actor, barChunks);
+            return GetChunkedBars(config, actor, barChunks);
         }
 
-        public static BarHud GetBar(string ID, BarConfig Config, float current, float max, float min = 0f, GameObject? actor = null, params LabelConfig[] labels)
+        public static BarHud GetBar(BarConfig Config, float current, float max, float min = 0f, GameObject? actor = null, params LabelConfig[] labels)
         {
             Rect foreground = GetFillRect(Config.Position, Config.Size, Config.FillDirection, Config.FillColor, current, max, min);
-            return new BarHud(ID, Config, actor).Foreground(foreground).Labels(labels);
+            return new BarHud(Config, actor).Foreground(foreground).Labels(labels);
         }
 
         /// <summary>

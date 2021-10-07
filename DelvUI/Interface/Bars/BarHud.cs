@@ -32,7 +32,7 @@ namespace DelvUI.Interface.Bars
             ID = id;
         }
 
-        public BarHud(string id, BarConfig config, GameObject? actor = null) : this(id, config.DrawBorder, config.Anchor, actor)
+        public BarHud(BarConfig config, GameObject? actor = null) : this(config.ID, config.DrawBorder, config.Anchor, actor)
         {
             BackgroundRect = new Rect(config.Position, config.Size, config.BackgroundColor);
         }
@@ -51,7 +51,7 @@ namespace DelvUI.Interface.Bars
 
         public BarHud Labels(params LabelConfig[] labels)
         {
-            LabelHuds.AddRange(labels.Select(c => new LabelHud($"barLabel_{ID}", c)));
+            LabelHuds.AddRange(labels.Select(c => new LabelHud($"{ID}_Label", c)));
             return this;
         }
 
@@ -60,7 +60,7 @@ namespace DelvUI.Interface.Bars
             var barPos = Utils.GetAnchoredPosition(origin, BackgroundRect.Size, Anchor);
             var backgroundPos = barPos + BackgroundRect.Position;
 
-            DrawHelper.DrawInWindow($"DelvUI_Bar_{ID}", backgroundPos, BackgroundRect.Size, true, false, (drawList) =>
+            DrawHelper.DrawInWindow($"{ID}", backgroundPos, BackgroundRect.Size, true, false, (drawList) =>
             {
                 // Draw background
                 DrawHelper.DrawGradientFilledRect(backgroundPos, BackgroundRect.Size, BackgroundRect.Color, drawList);

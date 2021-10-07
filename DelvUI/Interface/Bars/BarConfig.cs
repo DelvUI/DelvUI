@@ -1,11 +1,16 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using Newtonsoft.Json;
+using System;
 using System.Numerics;
 
 namespace DelvUI.Interface.Bars
 {
     public class BarConfig : AnchorablePluginConfigObject
     {
+        [JsonIgnore]
+        public string ID { get; private set; }
+
         [ColorEdit4("Background Color")]
         [Order(20)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
@@ -31,6 +36,7 @@ namespace DelvUI.Interface.Bars
             Position = position;
             Size = size;
             FillColor = fillColor;
+            ID = $"DelvUI_Bar_{Guid.NewGuid()}";
         }
     }
 

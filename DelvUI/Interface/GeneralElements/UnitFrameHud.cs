@@ -84,7 +84,7 @@ namespace DelvUI.Interface.GeneralElements
 
             var background = new Rect(Config.Position, Config.Size, BackgroundColor(character));
             var healthFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, character.CurrentHp, character.MaxHp);
-            var bar = new BarHud(ID, Config, character).Background(background).Foreground(healthFill).Labels(Config.LeftLabelConfig, Config.RightLabelConfig);
+            var bar = new BarHud(Config, character).Background(background).Foreground(healthFill).Labels(Config.LeftLabelConfig, Config.RightLabelConfig);
 
             if (Config.UseMissingHealthBar)
             {
@@ -107,7 +107,7 @@ namespace DelvUI.Interface.GeneralElements
 
         private void DrawFriendlyNPC(Vector2 pos, GameObject? Actor)
         {
-            var bar = new BarHud(ID, Config, Actor);
+            var bar = new BarHud(Config, Actor);
             bar.Foreground(new Rect(Config.Position, Config.Size, Config.UseJobColor? GlobalColors.Instance.NPCFriendlyColor : Config.FillColor));
             bar.Labels(Config.LeftLabelConfig, Config.RightLabelConfig);
             bar.Draw(pos);

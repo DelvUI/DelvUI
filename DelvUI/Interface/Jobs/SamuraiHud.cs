@@ -106,7 +106,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.KenkiBar.HideWhenInactive || gauge.Kenki > 0)
             { 
                 Config.KenkiBar.Label.SetText(gauge.Kenki.ToString("N0"));
-                BarUtilities.GetProgressBar(nameof(Config.KenkiBar), Config.KenkiBar, gauge.Kenki, 100f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.KenkiBar, gauge.Kenki, 100f, 0f, player).Draw(pos);
             }
         }
 
@@ -116,7 +116,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.ShifuBar.HideWhenInactive || shifuDuration > 0)
             {
                 Config.ShifuBar.Label.SetText(Math.Truncate(shifuDuration).ToString());
-                BarUtilities.GetProgressBar(nameof(Config.ShifuBar), Config.ShifuBar, shifuDuration, 40f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.ShifuBar, shifuDuration, 40f, 0f, player).Draw(pos);
             }
         }
 
@@ -126,7 +126,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.JinpuBar.HideWhenInactive || jinpuDuration > 0)
             {
                 Config.JinpuBar.Label.SetText(Math.Truncate(jinpuDuration).ToString());
-                BarUtilities.GetProgressBar(nameof(Config.JinpuBar), Config.JinpuBar, jinpuDuration, 40f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.JinpuBar, jinpuDuration, 40f, 0f, player).Draw(pos);
             }
         }
 
@@ -139,7 +139,7 @@ namespace DelvUI.Interface.Jobs
                 if (!Config.HiganbanaBar.HideWhenInactive || higanbanaDuration > 0)
                 {
                     Config.HiganbanaBar.Label.SetText(Math.Truncate(higanbanaDuration).ToString());
-                    BarUtilities.GetProgressBar(nameof(Config.HiganbanaBar), Config.HiganbanaBar, higanbanaDuration, 60f, 0f, player).Draw(pos);
+                    BarUtilities.GetProgressBar(Config.HiganbanaBar, higanbanaDuration, 60f, 0f, player).Draw(pos);
                 }
             }
         }
@@ -159,7 +159,7 @@ namespace DelvUI.Interface.Jobs
                     sen[i] = new Tuple<PluginConfigColor, float, LabelConfig?>(colors[order[i]], hasSen[order[i]], null);
                 }
 
-                BarUtilities.GetChunkedBars(nameof(Config.SenBar), Config.SenBar, player, sen).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.SenBar, player, sen).Draw(pos);
             }
         }
 
@@ -168,7 +168,7 @@ namespace DelvUI.Interface.Jobs
             var gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.MeditationBar.HideWhenInactive || gauge.MeditationStacks > 0)
             {
-                BarUtilities.GetChunkedProgressBars(nameof(Config.MeditationBar), Config.MeditationBar, 3, gauge.MeditationStacks, 3f).Draw(pos);
+                BarUtilities.GetChunkedProgressBars(Config.MeditationBar, 3, gauge.MeditationStacks, 3f).Draw(pos);
             }
         }
     }
