@@ -237,7 +237,6 @@ namespace DelvUI.Interface.Jobs
 
         public NinjaConfig()
         {
-            // Setup initial bar config
             TrickAttackBar.Enabled = false;
             SuitonBar.Enabled = false;
             HutonBar.Threshold = true;
