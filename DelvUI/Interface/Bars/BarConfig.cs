@@ -1,12 +1,11 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using System.Numerics;
 
 namespace DelvUI.Interface.Bars
 {
     [Portable(false)]
-    public abstract class BarConfigBase : AnchorablePluginConfigObject
+    public class BarConfig : AnchorablePluginConfigObject
     {
         [ColorEdit4("Background Color")]
         [Order(20)]
@@ -28,16 +27,12 @@ namespace DelvUI.Interface.Bars
         [Order(40)]
         public bool HideWhenInactive = false;
 
-        public BarConfigBase(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+        public BarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
         {
             Position = position;
             Size = size;
             FillColor = fillColor;
         }
-
-        public abstract bool IsActive(float current, float max, float min);
-
-        public abstract BarHud[] GetBars(float current, float max, float min = 0f, GameObject? actor = null);
     }
 
     public enum BarDirection

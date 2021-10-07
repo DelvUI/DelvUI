@@ -1,21 +1,20 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
-using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
-using System;
-using System.Numerics;
+using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 
 namespace DelvUI.Interface.Bars
 {
     public class BarHud
     {
-        public Rect BackgroundRect { get; private set; }
+        public Rect BackgroundRect { get; private set; } = new Rect();
 
-        public Rect[] ForegroundRects { get; private set; }
+        public  List<Rect> ForegroundRects { get;  set; } = new List<Rect>();
 
-        public LabelHud[] Labels { get; private set; }
+        public List<LabelHud> LabelHuds { get; private set; } = new List<LabelHud>();
 
         public bool DrawBorder { get; private set; }
 
@@ -23,14 +22,31 @@ namespace DelvUI.Interface.Bars
 
         public GameObject? Actor { get; private set; }
 
-        public BarHud(Rect background, Rect[] foregrounds, bool drawBorder, DrawAnchor anchor, LabelConfig[]? labels = null, GameObject? actor = null)
+        public BarHud(bool drawBorder = true, DrawAnchor anchor = DrawAnchor.TopLeft, GameObject? actor = null)
         {
-            BackgroundRect = background;
-            ForegroundRects = foregrounds;
-            Labels = labels is not null ? labels.Select(c => new LabelHud($"_label{c.GetHashCode()}", c)).ToArray() : Array.Empty<LabelHud>();
             DrawBorder = drawBorder;
             Anchor = anchor;
             Actor = actor;
+        }
+
+        public BarHud(BarConfig config, GameObject? actor = null) : this(config.DrawBorder, config.Anchor, actor) {}
+
+        public BarHud Background(Rect rect)
+        {
+            BackgroundRect = rect;
+            return this;
+        }
+
+        public BarHud Foreground(params Rect[] rects)
+        {
+            ForegroundRects.AddRange(rects);
+            return this;
+        }
+
+        public BarHud Labels(params LabelConfig[] labels)
+        {
+            LabelHuds = labels.Select(c => new LabelHud("_barLabel", c)).ToList();
+            return this;
         }
 
         public void Draw(Vector2 origin)
@@ -56,115 +72,11 @@ namespace DelvUI.Interface.Bars
                 }
 
                 // Draw Labels
-                foreach (LabelHud label in Labels)
+                foreach (LabelHud label in LabelHuds)
                 {
                     label.Draw(backgroundPos, BackgroundRect.Size, Actor);
                 }
             });
-        }
-
-        public static BarHud[] GetChunkedBars(
-            int chunks,
-            int chunkPadding,
-            Vector2 size,
-            float current,
-            float max,
-            float min,
-            bool drawBorder,
-            DrawAnchor anchor,
-            BarDirection fillDirection,
-            LabelConfig? activeChunkLabel,
-            PluginConfigColor backgroundColor,
-            PluginConfigColor fillColor,
-            PluginConfigColor? chunkFullColor = null)
-        {
-            BarHud[] bars = new BarHud[chunks];
-            float chunkRange = (max - min) / chunks;
-
-            for (int i = 0; i < chunks; i++)
-            {
-                int barIndex = (fillDirection == BarDirection.Left || fillDirection == BarDirection.Up) ? chunks - i - 1 : i;
-
-                Vector2 chunkPos, chunkSize;
-                if (fillDirection == BarDirection.Right || fillDirection == BarDirection.Left)
-                {
-                    chunkSize = new Vector2((size.X - chunkPadding * (chunks - 1)) / chunks, size.Y);
-                    chunkPos = new Vector2((chunkSize.X + chunkPadding) * barIndex, 0);
-                }
-                else
-                {
-                    chunkSize = new Vector2(size.X, (size.Y - chunkPadding * (chunks - 1)) / chunks);
-                    chunkPos = new Vector2(0, (chunkSize.Y + chunkPadding) * barIndex);
-                }
-
-                Rect background = new Rect(chunkPos, chunkSize, backgroundColor);
-
-                float chunkMin = min + chunkRange * i;
-                float chunkMax = min + chunkRange * (i + 1);
-                PluginConfigColor chunkColor = chunkFullColor is not null && current >= chunkMax ? chunkFullColor : fillColor;
-                Rect foreground = Rect.GetFillRect(chunkPos, chunkSize, fillDirection, chunkColor, current, chunkMax, chunkMin);
-
-                LabelConfig[]? labels = activeChunkLabel is not null && current >= chunkMin && current < chunkMax ? new[] { activeChunkLabel } : null;
-                bars[i] = new BarHud(background, new[] { foreground }, drawBorder, anchor, labels);
-            }
-
-            return bars;
-        }
-    }
-
-    public class Rect
-    {
-        public Vector2 Position { get; set; }
-
-        public Vector2 Size { get; set; }
-
-        public PluginConfigColor Color { get; set; }
-
-        public Rect(Vector2 pos, Vector2 size, PluginConfigColor color)
-        {
-            Position = pos;
-            Size = size;
-            Color = color;
-        }
-
-        public static Vector2 GetFillDirectionOffset(Vector2 size, BarDirection fillDirection)
-        {
-            return fillDirection switch
-            {
-                BarDirection.Left => new(size.X, 0),
-                BarDirection.Right => new(size.X, 0),
-                BarDirection.Up => new(0, size.Y),
-                BarDirection.Down => new(0, size.Y),
-                _ => Vector2.Zero
-            };
-        }
-
-        public static Rect GetFillRect(Vector2 pos, Vector2 size, BarDirection fillDirection, PluginConfigColor color, float current, float max, float min = 0f)
-        {
-            Vector2 fillPos = Vector2.Zero;
-            Vector2 fillSize = Vector2.Zero;
-            float fillPercent = Math.Clamp((current - min) / (max - min), 0f, 1f);
-
-            if (fillDirection == BarDirection.Right)
-            {
-                fillSize = new Vector2(size.X * fillPercent, size.Y);
-            }
-            else if (fillDirection == BarDirection.Down)
-            {
-                fillSize = new Vector2(size.X, size.Y * fillPercent);
-            }
-            else if (fillDirection == BarDirection.Left)
-            {
-                fillSize = new Vector2(size.X * fillPercent, size.Y);
-                fillPos = Utils.GetAnchoredPosition(new(size.X, 0), fillSize, DrawAnchor.TopRight);
-            }
-            else if (fillDirection == BarDirection.Up)
-            {
-                fillSize = new Vector2(size.X, size.Y * fillPercent);
-                fillPos = Utils.GetAnchoredPosition(new(0, size.Y), fillSize, DrawAnchor.BottomLeft);
-            }
-
-            return new Rect(pos + fillPos, fillSize, color);
         }
     }
 }

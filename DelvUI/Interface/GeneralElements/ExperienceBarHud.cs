@@ -1,4 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
+using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using System.Collections.Generic;
@@ -23,12 +24,29 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || Actor is null)
+            if (!Config.Enabled || Actor is null || Config.HideWhenInactive && (Plugin.ClientState.LocalPlayer?.Level ?? 0) == 80)
             {
                 return;
             }
 
-            Config.GetBars(ExperienceHelper.Instance.CurrentExp, ExperienceHelper.Instance.RequiredExp, 0f, Actor).DrawBars(origin);
+            //Config.GetBars(ExperienceHelper.Instance.CurrentExp, ExperienceHelper.Instance.RequiredExp, 0f, Actor).Draw(origin);
+            uint current = ExperienceHelper.Instance.CurrentExp;
+            uint required = ExperienceHelper.Instance.RequiredExp;
+            uint rested = Config.ShowRestedExp ? ExperienceHelper.Instance.RestedExp : 0;
+
+            Rect background = new Rect(Config.Position, Config.Size, Config.BackgroundColor);
+
+            // Exp progress bar
+            PluginConfigColor expFillColor = Config.UseJobColor ? Utils.ColorForActor(Actor) : Config.FillColor;
+            Rect expBar = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, expFillColor, current, required);
+
+            // Rested exp bar
+            var restedPos = Config.FillDirection.IsInverted() ? Config.Position : Config.Position + BarUtilities.GetFillDirectionOffset(expBar.Size, Config.FillDirection);
+            var restedSize = Config.Size - BarUtilities.GetFillDirectionOffset(expBar.Size, Config.FillDirection);
+            Rect restedBar = BarUtilities.GetFillRect(restedPos, restedSize, Config.FillDirection, Config.RestedExpColor, rested, required);
+
+            var bar = new BarHud(Config, Actor).Background(background).Foreground(expBar, restedBar).Labels(Config.LeftLabel, Config.RightLabel);
+            bar.Draw(origin);
         }
     }
 
