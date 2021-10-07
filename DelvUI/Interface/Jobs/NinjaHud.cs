@@ -4,14 +4,13 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -20,44 +19,42 @@ namespace DelvUI.Interface.Jobs
     public class NinjaHud : JobHud
     {
         private new NinjaConfig Config => (NinjaConfig)_config;
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
-        private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
-        public NinjaHud(string id, NinjaConfig config, string? displayName = null) : base(id, config, displayName)
-        {
-
-        }
-
-        private readonly SpellHelper _spellHelper = new();
-        private float _oldMudraCooldownInfo;
+        public NinjaHud(string id, NinjaConfig config, string? displayName = null) : base(id, config, displayName) { }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
             List<Vector2> positions = new List<Vector2>();
             List<Vector2> sizes = new List<Vector2>();
 
-            if (Config.ShowHutonGauge)
+            if (Config.HutonBar.Enabled)
             {
-                positions.Add(Config.Position + Config.HutonGaugePosition);
-                sizes.Add(Config.HutonGaugeSize);
+                positions.Add(Config.Position + Config.HutonBar.Position);
+                sizes.Add(Config.HutonBar.Size);
             }
 
-            if (Config.ShowNinkiGauge)
+            if (Config.NinkiBar.Enabled)
             {
-                positions.Add(Config.Position + Config.NinkiGaugePosition);
-                sizes.Add(Config.NinkiGaugeSize);
+                positions.Add(Config.Position + Config.NinkiBar.Position);
+                sizes.Add(Config.NinkiBar.Size);
             }
 
-            if (Config.ShowTrickBar || Config.ShowSuitonBar)
+            if (Config.TrickAttackBar.Enabled)
             {
-                positions.Add(Config.Position + Config.TrickBarPosition);
-                sizes.Add(Config.TrickBarSize);
+                positions.Add(Config.Position + Config.TrickAttackBar.Position);
+                sizes.Add(Config.TrickAttackBar.Size);
             }
 
-            if (Config.ShowMudraCooldown)
+            if (Config.SuitonBar.Enabled)
             {
-                positions.Add(Config.Position + Config.MudraBarPosition);
-                sizes.Add(Config.MudraBarSize);
+                positions.Add(Config.Position + Config.SuitonBar.Position);
+                sizes.Add(Config.SuitonBar.Size);
+            }
+
+            if (Config.MudraBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.MudraBar.Position);
+                sizes.Add(Config.MudraBar.Size);
             }
 
             return (positions, sizes);
@@ -65,148 +62,154 @@ namespace DelvUI.Interface.Jobs
 
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            if (Config.ShowMudraCooldown)
+            var pos = origin + Config.Position;
+            if (Config.MudraBar.Enabled)
             {
-                DrawMudraBars(origin, player);
+                DrawMudraBars(pos, player);
             }
 
-            if (Config.ShowHutonGauge)
+            if (Config.HutonBar.Enabled)
             {
-                DrawHutonGauge(origin);
+                DrawHutonGauge(pos, player);
             }
 
-            if (Config.ShowNinkiGauge)
+            if (Config.NinkiBar.Enabled)
             {
-                DrawNinkiGauge(origin);
+                DrawNinkiGauge(pos, player);
             }
 
-            if (Config.EnableTrickSuitonBar)
+            if (Config.TrickAttackBar.Enabled)
             {
-                DrawTrickAndSuitonGauge(origin, player);
+                DrawTrickAttackBar(pos, player);
+            }
+
+            if (Config.SuitonBar.Enabled)
+            {
+                DrawSuitonBar(pos, player);
             }
         }
 
-        private void DrawMudraBars(Vector2 origin, PlayerCharacter player)
+        public (bool, bool, bool) GetMudraBuffs(PlayerCharacter? player, out Status? ninjutsuBuff, out Status? kassatsuBuff, out Status? tcjBuff)
         {
-            float xPos = origin.X + Config.Position.X + Config.MudraBarPosition.X - Config.MudraBarSize.X / 2f;
-            float yPos = origin.Y + Config.Position.Y + Config.MudraBarPosition.Y - Config.MudraBarSize.Y / 2f;
+            ninjutsuBuff = null;
+            kassatsuBuff = null;
+            tcjBuff = null;
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.MudraBarSize.Y, Config.MudraBarSize.X);
-
-            // each of the 2 mudra charges has a cooldown of 20s
-            float maxMudraCooldown = 40f;
-            // get the current cooldown and number of charges on mudras
-            float mudraCooldownInfo = _spellHelper.GetSpellCooldown(2259);
-            int mudraStacks = _spellHelper.GetStackCount(2, 2259);
-
-            // is the player casting ninjutsu or under kassatsu?
-            Status? mudraBuff = null, kassatsuBuff = null, tcjBuff = null;
-            foreach (Status statusEffect in player.StatusList)
+            if (player is not null)
             {
-                if (statusEffect.StatusId == 496) { mudraBuff = statusEffect; }
-                if (statusEffect.StatusId == 497) { kassatsuBuff = statusEffect; }
-                if (statusEffect.StatusId == 1186) { tcjBuff = statusEffect; }
-            }
-
-            bool haveMudraBuff = mudraBuff is not null;
-            bool haveKassatsuBuff = kassatsuBuff is not null;
-            bool haveTCJBuff = tcjBuff is not null;
-
-            // for some reason (perhaps a slight delay), the mudras may be on cooldown before the "Mudra" buff is applied
-            // hence we check for either
-            bool inNinjutsu = mudraStacks == -2 || haveMudraBuff;
-            // this ensures that if the cooldown suddenly drops to 0.5s because the player has casted a mudra
-            // then the depicted cooldown freezes while the ninjutsu is being casted
-            // unfortunately I can't quite get this to work for kassatsu
-            // this is really only a problem if we wish to keep showing chunked bars during ninjutsu casts
-            if (inNinjutsu)
-            {
-                mudraCooldownInfo = _oldMudraCooldownInfo;
-            }
-            else
-            {
-                _oldMudraCooldownInfo = mudraCooldownInfo;
-            }
-
-            // if we are casting ninjutsu then show ninjutsu info
-            // if we are in kassatsu, simply show "kassatsu" unless we are casting ninjutsu
-            // if we are in TCJ, simply show "ten chi jin" unless we are casting ninjutsu (this overrides kassatsu)
-            if (inNinjutsu || haveKassatsuBuff || haveTCJBuff)
-            {
-                string ninjutsuText = haveKassatsuBuff ? "KASSATSU" : "";
-                // determine which ninjutsu is being cast
-                // thanks to daemitus for pointing me in this direction
-                // NOTE: in ClientStructs it seems that StackCount and Param are switched
-                // if this ever breaks -- possibly due to a ClientStructs update -- try swapping them
-                if (haveMudraBuff)
+                foreach (Status status in player.StatusList)
                 {
-                    ninjutsuText = GenerateNinjutsuText(mudraBuff?.StackCount ?? 0, haveKassatsuBuff, haveTCJBuff);
-                }
-
-                // notice that this approach will never display the third ninjutsu cast under TCJ
-                // as TCJ ends before the third ninjutsu is cast
-                if (haveTCJBuff)
-                {
-                    ninjutsuText = GenerateNinjutsuText(tcjBuff?.StackCount ?? 0, haveKassatsuBuff, haveTCJBuff);
-                }
-                PluginConfigColor barColor = haveTCJBuff ? Config.TCJBarColor : (haveKassatsuBuff ? Config.KassatsuBarColor : Config.MudraBarColor);
-
-                float ninjutsuMaxDuration = haveMudraBuff || haveTCJBuff ? 6f : 15f;
-                float duration = haveTCJBuff ? tcjBuff?.RemainingTime ?? 0f : haveMudraBuff ? mudraBuff?.RemainingTime ?? 0f : haveKassatsuBuff ? kassatsuBuff?.RemainingTime ?? 0f : ninjutsuMaxDuration;
-
-                // it seems there is some time before the duration is updated after the buff is obtained
-                if (duration < 0)
-                {
-                    duration = ninjutsuMaxDuration;
-                }
-
-                builder.AddInnerBar(duration, ninjutsuMaxDuration, barColor);
-                if (Config.ShowNinjutsuText)
-                {
-                    builder.SetTextMode(BarTextMode.Single)
-                           .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, ninjutsuText);
+                    if (status.StatusId == 496) { ninjutsuBuff = status; }
+                    if (status.StatusId == 497) { kassatsuBuff = status; }
+                    if (status.StatusId == 1186) { tcjBuff = status; }
                 }
             }
-            else if ((!inNinjutsu || !haveKassatsuBuff || !haveTCJBuff) && Config.OnlyShowMudraWhenActive)
-            {
-                return;
+
+            return (ninjutsuBuff is not null, kassatsuBuff is not null, tcjBuff is not null);
+        }
+
+        private void DrawMudraBars(Vector2 pos, PlayerCharacter player)
+        {
+            var (hasNinjutsuBuff, hasKassatsuBuff, hasTCJBuff) = GetMudraBuffs(player, out Status? ninjutsuBuff, out Status? kassatsuBuff, out Status? tcjBuff);
+
+            int mudraStacks = SpellHelper.Instance.GetStackCount(2, 2259);
+            float mudraCooldown = SpellHelper.Instance.GetSpellCooldown(2259);
+
+            float current = 0f;
+            float max = 0f;
+
+            // For some reason, the mudras may be on cooldown before the "Mudra" buff is applied.
+            // Mudra stack count is set to -2 when a mudra is in the middle of its re-cast timer, so we can check for that instead.
+            bool inNinjutsu = mudraStacks == -2 || hasNinjutsuBuff;
+
+            if (hasTCJBuff || hasKassatsuBuff || inNinjutsu)
+            { 
+                if (hasTCJBuff)
+                {
+                    max = 6f;
+                    current = tcjBuff is null || tcjBuff.RemainingTime < 0 ? max : tcjBuff.RemainingTime;
+                    Config.MudraBar.Label.SetText(GenerateNinjutsuText(tcjBuff?.StackCount ?? 0, hasKassatsuBuff, hasTCJBuff));
+                }
+                else if (hasKassatsuBuff)
+                {
+                    max = 15f;
+                    current = kassatsuBuff is null || kassatsuBuff.RemainingTime < 0 ? max : kassatsuBuff.RemainingTime;
+                    Config.MudraBar.Label.SetText("KASSATSU");
+                }
+
+                if (inNinjutsu)
+                {
+                    max = 6f;
+                    current = ninjutsuBuff is null || ninjutsuBuff.RemainingTime < 0 ? max : ninjutsuBuff.RemainingTime;
+                    Config.MudraBar.Label.SetText(GenerateNinjutsuText(ninjutsuBuff?.StackCount ?? 0, hasKassatsuBuff, hasTCJBuff));
+                }
+
+                PluginConfigColor fillColor = hasTCJBuff ? Config.MudraBar.TCJBarColor : hasKassatsuBuff ? Config.MudraBar.KassatsuBarColor : Config.MudraBar.FillColor;
+                Rect foreground = BarUtilities.GetFillRect(Config.MudraBar.Position, Config.MudraBar.Size, Config.MudraBar.FillDirection, fillColor, current, max);
+                var bar = new BarHud(Config.MudraBar, player).Foreground(foreground).Labels(Config.MudraBar.Label);
+                bar.Draw(pos);
             }
             else
             {
-                // if we are neither casting ninjutsu nor in kassatsu nor in TCJ, show the mudra charges and cooldowns
-                builder.SetChunks(2)
-                   .SetChunkPadding(Config.MudraBarChunkPadding);
-                // show the mudra recharge timer on bars that aren't full
-                if (Config.ShowMudraBarText)
-                {
-                    PluginConfigColor[] chunkColors = { Config.MudraBarColor, Config.MudraBarColor };
-                    BarText[] charges = new BarText[2];
-                    charges[0] = new BarText(BarTextPosition.CenterMiddle, BarTextType.Remaining);
-                    charges[1] = new BarText(BarTextPosition.CenterMiddle, BarTextType.Remaining);
-                    if (mudraCooldownInfo < 20)
-                    {
-                        charges[0] = new BarText(BarTextPosition.CenterMiddle, BarTextType.Custom, "");
-                    }
-                    if (mudraCooldownInfo == 0)
-                    {
-                        charges[1] = new BarText(BarTextPosition.CenterMiddle, BarTextType.Custom, "");
-                    }
+                max = 40f;
+                current = max - mudraCooldown;
 
-                    BarText[] barTexts = { };
-                    builder.AddInnerBar(maxMudraCooldown - mudraCooldownInfo, maxMudraCooldown, chunkColors, PartialFillColor,
-                        BarTextMode.EachChunk, charges);
-                }
-                else
+                if (!Config.MudraBar.HideWhenInactive || current < max)
                 {
-                    builder.AddInnerBar(maxMudraCooldown - mudraCooldownInfo, maxMudraCooldown, Config.MudraBarColor);
+                    Config.MudraBar.Label.SetText(Math.Truncate((max - current) % 20).ToString());
+                    BarUtilities.GetChunkedProgressBars(Config.MudraBar, 2, current, max, 0f, player, Config.MudraBar.Label).Draw(pos);
                 }
             }
+        }
 
-            Bar bar = builder.SetBackgroundColor(EmptyColor.Base)
-                             .Build();
+        private void DrawHutonGauge(Vector2 pos, PlayerCharacter player)
+        {
+            NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
+            float hutonDurationLeft = gauge.HutonTimer / 1000f;
+            if (!Config.HutonBar.HideWhenInactive || hutonDurationLeft > 0)
+            {
+                Config.HutonBar.Label.SetText(Math.Truncate(hutonDurationLeft).ToString());
+                BarUtilities.GetProgressBar(Config.HutonBar, hutonDurationLeft, 70f, 0f, player).Draw(pos);
+            }
+        }
 
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+
+        private void DrawNinkiGauge(Vector2 pos, PlayerCharacter player)
+        {
+            NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
+            if (!Config.NinkiBar.HideWhenInactive || gauge.Ninki > 0)
+            {
+                Config.NinkiBar.Label.SetText(gauge.Ninki.ToString("N0"));
+                BarUtilities.GetProgressBar(Config.NinkiBar, gauge.Ninki, 100f, 0f, player).Draw(pos);
+            }
+        }
+
+        private void DrawTrickAttackBar(Vector2 pos, PlayerCharacter player)
+        {
+            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            float trickDuration = 0f;
+
+            if (actor is BattleChara target)
+            {
+                trickDuration = target.StatusList.FirstOrDefault(o => o.StatusId is 638 && o.SourceID == player.ObjectId && o.RemainingTime > 0)?.RemainingTime ?? 0f;
+            }
+
+            if (!Config.TrickAttackBar.HideWhenInactive || trickDuration > 0)
+            {
+                Config.TrickAttackBar.Label.SetText(Math.Truncate(trickDuration).ToString());
+                BarUtilities.GetProgressBar(Config.TrickAttackBar, trickDuration, 15f, 0f, player).Draw(pos);
+            }
+        }
+
+        private void DrawSuitonBar(Vector2 pos, PlayerCharacter player)
+        {
+            float suitonDuration = player.StatusList.FirstOrDefault(o => o.StatusId == 507 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
+
+            if (!Config.SuitonBar.HideWhenInactive || suitonDuration > 0)
+            {
+                Config.SuitonBar.Label.SetText(Math.Truncate(suitonDuration).ToString("N0"));
+                BarUtilities.GetProgressBar(Config.SuitonBar, suitonDuration, 20f, 0f, player).Draw(pos);
+            }
         }
 
         private string GenerateNinjutsuText(byte param, bool haveKassatsuBuff, bool haveTCJBuff)
@@ -220,142 +223,8 @@ namespace DelvUI.Interface.Jobs
                 27 or 30 => "HUTON",
                 39 or 45 => "DOTON",
                 54 or 57 => "SUITON",
-                _ => haveTCJBuff ? "TEN CHI JIN" : "NINJUTSU",
+                _ => haveTCJBuff ? "TEN CHI JIN" : "",
             };
-        }
-
-        private void DrawHutonGauge(Vector2 origin)
-        {
-            NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
-            int hutonDurationLeft = (int)Math.Ceiling((float)(gauge.HutonTimer / (double)1000));
-
-            if (hutonDurationLeft == 0 && Config.OnlyShowHutonWhenActive)
-            {
-                return;
-            }
-
-            float xPos = origin.X + Config.Position.X + Config.HutonGaugePosition.X - Config.HutonGaugeSize.X / 2f;
-            float yPos = origin.Y + Config.Position.Y + Config.HutonGaugePosition.Y - Config.HutonGaugeSize.Y / 2f;
-
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.HutonGaugeSize.Y, Config.HutonGaugeSize.X)
-                .SetBackgroundColor(EmptyColor.Base);
-            float maximum = 70f;
-
-            if (hutonDurationLeft > 0)
-            {
-                builder.AddInnerBar(Math.Abs(hutonDurationLeft), maximum, hutonDurationLeft > Config.HutonGaugeExpiryThreshold ? Config.HutonGaugeColor : Config.HutonGaugeExpiryColor);
-
-                if (Config.ShowHutonGaugeText)
-                {
-                    builder.SetTextMode(BarTextMode.Single)
-                           .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                }
-            }
-
-            if (!Config.ShowHutonGaugeBorder)
-            {
-                builder.SetDrawBorder(false);
-            }
-
-            Bar bar = builder.Build();
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
-        }
-
-        private void DrawNinkiGauge(Vector2 origin)
-        {
-            NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
-
-            if (gauge.Ninki == 0 && Config.OnlyShowNinkiWhenActive)
-            {
-                return;
-            }
-
-            float xPos = origin.X + Config.Position.X + Config.NinkiGaugePosition.X - Config.NinkiGaugeSize.X / 2f;
-            float yPos = origin.Y + Config.Position.Y + Config.NinkiGaugePosition.Y - Config.NinkiGaugeSize.Y / 2f;
-
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.NinkiGaugeSize.Y, Config.NinkiGaugeSize.X)
-                .SetBackgroundColor(EmptyColor.Base);
-
-            if (Config.ChunkNinkiGauge)
-            {
-                builder.SetChunks(2).SetChunkPadding(Config.NinkiGaugeChunkPadding).AddInnerBar(gauge.Ninki, 100, Config.NinkiGaugeColor, PartialFillColor);
-            }
-            else
-            {
-                builder.AddInnerBar(gauge.Ninki, 100, Config.NinkiGaugeColor);
-            }
-
-            if (Config.ShowNinkiGaugeText)
-            {
-                builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-            }
-
-            if (!Config.ShowNinkiGaugeBorder)
-            {
-                builder.SetDrawBorder(false);
-            }
-
-            Bar bar = builder.Build();
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
-        }
-
-        private void DrawTrickAndSuitonGauge(Vector2 origin, PlayerCharacter player)
-        {
-            float xPos = origin.X + Config.Position.X + Config.TrickBarPosition.X - Config.TrickBarSize.X / 2f;
-            float yPos = origin.Y + Config.Position.Y + Config.TrickBarPosition.Y - Config.TrickBarSize.Y / 2f;
-
-            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            float trickDuration = 0f;
-            float suitonDuration = 0f;
-            const float trickMaxDuration = 15f;
-
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.TrickBarSize.Y, Config.TrickBarSize.X);
-
-            if (actor is BattleChara target)
-            {
-                var trickStatus = target.StatusList.Where(o => o.StatusId is 638 && o.SourceID == player.ObjectId);
-                if (trickStatus.Any() && Config.ShowTrickBar)
-                {
-                    trickDuration = Math.Abs(trickStatus.First().RemainingTime);
-                }
-            }
-
-            if (trickDuration != 0)
-            {
-                builder.AddInnerBar(trickDuration, trickMaxDuration, Config.TrickBarColor);
-
-                if (Config.ShowTrickBarText)
-                {
-                    builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                }
-            }
-
-            IEnumerable<Status> suitonBuff = player.StatusList.Where(o => o.StatusId == 507);
-
-            if (suitonBuff.Any() && Config.ShowSuitonBar)
-            {
-                suitonDuration = Math.Abs(suitonBuff.First().RemainingTime);
-
-                builder.AddInnerBar(suitonDuration, 20, Config.SuitonBarColor);
-
-                if (Config.ShowSuitonBarText)
-                {
-                    builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.SuitonBarColor.Base, 0xFF000000, null);
-                }
-            }
-
-            if (trickDuration == 0f && suitonDuration == 0f && Config.OnlyShowTnSWhenActive)
-            {
-                return;
-            }
-
-            Bar bar = builder.Build();
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
         }
     }
 
@@ -365,173 +234,67 @@ namespace DelvUI.Interface.Jobs
     public class NinjaConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.NIN;
+
+        public NinjaConfig()
+        {
+            TrickAttackBar.Enabled = false;
+            SuitonBar.Enabled = false;
+            HutonBar.Threshold = true;
+        }
+
         public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
 
-        #region huton gauge
-        [Checkbox("Huton" + "##Huton", separator = true)]
-        [Order(30)]
-        public bool ShowHutonGauge = true;
 
-        [Checkbox("Only Show When Active" + "##Huton")]
-        [Order(35, collapseWith = nameof(ShowHutonGauge))]
-        public bool OnlyShowHutonWhenActive = false;
+        [NestedConfig("Mudra Bar", 30)]
+        public MudraBarConfig MudraBar = new MudraBarConfig(
+                                                            new(0, -50),
+                                                            new(254, 10),
+                                                            new PluginConfigColor(new Vector4(211f / 255f, 166f / 255f, 75f / 242f, 100f / 100f)));
 
-        [Checkbox("Timer" + "##Huton")]
-        [Order(40, collapseWith = nameof(ShowHutonGauge))]
-        public bool ShowHutonGaugeText = true;
+        [NestedConfig("Huton Bar", 35)]
+        public ProgressBarConfig HutonBar = new ProgressBarConfig(
+                                                            new(0, -10),
+                                                            new(254, 20),
+                                                            new PluginConfigColor(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f)),
+                                                            new PluginConfigColor(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
+                                                            40f);
 
-        [Checkbox("Border" + "##Huton")]
-        [Order(45, collapseWith = nameof(ShowHutonGauge))]
-        public bool ShowHutonGaugeBorder = true;
+        [NestedConfig("Ninki Bar", 40)]
+        public ProgressBarConfig NinkiBar = new ProgressBarConfig(
+                                                            new(0, -32), 
+                                                            new(254, 20), 
+                                                            new PluginConfigColor(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f)));
 
-        [DragFloat2("Position" + "##Huton", min = -4000f, max = 4000f)]
-        [Order(50, collapseWith = nameof(ShowHutonGauge))]
-        public Vector2 HutonGaugePosition = new(0, -54);
+        [NestedConfig("Trick Attack Bar", 45)]
+        public ProgressBarConfig TrickAttackBar = new ProgressBarConfig(
+                                                            new(0, -63),
+                                                            new(254, 10),
+                                                            new PluginConfigColor(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f)));
 
-        [DragFloat2("Size" + "##Huton", max = 2000f)]
-        [Order(55, collapseWith = nameof(ShowHutonGauge))]
-        public Vector2 HutonGaugeSize = new(254, 20);
+        [NestedConfig("Suiton Bar", 50)]
+        public ProgressBarConfig SuitonBar = new ProgressBarConfig(
+                                                            new(0, -75),
+                                                            new(254, 10),
+                                                            new PluginConfigColor(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f)));
+    }
 
-        [ColorEdit4("Color" + "##Huton")]
-        [Order(60, collapseWith = nameof(ShowHutonGauge))]
-        public PluginConfigColor HutonGaugeColor = new(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f));
-
-        [Checkbox("Expire" + "##Huton")]
-        [Order(65, collapseWith = nameof(ShowHutonGauge))]
-        public bool ShowHutonGaugeExpiry = true;
-
-        [DragFloat("Expire Threshold" + "##Huton", min = 1f, max = 70f)]
-        [Order(70, collapseWith = nameof(ShowHutonGaugeExpiry))]
-        public float HutonGaugeExpiryThreshold = 40f;
-
-        [ColorEdit4("Expire Color" + "##Huton")]
-        [Order(75, collapseWith = nameof(ShowHutonGaugeExpiry))]
-        public PluginConfigColor HutonGaugeExpiryColor = new(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
-
-
-        #endregion
-
-        #region ninki gauge
-        [Checkbox("Ninki" + "##Ninki", separator = true)]
-        [Order(80)]
-        public bool ShowNinkiGauge = true;
-
-        [Checkbox("Only Show When Active" + "##Ninki")]
-        [Order(85, collapseWith = nameof(ShowNinkiGauge))]
-        public bool OnlyShowNinkiWhenActive = false;
-
-        [Checkbox("Text" + "##Ninki")]
-        [Order(90, collapseWith = nameof(ShowNinkiGauge))]
-        public bool ShowNinkiGaugeText = true;
-
-        [Checkbox("Border" + "##Ninki")]
-        [Order(95, collapseWith = nameof(ShowNinkiGauge))]
-        public bool ShowNinkiGaugeBorder = true;
-
-        [Checkbox("Split Bar" + "##Ninki")]
-        [Order(100, collapseWith = nameof(ShowNinkiGauge))]
-        public bool ChunkNinkiGauge = true;
-
-        [DragFloat2("Position" + "##Ninki", min = -4000f, max = 4000f)]
-        [Order(105, collapseWith = nameof(ShowNinkiGauge))]
-        public Vector2 NinkiGaugePosition = new(0, -32);
-
-        [DragFloat2("Size" + "##Ninki", max = 2000f)]
-        [Order(110, collapseWith = nameof(ShowNinkiGauge))]
-        public Vector2 NinkiGaugeSize = new(254, 20);
-
-        [DragFloat("Spacing" + "##Ninki", min = -4000f, max = 4000f)]
-        [Order(115, collapseWith = nameof(ShowNinkiGauge))]
-        public float NinkiGaugeChunkPadding = 2;
-
-        [ColorEdit4("Color" + "##Ninki")]
-        [Order(120, collapseWith = nameof(ShowNinkiGauge))]
-        public PluginConfigColor NinkiGaugeColor = new(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f));
-
-        #endregion
-
-        #region trick / suiton
-        [Checkbox("Trick Attack & Suiton Bar" + "##TnS", separator = true)]
-        [Order(125)]
-        public bool EnableTrickSuitonBar = true;
-
-        [DragFloat2("Trick Attack & Suiton Position" + "##TnS", min = -4000f, max = 4000f)]
-        [Order(130, collapseWith = nameof(EnableTrickSuitonBar))]
-        public Vector2 TrickBarPosition = new(0, -10);
-
-        [DragFloat2("Trick Attack & Suiton Size" + "##TnS", max = 2000f)]
-        [Order(135, collapseWith = nameof(EnableTrickSuitonBar))]
-        public Vector2 TrickBarSize = new(254, 20);
-
-        [Checkbox("Only Show When Active" + "##TnS")]
-        [Order(140, collapseWith = nameof(EnableTrickSuitonBar))]
-        public bool OnlyShowTnSWhenActive = false;
-
-        [Checkbox("Trick Attack" + "##TnS")]
-        [Order(145, collapseWith = nameof(EnableTrickSuitonBar))]
-        public bool ShowTrickBar = false;
-
-        [Checkbox("Timer" + "##TnS")]
-        [Order(150, collapseWith = nameof(ShowTrickBar))]
-        public bool ShowTrickBarText = true;
-
-        [ColorEdit4("Color" + "##TnS")]
-        [Order(155, collapseWith = nameof(ShowTrickBar))]
-        public PluginConfigColor TrickBarColor = new(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f));
-
-        [Checkbox("Suiton" + "##TnS")]
-        [Order(160, collapseWith = nameof(EnableTrickSuitonBar))]
-        public bool ShowSuitonBar = false;
-
-        [Checkbox("Timer" + "##TnS")]
-        [Order(165, collapseWith = nameof(ShowSuitonBar))]
-        public bool ShowSuitonBarText = true;
-
-        [ColorEdit4("Color" + "##TnS")]
-        [Order(170, collapseWith = nameof(ShowSuitonBar))]
-        public PluginConfigColor SuitonBarColor = new(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f));
-        #endregion
-
-        #region mudra
-        [Checkbox("Mudra" + "##Mudra", separator = true)]
-        [Order(175)]
-        public bool ShowMudraCooldown = true;
-
-        [Checkbox("Only Show When Active" + "##Mudra")]
-        [Order(180, collapseWith = nameof(ShowMudraCooldown))]
-        public bool OnlyShowMudraWhenActive = false;
-
-        [Checkbox("Timers" + "##Mudra")]
-        [Order(185, collapseWith = nameof(ShowMudraCooldown))]
-        public bool ShowMudraBarText = true;
-
-        [Checkbox("Ninjutsu Text" + "##Mudra")]
-        [Order(190, collapseWith = nameof(ShowMudraCooldown))]
-        public bool ShowNinjutsuText = true;
-
-        [DragFloat2("Position" + "##Mudra", min = -4000f, max = 4000f)]
-        [Order(195, collapseWith = nameof(ShowMudraCooldown))]
-        public Vector2 MudraBarPosition = new(0, -73);
-
-        [DragFloat2("Size" + "##Mudra", max = 2000f)]
-        [Order(200, collapseWith = nameof(ShowMudraCooldown))]
-        public Vector2 MudraBarSize = new(254, 10);
-
-        [DragFloat("Spacing" + "##Mudra", min = -4000f, max = 4000f)]
-        [Order(205, collapseWith = nameof(ShowMudraCooldown))]
-        public float MudraBarChunkPadding = 2;
-
-        [ColorEdit4("Mudra" + "##Mudra")]
-        [Order(210, collapseWith = nameof(ShowMudraCooldown))]
-        public PluginConfigColor MudraBarColor = new(new Vector4(211 / 255f, 166 / 255f, 75 / 242f, 100f / 100f));
-
-        [ColorEdit4("Kassatsu" + "##Mudra")]
-        [Order(215, collapseWith = nameof(ShowMudraCooldown))]
+    public class MudraBarConfig : ChunkedBarConfig
+    {
+        [ColorEdit4("Kassatsu Color", spacing = true)]
+        [Order(60)]
         public PluginConfigColor KassatsuBarColor = new(new Vector4(239 / 255f, 123 / 255f, 222 / 242f, 100f / 100f));
 
-        [ColorEdit4("Ten Chi Jin" + "##Mudra")]
-        [Order(220, collapseWith = nameof(ShowMudraCooldown))]
+        [ColorEdit4("Ten Chi Jin Color")]
+        [Order(65)]
         public PluginConfigColor TCJBarColor = new(new Vector4(181 / 255f, 33 / 255f, 41 / 242f, 100f / 100f));
-        #endregion
+
+        [NestedConfig("Bar Text", 1000, separator = false, spacing = true)]
+        public LabelConfig Label;
+
+        public MudraBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor, 2)
+        {
+            Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+            UsePartialFillColor = true;
+        }
     }
 }

@@ -2,7 +2,9 @@
 using System.Globalization;
 using System.Numerics;
 using System.Text;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Text.SeStringHandling;
+using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using static System.Globalization.CultureInfo;
 
@@ -122,6 +124,24 @@ namespace DelvUI
             return str.Length <= maxLength ? str : str[..maxLength];
         }
 
+        public static bool IsHorizontal(this BarDirection direction)
+        {
+            return direction == BarDirection.Right || direction == BarDirection.Left;
+        }
+
+        public static bool IsInverted(this BarDirection direction)
+        {
+            return direction == BarDirection.Left || direction == BarDirection.Up;
+        }
+
+        public static void Draw(this BarHud[] bars, Vector2 origin)
+        {
+            foreach (BarHud bar in bars)
+            {
+                bar.Draw(origin);
+            }
+        }
+        
         public static string CheckForUpperCase(this string str)
         {            
             var culture = CurrentCulture.TextInfo;
