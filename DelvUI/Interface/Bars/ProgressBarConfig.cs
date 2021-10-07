@@ -6,9 +6,10 @@ using System.Numerics;
 
 namespace DelvUI.Interface.Bars
 {
+    [Exportable(false)]
     public class ProgressBarConfig : BarConfig
     {
-        [NestedConfig("Threshold", 45)]
+        [NestedConfig("Threshold", 45, separator = false, spacing = true)]
         public ThresholdConfig ThresholdConfig = new ThresholdConfig();
 
         [NestedConfig("Bar Text", 1000, separator = false, spacing = true)]
@@ -27,6 +28,7 @@ namespace DelvUI.Interface.Bars
         }
     }
 
+    [Exportable(false)]
     public class ThresholdConfig : PluginConfigObject
     {
         [DragFloat("Threshold Value", min = 0f, max = 10000f)]

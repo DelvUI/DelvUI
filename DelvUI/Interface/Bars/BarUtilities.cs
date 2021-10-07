@@ -10,6 +10,11 @@ namespace DelvUI.Interface.Bars
 {
     public class BarUtilities
     {
+        public static BarHud GetProgressBar(string id, ProgressBarConfig config, float current, float max, float min = 0f)
+        {
+            return GetProgressBar(id, config, current, max, min, null, null);
+        }
+
         public static BarHud GetProgressBar(string id, ProgressBarConfig config, float current, float max, float min = 0f, GameObject? actor = null)
         {
             return GetProgressBar(id, config, current, max, min, null, actor);
@@ -106,8 +111,9 @@ namespace DelvUI.Interface.Bars
 
                 Rect background = new Rect(chunkPos, chunkSize, config.BackgroundColor);
                 Rect foreground = GetFillRect(chunkPos, chunkSize, config.FillDirection, chunks[i].Item1, chunks[i].Item2, 1f, 0f);
+                BarGlowConfig? glow = chunks[i].Item2 >= 1 ? glowConfig : null;
 
-                bars[i] = new BarHud(id + i, config.DrawBorder, actor: actor, glowColor: glowConfig?.Color, glowSize: glowConfig?.Size)
+                bars[i] = new BarHud(id + i, config.DrawBorder, actor: actor, glowColor: glow?.Color, glowSize: glow?.Size)
                     .SetBackground(background)
                     .AddForegrounds(foreground);
 

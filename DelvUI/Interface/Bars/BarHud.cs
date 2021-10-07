@@ -115,13 +115,13 @@ namespace DelvUI.Interface.Bars
 
                     drawList.AddRect(glowPosition, glowPosition + glowSize, GlowColor.Base, 0, ImDrawFlags.None, GlowSize);
                 }
-
-                // Draw Labels
-                foreach (LabelHud label in LabelHuds)
-                {
-                    label.Draw(backgroundPos, BackgroundRect.Size, Actor);
-                }
             });
+
+            // Draw Labels
+            foreach (LabelHud label in LabelHuds)
+            {
+                label.Draw(backgroundPos, BackgroundRect.Size, Actor);
+            }
         }
     }
 }
