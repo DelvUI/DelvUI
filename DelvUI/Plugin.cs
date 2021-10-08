@@ -116,6 +116,7 @@ namespace DelvUI
             MouseOverHelper.Initialize();
             PartyManager.Initialize();
             ProfilesManager.Initialize();
+            PullTimerHelper.Initialize();
             TexturesCache.Initialize();
             TooltipsHelper.Initialize();
 
@@ -249,6 +250,7 @@ namespace DelvUI
             GlobalColors.Instance.Dispose();
             MouseOverHelper.Instance.Dispose();
             PartyManager.Instance.Dispose();
+            PullTimerHelper.Instance.Dispose();
             ProfilesManager.Instance.Dispose();
             SpellHelper.Instance.Dispose();
             TexturesCache.Instance.Dispose();

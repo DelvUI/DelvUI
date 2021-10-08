@@ -278,6 +278,11 @@ namespace DelvUI.Interface
             var expBarHud = new ExperienceBarHud("DelvUI_expBar", expBarConfig, "Experience Bar");
             _hudElements.Add(expBarHud);
             _hudElementsUsingPlayer.Add(expBarHud);
+            
+            //pull timer
+            var pullTimerConfig = ConfigurationManager.Instance.GetConfigObject<PullTimerConfig>();
+            var pullTimerHud = new PullTimerHud("DelvUI_pullTimer", pullTimerConfig, "Pull Timer");
+            _hudElements.Add(pullTimerHud);
         }
 
         public void Draw()
@@ -288,6 +293,7 @@ namespace DelvUI.Interface
             }
 
             MouseOverHelper.Instance.Target = null;
+            PullTimerHelper.Instance.Update();
             TooltipsHelper.Instance.RemoveTooltip(); // remove tooltip from previous frame
 
             if (!ShouldBeVisible())
