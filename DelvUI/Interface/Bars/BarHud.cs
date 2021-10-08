@@ -26,6 +26,7 @@ namespace DelvUI.Interface.Bars
         private GameObject? Actor { get; set; }
 
         private PluginConfigColor? GlowColor { get; set; }
+
         private int GlowSize { get; set; }
 
         public BarHud(

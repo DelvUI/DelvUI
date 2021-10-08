@@ -3,7 +3,6 @@ using DelvUI.Enums;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
-using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
 
@@ -72,9 +71,16 @@ namespace DelvUI.Config
 
     public abstract class MovablePluginConfigObject : PluginConfigObject
     {
+        public string ID { get; private set; }
+
         [DragInt2("Position", min = -4000, max = 4000)]
         [Order(5)]
         public Vector2 Position = Vector2.Zero;
+
+        public MovablePluginConfigObject()
+        {
+            ID = $"DelvUI_{GetType().Name}_{Guid.NewGuid()}";
+        }
     }
 
     public abstract class AnchorablePluginConfigObject : MovablePluginConfigObject
