@@ -38,7 +38,7 @@ namespace DelvUI.Helpers
             ImGui.SameLine();
         }
 
-        public static Node? DrawExportResetContextMenu(Node node, bool canExport)
+        public static Node? DrawExportResetContextMenu(Node node, bool canExport, bool canReset)
         {
             Node? nodeToReset = null;
 
@@ -50,7 +50,7 @@ namespace DelvUI.Helpers
                     ImGui.SetClipboardText(exportString ?? "");
                 }
 
-                if (ImGui.Selectable("Reset"))
+                if (canReset && ImGui.Selectable("Reset"))
                 {
                     ImGui.CloseCurrentPopup();
                     nodeToReset = node;

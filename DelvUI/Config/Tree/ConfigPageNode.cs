@@ -75,12 +75,27 @@ namespace DelvUI.Config.Tree
 
         public override string? GetBase64String()
         {
+            if (!AllowShare())
+            {
+                return null;
+            }
+
             return ImportExportHelper.GenerateExportString(ConfigObject);
         }
 
         protected override bool AllowExport()
         {
             return ConfigObject.Exportable;
+        }
+
+        protected override bool AllowShare()
+        {
+            return ConfigObject.Shareable;
+        }
+
+        protected override bool AllowReset()
+        {
+            return ConfigObject.Resettable;
         }
 
         public override bool Draw(ref bool changed) { return DrawWithID(ref changed); }

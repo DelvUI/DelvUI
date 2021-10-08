@@ -1,5 +1,6 @@
 ﻿using Dalamud.Interface;
 using Dalamud.Logging;
+using DelvUI.Config.Attributes;
 using DelvUI.Config.Tree;
 using DelvUI.Helpers;
 using ImGuiNET;
@@ -762,6 +763,10 @@ namespace DelvUI.Config.Profiles
     }
 
     // fake config object
+    [Disableable(false)]
+    [Exportable(false)]
+    [Shareable(false)]
+    [Resettable(false)]
     public class ProfilesConfig : PluginConfigObject
     {
         public new static ProfilesConfig DefaultConfig() { return new ProfilesConfig(); }

@@ -15,6 +15,8 @@ namespace DelvUI.Interface
 {
     [Disableable(false)]
     [Exportable(false)]
+    [Shareable(false)]
+    [Resettable(false)]
     [Section("Import")]
     [SubSection("General", 0)]
     public class ImportConfig : PluginConfigObject

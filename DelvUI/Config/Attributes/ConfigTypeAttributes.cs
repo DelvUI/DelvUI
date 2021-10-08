@@ -21,6 +21,26 @@ namespace DelvUI.Config.Attributes
         }
     }
 
+    public class ShareableAttribute : Attribute
+    {
+        public bool shareable;
+
+        public ShareableAttribute(bool shareable)
+        {
+            this.shareable = shareable;
+        }
+    }
+
+    public class ResettableAttribute : Attribute
+    {
+        public bool resettable;
+
+        public ResettableAttribute(bool resettable)
+        {
+            this.resettable = resettable;
+        }
+    }
+
     [AttributeUsage(AttributeTargets.Class)]
     public class DisableableAttribute : Attribute
     {

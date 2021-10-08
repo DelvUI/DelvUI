@@ -23,7 +23,14 @@ namespace DelvUI.Config.Tree
                 return;
             }
 
-            _nodeToReset = ImGuiHelper.DrawExportResetContextMenu(node, node.AllowExport());
+            bool allowExport = node.AllowExport();
+            bool allowReset = node.AllowReset();
+            if (!allowExport && !allowReset)
+            {
+                return;
+            }
+
+            _nodeToReset = ImGuiHelper.DrawExportResetContextMenu(node, allowExport, allowReset);
             _nodeToResetName = name;
         }
 
@@ -32,6 +39,32 @@ namespace DelvUI.Config.Tree
             foreach (Node child in _children)
             {
                 if (child.AllowExport())
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        protected virtual bool AllowShare()
+        {
+            foreach (Node child in _children)
+            {
+                if (child.AllowShare())
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        protected virtual bool AllowReset()
+        {
+            foreach (Node child in _children)
+            {
+                if (child.AllowReset())
                 {
                     return true;
                 }
