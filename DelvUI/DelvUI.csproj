@@ -28,6 +28,7 @@
         <Nullable>enable</Nullable>
         <WarningsAsErrors>Nullable</WarningsAsErrors>
         <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+        <UseWindowsForms>true</UseWindowsForms>
     </PropertyGroup>
 
     <!-- Release Configuration -->
