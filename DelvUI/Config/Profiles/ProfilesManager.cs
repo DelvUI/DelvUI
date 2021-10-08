@@ -10,6 +10,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace DelvUI.Config.Profiles
 {
@@ -122,6 +124,7 @@ namespace DelvUI.Config.Profiles
         [JsonIgnore] private string? _errorMessage = null;
         [JsonIgnore] private string? _deletingProfileName = null;
         [JsonIgnore] private string? _resetingProfileName = null;
+        [JsonIgnore] private string? _renamingProfileName = null;
 
         public SortedList<string, Profile> Profiles = new SortedList<string, Profile>();
 
@@ -147,9 +150,9 @@ namespace DelvUI.Config.Profiles
                 Save();
                 SaveCurrentProfile(ConfigurationManager.Instance.ExportCurrentConfigs());
             }
-            catch
+            catch (Exception e)
             {
-
+                PluginLog.Error("Error saving profile: " + e.Message);
             }
         }
 
@@ -251,8 +254,9 @@ namespace DelvUI.Config.Profiles
             {
                 Save();
             }
-            catch
+            catch (Exception e)
             {
+                PluginLog.Error("Error saving profile: " + e.Message);
                 return "Couldn't load profile \"" + profile + "\"!";
             }
 
@@ -268,6 +272,21 @@ namespace DelvUI.Config.Profiles
         {
             var srcPath = Path.Combine(ProfilesPath, profileName + ".delvui");
             var dstPath = Path.Combine(ProfilesPath, newProfileName + ".delvui");
+
+            return CloneProfile(profileName, srcPath, newProfileName, dstPath);
+        }
+
+        private string? CloneProfile(string profileName, string srcPath, string newProfileName, string dstPath)
+        {
+            if (newProfileName.Length == 0)
+            {
+                return null;
+            }
+
+            if (Profiles.Keys.Contains(newProfileName))
+            {
+                return "A profile with the name \"" + newProfileName + "\" already exists!";
+            }
 
             try
             {
@@ -287,12 +306,159 @@ namespace DelvUI.Config.Profiles
 
                 Save();
             }
-            catch
+            catch (Exception e)
             {
+                PluginLog.Error("Error cloning profile: " + e.Message);
                 return "Error trying to clone profile \"" + profileName + "\"!";
             }
 
             return null;
+        }
+
+        private string? RenameCurrentProfile(string newProfileName)
+        {
+            if (_currentProfileName == newProfileName || newProfileName.Length == 0)
+            {
+                return null;
+            }
+
+            if (Profiles.ContainsKey(newProfileName))
+            {
+                return "A profile with the name \"" + newProfileName + "\" already exists!";
+            }
+
+            var srcPath = Path.Combine(ProfilesPath, _currentProfileName + ".delvui");
+            var dstPath = Path.Combine(ProfilesPath, newProfileName + ".delvui");
+
+            try
+            {
+
+                if (File.Exists(dstPath))
+                {
+                    return "A profile with the name \"" + newProfileName + "\" already exists!";
+                }
+
+                File.Move(srcPath, dstPath);
+
+                Profile profile = Profiles[_currentProfileName];
+                profile.Name = newProfileName;
+
+                Profiles.Remove(_currentProfileName);
+                Profiles.Add(newProfileName, profile);
+
+                _currentProfileName = newProfileName;
+
+                Save();
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error renaming profile: " + e.Message);
+                return "Error trying to rename profile \"" + _currentProfileName + "\"!";
+            }
+
+            return null;
+        }
+
+        private string? Import(string newProfileName, string importString)
+        {
+            if (newProfileName.Length == 0)
+            {
+                return null;
+            }
+
+            if (Profiles.Keys.Contains(newProfileName))
+            {
+                return "A profile with the name \"" + newProfileName + "\" already exists!";
+            }
+
+            var dstPath = Path.Combine(ProfilesPath, newProfileName + ".delvui");
+
+            try
+            {
+                if (File.Exists(dstPath))
+                {
+                    return "A profile with the name \"" + newProfileName + "\" already exists!";
+                }
+
+                File.WriteAllText(dstPath, importString);
+
+                var newProfile = new Profile(newProfileName);
+                Profiles.Add(newProfileName, newProfile);
+
+                string? errorMessage = SwitchToProfile(newProfileName, false);
+
+                if (errorMessage != null)
+                {
+                    Profiles.Remove(newProfileName);
+                    File.Delete(dstPath);
+                    Save();
+
+                    return errorMessage;
+                }
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error importing profile: " + e.Message);
+                return "Error trying to import profile \"" + newProfileName + "\"!";
+            }
+
+            return null;
+        }
+
+        private string? ImportFromClipboard(string newProfileName)
+        {
+            string importString = ImGui.GetClipboardText();
+            if (importString.Length == 0)
+            {
+                return "Invalid import string!";
+            }
+
+            return Import(newProfileName, importString);
+        }
+
+        private string? ImportFromFile(string newProfileName)
+        {
+            if (newProfileName.Length == 0)
+            {
+                return null;
+            }
+
+            DialogResult result = DialogResult.Cancel;
+            OpenFileDialog? picker;
+
+            try
+            {
+                picker = new OpenFileDialog
+                {
+                    Multiselect = true,
+                    Filter = "DelvUI Profile (*.delvui)|*.delvui",
+                    CheckFileExists = true,
+                    Title = "Select a DelvUI Profile to import",
+                };
+
+                result = picker.ShowDialog();
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error with file picker: " + e.Message);
+                return "Error trying to open file picker!";
+            }
+
+            if (picker == null || result != DialogResult.OK)
+            {
+                return null;
+            }
+
+            try
+            {
+                var importString = File.ReadAllText(picker.FileName);
+                return Import(newProfileName, importString);
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error reading import file: " + e.Message);
+                return "Error reading the file!";
+            }
         }
 
         private string? DeleteProfile(string profileName)
@@ -321,8 +487,9 @@ namespace DelvUI.Config.Profiles
                     return SwitchToProfile(DefaultProfileName, false);
                 }
             }
-            catch
+            catch (Exception e)
             {
+                PluginLog.Error("Error deleting profile: " + e.Message);
                 return "Error trying to delete profile \"" + profileName + "\"!";
             }
 
@@ -369,6 +536,7 @@ namespace DelvUI.Config.Profiles
                     }
                 }
 
+                // reset
                 ImGui.PushFont(UiBuilder.IconFont);
                 ImGui.SameLine();
                 if (ImGui.Button("\uf2f9", new Vector2(0, 0)))
@@ -376,6 +544,36 @@ namespace DelvUI.Config.Profiles
                     _resetingProfileName = _currentProfileName;
                 }
 
+                // rename
+                ImGui.SameLine();
+                if (_currentProfileName != DefaultProfileName && ImGui.Button(FontAwesomeIcon.Pen.ToIconString()))
+                {
+                    _renamingProfileName = _currentProfileName;
+                }
+
+                // share
+                ImGui.SameLine();
+                if (ImGui.Button(FontAwesomeIcon.ShareSquare.ToIconString()))
+                {
+                    //_deletingProfileName = _currentProfileName;
+                    string? exportString = ConfigurationManager.Instance.ExportCurrentConfigs();
+                    if (exportString != null)
+                    {
+                        ImGui.SetClipboardText(exportString);
+                        ImGui.OpenPopup("export_succes_popup");
+                    }
+                }
+                ImGui.PopFont();
+
+                // export success popup
+                if (ImGui.BeginPopup("export_succes_popup"))
+                {
+                    ImGui.Text("Profile export string copied to clipboard!");
+                    ImGui.EndPopup();
+                }
+
+                // delete
+                ImGui.PushFont(UiBuilder.IconFont);
                 ImGui.SameLine();
                 if (_currentProfileName != DefaultProfileName && ImGui.Button(FontAwesomeIcon.Trash.ToIconString()))
                 {
@@ -391,28 +589,47 @@ namespace DelvUI.Config.Profiles
                 ImGui.Text("Create a new profile:");
 
                 ImGuiHelper.NewLineAndTab();
+                ImGui.PushItemWidth(408);
                 ImGui.InputText("Profile Name", ref _newProfileName, 200);
 
                 ImGuiHelper.NewLineAndTab();
-                ImGui.Combo("Copy from", ref _copyFromIndex, profiles, profiles.Length, 10);
+                ImGui.PushItemWidth(200);
+                ImGui.Combo("", ref _copyFromIndex, profiles, profiles.Length, 10);
 
-                ImGuiHelper.NewLineAndTab();
-                if (ImGui.Button("Create", new Vector2(200, 0)))
+                ImGui.SameLine();
+                if (ImGui.Button("Copy", new Vector2(200, 0)))
                 {
                     _newProfileName = _newProfileName.Trim();
+                    _errorMessage = CloneProfile(profiles[_copyFromIndex], _newProfileName);
 
-                    if (Profiles.Keys.Contains(_newProfileName))
+                    if (_errorMessage == null)
                     {
-                        _errorMessage = "A profile with the name \"" + _newProfileName + "\" already exists!";
+                        _errorMessage = SwitchToProfile(_newProfileName);
+                        _newProfileName = "";
                     }
-                    else
-                    {
-                        _errorMessage = CloneProfile(profiles[_copyFromIndex], _newProfileName);
+                }
 
-                        if (_errorMessage == null)
-                        {
-                            _errorMessage = SwitchToProfile(_newProfileName);
-                        }
+                ImGuiHelper.NewLineAndTab();
+                if (ImGui.Button("Import From Clipboard", new Vector2(200, 0)))
+                {
+                    _newProfileName = _newProfileName.Trim();
+                    _errorMessage = ImportFromClipboard(_newProfileName);
+
+                    if (_errorMessage == null)
+                    {
+                        _newProfileName = "";
+                    }
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Button("Import From File", new Vector2(200, 0)))
+                {
+                    _newProfileName = _newProfileName.Trim();
+                    _errorMessage = ImportFromFile(_newProfileName);
+
+                    if (_errorMessage == null)
+                    {
+                        _newProfileName = "";
                     }
                 }
             }
@@ -461,6 +678,24 @@ namespace DelvUI.Config.Profiles
                 if (didConfirm || didClose)
                 {
                     _resetingProfileName = null;
+                }
+            }
+
+            // rename modal
+            if (_renamingProfileName != null)
+            {
+                var (didConfirm, didClose) = ImGuiHelper.DrawInputModal("Rename", "Type a new name for the profile:", ref _renamingProfileName);
+
+                if (didConfirm)
+                {
+                    _errorMessage = RenameCurrentProfile(_renamingProfileName);
+
+                    changed = true;
+                }
+
+                if (didConfirm || didClose)
+                {
+                    _renamingProfileName = null;
                 }
             }
 
@@ -528,6 +763,10 @@ namespace DelvUI.Config.Profiles
     }
 
     // fake config object
+    [Disableable(false)]
+    [Exportable(false)]
+    [Shareable(false)]
+    [Resettable(false)]
     public class ProfilesConfig : PluginConfigObject
     {
         public new static ProfilesConfig DefaultConfig() { return new ProfilesConfig(); }

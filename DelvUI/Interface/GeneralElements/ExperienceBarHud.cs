@@ -44,6 +44,4 @@ namespace DelvUI.Interface.GeneralElements
             bar.Draw(origin);
         }
     }
-
-
 }

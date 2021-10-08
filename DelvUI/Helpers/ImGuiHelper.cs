@@ -38,7 +38,7 @@ namespace DelvUI.Helpers
             ImGui.SameLine();
         }
 
-        public static Node? DrawExportResetContextMenu(Node node, bool canExport)
+        public static Node? DrawExportResetContextMenu(Node node, bool canExport, bool canReset)
         {
             Node? nodeToReset = null;
 
@@ -50,7 +50,7 @@ namespace DelvUI.Helpers
                     ImGui.SetClipboardText(exportString ?? "");
                 }
 
-                if (ImGui.Selectable("Reset"))
+                if (canReset && ImGui.Selectable("Reset"))
                 {
                     ImGui.CloseCurrentPopup();
                     nodeToReset = node;
@@ -81,19 +81,19 @@ namespace DelvUI.Helpers
 
             if (ImGui.BeginPopupModal(title, ref p_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
             {
-                float maxWidth = 0;
+                float width = 300;
+                float height = Math.Min((ImGui.CalcTextSize(" ").Y + 5) * textLines.Count(), 240);
 
+                ImGui.BeginChild("confirmation_modal_message", new Vector2(width, height), false);
                 foreach (string text in textLines)
                 {
                     ImGui.Text(text);
-
-                    float textWidth = ImGui.CalcTextSize(text).X;
-                    maxWidth = Math.Max(maxWidth, textWidth);
                 }
+                ImGui.EndChild();
 
                 ImGui.NewLine();
 
-                if (ImGui.Button("OK", new Vector2(maxWidth / 2f - 5, 24)))
+                if (ImGui.Button("OK", new Vector2(width / 2f - 5, 24)))
                 {
                     ImGui.CloseCurrentPopup();
                     didConfirm = true;
@@ -102,7 +102,7 @@ namespace DelvUI.Helpers
 
                 ImGui.SetItemDefaultFocus();
                 ImGui.SameLine();
-                if (ImGui.Button("Cancel", new Vector2(maxWidth / 2f - 5, 24)))
+                if (ImGui.Button("Cancel", new Vector2(width / 2f - 5, 24)))
                 {
                     ImGui.CloseCurrentPopup();
                     didClose = true;
@@ -150,6 +150,54 @@ namespace DelvUI.Helpers
             }
 
             return didClose;
+        }
+
+        public static (bool, bool) DrawInputModal(string title, string message, ref string value)
+        {
+            bool didConfirm = false;
+            bool didClose = false;
+
+            ImGui.OpenPopup(title);
+
+            Vector2 center = ImGui.GetMainViewport().GetCenter();
+            ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
+
+            bool p_open = true; // i've no idea what this is used for
+
+            if (ImGui.BeginPopupModal(title, ref p_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
+            {
+                var textSize = ImGui.CalcTextSize(message).X;
+
+                ImGui.Text(message);
+
+                ImGui.PushItemWidth(textSize);
+                ImGui.InputText("", ref value, 64);
+
+                ImGui.NewLine();
+                if (ImGui.Button("OK", new Vector2(textSize / 2f - 5, 24)))
+                {
+                    ImGui.CloseCurrentPopup();
+                    didConfirm = true;
+                    didClose = true;
+                }
+
+                ImGui.SetItemDefaultFocus();
+                ImGui.SameLine();
+                if (ImGui.Button("Cancel", new Vector2(textSize / 2f - 5, 24)))
+                {
+                    ImGui.CloseCurrentPopup();
+                    didClose = true;
+                }
+
+                ImGui.EndPopup();
+            }
+            // close button on nav
+            else
+            {
+                didClose = true;
+            }
+
+            return (didConfirm, didClose);
         }
     }
 }

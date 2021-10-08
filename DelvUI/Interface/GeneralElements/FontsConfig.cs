@@ -24,7 +24,6 @@ namespace DelvUI.Interface.GeneralElements
     }
 
     [Disableable(false)]
-    [Exportable(false)]
     [Section("Misc")]
     [SubSection("Fonts", 0)]
     public class FontsConfig : PluginConfigObject

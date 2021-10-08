@@ -15,6 +15,8 @@ namespace DelvUI.Interface
 {
     [Disableable(false)]
     [Exportable(false)]
+    [Shareable(false)]
+    [Resettable(false)]
     [Section("Import")]
     [SubSection("General", 0)]
     public class ImportConfig : PluginConfigObject
@@ -24,7 +26,7 @@ namespace DelvUI.Interface
         private string? _errorMessage = null;
 
         private List<ImportData>? _importDataList = null;
-        private List<string>? _importMessages = null;
+        private List<bool>? _importDataEnabled = null;
 
         public new static ImportConfig DefaultConfig() { return new ImportConfig(); }
 
@@ -60,9 +62,9 @@ namespace DelvUI.Interface
             }
 
             // confirmation modal
-            if (_importDataList != null && _importDataList.Count > 0 && _importMessages != null)
+            if (_importDataList != null && _importDataList.Count > 0)
             {
-                var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Import", _importMessages);
+                var (didConfirm, didClose) = DrawImportConfirmationModal();
 
                 if (didConfirm)
                 {
@@ -78,7 +80,7 @@ namespace DelvUI.Interface
                 {
                     _importing = false;
                     _importDataList = null;
-                    _importMessages = null;
+                    _importDataEnabled = null;
                     changed = true;
                 }
 
@@ -90,15 +92,21 @@ namespace DelvUI.Interface
 
         private string? Import()
         {
-            if (_importDataList == null)
+            if (_importDataList == null || _importDataEnabled == null)
             {
                 return null;
             }
 
             List<PluginConfigObject> configObjects = new List<PluginConfigObject>(_importDataList.Count);
 
-            foreach (ImportData importData in _importDataList)
+            for (int i = 0; i < _importDataList.Count; i++)
             {
+                if (i >= _importDataEnabled.Count || _importDataEnabled[i] == false)
+                {
+                    continue;
+                }
+
+                ImportData importData = _importDataList[i];
                 PluginConfigObject? config = importData.GetObject();
                 if (config == null)
                 {
@@ -125,10 +133,7 @@ namespace DelvUI.Interface
             }
 
             _importDataList = new List<ImportData>(importStrings.Length);
-
-            const int maxLines = 6;
-            _importMessages = new List<string>(Math.Max(importStrings.Length + 1, maxLines));
-            _importMessages.Add("Are you sure you want to import?");
+            _importDataEnabled = new List<bool>(importStrings.Length);
 
             foreach (var str in importStrings)
             {
@@ -136,23 +141,102 @@ namespace DelvUI.Interface
                 {
                     ImportData importData = new ImportData(str);
                     _importDataList.Add(importData);
-                    _importMessages.Add("  -" + importData.Name);
+                    _importDataEnabled.Add(true);
                 }
                 catch (Exception e)
                 {
                     _importDataList = null;
-                    _importMessages = null;
+                    _importDataEnabled = null;
 
                     return e is ArgumentException ? e.Message : "Invalid import string!";
                 }
             }
 
-            if (_importMessages.Count == maxLines && importStrings.Length > maxLines)
+            return null;
+        }
+
+        public (bool, bool) DrawImportConfirmationModal()
+        {
+            if (_importDataList == null || _importDataEnabled == null)
             {
-                _importMessages[maxLines - 1] = "  -...";
+                return (false, true);
             }
 
-            return null;
+            bool didConfirm = false;
+            bool didClose = false;
+
+            ImGui.OpenPopup("Import");
+
+            Vector2 center = ImGui.GetMainViewport().GetCenter();
+            ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
+
+            bool p_open = true; // i've no idea what this is used for
+
+            if (ImGui.BeginPopupModal("Import", ref p_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
+            {
+                float width = 300;
+
+                ImGui.Text("Select which parts to import:");
+
+                ImGui.NewLine();
+                if (ImGui.Button("Select All", new Vector2(width / 2f - 5, 24)))
+                {
+                    for (int i = 0; i < _importDataEnabled.Count; i++)
+                    {
+                        _importDataEnabled[i] = true;
+                    }
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Button("Deselect All", new Vector2(width / 2f - 5, 24)))
+                {
+                    for (int i = 0; i < _importDataEnabled.Count; i++)
+                    {
+                        _importDataEnabled[i] = false;
+                    }
+                }
+
+                ImGui.NewLine();
+                float height = Math.Min(30 * _importDataList.Count, 400);
+
+                ImGui.BeginChild("import checkboxes", new Vector2(width, height), false);
+
+                for (int i = 0; i < _importDataList.Count; i++)
+                {
+                    bool value = _importDataEnabled[i];
+                    if (ImGui.Checkbox(_importDataList[i].Name, ref value))
+                    {
+                        _importDataEnabled[i] = value;
+                    }
+                }
+
+                ImGui.EndChild();
+
+                ImGui.NewLine();
+                if (ImGui.Button("OK", new Vector2(width / 2f - 5, 24)))
+                {
+                    ImGui.CloseCurrentPopup();
+                    didConfirm = true;
+                    didClose = true;
+                }
+
+                ImGui.SetItemDefaultFocus();
+                ImGui.SameLine();
+                if (ImGui.Button("Cancel", new Vector2(width / 2f - 5, 24)))
+                {
+                    ImGui.CloseCurrentPopup();
+                    didClose = true;
+                }
+
+                ImGui.EndPopup();
+            }
+            // close button on nav
+            else
+            {
+                didClose = true;
+            }
+
+            return (didConfirm, didClose);
         }
     }
 
