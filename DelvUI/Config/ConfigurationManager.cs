@@ -404,6 +404,7 @@ namespace DelvUI.Config
             typeof(GCDIndicatorConfig),
             typeof(MPTickerConfig),
             typeof(GridConfig),
+            typeof(PullTimerConfig),
 
             typeof(ImportConfig)
         };
