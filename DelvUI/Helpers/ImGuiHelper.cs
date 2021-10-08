@@ -81,19 +81,19 @@ namespace DelvUI.Helpers
 
             if (ImGui.BeginPopupModal(title, ref p_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
             {
-                float maxWidth = 0;
+                float width = 300;
+                float height = Math.Min((ImGui.CalcTextSize(" ").Y + 5) * textLines.Count(), 240);
 
+                ImGui.BeginChild("confirmation_modal_message", new Vector2(width, height), false);
                 foreach (string text in textLines)
                 {
                     ImGui.Text(text);
-
-                    float textWidth = ImGui.CalcTextSize(text).X;
-                    maxWidth = Math.Max(maxWidth, textWidth);
                 }
+                ImGui.EndChild();
 
                 ImGui.NewLine();
 
-                if (ImGui.Button("OK", new Vector2(maxWidth / 2f - 5, 24)))
+                if (ImGui.Button("OK", new Vector2(width / 2f - 5, 24)))
                 {
                     ImGui.CloseCurrentPopup();
                     didConfirm = true;
@@ -102,7 +102,7 @@ namespace DelvUI.Helpers
 
                 ImGui.SetItemDefaultFocus();
                 ImGui.SameLine();
-                if (ImGui.Button("Cancel", new Vector2(maxWidth / 2f - 5, 24)))
+                if (ImGui.Button("Cancel", new Vector2(width / 2f - 5, 24)))
                 {
                     ImGui.CloseCurrentPopup();
                     didClose = true;
