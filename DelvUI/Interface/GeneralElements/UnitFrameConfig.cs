@@ -136,6 +136,10 @@ namespace DelvUI.Interface.GeneralElements
         [Order(85, collapseWith = nameof(UseColorBasedOnHealthValue))]
         public float LowHealthColorThreshold = 25f;
 
+        [Combo("Blend Mode", "CIELAB", "XYZ", "RGB", "LChuv")]
+        [Order(86, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        public BlendMode blendMode = BlendMode.CIELAB;
+
         [Checkbox("Tank Invulnerability")]
         [Order(90)]
         public bool ShowTankInvulnerability = true;
@@ -166,6 +170,14 @@ namespace DelvUI.Interface.GeneralElements
             RightLabelConfig = rightLabelConfig;
             BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
         }
+    }
+
+    public enum BlendMode
+    {
+        CIELAB,
+        XYZ,
+        RGB,
+        LChuv
     }
 
     [Exportable(false)]

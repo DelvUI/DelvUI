@@ -75,7 +75,7 @@ namespace DelvUI.Interface.GeneralElements
             if (Config.UseColorBasedOnHealthValue)
             {
                 var scale = currentHp / Math.Max(1, maxHp);
-                fillColor = Utils.ColorByHealthValue(scale, Config.LowHealthColorThreshold / 100f, Config.FullHealthColorThreshold / 100f, Config.FullHealthColor, Config.LowHealthColor);
+                fillColor = Utils.ColorByHealthValue(scale, Config.LowHealthColorThreshold / 100f, Config.FullHealthColorThreshold / 100f, Config.FullHealthColor, Config.LowHealthColor, Config.blendMode);
             }
 
             var background = new Rect(Config.Position, Config.Size, BackgroundColor(character));
