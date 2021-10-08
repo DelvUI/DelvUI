@@ -190,43 +190,49 @@ namespace DelvUI.Interface.Jobs
 
         [NestedConfig("Sen Bar", 40)]
         public SenBarConfig SenBar = new SenBarConfig(
-                                                    new(0, -17),
-                                                    new(254, 10),
-                                                    new PluginConfigColor(new Vector4(0, 0, 0, 0)));
+            new(0, -17),
+            new(254, 10),
+            new PluginConfigColor(new Vector4(0, 0, 0, 0))
+        );
 
         [NestedConfig("Shifu Bar", 45)]
         public ProgressBarConfig ShifuBar = new ProgressBarConfig(
-                                                    new(-64, -56),
-                                                    new(126, 20),
-                                                    new PluginConfigColor(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f)));
+            new(-64, -56),
+            new(126, 20),
+            new PluginConfigColor(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f))
+        );
 
         [NestedConfig("Jinpu Bar", 50)]
         public ProgressBarConfig JinpuBar = new ProgressBarConfig(
-                                                    new(64, -56),
-                                                    new(126, 20),
-                                                    new PluginConfigColor(new(136f / 255f, 146f / 255f, 219f / 255f, 100f / 100f)));
+            new(64, -56),
+            new(126, 20),
+            new PluginConfigColor(new(136f / 255f, 146f / 255f, 219f / 255f, 100f / 100f))
+        );
 
         [NestedConfig("Kenki Bar", 55)]
         public ProgressBarConfig KenkiBar = new ProgressBarConfig(
-                                                    new(0, -34),
-                                                    new(254, 20),
-                                                    new PluginConfigColor(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f)));
+            new(0, -34),
+            new(254, 20),
+            new PluginConfigColor(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f))
+        );
 
 
         [NestedConfig("Higanbana Bar", 60)]
         public ProgressBarConfig HiganbanaBar = new ProgressBarConfig(
-                                                    new(0, -78),
-                                                    new(254, 20),
-                                                    new PluginConfigColor(new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f)),
-                                                    BarDirection.Right,
-                                                    new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
-                                                    15f);
+            new(0, -78),
+            new(254, 20),
+            new PluginConfigColor(new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f)),
+            BarDirection.Right,
+            new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
+            15f
+        );
 
         [NestedConfig("Meditation Bar", 65, separator = true)]
         public ChunkedBarConfig MeditationBar = new ChunkedBarConfig(
-                                                    new(0, -5),
-                                                    new(254, 10),
-                                                    new PluginConfigColor(new(247f / 255f, 163f / 255f, 89f / 255f, 100f / 100f)));
+            new(0, -5),
+            new(254, 10),
+            new PluginConfigColor(new(247f / 255f, 163f / 255f, 89f / 255f, 100f / 100f))
+        );
     }
 
     public class SenBarConfig : ChunkedBarConfig

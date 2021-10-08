@@ -1,5 +1,4 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
@@ -7,7 +6,6 @@ using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
@@ -72,11 +70,6 @@ namespace DelvUI.Interface.GeneralElements
             float currentHp = character.CurrentHp;
             float maxHp = character.MaxHp;
 
-            if (Config.TankStanceIndicatorConfig is { Enabled: true } && JobsHelper.IsJobTank(character.ClassJob.Id))
-            {
-                DrawTankStanceIndicator(pos);
-            }
-
             PluginConfigColor fillColor = Config.UseJobColor ? Utils.ColorForActor(character) : Config.FillColor;
 
             if (Config.UseColorBasedOnHealthValue)
@@ -98,17 +91,20 @@ namespace DelvUI.Interface.GeneralElements
 
             if (Config.ShieldConfig.Enabled)
             {
-                float shield = Utils.ActorShieldValue(Actor) * maxHp;
-                float overshield = Config.ShieldConfig.FillHealthFirst ? Math.Max(shield + currentHp - maxHp, 0f) : shield;
-                Rect overshieldFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, Config.ShieldConfig.Color, overshield, maxHp);
-                bar.AddForegrounds(overshieldFill);
-
-                if (Config.ShieldConfig.FillHealthFirst && currentHp < maxHp)
+                float shield = Utils.ActorShieldValue(Actor);
+                if (shield > 0f)
                 {
-                    var shieldPos = Config.FillDirection.IsInverted() ? Config.Position : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
-                    var shieldSize = Config.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
-                    Rect shieldFill = BarUtilities.GetFillRect(shieldPos, shieldSize, Config.FillDirection, Config.ShieldConfig.Color, shield - overshield, maxHp - currentHp, 0f);
-                    bar.AddForegrounds(shieldFill);
+                    bar.AddForegrounds(
+                        BarUtilities.GetShieldForeground(
+                            Config.ShieldConfig,
+                            Config.Position,
+                            Config.Size,
+                            healthFill.Size,
+                            Config.FillDirection,
+                            shield,
+                            character.CurrentHp,
+                            character.MaxHp)
+                    );
                 }
             }
 
@@ -118,28 +114,8 @@ namespace DelvUI.Interface.GeneralElements
         private void DrawFriendlyNPC(Vector2 pos, GameObject? Actor)
         {
             var bar = new BarHud(Config, Actor);
-            bar.AddForegrounds(new Rect(Config.Position, Config.Size, Config.UseJobColor? GlobalColors.Instance.NPCFriendlyColor : Config.FillColor));
+            bar.AddForegrounds(new Rect(Config.Position, Config.Size, Config.UseJobColor ? GlobalColors.Instance.NPCFriendlyColor : Config.FillColor));
             bar.AddLabels(Config.LeftLabelConfig, Config.RightLabelConfig);
-            bar.Draw(pos);
-        }
-
-        private void DrawTankStanceIndicator(Vector2 pos)
-        {
-            if (Actor is not BattleChara battleChara || Config.TankStanceIndicatorConfig == null)
-            {
-                return;
-            }
-
-            var tankStanceBuff = battleChara.StatusList.Where(
-                o => o.StatusId is 79 or 91 or 392 or 393 or 743 or 1396 or 1397 or 1833
-            );
-
-            var thickness = Config.TankStanceIndicatorConfig.Thickness + 1;
-            var barSize = new Vector2(Math.Min(Config.Size.X, Config.Size.Y), Config.Size.Y);
-            var cursorPos = Utils.GetAnchoredPosition(Config.Position + new Vector2(-thickness, thickness), Config.Size, Config.Anchor);
-
-            var color = !tankStanceBuff.Any() ? Config.TankStanceIndicatorConfig.InactiveColor : Config.TankStanceIndicatorConfig.ActiveColor;
-            var bar = new BarHud("DelvUI_TankStance").SetBackground(new Rect(cursorPos, barSize)).AddForegrounds(new Rect(cursorPos, barSize, color));
             bar.Draw(pos);
         }
 

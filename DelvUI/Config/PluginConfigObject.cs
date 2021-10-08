@@ -71,7 +71,8 @@ namespace DelvUI.Config
 
     public abstract class MovablePluginConfigObject : PluginConfigObject
     {
-        public string ID { get; private set; }
+        [JsonIgnore]
+        public readonly string ID;
 
         [DragInt2("Position", min = -4000, max = 4000)]
         [Order(5)]

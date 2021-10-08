@@ -188,7 +188,8 @@ namespace DelvUI.Interface.Bars
             float min = 0f,
             GameObject? actor = null,
             LabelConfig? label = null,
-            BarGlowConfig? glowConfig = null)
+            BarGlowConfig? glowConfig = null,
+            PluginConfigColor? partialFillColor = null)
         {
             float chunkRange = (max - min) / chunks;
 
@@ -199,11 +200,58 @@ namespace DelvUI.Interface.Bars
                 float chunkMin = min + chunkRange * i;
                 float chunkMax = min + chunkRange * (i + 1);
                 float chunkPercent = Math.Clamp((current - chunkMin) / (chunkMax - chunkMin), 0f, 1f);
-                PluginConfigColor chunkColor = config.UsePartialFillColor && config.PartialFillColor is not null && current < chunkMax ? config.PartialFillColor : config.FillColor;
+                PluginConfigColor chunkColor = partialFillColor is not null && current < chunkMax ? partialFillColor : config.FillColor;
                 barChunks[barIndex] = new Tuple<PluginConfigColor, float, LabelConfig?>(chunkColor, chunkPercent, chunkPercent < 1f ? label : null);
             }
 
             return GetChunkedBars(config, actor, glowConfig, barChunks);
+        }
+
+        public static BarHud[] GetChunkedProgressBars(
+            ChunkedProgressBarConfig config,
+            int chunks,
+            float current,
+            float max,
+            float min = 0f,
+            GameObject? actor = null,
+            LabelConfig? label = null,
+            BarGlowConfig? glowConfig = null)
+        {
+            return GetChunkedProgressBars(config, chunks, current, max, min, actor, label, glowConfig, config.UsePartialFillColor ? config.PartialFillColor : config.FillColor);
+        }
+
+        public static Rect[] GetShieldForeground(
+            ShieldConfig shieldConfig,
+            Vector2 pos,
+            Vector2 size,
+            Vector2 healthFillSize,
+            BarDirection fillDirection,
+            float shieldPercent,
+            float currentHp,
+            float maxHp)
+        {
+            float shieldValue = shieldPercent * maxHp;
+            float overshield = shieldConfig.FillHealthFirst ? Math.Max(shieldValue + currentHp - maxHp, 0f) : shieldValue;
+
+            var overshieldSize = fillDirection.IsHorizontal()
+                ? new Vector2(size.X, Math.Min(shieldConfig.Size, size.Y))
+                : new Vector2(Math.Min(shieldConfig.Size, size.X), size.Y);
+
+            Rect overshieldFill = GetFillRect(pos, overshieldSize, fillDirection, shieldConfig.Color, overshield, maxHp);
+
+            if (shieldConfig.FillHealthFirst && currentHp < maxHp)
+            {
+                var shieldPos = fillDirection.IsInverted() ? pos : pos + BarUtilities.GetFillDirectionOffset(healthFillSize, fillDirection);
+                var shieldSize = size - GetFillDirectionOffset(healthFillSize, fillDirection);
+                var healthFillShieldSize = fillDirection.IsHorizontal()
+                    ? new Vector2(shieldSize.X, Math.Min(shieldConfig.Size, size.Y))
+                    : new Vector2(Math.Min(shieldConfig.Size, size.X), shieldSize.Y);
+
+                Rect shieldFill = GetFillRect(shieldPos, healthFillShieldSize, fillDirection, shieldConfig.Color, shieldValue - overshield, maxHp - currentHp, 0f);
+                return new[] { overshieldFill, shieldFill };
+            }
+
+            return new[] { overshieldFill };
         }
 
         public static BarHud GetBar(
