@@ -1,14 +1,10 @@
 using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -263,10 +259,6 @@ namespace DelvUI.Interface.Jobs
         [ColorEdit4("Dark Arts Color" + "##MP")]
         [Order(26)]
         public PluginConfigColor DarkArtsColor = new PluginConfigColor(new Vector4(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
-
-        //[ColorEdit4("Partial Fill Color" + "##MP")]
-        //[Order(26)]
-        //public PluginConfigColor DarkArtsColor = new PluginConfigColor(new Vector4(141f / 255f, 141f / 255f, 141f / 255f, 100f / 100f));
 
         [NestedConfig("Glow When Dark Arts Is Active", 28, separator = false, spacing = true)]
         public BarGlowConfig GlowConfig = new BarGlowConfig();
