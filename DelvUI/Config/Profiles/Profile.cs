@@ -7,7 +7,7 @@ namespace DelvUI.Config.Profiles
 {
     public class Profile
     {
-        public readonly string Name;
+        public string Name;
 
         public bool AutoSwitchEnabled = false;
         public AutoSwitchData AutoSwitchData = new AutoSwitchData();

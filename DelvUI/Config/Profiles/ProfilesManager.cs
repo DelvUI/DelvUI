@@ -122,6 +122,7 @@ namespace DelvUI.Config.Profiles
         [JsonIgnore] private string? _errorMessage = null;
         [JsonIgnore] private string? _deletingProfileName = null;
         [JsonIgnore] private string? _resetingProfileName = null;
+        [JsonIgnore] private string? _renamingProfileName = null;
 
         public SortedList<string, Profile> Profiles = new SortedList<string, Profile>();
 
@@ -295,6 +296,50 @@ namespace DelvUI.Config.Profiles
             return null;
         }
 
+        private string? RenameCurrentProfile(string newProfileName)
+        {
+            if (_currentProfileName == newProfileName)
+            {
+                return null;
+            }
+
+            if (Profiles.ContainsKey(newProfileName))
+            {
+                return "A profile with the name \"" + newProfileName + "\" already exists!";
+            }
+
+            var srcPath = Path.Combine(ProfilesPath, _currentProfileName + ".delvui");
+            var dstPath = Path.Combine(ProfilesPath, newProfileName + ".delvui");
+
+            try
+            {
+
+                if (File.Exists(dstPath))
+                {
+                    return "A profile with the name \"" + newProfileName + "\" already exists!";
+                }
+
+                File.Move(srcPath, dstPath);
+
+                Profile profile = Profiles[_currentProfileName];
+                profile.Name = newProfileName;
+
+                Profiles.Remove(_currentProfileName);
+                Profiles.Add(newProfileName, profile);
+
+                _currentProfileName = newProfileName;
+
+                Save();
+            }
+            catch
+            {
+                return "Error trying to rename profile \"" + _currentProfileName + "\"!";
+            }
+
+            return null;
+        }
+
+
         private string? DeleteProfile(string profileName)
         {
             if (!Profiles.ContainsKey(profileName))
@@ -369,6 +414,7 @@ namespace DelvUI.Config.Profiles
                     }
                 }
 
+                // reset
                 ImGui.PushFont(UiBuilder.IconFont);
                 ImGui.SameLine();
                 if (ImGui.Button("\uf2f9", new Vector2(0, 0)))
@@ -376,6 +422,36 @@ namespace DelvUI.Config.Profiles
                     _resetingProfileName = _currentProfileName;
                 }
 
+                // rename
+                ImGui.SameLine();
+                if (_currentProfileName != DefaultProfileName && ImGui.Button(FontAwesomeIcon.Pen.ToIconString()))
+                {
+                    _renamingProfileName = _currentProfileName;
+                }
+
+                // share
+                ImGui.SameLine();
+                if (ImGui.Button(FontAwesomeIcon.ShareSquare.ToIconString()))
+                {
+                    //_deletingProfileName = _currentProfileName;
+                    string? exportString = ConfigurationManager.Instance.ExportCurrentConfigs();
+                    if (exportString != null)
+                    {
+                        ImGui.SetClipboardText(exportString);
+                        ImGui.OpenPopup("export_succes_popup");
+                    }
+                }
+                ImGui.PopFont();
+
+                // export success popup
+                if (ImGui.BeginPopup("export_succes_popup"))
+                {
+                    ImGui.Text("Profile export string copied to clipboard!");
+                    ImGui.EndPopup();
+                }
+
+                // delete
+                ImGui.PushFont(UiBuilder.IconFont);
                 ImGui.SameLine();
                 if (_currentProfileName != DefaultProfileName && ImGui.Button(FontAwesomeIcon.Trash.ToIconString()))
                 {
@@ -411,6 +487,7 @@ namespace DelvUI.Config.Profiles
 
                         if (_errorMessage == null)
                         {
+                            _newProfileName = "";
                             _errorMessage = SwitchToProfile(_newProfileName);
                         }
                     }
@@ -461,6 +538,24 @@ namespace DelvUI.Config.Profiles
                 if (didConfirm || didClose)
                 {
                     _resetingProfileName = null;
+                }
+            }
+
+            // rename modal
+            if (_renamingProfileName != null)
+            {
+                var (didConfirm, didClose) = ImGuiHelper.DrawInputModal("Rename", "Type a new name for the profile:", ref _renamingProfileName);
+
+                if (didConfirm)
+                {
+                    _errorMessage = RenameCurrentProfile(_renamingProfileName);
+
+                    changed = true;
+                }
+
+                if (didConfirm || didClose)
+                {
+                    _renamingProfileName = null;
                 }
             }
 

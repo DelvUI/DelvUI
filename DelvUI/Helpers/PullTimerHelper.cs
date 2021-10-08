@@ -35,7 +35,7 @@ namespace DelvUI.Helpers
             try
             {
                 _countdownTimerHook = new Hook<CountdownTimer>(countdownPtr, CountdownTimerFunc);
-                _countdownTimerHook.Enable();
+                _countdownTimerHook?.Enable();
             }
             catch (Exception e)
             {
@@ -73,16 +73,16 @@ namespace DelvUI.Helpers
 
         private ulong _countDown;
         public bool CountDownRunning;
-        
+
         private int _countDownStallTicks;
 
-        private readonly Hook<CountdownTimer> _countdownTimerHook;
+        private readonly Hook<CountdownTimer>? _countdownTimerHook;
         public float LastCountDownValue;
         private bool _shouldRestartCombatTimer = true;
         private bool _lastMaxValueSet = false;
 
         public readonly PullTimerState PullTimerState;
-        
+
         public void Update()
         {
             if (PullTimerState.Mocked)
@@ -94,13 +94,13 @@ namespace DelvUI.Helpers
             UpdateEncounterTimer();
             PullTimerState.InInstance = Plugin.Condition[ConditionFlag.BoundByDuty];
         }
-        
+
         private IntPtr CountdownTimerFunc(ulong value)
         {
             _countDown = value;
-            return _countdownTimerHook.Original(value);
+            return _countdownTimerHook!.Original(value);
         }
-        
+
         private void UpdateEncounterTimer()
         {
             if (Plugin.Condition[ConditionFlag.InCombat])
@@ -124,7 +124,7 @@ namespace DelvUI.Helpers
             PullTimerState.CombatDuration = _combatTimeEnd - _combatTimeStart;
             PullTimerState.CombatEnd = _combatTimeEnd;
         }
-        
+
         private void UpdateCountDown()
         {
             PullTimerState.CountingDown = false;
@@ -133,7 +133,7 @@ namespace DelvUI.Helpers
             {
                 return;
             }
-            
+
             var countDownPointerValue = Marshal.PtrToStructure<float>((IntPtr)_countDown + 0x2c);
 
             // is last value close enough (workaround for floating point approx)
@@ -174,9 +174,9 @@ namespace DelvUI.Helpers
 
         [UnmanagedFunctionPointer(CallingConvention.ThisCall, CharSet = CharSet.Ansi)]
         private delegate IntPtr CountdownTimer(ulong param1);
-        
+
     }
-    
+
     public class PullTimerState
     {
         private bool _inCombat;
@@ -221,8 +221,8 @@ namespace DelvUI.Helpers
 
         public float CountDownValue { get; set; } = 0f;
         public float CountDownMax { get; set; } = 0f;
-        public event EventHandler InCombatChanged;
-        public event EventHandler CountingDownChanged;
+        public event EventHandler? InCombatChanged;
+        public event EventHandler? CountingDownChanged;
         //
     }
 }

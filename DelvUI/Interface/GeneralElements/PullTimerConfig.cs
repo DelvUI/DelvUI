@@ -18,14 +18,11 @@ namespace DelvUI.Interface.GeneralElements
         [Order(50)]
         public bool ShowDecimals = true;
 
-        [NestedConfig("Text", 55)]
-        public EditableLabelConfig CenterLabel;
-
         public PullTimerConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {
         }
 
-        public new static PullTimerConfig DefaultConfig() 
+        public new static PullTimerConfig DefaultConfig()
         {
             var config = new PullTimerConfig(
                 new Vector2(0, HUDConstants.BaseHUDOffsetY - 35),
@@ -33,7 +30,7 @@ namespace DelvUI.Interface.GeneralElements
                 new PluginConfigColor(new Vector4(233f / 255f, 4f / 255f, 4f / 255f, 100f / 100f)));
 
             config.HideWhenInactive = true;
-            
+
             return config;
         }
     }

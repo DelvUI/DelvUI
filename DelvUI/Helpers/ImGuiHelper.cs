@@ -151,5 +151,53 @@ namespace DelvUI.Helpers
 
             return didClose;
         }
+
+        public static (bool, bool) DrawInputModal(string title, string message, ref string value)
+        {
+            bool didConfirm = false;
+            bool didClose = false;
+
+            ImGui.OpenPopup(title);
+
+            Vector2 center = ImGui.GetMainViewport().GetCenter();
+            ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
+
+            bool p_open = true; // i've no idea what this is used for
+
+            if (ImGui.BeginPopupModal(title, ref p_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
+            {
+                var textSize = ImGui.CalcTextSize(message).X;
+
+                ImGui.Text(message);
+
+                ImGui.PushItemWidth(textSize);
+                ImGui.InputText("", ref value, 64);
+
+                ImGui.NewLine();
+                if (ImGui.Button("OK", new Vector2(textSize / 2f - 5, 24)))
+                {
+                    ImGui.CloseCurrentPopup();
+                    didConfirm = true;
+                    didClose = true;
+                }
+
+                ImGui.SetItemDefaultFocus();
+                ImGui.SameLine();
+                if (ImGui.Button("Cancel", new Vector2(textSize / 2f - 5, 24)))
+                {
+                    ImGui.CloseCurrentPopup();
+                    didClose = true;
+                }
+
+                ImGui.EndPopup();
+            }
+            // close button on nav
+            else
+            {
+                didClose = true;
+            }
+
+            return (didConfirm, didClose);
+        }
     }
 }
