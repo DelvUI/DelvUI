@@ -307,7 +307,10 @@ namespace DelvUI.Config
             node.SelectedOptionName = oldSelection;
             node.AddExtraSectionNode(ProfilesManager.Instance.ProfilesNode);
 
+            ConfigBaseNode.ConfigObjectResetEvent -= OnConfigObjectReset;
             ConfigBaseNode = node;
+            ConfigBaseNode.ConfigObjectResetEvent += OnConfigObjectReset;
+
             ResetEvent?.Invoke(this);
 
             return true;
