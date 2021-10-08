@@ -90,7 +90,7 @@ namespace DelvUI.Helpers
             return t.Seconds.ToString();
         }
 
-        public static PluginConfigColor ColorByHealthValue(float i, float min, float max, PluginConfigColor fullHealthColor, PluginConfigColor lowHealthColor)
+        public static PluginConfigColor ColorByHealthValue(float i, float min, float max, PluginConfigColor fullHealthColor, PluginConfigColor lowHealthColor, BlendMode blendMode)
         {
             float ratio = i;
             if (min > 0 || max < 1)
@@ -110,30 +110,76 @@ namespace DelvUI.Helpers
                 }
             }
 
+            //build our converters
             var _rgbToLab = new ConverterBuilder().FromRGB().ToLab().Build();
             var _labToRgb = new ConverterBuilder().FromLab().ToRGB().Build();
+
+            var _rgbToXyz = new ConverterBuilder().FromRGB(RGBWorkingSpaces.sRGB).ToXYZ(Illuminants.D65).Build();
+            var _xyzToRgb = new ConverterBuilder().FromXYZ(Illuminants.D65).ToRGB(RGBWorkingSpaces.sRGB).Build();
+
+            var _rgbToLChuv = new ConverterBuilder().FromRGB().ToLChuv().Build();
+            var _lchuvToRgb = new ConverterBuilder().FromLChuv().ToRGB().Build();
 
             var rgbFullHealthColor = new RGBColor(fullHealthColor.Vector.X, fullHealthColor.Vector.Y, fullHealthColor.Vector.Z);
             var rgbLowHealthColor = new RGBColor(lowHealthColor.Vector.X, lowHealthColor.Vector.Y, lowHealthColor.Vector.Z);
 
+            //convert RGB to LAB
             var rgbFullHealthLab = _rgbToLab.Convert(rgbFullHealthColor);
             var rgbLowHealthLab = _rgbToLab.Convert(rgbLowHealthColor);
 
+            //convert RGB to XYZ
+            var rgbFullHealthXyz = _rgbToXyz.Convert(rgbFullHealthColor);
+            var rgbLowHealthXyz = _rgbToXyz.Convert(rgbLowHealthColor);
+
+            //convert RGB to LChuv
+            var rgbFullHealthLChuv = _rgbToLChuv.Convert(rgbFullHealthColor);
+            var rgbLowHealthLChuv = _rgbToLChuv.Convert(rgbLowHealthColor);
+
+            //XYZ interpolation results
+            float resultX = (float)((rgbFullHealthXyz.X - rgbLowHealthXyz.X) * ratio + rgbLowHealthXyz.X);
+            float resultY = (float)((rgbFullHealthXyz.Y - rgbLowHealthXyz.Y) * ratio + rgbLowHealthXyz.Y);
+            float resultZ = (float)((rgbFullHealthXyz.Z - rgbLowHealthXyz.Z) * ratio + rgbLowHealthXyz.Z);
+
+            //LAB interpolation results
             float resultL = (float)((rgbFullHealthLab.L - rgbLowHealthLab.L) * ratio + rgbLowHealthLab.L);
             float resultA = (float)((rgbFullHealthLab.a - rgbLowHealthLab.a) * ratio + rgbLowHealthLab.a);
             float resultB = (float)((rgbFullHealthLab.b - rgbLowHealthLab.b) * ratio + rgbLowHealthLab.b);
 
+            //RGB interpolation results
+            float resultR = (float)((fullHealthColor.Vector.X - lowHealthColor.Vector.X) * ratio + lowHealthColor.Vector.X);
+            float resultG = (float)((fullHealthColor.Vector.Y - lowHealthColor.Vector.Y) * ratio + lowHealthColor.Vector.Y);
+            float resultb = (float)((fullHealthColor.Vector.Z - lowHealthColor.Vector.Z) * ratio + lowHealthColor.Vector.Z);
+
+            //LChuv interpolation results
+            float resultl = (float)((rgbFullHealthLChuv.L - rgbLowHealthLChuv.L) * ratio + rgbLowHealthLChuv.L);
+            float resultc = (float)((rgbFullHealthLChuv.C - rgbLowHealthLChuv.C) * ratio + rgbLowHealthLChuv.C);
+            float resulth = (float)((rgbFullHealthLChuv.h - rgbLowHealthLChuv.h) * ratio + rgbLowHealthLChuv.h);
+
             var newColorLab = new LabColor(resultL, resultA, resultB);
+            var newColorXYZ = new XYZColor(resultX, resultY, resultZ);
+            var newColorRGB = new RGBColor(resultR, resultG, resultb);
+            var newColorLChuv = new LChuvColor(resultl, resultc, resulth);
+
             var newColorLab2RGB = _labToRgb.Convert(newColorLab);
+            var newColorXYZ2RGB = _xyzToRgb.Convert(newColorXYZ);
+            var newColorLChuv2RGB = _lchuvToRgb.Convert(newColorLChuv);
 
             float alpha = (fullHealthColor.Vector.W - lowHealthColor.Vector.W) * ratio + lowHealthColor.Vector.W;
 
             newColorLab2RGB.Clamp();
+            newColorXYZ2RGB.Clamp();
+            newColorLChuv2RGB.Clamp();
 
-            PluginConfigColor newColor = new PluginConfigColor(new Vector4((float)newColorLab2RGB.R, (float)newColorLab2RGB.G, (float)newColorLab2RGB.B, alpha));
-            return newColor;
+            switch (blendMode)
+            {
+                case BlendMode.CIELAB: return new PluginConfigColor(new Vector4((float)newColorLab2RGB.R, (float)newColorLab2RGB.G, (float)newColorLab2RGB.B, alpha));
+                case BlendMode.XYZ: return new PluginConfigColor(new Vector4((float)newColorXYZ2RGB.R, (float)newColorXYZ2RGB.G, (float)newColorXYZ2RGB.B, alpha));
+                case BlendMode.RGB: return new PluginConfigColor(new Vector4((float)newColorRGB.R, (float)newColorRGB.G, (float)newColorRGB.B, alpha));
+                case BlendMode.LChuv: return new PluginConfigColor(new Vector4((float)newColorLChuv2RGB.R, (float)newColorLChuv2RGB.G, (float)newColorLChuv2RGB.B, alpha));
+            }
+
+            return new PluginConfigColor(new Vector4((float)newColorLab2RGB.R, (float)newColorLab2RGB.G, (float)newColorLab2RGB.B, alpha));
         }
-
         public static PluginConfigColor ColorForActor(GameObject? actor)
         {
             if (actor == null || actor is not Character character)

@@ -148,6 +148,10 @@ namespace DelvUI.Interface.Party
         [Order(65, collapseWith = nameof(UseColorBasedOnHealthValue))]
         public float LowHealthColorThreshold = 25f;
 
+        [Combo("Blend Mode", "CIELAB", "XYZ", "RGB", "LChuv")]
+        [Order(66, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        public BlendMode blendMode = BlendMode.CIELAB;
+
         [Checkbox("Highlight When Hovering With Cursor", spacing = true)]
         [Order(70)]
         public bool ShowHighlight = true;
