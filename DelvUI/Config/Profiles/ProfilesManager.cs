@@ -460,7 +460,6 @@ namespace DelvUI.Config.Profiles
             }
         }
 
-
         private string? DeleteProfile(string profileName)
         {
             if (!Profiles.ContainsKey(profileName))
@@ -604,8 +603,8 @@ namespace DelvUI.Config.Profiles
 
                     if (_errorMessage == null)
                     {
-                        _newProfileName = "";
                         _errorMessage = SwitchToProfile(_newProfileName);
+                        _newProfileName = "";
                     }
                 }
 
