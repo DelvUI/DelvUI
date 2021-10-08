@@ -79,11 +79,6 @@ namespace DelvUI.Interface.Jobs
             {
                 DrawStormbiteDoTBar(pos, player);
             }
-            
-            if (Config.SoulVoiceBar.Enabled)
-            {
-                DrawSoulVoiceBar(pos);
-            }
 
             HandleCurrentSong(pos, player);
 
