@@ -38,7 +38,7 @@ namespace DelvUI.Interface.GeneralElements
             // Rested exp bar
             var restedPos = Config.FillDirection.IsInverted() ? Config.Position : Config.Position + BarUtilities.GetFillDirectionOffset(expBar.Size, Config.FillDirection);
             var restedSize = Config.Size - BarUtilities.GetFillDirectionOffset(expBar.Size, Config.FillDirection);
-            Rect restedBar = BarUtilities.GetFillRect(restedPos, restedSize, Config.FillDirection, Config.RestedExpColor, rested, required, current);
+            Rect restedBar = BarUtilities.GetFillRect(restedPos, restedSize, Config.FillDirection, Config.RestedExpColor, rested, required, 0f);
 
             var bar = new BarHud(Config, Actor).AddForegrounds(expBar, restedBar).AddLabels(Config.LeftLabel, Config.RightLabel);
             bar.Draw(origin);
