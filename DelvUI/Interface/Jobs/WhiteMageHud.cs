@@ -83,7 +83,7 @@ namespace DelvUI.Interface.Jobs
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(ID + "_diaBar", Config.DiaBar, player, target, DiaIDs, DiaDurations)?.
+            BarUtilities.GetDoTBar(Config.DiaBar, player, target, DiaIDs, DiaDurations)?.
                 Draw(origin);
         }
 
@@ -98,12 +98,12 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.LilyBar.HideWhenInactive || lilyScale > 0)
             {
-                BarUtilities.GetChunkedProgressBars(ID + "_lilyBar", Config.LilyBar, 3, lilyScale, 3).Draw(origin);
+                BarUtilities.GetChunkedProgressBars(Config.LilyBar, 3, lilyScale, 3).Draw(origin);
             }
 
             if (!Config.BloodLilyBar.HideWhenInactive || gauge.BloodLily > 0)
             {
-                BarUtilities.GetChunkedProgressBars(ID + "_bloodLilyBar", Config.BloodLilyBar, 3, gauge.BloodLily, 3).Draw(origin);
+                BarUtilities.GetChunkedProgressBars(Config.BloodLilyBar, 3, gauge.BloodLily, 3).Draw(origin);
             }
         }
 
@@ -113,7 +113,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.AsylumBar.HideWhenInactive || asylymDuration > 0)
             {
                 Config.AsylumBar.Label.SetText(Math.Truncate(asylymDuration).ToString());
-                BarUtilities.GetProgressBar(ID + "_asylumBar", Config.AsylumBar, asylymDuration, 24f, 0f, player).Draw(origin);
+                BarUtilities.GetProgressBar(Config.AsylumBar, asylymDuration, 24f, 0f, player).Draw(origin);
             }
         }
 
@@ -123,7 +123,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.PresenceOfMindBar.HideWhenInactive || presenceOfMindDuration > 0)
             {
                 Config.PresenceOfMindBar.Label.SetText(Math.Truncate(presenceOfMindDuration).ToString());
-                BarUtilities.GetProgressBar(ID + "_presenceOfMindBar", Config.PresenceOfMindBar, presenceOfMindDuration, 15f, 0f, player).Draw(origin);
+                BarUtilities.GetProgressBar(Config.PresenceOfMindBar, presenceOfMindDuration, 15f, 0f, player).Draw(origin);
             }
         }
 
@@ -133,7 +133,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.PlenaryBar.HideWhenInactive || plenaryDuration > 0)
             {
                 Config.PlenaryBar.Label.SetText(Math.Truncate(plenaryDuration).ToString());
-                BarUtilities.GetProgressBar(ID + "_plenaryBar", Config.PlenaryBar, plenaryDuration, 10f, 0f, player).Draw(origin);
+                BarUtilities.GetProgressBar(Config.PlenaryBar, plenaryDuration, 10f, 0f, player).Draw(origin);
             }
         }
 
@@ -143,7 +143,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.TemperanceBar.HideWhenInactive || temperanceDuration > 0)
             {
                 Config.TemperanceBar.Label.SetText(Math.Truncate(temperanceDuration).ToString());
-                BarUtilities.GetProgressBar(ID + "_temperanceBar", Config.TemperanceBar, temperanceDuration, 20f, 0f, player).Draw(origin);
+                BarUtilities.GetProgressBar(Config.TemperanceBar, temperanceDuration, 20f, 0f, player).Draw(origin);
             }
         }
     }

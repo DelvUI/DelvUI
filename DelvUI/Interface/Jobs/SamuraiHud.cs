@@ -104,9 +104,9 @@ namespace DelvUI.Interface.Jobs
         {
             var gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.KenkiBar.HideWhenInactive || gauge.Kenki > 0)
-            {
+            { 
                 Config.KenkiBar.Label.SetText(gauge.Kenki.ToString("N0"));
-                BarUtilities.GetProgressBar(ID + "_kenkiBar", Config.KenkiBar, gauge.Kenki, 100f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.KenkiBar, gauge.Kenki, 100f, 0f, player).Draw(pos);
             }
         }
 
@@ -116,7 +116,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.ShifuBar.HideWhenInactive || shifuDuration > 0)
             {
                 Config.ShifuBar.Label.SetText(Math.Truncate(shifuDuration).ToString());
-                BarUtilities.GetProgressBar(ID + "_shifuBar", Config.ShifuBar, shifuDuration, 40f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.ShifuBar, shifuDuration, 40f, 0f, player).Draw(pos);
             }
         }
 
@@ -126,7 +126,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.JinpuBar.HideWhenInactive || jinpuDuration > 0)
             {
                 Config.JinpuBar.Label.SetText(Math.Truncate(jinpuDuration).ToString());
-                BarUtilities.GetProgressBar(ID + "_jinpuBar", Config.JinpuBar, jinpuDuration, 40f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.JinpuBar, jinpuDuration, 40f, 0f, player).Draw(pos);
             }
         }
 
@@ -139,7 +139,7 @@ namespace DelvUI.Interface.Jobs
                 if (!Config.HiganbanaBar.HideWhenInactive || higanbanaDuration > 0)
                 {
                     Config.HiganbanaBar.Label.SetText(Math.Truncate(higanbanaDuration).ToString());
-                    BarUtilities.GetProgressBar(ID + "_higanbanaBar", Config.HiganbanaBar, higanbanaDuration, 60f, 0f, player).Draw(pos);
+                    BarUtilities.GetProgressBar(Config.HiganbanaBar, higanbanaDuration, 60f, 0f, player).Draw(pos);
                 }
             }
         }
@@ -159,7 +159,7 @@ namespace DelvUI.Interface.Jobs
                     sen[i] = new Tuple<PluginConfigColor, float, LabelConfig?>(colors[order[i]], hasSen[order[i]], null);
                 }
 
-                BarUtilities.GetChunkedBars(ID + "_senBar", Config.SenBar, player, sen).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.SenBar, player, sen).Draw(pos);
             }
         }
 
@@ -168,7 +168,7 @@ namespace DelvUI.Interface.Jobs
             var gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.MeditationBar.HideWhenInactive || gauge.MeditationStacks > 0)
             {
-                BarUtilities.GetChunkedProgressBars(ID + "_meditationBar", Config.MeditationBar, 3, gauge.MeditationStacks, 3f).Draw(pos);
+                BarUtilities.GetChunkedProgressBars(Config.MeditationBar, 3, gauge.MeditationStacks, 3f).Draw(pos);
             }
         }
     }
@@ -190,43 +190,49 @@ namespace DelvUI.Interface.Jobs
 
         [NestedConfig("Sen Bar", 40)]
         public SenBarConfig SenBar = new SenBarConfig(
-                                                    new(0, -17),
-                                                    new(254, 10),
-                                                    new PluginConfigColor(new Vector4(0, 0, 0, 0)));
+            new(0, -17),
+            new(254, 10),
+            new PluginConfigColor(new Vector4(0, 0, 0, 0))
+        );
 
         [NestedConfig("Shifu Bar", 45)]
         public ProgressBarConfig ShifuBar = new ProgressBarConfig(
-                                                    new(-64, -56),
-                                                    new(126, 20),
-                                                    new PluginConfigColor(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f)));
+            new(-64, -56),
+            new(126, 20),
+            new PluginConfigColor(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f))
+        );
 
         [NestedConfig("Jinpu Bar", 50)]
         public ProgressBarConfig JinpuBar = new ProgressBarConfig(
-                                                    new(64, -56),
-                                                    new(126, 20),
-                                                    new PluginConfigColor(new(136f / 255f, 146f / 255f, 219f / 255f, 100f / 100f)));
+            new(64, -56),
+            new(126, 20),
+            new PluginConfigColor(new(136f / 255f, 146f / 255f, 219f / 255f, 100f / 100f))
+        );
 
         [NestedConfig("Kenki Bar", 55)]
         public ProgressBarConfig KenkiBar = new ProgressBarConfig(
-                                                    new(0, -34),
-                                                    new(254, 20),
-                                                    new PluginConfigColor(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f)));
+            new(0, -34),
+            new(254, 20),
+            new PluginConfigColor(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f))
+        );
 
 
         [NestedConfig("Higanbana Bar", 60)]
         public ProgressBarConfig HiganbanaBar = new ProgressBarConfig(
-                                                    new(0, -78),
-                                                    new(254, 20),
-                                                    new PluginConfigColor(new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f)),
-                                                    BarDirection.Right,
-                                                    new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
-                                                    15f);
+            new(0, -78),
+            new(254, 20),
+            new PluginConfigColor(new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f)),
+            BarDirection.Right,
+            new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
+            15f
+        );
 
         [NestedConfig("Meditation Bar", 65, separator = true)]
         public ChunkedBarConfig MeditationBar = new ChunkedBarConfig(
-                                                    new(0, -5),
-                                                    new(254, 10),
-                                                    new PluginConfigColor(new(247f / 255f, 163f / 255f, 89f / 255f, 100f / 100f)));
+            new(0, -5),
+            new(254, 10),
+            new PluginConfigColor(new(247f / 255f, 163f / 255f, 89f / 255f, 100f / 100f))
+        );
     }
 
     public class SenBarConfig : ChunkedBarConfig

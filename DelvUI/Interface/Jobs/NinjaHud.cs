@@ -147,9 +147,7 @@ namespace DelvUI.Interface.Jobs
                 PluginConfigColor fillColor = hasTCJBuff ? Config.MudraBar.TCJBarColor : hasKassatsuBuff ? Config.MudraBar.KassatsuBarColor : Config.MudraBar.FillColor;
                 Rect foreground = BarUtilities.GetFillRect(Config.MudraBar.Position, Config.MudraBar.Size, Config.MudraBar.FillDirection, fillColor, current, max);
 
-                BarHud bar = new BarHud(ID + "_mudraBar", Config.MudraBar, player)
-                    .AddForegrounds(foreground)
-                    .AddLabels(Config.MudraBar.Label);
+                BarHud bar = new BarHud(Config.MudraBar, player).AddForegrounds(foreground).AddLabels(Config.MudraBar.Label);
                 bar.Draw(pos);
             }
             else
@@ -160,8 +158,7 @@ namespace DelvUI.Interface.Jobs
                 if (!Config.MudraBar.HideWhenInactive || current < max)
                 {
                     Config.MudraBar.Label.SetText(Math.Truncate((max - current) % 20).ToString());
-                    BarUtilities.GetChunkedProgressBars(ID + "_mudraBar", Config.MudraBar, 2, current, max, 0f, player, Config.MudraBar.Label)
-                        .Draw(pos);
+                    BarUtilities.GetChunkedProgressBars(Config.MudraBar, 2, current, max, 0f, player, Config.MudraBar.Label).Draw(pos);
                 }
             }
         }
@@ -173,7 +170,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.HutonBar.HideWhenInactive || hutonDurationLeft > 0)
             {
                 Config.HutonBar.Label.SetText(Math.Truncate(hutonDurationLeft).ToString());
-                BarUtilities.GetProgressBar(ID + "_hutonBar", Config.HutonBar, hutonDurationLeft, 70f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.HutonBar, hutonDurationLeft, 70f, 0f, player).Draw(pos);
             }
         }
 
@@ -184,7 +181,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.NinkiBar.HideWhenInactive || gauge.Ninki > 0)
             {
                 Config.NinkiBar.Label.SetText(gauge.Ninki.ToString("N0"));
-                BarUtilities.GetProgressBar(ID + "_ninkiBar", Config.NinkiBar, gauge.Ninki, 100f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.NinkiBar, gauge.Ninki, 100f, 0f, player).Draw(pos);
             }
         }
 
@@ -201,7 +198,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.TrickAttackBar.HideWhenInactive || trickDuration > 0)
             {
                 Config.TrickAttackBar.Label.SetText(Math.Truncate(trickDuration).ToString());
-                BarUtilities.GetProgressBar(ID + "_trickAttackBar", Config.TrickAttackBar, trickDuration, 15f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.TrickAttackBar, trickDuration, 15f, 0f, player).Draw(pos);
             }
         }
 
@@ -212,7 +209,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.SuitonBar.HideWhenInactive || suitonDuration > 0)
             {
                 Config.SuitonBar.Label.SetText(Math.Truncate(suitonDuration).ToString("N0"));
-                BarUtilities.GetProgressBar(ID + "_suitonBar", Config.SuitonBar, suitonDuration, 20f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.SuitonBar, suitonDuration, 20f, 0f, player).Draw(pos);
             }
         }
 
@@ -248,42 +245,46 @@ namespace DelvUI.Interface.Jobs
 
         public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
 
-
         [NestedConfig("Mudra Bar", 30)]
         public MudraBarConfig MudraBar = new MudraBarConfig(
-                                                            new(0, -50),
-                                                            new(254, 10),
-                                                            new PluginConfigColor(new Vector4(211f / 255f, 166f / 255f, 75f / 242f, 100f / 100f)));
+            new(0, -50),
+            new(254, 10),
+            new PluginConfigColor(new Vector4(211f / 255f, 166f / 255f, 75f / 242f, 100f / 100f))
+        );
 
         [NestedConfig("Huton Bar", 35)]
         public ProgressBarConfig HutonBar = new ProgressBarConfig(
-                                                            new(0, -10),
-                                                            new(254, 20),
-                                                            new PluginConfigColor(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f)),
-                                                            BarDirection.Right,
-                                                            new PluginConfigColor(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
-                                                            40f);
+            new(0, -10),
+            new(254, 20),
+            new PluginConfigColor(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f)),
+            BarDirection.Right,
+            new PluginConfigColor(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
+            40f
+        );
 
         [NestedConfig("Ninki Bar", 40)]
         public ProgressBarConfig NinkiBar = new ProgressBarConfig(
-                                                            new(0, -32),
-                                                            new(254, 20),
-                                                            new PluginConfigColor(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f)));
+            new(0, -32),
+            new(254, 20),
+            new PluginConfigColor(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f))
+        );
 
         [NestedConfig("Trick Attack Bar", 45)]
         public ProgressBarConfig TrickAttackBar = new ProgressBarConfig(
-                                                            new(0, -63),
-                                                            new(254, 10),
-                                                            new PluginConfigColor(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f)));
+            new(0, -63),
+            new(254, 10),
+            new PluginConfigColor(new Vector4(191f / 255f, 40f / 255f, 0f / 255f, 100f / 100f))
+        );
 
         [NestedConfig("Suiton Bar", 50)]
         public ProgressBarConfig SuitonBar = new ProgressBarConfig(
-                                                            new(0, -75),
-                                                            new(254, 10),
-                                                            new PluginConfigColor(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f)));
+            new(0, -75),
+            new(254, 10),
+            new PluginConfigColor(new Vector4(202f / 255f, 228f / 255f, 246f / 242f, 100f / 100f))
+        );
     }
 
-    public class MudraBarConfig : ChunkedBarConfig
+    public class MudraBarConfig : ChunkedProgressBarConfig
     {
         [ColorEdit4("Kassatsu Color", spacing = true)]
         [Order(60)]

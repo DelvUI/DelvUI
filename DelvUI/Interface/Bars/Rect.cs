@@ -11,11 +11,11 @@ namespace DelvUI.Interface.Bars
 
         public PluginConfigColor Color { get; set; }
 
-        public Rect(Vector2 pos, Vector2 size, PluginConfigColor color)
+        public Rect(Vector2 pos, Vector2 size, PluginConfigColor? color = null)
         {
             Position = pos;
             Size = size;
-            Color = color;
+            Color = color ?? new PluginConfigColor(new(0, 0, 0, 0));
         }
 
         public Rect() : this(new(0, 0), new(0, 0), new PluginConfigColor(new(0, 0, 0, 0))) { }

@@ -5,7 +5,6 @@ using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 
 namespace DelvUI.Interface.Bars
@@ -27,6 +26,7 @@ namespace DelvUI.Interface.Bars
         private GameObject? Actor { get; set; }
 
         private PluginConfigColor? GlowColor { get; set; }
+
         private int GlowSize { get; set; }
 
         public BarHud(
@@ -45,8 +45,8 @@ namespace DelvUI.Interface.Bars
             GlowSize = glowSize ?? 1;
         }
 
-        public BarHud(string id, BarConfig config, GameObject? actor = null, BarGlowConfig? glowConfig = null)
-            : this(id, config.DrawBorder, config.Anchor, actor, glowConfig?.Color, glowConfig?.Size)
+        public BarHud(BarConfig config, GameObject? actor = null, BarGlowConfig? glowConfig = null)
+            : this(config.ID, config.DrawBorder, config.Anchor, actor, glowConfig?.Color, glowConfig?.Size)
         {
             BackgroundRect = new Rect(config.Position, config.Size, config.BackgroundColor);
         }
@@ -90,10 +90,10 @@ namespace DelvUI.Interface.Bars
             var barPos = Utils.GetAnchoredPosition(origin, BackgroundRect.Size, Anchor);
             var backgroundPos = barPos + BackgroundRect.Position;
 
-            DrawHelper.DrawInWindow(ID, backgroundPos, BackgroundRect.Size, false, false, (drawList) =>
+            DrawHelper.DrawInWindow(ID, backgroundPos, BackgroundRect.Size, true, false, (drawList) =>
             {
                 // Draw background
-                DrawHelper.DrawGradientFilledRect(backgroundPos, BackgroundRect.Size, BackgroundRect.Color, drawList);
+                drawList.AddRectFilled(backgroundPos, backgroundPos + BackgroundRect.Size, BackgroundRect.Color.Base);
 
                 // Draw foregrounds
                 foreach (Rect rect in ForegroundRects)

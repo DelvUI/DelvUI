@@ -1,10 +1,11 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
+using DelvUI.Config;
 using DelvUI.Helpers;
+using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
@@ -13,19 +14,13 @@ namespace DelvUI.Interface.GeneralElements
     public unsafe class UnitFrameHud : DraggableHudElement, IHudElementWithActor
     {
         public UnitFrameConfig Config => (UnitFrameConfig)_config;
-        private LabelHud _leftLabel;
-        private LabelHud _rightLabel;
 
         private readonly OpenContextMenuFromTarget _openContextMenuFromTarget;
 
         public GameObject? Actor { get; set; } = null;
 
         public UnitFrameHud(string id, UnitFrameConfig config, string displayName) : base(id, config, displayName)
-        {
-            // labels
-            _leftLabel = new LabelHud(id + "_leftLabel", Config.LeftLabelConfig);
-            _rightLabel = new LabelHud(id + "_rightLabel", Config.RightLabelConfig);
-
+        { 
             // interaction stuff
             _openContextMenuFromTarget =
                 Marshal.GetDelegateForFunctionPointer<OpenContextMenuFromTarget>(Plugin.SigScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
@@ -43,149 +38,114 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
-            var endPos = startPos + Config.Size;
-
-            DrawHelper.DrawInWindow(ID, startPos, Config.Size, true, false, (drawList) =>
+            if (Actor is Character character)
             {
-                // health bar
-                if (Actor is not Character)
+                DrawCharacter(origin, character);
+            }
+            else
+            {
+                DrawFriendlyNPC(origin, Actor);
+            }
+
+            // Check if mouse is hovering over the box properly
+            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
+            if (ImGui.IsMouseHoveringRect(startPos, startPos + Config.Size) && !DraggingEnabled)
+            {
+                if (ImGui.GetIO().MouseClicked[0])
                 {
-                    DrawFriendlyNPC(drawList, startPos, endPos);
+                    Plugin.TargetManager.SetTarget(Actor);
                 }
-                else
+                else if (ImGui.GetIO().MouseClicked[1])
                 {
-                    DrawChara(drawList, startPos, (Character)Actor);
+                    var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
+                    _openContextMenuFromTarget(agentHud, Actor.Address);
                 }
 
-                // Check if mouse is hovering over the box properly
-                if (ImGui.IsMouseHoveringRect(startPos, endPos) && !DraggingEnabled)
-                {
-                    if (ImGui.GetIO().MouseClicked[0])
-                    {
-                        Plugin.TargetManager.SetTarget(Actor);
-                    }
-                    else if (ImGui.GetIO().MouseClicked[1])
-                    {
-                        var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
-                        _openContextMenuFromTarget(agentHud, Actor.Address);
-                    }
-
-                    MouseOverHelper.Instance.Target = Actor;
-                }
-            });
-
-            // labels                        
-            _leftLabel.Draw(startPos, Config.Size, Actor);
-            _rightLabel.Draw(startPos, Config.Size, Actor);
+                MouseOverHelper.Instance.Target = Actor;
+            }
         }
 
-        private void DrawChara(ImDrawListPtr drawList, Vector2 startPos, Character chara)
+        private void DrawCharacter(Vector2 pos, Character character)
         {
-            if (Config.TankStanceIndicatorConfig is { Enabled: true } && JobsHelper.IsJobTank(chara.ClassJob.Id))
+            float currentHp = character.CurrentHp;
+            float maxHp = character.MaxHp;
+
+            PluginConfigColor fillColor = Config.UseJobColor ? Utils.ColorForActor(character) : Config.FillColor;
+
+            if (Config.UseColorBasedOnHealthValue)
             {
-                DrawTankStanceIndicator(drawList, startPos);
+                var scale = currentHp / Math.Max(1, maxHp);
+                fillColor = Utils.ColorByHealthValue(scale, Config.LowHealthColorThreshold / 100f, Config.FullHealthColorThreshold / 100f, Config.FullHealthColor, Config.LowHealthColor);
             }
 
-            var endPos = startPos + Config.Size;
-            var scale = (float)chara.CurrentHp / Math.Max(1, chara.MaxHp);
-            var color = Config.UseCustomColor ? Config.CustomColor : Utils.ColorForActor(chara);
-            var bgColor = BackgroundColor(chara);
+            var background = new Rect(Config.Position, Config.Size, BackgroundColor(character));
+            var healthFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentHp, maxHp);
+            var bar = new BarHud(Config, character).SetBackground(background).AddForegrounds(healthFill).AddLabels(Config.LeftLabelConfig, Config.RightLabelConfig);
 
-            if (Config.UseCustomColor && Config.UseColorBasedOnHealthValue)
+            if (Config.UseMissingHealthBar)
             {
-                color = Utils.ColorByHealthValue(scale, Config.LowHealthColorThreshold / 100f, Config.FullHealthColorThreshold / 100f, Config.FullHealthColor, Config.LowHealthColor);
+                var healthMissingSize = Config.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
+                var healthMissingPos = Config.FillDirection.IsInverted() ? Config.Position : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
+                bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, Config.HealthMissingColor));
             }
 
-            // background
-            drawList.AddRectFilled(startPos, endPos, bgColor);
-
-            // health
-            DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X * scale, Config.Size.Y), color, drawList);
-
-            // shield
             if (Config.ShieldConfig.Enabled)
             {
-                var shield = Utils.ActorShieldValue(Actor);
-
-                if (Config.ShieldConfig.FillHealthFirst)
+                float shield = Utils.ActorShieldValue(Actor);
+                if (shield > 0f)
                 {
-                    DrawHelper.DrawShield(shield, scale, startPos, Config.Size,
-                        Config.ShieldConfig.Height, Config.ShieldConfig.HeightInPixels, Config.ShieldConfig.Color, drawList);
-                }
-                else
-                {
-                    DrawHelper.DrawOvershield(shield, startPos, Config.Size,
-                        Config.ShieldConfig.Height, Config.ShieldConfig.HeightInPixels, Config.ShieldConfig.Color, drawList);
+                    bar.AddForegrounds(
+                        BarUtilities.GetShieldForeground(
+                            Config.ShieldConfig,
+                            Config.Position,
+                            Config.Size,
+                            healthFill.Size,
+                            Config.FillDirection,
+                            shield,
+                            character.CurrentHp,
+                            character.MaxHp)
+                    );
                 }
             }
 
-            // border
-            drawList.AddRect(startPos, endPos, 0xFF000000);
+            bar.Draw(pos);
         }
 
-        private void DrawFriendlyNPC(ImDrawListPtr drawList, Vector2 startPos, Vector2 endPos)
+        private void DrawFriendlyNPC(Vector2 pos, GameObject? Actor)
         {
-            var color = Config.UseCustomColor ? Config.CustomColor : GlobalColors.Instance.NPCFriendlyColor;
-
-            drawList.AddRectFilled(startPos, endPos, GlobalColors.Instance.EmptyUnitFrameColor.Base);
-
-            DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X, Config.Size.Y), color, drawList);
-
-            drawList.AddRect(startPos, endPos, 0xFF000000);
+            var bar = new BarHud(Config, Actor);
+            bar.AddForegrounds(new Rect(Config.Position, Config.Size, Config.UseJobColor ? GlobalColors.Instance.NPCFriendlyColor : Config.FillColor));
+            bar.AddLabels(Config.LeftLabelConfig, Config.RightLabelConfig);
+            bar.Draw(pos);
         }
 
-        private void DrawTankStanceIndicator(ImDrawListPtr drawList, Vector2 startPos)
-        {
-            if (Actor is not BattleChara battleChara || Config.TankStanceIndicatorConfig == null)
-            {
-                return;
-            }
-
-            var tankStanceBuff = battleChara.StatusList.Where(
-                o => o.StatusId is 79 or 91 or 392 or 393 or 743 or 1396 or 1397 or 1833
-            );
-
-            var thickness = Config.TankStanceIndicatorConfig.Thickness + 1;
-            var barSize = new Vector2(Config.Size.Y > Config.Size.X ? Config.Size.X : Config.Size.Y, Config.Size.Y);
-            var cursorPos = startPos + new Vector2(-thickness, thickness);
-
-            var color = !tankStanceBuff.Any() ? Config.TankStanceIndicatorConfig.InactiveColor : Config.TankStanceIndicatorConfig.ActiveColor;
-
-            drawList.AddRectFilled(cursorPos, cursorPos + barSize, color.Base);
-            drawList.AddRect(cursorPos, cursorPos + barSize, 0xFF000000);
-        }
-
-        private uint BackgroundColor(Character? chara)
+        private PluginConfigColor BackgroundColor(Character? chara)
         {
             if (Config.ShowTankInvulnerability && chara is BattleChara battleChara && Utils.HasTankInvulnerability(battleChara))
             {
-                uint color;
                 if (Config.UseCustomInvulnerabilityColor)
                 {
-                    color = Config.CustomInvulnerabilityColor.Base;
+                    return Config.CustomInvulnerabilityColor;
                 }
                 else
                 {
-                    color = ImGui.ColorConvertFloat4ToU32(GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Vector.AdjustColor(-.8f));
+                    return new PluginConfigColor(GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Vector.AdjustColor(-.8f));
                 }
-
-                return color;
             }
 
-            if (Config.UseCustomBackgroundColor && chara is BattleChara)
+            if (chara is BattleChara)
             {
                 if (Config.UseJobColorAsBackgroundColor)
                 {
-                    return GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Base;
+                    return GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id);
                 }
                 else
                 {
-                    return Config.CustomBackgroundColor.Base;
+                    return Config.BackgroundColor;
                 }
             }
 
-            return GlobalColors.Instance.EmptyUnitFrameColor.Base;
+            return GlobalColors.Instance.EmptyUnitFrameColor;
         }
 
         private delegate void OpenContextMenuFromTarget(IntPtr agentHud, IntPtr gameObject);

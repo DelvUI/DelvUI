@@ -13,8 +13,6 @@ namespace DelvUI.Interface.GeneralElements
 
         public GameObject? Actor { get; set; } = null;
 
-        private BarHud? ExpBar { get; set; }
-
         public ExperienceBarHud(string ID, ExperienceBarConfig config, string displayName) : base(ID, config, displayName) { }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -42,7 +40,7 @@ namespace DelvUI.Interface.GeneralElements
             var restedSize = Config.Size - BarUtilities.GetFillDirectionOffset(expBar.Size, Config.FillDirection);
             Rect restedBar = BarUtilities.GetFillRect(restedPos, restedSize, Config.FillDirection, Config.RestedExpColor, rested, required, current);
 
-            var bar = new BarHud(ID, Config, Actor).AddForegrounds(expBar, restedBar).AddLabels(Config.LeftLabel, Config.RightLabel);
+            var bar = new BarHud(Config, Actor).AddForegrounds(expBar, restedBar).AddLabels(Config.LeftLabel, Config.RightLabel);
             bar.Draw(origin);
         }
     }

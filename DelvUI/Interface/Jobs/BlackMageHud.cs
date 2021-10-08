@@ -151,7 +151,6 @@ namespace DelvUI.Interface.Jobs
             bool drawTreshold = gauge.InAstralFire || !config.ThresholdConfig.ShowOnlyDuringAstralFire;
 
             BarHud bar = BarUtilities.GetProgressBar(
-                ID + "_manaBar",
                 config,
                 drawTreshold ? config.ThresholdConfig : null,
                 new LabelConfig[] { config.ValueLabelConfig, config.ElementTimerLabelConfig },
@@ -174,7 +173,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            BarUtilities.GetChunkedProgressBars(ID + "_umbralHeartBar", Config.UmbralHeartBar, 3, gauge.UmbralHearts, 3f)
+            BarUtilities.GetChunkedProgressBars(Config.UmbralHeartBar, 3, gauge.UmbralHearts, 3f)
                 .Draw(origin);
         }
 
@@ -187,7 +186,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            BarUtilities.GetChunkedProgressBars(ID + "_triplecastBar", Config.TriplecastBar, 3, stackCount, 3f)
+            BarUtilities.GetChunkedProgressBars(Config.TriplecastBar, 3, stackCount, 3f)
                 .Draw(origin);
         }
 
@@ -202,7 +201,7 @@ namespace DelvUI.Interface.Jobs
 
             int timer = gauge.IsEnochianActive ? (30000 - gauge.EnochianTimer) / 1000 : 0;
             Config.EnochianBar.Label.SetText($"{timer,0}");
-            BarUtilities.GetProgressBar(ID + "_enochianBar", Config.EnochianBar, timer, 30, 0f)
+            BarUtilities.GetProgressBar(Config.EnochianBar, timer, 30, 0f)
                 .Draw(origin);
         }
 
@@ -219,26 +218,26 @@ namespace DelvUI.Interface.Jobs
             if (player.Level < 80)
             {
                 var glow = gauge.PolyglotStacks == 1 ? Config.PolyglotBar.GlowConfig : null;
-                BarUtilities.GetBar(ID + "_polyglotBar", Config.PolyglotBar, gauge.PolyglotStacks, 1, 0, glowConfig: glow)
+                BarUtilities.GetBar(Config.PolyglotBar, gauge.PolyglotStacks, 1, 0, glowConfig: glow)
                     .Draw(origin);
             }
             // 2 stacks for level 80+
             else
             {
-                BarUtilities.GetChunkedProgressBars(ID + "_polyglotBar", Config.PolyglotBar, 2, gauge.PolyglotStacks, 2f, 0, null, null, Config.PolyglotBar.GlowConfig)
+                BarUtilities.GetChunkedProgressBars(Config.PolyglotBar, 2, gauge.PolyglotStacks, 2f, 0, null, null, Config.PolyglotBar.GlowConfig)
                     .Draw(origin);
             }
         }
 
         protected void DrawThundercloudBar(Vector2 origin, PlayerCharacter player)
         {
-            BarUtilities.GetProcBar(ID + "_thundercloudBar", Config.ThundercloudBar, player, 164, 18f)?
+            BarUtilities.GetProcBar(Config.ThundercloudBar, player, 164, 18f)?
                 .Draw(origin);
         }
 
         protected void DrawFirestarterBar(Vector2 origin, PlayerCharacter player)
         {
-            BarUtilities.GetProcBar(ID + "_firestarterBar", Config.FirestarterBar, player, 165, 18f)?
+            BarUtilities.GetProcBar(Config.FirestarterBar, player, 165, 18f)?
                 .Draw(origin);
         }
 
@@ -249,7 +248,7 @@ namespace DelvUI.Interface.Jobs
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(ID + "_thunderDoTBar", Config.ThunderDoTBar, player, target, ThunderDoTIDs, ThunderDoTDurations)?.
+            BarUtilities.GetDoTBar(Config.ThunderDoTBar, player, target, ThunderDoTIDs, ThunderDoTDurations)?.
                 Draw(origin);
         }
     }

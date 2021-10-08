@@ -142,7 +142,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            BarUtilities.GetBar(ID + "_balanceBar", Config.BalanceBar, value, 1, fillColor: color)
+            BarUtilities.GetBar(Config.BalanceBar, value, 1, fillColor: color)
                 .Draw(origin);
         }
 
@@ -155,7 +155,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             Config.WhiteManaBar.Label.SetText($"{mana,0}");
-            BarUtilities.GetProgressBar(ID + "_whiteManaBar", Config.WhiteManaBar, mana, 100).
+            BarUtilities.GetProgressBar(Config.WhiteManaBar, mana, 100).
                 Draw(origin);
         }
 
@@ -168,7 +168,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             Config.BlackManaBar.Label.SetText($"{mana,0}");
-            BarUtilities.GetProgressBar(ID + "_blackManaBar", Config.BlackManaBar, mana, 100).
+            BarUtilities.GetProgressBar(Config.BlackManaBar, mana, 100).
                 Draw(origin);
         }
 
@@ -181,7 +181,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            BarUtilities.GetChunkedProgressBars(ID + "_accelerationBar", Config.AccelerationBar, 3, stackCount, 3f)
+            BarUtilities.GetChunkedProgressBars(Config.AccelerationBar, 3, stackCount, 3f)
                 .Draw(origin);
         }
 
@@ -195,19 +195,19 @@ namespace DelvUI.Interface.Jobs
             };
 
             Config.DualcastBar.Label.SetText($"{(int)duration,0}");
-            BarUtilities.GetProgressBar(ID + "_dualcastBar", Config.DualcastBar, duration, 15f).
+            BarUtilities.GetProgressBar(Config.DualcastBar, duration, 15f).
                 Draw(origin);
         }
 
         private void DrawVerstoneBar(Vector2 origin, PlayerCharacter player)
         {
-            BarUtilities.GetProcBar(ID + "_verstoneBar", Config.VerstoneBar, player, 1235, 30)?
+            BarUtilities.GetProcBar(Config.VerstoneBar, player, 1235, 30)?
                 .Draw(origin);
         }
 
         private void DrawVerfireBar(Vector2 origin, PlayerCharacter player)
         {
-            BarUtilities.GetProcBar(ID + "_verfireBar", Config.VerfireBar, player, 1234, 30)?
+            BarUtilities.GetProcBar(Config.VerfireBar, player, 1234, 30)?
                 .Draw(origin);
         }
     }

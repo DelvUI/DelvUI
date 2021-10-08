@@ -129,7 +129,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            BarUtilities.GetChunkedProgressBars(ID + "_aetherflowBar", Config.AetherflowBar, 2, stackCount, 2)
+            BarUtilities.GetChunkedProgressBars(Config.AetherflowBar, 2, stackCount, 2)
                 .Draw(origin);
         }
 
@@ -146,7 +146,7 @@ namespace DelvUI.Interface.Jobs
             PluginConfigColor color = stacks >= 16 ? Config.DemiStatusIndicatorBar.PhoenixColor : Config.DemiStatusIndicatorBar.BahamutColor;
             int value = stacks < 8 ? 0 : 1;
 
-            BarUtilities.GetBar(ID + "_demiIndicatorBar", Config.DemiStatusIndicatorBar, value, 1, fillColor: color)
+            BarUtilities.GetBar(Config.DemiStatusIndicatorBar, value, 1, fillColor: color)
                 .Draw(origin);
         }
 
@@ -171,7 +171,7 @@ namespace DelvUI.Interface.Jobs
                 value = 2;
             }
 
-            BarUtilities.GetChunkedProgressBars(ID + "_dreadwyrmAetherBar", Config.DreadwyrmAetherBar, 2, value, 2)
+            BarUtilities.GetChunkedProgressBars(Config.DreadwyrmAetherBar, 2, value, 2)
                 .Draw(origin);
         }
 
@@ -216,7 +216,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             Config.TranceBar.Label.SetText($"{(int)tranceDuration / 1000,0}");
-            BarUtilities.GetProgressBar(ID + "_trancebar", Config.TranceBar, tranceDuration, maxDuration, fillColor: tranceColor)
+            BarUtilities.GetProgressBar(Config.TranceBar, tranceDuration, maxDuration, fillColor: tranceColor)
                 .Draw(origin);
         }
 
@@ -229,7 +229,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            BarUtilities.GetChunkedProgressBars(ID + "_ruinBar", Config.RuinBar, 4, stackCount, 4)
+            BarUtilities.GetChunkedProgressBars(Config.RuinBar, 4, stackCount, 4)
                 .Draw(origin);
         }
 
@@ -240,7 +240,7 @@ namespace DelvUI.Interface.Jobs
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(ID + "_miasmaBar", Config.MiasmaBar, player, target, MiasmaIDs, MiasmaDurations)?.
+            BarUtilities.GetDoTBar(Config.MiasmaBar, player, target, MiasmaIDs, MiasmaDurations)?.
                 Draw(origin);
         }
 
@@ -251,7 +251,7 @@ namespace DelvUI.Interface.Jobs
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(ID + "_bioBar", Config.BioBar, player, target, BioIDs, BioDurations)?.
+            BarUtilities.GetDoTBar(Config.BioBar, player, target, BioIDs, BioDurations)?.
                 Draw(origin);
         }
     }

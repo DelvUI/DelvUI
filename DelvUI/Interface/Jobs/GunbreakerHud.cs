@@ -55,7 +55,7 @@ namespace DelvUI.Interface.Jobs
             var gauge = Plugin.JobGauges.Get<GNBGauge>();
             if (!Config.PowderGauge.HideWhenInactive || gauge.Ammo > 0)
             {
-                BarUtilities.GetChunkedProgressBars(ID + "_powderGauge", Config.PowderGauge, 2, gauge.Ammo, 2).Draw(pos);
+                BarUtilities.GetChunkedProgressBars(Config.PowderGauge, 2, gauge.Ammo, 2).Draw(pos);
             }
         }
 
@@ -65,7 +65,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.NoMercy.HideWhenInactive || noMercyDuration > 0)
             {
                 Config.NoMercy.Label.SetText(Math.Truncate(noMercyDuration).ToString());
-                BarUtilities.GetProgressBar(ID + "_noMercyBar", Config.NoMercy, noMercyDuration, 20f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.NoMercy, noMercyDuration, 20f, 0f, player).Draw(pos);
             }
         }
     }
