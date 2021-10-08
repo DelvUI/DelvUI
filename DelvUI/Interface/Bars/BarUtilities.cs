@@ -232,20 +232,26 @@ namespace DelvUI.Interface.Bars
         {
             float shieldValue = shieldPercent * maxHp;
             float overshield = shieldConfig.FillHealthFirst ? Math.Max(shieldValue + currentHp - maxHp, 0f) : shieldValue;
+            float shieldSize = shieldConfig.Height;
+
+            if (!shieldConfig.HeightInPixels)
+            {
+                shieldSize = (fillDirection.IsHorizontal() ? size.Y : size.X) * shieldConfig.Height / 100f;
+            }
 
             var overshieldSize = fillDirection.IsHorizontal()
-                ? new Vector2(size.X, Math.Min(shieldConfig.Size, size.Y))
-                : new Vector2(Math.Min(shieldConfig.Size, size.X), size.Y);
+                ? new Vector2(size.X, Math.Min(shieldSize, size.Y))
+                : new Vector2(Math.Min(shieldSize, size.X), size.Y);
 
             Rect overshieldFill = GetFillRect(pos, overshieldSize, fillDirection, shieldConfig.Color, overshield, maxHp);
 
             if (shieldConfig.FillHealthFirst && currentHp < maxHp)
             {
                 var shieldPos = fillDirection.IsInverted() ? pos : pos + BarUtilities.GetFillDirectionOffset(healthFillSize, fillDirection);
-                var shieldSize = size - GetFillDirectionOffset(healthFillSize, fillDirection);
+                var shieldFillSize = size - GetFillDirectionOffset(healthFillSize, fillDirection);
                 var healthFillShieldSize = fillDirection.IsHorizontal()
-                    ? new Vector2(shieldSize.X, Math.Min(shieldConfig.Size, size.Y))
-                    : new Vector2(Math.Min(shieldConfig.Size, size.X), shieldSize.Y);
+                    ? new Vector2(shieldFillSize.X, Math.Min(shieldSize, size.Y))
+                    : new Vector2(Math.Min(shieldSize, size.X), shieldFillSize.Y);
 
                 Rect shieldFill = GetFillRect(shieldPos, healthFillShieldSize, fillDirection, shieldConfig.Color, shieldValue - overshield, maxHp - currentHp, 0f);
                 return new[] { overshieldFill, shieldFill };

@@ -24,7 +24,6 @@ namespace DelvUI.Interface.GeneralElements
             var rightLabelConfig = new EditableLabelConfig(new Vector2(-5, 0), "[health:current-short] | [health:percent]", DrawAnchor.TopRight, DrawAnchor.BottomRight);
 
             var config = new PlayerUnitFrameConfig(pos, size, leftLabelConfig, rightLabelConfig);
-            config.TankStanceIndicatorConfig = new TankStanceIndicatorConfig();
 
             return config;
         }
@@ -158,9 +157,6 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Shields", 115)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
-        [NestedConfig("Tank Stance", 120)]
-        public TankStanceIndicatorConfig? TankStanceIndicatorConfig = null;
-
         public UnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
             : base(position, size, new PluginConfigColor(new(40f / 255f, 40f / 255f, 40f / 255f, 100f / 100f)))
         {
@@ -177,11 +173,11 @@ namespace DelvUI.Interface.GeneralElements
     {
         [DragInt("Thickness")]
         [Order(5)]
-        public int Size = 26;
+        public int Height = 26; // Should be 'Size' instead of 'Height' but leaving as is to avoid breaking configs
 
         [Checkbox("Thickness in Pixels")]
         [Order(10)]
-        public bool SizeInPixels = false;
+        public bool HeightInPixels = false;
 
         [Checkbox("Fill Health First")]
         [Order(15)]
@@ -190,21 +186,5 @@ namespace DelvUI.Interface.GeneralElements
         [ColorEdit4("Color ##Shields")]
         [Order(20)]
         public PluginConfigColor Color = new PluginConfigColor(new Vector4(198f / 255f, 210f / 255f, 255f / 255f, 70f / 100f));
-    }
-
-    [Exportable(false)]
-    public class TankStanceIndicatorConfig : PluginConfigObject
-    {
-        [DragInt("Thickness")]
-        [Order(5)]
-        public int Thickness = 2;
-
-        [ColorEdit4("Active")]
-        [Order(10)]
-        public PluginConfigColor ActiveColor = new PluginConfigColor(new Vector4(0f / 255f, 205f / 255f, 230f / 255f, 100f / 100f));
-
-        [ColorEdit4("Inactive")]
-        [Order(15)]
-        public PluginConfigColor InactiveColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 32f / 255f, 100f / 100f));
     }
 }
