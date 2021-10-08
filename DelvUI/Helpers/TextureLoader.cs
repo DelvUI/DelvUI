@@ -65,6 +65,7 @@ namespace DelvUI.Helpers
                 case TextureFormat.DXT3: Decompress(SquishOptions.DXT3, src, dst, width, height); return true;
                 case TextureFormat.DXT5: Decompress(SquishOptions.DXT5, src, dst, width, height); return true;
                 case TextureFormat.A8R8G8B8: Array.Copy(src, dst, dst.Length); return true;
+                case TextureFormat.R4G4B4A4: ProcessA4R4G4B4(src, dst, width, height); return true;
             }
 
             return false;
@@ -89,6 +90,19 @@ namespace DelvUI.Helpers
             }
 
             return dst;
+        }
+        
+        private static void ProcessA4R4G4B4( Span< byte > src, byte[] dst, int width, int height )
+        {
+            for( var i = 0; ( i + 2 ) <= 2 * width * height; i += 2 )
+            {
+                var v = BitConverter.ToUInt16( src.Slice( i, sizeof( UInt16 ) ).ToArray(), 0 );
+
+                for( var j = 0; j < 4; ++j )
+                {
+                    dst[i * 2 + j] = (byte)(((v >> (4 * j)) & 0x0F) << 4);
+                }
+            }
         }
     }
 }
