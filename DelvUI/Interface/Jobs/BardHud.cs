@@ -95,7 +95,7 @@ namespace DelvUI.Interface.Jobs
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(ID + "_causticBiteDoTBar", Config.CausticBiteDoTBar, player, target, CausticBiteDoTIDs, CausticBiteDoTDurations)?.
+            BarUtilities.GetDoTBar(Config.CausticBiteDoTBar, player, target, CausticBiteDoTIDs, CausticBiteDoTDurations)?.
                          Draw(origin);
         }
         
@@ -106,7 +106,7 @@ namespace DelvUI.Interface.Jobs
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(ID + "_stormBiteDoTBar", Config.StormbiteDoTBar, player, target, StormbiteDoTIDs, StormbiteDoTDurations)?.
+            BarUtilities.GetDoTBar(Config.StormbiteDoTBar, player, target, StormbiteDoTIDs, StormbiteDoTDurations)?.
                          Draw(origin);
         }
         
@@ -196,7 +196,7 @@ namespace DelvUI.Interface.Jobs
             float duration = Math.Abs(songTimer / 1000f);
             
             Config.SongGaugeBar.Label.SetText($"{duration.ToString("N0", CultureInfo.InvariantCulture)}");
-            BarUtilities.GetProgressBar(ID + "_songBar", Config.SongGaugeBar, duration, 30f, 0f, null, songColor)
+            BarUtilities.GetProgressBar(Config.SongGaugeBar, duration, 30f, 0f, null, songColor)
                         .Draw(origin);
         }
 
@@ -212,7 +212,6 @@ namespace DelvUI.Interface.Jobs
 
             config.Label.SetText($"{soulVoice,0}");
             BarUtilities.GetProgressBar(
-                ID + "_soulVoiceBar", 
                 config, 
                 null, 
                 new LabelConfig[] { config.Label }, 
@@ -230,7 +229,7 @@ namespace DelvUI.Interface.Jobs
             BardStacksBarConfig config = Config.StacksBar;
 
             config.FillColor = stackColor;
-            BarUtilities.GetChunkedProgressBars(ID + "_stacksBar", Config.StacksBar, max, amount, max, 0F, null, null, glowConfig).
+            BarUtilities.GetChunkedProgressBars(Config.StacksBar, max, amount, max, 0F, null, null, glowConfig).
                          Draw(origin);
         }
     }
