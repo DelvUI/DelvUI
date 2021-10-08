@@ -63,7 +63,7 @@ namespace DelvUI.Interface.Bars
             DrawHelper.DrawInWindow($"{ID}", backgroundPos, BackgroundRect.Size, true, false, (drawList) =>
             {
                 // Draw background
-                DrawHelper.DrawGradientFilledRect(backgroundPos, BackgroundRect.Size, BackgroundRect.Color, drawList);
+                drawList.AddRectFilled(backgroundPos, backgroundPos + BackgroundRect.Size, BackgroundRect.Color.Base);
 
                 // Draw foregrounds
                 foreach (Rect rect in ForegroundRects)
