@@ -26,6 +26,7 @@
         <DebugType>full</DebugType>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <Nullable>enable</Nullable>
+        <WarningsAsErrors>Nullable</WarningsAsErrors>
         <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
     </PropertyGroup>
 
