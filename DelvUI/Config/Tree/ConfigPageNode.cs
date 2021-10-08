@@ -24,6 +24,7 @@ namespace DelvUI.Config.Tree
             {
                 _configObject = value;
                 GenerateNestedConfigPageNodes();
+                _drawList = null;
             }
         }
 
