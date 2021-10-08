@@ -68,26 +68,28 @@ namespace DelvUI.Interface.Jobs
         }
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
+            Vector2 pos = origin + Config.Position;
+            
             if (Config.CausticBiteDoTBar.Enabled)
             {
-                DrawCausticBiteDoTBar(origin, player);
+                DrawCausticBiteDoTBar(pos, player);
             }
             
             if (Config.StormbiteDoTBar.Enabled)
             {
-                DrawStormbiteDoTBar(origin, player);
+                DrawStormbiteDoTBar(pos, player);
             }
             
             if (Config.SoulVoiceBar.Enabled)
             {
-                DrawSoulVoiceBar(origin);
+                DrawSoulVoiceBar(pos);
             }
 
-            HandleCurrentSong(origin, player);
+            HandleCurrentSong(pos, player);
 
             if (Config.SoulVoiceBar.Enabled)
             {
-                DrawSoulVoiceBar(origin);
+                DrawSoulVoiceBar(pos);
             }
         }
 
@@ -125,7 +127,14 @@ namespace DelvUI.Interface.Jobs
                 case Song.WANDERER:
                     if (Config.StacksBar.Enabled && Config.StacksBar.ShowWMStacks)
                     {
-                        DrawStacksBar(origin, player, songStacks, 3, Config.StacksBar.WMStackColor);
+                        DrawStacksBar(
+                            origin, 
+                            player, 
+                            songStacks, 
+                            3, 
+                            Config.StacksBar.WMStackColor, 
+                            Config.StacksBar.WMGlowConfig.Enabled && songStacks == 3 ? Config.StacksBar.WMGlowConfig : null
+                            );
                     }
 
                     DrawSongTimerBar(origin, songTimer, Config.SongGaugeBar.WMColor);
@@ -177,7 +186,8 @@ namespace DelvUI.Interface.Jobs
         private void DrawBloodletterReady(Vector2 origin, PlayerCharacter player)
         {
             int active = _spellHelper.GetSpellCooldown(110) == 0 ? 1 : 0;
-            DrawStacksBar(origin, player, active, 1, Config.StacksBar.MBProcColor);
+            DrawStacksBar(origin, player, active, 1, Config.StacksBar.MBProcColor, 
+                Config.StacksBar.MBGlowConfig.Enabled ? Config.StacksBar.MBGlowConfig : null);
         }
 
         protected void DrawSongTimerBar(Vector2 origin, short songTimer, PluginConfigColor songColor)
@@ -215,23 +225,21 @@ namespace DelvUI.Interface.Jobs
                 100f, 
                 0f, 
                 null, 
-                null, 
+                config.FillColor, 
                 soulVoice == 100f && config.GlowConfig.Enabled ? config.GlowConfig : null
             ).Draw(origin);
         }
 
-        private void DrawStacksBar(Vector2 origin, PlayerCharacter player, int amount, int max, PluginConfigColor stackColor)
+        private void DrawStacksBar(Vector2 origin, PlayerCharacter player, int amount, int max, PluginConfigColor stackColor, BarGlowConfig? glowConfig = null)
         {
             BardStacksBarConfig config = Config.StacksBar;
 
             config.FillColor = stackColor;
-            BarUtilities.GetChunkedProgressBars(ID + "_stacksBar", Config.StacksBar, max, amount, max).
+            BarUtilities.GetChunkedProgressBars(ID + "_stacksBar", Config.StacksBar, max, amount, max, 0F, null, null, glowConfig).
                          Draw(origin);
         }
     }
     
-    
-
     [Section("Job Specific Bars")]
     [SubSection("Ranged", 0)]
     [SubSection("Bard", 1)]
@@ -264,32 +272,28 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
         );
       
-        [NestedConfig("Soul Voice Bar", 60)]
+        [NestedConfig("Soul Voice Bar", 35)]
         public BardSoulVoiceBarConfig SoulVoiceBar = new BardSoulVoiceBarConfig(
             new(0, -5),
             new(254, 10),
             new PluginConfigColor(new Vector4(248f / 255f, 227f / 255f, 0f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Stacks Bar", 90)]
+        [NestedConfig("Stacks Bar", 40)]
         public BardStacksBarConfig StacksBar = new BardStacksBarConfig(
             new(0, -39),
             new(254, 10),
             new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
         );
 
-        [ColorEdit4("DoT Expire" + "##Stacks")]
-        [Order(145)]
-        public PluginConfigColor ExpireColor = new(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
-        
-        [NestedConfig("Caustic Bite Bar", 150)]
+        [NestedConfig("Caustic Bite Bar", 60)]
         public ProgressBarConfig CausticBiteDoTBar = new ProgressBarConfig(
             new(-64, -51),
             new(126, 10),
             new PluginConfigColor(new Vector4(182f / 255f, 68f / 255f, 235f / 255f, 100f / 100f))
         );
         
-        [NestedConfig("Stormbite Bar", 185)]
+        [NestedConfig("Stormbite Bar", 65)]
         public ProgressBarConfig StormbiteDoTBar = new ProgressBarConfig(
             new(64, -51),
             new(126, 10),
@@ -301,15 +305,15 @@ namespace DelvUI.Interface.Jobs
     public class BardSongBarConfig : ProgressBarConfig
     {
         [ColorEdit4("Wanderer's Minuet" + "##Song")]
-        [Order(45)]
+        [Order(31)]
         public PluginConfigColor WMColor = new(new Vector4(158f / 255f, 157f / 255f, 36f / 255f, 100f / 100f));
 
         [ColorEdit4("Mage's Ballad" + "##Song")]
-        [Order(50)]
+        [Order(32)]
         public PluginConfigColor MBColor = new(new Vector4(143f / 255f, 90f / 255f, 143f / 255f, 100f / 100f));
 
         [ColorEdit4("Army's Paeon" + "##Song")]
-        [Order(55)]
+        [Order(33)]
         public PluginConfigColor APColor = new(new Vector4(207f / 255f, 205f / 255f, 52f / 255f, 100f / 100f));
 
         public BardSongBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
@@ -321,7 +325,7 @@ namespace DelvUI.Interface.Jobs
     [Exportable(false)]
     public class BardSoulVoiceBarConfig : ProgressBarConfig
     {
-        [NestedConfig("Show Glow", 60, separator = false, spacing = true)]
+        [NestedConfig("Show Glow", 36, separator = false, spacing = true)]
         public BarGlowConfig GlowConfig = new BarGlowConfig();
 
         public BardSoulVoiceBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
@@ -333,34 +337,34 @@ namespace DelvUI.Interface.Jobs
     [Exportable(false)]
     public class BardStacksBarConfig : ChunkedBarConfig
     {
-        [Checkbox("Wanderer's Minuet Stacks", separator = true)]
-        [Order(85)]
+        [Checkbox("Wanderer's Minuet Stacks", separator = false, spacing = true)]
+        [Order(51)]
         public bool ShowWMStacks = true;
         
-        [NestedConfig("Wanderer's Minuet Stacks Glow", 90, separator = false, spacing = true)]
+        [NestedConfig("Wanderer's Minuet Stacks Glow", 52, separator = false, spacing = true)]
         public BarGlowConfig WMGlowConfig = new BarGlowConfig();
 
         [Checkbox("Mage's Ballad Proc" + "##Stacks")]
-        [Order(95)]
+        [Order(53)]
         public bool ShowMBProc = true;
 
-        [NestedConfig("Mage's Ballad Proc Glow", 100, separator = false, spacing = true)]
+        [NestedConfig("Mage's Ballad Proc Glow", 54, separator = false, spacing = true)]
         public BarGlowConfig MBGlowConfig = new BarGlowConfig();
 
         [Checkbox("Army's Paeon Stacks" + "##Stacks")]
-        [Order(105)]
+        [Order(56)]
         public bool ShowAPStacks = true;
         
         [ColorEdit4("Wanderer's Minuet Stack" + "##Stacks")]
-        [Order(130)]
+        [Order(57)]
         public PluginConfigColor WMStackColor = new(new Vector4(150f / 255f, 215f / 255f, 232f / 255f, 100f / 100f));
 
         [ColorEdit4("Mage's Ballad Proc" + "##Stacks")]
-        [Order(135)]
+        [Order(58)]
         public PluginConfigColor MBProcColor = new(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
 
         [ColorEdit4("Army's Paeon Stack" + "##Stacks")]
-        [Order(140)]
+        [Order(59)]
         public PluginConfigColor APStackColor = new(new Vector4(0f / 255f, 222f / 255f, 177f / 255f, 100f / 100f));
 
         public BardStacksBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
