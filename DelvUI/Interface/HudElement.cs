@@ -51,4 +51,9 @@ namespace DelvUI.Interface
     {
         public GameObject? Actor { get; set; }
     }
+
+    public interface IHudElementWithAnchorableParent
+    {
+        public AnchorablePluginConfigObject? ParentConfig { get; set; }
+    }
 }

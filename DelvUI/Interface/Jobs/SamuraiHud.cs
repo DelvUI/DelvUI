@@ -183,21 +183,21 @@ namespace DelvUI.Interface.Jobs
         public SamuraiConfig()
         {
             // Setup initial bar config
-            HiganbanaBar.Threshold = true;
+            HiganbanaBar.ThresholdConfig.Enabled = true;
         }
 
         public new static SamuraiConfig DefaultConfig() { return new SamuraiConfig(); }
 
         [NestedConfig("Sen Bar", 40)]
         public SenBarConfig SenBar = new SenBarConfig(
-                                                    new (0, -17),
-                                                    new (254, 10),
+                                                    new(0, -17),
+                                                    new(254, 10),
                                                     new PluginConfigColor(new Vector4(0, 0, 0, 0)));
 
         [NestedConfig("Shifu Bar", 45)]
         public ProgressBarConfig ShifuBar = new ProgressBarConfig(
-                                                    new (-64, -56),
-                                                    new (126, 20),
+                                                    new(-64, -56),
+                                                    new(126, 20),
                                                     new PluginConfigColor(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f)));
 
         [NestedConfig("Jinpu Bar", 50)]
@@ -215,9 +215,10 @@ namespace DelvUI.Interface.Jobs
 
         [NestedConfig("Higanbana Bar", 60)]
         public ProgressBarConfig HiganbanaBar = new ProgressBarConfig(
-                                                    new (0, -78),
-                                                    new (254, 20),
+                                                    new(0, -78),
+                                                    new(254, 20),
                                                     new PluginConfigColor(new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f)),
+                                                    BarDirection.Right,
                                                     new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
                                                     15f);
 

@@ -126,7 +126,7 @@ namespace DelvUI.Helpers
                         : io.Fonts.AddFontFromFileTTF(path, fontData.Value.Size, null, ranges.Value.Data);
                     _fonts.Add(font);
 
-                    if (fontData.Key == config.DefaultFontKey)
+                    if (fontData.Key == FontsConfig.DefaultBigFontKey)
                     {
                         DefaultFont = font;
                         DefaultFontBuilt = true;

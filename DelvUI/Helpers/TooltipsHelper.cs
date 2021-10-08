@@ -12,7 +12,6 @@ namespace DelvUI.Helpers
         #region Singleton
         private TooltipsHelper()
         {
-            _config = ConfigurationManager.Instance.GetConfigObject<TooltipsConfig>();
         }
 
         public static void Initialize() { Instance = new TooltipsHelper(); }
@@ -44,7 +43,7 @@ namespace DelvUI.Helpers
         private static float MaxWidth = 300;
         private static float Margin = 5;
 
-        private TooltipsConfig _config;
+        private TooltipsConfig _config => ConfigurationManager.Instance.GetConfigObject<TooltipsConfig>();
 
         private string? _currentTooltipText = null;
         private Vector2 _textSize;

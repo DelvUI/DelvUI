@@ -123,7 +123,7 @@ namespace DelvUI.Interface.Jobs
             bool inNinjutsu = mudraStacks == -2 || hasNinjutsuBuff;
 
             if (hasTCJBuff || hasKassatsuBuff || inNinjutsu)
-            { 
+            {
                 if (hasTCJBuff)
                 {
                     max = 6f;
@@ -146,7 +146,8 @@ namespace DelvUI.Interface.Jobs
 
                 PluginConfigColor fillColor = hasTCJBuff ? Config.MudraBar.TCJBarColor : hasKassatsuBuff ? Config.MudraBar.KassatsuBarColor : Config.MudraBar.FillColor;
                 Rect foreground = BarUtilities.GetFillRect(Config.MudraBar.Position, Config.MudraBar.Size, Config.MudraBar.FillDirection, fillColor, current, max);
-                var bar = new BarHud(Config.MudraBar, player).Foreground(foreground).Labels(Config.MudraBar.Label);
+
+                BarHud bar = new BarHud(Config.MudraBar, player).AddForegrounds(foreground).AddLabels(Config.MudraBar.Label);
                 bar.Draw(pos);
             }
             else
@@ -239,7 +240,7 @@ namespace DelvUI.Interface.Jobs
         {
             TrickAttackBar.Enabled = false;
             SuitonBar.Enabled = false;
-            HutonBar.Threshold = true;
+            HutonBar.ThresholdConfig.Enabled = true;
         }
 
         public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
@@ -256,13 +257,14 @@ namespace DelvUI.Interface.Jobs
                                                             new(0, -10),
                                                             new(254, 20),
                                                             new PluginConfigColor(new Vector4(110f / 255f, 197f / 255f, 207f / 255f, 100f / 100f)),
+                                                            BarDirection.Right,
                                                             new PluginConfigColor(new Vector4(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
                                                             40f);
 
         [NestedConfig("Ninki Bar", 40)]
         public ProgressBarConfig NinkiBar = new ProgressBarConfig(
-                                                            new(0, -32), 
-                                                            new(254, 20), 
+                                                            new(0, -32),
+                                                            new(254, 20),
                                                             new PluginConfigColor(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f)));
 
         [NestedConfig("Trick Attack Bar", 45)]

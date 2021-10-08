@@ -12,7 +12,7 @@ namespace DelvUI.Interface.Jobs
         [JsonIgnore]
         public abstract uint JobId { get; }
 
-        [Checkbox("Use Generic MP Bar")]
+        [Checkbox("Show Generic Mana Bar")]
         [Order(20)]
         public bool UseDefaultPrimaryResourceBar = false;
 

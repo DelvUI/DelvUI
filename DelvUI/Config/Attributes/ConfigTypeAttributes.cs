@@ -500,9 +500,9 @@ namespace DelvUI.Config.Attributes
 
             if (index == -1)
             {
-                if (fontsConfig.Fonts.ContainsKey(fontsConfig.DefaultFontKey))
+                if (fontsConfig.Fonts.ContainsKey(FontsConfig.DefaultBigFontKey))
                 {
-                    index = fontsConfig.Fonts.IndexOfKey(fontsConfig.DefaultFontKey);
+                    index = fontsConfig.Fonts.IndexOfKey(FontsConfig.DefaultBigFontKey);
                 }
                 else
                 {

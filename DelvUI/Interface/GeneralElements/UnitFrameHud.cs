@@ -15,7 +15,7 @@ namespace DelvUI.Interface.GeneralElements
 {
     public unsafe class UnitFrameHud : DraggableHudElement, IHudElementWithActor
     {
-        private UnitFrameConfig Config => (UnitFrameConfig)_config;
+        public UnitFrameConfig Config => (UnitFrameConfig)_config;
 
         private readonly OpenContextMenuFromTarget _openContextMenuFromTarget;
 
@@ -87,13 +87,13 @@ namespace DelvUI.Interface.GeneralElements
 
             var background = new Rect(Config.Position, Config.Size, BackgroundColor(character));
             var healthFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentHp, maxHp);
-            var bar = new BarHud(Config, character).Background(background).Foreground(healthFill).Labels(Config.LeftLabelConfig, Config.RightLabelConfig);
+            var bar = new BarHud(Config, character).SetBackground(background).AddForegrounds(healthFill).AddLabels(Config.LeftLabelConfig, Config.RightLabelConfig);
 
             if (Config.UseMissingHealthBar)
             {
                 var healthMissingSize = Config.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
                 var healthMissingPos = Config.FillDirection.IsInverted() ? Config.Position : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
-                bar.Foreground(new Rect(healthMissingPos, healthMissingSize, Config.HealthMissingColor));
+                bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, Config.HealthMissingColor));
             }
 
             if (Config.ShieldConfig.Enabled)
@@ -101,14 +101,14 @@ namespace DelvUI.Interface.GeneralElements
                 float shield = Utils.ActorShieldValue(Actor) * maxHp;
                 float overshield = Config.ShieldConfig.FillHealthFirst ? Math.Max(shield + currentHp - maxHp, 0f) : shield;
                 Rect overshieldFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, Config.ShieldConfig.Color, overshield, maxHp);
-                bar.Foreground(overshieldFill);
+                bar.AddForegrounds(overshieldFill);
 
                 if (Config.ShieldConfig.FillHealthFirst && currentHp < maxHp)
                 {
                     var shieldPos = Config.FillDirection.IsInverted() ? Config.Position : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
                     var shieldSize = Config.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
                     Rect shieldFill = BarUtilities.GetFillRect(shieldPos, shieldSize, Config.FillDirection, Config.ShieldConfig.Color, shield - overshield, maxHp - currentHp, 0f);
-                    bar.Foreground(shieldFill);
+                    bar.AddForegrounds(shieldFill);
                 }
             }
 
@@ -118,8 +118,8 @@ namespace DelvUI.Interface.GeneralElements
         private void DrawFriendlyNPC(Vector2 pos, GameObject? Actor)
         {
             var bar = new BarHud(Config, Actor);
-            bar.Foreground(new Rect(Config.Position, Config.Size, Config.UseJobColor? GlobalColors.Instance.NPCFriendlyColor : Config.FillColor));
-            bar.Labels(Config.LeftLabelConfig, Config.RightLabelConfig);
+            bar.AddForegrounds(new Rect(Config.Position, Config.Size, Config.UseJobColor? GlobalColors.Instance.NPCFriendlyColor : Config.FillColor));
+            bar.AddLabels(Config.LeftLabelConfig, Config.RightLabelConfig);
             bar.Draw(pos);
         }
 
@@ -139,7 +139,7 @@ namespace DelvUI.Interface.GeneralElements
             var cursorPos = Utils.GetAnchoredPosition(Config.Position + new Vector2(-thickness, thickness), Config.Size, Config.Anchor);
 
             var color = !tankStanceBuff.Any() ? Config.TankStanceIndicatorConfig.InactiveColor : Config.TankStanceIndicatorConfig.ActiveColor;
-            var bar = new BarHud("DelvUI_TankStance").Background(new Rect(cursorPos, barSize)).Foreground(new Rect(cursorPos, barSize, color));
+            var bar = new BarHud("DelvUI_TankStance").SetBackground(new Rect(cursorPos, barSize)).AddForegrounds(new Rect(cursorPos, barSize, color));
             bar.Draw(pos);
         }
 

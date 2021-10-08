@@ -26,20 +26,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            // TODO: Do this properly...
-            // I'm reusing the same calculations for the draggable areas
-            // but these usually don't take into account job bars that are not always present
-            // so I can't exactly use those areas for the window otherwise some elements
-            // will be drawn outside of it and they won't be visible.
-            // For now, I'm taking the area and making it bigger...
-
-            var margin = new Vector2(200, 200);
-            var size = MaxPos - MinPos + margin * 2;
-
-            DrawHelper.DrawInWindow(ID, origin + MinPos - margin, size, false, false, (drawList) =>
-            {
-                DrawJobHud(origin, Player);
-            });
+            DrawJobHud(origin, Player);
         }
 
         public virtual void DrawJobHud(Vector2 origin, PlayerCharacter player)

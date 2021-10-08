@@ -4,6 +4,7 @@ using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using ImGuiNET;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
@@ -37,7 +38,11 @@ namespace DelvUI.Interface.GeneralElements
         public bool SupportChineseCharacters = false;
         public bool SupportKoreanCharacters = false;
 
-        [JsonIgnore] public readonly string DefaultFontKey = "big-noodle-too_24";
+        [JsonIgnore] public static readonly List<string> DefaultFontsKeys = new List<string>() { "big-noodle-too_24", "big-noodle-too_20", "big-noodle-too_16" };
+        [JsonIgnore] public static string DefaultBigFontKey => DefaultFontsKeys[0];
+        [JsonIgnore] public static string DefaultMediumFontKey => DefaultFontsKeys[1];
+        [JsonIgnore] public static string DefaultSmallFontKey => DefaultFontsKeys[2];
+
         [JsonIgnore] private int _inputFont = 0;
         [JsonIgnore] private int _inputSize = 23;
 
@@ -48,11 +53,16 @@ namespace DelvUI.Interface.GeneralElements
         {
             ReloadFonts();
 
-            // default font
-            if (!Fonts.ContainsKey(DefaultFontKey))
+            // default fonts
+            foreach (string key in DefaultFontsKeys)
             {
-                var defaultFont = new FontData("big-noodle-too", 24);
-                Fonts.Add(DefaultFontKey, defaultFont);
+                if (!Fonts.ContainsKey(key))
+                {
+                    string[] str = key.Split("_", StringSplitOptions.RemoveEmptyEntries);
+                    var defaultFont = new FontData(str[0], int.Parse(str[1]));
+                    Fonts.Add(key, defaultFont);
+                }
+
             }
 
             // sizes
@@ -61,6 +71,11 @@ namespace DelvUI.Interface.GeneralElements
             {
                 _sizes[i] = (i + 1).ToString();
             }
+        }
+
+        private bool IsDefaultFont(string key)
+        {
+            return DefaultFontsKeys.Contains(key);
         }
 
         private string ValidatePath(string path)
@@ -217,7 +232,7 @@ namespace DelvUI.Interface.GeneralElements
                         }
 
                         // remove
-                        if (key != DefaultFontKey && ImGui.TableSetColumnIndex(2))
+                        if (!IsDefaultFont(key) && ImGui.TableSetColumnIndex(2))
                         {
                             ImGui.PushFont(UiBuilder.IconFont);
                             ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);

@@ -6,6 +6,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.Bars
 {
+    [Exportable(false)]
     public class BarConfig : AnchorablePluginConfigObject
     {
         [JsonIgnore]
@@ -21,7 +22,7 @@ namespace DelvUI.Interface.Bars
 
         [Combo("Fill Direction", new string[] { "Left", "Right", "Up", "Down" })]
         [Order(30)]
-        public BarDirection FillDirection = BarDirection.Right;
+        public BarDirection FillDirection;
 
         [Checkbox("Show Border")]
         [Order(35)]
@@ -31,13 +32,26 @@ namespace DelvUI.Interface.Bars
         [Order(40)]
         public bool HideWhenInactive = false;
 
-        public BarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+        public BarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor, BarDirection fillDirection = BarDirection.Right)
         {
             Position = position;
             Size = size;
             FillColor = fillColor;
-            ID = $"DelvUI_Bar_{Guid.NewGuid()}";
+            FillDirection = fillDirection;
+            ID = Guid.NewGuid().ToString();
         }
+    }
+
+    [Exportable(false)]
+    public class BarGlowConfig : PluginConfigObject
+    {
+        [ColorEdit4("Color")]
+        [Order(5)]
+        public PluginConfigColor Color = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 50f / 100f));
+
+        [DragInt("Size", min = 1, max = 100)]
+        [Order(25)]
+        public int Size = 1;
     }
 
     public enum BarDirection
