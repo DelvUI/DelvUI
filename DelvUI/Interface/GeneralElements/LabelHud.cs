@@ -35,15 +35,16 @@ namespace DelvUI.Interface.GeneralElements
 
         private void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
         {
-            var fontPushed = FontsManager.Instance.PushFont(Config.FontID);
+            bool fontPushed = FontsManager.Instance.PushFont(Config.FontID);
 
-            var size = ImGui.CalcTextSize(text);
-            var pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
+            Vector2 size = ImGui.CalcTextSize(text);
+            Vector2 pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
+            Vector2 margin = new Vector2(10, 10);
 
-            DrawHelper.DrawInWindow(ID, pos, size, false, true, (drawList) =>
+            DrawHelper.DrawInWindow(ID, pos - margin, size + margin * 2, false, true, (drawList) =>
             {
                 var color = Color(actor);
-                
+
                 if (Config.ShowShadow)
                 {
                     DrawHelper.DrawShadowText(text, pos, color.Base, Config.ShadowColor.Base, drawList, Config.ShadowOffset);
@@ -53,8 +54,8 @@ namespace DelvUI.Interface.GeneralElements
                 {
                     DrawHelper.DrawOutlinedText(text, pos, color.Base, Config.OutlineColor.Base, drawList);
                 }
-                
-                if(!Config.ShowOutline && !Config.ShowShadow)
+
+                if (!Config.ShowOutline && !Config.ShowShadow)
                 {
                     drawList.AddText(pos, color.Base, text);
                 }
