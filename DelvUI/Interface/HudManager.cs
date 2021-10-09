@@ -19,7 +19,7 @@ namespace DelvUI.Interface
         private readonly Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
 
         private GridConfig? _gridConfig;
-        private HideHudConfig? _hudOptions;
+        private HUDOptionsConfig? _hudOptions;
         private DraggableHudElement? _selectedElement = null;
 
         private List<DraggableHudElement> _hudElements = null!;
@@ -128,7 +128,7 @@ namespace DelvUI.Interface
         private void CreateHudElements()
         {
             _gridConfig = ConfigurationManager.Instance.GetConfigObject<GridConfig>();
-            _hudOptions = ConfigurationManager.Instance.GetConfigObject<HideHudConfig>();
+            _hudOptions = ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>();
 
             _hudElements = new List<DraggableHudElement>();
             _hudElementsUsingPlayer = new List<IHudElementWithActor>();

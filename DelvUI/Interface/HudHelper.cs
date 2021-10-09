@@ -38,7 +38,7 @@ namespace DelvUI.Interface
         private delegate IntPtr GetBaseUIObjectDelegate();
         private delegate byte UpdateAddonPositionDelegate(IntPtr manager, IntPtr addon, byte clicked);
 
-        private HideHudConfig Config => ConfigurationManager.Instance.GetConfigObject<HideHudConfig>();
+        private HUDOptionsConfig Config => ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>();
 
         private bool _previousCombatState = true;
         private bool _isInitial = true;
