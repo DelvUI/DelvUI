@@ -63,7 +63,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.BatteryGauge.Enabled)
             {
-                DrawBatteryGauge(pos);
+                DrawBatteryGauge(pos, player);
             }
 
             if (Config.WildfireBar.Enabled)
@@ -83,14 +83,14 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawBatteryGauge(Vector2 origin)
+        private void DrawBatteryGauge(Vector2 origin, PlayerCharacter player)
         {
             MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
 
-            if ((!Config.BatteryGauge.HideWhenInactive || gauge.Battery > 0) && gauge.SummonTimeRemaining is 0)
+            if ((!Config.BatteryGauge.HideWhenInactive || gauge.Battery > 0) && !gauge.IsRobotActive)
             {
                 Config.BatteryGauge.Label.SetText(gauge.Battery.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.Battery, 100f, 0f).Draw(origin);
+                BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.Battery, 100f, 0f, player, Config.BatteryGauge.BatteryColor).Draw(origin);
             }
 
             if (gauge.IsRobotActive)
@@ -98,7 +98,7 @@ namespace DelvUI.Interface.Jobs
                 float robotDuration = gauge.SummonTimeRemaining / 1000f;
 
                 Config.BatteryGauge.Label.SetText(robotDuration.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.SummonTimeRemaining, _robotDuration[gauge.LastSummonBatteryPower / 10 - 5], 0f).Draw(origin);
+                BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.SummonTimeRemaining, _robotDuration[gauge.LastSummonBatteryPower / 10 - 5], 0f, player, Config.BatteryGauge.RobotColor).Draw(origin);
             }
         }
 
@@ -185,11 +185,11 @@ namespace DelvUI.Interface.Jobs
     {
         [ColorEdit4("Battery Color", spacing = true)]
         [Order(55)]
-        public PluginConfigColor StormsEyeColor = new(new Vector4(106f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        public PluginConfigColor BatteryColor = new(new Vector4(106f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
         [ColorEdit4("Robot Color")]
         [Order(60)]
-        public PluginConfigColor InnerReleaseColor = new(new Vector4(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
+        public PluginConfigColor RobotColor = new(new Vector4(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
 
         public BatteryGaugeConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {
