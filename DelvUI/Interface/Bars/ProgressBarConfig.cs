@@ -9,7 +9,7 @@ namespace DelvUI.Interface.Bars
     [Exportable(false)]
     public class ProgressBarConfig : BarConfig
     {
-        [NestedConfig("Threshold", 45, separator = false, spacing = true)]
+        [NestedConfig("Threshold", 45, separator = false, nest = true)]
         public ThresholdConfig ThresholdConfig = new ThresholdConfig();
 
         [NestedConfig("Bar Text", 1000, separator = false, spacing = true)]

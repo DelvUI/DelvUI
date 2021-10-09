@@ -31,6 +31,7 @@ namespace DelvUI.Config.Tree
         private bool _hasSeparator = true;
         private bool _hasSpacing = false;
 
+        private int _nodeDepth = 0;
         private FieldInfo? _parentCollapseField = null;
         private PluginConfigObject? _parentConfigObject = null;
 
@@ -184,6 +185,7 @@ namespace DelvUI.Config.Tree
                         // so if the ConfigObject is marked as undisableable, we bypass adding items as children *only* if their parent was the 'Enabled' field.
                         if (orderAttribute.collapseWith is null || (!ConfigObject.Disableable && orderAttribute.collapseWith.Equals("Enabled")))
                         {
+                            fieldNode.Depth = _nodeDepth;
                             _drawList.Add(new KeyValuePair<int, object>(orderAttribute.pos, fieldNode));
                         }
                         else
@@ -199,6 +201,11 @@ namespace DelvUI.Config.Tree
                         node._hasSpacing = nestedConfigAttribute.spacing;
                         if (nestedConfigAttribute.collapseWith is not null)
                         {
+                            if (nestedConfigAttribute.nest)
+                            {
+                                node._nodeDepth = _nodeDepth + 1;
+                            }
+                            
                             node._parentCollapseField = fields.Where(f => f.Name.Equals(nestedConfigAttribute.collapseWith)).FirstOrDefault();
                             node._parentConfigObject = ConfigObject;
                         }

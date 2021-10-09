@@ -577,6 +577,7 @@ namespace DelvUI.Config.Attributes
         public int pos;
         public bool separator = true;
         public bool spacing = false;
+        public bool nest = false;
         public string? collapseWith = "Enabled";
 
         public NestedConfigAttribute(string friendlyName, int pos)
