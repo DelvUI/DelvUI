@@ -320,6 +320,18 @@ namespace DelvUI.Interface.StatusEffects
                         drawList.AddRect(iconPos, iconPos + Config.IconConfig.Size, borderConfig.Color.Base, 0, ImDrawFlags.None, borderConfig.Thickness);
                     }
 
+                    // Draw dispell indicator above dispellable status effect on uncropped icons
+                    if (borderConfig != null && !cropIcon && statusEffectData.Data.CanDispel)
+                    {
+                        // 24x32
+                        drawList.AddRectFilled(
+                            iconPos + new Vector2(Config.IconConfig.Size.X * .07f, Config.IconConfig.Size.Y * .07f),
+                            iconPos + new Vector2(Config.IconConfig.Size.X * .93f, Config.IconConfig.Size.Y * .14f),
+                            borderConfig.Color.Base,
+                            8f
+                        );
+                    }
+
                     if (Actor != null && ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
                     {
                         // tooltip
