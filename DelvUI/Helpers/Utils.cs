@@ -132,11 +132,14 @@ namespace DelvUI.Helpers
                 }
             }
 
-            //convert our plugin colors to RGBColor
+            //convert our fullhealth and lowhealth colors to RGBColor
             var rgbFullHealthColor = new RGBColor(fullHealthColor.Vector.X, fullHealthColor.Vector.Y, fullHealthColor.Vector.Z);
             var rgbLowHealthColor = new RGBColor(lowHealthColor.Vector.X, lowHealthColor.Vector.Y, lowHealthColor.Vector.Z);
+
+            //store our interpolated alpha to be used later on
             float alpha = (fullHealthColor.Vector.W - lowHealthColor.Vector.W) * ratio + lowHealthColor.Vector.W;
 
+            //color space selection
             switch (blendMode)
             {
                 case BlendMode.LAB:
