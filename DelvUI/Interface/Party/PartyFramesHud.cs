@@ -73,6 +73,16 @@ namespace DelvUI.Interface.Party
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
             UpdateBars(Vector2.Zero);
 
+            /*
+             Part of openContextMenuFromTarget disassembly signature
+            .text:00007FF648523940                   Client__UI__Agent__AgentHUD_OpenContextMenuFromTarget proc near
+            .text:00007FF648523940
+            .text:00007FF648523940                   arg_0= qword ptr  8
+            .text:00007FF648523940                   arg_8= qword ptr  10h
+            .text:00007FF648523940
+            .text:00007FF648523940 48 85 D2          test    rdx, rdx
+            .text:00007FF648523943 74 7F             jz      short locret_7FF6485239C4
+            */
             _openContextMenu =
                 Marshal.GetDelegateForFunctionPointer<OpenContextMenu>(Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? EB 50 83 FB 01"));
         }

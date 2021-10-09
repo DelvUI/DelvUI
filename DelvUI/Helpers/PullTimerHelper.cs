@@ -31,6 +31,24 @@ namespace DelvUI.Helpers
         private PullTimerHelper()
         {
             PullTimerState = new PullTimerState();
+
+            /*
+             Part of Countdown disassembly Signature
+            .text:00007FF647F88F20                   CountdownPointer proc near
+            .text:00007FF647F88F20
+            .text:00007FF647F88F20                   var_28= xmmword ptr -28h
+            .text:00007FF647F88F20                   var_18= xmmword ptr -18h
+            .text:00007FF647F88F20                   arg_0= qword ptr  8
+            .text:00007FF647F88F20
+            .text:00007FF647F88F20 48 89 5C 24 08    mov     [rsp+arg_0], rbx
+            .text:00007FF647F88F25 57                push    rdi
+            .text:00007FF647F88F26 48 83 EC 40       sub     rsp, 40h
+            .text:00007FF647F88F2A 8B 41 28          mov     eax, [rcx+28h]
+            .text:00007FF647F88F2D 48 8B D9          mov     rbx, rcx
+            .text:00007FF647F88F30 89 41 2C          mov     [rcx+2Ch], eax
+            .text:00007FF647F88F33 48 8B 05 1E 3C AE+mov     rax, cs:g_Framework_2
+            */
+            
             IntPtr countdownPtr = Plugin.SigScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 40 8B 41");
             try
             {

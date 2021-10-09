@@ -52,12 +52,53 @@ namespace DelvUI.Interface
         {
             Config.ValueChangeEvent += ConfigValueChanged;
 
+            /*
+             Part of getBaseUiObject disassembly signature
+            .text:00007FF6481C2F60                   Component__GUI__AtkStage_GetSingleton1 proc near
+            .text:00007FF6481C2F60 48 8B 05 99 04 8D+mov     rax, cs:g_AtkStage
+            .text:00007FF6481C2F60 01
+            .text:00007FF6481C2F67 C3                retn
+            .text:00007FF6481C2F67                   Component__GUI__AtkStage_GetSingleton1 endp
+            .text:00007FF6481C2F67
+            */
             var getBaseUiObjectPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 41 B8 01 00 00 00 48 8D 15 ?? ?? ?? ?? 48 8B 48 20 E8 ?? ?? ?? ?? 48 8B CF");
             _getBaseUIObject = Marshal.GetDelegateForFunctionPointer<GetBaseUIObjectDelegate>(getBaseUiObjectPtr);
 
+            /*
+             Part of setPosition disassembly signature
+            .text:00007FF6481BFF20                   Component__GUI__AtkUnitBase_SetPosition proc near
+            .text:00007FF6481BFF20 4C 8B 89 C8 00 00+mov     r9, [rcx+0C8h]
+            .text:00007FF6481BFF20 00
+            .text:00007FF6481BFF27 41 0F BF C0       movsx   eax, r8w
+            .text:00007FF6481BFF2B 66 89 91 BC 01 00+mov     [rcx+1BCh], dx
+            .text:00007FF6481BFF2B 00
+            .text:00007FF6481BFF32 66 44 89 81 BE 01+mov     [rcx+1BEh], r8w
+            .text:00007FF6481BFF32 00 00
+            .text:00007FF6481BFF3A 66 0F 6E C8       movd    xmm1, eax
+            .text:00007FF6481BFF3E 0F BF C2          movsx   eax, dx
+            .text:00007FF6481BFF41 0F 5B C9          cvtdq2ps xmm1, xmm1
+            .text:00007FF6481BFF44 66 0F 6E D0       movd    xmm2, eax
+            .text:00007FF6481BFF48 0F 5B D2          cvtdq2ps xmm2, xmm2
+            .text:00007FF6481BFF4B 4D 85 C9          test    r9, r9
+            .text:00007FF6481BFF4E 74 3B             jz      short locret_7FF6481BFF8B
+            */
             var setPositionPtr = Plugin.SigScanner.ScanText("4C 8B 89 ?? ?? ?? ?? 41 0F BF C0");
             _setPosition = Marshal.GetDelegateForFunctionPointer<SetPositionDelegate>(setPositionPtr);
 
+            /*
+             Part of updateAddonPosition disassembly signature
+            .text:00007FF6481CF020                   sub_7FF6481CF020 proc near
+            .text:00007FF6481CF020
+            .text:00007FF6481CF020                   arg_0= qword ptr  8
+            .text:00007FF6481CF020
+            .text:00007FF6481CF020 48 89 5C 24 08    mov     [rsp+arg_0], rbx
+            .text:00007FF6481CF025 57                push    rdi
+            .text:00007FF6481CF026 48 83 EC 20       sub     rsp, 20h
+            .text:00007FF6481CF02A 48 8B DA          mov     rbx, rdx
+            .text:00007FF6481CF02D 48 8B F9          mov     rdi, rcx
+            .text:00007FF6481CF030 48 85 D2          test    rdx, rdx
+            .text:00007FF6481CF033 0F 84 CA 00 00 00 jz      loc_7FF6481CF103
+            */
             var updateAddonPositionPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? 33 D2 48 8B 01 FF 90 ?? ?? ?? ??");
             _updateAddonPosition = Marshal.GetDelegateForFunctionPointer<UpdateAddonPositionDelegate>(updateAddonPositionPtr);
         }
