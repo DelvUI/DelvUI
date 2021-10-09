@@ -56,6 +56,16 @@ namespace DelvUI.Config
                 return attribute == null || attribute.disableable;
             }
         }
+        
+        [JsonIgnore]
+        public string[]? DisableParentSettings
+        {
+            get
+            {
+                DisableParentSettingsAttribute? attribute = (DisableParentSettingsAttribute?)GetType().GetCustomAttribute(typeof(DisableParentSettingsAttribute), false);
+                return attribute?.DisabledFields;
+            }
+        }
         #endregion
 
         protected bool ColorEdit4(string label, ref PluginConfigColor color)

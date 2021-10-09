@@ -158,7 +158,7 @@ namespace DelvUI.Interface.Jobs
                 if (!Config.MudraBar.HideWhenInactive || current < max)
                 {
                     Config.MudraBar.Label.SetText(Math.Truncate((max - current) % 20).ToString());
-                    BarUtilities.GetChunkedProgressBars(Config.MudraBar, 2, current, max, 0f, player, Config.MudraBar.Label).Draw(pos);
+                    BarUtilities.GetChunkedProgressBars(Config.MudraBar, 2, current, max, 0f, player).Draw(pos);
                 }
             }
         }
@@ -166,14 +166,13 @@ namespace DelvUI.Interface.Jobs
         private void DrawHutonGauge(Vector2 pos, PlayerCharacter player)
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
-            float hutonDurationLeft = gauge.HutonTimer / 1000f;
-            if (!Config.HutonBar.HideWhenInactive || hutonDurationLeft > 0)
+
+            if (!Config.HutonBar.HideWhenInactive || gauge.HutonTimer > 0)
             {
-                Config.HutonBar.Label.SetText(Math.Truncate(hutonDurationLeft).ToString());
-                BarUtilities.GetProgressBar(Config.HutonBar, hutonDurationLeft, 70f, 0f, player).Draw(pos);
+                Config.HutonBar.Label.SetText($"{gauge.HutonTimer / 1000}");
+                BarUtilities.GetProgressBar(Config.HutonBar, gauge.HutonTimer, 70000f, 0f, player).Draw(pos);
             }
         }
-
 
         private void DrawNinkiGauge(Vector2 pos, PlayerCharacter player)
         {
@@ -295,12 +294,9 @@ namespace DelvUI.Interface.Jobs
         [Order(65)]
         public PluginConfigColor TCJBarColor = new(new Vector4(181 / 255f, 33 / 255f, 41 / 242f, 100f / 100f));
 
-        [NestedConfig("Bar Text", 1000, separator = false, spacing = true)]
-        public LabelConfig Label;
-
         public MudraBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor, 2)
         {
-            Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+            Label.Enabled = true;
             UsePartialFillColor = true;
         }
     }

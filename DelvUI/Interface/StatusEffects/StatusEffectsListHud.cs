@@ -310,13 +310,27 @@ namespace DelvUI.Interface.StatusEffects
                     var statusEffectData = list[i];
 
                     // icon
-                    DrawHelper.DrawIcon<LuminaStatus>(statusEffectData.Data, iconPos, Config.IconConfig.Size, false, drawList);
+                    var cropIcon = Config.IconConfig.CropIcon;
+                    DrawHelper.DrawIcon<LuminaStatus>(statusEffectData.Data, iconPos, Config.IconConfig.Size, false, drawList, cropIcon);
 
                     // border
                     var borderConfig = GetBorderConfig(statusEffectData);
-                    if (borderConfig != null)
+                    if (borderConfig != null && cropIcon)
                     {
                         drawList.AddRect(iconPos, iconPos + Config.IconConfig.Size, borderConfig.Color.Base, 0, ImDrawFlags.None, borderConfig.Thickness);
+                    }
+
+                    // Draw dispell indicator above dispellable status effect on uncropped icons
+                    if (borderConfig != null && !cropIcon && statusEffectData.Data.CanDispel)
+                    {
+                        var dispellIndicatorColor = new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f);
+                        // 24x32
+                        drawList.AddRectFilled(
+                            iconPos + new Vector2(Config.IconConfig.Size.X * .07f, Config.IconConfig.Size.Y * .07f),
+                            iconPos + new Vector2(Config.IconConfig.Size.X * .93f, Config.IconConfig.Size.Y * .14f),
+                            ImGui.ColorConvertFloat4ToU32(dispellIndicatorColor),
+                            8f
+                        );
                     }
 
                     if (Actor != null && ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))

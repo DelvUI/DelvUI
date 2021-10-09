@@ -237,13 +237,17 @@ namespace DelvUI.Interface.StatusEffects
         [NestedConfig("Stacks", 15, separator = false, spacing = true)]
         public LabelConfig StacksLabelConfig;
 
-        [NestedConfig("Border", 20, separator = false, spacing = true)]
+        [Checkbox("Crop Icon", spacing = true)]
+        [Order(20)]
+        public bool CropIcon = true;
+
+        [NestedConfig("Border", 25, collapseWith = nameof(CropIcon), separator = false, spacing = true)]
         public StatusEffectIconBorderConfig BorderConfig = new();
 
-        [NestedConfig("Dispellable Effects Border", 25, separator = false, spacing = true)]
+        [NestedConfig("Dispellable Effects Border", 30, collapseWith = nameof(CropIcon), separator = false, spacing = true)]
         public StatusEffectIconBorderConfig DispellableBorderConfig = new(new PluginConfigColor(new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f)), 2);
 
-        [NestedConfig("My Effects Border", 30, separator = false, spacing = true)]
+        [NestedConfig("My Effects Border", 35, collapseWith = nameof(CropIcon), separator = false, spacing = true)]
         public StatusEffectIconBorderConfig OwnedBorderConfig = new(new PluginConfigColor(new Vector4(35f / 255f, 179f / 255f, 69f / 255f, 100f / 100f)), 1);
 
         public StatusEffectIconConfig(LabelConfig? durationLabelConfig = null, LabelConfig? stacksLabelConfig = null)
@@ -449,7 +453,7 @@ namespace DelvUI.Interface.StatusEffects
                         {
                             if (row != null)
                             {
-                                DrawHelper.DrawIcon<Status>(row, ImGui.GetCursorPos(), iconSize, false);
+                                DrawHelper.DrawIcon<Status>(row, ImGui.GetCursorPos(), iconSize, false, true);
                             }
                         }
 

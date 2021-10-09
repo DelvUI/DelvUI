@@ -89,7 +89,7 @@ namespace DelvUI.Helpers
             drawList.AddText(new Vector2(pos.X, pos.Y), color, text);
         }
 
-        public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder) where T : ExcelRow
+        public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder, bool cropIcon) where T : ExcelRow
         {
             TextureWrap texture = TexturesCache.Instance.GetTexture<T>(row);
             if (texture == null)
@@ -97,7 +97,7 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(texture, size);
+            (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(texture, size, cropIcon);
 
             ImGui.SetCursorPos(position);
             ImGui.Image(texture.ImGuiHandle, size, uv0, uv1);
@@ -109,7 +109,7 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder, ImDrawListPtr drawList) where T : ExcelRow
+        public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder, ImDrawListPtr drawList, bool cropIcon) where T : ExcelRow
         {
             TextureWrap texture = TexturesCache.Instance.GetTexture<T>(row);
             if (texture == null)
@@ -117,7 +117,7 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(texture, size);
+            (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(texture, size, cropIcon);
 
             drawList.AddImage(texture.ImGuiHandle, position, position + size, uv0, uv1);
 
@@ -143,7 +143,7 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static (Vector2, Vector2) GetTexCoordinates(TextureWrap texture, Vector2 size)
+        public static (Vector2, Vector2) GetTexCoordinates(TextureWrap texture, Vector2 size, bool cropIcon = true)
         {
             if (texture == null)
             {
@@ -151,8 +151,16 @@ namespace DelvUI.Helpers
             }
 
             // Status = 24x32, show from 2,7 until 22,26
-            var uv0 = new Vector2(4f / texture.Width, 14f / texture.Height);
-            var uv1 = new Vector2(1f - 4f / texture.Width, 1f - 12f / texture.Height);
+            //show from 0,0 until 24,32 for uncropped status icon
+
+            float uv0x = cropIcon ? 4f : 1f; 
+            float uv0y = cropIcon ? 14f : 1f;
+
+            float uv1x = cropIcon ? 4f : 1f; 
+            float uv1y = cropIcon ? 12f : 1f; 
+
+            var uv0 = new Vector2(uv0x / texture.Width, uv0y / texture.Height);
+            var uv1 = new Vector2(1f - uv1x / texture.Width, 1f - uv1y / texture.Height);
 
             return (uv0, uv1);
         }
