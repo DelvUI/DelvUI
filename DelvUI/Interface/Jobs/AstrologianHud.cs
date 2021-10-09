@@ -7,7 +7,6 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
-using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 using ImGuiNET;
 using Newtonsoft.Json;
@@ -16,6 +15,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Numerics;
+using DelvUI.Interface.GeneralElements;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -23,9 +23,8 @@ namespace DelvUI.Interface.Jobs
     {
         private readonly SpellHelper _spellHelper = new();
         private new AstrologianConfig Config => (AstrologianConfig)_config;
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public AstrologianHud(AstrologianConfig config, string? displayName = null) : base(config, displayName)
+        public AstrologianHud(JobConfig config, string? displayName = null) : base(config, displayName)
         {
         }
 
@@ -34,34 +33,34 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new();
             List<Vector2> sizes = new();
 
-            if (Config.ShowDrawBar)
+            if (Config.DrawBar.Enabled)
             {
-                positions.Add(Config.Position + Config.DrawBarPosition);
-                sizes.Add(Config.DrawBarSize);
+                positions.Add(Config.Position + Config.DrawBar.Position);
+                sizes.Add(Config.DrawBar.Size);
             }
 
-            if (Config.ShowDivinationBar)
+            if (Config.DivinationBar.Enabled)
             {
-                positions.Add(Config.Position + Config.DivinationBarPosition);
-                sizes.Add(Config.DivinationBarSize);
+                positions.Add(Config.Position + Config.DivinationBar.Position);
+                sizes.Add(Config.DivinationBar.Size);
             }
 
-            if (Config.ShowDotBar)
+            if (Config.DotBar.Enabled)
             {
-                positions.Add(Config.Position + Config.DotBarPosition);
-                sizes.Add(Config.DotBarSize);
+                positions.Add(Config.Position + Config.DotBar.Position);
+                sizes.Add(Config.DotBar.Size);
             }
 
-            if (Config.ShowStarBar)
+            if (Config.StarBar.Enabled)
             {
-                positions.Add(Config.Position + Config.StarBarPosition);
-                sizes.Add(Config.StarBarSize);
+                positions.Add(Config.Position + Config.StarBar.Position);
+                sizes.Add(Config.StarBar.Size);
             }
 
-            if (Config.ShowLightspeedBar)
+            if (Config.LightspeedBar.Enabled)
             {
-                positions.Add(Config.Position + Config.LightspeedBarPosition);
-                sizes.Add(Config.LightspeedBarSize);
+                positions.Add(Config.Position + Config.LightspeedBar.Position);
+                sizes.Add(Config.LightspeedBar.Size);
             }
 
             return (positions, sizes);
@@ -69,29 +68,31 @@ namespace DelvUI.Interface.Jobs
 
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            if (Config.ShowDivinationBar)
+            Vector2 pos = origin + Config.Position;
+
+            if (Config.DivinationBar.Enabled)
             {
-                DrawDivinationBar(origin);
+                DrawDivinationBar(pos);
             }
 
-            if (Config.ShowDrawBar)
+            if (Config.DrawBar.Enabled)
             {
-                DrawDraw(origin);
+                DrawDraw(pos);
             }
 
-            if (Config.ShowDotBar)
+            if (Config.DotBar.Enabled)
             {
-                DrawDot(origin, player);
+                DrawDot(pos, player);
             }
 
-            if (Config.ShowLightspeedBar)
+            if (Config.LightspeedBar.Enabled)
             {
-                DrawLightspeed(origin, player);
+                DrawLightspeed(pos, player);
             }
 
-            if (Config.ShowStarBar)
+            if (Config.StarBar.Enabled)
             {
-                DrawStar(origin, player);
+                DrawStar(pos, player);
             }
         }
 
@@ -112,14 +113,15 @@ namespace DelvUI.Interface.Jobs
                 redrawCastInfo %= 30;
             }
 
-            if (Config.ShowRedrawCooldownTextBar)
+            if (!Config.ShowRedrawCooldownTextBar)
             {
-                string format = Config.EnableDecimalRedrawBar ? "N1" : "N0";
-
-                return Config.ShowRedrawTextBar ? redrawCastInfo.ToString(format) + " [" + redrawStacks + "]" : redrawCastInfo.ToString(format);
+                return Config.ShowRedrawTextBar ? redrawStacks.ToString("N0") : "";
             }
 
-            return Config.ShowRedrawTextBar ? redrawStacks.ToString("N0") : "";
+            string format = Config.EnableDecimalRedrawBar ? "N1" : "N0";
+
+            return Config.ShowRedrawTextBar ? redrawCastInfo.ToString(format) + " [" + redrawStacks + "]" : redrawCastInfo.ToString(format);
+
         }
 
         private unsafe void DrawDivinationBar(Vector2 origin)
@@ -373,7 +375,13 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDot(Vector2 origin, PlayerCharacter player)
         {
-            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            
+            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            List<uint> dotIDs = new (){ 1881 , 843 , 838 };
+            List<float> dotDuration = new() { 18, 30, 30 };
+            BarUtilities.GetDoTBar(Config.DotBar, player, target, dotIDs, dotDuration)?.Draw(origin);
+
+            /*GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float xPos = origin.X + Config.Position.X + Config.DotBarPosition.X - Config.DotBarSize.X / 2f;
             float yPos = origin.Y + Config.Position.Y + Config.DotBarPosition.Y - Config.DotBarSize.Y / 2f;
             ImDrawListPtr drawList = ImGui.GetWindowDrawList();
@@ -425,7 +433,7 @@ namespace DelvUI.Interface.Jobs
                              .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, dotDurationText)
                              .Build();
 
-            bar.Draw(drawList);
+            bar.Draw(drawList);*/
         }
 
         private void DrawLightspeed(Vector2 origin, PlayerCharacter player)
@@ -524,15 +532,191 @@ namespace DelvUI.Interface.Jobs
     public class AstrologianConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.AST;
-        public new static AstrologianConfig DefaultConfig()
-        {
-            AstrologianConfig? config = new() { UseDefaultPrimaryResourceBar = true };
 
-            return config;
+        private AstrologianConfig() { UseDefaultPrimaryResourceBar = true; }
+
+        public new static AstrologianConfig DefaultConfig() => new();
+
+        [NestedConfig("Draw Bar", 30)]
+        public AstrologianDrawBarConfig DrawBar = new(
+            new Vector2(0, -22),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
+        );
+
+        [NestedConfig("Divination Bar", 45)]
+        public AstrologianDivinationBarConfig DivinationBar = new (
+            new Vector2(0, -22),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
+        );
+
+        [NestedConfig("Dot Bar", 60)]
+        public AstrologianDotBarConfig DotBar = new(
+            new Vector2(0, -22),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
+        );
+
+        [NestedConfig("Star Bar", 75)]
+        public AstrologianStarBarConfig StarBar = new(
+            new Vector2(0, -22),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
+        );
+
+        [NestedConfig("Lightspeed Bar", 75)]
+        public AstrologianLightspeedBarConfig LightspeedBar = new(
+            new Vector2(0, -22),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
+        );
+
+        [Exportable(false)]
+        public class AstrologianDrawBarConfig : ProgressBarConfig
+        {
+            [Checkbox("Only Show When Active" + "##Draw")]
+            [Order(31)]
+            public bool OnlyShowDrawBarWhenActive = false;
+
+            [Checkbox("Card Preferred Target with Glow" + "##Draw", spacing = true)]
+            [Order(32)]
+            public bool ShowDrawGlowBar;
+
+            [Checkbox("Card Preferred Target with Text" + "##Draw")]
+            [Order(33)]
+            public bool ShowDrawTextBar = true;
+
+            [Checkbox("Draw Timer" + "##Draw", spacing = true)]
+            [Order(34)]
+            public bool ShowDrawCooldownTextBar = true;
+
+            [Checkbox("with Decimals" + "##Draw")]
+            [Order(35)]
+            public bool EnableDecimalDrawBar;
+
+            [Checkbox("Card Drawn Timer" + "##Draw")]
+            [Order(36)]
+            public bool ShowDrawCardWhileDrawn;
+
+            [Checkbox("Redraw Timer" + "##Redraw", spacing = true)]
+            [Order(37)]
+            public bool ShowRedrawCooldownTextBar = true;
+
+            [Checkbox("with Decimals" + "##Redraw")]
+            [Order(38)]
+            public bool EnableDecimalRedrawBar;
+
+            [Checkbox("Redraw Stacks" + "##Redraw")]
+            [Order(39)]
+            public bool ShowRedrawTextBar = true;
+
+            [Checkbox("Total Redraw Cooldown Instead of Next" + "##Redraw")]
+            [Order(40)]
+            public bool EnableRedrawCooldownCumulated;
+
+            [ColorEdit4("Draw on CD" + "##Draw")]
+            [Order(41)]
+            public PluginConfigColor DrawCdColor = new(new Vector4(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f));
+
+            [ColorEdit4("Draw Ready" + "##Draw")]
+            [Order(42)]
+            public PluginConfigColor DrawCdReadyColor = new(new Vector4(137f / 255f, 26f / 255f, 42f / 255f, 100f / 100f));
+
+            [ColorEdit4("Melee Glow" + "##Draw")]
+            [Order(43)]
+            public PluginConfigColor DrawMeleeGlowColor = new(new Vector4(83f / 255f, 34f / 255f, 120f / 255f, 100f / 100f));
+
+            [ColorEdit4("Ranged Glow" + "##Draw")]
+            [Order(44)]
+            public PluginConfigColor DrawRangedGlowColor = new(new Vector4(124f / 255f, 34f / 255f, 120f / 255f, 100f / 100f));
+
+            public AstrologianDrawBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+                : base(position, size, fillColor)
+            {
+            }
         }
 
-        #region Draw Bar
-        [Checkbox("Draw" + "##Draw", separator = true)]
+        [Exportable(false)]
+        public class AstrologianDivinationBarConfig : ProgressBarConfig
+        {
+            [Checkbox("Only Show When Active" + "##Divination")]
+            [Order(46)]
+            public bool OnlyShowDivinationBarWhenActive = false;
+
+            [DragFloat2("Position" + "##Divination", min = -2000f, max = 2000f)]
+            [Order(47)]
+            public Vector2 DivinationBarPosition = new(0, -49);
+
+            [DragFloat2("Size" + "##Divination", min = 1f, max = 2000f)]
+            [Order(48)]
+            public Vector2 DivinationBarSize = new(254, 10);
+
+            [DragInt("Spacing" + "##Divination", min = -1000, max = 1000)]
+            [Order(49)]
+            public int DivinationBarPad = 2;
+
+            [ColorEdit4("Sun" + "##Divination")]
+            [Order(50)]
+            public PluginConfigColor SealSunColor = new(new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f));
+
+            [ColorEdit4("Lunar" + "##Divination")]
+            [Order(51)]
+            public PluginConfigColor SealLunarColor = new(new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f));
+
+            [ColorEdit4("Celestial" + "##Divination")]
+            [Order(52)]
+            public PluginConfigColor SealCelestialColor = new(new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f));
+
+            [Checkbox("Seal Count Text" + "##Divination", spacing = true)]
+            [Order(53)]
+            public bool ShowDivinationTextBar;
+
+            [Checkbox("Seal Count Glow" + "##Divination")]
+            [Order(54)]
+            public bool ShowDivinationGlowBar = true;
+
+            [ColorEdit4("Glow" + "##Divination")]
+            [Order(55)]
+            public PluginConfigColor DivinationGlowColor = new(new Vector4(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f));
+
+            public AstrologianDivinationBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+                : base(position, size, fillColor)
+            {
+            }
+        }
+
+        [Exportable(false)]
+        public class AstrologianDotBarConfig : ProgressBarConfig
+        {
+
+            public AstrologianDotBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+                : base(position, size, fillColor)
+            {
+            }
+        }
+
+        [Exportable(false)]
+        public class AstrologianStarBarConfig : ProgressBarConfig
+        {
+
+            public AstrologianStarBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+                : base(position, size, fillColor)
+            {
+            }
+        }
+
+        [Exportable(false)]
+        public class AstrologianLightspeedBarConfig : ProgressBarConfig
+        {
+
+            public AstrologianLightspeedBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+                : base(position, size, fillColor)
+            {
+            }
+        }
+
+        /*[Checkbox("Draw" + "##Draw", separator = true)]
         [Order(30)]
         public bool ShowDrawBar = true;
 
@@ -607,43 +791,43 @@ namespace DelvUI.Interface.Jobs
         public bool ShowDivinationBar = true;
 
         [Checkbox("Only Show When Active" + "##Divination")]
-        [Order(115, collapseWith = nameof(ShowDivinationBar))]
+        [Order(115)]
         public bool OnlyShowDivinationBarWhenActive = false;
 
         [DragFloat2("Position" + "##Divination", min = -2000f, max = 2000f)]
-        [Order(120, collapseWith = nameof(ShowDivinationBar))]
+        [Order(120)]
         public Vector2 DivinationBarPosition = new(0, -49);
 
         [DragFloat2("Size" + "##Divination", min = 1f, max = 2000f)]
-        [Order(125, collapseWith = nameof(ShowDivinationBar))]
+        [Order(125)]
         public Vector2 DivinationBarSize = new(254, 10);
 
         [DragInt("Spacing" + "##Divination", min = -1000, max = 1000)]
-        [Order(130, collapseWith = nameof(ShowDivinationBar))]
+        [Order(130)]
         public int DivinationBarPad = 2;
 
         [ColorEdit4("Sun" + "##Divination")]
-        [Order(135, collapseWith = nameof(ShowDivinationBar))]
+        [Order(135)]
         public PluginConfigColor SealSunColor = new(new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f));
 
         [ColorEdit4("Lunar" + "##Divination")]
-        [Order(140, collapseWith = nameof(ShowDivinationBar))]
+        [Order(140)]
         public PluginConfigColor SealLunarColor = new(new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f));
 
         [ColorEdit4("Celestial" + "##Divination")]
-        [Order(145, collapseWith = nameof(ShowDivinationBar))]
+        [Order(145)]
         public PluginConfigColor SealCelestialColor = new(new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f));
 
         [Checkbox("Seal Count Text" + "##Divination", spacing = true)]
-        [Order(150, collapseWith = nameof(ShowDivinationBar))]
+        [Order(150)]
         public bool ShowDivinationTextBar;
 
         [Checkbox("Seal Count Glow" + "##Divination")]
-        [Order(155, collapseWith = nameof(ShowDivinationBar))]
+        [Order(155)]
         public bool ShowDivinationGlowBar = true;
 
         [ColorEdit4("Glow" + "##Divination")]
-        [Order(160, collapseWith = nameof(ShowDivinationBar))]
+        [Order(160)]
         public PluginConfigColor DivinationGlowColor = new(new Vector4(255f / 255f, 199f / 255f, 62f / 255f, 100f / 100f));
         #endregion
 
@@ -747,6 +931,6 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("with Decimals" + "##Lightspeed")]
         [Order(280, collapseWith = nameof(ShowLightspeedBar))]
         public bool EnableDecimalLightspeedBar;
-        #endregion
+        #endregion*/
     }
 }
