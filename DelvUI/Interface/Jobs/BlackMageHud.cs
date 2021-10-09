@@ -135,13 +135,13 @@ namespace DelvUI.Interface.Jobs
             }
 
             // value
-            config.ValueLabelConfig.SetText($"{player.CurrentMp,0}");
+            config.ValueLabelConfig.SetText($"{player.CurrentMp}");
 
             // element timer
             if (gauge.InAstralFire || gauge.InUmbralIce)
             {
                 var time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000 + 1 : 0;
-                config.ElementTimerLabelConfig.SetText($"{time,0}");
+                config.ElementTimerLabelConfig.SetText($"{time}");
             }
             else
             {
@@ -199,9 +199,9 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            int timer = gauge.IsEnochianActive ? (30000 - gauge.EnochianTimer) / 1000 : 0;
-            Config.EnochianBar.Label.SetText($"{timer,0}");
-            BarUtilities.GetProgressBar(Config.EnochianBar, timer, 30, 0f)
+            int timer = gauge.IsEnochianActive ? (30000 - gauge.EnochianTimer) : 0;
+            Config.EnochianBar.Label.SetText($"{timer / 1000}");
+            BarUtilities.GetProgressBar(Config.EnochianBar, timer, 30000, 0f)
                 .Draw(origin);
         }
 
