@@ -202,6 +202,10 @@ namespace DelvUI.Interface.Jobs
             var config = new DarkKnightConfig();
 
             config.BloodGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.DarksideBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.BloodWeaponBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.DeliriumBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.LivingShadowBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
 
             return config;
         }
@@ -233,14 +237,14 @@ namespace DelvUI.Interface.Jobs
 
         [NestedConfig("Blood Weapon Bar", 45)]
         public ProgressBarConfig BloodWeaponBar = new ProgressBarConfig(
-            new Vector2(64, -32),
+            new Vector2(-64, -32),
             new Vector2(126, 20),
             new PluginConfigColor(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Delirium Bar", 50)]
         public ProgressBarConfig DeliriumBar = new ProgressBarConfig(
-            new Vector2(-64, -32),
+            new Vector2(64, -32),
             new Vector2(126, 20),
             new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
         );
