@@ -14,7 +14,9 @@ namespace DelvUI.Interface.Jobs
 {
     public class MachinistHud : JobHud
     {
-        private readonly float[] _robotDuration = { 12.450f, 13.950f, 15.450f, 16.950f, 18.450f, 19.950f };
+        private bool _robotMaxDurationSet;
+        private float _robotMaxDuration;
+
         private new MachinistConfig Config => (MachinistConfig)_config;
 
         public MachinistHud(string id, MachinistConfig config, string? displayName = null) : base(id, config, displayName)
@@ -93,12 +95,22 @@ namespace DelvUI.Interface.Jobs
                 BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.Battery, 100f, 0f, player, Config.BatteryGauge.BatteryColor).Draw(origin);
             }
 
+            if (!gauge.IsRobotActive && _robotMaxDurationSet)
+            {
+                _robotMaxDurationSet = false;
+            }
             if (gauge.IsRobotActive)
             {
-                float robotDuration = gauge.SummonTimeRemaining / 1000f;                
+                if (!_robotMaxDurationSet)
+                {
+                    _robotMaxDuration = gauge.SummonTimeRemaining / 1000f;
+                    _robotMaxDurationSet = true;
+                }
+
+                float robotDuration = gauge.SummonTimeRemaining / 1000f;
 
                 Config.BatteryGauge.Label.SetText(robotDuration.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.BatteryGauge, robotDuration, gauge.LastSummonBatteryPower, 0f, player, Config.BatteryGauge.RobotColor).Draw(origin);
+                BarUtilities.GetProgressBar(Config.BatteryGauge, robotDuration, _robotMaxDuration, 0f, player, Config.BatteryGauge.RobotColor).Draw(origin);
             }
         }
 
