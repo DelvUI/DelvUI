@@ -1,4 +1,5 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Logging;
+using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using ImGuiNET;
@@ -22,6 +23,7 @@ namespace DelvUI.Interface
 
         private string _displayName;
         protected bool _windowPositionSet = false;
+        private Vector2 _lastWindowPos = Vector2.Zero;
         private Vector2 _positionOffset;
         private Vector2 _contentMargin = new Vector2(4, 0);
 
@@ -42,6 +44,9 @@ namespace DelvUI.Interface
             }
         }
 
+        public bool CanTakeInputForDrag = false;
+        public bool NeedsInputForDrag { get; private set; } = false;
+
         public virtual Vector2 ParentPos() { return Vector2.Zero; } // override
 
         public sealed override void Draw(Vector2 origin)
@@ -55,19 +60,57 @@ namespace DelvUI.Interface
             DrawChildren(origin);
         }
 
+        private bool CalculateNeedsInput(Vector2 pos, Vector2 size, bool selected)
+        {
+            Vector2 mousePos = ImGui.GetMousePos();
+
+            if (ImGui.IsMouseHoveringRect(pos, pos + size))
+            {
+                return true;
+            }
+
+            if (!selected)
+            {
+                return false;
+            }
+
+            var arrowsPos = DraggablesHelper.GetArrowPositions(pos, size);
+
+            foreach (Vector2 arrowPos in arrowsPos)
+            {
+                if (ImGui.IsMouseHoveringRect(arrowPos, arrowPos + DraggablesHelper.ArrowSize))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         protected virtual void DrawDraggableArea(Vector2 origin)
         {
             var windowFlags = ImGuiWindowFlags.NoScrollbar
             | ImGuiWindowFlags.NoTitleBar
             | ImGuiWindowFlags.NoResize
             | ImGuiWindowFlags.NoBackground
-            | ImGuiWindowFlags.NoDecoration
-            | ImGuiWindowFlags.NoFocusOnAppearing;
+            | ImGuiWindowFlags.NoDecoration;
 
+            if (!Selected)
+            {
+                windowFlags |= ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoFocusOnAppearing;
+            }
 
             // always update size
             var size = MaxPos - MinPos + _contentMargin * 2;
             ImGui.SetNextWindowSize(size, ImGuiCond.Always);
+
+            // needs input?
+            NeedsInputForDrag = CanTakeInputForDrag && CalculateNeedsInput(_lastWindowPos, size, Selected);
+
+            if (!NeedsInputForDrag)
+            {
+                windowFlags |= ImGuiWindowFlags.NoMove;
+            }
 
             // set initial position
             if (!_windowPositionSet)
@@ -81,12 +124,13 @@ namespace DelvUI.Interface
             // update config object position
             ImGui.Begin(ID + "_dragArea", windowFlags);
             var windowPos = ImGui.GetWindowPos();
+            _lastWindowPos = windowPos;
             _config.Position = windowPos + _positionOffset - origin;
 
             // check selection
             var tooltipText = "x: " + _config.Position.X.ToString() + "    y: " + _config.Position.Y.ToString();
 
-            if (ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
+            if (NeedsInputForDrag && ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
             {
                 bool cliked = ImGui.IsMouseClicked(ImGuiMouseButton.Left) || ImGui.IsMouseDown(ImGuiMouseButton.Left);
                 if (cliked && !Selected)
@@ -198,7 +242,6 @@ namespace DelvUI.Interface
                 return (Vector2)_maxPos;
             }
         }
-
         public void FlagDraggableAreaDirty()
         {
             _minPos = null;
