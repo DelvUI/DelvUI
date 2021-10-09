@@ -1,32 +1,25 @@
-﻿using Dalamud.Game.ClientState.Structs;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
     public class PaladinHud : JobHud
     {
         private new PaladinConfig Config => (PaladinConfig)_config;
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
-        private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
         public PaladinHud(string id, PaladinConfig config, string? displayName = null) : base(id, config, displayName)
         {
-
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -34,28 +27,34 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new();
             List<Vector2> sizes = new();
 
-            if (Config.ShowManaBar)
+            if (Config.ManaBar.Enabled)
             {
-                positions.Add(Config.Position + Config.ManaBarPosition);
-                sizes.Add(Config.ManaBarSize);
+                positions.Add(Config.Position + Config.ManaBar.Position);
+                sizes.Add(Config.ManaBar.Size);
             }
 
-            if (Config.ShowOathGauge)
+            if (Config.OathGauge.Enabled)
             {
-                positions.Add(Config.Position + Config.OathGaugePosition);
-                sizes.Add(Config.OathGaugeSize);
+                positions.Add(Config.Position + Config.OathGauge.Position);
+                sizes.Add(Config.OathGauge.Size);
             }
 
-            if (Config.ShowBuffBar)
+            if (Config.FightOrFlightBar.Enabled)
             {
-                positions.Add(Config.Position + Config.BuffBarPosition);
-                sizes.Add(Config.BuffBarSize);
+                positions.Add(Config.Position + Config.FightOrFlightBar.Position);
+                sizes.Add(Config.FightOrFlightBar.Size);
             }
 
-            if (Config.ShowAtonementBar)
+            if (Config.RequiescatBar.Enabled)
             {
-                positions.Add(Config.Position + Config.AtonementBarPosition);
-                sizes.Add(Config.AtonementBarSize);
+                positions.Add(Config.Position + Config.RequiescatBar.Position);
+                sizes.Add(Config.RequiescatBar.Size);
+            }
+
+            if (Config.AtonementBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.AtonementBar.Position);
+                sizes.Add(Config.AtonementBar.Size);
             }
 
             return (positions, sizes);
@@ -63,172 +62,101 @@ namespace DelvUI.Interface.Jobs
 
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            if (Config.ShowManaBar)
+            Vector2 pos = origin + Config.Position;
+
+            if (Config.ManaBar.Enabled)
             {
-                DrawManaBar(origin, player);
+                DrawManaBar(pos, player);
             }
 
-            if (Config.ShowOathGauge)
+            if (Config.OathGauge.Enabled)
             {
-                DrawOathGauge(origin);
+                DrawOathGauge(pos);
             }
 
-            if (Config.ShowBuffBar)
+            if (Config.FightOrFlightBar.Enabled)
             {
-                DrawBuffBar(origin, player);
+                DrawFightOrFlightBar(pos, player);
             }
 
-            if (Config.ShowAtonementBar)
+            if (Config.RequiescatBar.Enabled)
             {
-                DrawAtonementBar(origin, player);
+                DrawRequiescatBar(pos, player);
             }
 
-            if (Config.ShowGoringBladeBar)
+            if (Config.AtonementBar.Enabled)
             {
-                DrawDoTBar(origin, player);
+                DrawAtonementBar(pos, player);
+            }
+
+            if (Config.GoringBladeBar.Enabled)
+            {
+                DrawDoTBar(pos, player);
             }
         }
 
         private void DrawManaBar(Vector2 origin, PlayerCharacter player)
         {
-            float posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
-            float posY = origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f;
+            if (Config.ManaBar.HideWhenInactive && player.CurrentMp == player.MaxMp) { return; }
 
-            if (Config.HideManaWhenFull && player.CurrentMp is 10000) { return; }
-
-            BarBuilder builder = BarBuilder.Create(posX, posY, Config.ManaBarSize.Y, Config.ManaBarSize.X).SetBackgroundColor(EmptyColor.Base);
-
-            if (Config.ChunkManaBar)
-            {
-                builder.SetChunks(5).SetChunkPadding(Config.ManaBarPadding).AddInnerBar(player.CurrentMp, player.MaxMp, Config.ManaBarColor, EmptyColor);
-            }
-            else
-            {
-                builder.AddInnerBar(player.CurrentMp, player.MaxMp, Config.ManaBarColor);
-            }
-
-            if (Config.ShowManaBarText)
-            {
-                string formattedManaText = TextTags.GenerateFormattedTextFromTags(player, "[mana:current-short]");
-
-                builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterLeft, BarTextType.Custom, formattedManaText);
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            BarUtilities.GetChunkedProgressBars(Config.ManaBar, 5, player.CurrentMp, player.MaxMp, 0f, player).Draw(origin);
         }
 
         private void DrawOathGauge(Vector2 origin)
         {
             PLDGauge gauge = Plugin.JobGauges.Get<PLDGauge>();
 
-            if (Config.OnlyShowOathGaugeWhenActive && gauge.OathGauge is 0) { return; }
-
-            float xPos = origin.X + Config.Position.X + Config.OathGaugePosition.X - Config.OathGaugeSize.X / 2f;
-            float yPos = origin.Y + Config.Position.Y + Config.OathGaugePosition.Y - Config.OathGaugeSize.Y / 2f;
-
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.OathGaugeSize.Y, Config.OathGaugeSize.X)
-                                           .SetChunks(2)
-                                           .SetChunkPadding(Config.OathGaugePadding)
-                                           .SetBackgroundColor(EmptyColor.Base)
-                                           .AddInnerBar(gauge.OathGauge, 100, Config.OathGaugeColor, PartialFillColor);
-
-            if (Config.ShowOathGaugeText && gauge.OathGauge != 0)
+            if (!Config.OathGauge.HideWhenInactive || gauge.OathGauge > 0)
             {
-                builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                Config.OathGauge.Label.SetText(gauge.OathGauge.ToString("N0"));
+                BarUtilities.GetProgressBar(Config.OathGauge, gauge.OathGauge, 100, 0f).Draw(origin);
             }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
         }
 
-        private void DrawBuffBar(Vector2 origin, PlayerCharacter player)
+        private void DrawFightOrFlightBar(Vector2 origin, PlayerCharacter player)
         {
-            IEnumerable<Status> fightOrFlightBuff = player.StatusList.Where(o => o.StatusId == 76);
-            IEnumerable<Status> requiescatBuff = player.StatusList.Where(o => o.StatusId == 1368);
+            float fightOrFlightDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 76)?.RemainingTime ?? 0f;
 
-            if (Config.OnlyShowBuffBarWhenActive && !requiescatBuff.Any() && !fightOrFlightBuff.Any()) { return; }
-
-            float xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
-            float yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
-
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.BuffBarSize.Y, Config.BuffBarSize.X).SetBackgroundColor(EmptyColor.Base);
-
-            if (fightOrFlightBuff.Any())
+            if (!Config.FightOrFlightBar.HideWhenInactive || fightOrFlightDuration > 0)
             {
-                float fightOrFlightDuration = Math.Abs(fightOrFlightBuff.First().RemainingTime);
-                builder.AddInnerBar(fightOrFlightDuration, 25, Config.FightOrFlightColor);
-
-                if (Config.ShowBuffBarText)
-                {
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.FightOrFlightColor.Base, 0xFF000000, null);
-                }
+                Config.FightOrFlightBar.Label.SetText(Math.Abs(fightOrFlightDuration).ToString("N0"));
+                BarUtilities.GetProgressBar(Config.FightOrFlightBar, fightOrFlightDuration, 25f, 0f, player).Draw(origin);
             }
+        }
 
-            if (requiescatBuff.Any())
+        private void DrawRequiescatBar(Vector2 origin, PlayerCharacter player)
+        {
+            float requiescatDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1368)?.RemainingTime ?? 0f;
+
+            if (!Config.RequiescatBar.HideWhenInactive || requiescatDuration > 0)
             {
-                float requiescatDuration = Math.Abs(requiescatBuff.First().RemainingTime);
-                builder.AddInnerBar(requiescatDuration, 12, Config.RequiescatColor);
-
-                if (Config.ShowBuffBarText)
-                {
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.RequiescatColor.Base, 0xFF000000, null);
-                }
+                Config.RequiescatBar.Label.SetText(Math.Abs(requiescatDuration).ToString("N0"));
+                BarUtilities.GetProgressBar(Config.RequiescatBar, requiescatDuration, 12f, 0f, player).Draw(origin);
             }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
         }
 
         private void DrawAtonementBar(Vector2 origin, PlayerCharacter player)
         {
-            IEnumerable<Status> atonementBuff = player.StatusList.Where(o => o.StatusId == 1902);
-            int stackCount = atonementBuff.Any() ? atonementBuff.First().StackCount : 0;
+            byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId is 1902)?.StackCount ?? 0;
 
-            if (Config.OnlyShowAtonementWhenActive && stackCount is 0) { return; }
+            if (Config.AtonementBar.HideWhenInactive && stackCount == 0) { return; };
 
-            float xPos = origin.X + Config.Position.X + Config.AtonementBarPosition.X - Config.AtonementBarSize.X / 2f;
-            float yPos = origin.Y + Config.Position.Y + Config.AtonementBarPosition.Y - Config.AtonementBarSize.Y / 2f;
-
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.AtonementBarSize.Y, Config.AtonementBarSize.X)
-                                           .SetChunks(3)
-                                           .SetChunkPadding(Config.AtonementBarPadding)
-                                           .SetBackgroundColor(EmptyColor.Base)
-                                           .AddInnerBar(stackCount, 3, Config.AtonementColor, null);
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            BarUtilities.GetChunkedProgressBars(Config.AtonementBar, 3, stackCount, 3f)
+                .Draw(origin);
         }
 
         private void DrawDoTBar(Vector2 origin, PlayerCharacter player)
         {
-            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            if (actor is not BattleChara && Config.HideGoringBladeWhenNoTarget) { return; }
-
-            float duration = 0f;
-
+            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             if (actor is BattleChara target)
             {
-                IEnumerable<Status> goringBlade = target.StatusList.Where(o => o.StatusId is 725 && o.SourceID == player.ObjectId);
-                duration = goringBlade.Any() ? Math.Abs(goringBlade.First().RemainingTime) : 0f;
+                var dotDuration = target.StatusList.FirstOrDefault(o => o.StatusId is 725 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+                if (!Config.GoringBladeBar.HideWhenInactive || dotDuration > 0)
+                {
+                    Config.GoringBladeBar.Label.SetText(Math.Truncate(dotDuration).ToString());
+                    BarUtilities.GetProgressBar(Config.GoringBladeBar, dotDuration, 21f, 0f, player).Draw(origin);
+                }
             }
-
-            if (Config.OnlyShowGoringBladeWhenActive && duration is 0) { return; }
-
-            float xPos = origin.X + Config.Position.X + Config.GoringBladeBarPosition.X - Config.GoringBladeBarSize.X / 2f;
-            float yPos = origin.Y + Config.Position.Y + Config.GoringBladeBarPosition.Y - Config.GoringBladeBarSize.Y / 2f;
-
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.GoringBladeBarSize.Y, Config.GoringBladeBarSize.X)
-                                           .AddInnerBar(duration, 21, Config.GoringBladeColor)
-                                           .SetBackgroundColor(EmptyColor.Base);
-
-            if (Config.ShowGoringBladeBarText)
-            {
-                builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
         }
     }
 
@@ -238,156 +166,67 @@ namespace DelvUI.Interface.Jobs
     public class PaladinConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.PLD;
-        public new static PaladinConfig DefaultConfig() { return new PaladinConfig(); }
 
-        #region mana bar
-        [Checkbox("Mana", separator = true)]
-        [Order(30)]
-        public bool ShowManaBar = true;
+        public new static PaladinConfig DefaultConfig()
+        {
+            var config = new PaladinConfig();
 
-        [Checkbox("Hide When Full" + "##MP")]
-        [Order(31, collapseWith = nameof(ShowManaBar))]
-        public bool HideManaWhenFull = false;
+            config.OathGauge.ThresholdConfig.Enabled = true;
+            config.GoringBladeBar.ThresholdConfig.Enabled = true;
+            config.OathGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.FightOrFlightBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.RequiescatBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.GoringBladeBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
 
-        [Checkbox("Text" + "##MP")]
-        [Order(35, collapseWith = nameof(ShowManaBar))]
-        public bool ShowManaBarText = true;
+            return config;
+        }
 
-        [Checkbox("Split Bar" + "##MP")]
-        [Order(40, collapseWith = nameof(ShowManaBar))]
-        public bool ChunkManaBar = true;
+        [NestedConfig("Mana Bar", 30)]
+        public ChunkedBarConfig ManaBar = new ChunkedBarConfig(
+            new Vector2(0, -76),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(0f / 255f, 203f / 255f, 230f / 255f, 100f / 100f))
+        );
 
-        [DragFloat2("Position" + "##MP", min = -4000f, max = 4000f)]
-        [Order(45, collapseWith = nameof(ShowManaBar))]
-        public Vector2 ManaBarPosition = new(0, -76);
+        [NestedConfig("Oath Gauge", 35)]
+        public ProgressBarConfig OathGauge = new ProgressBarConfig(
+            new Vector2(0, -54),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(24f / 255f, 80f / 255f, 175f / 255f, 100f / 100f)),
+            BarDirection.Right,
+            new PluginConfigColor(new Vector4(180f / 255f, 180f / 255f, 180f / 255f, 100f / 100f)),
+            50
+        );
 
-        [DragFloat2("Size" + "##MP", max = 2000f)]
-        [Order(50, collapseWith = nameof(ShowManaBar))]
-        public Vector2 ManaBarSize = new(254, 20);
+        [NestedConfig("Fight or Flight Bar", 40)]
+        public ProgressBarConfig FightOrFlightBar = new ProgressBarConfig(
+            new Vector2(-64, -32),
+            new Vector2(126, 20),
+            new PluginConfigColor(new Vector4(240f / 255f, 50f / 255f, 0f / 255f, 100f / 100f))
+        );
 
-        [DragInt("Spacing" + "##MP", max = 100)]
-        [Order(55, collapseWith = nameof(ShowManaBar))]
-        public int ManaBarPadding = 2;
+        [NestedConfig("Requiescat Bar", 45)]
+        public ProgressBarConfig RequiescatBar = new ProgressBarConfig(
+            new Vector2(64, -32),
+            new Vector2(126, 20),
+            new PluginConfigColor(new Vector4(61f / 255f, 61f / 255f, 255f / 255f, 100f / 100f))
+        );
 
-        [ColorEdit4("Color" + "##MP")]
-        [Order(60, collapseWith = nameof(ShowManaBar))]
-        public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
-        #endregion
+        [NestedConfig("Atonement Bar", 50)]
+        public ChunkedBarConfig AtonementBar = new ChunkedBarConfig(
+            new Vector2(0, -10),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f))
+        );
 
-        #region oath gauge
-        [Checkbox("Oath Gauge", separator = true)]
-        [Order(65)]
-        public bool ShowOathGauge = true;
-
-        [Checkbox("Only Show When Active" + "##Oath")]
-        [Order(66, collapseWith = nameof(ShowOathGauge))]
-        public bool OnlyShowOathGaugeWhenActive = false;
-
-        [Checkbox("Text" + "##Oath")]
-        [Order(70, collapseWith = nameof(ShowOathGauge))]
-        public bool ShowOathGaugeText = true;
-
-        [DragFloat2("Position" + "##Oath", min = -4000f, max = 4000f)]
-        [Order(75, collapseWith = nameof(ShowOathGauge))]
-        public Vector2 OathGaugePosition = new(0, -54);
-
-        [DragFloat2("Size" + "##Oath", min = -4000f, max = 4000f)]
-        [Order(80, collapseWith = nameof(ShowOathGauge))]
-        public Vector2 OathGaugeSize = new(254, 20);
-
-        [DragInt("Spacing" + "##Oath", max = 100)]
-        [Order(85, collapseWith = nameof(ShowOathGauge))]
-        public int OathGaugePadding = 2;
-
-        [ColorEdit4("Color" + "##Oath")]
-        [Order(90, collapseWith = nameof(ShowOathGauge))]
-        public PluginConfigColor OathGaugeColor = new(new Vector4(24f / 255f, 80f / 255f, 175f / 255f, 100f / 100f));
-        #endregion
-
-        #region buff
-        [Checkbox("Fight or Flight & Requiescat", separator = true)]
-        [Order(95)]
-        public bool ShowBuffBar = true;
-
-        [Checkbox("Only Show When Active" + "##Buff")]
-        [Order(96, collapseWith = nameof(ShowBuffBar))]
-        public bool OnlyShowBuffBarWhenActive = false;
-
-        [Checkbox("Timer" + "##Buff")]
-        [Order(100, collapseWith = nameof(ShowBuffBar))]
-        public bool ShowBuffBarText = true;
-
-        [DragFloat2("Position" + "##Buff", min = -4000f, max = 4000f)]
-        [Order(105, collapseWith = nameof(ShowBuffBar))]
-        public Vector2 BuffBarPosition = new(0, -32);
-
-        [DragFloat2("Size" + "##Buff", min = -4000f, max = 4000f)]
-        [Order(110, collapseWith = nameof(ShowBuffBar))]
-        public Vector2 BuffBarSize = new(254, 20);
-
-        [ColorEdit4("Fight or Flight" + "##Buff")]
-        [Order(115, collapseWith = nameof(ShowBuffBar))]
-        public PluginConfigColor FightOrFlightColor = new(new Vector4(240f / 255f, 50f / 255f, 0f / 255f, 100f / 100f));
-
-        [ColorEdit4("Requiescat" + "##Buff")]
-        [Order(120, collapseWith = nameof(ShowBuffBar))]
-        public PluginConfigColor RequiescatColor = new(new Vector4(61f / 255f, 61f / 255f, 255f / 255f, 100f / 100f));
-        #endregion
-
-        #region atonement
-        [Checkbox("Atonement" + "##Atonement", separator = true)]
-        [Order(125)]
-        public bool ShowAtonementBar = true;
-
-        [Checkbox("Only Show When Active" + "##Atonement")]
-        [Order(126, collapseWith = nameof(ShowAtonementBar))]
-        public bool OnlyShowAtonementWhenActive = false;
-
-        [DragFloat2("Position" + "##Atonement", min = -4000f, max = 4000f)]
-        [Order(130, collapseWith = nameof(ShowAtonementBar))]
-        public Vector2 AtonementBarPosition = new(0, -10);
-
-        [DragFloat2("Size" + "##Atonement", min = -4000f, max = 4000f)]
-        [Order(135, collapseWith = nameof(ShowAtonementBar))]
-        public Vector2 AtonementBarSize = new(254, 20);
-
-        [DragInt("Spacing" + "##Atonement", max = 100)]
-        [Order(140, collapseWith = nameof(ShowAtonementBar))]
-        public int AtonementBarPadding = 2;
-
-        [ColorEdit4("Color" + "##Atonement")]
-        [Order(145, collapseWith = nameof(ShowAtonementBar))]
-        public PluginConfigColor AtonementColor = new(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f));
-        #endregion
-
-        #region goring blade
-        [Checkbox("Goring Blade" + "##GoringBlade", separator = true)]
-        [Order(150)]
-        public bool ShowGoringBladeBar = true;
-
-        [Checkbox("Only Show When Active" + "##GoringBlade")]
-        [Order(151, collapseWith = nameof(ShowGoringBladeBar))]
-        public bool OnlyShowGoringBladeWhenActive = false;
-
-        [Checkbox("Hide When No Target" + "##Darkside")]
-        [Order(152, collapseWith = nameof(ShowGoringBladeBar))]
-        public bool HideGoringBladeWhenNoTarget = true;
-
-        [Checkbox("Timer" + "##GoringBlade")]
-        [Order(155, collapseWith = nameof(ShowGoringBladeBar))]
-        public bool ShowGoringBladeBarText = true;
-
-        [DragFloat2("Position" + "##GoringBlade", min = -4000f, max = 4000f)]
-        [Order(160, collapseWith = nameof(ShowGoringBladeBar))]
-        public Vector2 GoringBladeBarPosition = new(0, -98);
-
-        [DragFloat2("Size" + "##GoringBlade", min = -4000f, max = 4000f)]
-        [Order(165, collapseWith = nameof(ShowGoringBladeBar))]
-        public Vector2 GoringBladeBarSize = new(254, 20);
-
-        [ColorEdit4("Color" + "##GoringBlade")]
-        [Order(170, collapseWith = nameof(ShowGoringBladeBar))]
-        public PluginConfigColor GoringBladeColor = new(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f));
-        #endregion
+        [NestedConfig("Goring Blade Bar", 55)]
+        public ProgressBarConfig GoringBladeBar = new ProgressBarConfig(
+            new(0, -98),
+            new(254, 20),
+            new PluginConfigColor(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f)),
+            BarDirection.Right,
+            new PluginConfigColor(new Vector4(233f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
+            5
+        );
     }
 }
