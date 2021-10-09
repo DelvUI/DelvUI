@@ -43,12 +43,18 @@ namespace DelvUI.Interface.GeneralElements
             DrawHelper.DrawInWindow(ID, pos, size, false, true, (drawList) =>
             {
                 var color = Color(actor);
+                
+                if (Config.ShowShadow)
+                {
+                    DrawHelper.DrawShadowText(text, pos, color.Base, Config.ShadowColor.Base, drawList, Config.ShadowOffset);
+                }
 
                 if (Config.ShowOutline)
                 {
                     DrawHelper.DrawOutlinedText(text, pos, color.Base, Config.OutlineColor.Base, drawList);
                 }
-                else
+                
+                if(!Config.ShowOutline && !Config.ShowShadow)
                 {
                     drawList.AddText(pos, color.Base, text);
                 }

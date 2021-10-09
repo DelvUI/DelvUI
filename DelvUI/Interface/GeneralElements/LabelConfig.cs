@@ -58,8 +58,20 @@ namespace DelvUI.Interface.GeneralElements
         [Order(40, collapseWith = nameof(ShowOutline))]
         public PluginConfigColor OutlineColor = new PluginConfigColor(Vector4.UnitW);
 
-        [Checkbox("Use Job Color")]
+        [Checkbox("Shadow")]
         [Order(45)]
+        public bool ShowShadow = false;
+
+        [ColorEdit4("Color ##Shadow")]
+        [Order(50, collapseWith = nameof(ShowShadow))]
+        public PluginConfigColor ShadowColor = new PluginConfigColor(Vector4.UnitW);
+        
+        [DragInt("Offset ##Shadow")]
+        [Order(55, collapseWith = nameof(ShowShadow))]
+        public int ShadowOffset = 1;
+        
+        [Checkbox("Use Job Color")]
+        [Order(60)]
         public bool UseJobColor = false;
 
         public LabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor)
