@@ -150,10 +150,11 @@ namespace DelvUI.Interface.Party
                 // if party is the same, just update actor references
                 if (!partyChanged)
                 {
+                    
                     foreach (var member in _groupMembers)
                     {
                         var index = member.ObjectId == player.ObjectId ? 0 : member.Order - 1;
-                        member.Update(EnmityForIndex(index), IsLeader(index), JobIdForIndex(index));
+                        member.Update(EnmityForIndex(index), IsLeader(index, player.ObjectId), JobIdForIndex(index));
                     }
                 }
                 // cross world party
@@ -268,7 +269,7 @@ namespace DelvUI.Interface.Party
                 }
 
                 var enmity = EnmityForIndex(isPlayer ? 0 : order - 1);
-                var isPartyLeader = IsLeader(i);
+                var isPartyLeader = IsLeader(i, player.ObjectId);
 
                 var member = isPlayer ?
                     new PartyFramesMember(player, order, enmity, isPartyLeader) :
@@ -379,12 +380,24 @@ namespace DelvUI.Interface.Party
             return enmityLevel;
         }
 
-        private bool IsLeader(int index)
+        private bool IsLeader(int index, uint playerId)
         {
-            var partyLeadIndex = Plugin.PartyList.PartyLeaderIndex;
-            if (partyLeadIndex >= 0 && partyLeadIndex < 8)
+
+            int LPOrder = 0;
+            for (int i = 0; i < Plugin.PartyList.Length-1; i++)
             {
-                return index == partyLeadIndex;
+                if (Plugin.PartyList[i]!.ObjectId == playerId)
+                {
+                    LPOrder = i;
+
+                    break;
+                }
+            }
+
+            var partyLeadIndex = Plugin.PartyList.PartyLeaderIndex == LPOrder ? 0 : index <= LPOrder ? Plugin.PartyList.PartyLeaderIndex +1 :Plugin.PartyList.PartyLeaderIndex;
+            if (partyLeadIndex is >= 0 and < 8)
+            {
+                return index ==partyLeadIndex;
             }
 
             if (PartyListAddon == null)

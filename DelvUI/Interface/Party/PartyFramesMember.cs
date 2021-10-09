@@ -107,7 +107,7 @@ namespace DelvUI.Interface.Party
 
         public FakePartyFramesMember(int order, EnmityLevel enmityLevel, bool isPartyLeader)
         {
-            Order = order;
+            Order = order+1;
             Level = (uint)RNG.Next(1, 80);
             JobId = (uint)RNG.Next(19, 38);
             MaxHP = (uint)RNG.Next(90000, 150000);
