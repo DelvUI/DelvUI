@@ -24,6 +24,7 @@ namespace DelvUI.Interface.Party
         public Character? Character { get; private set; }
 
         public int Order { get; private set; }
+        public int PartyListOrder { get; private set; }
         public string Name => _partyMember != null ? _partyMember.Name.ToString() : (Character != null ? Character.Name.ToString() : _name);
         public uint Level => _partyMember != null ? _partyMember.Level : (Character != null ? Character.Level : (uint)0);
         public uint JobId => _partyMember != null ? _partyMember.ClassJob.Id : (Character != null ? Character.ClassJob.Id : _jobId);
@@ -36,10 +37,11 @@ namespace DelvUI.Interface.Party
         public bool IsPartyLeader { get; private set; } = false;
         public float? RaiseTime { get; set; }
 
-        public PartyFramesMember(PartyMember partyMember, int order, EnmityLevel enmityLevel, bool isPartyLeader)
+        public PartyFramesMember(PartyMember partyMember, int order, int partyListOrder, EnmityLevel enmityLevel, bool isPartyLeader)
         {
             _partyMember = partyMember;
             Order = order;
+            PartyListOrder = partyListOrder;
             EnmityLevel = enmityLevel;
             IsPartyLeader = isPartyLeader;
 
@@ -93,6 +95,7 @@ namespace DelvUI.Interface.Party
         public Character? Character => null;
 
         public int Order { get; private set; }
+        public int PartyListOrder { get; private set; }
         public string Name => "Fake Name";
         public uint Level { get; private set; }
         public uint JobId { get; private set; }
@@ -131,6 +134,7 @@ namespace DelvUI.Interface.Party
         public Character? Character { get; }
 
         public int Order { get; }
+        public int PartyListOrder { get; }
         public string Name { get; }
         public uint Level { get; }
         public uint JobId { get; }

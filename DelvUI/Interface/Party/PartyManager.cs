@@ -152,8 +152,9 @@ namespace DelvUI.Interface.Party
                 {
                     foreach (var member in _groupMembers)
                     {
-                        var index = member.ObjectId == player.ObjectId ? 0 : member.Order - 1;
-                        member.Update(EnmityForIndex(index), IsLeader(index), JobIdForIndex(index));
+                        var partyListIndex = member.PartyListOrder;
+                        var index = member.Order;
+                        member.Update(EnmityForIndex(index), IsLeader(partyListIndex), JobIdForIndex(index));
                     }
                 }
                 // cross world party
@@ -314,7 +315,8 @@ namespace DelvUI.Interface.Party
                 var enmity = EnmityForIndex(isPlayer ? 0 : order - 1);
                 var isPartyLeader = i == Plugin.PartyList.PartyLeaderIndex;
 
-                var member = new PartyFramesMember(partyMember, order, enmity, isPartyLeader);
+                var partyListOrder = i;
+                var member = new PartyFramesMember(partyMember, order, partyListOrder, enmity, isPartyLeader);
                 _groupMembers.Add(member);
 
                 // player's chocobo (always last)
