@@ -61,7 +61,7 @@ namespace DelvUI.Interface.Bars
                 return null;
             }
 
-            config.Label.SetText($"{(int)duration,0}");
+            config.Label.SetText($"{(int)duration}");
             return GetProgressBar(config, duration, maxDuration, 0);
         }
 
@@ -100,7 +100,7 @@ namespace DelvUI.Interface.Bars
             float duration = Math.Abs(status?.RemainingTime ?? 0);
             float maxDuration = maxDurations[index];
 
-            config.Label.SetText($"{(int)duration,0}");
+            config.Label.SetText($"{(int)duration}");
             return GetProgressBar(config, duration, maxDuration, 0);
         }
 

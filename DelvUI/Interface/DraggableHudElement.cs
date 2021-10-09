@@ -95,11 +95,6 @@ namespace DelvUI.Interface
             | ImGuiWindowFlags.NoBackground
             | ImGuiWindowFlags.NoDecoration;
 
-            if (!Selected)
-            {
-                windowFlags |= ImGuiWindowFlags.NoBringToFrontOnFocus | ImGuiWindowFlags.NoFocusOnAppearing;
-            }
-
             // always update size
             var size = MaxPos - MinPos + _contentMargin * 2;
             ImGui.SetNextWindowSize(size, ImGuiCond.Always);

@@ -280,7 +280,7 @@ namespace DelvUI.Interface
 
             if (previousPos != Config.CastBarOriginalPosition)
             {
-                ConfigurationManager.Instance.SaveConfigurations();
+                ConfigurationManager.Instance.SaveConfigurations(true);
             }
 
             if (isVisible != Config.HideDefaultCastbar && !forceVisible)
@@ -309,7 +309,7 @@ namespace DelvUI.Interface
                 if (previousPos != pos || !existed)
                 {
                     Config.JobGaugeOriginalPosition[name] = pos;
-                    ConfigurationManager.Instance.SaveConfigurations();
+                    ConfigurationManager.Instance.SaveConfigurations(true);
                 }
 
                 SetAddonVisible((IntPtr)addon, forceVisible || !Config.HideDefaultJobGauges, Config.JobGaugeOriginalPosition[name]);
