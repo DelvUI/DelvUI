@@ -5,10 +5,8 @@ using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -16,38 +14,36 @@ namespace DelvUI.Interface.Jobs
 {
     public class MachinistHud : JobHud
     {
-        private readonly float[] _robotDuration = { 12.450f, 13.950f, 15.450f, 16.950f, 18.450f, 19.950f };
+        private bool _robotMaxDurationSet;
+        private float _robotMaxDuration;
+
         private new MachinistConfig Config => (MachinistConfig)_config;
 
         public MachinistHud(string id, MachinistConfig config, string? displayName = null) : base(id, config, displayName)
         {
-
         }
-
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
-        private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
             List<Vector2> positions = new List<Vector2>();
             List<Vector2> sizes = new List<Vector2>();
 
-            if (Config.ShowOverheat)
+            if (Config.OverheatGauge.Enabled)
             {
-                positions.Add(Config.Position + Config.OverheatPosition);
-                sizes.Add(Config.OverheatSize);
+                positions.Add(Config.Position + Config.OverheatGauge.Position);
+                sizes.Add(Config.OverheatGauge.Size);
             }
 
-            if (Config.ShowHeatGauge)
+            if (Config.HeatGauge.Enabled)
             {
-                positions.Add(Config.Position + Config.HeatGaugePosition);
-                sizes.Add(Config.HeatGaugeSize);
+                positions.Add(Config.Position + Config.HeatGauge.Position);
+                sizes.Add(Config.HeatGauge.Size);
             }
 
-            if (Config.ShowBatteryGauge)
+            if (Config.BatteryGauge.Enabled)
             {
-                positions.Add(Config.Position + Config.BatteryGaugePosition);
-                sizes.Add(Config.BatteryGaugeSize);
+                positions.Add(Config.Position + Config.BatteryGauge.Position);
+                sizes.Add(Config.BatteryGauge.Size);
             }
 
             return (positions, sizes);
@@ -55,155 +51,90 @@ namespace DelvUI.Interface.Jobs
 
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            if (Config.ShowOverheat)
+            Vector2 pos = origin + Config.Position;
+
+            if (Config.OverheatGauge.Enabled)
             {
-                DrawOverheatBar(origin);
+                DrawOverheatBar(pos);
             }
 
-            if (Config.ShowHeatGauge)
+            if (Config.HeatGauge.Enabled)
             {
-                DrawHeatGauge(origin);
+                DrawHeatGauge(pos);
             }
 
-            if (Config.ShowBatteryGauge)
+            if (Config.BatteryGauge.Enabled)
             {
-                DrawBatteryGauge(origin);
+                DrawBatteryGauge(pos, player);
             }
 
-            if (Config.ShowWildfire)
+            if (Config.WildfireBar.Enabled)
             {
-                DrawWildfireBar(origin, player);
+                DrawWildfireBar(pos, player);
             }
         }
 
         private void DrawHeatGauge(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<MCHGauge>();
+            MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
 
-            if (gauge.Heat == 0 && Config.OnlyShowHeatGaugeWhenActive)
+            if (!Config.HeatGauge.HideWhenInactive || gauge.Heat > 0)
             {
-                return;
+                Config.HeatGauge.Label.SetText(gauge.Heat.ToString("N0"));
+                BarUtilities.GetProgressBar(Config.HeatGauge, gauge.Heat, 100, 0f).Draw(origin);
             }
-
-            var position = origin + Config.Position + Config.HeatGaugePosition - Config.HeatGaugeSize / 2f;
-
-            var builder = BarBuilder.Create(position, Config.HeatGaugeSize)
-                                    .SetChunks(2)
-                                    .SetChunkPadding(Config.HeatGaugePadding)
-                                    .AddInnerBar(gauge.Heat, 100, Config.HeatGaugeFillColor, PartialFillColor);
-
-            if (Config.ShowHeatGaugeText && gauge.Heat != 0)
-            {
-                builder.SetTextMode(BarTextMode.EachChunk)
-                       .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                       .SetBackgroundColor(EmptyColor.Background);
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
         }
 
-        private void DrawBatteryGauge(Vector2 origin)
+        private void DrawBatteryGauge(Vector2 origin, PlayerCharacter player)
         {
-            var gauge = Plugin.JobGauges.Get<MCHGauge>();
+            MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
 
-            var position = origin + Config.Position + Config.BatteryGaugePosition - Config.BatteryGaugeSize / 2f;
-
-            var builder = BarBuilder.Create(position, Config.BatteryGaugeSize)
-                                    .SetChunks(new[] { .5f, .1f, .1f, .1f, .1f, .1f })
-                                    .SetChunkPadding(Config.BatteryGaugePadding)
-                                    .SetBackgroundColor(EmptyColor.Background);
-
-            if (Config.ShowBatteryGaugeBattery)
+            if ((!Config.BatteryGauge.HideWhenInactive || gauge.Battery > 0) && !gauge.IsRobotActive)
             {
-                builder.AddInnerBar(gauge.Battery, 100, Config.BatteryFillColor, PartialFillColor);
+                Config.BatteryGauge.Label.SetText(gauge.Battery.ToString("N0"));
+                BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.Battery, 100f, 0f, player, Config.BatteryGauge.BatteryColor).Draw(origin);
+            }
 
-                if (Config.ShowBatteryGaugeBatteryText && gauge.Battery != 0)
+            if (!gauge.IsRobotActive && _robotMaxDurationSet)
+            {
+                _robotMaxDurationSet = false;
+            }
+            if (gauge.IsRobotActive)
+            {
+                if (!_robotMaxDurationSet)
                 {
-                    builder.SetTextMode(BarTextMode.Single)
-                           .SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.BatteryFillColor.Base, 0xFF000000, null);
+                    _robotMaxDuration = gauge.SummonTimeRemaining / 1000f;
+                    _robotMaxDurationSet = true;
                 }
+
+                float robotDuration = gauge.SummonTimeRemaining / 1000f;
+
+                Config.BatteryGauge.Label.SetText(robotDuration.ToString("N0"));
+                BarUtilities.GetProgressBar(Config.BatteryGauge, robotDuration, _robotMaxDuration, 0f, player, Config.BatteryGauge.RobotColor).Draw(origin);
             }
-
-            if (gauge.IsRobotActive && Config.ShowBatteryGaugeRobotDuration)
-            {
-                builder.AddInnerBar(gauge.SummonTimeRemaining / 1000f, _robotDuration[gauge.LastSummonBatteryPower / 10 - 5], Config.RobotFillColor, null);
-
-                if (Config.ShowBatteryGaugeRobotDurationText && gauge.SummonTimeRemaining != 0)
-                {
-                    builder.SetTextMode(BarTextMode.Single)
-                           .SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.RobotFillColor.Base, 0xFF000000, null);
-                }
-            }
-
-            if (gauge.Battery == 0 && gauge.SummonTimeRemaining == 0 && Config.OnlyShowBatteryGaugeWhenActive)
-            {
-                return;
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            var bar = builder.Build();
-            bar.Draw(drawList);
         }
 
         private void DrawOverheatBar(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<MCHGauge>();
+            MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
+            float overheatDuration = gauge.OverheatTimeRemaining / 1000f;
 
-            if (!gauge.IsOverheated && Config.OnlyShowOverheatWhenActive)
+            if (!Config.OverheatGauge.HideWhenInactive || gauge.IsOverheated)
             {
-                return;
+                Config.OverheatGauge.Label.SetText(overheatDuration.ToString("N0"));
+                BarUtilities.GetProgressBar(Config.OverheatGauge, overheatDuration, 8f, 0f).Draw(origin);
             }
-
-            var position = origin + Config.Position + Config.OverheatPosition - Config.OverheatSize / 2f;
-
-            var builder = BarBuilder.Create(position, Config.OverheatSize)
-                .SetBackgroundColor(EmptyColor.Background);
-
-            if (gauge.IsOverheated)
-            {
-                builder.AddInnerBar(gauge.OverheatTimeRemaining / 1000f, 8, Config.OverheatFillColor, null);
-
-                if (Config.ShowOverheatText)
-                {
-                    builder.SetTextMode(BarTextMode.EachChunk)
-                           .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                }
-            }
-
-            var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
         }
 
         private void DrawWildfireBar(Vector2 origin, PlayerCharacter player)
         {
-            var wildfireBuff = player.StatusList.Where(o => o.StatusId == 1946);
-            float duration = 0f;
+            float wildfireDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1946)?.RemainingTime ?? 0f;
 
-            var position = origin + Config.Position + Config.WildfirePosition - Config.WildfireSize / 2f;
-
-            var builder = BarBuilder.Create(position, Config.WildfireSize).SetBackgroundColor(EmptyColor.Background);
-
-            if (wildfireBuff.Any())
+            if (!Config.WildfireBar.HideWhenInactive || wildfireDuration > 0)
             {
-                duration = wildfireBuff.First().RemainingTime;
-
-                builder.AddInnerBar(duration, 10, Config.WildfireFillColor, null);
-
-                if (Config.ShowWildfireText)
-                {
-                    builder.SetTextMode(BarTextMode.EachChunk)
-                           .SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                }
+                Config.WildfireBar.Label.SetText(wildfireDuration.ToString("N0"));
+                BarUtilities.GetProgressBar(Config.WildfireBar, wildfireDuration, 10, 0f).Draw(origin);
             }
-
-            if (duration == 0 && Config.OnlyShowWildfireWhenActive)
-            {
-                return;
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
         }
     }
 
@@ -213,134 +144,68 @@ namespace DelvUI.Interface.Jobs
     public class MachinistConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.MCH;
-        public new static MachinistConfig DefaultConfig() { return new MachinistConfig(); }
+        public new static MachinistConfig DefaultConfig()
+        {
+            var config = new MachinistConfig();
 
-        #region Overheat
-        [Checkbox("Overheat", separator = true)]
-        [Order(30)]
-        public bool ShowOverheat = true;
+            config.HeatGauge.ThresholdConfig.Enabled = true;
+            config.HeatGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.OverheatGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.BatteryGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.WildfireBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
 
-        [Checkbox("Only Show When Active" + "##Overheat")]
-        [Order(31, collapseWith = nameof(ShowOverheat))]
-        public bool OnlyShowOverheatWhenActive = false;
+            return config;
+        }
 
-        [Checkbox("Text" + "##Overheat")]
-        [Order(35, collapseWith = nameof(ShowOverheat))]
-        public bool ShowOverheatText = true;
+        [NestedConfig("Overheat Gauge", 30)]
+        public ProgressBarConfig OverheatGauge = new ProgressBarConfig(
+            new Vector2(0, -54),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(255f / 255f, 239f / 255f, 14f / 255f, 100f / 100f))
+        );
 
-        [DragFloat2("Position" + "##Overheat", min = -4000f, max = 4000f)]
-        [Order(40, collapseWith = nameof(ShowOverheat))]
-        public Vector2 OverheatPosition = new(0, -54);
+        [NestedConfig("Heat Gauge", 35)]
+        public ProgressBarConfig HeatGauge = new ProgressBarConfig(
+            new Vector2(0, -32),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(201f / 255f, 13f / 255f, 13f / 255f, 100f / 100f)),
+            BarDirection.Right,
+            new PluginConfigColor(new Vector4(180f / 255f, 180f / 255f, 180f / 255f, 100f / 100f)),
+            50
+        );
 
-        [DragFloat2("Size" + "##Overheat", min = 0, max = 4000f)]
-        [Order(45, collapseWith = nameof(ShowOverheat))]
-        public Vector2 OverheatSize = new(254, 20);
+        [NestedConfig("Battery Gauge", 40)]
+        public BatteryGaugeConfig BatteryGauge = new BatteryGaugeConfig(
+            new Vector2(0, -10),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(0, 0, 0, 0))
+        );
 
-        [ColorEdit4("Color" + "##Overheat")]
-        [Order(50, collapseWith = nameof(ShowOverheat))]
-        public PluginConfigColor OverheatFillColor = new(new Vector4(255f / 255f, 239f / 255f, 14f / 255f, 100f / 100f));
-        #endregion
-
-        #region Heat Gauge
-        [Checkbox("Show Heat Gauge", separator = true)]
-        [Order(55)]
-        public bool ShowHeatGauge = true;
-
-        [Checkbox("Only Show When Active" + "##HeatGauge")]
-        [Order(56, collapseWith = nameof(ShowHeatGauge))]
-        public bool OnlyShowHeatGaugeWhenActive = false;
-
-        [Checkbox("Text" + "##HeatGauge")]
-        [Order(60, collapseWith = nameof(ShowHeatGauge))]
-        public bool ShowHeatGaugeText = true;
-
-        [DragFloat2("Position" + "##HeatGauge", min = -4000f, max = 4000f)]
-        [Order(65, collapseWith = nameof(ShowHeatGauge))]
-        public Vector2 HeatGaugePosition = new(0, -32);
-
-        [DragFloat2("Size" + "##HeatGauge", min = 0, max = 4000f)]
-        [Order(70, collapseWith = nameof(ShowHeatGauge))]
-        public Vector2 HeatGaugeSize = new(254, 20);
-
-        [DragInt("Spacing" + "##HeatGauge", min = 0)]
-        [Order(75, collapseWith = nameof(ShowHeatGauge))]
-        public int HeatGaugePadding = 2;
-
-        [ColorEdit4("Color" + "##HeatGauge")]
-        [Order(80, collapseWith = nameof(ShowHeatGauge))]
-        public PluginConfigColor HeatGaugeFillColor = new(new Vector4(201f / 255f, 13f / 255f, 13f / 255f, 100f / 100f));
-        #endregion
-
-        #region Battery Gauge
-        [Checkbox("Battery", separator = true)]
-        [Order(85)]
-        public bool ShowBatteryGauge = true;
-
-        [Checkbox("Only Show When Active" + "##BatteryGauge")]
-        [Order(86, collapseWith = nameof(ShowBatteryGauge))]
-        public bool OnlyShowBatteryGaugeWhenActive = false;
-
-        [Checkbox("Battery" + "##BatteryGauge")]
-        [Order(90, collapseWith = nameof(ShowBatteryGauge))]
-        public bool ShowBatteryGaugeBattery = true;
-
-        [Checkbox("Text" + "##BatteryGauge")]
-        [Order(95, collapseWith = nameof(ShowBatteryGaugeBattery))]
-        public bool ShowBatteryGaugeBatteryText = false;
-
-        [Checkbox("Robot" + "##BatteryGauge")]
-        [Order(100, collapseWith = nameof(ShowBatteryGauge))]
-        public bool ShowBatteryGaugeRobotDuration = true;
-
-        [Checkbox("Timer" + "##Robot")]
-        [Order(105, collapseWith = nameof(ShowBatteryGaugeRobotDuration))]
-        public bool ShowBatteryGaugeRobotDurationText = true;
-
-        [DragFloat2("Position" + "##BatteryGauge", min = -4000f, max = 4000f)]
-        [Order(110, collapseWith = nameof(ShowBatteryGauge))]
-        public Vector2 BatteryGaugePosition = new(0, -10);
-
-        [DragFloat2("Size" + "##BatteryGauge", min = 0, max = 4000f)]
-        [Order(115, collapseWith = nameof(ShowBatteryGauge))]
-        public Vector2 BatteryGaugeSize = new(254, 20);
-
-        [DragInt("Spacing" + "##BatteryGauge", min = 0)]
-        [Order(120, collapseWith = nameof(ShowBatteryGauge))]
-        public int BatteryGaugePadding = 2;
-
-        [ColorEdit4("Battery" + "##BatteryGauge")]
-        [Order(125, collapseWith = nameof(ShowBatteryGauge))]
-        public PluginConfigColor BatteryFillColor = new(new Vector4(106f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
-
-        [ColorEdit4("Robot" + "##BatteryGauge")]
-        [Order(130, collapseWith = nameof(ShowBatteryGauge))]
-        public PluginConfigColor RobotFillColor = new(new Vector4(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
-        #endregion
-
-        #region Wildfire
-        [Checkbox("Wildfire", separator = true)]
-        [Order(135)]
-        public bool ShowWildfire = false;
-
-        [Checkbox("Only Show When Active" + "##Wildfire")]
-        [Order(136, collapseWith = nameof(ShowWildfire))]
-        public bool OnlyShowWildfireWhenActive = false;
-
-        [Checkbox("Text" + "##Wildfire")]
-        [Order(140, collapseWith = nameof(ShowWildfire))]
-        public bool ShowWildfireText = true;
-
-        [DragFloat2("Position" + "##Wildfire", min = -4000f, max = 4000f)]
-        [Order(145, collapseWith = nameof(ShowWildfire))]
-        public Vector2 WildfirePosition = new(0, -76);
-
-        [DragFloat2("Size" + "##Wildfire", min = 0, max = 4000f)]
-        [Order(150, collapseWith = nameof(ShowWildfire))]
-        public Vector2 WildfireSize = new(254, 20);
-
-        [ColorEdit4("Color" + "##Wildfire")]
-        [Order(155, collapseWith = nameof(ShowWildfire))]
-        public PluginConfigColor WildfireFillColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
-        #endregion
+        [NestedConfig("Wildfire Bar", 50)]
+        public ProgressBarConfig WildfireBar = new ProgressBarConfig(
+            new Vector2(0, -76),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f)),
+            BarDirection.Right,
+            new PluginConfigColor(new Vector4(180f / 255f, 180f / 255f, 180f / 255f, 100f / 100f)),
+            50
+        );
     }
+
+    [Exportable(false)]
+    public class BatteryGaugeConfig : ProgressBarConfig
+    {
+        [ColorEdit4("Battery Color", spacing = true)]
+        [Order(55)]
+        public PluginConfigColor BatteryColor = new(new Vector4(106f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+
+        [ColorEdit4("Robot Color")]
+        [Order(60)]
+        public PluginConfigColor RobotColor = new(new Vector4(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
+
+        public BatteryGaugeConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
+        {
+        }
+    }
+
 }
