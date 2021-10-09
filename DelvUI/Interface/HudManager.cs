@@ -19,7 +19,7 @@ namespace DelvUI.Interface
         private readonly Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
 
         private GridConfig? _gridConfig;
-        private HideHudConfig? _hudOptions;
+        private HUDOptionsConfig? _hudOptions;
         private DraggableHudElement? _selectedElement = null;
 
         private List<DraggableHudElement> _hudElements = null!;
@@ -128,7 +128,7 @@ namespace DelvUI.Interface
         private void CreateHudElements()
         {
             _gridConfig = ConfigurationManager.Instance.GetConfigObject<GridConfig>();
-            _hudOptions = ConfigurationManager.Instance.GetConfigObject<HideHudConfig>();
+            _hudOptions = ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>();
 
             _hudElements = new List<DraggableHudElement>();
             _hudElementsUsingPlayer = new List<IHudElementWithActor>();
@@ -280,7 +280,7 @@ namespace DelvUI.Interface
             var expBarHud = new ExperienceBarHud(expBarConfig, "Experience Bar");
             _hudElements.Add(expBarHud);
             _hudElementsUsingPlayer.Add(expBarHud);
-            
+
             //pull timer
             var pullTimerConfig = ConfigurationManager.Instance.GetConfigObject<PullTimerConfig>();
             var pullTimerHud = new PullTimerHud(pullTimerConfig, "Pull Timer");
@@ -357,7 +357,7 @@ namespace DelvUI.Interface
             // grid
             if (_gridConfig is not null && _gridConfig.Enabled)
             {
-                DraggablesHelper.DrawGrid(_gridConfig, _selectedElement?.GetConfig());
+                DraggablesHelper.DrawGrid(_gridConfig, _hudOptions, _selectedElement);
             }
 
             bool isHudLocked = ConfigurationManager.Instance.LockHUD;

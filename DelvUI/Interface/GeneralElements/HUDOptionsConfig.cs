@@ -6,11 +6,9 @@ using System.Numerics;
 namespace DelvUI.Interface.GeneralElements
 {
     [Disableable(false)]
-    [Exportable(false)]
-    [Shareable(false)]
     [Section("Misc")]
     [SubSection("HUD Options", 0)]
-    public class HideHudConfig : PluginConfigObject
+    public class HUDOptionsConfig : PluginConfigObject
     {
         [Checkbox("Global HUD Position")]
         [Order(5)]
@@ -51,6 +49,6 @@ namespace DelvUI.Interface.GeneralElements
         public Vector2 CastBarOriginalPosition;
         public Dictionary<string, Vector2> JobGaugeOriginalPosition = new Dictionary<string, Vector2>();
 
-        public new static HideHudConfig DefaultConfig() { return new HideHudConfig(); }
+        public new static HUDOptionsConfig DefaultConfig() { return new HUDOptionsConfig(); }
     }
 }
