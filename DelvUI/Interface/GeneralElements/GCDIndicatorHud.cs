@@ -15,7 +15,7 @@ namespace DelvUI.Interface.GeneralElements
         private GCDIndicatorConfig Config => (GCDIndicatorConfig)_config;
         public GameObject? Actor { get; set; } = null;
 
-        public GCDIndicatorHud(string ID, GCDIndicatorConfig config, string displayName) : base(ID, config, displayName) { }
+        public GCDIndicatorHud(GCDIndicatorConfig config, string displayName) : base(config, displayName) { }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {

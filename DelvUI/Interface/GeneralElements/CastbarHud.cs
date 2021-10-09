@@ -25,10 +25,10 @@ namespace DelvUI.Interface.GeneralElements
         protected override bool AnchorToParent => Config is UnitFrameCastbarConfig config ? config.AnchorToUnitFrame : false;
         protected override DrawAnchor ParentAnchor => Config is UnitFrameCastbarConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
 
-        public CastbarHud(string id, CastbarConfig config, string displayName) : base(id, config, displayName)
+        public CastbarHud(CastbarConfig config, string displayName) : base(config, displayName)
         {
-            _castNameLabel = new LabelHud(id + "_castNameLabel", config.CastNameConfig);
-            _castTimeLabel = new LabelHud(id + "_castTimeLabel", config.CastTimeConfig);
+            _castNameLabel = new LabelHud(config.CastNameConfig);
+            _castTimeLabel = new LabelHud(config.CastTimeConfig);
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -150,7 +150,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private PlayerCastbarConfig Config => (PlayerCastbarConfig)_config;
 
-        public PlayerCastbarHud(string id, PlayerCastbarConfig config, string displayName) : base(id, config, displayName)
+        public PlayerCastbarHud(PlayerCastbarConfig config, string displayName) : base(config, displayName)
         {
 
         }
@@ -189,7 +189,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private TargetCastbarConfig Config => (TargetCastbarConfig)_config;
 
-        public TargetCastbarHud(string id, TargetCastbarConfig config, string displayName) : base(id, config, displayName)
+        public TargetCastbarHud(TargetCastbarConfig config, string displayName) : base(config, displayName)
         {
 
         }

@@ -31,12 +31,12 @@ namespace DelvUI.Interface.StatusEffects
         protected override bool AnchorToParent => Config is UnitFrameStatusEffectsListConfig config ? config.AnchorToUnitFrame : false;
         protected override DrawAnchor ParentAnchor => Config is UnitFrameStatusEffectsListConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
 
-        public StatusEffectsListHud(string id, StatusEffectsListConfig config, string displayName) : base(id, config, displayName)
+        public StatusEffectsListHud(StatusEffectsListConfig config, string displayName) : base(config, displayName)
         {
             _config.ValueChangeEvent += OnConfigPropertyChanged;
 
-            _durationLabel = new LabelHud(id + "_duration", config.IconConfig.DurationLabelConfig);
-            _stacksLabel = new LabelHud(id + "_stacks", config.IconConfig.StacksLabelConfig);
+            _durationLabel = new LabelHud(config.IconConfig.DurationLabelConfig);
+            _stacksLabel = new LabelHud(config.IconConfig.StacksLabelConfig);
 
             UpdatePreview();
         }

@@ -25,7 +25,7 @@ namespace DelvUI.Interface.Jobs
         private new SummonerConfig Config => (SummonerConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public SummonerHud(string id, SummonerConfig config, string? displayName = null) : base(id, config, displayName)
+        public SummonerHud(SummonerConfig config, string? displayName = null) : base(config, displayName)
         {
 
         }

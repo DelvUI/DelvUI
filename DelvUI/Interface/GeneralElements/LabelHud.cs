@@ -10,9 +10,8 @@ namespace DelvUI.Interface.GeneralElements
     {
         private LabelConfig Config => (LabelConfig)_config;
 
-        public LabelHud(string id, LabelConfig config) : base(id, config)
+        public LabelHud(LabelConfig config) : base(config)
         {
-
         }
 
         public override void Draw(Vector2 origin)

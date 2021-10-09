@@ -18,7 +18,7 @@ namespace DelvUI.Interface.Jobs
         private new BlackMageConfig Config => (BlackMageConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public BlackMageHud(string id, BlackMageConfig config, string? displayName = null) : base(id, config, displayName)
+        public BlackMageHud(BlackMageConfig config, string? displayName = null) : base(config, displayName)
         {
 
         }

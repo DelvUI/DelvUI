@@ -25,7 +25,7 @@ namespace DelvUI.Interface.Jobs
         private new AstrologianConfig Config => (AstrologianConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public AstrologianHud(string id, AstrologianConfig config, string? displayName = null) : base(id, config, displayName)
+        public AstrologianHud(AstrologianConfig config, string? displayName = null) : base(config, displayName)
         {
         }
 

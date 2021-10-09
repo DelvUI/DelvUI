@@ -20,7 +20,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new NinjaConfig Config => (NinjaConfig)_config;
 
-        public NinjaHud(string id, NinjaConfig config, string? displayName = null) : base(id, config, displayName) { }
+        public NinjaHud(NinjaConfig config, string? displayName = null) : base(config, displayName) { }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {

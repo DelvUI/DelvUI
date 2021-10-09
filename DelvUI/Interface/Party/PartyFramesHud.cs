@@ -33,7 +33,7 @@ namespace DelvUI.Interface.Party
         private readonly List<PartyFramesBar> bars;
 
 
-        public PartyFramesHud(string id, PartyFramesConfig config, string displayName) : base(id, config, displayName)
+        public PartyFramesHud(PartyFramesConfig config, string displayName) : base(config, displayName)
         {
             _healthBarsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesHealthBarsConfig>();
             _raiseTrackerConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesRaiseTrackerConfig>();

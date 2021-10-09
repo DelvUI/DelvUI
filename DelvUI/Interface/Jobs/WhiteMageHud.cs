@@ -16,7 +16,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new WhiteMageConfig Config => (WhiteMageConfig)_config;
 
-        public WhiteMageHud(string id, WhiteMageConfig config, string? displayName = null) : base(id, config, displayName)
+        public WhiteMageHud(WhiteMageConfig config, string? displayName = null) : base(config, displayName)
         {
         }
 

@@ -15,7 +15,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new GunbreakerConfig Config => (GunbreakerConfig)_config;
 
-        public GunbreakerHud(string id, GunbreakerConfig config, string? displayName = null) : base(id, config, displayName) { }
+        public GunbreakerHud(GunbreakerConfig config, string? displayName = null) : base(config, displayName) { }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
