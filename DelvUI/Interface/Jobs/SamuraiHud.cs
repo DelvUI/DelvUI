@@ -215,8 +215,7 @@ namespace DelvUI.Interface.Jobs
             new(254, 20),
             new PluginConfigColor(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f))
         );
-
-
+        
         [NestedConfig("Higanbana Bar", 60)]
         public ProgressBarConfig HiganbanaBar = new ProgressBarConfig(
             new(0, -78),
@@ -235,6 +234,7 @@ namespace DelvUI.Interface.Jobs
         );
     }
 
+    [Exportable(false)]
     public class SenBarConfig : ChunkedBarConfig
     {
         [ColorEdit4("Setsu", spacing = true)]
