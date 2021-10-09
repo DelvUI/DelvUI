@@ -57,9 +57,9 @@ namespace DelvUI.Helpers
              Part of atkValueChangeType disassembly signature
             .text:00007FF647D8B7B4 E8 67 4B 40 00    call    Component__GUI__AtkValue_ChangeType
             .text:00007FF647D8B7B9 45 84 F6          test    r14b, r14b
-                                                                 .text:00007FF647D8B7BC 48 8D 4C 24 50    lea     rcx, [rsp+78h+var_28]
+            .text:00007FF647D8B7BC 48 8D 4C 24 50    lea     rcx, [rsp+78h+var_28]
             .text:00007FF647D8B7C1 8B D7             mov     edx, edi
-                                                                 .text:00007FF647D8B7C3 0F 94 C3          setz    bl
+            .text:00007FF647D8B7C3 0F 94 C3          setz    bl
             .text:00007FF647D8B7C6 88 5C 24 48       mov     [rsp+78h+var_30], bl
             */
             IntPtr atkValueChangeTypeAddress =
