@@ -22,6 +22,17 @@ namespace DelvUI.Interface.GeneralElements
         public UnitFrameHud(UnitFrameConfig config, string displayName) : base(config, displayName)
         { 
             // interaction stuff
+            
+            /*
+             Part of openContextMenuFromTarget disassembly signature
+            .text:00007FF648523940                   Client__UI__Agent__AgentHUD_OpenContextMenuFromTarget proc near
+            .text:00007FF648523940
+            .text:00007FF648523940                   arg_0= qword ptr  8
+            .text:00007FF648523940                   arg_8= qword ptr  10h
+            .text:00007FF648523940
+            .text:00007FF648523940 48 85 D2          test    rdx, rdx
+            .text:00007FF648523943 74 7F             jz      short locret_7FF6485239C4
+            */
             _openContextMenuFromTarget =
                 Marshal.GetDelegateForFunctionPointer<OpenContextMenuFromTarget>(Plugin.SigScanner.ScanText("48 85 D2 74 7F 48 89 5C 24"));
         }
