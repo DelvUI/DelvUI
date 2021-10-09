@@ -14,7 +14,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         [Checkbox("Global HUD Position")]
         [Order(5)]
-        public bool UseGlobalHudShift = true;
+        public bool UseGlobalHudShift = false;
 
         [DragInt2("Position", min = -4000, max = 4000)]
         [Order(80, collapseWith = nameof(UseGlobalHudShift))]

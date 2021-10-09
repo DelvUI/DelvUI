@@ -340,7 +340,7 @@ namespace DelvUI.Interface
             AssignActors();
 
             var origin = _origin;
-            if (_hudOptions is not null && _hudOptions.UseGlobalHudShift)
+            if (_hudOptions is { UseGlobalHudShift: true })
             {
                 origin += _hudOptions.HudOffset;
             }
