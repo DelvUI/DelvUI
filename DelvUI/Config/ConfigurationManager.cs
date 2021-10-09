@@ -398,7 +398,7 @@ namespace DelvUI.Config
             typeof(MiscColorConfig),
 
             typeof(FontsConfig),
-            typeof(HideHudConfig),
+            typeof(HUDOptionsConfig),
             typeof(TooltipsConfig),
             typeof(ExperienceBarConfig),
             typeof(GCDIndicatorConfig),

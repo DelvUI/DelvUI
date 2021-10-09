@@ -1,4 +1,5 @@
 ﻿using DelvUI.Config;
+using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
@@ -8,7 +9,7 @@ namespace DelvUI.Helpers
 {
     public static class DraggablesHelper
     {
-        public static void DrawGrid(GridConfig config, MovablePluginConfigObject? selectedElementConfig)
+        public static void DrawGrid(GridConfig config, HUDOptionsConfig? hudConfig, DraggableHudElement? selectedElement)
         {
             ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
@@ -20,13 +21,15 @@ namespace DelvUI.Helpers
               | ImGuiWindowFlags.NoScrollbar
               | ImGuiWindowFlags.AlwaysAutoResize
               | ImGuiWindowFlags.NoInputs
-              | ImGuiWindowFlags.NoBringToFrontOnFocus
               | ImGuiWindowFlags.NoDecoration
+              | ImGuiWindowFlags.NoBringToFrontOnFocus
+              | ImGuiWindowFlags.NoFocusOnAppearing
             );
 
-            var drawList = ImGui.GetWindowDrawList();
-            var screenSize = ImGui.GetMainViewport().Size;
-            var center = screenSize / 2f;
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            Vector2 screenSize = ImGui.GetMainViewport().Size;
+            Vector2 offset = hudConfig != null && hudConfig.UseGlobalHudShift ? hudConfig.HudOffset : Vector2.Zero;
+            Vector2 center = screenSize / 2f + offset;
 
             // grid
             if (config.ShowGrid)
@@ -66,14 +69,15 @@ namespace DelvUI.Helpers
                 drawList.AddLine(new Vector2(0, center.Y), new Vector2(screenSize.X, center.Y), 0xAAFFFFFF);
             }
 
-            // anchor
-            if (config.ShowAnchorPoints && selectedElementConfig != null)
+            if (config.ShowAnchorPoints && selectedElement != null)
             {
-                var anchorPos = center + selectedElementConfig.Position;
-                drawList.AddLine(center, anchorPos, 0xAAFFFFFF, 2);
+                Vector2 parentAnchorPos = center + selectedElement.ParentPos();
+                Vector2 anchorPos = parentAnchorPos + selectedElement.GetConfig().Position;
+
+                drawList.AddLine(parentAnchorPos, anchorPos, 0xAA0000FF, 2);
 
                 var anchorSize = new Vector2(10, 10);
-                drawList.AddRectFilled(anchorPos - anchorSize / 2f, anchorPos + anchorSize / 2f, 0xAAFFFFFF);
+                drawList.AddRectFilled(anchorPos - anchorSize / 2f, anchorPos + anchorSize / 2f, 0xAA0000FF);
             }
 
             ImGui.End();
