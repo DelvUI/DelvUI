@@ -44,12 +44,6 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.BatteryGauge.Size);
             }
 
-            if (Config.RobotGauge.Enabled)
-            {
-                positions.Add(Config.Position + Config.RobotGauge.Position);
-                sizes.Add(Config.RobotGauge.Size);
-            }
-
             return (positions, sizes);
         }
 
@@ -70,11 +64,6 @@ namespace DelvUI.Interface.Jobs
             if (Config.BatteryGauge.Enabled)
             {
                 DrawBatteryGauge(pos);
-            }
-
-            if (Config.RobotGauge.Enabled)
-            {
-                DrawRobotGauge(pos);
             }
 
             if (Config.WildfireBar.Enabled)
@@ -98,22 +87,18 @@ namespace DelvUI.Interface.Jobs
         {
             MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
 
-            if (!Config.BatteryGauge.HideWhenInactive || gauge.Battery > 0)
+            if ((!Config.BatteryGauge.HideWhenInactive || gauge.Battery > 0) && gauge.SummonTimeRemaining is 0)
             {
                 Config.BatteryGauge.Label.SetText(gauge.Battery.ToString("N0"));
                 BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.Battery, 100f, 0f).Draw(origin);
             }
-        }
 
-        private void DrawRobotGauge(Vector2 origin)
-        {
-            MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
-
-            float robotDuration = gauge.SummonTimeRemaining / 1000f;
-
-            if (!Config.RobotGauge.HideWhenInactive || gauge.IsRobotActive)
+            if (gauge.IsRobotActive)
             {
-                BarUtilities.GetChunkedProgressBars(Config.RobotGauge, 5, robotDuration, gauge.IsRobotActive ? _robotDuration[gauge.LastSummonBatteryPower / 10 - 5] : 0f, 0f).Draw(origin);
+                float robotDuration = gauge.SummonTimeRemaining / 1000f;
+
+                Config.BatteryGauge.Label.SetText(robotDuration.ToString("N0"));
+                BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.SummonTimeRemaining, _robotDuration[gauge.LastSummonBatteryPower / 10 - 5], 0f).Draw(origin);
             }
         }
 
@@ -178,20 +163,10 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Battery Gauge", 40)]
-        public ProgressBarConfig BatteryGauge = new ProgressBarConfig(
-            new Vector2(-64, -10),
-            new Vector2(126, 20),
-            new PluginConfigColor(new Vector4(106f / 255f, 255f / 255f, 255f / 255f, 100f / 100f)),
-            BarDirection.Right,
-            new PluginConfigColor(new Vector4(180f / 255f, 180f / 255f, 180f / 255f, 100f / 100f)),
-            50
-        );
-
-        [NestedConfig("Robot Gauge", 45)]
-        public ChunkedProgressBarConfig RobotGauge = new ChunkedProgressBarConfig(
-            new Vector2(64, -10),
-            new Vector2(126, 20),
-            new PluginConfigColor(new Vector4(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f))
+        public BatteryGaugeConfig BatteryGauge = new BatteryGaugeConfig(
+            new Vector2(0, -10),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(0, 0, 0, 0))
         );
 
         [NestedConfig("Wildfire Bar", 50)]
@@ -204,4 +179,21 @@ namespace DelvUI.Interface.Jobs
             50
         );
     }
+
+    [Exportable(false)]
+    public class BatteryGaugeConfig : ProgressBarConfig
+    {
+        [ColorEdit4("Battery Color", spacing = true)]
+        [Order(55)]
+        public PluginConfigColor StormsEyeColor = new(new Vector4(106f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+
+        [ColorEdit4("Robot Color")]
+        [Order(60)]
+        public PluginConfigColor InnerReleaseColor = new(new Vector4(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
+
+        public BatteryGaugeConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
+        {
+        }
+    }
+
 }
