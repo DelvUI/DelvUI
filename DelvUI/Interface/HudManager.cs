@@ -280,7 +280,7 @@ namespace DelvUI.Interface
             var expBarHud = new ExperienceBarHud(expBarConfig, "Experience Bar");
             _hudElements.Add(expBarHud);
             _hudElementsUsingPlayer.Add(expBarHud);
-            
+
             //pull timer
             var pullTimerConfig = ConfigurationManager.Instance.GetConfigObject<PullTimerConfig>();
             var pullTimerHud = new PullTimerHud(pullTimerConfig, "Pull Timer");
@@ -357,7 +357,7 @@ namespace DelvUI.Interface
             // grid
             if (_gridConfig is not null && _gridConfig.Enabled)
             {
-                DraggablesHelper.DrawGrid(_gridConfig, _selectedElement?.GetConfig());
+                DraggablesHelper.DrawGrid(_gridConfig, _hudOptions);
             }
 
             bool isHudLocked = ConfigurationManager.Instance.LockHUD;
@@ -385,6 +385,12 @@ namespace DelvUI.Interface
             if (_selectedElement != null)
             {
                 _selectedElement.Draw(origin);
+            }
+
+            // anchor
+            if (_gridConfig is not null && _gridConfig.Enabled)
+            {
+                DraggablesHelper.DrawAnchors(_gridConfig, _hudOptions, _selectedElement);
             }
 
             // tooltip

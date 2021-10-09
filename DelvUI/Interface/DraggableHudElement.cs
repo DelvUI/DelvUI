@@ -42,6 +42,8 @@ namespace DelvUI.Interface
             }
         }
 
+        public virtual Vector2 ParentAnchorPos() { return Vector2.Zero; } // override
+
         public sealed override void Draw(Vector2 origin)
         {
             if (_draggingEnabled)
@@ -59,7 +61,10 @@ namespace DelvUI.Interface
             | ImGuiWindowFlags.NoTitleBar
             | ImGuiWindowFlags.NoResize
             | ImGuiWindowFlags.NoBackground
-            | ImGuiWindowFlags.NoDecoration;
+            | ImGuiWindowFlags.NoDecoration
+            | ImGuiWindowFlags.NoFocusOnAppearing;
+
+
             // always update size
             var size = MaxPos - MinPos + _contentMargin * 2;
             ImGui.SetNextWindowSize(size, ImGuiCond.Always);
@@ -226,6 +231,16 @@ namespace DelvUI.Interface
         private Vector2? _lastParentPosition = null;
 
         private bool IsAnchored => AnchorToParent && ParentConfig != null;
+
+        public override Vector2 ParentAnchorPos()
+        {
+            if (!IsAnchored)
+            {
+                return Vector2.Zero;
+            }
+
+            return Utils.GetAnchoredPosition(ParentConfig!.Position, ParentConfig!.Size, ParentConfig!.Anchor);
+        }
 
         protected override Vector2 GetAnchoredPosition(Vector2 position, Vector2 size, DrawAnchor anchor)
         {
