@@ -138,9 +138,9 @@ namespace DelvUI.Interface.Jobs
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
             if (Config.DarksideBar.HideWhenInactive && gauge.DarksideTimeRemaining == 0) { return; };
 
-            int timer = Math.Abs(gauge.DarksideTimeRemaining / 1000);
-            Config.DarksideBar.Label.SetText($"{timer,0}");
-            BarUtilities.GetProgressBar(Config.DarksideBar, timer, 60f)
+            int timer = Math.Abs(gauge.DarksideTimeRemaining);
+            Config.DarksideBar.Label.SetText($"{timer / 1000}");
+            BarUtilities.GetProgressBar(Config.DarksideBar, timer, 60000f)
                 .Draw(origin);
         }
 
@@ -183,9 +183,9 @@ namespace DelvUI.Interface.Jobs
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
             if (Config.LivingShadowBar.HideWhenInactive && gauge.ShadowTimeRemaining == 0) { return; }
 
-            int timer = Math.Abs(gauge.ShadowTimeRemaining / 1000);
-            Config.LivingShadowBar.Label.SetText($"{timer,0}");
-            BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 24f)
+            int timer = Math.Abs(gauge.ShadowTimeRemaining);
+            Config.LivingShadowBar.Label.SetText($"{timer / 1000}");
+            BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 24000f)
                 .Draw(origin);
         }
     }
@@ -202,7 +202,7 @@ namespace DelvUI.Interface.Jobs
 
             config.BloodGauge.ThresholdConfig.Enabled = true;
             config.DarksideBar.ThresholdConfig.Enabled = true;
-            config.BloodGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;            
+            config.BloodGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.DarksideBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.BloodWeaponBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.DeliriumBar.Label.FontID = FontsConfig.DefaultMediumFontKey;

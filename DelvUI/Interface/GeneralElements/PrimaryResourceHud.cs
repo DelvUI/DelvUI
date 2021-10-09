@@ -93,7 +93,7 @@ namespace DelvUI.Interface.GeneralElements
             // label
             if (Config.ValueLabelConfig.Enabled)
             {
-                Config.ValueLabelConfig.SetText($"{current,0}");
+                Config.ValueLabelConfig.SetText($"{current}");
                 _valueLabel.Draw(startPos, Config.Size, Actor);
             }
         }

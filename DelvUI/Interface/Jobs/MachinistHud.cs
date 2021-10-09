@@ -103,14 +103,12 @@ namespace DelvUI.Interface.Jobs
             {
                 if (!_robotMaxDurationSet)
                 {
-                    _robotMaxDuration = gauge.SummonTimeRemaining / 1000f;
+                    _robotMaxDuration = gauge.SummonTimeRemaining;
                     _robotMaxDurationSet = true;
                 }
 
-                float robotDuration = gauge.SummonTimeRemaining / 1000f;
-
-                Config.BatteryGauge.Label.SetText(robotDuration.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.BatteryGauge, robotDuration, _robotMaxDuration, 0f, player, Config.BatteryGauge.RobotColor).Draw(origin);
+                Config.BatteryGauge.Label.SetText($"{gauge.SummonTimeRemaining / 1000}");
+                BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.SummonTimeRemaining, _robotMaxDuration, 0f, player, Config.BatteryGauge.RobotColor).Draw(origin);
             }
         }
 

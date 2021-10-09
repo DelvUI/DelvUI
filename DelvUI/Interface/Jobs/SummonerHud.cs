@@ -215,7 +215,7 @@ namespace DelvUI.Interface.Jobs
                     break;
             }
 
-            Config.TranceBar.Label.SetText($"{(int)tranceDuration / 1000,0}");
+            Config.TranceBar.Label.SetText($"{tranceDuration / 1000}");
             BarUtilities.GetProgressBar(Config.TranceBar, tranceDuration, maxDuration, fillColor: tranceColor)
                 .Draw(origin);
         }

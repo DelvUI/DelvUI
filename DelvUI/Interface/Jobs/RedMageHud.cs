@@ -148,26 +148,26 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawWhiteManaBar(Vector2 origin)
         {
-            int mana = (int)Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
+            byte mana = Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
             if (Config.WhiteManaBar.HideWhenInactive && mana == 0)
             {
                 return;
             }
 
-            Config.WhiteManaBar.Label.SetText($"{mana,0}");
+            Config.WhiteManaBar.Label.SetText($"{mana}");
             BarUtilities.GetProgressBar(Config.WhiteManaBar, mana, 100).
                 Draw(origin);
         }
 
         private void DrawBlackManaBar(Vector2 origin)
         {
-            int mana = (int)Plugin.JobGauges.Get<RDMGauge>().BlackMana;
+            byte mana = Plugin.JobGauges.Get<RDMGauge>().BlackMana;
             if (Config.BlackManaBar.HideWhenInactive && mana == 0)
             {
                 return;
             }
 
-            Config.BlackManaBar.Label.SetText($"{mana,0}");
+            Config.BlackManaBar.Label.SetText($"{mana}");
             BarUtilities.GetProgressBar(Config.BlackManaBar, mana, 100).
                 Draw(origin);
         }
@@ -194,7 +194,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            Config.DualcastBar.Label.SetText($"{(int)duration,0}");
+            Config.DualcastBar.Label.SetText($"{(int)duration}");
             BarUtilities.GetProgressBar(Config.DualcastBar, duration, 15f).
                 Draw(origin);
         }
