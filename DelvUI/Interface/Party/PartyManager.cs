@@ -271,9 +271,10 @@ namespace DelvUI.Interface.Party
                 var enmity = EnmityForIndex(isPlayer ? 0 : order - 1);
                 var isPartyLeader = IsLeader(i);
 
+                var partyListOrder = i;
                 var member = isPlayer ?
                     new PartyFramesMember(player, order, enmity, isPartyLeader) :
-                    new PartyFramesMember(NameForIndex(i), order, JobIdForIndex(i), isPartyLeader);
+                    new PartyFramesMember(NameForIndex(i), order, partyListOrder, JobIdForIndex(i), isPartyLeader);
 
                 _groupMembers.Add(member);
             }
