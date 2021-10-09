@@ -231,8 +231,10 @@ namespace DelvUI.Interface
                 return base.GetAnchoredPosition(position, size, anchor);
             }
 
-            Vector2 parentPos = Utils.GetAnchoredPosition(ParentConfig.Position, -ParentConfig.Size, ParentAnchor);
-            return Utils.GetAnchoredPosition(parentPos + position - ParentConfig.Size / 2f, size, anchor);
+            Vector2 parentAnchoredPos = Utils.GetAnchoredPosition(ParentConfig.Position, ParentConfig.Size, ParentConfig.Anchor);
+            Vector2 parentPos = Utils.GetAnchoredPosition(parentAnchoredPos, -ParentConfig.Size, ParentAnchor);
+
+            return Utils.GetAnchoredPosition(parentPos + position, size, anchor);
         }
     }
 }
