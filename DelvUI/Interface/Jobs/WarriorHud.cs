@@ -17,7 +17,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new WarriorConfig Config => (WarriorConfig)_config;        
 
-        public WarriorHud(string id, WarriorConfig config, string? displayName = null) : base(id, config, displayName)
+        public WarriorHud(WarriorConfig config, string? displayName = null) : base(config, displayName)
         {
         }
 

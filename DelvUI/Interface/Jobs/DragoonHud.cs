@@ -20,7 +20,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DragoonConfig Config => (DragoonConfig)_config;
 
-        public DragoonHud(string id, DragoonConfig config, string? displayName = null) : base(id, config, displayName)
+        public DragoonHud(DragoonConfig config, string? displayName = null) : base(config, displayName)
         {
 
         }

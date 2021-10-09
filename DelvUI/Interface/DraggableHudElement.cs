@@ -12,9 +12,9 @@ namespace DelvUI.Interface
 
     public class DraggableHudElement : HudElement
     {
-        public DraggableHudElement(string id, MovablePluginConfigObject config, string? displayName = null) : base(id, config)
+        public DraggableHudElement(MovablePluginConfigObject config, string? displayName = null) : base(config)
         {
-            _displayName = displayName ?? id;
+            _displayName = displayName ?? ID;
         }
 
         public event DraggableHudElementSelectHandler? SelectEvent;
@@ -215,8 +215,8 @@ namespace DelvUI.Interface
 
     public abstract class ParentAnchoredDraggableHudElement : DraggableHudElement
     {
-        public ParentAnchoredDraggableHudElement(string id, MovablePluginConfigObject config, string? displayName = null)
-            : base(id, config, displayName)
+        public ParentAnchoredDraggableHudElement(MovablePluginConfigObject config, string? displayName = null)
+            : base(config, displayName)
         {
         }
 

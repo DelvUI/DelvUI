@@ -6,7 +6,7 @@ namespace DelvUI.Interface.StatusEffects
 {
     public class CustomEffectsListHud : StatusEffectsListHud
     {
-        public CustomEffectsListHud(string id, StatusEffectsListConfig config, string displayName) : base(id, config, displayName)
+        public CustomEffectsListHud(StatusEffectsListConfig config, string displayName) : base(config, displayName)
         {
         }
 

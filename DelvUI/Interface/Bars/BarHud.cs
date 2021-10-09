@@ -69,7 +69,7 @@ namespace DelvUI.Interface.Bars
             {
                 foreach (LabelConfig config in labels)
                 {
-                    var labelHud = new LabelHud(ID + "_barLabel" + LabelHuds.Count, config);
+                    var labelHud = new LabelHud(config);
                     LabelHuds.Add(labelHud);
                 }
             }

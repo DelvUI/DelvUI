@@ -41,9 +41,9 @@ namespace DelvUI.Interface.GeneralElements
         protected override bool AnchorToParent => Config is UnitFramePrimaryResourceConfig config ? config.AnchorToUnitFrame : false;
         protected override DrawAnchor ParentAnchor => Config is UnitFramePrimaryResourceConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
 
-        public PrimaryResourceHud(string ID, PrimaryResourceConfig config, string displayName) : base(ID, config, displayName)
+        public PrimaryResourceHud(PrimaryResourceConfig config, string displayName) : base(config, displayName)
         {
-            _valueLabel = new LabelHud(ID + "_valueLabel", config.ValueLabelConfig);
+            _valueLabel = new LabelHud(config.ValueLabelConfig);
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()

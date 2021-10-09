@@ -10,12 +10,11 @@ namespace DelvUI.Interface
         protected MovablePluginConfigObject _config;
         public MovablePluginConfigObject GetConfig() { return _config; }
 
-        public string ID { get; private set; }
+        public string ID => _config.ID;
 
-        public HudElement(string id, MovablePluginConfigObject config)
+        public HudElement(MovablePluginConfigObject config)
         {
             _config = config;
-            ID = id;
         }
 
         public abstract void Draw(Vector2 origin);

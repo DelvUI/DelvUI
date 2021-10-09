@@ -20,7 +20,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new ScholarConfig Config => (ScholarConfig)_config;
 
-        public ScholarHud(string id, ScholarConfig config, string? displayName = null) : base(id, config, displayName)
+        public ScholarHud(ScholarConfig config, string? displayName = null) : base(config, displayName)
         {
 
         }

@@ -18,7 +18,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new PaladinConfig Config => (PaladinConfig)_config;
 
-        public PaladinHud(string id, PaladinConfig config, string? displayName = null) : base(id, config, displayName)
+        public PaladinHud(PaladinConfig config, string? displayName = null) : base(config, displayName)
         {
         }
 

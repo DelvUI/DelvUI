@@ -21,7 +21,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DancerConfig Config => (DancerConfig)_config;
 
-        public DancerHud(string id, DancerConfig config, string? displayName = null) : base(id, config, displayName)
+        public DancerHud(DancerConfig config, string? displayName = null) : base(config, displayName)
         {
 
         }

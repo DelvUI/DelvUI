@@ -15,7 +15,7 @@ namespace DelvUI.Interface.Jobs
         public GameObject? Actor { get; set; } = null;
         protected PlayerCharacter? Player => Actor is PlayerCharacter ? (PlayerCharacter)Actor : null;
 
-        public JobHud(string id, JobConfig config, string? displayName = null) : base(id, config, displayName)
+        public JobHud(JobConfig config, string? displayName = null) : base(config, displayName)
         {
         }
 

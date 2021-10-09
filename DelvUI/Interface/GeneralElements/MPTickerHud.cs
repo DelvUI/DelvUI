@@ -14,7 +14,7 @@ namespace DelvUI.Interface.GeneralElements
         private MPTickHelper _mpTickHelper = null!;
         public GameObject? Actor { get; set; } = null;
 
-        public MPTickerHud(string ID, MPTickerConfig config, string displayName) : base(ID, config, displayName) { }
+        public MPTickerHud(MPTickerConfig config, string displayName) : base(config, displayName) { }
 
         protected override void InternalDispose()
         {

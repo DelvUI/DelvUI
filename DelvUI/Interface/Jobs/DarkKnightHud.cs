@@ -17,7 +17,7 @@ namespace DelvUI.Interface.Jobs
     {
         private new DarkKnightConfig Config => (DarkKnightConfig)_config;
 
-        public DarkKnightHud(string id, DarkKnightConfig config, string? displayName = null) : base(id, config, displayName)
+        public DarkKnightHud(DarkKnightConfig config, string? displayName = null) : base(config, displayName)
         {
         }
 

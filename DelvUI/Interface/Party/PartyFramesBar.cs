@@ -59,15 +59,15 @@ namespace DelvUI.Interface.Party
             _debuffsConfig = debuffsConfig;
             _raiseTrackerConfig = raiseTrackerConfig;
 
-            _nameLabelHud = new LabelHud(id + "_nameLabel", config.NameLabelConfig);
-            _healthLabelHud = new LabelHud(id + "_healthLabel", config.HealthLabelConfig);
-            _manaLabelHud = new LabelHud(id + "_manaLabel", _manaBarConfig.ValueLabelConfig);
-            _orderLabelHud = new LabelHud(id + "_orderLabel", config.OrderLabelConfig);
-            _raiseLabelHud = new LabelHud(id + "_raiseLabel", _raiseTrackerConfig.LabelConfig);
+            _nameLabelHud = new LabelHud(config.NameLabelConfig);
+            _healthLabelHud = new LabelHud(config.HealthLabelConfig);
+            _manaLabelHud = new LabelHud(_manaBarConfig.ValueLabelConfig);
+            _orderLabelHud = new LabelHud(config.OrderLabelConfig);
+            _raiseLabelHud = new LabelHud(_raiseTrackerConfig.LabelConfig);
 
-            _castbarHud = new CastbarHud(id + "_castbar", _castbarConfig, "");
-            _buffsListHud = new StatusEffectsListHud(id + "_buffs", buffsConfig, "");
-            _debuffsListHud = new StatusEffectsListHud(id + "_debebuffs", debuffsConfig, "");
+            _castbarHud = new CastbarHud(_castbarConfig, "");
+            _buffsListHud = new StatusEffectsListHud(buffsConfig, "");
+            _debuffsListHud = new StatusEffectsListHud(debuffsConfig, "");
         }
 
         public PluginConfigColor GetColor(float scale)

@@ -19,7 +19,7 @@ namespace DelvUI.Interface.Jobs
 
         private new MachinistConfig Config => (MachinistConfig)_config;
 
-        public MachinistHud(string id, MachinistConfig config, string? displayName = null) : base(id, config, displayName)
+        public MachinistHud(MachinistConfig config, string? displayName = null) : base(config, displayName)
         {
         }
 

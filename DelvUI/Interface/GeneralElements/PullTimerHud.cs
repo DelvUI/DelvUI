@@ -14,7 +14,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public GameObject? Actor { get; set; } = null;
 
-        public PullTimerHud(string ID, PullTimerConfig config, string displayName) : base(ID, config, displayName) { }
+        public PullTimerHud(PullTimerConfig config, string displayName) : base(config, displayName) { }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {

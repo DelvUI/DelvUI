@@ -25,7 +25,7 @@ namespace DelvUI.Interface.Jobs
         private new BardConfig Config => (BardConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public BardHud(string id, BardConfig config, string? displayName = null) : base(id, config, displayName)
+        public BardHud(BardConfig config, string? displayName = null) : base(config, displayName)
         {
         }
 

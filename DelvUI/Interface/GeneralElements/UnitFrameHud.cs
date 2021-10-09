@@ -19,7 +19,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public GameObject? Actor { get; set; } = null;
 
-        public UnitFrameHud(string id, UnitFrameConfig config, string displayName) : base(id, config, displayName)
+        public UnitFrameHud(UnitFrameConfig config, string displayName) : base(config, displayName)
         { 
             // interaction stuff
             _openContextMenuFromTarget =
