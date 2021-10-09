@@ -49,6 +49,11 @@ namespace DelvUI.Config.Tree
             if (!_isChild)
             {
                 DrawSeparatorOrSpacing(MainField, _id);
+
+                if (Depth > 0)
+                {
+                    DrawNestIndicator(Depth);
+                }
             }
 
             // Draw the ConfigAttribute
@@ -72,9 +77,7 @@ namespace DelvUI.Config.Tree
                     {
                         // Shift cursor to the right to pad for children with depth more than 1.
                         // 26 is an arbitrary value I found to be around half the width of a checkbox
-                        ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(26, 0) * Math.Max((depth - 1), 0));
-                        ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
-                        ImGui.SameLine();
+                        DrawNestIndicator(depth);
                     }
 
                     child.Draw(ref changed, separatorDrawn);
@@ -82,6 +85,13 @@ namespace DelvUI.Config.Tree
 
                 ImGui.EndGroup();
             }
+        }
+
+        private void DrawNestIndicator(int depth)
+        {
+            ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(26, 0) * Math.Max((depth - 1), 0));
+            ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
+            ImGui.SameLine();
         }
 
         public void Draw(ref bool changed, FieldInfo field)
