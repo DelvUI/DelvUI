@@ -158,7 +158,7 @@ namespace DelvUI.Interface.Jobs
                 if (!Config.MudraBar.HideWhenInactive || current < max)
                 {
                     Config.MudraBar.Label.SetText(Math.Truncate((max - current) % 20).ToString());
-                    BarUtilities.GetChunkedProgressBars(Config.MudraBar, 2, current, max, 0f, player, Config.MudraBar.Label).Draw(pos);
+                    BarUtilities.GetChunkedProgressBars(Config.MudraBar, 2, current, max, 0f, player).Draw(pos);
                 }
             }
         }
@@ -295,12 +295,9 @@ namespace DelvUI.Interface.Jobs
         [Order(65)]
         public PluginConfigColor TCJBarColor = new(new Vector4(181 / 255f, 33 / 255f, 41 / 242f, 100f / 100f));
 
-        [NestedConfig("Bar Text", 1000, separator = false, spacing = true)]
-        public LabelConfig Label;
-
         public MudraBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor, 2)
         {
-            Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+            Label.Enabled = true;
             UsePartialFillColor = true;
         }
     }

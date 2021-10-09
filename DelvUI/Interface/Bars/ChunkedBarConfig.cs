@@ -1,5 +1,7 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
+using DelvUI.Interface.GeneralElements;
 using System.Numerics;
 
 namespace DelvUI.Interface.Bars
@@ -24,6 +26,10 @@ namespace DelvUI.Interface.Bars
     [Exportable(false)]
     public class ChunkedProgressBarConfig : ChunkedBarConfig
     {
+        [Checkbox("Show In Chunks")]
+        [Order(46)]
+        public bool UseChunks = true;
+
         [Checkbox("Use Partial Fill Color")]
         [Order(50)]
         public bool UsePartialFillColor = false;
@@ -32,6 +38,9 @@ namespace DelvUI.Interface.Bars
         [Order(55, collapseWith = nameof(UsePartialFillColor))]
         public PluginConfigColor PartialFillColor;
 
+        [NestedConfig("Bar Text", 1000, separator = false, spacing = true)]
+        public LabelConfig Label;
+
         public ChunkedProgressBarConfig(
             Vector2 position,
             Vector2 size,
@@ -39,6 +48,9 @@ namespace DelvUI.Interface.Bars
             int padding = 2,
             PluginConfigColor? partialFillColor = null) : base(position, size, fillColor, padding)
         {
+            Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+            Label.Enabled = false;
+
             PartialFillColor = partialFillColor ?? new PluginConfigColor(new(180f / 255f, 180f / 255f, 180f / 255f, 100f / 100f));
         }
     }
