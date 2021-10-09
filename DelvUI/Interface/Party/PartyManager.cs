@@ -412,7 +412,7 @@ namespace DelvUI.Interface.Party
             }
 
             var partyLeadIndex = Plugin.PartyList.PartyLeaderIndex;
-            if (partyLeadIndex < 0 || partyLeadIndex > 8)
+            if (partyLeadIndex < 0 || partyLeadIndex >= Plugin.PartyList.Length)
             {
                 return false;
             }
