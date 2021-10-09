@@ -323,11 +323,12 @@ namespace DelvUI.Interface.StatusEffects
                     // Draw dispell indicator above dispellable status effect on uncropped icons
                     if (borderConfig != null && !cropIcon && statusEffectData.Data.CanDispel)
                     {
+                        var dispellIndicatorColor = new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f);
                         // 24x32
                         drawList.AddRectFilled(
                             iconPos + new Vector2(Config.IconConfig.Size.X * .07f, Config.IconConfig.Size.Y * .07f),
                             iconPos + new Vector2(Config.IconConfig.Size.X * .93f, Config.IconConfig.Size.Y * .14f),
-                            borderConfig.Color.Base,
+                            ImGui.ColorConvertFloat4ToU32(dispellIndicatorColor),
                             8f
                         );
                     }
