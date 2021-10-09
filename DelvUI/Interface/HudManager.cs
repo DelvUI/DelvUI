@@ -16,7 +16,7 @@ namespace DelvUI.Interface
 {
     public class HudManager : IDisposable
     {
-        private Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
+        private readonly Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
 
         private GridConfig? _gridConfig;
         private HideHudConfig? _hudOptions;
