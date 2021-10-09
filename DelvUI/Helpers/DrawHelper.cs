@@ -143,21 +143,7 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static (Vector2, Vector2) GetTexCoordinates(TextureWrap texture, Vector2 size)
-        {
-            if (texture == null)
-            {
-                return (Vector2.Zero, Vector2.Zero);
-            }
-
-            // Status = 24x32, show from 2,7 until 22,26
-            var uv0 = new Vector2(4f / texture.Width, 14f / texture.Height);
-            var uv1 = new Vector2(1f - 4f / texture.Width, 1f - 12f / texture.Height);
-
-            return (uv0, uv1);
-        }
-
-        public static (Vector2, Vector2) GetTexCoordinates(TextureWrap texture, Vector2 size, bool cropIcon)
+        public static (Vector2, Vector2) GetTexCoordinates(TextureWrap texture, Vector2 size, bool cropIcon = true)
         {
             if (texture == null)
             {
