@@ -177,6 +177,10 @@ namespace DelvUI.Config.Tree
 
                 foreach (object attribute in field.GetCustomAttributes(true))
                 {
+                    if (ConfigObject.DisableParentSettings != null && ConfigObject.DisableParentSettings.Contains(field.Name))
+                    {
+                        continue;
+                    }
                     if (attribute is OrderAttribute orderAttribute)
                     {
                         FieldNode fieldNode = new FieldNode(field, ConfigObject, ID);

@@ -51,6 +51,17 @@ namespace DelvUI.Config.Attributes
             this.disableable = disableable;
         }
     }
+    
+    [AttributeUsage(AttributeTargets.Class)]
+    public class DisableParentSettingsAttribute : Attribute
+    {
+        public readonly string[] DisabledFields;
+
+        public DisableParentSettingsAttribute(params string[] fields)
+        {
+            this.DisabledFields = fields;
+        }
+    }
     #endregion
 
     #region method attributes
