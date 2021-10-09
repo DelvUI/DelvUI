@@ -136,9 +136,9 @@ namespace DelvUI.Interface.GeneralElements
         [Order(85, collapseWith = nameof(UseColorBasedOnHealthValue))]
         public float LowHealthColorThreshold = 25f;
 
-        [Combo("Blend Mode", "CIELAB", "XYZ", "RGB", "LChuv")]
+        [Combo("Blend Mode", "LAB", "LChab", "XYZ", "RGB", "LChuv", "Luv", "Jzazbz", "JzCzhz")]
         [Order(86, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public BlendMode blendMode = BlendMode.CIELAB;
+        public BlendMode blendMode = BlendMode.LAB;
 
         [Checkbox("Tank Invulnerability")]
         [Order(90)]
@@ -174,10 +174,14 @@ namespace DelvUI.Interface.GeneralElements
 
     public enum BlendMode
     {
-        CIELAB,
+        LAB,
+        LChab,
         XYZ,
         RGB,
-        LChuv
+        LChuv,
+        Luv,
+        Jzazbz,
+        JzCzhz
     }
 
     [Exportable(false)]
