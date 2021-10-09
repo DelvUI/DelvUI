@@ -1,4 +1,4 @@
-﻿using DelvUI.Config;
+using DelvUI.Config;
 using ImGuiNET;
 using ImGuiScene;
 using Lumina.Excel;
@@ -86,6 +86,17 @@ namespace DelvUI.Helpers
             }
 
             // text
+            drawList.AddText(new Vector2(pos.X, pos.Y), color, text);
+        }
+
+        public static void DrawShadowText(string text, Vector2 pos, uint color, uint shadowColor, ImDrawListPtr drawList, int offset = 1)
+        {
+            // TODO: Add parameter to allow to choose a direction
+            
+            // Shadow
+            drawList.AddText(new Vector2(pos.X + offset, pos.Y + offset), shadowColor, text);
+
+            // Text
             drawList.AddText(new Vector2(pos.X, pos.Y), color, text);
         }
 
