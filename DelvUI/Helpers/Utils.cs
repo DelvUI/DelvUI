@@ -227,6 +227,7 @@ namespace DelvUI.Helpers
 
             //Normalize RGB values
             newColorLab2RGB.NormalizeIntensity();
+            newColorLChab2RGB.NormalizeIntensity();
             newColorXYZ2RGB.NormalizeIntensity();
             newColorLChuv2RGB.NormalizeIntensity();
             newColorLuv2RGB.NormalizeIntensity();
