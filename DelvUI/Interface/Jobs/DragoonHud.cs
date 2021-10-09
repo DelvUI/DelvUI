@@ -82,24 +82,25 @@ namespace DelvUI.Interface.Jobs
 
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
+            var position = origin + Config.Position;
             if (Config.ShowChaosThrustBar)
             {
-                DrawChaosThrustBar(origin, player);
+                DrawChaosThrustBar(position, player);
             }
 
             if (Config.ShowDisembowelBar)
             {
-                DrawDisembowelBar(origin, player);
+                DrawDisembowelBar(position, player);
             }
 
             if (Config.ShowEyeOfTheDragonBar)
             {
-                DrawEyeOfTheDragonBars(origin);
+                DrawEyeOfTheDragonBars(position);
             }
 
             if (Config.ShowBloodBar)
             {
-                DrawBloodOfTheDragonBar(origin);
+                DrawBloodOfTheDragonBar(position);
             }
         }
 
@@ -224,57 +225,19 @@ namespace DelvUI.Interface.Jobs
         [JsonIgnore] public override uint JobId => JobIDs.DRG;
         public new static DragoonConfig DefaultConfig() { return new DragoonConfig(); }
 
-        #region Chaos Thrust Bar
-        [Checkbox("Chaos Thrust" + "##ChaosThrust", separator = true)]
-        [Order(30)]
-        public bool ShowChaosThrustBar = true;
+        [NestedConfig("Chaos Thrust", 30)]
+        public ProgressBarConfig ChaosThrustBar = new ProgressBarConfig(
+            new(0, -76),
+            new(254, 20),
+            new(new Vector4(106f / 255f, 82f / 255f, 148f / 255f, 100f / 100f))
+        );
 
-        [Checkbox("Only Show When Active" + "##ChaosThrust")]
-        [Order(35, collapseWith = nameof(ShowChaosThrustBar))]
-        public bool OnlyShowChaosThrustWhenActive = false;
-
-        [Checkbox("Timer" + "##ChaosThrust")]
-        [Order(40, collapseWith = nameof(ShowChaosThrustBar))]
-        public bool ShowChaosThrustBarText = true;
-
-        [DragFloat2("Position" + "##ChaosThrust", min = -4000f, max = 4000f)]
-        [Order(45, collapseWith = nameof(ShowChaosThrustBar))]
-        public Vector2 ChaosThrustBarPosition = new(0, -76);
-
-        [DragFloat2("Size" + "##ChaosThrust", max = 2000f)]
-        [Order(50, collapseWith = nameof(ShowChaosThrustBar))]
-        public Vector2 ChaosThrustBarSize = new(254, 20);
-
-        [ColorEdit4("Color" + "##ChaosThrust")]
-        [Order(55, collapseWith = nameof(ShowChaosThrustBar))]
-        public PluginConfigColor ChaosThrustBarColor = new(new Vector4(106f / 255f, 82f / 255f, 148f / 255f, 100f / 100f));
-        #endregion
-
-        #region Disembowel Bar
-        [Checkbox("Disembowel" + "##Disembowel", separator = true)]
-        [Order(60)]
-        public bool ShowDisembowelBar = true;
-
-        [Checkbox("Only Show When Active" + "##Disembowel")]
-        [Order(65, collapseWith = nameof(ShowDisembowelBar))]
-        public bool OnlyShowDisembowelWhenActive = false;
-
-        [Checkbox("Timer" + "##Disembowel")]
-        [Order(70, collapseWith = nameof(ShowDisembowelBar))]
-        public bool ShowDisembowelBarText = true;
-
-        [DragFloat2("Position" + "##Disembowel", min = -4000f, max = 4000f)]
-        [Order(75, collapseWith = nameof(ShowDisembowelBar))]
-        public Vector2 DisembowelBarPosition = new(0, -54);
-
-        [DragFloat2("Size" + "##Disembowel", max = 2000f)]
-        [Order(80, collapseWith = nameof(ShowDisembowelBar))]
-        public Vector2 DisembowelBarSize = new(254, 20);
-
-        [ColorEdit4("Color" + "##Disembowel")]
-        [Order(85, collapseWith = nameof(ShowDisembowelBar))]
-        public PluginConfigColor DisembowelBarColor = new(new Vector4(244f / 255f, 206f / 255f, 191f / 255f, 100f / 100f));
-        #endregion
+        [NestedConfig("Disembowel", 30)]
+        public ProgressBarConfig DisembowelBar = new ProgressBarConfig(
+            new(0, -54),
+            new(254, 20),
+            new(new Vector4(244f / 255f, 206f / 255f, 191f / 255f, 100f / 100f))
+        );
 
         #region Eye Of The Dragon Bar
         [Checkbox("Eye Of The Dragon" + "##EyeOfTheDragon", separator = true)]
@@ -302,34 +265,20 @@ namespace DelvUI.Interface.Jobs
         public PluginConfigColor EyeOfTheDragonColor = new(new Vector4(1f, 182f / 255f, 194f / 255f, 100f / 100f));
         #endregion
 
-        #region Blood Bar
-        [Checkbox("Blood of the Dragon", separator = true)]
-        [Order(120)]
-        public bool ShowBloodBar = true;
+        [NestedConfig("Blood of the Dragon", 30)]
+        public ProgressBarConfig BloodOfTheDragonBar = new ProgressBarConfig(
+            new(0, -10),
+            new(254, 20),
+            new(new Vector4(78f / 255f, 198f / 255f, 238f / 255f, 100f / 100f))
+        );
 
-        [Checkbox("Only Show When Active" + "##Blood")]
-        [Order(125, collapseWith = nameof(ShowBloodBar))]
-        public bool OnlyShowBloodBarWhenActive = false;
+        //[ColorEdit4("Blood of the Dragon" + "##Blood")]
+        //[Order(145, collapseWith = nameof(ShowBloodBar))]
+        //public PluginConfigColor BloodOfTheDragonColor = new(new Vector4(78f / 255f, 198f / 255f, 238f / 255f, 100f / 100f));
 
-        [Checkbox("Timer" + "##Blood")]
-        [Order(130, collapseWith = nameof(ShowBloodBar))]
-        public bool ShowBloodBarText = true;
-
-        [DragFloat2("Position" + "##Blood", min = -4000f, max = 4000f)]
-        [Order(135, collapseWith = nameof(ShowBloodBar))]
-        public Vector2 BloodBarPosition = new(0, -10);
-
-        [DragFloat2("Size" + "##Blood", max = 2000f)]
-        [Order(140, collapseWith = nameof(ShowBloodBar))]
-        public Vector2 BloodBarSize = new(254, 20);
-
-        [ColorEdit4("Blood of the Dragon" + "##Blood")]
-        [Order(145, collapseWith = nameof(ShowBloodBar))]
-        public PluginConfigColor BloodOfTheDragonColor = new(new Vector4(78f / 255f, 198f / 255f, 238f / 255f, 100f / 100f));
-
-        [ColorEdit4("Life of the Dragon" + "##Blood")]
-        [Order(150, collapseWith = nameof(ShowBloodBar))]
-        public PluginConfigColor LifeOfTheDragonColor = new(new Vector4(139f / 255f, 24f / 255f, 24f / 255f, 100f / 100f));
-        #endregion
+        //[ColorEdit4("Life of the Dragon" + "##Blood")]
+        //[Order(150, collapseWith = nameof(ShowBloodBar))]
+        //public PluginConfigColor LifeOfTheDragonColor = new(new Vector4(139f / 255f, 24f / 255f, 24f / 255f, 100f / 100f));
+        //#endregion
     }
 }
