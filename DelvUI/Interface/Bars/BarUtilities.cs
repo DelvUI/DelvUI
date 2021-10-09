@@ -22,7 +22,7 @@ namespace DelvUI.Interface.Bars
         public static BarHud GetProgressBar(
             BarConfig config,
             ThresholdConfig? thresholdConfig,
-            LabelConfig[] labelConfigs,
+            LabelConfig[]? labelConfigs,
             float current,
             float max,
             float min = 0f,
@@ -214,10 +214,15 @@ namespace DelvUI.Interface.Bars
             float max,
             float min = 0f,
             GameObject? actor = null,
-            LabelConfig? label = null,
             BarGlowConfig? glowConfig = null)
         {
-            return GetChunkedProgressBars(config, chunks, current, max, min, actor, label, glowConfig, config.UsePartialFillColor ? config.PartialFillColor : config.FillColor);
+            if (config.UseChunks)
+            {
+                return GetChunkedProgressBars(config, chunks, current, max, min, actor, config.Label, glowConfig, config.UsePartialFillColor ? config.PartialFillColor : config.FillColor);
+            }
+
+            BarHud bar = GetProgressBar(config, null, new LabelConfig[] { config.Label }, current, max, min, actor, null, glowConfig);
+            return new BarHud[] { bar };
         }
 
         public static Rect[] GetShieldForeground(

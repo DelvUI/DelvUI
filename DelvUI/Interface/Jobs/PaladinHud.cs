@@ -99,6 +99,7 @@ namespace DelvUI.Interface.Jobs
         {
             if (Config.ManaBar.HideWhenInactive && player.CurrentMp == player.MaxMp) { return; }
 
+            Config.ManaBar.Label.SetText($"{player.CurrentMp,0}");
             BarUtilities.GetChunkedProgressBars(Config.ManaBar, 5, player.CurrentMp, player.MaxMp, 0f, player).Draw(origin);
         }
 
@@ -182,7 +183,7 @@ namespace DelvUI.Interface.Jobs
         }
 
         [NestedConfig("Mana Bar", 30)]
-        public ChunkedBarConfig ManaBar = new ChunkedBarConfig(
+        public ChunkedProgressBarConfig ManaBar = new ChunkedProgressBarConfig(
             new Vector2(0, -76),
             new Vector2(254, 20),
             new PluginConfigColor(new Vector4(0f / 255f, 203f / 255f, 230f / 255f, 100f / 100f))

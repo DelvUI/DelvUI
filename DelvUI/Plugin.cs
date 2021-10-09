@@ -125,7 +125,6 @@ namespace DelvUI
 
         public void Dispose()
         {
-            _menuHook.Dispose();
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -231,6 +230,7 @@ namespace DelvUI
                 return;
             }
 
+            _menuHook.Dispose();
             _hudManager.Dispose();
 
             ConfigurationManager.Instance.DrawConfigWindow = false;
