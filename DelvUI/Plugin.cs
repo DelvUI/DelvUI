@@ -80,7 +80,15 @@ namespace DelvUI
             TargetManager = targetManager;
             UiBuilder = PluginInterface.UiBuilder;
 
-            AssemblyLocation = Assembly.GetExecutingAssembly().Location;
+            if (pluginInterface.AssemblyLocation.DirectoryName != null)
+            {
+                AssemblyLocation = pluginInterface.AssemblyLocation.DirectoryName + "\\";
+            }
+            else
+            {
+                AssemblyLocation = Assembly.GetExecutingAssembly().Location;
+            }
+
             Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.2.1.1";
 
             FontsManager.Initialize(AssemblyLocation);
