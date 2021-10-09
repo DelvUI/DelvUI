@@ -74,14 +74,23 @@ namespace DelvUI.Interface.Party
             UpdateBars(Vector2.Zero);
 
             /*
-             Part of openContextMenuFromTarget disassembly signature
-            .text:00007FF648523940                   Client__UI__Agent__AgentHUD_OpenContextMenuFromTarget proc near
-            .text:00007FF648523940
-            .text:00007FF648523940                   arg_0= qword ptr  8
-            .text:00007FF648523940                   arg_8= qword ptr  10h
-            .text:00007FF648523940
-            .text:00007FF648523940 48 85 D2          test    rdx, rdx
-            .text:00007FF648523943 74 7F             jz      short locret_7FF6485239C4
+             Part of openContextMenu disassembly signature
+            .text:00007FF648519790                   OpenPartyContextMenu proc near
+            .text:00007FF648519790
+            .text:00007FF648519790                   arg_0= qword ptr  8
+            .text:00007FF648519790                   arg_8= qword ptr  10h
+            .text:00007FF648519790                   arg_10= qword ptr  18h
+            .text:00007FF648519790
+            .text:00007FF648519790 48 89 5C 24 10    mov     [rsp+arg_8], rbx
+            .text:00007FF648519795 48 89 6C 24 18    mov     [rsp+arg_10], rbp
+            .text:00007FF64851979A 57                push    rdi
+            .text:00007FF64851979B 48 83 EC 20       sub     rsp, 20h
+            .text:00007FF64851979F 49 63 D8          movsxd  rbx, r8d
+            .text:00007FF6485197A2 8B EA             mov     ebp, edx
+            .text:00007FF6485197A4 48 8B F9          mov     rdi, rcx
+            .text:00007FF6485197A7 E8 74 BC 86 FF    call    sub_7FF647D85420
+            .text:00007FF6485197AC 84 C0             test    al, al
+            .text:00007FF6485197AE 0F 85 DF 00 00 00 jnz     loc_7FF648519893
             */
             _openContextMenu =
                 Marshal.GetDelegateForFunctionPointer<OpenContextMenu>(Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? EB 50 83 FB 01"));
