@@ -21,7 +21,7 @@ namespace DelvUI.Interface
         public bool Selected = false;
 
         private string _displayName;
-        private bool _windowPositionSet = false;
+        protected bool _windowPositionSet = false;
         private Vector2 _positionOffset;
         private Vector2 _contentMargin = new Vector2(4, 0);
 
@@ -53,14 +53,13 @@ namespace DelvUI.Interface
             DrawChildren(origin);
         }
 
-        private void DrawDraggableArea(Vector2 origin)
+        protected virtual void DrawDraggableArea(Vector2 origin)
         {
             var windowFlags = ImGuiWindowFlags.NoScrollbar
             | ImGuiWindowFlags.NoTitleBar
             | ImGuiWindowFlags.NoResize
             | ImGuiWindowFlags.NoBackground
             | ImGuiWindowFlags.NoDecoration;
-
             // always update size
             var size = MaxPos - MinPos + _contentMargin * 2;
             ImGui.SetNextWindowSize(size, ImGuiCond.Always);
@@ -131,7 +130,7 @@ namespace DelvUI.Interface
         public virtual void DrawChildren(Vector2 origin) { }
 
         #region draggable area
-        private Vector2? _minPos = null;
+        protected Vector2? _minPos = null;
         public Vector2 MinPos
         {
             get
@@ -163,7 +162,7 @@ namespace DelvUI.Interface
             }
         }
 
-        private Vector2? _maxPos = null;
+        protected Vector2? _maxPos = null;
         public Vector2 MaxPos
         {
             get
@@ -224,17 +223,35 @@ namespace DelvUI.Interface
         protected virtual DrawAnchor ParentAnchor { get; }
         public AnchorablePluginConfigObject? ParentConfig { get; set; }
 
+        private Vector2? _lastParentPosition = null;
+
+        private bool IsAnchored => AnchorToParent && ParentConfig != null;
+
         protected override Vector2 GetAnchoredPosition(Vector2 position, Vector2 size, DrawAnchor anchor)
         {
-            if (!AnchorToParent || ParentConfig == null)
+            if (!IsAnchored)
             {
                 return base.GetAnchoredPosition(position, size, anchor);
             }
 
-            Vector2 parentAnchoredPos = Utils.GetAnchoredPosition(ParentConfig.Position, ParentConfig.Size, ParentConfig.Anchor);
-            Vector2 parentPos = Utils.GetAnchoredPosition(parentAnchoredPos, -ParentConfig.Size, ParentAnchor);
+            Vector2 parentAnchoredPos = Utils.GetAnchoredPosition(ParentConfig!.Position, ParentConfig!.Size, ParentConfig!.Anchor);
+            Vector2 parentPos = Utils.GetAnchoredPosition(parentAnchoredPos, -ParentConfig!.Size, ParentAnchor);
 
             return Utils.GetAnchoredPosition(parentPos + position, size, anchor);
+        }
+
+        protected override void DrawDraggableArea(Vector2 origin)
+        {
+            // if the parent moved, update own draggable area
+            if (IsAnchored && (_lastParentPosition == null || _lastParentPosition != ParentConfig!.Position))
+            {
+                _windowPositionSet = false;
+                _minPos = null;
+                _maxPos = null;
+                _lastParentPosition = ParentConfig!.Position;
+            }
+
+            base.DrawDraggableArea(origin);
         }
     }
 }
