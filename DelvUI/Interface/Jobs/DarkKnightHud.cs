@@ -19,7 +19,6 @@ namespace DelvUI.Interface.Jobs
 
         public DarkKnightHud(string id, DarkKnightConfig config, string? displayName = null) : base(id, config, displayName)
         {
-
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -201,7 +200,9 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new DarkKnightConfig();
 
-            config.BloodGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.BloodGauge.ThresholdConfig.Enabled = true;
+            config.DarksideBar.ThresholdConfig.Enabled = true;
+            config.BloodGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;            
             config.DarksideBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.BloodWeaponBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.DeliriumBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
@@ -223,7 +224,8 @@ namespace DelvUI.Interface.Jobs
             new Vector2(254, 10),
             new PluginConfigColor(new Vector4(216f / 255f, 0f / 255f, 73f / 255f, 100f / 100f)),
             BarDirection.Right,
-            new PluginConfigColor(new Vector4(196f / 255f, 20f / 255f, 122f / 255f, 100f / 100f))
+            new PluginConfigColor(new Vector4(196f / 255f, 20f / 255f, 122f / 255f, 100f / 100f)),
+            50
         );
 
         [NestedConfig("Darkside Bar", 40)]
@@ -232,7 +234,8 @@ namespace DelvUI.Interface.Jobs
             new Vector2(254, 10),
             new PluginConfigColor(new Vector4(209f / 255f, 38f / 255f, 73f / 204f, 100f / 100f)),
             BarDirection.Right,
-            new PluginConfigColor(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f))
+            new PluginConfigColor(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f)),
+            5
         );
 
         [NestedConfig("Blood Weapon Bar", 45)]
@@ -249,7 +252,7 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Living Shadow Bar", 50)]
+        [NestedConfig("Living Shadow Bar", 55)]
         public ProgressBarConfig LivingShadowBar = new ProgressBarConfig(
             new Vector2(0, -10),
             new Vector2(254, 20),
