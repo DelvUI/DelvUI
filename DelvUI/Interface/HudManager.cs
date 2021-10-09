@@ -19,6 +19,7 @@ namespace DelvUI.Interface
         private Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
 
         private GridConfig? _gridConfig;
+        private HideHudConfig? _hudOptions;
         private DraggableHudElement? _selectedElement = null;
 
         private List<DraggableHudElement> _hudElements = null!;
@@ -127,6 +128,7 @@ namespace DelvUI.Interface
         private void CreateHudElements()
         {
             _gridConfig = ConfigurationManager.Instance.GetConfigObject<GridConfig>();
+            _hudOptions = ConfigurationManager.Instance.GetConfigObject<HideHudConfig>();
 
             _hudElements = new List<DraggableHudElement>();
             _hudElementsUsingPlayer = new List<IHudElementWithActor>();
@@ -337,6 +339,12 @@ namespace DelvUI.Interface
 
             AssignActors();
 
+            var origin = _origin;
+            if (_hudOptions is not null && _hudOptions.UseGlobalHudShift)
+            {
+                origin += _hudOptions.HudOffset;
+            }
+
             // show only castbar during quest events
             if (ShouldOnlyShowCastbar())
             {
@@ -360,7 +368,7 @@ namespace DelvUI.Interface
             {
                 if (element != _selectedElement && !_hudHelper.IsElementHidden(element))
                 {
-                    element.Draw(_origin);
+                    element.Draw(origin);
                 }
             }
 
@@ -369,14 +377,14 @@ namespace DelvUI.Interface
             {
                 if (!_hudHelper.IsElementHidden(_jobHud))
                 {
-                    _jobHud.Draw(_origin);
+                    _jobHud.Draw(origin);
                 }
             }
 
             // selected
             if (_selectedElement != null)
             {
-                _selectedElement.Draw(_origin);
+                _selectedElement.Draw(origin);
             }
 
             // tooltip

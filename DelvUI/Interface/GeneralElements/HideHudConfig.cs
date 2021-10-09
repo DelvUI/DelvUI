@@ -1,7 +1,5 @@
-﻿using System;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -11,10 +9,18 @@ namespace DelvUI.Interface.GeneralElements
     [Exportable(false)]
     [Shareable(false)]
     [Section("Misc")]
-    [SubSection("Hide Options", 0)]
+    [SubSection("HUD Options", 0)]
     public class HideHudConfig : PluginConfigObject
     {
-        [Checkbox("Hide DelvUI outside of combat", spacing = true)]
+        [Checkbox("Global HUD Position")]
+        [Order(5)]
+        public bool UseGlobalHudShift = true;
+
+        [DragInt2("Position", min = -4000, max = 4000)]
+        [Order(80, collapseWith = nameof(UseGlobalHudShift))]
+        public Vector2 HudOffset = new(0, 0);
+
+        [Checkbox("Hide DelvUI outside of combat", separator = true)]
         [Order(5)]
         public bool HideOutsideOfCombat = false;
 
