@@ -42,7 +42,7 @@ namespace DelvUI.Interface
             }
         }
 
-        public virtual Vector2 ParentAnchorPos() { return Vector2.Zero; } // override
+        public virtual Vector2 ParentPos() { return Vector2.Zero; } // override
 
         public sealed override void Draw(Vector2 origin)
         {
@@ -207,7 +207,7 @@ namespace DelvUI.Interface
 
         protected virtual Vector2 GetAnchoredPosition(Vector2 position, Vector2 size, DrawAnchor anchor)
         {
-            return Utils.GetAnchoredPosition(position, size, anchor);
+            return Utils.GetAnchoredPosition(ParentPos() + position, size, anchor);
         }
 
         protected virtual (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -232,27 +232,15 @@ namespace DelvUI.Interface
 
         private bool IsAnchored => AnchorToParent && ParentConfig != null;
 
-        public override Vector2 ParentAnchorPos()
+        public override Vector2 ParentPos()
         {
             if (!IsAnchored)
             {
                 return Vector2.Zero;
             }
 
-            return Utils.GetAnchoredPosition(ParentConfig!.Position, ParentConfig!.Size, ParentConfig!.Anchor);
-        }
-
-        protected override Vector2 GetAnchoredPosition(Vector2 position, Vector2 size, DrawAnchor anchor)
-        {
-            if (!IsAnchored)
-            {
-                return base.GetAnchoredPosition(position, size, anchor);
-            }
-
             Vector2 parentAnchoredPos = Utils.GetAnchoredPosition(ParentConfig!.Position, ParentConfig!.Size, ParentConfig!.Anchor);
-            Vector2 parentPos = Utils.GetAnchoredPosition(parentAnchoredPos, -ParentConfig!.Size, ParentAnchor);
-
-            return Utils.GetAnchoredPosition(parentPos + position, size, anchor);
+            return Utils.GetAnchoredPosition(parentAnchoredPos, -ParentConfig!.Size, ParentAnchor);
         }
 
         protected override void DrawDraggableArea(Vector2 origin)

@@ -71,7 +71,7 @@ namespace DelvUI.Helpers
 
             if (config.ShowAnchorPoints && selectedElement != null)
             {
-                Vector2 parentAnchorPos = center + selectedElement.ParentAnchorPos();
+                Vector2 parentAnchorPos = center + selectedElement.ParentPos();
                 Vector2 anchorPos = parentAnchorPos + selectedElement.GetConfig().Position;
 
                 drawList.AddLine(parentAnchorPos, anchorPos, 0xAA0000FF, 2);
