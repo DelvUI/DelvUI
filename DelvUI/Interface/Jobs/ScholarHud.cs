@@ -1,16 +1,13 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -135,7 +132,7 @@ namespace DelvUI.Interface.Jobs
             return config;
         }
 
-        [NestedConfig("Fairy Gauge", 30)]
+        [NestedConfig("Bio Bar", 30)]
         public ProgressBarConfig BioBar = new ProgressBarConfig(
             new(0, -10),
             new(254, 20),
