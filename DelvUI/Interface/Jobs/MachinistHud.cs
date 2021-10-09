@@ -95,10 +95,10 @@ namespace DelvUI.Interface.Jobs
 
             if (gauge.IsRobotActive)
             {
-                float robotDuration = gauge.SummonTimeRemaining / 1000f;
+                float robotDuration = gauge.SummonTimeRemaining / 1000f;                
 
                 Config.BatteryGauge.Label.SetText(robotDuration.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.SummonTimeRemaining, _robotDuration[gauge.LastSummonBatteryPower / 10 - 5], 0f, player, Config.BatteryGauge.RobotColor).Draw(origin);
+                BarUtilities.GetProgressBar(Config.BatteryGauge, robotDuration, gauge.LastSummonBatteryPower, 0f, player, Config.BatteryGauge.RobotColor).Draw(origin);
             }
         }
 
