@@ -310,11 +310,12 @@ namespace DelvUI.Interface.StatusEffects
                     var statusEffectData = list[i];
 
                     // icon
-                    DrawHelper.DrawIcon<LuminaStatus>(statusEffectData.Data, iconPos, Config.IconConfig.Size, false, drawList);
+                    var cropIcon = Config.IconConfig.CropIcon;
+                    DrawHelper.DrawIcon<LuminaStatus>(statusEffectData.Data, iconPos, Config.IconConfig.Size, false, drawList, cropIcon);
 
                     // border
                     var borderConfig = GetBorderConfig(statusEffectData);
-                    if (borderConfig != null)
+                    if (borderConfig != null && cropIcon)
                     {
                         drawList.AddRect(iconPos, iconPos + Config.IconConfig.Size, borderConfig.Color.Base, 0, ImDrawFlags.None, borderConfig.Thickness);
                     }

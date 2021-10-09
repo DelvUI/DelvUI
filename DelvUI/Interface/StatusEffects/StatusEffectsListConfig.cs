@@ -231,6 +231,10 @@ namespace DelvUI.Interface.StatusEffects
         [Order(5)]
         public Vector2 Size = new(40, 40);
 
+        [Checkbox("Crop Icon")]
+        [Order(6)]
+        public bool CropIcon = true;
+
         [NestedConfig("Duration", 10, separator = false, spacing = true)]
         public LabelConfig DurationLabelConfig;
 
@@ -449,7 +453,7 @@ namespace DelvUI.Interface.StatusEffects
                         {
                             if (row != null)
                             {
-                                DrawHelper.DrawIcon<Status>(row, ImGui.GetCursorPos(), iconSize, false);
+                                DrawHelper.DrawIcon<Status>(row, ImGui.GetCursorPos(), iconSize, false, true);
                             }
                         }
 
