@@ -357,7 +357,7 @@ namespace DelvUI.Interface
             // grid
             if (_gridConfig is not null && _gridConfig.Enabled)
             {
-                DraggablesHelper.DrawGrid(_gridConfig, _hudOptions);
+                DraggablesHelper.DrawGrid(_gridConfig, _hudOptions, _selectedElement);
             }
 
             bool isHudLocked = ConfigurationManager.Instance.LockHUD;
@@ -385,12 +385,6 @@ namespace DelvUI.Interface
             if (_selectedElement != null)
             {
                 _selectedElement.Draw(origin);
-            }
-
-            // anchor
-            if (_gridConfig is not null && _gridConfig.Enabled)
-            {
-                DraggablesHelper.DrawAnchors(_gridConfig, _hudOptions, _selectedElement);
             }
 
             // tooltip
