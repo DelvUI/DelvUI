@@ -46,7 +46,7 @@ namespace DelvUI.Interface.Bars
 
         [ColorEdit4("Color")]
         [Order(25, collapseWith = nameof(ChangeColor))]
-        public PluginConfigColor Color = new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
+        public PluginConfigColor Color = new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
 
         [Checkbox("Show Threshold Marker")]
         [Order(30)]

@@ -326,7 +326,7 @@ namespace DelvUI.Interface.Jobs
         public ProgressBarConfig ThundercloudBar = new ProgressBarConfig(
             new(-64, -69),
             new(126, 14),
-            new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f)),
+            new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 100f / 100f)),
             BarDirection.Left
         );
 
@@ -334,14 +334,14 @@ namespace DelvUI.Interface.Jobs
         public ProgressBarConfig ThunderDoTBar = new ProgressBarConfig(
             new(64, -69),
             new(126, 14),
-            new PluginConfigColor(new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f))
+            new PluginConfigColor(new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Firestarter Bar", 65)]
         public ProgressBarConfig FirestarterBar = new ProgressBarConfig(
             new(0, -85),
             new(254, 14),
-            new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f))
+            new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 100f / 100f))
         );
     }
 
