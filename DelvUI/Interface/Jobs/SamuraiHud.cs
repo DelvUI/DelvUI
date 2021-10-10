@@ -17,7 +17,6 @@ namespace DelvUI.Interface.Jobs
     public class SamuraiHud : JobHud
     {
         private new SamuraiConfig Config => (SamuraiConfig)_config;
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public SamuraiHud(SamuraiConfig config, string? displayName = null) : base(config, displayName)
         {
@@ -104,7 +103,7 @@ namespace DelvUI.Interface.Jobs
         {
             var gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.KenkiBar.HideWhenInactive || gauge.Kenki > 0)
-            { 
+            {
                 Config.KenkiBar.Label.SetText(gauge.Kenki.ToString("N0"));
                 BarUtilities.GetProgressBar(Config.KenkiBar, gauge.Kenki, 100f, 0f, player).Draw(pos);
             }
@@ -215,7 +214,7 @@ namespace DelvUI.Interface.Jobs
             new(254, 20),
             new PluginConfigColor(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f))
         );
-        
+
         [NestedConfig("Higanbana Bar", 60)]
         public ProgressBarConfig HiganbanaBar = new ProgressBarConfig(
             new(0, -78),
@@ -234,6 +233,7 @@ namespace DelvUI.Interface.Jobs
         );
     }
 
+    [DisableParentSettings("FillColor")]
     [Exportable(false)]
     public class SenBarConfig : ChunkedBarConfig
     {

@@ -1,18 +1,12 @@
 using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
-using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -23,7 +17,6 @@ namespace DelvUI.Interface.Jobs
         private bool _bahamutFinished = true;
 
         private new SummonerConfig Config => (SummonerConfig)_config;
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         public SummonerHud(SummonerConfig config, string? displayName = null) : base(config, displayName)
         {
@@ -327,6 +320,7 @@ namespace DelvUI.Interface.Jobs
         );
     }
 
+    [DisableParentSettings("FillColor")]
     [Exportable(false)]
     public class SummonerDemiStatusIndicatorBarConfig : BarConfig
     {

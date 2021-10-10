@@ -190,6 +190,7 @@ namespace DelvUI.Interface.Jobs
         );
     }
 
+    [DisableParentSettings("FillColor")]
     [Exportable(false)]
     public class BatteryGaugeConfig : ProgressBarConfig
     {
