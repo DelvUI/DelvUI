@@ -6,6 +6,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
+    [DisableParentSettings("HideWhenInactive")]
     [Section("Unit Frames")]
     [SubSection("Player", 0)]
     public class PlayerUnitFrameConfig : UnitFrameConfig
@@ -29,6 +30,7 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
+    [DisableParentSettings("HideWhenInactive")]
     [Section("Unit Frames")]
     [SubSection("Target", 0)]
     public class TargetUnitFrameConfig : UnitFrameConfig
@@ -50,6 +52,7 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
+    [DisableParentSettings("HideWhenInactive")]
     [Section("Unit Frames")]
     [SubSection("Target of Target", 0)]
     public class TargetOfTargetUnitFrameConfig : UnitFrameConfig
@@ -74,6 +77,7 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
+    [DisableParentSettings("HideWhenInactive")]
     [Section("Unit Frames")]
     [SubSection("Focus Target", 0)]
     public class FocusTargetUnitFrameConfig : UnitFrameConfig
@@ -98,6 +102,7 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
+    [DisableParentSettings("HideWhenInactive")]
     public class UnitFrameConfig : BarConfig
     {
         [Checkbox("Use Job Color")]

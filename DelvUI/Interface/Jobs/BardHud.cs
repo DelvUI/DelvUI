@@ -295,7 +295,7 @@ namespace DelvUI.Interface.Jobs
         );
     }
     
-    [DisableParentSettingsAttribute("FillColor")]
+    [DisableParentSettings("FillColor")]
     [Exportable(false)]
     public class BardSongBarConfig : ProgressBarConfig
     {

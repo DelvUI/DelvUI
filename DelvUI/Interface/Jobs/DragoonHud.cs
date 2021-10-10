@@ -202,15 +202,16 @@ namespace DelvUI.Interface.Jobs
         );
     }
 
+    [DisableParentSettings("FillColor")]
     [Exportable(false)]
     public class BloodOfTheDragonBar : BarConfig
     {
         [ColorEdit4("Blood of the Dragon")]
-        [Order(45)]
+        [Order(21)]
         public PluginConfigColor BloodOfTheDragonColor = new(new Vector4(78f / 255f, 198f / 255f, 238f / 255f, 100f / 100f));
 
         [ColorEdit4("Life of the Dragon")]
-        [Order(50)]
+        [Order(22)]
         public PluginConfigColor LifeOfTheDragonColor = new(new Vector4(139f / 255f, 24f / 255f, 24f / 255f, 100f / 100f));
 
         [NestedConfig("Bar Text", 1000, separator = false, spacing = true)]
