@@ -19,7 +19,45 @@ namespace DelvUI.Interface.GeneralElements
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
+            var (pos, size) = GetPositionAndSize(Vector2.Zero);
+
+            if (Config.CircularMode)
+            {
+                pos -= size / 2f;
+            }
+
+            return (new List<Vector2>() { pos }, new List<Vector2>() { size });
+        }
+
+        private (Vector2, Vector2) GetPositionAndSize(Vector2 origin)
+        {
+            Vector2 pos = Config.AnchorToMouse ? ImGui.GetMousePos() : origin + Config.Position;
+            Vector2 size = Config.Size;
+
+            if (Config.CircularMode)
+            {
+                size = new Vector2(Config.CircleRadius * 2, Config.CircleRadius * 2);
+                pos += size / 2f;
+            }
+            else
+            {
+                if (Config.VerticalMode)
+                {
+                    size = new Vector2(Config.Size.Y, Config.Size.X);
+                }
+            }
+
+            return (pos, size);
+        }
+
+        protected override void DrawDraggableArea(Vector2 origin)
+        {
+            if (Config.AnchorToMouse)
+            {
+                return;
+            }
+
+            base.DrawDraggableArea(origin);
         }
 
         public override void DrawChildren(Vector2 origin)
@@ -42,25 +80,23 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
-
-            if (Config.AnchorToMouse)
-            {
-                startPos = Utils.GetAnchoredPosition(ImGui.GetMousePos() + Config.MouseOffset, Config.Size, Config.Anchor);
-            }
+            var (pos, size) = GetPositionAndSize(origin);
+            pos = Utils.GetAnchoredPosition(pos, size, Config.Anchor);
 
             if (Config.CircularMode)
             {
-                DrawCircularIndicator(startPos, Config.CircleRadius, elapsed, total);
+                DrawCircularIndicator(pos, Config.CircleRadius, elapsed, total);
             }
             else
             {
-                DrawNormalBar(startPos, elapsed, total);
+                DrawNormalBar(pos, size, elapsed, total);
             }
         }
 
         private void DrawCircularIndicator(Vector2 position, float radius, float current, float total)
         {
+            total = Config.AlwaysShow && total == 0 ? 1 : total;
+
             var size = new Vector2(radius * 2);
             DrawHelper.DrawInWindow(ID, position - size / 2, size, false, false, (drawList) =>
             {
@@ -106,14 +142,10 @@ namespace DelvUI.Interface.GeneralElements
             });
         }
 
-        private void DrawNormalBar(Vector2 position, float current, float total)
+        private void DrawNormalBar(Vector2 position, Vector2 size, float current, float total)
         {
-            var windowPos = Config.VerticalMode ? new Vector2(position.X, position.Y - Config.Size.X) : position;
-            var windowSize = Config.VerticalMode ? new Vector2(Config.Size.Y, Config.Size.X) : Config.Size;
-
-            DrawHelper.DrawInWindow(ID, windowPos, windowSize, false, false, (drawList) =>
+            DrawHelper.DrawInWindow(ID, position, size, false, false, (drawList) =>
             {
-                var size = !Config.VerticalMode ? Config.Size : new Vector2(Config.Size.Y, -Config.Size.X);
                 var percentNonQueue = total != 0 ? 1F - (500f / 1000f) / total : 0;
 
                 var builder = BarBuilder.Create(position, size);

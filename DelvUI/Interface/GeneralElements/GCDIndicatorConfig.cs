@@ -8,7 +8,15 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("GCD Indicator", 0)]
     public class GCDIndicatorConfig : AnchorablePluginConfigObject
     {
-        [ColorEdit4("Color")]
+        [Checkbox("Always Show")]
+        [Order(1)]
+        public bool AlwaysShow = false;
+
+        [Checkbox("Anchor To Mouse")]
+        [Order(2)]
+        public bool AnchorToMouse = false;
+
+        [ColorEdit4("Color", spacing = true)]
         [Order(20)]
         public PluginConfigColor Color = new PluginConfigColor(new(220f / 255f, 220f / 255f, 220f / 255f, 100f / 100f));
 
@@ -16,35 +24,23 @@ namespace DelvUI.Interface.GeneralElements
         [Order(25)]
         public bool ShowBorder = true;
 
-        [Checkbox("Always Show")]
-        [Order(30)]
-        public bool AlwaysShow = false;
-
-        [Checkbox("Vertical Mode", spacing = true)]
+        [Checkbox("Vertical Mode")]
         [Order(35)]
         public bool VerticalMode = false;
-        
-        [Checkbox("Anchor To Mouse", spacing = true)]
-        [Order(40)]
-        public bool AnchorToMouse = false;
 
-        [DragInt2("Offset from Mouse", min = -4000, max = 4000)]
-        [Order(45, collapseWith = nameof(AnchorToMouse))]
-        public Vector2 MouseOffset = Vector2.Zero;
-
-        [Checkbox("Circular Mode")]
+        [Checkbox("Circular Mode", separator = true)]
         [Order(50)]
         public bool CircularMode = false;
 
         [DragInt("Radius")]
         [Order(55, collapseWith = nameof(CircularMode))]
         public int CircleRadius = 40;
-        
+
         [DragInt("Thickness")]
         [Order(60, collapseWith = nameof(CircularMode))]
         public int CircleThickness = 10;
 
-        [Checkbox("Show GCD Queue Indicator")]
+        [Checkbox("Show GCD Queue Indicator", separator = true)]
         [Order(65)]
         public bool ShowGCDQueueIndicator = true;
 
