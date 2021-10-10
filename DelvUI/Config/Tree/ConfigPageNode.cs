@@ -221,6 +221,10 @@ namespace DelvUI.Config.Tree
 
                 if (!wasAdded && Attribute.IsDefined(field, typeof(ConfigAttribute), true))
                 {
+                    if (ConfigObject.DisableParentSettings != null && ConfigObject.DisableParentSettings.Contains(field.Name))
+                    {
+                        continue;
+                    }
                     _drawList.Add(new KeyValuePair<int, object>(int.MaxValue, new FieldNode(field, ConfigObject, ID)));
                 }
             }
