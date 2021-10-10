@@ -24,6 +24,8 @@ namespace DelvUI.Config.Tree
 
             bool didReset = false;
 
+            ImGui.NewLine();
+
             ImGui.BeginChild(
                 "item view",
                 new Vector2(0, -ImGui.GetFrameHeightWithSpacing() - 15),
@@ -51,18 +53,6 @@ namespace DelvUI.Config.Tree
                     }
 
                     ImGui.EndTabBar();
-                    // close button
-                    Vector2 pos = ImGui.GetCursorPos();
-                    ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 20, 0));
-                    ImGui.PushFont(UiBuilder.IconFont);
-                    ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f));
-                    if (ImGui.Button(FontAwesomeIcon.Times.ToIconString(), new Vector2(20, 20)))
-                    {
-                        ConfigurationManager.Instance.DrawConfigWindow = !ConfigurationManager.Instance.DrawConfigWindow;
-                    }
-                    ImGui.PopStyleColor();
-                    ImGui.PopFont();
-                    ImGui.SetCursorPos(pos);
                 }
 
                 didReset |= DrawResetModal();

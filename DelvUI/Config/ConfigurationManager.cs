@@ -68,6 +68,9 @@ namespace DelvUI.Config
             }
         }
 
+        public bool DrawChangelog = false;
+        private string? _changelog = null;
+
         private bool _needsProfileUpdate = false;
         private bool _lockHUD = true;
 
@@ -108,6 +111,9 @@ namespace DelvUI.Config
             ConfigDirectory = configDirectory;
             ConfigBaseNode = configBaseNode;
             ConfigBaseNode.ConfigObjectResetEvent += OnConfigObjectReset;
+
+            LoadChangelog();
+            CheckVersion();
 
             LoadOrInitializeFiles();
 
@@ -174,6 +180,56 @@ namespace DelvUI.Config
             ProfilesManager.Instance.SaveCurrentProfile();
         }
 
+        private void LoadChangelog()
+        {
+            string path = Path.Combine(Plugin.AssemblyLocation, "changelog.md");
+
+            try
+            {
+                string fullChangelog = File.ReadAllText(path);
+                string versionChangelog = fullChangelog.Split("#", StringSplitOptions.RemoveEmptyEntries)[0];
+                _changelog = versionChangelog.Replace(Plugin.Version, "");
+
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error loading changelog: " + e.Message);
+            }
+        }
+
+        private void CheckVersion()
+        {
+            string path = Path.Combine(ConfigDirectory, "version");
+
+            try
+            {
+                bool needsWrite = false;
+
+                if (!File.Exists(path))
+                {
+                    needsWrite = true;
+                }
+                else
+                {
+                    string version = File.ReadAllText(path);
+                    if (version != Plugin.Version)
+                    {
+                        needsWrite = true;
+                    }
+                }
+
+                DrawChangelog = needsWrite;
+                if (needsWrite)
+                {
+                    File.WriteAllText(path, Plugin.Version);
+                }
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error checking version: " + e.Message);
+            }
+        }
+
         public void Draw()
         {
             if (DrawConfigWindow)
@@ -186,7 +242,11 @@ namespace DelvUI.Config
                 {
                     DraggablesHelper.DrawGridWindow();
                 }
+            }
 
+            if (DrawChangelog && _changelog != null)
+            {
+                DrawChangelog = !DrawHelper.DrawChangelogWindow(_changelog);
             }
         }
 

@@ -1,11 +1,10 @@
-﻿using Dalamud.Logging;
+﻿using Dalamud.Interface;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using ImGuiNET;
 using ImGuiScene;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -163,18 +162,21 @@ namespace DelvUI.Config.Tree
 
 
             ImGui.BeginGroup(); // Middle section
-
             {
                 ImGui.BeginGroup(); // Left
-
                 {
+                    // banner
                     TextureWrap? delvUiBanner = ConfigurationManager.Instance.BannerImage;
-
                     if (delvUiBanner != null)
                     {
                         ImGui.Image(delvUiBanner.ImGuiHandle, new Vector2(delvUiBanner.Width, delvUiBanner.Height));
                     }
 
+                    // version
+                    ImGui.SetCursorPos(new Vector2(60, 35));
+                    ImGui.Text($"v{Plugin.Version}");
+
+                    // section list
                     ImGui.BeginChild("left pane", new Vector2(150, -ImGui.GetFrameHeightWithSpacing() - 15), true);
 
                     // if no section is selected, select the first
@@ -220,7 +222,6 @@ namespace DelvUI.Config.Tree
                 ImGui.SameLine();
 
                 ImGui.BeginGroup(); // Right
-
                 {
                     foreach (SectionNode selectionNode in _nodes)
                     {
@@ -234,60 +235,72 @@ namespace DelvUI.Config.Tree
             ImGui.EndGroup(); // Middle section
 
             ImGui.BeginGroup();
-            ImGui.PushStyleColor(ImGuiCol.Border, Vector4.Zero);
-            ImGui.BeginChild("buttons", new Vector2(0, 0), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
-            ImGui.PopStyleColor();
-
-            ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
-            if (ImGui.Button((ConfigurationManager.Instance.ShowHUD ? "Hide" : "Show") + " HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
             {
-                ConfigurationManager.Instance.ShowHUD = !ConfigurationManager.Instance.ShowHUD;
+                ImGui.SetCursorPosX(0);
+
+                ImGui.PushStyleColor(ImGuiCol.Border, Vector4.Zero);
+                ImGui.BeginChild("buttons", new Vector2(1200, 0), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                ImGui.PopStyleColor();
+
+                const float buttonWidth = 150;
+
+                ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
+                if (ImGui.Button((ConfigurationManager.Instance.ShowHUD ? "Hide" : "Show") + " HUD", new Vector2(buttonWidth, 0)))
+                {
+                    ConfigurationManager.Instance.ShowHUD = !ConfigurationManager.Instance.ShowHUD;
+                }
+
+                ImGui.SameLine();
+                if (ImGui.Button((ConfigurationManager.Instance.LockHUD ? "Unlock" : "Lock") + " HUD", new Vector2(buttonWidth, 0)))
+                {
+                    ConfigurationManager.Instance.LockHUD = !ConfigurationManager.Instance.LockHUD;
+                }
+
+                ImGui.PopStyleVar();
+
+                ImGui.SameLine();
+                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 251);
+                if (ImGui.Button($"Changelog", new Vector2(buttonWidth, 0)))
+                {
+                    ConfigurationManager.Instance.DrawChangelog = true;
+                }
+
+                ImGui.SameLine();
+                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, 1f));
+                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, .85f));
+
+                if (ImGui.Button("Help!", new Vector2(buttonWidth, 0)))
+                {
+                    Utils.OpenUrl("https://discord.gg/delvui");
+                }
+
+                ImGui.PopStyleColor(2);
+
+                ImGui.SameLine();
+                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, 1f));
+                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, .85f));
+
+                if (ImGui.Button("Donate!", new Vector2(buttonWidth, 0)))
+                {
+                    Utils.OpenUrl("https://ko-fi.com/DelvUI");
+                }
+
+                ImGui.PopStyleColor(2);
+                ImGui.EndChild();
             }
-            ImGui.PopStyleVar();
-            ImGui.SameLine();
-            ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
-
-            if (ImGui.Button((ConfigurationManager.Instance.LockHUD ? "Unlock" : "Lock") + " HUD", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
-            {
-                ConfigurationManager.Instance.LockHUD = !ConfigurationManager.Instance.LockHUD;
-            }
-            ImGui.PopStyleVar();
-
-            ImGui.SameLine();
-            ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
-            ImGui.PushStyleColor(ImGuiCol.ButtonActive, Vector4.Zero);
-            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, Vector4.Zero);
-
-            if (ImGui.Button($"v{Plugin.Version}", new Vector2(ImGui.GetWindowWidth() / 7 * 3 - 50, 0)))
-            { }
-
-            ImGui.PopStyleColor(3);
-
-            ImGui.SameLine();
-
-            ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, 1f));
-            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, .85f));
-
-            if (ImGui.Button("Help!", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
-            {
-                Process.Start("https://discord.gg/delvui");
-            }
-
-            ImGui.PopStyleColor(2);
-
-            ImGui.SameLine();
-
-            ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, 1f));
-            ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, .85f));
-
-            if (ImGui.Button("Donate!", new Vector2(ImGui.GetWindowWidth() / 7, 0)))
-            {
-                Process.Start("https://ko-fi.com/DelvUI");
-            }
-
-            ImGui.PopStyleColor(2);
-            ImGui.EndChild();
             ImGui.EndGroup();
+
+            // close button
+            ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 28, 5));
+            ImGui.PushFont(UiBuilder.IconFont);
+            ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f));
+            if (ImGui.Button(FontAwesomeIcon.Times.ToIconString(), new Vector2(22, 22)))
+            {
+                ConfigurationManager.Instance.DrawConfigWindow = !ConfigurationManager.Instance.DrawConfigWindow;
+            }
+            ImGui.PopStyleColor();
+            ImGui.PopFont();
+
             PopStyles();
             ImGui.End();
 
