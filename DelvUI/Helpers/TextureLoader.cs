@@ -64,8 +64,10 @@ namespace DelvUI.Helpers
                 case TextureFormat.DXT1: Decompress(SquishOptions.DXT1, src, dst, width, height); return true;
                 case TextureFormat.DXT3: Decompress(SquishOptions.DXT3, src, dst, width, height); return true;
                 case TextureFormat.DXT5: Decompress(SquishOptions.DXT5, src, dst, width, height); return true;
-                case TextureFormat.A8R8G8B8: Array.Copy(src, dst, dst.Length); return true;
+                case TextureFormat.R5G5B5A1: ProcessA1R5G5B5(src, dst, width, height); return true;
                 case TextureFormat.R4G4B4A4: ProcessA4R4G4B4(src, dst, width, height); return true;
+                case TextureFormat.L8: ProcessR3G3B2(src, dst, width, height); return true;
+                case TextureFormat.A8R8G8B8: Array.Copy(src, dst, dst.Length); return true;
             }
 
             return false;
@@ -91,17 +93,53 @@ namespace DelvUI.Helpers
 
             return dst;
         }
-        
-        private static void ProcessA4R4G4B4( Span< byte > src, byte[] dst, int width, int height )
-        {
-            for( var i = 0; ( i + 2 ) <= 2 * width * height; i += 2 )
-            {
-                var v = BitConverter.ToUInt16( src.Slice( i, sizeof( UInt16 ) ).ToArray(), 0 );
 
-                for( var j = 0; j < 4; ++j )
+        private static void ProcessA1R5G5B5(Span<byte> src, byte[] dst, int width, int height)
+        {
+            for (var i = 0; (i + 2) <= 2 * width * height; i += 2)
+            {
+                var v = BitConverter.ToUInt16(src.Slice(i, sizeof(UInt16)).ToArray(), 0);
+
+                var a = (uint)(v & 0x8000);
+                var r = (uint)(v & 0x7C00);
+                var g = (uint)(v & 0x03E0);
+                var b = (uint)(v & 0x001F);
+
+                var rgb = ((r << 9) | (g << 6) | (b << 3));
+                var argbValue = (a * 0x1FE00 | rgb | ((rgb >> 5) & 0x070707));
+
+                for (var j = 0; j < 4; ++j)
+                {
+                    dst[i * 2 + j] = (byte)(argbValue >> (8 * j));
+                }
+            }
+        }
+
+        private static void ProcessA4R4G4B4(Span<byte> src, byte[] dst, int width, int height)
+        {
+            for (var i = 0; (i + 2) <= 2 * width * height; i += 2)
+            {
+                var v = BitConverter.ToUInt16(src.Slice(i, sizeof(UInt16)).ToArray(), 0);
+
+                for (var j = 0; j < 4; ++j)
                 {
                     dst[i * 2 + j] = (byte)(((v >> (4 * j)) & 0x0F) << 4);
                 }
+            }
+        }
+
+        private static void ProcessR3G3B2(Span<byte> src, byte[] dst, int width, int height)
+        {
+            for (var i = 0; i < width * height; ++i)
+            {
+                var r = (uint)(src[i] & 0xE0);
+                var g = (uint)(src[i] & 0x1C);
+                var b = (uint)(src[i] & 0x03);
+
+                dst[i * 4 + 0] = (byte)(b | (b << 2) | (b << 4) | (b << 6));
+                dst[i * 4 + 1] = (byte)(g | (g << 3) | (g << 6));
+                dst[i * 4 + 2] = (byte)(r | (r << 3) | (r << 6));
+                dst[i * 4 + 3] = 0xFF;
             }
         }
     }
