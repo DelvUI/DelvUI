@@ -14,7 +14,7 @@ namespace DelvUI.Interface.Bars
 {
     public class BarUtilities
     {
-        public static BarHud GetProgressBar(ProgressBarConfig config, float current, float max, float min = 0f, GameObject? actor = null, PluginConfigColor? fillColor = null)
+        public static BarHud GetProgressBar(ProgressBarConfig config, float current, float max, float min = 0f, GameObject? actor = null, PluginConfigColor? fillColor = null, BarGlowConfig? barGlowConfig = null)
         {
             return GetProgressBar(config, config.ThresholdConfig, new LabelConfig[] { config.Label }, current, max, min, actor, fillColor);
         }
@@ -169,6 +169,53 @@ namespace DelvUI.Interface.Bars
                 bars[i] = new BarHud(config.ID + i, config.DrawBorder, actor: actor, glowColor: glow?.Color, glowSize: glow?.Size)
                     .SetBackground(background)
                     .AddForegrounds(foreground);
+
+                var label = chunks[i].Item3;
+                if (label is not null)
+                {
+                    bars[i].AddLabels(label);
+                }
+            }
+
+            return bars;
+        }
+
+        public static BarHud[] GetChunkedBars(
+            ChunkedBarConfig config,
+            GameObject? actor,
+            BarGlowConfig? glowConfig = null,
+            bool[]? chucksToGlow = null,
+            params Tuple<PluginConfigColor, float, LabelConfig?>[] chunks)
+        {
+            if (chucksToGlow is null)
+            {
+                return GetChunkedBars(config, actor, null, chunks);
+            }
+
+            BarHud[] bars = new BarHud[chunks.Length];
+            Vector2 pos = Utils.GetAnchoredPosition(config.Position, config.Size, config.Anchor);
+
+            for (int i = 0; i < chunks.Length; i++)
+            {
+                Vector2 chunkPos, chunkSize;
+                if (config.FillDirection.IsHorizontal())
+                {
+                    chunkSize = new Vector2((config.Size.X - config.Padding * (chunks.Length - 1)) / chunks.Length, config.Size.Y);
+                    chunkPos = pos + new Vector2((chunkSize.X + config.Padding) * i, 0);
+                }
+                else
+                {
+                    chunkSize = new Vector2(config.Size.X, (config.Size.Y - config.Padding * (chunks.Length - 1)) / chunks.Length);
+                    chunkPos = pos + new Vector2(0, (chunkSize.Y + config.Padding) * i);
+                }
+
+                Rect background = new Rect(chunkPos, chunkSize, config.BackgroundColor);
+                Rect foreground = GetFillRect(chunkPos, chunkSize, config.FillDirection, chunks[i].Item1, chunks[i].Item2, 1f, 0f);
+                BarGlowConfig? glow = chucksToGlow[i] ? glowConfig : null;
+
+                bars[i] = new BarHud(config.ID + i, config.DrawBorder, actor: actor, glowColor: glow?.Color, glowSize: glow?.Size)
+                          .SetBackground(background)
+                          .AddForegrounds(foreground);
 
                 var label = chunks[i].Item3;
                 if (label is not null)
