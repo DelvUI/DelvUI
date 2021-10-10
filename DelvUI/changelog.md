@@ -30,6 +30,7 @@ Features:
 - Added support for Penumbra texture mods.
 - Added option to show the id of status effects on the tooltips.
 - Added option to show status effects with their original shape and dispellable indicator.
+- Added BLM specific options for the MP Ticker.
 
 Fixes:
 - Fixed several issues in the HUD unlocked mode.
