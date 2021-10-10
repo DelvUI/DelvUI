@@ -323,7 +323,7 @@ namespace DelvUI.Interface.Jobs
             float currentStarDuration = starPreCookingBuff > 0 ? StarMaxDuration - Math.Abs(starPreCookingBuff) : Math.Abs(starPostCookingBuff);
             PluginConfigColor currentStarColor = starPreCookingBuff > 0 ? Config.StarBar.StarEarthlyColor : Config.StarBar.StarGiantColor;
             Config.StarBar.Label.SetText($"{currentStarDuration.ToString(Config.StarBar.EnableDecimalStarBar ? "N1" : "N0", CultureInfo.InvariantCulture)}");
-            BarUtilities.GetProgressBar(Config.StarBar, currentStarDuration, StarMaxDuration, 0f, player, currentStarColor, Config.StarBar.StarGlowConfig.Enabled ? Config.StarBar.StarGlowConfig : null).Draw(origin); // Star Countdown after Star is ready 
+            BarUtilities.GetProgressBar(Config.StarBar, currentStarDuration, StarMaxDuration, 0f, player, currentStarColor, Config.StarBar.StarGlowConfig.Enabled && starPostCookingBuff > 0? Config.StarBar.StarGlowConfig : null).Draw(origin); // Star Countdown after Star is ready 
 
         }
     }
