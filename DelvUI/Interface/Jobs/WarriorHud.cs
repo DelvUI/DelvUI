@@ -15,7 +15,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class WarriorHud : JobHud
     {
-        private new WarriorConfig Config => (WarriorConfig)_config;        
+        private new WarriorConfig Config => (WarriorConfig)_config;
 
         public WarriorHud(WarriorConfig config, string? displayName = null) : base(config, displayName)
         {
@@ -117,6 +117,7 @@ namespace DelvUI.Interface.Jobs
         );
     }
 
+    [DisableParentSettings("FillColor")]
     [Exportable(false)]
     public class StormsEyeBarConfig : ProgressBarConfig
     {
@@ -133,6 +134,7 @@ namespace DelvUI.Interface.Jobs
         }
     }
 
+    [DisableParentSettings("FillColor")]
     [Exportable(false)]
     public class BeastGaugeConfig : ProgressBarConfig
     {

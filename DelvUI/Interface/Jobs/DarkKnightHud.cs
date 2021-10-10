@@ -100,36 +100,36 @@ namespace DelvUI.Interface.Jobs
         private void DarkArtsProc(Vector2 origin, PlayerCharacter player)
         {
             bool hasDarkArts = Plugin.JobGauges.Get<DRKGauge>().HasDarkArts;
-
             if (!Config.ManaBar.Enabled) { return; }
-            if (hasDarkArts)
+
+            if (hasDarkArts || !Config.ManaBar.UseChunks)
             {
                 DrawManaBar(origin, player, 1);
             }
-            else
+            if (!hasDarkArts && Config.ManaBar.UseChunks)
             {
                 DrawManaBar(origin, player, 3);
             }
+
         }
 
-        private void DrawManaBar(Vector2 origin, PlayerCharacter player, int chunks)
+        private void DrawManaBar(Vector2 origin, PlayerCharacter player, int chunks = 0)
         {
-            DarkKnightManaBarConfig config = Config.ManaBar;
             var gauge = Plugin.JobGauges.Get<DRKGauge>();
 
-            if (config.HideWhenInactive && !gauge.HasDarkArts && player.CurrentMp == player.MaxMp) { return; }
+            if (Config.ManaBar.HideWhenInactive && !gauge.HasDarkArts && player.CurrentMp == player.MaxMp) { return; }
 
+            Config.ManaBar.Label.SetText($"{player.CurrentMp,0}");
             // hardcoded 9k as maxMP so the chunks are each 3k since that's what a DRK wants to see
             BarUtilities.GetChunkedProgressBars(
-                config,
+                Config.ManaBar,
                 chunks,
                 player.CurrentMp,
-                9000,
+                Config.ManaBar.UseChunks ? 9000 : player.MaxMp,
                 0f,
                 player,
-                null,
-                gauge.HasDarkArts ? config.GlowConfig : null,
-                gauge.HasDarkArts ? config.DarkArtsColor : GlobalColors.Instance.PartialFillColor
+                Config.ManaBar.Label,
+                gauge.HasDarkArts ? Config.ManaBar.GlowConfig : null
                 ).Draw(origin);
         }
 
@@ -261,7 +261,7 @@ namespace DelvUI.Interface.Jobs
     }
 
     [Exportable(false)]
-    public class DarkKnightManaBarConfig : ChunkedBarConfig
+    public class DarkKnightManaBarConfig : ChunkedProgressBarConfig
     {
         [ColorEdit4("Dark Arts Color" + "##MP")]
         [Order(26)]
