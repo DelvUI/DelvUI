@@ -9,6 +9,9 @@ using DelvUI.Config;
 using DelvUI.Enums;
 using Colourful;
 using System.Text.RegularExpressions;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
+using Dalamud.Logging;
 
 namespace DelvUI.Helpers
 {
@@ -144,20 +147,20 @@ namespace DelvUI.Helpers
             {
                 case BlendMode.LAB:
                     {
-                    //convert RGB to LAB
-                    var rgbFullHealthLab = _rgbToLab.Convert(rgbFullHealthColor);
-                    var rgbLowHealthLab = _rgbToLab.Convert(rgbLowHealthColor);
+                        //convert RGB to LAB
+                        var rgbFullHealthLab = _rgbToLab.Convert(rgbFullHealthColor);
+                        var rgbLowHealthLab = _rgbToLab.Convert(rgbLowHealthColor);
 
-                    float LabresultL = (float)((rgbFullHealthLab.L - rgbLowHealthLab.L) * ratio + rgbLowHealthLab.L);
-                    float Labresulta = (float)((rgbFullHealthLab.a - rgbLowHealthLab.a) * ratio + rgbLowHealthLab.a);
-                    float Labresultb = (float)((rgbFullHealthLab.b - rgbLowHealthLab.b) * ratio + rgbLowHealthLab.b);
+                        float LabresultL = (float)((rgbFullHealthLab.L - rgbLowHealthLab.L) * ratio + rgbLowHealthLab.L);
+                        float Labresulta = (float)((rgbFullHealthLab.a - rgbLowHealthLab.a) * ratio + rgbLowHealthLab.a);
+                        float Labresultb = (float)((rgbFullHealthLab.b - rgbLowHealthLab.b) * ratio + rgbLowHealthLab.b);
 
-                    var newColorLab = new LabColor(LabresultL, Labresulta, Labresultb);
-                    var newColorLab2RGB = _labToRgb.Convert(newColorLab);
+                        var newColorLab = new LabColor(LabresultL, Labresulta, Labresultb);
+                        var newColorLab2RGB = _labToRgb.Convert(newColorLab);
 
-                    newColorLab2RGB.NormalizeIntensity();
+                        newColorLab2RGB.NormalizeIntensity();
 
-                    return new PluginConfigColor(new Vector4((float)newColorLab2RGB.R, (float)newColorLab2RGB.G, (float)newColorLab2RGB.B, alpha));
+                        return new PluginConfigColor(new Vector4((float)newColorLab2RGB.R, (float)newColorLab2RGB.G, (float)newColorLab2RGB.B, alpha));
                     }
 
                 case BlendMode.LChab:
@@ -291,7 +294,6 @@ namespace DelvUI.Helpers
             }
         }
 
-
         public static PluginConfigColor ColorForActor(GameObject? actor)
         {
             if (actor == null || actor is not Character character)
@@ -385,6 +387,34 @@ namespace DelvUI.Helpers
                 RegexOptions.IgnorePatternWhitespace);
 
             return regex.Replace(s, " ");
+        }
+
+        public static void OpenUrl(string url)
+        {
+            try
+            {
+                Process.Start(url);
+            }
+            catch
+            {
+                try
+                {
+                    // hack because of this: https://github.com/dotnet/corefx/issues/10361
+                    if (RuntimeInformation.IsOSPlatform(osPlatform: OSPlatform.Windows))
+                    {
+                        url = url.Replace("&", "^&");
+                        Process.Start(new ProcessStartInfo("cmd", $"/c start {url}") { CreateNoWindow = true });
+                    }
+                    else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+                    {
+                        Process.Start("xdg-open", url);
+                    }
+                }
+                catch (Exception e)
+                {
+                    PluginLog.Error("Error trying to open url: " + e.Message);
+                }
+            }
         }
     }
 }

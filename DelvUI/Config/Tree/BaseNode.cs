@@ -1,12 +1,10 @@
 ﻿using Dalamud.Interface;
-using Dalamud.Logging;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using ImGuiNET;
 using ImGuiScene;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -267,26 +265,24 @@ namespace DelvUI.Config.Tree
                     ConfigurationManager.Instance.DrawChangelog = true;
                 }
 
-
                 ImGui.SameLine();
                 ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, 1f));
                 ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, .85f));
 
                 if (ImGui.Button("Help!", new Vector2(buttonWidth, 0)))
                 {
-                    Process.Start("https://discord.gg/delvui");
+                    Utils.OpenUrl("https://discord.gg/delvui");
                 }
 
                 ImGui.PopStyleColor(2);
 
                 ImGui.SameLine();
-
                 ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, 1f));
                 ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, .85f));
 
                 if (ImGui.Button("Donate!", new Vector2(buttonWidth, 0)))
                 {
-                    Process.Start("https://ko-fi.com/DelvUI");
+                    Utils.OpenUrl("https://ko-fi.com/DelvUI");
                 }
 
                 ImGui.PopStyleColor(2);
