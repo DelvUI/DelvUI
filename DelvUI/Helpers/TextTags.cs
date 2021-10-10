@@ -122,7 +122,7 @@ namespace DelvUI.Helpers
                         return $"{Math.Round(100f / character.MaxHp * character.CurrentHp)}";
 
                     case "[health:percent-decimal]":
-                        return $"{100f / character.MaxHp * character.CurrentHp:##0.#}";
+                        return FormattableString.Invariant($"{100f / character.MaxHp * character.CurrentHp:##0.#}");
 
                     case "[health:deficit]":
                         return $"-{character.MaxHp - character.CurrentHp}";
@@ -166,7 +166,7 @@ namespace DelvUI.Helpers
                         return $"{Math.Round(100f / character.MaxMp * character.CurrentMp)}";
 
                     case "[mana:percent-decimal]":
-                        return $"{100f / character.MaxMp * character.CurrentMp:##0.#}";
+                        return FormattableString.Invariant($"{100f / character.MaxMp * character.CurrentMp:##0.#}");
 
                     case "[mana:deficit]":
                         return $"-character.MaxMp-character.CurrentMp";
