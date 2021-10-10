@@ -43,7 +43,7 @@ namespace DelvUI
 
         public static TextureWrap? BannerTexture;
 
-        public string AssemblyLocation { get; }
+        public static string AssemblyLocation { get; private set; } = "";
         public string Name => "DelvUI";
 
         public static string Version { get; private set; } = "";
@@ -89,7 +89,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.2.1.1";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.3.0.0";
 
             FontsManager.Initialize(AssemblyLocation);
             LoadBanner();

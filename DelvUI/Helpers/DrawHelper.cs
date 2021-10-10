@@ -92,7 +92,7 @@ namespace DelvUI.Helpers
         public static void DrawShadowText(string text, Vector2 pos, uint color, uint shadowColor, ImDrawListPtr drawList, int offset = 1)
         {
             // TODO: Add parameter to allow to choose a direction
-            
+
             // Shadow
             drawList.AddText(new Vector2(pos.X + offset, pos.Y + offset), shadowColor, text);
 
@@ -164,11 +164,11 @@ namespace DelvUI.Helpers
             // Status = 24x32, show from 2,7 until 22,26
             //show from 0,0 until 24,32 for uncropped status icon
 
-            float uv0x = cropIcon ? 4f : 1f; 
+            float uv0x = cropIcon ? 4f : 1f;
             float uv0y = cropIcon ? 14f : 1f;
 
-            float uv1x = cropIcon ? 4f : 1f; 
-            float uv1y = cropIcon ? 12f : 1f; 
+            float uv1x = cropIcon ? 4f : 1f;
+            float uv1y = cropIcon ? 12f : 1f;
 
             var uv0 = new Vector2(uv0x / texture.Width, uv0y / texture.Height);
             var uv1 = new Vector2(1f - uv1x / texture.Width, 1f - uv1y / texture.Height);
@@ -310,5 +310,36 @@ namespace DelvUI.Helpers
             }
         }
 
+        public static bool DrawChangelogWindow(string changelog)
+        {
+            bool didClose = false;
+            Vector2 size = new Vector2(500, 500);
+
+            ImGui.SetNextWindowSize(size, ImGuiCond.Appearing);
+            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
+
+            string title = "DelvUI Changelog v" + Plugin.Version + " ##DelvUI";
+            if (!ImGui.Begin(title, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar))
+            {
+                ImGui.End();
+                return didClose;
+            }
+
+            ImGui.BeginChild("##delvui_changelog", new Vector2(size.X - 10, size.Y - 80));
+            ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + size.X - 24);
+            ImGui.TextWrapped(changelog);
+            ImGui.EndChild();
+
+            ImGui.SetCursorPos(new Vector2(10, size.Y - 40));
+            if (ImGui.Button("Close", new Vector2(size.X - 20, 30)))
+            {
+                didClose = true;
+            }
+
+            ImGui.End();
+            ImGui.PopStyleColor();
+
+            return didClose;
+        }
     }
 }
