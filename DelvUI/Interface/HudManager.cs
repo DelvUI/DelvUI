@@ -360,32 +360,8 @@ namespace DelvUI.Interface
                 DraggablesHelper.DrawGrid(_gridConfig, _hudOptions, _selectedElement);
             }
 
-            bool isHudLocked = ConfigurationManager.Instance.LockHUD;
-
-
-            // general elements
-            foreach (var element in _hudElements)
-            {
-                if (element != _selectedElement && !_hudHelper.IsElementHidden(element))
-                {
-                    element.Draw(origin);
-                }
-            }
-
-            // job hud
-            if (_jobHud != null && _jobHud.Config.Enabled && _jobHud != _selectedElement)
-            {
-                if (!_hudHelper.IsElementHidden(_jobHud))
-                {
-                    _jobHud.Draw(origin);
-                }
-            }
-
-            // selected
-            if (_selectedElement != null)
-            {
-                _selectedElement.Draw(origin);
-            }
+            // draw elements
+            DraggablesHelper.DrawElements(origin, _hudHelper, _hudElements, _jobHud, _selectedElement);
 
             // tooltip
             TooltipsHelper.Instance.Draw();

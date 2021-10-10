@@ -1,8 +1,11 @@
 ﻿using DelvUI.Config;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.Jobs;
+using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace DelvUI.Helpers
@@ -83,6 +86,41 @@ namespace DelvUI.Helpers
             ImGui.End();
         }
 
+        public static void DrawElements(
+            Vector2 origin,
+            HudHelper hudHelper,
+            List<DraggableHudElement> elements,
+            JobHud? jobHud,
+            DraggableHudElement? selectedElement)
+        {
+            bool canTakeInput = true;
+
+            // selected
+            if (selectedElement != null && !hudHelper.IsElementHidden(selectedElement))
+            {
+                selectedElement.CanTakeInputForDrag = true;
+                selectedElement.Draw(origin);
+                canTakeInput = !selectedElement.NeedsInputForDrag;
+            }
+
+            // all
+            foreach (DraggableHudElement element in elements)
+            {
+                if (element == selectedElement || hudHelper.IsElementHidden(element)) { continue; }
+
+                element.CanTakeInputForDrag = canTakeInput;
+                element.Draw(origin);
+                canTakeInput = !canTakeInput ? false : !element.NeedsInputForDrag;
+            }
+
+            // job hud
+            if (jobHud != null && jobHud != selectedElement && !hudHelper.IsElementHidden(jobHud))
+            {
+                jobHud.CanTakeInputForDrag = canTakeInput;
+                jobHud.Draw(origin);
+            }
+        }
+
         public static bool DrawArrows(Vector2 position, Vector2 size, string tooltipText, out Vector2 offset)
         {
             offset = Vector2.Zero;
@@ -93,18 +131,11 @@ namespace DelvUI.Helpers
                 | ImGuiWindowFlags.NoBackground
                 | ImGuiWindowFlags.NoDecoration;
 
-            var arrowSize = new Vector2(40, 40);
             var margin = new Vector2(4, 0);
-            var windowSize = arrowSize + margin * 2;
+            var windowSize = ArrowSize + margin * 2;
 
             // left, right, up, down
-            var positions = new Vector2[]
-            {
-                new Vector2(position.X - arrowSize.X + 10, position.Y + size.Y / 2f - arrowSize.Y / 2f - 2),
-                new Vector2(position.X + size.X - 8, position.Y + size.Y / 2f - arrowSize.Y / 2f - 2),
-                new Vector2(position.X + size.X / 2f - arrowSize.X / 2f + 2, position.Y - arrowSize.Y + 1),
-                new Vector2(position.X + size.X / 2f - arrowSize.X / 2f + 2, position.Y + size.Y - 7)
-            };
+            var positions = GetArrowPositions(position, size);
             var offsets = new Vector2[]
             {
                 new Vector2(-1, 0),
@@ -141,6 +172,24 @@ namespace DelvUI.Helpers
             }
 
             return offset != Vector2.Zero;
+        }
+
+        public static Vector2 ArrowSize = new Vector2(40, 40);
+
+        public static Vector2[] GetArrowPositions(Vector2 position, Vector2 size)
+        {
+            return GetArrowPositions(position, size, ArrowSize);
+        }
+
+        public static Vector2[] GetArrowPositions(Vector2 position, Vector2 size, Vector2 arrowSize)
+        {
+            return new Vector2[]
+            {
+                new Vector2(position.X - arrowSize.X + 10, position.Y + size.Y / 2f - arrowSize.Y / 2f - 2),
+                new Vector2(position.X + size.X - 8, position.Y + size.Y / 2f - arrowSize.Y / 2f - 2),
+                new Vector2(position.X + size.X / 2f - arrowSize.X / 2f + 2, position.Y - arrowSize.Y + 1),
+                new Vector2(position.X + size.X / 2f - arrowSize.X / 2f + 2, position.Y + size.Y - 7)
+            };
         }
 
         public static void DrawGridWindow()
