@@ -295,7 +295,7 @@ namespace DelvUI.Interface.Jobs
         );
     }
     
-    [DisableParentSettings("Fill Color")]
+    [DisableParentSettings("FillColor")]
     [Exportable(false)]
     public class BardSongBarConfig : ProgressBarConfig
     {
@@ -329,7 +329,7 @@ namespace DelvUI.Interface.Jobs
         }
     }
     
-    [DisableParentSettings("Fill Color")]
+    [DisableParentSettings("FillColor")]
     [Exportable(false)]
     public class BardStacksBarConfig : ChunkedBarConfig
     {
