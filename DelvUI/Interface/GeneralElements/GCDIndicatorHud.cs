@@ -16,6 +16,9 @@ namespace DelvUI.Interface.GeneralElements
         private GCDIndicatorConfig Config => (GCDIndicatorConfig)_config;
         public GameObject? Actor { get; set; } = null;
 
+        private bool _wasBarEnabled = true;
+        private bool _wasCircularModeEnabled = false;
+
         public GCDIndicatorHud(GCDIndicatorConfig config, string displayName) : base(config, displayName) { }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -32,20 +35,13 @@ namespace DelvUI.Interface.GeneralElements
 
         private (Vector2, Vector2) GetPositionAndSize(Vector2 origin)
         {
-            Vector2 pos = Config.AnchorToMouse ? ImGui.GetMousePos() : origin + Config.Position;
-            Vector2 size = Config.Size;
+            Vector2 pos = Config.AnchorToMouse ? ImGui.GetMousePos() + Config.Position : origin + Config.Position;
+            Vector2 size = Config.Bar.Size;
 
             if (Config.CircularMode)
             {
                 size = new Vector2(Config.CircleRadius * 2, Config.CircleRadius * 2);
                 pos += size / 2f;
-            }
-            else
-            {
-                if (Config.VerticalMode)
-                {
-                    size = new Vector2(Config.Size.Y, Config.Size.X);
-                }
             }
 
             return (pos, size);
@@ -63,6 +59,8 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void DrawChildren(Vector2 origin)
         {
+            CheckToggles();
+
             if (!Config.Enabled || Actor == null || Actor is not PlayerCharacter)
             {
                 return;
@@ -81,17 +79,43 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var (pos, size) = GetPositionAndSize(origin);
-            pos = Utils.GetAnchoredPosition(pos, size, Config.Anchor);
+            Config.Bar.Position = Config.Position;
+            Config.Bar.Anchor = Config.Anchor;
+            Config.Bar.BackgroundColor = Config.BackgroundColor;
+            Config.Bar.FillColor = Config.FillColor;
+            Config.Bar.DrawBorder = Config.ShowBorder;
 
-            if (Config.CircularMode)
+            if (Config.Bar.Enabled)
             {
-                DrawCircularIndicator(pos, Config.CircleRadius, elapsed, total);
+                DrawNormalBar(origin, elapsed, total);
             }
             else
             {
-                DrawNormalBar(pos, size, elapsed, total);
+                var (pos, size) = GetPositionAndSize(origin);
+                pos = Utils.GetAnchoredPosition(pos, size, Config.Anchor);
+                DrawCircularIndicator(pos, Config.CircleRadius, elapsed, total);
             }
+
+        }
+
+        private void CheckToggles()
+        {
+            bool barEnabledChanged = _wasBarEnabled != Config.Bar.Enabled;
+            if (barEnabledChanged)
+            {
+                Config.CircularMode = !Config.Bar.Enabled;
+            }
+            else
+            {
+                bool circularModeChanged = _wasCircularModeEnabled != Config.CircularMode;
+                if (circularModeChanged)
+                {
+                    Config.Bar.Enabled = !Config.CircularMode;
+                }
+            }
+
+            _wasBarEnabled = Config.Bar.Enabled;
+            _wasCircularModeEnabled = Config.CircularMode;
         }
 
         private void DrawCircularIndicator(Vector2 position, float radius, float current, float total)
@@ -112,7 +136,7 @@ namespace DelvUI.Interface.GeneralElements
                 if (Config.AlwaysShow && current == total)
                 {
                     drawList.PathArcTo(position, radius, startAngle, 2f * (float)Math.PI, segments);
-                    drawList.PathStroke(Config.Color.Base, ImDrawFlags.None, Config.CircleThickness);
+                    drawList.PathStroke(Config.FillColor.Base, ImDrawFlags.None, Config.CircleThickness);
                 }
                 else
                 {
@@ -121,7 +145,7 @@ namespace DelvUI.Interface.GeneralElements
 
                     // drawing an arc with thickness to make it look like an annular sector
                     drawList.PathArcTo(position, radius, startAngle, progressAngle, segments);
-                    drawList.PathStroke(Config.Color.Base, ImDrawFlags.None, Config.CircleThickness);
+                    drawList.PathStroke(Config.FillColor.Base, ImDrawFlags.None, Config.CircleThickness);
 
                     // draw the queue indicator
                     if (Config.ShowGCDQueueIndicator && current > total - queueTime)
@@ -134,7 +158,7 @@ namespace DelvUI.Interface.GeneralElements
 
                     // anything that remains is background
                     drawList.PathArcTo(position, radius, progressAngle, 2f * (float)Math.PI, segments);
-                    drawList.PathStroke(Config.Color.Background, ImDrawFlags.None, Config.CircleThickness);
+                    drawList.PathStroke(Config.BackgroundColor.Base, ImDrawFlags.None, Config.CircleThickness);
                 }
 
                 if (Config.ShowBorder)
@@ -148,42 +172,41 @@ namespace DelvUI.Interface.GeneralElements
             });
         }
 
-        private void DrawCircularBorder(Vector2 position, float radius)
+        private void DrawNormalBar(Vector2 origin, float current, float total)
         {
+            GCDBarConfig config = Config.Bar;
 
-        }
+            Rect mainRect = BarUtilities.GetFillRect(config.Position, config.Size, config.FillDirection, config.FillColor, current, total, 0);
+            BarHud bar = new BarHud(config, null, null);
+            bar.AddForegrounds(mainRect);
 
-        private void DrawNormalBar(Vector2 position, Vector2 size, float current, float total)
-        {
-            DrawHelper.DrawInWindow(ID, position, size, false, false, (drawList) =>
+            float currentPercent = current / total;
+            float percentNonQueue = total != 0 ? 1F - (500f / 1000f) / total : 0;
+
+            PluginLog.Log(current + " - " + percentNonQueue + " - " + total);
+
+            if (percentNonQueue > 0 && currentPercent >= percentNonQueue && Config.ShowGCDQueueIndicator)
             {
-                var percentNonQueue = total != 0 ? 1F - (500f / 1000f) / total : 0;
+                float scale = 1 - percentNonQueue;
+                Vector2 size = config.FillDirection.IsHorizontal() ?
+                    new Vector2(config.Size.X * scale, config.Size.Y) :
+                    new Vector2(config.Size.X, config.Size.Y * scale);
 
-                var builder = BarBuilder.Create(position, size);
-
-                if (percentNonQueue > 0 && Config.ShowGCDQueueIndicator)
+                Vector2 pos = config.Position;
+                if (config.FillDirection == BarDirection.Right)
                 {
-                    builder.SetChunks(new float[2] { percentNonQueue, 1f - percentNonQueue });
+                    pos.X += config.Size.X * percentNonQueue;
+                }
+                else if (config.FillDirection == BarDirection.Down)
+                {
+                    pos.Y += config.Size.Y * percentNonQueue;
                 }
 
-                total = Config.AlwaysShow && total == 0 ? 1 : total;
-                current = Config.AlwaysShow && current == 0 ? total : current;
+                Rect foreground = BarUtilities.GetFillRect(pos, size, config.FillDirection, Config.QueueColor, currentPercent - percentNonQueue, scale, 0);
+                bar.AddForegrounds(foreground);
+            }
 
-                builder.AddInnerBar(current, total, Config.Color)
-                    .SetDrawBorder(Config.ShowBorder)
-                    .SetVertical(Config.VerticalMode);
-
-                if (percentNonQueue > 0 && Config.ShowGCDQueueIndicator)
-                {
-                    Vector2 queueStartOffset = Config.VerticalMode ? new(0, percentNonQueue * size.Y) : new(percentNonQueue * size.X, 0);
-                    Vector2 queueEndOffset = Config.VerticalMode ? new(size.X, percentNonQueue * size.Y) : new(percentNonQueue * size.X, size.Y);
-
-                    builder.SetChunksColors(new PluginConfigColor[2] { Config.Color, Config.QueueColor });
-                    drawList.AddRect(position + queueStartOffset, position + queueEndOffset, Config.QueueColor.Base);
-                }
-
-                builder.Build().Draw(drawList);
-            });
+            bar.Draw(origin);
         }
     }
 }
