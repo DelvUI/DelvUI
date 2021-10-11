@@ -398,7 +398,7 @@ namespace DelvUI.Interface.Party
             }
 
             var name = member.Name.ToString();
-            return _partyMembersInfo.FindIndex(o => o.ObjectId == member.ObjectId || o.Name == name) + 1;
+            return _partyMembersInfo.FindIndex(o => (member.ObjectId != 0 && o.ObjectId == member.ObjectId) || o.Name == name) + 1;
         }
 
         private void SortGroupMembers(PlayerCharacter player)
