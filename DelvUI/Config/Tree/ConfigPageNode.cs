@@ -209,7 +209,7 @@ namespace DelvUI.Config.Tree
                             {
                                 node._nodeDepth = _nodeDepth + 1;
                             }
-                            
+
                             node._parentCollapseField = fields.Where(f => f.Name.Equals(nestedConfigAttribute.collapseWith)).FirstOrDefault();
                             node._parentConfigObject = ConfigObject;
                         }
@@ -286,6 +286,7 @@ namespace DelvUI.Config.Tree
                 _nodeToResetName = Utils.UserFriendlyConfigName(ConfigObject.GetType().Name);
             }
 
+            ImGui.NewLine();
             ImGui.EndGroup();
 
             return DrawResetModal();

@@ -543,15 +543,21 @@ namespace DelvUI.Config.Profiles
                 {
                     _resetingProfileName = _currentProfileName;
                 }
+                ImGui.PopFont();
+                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Reset"); }
 
                 // rename
+                ImGui.PushFont(UiBuilder.IconFont);
                 ImGui.SameLine();
                 if (_currentProfileName != DefaultProfileName && ImGui.Button(FontAwesomeIcon.Pen.ToIconString()))
                 {
                     _renamingProfileName = _currentProfileName;
                 }
+                ImGui.PopFont();
+                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Rename"); }
 
                 // share
+                ImGui.PushFont(UiBuilder.IconFont);
                 ImGui.SameLine();
                 if (ImGui.Button(FontAwesomeIcon.ShareSquare.ToIconString()))
                 {
@@ -564,6 +570,7 @@ namespace DelvUI.Config.Profiles
                     }
                 }
                 ImGui.PopFont();
+                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Export"); }
 
                 // export success popup
                 if (ImGui.BeginPopup("export_succes_popup"))
@@ -580,6 +587,7 @@ namespace DelvUI.Config.Profiles
                     _deletingProfileName = _currentProfileName;
                 }
                 ImGui.PopFont();
+                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Delete"); }
 
                 ImGuiHelper.NewLineAndTab();
                 DrawAutoSwitchSettings(ref changed);
@@ -600,12 +608,19 @@ namespace DelvUI.Config.Profiles
                 if (ImGui.Button("Copy", new Vector2(200, 0)))
                 {
                     _newProfileName = _newProfileName.Trim();
-                    _errorMessage = CloneProfile(profiles[_copyFromIndex], _newProfileName);
-
-                    if (_errorMessage == null)
+                    if (_newProfileName.Length == 0)
                     {
-                        _errorMessage = SwitchToProfile(_newProfileName);
-                        _newProfileName = "";
+                        ImGui.OpenPopup("import_error_popup");
+                    }
+                    else
+                    {
+                        _errorMessage = CloneProfile(profiles[_copyFromIndex], _newProfileName);
+
+                        if (_errorMessage == null)
+                        {
+                            _errorMessage = SwitchToProfile(_newProfileName);
+                            _newProfileName = "";
+                        }
                     }
                 }
 
@@ -613,11 +628,18 @@ namespace DelvUI.Config.Profiles
                 if (ImGui.Button("Import From Clipboard", new Vector2(200, 0)))
                 {
                     _newProfileName = _newProfileName.Trim();
-                    _errorMessage = ImportFromClipboard(_newProfileName);
-
-                    if (_errorMessage == null)
+                    if (_newProfileName.Length == 0)
                     {
-                        _newProfileName = "";
+                        ImGui.OpenPopup("import_error_popup");
+                    }
+                    else
+                    {
+                        _errorMessage = ImportFromClipboard(_newProfileName);
+
+                        if (_errorMessage == null)
+                        {
+                            _newProfileName = "";
+                        }
                     }
                 }
 
@@ -625,12 +647,26 @@ namespace DelvUI.Config.Profiles
                 if (ImGui.Button("Import From File", new Vector2(200, 0)))
                 {
                     _newProfileName = _newProfileName.Trim();
-                    _errorMessage = ImportFromFile(_newProfileName);
-
-                    if (_errorMessage == null)
+                    if (_newProfileName.Length == 0)
                     {
-                        _newProfileName = "";
+                        ImGui.OpenPopup("import_error_popup");
                     }
+                    else
+                    {
+                        _errorMessage = ImportFromFile(_newProfileName);
+
+                        if (_errorMessage == null)
+                        {
+                            _newProfileName = "";
+                        }
+                    }
+                }
+
+                // no name popup
+                if (ImGui.BeginPopup("import_error_popup"))
+                {
+                    ImGui.Text("Please type a name for the new profile!");
+                    ImGui.EndPopup();
                 }
             }
 
