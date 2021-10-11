@@ -150,7 +150,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.BloodGauge.HideWhenInactive || gauge.Blood > 0)
             {
                 Config.BloodGauge.Label.SetText(gauge.Blood.ToString("N0"));
-                BarUtilities.GetChunkedProgressBars(Config.BloodGauge, 2, 75, 100).Draw(origin);
+                BarUtilities.GetChunkedProgressBars(Config.BloodGauge, 2, gauge.Blood, 100).Draw(origin);
             }
         }
 

@@ -82,7 +82,7 @@ namespace DelvUI.Interface.Jobs
             {
                 Config.BeastGauge.Label.SetText(gauge.BeastGauge.ToString("N0"));
 
-                var color = nascentChaosDuration == 0 ? Config.BeastGauge.NascentChaosColor : Config.BeastGauge.BeastGaugeColor;
+                var color = nascentChaosDuration == 0 ? Config.BeastGauge.BeastGaugeColor : Config.BeastGauge.NascentChaosColor;
                 BarUtilities.GetChunkedProgressBars(Config.BeastGauge, 2, gauge.BeastGauge, 100, fillColor: color)
                     .Draw(origin);
             }
