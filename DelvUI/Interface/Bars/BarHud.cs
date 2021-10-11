@@ -85,12 +85,12 @@ namespace DelvUI.Interface.Bars
             return this;
         }
 
-        public void Draw(Vector2 origin)
+        public void Draw(Vector2 origin, bool needsInput = false)
         {
             var barPos = Utils.GetAnchoredPosition(origin, BackgroundRect.Size, Anchor);
             var backgroundPos = barPos + BackgroundRect.Position;
 
-            DrawHelper.DrawInWindow(ID, backgroundPos, BackgroundRect.Size, true, false, (drawList) =>
+            DrawHelper.DrawInWindow(ID, backgroundPos, BackgroundRect.Size, needsInput, false, (drawList) =>
             {
                 // Draw background
                 drawList.AddRectFilled(backgroundPos, backgroundPos + BackgroundRect.Size, BackgroundRect.Color.Base);

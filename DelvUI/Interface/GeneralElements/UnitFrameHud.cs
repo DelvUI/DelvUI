@@ -20,9 +20,9 @@ namespace DelvUI.Interface.GeneralElements
         public GameObject? Actor { get; set; } = null;
 
         public UnitFrameHud(UnitFrameConfig config, string displayName) : base(config, displayName)
-        { 
+        {
             // interaction stuff
-            
+
             /*
              Part of openContextMenuFromTarget disassembly signature
             .text:00007FF648523940                   Client__UI__Agent__AgentHUD_OpenContextMenuFromTarget proc near
@@ -119,7 +119,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
             }
 
-            bar.Draw(pos);
+            bar.Draw(pos, true);
         }
 
         private void DrawFriendlyNPC(Vector2 pos, GameObject? Actor)
