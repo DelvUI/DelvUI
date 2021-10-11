@@ -15,6 +15,7 @@ Features:
     + Mouseover. All abilities automatically assume "mouseover" if the cursor is on top of a unit frame when the ability is used.
 - Added Experience Bar hud.
 - Added Pull timer hud.
+- Added Limit Break hud.
 - Every label is now customizable (font, size, color, etc).
 - Added mana bars for Target, Target of Target and Focus Target.
 - Added anchor options for basically every UI element.

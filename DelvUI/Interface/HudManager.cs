@@ -285,6 +285,11 @@ namespace DelvUI.Interface
             var pullTimerConfig = ConfigurationManager.Instance.GetConfigObject<PullTimerConfig>();
             var pullTimerHud = new PullTimerHud(pullTimerConfig, "Pull Timer");
             _hudElements.Add(pullTimerHud);
+            
+            //limit break
+            var limitBreakConfig = ConfigurationManager.Instance.GetConfigObject<LimitBreakConfig>();
+            var limitBreakHud = new LimitBreakHud(limitBreakConfig, "Limit Break");
+            _hudElements.Add(limitBreakHud);
         }
 
         public void Draw()
@@ -294,6 +299,7 @@ namespace DelvUI.Interface
                 Plugin.UiBuilder.RebuildFonts();
             }
 
+            LimitBreakHelper.Instance.Update();
             MouseOverHelper.Instance.Target = null;
             PullTimerHelper.Instance.Update();
             TooltipsHelper.Instance.RemoveTooltip(); // remove tooltip from previous frame
