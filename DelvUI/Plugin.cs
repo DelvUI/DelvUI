@@ -121,6 +121,7 @@ namespace DelvUI
             ChatHelper.Initialize();
             ClipRectsHelper.Initialize();
             GlobalColors.Initialize();
+            LimitBreakHelper.Initialize();
             MouseOverHelper.Initialize();
             PartyManager.Initialize();
             ProfilesManager.Initialize();
@@ -256,6 +257,7 @@ namespace DelvUI
             ExperienceHelper.Instance.Dispose();
             FontsManager.Instance.Dispose();
             GlobalColors.Instance.Dispose();
+            LimitBreakHelper.Instance.Dispose();
             MouseOverHelper.Instance.Dispose();
             PartyManager.Instance.Dispose();
             PullTimerHelper.Instance.Dispose();
