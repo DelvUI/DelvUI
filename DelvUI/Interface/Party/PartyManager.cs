@@ -92,8 +92,6 @@ namespace DelvUI.Interface.Party
         public IReadOnlyCollection<IPartyFramesMember> GroupMembers => _groupMembers.AsReadOnly();
         public uint MemberCount => (uint)_groupMembers.Count;
 
-        private bool _isCrossWorldParty = false;
-
         private PartyFramesRaiseTracker _raiseTracker;
 
         public event PartyMembersChangedEventHandler? MembersChangedEvent;
@@ -155,8 +153,7 @@ namespace DelvUI.Interface.Party
                     foreach (var member in _groupMembers)
                     {
                         var index = member.ObjectId == player.ObjectId ? 0 : member.Order - 1;
-                        bool isLeader = _isCrossWorldParty ? IsCrossWorldPartyLeader(index) : IsPartyLeader(member.ObjectId);
-                        member.Update(EnmityForIndex(index), isLeader, JobIdForIndex(index));
+                        member.Update(EnmityForIndex(index), IsPartyLeader(index), JobIdForIndex(index));
                     }
                 }
                 // cross world party
@@ -180,8 +177,6 @@ namespace DelvUI.Interface.Party
 
         private void UpdateSoloParty(PlayerCharacter player)
         {
-            _isCrossWorldParty = false;
-
             Character? chocobo = null;
             if (_config.ShowChocobo)
             {
@@ -254,8 +249,6 @@ namespace DelvUI.Interface.Party
 
         private void UpdateCrossWorldParty(PlayerCharacter player)
         {
-            _isCrossWorldParty = true;
-
             // create new members array with cross world data
             _groupMembers.Clear();
 
@@ -274,7 +267,7 @@ namespace DelvUI.Interface.Party
                 }
 
                 var enmity = EnmityForIndex(isPlayer ? 0 : order - 1);
-                var isPartyLeader = IsCrossWorldPartyLeader(i);
+                var isPartyLeader = IsPartyLeader(i);
 
                 var member = isPlayer ?
                     new PartyFramesMember(player, order, enmity, isPartyLeader) :
@@ -293,8 +286,6 @@ namespace DelvUI.Interface.Party
 
         private void UpdateRegularParty(PlayerCharacter player)
         {
-            _isCrossWorldParty = false;
-
             // create new members array with dalamud's data
             _groupMembers.Clear();
 
@@ -387,13 +378,8 @@ namespace DelvUI.Interface.Party
             return enmityLevel;
         }
 
-        private bool IsCrossWorldPartyLeader(int index)
+        private bool IsPartyLeader(int index)
         {
-            if (!_isCrossWorldParty)
-            {
-                return false;
-            }
-
             if (PartyListAddon == null)
             {
                 return false;
@@ -402,23 +388,6 @@ namespace DelvUI.Interface.Party
             // we use the icon Y coordinate in the party list to know the index (lmao)
             uint partyLeadIndex = (uint)PartyListAddon->LeaderMarkResNode->ChildNode->Y / 40;
             return index == partyLeadIndex;
-        }
-
-        private bool IsPartyLeader(uint objectId)
-        {
-            if (_isCrossWorldParty)
-            {
-                return false;
-            }
-
-            var partyLeadIndex = Plugin.PartyList.PartyLeaderIndex;
-            if (partyLeadIndex < 0 || partyLeadIndex >= Plugin.PartyList.Length)
-            {
-                return false;
-            }
-
-            PartyMember? leader = Plugin.PartyList[(int)partyLeadIndex];
-            return leader?.ObjectId == objectId;
         }
 
         private int? IndexForPartyMember(PartyMember member)
