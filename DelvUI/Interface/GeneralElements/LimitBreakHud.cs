@@ -39,12 +39,13 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
             
-            int currentLimitBreak = helper.LimitBreakBarWidth.Sum();
+            int currentLimitBreak = helper.LimitBreakActive ? helper.LimitBreakBarWidth.Sum() : 0;
             int maxLimitBreak = helper.LimitBreakMaxLevel * helper.MaxLimitBarWidth;
+            int limitBreakChunks = helper.LimitBreakActive ? helper.LimitBreakMaxLevel : 3;
             
-            Config.Label.SetText($"{helper.LimitBreakLevel} / {helper.LimitBreakMaxLevel}");
+            Config.Label.SetText($"{helper.LimitBreakLevel} / {limitBreakChunks}");
             
-            BarUtilities.GetChunkedProgressBars(Config, helper.LimitBreakMaxLevel, currentLimitBreak, maxLimitBreak).Draw(origin);
+            BarUtilities.GetChunkedProgressBars(Config, limitBreakChunks, currentLimitBreak, maxLimitBreak).Draw(origin);
         }
     }
 
