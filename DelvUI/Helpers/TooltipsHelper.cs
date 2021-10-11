@@ -95,7 +95,7 @@ namespace DelvUI.Helpers
             }
 
             // calculate text size
-            bool fontPushed = FontsManager.Instance.PushFont(_config.TitleFontID);
+            bool fontPushed = FontsManager.Instance.PushFont(_config.TextFontID);
             _textSize = ImGui.CalcTextSize(_currentTooltipText, MaxWidth);
             if (fontPushed) { ImGui.PopFont(); }
 
