@@ -40,7 +40,7 @@ namespace DelvUI.Interface.GeneralElements
             }
             
             int currentLimitBreak = helper.LimitBreakBarWidth.Sum();
-            int maxLimitBreak = helper.LimitBreakMaxLevel * 128;
+            int maxLimitBreak = helper.LimitBreakMaxLevel * helper.MaxLimitBarWidth;
             
             Config.Label.SetText($"{helper.LimitBreakLevel} / {helper.LimitBreakMaxLevel}");
             
