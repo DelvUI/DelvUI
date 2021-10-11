@@ -225,7 +225,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawFeathersBar(Vector2 origin, PlayerCharacter player)
         {
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
-            if (Config.FeatherGauge.HideWhenInactive && gauge.Feathers > 0)
+            if (Config.FeatherGauge.HideWhenInactive && gauge.Feathers is 0)
             {
                 return;
             }
