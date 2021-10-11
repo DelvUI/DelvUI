@@ -2,6 +2,7 @@
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Interface.Bars;
+using ImGuiNET;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
@@ -34,12 +35,12 @@ namespace DelvUI.Interface.GeneralElements
             RightLabel = new EditableLabelConfig(new Vector2(-5, 0), "([exp:percent]%)", DrawAnchor.BottomRight, DrawAnchor.TopRight);
         }
 
-        public new static ExperienceBarConfig DefaultConfig() 
+        public new static ExperienceBarConfig DefaultConfig()
         {
             return new ExperienceBarConfig(
-                new Vector2(0, HUDConstants.BaseHUDOffsetY + 50),
+                new Vector2(0, -ImGui.GetMainViewport().Size.Y * 0.45f),
                 new Vector2(860, 10),
-                new PluginConfigColor(new Vector4(211f / 255f, 166f / 255f, 79f / 255f, 100f / 100f))); 
+                new PluginConfigColor(new Vector4(211f / 255f, 166f / 255f, 79f / 255f, 100f / 100f)));
         }
     }
 }

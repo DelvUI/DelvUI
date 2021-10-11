@@ -51,7 +51,7 @@ namespace DelvUI.Config.Attributes
             this.disableable = disableable;
         }
     }
-    
+
     [AttributeUsage(AttributeTargets.Class)]
     public class DisableParentSettingsAttribute : Attribute
     {
@@ -514,7 +514,7 @@ namespace DelvUI.Config.Attributes
     [AttributeUsage(AttributeTargets.Field)]
     public class FontAttribute : ConfigAttribute
     {
-        public FontAttribute() : base("Font and Size") { }
+        public FontAttribute(string friendlyName = "Font and Size") : base(friendlyName) { }
 
         public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
