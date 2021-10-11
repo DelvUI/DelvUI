@@ -2,6 +2,7 @@
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Interface.Bars;
+using ImGuiNET;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
@@ -17,7 +18,7 @@ namespace DelvUI.Interface.GeneralElements
         public new static LimitBreakConfig DefaultConfig()
         {
             var config = new LimitBreakConfig(
-                new Vector2(0, HUDConstants.BaseHUDOffsetY - 800),
+                new Vector2(0, ImGui.GetMainViewport().Size.Y * 0.1f),
                 new Vector2(500, 10),
                 new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 0f / 255f, 100f / 100f)));
 
