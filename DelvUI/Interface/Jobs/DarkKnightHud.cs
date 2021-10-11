@@ -129,7 +129,7 @@ namespace DelvUI.Interface.Jobs
                 0f,
                 player,
                 Config.ManaBar.Label,
-                gauge.HasDarkArts ? Config.ManaBar.GlowConfig : null
+                glowConfig: gauge.HasDarkArts ? Config.ManaBar.GlowConfig : null
                 ).Draw(origin);
         }
 

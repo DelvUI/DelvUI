@@ -224,7 +224,7 @@ namespace DelvUI.Interface.Jobs
             // 2 stacks for level 80+
             else
             {
-                BarUtilities.GetChunkedProgressBars(Config.PolyglotBar, 2, gauge.PolyglotStacks, 2f, 0, null, null, Config.PolyglotBar.GlowConfig)
+                BarUtilities.GetChunkedProgressBars(Config.PolyglotBar, 2, gauge.PolyglotStacks, 2f, 0, glowConfig: Config.PolyglotBar.GlowConfig)
                     .Draw(origin);
             }
         }

@@ -103,14 +103,14 @@ namespace DelvUI.Interface.Jobs
         }
 
         [NestedConfig("Storm's Eye Bar", 30)]
-        public StormsEyeBarConfig StormsEyeBar = new StormsEyeBarConfig(
+        public WarriorStormsEyeBarConfig StormsEyeBar = new WarriorStormsEyeBarConfig(
             new(0, -32),
             new(254, 20),
             new PluginConfigColor(new Vector4(0, 0, 0, 0))
         );
 
         [NestedConfig("Beast Gauge", 35)]
-        public BeastGaugeConfig BeastGauge = new BeastGaugeConfig(
+        public WarriorBeastGaugeConfig BeastGauge = new WarriorBeastGaugeConfig(
             new(0, -10),
             new(254, 20),
             new PluginConfigColor(new Vector4(0, 0, 0, 0))
@@ -119,7 +119,7 @@ namespace DelvUI.Interface.Jobs
 
     [DisableParentSettings("FillColor")]
     [Exportable(false)]
-    public class StormsEyeBarConfig : ProgressBarConfig
+    public class WarriorStormsEyeBarConfig : ProgressBarConfig
     {
         [ColorEdit4("Storm's Eye Color", spacing = true)]
         [Order(55)]
@@ -129,14 +129,14 @@ namespace DelvUI.Interface.Jobs
         [Order(60)]
         public PluginConfigColor InnerReleaseColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        public StormsEyeBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
+        public WarriorStormsEyeBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {
         }
     }
 
     [DisableParentSettings("FillColor")]
     [Exportable(false)]
-    public class BeastGaugeConfig : ProgressBarConfig
+    public class WarriorBeastGaugeConfig : ProgressBarConfig
     {
         [ColorEdit4("Beast Gauge Color", spacing = true)]
         [Order(65)]
@@ -146,7 +146,7 @@ namespace DelvUI.Interface.Jobs
         [Order(70)]
         public PluginConfigColor NascentChaosColor = new(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f));
 
-        public BeastGaugeConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
+        public WarriorBeastGaugeConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {
         }
     }

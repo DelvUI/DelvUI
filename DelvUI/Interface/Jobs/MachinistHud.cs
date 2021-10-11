@@ -173,7 +173,7 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Battery Gauge", 40)]
-        public BatteryGaugeConfig BatteryGauge = new BatteryGaugeConfig(
+        public MachinistBatteryGaugeConfig BatteryGauge = new MachinistBatteryGaugeConfig(
             new Vector2(0, -10),
             new Vector2(254, 20),
             new PluginConfigColor(new Vector4(0, 0, 0, 0))
@@ -192,7 +192,7 @@ namespace DelvUI.Interface.Jobs
 
     [DisableParentSettings("FillColor")]
     [Exportable(false)]
-    public class BatteryGaugeConfig : ProgressBarConfig
+    public class MachinistBatteryGaugeConfig : ProgressBarConfig
     {
         [ColorEdit4("Battery Color", spacing = true)]
         [Order(55)]
@@ -202,7 +202,7 @@ namespace DelvUI.Interface.Jobs
         [Order(60)]
         public PluginConfigColor RobotColor = new(new Vector4(153f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
 
-        public BatteryGaugeConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
+        public MachinistBatteryGaugeConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {
         }
     }

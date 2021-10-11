@@ -245,7 +245,7 @@ namespace DelvUI.Interface.Jobs
         public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
 
         [NestedConfig("Mudra Bar", 30)]
-        public MudraBarConfig MudraBar = new MudraBarConfig(
+        public NinjaMudraBarConfig MudraBar = new NinjaMudraBarConfig(
             new(0, -50),
             new(254, 10),
             new PluginConfigColor(new Vector4(211f / 255f, 166f / 255f, 75f / 242f, 100f / 100f))
@@ -284,7 +284,7 @@ namespace DelvUI.Interface.Jobs
     }
 
     [Exportable(false)]
-    public class MudraBarConfig : ChunkedProgressBarConfig
+    public class NinjaMudraBarConfig : ChunkedProgressBarConfig
     {
         [ColorEdit4("Kassatsu Color", spacing = true)]
         [Order(60)]
@@ -294,7 +294,7 @@ namespace DelvUI.Interface.Jobs
         [Order(65)]
         public PluginConfigColor TCJBarColor = new(new Vector4(181 / 255f, 33 / 255f, 41 / 242f, 100f / 100f));
 
-        public MudraBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor, 2)
+        public NinjaMudraBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor, 2)
         {
             Label.Enabled = true;
             UsePartialFillColor = true;

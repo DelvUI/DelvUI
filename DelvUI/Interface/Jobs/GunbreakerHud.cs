@@ -79,9 +79,17 @@ namespace DelvUI.Interface.Jobs
         public new static GunbreakerConfig DefaultConfig() { return new GunbreakerConfig(); }
 
         [NestedConfig("Powder Gauge", 30)]
-        public ChunkedBarConfig PowderGauge = new ChunkedBarConfig(new(0, -32), new(254, 20), new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 1f)));
+        public ChunkedBarConfig PowderGauge = new ChunkedBarConfig(
+            new(0, -32),
+            new(254, 20),
+            new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 1f))
+        );
 
         [NestedConfig("No Mercy", 35)]
-        public ProgressBarConfig NoMercy = new ProgressBarConfig(new(0, -10), new(254, 20), new(new Vector4(252f / 255f, 204f / 255f, 255f / 255f, 1f)));
+        public ProgressBarConfig NoMercy = new ProgressBarConfig(
+            new(0, -10),
+            new(254, 20),
+            new(new Vector4(252f / 255f, 204f / 255f, 255f / 255f, 1f))
+        );
     }
 }

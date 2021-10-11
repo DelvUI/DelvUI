@@ -52,7 +52,8 @@ namespace DelvUI.Interface.Bars
             ProgressBarConfig config,
             PlayerCharacter player,
             uint statusId,
-            float maxDuration)
+            float maxDuration,
+            bool trackDuration = true)
         {
             float duration = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId == statusId)?.RemainingTime ?? 0);
 
@@ -61,8 +62,14 @@ namespace DelvUI.Interface.Bars
                 return null;
             }
 
-            config.Label.SetText($"{(int)duration}");
-            return GetProgressBar(config, duration, maxDuration, 0);
+            if (trackDuration)
+            {
+                config.Label.SetText($"{(int)duration}");
+                return GetProgressBar(config, duration, maxDuration, 0);
+            }
+
+            config.Label.SetText("");
+            return GetBar(config, duration <= 0 ? 0 : 1, 1, 0);
         }
 
         public static BarHud? GetDoTBar(
@@ -133,38 +140,25 @@ namespace DelvUI.Interface.Bars
         // Tuple is <foregroundColor, percent fill, labels>
         public static BarHud[] GetChunkedBars(
             ChunkedBarConfig config,
+            Tuple<PluginConfigColor, float, LabelConfig?>[] chunks,
             GameObject? actor,
-            params Tuple<PluginConfigColor, float, LabelConfig?>[] chunks)
+            BarGlowConfig glowConfig)
         {
-            return GetChunkedBars(config, actor, null, chunks);
-        }
-
-        public static BarHud[] GetChunkedBars(
-            ChunkedBarConfig config,
-            GameObject? actor,
-            BarGlowConfig? glowConfig = null,
-            params Tuple<PluginConfigColor, float, LabelConfig?>[] chunks)
-        {
-            if (glowConfig is null)
-            {
-                return GetChunkedBars(config, actor, null, null, chunks);
-            }
-            List<bool> chucksToGlowList = new();
+            List<bool> chunksToGlowList = new();
             for (int i = 0; i < chunks.Length; i++)
             {
-                chucksToGlowList.Add(chunks[i].Item2 >= 1f);
+                chunksToGlowList.Add(chunks[i].Item2 >= 1f);
             }
-            bool[] chucksToGlow = chucksToGlowList.ToArray();
 
-            return GetChunkedBars(config,actor,glowConfig, chucksToGlow, chunks);
+            return GetChunkedBars(config, chunks, actor, glowConfig, chunksToGlowList.ToArray());
         }
 
         public static BarHud[] GetChunkedBars(
             ChunkedBarConfig config,
+            Tuple<PluginConfigColor, float, LabelConfig?>[] chunks,
             GameObject? actor,
             BarGlowConfig? glowConfig = null,
-            bool[]? chucksToGlow = null,
-            params Tuple<PluginConfigColor, float, LabelConfig?>[] chunks)
+            bool[]? chunksToGlow = null)
         {
             BarHud[] bars = new BarHud[chunks.Length];
             Vector2 pos = Utils.GetAnchoredPosition(config.Position, config.Size, config.Anchor);
@@ -185,20 +179,11 @@ namespace DelvUI.Interface.Bars
 
                 Rect background = new(chunkPos, chunkSize, config.BackgroundColor);
                 Rect foreground = GetFillRect(chunkPos, chunkSize, config.FillDirection, chunks[i].Item1, chunks[i].Item2, 1f, 0f);
+                BarGlowConfig? glow = chunksToGlow?[i] == true ? glowConfig : null;
 
-                if (chucksToGlow is null)
-                {
-                    bars[i] = new BarHud(config.ID + i, config.DrawBorder, actor: actor)
-                              .SetBackground(background)
-                              .AddForegrounds(foreground);
-                }
-                else
-                {
-                    BarGlowConfig? glow = chucksToGlow[i] ? glowConfig : null;
-                    bars[i] = new BarHud(config.ID + i, config.DrawBorder, actor: actor, glowColor: glow?.Color, glowSize: glow?.Size)
-                              .SetBackground(background)
-                              .AddForegrounds(foreground);
-                }
+                bars[i] = new BarHud(config.ID + i, config.DrawBorder, actor: actor, glowColor: glow?.Color, glowSize: glow?.Size)
+                          .SetBackground(background)
+                          .AddForegrounds(foreground);
 
                 LabelConfig? label = chunks[i].Item3;
                 if (label is not null)
@@ -218,8 +203,9 @@ namespace DelvUI.Interface.Bars
             float min = 0f,
             GameObject? actor = null,
             LabelConfig? label = null,
+            PluginConfigColor? partialFillColor = null,
             BarGlowConfig? glowConfig = null,
-            PluginConfigColor? partialFillColor = null)
+            bool[]? chunksToGlow = null)
         {
             float chunkRange = (max - min) / chunks;
 
@@ -234,7 +220,12 @@ namespace DelvUI.Interface.Bars
                 barChunks[barIndex] = new Tuple<PluginConfigColor, float, LabelConfig?>(chunkColor, chunkPercent, chunkPercent < 1f ? label : null);
             }
 
-            return GetChunkedBars(config, actor, glowConfig, barChunks);
+            if (glowConfig != null && chunksToGlow == null)
+            {
+                return GetChunkedBars(config, barChunks, actor, glowConfig);
+            }
+
+            return GetChunkedBars(config, barChunks, actor, glowConfig, chunksToGlow);
         }
 
         public static BarHud[] GetChunkedProgressBars(
@@ -248,7 +239,7 @@ namespace DelvUI.Interface.Bars
         {
             if (config.UseChunks)
             {
-                return GetChunkedProgressBars(config, chunks, current, max, min, actor, config.Label, glowConfig, config.UsePartialFillColor ? config.PartialFillColor : config.FillColor);
+                return GetChunkedProgressBars(config, chunks, current, max, min, actor, config.Label, config.UsePartialFillColor ? config.PartialFillColor : config.FillColor, glowConfig);
             }
 
             BarHud bar = GetProgressBar(config, null, new LabelConfig[] { config.Label }, current, max, min, actor, null, glowConfig);
@@ -303,10 +294,15 @@ namespace DelvUI.Interface.Bars
             GameObject? actor = null,
             PluginConfigColor? fillColor = null,
             BarGlowConfig? glowConfig = null,
-            params LabelConfig[] labels)
+            LabelConfig[]? labels = null)
         {
             Rect foreground = GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor ?? Config.FillColor, current, max, min);
-            return new BarHud(Config, actor, glowConfig).AddForegrounds(foreground).AddLabels(labels);
+
+            BarHud bar = new BarHud(Config, actor, glowConfig);
+            bar.AddForegrounds(foreground);
+            bar.AddLabels(labels);
+
+            return bar;
         }
 
         /// <summary>
