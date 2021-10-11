@@ -182,7 +182,7 @@ namespace DelvUI.Helpers
                     }
                 case BlendMode.XYZ:
                     {
-                        //convert RGB to LChab
+                        //convert RGB to XYZ
                         var XYZLeft = _rgbToXyz.Convert(rgbColorLeft);
                         var XYZRight = _rgbToXyz.Convert(rgbColorRight);
                         
@@ -201,7 +201,7 @@ namespace DelvUI.Helpers
                     }
                 case BlendMode.LChuv:
                     {
-                        //convert RGB to LChab
+                        //convert RGB to LChuv
                         var LChuvLeft = _rgbToLChuv.Convert(rgbColorLeft);
                         var LChuvRight = _rgbToLChuv.Convert(rgbColorRight);
 
@@ -214,7 +214,7 @@ namespace DelvUI.Helpers
 
                 case BlendMode.Luv:
                     {
-                        //convert RGB to LChab
+                        //convert RGB to Luv
                         var LuvLeft = _rgbToLuv.Convert(rgbColorLeft);
                         var LuvRight = _rgbToLuv.Convert(rgbColorRight);
 
@@ -227,7 +227,7 @@ namespace DelvUI.Helpers
                     }
                 case BlendMode.Jzazbz:
                     {
-                        //convert RGB to LChab
+                        //convert RGB to Jzazbz
                         var JzazbzLeft = _rgbToJzazbz.Convert(rgbColorLeft);
                         var JzazbzRight = _rgbToJzazbz.Convert(rgbColorRight);
 
@@ -239,7 +239,7 @@ namespace DelvUI.Helpers
                     }
                 case BlendMode.JzCzhz:
                     {
-                        //convert RGB to LChab
+                        //convert RGB to JzCzhz
                         var JzCzhzLeft = _rgbToJzCzhz.Convert(rgbColorLeft);
                         var JzCzhzRight = _rgbToJzCzhz.Convert(rgbColorRight);
 
