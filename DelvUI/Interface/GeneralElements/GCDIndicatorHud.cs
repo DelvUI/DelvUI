@@ -7,6 +7,7 @@ using System.Numerics;
 using DelvUI.Config;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Logging;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -96,6 +97,7 @@ namespace DelvUI.Interface.GeneralElements
         private void DrawCircularIndicator(Vector2 position, float radius, float current, float total)
         {
             total = Config.AlwaysShow && total == 0 ? 1 : total;
+            current = Config.AlwaysShow && current == 0 ? total : current;
 
             var size = new Vector2(radius * 2);
             DrawHelper.DrawInWindow(ID, position - size / 2, size, false, false, (drawList) =>
@@ -105,14 +107,22 @@ namespace DelvUI.Interface.GeneralElements
                 // controls how smooth the arc looks
                 const int segments = 100;
                 const float queueTime = 0.5f;
-                // TODO add this as a parameter
                 const float startAngle = 0f;
+
+                if (Config.AlwaysShow && current == total)
+                {
+                    drawList.PathArcTo(position, radius, startAngle, 2f * (float)Math.PI, segments);
+                    drawList.PathStroke(Config.Color.Base, ImDrawFlags.None, Config.CircleThickness);
+                    return;
+                }
 
                 // always draw until the queue threshold
                 float progressAngle = Math.Min(current, total - (Config.ShowGCDQueueIndicator ? queueTime : 0f)) / total * 2f * (float)Math.PI;
+
                 // drawing an arc with thickness to make it look like an annular sector
                 drawList.PathArcTo(position, radius, startAngle, progressAngle, segments);
                 drawList.PathStroke(Config.Color.Base, ImDrawFlags.None, Config.CircleThickness);
+
                 // draw the queue indicator
                 if (Config.ShowGCDQueueIndicator && current > total - queueTime)
                 {
@@ -121,6 +131,7 @@ namespace DelvUI.Interface.GeneralElements
                     drawList.PathArcTo(position, radius, oldAngle, progressAngle, segments);
                     drawList.PathStroke(Config.QueueColor.Base, ImDrawFlags.None, Config.CircleThickness);
                 }
+
                 // anything that remains is background
                 drawList.PathArcTo(position, radius, progressAngle, 2f * (float)Math.PI, segments);
                 drawList.PathStroke(Config.Color.Background, ImDrawFlags.None, Config.CircleThickness);
@@ -132,12 +143,6 @@ namespace DelvUI.Interface.GeneralElements
 
                     drawList.PathArcTo(position, radius + Config.CircleThickness / 2f, 0f, 2f * (float)Math.PI, segments);
                     drawList.PathStroke(0xFF000000, ImDrawFlags.None, 1);
-                }
-
-                if (Config.AlwaysShow && Config.CircularMode && Config.AnchorToMouse && current == total)
-                {
-                    drawList.PathArcTo(position, radius, 0f, 2f * (float)Math.PI, segments);
-                    drawList.PathStroke(Config.Color.Base, ImDrawFlags.None, Config.CircleThickness);
                 }
             });
         }
@@ -154,6 +159,9 @@ namespace DelvUI.Interface.GeneralElements
                 {
                     builder.SetChunks(new float[2] { percentNonQueue, 1f - percentNonQueue });
                 }
+
+                total = Config.AlwaysShow && total == 0 ? 1 : total;
+                current = Config.AlwaysShow && current == 0 ? total : current;
 
                 builder.AddInnerBar(current, total, Config.Color)
                     .SetDrawBorder(Config.ShowBorder)
