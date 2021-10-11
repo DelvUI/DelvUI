@@ -125,7 +125,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.EyeOfTheDragonBar.HideWhenInactive || gauge.EyeCount > 0)
             {
-                BarUtilities.GetChunkedProgressBars(Config.EyeOfTheDragonBar, 2, gauge.EyeCount, 2).Draw(origin);
+                BarUtilities.GetChunkedBars(Config.EyeOfTheDragonBar, 2, gauge.EyeCount, 2).Draw(origin);
             }
         }
 

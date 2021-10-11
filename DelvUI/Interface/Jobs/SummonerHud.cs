@@ -122,7 +122,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            BarUtilities.GetChunkedProgressBars(Config.AetherflowBar, 2, stackCount, 2)
+            BarUtilities.GetChunkedBars(Config.AetherflowBar, 2, stackCount, 2)
                 .Draw(origin);
         }
 
@@ -164,7 +164,7 @@ namespace DelvUI.Interface.Jobs
                 value = 2;
             }
 
-            BarUtilities.GetChunkedProgressBars(Config.DreadwyrmAetherBar, 2, value, 2)
+            BarUtilities.GetChunkedBars(Config.DreadwyrmAetherBar, 2, value, 2)
                 .Draw(origin);
         }
 
@@ -222,7 +222,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            BarUtilities.GetChunkedProgressBars(Config.RuinBar, 4, stackCount, 4)
+            BarUtilities.GetChunkedBars(Config.RuinBar, 4, stackCount, 4)
                 .Draw(origin);
         }
 

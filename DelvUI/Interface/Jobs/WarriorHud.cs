@@ -81,7 +81,10 @@ namespace DelvUI.Interface.Jobs
             if (!Config.BeastGauge.HideWhenInactive || gauge.BeastGauge > 0 || nascentChaosDuration > 0)
             {
                 Config.BeastGauge.Label.SetText(gauge.BeastGauge.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.BeastGauge, gauge.BeastGauge, 100, 0f, player, nascentChaosDuration > 0 ? Config.BeastGauge.NascentChaosColor : Config.BeastGauge.BeastGaugeColor).Draw(origin);
+
+                var color = nascentChaosDuration == 0 ? Config.BeastGauge.NascentChaosColor : Config.BeastGauge.BeastGaugeColor;
+                BarUtilities.GetChunkedProgressBars(Config.BeastGauge, 2, gauge.BeastGauge, 100, fillColor: color)
+                    .Draw(origin);
             }
         }
     }
@@ -136,7 +139,7 @@ namespace DelvUI.Interface.Jobs
 
     [DisableParentSettings("FillColor")]
     [Exportable(false)]
-    public class WarriorBeastGaugeConfig : ProgressBarConfig
+    public class WarriorBeastGaugeConfig : ChunkedProgressBarConfig
     {
         [ColorEdit4("Beast Gauge Color", spacing = true)]
         [Order(65)]

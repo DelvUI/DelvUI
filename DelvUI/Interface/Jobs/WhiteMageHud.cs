@@ -98,12 +98,12 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.LilyBar.HideWhenInactive || lilyScale > 0)
             {
-                BarUtilities.GetChunkedProgressBars(Config.LilyBar, 3, lilyScale, 3).Draw(origin);
+                BarUtilities.GetChunkedBars(Config.LilyBar, 3, lilyScale, 3).Draw(origin);
             }
 
             if (!Config.BloodLilyBar.HideWhenInactive || gauge.BloodLily > 0)
             {
-                BarUtilities.GetChunkedProgressBars(Config.BloodLilyBar, 3, gauge.BloodLily, 3).Draw(origin);
+                BarUtilities.GetChunkedBars(Config.BloodLilyBar, 3, gauge.BloodLily, 3).Draw(origin);
             }
         }
 

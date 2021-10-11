@@ -240,7 +240,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             BarGlowConfig? config = hasFlourishingBuff ? Config.FeatherGauge.GlowConfig : null;
-            BarUtilities.GetChunkedProgressBars(Config.FeatherGauge, 4, gauge.Feathers, 4, glowConfig: config, chunksToGlow: glows)
+            BarUtilities.GetChunkedBars(Config.FeatherGauge, 4, gauge.Feathers, 4, glowConfig: config, chunksToGlow: glows)
                 .Draw(origin);
         }
 

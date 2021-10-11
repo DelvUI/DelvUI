@@ -110,7 +110,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.OathGauge.HideWhenInactive || gauge.OathGauge > 0)
             {
                 Config.OathGauge.Label.SetText(gauge.OathGauge.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.OathGauge, gauge.OathGauge, 100, 0f).Draw(origin);
+                BarUtilities.GetChunkedProgressBars(Config.OathGauge, 2, gauge.OathGauge, 100).Draw(origin);
             }
         }
 
@@ -142,7 +142,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.AtonementBar.HideWhenInactive && stackCount == 0) { return; };
 
-            BarUtilities.GetChunkedProgressBars(Config.AtonementBar, 3, stackCount, 3f)
+            BarUtilities.GetChunkedBars(Config.AtonementBar, 3, stackCount, 3f)
                 .Draw(origin);
         }
 
@@ -172,7 +172,6 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new PaladinConfig();
 
-            config.OathGauge.ThresholdConfig.Enabled = true;
             config.GoringBladeBar.ThresholdConfig.Enabled = true;
             config.OathGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.FightOrFlightBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
@@ -190,13 +189,12 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Oath Gauge", 35)]
-        public ProgressBarConfig OathGauge = new ProgressBarConfig(
+        public ChunkedProgressBarConfig OathGauge = new ChunkedProgressBarConfig(
             new Vector2(0, -54),
             new Vector2(254, 20),
             new PluginConfigColor(new Vector4(24f / 255f, 80f / 255f, 175f / 255f, 100f / 100f)),
-            BarDirection.Right,
-            new PluginConfigColor(new Vector4(180f / 255f, 180f / 255f, 180f / 255f, 100f / 100f)),
-            50
+            2,
+            new PluginConfigColor(new Vector4(180f / 255f, 180f / 255f, 180f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Fight or Flight Bar", 40)]

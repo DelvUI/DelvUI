@@ -195,7 +195,7 @@ namespace DelvUI.Interface.Bars
             return bars;
         }
 
-        public static BarHud[] GetChunkedProgressBars(
+        public static BarHud[] GetChunkedBars(
             ChunkedBarConfig config,
             int chunks,
             float current,
@@ -203,6 +203,7 @@ namespace DelvUI.Interface.Bars
             float min = 0f,
             GameObject? actor = null,
             LabelConfig? label = null,
+            PluginConfigColor? fillColor = null,
             PluginConfigColor? partialFillColor = null,
             BarGlowConfig? glowConfig = null,
             bool[]? chunksToGlow = null)
@@ -216,7 +217,9 @@ namespace DelvUI.Interface.Bars
                 float chunkMin = min + chunkRange * i;
                 float chunkMax = min + chunkRange * (i + 1);
                 float chunkPercent = Math.Clamp((current - chunkMin) / (chunkMax - chunkMin), 0f, 1f);
-                PluginConfigColor chunkColor = partialFillColor is not null && current < chunkMax ? partialFillColor : config.FillColor;
+
+                PluginConfigColor chunkColor = partialFillColor != null && current < chunkMax ? partialFillColor : fillColor ?? config.FillColor;
+
                 barChunks[barIndex] = new Tuple<PluginConfigColor, float, LabelConfig?>(chunkColor, chunkPercent, chunkPercent < 1f ? label : null);
             }
 
@@ -235,14 +238,18 @@ namespace DelvUI.Interface.Bars
             float max,
             float min = 0f,
             GameObject? actor = null,
-            BarGlowConfig? glowConfig = null)
+            BarGlowConfig? glowConfig = null,
+            PluginConfigColor? fillColor = null)
         {
+            var color = fillColor ?? config.FillColor;
+
             if (config.UseChunks)
             {
-                return GetChunkedProgressBars(config, chunks, current, max, min, actor, config.Label, config.UsePartialFillColor ? config.PartialFillColor : config.FillColor, glowConfig);
+                var partialColor = config.UsePartialFillColor ? config.PartialFillColor : null;
+                return GetChunkedBars(config, chunks, current, max, min, actor, null, color, partialColor, glowConfig);
             }
 
-            BarHud bar = GetProgressBar(config, null, new LabelConfig[] { config.Label }, current, max, min, actor, null, glowConfig);
+            BarHud bar = GetProgressBar(config, null, new LabelConfig[] { config.Label }, current, max, min, actor, color, glowConfig);
             return new BarHud[] { bar };
         }
 

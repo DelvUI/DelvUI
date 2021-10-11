@@ -180,7 +180,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.NinkiBar.HideWhenInactive || gauge.Ninki > 0)
             {
                 Config.NinkiBar.Label.SetText(gauge.Ninki.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.NinkiBar, gauge.Ninki, 100f, 0f, player).Draw(pos);
+                BarUtilities.GetChunkedProgressBars(Config.NinkiBar, 2, gauge.Ninki, 100).Draw(pos);
             }
         }
 
@@ -262,7 +262,7 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Ninki Bar", 40)]
-        public ProgressBarConfig NinkiBar = new ProgressBarConfig(
+        public ChunkedProgressBarConfig NinkiBar = new ChunkedProgressBarConfig(
             new(0, -32),
             new(254, 20),
             new PluginConfigColor(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f))

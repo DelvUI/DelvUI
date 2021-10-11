@@ -167,7 +167,7 @@ namespace DelvUI.Interface.Jobs
             var gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.MeditationBar.HideWhenInactive || gauge.MeditationStacks > 0)
             {
-                BarUtilities.GetChunkedProgressBars(Config.MeditationBar, 3, gauge.MeditationStacks, 3f).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.MeditationBar, 3, gauge.MeditationStacks, 3f).Draw(pos);
             }
         }
     }

@@ -55,7 +55,7 @@ namespace DelvUI.Interface.Jobs
             var gauge = Plugin.JobGauges.Get<GNBGauge>();
             if (!Config.PowderGauge.HideWhenInactive || gauge.Ammo > 0)
             {
-                BarUtilities.GetChunkedProgressBars(Config.PowderGauge, 2, gauge.Ammo, 2).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.PowderGauge, 2, gauge.Ammo, 2).Draw(pos);
             }
         }
 
