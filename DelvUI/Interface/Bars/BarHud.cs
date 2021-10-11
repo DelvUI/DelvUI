@@ -18,7 +18,7 @@ namespace DelvUI.Interface.Bars
         private List<Rect> ForegroundRects { get; set; } = new List<Rect>();
 
         private List<LabelHud> LabelHuds { get; set; } = new List<LabelHud>();
-
+        
         private bool DrawBorder { get; set; }
 
         private DrawAnchor Anchor { get; set; }
@@ -28,10 +28,15 @@ namespace DelvUI.Interface.Bars
         private PluginConfigColor? GlowColor { get; set; }
 
         private int GlowSize { get; set; }
+        
+        private Vector2 Position { get; set; }
+        
+        public Strata Strata { get; private set; }
 
         public BarHud(
             string id,
             bool drawBorder = true,
+            Strata strata = Bars.Strata.Middle,
             DrawAnchor anchor = DrawAnchor.TopLeft,
             GameObject? actor = null,
             PluginConfigColor? glowColor = null,
@@ -39,6 +44,7 @@ namespace DelvUI.Interface.Bars
         {
             ID = id;
             DrawBorder = drawBorder;
+            Strata = strata;
             Anchor = anchor;
             Actor = actor;
             GlowColor = glowColor;
@@ -46,7 +52,7 @@ namespace DelvUI.Interface.Bars
         }
 
         public BarHud(BarConfig config, GameObject? actor = null, BarGlowConfig? glowConfig = null)
-            : this(config.ID, config.DrawBorder, config.Anchor, actor, glowConfig?.Color, glowConfig?.Size)
+            : this(config.ID, config.DrawBorder, config.Strata, config.Anchor, actor, glowConfig?.Color, glowConfig?.Size)
         {
             BackgroundRect = new Rect(config.Position, config.Size, config.BackgroundColor);
         }
@@ -87,7 +93,13 @@ namespace DelvUI.Interface.Bars
 
         public void Draw(Vector2 origin)
         {
-            var barPos = Utils.GetAnchoredPosition(origin, BackgroundRect.Size, Anchor);
+            this.Position = origin;
+            BarHandler.Instance.AddBar(this);
+        }
+        
+        public void DrawBar()
+        {
+            var barPos = Utils.GetAnchoredPosition(Position, BackgroundRect.Size, Anchor);
             var backgroundPos = barPos + BackgroundRect.Position;
 
             DrawHelper.DrawInWindow(ID, backgroundPos, BackgroundRect.Size, true, false, (drawList) =>

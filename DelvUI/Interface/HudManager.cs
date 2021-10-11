@@ -11,6 +11,7 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using DelvUI.Interface.Bars;
 
 namespace DelvUI.Interface
 {
@@ -362,6 +363,8 @@ namespace DelvUI.Interface
 
             // draw elements
             DraggablesHelper.DrawElements(origin, _hudHelper, _hudElements, _jobHud, _selectedElement);
+            
+            BarHandler.Instance.DrawBars();
 
             // tooltip
             TooltipsHelper.Instance.Draw();
