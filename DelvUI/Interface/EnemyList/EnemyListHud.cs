@@ -157,6 +157,7 @@ namespace DelvUI.Interface.EnemyList
                     Configs.HealthBar.DrawBorder,
                     borderColor,
                     Configs.HealthBar.BorderThickness,
+                    Strata.Middle,
                     DrawAnchor.TopLeft,
                     current: currentHp,
                     max: maxHp

@@ -18,7 +18,7 @@ namespace DelvUI.Interface.Bars
         private List<Rect> ForegroundRects { get; set; } = new List<Rect>();
 
         private List<LabelHud> LabelHuds { get; set; } = new List<LabelHud>();
-
+        
         private bool DrawBorder { get; set; }
 
         private PluginConfigColor? BorderColor { get; set; }
@@ -32,15 +32,22 @@ namespace DelvUI.Interface.Bars
         private PluginConfigColor? GlowColor { get; set; }
 
         private int GlowSize { get; set; }
+        
+        private Vector2 Position { get; set; }
+        
+        public Strata Strata { get; private set; }
 
         private float? Current;
         private float? Max;
+
+        private bool NeedsInput = false;
 
         public BarHud(
             string id,
             bool drawBorder = true,
             PluginConfigColor? borderColor = null,
             int borderThickness = 1,
+            Strata strata = Bars.Strata.Middle,
             DrawAnchor anchor = DrawAnchor.TopLeft,
             GameObject? actor = null,
             PluginConfigColor? glowColor = null,
@@ -52,6 +59,7 @@ namespace DelvUI.Interface.Bars
             DrawBorder = drawBorder;
             BorderColor = borderColor;
             BorderThickness = borderThickness;
+            Strata = strata;
             Anchor = anchor;
             Actor = actor;
             GlowColor = glowColor;
@@ -61,7 +69,7 @@ namespace DelvUI.Interface.Bars
         }
 
         public BarHud(BarConfig config, GameObject? actor = null, BarGlowConfig? glowConfig = null, float? current = null, float? max = null)
-            : this(config.ID, config.DrawBorder, config.BorderColor, config.BorderThickness, config.Anchor, actor, glowConfig?.Color, glowConfig?.Size, current, max)
+            : this(config.ID, config.DrawBorder, config.BorderColor, config.BorderThickness, config.Strata, config.Anchor, actor, glowConfig?.Color, glowConfig?.Size, current, max)
         {
             BackgroundRect = new Rect(config.Position, config.Size, config.BackgroundColor);
         }
@@ -102,10 +110,17 @@ namespace DelvUI.Interface.Bars
 
         public void Draw(Vector2 origin, bool needsInput = false)
         {
-            var barPos = Utils.GetAnchoredPosition(origin, BackgroundRect.Size, Anchor);
+            this.Position = origin;
+            this.NeedsInput = needsInput;
+            BarHandler.Instance.AddBar(this);
+        }
+        
+        public void DrawBar()
+        {
+            var barPos = Utils.GetAnchoredPosition(Position, BackgroundRect.Size, Anchor);
             var backgroundPos = barPos + BackgroundRect.Position;
 
-            DrawHelper.DrawInWindow(ID, backgroundPos, BackgroundRect.Size, needsInput, false, (drawList) =>
+            DrawHelper.DrawInWindow(ID, backgroundPos, BackgroundRect.Size, NeedsInput, false, (drawList) =>
             {
                 // Draw background
                 drawList.AddRectFilled(backgroundPos, backgroundPos + BackgroundRect.Size, BackgroundRect.Color.Base);

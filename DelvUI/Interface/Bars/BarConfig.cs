@@ -7,8 +7,12 @@ namespace DelvUI.Interface.Bars
     [Exportable(false)]
     public class BarConfig : AnchorablePluginConfigObject
     {
-        [ColorEdit4("Background Color")]
+        [Combo("Strata", new string[] {"Bottom", "Middle", "Top"})]
         [Order(16)]
+        public Strata Strata = Strata.Middle;
+        
+        [ColorEdit4("Background Color")]
+        [Order(17)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
 
         [ColorEdit4("Fill Color")]
