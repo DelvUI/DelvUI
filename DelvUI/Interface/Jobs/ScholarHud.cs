@@ -114,7 +114,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            BarUtilities.GetChunkedProgressBars(Config.AetherflowBar, 3, stackCount, 3)
+            BarUtilities.GetChunkedBars(Config.AetherflowBar, 3, stackCount, 3)
                 .Draw(origin);
         }
     }

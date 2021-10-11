@@ -121,7 +121,7 @@ namespace DelvUI.Interface.Jobs
 
             Config.ManaBar.Label.SetText($"{player.CurrentMp,0}");
             // hardcoded 9k as maxMP so the chunks are each 3k since that's what a DRK wants to see
-            BarUtilities.GetChunkedProgressBars(
+            BarUtilities.GetChunkedBars(
                 Config.ManaBar,
                 chunks,
                 player.CurrentMp,
@@ -129,7 +129,7 @@ namespace DelvUI.Interface.Jobs
                 0f,
                 player,
                 Config.ManaBar.Label,
-                gauge.HasDarkArts ? Config.ManaBar.GlowConfig : null
+                glowConfig: gauge.HasDarkArts ? Config.ManaBar.GlowConfig : null
                 ).Draw(origin);
         }
 
@@ -150,8 +150,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.BloodGauge.HideWhenInactive || gauge.Blood > 0)
             {
                 Config.BloodGauge.Label.SetText(gauge.Blood.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.BloodGauge, gauge.Blood, 100, 0f, player)
-                .Draw(origin);
+                BarUtilities.GetChunkedProgressBars(Config.BloodGauge, 2, 75, 100).Draw(origin);
             }
         }
 
@@ -200,7 +199,6 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new DarkKnightConfig();
 
-            config.BloodGauge.ThresholdConfig.Enabled = true;
             config.DarksideBar.ThresholdConfig.Enabled = true;
             config.BloodGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.DarksideBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
@@ -219,13 +217,12 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Blood Gauge", 35)]
-        public ProgressBarConfig BloodGauge = new ProgressBarConfig(
+        public ChunkedProgressBarConfig BloodGauge = new ChunkedProgressBarConfig(
             new Vector2(0, -49),
             new Vector2(254, 10),
             new PluginConfigColor(new Vector4(216f / 255f, 0f / 255f, 73f / 255f, 100f / 100f)),
-            BarDirection.Right,
-            new PluginConfigColor(new Vector4(196f / 255f, 20f / 255f, 122f / 255f, 100f / 100f)),
-            50
+            2,
+            new PluginConfigColor(new Vector4(196f / 255f, 20f / 255f, 122f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Darkside Bar", 40)]

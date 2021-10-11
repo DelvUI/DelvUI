@@ -229,7 +229,7 @@ namespace DelvUI.Interface.Jobs
             BardStacksBarConfig config = Config.StacksBar;
 
             config.FillColor = stackColor;
-            BarUtilities.GetChunkedProgressBars(Config.StacksBar, max, amount, max, 0F, null, null, glowConfig).
+            BarUtilities.GetChunkedBars(Config.StacksBar, max, amount, max, 0F, glowConfig: glowConfig).
                          Draw(origin);
         }
     }

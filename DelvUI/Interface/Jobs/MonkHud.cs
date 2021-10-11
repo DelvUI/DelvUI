@@ -189,7 +189,7 @@ namespace DelvUI.Interface.Jobs
             var gauge = Plugin.JobGauges.Get<MNKGauge>();
             if (!Config.ChakraBar.HideWhenInactive || gauge.Chakra > 0)
             {
-                BarUtilities.GetChunkedProgressBars(Config.ChakraBar, 5, gauge.Chakra, 5).Draw(origin);
+                BarUtilities.GetChunkedBars(Config.ChakraBar, 5, gauge.Chakra, 5).Draw(origin);
             }
         }
 

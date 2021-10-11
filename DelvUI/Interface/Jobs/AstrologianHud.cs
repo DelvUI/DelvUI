@@ -106,7 +106,7 @@ namespace DelvUI.Interface.Jobs
             string redrawStacksString = Config.DrawBar.ShowRedrawStacks ? redrawStacks.ToString("N0", CultureInfo.InvariantCulture) : "()";
             if (redrawCastInfo < 0 || !Config.DrawBar.ShowRedrawCooldown)
             {
-                return Config.DrawBar.ShowRedrawStacks ? "(" +redrawStacksString+")":"";
+                return Config.DrawBar.ShowRedrawStacks ? "(" + redrawStacksString + ")" : "";
             }
 
             if (!Config.DrawBar.EnableRedrawCooldownCumulated)
@@ -137,7 +137,7 @@ namespace DelvUI.Interface.Jobs
             {
                 sealsFromBytes[ix] = tmp->Seals[ix];
             }
-            
+
             for (int ix = 0; ix < 3; ++ix)
             {
                 byte seal = sealsFromBytes[ix];
@@ -190,7 +190,7 @@ namespace DelvUI.Interface.Jobs
                 }
 
                 Config.DivinationBar.Label.SetText(sealNumbers.ToString());
-                
+
 
                 for (int i = 0; i < sealNumbers; i++)
                 {
@@ -204,9 +204,13 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            Tuple<PluginConfigColor, float, LabelConfig?>[] divinationChunks = { new(chunkColors[0], chunkColors[0] != EmptyColor?1f:0f, null), new(chunkColors[1], chunkColors[1] != EmptyColor ? 1f : 0f, Config.DivinationBar.Label), new(chunkColors[2], chunkColors[2] != EmptyColor ? 1f : 0f, null) };
-            BarUtilities.GetChunkedBars(Config.DivinationBar, player, Config.DivinationBar.DivinationGlowColor, chucksToGlow, divinationChunks).Draw(origin);
+            Tuple<PluginConfigColor, float, LabelConfig?>[] divinationChunks = {
+                new(chunkColors[0], chunkColors[0] != EmptyColor ? 1f : 0f, null),
+                new(chunkColors[1], chunkColors[1] != EmptyColor ? 1f : 0f, Config.DivinationBar.Label),
+                new(chunkColors[2], chunkColors[2] != EmptyColor ? 1f : 0f, null) };
 
+            BarUtilities.GetChunkedBars(Config.DivinationBar, divinationChunks, player, Config.DivinationBar.DivinationGlowConfig, chucksToGlow)
+                .Draw(origin);
         }
 
         private void DrawDraw(Vector2 origin)
@@ -275,7 +279,7 @@ namespace DelvUI.Interface.Jobs
                 cardPresent = 1f;
                 cardMax = 1f;
                 Config.DrawBar.Label.SetText(cardJob);
-                Config.DrawBar.DrawDrawLabel.SetText(Config.DrawBar.DrawDrawLabel.Enabled ? drawCastInfo > 0 ? Math.Abs(drawCastInfo).ToString(Config.DrawBar.EnableDecimalDrawBar ? "N1" : "N0", CultureInfo.InvariantCulture) : "READY":"");
+                Config.DrawBar.DrawDrawLabel.SetText(Config.DrawBar.DrawDrawLabel.Enabled ? drawCastInfo > 0 ? Math.Abs(drawCastInfo).ToString(Config.DrawBar.EnableDecimalDrawBar ? "N1" : "N0", CultureInfo.InvariantCulture) : "READY" : "");
             }
             else
             {
@@ -285,10 +289,13 @@ namespace DelvUI.Interface.Jobs
                 cardColor = drawCastInfo > 0 ? Config.DrawBar.DrawCdColor : Config.DrawBar.DrawCdReadyColor;
                 cardMax = drawCastInfo > 0 ? 30f : 1f;
             }
-            
-            Config.DrawBar.DrawRedrawLabel.SetText(RedrawText(redrawCastInfo, redrawStacks));
-            BarUtilities.GetBar(Config.DrawBar, cardPresent, cardMax, 0f, Player, cardColor, Config.DrawBar.DrawGlowConfig.Enabled && Math.Abs(cardMax - 1f) == 0f  ? Config.DrawBar.DrawGlowConfig : null, Config.DrawBar.Label, Config.DrawBar.DrawRedrawLabel, Config.DrawBar.DrawDrawLabel).Draw(origin);
 
+            Config.DrawBar.DrawRedrawLabel.SetText(RedrawText(redrawCastInfo, redrawStacks));
+            LabelConfig[] labels = new LabelConfig[] { Config.DrawBar.Label, Config.DrawBar.DrawRedrawLabel, Config.DrawBar.DrawDrawLabel };
+            BarGlowConfig? glowConfig = Config.DrawBar.DrawGlowConfig.Enabled && Math.Abs(cardMax - 1f) == 0f ? Config.DrawBar.DrawGlowConfig : null;
+
+            BarUtilities.GetBar(Config.DrawBar, cardPresent, cardMax, 0f, Player, cardColor, glowConfig, labels)
+                .Draw(origin);
         }
 
         private void DrawDot(Vector2 origin, PlayerCharacter player)
@@ -305,7 +312,7 @@ namespace DelvUI.Interface.Jobs
             {
                 return;
             }
-            
+
             Config.LightspeedBar.Label.SetText($"{lightspeedDuration.ToString(Config.LightspeedBar.EnableDecimalLightspeedBar ? "N1" : "N0", CultureInfo.InvariantCulture)}");
             BarUtilities.GetProgressBar(Config.LightspeedBar, lightspeedDuration, LIGHTSPEED_MAX_DURATION).Draw(origin);
         }
@@ -314,7 +321,7 @@ namespace DelvUI.Interface.Jobs
         {
             float starPreCookingBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 1224 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
             float starPostCookingBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 1248 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
-            
+
             if (Config.StarBar.HideWhenInactive && starPostCookingBuff == 0f && starPreCookingBuff == 0f)
             {
                 return;
@@ -323,7 +330,7 @@ namespace DelvUI.Interface.Jobs
             float currentStarDuration = starPreCookingBuff > 0 ? STAR_MAX_DURATION - Math.Abs(starPreCookingBuff) : Math.Abs(starPostCookingBuff);
             PluginConfigColor currentStarColor = starPreCookingBuff > 0 ? Config.StarBar.StarEarthlyColor : Config.StarBar.StarGiantColor;
             Config.StarBar.Label.SetText($"{currentStarDuration.ToString(Config.StarBar.EnableDecimalStarBar ? "N1" : "N0", CultureInfo.InvariantCulture)}");
-            BarUtilities.GetProgressBar(Config.StarBar, currentStarDuration, STAR_MAX_DURATION, 0f, player, currentStarColor, Config.StarBar.StarGlowConfig.Enabled && starPostCookingBuff > 0? Config.StarBar.StarGlowConfig : null).Draw(origin); // Star Countdown after Star is ready 
+            BarUtilities.GetProgressBar(Config.StarBar, currentStarDuration, STAR_MAX_DURATION, 0f, player, currentStarColor, Config.StarBar.StarGlowConfig.Enabled && starPostCookingBuff > 0 ? Config.StarBar.StarGlowConfig : null).Draw(origin); // Star Countdown after Star is ready 
 
         }
     }
@@ -345,7 +352,7 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Divination Bar", 200)]
-        public AstrologianDivinationBarConfig DivinationBar = new (
+        public AstrologianDivinationBarConfig DivinationBar = new(
             new Vector2(0, -71),
             new Vector2(254, 10)
         );
@@ -383,7 +390,7 @@ namespace DelvUI.Interface.Jobs
             public bool EnableDecimalDrawBar;
 
             [NestedConfig("Redraw Timer Label" + "##Draw", 104, separator = false, spacing = true)]
-            public LabelConfig DrawRedrawLabel = new(new Vector2(0,0),"", DrawAnchor.Right, DrawAnchor.Right);
+            public LabelConfig DrawRedrawLabel = new(new Vector2(0, 0), "", DrawAnchor.Right, DrawAnchor.Right);
 
             [Checkbox("Redraw Stacks" + "##Redraw")]
             [Order(105)]
@@ -447,7 +454,7 @@ namespace DelvUI.Interface.Jobs
             public PluginConfigColor SealCelestialColor = new(new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f));
 
             [NestedConfig("Glow" + "##Divination", 205, separator = false, spacing = true)]
-            public BarGlowConfig DivinationGlowColor = new();
+            public BarGlowConfig DivinationGlowConfig = new();
 
             public AstrologianDivinationBarConfig(Vector2 position, Vector2 size)
                 : base(position, size, new PluginConfigColor(Vector4.Zero))

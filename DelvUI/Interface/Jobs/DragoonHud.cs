@@ -125,7 +125,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.EyeOfTheDragonBar.HideWhenInactive || gauge.EyeCount > 0)
             {
-                BarUtilities.GetChunkedProgressBars(Config.EyeOfTheDragonBar, 2, gauge.EyeCount, 2).Draw(origin);
+                BarUtilities.GetChunkedBars(Config.EyeOfTheDragonBar, 2, gauge.EyeCount, 2).Draw(origin);
             }
         }
 
@@ -151,7 +151,7 @@ namespace DelvUI.Interface.Jobs
                     color)
                 .Draw(origin);
             }
-            
+
         }
 
         private void DrawDisembowelBar(Vector2 origin, PlayerCharacter player)
@@ -195,7 +195,7 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Blood of the Dragon", 45)]
-        public BloodOfTheDragonBar BloodOfTheDragonBar = new BloodOfTheDragonBar(
+        public DragoonBloodOfTheDragonBar BloodOfTheDragonBar = new DragoonBloodOfTheDragonBar(
             new(0, -10),
             new(254, 20),
             new(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f))
@@ -204,7 +204,7 @@ namespace DelvUI.Interface.Jobs
 
     [DisableParentSettings("FillColor")]
     [Exportable(false)]
-    public class BloodOfTheDragonBar : BarConfig
+    public class DragoonBloodOfTheDragonBar : BarConfig
     {
         [ColorEdit4("Blood of the Dragon")]
         [Order(21)]
@@ -216,8 +216,8 @@ namespace DelvUI.Interface.Jobs
 
         [NestedConfig("Bar Text", 1000, separator = false, spacing = true)]
         public LabelConfig Label;
-        
-        public BloodOfTheDragonBar(Vector2 pos, Vector2 size, PluginConfigColor fillColor)
+
+        public DragoonBloodOfTheDragonBar(Vector2 pos, Vector2 size, PluginConfigColor fillColor)
             : base(pos, size, fillColor)
         {
             Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);

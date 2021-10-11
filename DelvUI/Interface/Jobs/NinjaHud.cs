@@ -180,7 +180,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.NinkiBar.HideWhenInactive || gauge.Ninki > 0)
             {
                 Config.NinkiBar.Label.SetText(gauge.Ninki.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.NinkiBar, gauge.Ninki, 100f, 0f, player).Draw(pos);
+                BarUtilities.GetChunkedProgressBars(Config.NinkiBar, 2, gauge.Ninki, 100).Draw(pos);
             }
         }
 
@@ -245,7 +245,7 @@ namespace DelvUI.Interface.Jobs
         public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
 
         [NestedConfig("Mudra Bar", 30)]
-        public MudraBarConfig MudraBar = new MudraBarConfig(
+        public NinjaMudraBarConfig MudraBar = new NinjaMudraBarConfig(
             new(0, -50),
             new(254, 10),
             new PluginConfigColor(new Vector4(211f / 255f, 166f / 255f, 75f / 242f, 100f / 100f))
@@ -262,7 +262,7 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Ninki Bar", 40)]
-        public ProgressBarConfig NinkiBar = new ProgressBarConfig(
+        public ChunkedProgressBarConfig NinkiBar = new ChunkedProgressBarConfig(
             new(0, -32),
             new(254, 20),
             new PluginConfigColor(new Vector4(137f / 255f, 82f / 255f, 236f / 255f, 100f / 100f))
@@ -284,7 +284,7 @@ namespace DelvUI.Interface.Jobs
     }
 
     [Exportable(false)]
-    public class MudraBarConfig : ChunkedProgressBarConfig
+    public class NinjaMudraBarConfig : ChunkedProgressBarConfig
     {
         [ColorEdit4("Kassatsu Color", spacing = true)]
         [Order(60)]
@@ -294,7 +294,7 @@ namespace DelvUI.Interface.Jobs
         [Order(65)]
         public PluginConfigColor TCJBarColor = new(new Vector4(181 / 255f, 33 / 255f, 41 / 242f, 100f / 100f));
 
-        public MudraBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor, 2)
+        public NinjaMudraBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor, 2)
         {
             Label.Enabled = true;
             UsePartialFillColor = true;

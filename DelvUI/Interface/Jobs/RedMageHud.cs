@@ -181,7 +181,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            BarUtilities.GetChunkedProgressBars(Config.AccelerationBar, 3, stackCount, 3f)
+            BarUtilities.GetChunkedBars(Config.AccelerationBar, 3, stackCount, 3f)
                 .Draw(origin);
         }
 

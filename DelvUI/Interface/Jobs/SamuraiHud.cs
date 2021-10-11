@@ -158,7 +158,7 @@ namespace DelvUI.Interface.Jobs
                     sen[i] = new Tuple<PluginConfigColor, float, LabelConfig?>(colors[order[i]], hasSen[order[i]], null);
                 }
 
-                BarUtilities.GetChunkedBars(Config.SenBar, player, sen).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.SenBar, sen, player).Draw(pos);
             }
         }
 
@@ -167,7 +167,7 @@ namespace DelvUI.Interface.Jobs
             var gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.MeditationBar.HideWhenInactive || gauge.MeditationStacks > 0)
             {
-                BarUtilities.GetChunkedProgressBars(Config.MeditationBar, 3, gauge.MeditationStacks, 3f).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.MeditationBar, 3, gauge.MeditationStacks, 3f).Draw(pos);
             }
         }
     }
@@ -188,7 +188,7 @@ namespace DelvUI.Interface.Jobs
         public new static SamuraiConfig DefaultConfig() { return new SamuraiConfig(); }
 
         [NestedConfig("Sen Bar", 40)]
-        public SenBarConfig SenBar = new SenBarConfig(
+        public SamuraiSenBarConfig SenBar = new SamuraiSenBarConfig(
             new(0, -17),
             new(254, 10),
             new PluginConfigColor(new Vector4(0, 0, 0, 0))
@@ -235,7 +235,7 @@ namespace DelvUI.Interface.Jobs
 
     [DisableParentSettings("FillColor")]
     [Exportable(false)]
-    public class SenBarConfig : ChunkedBarConfig
+    public class SamuraiSenBarConfig : ChunkedBarConfig
     {
         [ColorEdit4("Setsu", spacing = true)]
         [Order(60)]
@@ -253,6 +253,6 @@ namespace DelvUI.Interface.Jobs
         [Order(75)]
         public int[] SenOrder = new int[] { 0, 1, 2 };
 
-        public SenBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor, 2) { }
+        public SamuraiSenBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor, 2) { }
     }
 }

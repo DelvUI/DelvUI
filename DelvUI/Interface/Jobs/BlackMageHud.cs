@@ -173,7 +173,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            BarUtilities.GetChunkedProgressBars(Config.UmbralHeartBar, 3, gauge.UmbralHearts, 3f)
+            BarUtilities.GetChunkedBars(Config.UmbralHeartBar, 3, gauge.UmbralHearts, 3f)
                 .Draw(origin);
         }
 
@@ -186,7 +186,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            BarUtilities.GetChunkedProgressBars(Config.TriplecastBar, 3, stackCount, 3f)
+            BarUtilities.GetChunkedBars(Config.TriplecastBar, 3, stackCount, 3f)
                 .Draw(origin);
         }
 
@@ -224,7 +224,7 @@ namespace DelvUI.Interface.Jobs
             // 2 stacks for level 80+
             else
             {
-                BarUtilities.GetChunkedProgressBars(Config.PolyglotBar, 2, gauge.PolyglotStacks, 2f, 0, null, null, Config.PolyglotBar.GlowConfig)
+                BarUtilities.GetChunkedBars(Config.PolyglotBar, 2, gauge.PolyglotStacks, 2f, 0, glowConfig: Config.PolyglotBar.GlowConfig)
                     .Draw(origin);
             }
         }

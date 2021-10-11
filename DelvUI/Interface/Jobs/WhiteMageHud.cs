@@ -98,12 +98,12 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.LilyBar.HideWhenInactive || lilyScale > 0)
             {
-                BarUtilities.GetChunkedProgressBars(Config.LilyBar, 3, lilyScale, 3).Draw(origin);
+                BarUtilities.GetChunkedBars(Config.LilyBar, 3, lilyScale, 3).Draw(origin);
             }
 
             if (!Config.BloodLilyBar.HideWhenInactive || gauge.BloodLily > 0)
             {
-                BarUtilities.GetChunkedProgressBars(Config.BloodLilyBar, 3, gauge.BloodLily, 3).Draw(origin);
+                BarUtilities.GetChunkedBars(Config.BloodLilyBar, 3, gauge.BloodLily, 3).Draw(origin);
             }
         }
 
@@ -164,44 +164,51 @@ namespace DelvUI.Interface.Jobs
 
         [NestedConfig("Lily Bar", 30)]
         public ChunkedBarConfig LilyBar = new ChunkedBarConfig(
-                                                    new(-64, -32),
-                                                    new(126, 20),
-                                                    new PluginConfigColor(new(0f / 255f, 64f / 255f, 255f / 255f, 100f / 100f)));
+            new(-64, -32),
+            new(126, 20),
+            new PluginConfigColor(new(0f / 255f, 64f / 255f, 255f / 255f, 100f / 100f))
+        );
 
         [NestedConfig("Blood Lily Bar", 35)]
         public ChunkedBarConfig BloodLilyBar = new ChunkedBarConfig(
-                                                    new(64, -32),
-                                                    new(126, 20),
-                                                    new PluginConfigColor(new(199f / 255f, 40f / 255f, 9f / 255f, 100f / 100f)));
+            new(64, -32),
+            new(126, 20),
+            new PluginConfigColor(new(199f / 255f, 40f / 255f, 9f / 255f, 100f / 100f))
+        );
 
         [NestedConfig("Dia Bar", 40)]
         public ProgressBarConfig DiaBar = new ProgressBarConfig(
-                                                    new(0, -10),
-                                                    new(254, 20),
-                                                    new PluginConfigColor(new(0f / 255f, 64f / 255f, 255f / 255f, 100f / 100f)));
+            new(0, -10),
+            new(254, 20),
+            new PluginConfigColor(new(0f / 255f, 64f / 255f, 255f / 255f, 100f / 100f))
+        );
 
         [NestedConfig("Asylum Bar", 45)]
         public ProgressBarConfig AsylumBar = new ProgressBarConfig(
-                                                    new(-96, -52),
-                                                    new(62, 15),
-                                                    new PluginConfigColor(new(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f)));
+            new(-96, -52),
+            new(62, 15),
+            new PluginConfigColor(new(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f))
+        );
 
         [NestedConfig("Presence of Mind Bar", 50)]
         public ProgressBarConfig PresenceOfMindBar = new ProgressBarConfig(
-                                                    new(-32, -52),
-                                                    new(62, 15),
-                                                    new PluginConfigColor(new(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f)));
+            new(-32, -52),
+            new(62, 15),
+            new PluginConfigColor(new(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f))
+        );
 
         [NestedConfig("Plenary Bar", 55)]
         public ProgressBarConfig PlenaryBar = new ProgressBarConfig(
-                                                    new(32, -52),
-                                                    new(62, 15),
-                                                    new PluginConfigColor(new(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f)));
+            new(32, -52),
+            new(62, 15),
+            new PluginConfigColor(new(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f))
+        );
 
         [NestedConfig("Temperance Bar", 60)]
         public ProgressBarConfig TemperanceBar = new ProgressBarConfig(
-                                                    new(96, -52),
-                                                    new(62, 15),
-                                                    new PluginConfigColor(new(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f)));
+            new(96, -52),
+            new(62, 15),
+            new PluginConfigColor(new(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f))
+        );
     }
 }
