@@ -2,6 +2,7 @@
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Interface.Bars;
+using ImGuiNET;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
@@ -37,7 +38,7 @@ namespace DelvUI.Interface.GeneralElements
         public new static ExperienceBarConfig DefaultConfig()
         {
             return new ExperienceBarConfig(
-                new Vector2(0, 40),
+                new Vector2(0, -ImGui.GetMainViewport().Size.Y * 0.45f),
                 new Vector2(860, 10),
                 new PluginConfigColor(new Vector4(211f / 255f, 166f / 255f, 79f / 255f, 100f / 100f)));
         }
