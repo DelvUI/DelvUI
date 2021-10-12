@@ -285,6 +285,7 @@ namespace DelvUI.Interface
             var pullTimerConfig = ConfigurationManager.Instance.GetConfigObject<PullTimerConfig>();
             var pullTimerHud = new PullTimerHud(pullTimerConfig, "Pull Timer");
             _hudElements.Add(pullTimerHud);
+            _hudElementsUsingPlayer.Add(pullTimerHud);
             
             //limit break
             var limitBreakConfig = ConfigurationManager.Instance.GetConfigObject<LimitBreakConfig>();
