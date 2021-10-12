@@ -468,16 +468,17 @@ namespace DelvUI.Config.Profiles
             }
 
             DialogResult result = DialogResult.Cancel;
-            FolderBrowserDialog? picker;
+            SaveFileDialog? picker;
 
             try
             {
-                picker = new FolderBrowserDialog
+                picker = new SaveFileDialog
                 {
-                    ShowNewFolderButton = true,
-                    Description = "Select destination folder",
-                    UseDescriptionForTitle = true
-
+                    OverwritePrompt = true,
+                    Filter = "DelvUI Profile (*.delvui)|*.delvui",
+                    Title = "Save Profile",
+                    DefaultExt = ".delvui",
+                    AddExtension = true
                 };
 
                 result = picker.ShowDialog();
@@ -488,22 +489,21 @@ namespace DelvUI.Config.Profiles
                 return "Error trying to open folder picker!";
             }
 
-            if (picker == null || result != DialogResult.OK || picker.SelectedPath.Length <= 0)
+            if (picker == null || result != DialogResult.OK || picker.FileName.Length == 0)
             {
                 return null;
             }
 
             string src = CurrentProfilePath();
-            string dst = Path.Combine(picker.SelectedPath, newProfileName + ".delvui");
 
-            if (src == dst)
+            if (src == picker.FileName)
             {
                 return null;
             }
 
             try
             {
-                File.Copy(src, dst, true);
+                File.Copy(src, picker.FileName, true);
             }
             catch (Exception e)
             {
