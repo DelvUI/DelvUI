@@ -32,7 +32,7 @@ namespace DelvUI.Interface.GeneralElements
                 Config.Label.SetText("");
             }
             
-            if (!Config.Enabled)
+            if (!Config.Enabled || Actor is null)
             {
                 return;
             }
@@ -41,12 +41,12 @@ namespace DelvUI.Interface.GeneralElements
             {
                 return;
             }
+
+            var fillColor = Config.UseJobColor ? Utils.ColorForActor(Actor) : null;
             
             BarUtilities.GetProgressBar(Config, 
                 helper.CountDownValue,
-                helper.CountDownMax).Draw(origin);
+                helper.CountDownMax, 0F, Actor, fillColor).Draw(origin);
         }
     }
-
-
 }
