@@ -169,7 +169,7 @@ namespace DelvUI.Helpers
                         return FormattableString.Invariant($"{100f / character.MaxMp * character.CurrentMp:##0.#}");
 
                     case "[mana:deficit]":
-                        return $"-character.MaxMp-character.CurrentMp";
+                        return $"-{character.MaxMp-character.CurrentMp}";
 
                     case "[mana:deficit-short]":
                         return $"-{(character.MaxMp - character.CurrentMp).KiloFormat()}";
