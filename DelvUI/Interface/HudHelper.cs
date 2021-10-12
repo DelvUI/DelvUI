@@ -141,12 +141,17 @@ namespace DelvUI.Interface
         {
             if (!ConfigurationManager.Instance.LockHUD)
             {
-                return ConfigurationManager.Instance.LockHUD;
+                return false;
             }
 
             if (element.GetType() == typeof(PlayerCastbarHud))
             {
                 return false;
+            }
+
+            if (!element.GetConfig().Enabled)
+            {
+                return true;
             }
 
             // hide in gold saucer

@@ -21,7 +21,7 @@ namespace DelvUI.Interface.Jobs
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (Player == null)
+            if (Player == null || !_config.Enabled)
             {
                 return;
             }
