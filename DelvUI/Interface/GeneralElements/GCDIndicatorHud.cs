@@ -69,11 +69,6 @@ namespace DelvUI.Interface.GeneralElements
 
             GCDHelper.GetGCDInfo((PlayerCharacter)Actor, out var elapsed, out var total);
 
-            if (total == 0)
-            {
-                _lastTotalCastTime = 0;
-            }
-
             if (!Config.AlwaysShow && total == 0)
             {
                 return;
@@ -87,6 +82,7 @@ namespace DelvUI.Interface.GeneralElements
             var scale = elapsed / total;
             if (scale <= 0)
             {
+                _lastTotalCastTime = 0;
                 return;
             }
 
