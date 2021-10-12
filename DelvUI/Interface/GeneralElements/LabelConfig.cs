@@ -68,7 +68,7 @@ namespace DelvUI.Interface.GeneralElements
         
         [DragInt("Offset ##Shadow")]
         [Order(55, collapseWith = nameof(ShowShadow))]
-        public int ShadowOffset = 1;
+        public int ShadowOffset = 2;
         
         [Checkbox("Use Job Color")]
         [Order(60)]
