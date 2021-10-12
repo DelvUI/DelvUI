@@ -8,6 +8,7 @@ using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -302,6 +303,10 @@ namespace DelvUI.Interface.StatusEffects
         public bool UseAsWhitelist = false;
         public SortedList<string, uint> List = new SortedList<string, uint>();
 
+        [JsonIgnore] private string? _errorMessage = null;
+        [JsonIgnore] private string? _importString = null;
+        [JsonIgnore] private bool _clearingList = false;
+
         private string KeyName(Status status)
         {
             return status.Name + "[" + status.RowId.ToString() + "]";
@@ -368,6 +373,48 @@ namespace DelvUI.Interface.StatusEffects
             return false;
         }
 
+        private string ExportList()
+        {
+            string exportString = "";
+
+            for (int i = 0; i < List.Keys.Count; i++)
+            {
+                exportString += List.Keys[i] + "|";
+                exportString += List.Values[i] + "|";
+            }
+
+            return exportString;
+        }
+
+        private string? ImportList(string importString)
+        {
+            SortedList<string, uint> tmpList = new SortedList<string, uint>();
+
+            try
+            {
+                string[] strings = importString.Trim().Split("|", StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 0; i < strings.Length; i += 2)
+                {
+                    if (i + 1 >= strings.Length)
+                    {
+                        break;
+                    }
+
+                    string key = strings[i];
+                    uint value = uint.Parse(strings[i + 1]);
+
+                    tmpList.Add(key, value);
+                }
+            }
+            catch
+            {
+                return "Error importing list!";
+            }
+
+            List = tmpList;
+            return null;
+        }
+
         [JsonIgnore]
         private string _input = "";
 
@@ -404,22 +451,59 @@ namespace DelvUI.Interface.StatusEffects
 
                 ImGui.Text("\u2002 \u2002");
                 ImGui.SameLine();
-
+                ImGui.PushItemWidth(300);
                 if (ImGui.InputText("", ref _input, 64, ImGuiInputTextFlags.EnterReturnsTrue))
                 {
                     changed |= AddNewEntry(_input, sheet);
                     ImGui.SetKeyboardFocusHere(-1);
                 }
 
+                // add
                 ImGui.SameLine();
                 ImGui.PushFont(UiBuilder.IconFont);
-
                 if (ImGui.Button(FontAwesomeIcon.Plus.ToIconString(), new Vector2(0, 0)))
                 {
                     changed |= AddNewEntry(_input, sheet);
                     ImGui.SetKeyboardFocusHere(-2);
                 }
+
+                // export
+                ImGui.SameLine();
+                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 154);
+                if (ImGui.Button(FontAwesomeIcon.Upload.ToIconString(), new Vector2(0, 0)))
+                {
+                    ImGui.SetClipboardText(ExportList());
+                    ImGui.OpenPopup("export_succes_popup");
+                }
                 ImGui.PopFont();
+                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Export List to Clipboard"); }
+
+                // export success popup
+                if (ImGui.BeginPopup("export_succes_popup"))
+                {
+                    ImGui.Text("List exported to clipboard!");
+                    ImGui.EndPopup();
+                }
+
+                // import
+                ImGui.SameLine();
+                ImGui.PushFont(UiBuilder.IconFont);
+                if (ImGui.Button(FontAwesomeIcon.Download.ToIconString(), new Vector2(0, 0)))
+                {
+                    _importString = ImGui.GetClipboardText();
+                }
+                ImGui.PopFont();
+                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Import List from Clipboard"); }
+
+                // clear
+                ImGui.SameLine();
+                ImGui.PushFont(UiBuilder.IconFont);
+                if (ImGui.Button(FontAwesomeIcon.Trash.ToIconString(), new Vector2(0, 0)))
+                {
+                    _clearingList = true;
+                }
+                ImGui.PopFont();
+                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Clear List"); }
 
                 ImGui.Text("\u2002 \u2002");
                 ImGui.SameLine();
@@ -502,6 +586,55 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             ImGui.EndChild();
+
+            // error message
+            if (_errorMessage != null)
+            {
+                if (ImGuiHelper.DrawErrorModal(_errorMessage))
+                {
+                    _errorMessage = null;
+                }
+            }
+
+            // import confirmation
+            if (_importString != null)
+            {
+                string[] message = new string[] {
+                    "All the elements in the list will be replaced.",
+                    "Are you sure you want to import?"
+                };
+                var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Import?", message);
+
+                if (didConfirm)
+                {
+                    _errorMessage = ImportList(_importString);
+                    changed = true;
+                }
+
+                if (didConfirm || didClose)
+                {
+                    _importString = null;
+                }
+            }
+
+            // clear confirmation
+            if (_clearingList)
+            {
+                string message = "Are you sure you want to clear the list?";
+
+                var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Clear List?", message);
+
+                if (didConfirm)
+                {
+                    List.Clear();
+                    changed = true;
+                }
+
+                if (didConfirm || didClose)
+                {
+                    _clearingList = false;
+                }
+            }
 
             return false;
         }
