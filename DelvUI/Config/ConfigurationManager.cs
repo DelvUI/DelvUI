@@ -427,6 +427,7 @@ namespace DelvUI.Config
             typeof(PartyFramesBuffsConfig),
             typeof(PartyFramesDebuffsConfig),
             typeof(PartyFramesRaiseTrackerConfig),
+            typeof(PartyFramesInvulnTrackerConfig),
 
             typeof(PaladinConfig),
             typeof(WarriorConfig),

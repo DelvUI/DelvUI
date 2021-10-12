@@ -16,6 +16,7 @@ namespace DelvUI.Interface.Party
         private PartyFramesConfig Config => (PartyFramesConfig)_config;
         private PartyFramesHealthBarsConfig _healthBarsConfig;
         private PartyFramesRaiseTrackerConfig _raiseTrackerConfig;
+        private PartyFramesInvulnTrackerConfig _invulnTrackerConfig;
 
         private delegate void OpenContextMenu(IntPtr agentHud, int parentAddonId, int index);
         private readonly OpenContextMenu _openContextMenu;
@@ -37,6 +38,7 @@ namespace DelvUI.Interface.Party
         {
             _healthBarsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesHealthBarsConfig>();
             _raiseTrackerConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesRaiseTrackerConfig>();
+            _invulnTrackerConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesInvulnTrackerConfig>();
 
             var manaBarConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesManaBarConfig>();
             var castbarConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesCastbarConfig>();
@@ -61,7 +63,8 @@ namespace DelvUI.Interface.Party
                     leaderIconConfig,
                     buffsConfig,
                     debuffsConfig,
-                    _raiseTrackerConfig
+                    _raiseTrackerConfig,
+                    _invulnTrackerConfig
                 );
 
                 bar.MovePlayerEvent += OnMovePlayer;

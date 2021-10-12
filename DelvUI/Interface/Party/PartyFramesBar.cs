@@ -24,12 +24,14 @@ namespace DelvUI.Interface.Party
         private PartyFramesBuffsConfig _buffsConfig;
         private PartyFramesDebuffsConfig _debuffsConfig;
         private PartyFramesRaiseTrackerConfig _raiseTrackerConfig;
+        private PartyFramesInvulnTrackerConfig _invulnTrackerConfig;
 
         private LabelHud _nameLabelHud;
         private LabelHud _healthLabelHud;
         private LabelHud _manaLabelHud;
         private LabelHud _orderLabelHud;
         private LabelHud _raiseLabelHud;
+        private LabelHud _invulnLabelHud;
         private CastbarHud _castbarHud;
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
@@ -47,7 +49,8 @@ namespace DelvUI.Interface.Party
             PartyFramesLeaderIconConfig leaderIconConfig,
             PartyFramesBuffsConfig buffsConfig,
             PartyFramesDebuffsConfig debuffsConfig,
-            PartyFramesRaiseTrackerConfig raiseTrackerConfig
+            PartyFramesRaiseTrackerConfig raiseTrackerConfig,
+            PartyFramesInvulnTrackerConfig invulnTrackerConfig
         )
         {
             _config = config;
@@ -58,12 +61,14 @@ namespace DelvUI.Interface.Party
             _buffsConfig = buffsConfig;
             _debuffsConfig = debuffsConfig;
             _raiseTrackerConfig = raiseTrackerConfig;
+            _invulnTrackerConfig = invulnTrackerConfig;
 
             _nameLabelHud = new LabelHud(config.NameLabelConfig);
             _healthLabelHud = new LabelHud(config.HealthLabelConfig);
             _manaLabelHud = new LabelHud(_manaBarConfig.ValueLabelConfig);
             _orderLabelHud = new LabelHud(config.OrderLabelConfig);
             _raiseLabelHud = new LabelHud(_raiseTrackerConfig.LabelConfig);
+            _invulnLabelHud = new LabelHud(_invulnTrackerConfig.LabelConfig);
 
             _castbarHud = new CastbarHud(_castbarConfig, "");
             _buffsListHud = new StatusEffectsListHud(buffsConfig, "");
@@ -146,6 +151,8 @@ namespace DelvUI.Interface.Party
             // bg
             var bgColor = Member.RaiseTime != null && _raiseTrackerConfig.Enabled && _raiseTrackerConfig.ChangeBackgroundColorWhenRaised ?
                 _raiseTrackerConfig.BackgroundColor :
+                Member.InvulnTime != null && _invulnTrackerConfig.Enabled && _invulnTrackerConfig.ChangeBackgroundColorWhenInvuln ?
+                    _invulnTrackerConfig.BackgroundColor :
                 _config.ColorsConfig.BackgroundColor;
 
             drawList.AddRectFilled(Position, Position + _config.Size, bgColor.Base);
@@ -247,6 +254,14 @@ namespace DelvUI.Interface.Party
                 var iconPos = Utils.GetAnchoredPosition(parentPos + _raiseTrackerConfig.Position, _raiseTrackerConfig.IconSize, _raiseTrackerConfig.Anchor);
                 DrawHelper.DrawIcon(411, iconPos, _raiseTrackerConfig.IconSize, true, drawList);
             }
+            
+            // invuln icon
+            if (ShowingInvuln())
+            {
+                var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _invulnTrackerConfig.HealthBarAnchor);
+                var iconPos = Utils.GetAnchoredPosition(parentPos + _invulnTrackerConfig.Position, _invulnTrackerConfig.IconSize, _invulnTrackerConfig.Anchor);
+                DrawHelper.DrawIcon(013116, iconPos, _invulnTrackerConfig.IconSize, true, drawList);
+            }
 
             // highlight
             if (_config.ColorsConfig.ShowHighlight && isHovering)
@@ -295,8 +310,9 @@ namespace DelvUI.Interface.Party
 
             // name
             var showingRaise = ShowingRaise();
+            var showingInvuln = ShowingInvuln();
 
-            if (!showingRaise || !_raiseTrackerConfig.HideNameWhenRaised)
+            if (!showingInvuln || !showingRaise || !_raiseTrackerConfig.HideNameWhenRaised || !_invulnTrackerConfig.HideNameWhenInvuln)
             {
                 _nameLabelHud.Draw(Position, _config.Size, character, Member.Name);
             }
@@ -319,6 +335,14 @@ namespace DelvUI.Interface.Party
                 var text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
                 _raiseTrackerConfig.LabelConfig.SetText(text);
                 _raiseLabelHud.Draw(Position, _config.Size);
+            }            
+            // invuln label
+            if (showingInvuln)
+            {
+                var duration = Math.Abs(Member.InvulnTime!.Value);
+                var text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
+                _invulnTrackerConfig.LabelConfig.SetText(text);
+                _invulnLabelHud.Draw(Position, _config.Size);
             }
         }
 
@@ -326,6 +350,11 @@ namespace DelvUI.Interface.Party
         {
             return Member != null && Member.RaiseTime.HasValue && _raiseTrackerConfig.Enabled &&
                 (Member.RaiseTime.Value > 0 || _raiseTrackerConfig.KeepIconAfterCastFinishes);
+        }        
+        
+        private bool ShowingInvuln()
+        {
+            return Member != null && Member.InvulnTime.HasValue && _invulnTrackerConfig.Enabled && Member.InvulnTime.Value > 0;
         }
 
         private bool ShowMana()

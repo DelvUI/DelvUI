@@ -54,10 +54,10 @@
 
     <!-- Included Content -->
     <ItemGroup>
-        <Content Include="DelvUI.json" CopyToOutputDirectory="Always"/>
-        <Content Include="changelog.md" CopyToOutputDirectory="Always"/>
-        <Content Include="Media\**" CopyToOutputDirectory="PreserveNewest"/>
-        <Content Include="Media\images\icon.png" Link="images/icon.png" CopyToOutputDirectory="PreserveNewest" Visible="false"/>
+        <Content Include="DelvUI.json" CopyToOutputDirectory="Always" />
+        <Content Include="changelog.md" CopyToOutputDirectory="Always" />
+        <Content Include="Media\**" CopyToOutputDirectory="PreserveNewest" />
+        <Content Include="Media\images\icon.png" Link="images/icon.png" CopyToOutputDirectory="PreserveNewest" Visible="false" />
     </ItemGroup>
 
     <!-- Library References -->
@@ -93,13 +93,6 @@
 
     <!-- Dalamud Packager Task-->
     <Target Name="DalamudPackage" AfterTargets="Build">
-        <DalamudPackager 
-                ProjectDir="$(ProjectDir)" 
-                OutputPath="$(TargetDir)..\$(Configuration)" 
-                AssemblyName="$(AssemblyName)" 
-                MakeZip="true" 
-                Exclude="DelvUI.pdb;DelvUI.deps.json"
-                VersionComponents="4"
-        />
+        <DalamudPackager ProjectDir="$(ProjectDir)" OutputPath="$(TargetDir)..\$(Configuration)" AssemblyName="$(AssemblyName)" MakeZip="true" Exclude="DelvUI.pdb;DelvUI.deps.json" VersionComponents="4" />
     </Target>
 </Project>

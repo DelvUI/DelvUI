@@ -24,6 +24,7 @@ namespace DelvUI.Interface.Party
         private PartyManager(PartyFramesConfig config)
         {
             _raiseTracker = new PartyFramesRaiseTracker();
+            _invulnTracker = new PartyFramesInvulnTracker();
 
             Plugin.Framework.Update += FrameworkOnOnUpdateEvent;
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
@@ -93,6 +94,7 @@ namespace DelvUI.Interface.Party
         public uint MemberCount => (uint)_groupMembers.Count;
 
         private PartyFramesRaiseTracker _raiseTracker;
+        private PartyFramesInvulnTracker _invulnTracker;
 
         public event PartyMembersChangedEventHandler? MembersChangedEvent;
 
@@ -141,6 +143,7 @@ namespace DelvUI.Interface.Party
                     }
 
                     _raiseTracker.Update(_groupMembers);
+                    _invulnTracker.Update(_groupMembers);
                     return;
                 }
 
@@ -168,6 +171,7 @@ namespace DelvUI.Interface.Party
                 }
 
                 _raiseTracker.Update(_groupMembers);
+                _invulnTracker.Update(_groupMembers);
             }
             catch (Exception e)
             {
