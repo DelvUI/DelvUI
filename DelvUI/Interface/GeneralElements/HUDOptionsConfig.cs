@@ -39,7 +39,7 @@ namespace DelvUI.Interface.GeneralElements
         public bool HideDefaultCastbar = false;        
         
         [Checkbox("Hide Default Pulltimer", isMonitored = true)]
-        [Order(30)]
+        [Order(35)]
         public bool HideDefaultPulltimer = false;
 
         [Checkbox("Enable Combat Hotbars", isMonitored = true, spacing = true)]
