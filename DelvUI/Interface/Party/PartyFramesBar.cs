@@ -82,7 +82,7 @@ namespace DelvUI.Interface.Party
                 }
                 else if (_config.ColorsConfig.UseColorBasedOnHealthValue)
                 {
-                    color = Utils.ColorByHealthValue(scale, _config.ColorsConfig.LowHealthColorThreshold / 100f, _config.ColorsConfig.FullHealthColorThreshold / 100f, _config.ColorsConfig.FullHealthColor, _config.ColorsConfig.LowHealthColor, _config.ColorsConfig.blendMode);
+                    color = Utils.GetColorByScale(scale, _config.ColorsConfig.LowHealthColorThreshold / 100f, _config.ColorsConfig.FullHealthColorThreshold / 100f, _config.ColorsConfig.LowHealthColor, _config.ColorsConfig.FullHealthColor, _config.ColorsConfig.blendMode);
                 }
                 else
                 {
