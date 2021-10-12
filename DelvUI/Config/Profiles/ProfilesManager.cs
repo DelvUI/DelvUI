@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DelvUI.Config.Profiles
@@ -461,6 +460,60 @@ namespace DelvUI.Config.Profiles
             }
         }
 
+        private string? ExportToFile(string newProfileName)
+        {
+            if (newProfileName.Length == 0)
+            {
+                return null;
+            }
+
+            DialogResult result = DialogResult.Cancel;
+            FolderBrowserDialog? picker;
+
+            try
+            {
+                picker = new FolderBrowserDialog
+                {
+                    ShowNewFolderButton = true,
+                    Description = "Select destination folder",
+                    UseDescriptionForTitle = true
+
+                };
+
+                result = picker.ShowDialog();
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error with folder picker: " + e.Message);
+                return "Error trying to open folder picker!";
+            }
+
+            if (picker == null || result != DialogResult.OK || picker.SelectedPath.Length <= 0)
+            {
+                return null;
+            }
+
+            string src = CurrentProfilePath();
+            string dst = Path.Combine(picker.SelectedPath, newProfileName + ".delvui");
+
+            if (src == dst)
+            {
+                return null;
+            }
+
+            try
+            {
+                File.Copy(src, dst, true);
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error copying file: " + e.Message);
+                return "Error exporting the file!";
+            }
+
+            return null;
+        }
+
         private string? DeleteProfile(string profileName)
         {
             if (!Profiles.ContainsKey(profileName))
@@ -525,6 +578,7 @@ namespace DelvUI.Config.Profiles
                     return false;
                 }
 
+                ImGui.PushItemWidth(408);
                 ImGuiHelper.NewLineAndTab();
                 if (ImGui.Combo("Active Profile", ref _selectedProfileIndex, profiles, profiles.Length, 10))
                 {
@@ -537,8 +591,8 @@ namespace DelvUI.Config.Profiles
                 }
 
                 // reset
-                ImGui.PushFont(UiBuilder.IconFont);
                 ImGui.SameLine();
+                ImGui.PushFont(UiBuilder.IconFont);
                 if (ImGui.Button("\uf2f9", new Vector2(0, 0)))
                 {
                     _resetingProfileName = _currentProfileName;
@@ -546,22 +600,34 @@ namespace DelvUI.Config.Profiles
                 ImGui.PopFont();
                 if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Reset"); }
 
-                // rename
-                ImGui.PushFont(UiBuilder.IconFont);
-                ImGui.SameLine();
-                if (_currentProfileName != DefaultProfileName && ImGui.Button(FontAwesomeIcon.Pen.ToIconString()))
+                if (_currentProfileName != DefaultProfileName)
                 {
-                    _renamingProfileName = _currentProfileName;
-                }
-                ImGui.PopFont();
-                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Rename"); }
+                    // rename
+                    ImGui.SameLine();
+                    ImGui.PushFont(UiBuilder.IconFont);
+                    if (ImGui.Button(FontAwesomeIcon.Pen.ToIconString()))
+                    {
+                        _renamingProfileName = _currentProfileName;
+                    }
+                    ImGui.PopFont();
+                    if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Rename"); }
 
-                // share
-                ImGui.PushFont(UiBuilder.IconFont);
+                    // delete
+                    ImGui.SameLine();
+                    ImGui.PushFont(UiBuilder.IconFont);
+                    if (_currentProfileName != DefaultProfileName && ImGui.Button(FontAwesomeIcon.Trash.ToIconString()))
+                    {
+                        _deletingProfileName = _currentProfileName;
+                    }
+                    ImGui.PopFont();
+                    if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Delete"); }
+                }
+
+                // export to string
+                ImGuiHelper.Tab();
                 ImGui.SameLine();
-                if (ImGui.Button(FontAwesomeIcon.ShareSquare.ToIconString()))
+                if (ImGui.Button("Export to Clipboard", new Vector2(200, 0)))
                 {
-                    //_deletingProfileName = _currentProfileName;
                     string? exportString = ConfigurationManager.Instance.ExportCurrentConfigs();
                     if (exportString != null)
                     {
@@ -569,8 +635,6 @@ namespace DelvUI.Config.Profiles
                         ImGui.OpenPopup("export_succes_popup");
                     }
                 }
-                ImGui.PopFont();
-                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Export"); }
 
                 // export success popup
                 if (ImGui.BeginPopup("export_succes_popup"))
@@ -579,15 +643,11 @@ namespace DelvUI.Config.Profiles
                     ImGui.EndPopup();
                 }
 
-                // delete
-                ImGui.PushFont(UiBuilder.IconFont);
                 ImGui.SameLine();
-                if (_currentProfileName != DefaultProfileName && ImGui.Button(FontAwesomeIcon.Trash.ToIconString()))
+                if (ImGui.Button("Export to File", new Vector2(200, 0)))
                 {
-                    _deletingProfileName = _currentProfileName;
+                    _errorMessage = ExportToFile(_currentProfileName);
                 }
-                ImGui.PopFont();
-                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Delete"); }
 
                 ImGuiHelper.NewLineAndTab();
                 DrawAutoSwitchSettings(ref changed);
@@ -596,11 +656,11 @@ namespace DelvUI.Config.Profiles
                 ImGuiHelper.Tab();
                 ImGui.Text("Create a new profile:");
 
-                ImGuiHelper.NewLineAndTab();
+                ImGuiHelper.Tab();
                 ImGui.PushItemWidth(408);
                 ImGui.InputText("Profile Name", ref _newProfileName, 200);
 
-                ImGuiHelper.NewLineAndTab();
+                ImGuiHelper.Tab();
                 ImGui.PushItemWidth(200);
                 ImGui.Combo("", ref _copyFromIndex, profiles, profiles.Length, 10);
 
