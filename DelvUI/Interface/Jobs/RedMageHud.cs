@@ -15,8 +15,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class RedMageHud : JobHud
     {
-        private new RedMageConfig Config => (RedMageConfig)_config;
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
+        private new RedMageConfig Config => (RedMageConfig)_config;        
 
         public RedMageHud(RedMageConfig config, string? displayName = null) : base(config, displayName)
         {
@@ -114,13 +113,13 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBalanceBar(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<RDMGauge>();
-            var whiteGauge = (float)Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
-            var blackGauge = (float)Plugin.JobGauges.Get<RDMGauge>().BlackMana;
-            var scale = gauge.WhiteMana - gauge.BlackMana;
+            RDMGauge gauge = Plugin.JobGauges.Get<RDMGauge>();
+            float whiteGauge = (float)Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
+            float blackGauge = (float)Plugin.JobGauges.Get<RDMGauge>().BlackMana;
+            int scale = gauge.WhiteMana - gauge.BlackMana;
 
             PluginConfigColor color = Config.BalanceBar.FillColor;
-            var value = 0;
+            int value = 0;
 
             if (whiteGauge >= 80 && blackGauge >= 80)
             {

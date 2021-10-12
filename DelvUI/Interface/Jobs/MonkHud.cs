@@ -7,11 +7,9 @@ using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -23,7 +21,6 @@ namespace DelvUI.Interface.Jobs
 
         public MonkHud(MonkConfig config, string? displayName = null) : base(config, displayName)
         {
-
         }
 
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
@@ -144,7 +141,7 @@ namespace DelvUI.Interface.Jobs
                     2513 => "Formless Fist",
                     _ => ""
                 } : "";
-                
+
                 Config.FormsBar.Label.SetText(label);
                 BarUtilities.GetProgressBar(Config.FormsBar, formDuration, 15f, 0, player).Draw(origin);
             }
@@ -215,20 +212,10 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDemolishBar(Vector2 origin, PlayerCharacter player)
         {
-            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target ?? player;
-            var demolishDuration = 0f;
+            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            if (actor is BattleChara target)
-            {
-                demolishDuration = target.StatusList.FirstOrDefault(o => 
-                    o.StatusId is 246 && o.SourceID == player.ObjectId && o.RemainingTime > 0)?.RemainingTime ?? 0f;           
-            }
-
-            if (!Config.DemolishBar.HideWhenInactive || demolishDuration > 0f)
-            {
-                Config.DemolishBar.Label.SetText(Math.Truncate(demolishDuration).ToString());
-                BarUtilities.GetProgressBar(Config.DemolishBar, demolishDuration, 18f, 0f, player).Draw(origin);
-            }
+            BarUtilities.GetDoTBar(Config.DemolishBar, player, target, 246, 18f)?.
+                Draw(origin);
         }
     }
 
@@ -238,12 +225,14 @@ namespace DelvUI.Interface.Jobs
     public class MonkConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.MNK;
-        public new static MonkConfig DefaultConfig() { return new MonkConfig(); }
-
-        public MonkConfig()
+        public new static MonkConfig DefaultConfig()
         {
-            PerfectBalanceBar.FillDirection = BarDirection.Up;
-            LeadenFistBar.FillDirection = BarDirection.Up;
+            var config = new MonkConfig();
+
+            config.PerfectBalanceBar.FillDirection = BarDirection.Up;
+            config.LeadenFistBar.FillDirection = BarDirection.Up;
+
+            return config;
         }
 
         [NestedConfig("Demolish", 30)]
@@ -252,49 +241,49 @@ namespace DelvUI.Interface.Jobs
             new(111, 20),
             new(new Vector4(246f / 255f, 169f / 255f, 255f / 255f, 100f / 100f))
         );
-        
+
         [NestedConfig("Chakra", 35)]
         public ChunkedBarConfig ChakraBar = new ChunkedBarConfig(
             new(0, -32),
             new(254, 20),
             new(new Vector4(204f / 255f, 115f / 255f, 0f, 100f / 100f))
         );
-        
+
         [NestedConfig("Leaden Fist", 40)]
         public ProgressBarConfig LeadenFistBar = new ProgressBarConfig(
             new(0, -10),
             new(28, 20),
             new(new Vector4(255f / 255f, 0f, 0f, 100f / 100f))
         );
-        
+
         [NestedConfig("Twin Snakes", 45)]
         public ProgressBarConfig TwinSnakesBar = new ProgressBarConfig(
             new(-71, -10),
             new(111, 20),
             new(new Vector4(227f / 255f, 255f / 255f, 64f / 255f, 100f / 100f))
         );
-        
+
         [NestedConfig("Riddle of Earth", 50)]
         public ProgressBarConfig RiddleofEarthBar = new ProgressBarConfig(
             new(-69, -54),
             new(115, 20),
             new(new Vector4(157f / 255f, 59f / 255f, 255f / 255f, 100f / 100f))
         );
-        
+
         [NestedConfig("Perfect Balance", 55)]
         public ProgressBarConfig PerfectBalanceBar = new ProgressBarConfig(
             new(0, -54),
             new(20, 20),
             new(new Vector4(150f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
         );
-        
+
         [NestedConfig("True North", 60)]
         public ProgressBarConfig TrueNorthBar = new ProgressBarConfig(
             new(69, -54),
             new(115, 20),
             new(new Vector4(255f / 255f, 225f / 255f, 189f / 255f, 100f / 100f))
         );
-        
+
         [NestedConfig("Forms", 65)]
         public ProgressBarConfig FormsBar = new ProgressBarConfig(
             new(0, -76),

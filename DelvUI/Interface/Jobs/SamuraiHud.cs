@@ -1,6 +1,5 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -17,6 +16,8 @@ namespace DelvUI.Interface.Jobs
     public class SamuraiHud : JobHud
     {
         private new SamuraiConfig Config => (SamuraiConfig)_config;
+        private static readonly List<uint> HiganbanaIDs = new() { 1228, 1319 };
+        private static readonly List<float> HiganabaDurations = new() { 60f, 60f };
 
         public SamuraiHud(SamuraiConfig config, string? displayName = null) : base(config, displayName)
         {
@@ -101,7 +102,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawKenkiBar(Vector2 pos, PlayerCharacter player)
         {
-            var gauge = Plugin.JobGauges.Get<SAMGauge>();
+            SAMGauge gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.KenkiBar.HideWhenInactive || gauge.Kenki > 0)
             {
                 Config.KenkiBar.Label.SetText(gauge.Kenki.ToString("N0"));
@@ -131,21 +132,15 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawHiganbanaBar(Vector2 pos, PlayerCharacter player)
         {
-            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            if (actor is BattleChara target)
-            {
-                var higanbanaDuration = target.StatusList.FirstOrDefault(o => o.StatusId is 1228 or 1319 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
-                if (!Config.HiganbanaBar.HideWhenInactive || higanbanaDuration > 0)
-                {
-                    Config.HiganbanaBar.Label.SetText(Math.Truncate(higanbanaDuration).ToString());
-                    BarUtilities.GetProgressBar(Config.HiganbanaBar, higanbanaDuration, 60f, 0f, player).Draw(pos);
-                }
-            }
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+
+            BarUtilities.GetDoTBar(Config.HiganbanaBar, player, target, HiganbanaIDs, HiganabaDurations)?.
+                Draw(pos);
         }
 
         private void DrawSenBar(Vector2 pos, PlayerCharacter player)
         {
-            var gauge = Plugin.JobGauges.Get<SAMGauge>();
+            SAMGauge gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.SenBar.HideWhenInactive || gauge.HasSetsu || gauge.HasGetsu || gauge.HasKa)
             {
                 var order = Config.SenBar.SenOrder;
@@ -164,7 +159,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawMeditationBar(Vector2 pos)
         {
-            var gauge = Plugin.JobGauges.Get<SAMGauge>();
+            SAMGauge gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.MeditationBar.HideWhenInactive || gauge.MeditationStacks > 0)
             {
                 BarUtilities.GetChunkedBars(Config.MeditationBar, 3, gauge.MeditationStacks, 3f).Draw(pos);
@@ -179,13 +174,14 @@ namespace DelvUI.Interface.Jobs
     {
         [JsonIgnore] public override uint JobId => JobIDs.SAM;
 
-        public SamuraiConfig()
+        public new static SamuraiConfig DefaultConfig()
         {
-            // Setup initial bar config
-            HiganbanaBar.ThresholdConfig.Enabled = true;
-        }
+            var config = new SamuraiConfig();
 
-        public new static SamuraiConfig DefaultConfig() { return new SamuraiConfig(); }
+            config.HiganbanaBar.ThresholdConfig.Enabled = true;
+
+            return config;
+        }
 
         [NestedConfig("Sen Bar", 40)]
         public SamuraiSenBarConfig SenBar = new SamuraiSenBarConfig(

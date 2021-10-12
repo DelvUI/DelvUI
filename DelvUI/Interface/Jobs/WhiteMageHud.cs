@@ -9,12 +9,16 @@ using DelvUI.Interface.Bars;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using DelvUI.Interface.GeneralElements;
 
 namespace DelvUI.Interface.Jobs
 {
     public class WhiteMageHud : JobHud
     {
         private new WhiteMageConfig Config => (WhiteMageConfig)_config;
+
+        private static readonly List<uint> DiaIDs = new() { 143, 144, 1871 };
+        private static readonly List<float> DiaDurations = new() { 18, 18, 30 };
 
         public WhiteMageHud(WhiteMageConfig config, string? displayName = null) : base(config, displayName)
         {
@@ -75,9 +79,6 @@ namespace DelvUI.Interface.Jobs
             if (Config.PlenaryBar.Enabled) { DrawPlenaryBar(pos, player); }
             if (Config.TemperanceBar.Enabled) { DrawTemperanceBar(pos, player); }
         }
-
-        private static List<uint> DiaIDs = new List<uint> { 143, 144, 1871 };
-        private static List<float> DiaDurations = new List<float> { 18, 18, 30 };
 
         private void DrawDiaBar(Vector2 origin, PlayerCharacter player)
         {
@@ -154,13 +155,19 @@ namespace DelvUI.Interface.Jobs
     public class WhiteMageConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.WHM;
-
-        public WhiteMageConfig()
+        public new static WhiteMageConfig DefaultConfig()
         {
-            UseDefaultPrimaryResourceBar = true;
-        }
+            var config = new WhiteMageConfig();
 
-        public new static WhiteMageConfig DefaultConfig() { return new WhiteMageConfig(); }
+            config.UseDefaultPrimaryResourceBar = true;
+
+            config.AsylumBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.PresenceOfMindBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.PlenaryBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.TemperanceBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+
+            return config;
+        }
 
         [NestedConfig("Lily Bar", 30)]
         public ChunkedBarConfig LilyBar = new ChunkedBarConfig(

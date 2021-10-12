@@ -20,9 +20,11 @@ namespace DelvUI.Interface.Jobs
     {
         private new DragoonConfig Config => (DragoonConfig)_config;
 
+        private static readonly List<uint> ChaosThrustIDs = new() { 118, 1312 };
+        private static readonly List<float> ChaosThrustDurations = new() { 24, 24 };
+
         public DragoonHud(DragoonConfig config, string? displayName = null) : base(config, displayName)
         {
-
         }
 
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
@@ -104,19 +106,10 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawChaosThrustBar(Vector2 origin, PlayerCharacter player)
         {
-            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            float chaosThrustDuration = 0f;
+            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            if (actor is BattleChara target)
-            {
-                chaosThrustDuration = target.StatusList.FirstOrDefault(o => o.StatusId is 1312 or 118 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
-            }
-
-            if (!Config.ChaosThrustBar.HideWhenInactive || chaosThrustDuration > 0f)
-            {
-                Config.ChaosThrustBar.Label.SetText(Math.Truncate(chaosThrustDuration).ToString());
-                BarUtilities.GetProgressBar(Config.ChaosThrustBar, chaosThrustDuration, 24f, 0f, player).Draw(origin);
-            }
+            BarUtilities.GetDoTBar(Config.ChaosThrustBar, player, target, ChaosThrustIDs, ChaosThrustDurations)?.
+                Draw(origin);
         }
 
         private void DrawEyeOfTheDragonBars(Vector2 origin)

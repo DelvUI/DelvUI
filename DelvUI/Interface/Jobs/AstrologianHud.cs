@@ -331,7 +331,6 @@ namespace DelvUI.Interface.Jobs
             PluginConfigColor currentStarColor = starPreCookingBuff > 0 ? Config.StarBar.StarEarthlyColor : Config.StarBar.StarGiantColor;
             Config.StarBar.Label.SetText($"{currentStarDuration.ToString(Config.StarBar.EnableDecimalStarBar ? "N1" : "N0", CultureInfo.InvariantCulture)}");
             BarUtilities.GetProgressBar(Config.StarBar, currentStarDuration, STAR_MAX_DURATION, 0f, player, currentStarColor, Config.StarBar.StarGlowConfig.Enabled && starPostCookingBuff > 0 ? Config.StarBar.StarGlowConfig : null).Draw(origin); // Star Countdown after Star is ready 
-
         }
     }
 
@@ -341,8 +340,16 @@ namespace DelvUI.Interface.Jobs
     public class AstrologianConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.AST;
-        private AstrologianConfig() { UseDefaultPrimaryResourceBar = true; }
-        public new static AstrologianConfig DefaultConfig() => new();
+
+        public new static AstrologianConfig DefaultConfig()
+        {
+            var config = new AstrologianConfig();
+
+            config.UseDefaultPrimaryResourceBar = true;
+            config.DivinationBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+
+            return config;
+        }
 
         [NestedConfig("Draw Bar", 100)]
         public AstrologianDrawBarConfig DrawBar = new(

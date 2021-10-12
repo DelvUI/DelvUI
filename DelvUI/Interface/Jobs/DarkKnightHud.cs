@@ -110,12 +110,11 @@ namespace DelvUI.Interface.Jobs
             {
                 DrawManaBar(origin, player, 3);
             }
-
         }
 
         private void DrawManaBar(Vector2 origin, PlayerCharacter player, int chunks = 0)
         {
-            var gauge = Plugin.JobGauges.Get<DRKGauge>();
+            DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
 
             if (Config.ManaBar.HideWhenInactive && !gauge.HasDarkArts && player.CurrentMp == player.MaxMp) { return; }
 
@@ -160,7 +159,6 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.BloodWeaponBar.HideWhenInactive && bloodWeaponDuration is 0) { return; }
 
-
             Config.BloodWeaponBar.Label.SetText(Math.Truncate(bloodWeaponDuration).ToString());
             BarUtilities.GetProgressBar(Config.BloodWeaponBar, bloodWeaponDuration, 10, 0f)
                 .Draw(origin);
@@ -199,12 +197,13 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new DarkKnightConfig();
 
-            config.DarksideBar.ThresholdConfig.Enabled = true;
-            config.BloodGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.ManaBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+
             config.DarksideBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.BloodWeaponBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.DeliriumBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.LivingShadowBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.DarksideBar.ThresholdConfig.Enabled = true;
+
+            config.BloodGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.BloodGauge.UsePartialFillColor = true;
 
             return config;
         }
@@ -222,7 +221,7 @@ namespace DelvUI.Interface.Jobs
             new Vector2(254, 10),
             new PluginConfigColor(new Vector4(216f / 255f, 0f / 255f, 73f / 255f, 100f / 100f)),
             2,
-            new PluginConfigColor(new Vector4(196f / 255f, 20f / 255f, 122f / 255f, 100f / 100f))
+            new PluginConfigColor(new Vector4(180f / 255f, 180f / 255f, 180f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Darkside Bar", 40)]

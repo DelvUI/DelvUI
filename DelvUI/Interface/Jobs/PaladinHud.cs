@@ -2,7 +2,6 @@
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
-using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -10,7 +9,6 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -148,16 +146,10 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDoTBar(Vector2 origin, PlayerCharacter player)
         {
-            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            if (actor is BattleChara target)
-            {
-                var dotDuration = target.StatusList.FirstOrDefault(o => o.StatusId is 725 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
-                if (!Config.GoringBladeBar.HideWhenInactive || dotDuration > 0)
-                {
-                    Config.GoringBladeBar.Label.SetText(Math.Truncate(dotDuration).ToString());
-                    BarUtilities.GetProgressBar(Config.GoringBladeBar, dotDuration, 21f, 0f, player).Draw(origin);
-                }
-            }
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+
+            BarUtilities.GetDoTBar(Config.GoringBladeBar, player, target, 725, 21f)?.
+                Draw(origin);
         }
     }
 
@@ -168,15 +160,11 @@ namespace DelvUI.Interface.Jobs
     {
         [JsonIgnore] public override uint JobId => JobIDs.PLD;
 
-        public new static PaladinConfig DefaultConfig()
-        {
+        public new static PaladinConfig DefaultConfig() 
+        { 
             var config = new PaladinConfig();
 
-            config.GoringBladeBar.ThresholdConfig.Enabled = true;
-            config.OathGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.FightOrFlightBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.RequiescatBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.GoringBladeBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.OathGauge.UsePartialFillColor = true;
 
             return config;
         }
