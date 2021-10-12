@@ -171,13 +171,13 @@ namespace DelvUI.Interface.Party
                 if (_config.ShieldConfig.FillHealthFirst && Member.MaxHP > 0)
                 {
                     DrawHelper.DrawShield(Member.Shield, (float)Member.HP / Member.MaxHP, Position, _config.Size,
-                        _config.ShieldConfig.Height, !_config.ShieldConfig.HeightInPixels,
+                        _config.ShieldConfig.Height, _config.ShieldConfig.HeightInPixels,
                         _config.ShieldConfig.Color, drawList);
                 }
                 else
                 {
                     DrawHelper.DrawOvershield(Member.Shield, Position, _config.Size,
-                        _config.ShieldConfig.Height, !_config.ShieldConfig.HeightInPixels,
+                        _config.ShieldConfig.Height, _config.ShieldConfig.HeightInPixels,
                         _config.ShieldConfig.Color, drawList);
                 }
             }
