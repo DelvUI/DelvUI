@@ -36,7 +36,11 @@ namespace DelvUI.Interface.GeneralElements
 
         [Checkbox("Hide Default Castbar", isMonitored = true)]
         [Order(30)]
-        public bool HideDefaultCastbar = false;
+        public bool HideDefaultCastbar = false;        
+        
+        [Checkbox("Hide Default Pulltimer", isMonitored = true)]
+        [Order(30)]
+        public bool HideDefaultPulltimer = false;
 
         [Checkbox("Enable Combat Hotbars", isMonitored = true, spacing = true)]
         [Order(35)]
@@ -47,6 +51,7 @@ namespace DelvUI.Interface.GeneralElements
         public List<string> CombatActionBars = new List<string>();
 
         public Vector2 CastBarOriginalPosition;
+        public Vector2 PulltimerOriginalPosition;
         public Dictionary<string, Vector2> JobGaugeOriginalPosition = new Dictionary<string, Vector2>();
 
         public new static HUDOptionsConfig DefaultConfig() { return new HUDOptionsConfig(); }

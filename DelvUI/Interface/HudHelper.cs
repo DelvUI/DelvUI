@@ -125,6 +125,7 @@ namespace DelvUI.Interface
 
             UpdateCombatActionBars(true, true);
             UpdateDefaultCastBar(true);
+            UpdateDefaultPulltimer(true);
             UpdateJobGauges(true);
         }
 
@@ -133,6 +134,7 @@ namespace DelvUI.Interface
             UpdateCombatActionBars(_isInitial);
             UpdateJobGauges();
             UpdateDefaultCastBar();
+            UpdateDefaultPulltimer();
 
             _isInitial = false;
         }
@@ -183,6 +185,10 @@ namespace DelvUI.Interface
             if (e.PropertyName == "HideDefaultCastbar")
             {
                 UpdateDefaultCastBar();
+            }            
+            else if (e.PropertyName == "HideDefaultPulltimer")
+            {
+                UpdateDefaultPulltimer();
             }
             else if (e.PropertyName == "HideDefaultJobGauges" || e.PropertyName == "DisableJobGaugeSounds")
             {
@@ -295,7 +301,31 @@ namespace DelvUI.Interface
 
             SetAddonVisible((IntPtr)addon, forceVisible || !Config.HideDefaultCastbar, Config.CastBarOriginalPosition);
         }
+        
+        private unsafe void UpdateDefaultPulltimer(bool forceVisible = false)
+        {
+            var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("ScreenInfo_CountDown", 1);
+            if (addon == null)
+            {
+                return;
+            }
 
+            var previousPos = Config.PulltimerOriginalPosition;
+            var isVisible = UpdateAddonOriginalPosition(addon, ref Config.PulltimerOriginalPosition);
+
+            if (previousPos != Config.PulltimerOriginalPosition)
+            {
+                ConfigurationManager.Instance.SaveConfigurations(true);
+            }
+
+            if (isVisible != Config.HideDefaultPulltimer && !forceVisible)
+            {
+                return;
+            }
+
+            SetAddonVisible((IntPtr)addon, forceVisible || !Config.HideDefaultPulltimer, Config.PulltimerOriginalPosition);
+        }
+        
         private unsafe void UpdateJobGauges(bool forceVisible = false)
         {
             var (addons, names) = FindAddonsStartingWith("JobHud");
