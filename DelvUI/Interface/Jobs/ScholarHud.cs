@@ -4,7 +4,6 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
-using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,12 +16,12 @@ namespace DelvUI.Interface.Jobs
     {
         private new ScholarConfig Config => (ScholarConfig)_config;
 
+        private static readonly List<uint> BioDoTIDs = new() { 179, 189, 1895 };
+        private static readonly List<float> BioDoTDurations = new() { 30, 30, 30 };
+
         public ScholarHud(ScholarConfig config, string? displayName = null) : base(config, displayName)
         {
-
         }
-
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
@@ -69,9 +68,6 @@ namespace DelvUI.Interface.Jobs
                 DrawAetherBar(pos, player);
             }
         }
-
-        private static List<uint> BioDoTIDs = new List<uint> { 179, 189, 1895 };
-        private static List<float> BioDoTDurations = new List<float> { 30, 30, 30 };
 
         private void DrawBioBar(Vector2 origin, PlayerCharacter player)
         {

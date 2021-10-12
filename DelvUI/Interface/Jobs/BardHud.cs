@@ -1,19 +1,15 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Linq;
 using System.Numerics;
 using DelvUI.Enums;
 
@@ -244,7 +240,9 @@ namespace DelvUI.Interface.Jobs
         public new static BardConfig DefaultConfig()
         {
             var config = new BardConfig();
-            
+
+            config.SoulVoiceBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+
             config.StormbiteDoTBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.StormbiteDoTBar.Label.TextAnchor = DrawAnchor.Left;
             config.StormbiteDoTBar.Label.FrameAnchor = DrawAnchor.Left;
@@ -254,8 +252,8 @@ namespace DelvUI.Interface.Jobs
             config.CausticBiteDoTBar.Label.TextAnchor = DrawAnchor.Right;
             config.CausticBiteDoTBar.Label.FrameAnchor = DrawAnchor.Right;
             config.CausticBiteDoTBar.Label.Position = new Vector2(-2, 0);
-            config.CausticBiteDoTBar.FillDirection = BarDirection.Left;
-            
+            config.CausticBiteDoTBar.FillDirection = BarDirection.Left;                        
+
             return config;
         }
 

@@ -99,8 +99,7 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new WarriorConfig();
 
-            config.StormsEyeBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.BeastGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.BeastGauge.UsePartialFillColor = true;
 
             return config;
         }

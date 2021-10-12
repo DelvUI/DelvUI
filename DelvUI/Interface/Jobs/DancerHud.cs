@@ -7,7 +7,6 @@ using DelvUI.GameStructs;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -293,10 +292,10 @@ namespace DelvUI.Interface.Jobs
             config.EspritGauge.UseChunks = false;
             config.EspritGauge.Label.Enabled = true;
 
-            config.EspritGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.StandardFinishBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.TechnicalFinishBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.DevilmentBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.CascadeBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.FountainBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.WindmillBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.ShowerBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
 
             return config;
         }

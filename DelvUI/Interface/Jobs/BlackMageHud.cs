@@ -16,7 +16,9 @@ namespace DelvUI.Interface.Jobs
     public class BlackMageHud : JobHud
     {
         private new BlackMageConfig Config => (BlackMageConfig)_config;
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
+
+        private static readonly List<uint> ThunderDoTIDs = new() { 161, 162, 163, 1210 };
+        private static readonly List<float> ThunderDoTDurations = new() { 18, 12, 24, 18 };
 
         public BlackMageHud(BlackMageConfig config, string? displayName = null) : base(config, displayName)
         {
@@ -240,9 +242,6 @@ namespace DelvUI.Interface.Jobs
             BarUtilities.GetProcBar(Config.FirestarterBar, player, 165, 18f)?
                 .Draw(origin);
         }
-
-        private static List<uint> ThunderDoTIDs = new List<uint> { 161, 162, 163, 1210 };
-        private static List<float> ThunderDoTDurations = new List<float> { 18, 12, 24, 18 };
 
         protected void DrawThunderDoTBar(Vector2 origin, PlayerCharacter player)
         {

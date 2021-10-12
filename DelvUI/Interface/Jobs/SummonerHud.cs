@@ -5,6 +5,7 @@ using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +21,6 @@ namespace DelvUI.Interface.Jobs
 
         public SummonerHud(SummonerConfig config, string? displayName = null) : base(config, displayName)
         {
-
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -259,10 +259,14 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new SummonerConfig();
 
+            config.TranceBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+
+            config.MiasmaBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.MiasmaBar.Label.TextAnchor = DrawAnchor.Right;
             config.MiasmaBar.Label.FrameAnchor = DrawAnchor.Right;
             config.MiasmaBar.Label.Position = new Vector2(-2, 0);
 
+            config.BioBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.BioBar.Label.TextAnchor = DrawAnchor.Left;
             config.BioBar.Label.FrameAnchor = DrawAnchor.Left;
             config.BioBar.Label.Position = new Vector2(2, 0);

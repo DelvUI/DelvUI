@@ -8,7 +8,6 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
@@ -233,16 +232,26 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Ninja", 1)]
     public class NinjaConfig : JobConfig
     {
-        [JsonIgnore] public override uint JobId => JobIDs.NIN;
+        [JsonIgnore] public override uint JobId => JobIDs.NIN;       
 
-        public NinjaConfig()
-        {
-            TrickAttackBar.Enabled = false;
-            SuitonBar.Enabled = false;
-            HutonBar.ThresholdConfig.Enabled = true;
+        public new static NinjaConfig DefaultConfig() 
+        { 
+            var config = new NinjaConfig();
+
+            config.MudraBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+
+            config.TrickAttackBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.TrickAttackBar.Enabled = false;
+
+            config.SuitonBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.SuitonBar.Enabled = false;
+
+            config.HutonBar.ThresholdConfig.Enabled = true;
+
+            config.NinkiBar.UsePartialFillColor = true;
+
+            return config;
         }
-
-        public new static NinjaConfig DefaultConfig() { return new NinjaConfig(); }
 
         [NestedConfig("Mudra Bar", 30)]
         public NinjaMudraBarConfig MudraBar = new NinjaMudraBarConfig(

@@ -146,10 +146,7 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new MachinistConfig();
 
-            config.HeatGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.OverheatGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.BatteryGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.WildfireBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.HeatGauge.UsePartialFillColor = true;
 
             return config;
         }
