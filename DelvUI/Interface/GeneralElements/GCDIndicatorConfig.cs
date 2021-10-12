@@ -1,4 +1,4 @@
-﻿using DelvUI.Config;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Interface.Bars;
 using System.Numerics;
@@ -29,6 +29,10 @@ namespace DelvUI.Interface.GeneralElements
         [Checkbox("Show Border")]
         [Order(18)]
         public bool ShowBorder = true;
+
+        [Checkbox("Instant GCDs only", spacing = true)]
+        [Order(19)]
+        public bool InstantGCDsOnly = false;
 
         [Checkbox("Show GCD Queue Indicator", spacing = true)]
         [Order(20)]
