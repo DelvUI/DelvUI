@@ -462,10 +462,10 @@ namespace DelvUI.Config
             typeof(TooltipsConfig),
             typeof(ExperienceBarConfig),
             typeof(GCDIndicatorConfig),
-            typeof(MPTickerConfig),
-            typeof(GridConfig),
             typeof(PullTimerConfig),
             typeof(LimitBreakConfig),
+            typeof(MPTickerConfig),
+            typeof(GridConfig),
 
             typeof(ImportConfig)
         };
