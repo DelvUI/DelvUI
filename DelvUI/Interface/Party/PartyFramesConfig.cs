@@ -471,7 +471,7 @@ namespace DelvUI.Interface.Party
         [Order(35)]
         public bool ChangeBackgroundColorWhenRaised = true;
 
-        [ColorEdit4("Raise Backround Color")]
+        [ColorEdit4("Raise Background Color")]
         [Order(40, collapseWith = nameof(ChangeBackgroundColorWhenRaised))]
         public PluginConfigColor BackgroundColor = new(new Vector4(211f / 255f, 235f / 255f, 215f / 245f, 50f / 100f));
 
@@ -514,7 +514,7 @@ namespace DelvUI.Interface.Party
         [Order(35)]
         public bool ChangeBackgroundColorWhenInvuln = true;
 
-        [ColorEdit4("Invuln Backround Color")]
+        [ColorEdit4("Invuln Background Color")]
         [Order(40, collapseWith = nameof(ChangeBackgroundColorWhenInvuln))]
         public PluginConfigColor BackgroundColor = new(new Vector4(211f / 255f, 235f / 255f, 215f / 245f, 50f / 100f));
 
