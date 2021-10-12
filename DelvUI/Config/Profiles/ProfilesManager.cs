@@ -561,7 +561,6 @@ namespace DelvUI.Config.Profiles
                 ImGui.SameLine();
                 if (ImGui.Button(FontAwesomeIcon.ShareSquare.ToIconString()))
                 {
-                    //_deletingProfileName = _currentProfileName;
                     string? exportString = ConfigurationManager.Instance.ExportCurrentConfigs();
                     if (exportString != null)
                     {
