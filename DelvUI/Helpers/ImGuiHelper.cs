@@ -82,7 +82,7 @@ namespace DelvUI.Helpers
             if (ImGui.BeginPopupModal(title, ref p_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
             {
                 float width = 300;
-                float height = Math.Min((ImGui.CalcTextSize(" ").Y + 15) * textLines.Count(), 240);
+                float height = Math.Min((ImGui.CalcTextSize(" ").Y + 5) * textLines.Count(), 240);
 
                 ImGui.BeginChild("confirmation_modal_message", new Vector2(width, height), false);
                 foreach (string text in textLines)
