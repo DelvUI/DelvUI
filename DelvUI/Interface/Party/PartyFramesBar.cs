@@ -312,9 +312,12 @@ namespace DelvUI.Interface.Party
             var showingRaise = ShowingRaise();
             var showingInvuln = ShowingInvuln();
 
-            if (!showingInvuln || !showingRaise || !_raiseTrackerConfig.HideNameWhenRaised || !_invulnTrackerConfig.HideNameWhenInvuln)
+            if (!showingRaise || !_raiseTrackerConfig.HideNameWhenRaised)
             {
-                _nameLabelHud.Draw(Position, _config.Size, character, Member.Name);
+                if (!showingInvuln || !_invulnTrackerConfig.HideNameWhenInvuln)
+                {
+                    _nameLabelHud.Draw(Position, _config.Size, character, Member.Name);
+                }
             }
 
             // health label
