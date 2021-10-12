@@ -682,9 +682,9 @@ namespace DelvUI.Config.Profiles
 
             // delete confirmation
             if (_deletingProfileName != null)
-            {
-                string message = "Are you sure you want to delete the profile \"" + _deletingProfileName + "\"?";
-                var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Delete?", message);
+            {            
+                string[] lines = new string[] { "Are you sure you want to delete the profile:","\u2002- " +  _deletingProfileName};
+                var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Delete?", lines);
 
                 if (didConfirm)
                 {
@@ -701,8 +701,8 @@ namespace DelvUI.Config.Profiles
             // reset confirmation
             if (_resetingProfileName != null)
             {
-                string message = "Are you sure you want to reset the profile \"" + _resetingProfileName + "\"?";
-                var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Reset?", message);
+                string[] lines = new string[] { "Are you sure you want to reset the profile:","\u2002- " +  _resetingProfileName};
+                var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Reset?", lines);
 
                 if (didConfirm)
                 {
