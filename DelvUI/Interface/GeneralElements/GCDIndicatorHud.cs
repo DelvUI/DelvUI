@@ -18,6 +18,7 @@ namespace DelvUI.Interface.GeneralElements
 
         private bool _wasBarEnabled = true;
         private bool _wasCircularModeEnabled = false;
+        private float _lastTotalCastTime = 0;
 
         public GCDIndicatorHud(GCDIndicatorConfig config, string displayName) : base(config, displayName) { }
 
@@ -68,15 +69,38 @@ namespace DelvUI.Interface.GeneralElements
 
             GCDHelper.GetGCDInfo((PlayerCharacter)Actor, out var elapsed, out var total);
 
+            if (total == 0)
+            {
+                _lastTotalCastTime = 0;
+            }
+
             if (!Config.AlwaysShow && total == 0)
             {
                 return;
+            }
+
+            if (_lastTotalCastTime == 0 && ((BattleChara)Actor).IsCasting)
+            {
+                _lastTotalCastTime = ((BattleChara)Actor).TotalCastTime;
             }
 
             var scale = elapsed / total;
             if (scale <= 0)
             {
                 return;
+            }
+
+            if (Config.InstantGCDsOnly && _lastTotalCastTime != 0)
+            {
+                if (Config.AlwaysShow)
+                {
+                    elapsed = 0;
+                    total = 0;
+                }
+                else
+                {
+                    return;
+                }
             }
 
             Config.Bar.Position = Config.Position;
