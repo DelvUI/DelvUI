@@ -7,6 +7,7 @@ using ImGuiNET;
 using System;
 using System.Globalization;
 using System.Numerics;
+using Dalamud.Logging;
 
 namespace DelvUI.Interface.Party
 {
@@ -260,7 +261,7 @@ namespace DelvUI.Interface.Party
             {
                 var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _invulnTrackerConfig.HealthBarAnchor);
                 var iconPos = Utils.GetAnchoredPosition(parentPos + _invulnTrackerConfig.Position, _invulnTrackerConfig.IconSize, _invulnTrackerConfig.Anchor);
-                DrawHelper.DrawIcon(013116, iconPos, _invulnTrackerConfig.IconSize, true, drawList);
+                DrawHelper.DrawIcon(Member.InvulnIcon, iconPos, _invulnTrackerConfig.IconSize, true, drawList);
             }
 
             // highlight
@@ -312,12 +313,23 @@ namespace DelvUI.Interface.Party
             var showingRaise = ShowingRaise();
             var showingInvuln = ShowingInvuln();
 
-            if (!showingRaise || !_raiseTrackerConfig.HideNameWhenRaised)
+            var drawName = true;
+
+            if (showingRaise || showingInvuln)
             {
-                if (!showingInvuln || !_invulnTrackerConfig.HideNameWhenInvuln)
+                if (showingRaise && _raiseTrackerConfig.HideNameWhenRaised)
                 {
-                    _nameLabelHud.Draw(Position, _config.Size, character, Member.Name);
+                    drawName = false;
                 }
+                if (showingInvuln && _invulnTrackerConfig.HideNameWhenInvuln)
+                {
+                    drawName = false;
+                }
+            }
+
+            if (drawName)
+            {
+                _nameLabelHud.Draw(Position, _config.Size, character, Member.Name);
             }
 
             // health label

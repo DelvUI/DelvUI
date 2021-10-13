@@ -46,17 +46,16 @@ namespace DelvUI.Interface.Party
                 {
                     foreach (var status in battleChara.StatusList)
                     {
-                        if (InvulnIds.Contains(status.StatusId))
+                        if (InvulnMap.Keys.Contains(status.StatusId))
                         {
                             // apply invuln data based on buff
                             member.InvulnTime = status.RemainingTime;
+                            member.InvulnIcon = InvulnMap[status.StatusId];
                             break;
                         }
-                        else
-                        {
-                            // making sure the invuln buff doesnt exists anymore, was having issues with the way raisetracker was handling it
-                            member.InvulnTime = null;
-                        }
+
+                        // making sure the invuln buff doesnt exists anymore, was having issues with the way raisetracker was handling it
+                        member.InvulnTime = null;
                     }
                     
                 }
@@ -65,23 +64,13 @@ namespace DelvUI.Interface.Party
 
         #region invuln ids
         //these need to be mapped instead
-        private static List<uint> InvulnIds = new List<uint>()
+        private static Dictionary<uint, uint> InvulnMap = new Dictionary<uint, uint>()
         {
-            810,  // LIVING DEAD
-            811,  // WALKING DEAD
-            1302, // HALLOWED GROUND
-            409,  // HOLMGANG
-            1836, // SUPERBOLIDE
-
-        };        
-        private static List<uint> InvulnIcons = new List<uint>()
-        {
-            013115, // LIVING DEAD
-            013116, // WALKING DEAD
-            010255, // HOLMGANG
-            013606, // SUPERBOLIDE
-            012504, // HALLOWED GROUND
-
+            { 810, 003077 },    // LIVING DEAD
+            { 811, 003077 },    // WALKING DEAD
+            { 1302, 002502 },   // HALLOWED GROUND
+            { 409, 000266 },    // HOLMGANG
+            { 1836, 003416 }    // SUPERBOLIDE
         };
         
         #endregion
