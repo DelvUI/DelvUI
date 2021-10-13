@@ -1,8 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Helpers;
 
@@ -11,8 +9,9 @@ namespace DelvUI.Interface.Party
     public struct InvulnStatus
     {
         public uint InvulnIcon;
-        public float? InvulnTime;
-        public uint? InvulnId;
+        public float InvulnTime;
+        public uint InvulnId;
+
     }
     public class PartyFramesInvulnTracker
     {
@@ -38,11 +37,10 @@ namespace DelvUI.Interface.Party
 
             foreach (var member in partyMembers)
             {
-                InvulnStatus memberInvulnStatus = member.InvulnStatus;
                 
                 if (member.Character == null || member.ObjectId == 0)
                 {
-                    memberInvulnStatus.InvulnTime = null;
+                    member.InvulnStatus = null;
                     continue;
                 }
 
@@ -55,15 +53,15 @@ namespace DelvUI.Interface.Party
                 Status tankInvuln = Utils.HasTankInvulnerability(battleChara);
                 if (tankInvuln == null)
                 {
-                    memberInvulnStatus.InvulnTime = null;
+                    member.InvulnStatus = null;
                     break;
                 }
                 
                 // apply invuln data based on buff
 
-                memberInvulnStatus.InvulnTime = tankInvuln.RemainingTime;
-                memberInvulnStatus.InvulnIcon = InvulnMap[tankInvuln.StatusId];
-                memberInvulnStatus.InvulnId = tankInvuln.StatusId;
+                member.InvulnStatus.InvulnTime = tankInvuln.RemainingTime;
+                member.InvulnStatus.InvulnIcon = InvulnMap[tankInvuln.StatusId];
+                member.InvulnStatus.InvulnId = tankInvuln.StatusId;
 
             }
         }

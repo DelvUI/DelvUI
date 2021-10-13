@@ -325,7 +325,7 @@ namespace DelvUI.Interface.Party
 
             if (showingRaise || showingInvuln)
             {
-                if (showingRaise && _raiseTrackerConfig.HideNameWhenRaised || showingInvuln && _invulnTrackerConfig.HideNameWhenInvuln) 
+                if ((showingRaise && _raiseTrackerConfig.HideNameWhenRaised) || (showingInvuln && _invulnTrackerConfig.HideNameWhenInvuln)) 
                 {
                     drawName = false;
                 }
@@ -358,7 +358,7 @@ namespace DelvUI.Interface.Party
             // invuln label
             if (showingInvuln)
             {
-                var duration = Math.Abs(Member.InvulnStatus.InvulnTime!.Value);
+                var duration = Math.Abs(Member.InvulnStatus.InvulnTime.Value);
                 var text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
                 _invulnTrackerConfig.LabelConfig.SetText(text);
                 _invulnLabelHud.Draw(Position, _config.Size);
