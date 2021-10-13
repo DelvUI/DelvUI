@@ -6,7 +6,6 @@
 - Fixed DRK Dark Arts proc color not showing.
 - Fixed DRK manabar partial fill color when Dark Arts has proced.
 - Removed glow option from DRK Dark Arts proc.
-- Fixed mouseover not working for actions bounds to a mouse button.
 - Fixed party frames preview not showing accurate values for health and mana.
 - Fixed PLD Invulnerability not being properly tracked.
 

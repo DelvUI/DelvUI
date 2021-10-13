@@ -9,7 +9,6 @@ using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
 using Dalamud.Game.ClientState.Statuses;
-using System.Windows.Forms;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -78,11 +77,11 @@ namespace DelvUI.Interface.GeneralElements
             var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
             if (ImGui.IsMouseHoveringRect(startPos, startPos + Config.Size) && !DraggingEnabled)
             {
-                if (Control.MouseButtons == MouseButtons.Left)
+                if (ImGui.GetIO().MouseClicked[0])
                 {
                     Plugin.TargetManager.SetTarget(Actor);
                 }
-                else if (Control.MouseButtons == MouseButtons.Right)
+                else if (ImGui.GetIO().MouseClicked[1])
                 {
                     var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
                     _openContextMenuFromTarget(agentHud, Actor.Address);
@@ -140,7 +139,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
             }
 
-            bar.Draw(pos);
+            bar.Draw(pos, true);
         }
 
         private void DrawFriendlyNPC(Vector2 pos, GameObject? actor)

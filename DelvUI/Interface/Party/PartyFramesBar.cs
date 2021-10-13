@@ -8,7 +8,6 @@ using System;
 using System.Globalization;
 using System.Numerics;
 using Dalamud.Logging;
-using System.Windows.Forms;
 
 namespace DelvUI.Interface.Party
 {
@@ -149,17 +148,17 @@ namespace DelvUI.Interface.Party
                 MouseOverHelper.Instance.Target = character;
 
                 // move player bar to this spot on ctrl+alt+shift click
-                if (ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && Control.MouseButtons == MouseButtons.Left)
+                if (ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && ImGui.GetIO().MouseClicked[0])
                 {
                     MovePlayerEvent?.Invoke(this);
                 }
                 // target
-                else if (Control.MouseButtons == MouseButtons.Left && character != null)
+                else if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && character != null)
                 {
                     Plugin.TargetManager.SetTarget(character);
                 }
                 // context menu
-                else if (Control.MouseButtons == MouseButtons.Right)
+                else if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
                 {
                     OpenContextMenuEvent?.Invoke(this);
                 }

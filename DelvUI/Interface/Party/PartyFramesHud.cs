@@ -425,9 +425,29 @@ namespace DelvUI.Interface.Party
             }
             else
             {
-                DrawHelper.DrawInWindow(ID, origin + Config.Position, Config.Size, !Config.Lock, false, true, windowFlags, drawBarsAction);
+                bool needsInput = CalculateNeedsInput();
+                DrawHelper.DrawInWindow(ID, origin + Config.Position, Config.Size, needsInput, false, true, windowFlags, drawBarsAction);
                 drawElementsAction();
             }
+        }
+
+        protected bool CalculateNeedsInput()
+        {
+            if (!Config.Lock)
+            {
+                return true;
+            }
+
+            for (int i = 0; i < PartyManager.Instance.MemberCount; i++)
+            {
+                var bar = bars[i];
+                if (ImGui.IsMouseHoveringRect(bar.Position, bar.Position + _healthBarsConfig.Size))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }
