@@ -1,5 +1,6 @@
 # 0.3.0.2
 - Fixed smooth HP in party frames not being smooth enough.
+- Switching profile will now reload fonts as they can differ between profiles.
 
 # 0.3.0.1
 - Fixed smooth HP in party frames.
