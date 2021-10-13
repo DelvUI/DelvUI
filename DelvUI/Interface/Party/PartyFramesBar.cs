@@ -37,9 +37,24 @@ namespace DelvUI.Interface.Party
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
 
-        public IPartyFramesMember? Member;
         public bool Visible = false;
         public Vector2 Position;
+
+        private SmoothHPHelper _smoothHPHelper = new SmoothHPHelper();
+
+        private IPartyFramesMember? _member = null;
+        public IPartyFramesMember? Member
+        {
+            get => _member;
+            set
+            {
+                if (_member == value) { return; }
+
+                _member = value;
+                _smoothHPHelper.Reset();
+            }
+        }
+
 
         public PartyFramesBar(
             string id,
@@ -170,9 +185,9 @@ namespace DelvUI.Interface.Party
             uint currentHp = Member.HP;
             uint maxHp = Member.MaxHP;
 
-            if (_config.SmoothHealthConfig.Enabled && maxHp > 0)
+            if (_config.SmoothHealthConfig.Enabled)
             {
-                currentHp = _config.SmoothHealthConfig.GetNextHp((int)currentHp, (int)maxHp);
+                currentHp = _smoothHPHelper.GetNextHp((int)currentHp, (int)maxHp, _config.SmoothHealthConfig.Velocity);
             }
 
             var hpScale = maxHp > 0 ? (float)currentHp / (float)maxHp : 1;
@@ -308,7 +323,20 @@ namespace DelvUI.Interface.Party
             {
                 var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _manaBarConfig.HealthBarAnchor);
                 var manaBarPos = Utils.GetAnchoredPosition(parentPos + _manaBarConfig.Position, _manaBarConfig.Size, _manaBarConfig.Anchor);
-                _manaLabelHud.Draw(manaBarPos, _manaBarConfig.Size, character);
+
+                if (character == null)
+                {
+                    string oldText = _manaBarConfig.ValueLabelConfig.GetText();
+                    _manaBarConfig.ValueLabelConfig.SetText(Member.MP.ToString());
+
+                    _manaLabelHud.Draw(manaBarPos, _manaBarConfig.Size, character);
+
+                    _manaBarConfig.ValueLabelConfig.SetText(oldText);
+                }
+                else
+                {
+                    _manaLabelHud.Draw(manaBarPos, _manaBarConfig.Size, character);
+                }
             }
 
             // buffs / debuffs
@@ -345,7 +373,19 @@ namespace DelvUI.Interface.Party
             }
 
             // health label
-            _healthLabelHud.Draw(Position, _config.Size, character, Member.HP.ToString());
+            if (character == null)
+            {
+                string oldText = _config.HealthLabelConfig.GetText();
+                _config.HealthLabelConfig.SetText(Member.HP.ToString());
+
+                _healthLabelHud.Draw(Position, _config.Size, character);
+
+                _config.HealthLabelConfig.SetText(oldText);
+            }
+            else
+            {
+                _healthLabelHud.Draw(Position, _config.Size, character);
+            }
 
             // order
             if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)

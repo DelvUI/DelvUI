@@ -312,8 +312,10 @@ namespace DelvUI.Helpers
 
         public static bool DrawChangelogWindow(string changelog)
         {
+            float height = ImGui.CalcTextSize(changelog).Y + 100;
+
             bool didClose = false;
-            Vector2 size = new Vector2(500, 500);
+            Vector2 size = new Vector2(500, Math.Min(height, 500));
 
             ImGui.SetNextWindowSize(size, ImGuiCond.Appearing);
             ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));

@@ -18,7 +18,21 @@ namespace DelvUI.Interface.GeneralElements
 
         private readonly OpenContextMenuFromTarget _openContextMenuFromTarget;
 
-        public GameObject? Actor { get; set; } = null;
+        private SmoothHPHelper _smoothHPHelper = new SmoothHPHelper();
+
+        private GameObject? _actor = null;
+        public GameObject? Actor
+        {
+            get => _actor;
+            set
+            {
+                if (_actor == value) { return; }
+
+                _actor = value;
+                _smoothHPHelper.Reset();
+            }
+        }
+
 
         public UnitFrameHud(UnitFrameConfig config, string displayName) : base(config, displayName)
         {
@@ -76,7 +90,7 @@ namespace DelvUI.Interface.GeneralElements
                 MouseOverHelper.Instance.Target = Actor;
             }
         }
-        
+
         private void DrawCharacter(Vector2 pos, Character character)
         {
             uint currentHp = character.CurrentHp;
@@ -84,14 +98,14 @@ namespace DelvUI.Interface.GeneralElements
 
             if (Config.SmoothHealthConfig.Enabled)
             {
-                currentHp = Config.SmoothHealthConfig.GetNextHp((int)currentHp, (int)maxHp);
+                currentHp = _smoothHPHelper.GetNextHp((int)currentHp, (int)maxHp, Config.SmoothHealthConfig.Velocity);
             }
 
             PluginConfigColor fillColor = Config.UseJobColor ? Utils.ColorForActor(character) : Config.FillColor;
 
             if (Config.UseColorBasedOnHealthValue)
             {
-                var scale = currentHp / Math.Max(1, maxHp);
+                var scale = (float)currentHp / Math.Max(1, maxHp);
                 fillColor = Utils.GetColorByScale(scale, Config.LowHealthColorThreshold / 100f, Config.FullHealthColorThreshold / 100f, Config.LowHealthColor, Config.FullHealthColor, Config.blendMode);
             }
 
@@ -153,14 +167,14 @@ namespace DelvUI.Interface.GeneralElements
                     {
                         color = Config.CustomWalkingDeadColor;
                     }
-                    else 
+                    else
                     {
                         color = new PluginConfigColor(GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Vector.AdjustColor(-.8f));
                     }
 
                     return color;
                 }
-                
+
             }
 
             if (chara is BattleChara)

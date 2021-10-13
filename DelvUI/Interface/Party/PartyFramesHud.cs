@@ -348,8 +348,8 @@ namespace DelvUI.Interface.Party
                         {
                             raisedIndexes.Add(i);
                             continue;
-                        }                        
-                        
+                        }
+
                         if (_healthBarsConfig.ColorsConfig.ShowEnmityBorderColors)
                         {
                             if (member.EnmityLevel == EnmityLevel.Leader)

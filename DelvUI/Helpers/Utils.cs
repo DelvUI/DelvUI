@@ -1,19 +1,18 @@
-using DelvUI.Interface.GeneralElements;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
+using Colourful;
 using Dalamud.Game.ClientState.Objects;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
-using DelvUI.Config;
-using DelvUI.Enums;
-using Colourful;
-using System.Text.RegularExpressions;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
 using Dalamud.Game.ClientState.Statuses;
 using Dalamud.Logging;
+using DelvUI.Config;
+using DelvUI.Enums;
+using DelvUI.Interface.GeneralElements;
+using System;
+using System.Diagnostics;
+using System.Linq;
+using System.Numerics;
+using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace DelvUI.Helpers
 {
@@ -272,8 +271,8 @@ namespace DelvUI.Helpers
                 case ObjectKind.BattleNpc when (character.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat:
                     return GlobalColors.Instance.NPCHostileColor;
 
-                case ObjectKind.BattleNpc:
-                    if (!IsHostileMemory((BattleNpc)character))
+                case ObjectKind.BattleNpc when (actor is BattleNpc battleNpc):
+                    if (!IsHostileMemory(battleNpc))
                     {
                         return GlobalColors.Instance.NPCFriendlyColor;
                     }
@@ -285,7 +284,7 @@ namespace DelvUI.Helpers
 
         public static Status HasTankInvulnerability(BattleChara actor)
         {
-            var tankInvulnBuff = actor.StatusList.FirstOrDefault(o => o.StatusId is 810 or 811 or 1302 or 409 or 1836);
+            var tankInvulnBuff = actor.StatusList.FirstOrDefault(o => o.StatusId is 810 or 811 or 1302 or 409 or 1836 or 82);
             return tankInvulnBuff!;
         }
 
