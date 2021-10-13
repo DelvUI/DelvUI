@@ -69,7 +69,10 @@ namespace DelvUI.Interface.Jobs
         {
             Vector2 pos = origin + Config.Position;
 
-            DarkArtsProc(pos, player);
+            if (Config.ManaBar.Enabled)
+            {
+                DrawManaBar(pos, player);
+            }
 
             if (Config.BloodGauge.Enabled)
             {
@@ -97,37 +100,29 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DarkArtsProc(Vector2 origin, PlayerCharacter player)
-        {
-            bool hasDarkArts = Plugin.JobGauges.Get<DRKGauge>().HasDarkArts;
-            if (!Config.ManaBar.Enabled) { return; }
-
-            if (hasDarkArts || !Config.ManaBar.UseChunks)
-            {
-                DrawManaBar(origin, player, 1);
-            }
-            if (!hasDarkArts && Config.ManaBar.UseChunks)
-            {
-                DrawManaBar(origin, player, 3);
-            }
-        }
-
-        private void DrawManaBar(Vector2 origin, PlayerCharacter player, int chunks = 0)
+        private void DrawManaBar(Vector2 origin, PlayerCharacter player)
         {
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
 
             if (Config.ManaBar.HideWhenInactive && !gauge.HasDarkArts && player.CurrentMp == player.MaxMp) { return; }
 
+            if (gauge.HasDarkArts)
+            {
+                Config.ManaBar.UsePartialFillColor = false;
+            }
+            else { Config.ManaBar.UsePartialFillColor = true; }
+
             Config.ManaBar.Label.SetText($"{player.CurrentMp,0}");
             // hardcoded 9k as maxMP so the chunks are each 3k since that's what a DRK wants to see
             BarUtilities.GetChunkedProgressBars(
                 Config.ManaBar,
-                chunks,
+                gauge.HasDarkArts ? 1 : 3,
                 player.CurrentMp,
                 Config.ManaBar.UseChunks ? 9000 : player.MaxMp,
                 0f,
-                player,                
-                glowConfig: gauge.HasDarkArts ? Config.ManaBar.GlowConfig : null
+                player,
+                glowConfig: null,
+                gauge.HasDarkArts ? Config.ManaBar.DarkArtsColor : Config.ManaBar.FillColor
                 ).Draw(origin);
         }
 
@@ -197,6 +192,7 @@ namespace DelvUI.Interface.Jobs
             var config = new DarkKnightConfig();
 
             config.ManaBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.ManaBar.UsePartialFillColor = true;
 
             config.DarksideBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.DarksideBar.ThresholdConfig.Enabled = true;
@@ -262,13 +258,9 @@ namespace DelvUI.Interface.Jobs
         [Order(26)]
         public PluginConfigColor DarkArtsColor = new PluginConfigColor(new Vector4(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
 
-        [NestedConfig("Glow When Dark Arts Is Active", 28, separator = false, spacing = true)]
-        public BarGlowConfig GlowConfig = new BarGlowConfig();
-
         public DarkKnightManaBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
              : base(position, size, fillColor)
         {
-
         }
     }
 }
