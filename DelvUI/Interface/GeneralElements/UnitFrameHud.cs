@@ -9,6 +9,7 @@ using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
 using Dalamud.Game.ClientState.Statuses;
+using System.Windows.Forms;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -77,11 +78,11 @@ namespace DelvUI.Interface.GeneralElements
             var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
             if (ImGui.IsMouseHoveringRect(startPos, startPos + Config.Size) && !DraggingEnabled)
             {
-                if (ImGui.GetIO().MouseClicked[0])
+                if (Control.MouseButtons == MouseButtons.Left)
                 {
                     Plugin.TargetManager.SetTarget(Actor);
                 }
-                else if (ImGui.GetIO().MouseClicked[1])
+                else if (Control.MouseButtons == MouseButtons.Right)
                 {
                     var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
                     _openContextMenuFromTarget(agentHud, Actor.Address);
@@ -90,7 +91,7 @@ namespace DelvUI.Interface.GeneralElements
                 MouseOverHelper.Instance.Target = Actor;
             }
         }
-        
+
         private void DrawCharacter(Vector2 pos, Character character)
         {
             uint currentHp = character.CurrentHp;
@@ -139,7 +140,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
             }
 
-            bar.Draw(pos, true);
+            bar.Draw(pos);
         }
 
         private void DrawFriendlyNPC(Vector2 pos, GameObject? actor)
@@ -167,14 +168,14 @@ namespace DelvUI.Interface.GeneralElements
                     {
                         color = Config.CustomWalkingDeadColor;
                     }
-                    else 
+                    else
                     {
                         color = new PluginConfigColor(GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Vector.AdjustColor(-.8f));
                     }
 
                     return color;
                 }
-                
+
             }
 
             if (chara is BattleChara)
