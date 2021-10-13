@@ -8,6 +8,12 @@ using DelvUI.Helpers;
 
 namespace DelvUI.Interface.Party
 {
+    public struct InvulnStatus
+    {
+        public uint InvulnIcon;
+        public float? InvulnTime;
+        public uint? InvulnId;
+    }
     public class PartyFramesInvulnTracker
     {
         private PartyFramesInvulnTrackerConfig _config;
@@ -16,7 +22,7 @@ namespace DelvUI.Interface.Party
             _config = ConfigurationManager.Instance.GetConfigObject<PartyFramesInvulnTrackerConfig>();
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
         }
-
+        
         public void OnConfigReset(ConfigurationManager sender)
         {
             _config = sender.GetConfigObject<PartyFramesInvulnTrackerConfig>();
@@ -32,9 +38,11 @@ namespace DelvUI.Interface.Party
 
             foreach (var member in partyMembers)
             {
+                InvulnStatus memberInvulnStatus = member.InvulnStatus;
+                
                 if (member.Character == null || member.ObjectId == 0)
                 {
-                    member.InvulnTime = null;
+                    memberInvulnStatus.InvulnTime = null;
                     continue;
                 }
 
@@ -47,14 +55,15 @@ namespace DelvUI.Interface.Party
                 Status tankInvuln = Utils.HasTankInvulnerability(battleChara);
                 if (tankInvuln == null)
                 {
-                    member.InvulnTime = null;
+                    memberInvulnStatus.InvulnTime = null;
                     break;
                 }
                 
                 // apply invuln data based on buff
-                member.InvulnTime = tankInvuln.RemainingTime;
-                member.InvulnIcon = InvulnMap[tankInvuln.StatusId];
-                member.InvulnId = tankInvuln.StatusId;
+
+                memberInvulnStatus.InvulnTime = tankInvuln.RemainingTime;
+                memberInvulnStatus.InvulnIcon = InvulnMap[tankInvuln.StatusId];
+                memberInvulnStatus.InvulnId = tankInvuln.StatusId;
 
             }
         }

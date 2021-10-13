@@ -12,7 +12,7 @@ namespace DelvUI.Interface.Party
         Second = 2,
         Last = 255
     }
-
+    
     public unsafe class PartyFramesMember : IPartyFramesMember
     {
         protected PartyMember? _partyMember = null;
@@ -35,9 +35,8 @@ namespace DelvUI.Interface.Party
         public EnmityLevel EnmityLevel { get; private set; } = EnmityLevel.Last;
         public bool IsPartyLeader { get; private set; } = false;
         public float? RaiseTime { get; set; }
-        public float? InvulnTime { get; set; }
-        public uint InvulnIcon { get; set; }
-        public uint? InvulnId { get; set; }
+        public InvulnStatus InvulnStatus { get; set; }
+
 
         public PartyFramesMember(PartyMember partyMember, int order, EnmityLevel enmityLevel, bool isPartyLeader)
         {
@@ -107,9 +106,8 @@ namespace DelvUI.Interface.Party
         public EnmityLevel EnmityLevel { get; private set; }
         public bool IsPartyLeader { get; }
         public float? RaiseTime { get; set; }
-        public float? InvulnTime { get; set; }
-        public uint InvulnIcon { get; set; }
-        public uint? InvulnId { get; set; }
+        public InvulnStatus InvulnStatus { get; set; }
+
 
         public FakePartyFramesMember(int order, EnmityLevel enmityLevel, bool isPartyLeader)
         {
@@ -148,9 +146,7 @@ namespace DelvUI.Interface.Party
         public EnmityLevel EnmityLevel { get; }
         public bool IsPartyLeader { get; }
         public float? RaiseTime { get; set; }
-        public float? InvulnTime { get; set; }
-        public uint InvulnIcon { get; set; }
-        public uint? InvulnId { get; set; }
+        public InvulnStatus InvulnStatus { get; set; }
 
         public void Update(EnmityLevel enmityLevel, bool isPartyLeader, uint jobId);
     }
