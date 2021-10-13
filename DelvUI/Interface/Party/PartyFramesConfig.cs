@@ -90,6 +90,9 @@ namespace DelvUI.Interface.Party
 
         [NestedConfig("Change Alpha Based on Range", 65)]
         public PartyFramesRangeConfig RangeConfig = new PartyFramesRangeConfig();
+
+        [NestedConfig("Use Smooth Transitions", 70)]
+        public SmoothHealthConfig SmoothHealthConfig = new SmoothHealthConfig();
     }
 
     [Disableable(false)]

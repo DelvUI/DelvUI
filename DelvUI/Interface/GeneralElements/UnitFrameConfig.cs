@@ -145,7 +145,7 @@ namespace DelvUI.Interface.GeneralElements
         [Combo("Blend Mode", "LAB", "LChab", "XYZ", "RGB", "LChuv", "Luv", "Jzazbz", "JzCzhz")]
         [Order(90, collapseWith = nameof(UseColorBasedOnHealthValue))]
         public BlendMode blendMode = BlendMode.LAB;
-        
+
         [Checkbox("Tank Invulnerability")]
         [Order(95)]
         public bool ShowTankInvulnerability = true;
@@ -157,10 +157,10 @@ namespace DelvUI.Interface.GeneralElements
         [ColorEdit4("Tank Invulnerability Color ##TankInvulnerabilityCustom")]
         [Order(105, collapseWith = nameof(UseCustomInvulnerabilityColor))]
         public PluginConfigColor CustomInvulnerabilityColor = new PluginConfigColor(new Vector4(100f / 255f, 100f / 255f, 100f / 255f, 100f / 100f));
-        
+
         [NestedConfig("Use Smooth Transitions", 110, separator = false, nest = true)]
-        public SmoothHealthConfig SmoothHealthConfig;
-        
+        public SmoothHealthConfig SmoothHealthConfig = new SmoothHealthConfig();
+
         [NestedConfig("Left Text", 115)]
         public EditableLabelConfig LeftLabelConfig;
 
@@ -178,7 +178,6 @@ namespace DelvUI.Interface.GeneralElements
             LeftLabelConfig = leftLabelConfig;
             RightLabelConfig = rightLabelConfig;
             BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
-            SmoothHealthConfig = new SmoothHealthConfig();
         }
     }
 
@@ -220,7 +219,7 @@ namespace DelvUI.Interface.GeneralElements
         [DragFloat("Velocity", min = 1f, max = 100f)]
         [Order(5)]
         public float Velocity = 25f;
-        
+
         private float? _startHp;
         private float? _targetHp;
         private float? _lastHp;
@@ -246,7 +245,7 @@ namespace DelvUI.Interface.GeneralElements
                 float offset = delta * Velocity / 100f;
                 _startHp = Math.Clamp(_startHp.Value + offset, 0, maxHp);
             }
-            
+
             _lastHp = currentHp;
             return _startHp.HasValue ? (uint)_startHp.Value : (uint)currentHp;
         }
