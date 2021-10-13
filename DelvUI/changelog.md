@@ -2,6 +2,7 @@
 - Fixed smooth HP in party frames.
 - Fixed tooltips doing weird things when the config window is opened.
 - Fixed BLM's Polyglot Bar Glow not hiding.
+- Fixed mouseover not working for actions bounds to a mouse button.
 
 # 0.3.0.0
 This version brings A LOT of changes. Chances are your settings will be invalid / broken. We recommend starting from a clean state.
