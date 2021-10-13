@@ -1,9 +1,13 @@
-﻿using Dalamud.Game.ClientState.Actors.Types;
-using DelvUI.Helpers;
+﻿using DelvUI.Helpers;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Dalamud.Game.ClientState.Objects.Types;
+using DelvUI.Interface.Bars;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using System.Linq;
+using Dalamud.Game.ClientState.JobGauge.Types;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -11,29 +15,50 @@ namespace DelvUI.Interface.GeneralElements
     {
         private MPTickerConfig Config => (MPTickerConfig)_config;
 
-        private MPTickHelper _mpTickHelper;
-        public Actor Actor { get; set; } = null;
+        private MPTickHelper _mpTickHelper = null!;
+        public GameObject? Actor { get; set; } = null;
 
-        public MPTickerHud(string ID, MPTickerConfig config, string displayName) : base(ID, config, displayName) { }
+        public MPTickerHud(MPTickerConfig config, string displayName) : base(config, displayName) { }
+
+        protected override void InternalDispose()
+        {
+            _mpTickHelper.Dispose();
+        }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
+            return (new List<Vector2>() { Config.Position + Config.Bar.Position },
+                    new List<Vector2>() { Config.Bar.Size });
         }
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || Actor == null || Actor is not Chara)
+            if (!Config.Enabled || Actor == null || Actor is not PlayerCharacter player)
             {
                 return;
             }
 
-            if (Config.HideOnFullMP)
+            // full mp
+            if (Config.HideOnFullMP && player.CurrentMp >= player.MaxMp)
             {
-                var chara = (Chara)Actor;
-                if (chara.CurrentMp >= chara.MaxMp)
+                return;
+            }
+
+            // BLM specific settings
+            if (Config.EnableOnlyForBLM)
+            {
+                if (player.ClassJob.Id != JobIDs.BLM)
                 {
+
                     return;
+                }
+                else
+                {
+                    var gauge = Plugin.JobGauges.Get<BLMGauge>();
+                    if (Config.ShowOnlyDuringUmbralIce && !gauge.InUmbralIce)
+                    {
+                        return;
+                    }
                 }
             }
 
@@ -52,25 +77,32 @@ namespace DelvUI.Interface.GeneralElements
                 scale = 1;
             }
 
-            var barSize = new Vector2(Math.Max(1f, Config.Size.X * scale), Config.Size.Y);
-            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
+            MPTickerFire3ThresholdConfig? thresholdConfig = GetFire3ThresholdConfig();
+            BarUtilities.GetProgressBar(Config.Bar, thresholdConfig, null, scale, 1, 0, fillColor: Config.Bar.FillColor)
+                .Draw(origin + Config.Position);
+        }
 
-            var drawList = ImGui.GetWindowDrawList();
-            drawList.AddRectFilled(startPos, startPos + Config.Size, 0x88000000);
-
-            drawList.AddRectFilledMultiColor(
-                startPos,
-                startPos + barSize,
-                Config.Color.TopGradient,
-                Config.Color.TopGradient,
-                Config.Color.BottomGradient,
-                Config.Color.BottomGradient
-            );
-
-            if (Config.ShowBorder)
+        private MPTickerFire3ThresholdConfig? GetFire3ThresholdConfig()
+        {
+            if (Actor is not PlayerCharacter player || player.ClassJob.Id != JobIDs.BLM)
             {
-                drawList.AddRect(startPos, startPos + Config.Size, 0xFF000000);
+                return null;
             }
+
+            MPTickerFire3ThresholdConfig config = Config.Bar.Fire3Threshold;
+            if (!config.Enabled)
+            {
+                return null;
+            }
+
+            bool leyLinesActive = player.StatusList.Any(e => e.StatusId == 738);
+            float castTime = config.Fire3CastTime * (leyLinesActive ? 0.85f : 1f);
+
+            // tick rate is 3s
+            // adding 0.3f as "safety net"
+            config.Value = (3 - castTime + 0.3f) / 3;
+
+            return config;
         }
     }
 }

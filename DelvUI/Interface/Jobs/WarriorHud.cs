@@ -1,11 +1,10 @@
-﻿using Dalamud.Game.ClientState.Structs;
-using Dalamud.Game.ClientState.Structs.JobGauge;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,107 +16,76 @@ namespace DelvUI.Interface.Jobs
     public class WarriorHud : JobHud
     {
         private new WarriorConfig Config => (WarriorConfig)_config;
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public WarriorHud(string id, WarriorConfig config, string displayName = null) : base(id, config, displayName)
+        public WarriorHud(WarriorConfig config, string? displayName = null) : base(config, displayName)
         {
-
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            List<Vector2> positions = new List<Vector2>();
-            List<Vector2> sizes = new List<Vector2>();
+            List<Vector2> positions = new();
+            List<Vector2> sizes = new();
 
-            if (Config.ShowStormsEye)
+            if (Config.StormsEyeBar.Enabled)
             {
-                positions.Add(Config.Position + Config.StormsEyePosition);
-                sizes.Add(Config.StormsEyeSize);
+                positions.Add(Config.Position + Config.StormsEyeBar.Position);
+                sizes.Add(Config.StormsEyeBar.Size);
             }
 
-            if (Config.ShowBeastGauge)
+            if (Config.BeastGauge.Enabled)
             {
-                positions.Add(Config.Position + Config.BeastGaugePosition);
-                sizes.Add(Config.BeastGaugeSize);
+                positions.Add(Config.Position + Config.BeastGauge.Position);
+                sizes.Add(Config.BeastGauge.Size);
             }
 
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            if (Config.ShowStormsEye)
+            Vector2 pos = origin + Config.Position;
+
+            if (Config.StormsEyeBar.Enabled)
             {
-                DrawStormsEyeBar(origin);
+                DrawStormsEyeBar(pos, player);
             }
 
-            if (Config.ShowBeastGauge)
+            if (Config.BeastGauge.Enabled)
             {
-                DrawBeastGauge(origin);
+                DrawBeastGauge(pos, player);
             }
         }
 
-        private void DrawStormsEyeBar(Vector2 origin)
+        private void DrawStormsEyeBar(Vector2 origin, PlayerCharacter player)
         {
-            IEnumerable<StatusEffect> innerReleaseBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId is 1177 or 86);
-            IEnumerable<StatusEffect> stormsEyeBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 90);
+            float innerReleaseDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1177 or 86)?.RemainingTime ?? 0f;
+            float stormsEyeDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 90)?.RemainingTime ?? 0f;
 
-            Vector2 position = origin + Config.Position + Config.StormsEyePosition - Config.StormsEyeSize / 2f;
-
-            BarBuilder builder = BarBuilder.Create(position, Config.StormsEyeSize).SetBackgroundColor(EmptyColor.Base);
-
-            var duration = 0f;
-            var maximum = 10f;
-            PluginConfigColor color = EmptyColor;
-
-            if (innerReleaseBuff.Any())
+            if ((!Config.StormsEyeBar.HideWhenInactive || stormsEyeDuration > 0) && innerReleaseDuration is 0)
             {
-                duration = Math.Abs(innerReleaseBuff.First().Duration);
-                color = Config.InnerReleaseColor;
+                Config.StormsEyeBar.Label.SetText(Math.Truncate(stormsEyeDuration).ToString());
+                BarUtilities.GetProgressBar(Config.StormsEyeBar, stormsEyeDuration, 60f, 0f, player, Config.StormsEyeBar.StormsEyeColor).Draw(origin);
             }
-            else if (stormsEyeBuff.Any())
+            if (innerReleaseDuration > 0)
             {
-                duration = Math.Abs(stormsEyeBuff.First().Duration);
-                maximum = 60f;
-                color = Config.StormsEyeColor;
+                Config.StormsEyeBar.Label.SetText(Math.Truncate(innerReleaseDuration).ToString());
+                BarUtilities.GetProgressBar(Config.StormsEyeBar, innerReleaseDuration, 10f, 0f, player, Config.StormsEyeBar.InnerReleaseColor).Draw(origin);
             }
-
-            builder.AddInnerBar(duration, maximum, color);
-
-            if (Config.ShowStormsEyeText)
-            {
-                builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
         }
 
-        private void DrawBeastGauge(Vector2 origin)
+        private void DrawBeastGauge(Vector2 origin, PlayerCharacter player)
         {
             WARGauge gauge = Plugin.JobGauges.Get<WARGauge>();
-            IEnumerable<StatusEffect> nascentChaosBuff = Plugin.ClientState.LocalPlayer.StatusEffects.Where(o => o.EffectId == 1897);
+            var nascentChaosDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1897)?.RemainingTime ?? 0f;
 
-            Vector2 position = origin + Config.Position + Config.BeastGaugePosition - Config.BeastGaugeSize / 2f;
-
-            BarBuilder builder = BarBuilder.Create(position, Config.BeastGaugeSize)
-                                           .SetChunks(2)
-                                           .AddInnerBar(gauge.BeastGaugeAmount, 100, Config.BeastGaugeFillColor)
-                                           .SetBackgroundColor(EmptyColor.Base)
-                                           .SetChunkPadding(Config.BeastGaugePadding);
-
-            if (nascentChaosBuff.Any())
+            if (!Config.BeastGauge.HideWhenInactive || gauge.BeastGauge > 0 || nascentChaosDuration > 0)
             {
-                builder.SetChunksColors(Config.NascentChaosColor);
-            }
+                Config.BeastGauge.Label.SetText(gauge.BeastGauge.ToString("N0"));
 
-            if (Config.ShowBeastGaugeText)
-            {
-                builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                var color = nascentChaosDuration == 0 ? Config.BeastGauge.BeastGaugeColor : Config.BeastGauge.NascentChaosColor;
+                BarUtilities.GetChunkedProgressBars(Config.BeastGauge, 2, gauge.BeastGauge, 100, fillColor: color)
+                    .Draw(origin);
             }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
         }
     }
 
@@ -127,64 +95,61 @@ namespace DelvUI.Interface.Jobs
     public class WarriorConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.WAR;
-        public new static WarriorConfig DefaultConfig() { return new WarriorConfig(); }
+        public new static WarriorConfig DefaultConfig()
+        {
+            var config = new WarriorConfig();
 
-        #region Storm's Eye
-        [Checkbox("Storm's Eye", separator = true)]
-        [CollapseControl(30, 0)]
-        public bool ShowStormsEye = true;
+            config.BeastGauge.UsePartialFillColor = true;
 
-        [Checkbox("Text" + "##StormsEye")]
-        [CollapseWith(0, 0)]
-        public bool ShowStormsEyeText = true;
+            return config;
+        }
 
-        [DragFloat2("Position" + "##StormsEye", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 0)]
-        public Vector2 StormsEyePosition = new(0, -32);
+        [NestedConfig("Storm's Eye Bar", 30)]
+        public WarriorStormsEyeBarConfig StormsEyeBar = new WarriorStormsEyeBarConfig(
+            new(0, -32),
+            new(254, 20),
+            new PluginConfigColor(new Vector4(0, 0, 0, 0))
+        );
 
-        [DragFloat2("Size" + "##StormsEye", min = 1f, max = 4000f)]
-        [CollapseWith(10, 0)]
-        public Vector2 StormsEyeSize = new(254, 20);
-        
-        [ColorEdit4("Storm's Eye")]
-        [CollapseWith(15, 0)]
+        [NestedConfig("Beast Gauge", 35)]
+        public WarriorBeastGaugeConfig BeastGauge = new WarriorBeastGaugeConfig(
+            new(0, -10),
+            new(254, 20),
+            new PluginConfigColor(new Vector4(0, 0, 0, 0))
+        );
+    }
+
+    [DisableParentSettings("FillColor")]
+    [Exportable(false)]
+    public class WarriorStormsEyeBarConfig : ProgressBarConfig
+    {
+        [ColorEdit4("Storm's Eye Color", spacing = true)]
+        [Order(55)]
         public PluginConfigColor StormsEyeColor = new(new Vector4(255f / 255f, 136f / 255f, 146f / 255f, 100f / 100f));
-        
+
         [ColorEdit4("Inner Release")]
-        [CollapseWith(20, 0)]
+        [Order(60)]
         public PluginConfigColor InnerReleaseColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
+        public WarriorStormsEyeBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
+        {
+        }
+    }
 
-        #endregion
+    [DisableParentSettings("FillColor")]
+    [Exportable(false)]
+    public class WarriorBeastGaugeConfig : ChunkedProgressBarConfig
+    {
+        [ColorEdit4("Beast Gauge Color", spacing = true)]
+        [Order(65)]
+        public PluginConfigColor BeastGaugeColor = new(new Vector4(201f / 255f, 13f / 255f, 13f / 255f, 100f / 100f));
 
-        #region Beast Gauge
-        [Checkbox("Beast Gauge",separator = true)]
-        [CollapseControl(35, 1)]
-        public bool ShowBeastGauge = true;
-
-        [Checkbox("Text" + "##BeastGauge")]
-        [CollapseWith(0, 1)]
-        public bool ShowBeastGaugeText = false;
-
-        [DragFloat2("Position" + "##BeastGauge", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 1)]
-        public Vector2 BeastGaugePosition = new(0, -10);
-
-        [DragFloat2("Size" + "##BeastGauge", min = 1f, max = 4000f)]
-        [CollapseWith(10, 1)]
-        public Vector2 BeastGaugeSize = new(254, 20);
-
-        [DragFloat("Spacing" + "##BeastGauge")]
-        [CollapseWith(15, 1)]
-        public float BeastGaugePadding = 2.0f;
-
-        [ColorEdit4("Beast Gauge")]
-        [CollapseWith(20, 1)]
-        public PluginConfigColor BeastGaugeFillColor = new(new Vector4(201f / 255f, 13f / 255f, 13f / 255f, 100f / 100f));
-
-        [ColorEdit4("Nascent Chaos")]
-        [CollapseWith(25, 1)]
+        [ColorEdit4("Nascent Chaos Color")]
+        [Order(70)]
         public PluginConfigColor NascentChaosColor = new(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f));
-        #endregion
+
+        public WarriorBeastGaugeConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
+        {
+        }
     }
 }

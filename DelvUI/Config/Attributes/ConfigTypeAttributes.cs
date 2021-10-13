@@ -1,4 +1,5 @@
-﻿using DelvUI.Interface.GeneralElements;
+﻿using Dalamud.Interface;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -10,13 +11,33 @@ namespace DelvUI.Config.Attributes
 {
     #region class attributes
     [AttributeUsage(AttributeTargets.Class)]
-    public class PortableAttribute : Attribute
+    public class ExportableAttribute : Attribute
     {
-        public bool portable;
+        public bool exportable;
 
-        public PortableAttribute(bool portable)
+        public ExportableAttribute(bool exportable)
         {
-            this.portable = portable;
+            this.exportable = exportable;
+        }
+    }
+
+    public class ShareableAttribute : Attribute
+    {
+        public bool shareable;
+
+        public ShareableAttribute(bool shareable)
+        {
+            this.shareable = shareable;
+        }
+    }
+
+    public class ResettableAttribute : Attribute
+    {
+        public bool resettable;
+
+        public ResettableAttribute(bool resettable)
+        {
+            this.resettable = resettable;
         }
     }
 
@@ -28,6 +49,17 @@ namespace DelvUI.Config.Attributes
         public DisableableAttribute(bool disableable)
         {
             this.disableable = disableable;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class DisableParentSettingsAttribute : Attribute
+    {
+        public readonly string[] DisabledFields;
+
+        public DisableParentSettingsAttribute(params string[] fields)
+        {
+            this.DisabledFields = fields;
         }
     }
     #endregion
@@ -53,18 +85,18 @@ namespace DelvUI.Config.Attributes
             this.friendlyName = friendlyName;
         }
 
-        public abstract bool Draw(FieldInfo field, PluginConfigObject config, string ID);
+        public abstract bool Draw(FieldInfo field, PluginConfigObject config, string? ID);
 
-        protected string IDText(string ID) => ID != null ? " ##" + ID : "";
+        protected string IDText(string? ID) => ID != null ? " ##" + ID : "";
 
-        protected void TriggerChangeEvent<T>(PluginConfigObject config, string fieldName, object value)
+        protected void TriggerChangeEvent<T>(PluginConfigObject config, string fieldName, object value, ChangeType type = ChangeType.None)
         {
             if (!isMonitored || config is not IOnChangeEventArgs eventObject)
             {
                 return;
             }
 
-            eventObject.onValueChangedRegisterEvent(new OnChangeEventArgs<T>(fieldName, (T)value));
+            eventObject.OnValueChanged(new OnChangeEventArgs<T>(fieldName, (T)value, type));
         }
     }
 
@@ -73,9 +105,8 @@ namespace DelvUI.Config.Attributes
     {
         public CheckboxAttribute(string friendlyName) : base(friendlyName) { }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string ID)
+        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            object fieldVal = field.GetValue(config);
             var disableable = config.Disableable;
 
             if (!disableable && friendlyName == "Enabled")
@@ -87,7 +118,8 @@ namespace DelvUI.Config.Attributes
                 return false;
             }
 
-            bool boolVal = (bool)fieldVal;
+            bool? fieldVal = (bool?)field.GetValue(config);
+            bool boolVal = fieldVal.HasValue ? fieldVal.Value : false;
 
             if (ImGui.Checkbox(ID != null && friendlyName == "Enabled" ? ID : friendlyName + IDText(ID), ref boolVal))
             {
@@ -116,9 +148,10 @@ namespace DelvUI.Config.Attributes
             velocity = 1f;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string ID)
+        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            float floatVal = (float)field.GetValue(config);
+            float? fieldVal = (float?)field.GetValue(config);
+            float floatVal = fieldVal.HasValue ? fieldVal.Value : 0;
 
             if (ImGui.DragFloat(friendlyName + IDText(ID), ref floatVal, velocity, min, max))
             {
@@ -147,9 +180,10 @@ namespace DelvUI.Config.Attributes
             velocity = 1;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string ID)
+        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            int intVal = (int)field.GetValue(config);
+            int? fieldVal = (int?)field.GetValue(config);
+            int intVal = fieldVal.HasValue ? fieldVal.Value : 0;
 
             if (ImGui.DragInt(friendlyName + IDText(ID), ref intVal, velocity, min, max))
             {
@@ -178,9 +212,10 @@ namespace DelvUI.Config.Attributes
             velocity = 1f;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string ID)
+        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            Vector2 vectorVal = (Vector2)field.GetValue(config);
+            Vector2? fieldVal = (Vector2?)field.GetValue(config);
+            Vector2 vectorVal = fieldVal.HasValue ? fieldVal.Value : Vector2.Zero;
 
             if (ImGui.DragFloat2(friendlyName + IDText(ID), ref vectorVal, velocity, min, max))
             {
@@ -209,9 +244,10 @@ namespace DelvUI.Config.Attributes
             velocity = 1;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string ID)
+        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            Vector2 vectorVal = (Vector2)field.GetValue(config);
+            Vector2? fieldVal = (Vector2?)field.GetValue(config);
+            Vector2 vectorVal = fieldVal.HasValue ? fieldVal.Value : Vector2.Zero;
 
             if (ImGui.DragFloat2(friendlyName + IDText(ID), ref vectorVal, velocity, min, max))
             {
@@ -237,9 +273,10 @@ namespace DelvUI.Config.Attributes
             maxLength = 999;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string ID)
+        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            string stringVal = (string)field.GetValue(config);
+            string? fieldVal = (string?)field.GetValue(config);
+            string stringVal = fieldVal ?? "";
 
             if (ImGui.InputText(friendlyName + IDText(ID), ref stringVal, maxLength))
             {
@@ -259,13 +296,18 @@ namespace DelvUI.Config.Attributes
     {
         public ColorEdit4Attribute(string friendlyName) : base(friendlyName) { }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string ID)
+        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            PluginConfigColor colorVal = (PluginConfigColor)field.GetValue(config);
-            Vector4 vector = colorVal.Vector;
+            PluginConfigColor? colorVal = (PluginConfigColor?)field.GetValue(config);
+            Vector4 vector = (colorVal != null ? colorVal.Vector : Vector4.Zero);
 
             if (ImGui.ColorEdit4(friendlyName + IDText(ID), ref vector))
             {
+                if (colorVal is null)
+                {
+                    return false;
+                }
+
                 colorVal.Vector = vector;
                 field.SetValue(config, colorVal);
 
@@ -288,9 +330,15 @@ namespace DelvUI.Config.Attributes
             this.options = options;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string ID)
+        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            int intVal = (int)field.GetValue(config);
+            object? fieldVal = field.GetValue(config);
+
+            int intVal = 0;
+            if (fieldVal != null)
+            {
+                intVal = (int)fieldVal;
+            }
 
             if (ImGui.Combo(friendlyName + IDText(ID), ref intVal, options, options.Length, 4))
             {
@@ -315,10 +363,11 @@ namespace DelvUI.Config.Attributes
             this.names = names;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string ID)
+        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
             ImGui.Text(friendlyName);
-            int[] order = (int[])field.GetValue(config);
+            int[]? fieldVal = (int[]?)field.GetValue(config);
+            int[] order = fieldVal ?? Array.Empty<int>();
 
             for (int i = 0; i < order.Length; i++)
             {
@@ -366,107 +415,125 @@ namespace DelvUI.Config.Attributes
             this.options = options;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string ID)
+        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            List<string> opts = (List<string>)field.GetValue(config);
+            var changed = false;
+
+            List<string>? fieldVal = (List<string>?)field.GetValue(config);
+            List<string> opts = fieldVal ?? new List<string>();
+
             var idText = IDText(ID);
+            int indexToRemove = -1;
 
-            ImGui.BeginGroup();
+            ImGui.BeginChild(friendlyName, new Vector2(400, 230));
 
-            if (ImGui.BeginTable("##myTable2" + friendlyName + idText, 2))
+            List<string> addOptions = new(options);
+            for (int i = 0; i < opts.Count; i++)
             {
-                ImGui.TableNextColumn();
+                addOptions.Remove(opts[i]);
+            }
 
-                List<string> addOptions = new(options);
-                for (int i = 0; i < opts.Count; i++)
-                {
-                    addOptions.Remove(opts[i]);
-                }
+            int intVal = 0;
+            ImGui.Text("Add");
+            if (ImGui.Combo("##Add" + idText + friendlyName, ref intVal, addOptions.ToArray(), addOptions.Count, 6))
+            {
+                changed = true;
 
-                int intVal = 0;
-                ImGui.Text("Add");
-                if (ImGui.Combo("##Add" + idText + friendlyName, ref intVal, addOptions.ToArray(), addOptions.Count, 6))
-                {
-                    var change = addOptions[intVal];
-                    opts.Add(change);
-                    field.SetValue(config, opts);
+                var change = addOptions[intVal];
+                opts.Add(change);
+                field.SetValue(config, opts);
 
-                    if (isMonitored && config is IOnChangeEventArgs eventObject)
-                    {
-                        eventObject.onValueChangedRegisterEvent(
-                            new OnChangeEventArgs<string>(field.Name, change, ChangeType.ListAdd)
-                        );
-                    }
-
-                    return true;
-                }
-
-                ImGui.TableNextColumn();
-
-                var removeOpts = opts;
-
-                int removeVal = 0;
-                ImGui.Text("Remove");
-                if (ImGui.Combo("##Remove" + idText + friendlyName, ref removeVal, removeOpts.ToArray(), removeOpts.Count, 6))
-                {
-                    var change = removeOpts[removeVal];
-                    opts.Remove(change);
-                    field.SetValue(config, opts);
-
-                    if (isMonitored && config is IOnChangeEventArgs eventObject)
-                    {
-                        eventObject.onValueChangedRegisterEvent(
-                            new OnChangeEventArgs<string>(field.Name, change, ChangeType.ListRemove)
-                        );
-                    }
-
-                    return true;
-                }
-
-                ImGui.EndTable();
+                TriggerChangeEvent<string>(config, field.Name, change, ChangeType.ListAdd);
             }
 
             ImGui.Text(friendlyName + ":");
+            var flags =
+                ImGuiTableFlags.RowBg |
+                ImGuiTableFlags.Borders |
+                ImGuiTableFlags.BordersOuter |
+                ImGuiTableFlags.BordersInner |
+                ImGuiTableFlags.ScrollY |
+                ImGuiTableFlags.SizingFixedSame;
 
-            if (opts.Count > 0 && ImGui.BeginTable("##myTable" + friendlyName, 5))
+            if (ImGui.BeginTable("##myTable2" + friendlyName + idText, 2, flags, new Vector2(326, 150)))
             {
-                var length = opts.Count;
-                for (int i = 0; i < length; i++)
+                ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 0, 0);
+                ImGui.TableSetupColumn("", ImGuiTableColumnFlags.WidthFixed, 0, 1);
+
+                ImGui.TableSetupScrollFreeze(0, 1);
+                ImGui.TableHeadersRow();
+
+                for (int i = 0; i < opts.Count(); i++)
                 {
-                    ImGui.TableNextColumn();
-                    ImGui.Text(opts[i]);
+                    ImGui.PushID(i.ToString());
+                    ImGui.TableNextRow(ImGuiTableRowFlags.None);
+
+                    if (ImGui.TableSetColumnIndex(0))
+                    {
+                        ImGui.Text(opts[i]);
+                    }
+
+                    if (ImGui.TableSetColumnIndex(1))
+                    {
+                        ImGui.PushFont(UiBuilder.IconFont);
+                        ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
+                        ImGui.PushStyleColor(ImGuiCol.ButtonActive, Vector4.Zero);
+                        ImGui.PushStyleColor(ImGuiCol.ButtonHovered, Vector4.Zero);
+
+                        if (ImGui.Button(FontAwesomeIcon.Trash.ToIconString()))
+                        {
+                            changed = true;
+                            indexToRemove = i;
+                        }
+
+                        ImGui.PopFont();
+                        ImGui.PopStyleColor(3);
+                    }
                 }
+
                 ImGui.EndTable();
             }
 
-            ImGui.EndGroup();
+            if (indexToRemove >= 0)
+            {
+                changed = true;
 
-            return false;
+                var change = opts[indexToRemove];
+                opts.Remove(change);
+                field.SetValue(config, opts);
+
+                TriggerChangeEvent<string>(config, field.Name, change, ChangeType.ListRemove);
+            }
+
+            ImGui.EndChild();
+
+            return changed;
         }
     }
 
     [AttributeUsage(AttributeTargets.Field)]
     public class FontAttribute : ConfigAttribute
     {
-        public FontAttribute() : base("Font and Size") { }
+        public FontAttribute(string friendlyName = "Font and Size") : base(friendlyName) { }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string ID)
+        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            var fontsConfig = ConfigurationManager.GetInstance().GetConfigObject<FontsConfig>();
+            var fontsConfig = ConfigurationManager.Instance.GetConfigObject<FontsConfig>();
             if (fontsConfig == null)
             {
                 return false;
             }
 
-            string stringVal = (string)field.GetValue(config);
+            string? stringVal = (string?)field.GetValue(config);
+
             int index = stringVal == null || stringVal.Length == 0 || !fontsConfig.Fonts.ContainsKey(stringVal) ? -1 :
                 fontsConfig.Fonts.IndexOfKey(stringVal);
 
             if (index == -1)
             {
-                if (fontsConfig.Fonts.ContainsKey(fontsConfig.DefaultFontKey))
+                if (fontsConfig.Fonts.ContainsKey(FontsConfig.DefaultBigFontKey))
                 {
-                    index = fontsConfig.Fonts.IndexOfKey(fontsConfig.DefaultFontKey);
+                    index = fontsConfig.Fonts.IndexOfKey(FontsConfig.DefaultBigFontKey);
                 }
                 else
                 {
@@ -505,6 +572,7 @@ namespace DelvUI.Config.Attributes
     public class OrderAttribute : Attribute
     {
         public int pos;
+        public string? collapseWith = "Enabled";
 
         public OrderAttribute(int pos)
         {
@@ -514,39 +582,14 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class CollapseControlAttribute : Attribute
-    {
-        public int pos;
-        public int id;
-
-
-        public CollapseControlAttribute(int pos, int id)
-        {
-            this.pos = pos;
-            this.id = id;
-
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Field)]
-    public class CollapseWithAttribute : Attribute
-    {
-        public int pos;
-        public int id;
-
-        public CollapseWithAttribute(int pos, int id)
-        {
-            this.pos = pos;
-            this.id = id;
-
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Field)]
     public class NestedConfigAttribute : Attribute
     {
         public string friendlyName;
         public int pos;
+        public bool separator = true;
+        public bool spacing = false;
+        public bool nest = false;
+        public string? collapseWith = "Enabled";
 
         public NestedConfigAttribute(string friendlyName, int pos)
         {

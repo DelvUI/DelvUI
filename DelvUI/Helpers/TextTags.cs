@@ -1,108 +1,200 @@
-﻿using Dalamud.Game.ClientState.Actors;
-using Dalamud.Game.ClientState.Actors.Types;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static DelvUI.Extensions;
+using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Helpers
 {
     public static class TextTags
     {
-        private static string ReplaceTagWithString(string tag, dynamic actor)
+        private static string ReplaceTagWithString(string tag, GameObject? actor, string? name = null)
         {
-            return tag switch
+            var n = actor != null ? actor.Name : name ?? "";
+
+            switch (tag)
             {
-                // Health
-                "[health:current]" when IsPropertyExist(actor, "CurrentHp") => actor.CurrentHp.ToString(),
-                "[health:current-short]" when IsPropertyExist(actor, "CurrentHp") => ((int)actor.CurrentHp).KiloFormat(),
-                "[health:current-percent]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => actor.CurrentHp == actor.MaxHp
-                    ? actor.CurrentHp.ToString()
-                    : $"{Math.Round(100f / actor.MaxHp * actor.CurrentHp)}",
-                "[health:current-percent-short]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => actor.CurrentHp == actor.MaxHp
-                    ? ((int)actor.CurrentHp).KiloFormat()
-                    : $"{Math.Round(100f / actor.MaxHp * actor.CurrentHp)}",
-                "[health:current-max]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => $"{actor.CurrentHp.ToString()}  |  {actor.MaxHp}",
-                "[health:current-max-short]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") =>
-                    $"{((int)actor.CurrentHp).KiloFormat()}  |  {((int)actor.MaxHp).KiloFormat()}",
-                "[health:current-max-percent]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => actor.CurrentHp == actor.MaxHp
-                    ? $"{Math.Round(100f / actor.MaxHp * actor.CurrentHp)} - 100"
-                    : $"{actor.CurrentHp} - {actor.MaxHp}",
-                "[health:current-max-percent-short]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => actor.CurrentHp == actor.MaxHp
-                    ? $"{Math.Round(100f / actor.MaxHp * actor.CurrentHp)} - 100"
-                    : $"{((int)actor.CurrentHp).KiloFormat()}  |  {((int)actor.MaxHp).KiloFormat()}",
-                "[health:max]" when IsPropertyExist(actor, "MaxHp") => actor.MaxHp.ToString(),
-                "[health:max-short]" when IsPropertyExist(actor, "MaxHp") => ((int)actor.MaxHp).KiloFormat(),
-                "[health:percent]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => $"{Math.Round(100f / actor.MaxHp * actor.CurrentHp)}",
-                "[health:percent-decimal]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => $"{100f / actor.MaxHp * actor.CurrentHp:##0.#}",
-                "[health:deficit]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") => $"-{actor.MaxHp - actor.CurrentHp}",
-                "[health:deficit-short]" when IsPropertyExist(actor, "CurrentHp") && IsPropertyExist(actor, "MaxHp") =>
-                    $"-{((int)actor.MaxHp - (int)actor.CurrentHp).KiloFormat()}",
+                case "[exp:current-short]":
+                    return ExperienceHelper.Instance.CurrentExp.KiloFormat();
 
-                // Mana
-                "[mana:current]" when IsPropertyExist(actor, "CurrentMp") => actor.CurrentMp.ToString(),
-                "[mana:current-short]" when IsPropertyExist(actor, "CurrentMp") => ((int)actor.CurrentMp).KiloFormat(),
-                "[mana:current-percent]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") => actor.CurrentMp == actor.MaxMp
-                    ? actor.CurrentMp.ToString()
-                    : $"{Math.Round(100f / actor.MaxMp * actor.CurrentMp)}",
-                "[mana:current-percent-short]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") => actor.CurrentMp == actor.MaxMp
-                    ? ((int)actor.CurrentMp).KiloFormat()
-                    : $"{Math.Round(100f / actor.MaxMp * actor.CurrentMp)}",
-                "[mana:current-max]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") => $"{actor.CurrentMp.ToString()}  |  {actor.MaxMp}",
-                "[mana:current-max-short]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") =>
-                    $"{((int)actor.CurrentMp).KiloFormat()} | {((int)actor.MaxMp).KiloFormat()}",
-                "[mana:current-max-percent]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") => actor.CurrentMp == actor.MaxMp
-                    ? $"{Math.Round(100f / actor.MaxMp * actor.CurrentMp)}  |  100"
-                    : $"{actor.CurrentMp} - {actor.MaxMp}",
-                "[mana:current-max-percent-short]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") => actor.CurrentMp == actor.MaxMp
-                    ? $"{Math.Round(100f / actor.MaxMp * actor.CurrentMp)}  |  100"
-                    : $"{((int)actor.CurrentMp).KiloFormat()} - {((int)actor.MaxMp).KiloFormat()}",
-                "[mana:max]" when IsPropertyExist(actor, "MaxMp") => actor.MaxMp.ToString(),
-                "[mana:max-short]" when IsPropertyExist(actor, "MaxMp") => ((int)actor.MaxMp).KiloFormat(),
-                "[mana:percent]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") =>
-                    $"{Math.Round(100f / actor.MaxMp * actor.CurrentMp)}",
-                "[mana:percent-decimal]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") =>
-                    $"{100f / actor.MaxMp * actor.CurrentMp:##0.#}",
-                "[mana:deficit]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp") =>
-                    $"-{(int)actor.MaxMp - (int)actor.CurrentMp}",
-                "[mana:deficit-short]" when IsPropertyExist(actor, "CurrentMp") && IsPropertyExist(actor, "MaxMp")
-                    => $"-{((int)actor.MaxMp - (int)actor.CurrentMp).KiloFormat()}",
+                case "[exp:required-short]":
+                    return ExperienceHelper.Instance.RequiredExp.KiloFormat();
 
-                // Name
-                "[name]" when IsPropertyExist(actor, "Name") => actor.Name.ToString(),
-                "[name:first]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).FirstName(),
-                "[name:first-npcmedium]" when IsPropertyExist(actor, "Name") && IsPropertyExist(actor, "ObjectKind") => actor.ObjectKind == ObjectKind.Player
-                ? ((string)actor.Name).FirstName()
-                : ((string)actor.Name).Truncate(15),
-                "[name:first-npclong]" when IsPropertyExist(actor, "Name") && IsPropertyExist(actor, "ObjectKind") => actor.ObjectKind == ObjectKind.Player
-                ? ((string)actor.Name).FirstName()
-                : ((string)actor.Name).Truncate(20),
-                "[name:first-npcfull]" when IsPropertyExist(actor, "Name") && IsPropertyExist(actor, "ObjectKind") => actor.ObjectKind == ObjectKind.Player
-                ? ((string)actor.Name).FirstName()
-                : actor.Name.ToString(),
-                "[name:first-initial]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).FirstName().Length == 0 ? "" : ((string)actor.Name).FirstName().Substring(0, 1),
-                "[name:last]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).LastName(),
-                "[name:last-initial]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).LastName().Length == 0 ? "" : ((string)actor.Name).LastName().Substring(0, 1),
-                "[name:abbreviate]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Abbreviate(),
-                "[name:veryshort]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Truncate(5),
-                "[name:short]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Truncate(10),
-                "[name:medium]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Truncate(15),
-                "[name:long]" when IsPropertyExist(actor, "Name") => ((string)actor.Name).Truncate(20),
-                "" => "",
+                case "[exp:rested-short]":
+                    return ExperienceHelper.Instance.RestedExp.KiloFormat();
 
-                // Misc
-                "[company]" when IsPropertyExist(actor, "CompanyTag") => actor.CompanyTag,
-                "[level]" when IsPropertyExist(actor, "Level") => actor.Level.ToString(),
-                "[job]" when actor is Chara => JobsHelper.JobNames.TryGetValue(((Chara)actor).ClassJob.Id, out var jobName) ? jobName : "",
-                _ => ""
-            };
+                case "[exp:current]":
+                    return ExperienceHelper.Instance.CurrentExp.ToString("N0", CultureInfo.InvariantCulture);
+
+                case "[exp:required]":
+                    return ExperienceHelper.Instance.RequiredExp.ToString("N0", CultureInfo.InvariantCulture);
+
+                case "[exp:rested]":
+                    return ExperienceHelper.Instance.RestedExp.ToString("N0", CultureInfo.InvariantCulture);
+
+                case "[exp:percent]":
+                    return ExperienceHelper.Instance.PercentExp.ToString("N1", CultureInfo.InvariantCulture);
+            }
+
+            switch (tag)
+            {
+                case "[name]":
+                    return n.ToString().CheckForUpperCase();
+
+                case "[name:first]":
+                    return n.FirstName().CheckForUpperCase();
+
+                case "[name:first-initial]":
+                    return n.FirstName().CheckForUpperCase().Length == 0 ? "" : n.FirstName().CheckForUpperCase()[..1];
+
+                case "[name:first-npcmedium]":
+                    return actor?.ObjectKind == ObjectKind.Player ? n.FirstName().CheckForUpperCase() : n.Truncate(15).CheckForUpperCase();
+
+                case "[name:first-npclong]":
+                    return actor?.ObjectKind == ObjectKind.Player ? n.FirstName().CheckForUpperCase() : n.Truncate(20).CheckForUpperCase();
+
+                case "[name:first-npcfull]":
+                    return actor?.ObjectKind == ObjectKind.Player ? n.FirstName().CheckForUpperCase() : n.ToString().CheckForUpperCase();
+
+                case "[name:last]":
+                    return n.LastName().CheckForUpperCase();
+
+                case "[name:last-initial]":
+                    return n.LastName().CheckForUpperCase().Length == 0 ? "" : n.LastName().CheckForUpperCase()[..1];
+
+                case "[name:initials]":
+                    return n.Initials().CheckForUpperCase();
+
+                case "[name:abbreviate]":
+                    return n.Abbreviate().CheckForUpperCase();
+
+                case "[name:veryshort]":
+                    return n.Truncate(5).CheckForUpperCase();
+
+                case "[name:short]":
+                    return n.Truncate(10).CheckForUpperCase();
+
+                case "[name:medium]":
+                    return n.Truncate(15).CheckForUpperCase();
+
+                case "[name:long]":
+                    return n.Truncate(20).CheckForUpperCase();
+            }
+
+            if (actor is Character character)
+            {
+                switch (tag)
+                {
+                    case "[health:current]":
+                        return character.CurrentHp.ToString();
+
+                    case "[health:current-short]":
+                        return character.CurrentHp.KiloFormat();
+
+                    case "[health:current-percent]":
+                        return character.CurrentHp == character.MaxHp ? character.CurrentHp.ToString() : $"{Math.Round(100f / character.MaxHp * character.CurrentHp)}";
+
+                    case "[health:current-percent-short]":
+                        return character.CurrentHp == character.MaxHp ? character.CurrentHp.KiloFormat() : $"{Math.Round(100f / character.MaxHp * character.CurrentHp)}";
+
+                    case "[health:current-max]":
+                        return $"{character.CurrentHp.ToString()}  |  {character.MaxHp}";
+
+                    case "[health:current-max-short]":
+                        return $"{character.CurrentHp.KiloFormat()}  |  {character.MaxHp.KiloFormat()}";
+
+                    case "[health:current-max-percent]":
+                        return character.CurrentHp == character.MaxHp ? $"{Math.Round(100f / character.MaxHp * character.CurrentHp)} - 100" : $"{character.CurrentHp} - {character.MaxHp}";
+
+                    case "[health:current-max-percent-short]":
+                        return character.CurrentHp == character.MaxHp
+                            ? $"{Math.Round(100f / character.MaxHp * character.CurrentHp)} - 100"
+                            : $"{character.CurrentHp.KiloFormat()}  |  {character.MaxHp.KiloFormat()}";
+
+                    case "[health:max]":
+                        return character.MaxHp.ToString();
+
+                    case "[health:max-short]":
+                        return character.MaxHp.KiloFormat();
+
+                    case "[health:percent]":
+                        return $"{Math.Round(100f / character.MaxHp * character.CurrentHp)}";
+
+                    case "[health:percent-decimal]":
+                        return FormattableString.Invariant($"{100f / character.MaxHp * character.CurrentHp:##0.#}");
+
+                    case "[health:deficit]":
+                        return $"-{character.MaxHp - character.CurrentHp}";
+
+                    case "[health:deficit-short]":
+                        return $"-{(character.MaxHp - character.CurrentHp).KiloFormat()}";
+
+                    case "[mana:current]":
+                        return character.CurrentMp.ToString();
+
+                    case "[mana:current-short]":
+                        return character.CurrentMp.KiloFormat();
+
+                    case "[mana:current-percent]":
+                        return character.CurrentMp == character.MaxMp ? character.CurrentMp.ToString() : $"{Math.Round(100f / character.MaxMp * character.CurrentMp)}";
+
+                    case "[mana:current-percent-short]":
+                        return character.CurrentMp == character.MaxMp ? character.CurrentMp.KiloFormat() : $"{Math.Round(100f / character.MaxMp * character.CurrentMp)}";
+
+                    case "[mana:current-max]":
+                        return $"{character.CurrentMp.ToString()}  |  {character.MaxMp}";
+
+                    case "[mana:current-max-short]":
+                        return $"{character.CurrentMp.KiloFormat()} | {character.MaxMp.KiloFormat()}";
+
+                    case "[mana:current-max-percent]":
+                        return character.CurrentMp == character.MaxMp ? $"{Math.Round(100f / character.MaxMp * character.CurrentMp)}  |  100" : $"{character.CurrentMp} - {character.MaxMp}";
+
+                    case "[mana:current-max-percent-short]":
+                        return character.CurrentMp == character.MaxMp
+                            ? $"{Math.Round(100f / character.MaxMp * character.CurrentMp)}  |  100"
+                            : $"{character.CurrentMp.KiloFormat()} - {character.MaxMp.KiloFormat()}";
+
+                    case "[mana:max]":
+                        return character.MaxMp.ToString();
+
+                    case "[mana:max-short]":
+                        return character.MaxMp.KiloFormat();
+
+                    case "[mana:percent]":
+                        return $"{Math.Round(100f / character.MaxMp * character.CurrentMp)}";
+
+                    case "[mana:percent-decimal]":
+                        return FormattableString.Invariant($"{100f / character.MaxMp * character.CurrentMp:##0.#}");
+
+                    case "[mana:deficit]":
+                        return $"-{character.MaxMp-character.CurrentMp}";
+
+                    case "[mana:deficit-short]":
+                        return $"-{(character.MaxMp - character.CurrentMp).KiloFormat()}";
+
+                    case "[distance]":
+                        return (character.YalmDistanceX + 1).ToString();
+
+                    case "[company]":
+                        return character.CompanyTag.ToString();
+
+                    case "[level]":
+                        return character.Level.ToString();
+
+                    case "[job]":
+                        return JobsHelper.JobNames.TryGetValue(character.ClassJob.Id, out var jobName) ? jobName : "";
+                }
+            }
+
+            return "";
         }
 
-        public static string GenerateFormattedTextFromTags(dynamic actor, string text)
+        public static string GenerateFormattedTextFromTags(GameObject? actor, string text, string? name = null)
         {
-            var matches = Regex.Matches(text, @"\[(.*?)\]");
-
-            return matches.Cast<Match>().Aggregate(text, (current, m) => current.Replace(m.Value, ReplaceTagWithString(m.Value, actor)));
+            MatchCollection matches = Regex.Matches(text, @"\[(.*?)\]");
+            return matches.Aggregate(text, (current, m) => current.Replace(m.Value, ReplaceTagWithString(m.Value, actor, name)));
         }
     }
 }

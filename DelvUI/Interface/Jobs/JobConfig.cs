@@ -12,16 +12,22 @@ namespace DelvUI.Interface.Jobs
         [JsonIgnore]
         public abstract uint JobId { get; }
 
-        [Checkbox("Use Generic MP Bar")]
+        [Checkbox("Show Generic Mana Bar")]
         [Order(20)]
         public bool UseDefaultPrimaryResourceBar = false;
 
         [JsonIgnore]
         public PrimaryResourceTypes PrimaryResourceType = PrimaryResourceTypes.MP;
 
-        public new static JobConfig DefaultConfig()
+        public new static JobConfig? DefaultConfig()
         {
-            return (JobConfig)Activator.CreateInstance(MethodBase.GetCurrentMethod().DeclaringType);
+            var type = MethodBase.GetCurrentMethod()?.DeclaringType;
+            if (type is null)
+            {
+                return null;
+            }
+
+            return (JobConfig?)Activator.CreateInstance(type);
         }
 
         public JobConfig()

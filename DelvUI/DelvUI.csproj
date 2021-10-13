@@ -1,31 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup Label="Target">
-        <PlatformTarget>AnyCPU</PlatformTarget>
-        <TargetFramework>net48</TargetFramework>
-        <LangVersion>preview</LangVersion>
-        <Platforms>AnyCPU</Platforms>
+        <PlatformTarget>x64</PlatformTarget>
+        <TargetFramework>net5.0-windows</TargetFramework>
+        <LangVersion>latest</LangVersion>
+        <Platforms>x64</Platforms>
         <Configurations>Debug;Release</Configurations>
-        <AssemblyVersion>0.2.1.0</AssemblyVersion>
-        <FileVersion>0.2.1.0</FileVersion>
-        <InformationalVersion>0.2.1.0 (Beta2 Patch1)</InformationalVersion>
     </PropertyGroup>
 
     <!-- Assembly Configuration -->
     <PropertyGroup>
         <AssemblyName>DelvUI</AssemblyName>
+        <AssemblyVersion>0.3.0.0</AssemblyVersion>
+        <FileVersion>0.3.0.0</FileVersion>
+        <InformationalVersion>0.3.0.0 (Beta3)</InformationalVersion>
     </PropertyGroup>
 
     <!-- Build Configuration -->
     <PropertyGroup>
         <OutputType>Library</OutputType>
+        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
         <DebugSymbols>true</DebugSymbols>
         <DebugType>full</DebugType>
-        <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+        <Nullable>enable</Nullable>
+        <WarningsAsErrors>Nullable</WarningsAsErrors>
+        <ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+        <UseWindowsForms>true</UseWindowsForms>
     </PropertyGroup>
-
 
     <!-- Release Configuration -->
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
@@ -34,7 +38,7 @@
 
     <!-- Dalamud Configuration -->
     <PropertyGroup>
-        <DalamudVersion>5.2.7.0</DalamudVersion>
+        <DalamudVersion>dev</DalamudVersion>
         <DalamudLocal>../dalamud/</DalamudLocal>
         <DalamudXIVLauncher>$(APPDATA)\XIVLauncher\addon\Hooks\$(DalamudVersion)</DalamudXIVLauncher>
     </PropertyGroup>
@@ -50,14 +54,10 @@
 
     <!-- Included Content -->
     <ItemGroup>
-        <Content Include="Media\**">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
-    </ItemGroup>
-
-    <!-- Project References -->
-    <ItemGroup>
-        <ProjectReference Include="..\lib\FFXIVClientStructs\FFXIVClientStructs\FFXIVClientStructs.csproj" />
+        <Content Include="DelvUI.json" CopyToOutputDirectory="Always" />
+        <Content Include="changelog.md" CopyToOutputDirectory="Always" />
+        <Content Include="Media\**" CopyToOutputDirectory="PreserveNewest" />
+        <Content Include="Media\images\icon.png" Link="images/icon.png" CopyToOutputDirectory="PreserveNewest" Visible="false" />
     </ItemGroup>
 
     <!-- Library References -->
@@ -65,7 +65,6 @@
         <Reference Include="Dalamud">
             <Private>false</Private>
         </Reference>
-        <Reference Include="Microsoft.CSharp" />
         <Reference Include="Newtonsoft.Json">
             <Private>false</Private>
         </Reference>
@@ -81,35 +80,26 @@
         <Reference Include="Lumina.Excel">
             <Private>false</Private>
         </Reference>
+        <Reference Include="FFXIVClientStructs">
+            <Private>false</Private>
+        </Reference>
     </ItemGroup>
 
     <!-- NuGet Packages -->
     <ItemGroup>
         <PackageReference Include="DalamudPackager" Version="2.1.2" />
-        <PackageReference Include="ILRepack" Version="2.1.0-beta1" GeneratePathProperty="true" />
+        <PackageReference Include="Colourful" Version="3.0.0" />
     </ItemGroup>
 
-    <!-- ILRepack Task -->
-    <Target Name="ILRepack" AfterTargets="PostBuildEvent">
-        <ItemGroup>
-            <InputAssemblies Include="&quot;$(TargetPath)&quot;" />
-            <InputAssemblies Include="&quot;$(TargetDir)FFXIVClientStructs.dll&quot;" Exclude="$(TargetPath)" />
-            <InputAssemblies Include="&quot;$(TargetDir)FFXIVClientStructs.Common.dll&quot;" Exclude="$(TargetPath)" />
-            <InputAssemblies Include="&quot;$(TargetDir)Serilog.dll&quot;" Exclude="$(TargetPath)" />
-        </ItemGroup>
-        <Exec Command="$(PkgILRepack)\tools\ILRepack.exe /lib:$(DalamudLocal) /lib:$(DalamudXIVLauncher) /out:&quot;$(TargetDir)..\$(Configuration).ILMerge\$(TargetFileName)&quot; @(InputAssemblies, ' ')" />
-    </Target>
-
-    <!-- Move Media to ILMerge -->
-    <Target Name="MoveMedia" AfterTargets="ILRepack">
-        <ItemGroup>
-            <_CopyMedia Include="$(OutputPath)\Media\**\*.*" />
-        </ItemGroup>
-        <Copy SourceFiles="@(_CopyMedia)" DestinationFolder="$(TargetDir)..\$(Configuration).ILMerge\Media\%(RecursiveDir)" SkipUnchangedFiles="true" OverwriteReadOnlyFiles="true" Retries="3" RetryDelayMilliseconds="500" />
-    </Target>
-
     <!-- Dalamud Packager Task-->
-    <Target Name="DalamudPackage" AfterTargets="MoveMedia">
-        <DalamudPackager ProjectDir="$(ProjectDir)" OutputPath="$(TargetDir)..\$(Configuration).ILMerge" AssemblyName="$(AssemblyName)" MakeZip="true" />
+    <Target Name="DalamudPackage" AfterTargets="Build">
+        <DalamudPackager 
+            ProjectDir="$(ProjectDir)" 
+            OutputPath="$(TargetDir)..\$(Configuration)" 
+            AssemblyName="$(AssemblyName)" 
+            MakeZip="true" 
+            Exclude="DelvUI.pdb;DelvUI.deps.json" 
+            VersionComponents="4" 
+        />
     </Target>
 </Project>

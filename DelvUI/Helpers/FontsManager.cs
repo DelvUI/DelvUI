@@ -1,19 +1,19 @@
-﻿using Dalamud.Plugin;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Dalamud.Logging;
 
 namespace DelvUI.Helpers
 {
-    public class FontsManager
+    public class FontsManager : IDisposable
     {
         #region Singleton
         private FontsManager(string basePath)
         {
-            FontsPath = Path.GetDirectoryName(basePath) + "\\Media\\Fonts\\";
+            DefaultFontsPath = Path.GetDirectoryName(basePath) + "\\Media\\Fonts\\";
         }
 
         public static void Initialize(string basePath)
@@ -21,8 +21,8 @@ namespace DelvUI.Helpers
             Instance = new FontsManager(basePath);
         }
 
-        public static FontsManager Instance { get; private set; }
-        private FontsConfig _config = null;
+        public static FontsManager Instance { get; private set; } = null!;
+        private FontsConfig? _config;
 
         public void LoadConfig()
         {
@@ -31,18 +31,39 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            _config = ConfigurationManager.GetInstance().GetConfigObject<FontsConfig>();
-            ConfigurationManager.GetInstance().ResetEvent += OnConfigReset;
+            _config = ConfigurationManager.Instance.GetConfigObject<FontsConfig>();
+            ConfigurationManager.Instance.ResetEvent += OnConfigReset;
         }
 
-        private void OnConfigReset(object sender, EventArgs e)
+        private void OnConfigReset(ConfigurationManager sender)
         {
-            _config = ConfigurationManager.GetInstance().GetConfigObject<FontsConfig>();
+            _config = sender.GetConfigObject<FontsConfig>();
+        }
+
+        ~FontsManager()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
+            Instance = null!;
         }
         #endregion
 
-        public readonly string FontsPath;
-
+        public readonly string DefaultFontsPath;
 
         public bool DefaultFontBuilt { get; private set; }
         public ImFontPtr DefaultFont { get; private set; } = null;
@@ -61,14 +82,14 @@ namespace DelvUI.Helpers
             return false;
         }
 
-        public bool PushFont(string fontID)
+        public bool PushFont(string? fontId)
         {
-            if (fontID == null || !_config.Fonts.ContainsKey(fontID))
+            if (fontId == null || _config == null || !_config.Fonts.ContainsKey(fontId))
             {
                 return false;
             }
 
-            var index = _config.Fonts.IndexOfKey(fontID);
+            var index = _config.Fonts.IndexOfKey(fontId);
             if (index < 0 || index >= _fonts.Count)
             {
                 return false;
@@ -83,16 +104,20 @@ namespace DelvUI.Helpers
             _fonts.Clear();
             DefaultFontBuilt = false;
 
-            var config = ConfigurationManager.GetInstance().GetConfigObject<FontsConfig>();
+            var config = ConfigurationManager.Instance.GetConfigObject<FontsConfig>();
             ImGuiIOPtr io = ImGui.GetIO();
             var ranges = GetCharacterRanges(config, io);
 
             foreach (var fontData in config.Fonts)
             {
-                var path = FontsPath + fontData.Value.Name + ".ttf";
+                var path = DefaultFontsPath + fontData.Value.Name + ".ttf";
                 if (!File.Exists(path))
                 {
-                    continue;
+                    path = config.ValidatedFontsPath + fontData.Value.Name + ".ttf";
+                    if (!File.Exists(path))
+                    {
+                        continue;
+                    }
                 }
 
                 try
@@ -101,7 +126,7 @@ namespace DelvUI.Helpers
                         : io.Fonts.AddFontFromFileTTF(path, fontData.Value.Size, null, ranges.Value.Data);
                     _fonts.Add(font);
 
-                    if (fontData.Key == config.DefaultFontKey)
+                    if (fontData.Key == FontsConfig.DefaultBigFontKey)
                     {
                         DefaultFont = font;
                         DefaultFontBuilt = true;

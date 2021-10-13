@@ -1,10 +1,12 @@
-using Dalamud.Game.ClientState.Structs.JobGauge;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,9 +19,8 @@ namespace DelvUI.Interface.Jobs
     {
         private new MonkConfig Config => (MonkConfig)_config;
 
-        public MonkHud(string id, MonkConfig config, string displayName = null) : base(id, config, displayName)
+        public MonkHud(MonkConfig config, string? displayName = null) : base(config, displayName)
         {
-
         }
 
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
@@ -30,359 +31,191 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new List<Vector2>();
             List<Vector2> sizes = new List<Vector2>();
 
-            if (Config.ShowDemolishBar)
+            if (Config.DemolishBar.Enabled)
             {
-                positions.Add(Config.Position + Config.DemolishBarPosition);
-                sizes.Add(Config.DemolishBarSize);
+                positions.Add(Config.Position + Config.DemolishBar.Position);
+                sizes.Add(Config.DemolishBar.Size);
             }
 
-            if (Config.ShowChakraBar)
+            if (Config.ChakraBar.Enabled)
             {
-                positions.Add(Config.Position + Config.ChakraBarPosition);
-                sizes.Add(Config.ChakraBarSize);
+                positions.Add(Config.Position + Config.ChakraBar.Position);
+                sizes.Add(Config.ChakraBar.Size);
             }
 
-            if (Config.ShowLeadenFistBar)
+            if (Config.LeadenFistBar.Enabled)
             {
-                positions.Add(Config.Position + Config.LeadenFistBarPosition);
-                sizes.Add(Config.LeadenFistBarSize);
+                positions.Add(Config.Position + Config.LeadenFistBar.Position);
+                sizes.Add(Config.LeadenFistBar.Size);
             }
 
-            if (Config.ShowTwinSnakesBar)
+            if (Config.TwinSnakesBar.Enabled)
             {
-                positions.Add(Config.Position + Config.TwinSnakesBarPosition);
-                sizes.Add(Config.TwinSnakesBarSize);
+                positions.Add(Config.Position + Config.TwinSnakesBar.Position);
+                sizes.Add(Config.TwinSnakesBar.Size);
             }
 
-            if (Config.ShowRiddleofEarthBar)
+            if (Config.RiddleofEarthBar.Enabled)
             {
-                positions.Add(Config.Position + Config.RiddleofEarthBarPosition);
-                sizes.Add(Config.RiddleofEarthBarSize);
+                positions.Add(Config.Position + Config.RiddleofEarthBar.Position);
+                sizes.Add(Config.RiddleofEarthBar.Size);
             }
 
-            if (Config.ShowPerfectBalanceBar)
+            if (Config.PerfectBalanceBar.Enabled)
             {
-                positions.Add(Config.Position + Config.PerfectBalanceBarPosition);
-                sizes.Add(Config.PerfectBalanceBarSize);
+                positions.Add(Config.Position + Config.PerfectBalanceBar.Position);
+                sizes.Add(Config.PerfectBalanceBar.Size);
             }
 
-            if (Config.ShowTrueNorthBar)
+            if (Config.TrueNorthBar.Enabled)
             {
-                positions.Add(Config.Position + Config.TrueNorthBarPosition);
-                sizes.Add(Config.TrueNorthBarSize);
+                positions.Add(Config.Position + Config.TrueNorthBar.Position);
+                sizes.Add(Config.TrueNorthBar.Size);
+            }
+
+            if (Config.FormsBar.Enabled)
+            {
+                positions.Add((Config.Position + Config.FormsBar.Position));
+                sizes.Add(Config.FormsBar.Size);
             }
 
             return (positions, sizes);
         }
 
-        public override void DrawChildren(Vector2 origin)
+        public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            if (Config.ShowFormsBar)
+            var position = origin + Config.Position;
+            if (Config.FormsBar.Enabled)
             {
-                DrawFormsBar(origin);
+                DrawFormsBar(position, player);
             }
 
-            if (Config.ShowRiddleofEarthBar)
+            if (Config.RiddleofEarthBar.Enabled)
             {
-                DrawRiddleOfEarthBar(origin);
+                DrawRiddleOfEarthBar(position, player);
             }
 
-            if (Config.ShowPerfectBalanceBar)
+            if (Config.PerfectBalanceBar.Enabled)
             {
-                DrawPerfectBalanceBar(origin);
+                DrawPerfectBalanceBar(position, player);
             }
 
-            if (Config.ShowTrueNorthBar)
+            if (Config.TrueNorthBar.Enabled)
             {
-                DrawTrueNorthBar(origin);
+                DrawTrueNorthBar(position, player);
             }
 
-            if (Config.ShowChakraBar)
+            if (Config.ChakraBar.Enabled)
             {
-                DrawChakraGauge(origin);
+                DrawChakraGauge(position);
             }
 
-            if (Config.ShowLeadenFistBar)
+            if (Config.LeadenFistBar.Enabled)
             {
-                DrawLeadenFistBar(origin);
+                DrawLeadenFistBar(position, player);
             }
 
-            if (Config.ShowTwinSnakesBar)
+            if (Config.TwinSnakesBar.Enabled)
             {
-                DrawTwinSnakesBar(origin);
+                DrawTwinSnakesBar(position, player);
             }
 
-            if (Config.ShowDemolishBar)
+            if (Config.DemolishBar.Enabled)
             {
-                DrawDemolishBar(origin);
+                DrawDemolishBar(position, player);
             }
         }
 
-        private void DrawFormsBar(Vector2 origin)
+        private void DrawFormsBar(Vector2 origin, PlayerCharacter player)
         {
-            var target = Plugin.ClientState.LocalPlayer;
-            var opoOpoForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 107);
-            var raptorForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 108);
-            var coeurlForm = target.StatusEffects.FirstOrDefault(o => o.EffectId == 109);
-            var formlessFist = target.StatusEffects.FirstOrDefault(o => o.EffectId == 2513);
+            Status? form = player.StatusList.FirstOrDefault(o => o.StatusId is 107 or 108 or 109 or 2513 && o.RemainingTime > 0f);
 
-            var opoOpoFormDuration = opoOpoForm.Duration;
-            var raptorFormDuration = raptorForm.Duration;
-            var coeurlFormDuration = coeurlForm.Duration;
-            var formlessFistDuration = formlessFist.Duration;
-
-            var position = origin + Config.Position + Config.FormsBarPosition - Config.FormsBarSize / 2f;
-
-            var builder = BarBuilder.Create(position, Config.FormsBarSize);
-            var maximum = 15f;
-
-            if (opoOpoFormDuration > 0)
+            if (!Config.FormsBar.HideWhenInactive || form is not null)
             {
-                var bar = builder.AddInnerBar(Math.Abs(opoOpoFormDuration), maximum, Config.FormsBarFillColor)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Opo-Opo Form")
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
+                float formDuration = form?.RemainingTime ?? 0f;
+                string label = form is not null ? form.StatusId switch
+                {
+                    107 => "Opo-Opo Form",
+                    108 => "Raptor Form",
+                    109 => "Coeurl Form",
+                    2513 => "Formless Fist",
+                    _ => ""
+                } : "";
 
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
-            }
-
-            if (raptorFormDuration > 0)
-            {
-                var bar = builder.AddInnerBar(Math.Abs(raptorFormDuration), maximum, Config.FormsBarFillColor)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Raptor Form")
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
-            }
-
-            if (coeurlFormDuration > 0)
-            {
-                var bar = builder.AddInnerBar(Math.Abs(coeurlFormDuration), maximum, Config.FormsBarFillColor)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Coeurl Form")
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
-            }
-
-            if (formlessFist.Duration > 0)
-            {
-                var bar = builder.AddInnerBar(Math.Abs(formlessFist.Duration), maximum, Config.FormsBarFillColor)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, "Formless Fist")
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
-            }
-            else
-            {
-                var bar = builder.AddInnerBar(0, maximum, Config.FormsBarFillColor)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
+                Config.FormsBar.Label.SetText(label);
+                BarUtilities.GetProgressBar(Config.FormsBar, formDuration, 15f, 0, player).Draw(origin);
             }
         }
 
-        private void DrawTrueNorthBar(Vector2 origin)
+        private void DrawTrueNorthBar(Vector2 origin, PlayerCharacter player)
         {
-            var target = Plugin.ClientState.LocalPlayer;
-            var trueNorth = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1250);
-            var trueNorthDuration = trueNorth.Duration;
-
-            var position = origin + Config.Position + Config.TrueNorthBarPosition - Config.TrueNorthBarSize / 2f;
-            var builder = BarBuilder.Create(position, Config.TrueNorthBarSize);
-            var maximum = 10f;
-
-            if (trueNorthDuration > 0)
+            float trueNorthDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1250 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
+            if (!Config.TrueNorthBar.HideWhenInactive || trueNorthDuration > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, Config.TrueNorthBarFillColor)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
-            }
-            else
-            {
-                var bar = builder.AddInnerBar(Math.Abs(trueNorthDuration), maximum, Config.TrueNorthBarFillColor)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
+                Config.TrueNorthBar.Label.SetText(Math.Truncate(trueNorthDuration).ToString());
+                BarUtilities.GetProgressBar(Config.TrueNorthBar, trueNorthDuration, 10f, 0f, player).Draw(origin);
             }
         }
 
-        private void DrawPerfectBalanceBar(Vector2 origin)
+        private void DrawPerfectBalanceBar(Vector2 origin, PlayerCharacter player)
         {
-            var target = Plugin.ClientState.LocalPlayer;
-            var perfectBalance = target.StatusEffects.FirstOrDefault(o => o.EffectId == 110);
-            var perfectBalanceDuration = perfectBalance.StackCount;
-
-            var position = origin + Config.Position + Config.PerfectBalanceBarPosition - Config.PerfectBalanceBarSize / 2f;
-            var builder = BarBuilder.Create(position, Config.PerfectBalanceBarSize);
-            var maximum = 6f;
-
-            if (perfectBalanceDuration > 0)
+            Status? perfectBalance = player.StatusList.Where(o => o.StatusId is 110 && o.RemainingTime > 0f).FirstOrDefault();
+            if (!Config.PerfectBalanceBar.HideWhenInactive || perfectBalance is not null)
             {
-                var bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, Config.PerfectBalanceBarFillColor)
-                                 .SetVertical(true)
-                                 .SetFlipDrainDirection(Config.PerfectBalanceInverted)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
-            }
-            else
-            {
-                var bar = builder.AddInnerBar(Math.Abs(perfectBalanceDuration), maximum, Config.PerfectBalanceBarFillColor)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
+                float duration = perfectBalance?.RemainingTime ?? 0f;
+                float stacks = perfectBalance?.StackCount ?? 0f;
+                Config.PerfectBalanceBar.Label.SetText(stacks.ToString());
+                BarUtilities.GetProgressBar(Config.PerfectBalanceBar, duration, 15f, 0, player).Draw(origin);
             }
         }
 
-        private void DrawRiddleOfEarthBar(Vector2 origin)
+        private void DrawRiddleOfEarthBar(Vector2 origin, PlayerCharacter player)
         {
-            var target = Plugin.ClientState.LocalPlayer;
-            var riddleOfEarth = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1179);
-            var riddleOfEarthDuration = riddleOfEarth.StackCount;
-
-            var position = origin + Config.Position + Config.RiddleofEarthBarPosition - Config.RiddleofEarthBarSize / 2f;
-            var builder = BarBuilder.Create(position, Config.RiddleofEarthBarSize);
-            var maximum = 3f;
-
-            if (riddleOfEarthDuration > 0)
+            Status? riddleOfEarth = player.StatusList.Where(o => o.StatusId is 1179 && o.RemainingTime > 0f).FirstOrDefault();
+            if (!Config.PerfectBalanceBar.HideWhenInactive || riddleOfEarth is not null)
             {
-                var bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, Config.RiddleofEarthBarFillColor)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .SetFlipDrainDirection(Config.RiddleofEarthInverted)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
-            }
-            else
-            {
-                var bar = builder.AddInnerBar(Math.Abs(riddleOfEarthDuration), maximum, Config.RiddleofEarthBarFillColor)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .SetFlipDrainDirection(Config.RiddleofEarthInverted == false)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
+                float duration = riddleOfEarth?.RemainingTime ?? 0f;
+                float stacks = riddleOfEarth?.StackCount ?? 0f;
+                Config.RiddleofEarthBar.Label.SetText(stacks.ToString());
+                BarUtilities.GetProgressBar(Config.RiddleofEarthBar, duration, 10f, 0, player).Draw(origin);
             }
         }
 
         private void DrawChakraGauge(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<MNKGauge>();
-
-            var position = origin + Config.Position + Config.ChakraBarPosition - Config.ChakraBarSize / 2f;
-            var bar = BarBuilder.Create(position, Config.ChakraBarSize)
-                                .SetChunks(5)
-                                .SetChunkPadding(2)
-                                .AddInnerBar(gauge.NumChakra, 5, Config.ChakraBarFillColor, EmptyColor)
-                                .SetBackgroundColor(EmptyColor.Background)
-                                .Build();
-
-            var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
-        }
-
-        private void DrawTwinSnakesBar(Vector2 origin)
-        {
-            var target = Plugin.ClientState.LocalPlayer;
-            var twinSnakes = target.StatusEffects.FirstOrDefault(o => o.EffectId == 101);
-            var twinSnakesDuration = twinSnakes.Duration;
-
-            var position = origin + Config.Position + Config.TwinSnakesBarPosition - Config.TwinSnakesBarSize / 2f;
-
-            var builder = BarBuilder.Create(position, Config.TwinSnakesBarSize);
-            var maximum = 15f;
-
-            var bar = builder.AddInnerBar(Math.Abs(twinSnakesDuration), maximum, Config.TwinSnakesBarFillColor)
-                             .SetTextMode(BarTextMode.EachChunk)
-                             .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                             .SetBackgroundColor(EmptyColor.Background)
-                             .SetFlipDrainDirection(Config.TwinSnakesBarInverted)
-                             .Build();
-
-            var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
-        }
-
-        private void DrawLeadenFistBar(Vector2 origin)
-        {
-            var target = Plugin.ClientState.LocalPlayer;
-            var leadenFist = target.StatusEffects.FirstOrDefault(o => o.EffectId == 1861);
-            var leadenFistDuration = leadenFist.Duration;
-
-            var position = origin + Config.Position + Config.LeadenFistBarPosition - Config.LeadenFistBarSize / 2f;
-            var builder = BarBuilder.Create(position, Config.LeadenFistBarSize);
-            var maximum = 30f;
-
-            if (leadenFistDuration > 0)
+            if (!Config.ChakraBar.HideWhenInactive || gauge.Chakra > 0)
             {
-                var bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, Config.LeadenFistBarFillColor)
-                                 .SetVertical(true)
-                                 .SetTextMode(BarTextMode.EachChunk)
-                                 .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
-            }
-            else
-            {
-                var bar = builder.AddInnerBar(Math.Abs(leadenFistDuration), maximum, Config.LeadenFistBarFillColor)
-                                 .SetBackgroundColor(EmptyColor.Background)
-                                 .Build();
-
-                var drawList = ImGui.GetWindowDrawList();
-                bar.Draw(drawList);
+                BarUtilities.GetChunkedBars(Config.ChakraBar, 5, gauge.Chakra, 5).Draw(origin);
             }
         }
 
-        private void DrawDemolishBar(Vector2 origin)
+        private void DrawTwinSnakesBar(Vector2 origin, PlayerCharacter player)
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.CurrentTarget ?? Plugin.ClientState.LocalPlayer;
-            var demolish = target.StatusEffects.FirstOrDefault(o => o.EffectId == 246 && o.OwnerId == Plugin.ClientState.LocalPlayer.ActorId);
-            var demolishDuration = demolish.Duration;
+            float twinSnakesDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 101 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
+            if (!Config.TwinSnakesBar.HideWhenInactive || twinSnakesDuration > 0)
+            {
+                Config.TwinSnakesBar.Label.SetText(Math.Truncate(twinSnakesDuration).ToString());
+                BarUtilities.GetProgressBar(Config.TwinSnakesBar, twinSnakesDuration, 15f, 0f, player).Draw(origin);
+            }
+        }
 
-            var position = origin + Config.Position + Config.DemolishBarPosition - Config.DemolishBarSize / 2f;
-            var builder = BarBuilder.Create(position, Config.DemolishBarSize);
-            var maximum = 18f;
+        private void DrawLeadenFistBar(Vector2 origin, PlayerCharacter player)
+        {
+            float leadenFistDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1861 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
+            if (!Config.LeadenFistBar.HideWhenInactive || leadenFistDuration > 0)
+            {
+                Config.LeadenFistBar.Label.SetText(Math.Truncate(leadenFistDuration).ToString());
+                BarUtilities.GetProgressBar(Config.LeadenFistBar, leadenFistDuration, 30f, 0f, player).Draw(origin);
+            }
+        }
 
-            var bar = builder.AddInnerBar(Math.Abs(demolishDuration), maximum, Config.DemolishBarFillColor)
-                             .SetTextMode(BarTextMode.EachChunk)
-                             .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                             .SetBackgroundColor(EmptyColor.Background)
-                             .Build();
+        private void DrawDemolishBar(Vector2 origin, PlayerCharacter player)
+        {
+            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            BarUtilities.GetDoTBar(Config.DemolishBar, player, target, 246, 18f)?.
+                Draw(origin);
         }
     }
 
@@ -392,162 +225,70 @@ namespace DelvUI.Interface.Jobs
     public class MonkConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.MNK;
-        public new static MonkConfig DefaultConfig() { return new MonkConfig(); }
+        public new static MonkConfig DefaultConfig()
+        {
+            var config = new MonkConfig();
 
-        #region Demolish Bar
-        [Checkbox("Demolish", separator = true)]
-        [CollapseControl(30, 0)]
-        public bool ShowDemolishBar = true;
+            config.PerfectBalanceBar.FillDirection = BarDirection.Up;
+            config.LeadenFistBar.FillDirection = BarDirection.Up;
 
-        [DragFloat2("Position" + "##Demolish", min = -4000f, max = 4000f)]
-        [CollapseWith(0, 0)]
-        public Vector2 DemolishBarPosition = new(71, -10);
+            return config;
+        }
 
-        [DragFloat2("Size" + "##Demolish", min = 0, max = 4000f)]
-        [CollapseWith(5, 0)]
-        public Vector2 DemolishBarSize = new(111, 20);
+        [NestedConfig("Demolish", 30)]
+        public ProgressBarConfig DemolishBar = new ProgressBarConfig(
+            new(71, -10),
+            new(111, 20),
+            new(new Vector4(246f / 255f, 169f / 255f, 255f / 255f, 100f / 100f))
+        );
 
-        [ColorEdit4("Color" + "##Demolish")]
-        [CollapseWith(10, 0)]
-        public PluginConfigColor DemolishBarFillColor = new(new Vector4(246f / 255f, 169f / 255f, 255f / 255f, 100f / 100f));
-        #endregion
+        [NestedConfig("Chakra", 35)]
+        public ChunkedBarConfig ChakraBar = new ChunkedBarConfig(
+            new(0, -32),
+            new(254, 20),
+            new(new Vector4(204f / 255f, 115f / 255f, 0f, 100f / 100f))
+        );
 
-        #region Chakra Bar
-        [Checkbox("Chakra", separator = true)]
-        [CollapseControl(35, 1)]
-        public bool ShowChakraBar = true;
+        [NestedConfig("Leaden Fist", 40)]
+        public ProgressBarConfig LeadenFistBar = new ProgressBarConfig(
+            new(0, -10),
+            new(28, 20),
+            new(new Vector4(255f / 255f, 0f, 0f, 100f / 100f))
+        );
 
-        [DragFloat2("Position" + "##Chakbra", min = -4000f, max = 4000f)]
-        [CollapseWith(0, 1)]
-        public Vector2 ChakraBarPosition = new(0, -32);
+        [NestedConfig("Twin Snakes", 45)]
+        public ProgressBarConfig TwinSnakesBar = new ProgressBarConfig(
+            new(-71, -10),
+            new(111, 20),
+            new(new Vector4(227f / 255f, 255f / 255f, 64f / 255f, 100f / 100f))
+        );
 
-        [DragFloat2("Size" + "##Chakbra", min = 0, max = 4000f)]
-        [CollapseWith(5, 1)]
-        public Vector2 ChakraBarSize = new(254, 20);
+        [NestedConfig("Riddle of Earth", 50)]
+        public ProgressBarConfig RiddleofEarthBar = new ProgressBarConfig(
+            new(-69, -54),
+            new(115, 20),
+            new(new Vector4(157f / 255f, 59f / 255f, 255f / 255f, 100f / 100f))
+        );
 
-        [ColorEdit4("Color" + "##Chakbra")]
-        [CollapseWith(10, 1)]
-        public PluginConfigColor ChakraBarFillColor = new(new Vector4(204f / 255f, 115f / 255f, 0f, 100f / 100f));
-        #endregion
+        [NestedConfig("Perfect Balance", 55)]
+        public ProgressBarConfig PerfectBalanceBar = new ProgressBarConfig(
+            new(0, -54),
+            new(20, 20),
+            new(new Vector4(150f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
+        );
 
-        #region Leaden Fist Bar
-        [Checkbox("Leaden Fist", separator = true)]
-        [CollapseControl(40, 2)]
-        public bool ShowLeadenFistBar = true;
+        [NestedConfig("True North", 60)]
+        public ProgressBarConfig TrueNorthBar = new ProgressBarConfig(
+            new(69, -54),
+            new(115, 20),
+            new(new Vector4(255f / 255f, 225f / 255f, 189f / 255f, 100f / 100f))
+        );
 
-        [DragFloat2("Position" + "##LeadenFist", min = -4000f, max = 4000f)]
-        [CollapseWith(0, 2)]
-        public Vector2 LeadenFistBarPosition = new(0, -10);
-
-        [DragFloat2("Size" + "##LeadenFist", min = 0, max = 4000f)]
-        [CollapseWith(5, 2)]
-        public Vector2 LeadenFistBarSize = new(28, 20);
-
-        [ColorEdit4("Color" + "##LeadenFist")]
-        [CollapseWith(10, 2)]
-        public PluginConfigColor LeadenFistBarFillColor = new(new Vector4(255f / 255f, 0f, 0f, 100f / 100f));
-        #endregion
-
-        #region Twin Snakes Bar
-        [Checkbox("Twin Snakes", separator = true)]
-        [CollapseControl(45, 3)]
-        public bool ShowTwinSnakesBar = true;
-
-        [DragFloat2("Position" + "##TwinSnakes", min = -4000f, max = 4000f)]
-        [CollapseWith(0, 3)]
-        public Vector2 TwinSnakesBarPosition = new(-71, -10);
-
-        [DragFloat2("Size" + "##TwinSnakes", min = 0, max = 4000f)]
-        [CollapseWith(5, 3)]
-        public Vector2 TwinSnakesBarSize = new(111, 20);
-
-        [ColorEdit4("Color" + "##TwinSnakes")]
-        [CollapseWith(10, 3)]
-        public PluginConfigColor TwinSnakesBarFillColor = new(new Vector4(227f / 255f, 255f / 255f, 64f / 255f, 100f / 100f));
-
-        [Checkbox("Inverted" + "##TwinSnakes")]
-        [CollapseWith(15, 3)]
-        public bool TwinSnakesBarInverted = true;
-        #endregion
-
-        #region Riddle of Earth
-        [Checkbox("Riddle of Earth", separator = true)]
-        [CollapseControl(50, 4)]
-        public bool ShowRiddleofEarthBar = true;
-
-        [DragFloat2("Position" + "##RiddleofEarth", min = -4000f, max = 4000f)]
-        [CollapseWith(0, 4)]
-        public Vector2 RiddleofEarthBarPosition = new(-69, -54);
-
-        [DragFloat2("Size" + "##RiddleofEarth", min = 0, max = 4000f)]
-        [CollapseWith(5, 4)]
-        public Vector2 RiddleofEarthBarSize = new(115, 20);
-
-        [ColorEdit4("Color" + "##RiddleofEarth")]
-        [CollapseWith(10, 4)]
-        public PluginConfigColor RiddleofEarthBarFillColor = new(new Vector4(157f / 255f, 59f / 255f, 255f / 255f, 100f / 100f));
-
-        [Checkbox("Inverted" + "##RiddleofEarth")]
-        [CollapseWith(15, 4)]
-        public bool RiddleofEarthInverted = true;
-        #endregion
-
-        #region Perfect Balance
-        [Checkbox("Perfect Balance", separator = true)]
-        [CollapseControl(55, 5)]
-        public bool ShowPerfectBalanceBar = true;
-
-        [DragFloat2("Position" + "##PerfectBalance", min = -4000f, max = 4000f)]
-        [CollapseWith(0, 5)]
-        public Vector2 PerfectBalanceBarPosition = new(0, -54);
-
-        [DragFloat2("Size" + "##PerfectBalance", min = 0, max = 4000f)]
-        [CollapseWith(5, 5)]
-        public Vector2 PerfectBalanceBarSize = new(20, 20);
-
-        [ColorEdit4("Color" + "##PerfectBalance")]
-        [CollapseWith(10, 5)]
-        public PluginConfigColor PerfectBalanceBarFillColor = new(new Vector4(150f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
-
-        [Checkbox("Inverted" + "##PerfectBalance")]
-        [CollapseWith(15, 5)]
-        public bool PerfectBalanceInverted = true;
-        #endregion
-
-        #region True North
-        [Checkbox("True North", separator = true)]
-        [CollapseControl(60, 6)]
-        public bool ShowTrueNorthBar = true;
-
-        [DragFloat2("Position" + "##TrueNorth", min = -4000f, max = 4000f)]
-        [CollapseWith(0, 6)]
-        public Vector2 TrueNorthBarPosition = new(69, -54);
-
-        [DragFloat2("Size" + "##TrueNorth", min = 0, max = 4000f)]
-        [CollapseWith(5, 6)]
-        public Vector2 TrueNorthBarSize = new(115, 20);
-
-        [ColorEdit4("Color" + "##TrueNorth")]
-        [CollapseWith(10, 6)]
-        public PluginConfigColor TrueNorthBarFillColor = new(new Vector4(255f / 255f, 225f / 255f, 189f / 255f, 100f / 100f));
-        #endregion
-
-        #region Forms
-        [Checkbox("Forms" + "##Forms", separator = true)]
-        [CollapseControl(65, 7)]
-        public bool ShowFormsBar = false;
-
-        [DragFloat2("Position" + "##Forms", min = -4000f, max = 4000f)]
-        [CollapseWith(0, 7)]
-        public Vector2 FormsBarPosition = new(0, -76);
-
-        [DragFloat2("Size" + "##Forms", min = 0, max = 4000f)]
-        [CollapseWith(5, 7)]
-        public Vector2 FormsBarSize = new(254, 20);
-
-        [ColorEdit4("Color" + "##Forms")]
-        [CollapseWith(10, 7)]
-        public PluginConfigColor FormsBarFillColor = new(new Vector4(36f / 255f, 131f / 255f, 255f / 255f, 100f / 100f));
-        #endregion
+        [NestedConfig("Forms", 65)]
+        public ProgressBarConfig FormsBar = new ProgressBarConfig(
+            new(0, -76),
+            new(254, 20),
+            new(new Vector4(36f / 255f, 131f / 255f, 255f / 255f, 100f / 100f))
+        );
     }
 }

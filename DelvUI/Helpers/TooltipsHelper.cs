@@ -7,40 +7,61 @@ using System.Text.RegularExpressions;
 
 namespace DelvUI.Helpers
 {
-    public class TooltipsHelper
+    public class TooltipsHelper : IDisposable
     {
         #region Singleton
         private TooltipsHelper()
         {
-            _config = ConfigurationManager.GetInstance().GetConfigObject<TooltipsConfig>();
         }
 
         public static void Initialize() { Instance = new TooltipsHelper(); }
 
-        public static TooltipsHelper Instance { get; private set; }
+        public static TooltipsHelper Instance { get; private set; } = null!;
 
+        ~TooltipsHelper()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            Instance = null!;
+        }
         #endregion
 
         private static float MaxWidth = 300;
         private static float Margin = 5;
 
-        private TooltipsConfig _config;
+        private TooltipsConfig _config => ConfigurationManager.Instance.GetConfigObject<TooltipsConfig>();
 
-        private string _currentTooltipText = null;
+        private string? _currentTooltipText = null;
         private Vector2 _textSize;
-        private string _currentTooltipTitle = null;
+        private string? _currentTooltipTitle = null;
         private Vector2 _titleSize;
-        private string _previousRawText = null;
+        private string? _previousRawText = null;
 
         private Vector2 _position;
         private Vector2 _size;
 
-        public void ShowTooltipOnCursor(string text, string title = null)
+        private bool _dataIsValid = false;
+
+        public void ShowTooltipOnCursor(string text, string? title = null, uint id = 0)
         {
-            ShowTooltip(text, ImGui.GetMousePos(), title);
+            ShowTooltip(text, ImGui.GetMousePos(), title, id);
         }
 
-        public void ShowTooltip(string text, Vector2 position, string title = null)
+        public void ShowTooltip(string text, Vector2 position, string? title = null, uint id = 0)
         {
             if (text == null)
             {
@@ -59,12 +80,25 @@ namespace DelvUI.Helpers
             if (title != null)
             {
                 _currentTooltipTitle = title;
-                _titleSize = ImGui.CalcTextSize(title, MaxWidth);
+
+                if (_config.ShowStatusIDs)
+                {
+                    _currentTooltipTitle += " (ID: " + id + ")";
+                }
+
+                bool titleFontPushed = FontsManager.Instance.PushFont(_config.TitleFontID);
+
+                _titleSize = ImGui.CalcTextSize(_currentTooltipTitle, MaxWidth);
                 _titleSize.Y += Margin;
+
+                if (titleFontPushed) { ImGui.PopFont(); }
             }
 
             // calculate text size
+            bool fontPushed = FontsManager.Instance.PushFont(_config.TextFontID);
             _textSize = ImGui.CalcTextSize(_currentTooltipText, MaxWidth);
+            if (fontPushed) { ImGui.PopFont(); }
+
             _size = new Vector2(Math.Max(_titleSize.X, _textSize.X) + Margin * 2, _titleSize.Y + _textSize.Y + Margin * 2);
 
             // position tooltip using the given coordinates as bottom center
@@ -73,18 +107,18 @@ namespace DelvUI.Helpers
 
             // correct tooltips off screen
             _position = ConstrainPosition(position, _size);
+
+            _dataIsValid = true;
         }
 
         public void RemoveTooltip()
         {
-            _currentTooltipText = null;
-            _currentTooltipTitle = null;
-            _previousRawText = null;
+            _dataIsValid = false;
         }
 
         public void Draw()
         {
-            if (_currentTooltipText == null)
+            if (!_dataIsValid)
             {
                 return;
             }
@@ -107,7 +141,7 @@ namespace DelvUI.Helpers
             ImGui.SetNextWindowFocus();
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
-            ImGui.Begin("delvui_tooltip", windowFlags);
+            ImGui.Begin("DelvUI_tooltip", windowFlags);
             var drawList = ImGui.GetWindowDrawList();
 
             drawList.AddRectFilled(_position, _position + _size, _config.BackgroundColor.Base);
@@ -115,22 +149,32 @@ namespace DelvUI.Helpers
             if (_currentTooltipTitle != null)
             {
                 // title
+                bool fontPushed = FontsManager.Instance.PushFont(_config.TitleFontID);
+
                 var cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _titleSize.X / 2f, Margin);
                 ImGui.SetCursorPos(cursorPos);
                 ImGui.PushTextWrapPos(cursorPos.X + _titleSize.X);
                 ImGui.TextColored(_config.TitleColor.Vector, _currentTooltipTitle);
                 ImGui.PopTextWrapPos();
 
+                if (fontPushed) { ImGui.PopFont(); }
+
                 // text
+                fontPushed = FontsManager.Instance.PushFont(_config.TextFontID);
+
                 cursorPos = new Vector2(windowMargin.X + _size.X / 2f - _textSize.X / 2f, Margin + _titleSize.Y);
                 ImGui.SetCursorPos(cursorPos);
                 ImGui.PushTextWrapPos(cursorPos.X + _textSize.X);
                 ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
                 ImGui.PopTextWrapPos();
+
+                if (fontPushed) { ImGui.PopFont(); }
             }
             else
             {
                 // text
+                bool fontPushed = FontsManager.Instance.PushFont(_config.TextFontID);
+
                 var cursorPos = windowMargin + new Vector2(Margin, Margin);
                 var textWidth = _size.X - Margin * 2;
 
@@ -138,6 +182,8 @@ namespace DelvUI.Helpers
                 ImGui.PushTextWrapPos(cursorPos.X + textWidth);
                 ImGui.TextColored(_config.TextColor.Vector, _currentTooltipText);
                 ImGui.PopTextWrapPos();
+
+                if (fontPushed) { ImGui.PopFont(); }
             }
 
             ImGui.End();
@@ -195,16 +241,28 @@ namespace DelvUI.Helpers
     {
         public new static TooltipsConfig DefaultConfig() { return new TooltipsConfig(); }
 
-        [ColorEdit4("Title Color")]
-        [Order(10)]
-        public PluginConfigColor TitleColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
-
-        [ColorEdit4("Text Color")]
-        [Order(10)]
-        public PluginConfigColor TextColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 80f / 100f));
+        [Checkbox("Show Status Effects IDs")]
+        [Order(5)]
+        public bool ShowStatusIDs = false;
 
         [ColorEdit4("Background Color")]
         [Order(10)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 60f / 100f));
+
+        [Font("Title Font and Size", spacing = true)]
+        [Order(15)]
+        public string? TitleFontID = null;
+
+        [ColorEdit4("Title Color")]
+        [Order(20)]
+        public PluginConfigColor TitleColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+
+        [Font("Text Font and Size", spacing = true)]
+        [Order(25)]
+        public string? TextFontID = null;
+
+        [ColorEdit4("Text Color")]
+        [Order(30)]
+        public PluginConfigColor TextColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 80f / 100f));
     }
 }

@@ -4,10 +4,10 @@ using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using ImGuiNET;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
-using System.Reflection;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -30,26 +30,38 @@ namespace DelvUI.Interface.GeneralElements
     {
         public new static FontsConfig DefaultConfig() { return new FontsConfig(); }
 
+        public string FontsPath = "C:\\";
+        [JsonIgnore] public string ValidatedFontsPath => ValidatePath(FontsPath);
+
         public SortedList<string, FontData> Fonts = new SortedList<string, FontData>();
         public bool SupportChineseCharacters = false;
         public bool SupportKoreanCharacters = false;
 
-        [JsonIgnore] public readonly string DefaultFontKey = "big-noodle-too_24";
+        [JsonIgnore] public static readonly List<string> DefaultFontsKeys = new List<string>() { "big-noodle-too_24", "big-noodle-too_20", "big-noodle-too_16" };
+        [JsonIgnore] public static string DefaultBigFontKey => DefaultFontsKeys[0];
+        [JsonIgnore] public static string DefaultMediumFontKey => DefaultFontsKeys[1];
+        [JsonIgnore] public static string DefaultSmallFontKey => DefaultFontsKeys[2];
+
         [JsonIgnore] private int _inputFont = 0;
         [JsonIgnore] private int _inputSize = 23;
 
-        [JsonIgnore] private string[] _fonts;
-        [JsonIgnore] private string[] _sizes;
+        [JsonIgnore] private string[] _fonts = null!;
+        [JsonIgnore] private string[] _sizes = null!;
 
         public FontsConfig()
         {
             ReloadFonts();
 
-            // default font
-            if (!Fonts.ContainsKey(DefaultFontKey))
+            // default fonts
+            foreach (string key in DefaultFontsKeys)
             {
-                var defaultFont = new FontData("big-noodle-too", 24);
-                Fonts.Add(DefaultFontKey, defaultFont);
+                if (!Fonts.ContainsKey(key))
+                {
+                    string[] str = key.Split("_", StringSplitOptions.RemoveEmptyEntries);
+                    var defaultFont = new FontData(str[0], int.Parse(str[1]));
+                    Fonts.Add(key, defaultFont);
+                }
+
             }
 
             // sizes
@@ -60,16 +72,53 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
-        private void ReloadFonts()
+        private bool IsDefaultFont(string key)
         {
-            var fontsPath = FontsManager.Instance.FontsPath;
-            var fonts = Directory.GetFiles(fontsPath, "*.ttf");
+            return DefaultFontsKeys.Contains(key);
+        }
 
-            _fonts = new string[fonts.Length];
+        private string ValidatePath(string path)
+        {
+            if (path.EndsWith("\\") || path.EndsWith("/"))
+            {
+                return path;
+            }
+
+            return path + "\\";
+        }
+
+        private string[] FontsFromPath(string path)
+        {
+            string[] fonts;
+            try
+            {
+                fonts = Directory.GetFiles(path, "*.ttf");
+            }
+            catch
+            {
+                fonts = new string[0];
+            }
+
             for (int i = 0; i < fonts.Length; i++)
             {
-                _fonts[i] = fonts[i].Replace(fontsPath, "").Replace(".ttf", "").Replace(".TTF", "");
+                fonts[i] = fonts[i]
+                    .Replace(path, "")
+                    .Replace(".ttf", "")
+                    .Replace(".TTF", "");
             }
+
+            return fonts;
+        }
+
+        private void ReloadFonts()
+        {
+            var defaultFontsPath = ValidatePath(FontsManager.Instance.DefaultFontsPath);
+            string[] defaultFonts = FontsFromPath(defaultFontsPath);
+            string[] userFonts = FontsFromPath(ValidatedFontsPath);
+
+            _fonts = new string[defaultFonts.Length + userFonts.Length];
+            defaultFonts.CopyTo(_fonts, 0);
+            userFonts.CopyTo(_fonts, defaultFonts.Length);
         }
 
         private bool AddNewEntry(int font, int size)
@@ -101,13 +150,8 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         [ManualDraw]
-        public bool Draw()
+        public bool Draw(ref bool changed)
         {
-            if (!Enabled)
-            {
-                return false;
-            }
-
             var flags =
                 ImGuiTableFlags.RowBg |
                 ImGuiTableFlags.Borders |
@@ -116,26 +160,25 @@ namespace DelvUI.Interface.GeneralElements
                 ImGuiTableFlags.ScrollY |
                 ImGuiTableFlags.SizingFixedSame;
 
-            var changed = false;
             var indexToRemove = -1;
 
             if (ImGui.BeginChild("Fonts", new Vector2(400, 400), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 if (_fonts.Length == 0)
                 {
-                    ImGui.Text("\u2002");
-                    ImGui.SameLine();
-                    ImGui.Text("Please add a font file in the Media/Fonts directory of DelvUI");
+                    ImGuiHelper.Tab();
+                    ImGui.Text("Default font not found in \"%appdata%/Roaming/XIVLauncher/InstalledPlugins/DelvUI/Media/Fonts/big-noodle-too.ttf\"");
                     return false;
                 }
 
-                ImGui.NewLine();
-                ImGui.Text("\u2002");
-                ImGui.SameLine();
-                ImGui.Text("Select a font and size to add:");
+                ImGuiHelper.NewLineAndTab();
+                if (ImGui.InputText("Fonts Path", ref FontsPath, 200, ImGuiInputTextFlags.EnterReturnsTrue))
+                {
+                    changed = true;
+                    ReloadFonts();
+                }
 
-                ImGui.Text("\u2002");
-                ImGui.SameLine();
+                ImGuiHelper.Tab();
                 ImGui.Combo("Font ##font", ref _inputFont, _fonts, _fonts.Length, 10);
 
                 ImGui.SameLine();
@@ -146,8 +189,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
                 ImGui.PopFont();
 
-                ImGui.Text("\u2002");
-                ImGui.SameLine();
+                ImGuiHelper.Tab();
                 ImGui.Combo("Size  ##size", ref _inputSize, _sizes, _sizes.Length, 10);
 
                 ImGui.SameLine();
@@ -158,9 +200,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
                 ImGui.PopFont();
 
-                ImGui.NewLine();
-                ImGui.Text("\u2002");
-                ImGui.SameLine();
+                ImGuiHelper.NewLineAndTab();
                 if (ImGui.BeginTable("table", 3, flags, new Vector2(326, 150)))
                 {
                     ImGui.TableSetupColumn("Name", ImGuiTableColumnFlags.WidthStretch, 0, 0);
@@ -191,7 +231,7 @@ namespace DelvUI.Interface.GeneralElements
                         }
 
                         // remove
-                        if (key != DefaultFontKey && ImGui.TableSetColumnIndex(2))
+                        if (!IsDefaultFont(key) && ImGui.TableSetColumnIndex(2))
                         {
                             ImGui.PushFont(UiBuilder.IconFont);
                             ImGui.PushStyleColor(ImGuiCol.Button, Vector4.Zero);
@@ -214,9 +254,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
 
                 ImGui.NewLine();
-                ImGui.NewLine();
-                ImGui.Text("\u2002");
-                ImGui.SameLine();
+                ImGuiHelper.NewLineAndTab();
                 if (ImGui.Checkbox("Support Chinese", ref SupportChineseCharacters))
                 {
                     changed = true;
@@ -239,7 +277,7 @@ namespace DelvUI.Interface.GeneralElements
 
             ImGui.EndChild();
 
-            return changed;
+            return false;
         }
     }
 }
