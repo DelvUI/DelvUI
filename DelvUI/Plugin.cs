@@ -89,7 +89,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.3.0.0";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.3.0.1";
 
             FontsManager.Initialize(AssemblyLocation);
             LoadBanner();
