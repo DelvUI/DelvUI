@@ -3,7 +3,6 @@ using DelvUI.Enums;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
-using System.Diagnostics;
 using System.Numerics;
 using System.Reflection;
 
@@ -11,17 +10,40 @@ namespace DelvUI.Config
 {
     public abstract class PluginConfigObject : IOnChangeEventArgs
     {
-        [Checkbox("Enabled", separator = true)]
-        [Order(0)]
+        public string Version => Plugin.Version;
+
+        [Checkbox("Enabled")]
+        [Order(0, collapseWith = null)]
         public bool Enabled = true;
 
+        #region convenience properties
         [JsonIgnore]
-        public bool Portable
+        public bool Exportable
         {
             get
             {
-                PortableAttribute? attribute = (PortableAttribute?)GetType().GetCustomAttribute(typeof(PortableAttribute), false);
-                return attribute == null || attribute.portable;
+                ExportableAttribute? attribute = (ExportableAttribute?)GetType().GetCustomAttribute(typeof(ExportableAttribute), false);
+                return attribute == null || attribute.exportable;
+            }
+        }
+
+        [JsonIgnore]
+        public bool Shareable
+        {
+            get
+            {
+                ShareableAttribute? attribute = (ShareableAttribute?)GetType().GetCustomAttribute(typeof(ShareableAttribute), false);
+                return attribute == null || attribute.shareable;
+            }
+        }
+
+        [JsonIgnore]
+        public bool Resettable
+        {
+            get
+            {
+                ResettableAttribute? attribute = (ResettableAttribute?)GetType().GetCustomAttribute(typeof(ResettableAttribute), false);
+                return attribute == null || attribute.resettable;
             }
         }
 
@@ -34,6 +56,17 @@ namespace DelvUI.Config
                 return attribute == null || attribute.disableable;
             }
         }
+        
+        [JsonIgnore]
+        public string[]? DisableParentSettings
+        {
+            get
+            {
+                DisableParentSettingsAttribute? attribute = (DisableParentSettingsAttribute?)GetType().GetCustomAttribute(typeof(DisableParentSettingsAttribute), false);
+                return attribute?.DisabledFields;
+            }
+        }
+        #endregion
 
         protected bool ColorEdit4(string label, ref PluginConfigColor color)
         {
@@ -70,12 +103,19 @@ namespace DelvUI.Config
 
     public abstract class MovablePluginConfigObject : PluginConfigObject
     {
+        [JsonIgnore]
+        public readonly string ID;
+
         [DragInt2("Position", min = -4000, max = 4000)]
         [Order(5)]
         public Vector2 Position = Vector2.Zero;
+
+        public MovablePluginConfigObject()
+        {
+            ID = $"DelvUI_{GetType().Name}_{Guid.NewGuid()}";
+        }
     }
 
-    [Serializable]
     public abstract class AnchorablePluginConfigObject : MovablePluginConfigObject
     {
         [DragInt2("Size", min = 1, max = 4000)]
@@ -87,7 +127,6 @@ namespace DelvUI.Config
         public DrawAnchor Anchor = DrawAnchor.Center;
     }
 
-    [Serializable]
     public class PluginConfigColor
     {
         [JsonIgnore] private float[] _colorMapRatios = { -.8f, -.3f, .1f };

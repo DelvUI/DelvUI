@@ -2,8 +2,11 @@
 using System.Globalization;
 using System.Numerics;
 using System.Text;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.Text.SeStringHandling;
+using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.String;
+using static System.Globalization.CultureInfo;
 
 namespace DelvUI
 {
@@ -32,6 +35,25 @@ namespace DelvUI
             return splits.Length > 1 ? splits[^1] : "";
         }
 
+        public static string Initials(this SeString str)
+        {
+            var initials = "";
+            var firstName = FirstName(str);
+            var lastName = LastName(str);
+
+            if (firstName.Length > 0)
+            {
+                initials = firstName[0] + ".";
+            }
+
+            if (lastName.Length > 0)
+            {
+                initials += " " + lastName[0] + ".";
+            }
+
+            return initials;
+        }
+
         public static Vector4 AdjustColor(this Vector4 vec, float correctionFactor)
         {
             float red = vec.X;
@@ -53,6 +75,16 @@ namespace DelvUI
             }
 
             return new Vector4(red, green, blue, vec.W);
+        }
+
+        public static Vector4 AdjustColorAlpha(this Vector4 vec, float correctionFactor)
+        {
+            return new Vector4(vec.X, vec.Y, vec.Z, Math.Min(1, Math.Max(0, vec.W + 1 * correctionFactor)));
+        }
+
+        public static Vector4 WithNewAlpha(this Vector4 vec, float alpha)
+        {
+            return new Vector4(vec.X, vec.Y, vec.Z, alpha);
         }
 
         public static unsafe string GetString(this Utf8String utf8String)
@@ -90,6 +122,35 @@ namespace DelvUI
             }
 
             return str.Length <= maxLength ? str : str[..maxLength];
+        }
+
+        public static bool IsHorizontal(this BarDirection direction)
+        {
+            return direction == BarDirection.Right || direction == BarDirection.Left;
+        }
+
+        public static bool IsInverted(this BarDirection direction)
+        {
+            return direction == BarDirection.Left || direction == BarDirection.Up;
+        }
+
+        public static void Draw(this BarHud[] bars, Vector2 origin)
+        {
+            foreach (BarHud bar in bars)
+            {
+                bar.Draw(origin);
+            }
+        }
+        
+        public static string CheckForUpperCase(this string str)
+        {            
+            var culture = CurrentCulture.TextInfo;
+            if (!string.IsNullOrEmpty(str) && char.IsLetter(str[0]) && !char.IsUpper(str[0]))
+            {
+                str = culture.ToTitleCase(str);
+            }
+
+            return str;
         }
     }
 }

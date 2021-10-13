@@ -1,43 +1,77 @@
+using Dalamud.Logging;
+using DelvUI.Config.Profiles;
 using DelvUI.Config.Tree;
 using DelvUI.Helpers;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
+using DelvUI.Interface.Party;
 using DelvUI.Interface.StatusEffects;
-using ImGuiNET;
 using ImGuiScene;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Linq;
 using System.Reflection;
 using System.Text;
-using Dalamud.Logging;
 
 namespace DelvUI.Config
 {
     public delegate void ConfigurationManagerEventHandler(ConfigurationManager configurationManager);
 
-    public class ConfigurationManager
+    public class ConfigurationManager : IDisposable
     {
-        private static ConfigurationManager _instance = null!;
+        public static ConfigurationManager Instance { get; private set; } = null!;
 
         public readonly TextureWrap? BannerImage;
-
         public BaseNode ConfigBaseNode;
 
         public GradientDirection GradientDirection
         {
             get
             {
-                var config = GetInstance().GetConfigObject<MiscColorConfig>();
+                var config = Instance.GetConfigObject<MiscColorConfig>();
                 return config != null ? config.GradientDirection : GradientDirection.None;
             }
         }
 
         public string ConfigDirectory;
-        public bool DrawConfigWindow;
 
+        private bool _drawConfigWindow;
+        public bool DrawConfigWindow
+        {
+            get => _drawConfigWindow;
+            set
+            {
+                if (_drawConfigWindow == value)
+                {
+                    return;
+                }
+
+                _drawConfigWindow = value;
+
+                if (!_drawConfigWindow)
+                {
+                    if (ConfigBaseNode.NeedsSave)
+                    {
+                        SaveConfigurations();
+                    }
+
+                    if (_needsProfileUpdate)
+                    {
+                        UpdateCurrentProfile();
+                        _needsProfileUpdate = false;
+                    }
+                }
+            }
+        }
+
+        public bool DrawChangelog = false;
+        private string? _changelog = null;
+
+        private bool _needsProfileUpdate = false;
         private bool _lockHUD = true;
 
         public bool LockHUD
@@ -67,7 +101,6 @@ namespace DelvUI.Config
         public event ConfigurationManagerEventHandler? LockEvent;
 
         public ConfigurationManager(
-            bool defaultConfig,
             TextureWrap? bannerImage,
             string configDirectory,
             BaseNode configBaseNode,
@@ -77,102 +110,125 @@ namespace DelvUI.Config
             BannerImage = bannerImage;
             ConfigDirectory = configDirectory;
             ConfigBaseNode = configBaseNode;
-            _instance = this;
+            ConfigBaseNode.ConfigObjectResetEvent += OnConfigObjectReset;
 
-            if (!defaultConfig)
-            {
-                LoadConfigurations();
-            }
+            LoadChangelog();
+            CheckVersion();
+
+            LoadOrInitializeFiles();
 
             LockEvent = lockEvent;
 
             ResetEvent = resetEvent;
             ResetEvent?.Invoke(this);
+
+            Plugin.ClientState.Logout += OnLogout;
         }
 
-
-        public static ConfigurationManager Initialize(bool defaultConfig)
+        ~ConfigurationManager()
         {
-            Type[] configObjects =
-            {
-                typeof(PlayerUnitFrameConfig),
-                typeof(TargetUnitFrameConfig),
-                typeof(TargetOfTargetUnitFrameConfig),
-                typeof(FocusTargetUnitFrameConfig),
-
-                typeof(PlayerCastbarConfig),
-                typeof(TargetCastbarConfig),
-                typeof(TargetOfTargetCastbarConfig),
-                typeof(FocusTargetCastbarConfig),
-
-                typeof(PlayerBuffsListConfig),
-                typeof(PlayerDebuffsListConfig),
-                typeof(TargetBuffsListConfig),
-                typeof(TargetDebuffsListConfig),
-                typeof(CustomEffectsListConfig),
-
-                typeof(PaladinConfig),
-                typeof(WarriorConfig),
-                typeof(DarkKnightConfig),
-                typeof(GunbreakerConfig),
-
-                typeof(WhiteMageConfig),
-                typeof(ScholarConfig),
-                typeof(AstrologianConfig),
-
-                typeof(MonkConfig),
-                typeof(DragoonConfig),
-                typeof(NinjaConfig),
-                typeof(SamuraiConfig),
-
-                typeof(BardConfig),
-                typeof(MachinistConfig),
-                typeof(DancerConfig),
-
-                typeof(BlackMageConfig),
-                typeof(SummonerConfig),
-                typeof(RedMageConfig),
-
-                typeof(TanksColorConfig),
-                typeof(HealersColorConfig),
-                typeof(MeleeColorConfig),
-                typeof(RangedColorConfig),
-                typeof(CastersColorConfig),
-                typeof(MiscColorConfig),
-
-                typeof(FontsConfig),
-                typeof(HideHudConfig),
-                typeof(PrimaryResourceConfig),
-                typeof(TooltipsConfig),
-                typeof(GCDIndicatorConfig),
-                typeof(MPTickerConfig),
-                typeof(GridConfig),
-
-                typeof(ImportExportConfig)
-            };
-
-            return Initialize(defaultConfig, configObjects);
+            Dispose(false);
         }
 
-        public static ConfigurationManager Initialize(bool defaultConfig, params Type[] configObjectTypes)
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            ConfigBaseNode.ConfigObjectResetEvent -= OnConfigObjectReset;
+            Plugin.ClientState.Logout -= OnLogout;
+            BannerImage?.Dispose();
+
+            Instance = null!;
+        }
+
+        public static void Initialize()
         {
             BaseNode node = new();
-
-            foreach (Type type in configObjectTypes)
-            {
-                var genericMethod = node.GetType().GetMethod("GetOrAddConfig");
-                var method = genericMethod?.MakeGenericMethod(type);
-                method?.Invoke(node, null);
-            }
+            InitializeBaseNode(node);
 
             TextureWrap? banner = Plugin.BannerTexture;
 
-            var currentResetEvent = GetInstance()?.ResetEvent;
-            var currentLockEvent = GetInstance()?.LockEvent;
-            return new ConfigurationManager(defaultConfig, banner, Plugin.PluginInterface.GetPluginConfigDirectory(), node, currentResetEvent, currentLockEvent);
+            var currentResetEvent = (ConfigurationManagerEventHandler?)Instance?.ResetEvent?.Clone();
+            var currentLockEvent = (ConfigurationManagerEventHandler?)Instance?.LockEvent?.Clone();
+
+            Instance = new ConfigurationManager(
+                banner,
+                Plugin.PluginInterface.GetPluginConfigDirectory(),
+                node,
+                currentResetEvent,
+                currentLockEvent
+            );
         }
 
-        public static ConfigurationManager GetInstance() => _instance;
+        private void OnConfigObjectReset(BaseNode sender)
+        {
+            ResetEvent?.Invoke(this);
+        }
+
+        private void OnLogout(object? sender, EventArgs? args)
+        {
+            SaveConfigurations();
+            ProfilesManager.Instance.SaveCurrentProfile();
+        }
+
+        private void LoadChangelog()
+        {
+            string path = Path.Combine(Plugin.AssemblyLocation, "changelog.md");
+
+            try
+            {
+                string fullChangelog = File.ReadAllText(path);
+                string versionChangelog = fullChangelog.Split("#", StringSplitOptions.RemoveEmptyEntries)[0];
+                _changelog = versionChangelog.Replace(Plugin.Version, "");
+
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error loading changelog: " + e.Message);
+            }
+        }
+
+        private void CheckVersion()
+        {
+            string path = Path.Combine(ConfigDirectory, "version");
+
+            try
+            {
+                bool needsWrite = false;
+
+                if (!File.Exists(path))
+                {
+                    needsWrite = true;
+                }
+                else
+                {
+                    string version = File.ReadAllText(path);
+                    if (version != Plugin.Version)
+                    {
+                        needsWrite = true;
+                    }
+                }
+
+                DrawChangelog = needsWrite;
+                if (needsWrite)
+                {
+                    File.WriteAllText(path, Plugin.Version);
+                }
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error checking version: " + e.Message);
+            }
+        }
 
         public void Draw()
         {
@@ -186,14 +242,20 @@ namespace DelvUI.Config
                 {
                     DraggablesHelper.DrawGridWindow();
                 }
+            }
 
+            if (DrawChangelog && _changelog != null)
+            {
+                DrawChangelog = !DrawHelper.DrawChangelogWindow(_changelog);
             }
         }
 
-        public void LoadConfigurations() { ConfigBaseNode.Load(ConfigDirectory); }
+        public void AddExtraSectionNode(SectionNode node)
+        {
+            ConfigBaseNode.AddExtraSectionNode(node);
+        }
 
-        public void SaveConfigurations() { ConfigBaseNode.Save(ConfigDirectory); }
-
+        #region config getters and setters
         public PluginConfigObject GetConfigObjectForType(Type type)
         {
             MethodInfo? genericMethod = GetType().GetMethod("GetConfigObject");
@@ -201,96 +263,213 @@ namespace DelvUI.Config
             return (PluginConfigObject)method?.Invoke(this, null)!;
         }
         public T GetConfigObject<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigObject<T>()!;
+
+        public static PluginConfigObject GetDefaultConfigObjectForType(Type type)
+        {
+            MethodInfo? method = type.GetMethod("DefaultConfig", BindingFlags.Public | BindingFlags.Static);
+            return (PluginConfigObject)method?.Invoke(null, null)!;
+        }
+
         public ConfigPageNode GetConfigPageNode<T>() where T : PluginConfigObject => ConfigBaseNode.GetConfigPageNode<T>()!;
 
-        public static string CompressAndBase64Encode(string jsonString)
-        {
-            using MemoryStream output = new();
+        public void SetConfigObject(PluginConfigObject configObject) => ConfigBaseNode.SetConfigObject(configObject);
+        #endregion
 
-            using (DeflateStream gzip = new(output, CompressionLevel.Optimal))
-            {
-                using StreamWriter writer = new(gzip, Encoding.UTF8);
-                writer.Write(jsonString);
-            }
-
-            return Convert.ToBase64String(output.ToArray());
-        }
-
-        public static string Base64DecodeAndDecompress(string base64String)
-        {
-            var base64EncodedBytes = Convert.FromBase64String(base64String);
-
-            using MemoryStream inputStream = new(base64EncodedBytes);
-            using DeflateStream gzip = new(inputStream, CompressionMode.Decompress);
-            using StreamReader reader = new(gzip, Encoding.UTF8);
-            var decodedString = reader.ReadToEnd();
-
-            return decodedString;
-        }
-
-        public static string GenerateExportString(PluginConfigObject configObject)
-        {
-            var jsonString = JsonConvert.SerializeObject(configObject, Formatting.Indented,
-                new JsonSerializerSettings { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects });
-
-            return CompressAndBase64Encode(jsonString);
-        }
-
-        public static string ExportBaseNode(BaseNode baseNode)
-        {
-            JsonSerializerSettings settings = new JsonSerializerSettings
-            {
-                TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-                TypeNameHandling = TypeNameHandling.Objects
-            };
-            var jsonString = JsonConvert.SerializeObject(baseNode, Formatting.Indented, settings);
-            ImGui.SetClipboardText(jsonString);
-            return CompressAndBase64Encode(jsonString);
-        }
-
-        public static void LoadImportedConfiguration(string importString, ConfigPageNode configPageNode)
-        {
-            // see comments on ConfigPageNode's Load
-            MethodInfo? methodInfo = typeof(ConfigurationManager).GetMethod("LoadImportString");
-            MethodInfo? function = methodInfo?.MakeGenericMethod(configPageNode.ConfigObject.GetType());
-            PluginConfigObject? importedConfigObject = (PluginConfigObject?)function?.Invoke(GetInstance(), new object[] { importString });
-
-            if (importedConfigObject != null)
-            {
-                PluginLog.Log($"Importing {importedConfigObject.GetType()}");
-                // update the tree 
-                configPageNode.ConfigObject = importedConfigObject;
-                // but also update the dictionary
-                GetInstance().ConfigBaseNode.configPageNodesMap[configPageNode.ConfigObject.GetType()] = configPageNode;
-                GetInstance().SaveConfigurations();
-
-                _instance.ResetEvent?.Invoke(_instance);
-            }
-            else
-            {
-                PluginLog.Log($"Could not load from import string (of type {configPageNode.ConfigObject.GetType()})");
-            }
-        }
-
-        public static void LoadTotalConfiguration(string[] importStrings)
-        {
-            _instance.ConfigBaseNode.LoadBase64String(importStrings);
-            _instance.ResetEvent?.Invoke(_instance);
-        }
-
-        public static T? LoadImportString<T>(string importString) where T : PluginConfigObject
+        #region load / save / profiles
+        private void LoadOrInitializeFiles()
         {
             try
             {
-                var jsonString = Base64DecodeAndDecompress(importString);
-                return JsonConvert.DeserializeObject<T>(jsonString);
+                // detect if we need to create the config files (fresh install)
+                if (Directory.GetDirectories(ConfigDirectory).Length == 0)
+                {
+                    SaveConfigurations(true);
+                }
+                else
+                {
+                    LoadConfigurations();
+                }
             }
-            catch (Exception ex)
+            catch
             {
-                PluginLog.Log(ex.Message + "\n" + ex.StackTrace);
-
-                return default;
+                PluginLog.Error("Error initializing configurations!");
             }
         }
+
+        public void LoadConfigurations()
+        {
+            ConfigBaseNode.Load(ConfigDirectory);
+        }
+
+        public void SaveConfigurations(bool forced = false)
+        {
+            if (!forced && !ConfigBaseNode.NeedsSave)
+            {
+                return;
+            }
+
+            ConfigBaseNode.Save(ConfigDirectory);
+
+            if (ProfilesManager.Instance != null)
+            {
+                ProfilesManager.Instance.SaveCurrentProfile();
+            }
+
+            ConfigBaseNode.NeedsSave = false;
+        }
+
+        public void UpdateCurrentProfile()
+        {
+            // dont update the profile on job change when the config window is opened
+            if (_drawConfigWindow)
+            {
+                _needsProfileUpdate = true;
+                return;
+            }
+
+            ProfilesManager.Instance.UpdateCurrentProfile();
+        }
+
+        public string? ExportCurrentConfigs()
+        {
+            return ConfigBaseNode.GetBase64String();
+        }
+
+        public bool ImportProfile(string rawString)
+        {
+            List<string> importStrings = new List<string>(rawString.Trim().Split(new string[] { "|" }, StringSplitOptions.RemoveEmptyEntries));
+            ImportData[] imports = importStrings.Select(str => new ImportData(str)).ToArray();
+
+            BaseNode node = new BaseNode();
+            InitializeBaseNode(node);
+
+            foreach (ImportData importData in imports)
+            {
+                PluginConfigObject? config = importData.GetObject();
+                if (config == null)
+                {
+                    return false;
+                }
+
+                node.SetConfigObject(config);
+            }
+
+            try
+            {
+                node.Save(ConfigDirectory);
+            }
+            catch
+            {
+                return false;
+            }
+
+            string? oldSelection = ConfigBaseNode.SelectedOptionName;
+            node.SelectedOptionName = oldSelection;
+            node.AddExtraSectionNode(ProfilesManager.Instance.ProfilesNode);
+
+            ConfigBaseNode.ConfigObjectResetEvent -= OnConfigObjectReset;
+            ConfigBaseNode = node;
+            ConfigBaseNode.ConfigObjectResetEvent += OnConfigObjectReset;
+
+            ResetEvent?.Invoke(this);
+
+            return true;
+        }
+
+        public void ResetConfig()
+        {
+            ConfigBaseNode.Reset();
+            ResetEvent?.Invoke(this);
+        }
+        #endregion
+
+        #region initialization
+        private static void InitializeBaseNode(BaseNode node)
+        {
+            // creates node tree in the right order...
+            foreach (Type type in configObjectTypes)
+            {
+                var genericMethod = node.GetType().GetMethod("GetConfigPageNode");
+                var method = genericMethod?.MakeGenericMethod(type);
+                method?.Invoke(node, null);
+            }
+        }
+
+        private static Type[] configObjectTypes = new Type[]
+        {
+            typeof(PlayerUnitFrameConfig),
+            typeof(TargetUnitFrameConfig),
+            typeof(TargetOfTargetUnitFrameConfig),
+            typeof(FocusTargetUnitFrameConfig),
+
+            typeof(PlayerPrimaryResourceConfig),
+            typeof(TargetPrimaryResourceConfig),
+            typeof(TargetOfTargetPrimaryResourceConfig),
+            typeof(FocusTargetPrimaryResourceConfig),
+
+            typeof(PlayerCastbarConfig),
+            typeof(TargetCastbarConfig),
+            typeof(TargetOfTargetCastbarConfig),
+            typeof(FocusTargetCastbarConfig),
+
+            typeof(PlayerBuffsListConfig),
+            typeof(PlayerDebuffsListConfig),
+            typeof(TargetBuffsListConfig),
+            typeof(TargetDebuffsListConfig),
+            typeof(CustomEffectsListConfig),
+
+            typeof(PartyFramesConfig),
+            typeof(PartyFramesHealthBarsConfig),
+            typeof(PartyFramesManaBarConfig),
+            typeof(PartyFramesCastbarConfig),
+            typeof(PartyFramesRoleIconConfig),
+            typeof(PartyFramesLeaderIconConfig),
+            typeof(PartyFramesBuffsConfig),
+            typeof(PartyFramesDebuffsConfig),
+            typeof(PartyFramesRaiseTrackerConfig),
+            typeof(PartyFramesInvulnTrackerConfig),
+
+            typeof(PaladinConfig),
+            typeof(WarriorConfig),
+            typeof(DarkKnightConfig),
+            typeof(GunbreakerConfig),
+
+            typeof(WhiteMageConfig),
+            typeof(ScholarConfig),
+            typeof(AstrologianConfig),
+
+            typeof(MonkConfig),
+            typeof(DragoonConfig),
+            typeof(NinjaConfig),
+            typeof(SamuraiConfig),
+
+            typeof(BardConfig),
+            typeof(MachinistConfig),
+            typeof(DancerConfig),
+
+            typeof(BlackMageConfig),
+            typeof(SummonerConfig),
+            typeof(RedMageConfig),
+
+            typeof(TanksColorConfig),
+            typeof(HealersColorConfig),
+            typeof(MeleeColorConfig),
+            typeof(RangedColorConfig),
+            typeof(CastersColorConfig),
+            typeof(MiscColorConfig),
+
+            typeof(FontsConfig),
+            typeof(HUDOptionsConfig),
+            typeof(TooltipsConfig),
+            typeof(ExperienceBarConfig),
+            typeof(GCDIndicatorConfig),
+            typeof(PullTimerConfig),
+            typeof(LimitBreakConfig),
+            typeof(MPTickerConfig),
+            typeof(GridConfig),
+
+            typeof(ImportConfig)
+        };
+        #endregion
     }
 }

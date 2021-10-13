@@ -4,16 +4,18 @@ using Dalamud.Game.ClientState;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.JobGauge;
 using Dalamud.Game.ClientState.Objects;
+using Dalamud.Game.ClientState.Party;
 using Dalamud.Game.Command;
 using Dalamud.Game.Gui;
 using Dalamud.Interface;
 using Dalamud.Logging;
 using Dalamud.Plugin;
 using DelvUI.Config;
+using DelvUI.Config.Profiles;
 using DelvUI.Helpers;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
-using FFXIVClientStructs;
+using DelvUI.Interface.Party;
 using ImGuiNET;
 using ImGuiScene;
 using System;
@@ -37,10 +39,11 @@ namespace DelvUI
         public static SigScanner SigScanner { get; private set; } = null!;
         public static TargetManager TargetManager { get; private set; } = null!;
         public static UiBuilder UiBuilder { get; private set; } = null!;
+        public static PartyList PartyList { get; private set; } = null!;
 
         public static TextureWrap? BannerTexture;
 
-        public string AssemblyLocation { get; }
+        public static string AssemblyLocation { get; private set; } = "";
         public string Name => "DelvUI";
 
         public static string Version { get; private set; } = "";
@@ -58,6 +61,7 @@ namespace DelvUI
             GameGui gameGui,
             JobGauges jobGauges,
             ObjectTable objectTable,
+            PartyList partyList,
             SigScanner sigScanner,
             TargetManager targetManager
         )
@@ -71,28 +75,32 @@ namespace DelvUI
             GameGui = gameGui;
             JobGauges = jobGauges;
             ObjectTable = objectTable;
+            PartyList = partyList;
             SigScanner = sigScanner;
             TargetManager = targetManager;
             UiBuilder = PluginInterface.UiBuilder;
-            AssemblyLocation = Assembly.GetExecutingAssembly().Location;
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "";
+            if (pluginInterface.AssemblyLocation.DirectoryName != null)
+            {
+                AssemblyLocation = pluginInterface.AssemblyLocation.DirectoryName + "\\";
+            }
+            else
+            {
+                AssemblyLocation = Assembly.GetExecutingAssembly().Location;
+            }
+
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.3.0.0";
+
             FontsManager.Initialize(AssemblyLocation);
-
             LoadBanner();
 
             // initialize a not-necessarily-defaults configuration
-            ConfigurationManager.Initialize(false);
+            ConfigurationManager.Initialize();
             FontsManager.Instance.LoadConfig();
 
             UiBuilder.Draw += Draw;
             UiBuilder.BuildFonts += BuildFont;
             UiBuilder.OpenConfigUi += OpenConfigUi;
-
-            if (!FontsManager.Instance.DefaultFontBuilt)
-            {
-                UiBuilder.RebuildFonts();
-            }
 
             CommandManager.AddHandler(
                 "/delvui",
@@ -110,19 +118,22 @@ namespace DelvUI
 
             _menuHook = new SystemMenuHook(PluginInterface);
 
-            TexturesCache.Initialize();
-            GlobalColors.Initialize();
-            TooltipsHelper.Initialize();
             ChatHelper.Initialize();
+            ClipRectsHelper.Initialize();
+            GlobalColors.Initialize();
+            LimitBreakHelper.Initialize();
             MouseOverHelper.Initialize();
-            Resolver.Initialize();
+            PartyManager.Initialize();
+            ProfilesManager.Initialize();
+            PullTimerHelper.Initialize();
+            TexturesCache.Initialize();
+            TooltipsHelper.Initialize();
 
             _hudManager = new HudManager();
         }
 
         public void Dispose()
         {
-            _menuHook.Dispose();
             Dispose(true);
             GC.SuppressFinalize(this);
         }
@@ -156,7 +167,7 @@ namespace DelvUI
 
         private void PluginCommand(string command, string arguments)
         {
-            var configManager = ConfigurationManager.GetInstance();
+            var configManager = ConfigurationManager.Instance;
 
             if (configManager.DrawConfigWindow && !configManager.LockHUD)
             {
@@ -167,24 +178,15 @@ namespace DelvUI
                 switch (arguments)
                 {
                     case "toggle":
-                        ConfigurationManager.GetInstance().ShowHUD = !ConfigurationManager.GetInstance().ShowHUD;
-
+                        ConfigurationManager.Instance.ShowHUD = !ConfigurationManager.Instance.ShowHUD;
                         break;
 
                     case "show":
-                        ConfigurationManager.GetInstance().ShowHUD = true;
-
+                        ConfigurationManager.Instance.ShowHUD = true;
                         break;
 
                     case "hide":
-                        ConfigurationManager.GetInstance().ShowHUD = false;
-
-                        break;
-
-                    case "reset":
-                        ConfigurationManager.Initialize(true);
-                        ConfigurationManager.GetInstance().SaveConfigurations();
-
+                        ConfigurationManager.Instance.ShowHUD = false;
                         break;
 
                     default:
@@ -195,20 +197,22 @@ namespace DelvUI
             }
         }
 
-        private void ReloadConfigCommand(string command, string arguments) { ConfigurationManager.GetInstance().LoadConfigurations(); }
+        private void ReloadConfigCommand(string command, string arguments) { ConfigurationManager.Instance.LoadConfigurations(); }
 
         private void Draw()
         {
-            bool hudState = Condition[ConditionFlag.WatchingCutscene]
-                         || Condition[ConditionFlag.WatchingCutscene78]
-                         || Condition[ConditionFlag.OccupiedInCutSceneEvent]
-                         || Condition[ConditionFlag.CreatingCharacter]
-                         || Condition[ConditionFlag.BetweenAreas]
-                         || Condition[ConditionFlag.BetweenAreas51];
+            bool hudState =
+                Condition[ConditionFlag.WatchingCutscene] ||
+                Condition[ConditionFlag.WatchingCutscene78] ||
+                Condition[ConditionFlag.OccupiedInCutSceneEvent] ||
+                Condition[ConditionFlag.CreatingCharacter] ||
+                Condition[ConditionFlag.BetweenAreas] ||
+                Condition[ConditionFlag.BetweenAreas51] ||
+                Condition[ConditionFlag.OccupiedSummoningBell];
 
             UiBuilder.OverrideGameCursor = false;
 
-            ConfigurationManager.GetInstance().Draw();
+            ConfigurationManager.Instance.Draw();
 
             var fontPushed = FontsManager.Instance.PushDefaultFont();
 
@@ -225,7 +229,7 @@ namespace DelvUI
 
         private void OpenConfigUi()
         {
-            ConfigurationManager.GetInstance().DrawConfigWindow = !ConfigurationManager.GetInstance().DrawConfigWindow;
+            ConfigurationManager.Instance.DrawConfigWindow = !ConfigurationManager.Instance.DrawConfigWindow;
         }
 
         protected virtual void Dispose(bool disposing)
@@ -235,9 +239,10 @@ namespace DelvUI
                 return;
             }
 
-            HudHelper.RestoreToGameDefaults();
+            _menuHook.Dispose();
+            _hudManager.Dispose();
 
-            ConfigurationManager.GetInstance().DrawConfigWindow = false;
+            ConfigurationManager.Instance.DrawConfigWindow = false;
 
             CommandManager.RemoveHandler("/delvui");
             CommandManager.RemoveHandler("/delvuireloadconfig");
@@ -246,6 +251,23 @@ namespace DelvUI
             UiBuilder.BuildFonts -= BuildFont;
             UiBuilder.OpenConfigUi -= OpenConfigUi;
             UiBuilder.RebuildFonts();
+
+            ChatHelper.Instance.Dispose();
+            ClipRectsHelper.Instance.Dispose();
+            ExperienceHelper.Instance.Dispose();
+            FontsManager.Instance.Dispose();
+            GlobalColors.Instance.Dispose();
+            LimitBreakHelper.Instance.Dispose();
+            MouseOverHelper.Instance.Dispose();
+            PartyManager.Instance.Dispose();
+            PullTimerHelper.Instance.Dispose();
+            ProfilesManager.Instance.Dispose();
+            SpellHelper.Instance.Dispose();
+            TexturesCache.Instance.Dispose();
+            TooltipsHelper.Instance.Dispose();
+
+            // This needs to remain last to avoid race conditions
+            ConfigurationManager.Instance.Dispose();
         }
     }
 }

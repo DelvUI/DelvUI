@@ -23,23 +23,76 @@ using System.Text;
 
 namespace DelvUI.Helpers
 {
-    public class ChatHelper
+    public class ChatHelper : IDisposable
     {
         #region Singleton
         private ChatHelper()
         {
+            /*
+             Part of baseUi disassembly signature
+            .text:00007FF647D391BB 48 8B 0D 96 39 D3+mov     rcx, cs:g_Framework_2
+            .text:00007FF647D391BB 01
+            .text:00007FF647D391C2 48 8D 54 24 70    lea     rdx, [rsp+520h+Source]
+            .text:00007FF647D391C7 48 83 C1 10       add     rcx, 10h
+            .text:00007FF647D391CB E8 F0 02 01 00    call    sub_7FF647D494C0
+            .text:00007FF647D391D0 48 8B 4D 80       mov     rcx, [rbp+420h+var_4A0]
+            .text:00007FF647D391D4 48 8D 05 ED 29 61+lea     rax, off_7FF64934BBC8
+            */
             IntPtr baseUi = Plugin.SigScanner.GetStaticAddressFromSig("48 8B 0D ?? ?? ?? ?? 48 8D 54 24 ?? 48 83 C1 10 E8");
+            
+            /*
+             Part of uiModule disassembly signature
+            .text:00007FF6482E7076 E8 95 AF A8 FF    call    Client__System__Framework__Framework_GetUIModule
+            .text:00007FF6482E707B 48 83 7F 50 00    cmp     qword ptr [rdi+50h], 0
+            .text:00007FF6482E7080 48 8B F0          mov     rsi, rax
+            .text:00007FF6482E7083 0F 84 58 01 00 00 jz      loc_7FF6482E71E1
+            */
             IntPtr uiModule = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 83 7F ?? 00 48 8B F0");
 
             UiModuleDelegate uiModuleDelegate = Marshal.GetDelegateForFunctionPointer<UiModuleDelegate>(uiModule);
             _uiModulePtr = (IntPtr?)uiModuleDelegate.DynamicInvoke(Marshal.ReadIntPtr(baseUi));
 
+            /*
+             Part of chatModule disassembly signature
+            .text:00007FF6482AF4B0                   sub_7FF6482AF4B0 proc near
+            .text:00007FF6482AF4B0
+            .text:00007FF6482AF4B0                   arg_0= qword ptr  8
+            .text:00007FF6482AF4B0
+            .text:00007FF6482AF4B0 48 89 5C 24 08    mov     [rsp+arg_0], rbx
+            .text:00007FF6482AF4B5 57                push    rdi
+            .text:00007FF6482AF4B6 48 83 EC 20       sub     rsp, 20h
+            .text:00007FF6482AF4BA 48 8B FA          mov     rdi, rdx
+            .text:00007FF6482AF4BD 48 8B D9          mov     rbx, rcx
+            .text:00007FF6482AF4C0 45 84 C9          test    r9b, r9b
+            .text:00007FF6482AF4C3 74 0C             jz      short loc_7FF6482AF4D1
+            */
             _chatModulePtr = Plugin.SigScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 20 48 8B FA 48 8B D9 45 84 C9");
         }
 
         public static void Initialize() { Instance = new ChatHelper(); }
 
         public static ChatHelper Instance { get; private set; } = null!;
+
+        ~ChatHelper()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            Instance = null!;
+        }
         #endregion
 
         private IntPtr? _uiModulePtr;

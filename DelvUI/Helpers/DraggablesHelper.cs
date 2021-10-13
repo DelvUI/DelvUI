@@ -1,32 +1,38 @@
 ﻿using DelvUI.Config;
 using DelvUI.Interface;
+using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.Jobs;
+using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
 using System;
+using System.Collections.Generic;
 using System.Numerics;
 
 namespace DelvUI.Helpers
 {
     public static class DraggablesHelper
     {
-        public static void DrawGrid(GridConfig config, MovablePluginConfigObject? selectedElementConfig)
+        public static void DrawGrid(GridConfig config, HUDOptionsConfig? hudConfig, DraggableHudElement? selectedElement)
         {
             ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
 
             ImGui.SetNextWindowBgAlpha(config.BackgroundAlpha);
 
-            ImGui.Begin("DelvUI_draggables",
+            ImGui.Begin("DelvUI_grid",
                 ImGuiWindowFlags.NoTitleBar
               | ImGuiWindowFlags.NoScrollbar
               | ImGuiWindowFlags.AlwaysAutoResize
               | ImGuiWindowFlags.NoInputs
-              | ImGuiWindowFlags.NoBringToFrontOnFocus
               | ImGuiWindowFlags.NoDecoration
+              | ImGuiWindowFlags.NoBringToFrontOnFocus
+              | ImGuiWindowFlags.NoFocusOnAppearing
             );
 
-            var drawList = ImGui.GetWindowDrawList();
-            var screenSize = ImGui.GetMainViewport().Size;
-            var center = screenSize / 2f;
+            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+            Vector2 screenSize = ImGui.GetMainViewport().Size;
+            Vector2 offset = hudConfig != null && hudConfig.UseGlobalHudShift ? hudConfig.HudOffset : Vector2.Zero;
+            Vector2 center = screenSize / 2f + offset;
 
             // grid
             if (config.ShowGrid)
@@ -66,17 +72,53 @@ namespace DelvUI.Helpers
                 drawList.AddLine(new Vector2(0, center.Y), new Vector2(screenSize.X, center.Y), 0xAAFFFFFF);
             }
 
-            // anchor
-            if (config.ShowAnchorPoints && selectedElementConfig != null)
+            if (config.ShowAnchorPoints && selectedElement != null)
             {
-                var anchorPos = center + selectedElementConfig.Position;
-                drawList.AddLine(center, anchorPos, 0xAAFFFFFF, 2);
+                Vector2 parentAnchorPos = center + selectedElement.ParentPos();
+                Vector2 anchorPos = parentAnchorPos + selectedElement.GetConfig().Position;
+
+                drawList.AddLine(parentAnchorPos, anchorPos, 0xAA0000FF, 2);
 
                 var anchorSize = new Vector2(10, 10);
-                drawList.AddRectFilled(anchorPos - anchorSize / 2f, anchorPos + anchorSize / 2f, 0xAAFFFFFF);
+                drawList.AddRectFilled(anchorPos - anchorSize / 2f, anchorPos + anchorSize / 2f, 0xAA0000FF);
             }
 
             ImGui.End();
+        }
+
+        public static void DrawElements(
+            Vector2 origin,
+            HudHelper hudHelper,
+            List<DraggableHudElement> elements,
+            JobHud? jobHud,
+            DraggableHudElement? selectedElement)
+        {
+            bool canTakeInput = true;
+
+            // selected
+            if (selectedElement != null && !hudHelper.IsElementHidden(selectedElement))
+            {
+                selectedElement.CanTakeInputForDrag = true;
+                selectedElement.Draw(origin);
+                canTakeInput = !selectedElement.NeedsInputForDrag;
+            }
+
+            // all
+            foreach (DraggableHudElement element in elements)
+            {
+                if (element == selectedElement || hudHelper.IsElementHidden(element)) { continue; }
+
+                element.CanTakeInputForDrag = canTakeInput;
+                element.Draw(origin);
+                canTakeInput = !canTakeInput ? false : !element.NeedsInputForDrag;
+            }
+
+            // job hud
+            if (jobHud != null && jobHud != selectedElement && !hudHelper.IsElementHidden(jobHud))
+            {
+                jobHud.CanTakeInputForDrag = canTakeInput;
+                jobHud.Draw(origin);
+            }
         }
 
         public static bool DrawArrows(Vector2 position, Vector2 size, string tooltipText, out Vector2 offset)
@@ -89,18 +131,11 @@ namespace DelvUI.Helpers
                 | ImGuiWindowFlags.NoBackground
                 | ImGuiWindowFlags.NoDecoration;
 
-            var arrowSize = new Vector2(40, 40);
             var margin = new Vector2(4, 0);
-            var windowSize = arrowSize + margin * 2;
+            var windowSize = ArrowSize + margin * 2;
 
             // left, right, up, down
-            var positions = new Vector2[]
-            {
-                new Vector2(position.X - arrowSize.X + 10, position.Y + size.Y / 2f - arrowSize.Y / 2f - 2),
-                new Vector2(position.X + size.X - 8, position.Y + size.Y / 2f - arrowSize.Y / 2f - 2),
-                new Vector2(position.X + size.X / 2f - arrowSize.X / 2f + 2, position.Y - arrowSize.Y + 1),
-                new Vector2(position.X + size.X / 2f - arrowSize.X / 2f + 2, position.Y + size.Y - 7)
-            };
+            var positions = GetArrowPositions(position, size);
             var offsets = new Vector2[]
             {
                 new Vector2(-1, 0),
@@ -116,7 +151,7 @@ namespace DelvUI.Helpers
                 ImGui.SetNextWindowSize(windowSize, ImGuiCond.Always);
                 ImGui.SetNextWindowPos(pos);
 
-                ImGui.Begin("arrow " + i.ToString(), windowFlags);
+                ImGui.Begin("DelvUI_draggablesArrow " + i.ToString(), windowFlags);
 
                 // fake button
                 ImGui.ArrowButton("arrow button " + i.ToString(), (ImGuiDir)i);
@@ -139,9 +174,27 @@ namespace DelvUI.Helpers
             return offset != Vector2.Zero;
         }
 
+        public static Vector2 ArrowSize = new Vector2(40, 40);
+
+        public static Vector2[] GetArrowPositions(Vector2 position, Vector2 size)
+        {
+            return GetArrowPositions(position, size, ArrowSize);
+        }
+
+        public static Vector2[] GetArrowPositions(Vector2 position, Vector2 size, Vector2 arrowSize)
+        {
+            return new Vector2[]
+            {
+                new Vector2(position.X - arrowSize.X + 10, position.Y + size.Y / 2f - arrowSize.Y / 2f - 2),
+                new Vector2(position.X + size.X - 8, position.Y + size.Y / 2f - arrowSize.Y / 2f - 2),
+                new Vector2(position.X + size.X / 2f - arrowSize.X / 2f + 2, position.Y - arrowSize.Y + 1),
+                new Vector2(position.X + size.X / 2f - arrowSize.X / 2f + 2, position.Y + size.Y - 7)
+            };
+        }
+
         public static void DrawGridWindow()
         {
-            var configManager = ConfigurationManager.GetInstance();
+            var configManager = ConfigurationManager.Instance;
             var node = configManager.GetConfigPageNode<GridConfig>();
             if (node == null)
             {
@@ -150,7 +203,7 @@ namespace DelvUI.Helpers
 
             GridConfig config = (GridConfig)node.ConfigObject;
 
-            ImGui.SetNextWindowSize(new Vector2(420, 324), ImGuiCond.Appearing);
+            ImGui.SetNextWindowSize(new Vector2(340, 300), ImGuiCond.Appearing);
             ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
 
             if (!ImGui.Begin("Grid", ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
@@ -158,12 +211,12 @@ namespace DelvUI.Helpers
                 ImGui.End();
                 return;
             }
-            ImGui.PopStyleColor();
 
+            ImGui.PushItemWidth(150);
             var changed = false;
             node.Draw(ref changed);
 
-            ImGui.NewLine();
+            ImGui.SetCursorPos(new Vector2(8, 260));
 
             if (ImGui.Button("Lock HUD", new Vector2(ImGui.GetWindowContentRegionWidth(), 30)))
             {
@@ -178,6 +231,7 @@ namespace DelvUI.Helpers
             }
 
             ImGui.End();
+            ImGui.PopStyleColor();
         }
     }
 }

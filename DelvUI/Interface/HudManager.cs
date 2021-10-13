@@ -1,27 +1,25 @@
-using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Interface;
-using Dalamud.Plugin;
 using DelvUI.Config;
-using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
+using DelvUI.Interface.Party;
 using DelvUI.Interface.StatusEffects;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Dalamud.Game.ClientState.Conditions;
-using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface
 {
-    public class HudManager
+    public class HudManager : IDisposable
     {
-        private Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
+        private readonly Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
 
         private GridConfig? _gridConfig;
+        private HUDOptionsConfig? _hudOptions;
         private DraggableHudElement? _selectedElement = null;
 
         private List<DraggableHudElement> _hudElements = null!;
@@ -30,32 +28,62 @@ namespace DelvUI.Interface
         private List<IHudElementWithActor> _hudElementsUsingTargetOfTarget = null!;
         private List<IHudElementWithActor> _hudElementsUsingFocusTarget = null!;
 
+        private UnitFrameHud _playerUnitFrameHud = null!;
+        private UnitFrameHud _targetUnitFrameHud = null!;
+        private UnitFrameHud _totUnitFrameHud = null!;
+        private UnitFrameHud _focusTargetUnitFrameHud = null!;
+
+        private PlayerCastbarHud _playerCastbarHud = null!;
         private CustomEffectsListHud _customEffectsHud = null!;
-        private PrimaryResourceHud _primaryResourceHud = null!;
+        private PrimaryResourceHud _playerManaBarHud = null!;
         private JobHud? _jobHud = null;
+        private PartyFramesHud _partyFramesHud = null!;
+
         private Dictionary<uint, JobHudTypes> _jobsMap = null!;
         private Dictionary<uint, Type> _unsupportedJobsMap = null!;
 
-        private HudHelper? _helper { get; set; }
-        private bool _prevInEvent = true;
+        private double _occupiedInQuestStartTime = -1;
+
+        private HudHelper _hudHelper = new HudHelper();
 
         public HudManager()
         {
             CreateJobsMap();
 
-            ConfigurationManager.GetInstance().ResetEvent += OnConfigReset;
-            ConfigurationManager.GetInstance().LockEvent += OnHUDLockChanged;
+            ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+            ConfigurationManager.Instance.LockEvent += OnHUDLockChanged;
 
             CreateHudElements();
         }
 
         ~HudManager()
         {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            _hudHelper.Dispose();
+
             _hudElements.Clear();
             _hudElementsUsingPlayer.Clear();
             _hudElementsUsingTarget.Clear();
             _hudElementsUsingTargetOfTarget.Clear();
             _hudElementsUsingFocusTarget.Clear();
+
+            ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
+            ConfigurationManager.Instance.LockEvent -= OnHUDLockChanged;
         }
 
         private void OnConfigReset(ConfigurationManager sender)
@@ -99,7 +127,8 @@ namespace DelvUI.Interface
 
         private void CreateHudElements()
         {
-            _gridConfig = ConfigurationManager.GetInstance().GetConfigObject<GridConfig>();
+            _gridConfig = ConfigurationManager.Instance.GetConfigObject<GridConfig>();
+            _hudOptions = ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>();
 
             _hudElements = new List<DraggableHudElement>();
             _hudElementsUsingPlayer = new List<IHudElementWithActor>();
@@ -108,6 +137,7 @@ namespace DelvUI.Interface
             _hudElementsUsingFocusTarget = new List<IHudElementWithActor>();
 
             CreateUnitFrames();
+            CreateManaBars();
             CreateCastbars();
             CreateStatusEffectsLists();
             CreateMiscElements();
@@ -120,115 +150,174 @@ namespace DelvUI.Interface
 
         private void CreateUnitFrames()
         {
-            var playerUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerUnitFrameConfig>();
-            var playerUnitFrame = new UnitFrameHud("playerUnitFrame", playerUnitFrameConfig, "Player");
-            _hudElements.Add(playerUnitFrame);
-            _hudElementsUsingPlayer.Add(playerUnitFrame);
+            var playerUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<PlayerUnitFrameConfig>();
+            _playerUnitFrameHud = new UnitFrameHud(playerUnitFrameConfig, "Player");
+            _hudElements.Add(_playerUnitFrameHud);
+            _hudElementsUsingPlayer.Add(_playerUnitFrameHud);
 
-            var targetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetUnitFrameConfig>();
-            var targetUnitFrame = new UnitFrameHud("targetUnitFrame", targetUnitFrameConfig, "Target");
-            _hudElements.Add(targetUnitFrame);
-            _hudElementsUsingTarget.Add(targetUnitFrame);
+            var targetUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<TargetUnitFrameConfig>();
+            _targetUnitFrameHud = new UnitFrameHud(targetUnitFrameConfig, "Target");
+            _hudElements.Add(_targetUnitFrameHud);
+            _hudElementsUsingTarget.Add(_targetUnitFrameHud);
 
-            var targetOfTargetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetOfTargetUnitFrameConfig>();
-            var targetOfTargetUnitFrame = new UnitFrameHud("targetOfTargetUnitFrame", targetOfTargetUnitFrameConfig, "Target of Target");
-            _hudElements.Add(targetOfTargetUnitFrame);
-            _hudElementsUsingTargetOfTarget.Add(targetOfTargetUnitFrame);
+            var targetOfTargetUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<TargetOfTargetUnitFrameConfig>();
+            _totUnitFrameHud = new UnitFrameHud(targetOfTargetUnitFrameConfig, "Target of Target");
+            _hudElements.Add(_totUnitFrameHud);
+            _hudElementsUsingTargetOfTarget.Add(_totUnitFrameHud);
 
-            var focusTargetUnitFrameConfig = ConfigurationManager.GetInstance().GetConfigObject<FocusTargetUnitFrameConfig>();
-            var focusTargetUnitFrame = new UnitFrameHud("focusTargetUnitFrame", focusTargetUnitFrameConfig, "Focus Target");
-            _hudElements.Add(focusTargetUnitFrame);
-            _hudElementsUsingFocusTarget.Add(focusTargetUnitFrame);
+            var focusTargetUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetUnitFrameConfig>();
+            _focusTargetUnitFrameHud = new UnitFrameHud(focusTargetUnitFrameConfig, "Focus Target");
+            _hudElements.Add(_focusTargetUnitFrameHud);
+            _hudElementsUsingFocusTarget.Add(_focusTargetUnitFrameHud);
+
+            var partyFramesConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesConfig>();
+            _partyFramesHud = new PartyFramesHud(partyFramesConfig, "Party Frames");
+            _hudElements.Add(_partyFramesHud);
+        }
+
+        private void CreateManaBars()
+        {
+            var playerManaBarConfig = ConfigurationManager.Instance.GetConfigObject<PlayerPrimaryResourceConfig>();
+            _playerManaBarHud = new PrimaryResourceHud(playerManaBarConfig, "Player Mana Bar");
+            _playerManaBarHud.ParentConfig = _playerUnitFrameHud.Config;
+            _hudElements.Add(_playerManaBarHud);
+            _hudElementsUsingPlayer.Add(_playerManaBarHud);
+
+            var targetManaBarConfig = ConfigurationManager.Instance.GetConfigObject<TargetPrimaryResourceConfig>();
+            var targetManaBarHud = new PrimaryResourceHud(targetManaBarConfig, "Target Mana Bar");
+            targetManaBarHud.ParentConfig = _targetUnitFrameHud.Config;
+            _hudElements.Add(targetManaBarHud);
+            _hudElementsUsingTarget.Add(targetManaBarHud);
+
+            var totManaBarConfig = ConfigurationManager.Instance.GetConfigObject<TargetOfTargetPrimaryResourceConfig>();
+            var totManaBarHud = new PrimaryResourceHud(totManaBarConfig, "ToT Mana Bar");
+            totManaBarHud.ParentConfig = _totUnitFrameHud.Config;
+            _hudElements.Add(totManaBarHud);
+            _hudElementsUsingTargetOfTarget.Add(totManaBarHud);
+
+            var focusManaBarConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetPrimaryResourceConfig>();
+            var focusManaBarHud = new PrimaryResourceHud(focusManaBarConfig, "Focus Mana Bar");
+            focusManaBarHud.ParentConfig = _focusTargetUnitFrameHud.Config;
+            _hudElements.Add(focusManaBarHud);
+            _hudElementsUsingFocusTarget.Add(focusManaBarHud);
         }
 
         private void CreateCastbars()
         {
-            var playerCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerCastbarConfig>();
-            var playerCastbar = new PlayerCastbarHud("playerCastbar", playerCastbarConfig, "Player Castbar");
-            _hudElements.Add(playerCastbar);
-            _hudElementsUsingPlayer.Add(playerCastbar);
+            var playerCastbarConfig = ConfigurationManager.Instance.GetConfigObject<PlayerCastbarConfig>();
+            _playerCastbarHud = new PlayerCastbarHud(playerCastbarConfig, "Player Castbar");
+            _playerCastbarHud.ParentConfig = _playerUnitFrameHud.Config;
+            _hudElements.Add(_playerCastbarHud);
+            _hudElementsUsingPlayer.Add(_playerCastbarHud);
 
-            var targetCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetCastbarConfig>();
-            var targetCastbar = new TargetCastbarHud("targetCastbar", targetCastbarConfig, "Target Castbar");
+            var targetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<TargetCastbarConfig>();
+            var targetCastbar = new TargetCastbarHud(targetCastbarConfig, "Target Castbar");
+            targetCastbar.ParentConfig = _targetUnitFrameHud.Config;
             _hudElements.Add(targetCastbar);
             _hudElementsUsingTarget.Add(targetCastbar);
 
-            var targetOfTargetCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetOfTargetCastbarConfig>();
-            var targetOfTargetCastbar = new CastbarHud("targetOfTargetCastbar", targetOfTargetCastbarConfig, "ToT Castbar");
+            var targetOfTargetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<TargetOfTargetCastbarConfig>();
+            var targetOfTargetCastbar = new CastbarHud(targetOfTargetCastbarConfig, "ToT Castbar");
+            targetOfTargetCastbar.ParentConfig = _totUnitFrameHud.Config;
             _hudElements.Add(targetOfTargetCastbar);
             _hudElementsUsingTargetOfTarget.Add(targetOfTargetCastbar);
 
-            var focusTargetCastbarConfig = ConfigurationManager.GetInstance().GetConfigObject<FocusTargetCastbarConfig>();
-            var focusTargetCastbar = new CastbarHud("focusTargetCastbar", focusTargetCastbarConfig, "Focus Castbar");
+            var focusTargetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetCastbarConfig>();
+            var focusTargetCastbar = new CastbarHud(focusTargetCastbarConfig, "Focus Castbar");
+            focusTargetCastbar.ParentConfig = _focusTargetUnitFrameHud.Config;
             _hudElements.Add(focusTargetCastbar);
             _hudElementsUsingFocusTarget.Add(focusTargetCastbar);
         }
 
         private void CreateStatusEffectsLists()
         {
-            var playerBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerBuffsListConfig>();
-            var playerBuffs = new StatusEffectsListHud("playerBuffs", playerBuffsConfig, "Buffs");
+            var playerBuffsConfig = ConfigurationManager.Instance.GetConfigObject<PlayerBuffsListConfig>();
+            var playerBuffs = new StatusEffectsListHud(playerBuffsConfig, "Buffs");
+            playerBuffs.ParentConfig = _playerUnitFrameHud.Config;
             _hudElements.Add(playerBuffs);
             _hudElementsUsingPlayer.Add(playerBuffs);
 
-            var playerDebuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<PlayerDebuffsListConfig>();
-            var playerDebuffs = new StatusEffectsListHud("playerDebuffs", playerDebuffsConfig, "Debufffs");
+            var playerDebuffsConfig = ConfigurationManager.Instance.GetConfigObject<PlayerDebuffsListConfig>();
+            var playerDebuffs = new StatusEffectsListHud(playerDebuffsConfig, "Debufffs");
+            playerDebuffs.ParentConfig = _playerUnitFrameHud.Config;
             _hudElements.Add(playerDebuffs);
             _hudElementsUsingPlayer.Add(playerDebuffs);
 
-            var targetBuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetBuffsListConfig>();
-            var targetBuffs = new StatusEffectsListHud("targetBuffs", targetBuffsConfig, "Target Buffs");
+            var targetBuffsConfig = ConfigurationManager.Instance.GetConfigObject<TargetBuffsListConfig>();
+            var targetBuffs = new StatusEffectsListHud(targetBuffsConfig, "Target Buffs");
+            targetBuffs.ParentConfig = _targetUnitFrameHud.Config;
             _hudElements.Add(targetBuffs);
             _hudElementsUsingTarget.Add(targetBuffs);
 
-            var targetDebuffsConfig = ConfigurationManager.GetInstance().GetConfigObject<TargetDebuffsListConfig>();
-            var targetDebuffs = new StatusEffectsListHud("targetDebuffs", targetDebuffsConfig, "Target Debuffs");
+            var targetDebuffsConfig = ConfigurationManager.Instance.GetConfigObject<TargetDebuffsListConfig>();
+            var targetDebuffs = new StatusEffectsListHud(targetDebuffsConfig, "Target Debuffs");
+            targetDebuffs.ParentConfig = _targetUnitFrameHud.Config;
             _hudElements.Add(targetDebuffs);
             _hudElementsUsingTarget.Add(targetDebuffs);
 
-            var custonEffectsConfig = ConfigurationManager.GetInstance().GetConfigObject<CustomEffectsListConfig>();
-            _customEffectsHud = new CustomEffectsListHud("customEffects", custonEffectsConfig, "Custom Effects");
+            var custonEffectsConfig = ConfigurationManager.Instance.GetConfigObject<CustomEffectsListConfig>();
+            _customEffectsHud = new CustomEffectsListHud(custonEffectsConfig, "Custom Effects");
             _hudElements.Add(_customEffectsHud);
             _hudElementsUsingPlayer.Add(_customEffectsHud);
         }
 
         private void CreateMiscElements()
         {
-            // primary resource bar
-            var primaryResourceConfig = ConfigurationManager.GetInstance().GetConfigObject<PrimaryResourceConfig>();
-            _primaryResourceHud = new PrimaryResourceHud("primaryResource", primaryResourceConfig, "Primary Resource");
-            _hudElements.Add(_primaryResourceHud);
-            _hudElementsUsingPlayer.Add(_primaryResourceHud);
-
             // gcd indicator
-            var gcdIndicatorConfig = ConfigurationManager.GetInstance().GetConfigObject<GCDIndicatorConfig>();
-            var gcdIndicator = new GCDIndicatorHud("gcdIndicator", gcdIndicatorConfig, "GCD Indicator");
+            var gcdIndicatorConfig = ConfigurationManager.Instance.GetConfigObject<GCDIndicatorConfig>();
+            var gcdIndicator = new GCDIndicatorHud(gcdIndicatorConfig, "GCD Indicator");
             _hudElements.Add(gcdIndicator);
             _hudElementsUsingPlayer.Add(gcdIndicator);
 
             // mp ticker
-            var mpTickerConfig = ConfigurationManager.GetInstance().GetConfigObject<MPTickerConfig>();
-            var mpTicker = new MPTickerHud("mpTicker", mpTickerConfig, "MP Ticker");
+            var mpTickerConfig = ConfigurationManager.Instance.GetConfigObject<MPTickerConfig>();
+            var mpTicker = new MPTickerHud(mpTickerConfig, "MP Ticker");
             _hudElements.Add(mpTicker);
             _hudElementsUsingPlayer.Add(mpTicker);
+
+            //exp bar
+            var expBarConfig = ConfigurationManager.Instance.GetConfigObject<ExperienceBarConfig>();
+            var expBarHud = new ExperienceBarHud(expBarConfig, "Experience Bar");
+            _hudElements.Add(expBarHud);
+            _hudElementsUsingPlayer.Add(expBarHud);
+
+            //pull timer
+            var pullTimerConfig = ConfigurationManager.Instance.GetConfigObject<PullTimerConfig>();
+            var pullTimerHud = new PullTimerHud(pullTimerConfig, "Pull Timer");
+            _hudElements.Add(pullTimerHud);
+            _hudElementsUsingPlayer.Add(pullTimerHud);
+            
+            //limit break
+            var limitBreakConfig = ConfigurationManager.Instance.GetConfigObject<LimitBreakConfig>();
+            var limitBreakHud = new LimitBreakHud(limitBreakConfig, "Limit Break");
+            _hudElements.Add(limitBreakHud);
         }
 
         public void Draw()
         {
+            if (!FontsManager.Instance.DefaultFontBuilt)
+            {
+                Plugin.UiBuilder.RebuildFonts();
+            }
+
+            LimitBreakHelper.Instance.Update();
             MouseOverHelper.Instance.Target = null;
+            PullTimerHelper.Instance.Update();
+            TooltipsHelper.Instance.RemoveTooltip(); // remove tooltip from previous frame
 
             if (!ShouldBeVisible())
             {
-                _helper = null;
                 return;
             }
+
+            ClipRectsHelper.Instance.Update();
 
             ImGuiHelpers.ForceNextWindowMainViewport();
             ImGui.SetNextWindowPos(Vector2.Zero);
             ImGui.SetNextWindowSize(ImGui.GetMainViewport().Size);
 
             var begin = ImGui.Begin(
-                "DelvUI2",
+                "DelvUI_HUD",
                 ImGuiWindowFlags.NoTitleBar
               | ImGuiWindowFlags.NoScrollbar
               | ImGuiWindowFlags.AlwaysAutoResize
@@ -243,51 +332,43 @@ namespace DelvUI.Interface
                 return;
             }
 
-            _helper ??= new HudHelper();
+            _hudHelper.Update();
 
-            bool inEvent = Plugin.Condition[ConditionFlag.OccupiedInEvent]
-                || Plugin.Condition[ConditionFlag.OccupiedInQuestEvent]
-                || Plugin.Condition[ConditionFlag.UsingHousingFunctions];
-            bool updateByEvent = _prevInEvent != inEvent;
+            if (UpdateJob())
+            {
+                // not the cleanest way of doing this
+                // we should probably have some class that checks for the 
+                // player's job changing and then firing an event
+                // however i didn't want to deal with possible race conditions
+                // on the hud manager so for now i'm taking the lazy apporach
+                ConfigurationManager.Instance.UpdateCurrentProfile();
+            }
 
-            _helper.Configure(updateByEvent);
-            _prevInEvent = inEvent;
-
-            UpdateJob();
             AssignActors();
+
+            var origin = _origin;
+            if (_hudOptions is { UseGlobalHudShift: true })
+            {
+                origin += _hudOptions.HudOffset;
+            }
+
+            // show only castbar during quest events
+            if (ShouldOnlyShowCastbar())
+            {
+                _playerCastbarHud?.Draw(_origin);
+
+                ImGui.End();
+                return;
+            }
 
             // grid
             if (_gridConfig is not null && _gridConfig.Enabled)
             {
-                DraggablesHelper.DrawGrid(_gridConfig, _selectedElement?.GetConfig());
+                DraggablesHelper.DrawGrid(_gridConfig, _hudOptions, _selectedElement);
             }
 
-            bool isHudLocked = ConfigurationManager.GetInstance().LockHUD;
-
-
-            // general elements
-            foreach (var element in _hudElements)
-            {
-                if (element != _selectedElement && !_helper.IsElementHidden(element))
-                {
-                    element.Draw(_origin);
-                }
-            }
-
-            // job hud
-            if (_jobHud != null && _jobHud.Config.Enabled && _jobHud != _selectedElement)
-            {
-                if (!_helper.IsElementHidden(_jobHud))
-                {
-                    _jobHud.Draw(_origin);
-                }
-            }
-
-            // selected
-            if (_selectedElement != null)
-            {
-                _selectedElement.Draw(_origin);
-            }
+            // draw elements
+            DraggablesHelper.DrawElements(origin, _hudHelper, _hudElements, _jobHud, _selectedElement);
 
             // tooltip
             TooltipsHelper.Instance.Draw();
@@ -297,7 +378,7 @@ namespace DelvUI.Interface
 
         protected unsafe bool ShouldBeVisible()
         {
-            if (!ConfigurationManager.GetInstance().ShowHUD || Plugin.ClientState.LocalPlayer == null)
+            if (!ConfigurationManager.Instance.ShowHUD || Plugin.ClientState.LocalPlayer == null)
             {
                 return false;
             }
@@ -311,19 +392,49 @@ namespace DelvUI.Interface
             return paramenterVisible && !fadeMiddleVisible;
         }
 
-        private void UpdateJob()
+        protected bool ShouldOnlyShowCastbar()
+        {
+            // when in quest dialogs and events, hide everything except castbars
+            // this includes talking to npcs or interacting with quest related stuff
+            if (Plugin.Condition[ConditionFlag.OccupiedInQuestEvent] ||
+                Plugin.Condition[ConditionFlag.OccupiedInEvent])
+            {
+                // we have to wait a bit to avoid weird flickering when clicking shiny stuff
+                // we hide delvui after half a second passed in this state
+                // interestingly enough, default hotbars seem to do something similar
+                var time = ImGui.GetTime();
+                if (_occupiedInQuestStartTime > 0)
+                {
+                    if (time - _occupiedInQuestStartTime > 0.5)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    _occupiedInQuestStartTime = time;
+                }
+            }
+            else
+            {
+                _occupiedInQuestStartTime = -1;
+            }
+
+            return false;
+        }
+
+        private bool UpdateJob()
         {
             var player = Plugin.ClientState.LocalPlayer;
             if (player is null)
             {
-                return;
+                return false;
             }
 
             var newJobId = player.ClassJob.Id;
             if (_jobHud != null && _jobHud.Config.JobId == newJobId)
             {
-                _primaryResourceHud.ResourceType = _jobHud.Config.UseDefaultPrimaryResourceBar ? _jobHud.Config.PrimaryResourceType : PrimaryResourceTypes.None;
-                return;
+                return false;
             }
 
             JobConfig? config = null;
@@ -332,21 +443,18 @@ namespace DelvUI.Interface
             if (_unsupportedJobsMap.ContainsKey(newJobId) && _unsupportedJobsMap.TryGetValue(newJobId, out var type))
             {
                 config = (JobConfig)Activator.CreateInstance(type)!;
-                _jobHud = new JobHud(type.FullName!, config);
+                _jobHud = new JobHud(config);
             }
 
             // supported jobs
             if (_jobsMap.TryGetValue(newJobId, out var types))
             {
-                config = (JobConfig)ConfigurationManager.GetInstance().GetConfigObjectForType(types.ConfigType);
-                _jobHud = (JobHud)Activator.CreateInstance(types.HudType, types.HudType.FullName, config, types.DisplayName)!;
+                config = (JobConfig)ConfigurationManager.Instance.GetConfigObjectForType(types.ConfigType);
+                _jobHud = (JobHud)Activator.CreateInstance(types.HudType, config, types.DisplayName)!;
                 _jobHud.SelectEvent += OnDraggableElementSelected;
             }
 
-            if (config != null && _primaryResourceHud != null)
-            {
-                _primaryResourceHud.ResourceType = config.UseDefaultPrimaryResourceBar ? config.PrimaryResourceType : PrimaryResourceTypes.None;
-            }
+            return true;
         }
 
         private void AssignActors()
@@ -387,6 +495,12 @@ namespace DelvUI.Interface
             foreach (var element in _hudElementsUsingFocusTarget)
             {
                 element.Actor = focusTarget;
+            }
+
+            // player mana bar
+            if (_jobHud != null && _playerManaBarHud != null && !_jobHud.Config.UseDefaultPrimaryResourceBar)
+            {
+                _playerManaBarHud.ResourceType = PrimaryResourceTypes.None;
             }
         }
 
@@ -478,44 +592,5 @@ namespace DelvUI.Interface
         internal static Vector2 DefaultBigUnitFrameSize = new Vector2(270, 50);
         internal static Vector2 DefaultSmallUnitFrameSize = new Vector2(120, 20);
         internal static Vector2 DefaultStatusEffectsListSize = new Vector2(292, 82);
-    }
-
-    [Portable(false)]
-    [Section("Misc")]
-    [SubSection("Grid", 0)]
-    public class GridConfig : PluginConfigObject
-    {
-        public new static GridConfig DefaultConfig()
-        {
-            var config = new GridConfig();
-            config.Enabled = false;
-
-            return config;
-        }
-
-        [DragFloat("Background Alpha", min = 0, max = 1, velocity = .05f, spacing = true)]
-        [Order(10)]
-        public float BackgroundAlpha = 0.3f;
-
-        [Checkbox("Show Center Lines")]
-        [Order(15)]
-        public bool ShowCenterLines = true;
-        [Checkbox("Show Anchor Points")]
-        [Order(20)]
-
-        public bool ShowAnchorPoints = true;
-        [Checkbox("Grid Divisions", spacing = true)]
-        [CollapseControl(25, 0)]
-        public bool ShowGrid = true;
-
-        [DragInt("Divisions Distance", min = 50, max = 500)]
-        [CollapseWith(0, 0)]
-        public int GridDivisionsDistance = 50;
-
-        [DragInt("Subdivision Count", min = 1, max = 10)]
-        [CollapseWith(5, 0)]
-        public int GridSubdivisionCount = 4;
-
-
     }
 }

@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface.StatusEffects
 {
     public class CustomEffectsListHud : StatusEffectsListHud
     {
-        public CustomEffectsListHud(string id, StatusEffectsListConfig config, string displayName) : base(id, config, displayName)
+        public CustomEffectsListHud(StatusEffectsListConfig config, string displayName) : base(config, displayName)
         {
         }
 
@@ -15,6 +16,11 @@ namespace DelvUI.Interface.StatusEffects
         {
             var list = StatusEffectDataList(TargetActor);
             list.AddRange(StatusEffectDataList(Actor));
+
+            // cull duplicate statuses from the same source
+            list = list.GroupBy(s => new { s.Status.StatusID, s.Status.SourceID })
+                .Select(status => status.First())
+                .ToList();
 
             // show mine first
             if (Config.ShowMineFirst)

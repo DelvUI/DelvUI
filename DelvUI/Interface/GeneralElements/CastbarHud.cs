@@ -1,18 +1,18 @@
-﻿using DelvUI.Enums;
+﻿using Dalamud.Game.ClientState.Objects.Enums;
+using Dalamud.Game.ClientState.Objects.Types;
+using DelvUI.Config;
+using DelvUI.Enums;
 using DelvUI.Helpers;
+using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Numerics;
-using Dalamud.Game.ClientState.Objects.Enums;
-using Dalamud.Game.ClientState.Objects.Types;
-using DelvUI.Config;
-using BattleChara = FFXIVClientStructs.FFXIV.Client.Game.Character.BattleChara;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class CastbarHud : DraggableHudElement, IHudElementWithActor
+    public class CastbarHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
     {
         private CastbarConfig Config => (CastbarConfig)_config;
         private LabelHud _castNameLabel;
@@ -22,10 +22,13 @@ namespace DelvUI.Interface.GeneralElements
 
         public GameObject? Actor { get; set; }
 
-        public CastbarHud(string id, CastbarConfig config, string displayName) : base(id, config, displayName)
+        protected override bool AnchorToParent => Config is UnitFrameCastbarConfig config ? config.AnchorToUnitFrame : false;
+        protected override DrawAnchor ParentAnchor => Config is UnitFrameCastbarConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
+
+        public CastbarHud(CastbarConfig config, string displayName) : base(config, displayName)
         {
-            _castNameLabel = new LabelHud(id + "_castNameLabel", config.CastNameConfig);
-            _castTimeLabel = new LabelHud(id + "_castTimeLabel", config.CastTimeConfig);
+            _castNameLabel = new LabelHud(config.CastNameConfig);
+            _castTimeLabel = new LabelHud(config.CastTimeConfig);
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -35,80 +38,101 @@ namespace DelvUI.Interface.GeneralElements
 
         public override unsafe void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || Actor == null || Actor is not Character)
+            if (!Config.Enabled)
             {
                 return;
             }
 
-            if (Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc)
+            if (!Config.Preview &&
+                (Actor == null || Actor is not Character || Actor.ObjectKind != ObjectKind.Player && Actor.ObjectKind != ObjectKind.BattleNpc))
             {
                 return;
             }
 
-            var battleChara = (BattleChara*)Actor.Address;
-            var castInfo = battleChara->SpellCastInfo;
-            var isCasting = castInfo.IsCasting > 0;
-
-            if (castInfo.IsCasting <= 0 && !Config.Preview)
+            UpdateCurrentCast(out var currentCastTime, out var totalCastTime);
+            if (totalCastTime == 0)
             {
                 return;
-            }
-
-            var currentCastId = castInfo.ActionID;
-            var currentCastType = castInfo.ActionType;
-            var currentCastTime = castInfo.CurrentCastTime;
-            var totalCastTime = castInfo.TotalCastTime;
-
-            if (LastUsedCast == null || LastUsedCast.CastId != currentCastId || LastUsedCast.ActionType != currentCastType)
-            {
-                LastUsedCast = new LastUsedCast(currentCastId, currentCastType, castInfo.Interruptible > 0);
             }
 
             var castPercent = 100f / totalCastTime * currentCastTime;
             var castScale = castPercent / 100f;
-            var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
-            var endPos = startPos + Config.Size;
 
-            var drawList = ImGui.GetWindowDrawList();
+            Vector2 startPos = origin + GetAnchoredPosition(Config.Position, Config.Size, Config.Anchor);
+            Vector2 endPos = startPos + Config.Size;
 
-            // bg
-            drawList.AddRectFilled(startPos, endPos, 0x88000000);
-
-            // extras
-            DrawExtras(startPos, totalCastTime);
-
-            // cast bar
-            var color = Color();
-            DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X * castScale, Config.Size.Y), color, drawList);
-
-            // border
-            drawList.AddRect(startPos, endPos, 0xFF000000);
-
-            // icon
-            var iconSize = Vector2.Zero;
-            if (Config.ShowIcon)
+            DrawHelper.DrawInWindow(ID, startPos, Config.Size, false, false, (drawList) =>
             {
-                if (LastUsedCast.IconTexture != null)
+                // bg
+                drawList.AddRectFilled(startPos, endPos, 0x88000000);
+
+                // extras
+                DrawExtras(startPos, totalCastTime);
+
+                // cast bar
+                var color = Color();
+                DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X * castScale, Config.Size.Y), color, drawList);
+
+                // border
+                drawList.AddRect(startPos, endPos, 0xFF000000);
+
+                // icon
+                var iconSize = Vector2.Zero;
+                if (Config.ShowIcon)
                 {
-                    ImGui.SetCursorPos(startPos);
-                    iconSize = new Vector2(Config.Size.Y, Config.Size.Y);
-                    ImGui.Image(LastUsedCast.IconTexture.ImGuiHandle, iconSize);
-                    drawList.AddRect(startPos, startPos + iconSize, 0xFF000000);
+                    if (LastUsedCast != null && LastUsedCast.IconTexture != null)
+                    {
+                        ImGui.SetCursorPos(startPos);
+                        iconSize = new Vector2(Config.Size.Y, Config.Size.Y);
+                        ImGui.Image(LastUsedCast.IconTexture.ImGuiHandle, iconSize);
+                        drawList.AddRect(startPos, startPos + iconSize, 0xFF000000);
+                    }
+                    else if (Config.Preview)
+                    {
+                        drawList.AddRect(startPos, startPos + new Vector2(Config.Size.Y, Config.Size.Y), 0xFF000000);
+                    }
                 }
-                else if (Config.Preview)
-                {
-                    drawList.AddRect(startPos, startPos + new Vector2(Config.Size.Y, Config.Size.Y), 0xFF000000);
-                }
-            }
+            });
 
             // cast name
-            Config.CastNameConfig.SetText(Config.Preview ? "Name" : LastUsedCast.ActionText);
-            _castNameLabel.Draw(startPos + new Vector2(iconSize.X, 0), Config.Size, Actor);
+            var iconSize = Config.ShowIcon ? Config.Size.Y : 0;
+            var castNamePos = startPos + new Vector2(iconSize, 0);
+            string? castName = LastUsedCast?.ActionText.CheckForUpperCase();
+
+            Config.CastNameConfig.SetText(Config.Preview ? "Cast Name" : (castName != null ? castName : ""));
+            _castNameLabel.Draw(startPos + new Vector2(iconSize, 0), Config.Size, Actor);
 
             // cast time
-            var text = Config.Preview ? "Time" : Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
+            var text = Config.Preview ? "Cast Time" : Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
             Config.CastTimeConfig.SetText(text);
             _castTimeLabel.Draw(startPos, Config.Size, Actor);
+        }
+
+        private unsafe void UpdateCurrentCast(out float currentCastTime, out float totalCastTime)
+        {
+            currentCastTime = Config.Preview ? 0.5f : 0f;
+            totalCastTime = 1f;
+
+            if (Config.Preview || Actor is not BattleChara battleChara)
+            {
+                return;
+            }
+
+            totalCastTime = 0;
+            if (!battleChara.IsCasting)
+            {
+                return;
+            }
+
+            var currentCastId = battleChara.CastActionId;
+            var currentCastType = (ActionType)battleChara.CastActionType;
+            currentCastTime = battleChara.CurrentCastTime;
+            totalCastTime = battleChara.TotalCastTime;
+
+            if (LastUsedCast == null || LastUsedCast.CastId != currentCastId || LastUsedCast.ActionType != currentCastType)
+            {
+                LastUsedCast = new LastUsedCast(currentCastId, currentCastType, battleChara.IsCastInterruptible);
+            }
         }
 
         public virtual void DrawExtras(Vector2 castbarPos, float totalCastTime)
@@ -126,7 +150,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private PlayerCastbarConfig Config => (PlayerCastbarConfig)_config;
 
-        public PlayerCastbarHud(string id, PlayerCastbarConfig config, string displayName) : base(id, config, displayName)
+        public PlayerCastbarHud(PlayerCastbarConfig config, string displayName) : base(config, displayName)
         {
 
         }
@@ -165,7 +189,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private TargetCastbarConfig Config => (TargetCastbarConfig)_config;
 
-        public TargetCastbarHud(string id, TargetCastbarConfig config, string displayName) : base(id, config, displayName)
+        public TargetCastbarHud(TargetCastbarConfig config, string displayName) : base(config, displayName)
         {
 
         }

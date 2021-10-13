@@ -1,4 +1,5 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Logging;
+using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using ImGuiNET;
@@ -12,16 +13,17 @@ namespace DelvUI.Interface
 
     public class DraggableHudElement : HudElement
     {
-        public DraggableHudElement(string id, MovablePluginConfigObject config, string? displayName = null) : base(id, config)
+        public DraggableHudElement(MovablePluginConfigObject config, string? displayName = null) : base(config)
         {
-            _displayName = displayName ?? id;
+            _displayName = displayName ?? ID;
         }
 
         public event DraggableHudElementSelectHandler? SelectEvent;
         public bool Selected = false;
 
         private string _displayName;
-        private bool _windowPositionSet = false;
+        protected bool _windowPositionSet = false;
+        private Vector2 _lastWindowPos = Vector2.Zero;
         private Vector2 _positionOffset;
         private Vector2 _contentMargin = new Vector2(4, 0);
 
@@ -42,16 +44,51 @@ namespace DelvUI.Interface
             }
         }
 
+        public bool CanTakeInputForDrag = false;
+        public bool NeedsInputForDrag { get; private set; } = false;
+
+        public virtual Vector2 ParentPos() { return Vector2.Zero; } // override
+
         public sealed override void Draw(Vector2 origin)
         {
-
-            DrawChildren(origin);
-
-            if (!_draggingEnabled)
+            if (_draggingEnabled)
             {
+                DrawDraggableArea(origin);
                 return;
             }
 
+            DrawChildren(origin);
+        }
+
+        private bool CalculateNeedsInput(Vector2 pos, Vector2 size, bool selected)
+        {
+            Vector2 mousePos = ImGui.GetMousePos();
+
+            if (ImGui.IsMouseHoveringRect(pos, pos + size))
+            {
+                return true;
+            }
+
+            if (!selected)
+            {
+                return false;
+            }
+
+            var arrowsPos = DraggablesHelper.GetArrowPositions(pos, size);
+
+            foreach (Vector2 arrowPos in arrowsPos)
+            {
+                if (ImGui.IsMouseHoveringRect(arrowPos, arrowPos + DraggablesHelper.ArrowSize))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        protected virtual void DrawDraggableArea(Vector2 origin)
+        {
             var windowFlags = ImGuiWindowFlags.NoScrollbar
             | ImGuiWindowFlags.NoTitleBar
             | ImGuiWindowFlags.NoResize
@@ -61,6 +98,14 @@ namespace DelvUI.Interface
             // always update size
             var size = MaxPos - MinPos + _contentMargin * 2;
             ImGui.SetNextWindowSize(size, ImGuiCond.Always);
+
+            // needs input?
+            NeedsInputForDrag = CanTakeInputForDrag && CalculateNeedsInput(_lastWindowPos, size, Selected);
+
+            if (!NeedsInputForDrag)
+            {
+                windowFlags |= ImGuiWindowFlags.NoMove;
+            }
 
             // set initial position
             if (!_windowPositionSet)
@@ -72,14 +117,15 @@ namespace DelvUI.Interface
             }
 
             // update config object position
-            ImGui.Begin("dragArea " + ID, windowFlags);
+            ImGui.Begin(ID + "_dragArea", windowFlags);
             var windowPos = ImGui.GetWindowPos();
+            _lastWindowPos = windowPos;
             _config.Position = windowPos + _positionOffset - origin;
 
             // check selection
             var tooltipText = "x: " + _config.Position.X.ToString() + "    y: " + _config.Position.Y.ToString();
 
-            if (ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
+            if (NeedsInputForDrag && ImGui.IsMouseHoveringRect(windowPos, windowPos + size))
             {
                 bool cliked = ImGui.IsMouseClicked(ImGuiMouseButton.Left) || ImGui.IsMouseDown(ImGuiMouseButton.Left);
                 if (cliked && !Selected)
@@ -128,7 +174,7 @@ namespace DelvUI.Interface
         public virtual void DrawChildren(Vector2 origin) { }
 
         #region draggable area
-        private Vector2? _minPos = null;
+        protected Vector2? _minPos = null;
         public Vector2 MinPos
         {
             get
@@ -150,7 +196,7 @@ namespace DelvUI.Interface
                 var anchorConfig = _config as AnchorablePluginConfigObject;
                 for (int i = 0; i < positions.Count; i++)
                 {
-                    var pos = Utils.GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center);
+                    var pos = GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center);
                     minX = Math.Min(minX, pos.X);
                     minY = Math.Min(minY, pos.Y);
                 }
@@ -160,7 +206,7 @@ namespace DelvUI.Interface
             }
         }
 
-        private Vector2? _maxPos = null;
+        protected Vector2? _maxPos = null;
         public Vector2 MaxPos
         {
             get
@@ -182,7 +228,7 @@ namespace DelvUI.Interface
                 var anchorConfig = _config as AnchorablePluginConfigObject;
                 for (int i = 0; i < positions.Count; i++)
                 {
-                    var pos = Utils.GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center) + sizes[i];
+                    var pos = GetAnchoredPosition(positions[i], sizes[i], anchorConfig?.Anchor ?? DrawAnchor.Center) + sizes[i];
                     maxX = Math.Max(maxX, pos.X);
                     maxY = Math.Max(maxY, pos.Y);
                 }
@@ -191,11 +237,15 @@ namespace DelvUI.Interface
                 return (Vector2)_maxPos;
             }
         }
-
         public void FlagDraggableAreaDirty()
         {
             _minPos = null;
             _maxPos = null;
+        }
+
+        protected virtual Vector2 GetAnchoredPosition(Vector2 position, Vector2 size, DrawAnchor anchor)
+        {
+            return Utils.GetAnchoredPosition(ParentPos() + position, size, anchor);
         }
 
         protected virtual (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -203,5 +253,46 @@ namespace DelvUI.Interface
             return (new List<Vector2>(), new List<Vector2>());
         }
         #endregion
+    }
+
+    public abstract class ParentAnchoredDraggableHudElement : DraggableHudElement
+    {
+        public ParentAnchoredDraggableHudElement(MovablePluginConfigObject config, string? displayName = null)
+            : base(config, displayName)
+        {
+        }
+
+        protected virtual bool AnchorToParent { get; }
+        protected virtual DrawAnchor ParentAnchor { get; }
+        public AnchorablePluginConfigObject? ParentConfig { get; set; }
+
+        private Vector2? _lastParentPosition = null;
+
+        private bool IsAnchored => AnchorToParent && ParentConfig != null;
+
+        public override Vector2 ParentPos()
+        {
+            if (!IsAnchored)
+            {
+                return Vector2.Zero;
+            }
+
+            Vector2 parentAnchoredPos = Utils.GetAnchoredPosition(ParentConfig!.Position, ParentConfig!.Size, ParentConfig!.Anchor);
+            return Utils.GetAnchoredPosition(parentAnchoredPos, -ParentConfig!.Size, ParentAnchor);
+        }
+
+        protected override void DrawDraggableArea(Vector2 origin)
+        {
+            // if the parent moved, update own draggable area
+            if (IsAnchored && (_lastParentPosition == null || _lastParentPosition != ParentConfig!.Position))
+            {
+                _windowPositionSet = false;
+                _minPos = null;
+                _maxPos = null;
+                _lastParentPosition = ParentConfig!.Position;
+            }
+
+            base.DrawDraggableArea(origin);
+        }
     }
 }

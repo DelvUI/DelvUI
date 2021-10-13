@@ -1,17 +1,13 @@
 using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -21,41 +17,49 @@ namespace DelvUI.Interface.Jobs
     {
         private new DarkKnightConfig Config => (DarkKnightConfig)_config;
 
-        public DarkKnightHud(string id, DarkKnightConfig config, string? displayName = null) : base(id, config, displayName)
+        public DarkKnightHud(DarkKnightConfig config, string? displayName = null) : base(config, displayName)
         {
-
         }
-
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
-        private PluginConfigColor PartialFillColor => GlobalColors.Instance.PartialFillColor;
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
             List<Vector2> positions = new();
             List<Vector2> sizes = new();
 
-            if (Config.ShowManaBar)
+            if (Config.ManaBar.Enabled)
             {
-                positions.Add(Config.Position + Config.ManaBarPosition);
-                sizes.Add(Config.ManaBarSize);
+                positions.Add(Config.Position + Config.ManaBar.Position);
+                sizes.Add(Config.ManaBar.Size);
             }
 
-            if (Config.ShowBloodGauge)
+            if (Config.BloodGauge.Enabled)
             {
-                positions.Add(Config.Position + Config.BloodGaugePosition);
-                sizes.Add(Config.BloodGaugeSize);
+                positions.Add(Config.Position + Config.BloodGauge.Position);
+                sizes.Add(Config.BloodGauge.Size);
             }
 
-            if (Config.ShowBuffBar)
+            if (Config.DarksideBar.Enabled)
             {
-                positions.Add(Config.Position + Config.BuffBarPosition);
-                sizes.Add(Config.BuffBarSize);
+                positions.Add(Config.Position + Config.DarksideBar.Position);
+                sizes.Add(Config.DarksideBar.Size);
             }
 
-            if (Config.ShowLivingShadowBar)
+            if (Config.BloodWeaponBar.Enabled)
             {
-                positions.Add(Config.Position + Config.LivingShadowBarPosition);
-                sizes.Add(Config.LivingShadowBarSize);
+                positions.Add(Config.Position + Config.BloodWeaponBar.Position);
+                sizes.Add(Config.BloodWeaponBar.Size);
+            }
+
+            if (Config.DeliriumBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.DeliriumBar.Position);
+                sizes.Add(Config.DeliriumBar.Size);
+            }
+
+            if (Config.LivingShadowBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.LivingShadowBar.Position);
+                sizes.Add(Config.LivingShadowBar.Size);
             }
 
             return (positions, sizes);
@@ -63,195 +67,123 @@ namespace DelvUI.Interface.Jobs
 
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            if (Config.ShowManaBar)
+            Vector2 pos = origin + Config.Position;
+
+            DarkArtsProc(pos, player);
+
+            if (Config.BloodGauge.Enabled)
             {
-                DrawManaBar(origin, player);
+                DrawBloodGauge(pos, player);
             }
 
-            if (Config.ShowBloodGauge)
+            if (Config.DarksideBar.Enabled)
             {
-                DrawBloodGauge(origin);
+                DrawDarkside(pos);
             }
 
-            if (Config.ShowDarkside)
+            if (Config.BloodWeaponBar.Enabled)
             {
-                DrawDarkside(origin);
+                DrawBloodWeaponBar(pos, player);
             }
 
-            if (Config.ShowBuffBar)
+            if (Config.DeliriumBar.Enabled)
             {
-                DrawBuffBar(origin, player);
+                DrawDeliriumBar(pos, player);
             }
 
-            if (Config.ShowLivingShadowBar)
+            if (Config.LivingShadowBar.Enabled)
             {
-                DrawLivingShadowBar(origin, player);
+                DrawLivingShadowBar(pos);
             }
         }
 
-        private void DrawManaBar(Vector2 origin, PlayerCharacter player)
+        private void DarkArtsProc(Vector2 origin, PlayerCharacter player)
         {
-            var darkArtsBuff = Plugin.JobGauges.Get<DRKGauge>().HasDarkArts;
+            bool hasDarkArts = Plugin.JobGauges.Get<DRKGauge>().HasDarkArts;
+            if (!Config.ManaBar.Enabled) { return; }
 
-            var posX = origin.X + Config.Position.X + Config.ManaBarPosition.X - Config.ManaBarSize.X / 2f;
-            var posY = origin.Y + Config.Position.Y + Config.ManaBarPosition.Y - Config.ManaBarSize.Y / 2f;
-
-            BarBuilder builder = BarBuilder.Create(posX, posY, Config.ManaBarSize.Y, Config.ManaBarSize.X).SetBackgroundColor(EmptyColor.Background);
-
-            if (Config.ChunkManaBar)
+            if (hasDarkArts || !Config.ManaBar.UseChunks)
             {
-                builder.SetChunks(3).SetChunkPadding(Config.ManaBarPadding).AddInnerBar(player.CurrentMp, 9000, Config.ManaBarColor, PartialFillColor);
+                DrawManaBar(origin, player, 1);
             }
-            else
+            if (!hasDarkArts && Config.ManaBar.UseChunks)
             {
-                builder.AddInnerBar(player.CurrentMp, player.MaxMp, Config.ManaBarColor);
+                DrawManaBar(origin, player, 3);
             }
+        }
 
-            if (Config.ShowManaBarText)
-            {
-                var formattedManaText = TextTags.GenerateFormattedTextFromTags(player, "[mana:current-short]");
+        private void DrawManaBar(Vector2 origin, PlayerCharacter player, int chunks = 0)
+        {
+            DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
 
-                builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterLeft, BarTextType.Custom, formattedManaText);
-            }
+            if (Config.ManaBar.HideWhenInactive && !gauge.HasDarkArts && player.CurrentMp == player.MaxMp) { return; }
 
-            if (darkArtsBuff)
-            {
-                builder.SetGlowSize(2);
-                builder.SetGlowColor(Config.DarkArtsColor.Base);
-                builder.SetChunksColors(Config.DarkArtsColor);
-                builder.SetPartialFillColor(Config.DarkArtsColor);
-                builder.SetBackgroundColor(Config.DarkArtsColor.Background);
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            Config.ManaBar.Label.SetText($"{player.CurrentMp,0}");
+            // hardcoded 9k as maxMP so the chunks are each 3k since that's what a DRK wants to see
+            BarUtilities.GetChunkedBars(
+                Config.ManaBar,
+                chunks,
+                player.CurrentMp,
+                Config.ManaBar.UseChunks ? 9000 : player.MaxMp,
+                0f,
+                player,
+                Config.ManaBar.Label,
+                glowConfig: gauge.HasDarkArts ? Config.ManaBar.GlowConfig : null
+                ).Draw(origin);
         }
 
         private void DrawDarkside(Vector2 origin)
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            if (target is not Character && Config.HideDarksideWhenNoTarget)
-            {
-                return;
-            }
+            DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
+            if (Config.DarksideBar.HideWhenInactive && gauge.DarksideTimeRemaining == 0) { return; };
 
-            float darksideTimer = Plugin.JobGauges.Get<DRKGauge>().DarksideTimeRemaining;
-            float darksideDuration = Math.Abs(darksideTimer / 1000);
-            var max = 60f;
-
-            var posX = origin.X + Config.Position.X + Config.DarksidePosition.X - Config.DarksideSize.X / 2f;
-            var posY = origin.Y + Config.Position.Y + Config.DarksidePosition.Y - Config.DarksideSize.Y / 2f;
-
-            if (darksideDuration == 0 && Config.OnlyShowWhenActive)
-            {
-                return;
-            }
-
-            var darksideColor = darksideDuration > 5 ? Config.DarksideColor : Config.DarksideExpiryColor;
-            BarBuilder builder = BarBuilder.Create(posX, posY, Config.DarksideSize.Y, Config.DarksideSize.X)
-                .SetBackgroundColor(EmptyColor.Background)
-                .AddInnerBar(darksideDuration, max, darksideColor);
-
-            if (Config.ShowDarksideText)
-            {
-                builder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            int timer = Math.Abs(gauge.DarksideTimeRemaining);
+            Config.DarksideBar.Label.SetText($"{timer / 1000}");
+            BarUtilities.GetProgressBar(Config.DarksideBar, timer, 60000f)
+                .Draw(origin);
         }
 
-        private void DrawBloodGauge(Vector2 origin)
+        private void DrawBloodGauge(Vector2 origin, PlayerCharacter player)
         {
-            var gauge = Plugin.JobGauges.Get<DRKGauge>();
-
-            var posX = origin.X + Config.Position.X + Config.BloodGaugePosition.X - Config.BloodGaugeSize.X / 2f;
-            var posY = origin.Y + Config.Position.Y + Config.BloodGaugePosition.Y - Config.BloodGaugeSize.Y / 2f;
-
-            BarBuilder builder = BarBuilder.Create(posX, posY, Config.BloodGaugeSize.Y, Config.BloodGaugeSize.X).SetBackgroundColor(EmptyColor.Background);
-
-            if (Config.ChunkBloodGauge)
+            DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
+            if (!Config.BloodGauge.HideWhenInactive || gauge.Blood > 0)
             {
-                builder.SetChunks(2).SetChunkPadding(Config.BloodGaugePadding).AddInnerBar(gauge.Blood, 100, Config.BloodColor, PartialFillColor);
+                Config.BloodGauge.Label.SetText(gauge.Blood.ToString("N0"));
+                BarUtilities.GetChunkedProgressBars(Config.BloodGauge, 2, gauge.Blood, 100).Draw(origin);
             }
-            else
-            {
-                if (gauge.Blood == 100)
-                {
-                    builder.AddInnerBar(gauge.Blood, 100, Config.BloodColorFull);
-                }
-                else if (gauge.Blood > 100)
-                {
-                    builder.AddInnerBar(gauge.Blood, 100, Config.BloodColor);
-                }
-                else
-                {
-                    builder.AddInnerBar(gauge.Blood, 100, PartialFillColor);
-                }
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
         }
 
-        private void DrawBuffBar(Vector2 origin, PlayerCharacter player)
+        private void DrawBloodWeaponBar(Vector2 origin, PlayerCharacter player)
         {
-            IEnumerable<Status> bloodWeaponBuff = player.StatusList.Where(o => o.StatusId == 742);
-            IEnumerable<Status> deliriumBuff = player.StatusList.Where(o => o.StatusId == 1972);
+            float bloodWeaponDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 742)?.RemainingTime ?? 0f;
 
-            var xPos = origin.X + Config.Position.X + Config.BuffBarPosition.X - Config.BuffBarSize.X / 2f;
-            var yPos = origin.Y + Config.Position.Y + Config.BuffBarPosition.Y - Config.BuffBarSize.Y / 2f;
+            if (Config.BloodWeaponBar.HideWhenInactive && bloodWeaponDuration is 0) { return; }
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.BuffBarSize.Y, Config.BuffBarSize.X).SetBackgroundColor(EmptyColor.Background);
-
-            if (bloodWeaponBuff.Any())
-            {
-                var fightOrFlightDuration = Math.Abs(bloodWeaponBuff.First().RemainingTime);
-                builder.AddInnerBar(fightOrFlightDuration, 10, Config.BloodWeaponColor);
-
-                if (Config.ShowBuffBarText)
-                {
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.BloodWeaponColor.Vector, Vector4.UnitW, null);
-                }
-            }
-
-            if (deliriumBuff.Any())
-            {
-                var deliriumDuration = Math.Abs(deliriumBuff.First().RemainingTime);
-                builder.AddInnerBar(deliriumDuration, 10, Config.DeliriumColor);
-
-                if (Config.ShowBuffBarText)
-                {
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterRight, BarTextType.Current, Config.DeliriumColor.Vector, Vector4.UnitW, null);
-                }
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            Config.BloodWeaponBar.Label.SetText(Math.Truncate(bloodWeaponDuration).ToString());
+            BarUtilities.GetProgressBar(Config.BloodWeaponBar, bloodWeaponDuration, 10, 0f)
+                .Draw(origin);
         }
 
-        private void DrawLivingShadowBar(Vector2 origin, PlayerCharacter player)
+        private void DrawDeliriumBar(Vector2 origin, PlayerCharacter player)
         {
-            var shadowTimeRemaining = Plugin.JobGauges.Get<DRKGauge>().ShadowTimeRemaining / 1000;
-            var livingShadow = player.Level >= 80 && shadowTimeRemaining is > 0 and <= 24;
+            float deliriumDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1972)?.RemainingTime ?? 0f;
 
-            var xPos = origin.X + Config.Position.X + Config.LivingShadowBarPosition.X - Config.LivingShadowBarSize.X / 2f;
-            var yPos = origin.Y + Config.Position.Y + Config.LivingShadowBarPosition.Y - Config.LivingShadowBarSize.Y / 2f;
+            if (Config.DeliriumBar.HideWhenInactive && deliriumDuration is 0) { return; }
 
-            BarBuilder builder = BarBuilder.Create(xPos, yPos, Config.LivingShadowBarSize.Y, Config.LivingShadowBarSize.X).SetBackgroundColor(EmptyColor.Background);
+            Config.DeliriumBar.Label.SetText(Math.Truncate(deliriumDuration).ToString());
+            BarUtilities.GetProgressBar(Config.DeliriumBar, deliriumDuration, 10, 0f)
+                .Draw(origin);
+        }
 
-            if (livingShadow)
-            {
-                builder.AddInnerBar(shadowTimeRemaining, 24, Config.LivingShadowColor);
+        private void DrawLivingShadowBar(Vector2 origin)
+        {
+            DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
+            if (Config.LivingShadowBar.HideWhenInactive && gauge.ShadowTimeRemaining == 0) { return; }
 
-                if (Config.ShowLivingShadowBarText)
-                {
-                    builder.SetTextMode(BarTextMode.EachChunk).SetText(BarTextPosition.CenterLeft, BarTextType.Current, Config.LivingShadowColor.Vector, Vector4.UnitW, null);
-                }
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            int timer = Math.Abs(gauge.ShadowTimeRemaining);
+            Config.LivingShadowBar.Label.SetText($"{timer / 1000}");
+            BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 24000f)
+                .Draw(origin);
         }
     }
 
@@ -261,160 +193,83 @@ namespace DelvUI.Interface.Jobs
     public class DarkKnightConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.DRK;
-        public new static DarkKnightConfig DefaultConfig() { return new DarkKnightConfig(); }
+        public new static DarkKnightConfig DefaultConfig()
+        {
+            var config = new DarkKnightConfig();
 
-        #region Mana Bar
-        [Checkbox("Mana", separator = true)]
-        [CollapseControl(30, 0)]
-        public bool ShowManaBar = true;
+            config.ManaBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
 
-        [Checkbox("Text" + "##DRKManaBar")]
-        [CollapseWith(0, 0)]
-        public bool ShowManaBarText = false;
+            config.DarksideBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.DarksideBar.ThresholdConfig.Enabled = true;
 
-        [Checkbox("Split Bar")]
-        [CollapseWith(5, 0)]
-        public bool ChunkManaBar = true;
+            config.BloodGauge.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.BloodGauge.UsePartialFillColor = true;
 
-        [DragFloat2("Position" + "##DRKManaBar", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 0)]
-        public Vector2 ManaBarPosition = new Vector2(0, -61);
+            return config;
+        }
 
-        [DragFloat2("Size" + "##DRKManaBar", min = 0, max = 4000f)]
-        [CollapseWith(15, 0)]
-        public Vector2 ManaBarSize = new Vector2(254, 10);
+        [NestedConfig("Mana Bar", 30)]
+        public DarkKnightManaBarConfig ManaBar = new DarkKnightManaBarConfig(
+            new Vector2(0, -61),
+            new Vector2(254, 10),
+            new PluginConfigColor(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f))
+        );
 
-        [DragInt("Spacing" + "##DRKManaBar", min = 0)]
-        [CollapseWith(20, 0)]
-        public int ManaBarPadding = 1;
+        [NestedConfig("Blood Gauge", 35)]
+        public ChunkedProgressBarConfig BloodGauge = new ChunkedProgressBarConfig(
+            new Vector2(0, -49),
+            new Vector2(254, 10),
+            new PluginConfigColor(new Vector4(216f / 255f, 0f / 255f, 73f / 255f, 100f / 100f)),
+            2,
+            new PluginConfigColor(new Vector4(180f / 255f, 180f / 255f, 180f / 255f, 100f / 100f))
+        );
 
-        [CollapseWith(25, 0)]
-        [ColorEdit4("Mana" + "##DRKManaBar")]
-        public PluginConfigColor ManaBarColor = new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
+        [NestedConfig("Darkside Bar", 40)]
+        public ProgressBarConfig DarksideBar = new ProgressBarConfig(
+            new Vector2(0, -73),
+            new Vector2(254, 10),
+            new PluginConfigColor(new Vector4(209f / 255f, 38f / 255f, 73f / 204f, 100f / 100f)),
+            BarDirection.Right,
+            new PluginConfigColor(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f)),
+            5
+        );
 
-        [ColorEdit4("Dark Arts Proc" + "##DRKManaBar")]
-        [CollapseWith(30, 0)]
-        public PluginConfigColor DarkArtsColor = new(new Vector4(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
-        #endregion
+        [NestedConfig("Blood Weapon Bar", 45)]
+        public ProgressBarConfig BloodWeaponBar = new ProgressBarConfig(
+            new Vector2(-64, -32),
+            new Vector2(126, 20),
+            new PluginConfigColor(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f))
+        );
 
-        #region Blood Gauge
-        [Checkbox("Blood Gauge" + "##BloodGauge", separator = true)]
-        [CollapseControl(35, 1)]
-        public bool ShowBloodGauge = true;
+        [NestedConfig("Delirium Bar", 50)]
+        public ProgressBarConfig DeliriumBar = new ProgressBarConfig(
+            new Vector2(64, -32),
+            new Vector2(126, 20),
+            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
+        );
 
-        [Checkbox("Split Bar" + "##BloodGauge")]
-        [CollapseWith(0, 1)]
-        public bool ChunkBloodGauge = true;
+        [NestedConfig("Living Shadow Bar", 55)]
+        public ProgressBarConfig LivingShadowBar = new ProgressBarConfig(
+            new Vector2(0, -10),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(255f / 255f, 105f / 255f, 205f / 255f, 100f / 100f))
+        );
+    }
 
-        [DragFloat2("Position" + "##BloodGauge", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 1)]
-        public Vector2 BloodGaugePosition = new Vector2(0, -49);
+    [Exportable(false)]
+    public class DarkKnightManaBarConfig : ChunkedProgressBarConfig
+    {
+        [ColorEdit4("Dark Arts Color" + "##MP")]
+        [Order(26)]
+        public PluginConfigColor DarkArtsColor = new PluginConfigColor(new Vector4(210f / 255f, 33f / 255f, 33f / 255f, 100f / 100f));
 
-        [DragFloat2("Size" + "##BloodGauge", min = 0, max = 4000f)]
-        [CollapseWith(15, 1)]
-        public Vector2 BloodGaugeSize = new Vector2(254, 10);
+        [NestedConfig("Glow When Dark Arts Is Active", 28, separator = false, spacing = true)]
+        public BarGlowConfig GlowConfig = new BarGlowConfig();
 
-        [DragInt("Spacing" + "##BloodGauge", min = 0)]
-        [CollapseWith(20, 1)]
-        public int BloodGaugePadding = 2;
+        public DarkKnightManaBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
 
-        [ColorEdit4("Color Left" + "##BloodGauge")]
-        [CollapseWith(25, 1)]
-        public PluginConfigColor BloodColor = new(new Vector4(196f / 255f, 20f / 255f, 122f / 255f, 100f / 100f));
-
-        [ColorEdit4("Color Filled" + "##BloodGauge")]
-        [CollapseWith(30, 1)]
-        public PluginConfigColor BloodColorFull = new(new Vector4(216f / 255f, 0f / 255f, 73f / 255f, 100f / 100f));
-        #endregion
-
-        #region Darkside
-        [Checkbox("Darkside" + "##Darkside", separator = true)]
-        [CollapseControl(40, 2)]
-        public bool ShowDarkside = true;
-
-        [Checkbox("Only Show When Active" + "##Darkside")]
-        [CollapseWith(0, 2)]
-        public bool OnlyShowWhenActive = true;
-
-        [DragFloat2("Position" + "##Darkside", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 2)]
-        public Vector2 DarksidePosition = new Vector2(0, -73);
-
-        [DragFloat2("Size" + "##Darkside", min = 0, max = 4000f)]
-        [CollapseWith(10, 2)]
-        public Vector2 DarksideSize = new Vector2(254, 10);
-
-        [ColorEdit4("Darkside" + "##Darkside")]
-        [CollapseWith(15, 2)]
-        public PluginConfigColor DarksideColor = new(new Vector4(209 / 255f, 38f / 255f, 204f / 255f, 100f / 100f));
-
-        [ColorEdit4("Darkside Expiry" + "##Darkside")]
-        [CollapseWith(20, 2)]
-        public PluginConfigColor DarksideExpiryColor = new(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
-
-        [Checkbox("Show Darkside Text" + "##Darkside")]
-        [CollapseWith(25, 2)]
-        public bool ShowDarksideText = true;
-
-        [Checkbox("Hide When No Target" + "##Darkside")]
-        [CollapseWith(30, 2)]
-        public bool HideDarksideWhenNoTarget = false;
-        #endregion
-
-        #region Buff Bar
-        [Checkbox("Blood Weapon & Delirium", separator = true)]
-        [CollapseControl(45, 3)]
-        public bool ShowBuffBar = false;
-
-        [Checkbox("Timer" + "##DRKBuffBar")]
-        [CollapseWith(0, 3)]
-        public bool ShowBuffBarText = true;
-
-        [DragFloat2("Position" + "##DRKBuffBar", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 3)]
-        public Vector2 BuffBarPosition = new Vector2(0, -32);
-
-        [DragFloat2("Size" + "##DRKBuffBar", min = 0, max = 4000f)]
-        [CollapseWith(10, 3)]
-        public Vector2 BuffBarSize = new Vector2(254, 20);
-
-        [DragInt("Spacing" + "##DRKBuffBar", min = 0)]
-        [CollapseWith(15, 3)]
-        public int BuffBarPadding = 2;
-
-        [ColorEdit4("Blood Weapon" + "##DRKBuffBar")]
-        [CollapseWith(20, 3)]
-        public PluginConfigColor BloodWeaponColor = new(new Vector4(160f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
-
-        [ColorEdit4("Delirium" + "##DRKBuffBar")]
-        [CollapseWith(25, 3)]
-        public PluginConfigColor DeliriumColor = new(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
-        #endregion
-
-        #region Living Shadow
-        [Checkbox("Living Shadow", separator = true)]
-        [CollapseControl(50, 4)]
-        public bool ShowLivingShadowBar = false;
-
-        [Checkbox("Timer" + "##DRKLivingShadow")]
-        [CollapseWith(0, 4)]
-        public bool ShowLivingShadowBarText = true;
-
-        [DragFloat2("Position" + "##DRKLivingShadow", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 4)]
-        public Vector2 LivingShadowBarPosition = new Vector2(0, -10);
-
-        [DragFloat2("Size" + "##DRKLivingShadow", min = 0, max = 4000f)]
-        [CollapseWith(10, 4)]
-        public Vector2 LivingShadowBarSize = new Vector2(254, 20);
-
-        [DragInt("Spacing" + "##DRKLivingShadow", min = 0)]
-        [CollapseWith(15, 4)]
-        public int LivingShadowPadding = 2;
-
-        [ColorEdit4("Color" + "##DRKLivingShadow")]
-        [CollapseWith(20, 4)]
-        public PluginConfigColor LivingShadowColor = new(new Vector4(225f / 255f, 105f / 255f, 205f / 255f, 100f / 100f));
-        #endregion
+        }
     }
 }

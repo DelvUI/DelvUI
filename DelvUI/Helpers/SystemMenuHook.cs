@@ -24,22 +24,74 @@ namespace DelvUI.Helpers
 
         public SystemMenuHook(DalamudPluginInterface pluginInterface)
         {
+            /*
+             Part of openSystemMenu disassembly signature
+            .text:00007FF648526B20                   Client__UI__Agent__AgentHUD_OpenSystemMenu proc near
+            .text:00007FF648526B20
+            .text:00007FF648526B20                   var_48= qword ptr -48h
+            .text:00007FF648526B20                   var_40= qword ptr -40h
+            .text:00007FF648526B20                   var_38= word ptr -38h
+            .text:00007FF648526B20                   var_30= dword ptr -30h
+            .text:00007FF648526B20                   arg_0= qword ptr  8
+            .text:00007FF648526B20                   arg_8= qword ptr  10h
+            .text:00007FF648526B20                   arg_10= dword ptr  18h
+            .text:00007FF648526B20                   arg_18= qword ptr  20h
+            .text:00007FF648526B20
+            .text:00007FF648526B20 48 89 5C 24 08    mov     [rsp+arg_0], rbx
+            .text:00007FF648526B25 48 89 6C 24 10    mov     [rsp+arg_8], rbp
+            .text:00007FF648526B2A 48 89 74 24 20    mov     [rsp+arg_18], rsi
+            .text:00007FF648526B2F 57                push    rdi
+            .text:00007FF648526B30 41 54             push    r12
+            .text:00007FF648526B32 41 55             push    r13
+            .text:00007FF648526B34 41 56             push    r14
+            .text:00007FF648526B36 41 57             push    r15
+            .text:00007FF648526B38 48 83 EC 40       sub     rsp, 40h
+            .text:00007FF648526B3C 46 8D 34 45 07 00+lea     r14d, ds:7[r8*2]
+            */
             IntPtr openSystemMenuAddress = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 32 C0 4C 8B AC 24 ?? ?? ?? ?? 48 8B 8D ?? ?? ?? ??");
 
             _hookAgentHudOpenSystemMenu = new Hook<AgentHudOpenSystemMenuPrototype>(openSystemMenuAddress, AgentHudOpenSystemMenuDetour);
             _hookAgentHudOpenSystemMenu.Enable();
 
+            /*
+             Part of atkValueChangeType disassembly signature
+            .text:00007FF647D8B7B4 E8 67 4B 40 00    call    Component__GUI__AtkValue_ChangeType
+            .text:00007FF647D8B7B9 45 84 F6          test    r14b, r14b
+            .text:00007FF647D8B7BC 48 8D 4C 24 50    lea     rcx, [rsp+78h+var_28]
+            .text:00007FF647D8B7C1 8B D7             mov     edx, edi
+            .text:00007FF647D8B7C3 0F 94 C3          setz    bl
+            .text:00007FF647D8B7C6 88 5C 24 48       mov     [rsp+78h+var_30], bl
+            */
             IntPtr atkValueChangeTypeAddress =
                 Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 45 84 F6 48 8D 4C 24 ??");
 
             _atkValueChangeType =
                 Marshal.GetDelegateForFunctionPointer<AtkValueChangeType>(atkValueChangeTypeAddress);
 
+            /*
+             Part of atkValueSetString disassembly signature
+            .text:00007FF647F252E5 E8 16 AB 26 00    call    Component__GUI__AtkValue_SetString
+            .text:00007FF647F252EA 41 03 ED          add     ebp, r13d
+            .text:00007FF647F252ED E9 A3 00 00 00    jmp     loc_7FF647F25395
+            */
             IntPtr atkValueSetStringAddress =
                 Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 41 03 ED");
 
             _atkValueSetString = Marshal.GetDelegateForFunctionPointer<AtkValueSetString>(atkValueSetStringAddress);
 
+            /*
+             Part of uiModuleRequestMainCommand disassembly signature
+            .text:00007FF6482AE6A0                   Client__UI__UIModule_ExecuteMainCommand proc near
+            .text:00007FF6482AE6A0
+            .text:00007FF6482AE6A0                   var_A8= byte ptr -0A8h
+            .text:00007FF6482AE6A0                   var_98= byte ptr -98h
+            .text:00007FF6482AE6A0                   var_28= qword ptr -28h
+            .text:00007FF6482AE6A0                   var_18= qword ptr -18h
+            .text:00007FF6482AE6A0                   arg_10= qword ptr  18h
+            .text:00007FF6482AE6A0
+            .text:00007FF6482AE6A0                   ; __unwind { // __GSHandlerCheck
+            .text:00007FF6482AE6A0 40 53             push    rbx
+            */
             IntPtr uiModuleRequestMainCommandAddress = Plugin.SigScanner.ScanText(
                 "40 53 56 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 ?? ?? ?? ?? 48 8B 01 8B DA 48 8B F1 FF 90 ?? ?? ?? ??"
             );

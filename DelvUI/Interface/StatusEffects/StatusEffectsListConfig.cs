@@ -8,6 +8,7 @@ using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -15,7 +16,7 @@ namespace DelvUI.Interface.StatusEffects
 {
     [Section("Buffs and Debuffs")]
     [SubSection("Player Buffs", 0)]
-    public class PlayerBuffsListConfig : StatusEffectsListConfig
+    public class PlayerBuffsListConfig : UnitFrameStatusEffectsListConfig
     {
         public new static PlayerBuffsListConfig DefaultConfig()
         {
@@ -36,7 +37,7 @@ namespace DelvUI.Interface.StatusEffects
 
     [Section("Buffs and Debuffs")]
     [SubSection("Player Debuffs", 0)]
-    public class PlayerDebuffsListConfig : StatusEffectsListConfig
+    public class PlayerDebuffsListConfig : UnitFrameStatusEffectsListConfig
     {
         public new static PlayerDebuffsListConfig DefaultConfig()
         {
@@ -56,15 +57,19 @@ namespace DelvUI.Interface.StatusEffects
 
     [Section("Buffs and Debuffs")]
     [SubSection("Target Buffs", 0)]
-    public class TargetBuffsListConfig : StatusEffectsListConfig
+    public class TargetBuffsListConfig : UnitFrameStatusEffectsListConfig
     {
         public new static TargetBuffsListConfig DefaultConfig()
         {
-            var pos = new Vector2(HUDConstants.UnitFramesOffsetX, HUDConstants.BaseHUDOffsetY - 50);
+            var pos = new Vector2(0, -1);
             var iconConfig = new StatusEffectIconConfig();
             iconConfig.DispellableBorderConfig.Enabled = false;
 
-            return new TargetBuffsListConfig(pos, HUDConstants.DefaultStatusEffectsListSize, true, false, true, GrowthDirections.Right | GrowthDirections.Up, iconConfig);
+            var config = new TargetBuffsListConfig(pos, HUDConstants.DefaultStatusEffectsListSize, true, false, true, GrowthDirections.Right | GrowthDirections.Up, iconConfig);
+            config.AnchorToUnitFrame = true;
+            config.UnitFrameAnchor = DrawAnchor.TopLeft;
+
+            return config;
         }
 
         public TargetBuffsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
@@ -76,18 +81,39 @@ namespace DelvUI.Interface.StatusEffects
 
     [Section("Buffs and Debuffs")]
     [SubSection("Target Debuffs", 0)]
-    public class TargetDebuffsListConfig : StatusEffectsListConfig
+    public class TargetDebuffsListConfig : UnitFrameStatusEffectsListConfig
     {
         public new static TargetDebuffsListConfig DefaultConfig()
         {
-            var pos = new Vector2(HUDConstants.UnitFramesOffsetX, HUDConstants.BaseHUDOffsetY - HUDConstants.DefaultStatusEffectsListSize.Y - 50);
+            var pos = new Vector2(0, -85);
             var iconConfig = new StatusEffectIconConfig();
             iconConfig.DispellableBorderConfig.Enabled = false;
 
-            return new TargetDebuffsListConfig(pos, HUDConstants.DefaultStatusEffectsListSize, false, true, true, GrowthDirections.Right | GrowthDirections.Up, iconConfig);
+            var config = new TargetDebuffsListConfig(pos, HUDConstants.DefaultStatusEffectsListSize, false, true, true, GrowthDirections.Right | GrowthDirections.Up, iconConfig);
+            config.AnchorToUnitFrame = true;
+            config.UnitFrameAnchor = DrawAnchor.TopLeft;
+
+            return config;
         }
 
         public TargetDebuffsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
+            GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
+            : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
+        {
+        }
+    }
+
+    public abstract class UnitFrameStatusEffectsListConfig : StatusEffectsListConfig
+    {
+        [Checkbox("Anchor to Unit Frame")]
+        [Order(16)]
+        public bool AnchorToUnitFrame = false;
+
+        [Anchor("Unit Frame Anchor")]
+        [Order(17, collapseWith = nameof(AnchorToUnitFrame))]
+        public DrawAnchor UnitFrameAnchor = DrawAnchor.TopLeft;
+
+        public UnitFrameStatusEffectsListConfig(Vector2 position, Vector2 size, bool showBuffs, bool showDebuffs, bool showPermanentEffects,
             GrowthDirections growthDirections, StatusEffectIconConfig iconConfig)
             : base(position, size, showBuffs, showDebuffs, showPermanentEffects, growthDirections, iconConfig)
         {
@@ -104,12 +130,12 @@ namespace DelvUI.Interface.StatusEffects
         public Vector2 Size;
 
         [DragInt2("Icon Padding", min = 0, max = 100)]
-        [Order(16)]
+        [Order(19)]
         public Vector2 IconPadding = new(2, 2);
 
-        [Checkbox("Preview")]
+        [Checkbox("Preview", isMonitored = true)]
         [Order(20)]
-        public bool ShowArea;
+        public bool Preview;
 
         [Checkbox("Fill Rows First", separator = true)]
         [Order(25)]
@@ -198,7 +224,7 @@ namespace DelvUI.Interface.StatusEffects
         };
     }
 
-    [Portable(false)]
+    [Exportable(false)]
     [Disableable(false)]
     public class StatusEffectIconConfig : PluginConfigObject
     {
@@ -206,19 +232,23 @@ namespace DelvUI.Interface.StatusEffects
         [Order(5)]
         public Vector2 Size = new(40, 40);
 
-        [NestedConfig("Duration", 10)]
+        [NestedConfig("Duration", 10, separator = false, spacing = true)]
         public LabelConfig DurationLabelConfig;
 
-        [NestedConfig("Stacks", 15)]
+        [NestedConfig("Stacks", 15, separator = false, spacing = true)]
         public LabelConfig StacksLabelConfig;
 
-        [NestedConfig("Border", 20)]
+        [Checkbox("Crop Icon", spacing = true)]
+        [Order(20)]
+        public bool CropIcon = true;
+
+        [NestedConfig("Border", 25, collapseWith = nameof(CropIcon), separator = false, spacing = true)]
         public StatusEffectIconBorderConfig BorderConfig = new();
 
-        [NestedConfig("Dispellable Effects Border", 25)]
+        [NestedConfig("Dispellable Effects Border", 30, collapseWith = nameof(CropIcon), separator = false, spacing = true)]
         public StatusEffectIconBorderConfig DispellableBorderConfig = new(new PluginConfigColor(new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f)), 2);
 
-        [NestedConfig("My Effects Border", 30)]
+        [NestedConfig("My Effects Border", 35, collapseWith = nameof(CropIcon), separator = false, spacing = true)]
         public StatusEffectIconBorderConfig OwnedBorderConfig = new(new PluginConfigColor(new Vector4(35f / 255f, 179f / 255f, 69f / 255f, 100f / 100f)), 1);
 
         public StatusEffectIconConfig(LabelConfig? durationLabelConfig = null, LabelConfig? stacksLabelConfig = null)
@@ -228,7 +258,7 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 
-    [Portable(false)]
+    [Exportable(false)]
     public class StatusEffectIconBorderConfig : PluginConfigObject
     {
         [ColorEdit4("Color")]
@@ -267,15 +297,24 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 
-    [Portable(false)]
+    [Exportable(false)]
     public class StatusEffectsBlacklistConfig : PluginConfigObject
     {
         public bool UseAsWhitelist = false;
         public SortedList<string, uint> List = new SortedList<string, uint>();
 
+        [JsonIgnore] private string? _errorMessage = null;
+        [JsonIgnore] private string? _importString = null;
+        [JsonIgnore] private bool _clearingList = false;
+
+        private string KeyName(Status status)
+        {
+            return status.Name + "[" + status.RowId.ToString() + "]";
+        }
+
         public bool StatusAllowed(Status status)
         {
-            var inList = List.ContainsKey(status.Name + "[" + status.RowId.ToString() + "]");
+            var inList = List.ContainsKey(KeyName(status));
             if ((inList && !UseAsWhitelist) || (!inList && UseAsWhitelist))
             {
                 return false;
@@ -286,9 +325,9 @@ namespace DelvUI.Interface.StatusEffects
 
         public bool AddNewEntry(Status? status)
         {
-            if (status != null && !List.ContainsKey(status.Name))
+            if (status != null && !List.ContainsKey(KeyName(status)))
             {
-                List.Add(status.Name + "[" + status.RowId.ToString() + "]", status.RowId);
+                List.Add(KeyName(status), status.RowId);
                 _input = "";
 
                 return true;
@@ -334,11 +373,53 @@ namespace DelvUI.Interface.StatusEffects
             return false;
         }
 
+        private string ExportList()
+        {
+            string exportString = "";
+
+            for (int i = 0; i < List.Keys.Count; i++)
+            {
+                exportString += List.Keys[i] + "|";
+                exportString += List.Values[i] + "|";
+            }
+
+            return exportString;
+        }
+
+        private string? ImportList(string importString)
+        {
+            SortedList<string, uint> tmpList = new SortedList<string, uint>();
+
+            try
+            {
+                string[] strings = importString.Trim().Split("|", StringSplitOptions.RemoveEmptyEntries);
+                for (int i = 0; i < strings.Length; i += 2)
+                {
+                    if (i + 1 >= strings.Length)
+                    {
+                        break;
+                    }
+
+                    string key = strings[i];
+                    uint value = uint.Parse(strings[i + 1]);
+
+                    tmpList.Add(key, value);
+                }
+            }
+            catch
+            {
+                return "Error importing list!";
+            }
+
+            List = tmpList;
+            return null;
+        }
+
         [JsonIgnore]
         private string _input = "";
 
         [ManualDraw]
-        public bool Draw()
+        public bool Draw(ref bool changed)
         {
             if (!Enabled)
             {
@@ -353,7 +434,6 @@ namespace DelvUI.Interface.StatusEffects
                 ImGuiTableFlags.ScrollY |
                 ImGuiTableFlags.SizingFixedSame;
 
-            var changed = false;
             var sheet = Plugin.DataManager.GetExcelSheet<Status>();
             var iconSize = new Vector2(30, 30);
             var indexToRemove = -1;
@@ -371,22 +451,59 @@ namespace DelvUI.Interface.StatusEffects
 
                 ImGui.Text("\u2002 \u2002");
                 ImGui.SameLine();
-
+                ImGui.PushItemWidth(300);
                 if (ImGui.InputText("", ref _input, 64, ImGuiInputTextFlags.EnterReturnsTrue))
                 {
                     changed |= AddNewEntry(_input, sheet);
                     ImGui.SetKeyboardFocusHere(-1);
                 }
 
+                // add
                 ImGui.SameLine();
                 ImGui.PushFont(UiBuilder.IconFont);
-
                 if (ImGui.Button(FontAwesomeIcon.Plus.ToIconString(), new Vector2(0, 0)))
                 {
                     changed |= AddNewEntry(_input, sheet);
                     ImGui.SetKeyboardFocusHere(-2);
                 }
+
+                // export
+                ImGui.SameLine();
+                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 154);
+                if (ImGui.Button(FontAwesomeIcon.Upload.ToIconString(), new Vector2(0, 0)))
+                {
+                    ImGui.SetClipboardText(ExportList());
+                    ImGui.OpenPopup("export_succes_popup");
+                }
                 ImGui.PopFont();
+                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Export List to Clipboard"); }
+
+                // export success popup
+                if (ImGui.BeginPopup("export_succes_popup"))
+                {
+                    ImGui.Text("List exported to clipboard!");
+                    ImGui.EndPopup();
+                }
+
+                // import
+                ImGui.SameLine();
+                ImGui.PushFont(UiBuilder.IconFont);
+                if (ImGui.Button(FontAwesomeIcon.Download.ToIconString(), new Vector2(0, 0)))
+                {
+                    _importString = ImGui.GetClipboardText();
+                }
+                ImGui.PopFont();
+                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Import List from Clipboard"); }
+
+                // clear
+                ImGui.SameLine();
+                ImGui.PushFont(UiBuilder.IconFont);
+                if (ImGui.Button(FontAwesomeIcon.Trash.ToIconString(), new Vector2(0, 0)))
+                {
+                    _clearingList = true;
+                }
+                ImGui.PopFont();
+                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Clear List"); }
 
                 ImGui.Text("\u2002 \u2002");
                 ImGui.SameLine();
@@ -420,7 +537,7 @@ namespace DelvUI.Interface.StatusEffects
                         {
                             if (row != null)
                             {
-                                DrawHelper.DrawIcon<Status>(row, ImGui.GetCursorPos(), iconSize, false);
+                                DrawHelper.DrawIcon<Status>(row, ImGui.GetCursorPos(), iconSize, false, true);
                             }
                         }
 
@@ -470,10 +587,59 @@ namespace DelvUI.Interface.StatusEffects
 
             ImGui.EndChild();
 
-            return changed;
+            // error message
+            if (_errorMessage != null)
+            {
+                if (ImGuiHelper.DrawErrorModal(_errorMessage))
+                {
+                    _errorMessage = null;
+                }
+            }
+
+            // import confirmation
+            if (_importString != null)
+            {
+                string[] message = new string[] {
+                    "All the elements in the list will be replaced.",
+                    "Are you sure you want to import?"
+                };
+                var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Import?", message);
+
+                if (didConfirm)
+                {
+                    _errorMessage = ImportList(_importString);
+                    changed = true;
+                }
+
+                if (didConfirm || didClose)
+                {
+                    _importString = null;
+                }
+            }
+
+            // clear confirmation
+            if (_clearingList)
+            {
+                string message = "Are you sure you want to clear the list?";
+
+                var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Clear List?", message);
+
+                if (didConfirm)
+                {
+                    List.Clear();
+                    changed = true;
+                }
+
+                if (didConfirm || didClose)
+                {
+                    _clearingList = false;
+                }
+            }
+
+            return false;
         }
     }
-    /**/
+
     [Section("Buffs and Debuffs")]
     [SubSection("Custom Effects", 0)]
     public class CustomEffectsListConfig : StatusEffectsListConfig
@@ -484,11 +650,12 @@ namespace DelvUI.Interface.StatusEffects
             iconConfig.DispellableBorderConfig.Enabled = false;
             iconConfig.Size = new Vector2(30, 30);
 
-            var pos = new Vector2(-HUDConstants.UnitFramesOffsetX - HUDConstants.DefaultBigUnitFrameSize.X / 2f, HUDConstants.BaseHUDOffsetY - 50);
-            var size = new Vector2(iconConfig.Size.X * 5 + 10, iconConfig.Size.Y * 3 + 10);
+            var pos = new Vector2(0, HUDConstants.BaseHUDOffsetY);
+            var size = new Vector2(250, iconConfig.Size.Y * 3 + 10);
 
             var config = new CustomEffectsListConfig(pos, size, true, true, false, GrowthDirections.Centered | GrowthDirections.Up, iconConfig);
             config.Enabled = false;
+            config.Directions = 5;
 
             // pre-populated white list
             config.BlacklistConfig.UseAsWhitelist = true;

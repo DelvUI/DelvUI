@@ -1,27 +1,26 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Objects.SubKinds;
 
 namespace DelvUI.Interface.Jobs
 {
     public class BlackMageHud : JobHud
     {
         private new BlackMageConfig Config => (BlackMageConfig)_config;
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public BlackMageHud(string id, BlackMageConfig config, string? displayName = null) : base(id, config, displayName)
+        private static readonly List<uint> ThunderDoTIDs = new() { 161, 162, 163, 1210 };
+        private static readonly List<float> ThunderDoTDurations = new() { 18, 12, 24, 18 };
+
+        public BlackMageHud(BlackMageConfig config, string? displayName = null) : base(config, displayName)
         {
 
         }
@@ -31,46 +30,52 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new List<Vector2>();
             List<Vector2> sizes = new List<Vector2>();
 
-            if (Config.ShowManaBar)
+            if (Config.ManaBar.Enabled)
             {
-                positions.Add(Config.Position + Config.ManaBarPosition);
-                sizes.Add(Config.ManaBarSize);
+                positions.Add(Config.Position + Config.ManaBar.Position);
+                sizes.Add(Config.ManaBar.Size);
             }
 
-            if (Config.ShowUmbralHeart)
+            if (Config.UmbralHeartBar.Enabled)
             {
-                positions.Add(Config.Position + Config.UmbralHeartPosition);
-                sizes.Add(Config.UmbralHeartSize);
+                positions.Add(Config.Position + Config.UmbralHeartBar.Position);
+                sizes.Add(Config.UmbralHeartBar.Size);
             }
 
-            if (Config.ShowPolyglot)
+            if (Config.TriplecastBar.Enabled)
             {
-                positions.Add(Config.Position + Config.PolyglotPosition);
-                sizes.Add(Config.PolyglotSize);
+                positions.Add(Config.Position + Config.TriplecastBar.Position);
+                sizes.Add(Config.TriplecastBar.Size);
             }
 
-            if (Config.ShowTriplecast)
+            if (Config.EnochianBar.Enabled)
             {
-                positions.Add(Config.Position + Config.TriplecastPosition);
-                sizes.Add(Config.TriplecastSize);
+                positions.Add(Config.Position + Config.EnochianBar.Position);
+                sizes.Add(Config.EnochianBar.Size);
             }
 
-            if (Config.AlwaysShowFirestarterProcs)
+            if (Config.PolyglotBar.Enabled)
             {
-                positions.Add(Config.Position + Config.FirestarterBarPosition);
-                sizes.Add(Config.FirestarterBarSize);
+                positions.Add(Config.Position + Config.PolyglotBar.Position);
+                sizes.Add(Config.PolyglotBar.Size);
             }
 
-            if (Config.AlwaysShowFirestarterProcs)
+            if (Config.ThundercloudBar.Enabled && !Config.ThundercloudBar.HideWhenInactive)
             {
-                positions.Add(Config.Position + Config.ThundercloudBarPosition);
-                sizes.Add(Config.ThundercloudBarSize);
+                positions.Add(Config.Position + Config.ThundercloudBar.Position);
+                sizes.Add(Config.ThundercloudBar.Size);
             }
 
-            if (Config.ShowDotBar)
+            if (Config.ThunderDoTBar.Enabled && !Config.ThunderDoTBar.HideWhenInactive)
             {
-                positions.Add(Config.Position + Config.DoTBarPosition);
-                sizes.Add(Config.DoTBarSize);
+                positions.Add(Config.Position + Config.ThunderDoTBar.Position);
+                sizes.Add(Config.ThunderDoTBar.Size);
+            }
+
+            if (Config.FirestarterBar.Enabled && !Config.FirestarterBar.HideWhenInactive)
+            {
+                positions.Add(Config.Position + Config.FirestarterBar.Position);
+                sizes.Add(Config.FirestarterBar.Size);
             }
 
             return (positions, sizes);
@@ -78,259 +83,172 @@ namespace DelvUI.Interface.Jobs
 
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            if (Config.ShowManaBar)
+            Vector2 pos = origin + Config.Position;
+
+            if (Config.UmbralHeartBar.Enabled)
             {
-                DrawManaBar(origin, player);
+                DrawUmbralHeartBar(pos);
             }
 
-            if (Config.ShowUmbralHeart)
+            if (Config.TriplecastBar.Enabled)
             {
-                DrawUmbralHeartStacks(origin);
+                DrawTripleCastBar(pos, player);
             }
 
-            if (Config.ShowPolyglot)
+            if (Config.PolyglotBar.Enabled)
             {
-                DrawPolyglot(origin);
+                DrawPolyglotBar(pos, player);
             }
 
-            if (Config.ShowTriplecast)
+            if (Config.ManaBar.Enabled)
             {
-                DrawTripleCast(origin, player);
+                DrawManaBar(pos, player);
             }
 
-            if (Config.ShowFirestarterProcs)
+            if (Config.EnochianBar.Enabled)
             {
-                DrawFirestarterProcs(origin, player);
+                DrawEnochianBar(pos);
             }
 
-            if (Config.ShowThundercloudProcs)
+            if (Config.ThundercloudBar.Enabled)
             {
-                DrawThundercloudProcs(origin, player);
+                DrawThundercloudBar(pos, player);
             }
 
-            if (Config.ShowDotBar)
+            if (Config.ThunderDoTBar.Enabled)
             {
-                DrawDotTimer(origin, player);
+                DrawThunderDoTBar(pos, player);
+            }
+
+            if (Config.FirestarterBar.Enabled)
+            {
+                DrawFirestarterBar(pos, player);
             }
         }
 
         protected void DrawManaBar(Vector2 origin, PlayerCharacter player)
         {
+            BlackMageManaBarConfig config = Config.ManaBar;
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
 
-            var position = origin + Config.Position + Config.ManaBarPosition - Config.ManaBarSize / 2f;
+            if (config.HideWhenInactive && !gauge.InAstralFire && !gauge.InUmbralIce && player.CurrentMp == player.MaxMp)
+            {
+                return;
+            }
 
-            var color = gauge.InAstralFire ? Config.ManaBarFireColor : gauge.InUmbralIce ? Config.ManaBarIceColor : Config.ManaBarNoElementColor;
-
-            var builder = BarBuilder.Create(position, Config.ManaBarSize)
-                .AddInnerBar(player.CurrentMp, player.MaxMp, color)
-                .SetBackgroundColor(EmptyColor.Base);
+            // value
+            config.ValueLabelConfig.SetText($"{player.CurrentMp}");
 
             // element timer
             if (gauge.InAstralFire || gauge.InUmbralIce)
             {
                 var time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000 + 1 : 0;
-                builder.SetTextMode(BarTextMode.Single);
-                builder.SetText(BarTextPosition.CenterMiddle, BarTextType.Custom, $"{time,0}");
+                config.ElementTimerLabelConfig.SetText($"{time}");
             }
-
-            // enochian
-            if (gauge.IsEnochianActive)
+            else
             {
-                builder.SetGlowSize(2);
-                builder.SetGlowColor(0x88FFFFFF);
+                config.ElementTimerLabelConfig.SetText("");
             }
 
-            var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            bool drawTreshold = gauge.InAstralFire || !config.ThresholdConfig.ShowOnlyDuringAstralFire;
 
-            // threshold marker
-            if (Config.ShowManaThresholdMarker && gauge.InAstralFire)
-            {
-                var pos = new Vector2(
-                    position.X + Config.ManaThresholdValue / 10000f * Config.ManaBarSize.X,
-                    position.Y + Config.ManaBarSize.Y
-                );
-                var size = new Vector2(3, Config.ManaBarSize.Y);
+            BarHud bar = BarUtilities.GetProgressBar(
+                config,
+                drawTreshold ? config.ThresholdConfig : null,
+                new LabelConfig[] { config.ValueLabelConfig, config.ElementTimerLabelConfig },
+                player.CurrentMp,
+                player.MaxMp,
+                0,
+                player,
+                gauge.InAstralFire ? config.FireColor : gauge.InUmbralIce ? config.IceColor : config.FillColor,
+                gauge.IsEnochianActive && config.GlowConfig.Enabled ? config.GlowConfig : null
+            );
 
-                drawList.AddRectFilledMultiColor(
-                    pos,
-                    pos - size,
-                    0xFF000000,
-                    0x00000000,
-                    0x00000000,
-                    0xFF000000
-                );
-            }
-
-            // mana
-            if (Config.ShowManaValue)
-            {
-                var text = $"{player.CurrentMp,0}";
-                var textSize = ImGui.CalcTextSize(text);
-                var textPos = new Vector2(
-                    position.X + 2,
-                    position.Y + Config.ManaBarSize.Y / 2f - textSize.Y / 2f
-                );
-                DrawHelper.DrawOutlinedText(text, textPos);
-            }
+            bar.Draw(origin);
         }
 
-        protected void DrawUmbralHeartStacks(Vector2 origin)
+        protected void DrawUmbralHeartBar(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
-            var position = origin + Config.Position + Config.UmbralHeartPosition - Config.UmbralHeartSize / 2f;
+            if (Config.UmbralHeartBar.HideWhenInactive && gauge.UmbralHearts == 0)
+            {
+                return;
+            };
 
-            var bar = BarBuilder.Create(position, Config.UmbralHeartSize)
-                                .SetChunks(3)
-                                .SetChunkPadding(Config.UmbralHeartPadding)
-                                .AddInnerBar(gauge.UmbralHearts, 3, Config.UmbralHeartColor, EmptyColor)
-                                .SetBackgroundColor(EmptyColor.Base)
-                                .Build();
-
-            var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            BarUtilities.GetChunkedBars(Config.UmbralHeartBar, 3, gauge.UmbralHearts, 3f)
+                .Draw(origin);
         }
 
-        protected void DrawPolyglot(Vector2 origin)
+        protected void DrawTripleCastBar(Vector2 origin, PlayerCharacter player)
+        {
+            byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId is 1211)?.StackCount ?? 0;
+
+            if (Config.TriplecastBar.HideWhenInactive && stackCount == 0)
+            {
+                return;
+            };
+
+            BarUtilities.GetChunkedBars(Config.TriplecastBar, 3, stackCount, 3f)
+                .Draw(origin);
+        }
+
+        protected void DrawEnochianBar(Vector2 origin)
         {
             var gauge = Plugin.JobGauges.Get<BLMGauge>();
 
-            var position = origin + Config.Position + Config.PolyglotPosition - Config.PolyglotSize / 2f;
-
-            var barWidth = (int)(Config.PolyglotSize.X - Config.PolyglotPadding) / 2;
-            var barSize = new Vector2(barWidth, Config.PolyglotSize.Y);
-
-            var scale = 1 - (gauge.IsEnochianActive ? gauge.EnochianTimer / 30000f : 1);
-            var drawList = ImGui.GetWindowDrawList();
-
-            // 1
-            var builder = BarBuilder.Create(position, barSize)
-                                    .AddInnerBar(gauge.PolyglotStacks < 1 ? scale : 1, 1, Config.PolyglotColor)
-                                    .SetBackgroundColor(EmptyColor.Base);
-
-            if (gauge.PolyglotStacks >= 1)
-            {
-                builder.SetGlowColor(0x88FFFFFF);
-            }
-
-            builder.Build().Draw(drawList);
-
-            // 2
-            position.X += barWidth + Config.PolyglotPadding;
-            builder = BarBuilder.Create(position, barSize)
-                                .AddInnerBar(gauge.PolyglotStacks == 1 ? scale : gauge.PolyglotStacks == 0 ? 0 : 1, 1, Config.PolyglotColor)
-                                .SetBackgroundColor(EmptyColor.Base);
-
-            if (gauge.PolyglotStacks == 2)
-            {
-                builder.SetGlowColor(0x88FFFFFF);
-            }
-
-            builder.Build().Draw(drawList);
-        }
-
-        protected void DrawTripleCast(Vector2 origin, PlayerCharacter player)
-        {
-            var tripleStackBuff = player.StatusList.FirstOrDefault(o => o.StatusId == 1211);
-
-            var position = origin + Config.Position + Config.TriplecastPosition - Config.TriplecastSize / 2f;
-
-            var bar = BarBuilder.Create(position, Config.TriplecastSize)
-                                .SetChunks(3)
-                                .SetChunkPadding(Config.TriplecastPadding)
-                                .AddInnerBar(tripleStackBuff?.StackCount ?? 0, 3, Config.TriplecastColor, EmptyColor)
-                                .SetBackgroundColor(EmptyColor.Base)
-                                .Build();
-
-            var drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
-        }
-
-        protected void DrawFirestarterProcs(Vector2 origin, PlayerCharacter player)
-        {
-            var statusEffects = player.StatusList;
-            var firestarterTimer = Config.ShowFirestarterProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.StatusId == 165)?.RemainingTime ?? 0f) : 0;
-
-            DrawProc(
-                origin,
-                Config.FirestarterBarPosition,
-                Config.FirestarterBarSize,
-                firestarterTimer,
-                18f,
-                Config.InvertFirestarterBar,
-                Config.AlwaysShowFirestarterProcs,
-                Config.FirestarterColor
-            );
-        }
-
-        protected void DrawThundercloudProcs(Vector2 origin, PlayerCharacter player)
-        {
-            var statusEffects = player.StatusList;
-            var thundercloudTimer = Config.ShowThundercloudProcs ? Math.Abs(statusEffects.FirstOrDefault(o => o.StatusId == 164)?.RemainingTime ?? 0f) : 0;
-
-            DrawProc(
-                origin,
-                Config.ThundercloudBarPosition,
-                Config.ThundercloudBarSize,
-                thundercloudTimer,
-                18f,
-                Config.InvertThundercloudBar,
-                Config.AlwaysShowThundercloudProcs,
-                Config.ThundercloudColor
-            );
-        }
-
-        protected void DrawProc(Vector2 origin, Vector2 position, Vector2 size, float timer, float maxDuration, bool invert, bool alwayShow, PluginConfigColor color)
-        {
-            if (timer == 0 && !alwayShow)
+            if (Config.EnochianBar.HideWhenInactive && !gauge.IsEnochianActive)
             {
                 return;
             }
 
-            var pos = origin + Config.Position + position - size / 2f;
-
-            var builder = BarBuilder.Create(pos, size)
-                .AddInnerBar(timer, 18f, color)
-                .SetFlipDrainDirection(invert);
-
-            var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+            int timer = gauge.IsEnochianActive ? (30000 - gauge.EnochianTimer) : 0;
+            Config.EnochianBar.Label.SetText($"{timer / 1000}");
+            BarUtilities.GetProgressBar(Config.EnochianBar, timer, 30000, 0f)
+                .Draw(origin);
         }
 
-        protected void DrawDotTimer(Vector2 origin, PlayerCharacter player)
+        protected void DrawPolyglotBar(Vector2 origin, PlayerCharacter player)
         {
-            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            float timer = 0;
-            float maxDuration = 1;
+            var gauge = Plugin.JobGauges.Get<BLMGauge>();
 
-            if (actor is BattleChara target)
+            if (Config.PolyglotBar.HideWhenInactive && gauge.PolyglotStacks == 0)
             {
-                // thunder 1 to 4
-                int[] dotIDs = { 161, 162, 163, 1210 };
-                float[] dotDurations = { 12, 18, 24, 18 };
-
-                for (var i = 0; i < 4; i++)
-                {
-                    timer = target.StatusList.FirstOrDefault(o => o.StatusId == dotIDs[i] && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
-
-                    if (timer > 0)
-                    {
-                        maxDuration = dotDurations[i];
-
-                        break;
-                    }
-                }
+                return;
             }
 
-            var position = origin + Config.Position + Config.DoTBarPosition - Config.DoTBarSize / 2f;
+            // only 1 stack before level 80
+            if (player.Level < 80)
+            {
+                var glow = gauge.PolyglotStacks == 1 ? Config.PolyglotBar.GlowConfig : null;
+                BarUtilities.GetBar(Config.PolyglotBar, gauge.PolyglotStacks, 1, 0, glowConfig: glow)
+                    .Draw(origin);
+            }
+            // 2 stacks for level 80+
+            else
+            {
+                BarUtilities.GetChunkedBars(Config.PolyglotBar, 2, gauge.PolyglotStacks, 2f, 0, glowConfig: Config.PolyglotBar.GlowConfig)
+                    .Draw(origin);
+            }
+        }
 
-            var builder = BarBuilder.Create(position, Config.DoTBarSize)
-                .AddInnerBar(timer, maxDuration, Config.DotColor)
-                .SetFlipDrainDirection(Config.InvertDoTBar);
+        protected void DrawThundercloudBar(Vector2 origin, PlayerCharacter player)
+        {
+            BarUtilities.GetProcBar(Config.ThundercloudBar, player, 164, 18f)?
+                .Draw(origin);
+        }
 
-            var drawList = ImGui.GetWindowDrawList();
-            builder.Build().Draw(drawList);
+        protected void DrawFirestarterBar(Vector2 origin, PlayerCharacter player)
+        {
+            BarUtilities.GetProcBar(Config.FirestarterBar, player, 165, 18f)?
+                .Draw(origin);
+        }
+
+        protected void DrawThunderDoTBar(Vector2 origin, PlayerCharacter player)
+        {
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+
+            BarUtilities.GetDoTBar(Config.ThunderDoTBar, player, target, ThunderDoTIDs, ThunderDoTDurations)?.
+                Draw(origin);
         }
     }
 
@@ -340,184 +258,147 @@ namespace DelvUI.Interface.Jobs
     public class BlackMageConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.BLM;
-        public new static BlackMageConfig DefaultConfig() { return new BlackMageConfig(); }
 
-        #region mana bar
-        [Checkbox("Show Mana Bar", separator = true)]
-        [CollapseControl(30, 0)]
-        public bool ShowManaBar = true;
+        public new static BlackMageConfig DefaultConfig()
+        {
+            var config = new BlackMageConfig();
 
-        [DragFloat2("Mana Bar Position", min = -2000, max = 2000f)]
-        [CollapseWith(0, 0)]
-        public Vector2 ManaBarPosition = new Vector2(0, -10);
+            config.EnochianBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.EnochianBar.Label.TextAnchor = DrawAnchor.Left;
+            config.EnochianBar.Label.FrameAnchor = DrawAnchor.Left;
+            config.EnochianBar.Label.Position = new Vector2(2, 0);
 
-        [DragFloat2("Mana Bar Size", max = 2000f)]
-        [CollapseWith(5, 0)]
-        public Vector2 ManaBarSize = new Vector2(254, 20);
+            config.ThundercloudBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.ThundercloudBar.Label.TextAnchor = DrawAnchor.Right;
+            config.ThundercloudBar.Label.FrameAnchor = DrawAnchor.Right;
+            config.ThundercloudBar.Label.Position = new Vector2(-2, 0);
 
-        [Checkbox("Show Mana Value")]
-        [CollapseWith(10, 0)]
-        public bool ShowManaValue = false;
+            config.ThunderDoTBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.ThunderDoTBar.Label.TextAnchor = DrawAnchor.Left;
+            config.ThunderDoTBar.Label.FrameAnchor = DrawAnchor.Left;
+            config.ThunderDoTBar.Label.Position = new Vector2(2, 0);
 
-        [Checkbox("Show Mana Threshold Marker During Astral Fire")]
-        [CollapseWith(15, 0)]
-        public bool ShowManaThresholdMarker = true;
+            config.FirestarterBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.FirestarterBar.Label.TextAnchor = DrawAnchor.Left;
+            config.FirestarterBar.Label.FrameAnchor = DrawAnchor.Left;
+            config.FirestarterBar.Label.Position = new Vector2(2, 0);
 
-        [DragInt("Mana Threshold Marker Value", max = 10000)]
-        [CollapseWith(20, 0)]
-        public int ManaThresholdValue = 2400;
+            return config;
+        }
 
-        [ColorEdit4("Mana Bar Color")]
-        [CollapseWith(25, 0)]
-        public PluginConfigColor ManaBarNoElementColor = new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
+        [NestedConfig("Mana Bar", 30)]
+        public BlackMageManaBarConfig ManaBar = new BlackMageManaBarConfig(
+            new Vector2(0, -10),
+            new Vector2(254, 20),
+            new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f))
+        );
 
-        [ColorEdit4("Mana Bar Ice Color")]
-        [CollapseWith(30, 0)]
-        public PluginConfigColor ManaBarIceColor = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
+        [NestedConfig("Umbreal Heart Bar", 35)]
+        public ChunkedBarConfig UmbralHeartBar = new ChunkedBarConfig(
+            new(0, -27),
+            new(254, 10),
+            new PluginConfigColor(new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f))
+        );
 
-        [ColorEdit4("Mana Bar Fire Color")]
-        [CollapseWith(35, 0)]
-        public PluginConfigColor ManaBarFireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
-        #endregion
+        [NestedConfig("Triplecast Bar", 40)]
+        public ChunkedBarConfig TriplecastBar = new ChunkedBarConfig(
+            new(0, -39),
+            new(254, 10),
+            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
+        );
 
-        #region umbral heart
-        [Checkbox("Show Umbral Heart Bar", separator = true)]
-        [CollapseControl(35, 1)]
-        public bool ShowUmbralHeart = true;
+        [NestedConfig("Enochian Bar", 45)]
+        public ProgressBarConfig EnochianBar = new ProgressBarConfig(
+            new(-16, -53),
+            new(222, 14),
+            new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f))
+        );
 
-        [DragFloat2("Umbral Heart Bar Position", min = -2000, max = 2000f)]
-        [CollapseWith(0, 1)]
-        public Vector2 UmbralHeartPosition = new Vector2(0, -30);
+        [NestedConfig("Polyglot Bar", 50)]
+        public BlackMagePolyglotBarConfig PolyglotBar = new BlackMagePolyglotBarConfig(
+            new(112, -53),
+            new(30, 14),
+            new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f))
+        );
 
-        [DragFloat2("Umbral Heart Bar Size", max = 2000f)]
-        [CollapseWith(5, 1)]
-        public Vector2 UmbralHeartSize = new Vector2(254, 16);
+        [NestedConfig("Thundercloud Bar", 55)]
+        public ProgressBarConfig ThundercloudBar = new ProgressBarConfig(
+            new(-64, -69),
+            new(126, 14),
+            new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 100f / 100f)),
+            BarDirection.Left
+        );
 
-        [DragInt("Umbral Heart Padding", min = -100, max = 100)]
-        [CollapseWith(10, 1)]
-        public int UmbralHeartPadding = 2;
+        [NestedConfig("Thunder DoT Bar", 60)]
+        public ProgressBarConfig ThunderDoTBar = new ProgressBarConfig(
+            new(64, -69),
+            new(126, 14),
+            new PluginConfigColor(new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 100f / 100f))
+        );
 
-        [ColorEdit4("Umbral Heart Color")]
-        [CollapseWith(15, 1)]
-        public PluginConfigColor UmbralHeartColor = new PluginConfigColor(new Vector4(125f / 255f, 195f / 255f, 205f / 255f, 100f / 100f));
-        #endregion
+        [NestedConfig("Firestarter Bar", 65)]
+        public ProgressBarConfig FirestarterBar = new ProgressBarConfig(
+            new(0, -85),
+            new(254, 14),
+            new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 100f / 100f))
+        );
+    }
 
-        #region triple cast
-        [Checkbox("Show Triplecast", separator = true)]
-        [CollapseControl(40, 2)]
-        public bool ShowTriplecast = true;
+    [Exportable(false)]
+    public class BlackMageManaBarConfig : BarConfig
+    {
+        [ColorEdit4("Ice Color" + "##MP")]
+        [Order(26)]
+        public PluginConfigColor IceColor = new PluginConfigColor(new Vector4(69f / 255f, 115f / 255f, 202f / 255f, 100f / 100f));
 
-        [DragFloat2("Triplecast Position", min = -2000, max = 2000f)]
-        [CollapseWith(0, 2)]
-        public Vector2 TriplecastPosition = new Vector2(0, -48);
+        [ColorEdit4("Fire Color" + "##MP")]
+        [Order(27)]
+        public PluginConfigColor FireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
 
-        [DragFloat2("Triplecast Size", max = 2000)]
-        [CollapseWith(5, 2)]
-        public Vector2 TriplecastSize = new Vector2(254, 16);
+        [NestedConfig("Value Label", 45, separator = false, spacing = true)]
+        public LabelConfig ValueLabelConfig = new LabelConfig(new Vector2(2, 0), "", DrawAnchor.Left, DrawAnchor.Left);
 
-        [DragInt("Trioplecast Padding", min = -100, max = 100)]
-        [CollapseWith(10, 2)]
-        public int TriplecastPadding = 2;
+        [NestedConfig("Element Timer Label", 50, separator = false, spacing = true)]
+        public LabelConfig ElementTimerLabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
 
-        [ColorEdit4("Triplecast Color")]
-        [CollapseWith(15, 2)]
-        public PluginConfigColor TriplecastColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
-        #endregion
+        [NestedConfig("Glow When Enochian Is Active", 55, separator = false, spacing = true)]
+        public BarGlowConfig GlowConfig = new BarGlowConfig();
 
-        #region polyglot
-        [Checkbox("Show Polyglot Stacks", separator = true)]
-        [CollapseControl(45, 3)]
-        public bool ShowPolyglot = true;
+        [NestedConfig("Threshold", 65, separator = false, spacing = true)]
+        public BlackMakeManaBarThresholdConfig ThresholdConfig = new BlackMakeManaBarThresholdConfig();
 
-        [DragFloat2("Polyglot Position", min = -2000, max = 2000f)]
-        [CollapseWith(0, 3)]
-        public Vector2 PolyglotPosition = new Vector2(0, -67);
+        public BlackMageManaBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+        }
+    }
 
-        [DragFloat2("Polyglot Size", max = 2000f)]
-        [CollapseWith(5, 3)]
-        public Vector2 PolyglotSize = new Vector2(38, 18);
+    [Exportable(false)]
+    public class BlackMakeManaBarThresholdConfig : ThresholdConfig
+    {
+        [Checkbox("Show Only During Astral Fire")]
+        [Order(5)]
+        public bool ShowOnlyDuringAstralFire = true;
 
-        [DragInt("Polyglot Padding", min = -100, max = 100)]
-        [CollapseWith(10, 3)]
-        public int PolyglotPadding = 2;
+        public BlackMakeManaBarThresholdConfig()
+        {
+            Enabled = true;
+            Value = 2400;
+            Color = new PluginConfigColor(new Vector4(240f / 255f, 120f / 255f, 10f / 255f, 100f / 100f));
+            ShowMarker = true;
+            MarkerColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        }
+    }
 
-        [ColorEdit4("Polyglot Color")]
-        [CollapseWith(15, 3)]
-        public PluginConfigColor PolyglotColor = new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f));
-        #endregion
+    [Exportable(false)]
+    public class BlackMagePolyglotBarConfig : ChunkedBarConfig
+    {
+        [NestedConfig("Show Glow", 60, separator = false, spacing = true)]
+        public BarGlowConfig GlowConfig = new BarGlowConfig();
 
-        #region firestarter
-        [Checkbox("Show Firestarter Proc", separator = true)]
-        [CollapseControl(50, 4)]
-        public bool ShowFirestarterProcs = true;
-
-        [Checkbox("Always Show ##Firestarter")]
-        [CollapseWith(0, 4)]
-        public bool AlwaysShowFirestarterProcs = true;
-
-        [DragFloat2("Position ##Firestarter", min = -2000, max = 2000f)]
-        [CollapseWith(5, 4)]
-        public Vector2 FirestarterBarPosition = new Vector2(-74, -72);
-
-        [DragFloat2("Size ##Firestarter", max = 2000f)]
-        [CollapseWith(10, 4)]
-        public Vector2 FirestarterBarSize = new Vector2(106, 8);
-
-        [Checkbox("Invert ##Firestarter")]
-        [CollapseWith(15, 4)]
-        public bool InvertFirestarterBar = true;
-
-        [ColorEdit4("Color ##Firestarter")]
-        [CollapseWith(20, 4)]
-        public PluginConfigColor FirestarterColor = new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 0 / 255f, 90f / 100f));
-        #endregion
-
-        #region thundercloud
-        [Checkbox("Show Thundercloud Proc", separator = true)]
-        [CollapseControl(55, 5)]
-        public bool ShowThundercloudProcs = true;
-
-        [Checkbox("Always Show ##Thundercloud")]
-        [CollapseWith(0, 5)]
-        public bool AlwaysShowThundercloudProcs = true;
-
-        [DragFloat2("Position ##Thundercloud", min = -2000, max = 2000f)]
-        [CollapseWith(5, 5)]
-        public Vector2 ThundercloudBarPosition = new Vector2(-74, -62);
-
-        [DragFloat2("Size ##Thundercloud", max = 2000f)]
-        [CollapseWith(10, 5)]
-        public Vector2 ThundercloudBarSize = new Vector2(106, 8);
-
-        [Checkbox("Invert ##Thundercloud")]
-        [CollapseWith(15, 5)]
-        public bool InvertThundercloudBar = true;
-
-        [ColorEdit4("Color ##Thundercloud")]
-        [CollapseWith(20, 5)]
-        public PluginConfigColor ThundercloudColor = new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 90f / 100f));
-        #endregion
-
-        #region thunder dots
-        [Checkbox("Show DoT Bar", separator = true)]
-        [CollapseControl(55, 6)]
-        public bool ShowDotBar = true;
-
-        [Checkbox("Invert DoT Bar")]
-        [CollapseWith(0, 6)]
-        public bool InvertDoTBar = false;
-
-        [DragFloat2("DoT Bar Position", min = -2000, max = 2000f)]
-        [CollapseWith(5, 6)]
-        public Vector2 DoTBarPosition = new Vector2(74, -67);
-
-        [DragFloat2("DoT Bar Size", max = 2000f)]
-        [CollapseWith(10, 6)]
-        public Vector2 DoTBarSize = new Vector2(106, 18);
-
-        [ColorEdit4("DoT Color")]
-        [CollapseWith(15, 6)]
-        public PluginConfigColor DotColor = new PluginConfigColor(new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 90f / 100f));
-        #endregion
+        public BlackMagePolyglotBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+        }
     }
 }

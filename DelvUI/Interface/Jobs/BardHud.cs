@@ -1,19 +1,17 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Globalization;
 using System.Numerics;
+using DelvUI.Enums;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -23,7 +21,7 @@ namespace DelvUI.Interface.Jobs
         private new BardConfig Config => (BardConfig)_config;
         private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
 
-        public BardHud(string id, BardConfig config, string? displayName = null) : base(id, config, displayName)
+        public BardHud(BardConfig config, string? displayName = null) : base(config, displayName)
         {
         }
 
@@ -32,155 +30,83 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new List<Vector2>();
             List<Vector2> sizes = new List<Vector2>();
 
-            if (Config.ShowSongGauge)
+            if (Config.SongGaugeBar.Enabled)
             {
-                positions.Add(Config.Position + Config.SongGaugePosition);
-                sizes.Add(Config.SongGaugeSize);
+                positions.Add(Config.Position + Config.SongGaugeBar.Position);
+                sizes.Add(Config.SongGaugeBar.Size);
             }
 
-            if (Config.ShowSoulGauge)
+            if (Config.SoulVoiceBar.Enabled)
             {
-                positions.Add(Config.Position + Config.SoulGaugePosition);
-                sizes.Add(Config.SoulGaugeSize);
+                positions.Add(Config.Position + Config.SoulVoiceBar.Position);
+                sizes.Add(Config.SoulVoiceBar.Size);
             }
 
-            if (Config.ShowAPStacks || Config.ShowEmptyStacks || Config.ShowMBProc || Config.ShowWMStacks)
+            if (Config.StacksBar.Enabled)
             {
-                positions.Add(Config.Position + Config.StackPosition);
-                sizes.Add(Config.StackSize);
+                positions.Add(Config.Position + Config.StacksBar.Position);
+                sizes.Add(Config.StacksBar.Size);
             }
 
-            if (Config.ShowCB)
+            if (Config.CausticBiteDoTBar.Enabled)
             {
-                positions.Add(Config.Position + Config.CBPosition);
-                sizes.Add(Config.CBSize);
+                positions.Add(Config.Position + Config.CausticBiteDoTBar.Position);
+                sizes.Add(Config.CausticBiteDoTBar.Size);
             }
 
-            if (Config.ShowSB)
+            if (Config.StormbiteDoTBar.Enabled)
             {
-                positions.Add(Config.Position + Config.SBPosition);
-                sizes.Add(Config.SBSize);
+                positions.Add(Config.Position + Config.StormbiteDoTBar.Position);
+                sizes.Add(Config.StormbiteDoTBar.Size);
             }
 
             return (positions, sizes);
         }
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            if (Config.ShowCB || Config.ShowSB)
+            Vector2 pos = origin + Config.Position;
+            
+            if (Config.CausticBiteDoTBar.Enabled)
             {
-                DrawActiveDots(origin);
+                DrawCausticBiteDoTBar(pos, player);
+            }
+            
+            if (Config.StormbiteDoTBar.Enabled)
+            {
+                DrawStormbiteDoTBar(pos, player);
             }
 
-            HandleCurrentSong(origin);
+            HandleCurrentSong(pos, player);
 
-            if (Config.ShowSoulGauge)
+            if (Config.SoulVoiceBar.Enabled)
             {
-                DrawSoulVoiceBar(origin);
+                DrawSoulVoiceBar(pos);
             }
         }
 
-        private void DrawActiveDots(Vector2 origin)
+        private static List<uint> CausticBiteDoTIDs = new List<uint> { 124, 1200 };
+        private static List<float> CausticBiteDoTDurations = new List<float> { 30, 30 };
+        
+        protected void DrawCausticBiteDoTBar(Vector2 origin, PlayerCharacter player)
         {
-            var player = Plugin.ClientState.LocalPlayer;
-            if (player == null)
-            {
-                return;
-            }
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            GameObject? actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            if (actor is not BattleChara && !Config.CBNoTarget && !Config.SBNoTarget)
-            {
-                return;
-            }
-
-            Vector2 barSize = Config.CBSize;
-            Vector2 position = origin + Config.Position + Config.CBPosition - barSize / 2f;
-
-            List<Bar> barDrawList = new();
-
-            if (Config.ShowCB)
-            {
-                float duration = 0;
-
-                if (actor is BattleChara target)
-                {
-                    Status? cb = target.StatusList.FirstOrDefault(
-                        o => o.StatusId == 1200 && o.SourceID == player.ObjectId
-                          || o.StatusId == 124 && o.SourceID == player.ObjectId
-                    );
-
-                    duration = Math.Abs(cb?.RemainingTime ?? 0f);
-                }
-
-                PluginConfigColor color = duration <= 5 ? Config.ExpireColor : Config.CBColor;
-
-                BarBuilder builder = BarBuilder.Create(position, barSize);
-
-                Bar cbBar = builder.AddInnerBar(duration, 30f, color).SetFlipDrainDirection(Config.CBInverted).SetBackgroundColor(EmptyColor.Base).Build();
-
-                if (Config.CBValue)
-                {
-                    BarTextPosition textPos = Config.CBInverted ? BarTextPosition.CenterRight : BarTextPosition.CenterLeft;
-                    builder.SetTextMode(BarTextMode.Single);
-                    builder.SetText(textPos, BarTextType.Current);
-                }
-
-                if (actor is BattleChara || Config.CBNoTarget)
-                {
-                    barDrawList.Add(cbBar);
-                }
-            }
-
-            barSize = Config.SBSize;
-            position = origin + Config.Position + Config.SBPosition - barSize / 2f;
-
-            if (Config.ShowSB)
-            {
-                float duration = 0;
-
-                if (actor is BattleChara target)
-                {
-                    Status? sb = target.StatusList.FirstOrDefault(
-                        o => o.StatusId == 1201 && o.SourceID == player.ObjectId
-                          || o.StatusId == 129 && o.SourceID == player.ObjectId
-                    );
-
-                    duration = Math.Abs(sb?.RemainingTime ?? 0f);
-                }
-
-                PluginConfigColor color = duration <= 5 ? Config.ExpireColor : Config.SBColor;
-
-                BarBuilder builder = BarBuilder.Create(position, barSize);
-
-                Bar sbBar = builder.AddInnerBar(duration, 30f, color).SetFlipDrainDirection(Config.SBInverted).SetBackgroundColor(EmptyColor.Base).Build();
-
-                if (Config.SBValue)
-                {
-                    BarTextPosition textPos = Config.SBInverted ? BarTextPosition.CenterRight : BarTextPosition.CenterLeft;
-                    builder.SetTextMode(BarTextMode.Single);
-                    builder.SetText(textPos, BarTextType.Current);
-                }
-
-                if (actor is BattleChara || Config.SBNoTarget)
-                {
-                    barDrawList.Add(sbBar);
-                }
-            }
-
-            if (barDrawList.Count <= 0)
-            {
-                return;
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-
-            foreach (Bar bar in barDrawList)
-            {
-                bar.Draw(drawList);
-            }
+            BarUtilities.GetDoTBar(Config.CausticBiteDoTBar, player, target, CausticBiteDoTIDs, CausticBiteDoTDurations)?.
+                         Draw(origin);
         }
+        
+        private static List<uint> StormbiteDoTIDs = new List<uint> { 129, 1201 };
+        private static List<float> StormbiteDoTDurations = new List<float> { 30, 30 };
+        
+        protected void DrawStormbiteDoTBar(Vector2 origin, PlayerCharacter player)
+        {
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-        private void HandleCurrentSong(Vector2 origin)
+            BarUtilities.GetDoTBar(Config.StormbiteDoTBar, player, target, StormbiteDoTIDs, StormbiteDoTDurations)?.
+                         Draw(origin);
+        }
+        
+        private void HandleCurrentSong(Vector2 origin, PlayerCharacter player)
         {
             BRDGauge gauge = Plugin.JobGauges.Get<BRDGauge>();
             byte songStacks = gauge.Repertoire;
@@ -190,325 +116,254 @@ namespace DelvUI.Interface.Jobs
             switch (song)
             {
                 case Song.WANDERER:
-                    if (Config.ShowWMStacks)
+                    if (Config.StacksBar.Enabled && Config.StacksBar.ShowWMStacks)
                     {
-                        DrawStacks(origin, songStacks, 3, Config.WMStackColor);
+                        DrawStacksBar(
+                            origin, 
+                            player, 
+                            songStacks, 
+                            3, 
+                            Config.StacksBar.WMStackColor, 
+                            Config.StacksBar.WMGlowConfig.Enabled && songStacks == 3 ? Config.StacksBar.WMGlowConfig : null
+                            );
                     }
 
-                    DrawSongTimer(origin, songTimer, Config.WMColor);
+                    DrawSongTimerBar(origin, songTimer, Config.SongGaugeBar.WMColor);
 
                     break;
 
                 case Song.MAGE:
-                    if (Config.ShowMBProc)
+                    if (Config.StacksBar.Enabled && Config.StacksBar.ShowMBProc)
                     {
-                        DrawBloodletterReady(origin, Config.MBProcColor);
+                        DrawBloodletterReady(origin, player);
                     }
 
-                    DrawSongTimer(origin, songTimer, Config.MBColor);
+                    DrawSongTimerBar(origin, songTimer, Config.SongGaugeBar.MBColor);
 
                     break;
 
                 case Song.ARMY:
-                    if (Config.ShowAPStacks)
+                    if (Config.StacksBar.Enabled && Config.StacksBar.ShowAPStacks)
                     {
-                        DrawStacks(origin, songStacks, 4, Config.APStackColor);
+                        DrawStacksBar(origin, player, songStacks, 4, Config.StacksBar.APStackColor);
                     }
 
-                    DrawSongTimer(origin, songTimer, Config.APColor);
+                    DrawSongTimerBar(origin, songTimer, Config.SongGaugeBar.APColor);
 
                     break;
 
                 case Song.NONE:
-                    if (Config.ShowEmptyStacks)
+                    if (Config.StacksBar.Enabled && !Config.StacksBar.HideWhenInactive)
                     {
-                        DrawStacks(origin, 0, 3, Config.APStackColor);
+                        DrawStacksBar(origin, player, 0, 3, Config.StacksBar.WMStackColor);
                     }
 
-                    DrawSongTimer(origin, 0, EmptyColor);
+                    DrawSongTimerBar(origin, 0, EmptyColor);
 
                     break;
 
                 default:
-                    if (Config.ShowEmptyStacks)
+                    if (Config.StacksBar.Enabled && !Config.StacksBar.HideWhenInactive)
                     {
-                        DrawStacks(origin, 0, 3, Config.APStackColor);
+                        DrawStacksBar(origin, player, 0, 3, Config.StacksBar.WMStackColor);
                     }
 
-                    DrawSongTimer(origin, 0, EmptyColor);
+                    DrawSongTimerBar(origin, 0, EmptyColor);
 
                     break;
             }
         }
 
-        private void DrawBloodletterReady(Vector2 origin, PluginConfigColor color)
+        private void DrawBloodletterReady(Vector2 origin, PlayerCharacter player)
         {
-            // I want to draw Bloodletter procs here (just color entire bar red to indicate cooldown is ready).
-            // But can't find a way yet to accomplish this.
+            int active = _spellHelper.GetSpellCooldown(110) == 0 ? 1 : 0;
+            DrawStacksBar(origin, player, active, 1, Config.StacksBar.MBProcColor, 
+                Config.StacksBar.MBGlowConfig.Enabled ? Config.StacksBar.MBGlowConfig : null);
+        }
 
-            if (!Config.ShowMBProc)
+        protected void DrawSongTimerBar(Vector2 origin, short songTimer, PluginConfigColor songColor)
+        {
+            
+            if (Config.SongGaugeBar.HideWhenInactive && songTimer == 0 || !Config.SongGaugeBar.Enabled)
             {
                 return;
             }
-
-            Vector2 barSize = Config.StackSize;
-            Vector2 position = origin + Config.Position + Config.StackPosition - barSize / 2f;
-
-            BarBuilder builder = BarBuilder.Create(position, barSize);
-
-            int active = _spellHelper.GetSpellCooldown(110) == 0 ? 100 : 0;
-
-            Bar bar = builder.AddInnerBar(active, 100, Config.MBProcColor)
-                             .SetBackgroundColor(EmptyColor.Base)
-                             .Build();
-
-            if (Config.ShowMBProcGlow && active == 100)
-            {
-                builder.SetGlowSize(2);
-                builder.SetGlowColor(0x88FFFFFF);
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            
+            float duration = Math.Abs(songTimer / 1000f);
+            
+            Config.SongGaugeBar.Label.SetText($"{duration.ToString("N0", CultureInfo.InvariantCulture)}");
+            BarUtilities.GetProgressBar(Config.SongGaugeBar, duration, 30f, 0f, null, songColor)
+                        .Draw(origin);
         }
 
-        private void DrawSongTimer(Vector2 origin, short songTimer, PluginConfigColor songColor)
+        protected void DrawSoulVoiceBar(Vector2 origin)
         {
-            if (!Config.ShowSongGauge)
-            {
-                return;
-            }
-
-            Vector2 barSize = Config.SongGaugeSize;
-            Vector2 position = origin + Config.Position + Config.SongGaugePosition - barSize / 2f;
-
-            BarBuilder builder = BarBuilder.Create(position, barSize);
-
-            short duration = Math.Abs(songTimer);
-
-            Bar bar = builder.AddInnerBar(duration / 1000f, 30f, songColor)
-                             .SetTextMode(BarTextMode.EachChunk)
-                             .SetText(BarTextPosition.CenterMiddle, BarTextType.Current)
-                             .SetBackgroundColor(EmptyColor.Base)
-                             .Build();
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
-        }
-
-        private void DrawSoulVoiceBar(Vector2 origin)
-        {
+            BardSoulVoiceBarConfig config = Config.SoulVoiceBar;
             byte soulVoice = Plugin.JobGauges.Get<BRDGauge>().SoulVoice;
 
-            Vector2 barSize = Config.SoulGaugeSize;
-            Vector2 position = origin + Config.Position + Config.SoulGaugePosition - barSize / 2f;
-
-            BarBuilder builder = BarBuilder.Create(position, barSize);
-
-            Bar bar = builder.AddInnerBar(soulVoice, 100f, Config.SoulGaugeColor).SetBackgroundColor(EmptyColor.Base).Build();
-
-            if (Config.ShowSoulGaugeGlow && soulVoice == 100)
+            if (config.HideWhenInactive && soulVoice == 0)
             {
-                builder.SetGlowSize(2);
-                builder.SetGlowColor(0x88FFFFFF);
+                return;
             }
 
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            config.Label.SetText($"{soulVoice,0}");
+            BarUtilities.GetProgressBar(
+                config, 
+                null, 
+                new LabelConfig[] { config.Label }, 
+                soulVoice, 
+                100f, 
+                0f, 
+                null, 
+                config.FillColor, 
+                soulVoice == 100f && config.GlowConfig.Enabled ? config.GlowConfig : null
+            ).Draw(origin);
         }
 
-        private void DrawStacks(Vector2 origin, int amount, int max, PluginConfigColor stackColor)
+        private void DrawStacksBar(Vector2 origin, PlayerCharacter player, int amount, int max, PluginConfigColor stackColor, BarGlowConfig? glowConfig = null)
         {
-            Vector2 barSize = Config.StackSize;
-            Vector2 position = origin + Config.Position + Config.StackPosition - barSize / 2f;
+            BardStacksBarConfig config = Config.StacksBar;
 
-            BarBuilder builder = BarBuilder.Create(position, barSize);
-
-            Bar bar = builder.SetChunks(max)
-                             .SetChunkPadding(Config.StackPadding)
-                             .AddInnerBar(amount, max, stackColor)
-                             .SetBackgroundColor(EmptyColor.Base)
-                             .Build();
-
-            if (Config.ShowWMStacksGlow && amount == 3 && max == 3)
-            {
-                builder.SetGlowSize(2);
-                builder.SetGlowColor(0x88FFFFFF);
-            }
-
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-            bar.Draw(drawList);
+            config.FillColor = stackColor;
+            BarUtilities.GetChunkedBars(Config.StacksBar, max, amount, max, 0F, glowConfig: glowConfig).
+                         Draw(origin);
         }
     }
-
+    
     [Section("Job Specific Bars")]
     [SubSection("Ranged", 0)]
     [SubSection("Bard", 1)]
     public class BardConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.BRD;
-        public new static BardConfig DefaultConfig() { return new BardConfig(); }
 
-        #region song gauge
-        [Checkbox("Song Gauge Enabled", separator = true)]
-        [CollapseControl(30, 0)]
-        public bool ShowSongGauge = true;
+        public new static BardConfig DefaultConfig()
+        {
+            var config = new BardConfig();
 
-        [DragFloat2("Song Gauge Size", min = 1f, max = 2000f)]
-        [CollapseWith(0, 0)]
-        public Vector2 SongGaugeSize = new(254, 20);
+            config.SoulVoiceBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
 
-        [DragFloat2("Song Gauge Position", min = -4000f, max = 4000f)]
-        [CollapseWith(5, 0)]
-        public Vector2 SongGaugePosition = new(0, -22);
+            config.StormbiteDoTBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.StormbiteDoTBar.Label.TextAnchor = DrawAnchor.Left;
+            config.StormbiteDoTBar.Label.FrameAnchor = DrawAnchor.Left;
+            config.StormbiteDoTBar.Label.Position = new Vector2(2, 0);
+            
+            config.CausticBiteDoTBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.CausticBiteDoTBar.Label.TextAnchor = DrawAnchor.Right;
+            config.CausticBiteDoTBar.Label.FrameAnchor = DrawAnchor.Right;
+            config.CausticBiteDoTBar.Label.Position = new Vector2(-2, 0);
+            config.CausticBiteDoTBar.FillDirection = BarDirection.Left;                        
 
-        [ColorEdit4("Wanderer's Minuet Color")]
-        [CollapseWith(10, 0)]
+            return config;
+        }
+
+        [NestedConfig("Song Gauge Bar", 30)]
+        public BardSongBarConfig SongGaugeBar = new BardSongBarConfig(
+            new(0, -22),
+            new(254, 20),
+            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
+        );
+      
+        [NestedConfig("Soul Voice Bar", 35)]
+        public BardSoulVoiceBarConfig SoulVoiceBar = new BardSoulVoiceBarConfig(
+            new(0, -5),
+            new(254, 10),
+            new PluginConfigColor(new Vector4(248f / 255f, 227f / 255f, 0f / 255f, 100f / 100f))
+        );
+
+        [NestedConfig("Stacks Bar", 40)]
+        public BardStacksBarConfig StacksBar = new BardStacksBarConfig(
+            new(0, -39),
+            new(254, 10),
+            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
+        );
+
+        [NestedConfig("Caustic Bite Bar", 60)]
+        public ProgressBarConfig CausticBiteDoTBar = new ProgressBarConfig(
+            new(-64, -51),
+            new(126, 10),
+            new PluginConfigColor(new Vector4(182f / 255f, 68f / 255f, 235f / 255f, 100f / 100f))
+        );
+        
+        [NestedConfig("Stormbite Bar", 65)]
+        public ProgressBarConfig StormbiteDoTBar = new ProgressBarConfig(
+            new(64, -51),
+            new(126, 10),
+            new PluginConfigColor(new Vector4(72f / 255f, 117f / 255f, 202f / 255f, 100f / 100f))
+        );
+    }
+    
+    [DisableParentSettings("FillColor")]
+    [Exportable(false)]
+    public class BardSongBarConfig : ProgressBarConfig
+    {
+        [ColorEdit4("Wanderer's Minuet" + "##Song")]
+        [Order(31)]
         public PluginConfigColor WMColor = new(new Vector4(158f / 255f, 157f / 255f, 36f / 255f, 100f / 100f));
 
-        [ColorEdit4("Mage's Ballad Color")]
-        [CollapseWith(15, 0)]
+        [ColorEdit4("Mage's Ballad" + "##Song")]
+        [Order(32)]
         public PluginConfigColor MBColor = new(new Vector4(143f / 255f, 90f / 255f, 143f / 255f, 100f / 100f));
 
-        [ColorEdit4("Army's Paeon Color")]
-        [CollapseWith(20, 0)]
+        [ColorEdit4("Army's Paeon" + "##Song")]
+        [Order(33)]
         public PluginConfigColor APColor = new(new Vector4(207f / 255f, 205f / 255f, 52f / 255f, 100f / 100f));
-        #endregion
 
-        #region soul gauge
-        [Checkbox("Soul Gauge Enabled", separator = true)]
-        [CollapseControl(35, 1)]
-        public bool ShowSoulGauge = true;
+        public BardSongBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+            : base(position, size, fillColor)
+        {
+        }
+    }
+    
+    [Exportable(false)]
+    public class BardSoulVoiceBarConfig : ProgressBarConfig
+    {
+        [NestedConfig("Show Glow", 36, separator = false, spacing = true)]
+        public BarGlowConfig GlowConfig = new BarGlowConfig();
 
-        [Checkbox("Soul Gauge Full Glow Enabled")]
-        [CollapseWith(0, 1)]
-        public bool ShowSoulGaugeGlow = false;
-
-        [DragFloat2("Soul Gauge Size", min = 1f, max = 2000f)]
-        [CollapseWith(5, 1)]
-        public Vector2 SoulGaugeSize = new(254, 10);
-
-        [DragFloat2("Soul Gauge Position", min = -4000f, max = 4000f)]
-        [CollapseWith(10, 1)]
-        public Vector2 SoulGaugePosition = new(0, -5);
-
-        [ColorEdit4("Soul Gauge Color")]
-        [CollapseWith(15, 1)]
-        public PluginConfigColor SoulGaugeColor = new(new Vector4(248f / 255f, 227f / 255f, 0f / 255f, 100f / 100f));
-        #endregion
-
-        #region Song Procs / Stacks
-        [Checkbox("Wanderer's Minuet Stacks Enabled", separator = true)]
-        [Order(40)]
+        public BardSoulVoiceBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+            : base(position, size, fillColor)
+        {
+        }
+    }
+    
+    [DisableParentSettings("FillColor")]
+    [Exportable(false)]
+    public class BardStacksBarConfig : ChunkedBarConfig
+    {
+        [Checkbox("Wanderer's Minuet Stacks", separator = false, spacing = true)]
+        [Order(51)]
         public bool ShowWMStacks = true;
+        
+        [NestedConfig("Wanderer's Minuet Stacks Glow", 52, separator = false, spacing = true)]
+        public BarGlowConfig WMGlowConfig = new BarGlowConfig();
 
-        [Checkbox("Wanderer's Minuet Stacks Glow Enabled")]
-        [Order(45)]
-        public bool ShowWMStacksGlow = false;
-
-        [Checkbox("Mage's Ballad Proc Enabled")]
-        [Order(50)]
+        [Checkbox("Mage's Ballad Proc" + "##Stacks")]
+        [Order(53)]
         public bool ShowMBProc = true;
 
-        [Checkbox("Mage's Ballad Proc Glow Enabled")]
-        [Order(55)]
-        public bool ShowMBProcGlow = false;
+        [NestedConfig("Mage's Ballad Proc Glow", 54, separator = false, spacing = true)]
+        public BarGlowConfig MBGlowConfig = new BarGlowConfig();
 
-        [Checkbox("Army's Paeon Stacks Enabled")]
-        [Order(60)]
+        [Checkbox("Army's Paeon Stacks" + "##Stacks")]
+        [Order(56)]
         public bool ShowAPStacks = true;
-
-        [Checkbox("Show Empty Stack Area")]
-        [Order(65)]
-        public bool ShowEmptyStacks = true;
-
-        [DragFloat2("Stack Size", min = 1f, max = 2000f)]
-        [Order(70)]
-        public Vector2 StackSize = new(254, 10);
-
-        [DragFloat2("Stack Position", min = -4000f, max = 4000f)]
-        [Order(75)]
-        public Vector2 StackPosition = new(0, -39);
-
-        [DragInt("Stack Padding", max = 1000)]
-        [Order(80)]
-        public int StackPadding = 2;
-
-        [ColorEdit4("Wanderer's Minuet Stack Color")]
-        [Order(85)]
+        
+        [ColorEdit4("Wanderer's Minuet Stack" + "##Stacks")]
+        [Order(57)]
         public PluginConfigColor WMStackColor = new(new Vector4(150f / 255f, 215f / 255f, 232f / 255f, 100f / 100f));
 
-        [ColorEdit4("Mage's Ballad Proc Color")]
-        [Order(90)]
+        [ColorEdit4("Mage's Ballad Proc" + "##Stacks")]
+        [Order(58)]
         public PluginConfigColor MBProcColor = new(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
 
-        [ColorEdit4("Army's Paeon Stack Color")]
-        [Order(95)]
+        [ColorEdit4("Army's Paeon Stack" + "##Stacks")]
+        [Order(59)]
         public PluginConfigColor APStackColor = new(new Vector4(0f / 255f, 222f / 255f, 177f / 255f, 100f / 100f));
 
-        [ColorEdit4("DoT Expire Color")]
-        [Order(100)]
-        public PluginConfigColor ExpireColor = new(new Vector4(199f / 255f, 46f / 255f, 46f / 255f, 100f / 100f));
-        #endregion
-
-        #region caustic bite
-        [Checkbox("Caustic Bite Enabled", separator = true)]
-        [CollapseControl(105, 2)]
-        public bool ShowCB = true;
-
-        [Checkbox("Show Caustic Bite On No Target")]
-        [CollapseWith(0, 2)]
-        public bool CBNoTarget = true;
-
-        [Checkbox("Caustic Bite Value")]
-        [CollapseWith(5, 2)]
-        public bool CBValue = true;
-
-        [Checkbox("Caustic Bite Inverted")]
-        [CollapseWith(10, 2)]
-        public bool CBInverted = true;
-
-        [DragFloat2("Caustic Bite Size", max = 2000f)]
-        [CollapseWith(15, 2)]
-        public Vector2 CBSize = new(126, 10);
-
-        [DragFloat2("Caustic Bite Position", min = -4000f, max = 4000f)]
-        [CollapseWith(20, 2)]
-        public Vector2 CBPosition = new(-64, -51);
-
-        [ColorEdit4("Caustic Bite Color")]
-        [CollapseWith(25, 2)]
-        public PluginConfigColor CBColor = new(new Vector4(182f / 255f, 68f / 255f, 235f / 255f, 100f / 100f));
-        #endregion
-
-        #region stormbite
-        [Checkbox("Stormbite Enabled", separator = true)]
-        [CollapseControl(110, 3)]
-        public bool ShowSB = true;
-
-        [Checkbox("Show Stormbite On No Target")]
-        [CollapseWith(0, 3)]
-        public bool SBNoTarget = true;
-
-        [Checkbox("Stormbite Value")]
-        [CollapseWith(5, 3)]
-        public bool SBValue = true;
-
-        [Checkbox("Stormbite Inverted")]
-        [CollapseWith(10, 3)]
-        public bool SBInverted = false;
-
-        [DragFloat2("Stormbite Size", max = 2000f)]
-        [CollapseWith(15, 3)]
-        public Vector2 SBSize = new(126, 10);
-
-        [DragFloat2("Stormbite Position", min = -4000f, max = 4000f)]
-        [CollapseWith(20, 3)]
-        public Vector2 SBPosition = new(64, -51);
-
-        [ColorEdit4("Stormbite Color")]
-        [CollapseWith(25, 3)]
-        public PluginConfigColor SBColor = new(new Vector4(72f / 255f, 117f / 255f, 202f / 255f, 100f / 100f));
-        #endregion
+        public BardStacksBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+            : base(position, size, fillColor)
+        {
+        }
     }
 }

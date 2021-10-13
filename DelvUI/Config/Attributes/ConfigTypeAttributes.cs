@@ -1,5 +1,4 @@
 ﻿using Dalamud.Interface;
-using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
@@ -12,13 +11,33 @@ namespace DelvUI.Config.Attributes
 {
     #region class attributes
     [AttributeUsage(AttributeTargets.Class)]
-    public class PortableAttribute : Attribute
+    public class ExportableAttribute : Attribute
     {
-        public bool portable;
+        public bool exportable;
 
-        public PortableAttribute(bool portable)
+        public ExportableAttribute(bool exportable)
         {
-            this.portable = portable;
+            this.exportable = exportable;
+        }
+    }
+
+    public class ShareableAttribute : Attribute
+    {
+        public bool shareable;
+
+        public ShareableAttribute(bool shareable)
+        {
+            this.shareable = shareable;
+        }
+    }
+
+    public class ResettableAttribute : Attribute
+    {
+        public bool resettable;
+
+        public ResettableAttribute(bool resettable)
+        {
+            this.resettable = resettable;
         }
     }
 
@@ -30,6 +49,17 @@ namespace DelvUI.Config.Attributes
         public DisableableAttribute(bool disableable)
         {
             this.disableable = disableable;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class)]
+    public class DisableParentSettingsAttribute : Attribute
+    {
+        public readonly string[] DisabledFields;
+
+        public DisableParentSettingsAttribute(params string[] fields)
+        {
+            this.DisabledFields = fields;
         }
     }
     #endregion
@@ -407,14 +437,13 @@ namespace DelvUI.Config.Attributes
             ImGui.Text("Add");
             if (ImGui.Combo("##Add" + idText + friendlyName, ref intVal, addOptions.ToArray(), addOptions.Count, 6))
             {
+                changed = true;
+
                 var change = addOptions[intVal];
                 opts.Add(change);
                 field.SetValue(config, opts);
 
-                if (isMonitored && config is IOnChangeEventArgs eventObject)
-                {
-                    TriggerChangeEvent<string>(config, field.Name, change, ChangeType.ListAdd);
-                }
+                TriggerChangeEvent<string>(config, field.Name, change, ChangeType.ListAdd);
             }
 
             ImGui.Text(friendlyName + ":");
@@ -467,22 +496,16 @@ namespace DelvUI.Config.Attributes
 
             if (indexToRemove >= 0)
             {
+                changed = true;
+
                 var change = opts[indexToRemove];
                 opts.Remove(change);
                 field.SetValue(config, opts);
 
-                if (isMonitored && config is IOnChangeEventArgs eventObject)
-                {
-                    eventObject.OnValueChanged(
-                        new OnChangeEventArgs<string>(field.Name, change, ChangeType.ListRemove)
-                    );
-                }
-
+                TriggerChangeEvent<string>(config, field.Name, change, ChangeType.ListRemove);
             }
 
             ImGui.EndChild();
-
-
 
             return changed;
         }
@@ -491,11 +514,11 @@ namespace DelvUI.Config.Attributes
     [AttributeUsage(AttributeTargets.Field)]
     public class FontAttribute : ConfigAttribute
     {
-        public FontAttribute() : base("Font and Size") { }
+        public FontAttribute(string friendlyName = "Font and Size") : base(friendlyName) { }
 
         public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
         {
-            var fontsConfig = ConfigurationManager.GetInstance().GetConfigObject<FontsConfig>();
+            var fontsConfig = ConfigurationManager.Instance.GetConfigObject<FontsConfig>();
             if (fontsConfig == null)
             {
                 return false;
@@ -508,9 +531,9 @@ namespace DelvUI.Config.Attributes
 
             if (index == -1)
             {
-                if (fontsConfig.Fonts.ContainsKey(fontsConfig.DefaultFontKey))
+                if (fontsConfig.Fonts.ContainsKey(FontsConfig.DefaultBigFontKey))
                 {
-                    index = fontsConfig.Fonts.IndexOfKey(fontsConfig.DefaultFontKey);
+                    index = fontsConfig.Fonts.IndexOfKey(FontsConfig.DefaultBigFontKey);
                 }
                 else
                 {
@@ -549,6 +572,7 @@ namespace DelvUI.Config.Attributes
     public class OrderAttribute : Attribute
     {
         public int pos;
+        public string? collapseWith = "Enabled";
 
         public OrderAttribute(int pos)
         {
@@ -558,39 +582,14 @@ namespace DelvUI.Config.Attributes
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class CollapseControlAttribute : Attribute
-    {
-        public int pos;
-        public int id;
-
-
-        public CollapseControlAttribute(int pos, int id)
-        {
-            this.pos = pos;
-            this.id = id;
-
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Field)]
-    public class CollapseWithAttribute : Attribute
-    {
-        public int pos;
-        public int id;
-
-        public CollapseWithAttribute(int pos, int id)
-        {
-            this.pos = pos;
-            this.id = id;
-
-        }
-    }
-
-    [AttributeUsage(AttributeTargets.Field)]
     public class NestedConfigAttribute : Attribute
     {
         public string friendlyName;
         public int pos;
+        public bool separator = true;
+        public bool spacing = false;
+        public bool nest = false;
+        public string? collapseWith = "Enabled";
 
         public NestedConfigAttribute(string friendlyName, int pos)
         {

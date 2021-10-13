@@ -1,15 +1,13 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Numerics;
 
@@ -18,9 +16,10 @@ namespace DelvUI.Interface.Jobs
     public class SamuraiHud : JobHud
     {
         private new SamuraiConfig Config => (SamuraiConfig)_config;
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
+        private static readonly List<uint> HiganbanaIDs = new() { 1228, 1319 };
+        private static readonly List<float> HiganabaDurations = new() { 60f, 60f };
 
-        public SamuraiHud(string id, SamuraiConfig config, string? displayName = null) : base(id, config, displayName)
+        public SamuraiHud(SamuraiConfig config, string? displayName = null) : base(config, displayName)
         {
         }
 
@@ -29,28 +28,40 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new List<Vector2>();
             List<Vector2> sizes = new List<Vector2>();
 
-            if (Config.ShowKenkiBar)
+            if (Config.KenkiBar.Enabled)
             {
-                positions.Add(Config.Position + Config.KenkiBarPosition);
-                sizes.Add(Config.KenkiBarSize);
+                positions.Add(Config.Position + Config.KenkiBar.Position);
+                sizes.Add(Config.KenkiBar.Size);
             }
 
-            if (Config.ShowSenBar)
+            if (Config.ShifuBar.Enabled)
             {
-                positions.Add(Config.Position + Config.SenBarPosition);
-                sizes.Add(Config.SenBarSize);
+                positions.Add(Config.Position + Config.ShifuBar.Position);
+                sizes.Add(Config.ShifuBar.Size);
             }
 
-            if (Config.ShowMeditationBar)
+            if (Config.JinpuBar.Enabled)
             {
-                positions.Add(Config.Position + Config.MeditationBarPosition);
-                sizes.Add(Config.MeditationBarSize);
+                positions.Add(Config.Position + Config.JinpuBar.Position);
+                sizes.Add(Config.JinpuBar.Size);
             }
 
-            if (Config.ShowBuffsBar)
+            if (Config.HiganbanaBar.Enabled)
             {
-                positions.Add(Config.Position + Config.BuffsBarPosition);
-                sizes.Add(Config.BuffsBarSize);
+                positions.Add(Config.Position + Config.HiganbanaBar.Position);
+                sizes.Add(Config.HiganbanaBar.Size);
+            }
+
+            if (Config.SenBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.SenBar.Position);
+                sizes.Add(Config.SenBar.Size);
+            }
+
+            if (Config.MeditationBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.MeditationBar.Position);
+                sizes.Add(Config.MeditationBar.Size);
             }
 
             return (positions, sizes);
@@ -58,172 +69,101 @@ namespace DelvUI.Interface.Jobs
 
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
-            if (Config.ShowKenkiBar)
+            if (Config.KenkiBar.Enabled)
             {
-                DrawKenkiBar(origin);
+                DrawKenkiBar(origin + Config.Position, player);
             }
 
-            if (Config.ShowSenBar)
+            if (Config.ShifuBar.Enabled)
             {
-                DrawSenResourceBar(origin);
+                DrawShifuBar(origin + Config.Position, player);
             }
 
-            if (Config.ShowMeditationBar)
+            if (Config.JinpuBar.Enabled)
             {
-                DrawMeditationResourceBar(origin);
+                DrawJinpuBar(origin + Config.Position, player);
             }
 
-            if (Config.ShowBuffsBar)
+            if (Config.SenBar.Enabled)
             {
-                DrawActiveBuffs(origin, player);
+                DrawSenBar(origin + Config.Position, player);
             }
 
-            if (Config.ShowHiganbanaBar)
+            if (Config.MeditationBar.Enabled)
             {
-                DrawHiganbanaBar(origin, player);
-            }
-        }
-
-        private void DrawKenkiBar(Vector2 origin)
-        {
-            var gauge = Plugin.JobGauges.Get<SAMGauge>();
-            var pos = new Vector2(
-                origin.X + Config.Position.X + Config.KenkiBarPosition.X - Config.KenkiBarSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.KenkiBarPosition.Y - Config.KenkiBarSize.Y / 2f
-            );
-
-            var kenkiBuilder = BarBuilder.Create(pos, Config.KenkiBarSize)
-                .SetBackgroundColor(EmptyColor.Base)
-                .AddInnerBar(gauge.Kenki, 100, Config.KenkiColor);
-
-            if (Config.ShowKenkiText)
-            {
-                kenkiBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
+                DrawMeditationBar(origin + Config.Position);
             }
 
-            var drawList = ImGui.GetWindowDrawList();
-            kenkiBuilder.Build().Draw(drawList);
-        }
-
-        private void DrawHiganbanaBar(Vector2 origin, PlayerCharacter player)
-        {
-            var actor = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            if (actor is not BattleChara target)
+            if (Config.HiganbanaBar.Enabled)
             {
-                return;
-            }
-
-            var actorId = player.ObjectId;
-            var higanbana = target.StatusList.FirstOrDefault(o => o.StatusId == 1228 && o.SourceID == actorId || o.StatusId == 1319 && o.SourceID == actorId);
-            var higanbanaDuration = higanbana?.RemainingTime ?? 0f;
-
-            if (higanbanaDuration == 0)
-            {
-                return;
-            }
-
-            var higanbanaColor = higanbanaDuration > 5 ? Config.HiganbanaColor : Config.HiganbanaExpiryColor;
-            var pos = new Vector2(
-                origin.X + Config.Position.X + Config.HiganbanaBarPosition.X - Config.HiganbanaBarSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.HiganbanaBarPosition.Y - Config.HiganbanaBarSize.Y / 2f
-            );
-
-            var higanbanaBuilder = BarBuilder.Create(pos, Config.HiganbanaBarSize)
-                .SetBackgroundColor(EmptyColor.Base)
-                .AddInnerBar(higanbanaDuration, 60f, higanbanaColor).SetFlipDrainDirection(false);
-
-            if (Config.ShowHiganbanaText)
-            {
-                higanbanaBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-            }
-            var drawList = ImGui.GetWindowDrawList();
-            higanbanaBuilder.Build().Draw(drawList);
-        }
-
-        private void DrawActiveBuffs(Vector2 origin, PlayerCharacter player)
-        {
-            var buffsSize = new Vector2(Config.BuffsBarSize.X / 2f - Config.BuffsPadding / 2f, Config.BuffsBarSize.Y);
-            var order = Config.buffOrder;
-
-            // shifu
-            var shifu = player.StatusList.FirstOrDefault(o => o.StatusId == 1299);
-            var shifuDuration = shifu?.RemainingTime ?? 0f;
-            var shifuPos = new Vector2(
-                origin.X + Config.Position.X + Config.BuffsBarPosition.X + (2 * order[0] - 1) * Config.BuffsBarSize.X / 2f - order[0] * buffsSize.X,
-                origin.Y + Config.Position.Y + Config.BuffsBarPosition.Y - Config.BuffsBarSize.Y / 2f
-            );
-            var shifuBuilder = BarBuilder.Create(shifuPos, buffsSize)
-                .SetBackgroundColor(EmptyColor.Base)
-                .AddInnerBar(shifuDuration, 40f, Config.ShifuColor)
-                .SetFlipDrainDirection(true);
-
-            // jinpu
-            var jinpu = player.StatusList.FirstOrDefault(o => o.StatusId == 1298);
-            var jinpuDuration = jinpu?.RemainingTime ?? 0f;
-            var jinpuPos = new Vector2(
-                origin.X + Config.Position.X + Config.BuffsBarPosition.X + (2 * order[1] - 1) * Config.BuffsBarSize.X / 2f - order[1] * buffsSize.X,
-                origin.Y + Config.Position.Y + Config.BuffsBarPosition.Y - Config.BuffsBarSize.Y / 2f
-            );
-            var jinpuBuilder = BarBuilder.Create(jinpuPos, buffsSize)
-                .SetBackgroundColor(EmptyColor.Base)
-                .AddInnerBar(jinpuDuration, 40f, Config.JinpuColor)
-                .SetFlipDrainDirection(false);
-
-            if (Config.ShowBuffsText)
-            {
-                shifuBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-                jinpuBuilder.SetTextMode(BarTextMode.Single).SetText(BarTextPosition.CenterMiddle, BarTextType.Current);
-            }
-
-            var drawList = ImGui.GetWindowDrawList();
-            shifuBuilder.Build().Draw(drawList);
-            jinpuBuilder.Build().Draw(drawList);
-        }
-
-        private void DrawSenResourceBar(Vector2 origin)
-        {
-            var gauge = Plugin.JobGauges.Get<SAMGauge>();
-            var senBarWidth = (Config.SenBarSize.X - Config.SenBarPadding * 2) / 3f;
-            var senBarSize = new Vector2(senBarWidth, Config.SenBarSize.Y);
-
-            var cursorPos = new Vector2(
-                origin.X + Config.Position.X + Config.SenBarPosition.X - Config.SenBarSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.SenBarPosition.Y - Config.SenBarSize.Y / 2f
-            );
-            var drawList = ImGui.GetWindowDrawList();
-
-            // setsu, getsu, ka
-            var order = Config.senOrder;
-            var hasSen = new[] { gauge.HasSetsu ? 1 : 0, gauge.HasGetsu ? 1 : 0, gauge.HasKa ? 1 : 0 };
-            var colors = new[] { Config.SetsuColor, Config.GetsuColor, Config.KaColor };
-
-            for (int i = 0; i < 3; i++)
-            {
-                var builder = BarBuilder.Create(cursorPos, senBarSize).
-                    AddInnerBar(hasSen[order[i]], 1, colors[order[i]]);
-
-                builder.Build().Draw(drawList);
-                cursorPos.X += senBarWidth + Config.SenBarPadding;
+                DrawHiganbanaBar(origin + Config.Position, player);
             }
         }
 
-        private void DrawMeditationResourceBar(Vector2 origin)
+        private void DrawKenkiBar(Vector2 pos, PlayerCharacter player)
         {
-            var gauge = Plugin.JobGauges.Get<SAMGauge>();
+            SAMGauge gauge = Plugin.JobGauges.Get<SAMGauge>();
+            if (!Config.KenkiBar.HideWhenInactive || gauge.Kenki > 0)
+            {
+                Config.KenkiBar.Label.SetText(gauge.Kenki.ToString("N0"));
+                BarUtilities.GetProgressBar(Config.KenkiBar, gauge.Kenki, 100f, 0f, player).Draw(pos);
+            }
+        }
 
-            var pos = new Vector2(
-                origin.X + Config.Position.X + Config.MeditationBarPosition.X - Config.MeditationBarSize.X / 2f,
-                origin.Y + Config.Position.Y + Config.MeditationBarPosition.Y - Config.MeditationBarSize.Y / 2f
-            );
+        private void DrawShifuBar(Vector2 pos, PlayerCharacter player)
+        {
+            float shifuDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1299)?.RemainingTime ?? 0f;
+            if (!Config.ShifuBar.HideWhenInactive || shifuDuration > 0)
+            {
+                Config.ShifuBar.Label.SetText(Math.Truncate(shifuDuration).ToString());
+                BarUtilities.GetProgressBar(Config.ShifuBar, shifuDuration, 40f, 0f, player).Draw(pos);
+            }
+        }
 
-            var meditationBuilder = BarBuilder.Create(pos, Config.MeditationBarSize)
-                .SetChunks(3)
-                .SetBackgroundColor(EmptyColor.Base)
-                .SetChunkPadding(Config.MeditationBarPadding)
-                .AddInnerBar(gauge.MeditationStacks, 3, Config.MeditationColor);
+        private void DrawJinpuBar(Vector2 pos, PlayerCharacter player)
+        {
+            float jinpuDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1298)?.RemainingTime ?? 0f;
+            if (!Config.JinpuBar.HideWhenInactive || jinpuDuration > 0)
+            {
+                Config.JinpuBar.Label.SetText(Math.Truncate(jinpuDuration).ToString());
+                BarUtilities.GetProgressBar(Config.JinpuBar, jinpuDuration, 40f, 0f, player).Draw(pos);
+            }
+        }
 
-            var drawList = ImGui.GetWindowDrawList();
-            meditationBuilder.Build().Draw(drawList);
+        private void DrawHiganbanaBar(Vector2 pos, PlayerCharacter player)
+        {
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+
+            BarUtilities.GetDoTBar(Config.HiganbanaBar, player, target, HiganbanaIDs, HiganabaDurations)?.
+                Draw(pos);
+        }
+
+        private void DrawSenBar(Vector2 pos, PlayerCharacter player)
+        {
+            SAMGauge gauge = Plugin.JobGauges.Get<SAMGauge>();
+            if (!Config.SenBar.HideWhenInactive || gauge.HasSetsu || gauge.HasGetsu || gauge.HasKa)
+            {
+                var order = Config.SenBar.SenOrder;
+                var hasSen = new[] { gauge.HasSetsu ? 1 : 0, gauge.HasGetsu ? 1 : 0, gauge.HasKa ? 1 : 0 };
+                var colors = new[] { Config.SenBar.SetsuColor, Config.SenBar.GetsuColor, Config.SenBar.KaColor };
+
+                var sen = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
+                for (int i = 0; i < 3; i++)
+                {
+                    sen[i] = new Tuple<PluginConfigColor, float, LabelConfig?>(colors[order[i]], hasSen[order[i]], null);
+                }
+
+                BarUtilities.GetChunkedBars(Config.SenBar, sen, player).Draw(pos);
+            }
+        }
+
+        private void DrawMeditationBar(Vector2 pos)
+        {
+            SAMGauge gauge = Plugin.JobGauges.Get<SAMGauge>();
+            if (!Config.MeditationBar.HideWhenInactive || gauge.MeditationStacks > 0)
+            {
+                BarUtilities.GetChunkedBars(Config.MeditationBar, 3, gauge.MeditationStacks, 3f).Draw(pos);
+            }
         }
     }
 
@@ -233,153 +173,82 @@ namespace DelvUI.Interface.Jobs
     public class SamuraiConfig : JobConfig
     {
         [JsonIgnore] public override uint JobId => JobIDs.SAM;
-        public new static SamuraiConfig DefaultConfig() { return new SamuraiConfig(); }
 
-        #region Kenki
-        [Checkbox("Show Kenki Bar")]
-        [CollapseControl(30, 0)]
-        public bool ShowKenkiBar = true;
+        public new static SamuraiConfig DefaultConfig()
+        {
+            var config = new SamuraiConfig();
 
-        [DragFloat2("Kenki Bar Size", max = 2000f)]
-        [CollapseWith(0, 0)]
-        public Vector2 KenkiBarSize = new Vector2(254, 20);
+            config.HiganbanaBar.ThresholdConfig.Enabled = true;
 
-        [DragFloat2("Kenki Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(5, 0)]
-        public Vector2 KenkiBarPosition = new Vector2(0, -34);
+            return config;
+        }
 
-        [Checkbox("Show Kenki Text")]
-        [CollapseWith(10, 0)]
-        public bool ShowKenkiText = true;
-        #endregion
+        [NestedConfig("Sen Bar", 40)]
+        public SamuraiSenBarConfig SenBar = new SamuraiSenBarConfig(
+            new(0, -17),
+            new(254, 10),
+            new PluginConfigColor(new Vector4(0, 0, 0, 0))
+        );
 
-        #region Sen
-        [Checkbox("Show Sen Bar")]
-        [CollapseControl(35, 1)]
-        public bool ShowSenBar = true;
+        [NestedConfig("Shifu Bar", 45)]
+        public ProgressBarConfig ShifuBar = new ProgressBarConfig(
+            new(-64, -56),
+            new(126, 20),
+            new PluginConfigColor(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f))
+        );
 
-        [DragInt("Sen Bar Padding", max = 1000)]
-        [CollapseWith(0, 1)]
-        public int SenBarPadding = 2;
+        [NestedConfig("Jinpu Bar", 50)]
+        public ProgressBarConfig JinpuBar = new ProgressBarConfig(
+            new(64, -56),
+            new(126, 20),
+            new PluginConfigColor(new(136f / 255f, 146f / 255f, 219f / 255f, 100f / 100f))
+        );
 
-        [DragFloat2("Sen Bar Size", max = 2000f)]
-        [CollapseWith(5, 1)]
-        public Vector2 SenBarSize = new Vector2(254, 10);
+        [NestedConfig("Kenki Bar", 55)]
+        public ProgressBarConfig KenkiBar = new ProgressBarConfig(
+            new(0, -34),
+            new(254, 20),
+            new PluginConfigColor(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f))
+        );
 
-        [DragFloat2("Sen Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(10, 1)]
-        public Vector2 SenBarPosition = new Vector2(0, -17);
+        [NestedConfig("Higanbana Bar", 60)]
+        public ProgressBarConfig HiganbanaBar = new ProgressBarConfig(
+            new(0, -78),
+            new(254, 20),
+            new PluginConfigColor(new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f)),
+            BarDirection.Right,
+            new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f)),
+            15f
+        );
 
-        [DragDropHorizontal("Sen Order", "Setsu", "Getsu", "Ka")]
-        [CollapseWith(15, 1)]
-        public int[] senOrder = new int[] { 0, 1, 2 };
-        #endregion
+        [NestedConfig("Meditation Bar", 65, separator = true)]
+        public ChunkedBarConfig MeditationBar = new ChunkedBarConfig(
+            new(0, -5),
+            new(254, 10),
+            new PluginConfigColor(new(247f / 255f, 163f / 255f, 89f / 255f, 100f / 100f))
+        );
+    }
 
-        #region Meditation
-        [Checkbox("Show Meditation Bar")]
-        [CollapseControl(40, 2)]
-        public bool ShowMeditationBar = true;
-
-        [DragInt("Meditation Bar Padding", max = 1000)]
-        [CollapseWith(0, 2)]
-        public int MeditationBarPadding = 2;
-
-        [DragFloat2("Meditation Bar Size", max = 2000f)]
-        [CollapseWith(5, 2)]
-        public Vector2 MeditationBarSize = new Vector2(254, 10);
-
-        [DragFloat2("Meditation Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(10, 2)]
-        public Vector2 MeditationBarPosition = new Vector2(0, -5);
-        #endregion
-
-        #region Buffs
-        [Checkbox("Show Buffs Bar")]
-        [CollapseControl(45, 3)]
-        public bool ShowBuffsBar = true;
-
-        [DragInt("Buffs Bar Padding", max = 1000)]
-        [CollapseWith(0, 3)]
-        public int BuffsPadding = 2;
-
-        [DragFloat2("Buffs Bar Size", max = 2000f)]
-        [CollapseWith(5, 3)]
-        public Vector2 BuffsBarSize = new Vector2(254, 20);
-
-        [DragFloat2("Buffs Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(10, 3)]
-        public Vector2 BuffsBarPosition = new Vector2(0, -56);
-
-        [Checkbox("Show Buffs Bar Text")]
-        [CollapseWith(15, 3)]
-        public bool ShowBuffsText = true;
-
-        [DragDropHorizontal("Shifu/Jinpu Order", "Shifu", "Jinpu")]
-        [CollapseWith(20, 3)]
-        public int[] buffOrder = new int[] { 0, 1 };
-
-        #endregion
-
-        #region Higanbana
-        [Checkbox("Show Higanbana Bar")]
-        [CollapseControl(300, 4)]
-        public bool ShowHiganbanaBar = true;
-
-        [DragFloat2("Higanbana Bar Size", max = 2000f)]
-        [CollapseWith(0, 4)]
-        public Vector2 HiganbanaBarSize = new Vector2(254, 20);
-
-        [DragFloat2("Higanbana Bar Position", min = -2000f, max = 2000f)]
-        [CollapseWith(5, 4)]
-        public Vector2 HiganbanaBarPosition = new Vector2(0, -78);
-
-        [Checkbox("Show Higanbana Text")]
-        [CollapseWith(10, 4)]
-        public bool ShowHiganbanaText = true;
-        #endregion
-
-        #region BarOrders
-
-
-
-        #endregion
-
-        #region colors
-        [ColorEdit4("Kenki Bar Color")]
-        [Order(55)]
-        public PluginConfigColor KenkiColor = new PluginConfigColor(new(255f / 255f, 82f / 255f, 82f / 255f, 53f / 100f));
-
-        [ColorEdit4("Setsu Color")]
+    [DisableParentSettings("FillColor")]
+    [Exportable(false)]
+    public class SamuraiSenBarConfig : ChunkedBarConfig
+    {
+        [ColorEdit4("Setsu", spacing = true)]
         [Order(60)]
         public PluginConfigColor SetsuColor = new PluginConfigColor(new(89f / 255f, 234f / 255f, 247f / 255f, 100f / 100f));
 
-        [ColorEdit4("Getsu Color")]
+        [ColorEdit4("Getsu")]
         [Order(65)]
         public PluginConfigColor GetsuColor = new PluginConfigColor(new(89f / 255f, 126f / 255f, 247f / 255f, 100f / 100f));
 
-        [ColorEdit4("Ka Color")]
+        [ColorEdit4("Ka")]
         [Order(70)]
         public PluginConfigColor KaColor = new PluginConfigColor(new(247f / 255f, 89f / 255f, 89f / 255f, 100f / 100f));
 
-        [ColorEdit4("Meditation Color")]
+        [DragDropHorizontal("Order", "Setsu", "Getsu", "Ka")]
         [Order(75)]
-        public PluginConfigColor MeditationColor = new PluginConfigColor(new(247f / 255f, 163f / 255f, 89f / 255f, 100f / 100f));
+        public int[] SenOrder = new int[] { 0, 1, 2 };
 
-        [ColorEdit4("Shifu Color")]
-        [Order(80)]
-        public PluginConfigColor ShifuColor = new PluginConfigColor(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f));
-
-        [ColorEdit4("Jinpu Color")]
-        [Order(85)]
-        public PluginConfigColor JinpuColor = new PluginConfigColor(new(136f / 255f, 146f / 255f, 219f / 255f, 100f / 100f));
-
-        [ColorEdit4("Higanbana Color")]
-        [Order(90)]
-        public PluginConfigColor HiganbanaColor = new PluginConfigColor(new(237f / 255f, 141f / 255f, 7f / 255f, 100f / 100f));
-
-        [ColorEdit4("Higanbana Expiry Color")]
-        [Order(95)]
-        public PluginConfigColor HiganbanaExpiryColor = new PluginConfigColor(new(230f / 255f, 33f / 255f, 33f / 255f, 53f / 100f));
-        #endregion
+        public SamuraiSenBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor, 2) { }
     }
 }

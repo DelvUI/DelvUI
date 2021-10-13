@@ -1,7 +1,8 @@
-﻿using Dalamud.Plugin;
-using System.Numerics;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Plugin;
+using DelvUI.Helpers;
+using System.Numerics;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -14,13 +15,13 @@ namespace DelvUI.Interface.Jobs
         public GameObject? Actor { get; set; } = null;
         protected PlayerCharacter? Player => Actor is PlayerCharacter ? (PlayerCharacter)Actor : null;
 
-        public JobHud(string id, JobConfig config, string? displayName = null) : base(id, config, displayName)
+        public JobHud(JobConfig config, string? displayName = null) : base(config, displayName)
         {
         }
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (Player == null)
+            if (Player == null || !_config.Enabled)
             {
                 return;
             }

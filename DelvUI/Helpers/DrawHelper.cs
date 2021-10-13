@@ -1,10 +1,9 @@
-﻿using ImGuiNET;
+using DelvUI.Config;
+using ImGuiNET;
+using ImGuiScene;
 using Lumina.Excel;
 using System;
 using System.Numerics;
-using DelvUI.Config;
-using FFXIVClientStructs.FFXIV.Component.GUI;
-using ImGuiScene;
 
 namespace DelvUI.Helpers
 {
@@ -35,7 +34,7 @@ namespace DelvUI.Helpers
 
         public static void DrawGradientFilledRect(Vector2 position, Vector2 size, PluginConfigColor color, ImDrawListPtr drawList)
         {
-            var gradientDirection = ConfigurationManager.GetInstance().GradientDirection;
+            var gradientDirection = ConfigurationManager.Instance.GradientDirection;
             DrawGradientFilledRect(position, size, color, drawList, gradientDirection);
         }
 
@@ -66,58 +65,6 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static void DrawOutlinedText(string text, Vector2 pos, float fontScale)
-        {
-            DrawOutlinedText(text, pos, Vector4.One, Vector4.UnitW, fontScale);
-        }
-
-        public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor, float fontScale)
-        {
-            DrawOutlinedText(text, pos, color, outlineColor, fontScale, FontsManager.Instance.DefaultFont);
-        }
-
-        public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor, float fontScale, ImFontPtr fontPtr)
-        {
-            var originalScale = fontPtr.Scale;
-            fontPtr.Scale = fontScale;
-            ImGui.PushFont(fontPtr);
-            DrawOutlinedText(text, pos, color, outlineColor);
-            ImGui.PopFont();
-            fontPtr.Scale = originalScale;
-        }
-
-        public static void DrawOutlinedText(string text, Vector2 pos) { DrawOutlinedText(text, pos, Vector4.One, Vector4.UnitW); }
-
-        public static void DrawOutlinedText(string text, Vector2 pos, Vector4 color, Vector4 outlineColor)
-        {
-            ImGui.SetCursorPos(new Vector2(pos.X - 1, pos.Y + 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X, pos.Y + 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X + 1, pos.Y + 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X - 1, pos.Y));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X + 1, pos.Y));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X - 1, pos.Y - 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X, pos.Y - 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X + 1, pos.Y - 1));
-            ImGui.TextColored(outlineColor, text);
-
-            ImGui.SetCursorPos(new Vector2(pos.X, pos.Y));
-            ImGui.TextColored(color, text);
-        }
-
         public static void DrawOutlinedText(string text, Vector2 pos, ImDrawListPtr drawList, int thickness = 1)
         {
             DrawOutlinedText(text, pos, 0xFFFFFFFF, 0xFF000000, drawList, thickness);
@@ -142,13 +89,26 @@ namespace DelvUI.Helpers
             drawList.AddText(new Vector2(pos.X, pos.Y), color, text);
         }
 
-        public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder) where T : ExcelRow
+        public static void DrawShadowText(string text, Vector2 pos, uint color, uint shadowColor, ImDrawListPtr drawList, int offset = 1)
         {
-            var texture = GetIconAndTexCoordinates<T>(row, size, out Vector2 uv0, out Vector2 uv1);
+            // TODO: Add parameter to allow to choose a direction
+
+            // Shadow
+            drawList.AddText(new Vector2(pos.X + offset, pos.Y + offset), shadowColor, text);
+
+            // Text
+            drawList.AddText(new Vector2(pos.X, pos.Y), color, text);
+        }
+
+        public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder, bool cropIcon) where T : ExcelRow
+        {
+            TextureWrap texture = TexturesCache.Instance.GetTexture<T>(row);
             if (texture == null)
             {
                 return;
             }
+
+            (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(texture, size, cropIcon);
 
             ImGui.SetCursorPos(position);
             ImGui.Image(texture.ImGuiHandle, size, uv0, uv1);
@@ -160,13 +120,15 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder, ImDrawListPtr drawList) where T : ExcelRow
+        public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder, ImDrawListPtr drawList, bool cropIcon) where T : ExcelRow
         {
-            var texture = GetIconAndTexCoordinates<T>(row, size, out Vector2 uv0, out Vector2 uv1);
+            TextureWrap texture = TexturesCache.Instance.GetTexture<T>(row);
             if (texture == null)
             {
                 return;
             }
+
+            (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(texture, size, cropIcon);
 
             drawList.AddImage(texture.ImGuiHandle, position, position + size, uv0, uv1);
 
@@ -176,21 +138,42 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static TextureWrap? GetIconAndTexCoordinates<T>(dynamic row, Vector2 size, out Vector2 uv0, out Vector2 uv1) where T : ExcelRow
+        public static void DrawIcon(uint iconId, Vector2 position, Vector2 size, bool drawBorder, ImDrawListPtr drawList)
         {
-            uv0 = Vector2.Zero;
-            uv1 = Vector2.Zero;
-
-            // Status = 24x32, show from 2,7 until 22,26
-            var texture = TexturesCache.Instance.GetTexture<T>(row);
+            TextureWrap? texture = TexturesCache.Instance.GetTextureFromIconId(iconId);
             if (texture == null)
             {
-                return null;
+                return;
             }
 
-            uv0 = new Vector2(4f / texture.Width, 14f / texture.Height);
-            uv1 = new Vector2(1f - 4f / texture.Width, 1f - 12f / texture.Height);
-            return texture;
+            drawList.AddImage(texture.ImGuiHandle, position, position + size, Vector2.Zero, Vector2.One);
+
+            if (drawBorder)
+            {
+                drawList.AddRect(position, position + size, 0xFF000000);
+            }
+        }
+
+        public static (Vector2, Vector2) GetTexCoordinates(TextureWrap texture, Vector2 size, bool cropIcon = true)
+        {
+            if (texture == null)
+            {
+                return (Vector2.Zero, Vector2.Zero);
+            }
+
+            // Status = 24x32, show from 2,7 until 22,26
+            //show from 0,0 until 24,32 for uncropped status icon
+
+            float uv0x = cropIcon ? 4f : 1f;
+            float uv0y = cropIcon ? 14f : 1f;
+
+            float uv1x = cropIcon ? 4f : 1f;
+            float uv1y = cropIcon ? 12f : 1f;
+
+            var uv0 = new Vector2(uv0x / texture.Width, uv0y / texture.Height);
+            var uv1 = new Vector2(1f - uv1x / texture.Width, 1f - uv1y / texture.Height);
+
+            return (uv0, uv1);
         }
 
         public static void DrawOvershield(float shield, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, PluginConfigColor color, ImDrawListPtr drawList)
@@ -200,7 +183,7 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            var h = !useRatioForHeight ? barSize.Y / 100 * height : height;
+            var h = useRatioForHeight ? barSize.Y / 100 * height : height;
 
             DrawGradientFilledRect(cursorPos, new Vector2(Math.Max(1, barSize.X * shield), h), color, drawList);
         }
@@ -220,12 +203,11 @@ namespace DelvUI.Helpers
             }
 
             // hp portion
-            var h = !useRatioForHeight ? barSize.Y / 100 * Math.Min(100, height) : height;
+            var h = useRatioForHeight ? barSize.Y / 100 * Math.Min(100, height) : height;
             var missingHPRatio = 1 - hp;
             var s = Math.Min(shield, missingHPRatio);
             var shieldStartPos = cursorPos + new Vector2(Math.Max(1, barSize.X * hp), 0);
             DrawGradientFilledRect(shieldStartPos, new Vector2(Math.Max(1, barSize.X * s), barSize.Y), color, drawList);
-
 
             // overshield
             shield = shield - s;
@@ -237,75 +219,127 @@ namespace DelvUI.Helpers
             DrawGradientFilledRect(cursorPos, new Vector2(Math.Max(1, barSize.X * shield), h), color, drawList);
         }
 
-        public static unsafe void ClipAround(AtkUnitBase* addon, string windowName, ImDrawListPtr drawList, Action<ImDrawListPtr, string> drawAction)
+        public static void DrawInWindow(string name, Vector2 pos, Vector2 size, bool needsInput, bool needsFocus, Action<ImDrawListPtr> drawAction)
         {
-            if (addon->IsVisible)
+            ImGuiWindowFlags windowFlags =
+                ImGuiWindowFlags.NoTitleBar |
+                ImGuiWindowFlags.NoScrollbar |
+                ImGuiWindowFlags.NoBackground |
+                ImGuiWindowFlags.NoMove |
+                ImGuiWindowFlags.NoResize;
+
+            DrawInWindow(name, pos, size, needsInput, needsFocus, false, windowFlags, drawAction);
+        }
+
+        public static void DrawInWindow(
+            string name,
+            Vector2 pos,
+            Vector2 size,
+            bool needsInput,
+            bool needsFocus,
+            bool needsWindow,
+            ImGuiWindowFlags windowFlags,
+            Action<ImDrawListPtr> drawAction)
+        {
+            if (!needsInput)
             {
-                ClipAround(
-                    new Vector2(addon->X + 5, addon->Y + 5),
-                    new Vector2(
-                        addon->X + addon->WindowNode->AtkResNode.Width - 5,
-                        addon->Y + addon->WindowNode->AtkResNode.Height - 5
-                    ),
-                    windowName, drawList, drawAction
-                );
+                windowFlags |= ImGuiWindowFlags.NoInputs;
             }
+
+            if (!needsFocus)
+            {
+                windowFlags |= ImGuiWindowFlags.NoFocusOnAppearing | ImGuiWindowFlags.NoBringToFrontOnFocus;
+            }
+
+            ClipRect? clipRect = ClipRectsHelper.Instance.GetClipRectForArea(pos, size);
+
+            // no clipping needed
+            if (!clipRect.HasValue)
+            {
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
+
+                if (!needsInput && !needsWindow)
+                {
+                    drawAction(drawList);
+                    return;
+                }
+
+                ImGui.SetNextWindowPos(pos);
+                ImGui.SetNextWindowSize(size);
+
+                var begin = ImGui.Begin(name, windowFlags);
+                if (!begin)
+                {
+                    ImGui.End();
+                    return;
+                }
+
+                drawAction(drawList);
+
+                ImGui.End();
+            }
+
+            // clip around game's window
             else
             {
-                drawAction(drawList, windowName);
+                var flags = windowFlags;
+                if (needsInput && clipRect.Value.Contains(ImGui.GetMousePos()))
+                {
+                    flags |= ImGuiWindowFlags.NoInputs;
+                }
+
+                var invertedClipRects = ClipRectsHelper.GetInvertedClipRects(clipRect.Value);
+                for (int i = 0; i < invertedClipRects.Length; i++)
+                {
+                    ImGui.SetNextWindowPos(pos);
+                    ImGui.SetNextWindowSize(size);
+
+                    var begin = ImGui.Begin(name + "_" + i, flags);
+                    if (!begin)
+                    {
+                        ImGui.End();
+                        continue;
+                    }
+
+                    ImGui.PushClipRect(invertedClipRects[i].Min, invertedClipRects[i].Max, false);
+                    drawAction(ImGui.GetWindowDrawList());
+                    ImGui.PopClipRect();
+
+                    ImGui.End();
+                }
             }
         }
 
-        public static void ClipAround(Vector2 min, Vector2 max, string windowName, ImDrawListPtr drawList, Action<ImDrawListPtr, string> drawAction)
+        public static bool DrawChangelogWindow(string changelog)
         {
-            var maxX = ImGui.GetMainViewport().Size.X;
-            var maxY = ImGui.GetMainViewport().Size.Y;
-            var aboveMin = new Vector2(0, 0);
-            var aboveMax = new Vector2(maxX, min.Y);
-            var leftMin = new Vector2(0, min.Y);
-            var leftMax = new Vector2(min.X, maxY);
+            bool didClose = false;
+            Vector2 size = new Vector2(500, 500);
 
-            var rightMin = new Vector2(max.X, min.Y);
-            var rightMax = new Vector2(maxX, max.Y);
-            var belowMin = new Vector2(min.X, max.Y);
-            var belowMax = new Vector2(maxX, maxY);
+            ImGui.SetNextWindowSize(size, ImGuiCond.Appearing);
+            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
 
-            for (var i = 0; i < 4; i++)
+            string title = "DelvUI Changelog v" + Plugin.Version + " ##DelvUI";
+            if (!ImGui.Begin(title, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar))
             {
-                Vector2 clipMin;
-                Vector2 clipMax;
-
-                switch (i)
-                {
-                    default:
-                        clipMin = aboveMin;
-                        clipMax = aboveMax;
-
-                        break;
-
-                    case 1:
-                        clipMin = leftMin;
-                        clipMax = leftMax;
-
-                        break;
-
-                    case 2:
-                        clipMin = rightMin;
-                        clipMax = rightMax;
-
-                        break;
-
-                    case 3:
-                        clipMin = belowMin;
-                        clipMax = belowMax;
-
-                        break;
-                }
-
-                ImGui.PushClipRect(clipMin, clipMax, false);
-                drawAction(drawList, windowName + "_" + i);
-                ImGui.PopClipRect();
+                ImGui.End();
+                return didClose;
             }
+
+            ImGui.BeginChild("##delvui_changelog", new Vector2(size.X - 10, size.Y - 80));
+            ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + size.X - 24);
+            ImGui.TextWrapped(changelog);
+            ImGui.EndChild();
+
+            ImGui.SetCursorPos(new Vector2(10, size.Y - 40));
+            if (ImGui.Button("Close", new Vector2(size.X - 20, 30)))
+            {
+                didClose = true;
+            }
+
+            ImGui.End();
+            ImGui.PopStyleColor();
+
+            return didClose;
         }
     }
 }

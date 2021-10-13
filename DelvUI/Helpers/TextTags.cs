@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Globalization;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Dalamud.Game.ClientState.Objects.Enums;
@@ -8,51 +9,81 @@ namespace DelvUI.Helpers
 {
     public static class TextTags
     {
-        private static string ReplaceTagWithString(string tag, GameObject actor)
+        private static string ReplaceTagWithString(string tag, GameObject? actor, string? name = null)
         {
+            var n = actor != null ? actor.Name : name ?? "";
+
+            switch (tag)
+            {
+                case "[exp:current-short]":
+                    return ExperienceHelper.Instance.CurrentExp.KiloFormat();
+
+                case "[exp:required-short]":
+                    return ExperienceHelper.Instance.RequiredExp.KiloFormat();
+
+                case "[exp:rested-short]":
+                    return ExperienceHelper.Instance.RestedExp.KiloFormat();
+
+                case "[exp:current]":
+                    return ExperienceHelper.Instance.CurrentExp.ToString("N0", CultureInfo.InvariantCulture);
+
+                case "[exp:required]":
+                    return ExperienceHelper.Instance.RequiredExp.ToString("N0", CultureInfo.InvariantCulture);
+
+                case "[exp:rested]":
+                    return ExperienceHelper.Instance.RestedExp.ToString("N0", CultureInfo.InvariantCulture);
+
+                case "[exp:percent]":
+                    return ExperienceHelper.Instance.PercentExp.ToString("N1", CultureInfo.InvariantCulture);
+            }
+
             switch (tag)
             {
                 case "[name]":
-                    return actor.Name.ToString();
+                    return n.ToString().CheckForUpperCase();
 
                 case "[name:first]":
-                    return actor.Name.FirstName();
+                    return n.FirstName().CheckForUpperCase();
 
                 case "[name:first-initial]":
-                    return actor.Name.FirstName().Length == 0 ? "" : actor.Name.FirstName()[..1];
+                    return n.FirstName().CheckForUpperCase().Length == 0 ? "" : n.FirstName().CheckForUpperCase()[..1];
 
                 case "[name:first-npcmedium]":
-                    return actor.ObjectKind == ObjectKind.Player ? actor.Name.FirstName() : actor.Name.Truncate(15);
-                
+                    return actor?.ObjectKind == ObjectKind.Player ? n.FirstName().CheckForUpperCase() : n.Truncate(15).CheckForUpperCase();
+
                 case "[name:first-npclong]":
-                    return actor.ObjectKind == ObjectKind.Player ? actor.Name.FirstName() : actor.Name.Truncate(20);
-                
+                    return actor?.ObjectKind == ObjectKind.Player ? n.FirstName().CheckForUpperCase() : n.Truncate(20).CheckForUpperCase();
+
                 case "[name:first-npcfull]":
-                    return actor.ObjectKind == ObjectKind.Player ? actor.Name.FirstName() : actor.Name.ToString();
-                
+                    return actor?.ObjectKind == ObjectKind.Player ? n.FirstName().CheckForUpperCase() : n.ToString().CheckForUpperCase();
+
                 case "[name:last]":
-                    return actor.Name.LastName();
+                    return n.LastName().CheckForUpperCase();
 
                 case "[name:last-initial]":
-                    return actor.Name.LastName().Length == 0 ? "" : actor.Name.LastName()[..1];
+                    return n.LastName().CheckForUpperCase().Length == 0 ? "" : n.LastName().CheckForUpperCase()[..1];
+
+                case "[name:initials]":
+                    return n.Initials().CheckForUpperCase();
 
                 case "[name:abbreviate]":
-                    return actor.Name.Abbreviate();
+                    return n.Abbreviate().CheckForUpperCase();
 
                 case "[name:veryshort]":
-                    return actor.Name.Truncate(5);
+                    return n.Truncate(5).CheckForUpperCase();
 
                 case "[name:short]":
-                    return actor.Name.Truncate(10);
+                    return n.Truncate(10).CheckForUpperCase();
 
                 case "[name:medium]":
-                    return actor.Name.Truncate(15);
+                    return n.Truncate(15).CheckForUpperCase();
 
                 case "[name:long]":
-                    return actor.Name.Truncate(20);
+                    return n.Truncate(20).CheckForUpperCase();
             }
 
-            if (actor is Character character) {
+            if (actor is Character character)
+            {
                 switch (tag)
                 {
                     case "[health:current]":
@@ -91,7 +122,7 @@ namespace DelvUI.Helpers
                         return $"{Math.Round(100f / character.MaxHp * character.CurrentHp)}";
 
                     case "[health:percent-decimal]":
-                        return $"{100f / character.MaxHp * character.CurrentHp:##0.#}";
+                        return FormattableString.Invariant($"{100f / character.MaxHp * character.CurrentHp:##0.#}");
 
                     case "[health:deficit]":
                         return $"-{character.MaxHp - character.CurrentHp}";
@@ -135,13 +166,16 @@ namespace DelvUI.Helpers
                         return $"{Math.Round(100f / character.MaxMp * character.CurrentMp)}";
 
                     case "[mana:percent-decimal]":
-                        return $"{100f / character.MaxMp * character.CurrentMp:##0.#}";
+                        return FormattableString.Invariant($"{100f / character.MaxMp * character.CurrentMp:##0.#}");
 
                     case "[mana:deficit]":
-                        return $"-character.MaxMp-character.CurrentMp";
+                        return $"-{character.MaxMp-character.CurrentMp}";
 
                     case "[mana:deficit-short]":
                         return $"-{(character.MaxMp - character.CurrentMp).KiloFormat()}";
+
+                    case "[distance]":
+                        return (character.YalmDistanceX + 1).ToString();
 
                     case "[company]":
                         return character.CompanyTag.ToString();
@@ -157,10 +191,10 @@ namespace DelvUI.Helpers
             return "";
         }
 
-        public static string GenerateFormattedTextFromTags(GameObject actor, string text)
+        public static string GenerateFormattedTextFromTags(GameObject? actor, string text, string? name = null)
         {
             MatchCollection matches = Regex.Matches(text, @"\[(.*?)\]");
-            return matches.Aggregate(text, (current, m) => current.Replace(m.Value, ReplaceTagWithString(m.Value, actor)));
+            return matches.Aggregate(text, (current, m) => current.Replace(m.Value, ReplaceTagWithString(m.Value, actor, name)));
         }
     }
 }

@@ -6,24 +6,28 @@ using System.Collections.Generic;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class GlobalColors
+    public class GlobalColors : IDisposable
     {
         #region Singleton
+        private MiscColorConfig _miscColorConfig = null!;
 
-
-        private readonly MiscColorConfig _miscColorConfig;
-
-        private Dictionary<uint, PluginConfigColor> ColorMap;
+        private Dictionary<uint, PluginConfigColor> ColorMap = null!;
 
         private GlobalColors()
         {
-            _miscColorConfig = ConfigurationManager.GetInstance().GetConfigObject<MiscColorConfig>();
+            ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+            OnConfigReset(ConfigurationManager.Instance);
+        }
 
-            var tanksColorConfig = ConfigurationManager.GetInstance().GetConfigObject<TanksColorConfig>();
-            var healersColorConfig = ConfigurationManager.GetInstance().GetConfigObject<HealersColorConfig>();
-            var meleeColorConfig = ConfigurationManager.GetInstance().GetConfigObject<MeleeColorConfig>();
-            var rangedColorConfig = ConfigurationManager.GetInstance().GetConfigObject<RangedColorConfig>();
-            var castersColorConfig = ConfigurationManager.GetInstance().GetConfigObject<CastersColorConfig>();
+        private void OnConfigReset(ConfigurationManager sender)
+        {
+            _miscColorConfig = sender.GetConfigObject<MiscColorConfig>();
+
+            var tanksColorConfig = sender.GetConfigObject<TanksColorConfig>();
+            var healersColorConfig = sender.GetConfigObject<HealersColorConfig>();
+            var meleeColorConfig = sender.GetConfigObject<MeleeColorConfig>();
+            var rangedColorConfig = sender.GetConfigObject<RangedColorConfig>();
+            var castersColorConfig = sender.GetConfigObject<CastersColorConfig>();
 
             ColorMap = new Dictionary<uint, PluginConfigColor>()
             {
@@ -88,6 +92,27 @@ namespace DelvUI.Interface.GeneralElements
 
         public static GlobalColors Instance { get; private set; } = null!;
 
+        ~GlobalColors()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
+            Instance = null!;
+        }
         #endregion
 
         public PluginConfigColor? ColorForJobId(uint jobId)
