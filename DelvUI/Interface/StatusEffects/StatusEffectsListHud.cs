@@ -332,34 +332,6 @@ namespace DelvUI.Interface.StatusEffects
                             8f
                         );
                     }
-
-                    if (Actor != null && ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
-                    {
-                        // tooltip
-                        if (Config.ShowTooltips)
-                        {
-                            TooltipsHelper.Instance.ShowTooltipOnCursor(
-                                statusEffectData.Data.Description,
-                                statusEffectData.Data.Name,
-                                statusEffectData.Status.StatusID
-                            );
-                        }
-
-                        // remove buff on right click
-                        bool isFromPlayer = statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId;
-
-                        if (statusEffectData.Data.Category == 1 && isFromPlayer && ImGui.GetIO().MouseClicked[1])
-                        {
-                            ChatHelper.SendChatMessage("/statusoff \"" + statusEffectData.Data.Name + "\"");
-                        }
-
-                        // automatic add to black list with ctrl+alt+shift click
-                        if (Config.BlacklistConfig.Enabled &&
-                            ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && ImGui.GetIO().MouseClicked[0])
-                        {
-                            Config.BlacklistConfig.AddNewEntry(statusEffectData.Data);
-                        }
-                    }
                 }
             });
 
@@ -390,6 +362,35 @@ namespace DelvUI.Interface.StatusEffects
                     Config.IconConfig.StacksLabelConfig.SetText(text);
 
                     _stacksLabel.Draw(iconPos, Config.IconConfig.Size);
+                }
+
+                // tooltips / interaction
+                if (ImGui.IsMouseHoveringRect(iconPos, iconPos + Config.IconConfig.Size))
+                {
+                    // tooltip
+                    if (Config.ShowTooltips)
+                    {
+                        TooltipsHelper.Instance.ShowTooltipOnCursor(
+                            statusEffectData.Data.Description,
+                            statusEffectData.Data.Name,
+                            statusEffectData.Status.StatusID
+                        );
+                    }
+
+                    // remove buff on right click
+                    bool isFromPlayer = statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId;
+
+                    if (statusEffectData.Data.Category == 1 && isFromPlayer && ImGui.GetIO().MouseClicked[1])
+                    {
+                        ChatHelper.SendChatMessage("/statusoff \"" + statusEffectData.Data.Name + "\"");
+                    }
+
+                    // automatic add to black list with ctrl+alt+shift click
+                    if (Config.BlacklistConfig.Enabled &&
+                        ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && ImGui.GetIO().MouseClicked[0])
+                    {
+                        Config.BlacklistConfig.AddNewEntry(statusEffectData.Data);
+                    }
                 }
             }
         }

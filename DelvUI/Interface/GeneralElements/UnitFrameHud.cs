@@ -1,14 +1,13 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
+﻿using System;
+using System.Collections.Generic;
+using System.Numerics;
+using System.Runtime.InteropServices;
+using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Runtime.InteropServices;
 using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.GeneralElements
@@ -77,11 +76,16 @@ namespace DelvUI.Interface.GeneralElements
                 MouseOverHelper.Instance.Target = Actor;
             }
         }
-
+        
         private void DrawCharacter(Vector2 pos, Character character)
         {
-            float currentHp = character.CurrentHp;
-            float maxHp = character.MaxHp;
+            uint currentHp = character.CurrentHp;
+            uint maxHp = character.MaxHp;
+
+            if (Config.SmoothHealthConfig.Enabled)
+            {
+                currentHp = Config.SmoothHealthConfig.GetNextHp((int)currentHp, (int)maxHp);
+            }
 
             PluginConfigColor fillColor = Config.UseJobColor ? Utils.ColorForActor(character) : Config.FillColor;
 
@@ -124,9 +128,9 @@ namespace DelvUI.Interface.GeneralElements
             bar.Draw(pos, true);
         }
 
-        private void DrawFriendlyNPC(Vector2 pos, GameObject? Actor)
+        private void DrawFriendlyNPC(Vector2 pos, GameObject? actor)
         {
-            var bar = new BarHud(Config, Actor);
+            var bar = new BarHud(Config, actor);
             bar.AddForegrounds(new Rect(Config.Position, Config.Size, Config.UseJobColor ? GlobalColors.Instance.NPCFriendlyColor : Config.FillColor));
             bar.AddLabels(Config.LeftLabelConfig, Config.RightLabelConfig);
             bar.Draw(pos);
