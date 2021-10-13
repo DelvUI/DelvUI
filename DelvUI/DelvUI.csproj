@@ -96,7 +96,8 @@
         <DalamudPackager 
             ProjectDir="$(ProjectDir)" 
             OutputPath="$(TargetDir)..\$(Configuration)" 
-            AssemblyName="$(AssemblyName)" MakeZip="true" 
+            AssemblyName="$(AssemblyName)" 
+            MakeZip="true" 
             Exclude="DelvUI.pdb;DelvUI.deps.json" 
             VersionComponents="4" 
         />
