@@ -155,9 +155,9 @@ namespace DelvUI.Interface.Party
             {
                 bgColor = _raiseTrackerConfig.BackgroundColor;
             }
-            else if (Member.InvulnStatus.InvulnTime != null && _invulnTrackerConfig.Enabled && _invulnTrackerConfig.ChangeBackgroundColorWhenInvuln)
+            else if (Member.InvulnStatus?.InvulnTime != null && _invulnTrackerConfig.Enabled && _invulnTrackerConfig.ChangeBackgroundColorWhenInvuln)
             {
-                bgColor = Member.InvulnStatus.InvulnId == 811 ? _invulnTrackerConfig.WalkingDeadBackgroundColor : _invulnTrackerConfig.BackgroundColor;
+                bgColor = Member.InvulnStatus?.InvulnId == 811 ? _invulnTrackerConfig.WalkingDeadBackgroundColor : _invulnTrackerConfig.BackgroundColor;
             }
             else
             {
@@ -269,7 +269,7 @@ namespace DelvUI.Interface.Party
             {
                 var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _invulnTrackerConfig.HealthBarAnchor);
                 var iconPos = Utils.GetAnchoredPosition(parentPos + _invulnTrackerConfig.Position, _invulnTrackerConfig.IconSize, _invulnTrackerConfig.Anchor);
-                DrawHelper.DrawIcon(Member.InvulnStatus.InvulnIcon, iconPos, _invulnTrackerConfig.IconSize, true, drawList);
+                DrawHelper.DrawIcon(Member.InvulnStatus!.InvulnIcon, iconPos, _invulnTrackerConfig.IconSize, true, drawList);
             }
 
             // highlight
@@ -358,7 +358,7 @@ namespace DelvUI.Interface.Party
             // invuln label
             if (showingInvuln)
             {
-                var duration = Math.Abs(Member.InvulnStatus.InvulnTime.Value);
+                var duration = Math.Abs(Member.InvulnStatus!.InvulnTime);
                 var text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
                 _invulnTrackerConfig.LabelConfig.SetText(text);
                 _invulnLabelHud.Draw(Position, _config.Size);
@@ -373,7 +373,7 @@ namespace DelvUI.Interface.Party
         
         private bool ShowingInvuln()
         {
-            return Member != null && Member.InvulnStatus.InvulnTime.HasValue && _invulnTrackerConfig.Enabled && Member.InvulnStatus.InvulnTime.Value > 0;
+            return Member != null && Member.InvulnStatus != null && _invulnTrackerConfig.Enabled && Member.InvulnStatus.InvulnTime > 0;
         }
 
         private bool ShowMana()

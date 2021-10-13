@@ -6,12 +6,18 @@ using DelvUI.Helpers;
 
 namespace DelvUI.Interface.Party
 {
-    public struct InvulnStatus
+    public class InvulnStatus
     {
-        public uint InvulnIcon;
-        public float InvulnTime;
-        public uint InvulnId;
+        public readonly uint InvulnIcon;
+        public readonly float InvulnTime;
+        public readonly uint InvulnId;
 
+        public InvulnStatus(uint invulnIcon, float invulnTime, uint invulnId)
+        {
+            InvulnIcon = invulnIcon;
+            InvulnTime = invulnTime;
+            InvulnId = invulnId;
+        }
     }
     public class PartyFramesInvulnTracker
     {
@@ -59,10 +65,7 @@ namespace DelvUI.Interface.Party
                 
                 // apply invuln data based on buff
 
-                member.InvulnStatus.InvulnTime = tankInvuln.RemainingTime;
-                member.InvulnStatus.InvulnIcon = InvulnMap[tankInvuln.StatusId];
-                member.InvulnStatus.InvulnId = tankInvuln.StatusId;
-
+                member.InvulnStatus = new InvulnStatus(InvulnMap[tankInvuln.StatusId], tankInvuln.RemainingTime, tankInvuln.StatusId);
             }
         }
 
