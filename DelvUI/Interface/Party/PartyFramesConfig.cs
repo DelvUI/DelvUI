@@ -474,7 +474,7 @@ namespace DelvUI.Interface.Party
         [Order(35)]
         public bool ChangeBackgroundColorWhenRaised = true;
 
-        [ColorEdit4("Raise Backround Color")]
+        [ColorEdit4("Raise Background Color")]
         [Order(40, collapseWith = nameof(ChangeBackgroundColorWhenRaised))]
         public PluginConfigColor BackgroundColor = new(new Vector4(211f / 255f, 235f / 255f, 215f / 245f, 50f / 100f));
 
@@ -487,6 +487,57 @@ namespace DelvUI.Interface.Party
         public PluginConfigColor BorderColor = new(new Vector4(47f / 255f, 169f / 255f, 215f / 255f, 100f / 100f));
 
         [NestedConfig("Label", 55)]
+        public LabelConfig LabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+    }    
+    
+    [Exportable(false)]
+    [Section("Party Frames")]
+    [SubSection("Invuln Tracker", 0)]
+    public class PartyFramesInvulnTrackerConfig : MovablePluginConfigObject
+    {
+        public new static PartyFramesInvulnTrackerConfig DefaultConfig() { return new PartyFramesInvulnTrackerConfig(); }
+
+        [DragInt2("Icon Size", min = 1, max = 1000)]
+        [Order(10)]
+        public Vector2 IconSize = new(50, 50);
+
+        [Anchor("Health Bar Anchor")]
+        [Order(15)]
+        public DrawAnchor HealthBarAnchor = DrawAnchor.Center;
+
+        [Anchor("Anchor")]
+        [Order(20)]
+        public DrawAnchor Anchor = DrawAnchor.Center;
+
+        [Checkbox("Hide Name When Invuln is Up", spacing = true)]
+        [Order(25)]
+        public bool HideNameWhenInvuln = true;
+
+        [Checkbox("Change Background Color When Invuln is Up", spacing = true)]
+        [Order(35)]
+        public bool ChangeBackgroundColorWhenInvuln = true;
+
+        [ColorEdit4("Invuln Background Color")]
+        [Order(40, collapseWith = nameof(ChangeBackgroundColorWhenInvuln))]
+        public PluginConfigColor BackgroundColor = new(new Vector4(211f / 255f, 235f / 255f, 215f / 245f, 50f / 100f));
+        
+        [Checkbox("Walking Dead Custom Color")]
+        [Order(42, collapseWith = nameof(ChangeBackgroundColorWhenInvuln))]
+        public bool UseCustomWalkingDeadColor = true;
+        
+        [ColorEdit4("Walking Dead Background Color")]
+        [Order(45, collapseWith = nameof(UseCustomWalkingDeadColor))]
+        public PluginConfigColor WalkingDeadBackgroundColor = new(new Vector4(158f / 255f, 158f / 255f, 158f / 255f, 50f / 100f));
+        
+        [Checkbox("Change Border Color When Invuln is Up", spacing = true)]
+        [Order(50)]
+        public bool ChangeBorderColorWhenInvuln = true;
+
+        [ColorEdit4("Invuln Border Color")]
+        [Order(55, collapseWith = nameof(ChangeBorderColorWhenInvuln))]
+        public PluginConfigColor BorderColor = new(new Vector4(47f / 255f, 169f / 255f, 215f / 255f, 100f / 100f));
+
+        [NestedConfig("Label", 60)]
         public LabelConfig LabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
     }
 }
