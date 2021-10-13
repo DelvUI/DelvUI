@@ -155,7 +155,15 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Tank Invulnerability Color ##TankInvulnerabilityCustom")]
         [Order(100, collapseWith = nameof(UseCustomInvulnerabilityColor))]
-        public PluginConfigColor CustomInvulnerabilityColor = new PluginConfigColor(new Vector4(100f / 255f, 100f / 255f, 100f / 255f, 100f / 100f));
+        public PluginConfigColor CustomInvulnerabilityColor = new PluginConfigColor(new Vector4(211f / 255f, 235f / 255f, 215f / 245f, 50f / 100f));
+        
+        [Checkbox("Walking Dead Custom Color")]
+        [Order(102, collapseWith = nameof(ShowTankInvulnerability))]
+        public bool UseCustomWalkingDeadColor = true;
+        
+        [ColorEdit4("Walking Dead Color ##TankWalkingDeadCustom")]
+        [Order(103, collapseWith = nameof(UseCustomWalkingDeadColor))]
+        public PluginConfigColor CustomWalkingDeadColor = new PluginConfigColor(new Vector4(158f / 255f, 158f / 255f, 158f / 255f, 50f / 100f));
 
         [NestedConfig("Left Text", 105)]
         public EditableLabelConfig LeftLabelConfig;

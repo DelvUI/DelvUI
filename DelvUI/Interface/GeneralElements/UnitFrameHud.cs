@@ -6,8 +6,10 @@ using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -132,16 +134,29 @@ namespace DelvUI.Interface.GeneralElements
 
         private PluginConfigColor BackgroundColor(Character? chara)
         {
-            if (Config.ShowTankInvulnerability && chara is BattleChara battleChara && Utils.HasTankInvulnerability(battleChara))
+            if (Config.ShowTankInvulnerability && chara is BattleChara battleChara)
             {
-                if (Config.UseCustomInvulnerabilityColor)
+                Status tankInvuln = Utils.HasTankInvulnerability(battleChara);
+
+                if (tankInvuln != null)
                 {
-                    return Config.CustomInvulnerabilityColor;
+                    PluginConfigColor color;
+                    if (Config.UseCustomInvulnerabilityColor)
+                    {
+                        color = Config.CustomInvulnerabilityColor;
+                    }
+                    else if (tankInvuln.StatusId == 811 && Config.UseCustomWalkingDeadColor)
+                    {
+                        color = Config.CustomWalkingDeadColor;
+                    }
+                    else 
+                    {
+                        color = new PluginConfigColor(GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Vector.AdjustColor(-.8f));
+                    }
+
+                    return color;
                 }
-                else
-                {
-                    return new PluginConfigColor(GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id).Vector.AdjustColor(-.8f));
-                }
+                
             }
 
             if (chara is BattleChara)

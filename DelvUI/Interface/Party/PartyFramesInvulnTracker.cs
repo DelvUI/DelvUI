@@ -3,6 +3,8 @@ using DelvUI.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Dalamud.Game.ClientState.Statuses;
+using DelvUI.Helpers;
 
 namespace DelvUI.Interface.Party
 {
@@ -36,29 +38,24 @@ namespace DelvUI.Interface.Party
                     continue;
                 }
 
-                if (member.Character is not BattleChara battleChara)
+                if (member.Character is not BattleChara battleChara || member.HP <= 0)
                 {
                     continue;
                 }
 
                 // check invuln buff
-                if (member.HP > 0)
+                Status tankInvuln = Utils.HasTankInvulnerability(battleChara);
+                if (tankInvuln == null)
                 {
-                    foreach (var status in battleChara.StatusList)
-                    {
-                        if (InvulnMap.Keys.Contains(status.StatusId))
-                        {
-                            // apply invuln data based on buff
-                            member.InvulnTime = status.RemainingTime;
-                            member.InvulnIcon = InvulnMap[status.StatusId];
-                            break;
-                        }
-
-                        // making sure the invuln buff doesnt exists anymore, was having issues with the way raisetracker was handling it
-                        member.InvulnTime = null;
-                    }
-                    
+                    member.InvulnTime = null;
+                    break;
                 }
+                
+                // apply invuln data based on buff
+                member.InvulnTime = tankInvuln.RemainingTime;
+                member.InvulnIcon = InvulnMap[tankInvuln.StatusId];
+                member.InvulnId = tankInvuln.StatusId;
+
             }
         }
 

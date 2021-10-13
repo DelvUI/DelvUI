@@ -37,6 +37,7 @@ namespace DelvUI.Interface.Party
         public float? RaiseTime { get; set; }
         public float? InvulnTime { get; set; }
         public uint InvulnIcon { get; set; }
+        public uint? InvulnId { get; set; }
 
         public PartyFramesMember(PartyMember partyMember, int order, EnmityLevel enmityLevel, bool isPartyLeader)
         {
@@ -108,6 +109,7 @@ namespace DelvUI.Interface.Party
         public float? RaiseTime { get; set; }
         public float? InvulnTime { get; set; }
         public uint InvulnIcon { get; set; }
+        public uint? InvulnId { get; set; }
 
         public FakePartyFramesMember(int order, EnmityLevel enmityLevel, bool isPartyLeader)
         {
@@ -148,6 +150,7 @@ namespace DelvUI.Interface.Party
         public float? RaiseTime { get; set; }
         public float? InvulnTime { get; set; }
         public uint InvulnIcon { get; set; }
+        public uint? InvulnId { get; set; }
 
         public void Update(EnmityLevel enmityLevel, bool isPartyLeader, uint jobId);
     }

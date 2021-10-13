@@ -517,16 +517,24 @@ namespace DelvUI.Interface.Party
         [ColorEdit4("Invuln Background Color")]
         [Order(40, collapseWith = nameof(ChangeBackgroundColorWhenInvuln))]
         public PluginConfigColor BackgroundColor = new(new Vector4(211f / 255f, 235f / 255f, 215f / 245f, 50f / 100f));
-
-        [Checkbox("Change Border Color When Invuln", spacing = true)]
-        [Order(45)]
+        
+        [Checkbox("Walking Dead Custom Color")]
+        [Order(42, collapseWith = nameof(ChangeBackgroundColorWhenInvuln))]
+        public bool UseCustomWalkingDeadColor = true;
+        
+        [ColorEdit4("Walking Dead Background Color")]
+        [Order(45, collapseWith = nameof(UseCustomWalkingDeadColor))]
+        public PluginConfigColor WalkingDeadBackgroundColor = new(new Vector4(158f / 255f, 158f / 255f, 158f / 255f, 50f / 100f));
+        
+        [Checkbox("Change Border Color When Invuln is Up", spacing = true)]
+        [Order(50)]
         public bool ChangeBorderColorWhenInvuln = true;
 
         [ColorEdit4("Invuln Border Color")]
-        [Order(50, collapseWith = nameof(ChangeBorderColorWhenInvuln))]
+        [Order(55, collapseWith = nameof(ChangeBorderColorWhenInvuln))]
         public PluginConfigColor BorderColor = new(new Vector4(47f / 255f, 169f / 255f, 215f / 255f, 100f / 100f));
 
-        [NestedConfig("Label", 55)]
+        [NestedConfig("Label", 60)]
         public LabelConfig LabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
     }
 }

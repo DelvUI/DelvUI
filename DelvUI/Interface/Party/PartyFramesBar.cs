@@ -150,12 +150,20 @@ namespace DelvUI.Interface.Party
             }
 
             // bg
-            var bgColor = Member.RaiseTime != null && _raiseTrackerConfig.Enabled && _raiseTrackerConfig.ChangeBackgroundColorWhenRaised ?
-                _raiseTrackerConfig.BackgroundColor :
-                Member.InvulnTime != null && _invulnTrackerConfig.Enabled && _invulnTrackerConfig.ChangeBackgroundColorWhenInvuln ?
-                    _invulnTrackerConfig.BackgroundColor :
-                _config.ColorsConfig.BackgroundColor;
-
+            PluginConfigColor bgColor;
+            if (Member.RaiseTime != null && _raiseTrackerConfig.Enabled && _raiseTrackerConfig.ChangeBackgroundColorWhenRaised)
+            {
+                bgColor = _raiseTrackerConfig.BackgroundColor;
+            }
+            else if (Member.InvulnTime != null && _invulnTrackerConfig.Enabled && _invulnTrackerConfig.ChangeBackgroundColorWhenInvuln)
+            {
+                bgColor = Member.InvulnId == 811 ? _invulnTrackerConfig.WalkingDeadBackgroundColor : _invulnTrackerConfig.BackgroundColor;
+            }
+            else
+            {
+                bgColor = _config.ColorsConfig.BackgroundColor;
+            }
+            
             drawList.AddRectFilled(Position, Position + _config.Size, bgColor.Base);
 
             // hp
