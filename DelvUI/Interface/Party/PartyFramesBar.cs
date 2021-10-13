@@ -163,11 +163,19 @@ namespace DelvUI.Interface.Party
             {
                 bgColor = _config.ColorsConfig.BackgroundColor;
             }
-            
+
             drawList.AddRectFilled(Position, Position + _config.Size, bgColor.Base);
 
             // hp
-            var hpScale = Member.MaxHP > 0 ? (float)Member.HP / (float)Member.MaxHP : 1;
+            uint currentHp = Member.HP;
+            uint maxHp = Member.MaxHP;
+
+            if (_config.SmoothHealthConfig.Enabled && maxHp > 0)
+            {
+                currentHp = _config.SmoothHealthConfig.GetNextHp((int)currentHp, (int)maxHp);
+            }
+
+            var hpScale = maxHp > 0 ? (float)currentHp / (float)maxHp : 1;
             var hpFillSize = new Vector2(_config.Size.X * hpScale, _config.Size.Y);
             PluginConfigColor? hpColor = GetColor(hpScale);
 
@@ -186,7 +194,7 @@ namespace DelvUI.Interface.Party
             {
                 if (_config.ShieldConfig.FillHealthFirst && Member.MaxHP > 0)
                 {
-                    DrawHelper.DrawShield(Member.Shield, (float)Member.HP / Member.MaxHP, Position, _config.Size,
+                    DrawHelper.DrawShield(Member.Shield, (float)currentHp / maxHp, Position, _config.Size,
                         _config.ShieldConfig.Height, !_config.ShieldConfig.HeightInPixels,
                         _config.ShieldConfig.Color, drawList);
                 }
@@ -263,7 +271,7 @@ namespace DelvUI.Interface.Party
                 var iconPos = Utils.GetAnchoredPosition(parentPos + _raiseTrackerConfig.Position, _raiseTrackerConfig.IconSize, _raiseTrackerConfig.Anchor);
                 DrawHelper.DrawIcon(411, iconPos, _raiseTrackerConfig.IconSize, true, drawList);
             }
-            
+
             // invuln icon
             if (ShowingInvuln())
             {
@@ -325,7 +333,7 @@ namespace DelvUI.Interface.Party
 
             if (showingRaise || showingInvuln)
             {
-                if ((showingRaise && _raiseTrackerConfig.HideNameWhenRaised) || (showingInvuln && _invulnTrackerConfig.HideNameWhenInvuln)) 
+                if ((showingRaise && _raiseTrackerConfig.HideNameWhenRaised) || (showingInvuln && _invulnTrackerConfig.HideNameWhenInvuln))
                 {
                     drawName = false;
                 }
@@ -354,7 +362,7 @@ namespace DelvUI.Interface.Party
                 var text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
                 _raiseTrackerConfig.LabelConfig.SetText(text);
                 _raiseLabelHud.Draw(Position, _config.Size);
-            }            
+            }
             // invuln label
             if (showingInvuln)
             {
@@ -369,8 +377,8 @@ namespace DelvUI.Interface.Party
         {
             return Member != null && Member.RaiseTime.HasValue && _raiseTrackerConfig.Enabled &&
                 (Member.RaiseTime.Value > 0 || _raiseTrackerConfig.KeepIconAfterCastFinishes);
-        }        
-        
+        }
+
         private bool ShowingInvuln()
         {
             return Member != null && Member.InvulnStatus != null && _invulnTrackerConfig.Enabled && Member.InvulnStatus.InvulnTime > 0;

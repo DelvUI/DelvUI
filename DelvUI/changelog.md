@@ -12,6 +12,7 @@ Features:
     + The game's party sorting settings. You can use the game's sorting options and change player's order in the game's social window, and it will be reflected in DelvUI's party frames.
     + Overriding your own position in the frames through the settings or by Ctrl+Alt+Shift+Clicking on another player (this will move you to that position in the list).
     + Raise Tracker. Tracks Raise casts and Raise buffs on the party.
+    + Tank Invulnerabilty Tracker.
     + Mouseover. All abilities automatically assume "mouseover" if the cursor is on top of a unit frame when the ability is used.
 - Added Experience Bar hud.
 - Added Pull timer hud.
