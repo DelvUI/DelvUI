@@ -2,6 +2,7 @@
 - Fixed smooth HP in party frames.
 - Fixed tooltips doing weird things when the config window is opened.
 - Fixed BLM's Polyglot Bar Glow not hiding.
+- Fixed DRK manabar showing label when chunked.
 - Fixed mouseover not working for actions bounds to a mouse button.
 
 # 0.3.0.0

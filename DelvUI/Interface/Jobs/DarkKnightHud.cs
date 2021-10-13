@@ -120,14 +120,13 @@ namespace DelvUI.Interface.Jobs
 
             Config.ManaBar.Label.SetText($"{player.CurrentMp,0}");
             // hardcoded 9k as maxMP so the chunks are each 3k since that's what a DRK wants to see
-            BarUtilities.GetChunkedBars(
+            BarUtilities.GetChunkedProgressBars(
                 Config.ManaBar,
                 chunks,
                 player.CurrentMp,
                 Config.ManaBar.UseChunks ? 9000 : player.MaxMp,
                 0f,
-                player,
-                Config.ManaBar.Label,
+                player,                
                 glowConfig: gauge.HasDarkArts ? Config.ManaBar.GlowConfig : null
                 ).Draw(origin);
         }
