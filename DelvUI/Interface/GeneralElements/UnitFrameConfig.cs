@@ -1,8 +1,9 @@
-﻿using DelvUI.Config;
+﻿using System;
+using System.Numerics;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Interface.Bars;
-using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -142,28 +143,31 @@ namespace DelvUI.Interface.GeneralElements
         public float LowHealthColorThreshold = 25f;
 
         [Combo("Blend Mode", "LAB", "LChab", "XYZ", "RGB", "LChuv", "Luv", "Jzazbz", "JzCzhz")]
-        [Order(86, collapseWith = nameof(UseColorBasedOnHealthValue))]
+        [Order(90, collapseWith = nameof(UseColorBasedOnHealthValue))]
         public BlendMode blendMode = BlendMode.LAB;
-
+        
         [Checkbox("Tank Invulnerability")]
-        [Order(90)]
+        [Order(95)]
         public bool ShowTankInvulnerability = true;
 
         [Checkbox("Tank Invulnerability Custom Color")]
-        [Order(95, collapseWith = nameof(ShowTankInvulnerability))]
+        [Order(100, collapseWith = nameof(ShowTankInvulnerability))]
         public bool UseCustomInvulnerabilityColor = true;
 
         [ColorEdit4("Tank Invulnerability Color ##TankInvulnerabilityCustom")]
-        [Order(100, collapseWith = nameof(UseCustomInvulnerabilityColor))]
+        [Order(105, collapseWith = nameof(UseCustomInvulnerabilityColor))]
         public PluginConfigColor CustomInvulnerabilityColor = new PluginConfigColor(new Vector4(100f / 255f, 100f / 255f, 100f / 255f, 100f / 100f));
-
-        [NestedConfig("Left Text", 105)]
+        
+        [NestedConfig("Use Smooth Transitions", 110, separator = false, nest = true)]
+        public SmoothHealthConfig SmoothHealthConfig;
+        
+        [NestedConfig("Left Text", 115)]
         public EditableLabelConfig LeftLabelConfig;
 
-        [NestedConfig("Right Text", 110)]
+        [NestedConfig("Right Text", 120)]
         public EditableLabelConfig RightLabelConfig;
 
-        [NestedConfig("Shields", 115)]
+        [NestedConfig("Shields", 125)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
         public UnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
@@ -174,6 +178,7 @@ namespace DelvUI.Interface.GeneralElements
             LeftLabelConfig = leftLabelConfig;
             RightLabelConfig = rightLabelConfig;
             BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+            SmoothHealthConfig = new SmoothHealthConfig();
         }
     }
 
@@ -207,5 +212,43 @@ namespace DelvUI.Interface.GeneralElements
         [ColorEdit4("Color ##Shields")]
         [Order(20)]
         public PluginConfigColor Color = new PluginConfigColor(new Vector4(198f / 255f, 210f / 255f, 255f / 255f, 70f / 100f));
+    }
+
+    [Exportable(false)]
+    public class SmoothHealthConfig : PluginConfigObject
+    {
+        [DragFloat("Velocity", min = 1f, max = 100f)]
+        [Order(5)]
+        public float Velocity = 25f;
+        
+        private float? _startHp;
+        private float? _targetHp;
+        private float? _lastHp;
+
+        public uint GetNextHp(int currentHp, int maxHp)
+        {
+            if (!_startHp.HasValue || !_targetHp.HasValue || !_lastHp.HasValue)
+            {
+                _lastHp = currentHp;
+                _startHp = currentHp;
+                _targetHp = currentHp;
+            }
+
+            if (currentHp != _lastHp)
+            {
+                _startHp = _lastHp;
+                _targetHp = currentHp;
+            }
+
+            if (_startHp.HasValue && _targetHp.HasValue)
+            {
+                float delta = _targetHp.Value - _startHp.Value;
+                float offset = delta * Velocity / 100f;
+                _startHp = Math.Clamp(_startHp.Value + offset, 0, maxHp);
+            }
+            
+            _lastHp = currentHp;
+            return _startHp.HasValue ? (uint)_startHp.Value : (uint)currentHp;
+        }
     }
 }
