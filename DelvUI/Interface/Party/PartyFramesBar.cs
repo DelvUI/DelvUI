@@ -325,11 +325,7 @@ namespace DelvUI.Interface.Party
 
             if (showingRaise || showingInvuln)
             {
-                if (showingRaise && _raiseTrackerConfig.HideNameWhenRaised)
-                {
-                    drawName = false;
-                }
-                if (showingInvuln && _invulnTrackerConfig.HideNameWhenInvuln)
+                if (showingRaise && _raiseTrackerConfig.HideNameWhenRaised || showingInvuln && _invulnTrackerConfig.HideNameWhenInvuln) 
                 {
                     drawName = false;
                 }
