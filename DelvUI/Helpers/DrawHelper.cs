@@ -183,7 +183,7 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            var h = !useRatioForHeight ? barSize.Y / 100 * height : height;
+            var h = useRatioForHeight ? barSize.Y / 100 * height : height;
 
             DrawGradientFilledRect(cursorPos, new Vector2(Math.Max(1, barSize.X * shield), h), color, drawList);
         }
@@ -203,7 +203,7 @@ namespace DelvUI.Helpers
             }
 
             // hp portion
-            var h = !useRatioForHeight ? barSize.Y / 100 * Math.Min(100, height) : height;
+            var h = useRatioForHeight ? barSize.Y / 100 * Math.Min(100, height) : height;
             var missingHPRatio = 1 - hp;
             var s = Math.Min(shield, missingHPRatio);
             var shieldStartPos = cursorPos + new Vector2(Math.Max(1, barSize.X * hp), 0);

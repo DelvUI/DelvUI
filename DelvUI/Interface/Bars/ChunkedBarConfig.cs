@@ -9,7 +9,7 @@ namespace DelvUI.Interface.Bars
     [Exportable(false)]
     public class ChunkedBarConfig : BarConfig
     {
-        [DragInt("Padding", min = 0, max = 10000)]
+        [DragInt("Padding", min = -4000, max = 4000)]
         [Order(45)]
         public int Padding = 2;
 
