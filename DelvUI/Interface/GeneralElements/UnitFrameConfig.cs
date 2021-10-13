@@ -156,18 +156,27 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Tank Invulnerability Color ##TankInvulnerabilityCustom")]
         [Order(105, collapseWith = nameof(UseCustomInvulnerabilityColor))]
-        public PluginConfigColor CustomInvulnerabilityColor = new PluginConfigColor(new Vector4(100f / 255f, 100f / 255f, 100f / 255f, 100f / 100f));
+        public PluginConfigColor CustomInvulnerabilityColor = new PluginConfigColor(new Vector4(211f / 255f, 235f / 255f, 215f / 245f, 50f / 100f));
         
-        [NestedConfig("Use Smooth Transitions", 110, separator = false, nest = true)]
+        [Checkbox("Walking Dead Custom Color")]
+        [Order(110, collapseWith = nameof(ShowTankInvulnerability))]
+        public bool UseCustomWalkingDeadColor = true;
+        
+        [ColorEdit4("Walking Dead Color ##TankWalkingDeadCustom")]
+        [Order(115, collapseWith = nameof(UseCustomWalkingDeadColor))]
+        public PluginConfigColor CustomWalkingDeadColor = new PluginConfigColor(new Vector4(158f / 255f, 158f / 255f, 158f / 255f, 50f / 100f));
+
+        
+        [NestedConfig("Use Smooth Transitions", 120, separator = false, nest = true)]
         public SmoothHealthConfig SmoothHealthConfig;
         
-        [NestedConfig("Left Text", 115)]
+        [NestedConfig("Left Text", 125)]
         public EditableLabelConfig LeftLabelConfig;
 
-        [NestedConfig("Right Text", 120)]
+        [NestedConfig("Right Text", 130)]
         public EditableLabelConfig RightLabelConfig;
 
-        [NestedConfig("Shields", 125)]
+        [NestedConfig("Shields", 135)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
         public UnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)

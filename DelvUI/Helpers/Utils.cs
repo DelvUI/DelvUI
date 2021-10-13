@@ -1,5 +1,6 @@
 using DelvUI.Interface.GeneralElements;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.Objects;
@@ -11,6 +12,7 @@ using Colourful;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Dalamud.Game.ClientState.Statuses;
 using Dalamud.Logging;
 
 namespace DelvUI.Helpers
@@ -281,10 +283,10 @@ namespace DelvUI.Helpers
             return GlobalColors.Instance.NPCNeutralColor;
         }
 
-        public static bool HasTankInvulnerability(BattleChara actor)
+        public static Status HasTankInvulnerability(BattleChara actor)
         {
-            var tankInvulnBuff = actor.StatusList.Where(o => o.StatusId is 810 or 1302 or 409 or 1836);
-            return tankInvulnBuff.Any();
+            var tankInvulnBuff = actor.StatusList.FirstOrDefault(o => o.StatusId is 810 or 811 or 1302 or 409 or 1836);
+            return tankInvulnBuff!;
         }
 
         public static GameObject? FindTargetOfTarget(GameObject? target, GameObject? player, ObjectTable actors)
