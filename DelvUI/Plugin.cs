@@ -122,6 +122,7 @@ namespace DelvUI
             ClipRectsHelper.Initialize();
             GlobalColors.Initialize();
             LimitBreakHelper.Initialize();
+            MouseHelper.Initialize();
             MouseOverHelper.Initialize();
             PartyManager.Initialize();
             ProfilesManager.Initialize();
@@ -212,6 +213,7 @@ namespace DelvUI
 
             UiBuilder.OverrideGameCursor = false;
 
+            MouseHelper.Instance?.Update();
             ConfigurationManager.Instance.Draw();
 
             var fontPushed = FontsManager.Instance.PushDefaultFont();
@@ -258,6 +260,7 @@ namespace DelvUI
             FontsManager.Instance.Dispose();
             GlobalColors.Instance.Dispose();
             LimitBreakHelper.Instance.Dispose();
+            MouseHelper.Instance.Dispose();
             MouseOverHelper.Instance.Dispose();
             PartyManager.Instance.Dispose();
             PullTimerHelper.Instance.Dispose();

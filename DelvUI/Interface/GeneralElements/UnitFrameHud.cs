@@ -34,7 +34,6 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
-
         public UnitFrameHud(UnitFrameConfig config, string displayName) : base(config, displayName)
         {
             // interaction stuff
@@ -78,11 +77,11 @@ namespace DelvUI.Interface.GeneralElements
             var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
             if (ImGui.IsMouseHoveringRect(startPos, startPos + Config.Size) && !DraggingEnabled)
             {
-                if (Control.MouseButtons == MouseButtons.Left)
+                if (MouseHelper.Instance.LeftButton == MouseButtonState.Clicked)
                 {
                     Plugin.TargetManager.SetTarget(Actor);
                 }
-                else if (Control.MouseButtons == MouseButtons.Right)
+                else if (MouseHelper.Instance.RightButton == MouseButtonState.Clicked)
                 {
                     var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
                     _openContextMenuFromTarget(agentHud, Actor.Address);
