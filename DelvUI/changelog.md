@@ -1,5 +1,6 @@
 # 0.3.0.1
 - Fixed smooth HP in party frames.
+- Fixed tooltips doing weird things when the config window is opened.
 - Fixed BLM's Polyglot Bar Glow not hiding.
 
 # 0.3.0.0
