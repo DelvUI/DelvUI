@@ -34,6 +34,7 @@ Features:
 - Added font options fot tooltips.
 - Added option to show status effects with their original shape and dispellable indicator.
 - Added BLM specific options for the MP Ticker.
+- Smooth HP transitions for unit- and party frames.
 
 Fixes:
 - Fixed several issues in the HUD unlocked mode.
