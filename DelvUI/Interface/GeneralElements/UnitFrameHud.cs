@@ -18,7 +18,21 @@ namespace DelvUI.Interface.GeneralElements
 
         private readonly OpenContextMenuFromTarget _openContextMenuFromTarget;
 
-        public GameObject? Actor { get; set; } = null;
+        private SmoothHPHelper _smoothHPHelper = new SmoothHPHelper();
+
+        private GameObject? _actor = null;
+        public GameObject? Actor
+        {
+            get => _actor;
+            set
+            {
+                if (_actor == value) { return; }
+
+                _actor = value;
+                _smoothHPHelper.Reset();
+            }
+        }
+
 
         public UnitFrameHud(UnitFrameConfig config, string displayName) : base(config, displayName)
         {
@@ -84,7 +98,7 @@ namespace DelvUI.Interface.GeneralElements
 
             if (Config.SmoothHealthConfig.Enabled)
             {
-                currentHp = Config.SmoothHealthConfig.GetNextHp((int)currentHp, (int)maxHp);
+                currentHp = _smoothHPHelper.GetNextHp((int)currentHp, (int)maxHp, Config.SmoothHealthConfig.Velocity);
             }
 
             PluginConfigColor fillColor = Config.UseJobColor ? Utils.ColorForActor(character) : Config.FillColor;
