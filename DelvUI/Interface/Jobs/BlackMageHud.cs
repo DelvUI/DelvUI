@@ -219,14 +219,15 @@ namespace DelvUI.Interface.Jobs
             // only 1 stack before level 80
             if (player.Level < 80)
             {
-                var glow = gauge.PolyglotStacks == 1 ? Config.PolyglotBar.GlowConfig : null;
+                var glow = gauge.PolyglotStacks == 1 && Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
                 BarUtilities.GetBar(Config.PolyglotBar, gauge.PolyglotStacks, 1, 0, glowConfig: glow)
                     .Draw(origin);
             }
             // 2 stacks for level 80+
             else
             {
-                BarUtilities.GetChunkedBars(Config.PolyglotBar, 2, gauge.PolyglotStacks, 2f, 0, glowConfig: Config.PolyglotBar.GlowConfig)
+                var glow = Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
+                BarUtilities.GetChunkedBars(Config.PolyglotBar, 2, gauge.PolyglotStacks, 2f, 0, glowConfig: glow)
                     .Draw(origin);
             }
         }
