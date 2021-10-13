@@ -76,6 +76,7 @@ namespace DelvUI.Interface.Party
             { 810, 003077 },    // LIVING DEAD
             { 811, 003077 },    // WALKING DEAD
             { 1302, 002502 },   // HALLOWED GROUND
+            { 82, 002502 },     // HALLOWED GROUND
             { 409, 000266 },    // HOLMGANG
             { 1836, 003416 }    // SUPERBOLIDE
         };
