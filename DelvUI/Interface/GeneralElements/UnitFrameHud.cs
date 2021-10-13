@@ -106,7 +106,7 @@ namespace DelvUI.Interface.GeneralElements
 
             if (Config.UseColorBasedOnHealthValue)
             {
-                var scale = currentHp / Math.Max(1, maxHp);
+                var scale = (float)currentHp / Math.Max(1, maxHp);
                 fillColor = Utils.GetColorByScale(scale, Config.LowHealthColorThreshold / 100f, Config.FullHealthColorThreshold / 100f, Config.LowHealthColor, Config.FullHealthColor, Config.blendMode);
             }
 
