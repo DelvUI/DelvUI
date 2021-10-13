@@ -324,7 +324,20 @@ namespace DelvUI.Interface.Party
             {
                 var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _manaBarConfig.HealthBarAnchor);
                 var manaBarPos = Utils.GetAnchoredPosition(parentPos + _manaBarConfig.Position, _manaBarConfig.Size, _manaBarConfig.Anchor);
-                _manaLabelHud.Draw(manaBarPos, _manaBarConfig.Size, character);
+
+                if (character == null)
+                {
+                    string oldText = _manaBarConfig.ValueLabelConfig.GetText();
+                    _manaBarConfig.ValueLabelConfig.SetText(Member.MP.ToString());
+
+                    _manaLabelHud.Draw(manaBarPos, _manaBarConfig.Size, character);
+
+                    _manaBarConfig.ValueLabelConfig.SetText(oldText);
+                }
+                else
+                {
+                    _manaLabelHud.Draw(manaBarPos, _manaBarConfig.Size, character);
+                }
             }
 
             // buffs / debuffs
@@ -361,7 +374,19 @@ namespace DelvUI.Interface.Party
             }
 
             // health label
-            _healthLabelHud.Draw(Position, _config.Size, character, Member.HP.ToString());
+            if (character == null)
+            {
+                string oldText = _config.HealthLabelConfig.GetText();
+                _config.HealthLabelConfig.SetText(Member.HP.ToString());
+
+                _healthLabelHud.Draw(Position, _config.Size, character);
+
+                _config.HealthLabelConfig.SetText(oldText);
+            }
+            else
+            {
+                _healthLabelHud.Draw(Position, _config.Size, character);
+            }
 
             // order
             if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)
