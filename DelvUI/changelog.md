@@ -8,7 +8,7 @@
 - Removed glow option from DRK Dark Arts proc.
 - Fixed party frames preview not showing accurate values for health and mana.
 - Fixed PLD Invulnerability not being properly tracked.
-- Fixed crash while traveling on Hunt Train.
+- Fixed some crashes.
 
 # 0.3.0.0
 This version brings A LOT of changes. Chances are your settings will be invalid / broken. We recommend starting from a clean state.
