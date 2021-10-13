@@ -37,9 +37,24 @@ namespace DelvUI.Interface.Party
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
 
-        public IPartyFramesMember? Member;
         public bool Visible = false;
         public Vector2 Position;
+
+        private SmoothHPHelper _smoothHPHelper = new SmoothHPHelper();
+
+        private IPartyFramesMember? _member = null;
+        public IPartyFramesMember? Member
+        {
+            get => _member;
+            set
+            {
+                if (_member == value) { return; }
+
+                _member = value;
+                _smoothHPHelper.Reset();
+            }
+        }
+
 
         public PartyFramesBar(
             string id,
@@ -170,9 +185,9 @@ namespace DelvUI.Interface.Party
             uint currentHp = Member.HP;
             uint maxHp = Member.MaxHP;
 
-            if (_config.SmoothHealthConfig.Enabled && maxHp > 0)
+            if (_config.SmoothHealthConfig.Enabled)
             {
-                currentHp = _config.SmoothHealthConfig.GetNextHp((int)currentHp, (int)maxHp);
+                currentHp = _smoothHPHelper.GetNextHp((int)currentHp, (int)maxHp, _config.SmoothHealthConfig.Velocity);
             }
 
             var hpScale = maxHp > 0 ? (float)currentHp / (float)maxHp : 1;
