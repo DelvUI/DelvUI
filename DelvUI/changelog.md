@@ -1,3 +1,6 @@
+# 0.3.0.2
+- Fixed smooth HP in party frames not being smooth enough.
+
 # 0.3.0.1
 - Fixed smooth HP in party frames.
 - Fixed tooltips doing weird things when the config window is opened.

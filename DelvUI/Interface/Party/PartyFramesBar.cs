@@ -42,19 +42,7 @@ namespace DelvUI.Interface.Party
 
         private SmoothHPHelper _smoothHPHelper = new SmoothHPHelper();
 
-        private IPartyFramesMember? _member = null;
-        public IPartyFramesMember? Member
-        {
-            get => _member;
-            set
-            {
-                if (_member == value) { return; }
-
-                _member = value;
-                _smoothHPHelper.Reset();
-            }
-        }
-
+        public IPartyFramesMember? Member;
 
         public PartyFramesBar(
             string id,
