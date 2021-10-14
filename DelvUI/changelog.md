@@ -1,3 +1,25 @@
+# 0.3.1.0
+Features:
+- Added a mouseover settings under Misc > HUD Options. Three modes supported:
+    1. Mouseover completely disabled for DelvUI frames.
+    2. Automatic mode: All your actions will automatically assume mouseover when your cursor is on top of a unit frame. Mouseover macros or other mouseover plugins are not necessary and WON'T WORK with DelvUI in this mode!
+    3. Regular mode: DelvUI unit frames will behave like the game's ones. You'll need to use mouseover macros or other mouseover related plugins in this mode.
+
+- Added a command to forcibly switch the active Job Pack to the specified job:
+    + Turn on with `/delvui forcejob job`
+    + Turn off with `/delvui forcejob off`
+
+Fixes:
+- Fixed some threshold or timers not working properly in some job specific bars.
+- Fixed mouseover not working for actions bound to mouse buttons (ie M3, M4, etc).
+- Fixed smooth HP in party frames not being smooth enough.
+- Fixed fonts not properly reloading when switching profiles.
+- Fixed tooltips missing characters / not working in other languages with a non-standard latin alphabet.
+- Fixed tooltips not showing when the config window is opened.
+- Fixed tank invuln breaking when two tanks used invuln at the same time.
+- Fixed tank invuln breaking when an actor died with invuln up.
+- Fixed bugs with the mana bars.
+
 # 0.3.0.1
 - Fixed smooth HP in party frames.
 - Fixed tooltips doing weird things when the config window is opened.
@@ -26,6 +48,7 @@ Features:
     + Raise Tracker. Tracks Raise casts and Raise buffs on the party.
     + Tank Invulnerabilty Tracker.
     + Mouseover. All abilities automatically assume "mouseover" if the cursor is on top of a unit frame when the ability is used.
+
 - Added Experience Bar hud.
 - Added Pull timer hud.
 - Added Limit Break hud.

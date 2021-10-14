@@ -13,6 +13,7 @@ namespace DelvUI.Helpers
         {
             var n = actor != null ? actor.Name : name ?? "";
 
+            // exp
             switch (tag)
             {
                 case "[exp:current-short]":
@@ -37,6 +38,7 @@ namespace DelvUI.Helpers
                     return ExperienceHelper.Instance.PercentExp.ToString("N1", CultureInfo.InvariantCulture);
             }
 
+            // name
             switch (tag)
             {
                 case "[name]":
@@ -84,6 +86,23 @@ namespace DelvUI.Helpers
 
             if (actor is Character character)
             {
+                // misc
+                switch (tag)
+                {
+                    case "[distance]":
+                        return (character.YalmDistanceX + 1).ToString();
+
+                    case "[company]":
+                        return character.CompanyTag.ToString();
+
+                    case "[level]":
+                        return character.Level.ToString();
+
+                    case "[job]":
+                        return JobsHelper.JobNames.TryGetValue(character.ClassJob.Id, out var jobName) ? jobName : "";
+                }
+
+                // health
                 switch (tag)
                 {
                     case "[health:current]":
@@ -129,62 +148,58 @@ namespace DelvUI.Helpers
 
                     case "[health:deficit-short]":
                         return $"-{(character.MaxHp - character.CurrentHp).KiloFormat()}";
+                }
+
+                // mana
+                uint currentMp = JobsHelper.CurrentPrimaryResource(character);
+                uint maxMp = JobsHelper.MaxPrimaryResource(character);
+
+                switch (tag)
+                {
 
                     case "[mana:current]":
-                        return character.CurrentMp.ToString();
+                        return currentMp.ToString();
 
                     case "[mana:current-short]":
-                        return character.CurrentMp.KiloFormat();
+                        return currentMp.KiloFormat();
 
                     case "[mana:current-percent]":
-                        return character.CurrentMp == character.MaxMp ? character.CurrentMp.ToString() : $"{Math.Round(100f / character.MaxMp * character.CurrentMp)}";
+                        return currentMp == maxMp ? currentMp.ToString() : $"{Math.Round(100f / maxMp * currentMp)}";
 
                     case "[mana:current-percent-short]":
-                        return character.CurrentMp == character.MaxMp ? character.CurrentMp.KiloFormat() : $"{Math.Round(100f / character.MaxMp * character.CurrentMp)}";
+                        return currentMp == maxMp ? currentMp.KiloFormat() : $"{Math.Round(100f / maxMp * currentMp)}";
 
                     case "[mana:current-max]":
-                        return $"{character.CurrentMp.ToString()}  |  {character.MaxMp}";
+                        return $"{currentMp}  |  {maxMp}";
 
                     case "[mana:current-max-short]":
-                        return $"{character.CurrentMp.KiloFormat()} | {character.MaxMp.KiloFormat()}";
+                        return $"{currentMp.KiloFormat()} | {maxMp.KiloFormat()}";
 
                     case "[mana:current-max-percent]":
-                        return character.CurrentMp == character.MaxMp ? $"{Math.Round(100f / character.MaxMp * character.CurrentMp)}  |  100" : $"{character.CurrentMp} - {character.MaxMp}";
+                        return currentMp == maxMp ? $"{Math.Round(100f / maxMp * currentMp)}  |  100" : $"{currentMp} - {maxMp}";
 
                     case "[mana:current-max-percent-short]":
-                        return character.CurrentMp == character.MaxMp
-                            ? $"{Math.Round(100f / character.MaxMp * character.CurrentMp)}  |  100"
-                            : $"{character.CurrentMp.KiloFormat()} - {character.MaxMp.KiloFormat()}";
+                        return currentMp == maxMp
+                            ? $"{Math.Round(100f / maxMp * currentMp)}  |  100"
+                            : $"{currentMp.KiloFormat()} - {maxMp.KiloFormat()}";
 
                     case "[mana:max]":
-                        return character.MaxMp.ToString();
+                        return maxMp.ToString();
 
                     case "[mana:max-short]":
-                        return character.MaxMp.KiloFormat();
+                        return maxMp.KiloFormat();
 
                     case "[mana:percent]":
-                        return $"{Math.Round(100f / character.MaxMp * character.CurrentMp)}";
+                        return $"{Math.Round(100f / maxMp * currentMp)}";
 
                     case "[mana:percent-decimal]":
-                        return FormattableString.Invariant($"{100f / character.MaxMp * character.CurrentMp:##0.#}");
+                        return FormattableString.Invariant($"{100f / maxMp * currentMp:##0.#}");
 
                     case "[mana:deficit]":
-                        return $"-{character.MaxMp-character.CurrentMp}";
+                        return $"-{maxMp - currentMp}";
 
                     case "[mana:deficit-short]":
-                        return $"-{(character.MaxMp - character.CurrentMp).KiloFormat()}";
-
-                    case "[distance]":
-                        return (character.YalmDistanceX + 1).ToString();
-
-                    case "[company]":
-                        return character.CompanyTag.ToString();
-
-                    case "[level]":
-                        return character.Level.ToString();
-
-                    case "[job]":
-                        return JobsHelper.JobNames.TryGetValue(character.ClassJob.Id, out var jobName) ? jobName : "";
+                        return $"-{(maxMp - currentMp).KiloFormat()}";
                 }
             }
 

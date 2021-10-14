@@ -7,13 +7,13 @@ using Dalamud.Game.ClientState.Objects.Types;
 using System;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Enums;
+using DelvUI.Interface.Bars;
 
 namespace DelvUI.Interface.GeneralElements
 {
     public class PrimaryResourceHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
     {
         private PrimaryResourceConfig Config => (PrimaryResourceConfig)_config;
-        private LabelHud _valueLabel;
 
         public PrimaryResourceTypes ResourceType = PrimaryResourceTypes.MP;
 
@@ -43,7 +43,6 @@ namespace DelvUI.Interface.GeneralElements
 
         public PrimaryResourceHud(PrimaryResourceConfig config, string displayName) : base(config, displayName)
         {
-            _valueLabel = new LabelHud(config.ValueLabelConfig);
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -61,44 +60,28 @@ namespace DelvUI.Interface.GeneralElements
             var chara = (Character)Actor;
             int current = 0;
             int max = 0;
-            int percent = 0;
 
-            GetResources(ref current, ref max, ref percent, chara);
-            if (Config.HidePrimaryResourceWhenFull && current == max) { return; }
-
-            var scale = (float)current / max;
-            Vector2 startPos = origin + GetAnchoredPosition(Config.Position, Config.Size, Config.Anchor);
-
-            DrawHelper.DrawInWindow(ID, startPos, Config.Size, false, false, (drawList) =>
+            GetResources(ref current, ref max, chara);
+            if (Config.HidePrimaryResourceWhenFull && current == max)
             {
-                // bar
-                drawList.AddRectFilled(startPos, startPos + Config.Size, 0x88000000);
-
-                var color = Config.ShowThresholdMarker && percent < Config.ThresholdMarkerValue / 100 ? Config.BelowThresholdColor : Color(Actor);
-
-                DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X * scale, Config.Size.Y), color, drawList);
-
-                drawList.AddRect(startPos, startPos + Config.Size, 0xFF000000);
-
-                // threshold
-                if (Config.ShowThresholdMarker)
-                {
-                    var position = new Vector2(startPos.X + Config.ThresholdMarkerValue / 10000f * Config.Size.X - 2, startPos.Y);
-                    var size = new Vector2(2, Config.Size.Y);
-                    drawList.AddRect(position, position + size, 0xFF000000);
-                }
-            });
-
-
-            // label
-            if (Config.ValueLabelConfig.Enabled)
-            {
-                Config.ValueLabelConfig.SetText($"{current}");
-                _valueLabel.Draw(startPos, Config.Size, Actor);
+                return;
             }
+
+            BarHud bar = BarUtilities.GetProgressBar(
+                Config,
+                Config.ThresholdConfig,
+                new LabelConfig[] { Config.ValueLabel },
+                current,
+                max,
+                0,
+                chara,
+                GetColor(chara)
+            );
+
+            bar.Draw(origin + ParentPos());
         }
 
-        private void GetResources(ref int current, ref int max, ref int percent, Character actor)
+        private void GetResources(ref int current, ref int max, Character actor)
         {
             switch (ResourceType)
             {
@@ -106,7 +89,6 @@ namespace DelvUI.Interface.GeneralElements
                     {
                         current = (int)actor.CurrentMp;
                         max = (int)actor.MaxMp;
-                        if (max != 0) { percent = (int)Math.Round((double)(100 * current / max)); }
                     }
 
                     break;
@@ -115,7 +97,6 @@ namespace DelvUI.Interface.GeneralElements
                     {
                         current = (int)actor.CurrentCp;
                         max = (int)actor.MaxCp;
-                        if (max != 0) { percent = (int)Math.Round((double)(100 * current / max)); }
                     }
 
                     break;
@@ -124,18 +105,17 @@ namespace DelvUI.Interface.GeneralElements
                     {
                         current = (int)actor.CurrentGp;
                         max = (int)actor.MaxGp;
-                        if (max != 0) { percent = (int)Math.Round((double)(100 * current / max)); }
                     }
 
                     break;
             }
         }
 
-        public virtual PluginConfigColor Color(GameObject? actor = null)
+        public virtual PluginConfigColor GetColor(GameObject? actor = null)
         {
             if (!Config.UseJobColor)
             {
-                return Config.Color;
+                return Config.FillColor;
             }
 
             return actor is not Character character ? GlobalColors.Instance.NPCFriendlyColor : Utils.ColorForActor(character);

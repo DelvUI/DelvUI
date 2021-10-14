@@ -3,7 +3,6 @@ using DelvUI.Config.Attributes;
 using ImGuiNET;
 using System;
 using System.Numerics;
-using System.Text.RegularExpressions;
 
 namespace DelvUI.Helpers
 {
@@ -71,7 +70,7 @@ namespace DelvUI.Helpers
             // remove styling tags from text
             if (_previousRawText != text)
             {
-                _currentTooltipText = SanitizeText(text);
+                _currentTooltipText = text;
                 _previousRawText = text;
             }
 
@@ -118,7 +117,7 @@ namespace DelvUI.Helpers
 
         public void Draw()
         {
-            if (!_dataIsValid || ConfigurationManager.Instance.DrawConfigWindow)
+            if (!_dataIsValid || ConfigurationManager.Instance.ShowingModalWindow)
             {
                 return;
             }
@@ -190,27 +189,6 @@ namespace DelvUI.Helpers
             ImGui.PopStyleVar();
 
             RemoveTooltip();
-        }
-
-        private string SanitizeText(string text)
-        {
-            // some data comes with unicode characters i couldn't figure out how to get rid of
-            // so im doing a pretty aggressive replace to keep only "nice" characters
-            var result = Regex.Replace(text, @"[^a-zA-Z0-9 -\:\.\,\?\!\(\)%]", "");
-
-            // after that there's still some leftovers characters that need to be removed
-            Regex regex = new Regex("HI(.*?)IH");
-            foreach (Match match in regex.Matches(result))
-            {
-                if (match.Groups.Count > 1)
-                {
-                    result = result.Replace(match.Value, match.Groups[1].Value);
-                }
-            }
-
-            result = result.Replace("%", "%%");
-
-            return result;
         }
 
         private Vector2 ConstrainPosition(Vector2 position, Vector2 size)

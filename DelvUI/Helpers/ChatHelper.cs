@@ -39,18 +39,6 @@ namespace DelvUI.Helpers
             .text:00007FF647D391D4 48 8D 05 ED 29 61+lea     rax, off_7FF64934BBC8
             */
             IntPtr baseUi = Plugin.SigScanner.GetStaticAddressFromSig("48 8B 0D ?? ?? ?? ?? 48 8D 54 24 ?? 48 83 C1 10 E8");
-            
-            /*
-             Part of uiModule disassembly signature
-            .text:00007FF6482E7076 E8 95 AF A8 FF    call    Client__System__Framework__Framework_GetUIModule
-            .text:00007FF6482E707B 48 83 7F 50 00    cmp     qword ptr [rdi+50h], 0
-            .text:00007FF6482E7080 48 8B F0          mov     rsi, rax
-            .text:00007FF6482E7083 0F 84 58 01 00 00 jz      loc_7FF6482E71E1
-            */
-            IntPtr uiModule = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 83 7F ?? 00 48 8B F0");
-
-            UiModuleDelegate uiModuleDelegate = Marshal.GetDelegateForFunctionPointer<UiModuleDelegate>(uiModule);
-            _uiModulePtr = (IntPtr?)uiModuleDelegate.DynamicInvoke(Marshal.ReadIntPtr(baseUi));
 
             /*
              Part of chatModule disassembly signature
@@ -95,7 +83,6 @@ namespace DelvUI.Helpers
         }
         #endregion
 
-        private IntPtr? _uiModulePtr;
         private IntPtr _chatModulePtr;
 
         public static void SendChatMessage(string message)
@@ -121,7 +108,7 @@ namespace DelvUI.Helpers
                 return;
             }
 
-            if (!_uiModulePtr.HasValue || _uiModulePtr == IntPtr.Zero || _chatModulePtr == IntPtr.Zero)
+            if (_chatModulePtr == IntPtr.Zero)
             {
                 return;
             }
@@ -131,7 +118,7 @@ namespace DelvUI.Helpers
             var payload = MessagePayload(text, length);
 
             ChatDelegate chatDelegate = Marshal.GetDelegateForFunctionPointer<ChatDelegate>(_chatModulePtr);
-            chatDelegate.Invoke(_uiModulePtr.Value, payload, IntPtr.Zero, (byte)0);
+            chatDelegate.Invoke(Plugin.GameGui.GetUIModule(), payload, IntPtr.Zero, (byte)0);
 
             Marshal.FreeHGlobal(payload);
             Marshal.FreeHGlobal(text);

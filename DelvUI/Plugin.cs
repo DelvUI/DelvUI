@@ -89,7 +89,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.3.0.1";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.3.1.0";
 
             FontsManager.Initialize(AssemblyLocation);
             LoadBanner();
@@ -97,24 +97,6 @@ namespace DelvUI
             // initialize a not-necessarily-defaults configuration
             ConfigurationManager.Initialize();
             FontsManager.Instance.LoadConfig();
-
-            UiBuilder.Draw += Draw;
-            UiBuilder.BuildFonts += BuildFont;
-            UiBuilder.OpenConfigUi += OpenConfigUi;
-
-            CommandManager.AddHandler(
-                "/delvui",
-                new CommandInfo(PluginCommand)
-                {
-                    HelpMessage = "Opens the DelvUI configuration window.\n"
-                                + "/delvui toggle → Toggles HUD visibility.\n"
-                                + "/delvui show → Shows HUD.\n"
-                                + "/delvui hide → Hides HUD.\n"
-                                + "/delvui reset → Resets HUD to default. This is irreversible!",
-
-                    ShowInHelp = true
-                }
-            );
 
             _menuHook = new SystemMenuHook(PluginInterface);
 
@@ -130,6 +112,23 @@ namespace DelvUI
             TooltipsHelper.Initialize();
 
             _hudManager = new HudManager();
+
+            UiBuilder.Draw += Draw;
+            UiBuilder.BuildFonts += BuildFont;
+            UiBuilder.OpenConfigUi += OpenConfigUi;
+
+            CommandManager.AddHandler(
+                "/delvui",
+                new CommandInfo(PluginCommand)
+                {
+                    HelpMessage = "Opens the DelvUI configuration window.\n"
+                                + "/delvui toggle → Toggles HUD visibility.\n"
+                                + "/delvui show → Shows HUD.\n"
+                                + "/delvui hide → Hides HUD.",
+
+                    ShowInHelp = true
+                }
+            );
         }
 
         public void Dispose()
@@ -189,6 +188,29 @@ namespace DelvUI
                         ConfigurationManager.Instance.ShowHUD = false;
                         break;
 
+                    case { } argument when argument.StartsWith("forcejob"):
+                        // TODO: Turn this into a helper function?
+                        var args = argument.Split(" ");
+
+                        if (args.Length > 0)
+                        {
+                            if (args[1] == "off")
+                            {
+                                ForcedJob.Enabled = false;
+
+                                return;
+                            }
+
+                            var job = typeof(JobIDs).GetField(args[1].ToUpper());
+
+                            if (job != null)
+                            {
+                                ForcedJob.Enabled = true;
+                                ForcedJob.ForcedJobId = (uint)(job.GetValue(null) ?? JobIDs.ACN);
+                            }
+                        }
+                        break;
+
                     default:
                         configManager.DrawConfigWindow = !configManager.DrawConfigWindow;
 
@@ -196,8 +218,6 @@ namespace DelvUI
                 }
             }
         }
-
-        private void ReloadConfigCommand(string command, string arguments) { ConfigurationManager.Instance.LoadConfigurations(); }
 
         private void Draw()
         {
@@ -225,6 +245,8 @@ namespace DelvUI
             {
                 ImGui.PopFont();
             }
+
+            MouseOverHelper.Instance.Update();
         }
 
         private void OpenConfigUi()
@@ -245,7 +267,6 @@ namespace DelvUI
             ConfigurationManager.Instance.DrawConfigWindow = false;
 
             CommandManager.RemoveHandler("/delvui");
-            CommandManager.RemoveHandler("/delvuireloadconfig");
 
             UiBuilder.Draw -= Draw;
             UiBuilder.BuildFonts -= BuildFont;

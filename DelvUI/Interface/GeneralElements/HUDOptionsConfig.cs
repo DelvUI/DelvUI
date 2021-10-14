@@ -15,39 +15,51 @@ namespace DelvUI.Interface.GeneralElements
         public bool UseGlobalHudShift = false;
 
         [DragInt2("Position", min = -4000, max = 4000)]
-        [Order(80, collapseWith = nameof(UseGlobalHudShift))]
+        [Order(6, collapseWith = nameof(UseGlobalHudShift))]
         public Vector2 HudOffset = new(0, 0);
 
+        [Checkbox("Mouseover", separator = true)]
+        [Order(10)]
+        public bool MouseoverEnabled = true;
+
+        [Checkbox("Automatic Mode", help =
+            "When enabled: All your actions will automatically assume mouseover when your cursor is on top of a unit frame.\n" +
+            "Mouseover macros or other mouseover plugins are not necessary and WON'T WORK in this mode!\n\n" +
+            "When disabled: DelvUI unit frames will behave like the game's ones.\n" +
+            "You'll need to use mouseover macros or other mouseover related plugins in this mode.")]
+        [Order(11, collapseWith = nameof(MouseoverEnabled))]
+        public bool MouseoverAutomaticMode = true;
+
         [Checkbox("Hide DelvUI outside of combat", separator = true)]
-        [Order(5)]
+        [Order(20)]
         public bool HideOutsideOfCombat = false;
 
         [Checkbox("Hide DelvUI in Gold Saucer")]
-        [Order(10)]
+        [Order(25)]
         public bool HideInGoldSaucer = false;
 
         [Checkbox("Hide only JobPack HUD outside of combat")]
-        [Order(15)]
+        [Order(30)]
         public bool HideOnlyJobPackHudOutsideOfCombat = false;
 
         [Checkbox("Hide Default Job Gauges", isMonitored = true, spacing = true)]
-        [Order(20)]
+        [Order(35)]
         public bool HideDefaultJobGauges = false;
 
         [Checkbox("Hide Default Castbar", isMonitored = true)]
-        [Order(30)]
-        public bool HideDefaultCastbar = false;        
-        
+        [Order(40)]
+        public bool HideDefaultCastbar = false;
+
         [Checkbox("Hide Default Pulltimer", isMonitored = true)]
-        [Order(32)]
+        [Order(45)]
         public bool HideDefaultPulltimer = false;
 
-        [Checkbox("Enable Combat Hotbars", isMonitored = true, spacing = true)]
-        [Order(35)]
+        [Checkbox("Enable Combat Hotbars", isMonitored = true, separator = true)]
+        [Order(50)]
         public bool EnableCombatActionBars = false;
 
         [DynamicList("Hotbars Shown Only In Combat", "Hotbar 1", "Hotbar 2", "Hotbar 3", "Hotbar 4", "Hotbar 5", "Hotbar 6", "Hotbar 7", "Hotbar 8", "Hotbar 9", "Hotbar 10", isMonitored = true)]
-        [Order(40, collapseWith = nameof(EnableCombatActionBars))]
+        [Order(81, collapseWith = nameof(EnableCombatActionBars))]
         public List<string> CombatActionBars = new List<string>();
 
         public Vector2 CastBarOriginalPosition;
