@@ -1,8 +1,10 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Helpers;
+using ImGuiNET;
 
 namespace DelvUI.Interface.Party
 {
@@ -60,9 +62,9 @@ namespace DelvUI.Interface.Party
                 if (tankInvuln == null)
                 {
                     member.InvulnStatus = null;
-                    break;
+                    continue;
                 }
-                
+
                 // apply invuln data based on buff
 
                 member.InvulnStatus = new InvulnStatus(InvulnMap[tankInvuln.StatusId], tankInvuln.RemainingTime, tankInvuln.StatusId);

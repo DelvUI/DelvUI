@@ -16,6 +16,7 @@ Fixes:
 - Fixed fonts not properly reloading when switching profiles.
 - Fixed tooltips missing characters / not working in other languages with a non-standard latin alphabet.
 - Fixed tooltips not showing when the config window is opened.
+- Fixed tank invuln breaking when two tanks used invuln at the same time.
 
 # 0.3.0.1
 - Fixed smooth HP in party frames.
