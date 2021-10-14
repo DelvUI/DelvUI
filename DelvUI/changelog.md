@@ -1,6 +1,7 @@
 # 0.3.0.2
 - Fixed smooth HP in party frames not being smooth enough.
 - Switching profile will now reload fonts as they can differ between profiles.
+- Fixed tooltips missing characters / not working in other languages with a non-standard latin alphabet.
 
 # 0.3.0.1
 - Fixed smooth HP in party frames.
