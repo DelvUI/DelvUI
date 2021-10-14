@@ -2,6 +2,7 @@
 - Fixed smooth HP in party frames not being smooth enough.
 - Fixed mouseover not working for actions bound to mouse buttons (ie M3, M4, etc).
 - Added a mouseover setting under Misc > HUD Options to enable and disable the feature completely.
+- Fixed fonts not properly reloading when switching profiles.
 
 # 0.3.0.1
 - Fixed smooth HP in party frames.
