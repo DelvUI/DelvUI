@@ -152,7 +152,7 @@ namespace DelvUI.Helpers
 
                 // mana
                 uint currentMp = JobsHelper.CurrentPrimaryResource(character);
-                uint maxMp = JobsHelper.CurrentPrimaryResource(character);
+                uint maxMp = JobsHelper.MaxPrimaryResource(character);
 
                 switch (tag)
                 {
