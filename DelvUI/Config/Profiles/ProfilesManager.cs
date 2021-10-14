@@ -252,6 +252,7 @@ namespace DelvUI.Config.Profiles
             try
             {
                 Save();
+                Plugin.UiBuilder.RebuildFonts();
             }
             catch (Exception e)
             {
@@ -743,8 +744,8 @@ namespace DelvUI.Config.Profiles
 
             // delete confirmation
             if (_deletingProfileName != null)
-            {            
-                string[] lines = new string[] { "Are you sure you want to delete the profile:","\u2002- " +  _deletingProfileName};
+            {
+                string[] lines = new string[] { "Are you sure you want to delete the profile:", "\u2002- " + _deletingProfileName };
                 var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Delete?", lines);
 
                 if (didConfirm)
@@ -762,7 +763,7 @@ namespace DelvUI.Config.Profiles
             // reset confirmation
             if (_resetingProfileName != null)
             {
-                string[] lines = new string[] { "Are you sure you want to reset the profile:","\u2002- " +  _resetingProfileName};
+                string[] lines = new string[] { "Are you sure you want to reset the profile:", "\u2002- " + _resetingProfileName };
                 var (didConfirm, didClose) = ImGuiHelper.DrawConfirmationModal("Reset?", lines);
 
                 if (didConfirm)
