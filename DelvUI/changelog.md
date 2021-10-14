@@ -2,6 +2,9 @@
 - Fixed smooth HP in party frames not being smooth enough.
 - Switching profile will now reload fonts as they can differ between profiles.
 - Fixed tooltips missing characters / not working in other languages with a non-standard latin alphabet.
+- Added a command to forcibly switch the active Job Pack to the specified job:
+  + Turn on with `/delvui forcejob job`
+  + Turn off with `/delvui forcejob off`
 
 # 0.3.0.1
 - Fixed smooth HP in party frames.

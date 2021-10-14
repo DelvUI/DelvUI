@@ -189,6 +189,29 @@ namespace DelvUI
                         ConfigurationManager.Instance.ShowHUD = false;
                         break;
 
+                    case { } argument when argument.StartsWith("forcejob"):
+                        // TODO: Turn this into a helper function?
+                        var args = argument.Split(" ");
+
+                        if (args.Length > 0)
+                        {
+                            if (args[1] == "off")
+                            {
+                                ForcedJob.Enabled = false;
+
+                                return;
+                            }
+
+                            var job = typeof(JobIDs).GetField(args[1].ToUpper());
+
+                            if (job != null)
+                            {
+                                ForcedJob.Enabled = true;
+                                ForcedJob.ForcedJobId = (uint)(job.GetValue(null) ?? JobIDs.ACN);
+                            }
+                        }
+                        break;
+
                     default:
                         configManager.DrawConfigWindow = !configManager.DrawConfigWindow;
 
