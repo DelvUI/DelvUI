@@ -1,10 +1,8 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using System.Collections.Generic;
-using System.Drawing.Printing;
 using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Helpers;
-using ImGuiNET;
 
 namespace DelvUI.Interface.Party
 {
