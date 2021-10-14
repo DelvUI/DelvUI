@@ -17,7 +17,7 @@ Fixes:
 - Fixed tooltips missing characters / not working in other languages with a non-standard latin alphabet.
 - Fixed tooltips not showing when the config window is opened.
 - Fixed tank invuln breaking when two tanks used invuln at the same time.
-- Fixed tank invuln breaking when an actor died with invuln up
+- Fixed tank invuln breaking when an actor died with invuln up.
 - Fixed bugs with the mana bars.
 
 # 0.3.0.1
