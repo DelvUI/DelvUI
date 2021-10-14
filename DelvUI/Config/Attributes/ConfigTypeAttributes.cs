@@ -111,11 +111,6 @@ namespace DelvUI.Config.Attributes
 
             eventObject.OnValueChanged(new OnChangeEventArgs<T>(fieldName, (T)value, type));
         }
-
-        protected void DrawHelp()
-        {
-
-        }
     }
 
     [AttributeUsage(AttributeTargets.Field)]
