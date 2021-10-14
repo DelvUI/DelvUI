@@ -432,6 +432,12 @@ namespace DelvUI.Interface
             }
 
             var newJobId = player.ClassJob.Id;
+
+            if (ForcedJob.Enabled)
+            {
+                newJobId = ForcedJob.ForcedJobId;
+            }
+            
             if (_jobHud != null && _jobHud.Config.JobId == newJobId)
             {
                 return false;
@@ -581,6 +587,12 @@ namespace DelvUI.Interface
             ConfigType = configType;
             DisplayName = displayName;
         }
+    }
+
+    public static class ForcedJob
+    {
+        internal static bool Enabled;
+        internal static uint ForcedJobId;
     }
 
     internal static class HUDConstants

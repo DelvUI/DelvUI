@@ -9,6 +9,7 @@ using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Dalamud.Utility;
 using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
 using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
@@ -371,7 +372,7 @@ namespace DelvUI.Interface.StatusEffects
                     if (Config.ShowTooltips)
                     {
                         TooltipsHelper.Instance.ShowTooltipOnCursor(
-                            statusEffectData.Data.Description,
+                            statusEffectData.Data.Description.ToDalamudString().ToString(),
                             statusEffectData.Data.Name,
                             statusEffectData.Status.StatusID
                         );
