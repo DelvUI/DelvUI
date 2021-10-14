@@ -5,6 +5,7 @@
 - Added a command to forcibly switch the active Job Pack to the specified job:
   + Turn on with `/delvui forcejob job`
   + Turn off with `/delvui forcejob off`
+- Fixed tooltips not showing when the config window is opened.
 
 # 0.3.0.1
 - Fixed smooth HP in party frames.
