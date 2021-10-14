@@ -124,8 +124,7 @@ namespace DelvUI
                     HelpMessage = "Opens the DelvUI configuration window.\n"
                                 + "/delvui toggle → Toggles HUD visibility.\n"
                                 + "/delvui show → Shows HUD.\n"
-                                + "/delvui hide → Hides HUD.\n"
-                                + "/delvui reset → Resets HUD to default. This is irreversible!",
+                                + "/delvui hide → Hides HUD.",
 
                     ShowInHelp = true
                 }
@@ -220,8 +219,6 @@ namespace DelvUI
             }
         }
 
-        private void ReloadConfigCommand(string command, string arguments) { ConfigurationManager.Instance.LoadConfigurations(); }
-
         private void Draw()
         {
             bool hudState =
@@ -270,7 +267,6 @@ namespace DelvUI
             ConfigurationManager.Instance.DrawConfigWindow = false;
 
             CommandManager.RemoveHandler("/delvui");
-            CommandManager.RemoveHandler("/delvuireloadconfig");
 
             UiBuilder.Draw -= Draw;
             UiBuilder.BuildFonts -= BuildFont;
