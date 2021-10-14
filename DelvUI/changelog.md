@@ -1,9 +1,9 @@
 # 0.3.1.0
 Features:
 - Added a mouseover settings under Misc > HUD Options. Three modes supported:
-    + Mouseover completely disabled
-    + Automatic mode: All your actions will automatically assume mouseover when your cursor is on top of a unit frame. Mouseover macros or other mouseover plugins are not necessary and WON'T WORK in this mode!
-    + Regular mode: DelvUI unit frames will behave like the game's ones. You'll need to use mouseover macros or other mouseover related plugins in this mode.
+    1. Mouseover completely disabled for DelvUI frames.
+    2. Automatic mode: All your actions will automatically assume mouseover when your cursor is on top of a unit frame. Mouseover macros or other mouseover plugins are not necessary and WON'T WORK with DelvUI in this mode!
+    3. Regular mode: DelvUI unit frames will behave like the game's ones. You'll need to use mouseover macros or other mouseover related plugins in this mode.
 
 - Added a command to forcibly switch the active Job Pack to the specified job:
     + Turn on with `/delvui forcejob job`
@@ -17,6 +17,7 @@ Fixes:
 - Fixed tooltips missing characters / not working in other languages with a non-standard latin alphabet.
 - Fixed tooltips not showing when the config window is opened.
 - Fixed tank invuln breaking when two tanks used invuln at the same time.
+- Fixed bugs with the mana bars.
 
 # 0.3.0.1
 - Fixed smooth HP in party frames.

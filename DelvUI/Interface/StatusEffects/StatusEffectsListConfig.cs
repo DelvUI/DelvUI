@@ -292,6 +292,7 @@ namespace DelvUI.Interface.StatusEffects
             var config = new LabelConfig(new Vector2(16, -11), "", DrawAnchor.Center, DrawAnchor.Center);
             config.Color = new(Vector4.UnitW);
             config.OutlineColor = new(Vector4.One);
+            config.ShadowColor = new(Vector4.One);
 
             return config;
         }

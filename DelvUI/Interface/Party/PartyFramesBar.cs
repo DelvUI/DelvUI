@@ -29,10 +29,10 @@ namespace DelvUI.Interface.Party
 
         private LabelHud _nameLabelHud;
         private LabelHud _healthLabelHud;
-        private LabelHud _manaLabelHud;
         private LabelHud _orderLabelHud;
         private LabelHud _raiseLabelHud;
         private LabelHud _invulnLabelHud;
+        private PrimaryResourceHud _manaBarHud;
         private CastbarHud _castbarHud;
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
@@ -69,11 +69,11 @@ namespace DelvUI.Interface.Party
 
             _nameLabelHud = new LabelHud(config.NameLabelConfig);
             _healthLabelHud = new LabelHud(config.HealthLabelConfig);
-            _manaLabelHud = new LabelHud(_manaBarConfig.ValueLabelConfig);
             _orderLabelHud = new LabelHud(config.OrderLabelConfig);
             _raiseLabelHud = new LabelHud(_raiseTrackerConfig.LabelConfig);
             _invulnLabelHud = new LabelHud(_invulnTrackerConfig.LabelConfig);
 
+            _manaBarHud = new PrimaryResourceHud(_manaBarConfig, "");
             _castbarHud = new CastbarHud(_castbarConfig, "");
             _buffsListHud = new StatusEffectsListHud(buffsConfig, "");
             _debuffsListHud = new StatusEffectsListHud(debuffsConfig, "");
@@ -219,22 +219,6 @@ namespace DelvUI.Interface.Party
             var color = borderColor != null ? borderColor.Base : _config.ColorsConfig.BorderColor.Base;
             drawList.AddRect(borderPos, borderPos + borderSize, color);
 
-            // mana
-            if (ShowMana())
-            {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _manaBarConfig.HealthBarAnchor);
-                var manaBarPos = Utils.GetAnchoredPosition(parentPos + _manaBarConfig.Position, _manaBarConfig.Size, _manaBarConfig.Anchor);
-
-                drawList.AddRectFilled(manaBarPos, manaBarPos + _manaBarConfig.Size, _manaBarConfig.BackgroundColor.Base);
-
-                var scale = (float)Member.MP / (float)Member.MaxMP;
-                var fillSize = new Vector2(Math.Max(1, _config.Size.X * scale), _manaBarConfig.Size.Y);
-
-                DrawHelper.DrawGradientFilledRect(manaBarPos, fillSize, _manaBarConfig.Color, drawList);
-
-                _manaLabelHud.Draw(manaBarPos, _manaBarConfig.Size, character);
-            }
-
             // role/job icon
             if (_roleIconConfig.Enabled && Member.JobId > 0)
             {
@@ -314,21 +298,8 @@ namespace DelvUI.Interface.Party
             if (ShowMana())
             {
                 var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _manaBarConfig.HealthBarAnchor);
-                var manaBarPos = Utils.GetAnchoredPosition(parentPos + _manaBarConfig.Position, _manaBarConfig.Size, _manaBarConfig.Anchor);
-
-                if (character == null)
-                {
-                    string oldText = _manaBarConfig.ValueLabelConfig.GetText();
-                    _manaBarConfig.ValueLabelConfig.SetText(Member.MP.ToString());
-
-                    _manaLabelHud.Draw(manaBarPos, _manaBarConfig.Size, character);
-
-                    _manaBarConfig.ValueLabelConfig.SetText(oldText);
-                }
-                else
-                {
-                    _manaLabelHud.Draw(manaBarPos, _manaBarConfig.Size, character);
-                }
+                _manaBarHud.Actor = character;
+                _manaBarHud.Draw(parentPos);
             }
 
             // buffs / debuffs
