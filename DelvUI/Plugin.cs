@@ -98,6 +98,21 @@ namespace DelvUI
             ConfigurationManager.Initialize();
             FontsManager.Instance.LoadConfig();
 
+            _menuHook = new SystemMenuHook(PluginInterface);
+
+            ChatHelper.Initialize();
+            ClipRectsHelper.Initialize();
+            GlobalColors.Initialize();
+            LimitBreakHelper.Initialize();
+            MouseOverHelper.Initialize();
+            PartyManager.Initialize();
+            ProfilesManager.Initialize();
+            PullTimerHelper.Initialize();
+            TexturesCache.Initialize();
+            TooltipsHelper.Initialize();
+
+            _hudManager = new HudManager();
+
             UiBuilder.Draw += Draw;
             UiBuilder.BuildFonts += BuildFont;
             UiBuilder.OpenConfigUi += OpenConfigUi;
@@ -115,21 +130,6 @@ namespace DelvUI
                     ShowInHelp = true
                 }
             );
-
-            _menuHook = new SystemMenuHook(PluginInterface);
-
-            ChatHelper.Initialize();
-            ClipRectsHelper.Initialize();
-            GlobalColors.Initialize();
-            LimitBreakHelper.Initialize();
-            MouseOverHelper.Initialize();
-            PartyManager.Initialize();
-            ProfilesManager.Initialize();
-            PullTimerHelper.Initialize();
-            TexturesCache.Initialize();
-            TooltipsHelper.Initialize();
-
-            _hudManager = new HudManager();
         }
 
         public void Dispose()
@@ -225,6 +225,8 @@ namespace DelvUI
             {
                 ImGui.PopFont();
             }
+
+            MouseOverHelper.Instance.Update();
         }
 
         private void OpenConfigUi()

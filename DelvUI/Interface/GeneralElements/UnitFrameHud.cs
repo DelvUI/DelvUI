@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Numerics;
-using System.Runtime.InteropServices;
-using Dalamud.Game.ClientState.Objects.Types;
+﻿using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
-using Dalamud.Game.ClientState.Statuses;
+using System;
+using System.Collections.Generic;
+using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -33,6 +33,7 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
+        private bool _wasHovering = false;
 
         public UnitFrameHud(UnitFrameConfig config, string displayName) : base(config, displayName)
         {
@@ -77,17 +78,28 @@ namespace DelvUI.Interface.GeneralElements
             var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
             if (ImGui.IsMouseHoveringRect(startPos, startPos + Config.Size) && !DraggingEnabled)
             {
-                if (ImGui.GetIO().MouseClicked[0])
+                MouseOverHelper.Instance.Target = Actor;
+
+                if (!_wasHovering)
+                {
+                    MouseOverHelper.Instance.StartHandlingMouseInputs();
+                    _wasHovering = true;
+                }
+
+                if (MouseOverHelper.Instance.LeftButtonClicked)
                 {
                     Plugin.TargetManager.SetTarget(Actor);
                 }
-                else if (ImGui.GetIO().MouseClicked[1])
+                else if (MouseOverHelper.Instance.RightButtonClicked)
                 {
                     var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
                     _openContextMenuFromTarget(agentHud, Actor.Address);
                 }
-
-                MouseOverHelper.Instance.Target = Actor;
+            }
+            else if (_wasHovering)
+            {
+                MouseOverHelper.Instance.StopHandlingMouseInputs();
+                _wasHovering = false;
             }
         }
 
@@ -139,7 +151,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
             }
 
-            bar.Draw(pos, true);
+            bar.Draw(pos);
         }
 
         private void DrawFriendlyNPC(Vector2 pos, GameObject? actor)
