@@ -79,13 +79,26 @@ namespace DelvUI.Config.Attributes
         public bool isMonitored = false;
         public bool separator = false;
         public bool spacing = false;
+        public string? help = null;
 
         public ConfigAttribute(string friendlyName)
         {
             this.friendlyName = friendlyName;
         }
 
-        public abstract bool Draw(FieldInfo field, PluginConfigObject config, string? ID);
+        public bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
+        {
+            bool result = DrawField(field, config, ID);
+
+            if (help != null && ImGui.IsItemHovered())
+            {
+                ImGui.SetTooltip(help);
+            }
+
+            return result;
+        }
+
+        public abstract bool DrawField(FieldInfo field, PluginConfigObject config, string? ID);
 
         protected string IDText(string? ID) => ID != null ? " ##" + ID : "";
 
@@ -105,7 +118,7 @@ namespace DelvUI.Config.Attributes
     {
         public CheckboxAttribute(string friendlyName) : base(friendlyName) { }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
+        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID)
         {
             var disableable = config.Disableable;
 
@@ -148,7 +161,7 @@ namespace DelvUI.Config.Attributes
             velocity = 1f;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
+        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID)
         {
             float? fieldVal = (float?)field.GetValue(config);
             float floatVal = fieldVal.HasValue ? fieldVal.Value : 0;
@@ -180,7 +193,7 @@ namespace DelvUI.Config.Attributes
             velocity = 1;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
+        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID)
         {
             int? fieldVal = (int?)field.GetValue(config);
             int intVal = fieldVal.HasValue ? fieldVal.Value : 0;
@@ -212,7 +225,7 @@ namespace DelvUI.Config.Attributes
             velocity = 1f;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
+        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID)
         {
             Vector2? fieldVal = (Vector2?)field.GetValue(config);
             Vector2 vectorVal = fieldVal.HasValue ? fieldVal.Value : Vector2.Zero;
@@ -244,7 +257,7 @@ namespace DelvUI.Config.Attributes
             velocity = 1;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
+        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID)
         {
             Vector2? fieldVal = (Vector2?)field.GetValue(config);
             Vector2 vectorVal = fieldVal.HasValue ? fieldVal.Value : Vector2.Zero;
@@ -273,7 +286,7 @@ namespace DelvUI.Config.Attributes
             maxLength = 999;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
+        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID)
         {
             string? fieldVal = (string?)field.GetValue(config);
             string stringVal = fieldVal ?? "";
@@ -296,7 +309,7 @@ namespace DelvUI.Config.Attributes
     {
         public ColorEdit4Attribute(string friendlyName) : base(friendlyName) { }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
+        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID)
         {
             PluginConfigColor? colorVal = (PluginConfigColor?)field.GetValue(config);
             Vector4 vector = (colorVal != null ? colorVal.Vector : Vector4.Zero);
@@ -330,7 +343,7 @@ namespace DelvUI.Config.Attributes
             this.options = options;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
+        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID)
         {
             object? fieldVal = field.GetValue(config);
 
@@ -363,7 +376,7 @@ namespace DelvUI.Config.Attributes
             this.names = names;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
+        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID)
         {
             ImGui.Text(friendlyName);
             int[]? fieldVal = (int[]?)field.GetValue(config);
@@ -415,7 +428,7 @@ namespace DelvUI.Config.Attributes
             this.options = options;
         }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
+        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID)
         {
             var changed = false;
 
@@ -516,7 +529,7 @@ namespace DelvUI.Config.Attributes
     {
         public FontAttribute(string friendlyName = "Font and Size") : base(friendlyName) { }
 
-        public override bool Draw(FieldInfo field, PluginConfigObject config, string? ID)
+        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID)
         {
             var fontsConfig = ConfigurationManager.Instance.GetConfigObject<FontsConfig>();
             if (fontsConfig == null)

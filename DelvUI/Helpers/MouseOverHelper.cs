@@ -18,13 +18,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-using Dalamud.Hooking;
-using Lumina.Excel;
-using System;
 using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
-using Dalamud.Logging;
+using Dalamud.Hooking;
+using DelvUI.Config;
+using DelvUI.Interface.GeneralElements;
+using Lumina.Excel;
+using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Action = Lumina.Excel.GeneratedSheets.Action;
 
 namespace DelvUI.Helpers
@@ -32,11 +35,13 @@ namespace DelvUI.Helpers
     public delegate void OnSetUIMouseoverActorId(long arg1, long arg2);
     public delegate ulong OnRequestAction(long arg1, uint arg2, ulong arg3, long arg4, uint arg5, uint arg6, int arg7);
 
-    public class MouseOverHelper : IDisposable
+    public unsafe class MouseOverHelper : IDisposable
     {
         #region Singleton
         private MouseOverHelper()
         {
+            _sheet = Plugin.DataManager.GetExcelSheet<Action>();
+
 #if DEBUG
             /*
              Part of setUIMouseOverActorId disassembly signature
@@ -84,7 +89,15 @@ namespace DelvUI.Helpers
             _requsetActionHook = new Hook<OnRequestAction>(_requestAction, new OnRequestAction(HandleRequestAction));
             _requsetActionHook.Enable();
 
-            _sheet = Plugin.DataManager.GetExcelSheet<Action>();
+            // WndProc detour
+            IntPtr windowHandle = Process.GetCurrentProcess().MainWindowHandle;
+            _wndProcDelegate = WndProcDetour;
+            _wndProcPtr = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate);
+            _imguiWndProcPtr = SetWindowLongPtr(windowHandle, GWL_WNDPROC, _wndProcPtr);
+
+            // mouseover setting
+            ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+            OnConfigReset(ConfigurationManager.Instance);
         }
 
         public static void Initialize() { Instance = new MouseOverHelper(); }
@@ -109,11 +122,17 @@ namespace DelvUI.Helpers
                 return;
             }
 
+            ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
+
             _uiMouseOverActorIdHook?.Dispose();
             _requsetActionHook?.Dispose();
             Instance = null!;
         }
         #endregion
+
+        private HUDOptionsConfig _config = null!;
+
+        private const int UnknownOffset = 0xAA750;
 
         private IntPtr _setUIMouseOverActorId;
         private Hook<OnSetUIMouseoverActorId> _uiMouseOverActorIdHook;
@@ -121,12 +140,39 @@ namespace DelvUI.Helpers
         private IntPtr _requestAction;
         private Hook<OnRequestAction> _requsetActionHook;
 
+        private WndProcDelegate _wndProcDelegate;
+        private IntPtr _wndProcPtr;
+        private IntPtr _imguiWndProcPtr;
+
         private ExcelSheet<Action>? _sheet;
-        public GameObject? Target = null;
+
+        private GameObject? _target = null;
+        public GameObject? Target
+        {
+            get => _target;
+            set
+            {
+                _target = value;
+
+                // set mouseover target in-game
+                if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode)
+                {
+                    IntPtr uiModule = Plugin.GameGui.GetUIModule();
+                    long unknownAddress = (long)uiModule + UnknownOffset;
+                    long targetAddress = _target != null && _target.ObjectId != 0 ? (long)_target.Address : 0;
+                    _uiMouseOverActorIdHook.Original(unknownAddress, targetAddress);
+                }
+            }
+        }
+
+        private void OnConfigReset(ConfigurationManager sender)
+        {
+            _config = sender.GetConfigObject<HUDOptionsConfig>();
+        }
 
         private void HandleUIMouseOverActorId(long arg1, long arg2)
         {
-            PluginLog.Log("MO: {0} - {1}", arg1, arg2);
+            //PluginLog.Log("MO: {0} - {1}", arg1.ToString("X"), arg2.ToString("X"));
             _uiMouseOverActorIdHook.Original(arg1, arg2);
         }
 
@@ -134,7 +180,7 @@ namespace DelvUI.Helpers
         {
             //PluginLog.Log("ACTION: {0} - {1} - {2} - {3} - {4} - {5} - {6}}", arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 
-            if (IsActionValid(arg3, Target))
+            if (_config.MouseoverEnabled && _config.MouseoverAutomaticMode && IsActionValid(arg3, Target))
             {
                 return _requsetActionHook.Original(arg1, arg2, arg3, Target!.ObjectId, arg5, arg6, arg7);
             }
@@ -172,5 +218,61 @@ namespace DelvUI.Helpers
 
             return action.CanTargetHostile;
         }
+
+        #region mouseover inputs proxy
+        public bool HandlingInputs => Target != null;
+
+        public bool LeftButtonClicked = false;
+        public bool RightButtonClicked = false;
+
+        // wnd proc detour
+        // if we're "eating" inputs, we only process left and right clicks
+        // any other message is passed along to the ImGui scene
+        private IntPtr WndProcDetour(IntPtr hWnd, uint msg, ulong wParam, long lParam)
+        {
+            // eat left and right clicks?
+            if (HandlingInputs)
+            {
+                switch (msg)
+                {
+                    case WM_LBUTTONDOWN:
+                    case WM_RBUTTONDOWN:
+                        return (IntPtr)0;
+
+                    case WM_LBUTTONUP:
+                        LeftButtonClicked = true;
+                        return (IntPtr)0;
+
+                    case WM_RBUTTONUP:
+                        RightButtonClicked = true;
+                        return (IntPtr)0;
+                }
+            }
+
+            // call imgui's wnd proc
+            return (IntPtr)CallWindowProc(_imguiWndProcPtr, hWnd, msg, wParam, lParam);
+        }
+
+        public void Update()
+        {
+            LeftButtonClicked = false;
+            RightButtonClicked = false;
+        }
+
+        public delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, ulong wParam, long lParam);
+
+        [DllImport("user32.dll", EntryPoint = "SetWindowLongPtrW", SetLastError = true)]
+        public static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+        [DllImport("user32.dll", EntryPoint = "CallWindowProcW")]
+        public static extern long CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, uint Msg, ulong wParam, long lParam);
+
+        private const uint WM_LBUTTONDOWN = 513;
+        private const uint WM_LBUTTONUP = 514;
+        private const uint WM_RBUTTONDOWN = 516;
+        private const uint WM_RBUTTONUP = 517;
+
+        private const int GWL_WNDPROC = -4;
+        #endregion
     }
 }

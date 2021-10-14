@@ -378,17 +378,20 @@ namespace DelvUI.Interface.StatusEffects
                         );
                     }
 
+                    bool leftClick = MouseOverHelper.Instance.HandlingInputs ? MouseOverHelper.Instance.LeftButtonClicked : ImGui.GetIO().MouseClicked[0];
+                    bool rightClick = MouseOverHelper.Instance.HandlingInputs ? MouseOverHelper.Instance.RightButtonClicked : ImGui.GetIO().MouseClicked[1];
+
                     // remove buff on right click
                     bool isFromPlayer = statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId;
 
-                    if (statusEffectData.Data.Category == 1 && isFromPlayer && ImGui.GetIO().MouseClicked[1])
+                    if (statusEffectData.Data.Category == 1 && isFromPlayer && rightClick)
                     {
                         ChatHelper.SendChatMessage("/statusoff \"" + statusEffectData.Data.Name + "\"");
                     }
 
                     // automatic add to black list with ctrl+alt+shift click
                     if (Config.BlacklistConfig.Enabled &&
-                        ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && ImGui.GetIO().MouseClicked[0])
+                        ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && leftClick)
                     {
                         Config.BlacklistConfig.AddNewEntry(statusEffectData.Data);
                     }

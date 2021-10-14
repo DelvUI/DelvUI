@@ -89,7 +89,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.3.0.1";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.3.1.0";
 
             FontsManager.Initialize(AssemblyLocation);
             LoadBanner();
@@ -97,6 +97,21 @@ namespace DelvUI
             // initialize a not-necessarily-defaults configuration
             ConfigurationManager.Initialize();
             FontsManager.Instance.LoadConfig();
+
+            _menuHook = new SystemMenuHook(PluginInterface);
+
+            ChatHelper.Initialize();
+            ClipRectsHelper.Initialize();
+            GlobalColors.Initialize();
+            LimitBreakHelper.Initialize();
+            MouseOverHelper.Initialize();
+            PartyManager.Initialize();
+            ProfilesManager.Initialize();
+            PullTimerHelper.Initialize();
+            TexturesCache.Initialize();
+            TooltipsHelper.Initialize();
+
+            _hudManager = new HudManager();
 
             UiBuilder.Draw += Draw;
             UiBuilder.BuildFonts += BuildFont;
@@ -115,21 +130,6 @@ namespace DelvUI
                     ShowInHelp = true
                 }
             );
-
-            _menuHook = new SystemMenuHook(PluginInterface);
-
-            ChatHelper.Initialize();
-            ClipRectsHelper.Initialize();
-            GlobalColors.Initialize();
-            LimitBreakHelper.Initialize();
-            MouseOverHelper.Initialize();
-            PartyManager.Initialize();
-            ProfilesManager.Initialize();
-            PullTimerHelper.Initialize();
-            TexturesCache.Initialize();
-            TooltipsHelper.Initialize();
-
-            _hudManager = new HudManager();
         }
 
         public void Dispose()
@@ -248,6 +248,8 @@ namespace DelvUI
             {
                 ImGui.PopFont();
             }
+
+            MouseOverHelper.Instance.Update();
         }
 
         private void OpenConfigUi()

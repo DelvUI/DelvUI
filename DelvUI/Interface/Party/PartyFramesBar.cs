@@ -135,18 +135,22 @@ namespace DelvUI.Interface.Party
             {
                 MouseOverHelper.Instance.Target = character;
 
-                // move player bar to this spot on ctrl+alt+shift click
-                if (ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && ImGui.GetIO().MouseClicked[0])
+                // left click
+                if (MouseOverHelper.Instance.LeftButtonClicked)
                 {
-                    MovePlayerEvent?.Invoke(this);
+                    // move player bar to this spot on ctrl+alt+shift click
+                    if (ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift)
+                    {
+                        MovePlayerEvent?.Invoke(this);
+                    }
+                    // target
+                    else if (character != null)
+                    {
+                        Plugin.TargetManager.SetTarget(character);
+                    }
                 }
-                // target
-                else if (ImGui.IsMouseClicked(ImGuiMouseButton.Left) && character != null)
-                {
-                    Plugin.TargetManager.SetTarget(character);
-                }
-                // context menu
-                else if (ImGui.IsMouseClicked(ImGuiMouseButton.Right))
+                // right click (context menu)
+                else if (MouseOverHelper.Instance.RightButtonClicked)
                 {
                     OpenContextMenuEvent?.Invoke(this);
                 }
