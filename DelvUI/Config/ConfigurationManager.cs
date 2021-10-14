@@ -71,6 +71,8 @@ namespace DelvUI.Config
         public bool DrawChangelog = false;
         private string? _changelog = null;
 
+        public bool ShowingModalWindow = false;
+
         private bool _needsProfileUpdate = false;
         private bool _lockHUD = true;
 

@@ -117,7 +117,7 @@ namespace DelvUI.Helpers
 
         public void Draw()
         {
-            if (!_dataIsValid || ConfigurationManager.Instance.DrawConfigWindow)
+            if (!_dataIsValid || ConfigurationManager.Instance.ShowingModalWindow)
             {
                 return;
             }

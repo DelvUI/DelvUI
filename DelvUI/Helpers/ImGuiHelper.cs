@@ -1,4 +1,5 @@
-﻿using DelvUI.Config.Tree;
+﻿using DelvUI.Config;
+using DelvUI.Config.Tree;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -69,6 +70,8 @@ namespace DelvUI.Helpers
 
         public static (bool, bool) DrawConfirmationModal(string title, IEnumerable<string> textLines)
         {
+            ConfigurationManager.Instance.ShowingModalWindow = true;
+
             bool didConfirm = false;
             bool didClose = false;
 
@@ -116,11 +119,18 @@ namespace DelvUI.Helpers
                 didClose = true;
             }
 
+            if (didClose)
+            {
+                ConfigurationManager.Instance.ShowingModalWindow = false;
+            }
+
             return (didConfirm, didClose);
         }
 
         public static bool DrawErrorModal(string message)
         {
+            ConfigurationManager.Instance.ShowingModalWindow = true;
+
             bool didClose = false;
             ImGui.OpenPopup("Error");
 
@@ -149,11 +159,18 @@ namespace DelvUI.Helpers
                 didClose = true;
             }
 
+            if (didClose)
+            {
+                ConfigurationManager.Instance.ShowingModalWindow = false;
+            }
+
             return didClose;
         }
 
         public static (bool, bool) DrawInputModal(string title, string message, ref string value)
         {
+            ConfigurationManager.Instance.ShowingModalWindow = true;
+
             bool didConfirm = false;
             bool didClose = false;
 
@@ -195,6 +212,11 @@ namespace DelvUI.Helpers
             else
             {
                 didClose = true;
+            }
+
+            if (didClose)
+            {
+                ConfigurationManager.Instance.ShowingModalWindow = false;
             }
 
             return (didConfirm, didClose);
