@@ -162,6 +162,8 @@ namespace DelvUI.Interface
                 return (false, true);
             }
 
+            ConfigurationManager.Instance.ShowingModalWindow = true;
+
             bool didConfirm = false;
             bool didClose = false;
 
@@ -234,6 +236,11 @@ namespace DelvUI.Interface
             else
             {
                 didClose = true;
+            }
+
+            if (didClose)
+            {
+                ConfigurationManager.Instance.ShowingModalWindow = false;
             }
 
             return (didConfirm, didClose);
