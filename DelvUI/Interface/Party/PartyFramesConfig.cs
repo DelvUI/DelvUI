@@ -228,44 +228,31 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    [DisableParentSettings("HideWhenInactive", "Label")]
     [Exportable(false)]
     [Section("Party Frames")]
     [SubSection("Mana Bar", 0)]
-    public class PartyFramesManaBarConfig : MovablePluginConfigObject
+    public class PartyFramesManaBarConfig : PrimaryResourceConfig
     {
         public new static PartyFramesManaBarConfig DefaultConfig()
         {
-            var config = new PartyFramesManaBarConfig();
-            config.ValueLabelConfig.Enabled = false;
+            var config = new PartyFramesManaBarConfig(Vector2.Zero, new(180, 6));
+            config.ValueLabel.Enabled = false;
             return config;
         }
 
-        [DragInt2("Size", min = 1, max = 1000)]
-        [Order(20)]
-        public Vector2 Size = new(180, 6);
-
         [Anchor("Health Bar Anchor")]
-        [Order(25)]
+        [Order(14)]
         public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;
 
-        [Anchor("Anchor")]
-        [Order(30)]
-        public DrawAnchor Anchor = DrawAnchor.BottomLeft;
-
         [Checkbox("Show Only For Healers")]
-        [Order(35)]
+        [Order(42)]
         public bool ShowOnlyForHealers = true;
 
-        [ColorEdit4("Color")]
-        [Order(40)]
-        public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
-
-        [ColorEdit4("Background Color")]
-        [Order(45)]
-        public PluginConfigColor BackgroundColor = new PluginConfigColor(new(0 / 255f, 20f / 255f, 100f / 255f, 100f / 100f));
-
-        [NestedConfig("Label", 50)]
-        public EditableLabelConfig ValueLabelConfig = new EditableLabelConfig(Vector2.Zero, "[mana:current-short]", DrawAnchor.Center, DrawAnchor.Center);
+        public PartyFramesManaBarConfig(Vector2 position, Vector2 size)
+            : base(position, size)
+        {
+        }
     }
 
     [Exportable(false)]
@@ -488,8 +475,8 @@ namespace DelvUI.Interface.Party
 
         [NestedConfig("Label", 55)]
         public LabelConfig LabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
-    }    
-    
+    }
+
     [Exportable(false)]
     [Section("Party Frames")]
     [SubSection("Invuln Tracker", 0)]
@@ -520,15 +507,15 @@ namespace DelvUI.Interface.Party
         [ColorEdit4("Invuln Background Color")]
         [Order(40, collapseWith = nameof(ChangeBackgroundColorWhenInvuln))]
         public PluginConfigColor BackgroundColor = new(new Vector4(211f / 255f, 235f / 255f, 215f / 245f, 50f / 100f));
-        
+
         [Checkbox("Walking Dead Custom Color")]
         [Order(42, collapseWith = nameof(ChangeBackgroundColorWhenInvuln))]
         public bool UseCustomWalkingDeadColor = true;
-        
+
         [ColorEdit4("Walking Dead Background Color")]
         [Order(45, collapseWith = nameof(UseCustomWalkingDeadColor))]
         public PluginConfigColor WalkingDeadBackgroundColor = new(new Vector4(158f / 255f, 158f / 255f, 158f / 255f, 50f / 100f));
-        
+
         [Checkbox("Change Border Color When Invuln is Up", spacing = true)]
         [Order(50)]
         public bool ChangeBorderColorWhenInvuln = true;

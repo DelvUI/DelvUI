@@ -1,16 +1,18 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
+using DelvUI.Interface.Bars;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
+    [DisableParentSettings("HideWhenInactive", "Label")]
     [Section("Mana Bars")]
     [SubSection("Player", 0)]
     public class PlayerPrimaryResourceConfig : UnitFramePrimaryResourceConfig
     {
-        public PlayerPrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
-            : base(position, size, valueLabelConfig)
+        public PlayerPrimaryResourceConfig(Vector2 position, Vector2 size)
+            : base(position, size)
         {
 
         }
@@ -20,21 +22,20 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(HUDConstants.DefaultBigUnitFrameSize.X, 10);
             var pos = new Vector2(0, 0);
 
-            var labelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
-
-            var config = new PlayerPrimaryResourceConfig(pos, size, labelConfig);
+            var config = new PlayerPrimaryResourceConfig(pos, size);
             config.Anchor = DrawAnchor.Bottom;
 
             return config;
         }
     }
 
+    [DisableParentSettings("HideWhenInactive", "Label")]
     [Section("Mana Bars")]
     [SubSection("Target", 0)]
     public class TargetPrimaryResourceConfig : UnitFramePrimaryResourceConfig
     {
-        public TargetPrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
-            : base(position, size, valueLabelConfig)
+        public TargetPrimaryResourceConfig(Vector2 position, Vector2 size)
+            : base(position, size)
         {
 
         }
@@ -44,21 +45,20 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(HUDConstants.DefaultBigUnitFrameSize.X, 10);
             var pos = new Vector2(0, 0);
 
-            var labelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
-
-            var config = new TargetPrimaryResourceConfig(pos, size, labelConfig);
+            var config = new TargetPrimaryResourceConfig(pos, size);
             config.Anchor = DrawAnchor.Bottom;
 
             return config;
         }
     }
 
+    [DisableParentSettings("HideWhenInactive", "Label")]
     [Section("Mana Bars")]
     [SubSection("Target of Target", 0)]
     public class TargetOfTargetPrimaryResourceConfig : UnitFramePrimaryResourceConfig
     {
-        public TargetOfTargetPrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
-            : base(position, size, valueLabelConfig)
+        public TargetOfTargetPrimaryResourceConfig(Vector2 position, Vector2 size)
+            : base(position, size)
         {
 
         }
@@ -68,21 +68,20 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(HUDConstants.DefaultSmallUnitFrameSize.X, 10);
             var pos = new Vector2(0, 0);
 
-            var labelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
-
-            var config = new TargetOfTargetPrimaryResourceConfig(pos, size, labelConfig);
+            var config = new TargetOfTargetPrimaryResourceConfig(pos, size);
             config.Anchor = DrawAnchor.Bottom;
 
             return config;
         }
     }
 
+    [DisableParentSettings("HideWhenInactive", "Label")]
     [Section("Mana Bars")]
     [SubSection("Focus Target", 0)]
     public class FocusTargetPrimaryResourceConfig : UnitFramePrimaryResourceConfig
     {
-        public FocusTargetPrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
-            : base(position, size, valueLabelConfig)
+        public FocusTargetPrimaryResourceConfig(Vector2 position, Vector2 size)
+            : base(position, size)
         {
 
         }
@@ -92,9 +91,7 @@ namespace DelvUI.Interface.GeneralElements
             var size = new Vector2(HUDConstants.DefaultSmallUnitFrameSize.X, 10);
             var pos = new Vector2(0, 0);
 
-            var labelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
-
-            var config = new FocusTargetPrimaryResourceConfig(pos, size, labelConfig);
+            var config = new FocusTargetPrimaryResourceConfig(pos, size);
             config.Anchor = DrawAnchor.Bottom;
 
             return config;
@@ -111,47 +108,30 @@ namespace DelvUI.Interface.GeneralElements
         [Order(17, collapseWith = nameof(AnchorToUnitFrame))]
         public DrawAnchor UnitFrameAnchor = DrawAnchor.Bottom;
 
-        public UnitFramePrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
-            : base(position, size, valueLabelConfig)
+        public UnitFramePrimaryResourceConfig(Vector2 position, Vector2 size)
+            : base(position, size)
         {
 
         }
     }
 
-    public abstract class PrimaryResourceConfig : AnchorablePluginConfigObject
+    public abstract class PrimaryResourceConfig : ProgressBarConfig
     {
-        [ColorEdit4("Color")]
-        [Order(20)]
-        public PluginConfigColor Color = new PluginConfigColor(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
-
-        [Checkbox("Use Job Color")]
-        [Order(25)]
+        [Checkbox("Use Job Color", spacing = true)]
+        [Order(19)]
         public bool UseJobColor = false;
 
-        [NestedConfig("Label", 30)]
-        public LabelConfig ValueLabelConfig;
-
-        [Checkbox("Threshold Marker", spacing = true)]
-        [Order(35)]
-        public bool ShowThresholdMarker = false;
-
-        [DragInt("Value", min = 1, max = 10000)]
-        [Order(40, collapseWith = nameof(ShowThresholdMarker))]
-        public int ThresholdMarkerValue = 7000;
-
-        [ColorEdit4("Color" + "##Threshold")]
-        [Order(45, collapseWith = nameof(ShowThresholdMarker))]
-        public PluginConfigColor BelowThresholdColor = new(new Vector4(190 / 255f, 28f / 255f, 57f / 255f, 100f / 100f));
-
         [Checkbox("Hide When Full", spacing = true)]
-        [Order(50)]
+        [Order(41)]
         public bool HidePrimaryResourceWhenFull = false;
 
-        public PrimaryResourceConfig(Vector2 position, Vector2 size, LabelConfig valueLabelConfig)
+        [NestedConfig("Label", 1000, separator = false, spacing = true)]
+        public EditableLabelConfig ValueLabel = new EditableLabelConfig(Vector2.Zero, "[mana:current]", DrawAnchor.Center, DrawAnchor.Center);
+
+        public PrimaryResourceConfig(Vector2 position, Vector2 size)
+            : base(position, size, new(new(0 / 255f, 162f / 255f, 252f / 255f, 100f / 100f)))
         {
-            Position = position;
-            Size = size;
-            ValueLabelConfig = valueLabelConfig;
+
         }
     }
 }
