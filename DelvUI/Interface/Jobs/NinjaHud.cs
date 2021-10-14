@@ -165,11 +165,11 @@ namespace DelvUI.Interface.Jobs
         private void DrawHutonGauge(Vector2 pos, PlayerCharacter player)
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
-
+            float hutonDuration = gauge.HutonTimer / 1000f;
             if (!Config.HutonBar.HideWhenInactive || gauge.HutonTimer > 0)
             {
-                Config.HutonBar.Label.SetText($"{gauge.HutonTimer / 1000}");
-                BarUtilities.GetProgressBar(Config.HutonBar, gauge.HutonTimer, 70000f, 0f, player).Draw(pos);
+                Config.HutonBar.Label.SetText($"{(int)hutonDuration}");
+                BarUtilities.GetProgressBar(Config.HutonBar, hutonDuration, 70f, 0f, player).Draw(pos);
             }
         }
 
