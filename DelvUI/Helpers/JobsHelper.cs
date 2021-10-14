@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace DelvUI.Helpers
 {

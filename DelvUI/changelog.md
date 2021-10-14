@@ -1,6 +1,9 @@
 # 0.3.0.2
 - Fixed smooth HP in party frames not being smooth enough.
 - Switching profile will now reload fonts as they can differ between profiles.
+- Added a command to forcibly switch JobHud to specified job:
+  + Turn on with `/delvui forcejob job`
+  + Turn off with `/delvui forcejob off`
 
 # 0.3.0.1
 - Fixed smooth HP in party frames.
