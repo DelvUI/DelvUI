@@ -11,8 +11,6 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Windows.Forms;
-using DelvUI.Interface.GeneralElements;
-using System.Reflection;
 
 namespace DelvUI.Config.Profiles
 {
@@ -254,11 +252,7 @@ namespace DelvUI.Config.Profiles
             try
             {
                 Save();
-                FontsConfig fontsConfig = new();
-                MethodInfo? methodInfo = typeof(FontsConfig)
-                    .GetMethod("ReloadFonts", BindingFlags.NonPublic | BindingFlags.Instance);
-
-                methodInfo?.Invoke(fontsConfig, null);
+                Plugin.UiBuilder.RebuildFonts();
             }
             catch (Exception e)
             {
