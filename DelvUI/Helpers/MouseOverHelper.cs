@@ -217,6 +217,7 @@ namespace DelvUI.Helpers
         // if counter is greater than 0 it means we'll start "eating" mouse inputs
         // hud elements that use mouseover should use this class to check for mouse clicks
         private int _handleInputsCounter = 0;
+        public bool HandlingInputs => _handleInputsCounter > 0;
 
         public bool LeftButtonClicked = false;
         public bool RightButtonClicked = false;
@@ -238,7 +239,7 @@ namespace DelvUI.Helpers
         private IntPtr WndProcDetour(IntPtr hWnd, uint msg, ulong wParam, long lParam)
         {
             // eat left and right clicks?
-            if (_enabled && _handleInputsCounter > 0)
+            if (_enabled && HandlingInputs)
             {
                 switch (msg)
                 {
