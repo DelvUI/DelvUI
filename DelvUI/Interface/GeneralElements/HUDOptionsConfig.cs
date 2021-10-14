@@ -18,9 +18,17 @@ namespace DelvUI.Interface.GeneralElements
         [Order(6, collapseWith = nameof(UseGlobalHudShift))]
         public Vector2 HudOffset = new(0, 0);
 
-        [Checkbox("Automatic Mouseover (all unit frames will automatically assume mouseover when you use an action and the cursor is on top of them)", isMonitored = true, separator = true)]
+        [Checkbox("Mouseover", separator = true)]
         [Order(10)]
         public bool MouseoverEnabled = true;
+
+        [Checkbox("Automatic Mode", help =
+            "When enabled: All your actions will automatically assume mouseover when your cursor is on top of a unit frame.\n" +
+            "Mouseover macros or other mouseover plugins are not necessary and WON'T WORK in this mode!\n\n" +
+            "When disabled: DelvUI unit frames will behave like the game's ones.\n" +
+            "You'll need to use mouseover macros or other mouseover related plugins in this mode.")]
+        [Order(11, collapseWith = nameof(MouseoverEnabled))]
+        public bool MouseoverAutomaticMode = true;
 
         [Checkbox("Hide DelvUI outside of combat", separator = true)]
         [Order(20)]

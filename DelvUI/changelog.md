@@ -1,13 +1,15 @@
-# 0.3.0.2
+# 0.3.1.0
+- Fixed mouseover not working for actions bound to mouse buttons (ie M3, M4, etc).
+- Added a mouseover settings under Misc > HUD Options. Three modes supported:
+    + Mouseover completely disabled
+    + Automatic mode: All your actions will automatically assume mouseover when your cursor is on top of a unit frame. Mouseover macros or other mouseover plugins are not necessary and WON'T WORK in this mode!
+    + Regular mode: DelvUI unit frames will behave like the game's ones. You'll need to use mouseover macros or other mouseover related plugins in this mode.
 - Fixed smooth HP in party frames not being smooth enough.
-- Switching profile will now reload fonts as they can differ between profiles.
+- Fixed fonts not properly reloading when switching profiles.
 - Fixed tooltips missing characters / not working in other languages with a non-standard latin alphabet.
 - Added a command to forcibly switch the active Job Pack to the specified job:
-  + Turn on with `/delvui forcejob job`
-  + Turn off with `/delvui forcejob off`
-- Fixed mouseover not working for actions bound to mouse buttons (ie M3, M4, etc).
-- Added a mouseover setting under Misc > HUD Options to enable and disable the feature completely.
-- Fixed fonts not properly reloading when switching profiles.
+    + Turn on with `/delvui forcejob job`
+    + Turn off with `/delvui forcejob off`
 
 # 0.3.0.1
 - Fixed smooth HP in party frames.

@@ -123,13 +123,16 @@ namespace DelvUI.Helpers
             }
 
             ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
-            _hudOptionsConfig.ValueChangeEvent -= OnConfigChanged;
 
             _uiMouseOverActorIdHook?.Dispose();
             _requsetActionHook?.Dispose();
             Instance = null!;
         }
         #endregion
+
+        private HUDOptionsConfig _config = null!;
+
+        private const int UnknownOffset = 0xAA750;
 
         private IntPtr _setUIMouseOverActorId;
         private Hook<OnSetUIMouseoverActorId> _uiMouseOverActorIdHook;
@@ -142,29 +145,34 @@ namespace DelvUI.Helpers
         private IntPtr _imguiWndProcPtr;
 
         private ExcelSheet<Action>? _sheet;
-        public GameObject? Target = null;
 
-        private HUDOptionsConfig _hudOptionsConfig => ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>();
-        private bool _enabled = false;
-
-        private void OnConfigChanged(object sender, OnChangeBaseArgs args)
+        private GameObject? _target = null;
+        public GameObject? Target
         {
-            if (args.PropertyName == "MouseoverEnabled" && sender is HUDOptionsConfig config)
+            get => _target;
+            set
             {
-                _enabled = config.MouseoverEnabled;
+                _target = value;
+
+                // set mouseover target in-game
+                if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode)
+                {
+                    IntPtr uiModule = Plugin.GameGui.GetUIModule();
+                    long unknownAddress = (long)uiModule + UnknownOffset;
+                    long targetAddress = _target != null && _target.ObjectId != 0 ? (long)_target.Address : 0;
+                    _uiMouseOverActorIdHook.Original(unknownAddress, targetAddress);
+                }
             }
         }
 
         private void OnConfigReset(ConfigurationManager sender)
         {
-            HUDOptionsConfig config = _hudOptionsConfig;
-            config.ValueChangeEvent += OnConfigChanged;
-            _enabled = config.MouseoverEnabled;
+            _config = sender.GetConfigObject<HUDOptionsConfig>();
         }
 
         private void HandleUIMouseOverActorId(long arg1, long arg2)
         {
-            //PluginLog.Log("MO: {0} - {1}", arg1, arg2);
+            //PluginLog.Log("MO: {0} - {1}", arg1.ToString("X"), arg2.ToString("X"));
             _uiMouseOverActorIdHook.Original(arg1, arg2);
         }
 
@@ -172,7 +180,7 @@ namespace DelvUI.Helpers
         {
             //PluginLog.Log("ACTION: {0} - {1} - {2} - {3} - {4} - {5} - {6}}", arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 
-            if (_enabled && IsActionValid(arg3, Target))
+            if (_config.MouseoverEnabled && _config.MouseoverAutomaticMode && IsActionValid(arg3, Target))
             {
                 return _requsetActionHook.Original(arg1, arg2, arg3, Target!.ObjectId, arg5, arg6, arg7);
             }
@@ -212,26 +220,10 @@ namespace DelvUI.Helpers
         }
 
         #region mouseover inputs proxy
-        // elements increase the counter when they are being mouseovered
-        // and decrease the counter when they stop being mouseovered
-        // if counter is greater than 0 it means we'll start "eating" mouse inputs
-        // hud elements that use mouseover should use this class to check for mouse clicks
-        private int _handleInputsCounter = 0;
-        public bool HandlingInputs => _handleInputsCounter > 0;
+        public bool HandlingInputs => Target != null;
 
         public bool LeftButtonClicked = false;
         public bool RightButtonClicked = false;
-
-        public void StartHandlingMouseInputs()
-        {
-            _handleInputsCounter++;
-        }
-
-        public void StopHandlingMouseInputs()
-        {
-            _handleInputsCounter--;
-            _handleInputsCounter = Math.Max(_handleInputsCounter, 0);
-        }
 
         // wnd proc detour
         // if we're "eating" inputs, we only process left and right clicks
@@ -239,7 +231,7 @@ namespace DelvUI.Helpers
         private IntPtr WndProcDetour(IntPtr hWnd, uint msg, ulong wParam, long lParam)
         {
             // eat left and right clicks?
-            if (_enabled && HandlingInputs)
+            if (HandlingInputs)
             {
                 switch (msg)
                 {
