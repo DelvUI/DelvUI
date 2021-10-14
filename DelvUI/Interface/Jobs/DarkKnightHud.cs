@@ -160,7 +160,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDeliriumBar(Vector2 origin, PlayerCharacter player)
         {
-            float deliriumDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1972)?.RemainingTime ?? 0f;
+            float deliriumDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1972 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
 
             if (Config.DeliriumBar.HideWhenInactive && deliriumDuration is 0) { return; }
 
