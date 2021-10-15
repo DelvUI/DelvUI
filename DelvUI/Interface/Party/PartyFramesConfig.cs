@@ -109,11 +109,15 @@ namespace DelvUI.Interface.Party
         [Order(15)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 70f / 100f));
 
-        [ColorEdit4("Dead Backdrop")]
+        [Checkbox("Use Death Indicator Background Color", isMonitored = true, spacing = true)]
         [Order(16)]
-        public PluginConfigColor DeadBackdrop = new PluginConfigColor(new Vector4(204f / 255f, 3f / 255f, 3f / 255f, 50f / 100f));
+        public bool UseDeathIndicatorBackgroundColor = false;
 
-        [Checkbox("Use Role Colors", isMonitored = true, spacing = true)]
+        [ColorEdit4("Death Indicator Background Color")]
+        [Order(17, collapseWith = nameof(UseDeathIndicatorBackgroundColor))]
+        public PluginConfigColor DeathIndicatorBackgroundColor = new PluginConfigColor(new Vector4(204f / 255f, 3f / 255f, 3f / 255f, 50f / 100f));
+
+        [Checkbox("Use Role Colors", isMonitored = true)]
         [Order(20)]
         public bool UseRoleColors = false;
 
