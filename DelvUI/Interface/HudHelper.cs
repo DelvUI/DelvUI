@@ -162,7 +162,8 @@ namespace DelvUI.Interface
                 return true;
             }
 
-            bool isHidden = Config.HideOutsideOfCombat && !IsInCombat();
+            bool isHidden = Config.ShowInDuty ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty() : Config.HideOutsideOfCombat && !IsInCombat();
+
             if (!isHidden && element is JobHud)
             {
                 return Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
@@ -185,7 +186,7 @@ namespace DelvUI.Interface
             if (e.PropertyName == "HideDefaultCastbar")
             {
                 UpdateDefaultCastBar();
-            }            
+            }
             else if (e.PropertyName == "HideDefaultPulltimer")
             {
                 UpdateDefaultPulltimer();
@@ -301,7 +302,7 @@ namespace DelvUI.Interface
 
             SetAddonVisible((IntPtr)addon, forceVisible || !Config.HideDefaultCastbar, Config.CastBarOriginalPosition);
         }
-        
+
         private unsafe void UpdateDefaultPulltimer(bool forceVisible = false)
         {
             var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("ScreenInfo_CountDown", 1);
@@ -325,7 +326,7 @@ namespace DelvUI.Interface
 
             SetAddonVisible((IntPtr)addon, forceVisible || !Config.HideDefaultPulltimer, Config.PulltimerOriginalPosition);
         }
-        
+
         private unsafe void UpdateJobGauges(bool forceVisible = false)
         {
             var (addons, names) = FindAddonsStartingWith("JobHud");
