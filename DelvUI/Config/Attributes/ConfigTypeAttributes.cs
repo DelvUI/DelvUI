@@ -296,6 +296,8 @@ namespace DelvUI.Config.Attributes
             string stringVal = fieldVal ?? "";
             string? finalValue = null;
 
+            string popupId = ID != null ? "TextTagsList " + ID : "TextTagsList ##" + friendlyName;
+
             if (ImGui.InputText(friendlyName + IDText(ID), ref stringVal, maxLength))
             {
                 finalValue = stringVal;
@@ -306,15 +308,15 @@ namespace DelvUI.Config.Attributes
             {
                 ImGui.SameLine();
                 ImGui.PushFont(UiBuilder.IconFont);
-                if (ImGui.Button(FontAwesomeIcon.Pen.ToIconString()))
+                if (ImGui.Button(FontAwesomeIcon.Pen.ToIconString() + IDText(ID)))
                 {
-                    ImGui.OpenPopup("Text Tags List");
+                    ImGui.OpenPopup(popupId);
                 }
                 ImGui.PopFont();
                 if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Text Tags"); }
             }
 
-            var selectedTag = ImGuiHelper.DrawTextTagsList("Text Tags List", ref _searchText);
+            var selectedTag = ImGuiHelper.DrawTextTagsList(popupId, ref _searchText);
             if (selectedTag != null)
             {
                 finalValue = stringVal + selectedTag;
