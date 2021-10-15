@@ -238,7 +238,11 @@ namespace DelvUI.Helpers
                     ImGui.SetKeyboardFocusHere(0);
                 }
 
-                foreach (string key in TextTagsHelper.TextTags.Keys)
+                List<string> keys = new List<string>();
+                keys.AddRange(TextTagsHelper.TextTags.Keys);
+                keys.AddRange(TextTagsHelper.CharaTextTags.Keys);
+
+                foreach (string key in keys)
                 {
                     if (searchText.Length > 0 && !key.Contains(searchText))
                     {
@@ -253,28 +257,14 @@ namespace DelvUI.Helpers
                     }
 
                     // help tooltip
-                    if (ImGui.IsItemHovered())
+                    if (ImGui.IsItemHovered() && Plugin.ClientState.LocalPlayer != null)
                     {
-                        TextTag textTag = TextTagsHelper.TextTags[key];
-                        string message = textTag.ExplicitHelpText != null ? textTag.ExplicitHelpText + "\n" : "";
+                        string formattedText = TextTagsHelper.FormattedText(key, Plugin.ClientState.LocalPlayer);
 
-                        if (textTag.ExampleValues != null && textTag.ExampleValues.Length > 0)
+                        if (formattedText.Length > 0)
                         {
-                            message += "(";
-
-                            int count = textTag.ExampleValues.Length;
-                            for (int i = 0; i < count; i++)
-                            {
-                                object value = textTag.ExampleValues[i];
-
-                                message += i == count - 1 ? value.ToString() : value.ToString() + ", ";
-                            }
-
-                            message += ") => " + textTag.Execute(null, textTag.ExampleValues);
-
+                            ImGui.SetTooltip("Example: " + formattedText);
                         }
-
-                        ImGui.SetTooltip(message);
                     }
                 }
 
