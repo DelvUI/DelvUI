@@ -25,7 +25,7 @@ namespace DelvUI.Helpers
             }
 
             var iconId = row.Icon;
-            return GetTextureFromIconId(iconId);
+            return GetTextureFromIconId(iconId, stackCount, hdIcon);
         }
 
         public TextureWrap? GetTextureFromIconId(uint iconId, uint stackCount = 0, bool hdIcon = true)

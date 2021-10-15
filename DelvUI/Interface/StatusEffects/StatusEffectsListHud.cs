@@ -312,7 +312,7 @@ namespace DelvUI.Interface.StatusEffects
 
                     // icon
                     var cropIcon = Config.IconConfig.CropIcon;
-                    DrawHelper.DrawIcon<LuminaStatus>(statusEffectData.Data, iconPos, Config.IconConfig.Size, false, drawList, cropIcon);
+                    DrawHelper.DrawIcon<LuminaStatus>(drawList, statusEffectData.Data, iconPos, Config.IconConfig.Size, false, cropIcon, statusEffectData.Status.StackCount);
 
                     // border
                     var borderConfig = GetBorderConfig(statusEffectData);
