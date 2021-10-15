@@ -41,6 +41,12 @@ namespace DelvUI.Config.Tree
         public void AddChild(int position, FieldNode field)
         {
             field._isChild = true;
+
+            while (_childrenFields.ContainsKey(position))
+            {
+                position++;
+            }
+
             _childrenFields.Add(position, field);
         }
 
