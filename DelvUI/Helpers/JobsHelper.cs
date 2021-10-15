@@ -358,6 +358,61 @@ namespace DelvUI.Helpers
             [JobIDs.FSH] = "FSH",
         };
 
+    public static Dictionary<uint, string> JobNamesLong = new Dictionary<uint, string>()
+    {
+        // tanks
+        [JobIDs.GLD] = "Gladiator",
+        [JobIDs.MRD] = "Marauder",
+        [JobIDs.PLD] = "Paladin",
+        [JobIDs.WAR] = "Warrior",
+        [JobIDs.DRK] = "Dark Knight",
+        [JobIDs.GNB] = "Gunbreaker",
+
+        // melee dps
+        [JobIDs.PGL] = "Pugilist",
+        [JobIDs.LNC] = "Lancer",
+        [JobIDs.ROG] = "Rogue",
+        [JobIDs.MNK] = "Monk",
+        [JobIDs.DRG] = "Dragoon",
+        [JobIDs.NIN] = "Ninja",
+        [JobIDs.SAM] = "Samurai",
+
+        // ranged phys dps
+        [JobIDs.ARC] = "Archer",
+        [JobIDs.BRD] = "Bard",
+        [JobIDs.MCH] = "Machinist",
+        [JobIDs.DNC] = "Dancer",
+
+        // ranged magic dps
+        [JobIDs.THM] = "Thaumaturge",
+        [JobIDs.ACN] = "Arcanist",
+        [JobIDs.BLM] = "Black Mage",
+        [JobIDs.SMN] = "Summoner",
+        [JobIDs.RDM] = "Red Mage",
+        [JobIDs.BLU] = "Blue Mage",
+
+        // healers
+        [JobIDs.CNJ] = "Conjurer",
+        [JobIDs.WHM] = "White Mage",
+        [JobIDs.SCH] = "Scholar",
+        [JobIDs.AST] = "Astrologian",
+
+        // crafters
+        [JobIDs.CRP] = "Carpenter",
+        [JobIDs.BSM] = "Blacksmith",
+        [JobIDs.ARM] = "Armorer",
+        [JobIDs.GSM] = "Goldsmith",
+        [JobIDs.LTW] = "Leatherworker",
+        [JobIDs.WVR] = "Weaver",
+        [JobIDs.ALC] = "Alchemist",
+        [JobIDs.CUL] = "Culinarian",
+
+        // gatherers
+        [JobIDs.MIN] = "Miner",
+        [JobIDs.BOT] = "Botanist",
+        [JobIDs.FSH] = "Fisher",
+    };
+
         public static Dictionary<JobRoles, string> RoleNames = new Dictionary<JobRoles, string>()
         {
             [JobRoles.Tank] = "Tank",

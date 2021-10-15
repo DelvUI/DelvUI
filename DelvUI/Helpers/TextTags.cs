@@ -71,6 +71,9 @@ namespace DelvUI.Helpers
                 case "[name:abbreviate]":
                     return n.Abbreviate().CheckForUpperCase();
 
+                case "[name:npcabbreviate]":
+                    return actor?.ObjectKind == ObjectKind.Player ? n.ToString().CheckForUpperCase() : n.Abbreviate().CheckForUpperCase();
+
                 case "[name:veryshort]":
                     return n.Truncate(5).CheckForUpperCase();
 
@@ -97,9 +100,15 @@ namespace DelvUI.Helpers
 
                     case "[level]":
                         return character.Level.ToString();
+                    
+                    case "[level:hidden]":
+                        return character.Level < 80 ? character.Level.ToString() + " " : "";
 
                     case "[job]":
                         return JobsHelper.JobNames.TryGetValue(character.ClassJob.Id, out var jobName) ? jobName : "";
+                    
+                    case "[job:long]":
+                        return JobsHelper.JobNamesLong.TryGetValue(character.ClassJob.Id, out var jobNameLong) ? jobNameLong : "";
                 }
 
                 // health
@@ -139,6 +148,9 @@ namespace DelvUI.Helpers
 
                     case "[health:percent]":
                         return $"{Math.Round(100f / character.MaxHp * character.CurrentHp)}";
+                    
+                    case "[health:percent-hidden]":
+                        return character.CurrentHp == (0 | character.MaxHp) ? "" : $"{Math.Round(100f / character.MaxHp * character.CurrentHp)}";
 
                     case "[health:percent-decimal]":
                         return FormattableString.Invariant($"{100f / character.MaxHp * character.CurrentHp:##0.#}");

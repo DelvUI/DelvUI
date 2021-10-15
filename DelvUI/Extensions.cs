@@ -20,7 +20,7 @@ namespace DelvUI
                 splits[i] = splits[i][0].ToString();
             }
 
-            return string.Join(". ", splits).ToUpper();
+            return string.Join(". ", splits).ToString();
         }
 
         public static string FirstName(this SeString str)
