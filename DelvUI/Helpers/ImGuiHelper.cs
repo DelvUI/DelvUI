@@ -221,5 +221,57 @@ namespace DelvUI.Helpers
 
             return (didConfirm, didClose);
         }
+
+        public static string? DrawTextTagsList(string name, ref string searchText)
+        {
+            string? selectedTag = null;
+
+            ImGui.SetNextWindowSize(new(200, 300));
+
+            if (ImGui.BeginPopup(name))
+            {
+                // search
+                ImGui.InputText("", ref searchText, 64);
+
+                if (!ImGui.IsAnyItemActive() && !ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                {
+                    ImGui.SetKeyboardFocusHere(0);
+                }
+
+                List<string> keys = new List<string>();
+                keys.AddRange(TextTagsHelper.TextTags.Keys);
+                keys.AddRange(TextTagsHelper.CharaTextTags.Keys);
+
+                foreach (string key in keys)
+                {
+                    if (searchText.Length > 0 && !key.Contains(searchText))
+                    {
+                        continue;
+                    }
+
+                    // tag
+                    if (ImGui.Selectable(key))
+                    {
+                        selectedTag = key;
+                        searchText = "";
+                    }
+
+                    // help tooltip
+                    if (ImGui.IsItemHovered() && Plugin.ClientState.LocalPlayer != null)
+                    {
+                        string formattedText = TextTagsHelper.FormattedText(key, Plugin.ClientState.LocalPlayer);
+
+                        if (formattedText.Length > 0)
+                        {
+                            ImGui.SetTooltip("Example: " + formattedText);
+                        }
+                    }
+                }
+
+                ImGui.EndPopup();
+            }
+
+            return selectedTag;
+        }
     }
 }

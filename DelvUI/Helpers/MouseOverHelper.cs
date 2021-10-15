@@ -48,8 +48,8 @@ namespace DelvUI.Helpers
             .text:00007FF64830FD70 48 89 91 90 02 00+mov     [rcx+290h], rdx
             .text:00007FF64830FD70 00
             */
-            _setUIMouseOverActor = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B 6C 24 ?? 48 8B 5C 24 ?? 4C 8B 7C 24 ?? 41 83 FC 02");
-            //_uiMouseOverActorIdHook = new Hook<OnSetUIMouseoverActor>(_setUIMouseOverActorId, new OnSetUIMouseoverActor(HandleUIMouseOverActorId));
+            _setUIMouseOverActor = Plugin.SigScanner.ScanText("48 89 91 ?? ?? ?? ?? C3 CC CC CC CC CC CC CC CC 48 89 5C 24 ?? 55 56 57 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 ?? ?? ?? ?? 48 8D B1 ?? ?? ?? ?? 44 89 44 24 ?? 48 8B EA 48 8B D9 48 8B CE 48 8D 15 ?? ?? ?? ?? 41 B9 ?? ?? ?? ??");
+            _uiMouseOverActorHook = new Hook<OnSetUIMouseoverActor>(_setUIMouseOverActor, new OnSetUIMouseoverActor(HandleUIMouseOverActorId));
             //_uiMouseOverActorIdHook.Enable();
 
             /*
