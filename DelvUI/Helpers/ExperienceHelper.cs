@@ -33,8 +33,6 @@ namespace DelvUI.Helpers
         }
         #endregion
 
-        private AddonExp* _addonExp = null;
-
         public ExperienceHelper()
         {
         }
