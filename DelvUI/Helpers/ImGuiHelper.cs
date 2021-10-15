@@ -222,7 +222,7 @@ namespace DelvUI.Helpers
             return (didConfirm, didClose);
         }
 
-        public static string? DrawTextTagsList(string name)
+        public static string? DrawTextTagsList(string name, ref string searchText)
         {
             string? selectedTag = null;
 
@@ -230,13 +230,26 @@ namespace DelvUI.Helpers
 
             if (ImGui.BeginPopup(name))
             {
+                // search
+                ImGui.InputText("", ref searchText, 64);
+
+                if (!ImGui.IsAnyItemActive() && !ImGui.IsMouseClicked(ImGuiMouseButton.Left))
+                {
+                    ImGui.SetKeyboardFocusHere(0);
+                }
+
                 foreach (string key in TextTagsHelper.TextTags.Keys)
                 {
+                    if (searchText.Length > 0 && !key.Contains(searchText))
+                    {
+                        continue;
+                    }
+
                     // tag
                     if (ImGui.Selectable(key))
                     {
                         selectedTag = key;
-                        //ImGui.CloseCurrentPopup();
+                        searchText = "";
                     }
 
                     // help tooltip

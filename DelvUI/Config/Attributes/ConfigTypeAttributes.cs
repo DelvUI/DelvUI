@@ -282,6 +282,8 @@ namespace DelvUI.Config.Attributes
         public uint maxLength;
         public bool formattable = true;
 
+        private string _searchText = "";
+
         public InputTextAttribute(string friendlyName) : base(friendlyName)
         {
             this.friendlyName = friendlyName;
@@ -312,7 +314,7 @@ namespace DelvUI.Config.Attributes
                 if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Text Tags"); }
             }
 
-            var selectedTag = ImGuiHelper.DrawTextTagsList("Text Tags List");
+            var selectedTag = ImGuiHelper.DrawTextTagsList("Text Tags List", ref _searchText);
             if (selectedTag != null)
             {
                 finalValue = stringVal + selectedTag;
