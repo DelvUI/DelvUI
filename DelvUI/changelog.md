@@ -5,6 +5,7 @@
 - Re-enabled labels for chunked bars.
 - Fixed Target of Target and Focus Target castbars not showing damage type colors.
 - When previewing buffs or debuffs, there will always be at least one effect with stacks now.
+- Fixed stacks on uncropped status effects.
 
 # 0.3.1.1
 - Fixed mouseover not working in some situations.
