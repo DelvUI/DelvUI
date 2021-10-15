@@ -1,11 +1,11 @@
 # 0.3.1.2
 Features:
 - Added a Text Tags list when editing a label:
-    + Shows a list with all available tags formats.
+    + Shows a list with all available tag formats.
     + The tags can be added to the label by clicking on them.
     + Hovering with the cursor on top of a tag shows an example of what they do.
 
-- Added option to set a Death Indicator Background Color for unit- and party frames. Disabled by default.
+- Added option to set a Death Indicator Background Color for unitframes and party frames. Disabled by default.
 - Added Buff/Debuffs for the Focus Target.
 - Added a sub-option to Hide DelvUI outside of combat to always show in duties.
 - Re-enabled labels for chunked bars.
