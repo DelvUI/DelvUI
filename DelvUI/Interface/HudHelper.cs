@@ -162,6 +162,12 @@ namespace DelvUI.Interface
                 return true;
             }
 
+            // hide outside of duty
+            if (Config.HideOutsideOfDuty && !IsInDuty())
+            {
+                return true;
+            }
+
             bool isHidden = Config.HideOutsideOfCombat && !IsInCombat();
             if (!isHidden && element is JobHud)
             {

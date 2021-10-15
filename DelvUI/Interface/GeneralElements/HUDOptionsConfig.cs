@@ -34,6 +34,10 @@ namespace DelvUI.Interface.GeneralElements
         [Order(20)]
         public bool HideOutsideOfCombat = false;
 
+        [Checkbox("Hide DelvUI outside of duty")]
+        [Order(21)]
+        public bool HideOutsideOfDuty = false;
+
         [Checkbox("Hide DelvUI in Gold Saucer")]
         [Order(25)]
         public bool HideInGoldSaucer = false;
