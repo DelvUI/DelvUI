@@ -1,3 +1,6 @@
+# 0.3.1.2
+- Added option to hide DelvUI frames outside of duty.
+
 # 0.3.1.1
 - Fixed mouseover not working in some situations.
 
