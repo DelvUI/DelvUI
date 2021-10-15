@@ -221,5 +221,54 @@ namespace DelvUI.Helpers
 
             return (didConfirm, didClose);
         }
+
+        public static string? DrawTextTagsList(string name)
+        {
+            string? selectedTag = null;
+
+            ImGui.SetNextWindowSize(new(200, 300));
+
+            if (ImGui.BeginPopup(name))
+            {
+                foreach (string key in TextTagsHelper.TextTags.Keys)
+                {
+                    // tag
+                    if (ImGui.Selectable(key))
+                    {
+                        selectedTag = key;
+                        //ImGui.CloseCurrentPopup();
+                    }
+
+                    // help tooltip
+                    if (ImGui.IsItemHovered())
+                    {
+                        TextTag textTag = TextTagsHelper.TextTags[key];
+                        string message = textTag.ExplicitHelpText != null ? textTag.ExplicitHelpText + "\n" : "";
+
+                        if (textTag.ExampleValues != null && textTag.ExampleValues.Length > 0)
+                        {
+                            message += "(";
+
+                            int count = textTag.ExampleValues.Length;
+                            for (int i = 0; i < count; i++)
+                            {
+                                object value = textTag.ExampleValues[i];
+
+                                message += i == count - 1 ? value.ToString() : value.ToString() + ", ";
+                            }
+
+                            message += ") => " + textTag.Execute(null, textTag.ExampleValues);
+
+                        }
+
+                        ImGui.SetTooltip(message);
+                    }
+                }
+
+                ImGui.EndPopup();
+            }
+
+            return selectedTag;
+        }
     }
 }
