@@ -133,7 +133,7 @@ namespace DelvUI.Interface.Jobs
                 {
                     max = 15f;
                     current = kassatsuBuff is null || kassatsuBuff.RemainingTime < 0 ? max : kassatsuBuff.RemainingTime;
-                    Config.MudraBar.Label.SetText("KASSATSU");
+                    Config.MudraBar.Label.SetText("Kassatsu");
                 }
 
                 if (inNinjutsu)
@@ -215,14 +215,14 @@ namespace DelvUI.Interface.Jobs
         {
             return param switch
             {
-                1 or 2 or 3 => "FUMA SHURIKEN",
-                6 or 7 => haveKassatsuBuff ? "GOKA MEKKYAKU" : "KATON",
-                9 or 11 => "RAITON",
-                13 or 14 => haveKassatsuBuff ? "HYOSHO RANRYU" : "HYOTON",
-                27 or 30 => "HUTON",
-                39 or 45 => "DOTON",
-                54 or 57 => "SUITON",
-                _ => haveTCJBuff ? "TEN CHI JIN" : "",
+                1 or 2 or 3 => "Fuma Shuriken",
+                6 or 7 => haveKassatsuBuff ? "Goka Mekkyaku" : "Katon",
+                9 or 11 => "Raiton",
+                13 or 14 => haveKassatsuBuff ? "Hyosho Ranryu" : "Hyoton",
+                27 or 30 => "Huton",
+                39 or 45 => "Doton",
+                54 or 57 => "Suiton",
+                _ => haveTCJBuff ? "Ten Chi Jin" : "",
             };
         }
     }
