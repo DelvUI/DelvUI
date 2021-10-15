@@ -1,5 +1,6 @@
 # 0.3.1.2
 - Added option to set Dead Backdrop color for unit- and party frames.
+- Fixed Target of Target and Focus Target castbars not showing damage type colors.
 
 # 0.3.1.1
 - Fixed mouseover not working in some situations.
