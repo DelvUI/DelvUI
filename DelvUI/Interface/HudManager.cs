@@ -217,13 +217,13 @@ namespace DelvUI.Interface
             _hudElementsUsingTarget.Add(targetCastbar);
 
             var targetOfTargetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<TargetOfTargetCastbarConfig>();
-            var targetOfTargetCastbar = new CastbarHud(targetOfTargetCastbarConfig, "ToT Castbar");
+            var targetOfTargetCastbar = new TargetCastbarHud(targetOfTargetCastbarConfig, "ToT Castbar");
             targetOfTargetCastbar.ParentConfig = _totUnitFrameHud.Config;
             _hudElements.Add(targetOfTargetCastbar);
             _hudElementsUsingTargetOfTarget.Add(targetOfTargetCastbar);
 
             var focusTargetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetCastbarConfig>();
-            var focusTargetCastbar = new CastbarHud(focusTargetCastbarConfig, "Focus Castbar");
+            var focusTargetCastbar = new TargetCastbarHud(focusTargetCastbarConfig, "Focus Castbar");
             focusTargetCastbar.ParentConfig = _focusTargetUnitFrameHud.Config;
             _hudElements.Add(focusTargetCastbar);
             _hudElementsUsingFocusTarget.Add(focusTargetCastbar);
@@ -254,6 +254,18 @@ namespace DelvUI.Interface
             targetDebuffs.ParentConfig = _targetUnitFrameHud.Config;
             _hudElements.Add(targetDebuffs);
             _hudElementsUsingTarget.Add(targetDebuffs);
+
+            var focusTargetBuffsConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetBuffsListConfig>();
+            var focusTargetBuffs = new StatusEffectsListHud(focusTargetBuffsConfig, "focusTarget Buffs");
+            focusTargetBuffs.ParentConfig = _focusTargetUnitFrameHud.Config;
+            _hudElements.Add(focusTargetBuffs);
+            _hudElementsUsingFocusTarget.Add(focusTargetBuffs);
+
+            var focusTargetDebuffsConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetDebuffsListConfig>();
+            var focusTargetDebuffs = new StatusEffectsListHud(focusTargetDebuffsConfig, "focusTarget Debuffs");
+            focusTargetDebuffs.ParentConfig = _focusTargetUnitFrameHud.Config;
+            _hudElements.Add(focusTargetDebuffs);
+            _hudElementsUsingFocusTarget.Add(focusTargetDebuffs);
 
             var custonEffectsConfig = ConfigurationManager.Instance.GetConfigObject<CustomEffectsListConfig>();
             _customEffectsHud = new CustomEffectsListHud(custonEffectsConfig, "Custom Effects");
