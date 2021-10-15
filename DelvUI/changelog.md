@@ -1,3 +1,6 @@
+# 0.3.1.1
+- Fixed mouseover not working in some situations.
+
 # 0.3.1.0
 Features:
 - Added a mouseover settings under Misc > HUD Options. Three modes supported:

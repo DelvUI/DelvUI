@@ -42,6 +42,8 @@ namespace DelvUI.Interface.Party
 
         private SmoothHPHelper _smoothHPHelper = new SmoothHPHelper();
 
+        private bool _wasHovering = false;
+
         public IPartyFramesMember? Member;
 
         public PartyFramesBar(
@@ -134,6 +136,7 @@ namespace DelvUI.Interface.Party
             if (isHovering)
             {
                 MouseOverHelper.Instance.Target = character;
+                _wasHovering = true;
 
                 // left click
                 if (MouseOverHelper.Instance.LeftButtonClicked)
@@ -154,6 +157,11 @@ namespace DelvUI.Interface.Party
                 {
                     OpenContextMenuEvent?.Invoke(this);
                 }
+            }
+            else if (_wasHovering)
+            {
+                MouseOverHelper.Instance.Target = null;
+                _wasHovering = false;
             }
 
             // bg
