@@ -1,5 +1,5 @@
 # 0.3.1.2
-- Added option to set Dead Backdrop color for unit- and party frames.
+- Added option to set a Death Indicator Background Color for unit- and party frames. Disabled by default.
 - Added Buff/Debuffs for the Focus Target
 - Added a sub-option to Hide DelvUI outside of combat to always show in duties.
 - Re-enabled labels for chunked bars.
