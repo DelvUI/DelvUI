@@ -1,15 +1,14 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Utility;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Dalamud.Utility;
 using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
 using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
@@ -312,7 +311,8 @@ namespace DelvUI.Interface.StatusEffects
 
                     // icon
                     var cropIcon = Config.IconConfig.CropIcon;
-                    DrawHelper.DrawIcon<LuminaStatus>(drawList, statusEffectData.Data, iconPos, Config.IconConfig.Size, false, cropIcon, statusEffectData.Status.StackCount);
+                    int stackCount = statusEffectData.Data.MaxStacks > 0 ? statusEffectData.Status.StackCount : 0;
+                    DrawHelper.DrawIcon<LuminaStatus>(drawList, statusEffectData.Data, iconPos, Config.IconConfig.Size, false, cropIcon, stackCount);
 
                     // border
                     var borderConfig = GetBorderConfig(statusEffectData);
