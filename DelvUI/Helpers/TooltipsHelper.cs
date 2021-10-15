@@ -225,7 +225,7 @@ namespace DelvUI.Helpers
 
         [ColorEdit4("Background Color")]
         [Order(10)]
-        public PluginConfigColor BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 60f / 100f));
+        public PluginConfigColor BackgroundColor = new PluginConfigColor(new(19f / 255f, 19f / 255f, 19f / 255f, 190f / 250f));
 
         [Font("Title Font and Size", spacing = true)]
         [Order(15)]
@@ -233,7 +233,7 @@ namespace DelvUI.Helpers
 
         [ColorEdit4("Title Color")]
         [Order(20)]
-        public PluginConfigColor TitleColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        public PluginConfigColor TitleColor = new PluginConfigColor(new(255f / 255f, 210f / 255f, 31f / 255f, 100f / 100f));
 
         [Font("Text Font and Size", spacing = true)]
         [Order(25)]
@@ -241,6 +241,6 @@ namespace DelvUI.Helpers
 
         [ColorEdit4("Text Color")]
         [Order(30)]
-        public PluginConfigColor TextColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 80f / 100f));
+        public PluginConfigColor TextColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
     }
 }

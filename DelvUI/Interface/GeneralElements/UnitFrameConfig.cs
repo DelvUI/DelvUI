@@ -122,6 +122,14 @@ namespace DelvUI.Interface.GeneralElements
         [Order(60, collapseWith = nameof(UseMissingHealthBar))]
         public PluginConfigColor HealthMissingColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
+        [Checkbox("Death Indicator Background Color")]
+        [Order(61)]
+        public bool UseDeathIndicatorBackgroundColor = false;
+
+        [ColorEdit4("Color")]
+        [Order(62, collapseWith = nameof(UseDeathIndicatorBackgroundColor))]
+        public PluginConfigColor DeathIndicatorBackgroundColor = new PluginConfigColor(new Vector4(204f / 255f, 3f / 255f, 3f / 255f, 50f / 100f));
+
         [Checkbox("Color Based On Health Value")]
         [Order(65)]
         public bool UseColorBasedOnHealthValue = false;

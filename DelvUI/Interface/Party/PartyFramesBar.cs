@@ -176,7 +176,7 @@ namespace DelvUI.Interface.Party
             }
             else if (Member.HP <= 0)
             {
-                bgColor = _config.ColorsConfig.DeadBackdrop;
+                bgColor = _config.ColorsConfig.DeathIndicatorBackgroundColor;
             }
             else
             {
