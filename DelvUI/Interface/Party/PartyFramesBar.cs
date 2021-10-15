@@ -174,7 +174,7 @@ namespace DelvUI.Interface.Party
             {
                 bgColor = Member.InvulnStatus?.InvulnId == 811 ? _invulnTrackerConfig.WalkingDeadBackgroundColor : _invulnTrackerConfig.BackgroundColor;
             }
-            else if (Member.HP <= 0)
+            else if (_config.ColorsConfig.UseDeathIndicatorBackgroundColor && Member.HP <= 0)
             {
                 bgColor = _config.ColorsConfig.DeathIndicatorBackgroundColor;
             }
