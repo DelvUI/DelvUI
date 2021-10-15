@@ -2,6 +2,7 @@
 - Added option to set Dead Backdrop color for unit- and party frames.
 - Added a sub-option to Hide DelvUI outside of combat to always show in duties.
 - Re-enabled labels for chunked bars.
+- When previewing buffs or debuffs, there will always be at least one effect with stacks now.
 
 # 0.3.1.1
 - Fixed mouseover not working in some situations.
