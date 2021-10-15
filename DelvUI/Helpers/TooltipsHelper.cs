@@ -146,7 +146,7 @@ namespace DelvUI.Helpers
             drawList.AddRectFilled(_position, _position + _size, _config.BackgroundColor.Base);
 
             if (_config.DrawBorder) {
-                drawList.AddRect(_position, _position + _size, 0xFF000000);
+                drawList.AddRect(_position, _position + _size, _config.BorderConfig.Color.Base, 0, ImDrawFlags.None, _config.BorderConfig.Thickness);
             }
 
             if (_currentTooltipTitle != null)
@@ -250,5 +250,30 @@ namespace DelvUI.Helpers
         [Checkbox("Show Border", spacing = true)]
         [Order(35)]
         public bool DrawBorder = true;
+
+        [NestedConfig("Border", 35, separator = false, spacing = true)]
+        public TooltipBorderConfig BorderConfig = new();
+    }
+
+    [Exportable(false)]
+    public class TooltipBorderConfig : PluginConfigObject
+    {
+        [ColorEdit4("Color")]
+        [Order(5)]
+        public PluginConfigColor Color = new(Vector4.UnitW);
+
+        [DragInt("Thickness", min = 1, max = 100)]
+        [Order(10)]
+        public int Thickness = 1;
+
+        public TooltipBorderConfig()
+        {
+        }
+
+        public TooltipBorderConfig(PluginConfigColor color, int thickness)
+        {
+            Color = color;
+            Thickness = thickness;
+        }
     }
 }
