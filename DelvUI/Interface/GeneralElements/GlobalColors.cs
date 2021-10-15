@@ -127,7 +127,7 @@ namespace DelvUI.Interface.GeneralElements
 
         public PluginConfigColor SafeColorForJobId(uint jobId)
         {
-            return ColorForJobId(jobId) ?? _miscColorConfig.NPCNeutralColor;
+            return ColorForJobId(jobId) ?? _miscColorConfig.NPCHostileColor;
         }
 
         public PluginConfigColor EmptyUnitFrameColor => _miscColorConfig.EmptyUnitFrameColor;
