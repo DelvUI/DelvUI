@@ -286,7 +286,7 @@ namespace DelvUI.Interface
             var pullTimerHud = new PullTimerHud(pullTimerConfig, "Pull Timer");
             _hudElements.Add(pullTimerHud);
             _hudElementsUsingPlayer.Add(pullTimerHud);
-            
+
             //limit break
             var limitBreakConfig = ConfigurationManager.Instance.GetConfigObject<LimitBreakConfig>();
             var limitBreakHud = new LimitBreakHud(limitBreakConfig, "Limit Break");
@@ -301,7 +301,6 @@ namespace DelvUI.Interface
             }
 
             LimitBreakHelper.Instance.Update();
-            MouseOverHelper.Instance.Target = null;
             PullTimerHelper.Instance.Update();
             TooltipsHelper.Instance.RemoveTooltip(); // remove tooltip from previous frame
 
@@ -437,7 +436,7 @@ namespace DelvUI.Interface
             {
                 newJobId = ForcedJob.ForcedJobId;
             }
-            
+
             if (_jobHud != null && _jobHud.Config.JobId == newJobId)
             {
                 return false;

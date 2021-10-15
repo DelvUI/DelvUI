@@ -33,6 +33,8 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
+        private bool _wasHovering = false;
+
         public UnitFrameHud(UnitFrameConfig config, string displayName) : base(config, displayName)
         {
             // interaction stuff
@@ -77,6 +79,7 @@ namespace DelvUI.Interface.GeneralElements
             if (ImGui.IsMouseHoveringRect(startPos, startPos + Config.Size) && !DraggingEnabled)
             {
                 MouseOverHelper.Instance.Target = Actor;
+                _wasHovering = true;
 
                 if (MouseOverHelper.Instance.LeftButtonClicked)
                 {
@@ -87,6 +90,11 @@ namespace DelvUI.Interface.GeneralElements
                     var agentHud = new IntPtr(Framework.Instance()->GetUiModule()->GetAgentModule()->GetAgentByInternalID(4));
                     _openContextMenuFromTarget(agentHud, Actor.Address);
                 }
+            }
+            else if (_wasHovering)
+            {
+                MouseOverHelper.Instance.Target = null;
+                _wasHovering = false;
             }
         }
 
