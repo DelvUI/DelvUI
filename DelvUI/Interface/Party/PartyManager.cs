@@ -102,11 +102,8 @@ namespace DelvUI.Interface.Party
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
             // find party list hud agent
-            if (HudAgent == IntPtr.Zero || PartyListAddon == null)
-            {
-                PartyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1);
-                HudAgent = Plugin.GameGui.FindAgentInterface(PartyListAddon);
-            }
+            PartyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1);
+            HudAgent = Plugin.GameGui.FindAgentInterface(PartyListAddon);
 
             // no need to update on preview mode
             if (_config.Preview)
