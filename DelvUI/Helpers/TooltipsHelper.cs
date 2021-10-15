@@ -145,6 +145,10 @@ namespace DelvUI.Helpers
 
             drawList.AddRectFilled(_position, _position + _size, _config.BackgroundColor.Base);
 
+            if (_config.DrawBorder) {
+                drawList.AddRect(_position, _position + _size, 0xFF000000);
+            }
+
             if (_currentTooltipTitle != null)
             {
                 // title
@@ -242,5 +246,9 @@ namespace DelvUI.Helpers
         [ColorEdit4("Text Color")]
         [Order(30)]
         public PluginConfigColor TextColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        
+        [Checkbox("Show Border", spacing = true)]
+        [Order(35)]
+        public bool DrawBorder = true;
     }
 }
