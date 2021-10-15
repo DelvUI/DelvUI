@@ -202,7 +202,7 @@ namespace DelvUI.Interface.Bars
             float max,
             float min = 0f,
             GameObject? actor = null,
-            LabelConfig? label = null,
+            LabelConfig? labelTemplate = null,
             PluginConfigColor? fillColor = null,
             PluginConfigColor? partialFillColor = null,
             BarGlowConfig? glowConfig = null,
@@ -219,8 +219,15 @@ namespace DelvUI.Interface.Bars
                 float chunkPercent = Math.Clamp((current - chunkMin) / (chunkMax - chunkMin), 0f, 1f);
 
                 PluginConfigColor chunkColor = partialFillColor != null && current < chunkMax ? partialFillColor : fillColor ?? config.FillColor;
+                LabelConfig? label = null;
+                
+                if (labelTemplate != null)
+                {
+                    label = labelTemplate.Clone();
+                    label.SetText(Math.Clamp(current - chunkMin, 0, chunkRange).ToString("N0"));
+                }
 
-                barChunks[barIndex] = new Tuple<PluginConfigColor, float, LabelConfig?>(chunkColor, chunkPercent, chunkPercent < 1f ? label : null);
+                barChunks[barIndex] = new Tuple<PluginConfigColor, float, LabelConfig?>(chunkColor, chunkPercent, label);
             }
 
             if (glowConfig != null && chunksToGlow == null)
@@ -246,7 +253,7 @@ namespace DelvUI.Interface.Bars
             if (config.UseChunks)
             {
                 var partialColor = config.UsePartialFillColor ? config.PartialFillColor : null;
-                return GetChunkedBars(config, chunks, current, max, min, actor, null, color, partialColor, glowConfig);
+                return GetChunkedBars(config, chunks, current, max, min, actor, config.Label, color, partialColor, glowConfig);
             }
 
             BarHud bar = GetProgressBar(config, null, new LabelConfig[] { config.Label }, current, max, min, actor, color, glowConfig);

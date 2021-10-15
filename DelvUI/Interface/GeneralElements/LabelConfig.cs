@@ -92,5 +92,19 @@ namespace DelvUI.Interface.GeneralElements
         {
             _text = text;
         }
+
+        public virtual LabelConfig Clone() =>
+            new LabelConfig(Position, _text, FrameAnchor, TextAnchor)
+            {
+                Color = Color,
+                OutlineColor = OutlineColor,
+                ShadowColor = ShadowColor,
+                ShadowOffset = ShadowOffset,
+                ShowOutline = ShowOutline,
+                ShowShadow = ShowShadow,
+                FontID = FontID,
+                UseJobColor = UseJobColor,
+                Enabled = Enabled,
+            };
     }
 }
