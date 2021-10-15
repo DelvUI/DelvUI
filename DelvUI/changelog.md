@@ -10,6 +10,7 @@ Features:
 - Added a sub-option to Hide DelvUI outside of combat to always show in duties.
 - Re-enabled labels for chunked bars.
 - When previewing buffs or debuffs, there will always be at least one effect with stacks now.
+- Added show border option on tooltips.
 
 Fixes:
 - Fixed crashes when logging out and then logging back in.
