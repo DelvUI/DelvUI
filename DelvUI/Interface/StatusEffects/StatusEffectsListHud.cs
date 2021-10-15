@@ -496,9 +496,11 @@ namespace DelvUI.Interface.StatusEffects
             for (int i = 0; i < StatusEffectListsSize; i++)
             {
                 var fakeStruct = new StatusStruct();
+
+                // forcing "triplecast" buff first to always be able to test stacks
+                fakeStruct.StatusID = i == 0 ? (ushort)1211 : (ushort)RNG.Next(1, 200);
                 fakeStruct.RemainingTime = RNG.Next(1, 30);
-                fakeStruct.StatusID = (ushort)RNG.Next(1, 200);
-                fakeStruct.StackCount = (byte)RNG.Next(0, 3);
+                fakeStruct.StackCount = (byte)RNG.Next(1, 3);
                 fakeStruct.SourceID = 0;
 
                 _fakeEffects[i] = fakeStruct;
