@@ -1,3 +1,6 @@
+# PR
+- Added Buff/Debuffs for the Focus Target
+
 # 0.3.1.1
 - Fixed mouseover not working in some situations.
 

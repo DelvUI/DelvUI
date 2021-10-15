@@ -255,6 +255,18 @@ namespace DelvUI.Interface
             _hudElements.Add(targetDebuffs);
             _hudElementsUsingTarget.Add(targetDebuffs);
 
+            var focusTargetBuffsConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetBuffsListConfig>();
+            var focusTargetBuffs = new StatusEffectsListHud(focusTargetBuffsConfig, "focusTarget Buffs");
+            focusTargetBuffs.ParentConfig = _focusTargetUnitFrameHud.Config;
+            _hudElements.Add(focusTargetBuffs);
+            _hudElementsUsingFocusTarget.Add(focusTargetBuffs);
+
+            var focusTargetDebuffsConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetDebuffsListConfig>();
+            var focusTargetDebuffs = new StatusEffectsListHud(focusTargetDebuffsConfig, "focusTarget Debuffs");
+            focusTargetDebuffs.ParentConfig = _focusTargetUnitFrameHud.Config;
+            _hudElements.Add(focusTargetDebuffs);
+            _hudElementsUsingFocusTarget.Add(focusTargetDebuffs);
+
             var custonEffectsConfig = ConfigurationManager.Instance.GetConfigObject<CustomEffectsListConfig>();
             _customEffectsHud = new CustomEffectsListHud(custonEffectsConfig, "Custom Effects");
             _hudElements.Add(_customEffectsHud);
