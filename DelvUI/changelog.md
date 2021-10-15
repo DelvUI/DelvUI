@@ -1,4 +1,5 @@
 # 0.3.1.2
+- Added option to set Dead Backdrop color for unit- and party frames.
 - Added a sub-option to Hide DelvUI outside of combat to always show in duties.
 
 # 0.3.1.1

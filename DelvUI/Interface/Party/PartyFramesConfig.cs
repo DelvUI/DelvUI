@@ -4,8 +4,6 @@ using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
-using Newtonsoft.Json;
-using System;
 using System.Numerics;
 
 namespace DelvUI.Interface.Party
@@ -110,6 +108,10 @@ namespace DelvUI.Interface.Party
         [ColorEdit4("Background Color")]
         [Order(15)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 70f / 100f));
+
+        [ColorEdit4("Dead Backdrop")]
+        [Order(16)]
+        public PluginConfigColor DeadBackdrop = new PluginConfigColor(new Vector4(204f / 255f, 3f / 255f, 3f / 255f, 50f / 100f));
 
         [Checkbox("Use Role Colors", isMonitored = true, spacing = true)]
         [Order(20)]
