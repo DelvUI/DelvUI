@@ -5,6 +5,12 @@
     + Hovering with the cursor on top of a tag shows an example of what they do.
 
 - Added option to set Dead Backdrop color for unit- and party frames.
+- Added Buff/Debuffs for the Focus Target
+- Added a sub-option to Hide DelvUI outside of combat to always show in duties.
+- Re-enabled labels for chunked bars.
+- Fixed Target of Target and Focus Target castbars not showing damage type colors.
+- When previewing buffs or debuffs, there will always be at least one effect with stacks now.
+- Fixed stacks on uncropped status effects.
 
 # 0.3.1.1
 - Fixed mouseover not working in some situations.
