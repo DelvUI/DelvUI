@@ -1,5 +1,5 @@
 # 0.3.1.2
-- Added option to hide DelvUI frames outside of duty.
+- Added a sub-option to Hide DelvUI outside of combat to always show in duties.
 
 # 0.3.1.1
 - Fixed mouseover not working in some situations.
