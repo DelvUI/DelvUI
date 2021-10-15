@@ -32,7 +32,7 @@ using Action = Lumina.Excel.GeneratedSheets.Action;
 
 namespace DelvUI.Helpers
 {
-    public delegate void OnSetUIMouseoverActorId(long arg1, long arg2);
+    public delegate void OnSetUIMouseoverActor(long arg1, long arg2);
     public delegate ulong OnRequestAction(long arg1, uint arg2, ulong arg3, long arg4, uint arg5, uint arg6, int arg7);
 
     public unsafe class MouseOverHelper : IDisposable
@@ -42,17 +42,16 @@ namespace DelvUI.Helpers
         {
             _sheet = Plugin.DataManager.GetExcelSheet<Action>();
 
-#if DEBUG
             /*
              Part of setUIMouseOverActorId disassembly signature
             .text:00007FF64830FD70                   sub_7FF64830FD70 proc near
             .text:00007FF64830FD70 48 89 91 90 02 00+mov     [rcx+290h], rdx
             .text:00007FF64830FD70 00
             */
-            _setUIMouseOverActorId = Plugin.SigScanner.ScanText("48 89 91 ?? ?? ?? ?? C3 CC CC CC CC CC CC CC CC 48 89 5C 24 ?? 55 56 57 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 ?? ?? ?? ?? 48 8D B1 ?? ?? ?? ?? 44 89 44 24 ?? 48 8B EA 48 8B D9 48 8B CE 48 8D 15 ?? ?? ?? ?? 41 B9 ?? ?? ?? ??");
-            _uiMouseOverActorIdHook = new Hook<OnSetUIMouseoverActorId>(_setUIMouseOverActorId, new OnSetUIMouseoverActorId(HandleUIMouseOverActorId));
-            _uiMouseOverActorIdHook.Enable();
-#endif
+            _setUIMouseOverActor = Plugin.SigScanner.ScanText("48 89 91 ?? ?? ?? ?? C3 CC CC CC CC CC CC CC CC 48 89 5C 24 ?? 55 56 57 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 ?? ?? ?? ?? 48 8D B1 ?? ?? ?? ?? 44 89 44 24 ?? 48 8B EA 48 8B D9 48 8B CE 48 8D 15 ?? ?? ?? ?? 41 B9 ?? ?? ?? ??");
+            //_uiMouseOverActorIdHook = new Hook<OnSetUIMouseoverActor>(_setUIMouseOverActorId, new OnSetUIMouseoverActor(HandleUIMouseOverActorId));
+            //_uiMouseOverActorIdHook.Enable();
+
             /*
              Part of requestAction disassembly signature
             .text:00007FF6484F05A0                   Client__Game__ActionManager_UseAction proc near
@@ -124,7 +123,7 @@ namespace DelvUI.Helpers
 
             ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
 
-            _uiMouseOverActorIdHook?.Dispose();
+            _uiMouseOverActorHook?.Dispose();
             _requsetActionHook?.Dispose();
             Instance = null!;
         }
@@ -134,8 +133,8 @@ namespace DelvUI.Helpers
 
         private const int UnknownOffset = 0xAA750;
 
-        private IntPtr _setUIMouseOverActorId;
-        private Hook<OnSetUIMouseoverActorId> _uiMouseOverActorIdHook;
+        private IntPtr _setUIMouseOverActor;
+        private Hook<OnSetUIMouseoverActor>? _uiMouseOverActorHook;
 
         private IntPtr _requestAction;
         private Hook<OnRequestAction> _requsetActionHook;
@@ -160,7 +159,9 @@ namespace DelvUI.Helpers
                     IntPtr uiModule = Plugin.GameGui.GetUIModule();
                     long unknownAddress = (long)uiModule + UnknownOffset;
                     long targetAddress = _target != null && _target.ObjectId != 0 ? (long)_target.Address : 0;
-                    _uiMouseOverActorIdHook.Original(unknownAddress, targetAddress);
+
+                    OnSetUIMouseoverActor func = Marshal.GetDelegateForFunctionPointer<OnSetUIMouseoverActor>(_setUIMouseOverActor);
+                    func.Invoke(unknownAddress, targetAddress);
                 }
             }
         }
@@ -173,7 +174,7 @@ namespace DelvUI.Helpers
         private void HandleUIMouseOverActorId(long arg1, long arg2)
         {
             //PluginLog.Log("MO: {0} - {1}", arg1.ToString("X"), arg2.ToString("X"));
-            _uiMouseOverActorIdHook.Original(arg1, arg2);
+            _uiMouseOverActorHook?.Original(arg1, arg2);
         }
 
         private ulong HandleRequestAction(long arg1, uint arg2, ulong arg3, long arg4, uint arg5, uint arg6, int arg7)
