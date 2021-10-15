@@ -3,6 +3,7 @@
 - Added Buff/Debuffs for the Focus Target
 - Added a sub-option to Hide DelvUI outside of combat to always show in duties.
 - Re-enabled labels for chunked bars.
+- Fixed Target of Target and Focus Target castbars not showing damage type colors.
 
 # 0.3.1.1
 - Fixed mouseover not working in some situations.
