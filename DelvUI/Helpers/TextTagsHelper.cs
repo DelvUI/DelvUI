@@ -35,9 +35,9 @@ namespace DelvUI.Helpers
 
     public class CharacterTextTag : TextTag
     {
-        private Func<Character, object[]?, string> CharacterFunc;
+        private Func<Character?, object[]?, string> CharacterFunc;
 
-        public CharacterTextTag(object[]? exampleValues, Func<Character, object[]?, string> func, string? helpText = null)
+        public CharacterTextTag(object[]? exampleValues, Func<Character?, object[]?, string> func, string? helpText = null)
             : base(exampleValues, null, helpText)
         {
             CharacterFunc = func;
@@ -45,12 +45,17 @@ namespace DelvUI.Helpers
 
         public override string Execute(GameObject? actor, object[]? values)
         {
-            if (actor is not Character chara)
+            if (values != null)
             {
-                return "";
+                return CharacterFunc.Invoke(null, values);
             }
 
-            return CharacterFunc.Invoke(chara, values);
+            if (actor is Character chara)
+            {
+                return CharacterFunc.Invoke(chara, values);
+            }
+
+            return "";
         }
     }
 
@@ -158,133 +163,133 @@ namespace DelvUI.Helpers
 
             #region health
             ["[health:current]"] = new CharacterTextTag(
-                new object[] { 69420 },
+                new object[] { (uint)69420 },
                 (chara, values) =>
                 {
-                    uint hp = ValidateValue<uint?>(values, 0) ?? chara.CurrentHp;
+                    uint hp = ValidateValue<uint?>(values, 0) ?? (chara?.CurrentHp ?? 0);
                     return hp.ToString();
                 }
             ),
 
             ["[health:current-short]"] = new CharacterTextTag(
-                new object[] { 69420 },
+                new object[] { (uint)69420 },
                 (chara, values) =>
                 {
-                    uint hp = ValidateValue<uint?>(values, 0) ?? chara.CurrentHp;
+                    uint hp = ValidateValue<uint?>(values, 0) ?? (chara?.CurrentHp ?? 0);
                     return hp.KiloFormat();
                 }
             ),
 
             ["[health:current-percent]"] = new CharacterTextTag(
-                new object[] { 69000, 100000 },
+                new object[] { (uint)69000, (uint)100000 },
                 (chara, values) =>
                 {
-                    uint hp = ValidateValue<uint?>(values, 0) ?? chara.CurrentHp;
-                    uint max = ValidateValue<uint?>(values, 1) ?? chara.MaxHp;
-                    return hp == max ? hp.ToString() : $"{Math.Round(100f / max * hp)}";
+                    uint hp = ValidateValue<uint?>(values, 0) ?? (chara?.CurrentHp ?? 0);
+                    uint max = ValidateValue<uint?>(values, 1) ?? (chara?.MaxHp ?? 0);
+                    return hp == max ? hp.ToString() : (100f * hp / Math.Max(1, max)).ToString("N0");
                 },
                 "Health value if full, otherwise shows percentage"
             ),
 
             ["[health:current-percent-short]"] = new CharacterTextTag(
-                new object[] { 100000, 100000 },
+                new object[] { (uint)100000, (uint)100000 },
                 (chara, values) =>
                 {
-                    uint hp = ValidateValue<uint?>(values, 0) ?? chara.CurrentHp;
-                    uint max = ValidateValue<uint?>(values, 1) ?? chara.MaxHp;
-                    return hp == max ? hp.KiloFormat() : $"{Math.Round(100f / max * hp)}";
+                    uint hp = ValidateValue<uint?>(values, 0) ?? (chara?.CurrentHp ?? 0);
+                    uint max = ValidateValue<uint?>(values, 1) ?? (chara?.MaxHp ?? 0);
+                    return hp == max ? hp.KiloFormat() : (100f * hp / Math.Max(1, max)).ToString("N0");
                 },
                 "Health value if full, otherwise shows percentage"
             ),
 
             ["[health:current-max]"] = new CharacterTextTag(
-                new object[] { 69000, 100000 },
+                new object[] { (uint)69000, (uint)100000 },
                 (chara, values) =>
                 {
-                    uint hp = ValidateValue<uint?>(values, 0) ?? chara.CurrentHp;
-                    uint max = ValidateValue<uint?>(values, 1) ?? chara.MaxHp;
+                    uint hp = ValidateValue<uint?>(values, 0) ?? (chara?.CurrentHp ?? 0);
+                    uint max = ValidateValue<uint?>(values, 1) ?? (chara?.MaxHp ?? 0);
                     return $"{hp}  |  {max}";
                 },
-                "Current Health  |  Max Health)"
+                "(HP, MaxHP)"
             ),
 
             ["[health:current-max-short]"] = new CharacterTextTag(
-                new object[] { 69000, 100000 },
+                new object[] { (uint)69000, (uint)100000 },
                 (chara, values) =>
                 {
-                    uint hp = ValidateValue<uint?>(values, 0) ?? chara.CurrentHp;
-                    uint max = ValidateValue<uint?>(values, 1) ?? chara.MaxHp;
+                    uint hp = ValidateValue<uint?>(values, 0) ?? (chara?.CurrentHp ?? 0);
+                    uint max = ValidateValue<uint?>(values, 1) ?? (chara?.MaxHp ?? 0);
                     return $"{hp.KiloFormat()}  |  {max.KiloFormat()}";
                 },
-                "Current Health  |  Max Health"
+                "(HP, MaxHP)"
             ),
 
             ["[health:max]"] = new CharacterTextTag(
-                new object[] { 69420 },
+                new object[] { (uint)69420 },
                 (chara, values) =>
                 {
-                    uint hp = ValidateValue<uint?>(values, 0) ?? chara.MaxHp;
+                    uint hp = ValidateValue<uint?>(values, 0) ?? (chara?.MaxHp ?? 0);
                     return hp.ToString();
                 }
             ),
 
             ["[health:max-short]"] = new CharacterTextTag(
-                new object[] { 69420 },
+                new object[] { (uint)69420 },
                 (chara, values) =>
                 {
-                    uint hp = ValidateValue<uint?>(values, 0) ?? chara.MaxHp;
+                    uint hp = ValidateValue<uint?>(values, 0) ?? (chara?.MaxHp ?? 0);
                     return hp.KiloFormat();
                 }
             ),
 
             ["[health:percent]"] = new CharacterTextTag(
-                new object[] { 69420, 10000 },
+                new object[] { (uint)69420, (uint)100000 },
                 (chara, values) =>
                 {
-                    uint hp = ValidateValue<uint?>(values, 0) ?? chara.CurrentHp;
-                    uint max = ValidateValue<uint?>(values, 1) ?? chara.MaxHp;
-                    return $"{Math.Round(100f / hp * max)}";
+                    uint hp = ValidateValue<uint?>(values, 0) ?? (chara?.CurrentHp ?? 0);
+                    uint max = ValidateValue<uint?>(values, 1) ?? (chara?.MaxHp ?? 0);
+                    return (100f * hp / Math.Max(1, max)).ToString("N0");
                 },
-                "Current Health  |  Max Health)"
+                "(HP, MaxHP)"
             ),
 
             ["[health:percent-decimal]"] = new CharacterTextTag(
-                new object[] { 69420, 10000 },
+                new object[] { (uint)69420, (uint)100000 },
                 (chara, values) =>
                 {
-                    uint hp = ValidateValue<uint?>(values, 0) ?? chara.CurrentHp;
-                    uint max = ValidateValue<uint?>(values, 1) ?? chara.MaxHp;
-                    return FormattableString.Invariant($"{100f / max * hp:##0.#}");
+                    uint hp = ValidateValue<uint?>(values, 0) ?? (chara?.CurrentHp ?? 0);
+                    uint max = ValidateValue<uint?>(values, 1) ?? (chara?.MaxHp ?? 0);
+                    return FormattableString.Invariant($"{100f * hp / Math.Max(1f, max):##0.#}");
                 },
-                "Current Health  |  Max Health)"
+                "(HP, MaxHP)"
             ),
 
             ["[health:deficit]"] = new CharacterTextTag(
-                new object[] { 69420, 10000 },
+                new object[] { (uint)69420, (uint)100000 },
                 (chara, values) =>
                 {
-                    uint hp = ValidateValue<uint?>(values, 0) ?? chara.CurrentHp;
-                    uint max = ValidateValue<uint?>(values, 1) ?? chara.MaxHp;
+                    uint hp = ValidateValue<uint?>(values, 0) ?? (chara?.CurrentHp ?? 0);
+                    uint max = ValidateValue<uint?>(values, 1) ?? (chara?.MaxHp ?? 0);
                     return hp == max ? "0" : $"-{max - hp}";
                 },
-                "Current Health  |  Max Health)"
+                "(HP, MaxHP)"
             ),
 
             ["[health:deficit-short]"] = new CharacterTextTag(
-                new object[] { 69420, 10000 },
+                new object[] { (uint)69420, (uint)100000 },
                 (chara, values) =>
                 {
-                    uint hp = ValidateValue<uint?>(values, 0) ?? chara.CurrentHp;
-                    uint max = ValidateValue<uint?>(values, 1) ?? chara.MaxHp;
+                    uint hp = ValidateValue<uint?>(values, 0) ?? (chara?.CurrentHp ?? 0);
+                    uint max = ValidateValue<uint?>(values, 1) ?? (chara?.MaxHp ?? 0);
                     return hp == max ? "0" : $"-{(max - hp).KiloFormat()}";
                 },
-                "Current Health  |  Max Health)"
+                "(HP, MaxHP)"
             ),
             #endregion
 
             #region mana
             ["[mana:current]"] = new CharacterTextTag(
-                new object[] { 69420 },
+                new object[] { (uint)69420 },
                 (chara, values) =>
                 {
                     uint mp = ValidateValue<uint?>(values, 0) ?? JobsHelper.CurrentPrimaryResource(chara);
@@ -293,7 +298,7 @@ namespace DelvUI.Helpers
             ),
 
             ["[mana:current-short]"] = new CharacterTextTag(
-                new object[] { 69420 },
+                new object[] { (uint)69420 },
                 (chara, values) =>
                 {
                     uint mp = ValidateValue<uint?>(values, 0) ?? JobsHelper.CurrentPrimaryResource(chara);
@@ -302,51 +307,51 @@ namespace DelvUI.Helpers
             ),
 
             ["[mana:current-percent]"] = new CharacterTextTag(
-                new object[] { 69000, 100000 },
+                new object[] { (uint)69000, (uint)100000 },
                 (chara, values) =>
                 {
                     uint mp = ValidateValue<uint?>(values, 0) ?? JobsHelper.CurrentPrimaryResource(chara);
                     uint max = ValidateValue<uint?>(values, 1) ?? JobsHelper.MaxPrimaryResource(chara);
-                    return mp == max ? mp.ToString() : $"{Math.Round(100f / max * mp)}";
+                    return mp == max ? mp.ToString() : (100f * mp / Math.Max(1, max)).ToString("N0");
                 },
                 "Mana value if full, otherwise shows percentage"
             ),
 
             ["[mana:current-percent-short]"] = new CharacterTextTag(
-                new object[] { 100000, 100000 },
+                new object[] { (uint)100000, (uint)100000 },
                 (chara, values) =>
                 {
                     uint mp = ValidateValue<uint?>(values, 0) ?? JobsHelper.CurrentPrimaryResource(chara);
                     uint max = ValidateValue<uint?>(values, 1) ?? JobsHelper.MaxPrimaryResource(chara);
-                    return mp == max ? mp.KiloFormat() : $"{Math.Round(100f / max * mp)}";
+                    return mp == max ? mp.KiloFormat() : (100f * mp / Math.Max(1, max)).ToString("N0");
                 },
                 "Mana value if full, otherwise shows percentage"
             ),
 
             ["[mana:current-max]"] = new CharacterTextTag(
-                new object[] { 69000, 100000 },
+                new object[] { (uint)69000, (uint)100000 },
                 (chara, values) =>
                 {
                     uint mp = ValidateValue<uint?>(values, 0) ?? JobsHelper.CurrentPrimaryResource(chara);
                     uint max = ValidateValue<uint?>(values, 1) ?? JobsHelper.MaxPrimaryResource(chara);
                     return $"{mp}  |  {max}";
                 },
-                "Current Mana  |  Max Mana)"
+                "(MP, MaxMP)"
             ),
 
             ["[mana:current-max-short]"] = new CharacterTextTag(
-                new object[] { 69000, 100000 },
+                new object[] { (uint)69000, (uint)100000 },
                 (chara, values) =>
                 {
                     uint mp = ValidateValue<uint?>(values, 0) ?? JobsHelper.CurrentPrimaryResource(chara);
                     uint max = ValidateValue<uint?>(values, 1) ?? JobsHelper.MaxPrimaryResource(chara);
                     return $"{mp.KiloFormat()}  |  {max.KiloFormat()}";
                 },
-                "Current Mana  |  Max Mana"
+                "(MP, MaxMP)"
             ),
 
             ["[mana:max]"] = new CharacterTextTag(
-                new object[] { 69420 },
+                new object[] { (uint)69420 },
                 (chara, values) =>
                 {
                     uint mp = ValidateValue<uint?>(values, 0) ?? JobsHelper.CurrentPrimaryResource(chara);
@@ -355,7 +360,7 @@ namespace DelvUI.Helpers
             ),
 
             ["[mana:max-short]"] = new CharacterTextTag(
-                new object[] { 69420 },
+                new object[] { (uint)69420 },
                 (chara, values) =>
                 {
                     uint mp = ValidateValue<uint?>(values, 0) ?? JobsHelper.CurrentPrimaryResource(chara);
@@ -364,79 +369,79 @@ namespace DelvUI.Helpers
             ),
 
             ["[mana:percent]"] = new CharacterTextTag(
-                new object[] { 69420, 10000 },
+                new object[] { (uint)69420, (uint)100000 },
                 (chara, values) =>
                 {
                     uint mp = ValidateValue<uint?>(values, 0) ?? JobsHelper.CurrentPrimaryResource(chara);
                     uint max = ValidateValue<uint?>(values, 1) ?? JobsHelper.MaxPrimaryResource(chara);
-                    return $"{Math.Round(100f / mp * max)}";
+                    return (100f * mp / Math.Max(1, max)).ToString("N0");
                 },
-                "Current Mana  |  Max Mana"
+                "(MP, MaxMP)"
             ),
 
             ["[mana:percent-decimal]"] = new CharacterTextTag(
-                new object[] { 69420, 10000 },
+                new object[] { (uint)69420, (uint)100000 },
                 (chara, values) =>
                 {
                     uint mp = ValidateValue<uint?>(values, 0) ?? JobsHelper.CurrentPrimaryResource(chara);
                     uint max = ValidateValue<uint?>(values, 1) ?? JobsHelper.MaxPrimaryResource(chara);
-                    return FormattableString.Invariant($"{100f / max * mp:##0.#}");
+                    return FormattableString.Invariant($"{100f * mp / Math.Max(1, max):##0.#}");
                 },
-                "Current Mana  |  Max Mana"
+                "(MP, MaxMP)"
             ),
 
             ["[mana:deficit]"] = new CharacterTextTag(
-                new object[] { 69420, 10000 },
+                new object[] { (uint)69420, (uint)100000 },
                 (chara, values) =>
                 {
                     uint mp = ValidateValue<uint?>(values, 0) ?? JobsHelper.CurrentPrimaryResource(chara);
                     uint max = ValidateValue<uint?>(values, 1) ?? JobsHelper.MaxPrimaryResource(chara);
                     return mp == max ? "0" : $"-{max - mp}";
                 },
-                "Current Mana  |  Max Mana"
+                "(MP, MaxMP)"
             ),
 
             ["[mana:deficit-short]"] = new CharacterTextTag(
-                new object[] { 69420, 10000 },
+                new object[] { (uint)69420, (uint)100000 },
                 (chara, values) =>
                 {
                     uint mp = ValidateValue<uint?>(values, 0) ?? JobsHelper.CurrentPrimaryResource(chara);
                     uint max = ValidateValue<uint?>(values, 1) ?? JobsHelper.MaxPrimaryResource(chara);
                     return mp == max ? "0" : $"-{(max - mp).KiloFormat()}";
                 },
-                "Current Mana  |  Max Mana"
+                "(MP, MaxMP)"
             ),
             #endregion
 
             #region misc
             ["[distance]"] = new CharacterTextTag(
                 null,
-                (chara, values) => (chara.YalmDistanceX + 1).ToString(),
+                (chara, values) => chara != null ? (chara.YalmDistanceX + 1).ToString() : "",
                 "Distance to the character"
             ),
 
             ["[company]"] = new CharacterTextTag(
                 null,
-                (chara, values) => chara.CompanyTag.ToString(),
+                (chara, values) => chara != null ? chara.CompanyTag.ToString() : "",
                 "Company name"
             ),
 
             ["[level]"] = new CharacterTextTag(
                 null,
-                (chara, values) => chara.Level.ToString(),
+                (chara, values) => chara != null ? chara.Level.ToString() : "",
                 "Level of the character"
             ),
 
             ["[job]"] = new CharacterTextTag(
                 null,
-                (chara, values) => JobsHelper.JobNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
+                (chara, values) => chara != null ? (JobsHelper.JobNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "") : "",
                 "Job of the player (ie \"BLM\")"
             ),
             #endregion
 
             #region experience
             ["[exp:current]"] = new TextTag(
-                new object[] { 100000 },
+                new object[] { (uint)100000 },
                 (actor, values) =>
                 {
                     uint value = ValidateValue<uint?>(values, 0) ?? ExperienceHelper.Instance.CurrentExp;
@@ -445,7 +450,7 @@ namespace DelvUI.Helpers
             ),
 
             ["[exp:current-short]"] = new TextTag(
-                new object[] { 100000 },
+                new object[] { (uint)100000 },
                 (actor, values) =>
                 {
                     uint value = ValidateValue<uint?>(values, 0) ?? ExperienceHelper.Instance.CurrentExp;
@@ -454,7 +459,7 @@ namespace DelvUI.Helpers
             ),
 
             ["[exp:required]"] = new TextTag(
-                new object[] { 100000 },
+                new object[] { (uint)100000 },
                 (actor, values) =>
                 {
                     uint value = ValidateValue<uint?>(values, 0) ?? ExperienceHelper.Instance.RequiredExp;
@@ -463,7 +468,7 @@ namespace DelvUI.Helpers
             ),
 
             ["[exp:required-short]"] = new TextTag(
-                new object[] { 100000 },
+                new object[] { (uint)100000 },
                 (actor, values) =>
                 {
                     uint value = ValidateValue<uint?>(values, 0) ?? ExperienceHelper.Instance.RequiredExp;
@@ -472,7 +477,7 @@ namespace DelvUI.Helpers
             ),
 
             ["[exp:rested]"] = new TextTag(
-                new object[] { 100000 },
+                new object[] { (uint)100000 },
                 (actor, values) =>
                 {
                     uint value = ValidateValue<uint?>(values, 0) ?? ExperienceHelper.Instance.RestedExp;
@@ -481,7 +486,7 @@ namespace DelvUI.Helpers
             ),
 
             ["[exp:rested-short]"] = new TextTag(
-                new object[] { 100000 },
+                new object[] { (uint)100000 },
                 (actor, values) =>
                 {
                     uint value = ValidateValue<uint?>(values, 0) ?? ExperienceHelper.Instance.RestedExp;
