@@ -166,6 +166,10 @@ namespace DelvUI.Interface.Party
             {
                 bgColor = Member.InvulnStatus?.InvulnId == 811 ? _invulnTrackerConfig.WalkingDeadBackgroundColor : _invulnTrackerConfig.BackgroundColor;
             }
+            else if (_config.ColorsConfig.UseJobColorAsBackgroundColor)
+            {
+                bgColor = GlobalColors.Instance.SafeColorForJobId(Member.JobId);
+            }
             else
             {
                 bgColor = _config.ColorsConfig.BackgroundColor;

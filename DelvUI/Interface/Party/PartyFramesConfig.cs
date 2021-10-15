@@ -182,6 +182,10 @@ namespace DelvUI.Interface.Party
         [ColorEdit4("Enmity Second Color")]
         [Order(100, collapseWith = nameof(ShowSecondEnmity))]
         public PluginConfigColor EnmitySecondBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 175f / 255f, 40f / 255f, 100f / 100f));
+
+        [Checkbox("Job Color as Background Color")]
+        [Order(105)]
+        public bool UseJobColorAsBackgroundColor = false;
     }
 
     [Exportable(false)]
