@@ -1,3 +1,9 @@
+# 0.3.1.2
+- Added a Text Tags list when editing a label:
+    + Shows a list with all available tags formats.
+    + The tags can be added to the label by clicking on them.
+    + Hovering with the cursor on top of a tag shows an example of what they do.
+
 # 0.3.1.1
 - Fixed mouseover not working in some situations.
 
