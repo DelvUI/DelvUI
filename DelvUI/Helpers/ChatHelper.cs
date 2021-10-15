@@ -29,18 +29,6 @@ namespace DelvUI.Helpers
         private ChatHelper()
         {
             /*
-             Part of baseUi disassembly signature
-            .text:00007FF647D391BB 48 8B 0D 96 39 D3+mov     rcx, cs:g_Framework_2
-            .text:00007FF647D391BB 01
-            .text:00007FF647D391C2 48 8D 54 24 70    lea     rdx, [rsp+520h+Source]
-            .text:00007FF647D391C7 48 83 C1 10       add     rcx, 10h
-            .text:00007FF647D391CB E8 F0 02 01 00    call    sub_7FF647D494C0
-            .text:00007FF647D391D0 48 8B 4D 80       mov     rcx, [rbp+420h+var_4A0]
-            .text:00007FF647D391D4 48 8D 05 ED 29 61+lea     rax, off_7FF64934BBC8
-            */
-            IntPtr baseUi = Plugin.SigScanner.GetStaticAddressFromSig("48 8B 0D ?? ?? ?? ?? 48 8D 54 24 ?? 48 83 C1 10 E8");
-
-            /*
              Part of chatModule disassembly signature
             .text:00007FF6482AF4B0                   sub_7FF6482AF4B0 proc near
             .text:00007FF6482AF4B0

@@ -48,7 +48,7 @@ namespace DelvUI.Helpers
             .text:00007FF647F88F30 89 41 2C          mov     [rcx+2Ch], eax
             .text:00007FF647F88F33 48 8B 05 1E 3C AE+mov     rax, cs:g_Framework_2
             */
-            
+
             IntPtr countdownPtr = Plugin.SigScanner.ScanText("48 89 5C 24 ?? 57 48 83 EC 40 8B 41");
             try
             {
@@ -81,7 +81,9 @@ namespace DelvUI.Helpers
                 return;
             }
 
+            _countdownTimerHook?.Disable();
             _countdownTimerHook?.Dispose();
+
             Instance = null!;
         }
         #endregion

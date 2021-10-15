@@ -27,8 +27,6 @@ namespace DelvUI.Interface.GeneralElements
             get => _actor;
             set
             {
-                if (_actor == value) { return; }
-
                 _actor = value;
                 _smoothHPHelper.Reset();
             }
@@ -125,7 +123,7 @@ namespace DelvUI.Interface.GeneralElements
             {
                 var healthMissingSize = Config.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
                 var healthMissingPos = Config.FillDirection.IsInverted() ? Config.Position : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
-                PluginConfigColor? color = character.CurrentHp <= 0 ? Config.DeadBackdrop : Config.HealthMissingColor;
+                PluginConfigColor? color = Config.UseDeathIndicatorBackgroundColor && character.CurrentHp <= 0 ? Config.DeathIndicatorBackgroundColor : Config.HealthMissingColor;
                 bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, color));
             }
 
@@ -192,9 +190,9 @@ namespace DelvUI.Interface.GeneralElements
                 {
                     return GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id);
                 }
-                else if (chara.CurrentHp <= 0)
+                else if (Config.UseDeathIndicatorBackgroundColor && chara.CurrentHp <= 0)
                 {
-                    return Config.DeadBackdrop;
+                    return Config.DeathIndicatorBackgroundColor;
                 }
                 else
                 {
