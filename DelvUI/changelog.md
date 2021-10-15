@@ -4,6 +4,8 @@
     + The tags can be added to the label by clicking on them.
     + Hovering with the cursor on top of a tag shows an example of what they do.
 
+- Added option to set Dead Backdrop color for unit- and party frames.
+
 # 0.3.1.1
 - Fixed mouseover not working in some situations.
 
