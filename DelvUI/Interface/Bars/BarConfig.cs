@@ -11,20 +11,24 @@ namespace DelvUI.Interface.Bars
         [Order(20)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
 
-        [ColorEdit4("Fill Color")]
+        [ColorEdit4("Dead Backdrop")]
         [Order(25)]
+        public PluginConfigColor DeadBackdrop = new PluginConfigColor(new Vector4(204f / 255f, 3f / 255f, 3f / 255f, 50f / 100f));
+
+        [ColorEdit4("Fill Color")]
+        [Order(30)]
         public PluginConfigColor FillColor;
 
         [Combo("Fill Direction", new string[] { "Left", "Right", "Up", "Down" })]
-        [Order(30)]
+        [Order(35)]
         public BarDirection FillDirection;
 
         [Checkbox("Show Border")]
-        [Order(35)]
+        [Order(40)]
         public bool DrawBorder = true;
 
         [Checkbox("Hide When Inactive")]
-        [Order(40)]
+        [Order(45)]
         public bool HideWhenInactive = false;
 
         public BarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor, BarDirection fillDirection = BarDirection.Right)
