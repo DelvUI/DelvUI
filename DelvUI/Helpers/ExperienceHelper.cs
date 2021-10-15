@@ -33,20 +33,52 @@ namespace DelvUI.Helpers
         }
         #endregion
 
-        private readonly AddonExp* _addonExp;
+        private AddonExp* _addonExp = null;
 
         public ExperienceHelper()
         {
-            _addonExp = (AddonExp*)Plugin.GameGui.GetAddonByName("_Exp", 1);
         }
 
-        public uint CurrentExp => _addonExp->CurrentExp;
+        public AddonExp* GetExpAddon()
+        {
+            return (AddonExp*)Plugin.GameGui.GetAddonByName("_Exp", 1);
+        }
 
-        public uint RequiredExp => _addonExp->RequiredExp;
+        public uint CurrentExp
+        {
+            get
+            {
+                AddonExp* addon = GetExpAddon();
+                return addon != null ? addon->CurrentExp : 0;
+            }
+        }
 
-        public uint RestedExp => _addonExp->RestedExp;
+        public uint RequiredExp
+        {
+            get
+            {
+                AddonExp* addon = GetExpAddon();
+                return addon != null ? addon->RequiredExp : 0;
+            }
+        }
 
-        public float PercentExp => _addonExp->CurrentExpPercent;
+        public uint RestedExp
+        {
+            get
+            {
+                AddonExp* addon = GetExpAddon();
+                return addon != null ? addon->RestedExp : 0;
+            }
+        }
+
+        public float PercentExp
+        {
+            get
+            {
+                AddonExp* addon = GetExpAddon();
+                return addon != null ? addon->CurrentExpPercent : 0;
+            }
+        }
     }
 
     [StructLayout(LayoutKind.Explicit, Size = 0x290)]

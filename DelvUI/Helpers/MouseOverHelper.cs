@@ -123,8 +123,12 @@ namespace DelvUI.Helpers
 
             ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
 
+            _uiMouseOverActorHook?.Disable();
             _uiMouseOverActorHook?.Dispose();
+
+            _requsetActionHook?.Disable();
             _requsetActionHook?.Dispose();
+
             Instance = null!;
         }
         #endregion

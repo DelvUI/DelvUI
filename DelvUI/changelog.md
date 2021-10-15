@@ -1,4 +1,5 @@
 # 0.3.1.2
+- Fixed crashes when loging out and then loging back in.
 - Added option to set Dead Backdrop color for unit- and party frames.
 
 # 0.3.1.1
