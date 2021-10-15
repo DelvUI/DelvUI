@@ -10,7 +10,7 @@ namespace DelvUI.Interface.Bars
     public class ChunkedBarConfig : BarConfig
     {
         [DragInt("Padding", min = -4000, max = 4000)]
-        [Order(45)]
+        [Order(46)]
         public int Padding = 2;
 
         public ChunkedBarConfig(
@@ -27,7 +27,7 @@ namespace DelvUI.Interface.Bars
     public class ChunkedProgressBarConfig : ChunkedBarConfig
     {
         [Checkbox("Show In Chunks")]
-        [Order(46)]
+        [Order(47)]
         public bool UseChunks = true;
 
         [Checkbox("Use Partial Fill Color")]
