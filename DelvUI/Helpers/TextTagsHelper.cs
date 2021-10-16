@@ -10,6 +10,19 @@ namespace DelvUI.Helpers
 {
     public static class TextTagsHelper
     {
+        public static void Initialize()
+        {
+            foreach (string key in HealthTextTags.Keys)
+            {
+                CharaTextTags.Add(key, (chara) => HealthTextTags[key](chara.CurrentHp, chara.MaxHp));
+            }
+
+            foreach (string key in ManaTextTags.Keys)
+            {
+                CharaTextTags.Add(key, (chara) => ManaTextTags[key](JobsHelper.CurrentPrimaryResource(chara), JobsHelper.MaxPrimaryResource(chara)));
+            }
+        }
+
         public static Dictionary<string, Func<GameObject?, string?, string>> TextTags = new Dictionary<string, Func<GameObject?, string?, string>>()
         {
             #region name
@@ -85,86 +98,66 @@ namespace DelvUI.Helpers
             #endregion
         };
 
-        public static Dictionary<string, Func<Character, string>> CharaTextTags = new Dictionary<string, Func<Character, string>>()
+        public static Dictionary<string, Func<uint, uint, string>> HealthTextTags = new Dictionary<string, Func<uint, uint, string>>()
         {
             #region health
-            ["[health:current]"] = (chara) => chara.CurrentHp.ToString(),
+            ["[health:current]"] = (currentHp, maxHp) => currentHp.ToString(),
 
-            ["[health:current-short]"] = (chara) => chara.CurrentHp.KiloFormat(),
+            ["[health:current-short]"] = (currentHp, maxHp) => currentHp.KiloFormat(),
 
-            ["[health:current-percent]"] = (chara) =>
-                chara.CurrentHp == chara.MaxHp ?
-                    chara.CurrentHp.ToString() :
-                    (100f * chara.CurrentHp / Math.Max(1, chara.MaxHp)).ToString("N0"),
+            ["[health:current-percent]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.ToString() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
-            ["[health:current-percent-short]"] = (chara) =>
-                chara.CurrentHp == chara.MaxHp ?
-                    chara.CurrentHp.KiloFormat() :
-                    (100f * chara.CurrentHp / Math.Max(1, chara.MaxHp)).ToString("N0"),
+            ["[health:current-percent-short]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.KiloFormat() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
-            ["[health:current-max]"] = (chara) => $"{chara.CurrentHp}  |  {chara.MaxHp}",
+            ["[health:current-maxMp]"] = (currentHp, maxHp) => $"{currentHp}  |  {maxHp}",
 
-            ["[health:current-max-short]"] = (chara) => $"{chara.CurrentHp.KiloFormat()}  |  {chara.MaxHp.KiloFormat()}",
+            ["[health:current-maxMp-short]"] = (currentHp, maxHp) => $"{currentHp.KiloFormat()}  |  {maxHp.KiloFormat()}",
 
-            ["[health:chara.max]"] = (chara) => chara.CurrentHp.ToString(),
+            ["[health:chara.maxMp]"] = (currentHp, maxHp) => currentHp.ToString(),
 
-            ["[health:chara.max-short]"] = (chara) => chara.CurrentHp.KiloFormat(),
+            ["[health:chara.maxMp-short]"] = (currentHp, maxHp) => currentHp.KiloFormat(),
 
-            ["[health:percent]"] = (chara) => (100f * chara.CurrentHp / Math.Max(1, chara.MaxHp)).ToString("N0"),
+            ["[health:percent]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
-            ["[health:percent-decimal]"] = (chara) => FormattableString.Invariant($"{100f * chara.CurrentHp / Math.Max(1f, chara.MaxHp):##0.#}"),
+            ["[health:percent-decimal]"] = (currentHp, maxHp) => FormattableString.Invariant($"{100f * currentHp / Math.Max(1f, maxHp):##0.#}"),
 
-            ["[health:deficit]"] = (chara) => chara.CurrentHp == chara.MaxHp ? "0" : $"-{chara.MaxHp - chara.CurrentHp}",
+            ["[health:deficit]"] = (currentHp, maxHp) => currentHp == maxHp ? "0" : $"-{maxHp - currentHp}",
 
-            ["[health:deficit-short]"] = (chara) => chara.CurrentHp == chara.MaxHp ? "0" : $"-{(chara.MaxHp - chara.CurrentHp).KiloFormat()}",
+            ["[health:deficit-short]"] = (currentHp, maxHp) => currentHp == maxHp ? "0" : $"-{(maxHp - currentHp).KiloFormat()}",
             #endregion
+        };
 
+        public static Dictionary<string, Func<uint, uint, string>> ManaTextTags = new Dictionary<string, Func<uint, uint, string>>()
+        {
             #region mana
-            ["[mana:current]"] = (chara) => JobsHelper.CurrentPrimaryResource(chara).ToString(),
+            ["[mana:current]"] = (currentMp, maxMp) => currentMp.ToString(),
 
-            ["[mana:current-short]"] = (chara) => JobsHelper.CurrentPrimaryResource(chara).KiloFormat(),
+            ["[mana:current-short]"] = (currentMp, maxMp) => currentMp.KiloFormat(),
 
-            ["[mana:current-percent]"] = (chara) =>
-            {
-                uint mp = JobsHelper.CurrentPrimaryResource(chara);
-                uint max = JobsHelper.MaxPrimaryResource(chara);
-                return mp == max ? mp.ToString() : (100f * mp / Math.Max(1, max)).ToString("N0");
-            },
+            ["[mana:current-percent]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.ToString() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0"),
 
-            ["[mana:current-percent-short]"] = (chara) =>
-            {
-                uint mp = JobsHelper.CurrentPrimaryResource(chara);
-                uint max = JobsHelper.MaxPrimaryResource(chara);
-                return mp == max ? mp.KiloFormat() : (100f * mp / Math.Max(1, max)).ToString("N0");
-            },
+            ["[mana:current-percent-short]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.KiloFormat() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0"),
 
-            ["[mana:current-max]"] = (chara) => $"{JobsHelper.CurrentPrimaryResource(chara)}  |  {JobsHelper.MaxPrimaryResource(chara)}",
+            ["[mana:current-maxMp]"] = (currentMp, maxMp) => $"{currentMp}  |  {maxMp}",
 
-            ["[mana:current-max-short]"] = (chara) => $"{JobsHelper.CurrentPrimaryResource(chara).KiloFormat()}  |  {JobsHelper.MaxPrimaryResource(chara).KiloFormat()}",
+            ["[mana:current-maxMp-short]"] = (currentMp, maxMp) => $"{currentMp.KiloFormat()}  |  {maxMp.KiloFormat()}",
 
-            ["[mana:max]"] = (chara) => JobsHelper.CurrentPrimaryResource(chara).ToString(),
+            ["[mana:maxMp]"] = (currentMp, maxMp) => currentMp.ToString(),
 
-            ["[mana:max-short]"] = (chara) => JobsHelper.CurrentPrimaryResource(chara).KiloFormat(),
+            ["[mana:maxMp-short]"] = (currentMp, maxMp) => currentMp.KiloFormat(),
 
-            ["[mana:percent]"] = (chara) => (100f * JobsHelper.CurrentPrimaryResource(chara) / Math.Max(1, JobsHelper.MaxPrimaryResource(chara))).ToString("N0"),
+            ["[mana:percent]"] = (currentMp, maxMp) => (100f * currentMp / Math.Max(1, maxMp)).ToString("N0"),
 
-            ["[mana:percent-decimal]"] = (chara) => FormattableString.Invariant($"{100f * JobsHelper.CurrentPrimaryResource(chara) / Math.Max(1, JobsHelper.MaxPrimaryResource(chara)):##0.#}"),
+            ["[mana:percent-decimal]"] = (currentMp, maxMp) => FormattableString.Invariant($"{100f * currentMp / Math.Max(1, maxMp):##0.#}"),
 
-            ["[mana:deficit]"] = (chara) =>
-            {
-                uint mp = JobsHelper.CurrentPrimaryResource(chara);
-                uint max = JobsHelper.MaxPrimaryResource(chara);
-                return mp == max ? "0" : $"-{mp - max}";
-            },
+            ["[mana:deficit]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{currentMp - maxMp}",
 
-            ["[mana:deficit-short]"] = (chara) =>
-            {
-                uint mp = JobsHelper.CurrentPrimaryResource(chara);
-                uint max = JobsHelper.MaxPrimaryResource(chara);
-                return mp == max ? "0" : $"-{(mp - max).KiloFormat()}";
-            },
+            ["[mana:deficit-short]"] = (currentMp, maxMp) => currentMp == maxMp ? "0" : $"-{(currentMp - maxMp).KiloFormat()}",
             #endregion
+        };
 
+        public static Dictionary<string, Func<Character, string>> CharaTextTags = new Dictionary<string, Func<Character, string>>()
+        {
             #region misc
             ["[distance]"] = (chara) => (chara.YalmDistanceX + 1).ToString(),
 
@@ -176,7 +169,13 @@ namespace DelvUI.Helpers
             #endregion
         };
 
-        private static string ReplaceTagWithString(string tag, GameObject? actor, string? name = null)
+        private static List<Dictionary<string, Func<uint, uint, string>>> NumericValuesTagMaps = new List<Dictionary<string, Func<uint, uint, string>>>()
+        {
+            HealthTextTags,
+            ManaTextTags
+        };
+
+        private static string ReplaceTagWithString(string tag, GameObject? actor, string? name = null, uint? current = null, uint? max = null)
         {
             if (TextTags.TryGetValue(tag, out Func<GameObject?, string?, string>? func) && func != null)
             {
@@ -188,17 +187,27 @@ namespace DelvUI.Helpers
             {
                 return charaFunc(chara);
             }
+            else if (current.HasValue && max.HasValue)
+            {
+                foreach (var map in NumericValuesTagMaps)
+                {
+                    if (map.TryGetValue(tag, out Func<uint, uint, string>? numericFunc) && numericFunc != null)
+                    {
+                        return numericFunc(current.Value, max.Value);
+                    }
+                }
+            }
 
             return "";
         }
 
-        public static string FormattedText(string text, GameObject? actor, string? name = null)
+        public static string FormattedText(string text, GameObject? actor, string? name = null, uint? current = null, uint? max = null)
         {
             MatchCollection matches = Regex.Matches(text, @"\[(.*?)\]");
-            return matches.Aggregate(text, (current, m) =>
+            return matches.Aggregate(text, (c, m) =>
             {
-                string formattedText = ReplaceTagWithString(m.Value, actor, name);
-                return current.Replace(m.Value, formattedText);
+                string formattedText = ReplaceTagWithString(m.Value, actor, name, current, max);
+                return c.Replace(m.Value, formattedText);
             });
         }
 
