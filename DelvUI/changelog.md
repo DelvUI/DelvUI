@@ -1,10 +1,11 @@
 # 0.3.1.3
 Features:
 - You can now attach HUD Layouts to be loaded alongside profiles.
-- Fixed unit frame background color and death indicator background color being linked together.
 
 Fixes:
 - Fixed clicks not working on game windows when they are on top of unit frames or party frames.
+- Fixed unit frame background color and death indicator background color being linked together.
+- Fixed storm's eye bar for warrior not tracking the buff properly.
 
 # 0.3.1.2
 Features:
