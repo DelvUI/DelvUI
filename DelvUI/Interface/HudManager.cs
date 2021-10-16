@@ -16,8 +16,6 @@ namespace DelvUI.Interface
 {
     public class HudManager : IDisposable
     {
-        private readonly Vector2 _origin = ImGui.GetMainViewport().Size / 2f;
-
         private GridConfig? _gridConfig;
         private HUDOptionsConfig? _hudOptions;
         private DraggableHudElement? _selectedElement = null;
@@ -357,7 +355,7 @@ namespace DelvUI.Interface
 
             AssignActors();
 
-            var origin = _origin;
+            var origin = ImGui.GetMainViewport().Size / 2f;
             if (_hudOptions is { UseGlobalHudShift: true })
             {
                 origin += _hudOptions.HudOffset;
@@ -366,7 +364,7 @@ namespace DelvUI.Interface
             // show only castbar during quest events
             if (ShouldOnlyShowCastbar())
             {
-                _playerCastbarHud?.Draw(_origin);
+                _playerCastbarHud?.Draw(origin);
 
                 ImGui.End();
                 return;
