@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.Party
 {
-    public class PartyFramesHud : DraggableHudElement
+    public class PartyFramesHud : DraggableHudElement, IHudElementWithMouseOver
     {
         private PartyFramesConfig Config => (PartyFramesConfig)_config;
         private PartyFramesHealthBarsConfig _healthBarsConfig;
@@ -248,6 +248,14 @@ namespace DelvUI.Interface.Party
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
             return (new List<Vector2>() { Config.Position + Config.Size / 2f }, new List<Vector2>() { Config.Size });
+        }
+
+        public void StopMouseover()
+        {
+            foreach (var bar in bars)
+            {
+                bar.StopMouseover();
+            }
         }
 
         public override void DrawChildren(Vector2 origin)

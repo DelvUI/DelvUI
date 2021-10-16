@@ -96,21 +96,35 @@ namespace DelvUI.Helpers
             bool canTakeInput = true;
 
             // selected
-            if (selectedElement != null && !hudHelper.IsElementHidden(selectedElement))
+            if (selectedElement != null)
             {
-                selectedElement.CanTakeInputForDrag = true;
-                selectedElement.Draw(origin);
-                canTakeInput = !selectedElement.NeedsInputForDrag;
+                if (!hudHelper.IsElementHidden(selectedElement))
+                {
+                    selectedElement.CanTakeInputForDrag = true;
+                    selectedElement.Draw(origin);
+                    canTakeInput = !selectedElement.NeedsInputForDrag;
+                }
+                else if (selectedElement is IHudElementWithMouseOver elementWithMouseOver)
+                {
+                    elementWithMouseOver.StopMouseover();
+                }
             }
 
             // all
             foreach (DraggableHudElement element in elements)
             {
-                if (element == selectedElement || hudHelper.IsElementHidden(element)) { continue; }
+                if (element == selectedElement) { continue; }
 
-                element.CanTakeInputForDrag = canTakeInput;
-                element.Draw(origin);
-                canTakeInput = !canTakeInput ? false : !element.NeedsInputForDrag;
+                if (!hudHelper.IsElementHidden(element))
+                {
+                    element.CanTakeInputForDrag = canTakeInput;
+                    element.Draw(origin);
+                    canTakeInput = !canTakeInput ? false : !element.NeedsInputForDrag;
+                }
+                else if (element is IHudElementWithMouseOver elementWithMouseOver)
+                {
+                    elementWithMouseOver.StopMouseover();
+                }
             }
 
             // job hud
