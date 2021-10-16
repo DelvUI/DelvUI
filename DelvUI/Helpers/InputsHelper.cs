@@ -231,7 +231,7 @@ namespace DelvUI.Helpers
         }
 
         #region mouseover inputs proxy
-        public bool HandlingInputs => Target != null;
+        public bool HandlingMouseInputs => Target != null;
 
         private bool? _leftButtonClicked = null;
         public bool LeftButtonClicked => _leftButtonClicked.HasValue ? _leftButtonClicked.Value : ImGui.GetIO().MouseClicked[0];
@@ -250,7 +250,7 @@ namespace DelvUI.Helpers
                 return (IntPtr)0;
             }
             // eat left and right clicks?
-            else if (HandlingInputs)
+            else if (HandlingMouseInputs)
             {
                 switch (msg)
                 {
