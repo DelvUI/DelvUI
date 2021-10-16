@@ -8,6 +8,7 @@ using System;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Enums;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.Party;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -38,6 +39,8 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
+        public IPartyFramesMember? PartyMember;
+
         protected override bool AnchorToParent => Config is UnitFramePrimaryResourceConfig config ? config.AnchorToUnitFrame : false;
         protected override DrawAnchor ParentAnchor => Config is UnitFramePrimaryResourceConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
 
@@ -52,16 +55,25 @@ namespace DelvUI.Interface.GeneralElements
 
         public override void DrawChildren(Vector2 origin)
         {
-            if (!Config.Enabled || ResourceType == PrimaryResourceTypes.None || Actor == null || Actor is not PlayerCharacter)
+            if (!Config.Enabled)
             {
                 return;
             }
 
-            var chara = (Character)Actor;
-            int current = 0;
-            int max = 0;
+            if (PartyMember == null && (ResourceType == PrimaryResourceTypes.None || Actor == null || Actor is not PlayerCharacter))
+            {
+                return;
+            }
 
-            GetResources(ref current, ref max, chara);
+            Character? chara = Actor != null ? (Character)Actor : null;
+            uint current = chara == null ? PartyMember?.MP ?? 0 : 0;
+            uint max = chara == null ? PartyMember?.MaxMP ?? 0 : 0;
+
+            if (chara != null)
+            {
+                GetResources(ref current, ref max, chara);
+            }
+
             if (Config.HidePrimaryResourceWhenFull && current == max)
             {
                 return;
@@ -75,50 +87,46 @@ namespace DelvUI.Interface.GeneralElements
                 max,
                 0,
                 chara,
-                GetColor(chara)
+                GetColor()
             );
 
             bar.Draw(origin + ParentPos());
         }
 
-        private void GetResources(ref int current, ref int max, Character actor)
+        private void GetResources(ref uint current, ref uint max, Character actor)
         {
             switch (ResourceType)
             {
                 case PrimaryResourceTypes.MP:
-                    {
-                        current = (int)actor.CurrentMp;
-                        max = (int)actor.MaxMp;
-                    }
-
+                    current = actor.CurrentMp;
+                    max = actor.MaxMp;
                     break;
 
                 case PrimaryResourceTypes.CP:
-                    {
-                        current = (int)actor.CurrentCp;
-                        max = (int)actor.MaxCp;
-                    }
-
+                    current = actor.CurrentCp;
+                    max = actor.MaxCp;
                     break;
 
                 case PrimaryResourceTypes.GP:
-                    {
-                        current = (int)actor.CurrentGp;
-                        max = (int)actor.MaxGp;
-                    }
-
+                    current = actor.CurrentGp;
+                    max = actor.MaxGp;
                     break;
             }
         }
 
-        public virtual PluginConfigColor GetColor(GameObject? actor = null)
+        public virtual PluginConfigColor GetColor()
         {
             if (!Config.UseJobColor)
             {
                 return Config.FillColor;
             }
 
-            return actor is not Character character ? GlobalColors.Instance.NPCFriendlyColor : Utils.ColorForActor(character);
+            if (PartyMember != null)
+            {
+                return GlobalColors.Instance.SafeColorForJobId(PartyMember.JobId);
+            }
+
+            return Utils.ColorForActor(Actor);
         }
     }
 }

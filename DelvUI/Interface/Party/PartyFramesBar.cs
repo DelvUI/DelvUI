@@ -317,6 +317,7 @@ namespace DelvUI.Interface.Party
             {
                 var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _manaBarConfig.HealthBarAnchor);
                 _manaBarHud.Actor = character;
+                _manaBarHud.PartyMember = Member;
                 _manaBarHud.Draw(parentPos);
             }
 
@@ -354,19 +355,7 @@ namespace DelvUI.Interface.Party
             }
 
             // health label
-            if (character == null)
-            {
-                string oldText = _config.HealthLabelConfig.GetText();
-                _config.HealthLabelConfig.SetText(Member.HP.ToString());
-
-                _healthLabelHud.Draw(Position, _config.Size, character);
-
-                _config.HealthLabelConfig.SetText(oldText);
-            }
-            else
-            {
-                _healthLabelHud.Draw(Position, _config.Size, character);
-            }
+            _healthLabelHud.Draw(Position, _config.Size, character, null, Member.HP, Member.MaxHP);
 
             // order
             if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)
