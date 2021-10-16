@@ -1,3 +1,6 @@
+Fixes:
+- Fixed non-latin characters encoding error in player names.
+
 # 0.3.1.2
 Features:
 - Added a Text Tags list when editing a label:
