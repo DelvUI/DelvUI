@@ -62,6 +62,7 @@ namespace DelvUI.Helpers
             "Bank",
             "RetainerSellList",
             "RetainerSell",
+            "SelectString",
             "Shop",
             "ShopExchangeCurrency",
             "ShopExchangeItem",
