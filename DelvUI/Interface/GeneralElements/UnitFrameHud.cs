@@ -21,16 +21,7 @@ namespace DelvUI.Interface.GeneralElements
 
         private SmoothHPHelper _smoothHPHelper = new SmoothHPHelper();
 
-        private GameObject? _actor = null;
-        public GameObject? Actor
-        {
-            get => _actor;
-            set
-            {
-                _actor = value;
-                _smoothHPHelper.Reset();
-            }
-        }
+        public GameObject? Actor { get; set; }
 
         private bool _wasHovering = false;
 
