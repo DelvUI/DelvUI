@@ -8,14 +8,11 @@ using DelvUI.Interface.Jobs;
 using DelvUI.Interface.Party;
 using DelvUI.Interface.StatusEffects;
 using ImGuiScene;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace DelvUI.Config
 {
@@ -230,6 +227,31 @@ namespace DelvUI.Config
             {
                 PluginLog.Error("Error checking version: " + e.Message);
             }
+        }
+
+        public bool UseEscInput()
+        {
+            if (DrawChangelog)
+            {
+                DrawChangelog = false;
+                return true;
+            }
+
+            if (DrawConfigWindow)
+            {
+                if (LockHUD)
+                {
+                    DrawConfigWindow = false;
+                }
+                else
+                {
+                    LockHUD = true;
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
         public void Draw()

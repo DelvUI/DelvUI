@@ -377,8 +377,8 @@ namespace DelvUI.Interface.StatusEffects
                         );
                     }
 
-                    bool leftClick = MouseOverHelper.Instance.HandlingInputs ? MouseOverHelper.Instance.LeftButtonClicked : ImGui.GetIO().MouseClicked[0];
-                    bool rightClick = MouseOverHelper.Instance.HandlingInputs ? MouseOverHelper.Instance.RightButtonClicked : ImGui.GetIO().MouseClicked[1];
+                    bool leftClick = InputsHelper.Instance.HandlingMouseInputs ? InputsHelper.Instance.LeftButtonClicked : ImGui.GetIO().MouseClicked[0];
+                    bool rightClick = InputsHelper.Instance.HandlingMouseInputs ? InputsHelper.Instance.RightButtonClicked : ImGui.GetIO().MouseClicked[1];
 
                     // remove buff on right click
                     bool isFromPlayer = statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId;

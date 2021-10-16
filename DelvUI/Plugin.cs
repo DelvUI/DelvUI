@@ -104,7 +104,7 @@ namespace DelvUI
             ClipRectsHelper.Initialize();
             GlobalColors.Initialize();
             LimitBreakHelper.Initialize();
-            MouseOverHelper.Initialize();
+            InputsHelper.Initialize();
             PartyManager.Initialize();
             ProfilesManager.Initialize();
             PullTimerHelper.Initialize();
@@ -247,7 +247,7 @@ namespace DelvUI
                 ImGui.PopFont();
             }
 
-            MouseOverHelper.Instance.Update();
+            InputsHelper.Instance.Update();
         }
 
         private void OpenConfigUi()
@@ -280,7 +280,7 @@ namespace DelvUI
             FontsManager.Instance.Dispose();
             GlobalColors.Instance.Dispose();
             LimitBreakHelper.Instance.Dispose();
-            MouseOverHelper.Instance.Dispose();
+            InputsHelper.Instance.Dispose();
             PartyManager.Instance.Dispose();
             PullTimerHelper.Instance.Dispose();
             ProfilesManager.Instance.Dispose();
