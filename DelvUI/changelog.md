@@ -5,7 +5,6 @@ Features:
 - Added option to dim DelvUI's setting window when not being focused (Misc > HUD Options).
 - Added alpha bar to color selections.
 
-
 Fixes:
 - Fixed clicks not working on game windows when they are on top of unit frames or party frames.
 - Fixed unit frame background color and death indicator background color being linked together.
@@ -13,6 +12,7 @@ Fixes:
 - Fixed mana bars not being visible when previewing party frames.
 - Fixed health and mana values not being correctly displayed when previewing party frames.
 - Fixed mouse clicks sometimes not responding at all.
+- Fixed hud not being properly centered when resizing the game window.
 
 # 0.3.1.2
 Features:
