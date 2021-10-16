@@ -109,13 +109,13 @@ namespace DelvUI.Helpers
 
             ["[health:current-percent-short]"] = (currentHp, maxHp) => currentHp == maxHp ? currentHp.KiloFormat() : (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
-            ["[health:current-maxMp]"] = (currentHp, maxHp) => $"{currentHp}  |  {maxHp}",
+            ["[health:current-max]"] = (currentHp, maxHp) => $"{currentHp}  |  {maxHp}",
 
-            ["[health:current-maxMp-short]"] = (currentHp, maxHp) => $"{currentHp.KiloFormat()}  |  {maxHp.KiloFormat()}",
+            ["[health:current-max-short]"] = (currentHp, maxHp) => $"{currentHp.KiloFormat()}  |  {maxHp.KiloFormat()}",
 
-            ["[health:chara.maxMp]"] = (currentHp, maxHp) => currentHp.ToString(),
+            ["[health:max]"] = (currentHp, maxHp) => maxHp.ToString(),
 
-            ["[health:chara.maxMp-short]"] = (currentHp, maxHp) => currentHp.KiloFormat(),
+            ["[health:max-short]"] = (currentHp, maxHp) => maxHp.KiloFormat(),
 
             ["[health:percent]"] = (currentHp, maxHp) => (100f * currentHp / Math.Max(1, maxHp)).ToString("N0"),
 
@@ -138,13 +138,13 @@ namespace DelvUI.Helpers
 
             ["[mana:current-percent-short]"] = (currentMp, maxMp) => currentMp == maxMp ? currentMp.KiloFormat() : (100f * currentMp / Math.Max(1, maxMp)).ToString("N0"),
 
-            ["[mana:current-maxMp]"] = (currentMp, maxMp) => $"{currentMp}  |  {maxMp}",
+            ["[mana:current-max]"] = (currentMp, maxMp) => $"{currentMp}  |  {maxMp}",
 
-            ["[mana:current-maxMp-short]"] = (currentMp, maxMp) => $"{currentMp.KiloFormat()}  |  {maxMp.KiloFormat()}",
+            ["[mana:current-max-short]"] = (currentMp, maxMp) => $"{currentMp.KiloFormat()}  |  {maxMp.KiloFormat()}",
 
-            ["[mana:maxMp]"] = (currentMp, maxMp) => currentMp.ToString(),
+            ["[mana:max]"] = (currentMp, maxMp) => maxMp.ToString(),
 
-            ["[mana:maxMp-short]"] = (currentMp, maxMp) => currentMp.KiloFormat(),
+            ["[mana:max-short]"] = (currentMp, maxMp) => maxMp.KiloFormat(),
 
             ["[mana:percent]"] = (currentMp, maxMp) => (100f * currentMp / Math.Max(1, maxMp)).ToString("N0"),
 
