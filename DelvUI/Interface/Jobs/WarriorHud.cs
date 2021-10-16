@@ -59,7 +59,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawStormsEyeBar(Vector2 origin, PlayerCharacter player)
         {
             float innerReleaseDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1177 or 86 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
-            float stormsEyeDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 90 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
+            float stormsEyeDuration = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId is 90)?.RemainingTime ?? 0f);
 
             if ((!Config.StormsEyeBar.HideWhenInactive || stormsEyeDuration > 0) && innerReleaseDuration is 0)
             {
