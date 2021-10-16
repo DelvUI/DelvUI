@@ -344,7 +344,7 @@ namespace DelvUI.Config.Attributes
             PluginConfigColor? colorVal = (PluginConfigColor?)field.GetValue(config);
             Vector4 vector = (colorVal != null ? colorVal.Vector : Vector4.Zero);
 
-            if (ImGui.ColorEdit4(friendlyName + IDText(ID), ref vector))
+            if (ImGui.ColorEdit4(friendlyName + IDText(ID), ref vector, ImGuiColorEditFlags.AlphaPreview | ImGuiColorEditFlags.AlphaBar))
             {
                 if (colorVal is null)
                 {

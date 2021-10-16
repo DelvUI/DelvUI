@@ -3,6 +3,8 @@ Features:
 - You can now attach HUD Layouts to be loaded alongside profiles.
 - Cropped status effects icons now always use the texture with 1 stack (This will make having texture mods for buffs and debuffs easier in the future).
 - Added option to dim DelvUI's setting window when not being focused (Misc > HUD Options).
+- Added alpha bar to color selections.
+
 
 Fixes:
 - Fixed clicks not working on game windows when they are on top of unit frames or party frames.
