@@ -126,7 +126,7 @@ namespace DelvUI.Interface.Party
         {
             if (_wasHovering)
             {
-                MouseOverHelper.Instance.Target = null;
+                InputsHelper.Instance.Target = null;
                 _wasHovering = false;
             }
         }
@@ -145,11 +145,11 @@ namespace DelvUI.Interface.Party
 
             if (isHovering)
             {
-                MouseOverHelper.Instance.Target = character;
+                InputsHelper.Instance.Target = character;
                 _wasHovering = true;
 
                 // left click
-                if (MouseOverHelper.Instance.LeftButtonClicked)
+                if (InputsHelper.Instance.LeftButtonClicked)
                 {
                     // move player bar to this spot on ctrl+alt+shift click
                     if (ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift)
@@ -163,14 +163,14 @@ namespace DelvUI.Interface.Party
                     }
                 }
                 // right click (context menu)
-                else if (MouseOverHelper.Instance.RightButtonClicked)
+                else if (InputsHelper.Instance.RightButtonClicked)
                 {
                     OpenContextMenuEvent?.Invoke(this);
                 }
             }
             else if (_wasHovering)
             {
-                MouseOverHelper.Instance.Target = null;
+                InputsHelper.Instance.Target = null;
                 _wasHovering = false;
             }
 

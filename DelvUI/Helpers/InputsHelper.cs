@@ -22,6 +22,7 @@ using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Hooking;
+using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
@@ -36,10 +37,10 @@ namespace DelvUI.Helpers
     public delegate void OnSetUIMouseoverActor(long arg1, long arg2);
     public delegate ulong OnRequestAction(long arg1, uint arg2, ulong arg3, long arg4, uint arg5, uint arg6, int arg7);
 
-    public unsafe class MouseOverHelper : IDisposable
+    public unsafe class InputsHelper : IDisposable
     {
         #region Singleton
-        private MouseOverHelper()
+        private InputsHelper()
         {
             _sheet = Plugin.DataManager.GetExcelSheet<Action>();
 
@@ -100,11 +101,11 @@ namespace DelvUI.Helpers
             OnConfigReset(ConfigurationManager.Instance);
         }
 
-        public static void Initialize() { Instance = new MouseOverHelper(); }
+        public static void Initialize() { Instance = new InputsHelper(); }
 
-        public static MouseOverHelper Instance { get; private set; } = null!;
+        public static InputsHelper Instance { get; private set; } = null!;
 
-        ~MouseOverHelper()
+        ~InputsHelper()
         {
             Dispose(false);
         }
@@ -243,11 +244,17 @@ namespace DelvUI.Helpers
         // any other message is passed along to the ImGui scene
         private IntPtr WndProcDetour(IntPtr hWnd, uint msg, ulong wParam, long lParam)
         {
+            // esc key press
+            if (msg == WM_KEYDOWN && wParam == 27 && ConfigurationManager.Instance.UseEscInput())
+            {
+                return (IntPtr)0;
+            }
             // eat left and right clicks?
-            if (HandlingInputs)
+            else if (HandlingInputs)
             {
                 switch (msg)
                 {
+                    // mouse clicks
                     case WM_LBUTTONDOWN:
                     case WM_RBUTTONDOWN:
                     case WM_LBUTTONUP:
@@ -287,6 +294,7 @@ namespace DelvUI.Helpers
         [DllImport("user32.dll", EntryPoint = "CallWindowProcW")]
         public static extern long CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, uint Msg, ulong wParam, long lParam);
 
+        private const uint WM_KEYDOWN = 256;
         private const uint WM_LBUTTONDOWN = 513;
         private const uint WM_LBUTTONUP = 514;
         private const uint WM_RBUTTONDOWN = 516;
