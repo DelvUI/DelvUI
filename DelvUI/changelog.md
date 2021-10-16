@@ -1,6 +1,3 @@
-Fixes:
-- Fixed non-latin characters encoding error in player names.
-
 # 0.3.1.2
 Features:
 - Added a Text Tags list when editing a label:
@@ -19,6 +16,7 @@ Fixes:
 - Fixed crashes when logging out and then logging back in.
 - Fixed Target of Target and Focus Target castbars not showing damage type colors.
 - Fixed stacks on uncropped status effects.
+- Fixed non-latin characters encoding error in player names.
 
 # 0.3.1.1
 - Fixed mouseover not working in some situations.
