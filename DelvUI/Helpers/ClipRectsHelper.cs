@@ -93,6 +93,7 @@ namespace DelvUI.Helpers
             "HousingSignBoard",
             "CrossWorldLinkshell",
             "ContactList",
+            "ColorantColoring",
             "MonsterNote",
             "RecipeNote",
             "GatheringNote",
