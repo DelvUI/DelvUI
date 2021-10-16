@@ -240,7 +240,13 @@ namespace DelvUI.Config.Profiles
 
             string oldProfile = _currentProfileName;
             _currentProfileName = profile;
+            Profile currentProfile = CurrentProfile();
 
+            if (currentProfile.AttachHudEnabled && currentProfile.HudLayout != 0)
+            {
+                ChatHelper.SendChatMessage("/hudlayout " + currentProfile.HudLayout);
+            }
+            
             if (!LoadCurrentProfile())
             {
                 _currentProfileName = oldProfile;
@@ -570,7 +576,7 @@ namespace DelvUI.Config.Profiles
         {
             string[] profiles = Profiles.Keys.ToArray();
 
-            if (ImGui.BeginChild("Profiles", new Vector2(800, 600), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            if (ImGui.BeginChild("Profiles", new Vector2(800, 600), false))
             {
                 if (Profiles.Count == 0)
                 {
@@ -649,10 +655,13 @@ namespace DelvUI.Config.Profiles
                 {
                     _errorMessage = ExportToFile(_currentProfileName);
                 }
-
+                
                 ImGuiHelper.NewLineAndTab();
-                DrawAutoSwitchSettings(ref changed);
-
+                DrawAttachHudLayout(ref changed);
+                
+                ImGuiHelper.NewLineAndTab();
+                DrawAutoSwitchSettings(ref changed);                
+                
                 ImGuiHelper.DrawSeparator(1, 1);
                 ImGuiHelper.Tab();
                 ImGui.Text("Create a new profile:");
@@ -856,6 +865,35 @@ namespace DelvUI.Config.Profiles
             }
 
             ImGui.SetCursorPos(new Vector2(originalPos.X, maxY + 30));
+        }
+        
+        private void DrawAttachHudLayout(ref bool changed)
+        {
+            Profile profile = CurrentProfile();
+
+            changed |= ImGui.Checkbox("Attach HUD Layout to this profile", ref profile.AttachHudEnabled);
+
+            if (!profile.AttachHudEnabled)
+            {
+                profile.HudLayout = 0;
+                return;
+            }
+
+            int hudLayout = profile.HudLayout;
+
+            ImGui.Text("\u2002\u2002\u2514");
+            
+            for (int i = 1; i <= 4; i++)
+            {
+                ImGui.SameLine();
+                bool hudLayoutEnabled = hudLayout == i;
+                if (ImGui.Checkbox("Hud Layout "+i, ref hudLayoutEnabled))
+                {
+                    profile.HudLayout = i;
+                    changed = true;
+                }
+            }
+
         }
     }
 

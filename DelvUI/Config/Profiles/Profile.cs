@@ -11,12 +11,19 @@ namespace DelvUI.Config.Profiles
 
         public bool AutoSwitchEnabled = false;
         public AutoSwitchData AutoSwitchData = new AutoSwitchData();
+        public int HudLayout;
+        public bool AttachHudEnabled = false;
 
-        public Profile(string name, bool autoSwitchEnabled = false, AutoSwitchData? autoSwitchData = null)
+        public Profile(string name, bool autoSwitchEnabled = false, AutoSwitchData? autoSwitchData = null, bool attachHudEnabled = false, int hudLayout = 0)
         {
             Name = name;
+            
             AutoSwitchEnabled = autoSwitchEnabled;
             AutoSwitchData = autoSwitchData ?? AutoSwitchData;
+            
+            AttachHudEnabled = attachHudEnabled;
+            HudLayout = hudLayout;
+
         }
     }
 
