@@ -122,10 +122,20 @@ namespace DelvUI.Interface.Party
             return _config.ColorsConfig.GenericRoleColor;
         }
 
+        public void StopMouseover()
+        {
+            if (_wasHovering)
+            {
+                MouseOverHelper.Instance.Target = null;
+                _wasHovering = false;
+            }
+        }
+
         public void Draw(Vector2 origin, ImDrawListPtr drawList, PluginConfigColor? borderColor = null)
         {
             if (!Visible || Member is null)
             {
+                StopMouseover();
                 return;
             }
 
@@ -293,14 +303,10 @@ namespace DelvUI.Interface.Party
         // need to separate elements that have their own window so clipping doesn't get messy
         public void DrawElements(Vector2 origin)
         {
-            if (!Visible || Member is null)
-            {
-                return;
-            }
-
             var player = Plugin.ClientState.LocalPlayer;
-            if (player == null)
+            if (!Visible || Member is null || player == null)
             {
+                StopMouseover();
                 return;
             }
 
@@ -311,6 +317,7 @@ namespace DelvUI.Interface.Party
             {
                 var parentPos = Utils.GetAnchoredPosition(Position, -_config.Size, _manaBarConfig.HealthBarAnchor);
                 _manaBarHud.Actor = character;
+                _manaBarHud.PartyMember = Member;
                 _manaBarHud.Draw(parentPos);
             }
 
@@ -348,19 +355,7 @@ namespace DelvUI.Interface.Party
             }
 
             // health label
-            if (character == null)
-            {
-                string oldText = _config.HealthLabelConfig.GetText();
-                _config.HealthLabelConfig.SetText(Member.HP.ToString());
-
-                _healthLabelHud.Draw(Position, _config.Size, character);
-
-                _config.HealthLabelConfig.SetText(oldText);
-            }
-            else
-            {
-                _healthLabelHud.Draw(Position, _config.Size, character);
-            }
+            _healthLabelHud.Draw(Position, _config.Size, character, null, Member.HP, Member.MaxHP);
 
             // order
             if (character == null || character?.ObjectKind != ObjectKind.BattleNpc)

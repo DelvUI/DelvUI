@@ -108,6 +108,7 @@ namespace DelvUI
             PartyManager.Initialize();
             ProfilesManager.Initialize();
             PullTimerHelper.Initialize();
+            TextTagsHelper.Initialize();
             TexturesCache.Initialize();
             TooltipsHelper.Initialize();
 

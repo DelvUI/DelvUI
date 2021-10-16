@@ -1,12 +1,16 @@
 # 0.3.1.3
 Features:
 - You can now attach HUD Layouts to be loaded alongside profiles.
-- When the status effects are cropped, the 1 stack icon is now the only one being shown regardless of the number of stacks to minimize clutter.
+- Cropped status effects icons now always use the texture with 1 stack (This will make having texture mods for buffs and debuffs easier in the future).
+- Added option to dim DelvUI's setting window when not being focused (Misc > HUD Options).
 
 Fixes:
 - Fixed clicks not working on game windows when they are on top of unit frames or party frames.
 - Fixed unit frame background color and death indicator background color being linked together.
 - Fixed storm's eye bar for warrior not tracking the buff duration properly.
+- Fixed mana bars not being visible when previewing party frames.
+- Fixed health and mana values not being correctly displayed when previewing party frames.
+- Fixed mouse clicks sometimes not responding at all.
 
 # 0.3.1.2
 Features:
