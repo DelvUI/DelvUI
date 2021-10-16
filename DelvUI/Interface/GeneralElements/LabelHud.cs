@@ -28,7 +28,7 @@ namespace DelvUI.Interface.GeneralElements
 
             var text = actor == null && actorName == null ?
                 Config.GetText() :
-                TextTags.GenerateFormattedTextFromTags(actor, Config.GetText(), actorName);
+                TextTagsHelper.FormattedText(Config.GetText(), actor, actorName);
 
             DrawLabel(text, origin, parentSize ?? Vector2.Zero, actor);
         }
@@ -43,7 +43,7 @@ namespace DelvUI.Interface.GeneralElements
             DrawHelper.DrawInWindow(ID, pos, size, false, true, (drawList) =>
             {
                 var color = Color(actor);
-                
+
                 if (Config.ShowShadow)
                 {
                     DrawHelper.DrawShadowText(text, pos, color.Base, Config.ShadowColor.Base, drawList, Config.ShadowOffset);
@@ -53,8 +53,8 @@ namespace DelvUI.Interface.GeneralElements
                 {
                     DrawHelper.DrawOutlinedText(text, pos, color.Base, Config.OutlineColor.Base, drawList);
                 }
-                
-                if(!Config.ShowOutline && !Config.ShowShadow)
+
+                if (!Config.ShowOutline && !Config.ShowShadow)
                 {
                     drawList.AddText(pos, color.Base, text);
                 }

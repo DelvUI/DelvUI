@@ -1,4 +1,5 @@
 ﻿using Dalamud.Interface;
+using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using System;
@@ -279,6 +280,9 @@ namespace DelvUI.Config.Attributes
     public class InputTextAttribute : ConfigAttribute
     {
         public uint maxLength;
+        public bool formattable = true;
+
+        private string _searchText = "";
 
         public InputTextAttribute(string friendlyName) : base(friendlyName)
         {
@@ -290,12 +294,38 @@ namespace DelvUI.Config.Attributes
         {
             string? fieldVal = (string?)field.GetValue(config);
             string stringVal = fieldVal ?? "";
+            string? finalValue = null;
+
+            string popupId = ID != null ? "TextTagsList " + ID : "TextTagsList ##" + friendlyName;
 
             if (ImGui.InputText(friendlyName + IDText(ID), ref stringVal, maxLength))
             {
-                field.SetValue(config, stringVal);
+                finalValue = stringVal;
+            }
 
-                TriggerChangeEvent<string>(config, field.Name, stringVal);
+            // text tags
+            if (formattable)
+            {
+                ImGui.SameLine();
+                ImGui.PushFont(UiBuilder.IconFont);
+                if (ImGui.Button(FontAwesomeIcon.Pen.ToIconString() + IDText(ID)))
+                {
+                    ImGui.OpenPopup(popupId);
+                }
+                ImGui.PopFont();
+                if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Text Tags"); }
+            }
+
+            var selectedTag = ImGuiHelper.DrawTextTagsList(popupId, ref _searchText);
+            if (selectedTag != null)
+            {
+                finalValue = stringVal + selectedTag;
+            }
+
+            if (finalValue != null)
+            {
+                field.SetValue(config, finalValue);
+                TriggerChangeEvent<string>(config, field.Name, finalValue);
 
                 return true;
             }

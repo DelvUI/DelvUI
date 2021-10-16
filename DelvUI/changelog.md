@@ -1,3 +1,22 @@
+# 0.3.1.2
+Features:
+- Added a Text Tags list when editing a label:
+    + Shows a list with all available tag formats.
+    + The tags can be added to the label by clicking on them.
+    + Hovering with the cursor on top of a tag shows an example of what they do.
+
+- Added option to set a Death Indicator Background Color for unit frames and party frames. Disabled by default.
+- Added Buff/Debuffs for the Focus Target.
+- Added a sub-option to Hide DelvUI outside of combat to always show in duties.
+- Re-enabled labels for chunked bars.
+- When previewing buffs or debuffs, there will always be at least one effect with stacks now.
+- Added show border option on tooltips.
+
+Fixes:
+- Fixed crashes when logging out and then logging back in.
+- Fixed Target of Target and Focus Target castbars not showing damage type colors.
+- Fixed stacks on uncropped status effects.
+
 # 0.3.1.1
 - Fixed mouseover not working in some situations.
 
@@ -27,9 +46,9 @@ Fixes:
 - Fixed smooth HP in party frames.
 - Fixed tooltips doing weird things when the config window is opened.
 - Fixed BLM's Polyglot Bar Glow not hiding.
-- Fixed DRK manabar showing label when chunked.
+- Fixed DRK mana bar showing label when chunked.
 - Fixed DRK Dark Arts proc color not showing.
-- Fixed DRK manabar partial fill color when Dark Arts has proced.
+- Fixed DRK mana bar partial fill color when Dark Arts has procced.
 - Removed glow option from DRK Dark Arts proc.
 - Fixed party frames preview not showing accurate values for health and mana.
 - Fixed PLD Invulnerability not being properly tracked.
@@ -49,7 +68,7 @@ Features:
     + The game's party sorting settings. You can use the game's sorting options and change player's order in the game's social window, and it will be reflected in DelvUI's party frames.
     + Overriding your own position in the frames through the settings or by Ctrl+Alt+Shift+Clicking on another player (this will move you to that position in the list).
     + Raise Tracker. Tracks Raise casts and Raise buffs on the party.
-    + Tank Invulnerabilty Tracker.
+    + Tank Invulnerability Tracker.
     + Mouseover. All abilities automatically assume "mouseover" if the cursor is on top of a unit frame when the ability is used.
 
 - Added Experience Bar hud.
@@ -66,7 +85,7 @@ Features:
 - Implemented auto-switch feature for profiles. You can define which profile you want for each job.
 - DelvUI's elements should now properly be covered by the game's windows (most of the time).
 - Added more color options for unit frames.
-- Added more textags.
+- Added more text tags.
 - Added support for Penumbra texture mods.
 - Added option to show the id of status effects on the tooltips.
 - Added font options fot tooltips.
@@ -89,7 +108,7 @@ Fixes:
 # 0.2.1.0
 - Added mouseover support for unit frames. All abilities automatically assume "mouseover" if the cursor is on top of a unit frame when the ability is used.
 - Added buffs and debuffs lists.
-- Added "Unlock HUD" mode where you can freely drag any DelvUI element on the scren.
+- Added "Unlock HUD" mode where you can freely drag any DelvUI element on the screen.
 - Added fonts and text size support
 - Many improvements in the configuration window.
 - General bug fixes and improvements.

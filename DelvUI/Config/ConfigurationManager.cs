@@ -418,6 +418,8 @@ namespace DelvUI.Config
             typeof(PlayerDebuffsListConfig),
             typeof(TargetBuffsListConfig),
             typeof(TargetDebuffsListConfig),
+            typeof(FocusTargetBuffsListConfig),
+            typeof(FocusTargetDebuffsListConfig),
             typeof(CustomEffectsListConfig),
 
             typeof(PartyFramesConfig),

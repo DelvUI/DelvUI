@@ -2,6 +2,7 @@ using DelvUI.Config;
 using ImGuiNET;
 using ImGuiScene;
 using Lumina.Excel;
+using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Numerics;
 
@@ -100,9 +101,9 @@ namespace DelvUI.Helpers
             drawList.AddText(new Vector2(pos.X, pos.Y), color, text);
         }
 
-        public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder, bool cropIcon) where T : ExcelRow
+        public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder, bool cropIcon, int stackCount = 1) where T : ExcelRow
         {
-            TextureWrap texture = TexturesCache.Instance.GetTexture<T>(row);
+            TextureWrap texture = TexturesCache.Instance.GetTexture<T>(row, (uint)Math.Max(0, stackCount - 1));
             if (texture == null)
             {
                 return;
@@ -120,9 +121,9 @@ namespace DelvUI.Helpers
             }
         }
 
-        public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder, ImDrawListPtr drawList, bool cropIcon) where T : ExcelRow
+        public static void DrawIcon<T>(ImDrawListPtr drawList, dynamic row, Vector2 position, Vector2 size, bool drawBorder, bool cropIcon, int stackCount = 1) where T : ExcelRow
         {
-            TextureWrap texture = TexturesCache.Instance.GetTexture<T>(row);
+            TextureWrap texture = TexturesCache.Instance.GetTexture<T>(row, (uint)Math.Max(0, stackCount - 1));
             if (texture == null)
             {
                 return;

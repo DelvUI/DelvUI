@@ -1,15 +1,14 @@
 ﻿using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.Types;
+using Dalamud.Utility;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Dalamud.Utility;
 using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
 using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
@@ -312,7 +311,8 @@ namespace DelvUI.Interface.StatusEffects
 
                     // icon
                     var cropIcon = Config.IconConfig.CropIcon;
-                    DrawHelper.DrawIcon<LuminaStatus>(statusEffectData.Data, iconPos, Config.IconConfig.Size, false, drawList, cropIcon);
+                    int stackCount = statusEffectData.Data.MaxStacks > 0 ? statusEffectData.Status.StackCount : 0;
+                    DrawHelper.DrawIcon<LuminaStatus>(drawList, statusEffectData.Data, iconPos, Config.IconConfig.Size, false, cropIcon, stackCount);
 
                     // border
                     var borderConfig = GetBorderConfig(statusEffectData);
@@ -496,9 +496,11 @@ namespace DelvUI.Interface.StatusEffects
             for (int i = 0; i < StatusEffectListsSize; i++)
             {
                 var fakeStruct = new StatusStruct();
+
+                // forcing "triplecast" buff first to always be able to test stacks
+                fakeStruct.StatusID = i == 0 ? (ushort)1211 : (ushort)RNG.Next(1, 200);
                 fakeStruct.RemainingTime = RNG.Next(1, 30);
-                fakeStruct.StatusID = (ushort)RNG.Next(1, 200);
-                fakeStruct.StackCount = (byte)RNG.Next(0, 3);
+                fakeStruct.StackCount = (byte)RNG.Next(1, 3);
                 fakeStruct.SourceID = 0;
 
                 _fakeEffects[i] = fakeStruct;

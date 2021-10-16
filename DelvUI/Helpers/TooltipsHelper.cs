@@ -145,6 +145,10 @@ namespace DelvUI.Helpers
 
             drawList.AddRectFilled(_position, _position + _size, _config.BackgroundColor.Base);
 
+            if (_config.BorderConfig.Enabled) {
+                drawList.AddRect(_position, _position + _size, _config.BorderConfig.Color.Base, 0, ImDrawFlags.None, _config.BorderConfig.Thickness);
+            }
+
             if (_currentTooltipTitle != null)
             {
                 // title
@@ -225,7 +229,7 @@ namespace DelvUI.Helpers
 
         [ColorEdit4("Background Color")]
         [Order(10)]
-        public PluginConfigColor BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 60f / 100f));
+        public PluginConfigColor BackgroundColor = new PluginConfigColor(new(19f / 255f, 19f / 255f, 19f / 255f, 190f / 250f));
 
         [Font("Title Font and Size", spacing = true)]
         [Order(15)]
@@ -233,7 +237,7 @@ namespace DelvUI.Helpers
 
         [ColorEdit4("Title Color")]
         [Order(20)]
-        public PluginConfigColor TitleColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+        public PluginConfigColor TitleColor = new PluginConfigColor(new(255f / 255f, 210f / 255f, 31f / 255f, 100f / 100f));
 
         [Font("Text Font and Size", spacing = true)]
         [Order(25)]
@@ -241,6 +245,31 @@ namespace DelvUI.Helpers
 
         [ColorEdit4("Text Color")]
         [Order(30)]
-        public PluginConfigColor TextColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 80f / 100f));
+        public PluginConfigColor TextColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+
+        [NestedConfig("Border", 35, separator = false, spacing = true)]
+        public TooltipBorderConfig BorderConfig = new();
+    }
+
+    [Exportable(false)]
+    public class TooltipBorderConfig : PluginConfigObject
+    {
+        [ColorEdit4("Color")]
+        [Order(5)]
+        public PluginConfigColor Color = new(new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 160f / 255f));
+
+        [DragInt("Thickness", min = 1, max = 100)]
+        [Order(10)]
+        public int Thickness = 4;
+
+        public TooltipBorderConfig()
+        {
+        }
+
+        public TooltipBorderConfig(PluginConfigColor color, int thickness)
+        {
+            Color = color;
+            Thickness = thickness;
+        }
     }
 }

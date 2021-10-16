@@ -1,4 +1,5 @@
-﻿using Dalamud.Game.ClientState.Objects.Types;
+﻿using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
 using DelvUI.Config;
 using DelvUI.Helpers;
@@ -26,8 +27,6 @@ namespace DelvUI.Interface.GeneralElements
             get => _actor;
             set
             {
-                if (_actor == value) { return; }
-
                 _actor = value;
                 _smoothHPHelper.Reset();
             }
@@ -124,7 +123,8 @@ namespace DelvUI.Interface.GeneralElements
             {
                 var healthMissingSize = Config.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
                 var healthMissingPos = Config.FillDirection.IsInverted() ? Config.Position : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
-                bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, Config.HealthMissingColor));
+                PluginConfigColor? color = Config.UseDeathIndicatorBackgroundColor && character.CurrentHp <= 0 ? Config.DeathIndicatorBackgroundColor : Config.HealthMissingColor;
+                bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, color));
             }
 
             if (Config.ShieldConfig.Enabled)
@@ -189,6 +189,10 @@ namespace DelvUI.Interface.GeneralElements
                 if (Config.UseJobColorAsBackgroundColor)
                 {
                     return GlobalColors.Instance.SafeColorForJobId(chara.ClassJob.Id);
+                }
+                else if (Config.UseDeathIndicatorBackgroundColor && chara.CurrentHp <= 0)
+                {
+                    return Config.DeathIndicatorBackgroundColor;
                 }
                 else
                 {
