@@ -1,3 +1,7 @@
+# 0.3.1.3
+Features:
+- You can now attach HUD Layouts to be loaded alongside profiles.
+
 # 0.3.1.2
 Features:
 - Added a Text Tags list when editing a label:
