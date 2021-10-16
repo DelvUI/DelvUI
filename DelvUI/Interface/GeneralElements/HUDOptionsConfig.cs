@@ -18,8 +18,12 @@ namespace DelvUI.Interface.GeneralElements
         [Order(6, collapseWith = nameof(UseGlobalHudShift))]
         public Vector2 HudOffset = new(0, 0);
 
-        [Checkbox("Mouseover", separator = true)]
+        [Checkbox("Dim DelvUI's settings window when not focused")]
         [Order(10)]
+        public bool DimConfigWindow = false;
+
+        [Checkbox("Mouseover", separator = true)]
+        [Order(15)]
         public bool MouseoverEnabled = true;
 
         [Checkbox("Automatic Mode", help =
@@ -27,7 +31,7 @@ namespace DelvUI.Interface.GeneralElements
             "Mouseover macros or other mouseover plugins are not necessary and WON'T WORK in this mode!\n\n" +
             "When disabled: DelvUI unit frames will behave like the game's ones.\n" +
             "You'll need to use mouseover macros or other mouseover related plugins in this mode.")]
-        [Order(11, collapseWith = nameof(MouseoverEnabled))]
+        [Order(16, collapseWith = nameof(MouseoverEnabled))]
         public bool MouseoverAutomaticMode = true;
 
         [Checkbox("Hide DelvUI outside of combat", separator = true, help = "Show in Duty-option available once enabed.")]
@@ -59,11 +63,11 @@ namespace DelvUI.Interface.GeneralElements
         public bool HideDefaultPulltimer = false;
 
         [Checkbox("Enable Combat Hotbars", isMonitored = true, separator = true)]
-        [Order(50)]
+        [Order(200)]
         public bool EnableCombatActionBars = false;
 
         [DynamicList("Hotbars Shown Only In Combat", "Hotbar 1", "Hotbar 2", "Hotbar 3", "Hotbar 4", "Hotbar 5", "Hotbar 6", "Hotbar 7", "Hotbar 8", "Hotbar 9", "Hotbar 10", isMonitored = true)]
-        [Order(81, collapseWith = nameof(EnableCombatActionBars))]
+        [Order(201, collapseWith = nameof(EnableCombatActionBars))]
         public List<string> CombatActionBars = new List<string>();
 
         public Vector2 CastBarOriginalPosition;
