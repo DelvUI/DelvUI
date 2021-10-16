@@ -9,6 +9,7 @@ Fixes:
 - Fixed storm's eye bar for warrior not tracking the buff duration properly.
 - Fixed mana bars not being visible when previewing party frames.
 - Fixed health and mana values not being correctly displayed when previewing party frames.
+- Fixed mouse clicks sometimes not responding at all.
 
 # 0.3.1.2
 Features:

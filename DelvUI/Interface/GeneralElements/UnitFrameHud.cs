@@ -13,7 +13,7 @@ using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public unsafe class UnitFrameHud : DraggableHudElement, IHudElementWithActor
+    public unsafe class UnitFrameHud : DraggableHudElement, IHudElementWithActor, IHudElementWithMouseOver
     {
         public UnitFrameConfig Config => (UnitFrameConfig)_config;
 
@@ -48,10 +48,20 @@ namespace DelvUI.Interface.GeneralElements
             return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
         }
 
+        public void StopMouseover()
+        {
+            if (_wasHovering)
+            {
+                MouseOverHelper.Instance.Target = null;
+                _wasHovering = false;
+            }
+        }
+
         public override void DrawChildren(Vector2 origin)
         {
             if (!Config.Enabled || Actor == null)
             {
+                StopMouseover();
                 return;
             }
 
