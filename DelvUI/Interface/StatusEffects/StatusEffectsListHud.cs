@@ -233,12 +233,18 @@ namespace DelvUI.Interface.StatusEffects
             GrowthDirections growthDirections = Config.GetGrowthDirections();
             Vector2 position = origin + GetAnchoredPosition(Config.Position, Config.Size, DrawAnchor.TopLeft);
             Vector2 areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
+            var margin = new Vector2(14, 10);
 
             var drawList = ImGui.GetWindowDrawList();
 
             // no need to do anything else if there are no effects
             if (list.Count == 0)
             {
+                // draw area if the config window is opened
+                if (ConfigurationManager.Instance.DrawConfigWindow)
+                {
+                    drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
+                }
                 return;
             }
 
@@ -291,14 +297,13 @@ namespace DelvUI.Interface.StatusEffects
             // window
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
-            var margin = new Vector2(14, 10);
             var windowPos = minPos - margin;
             var windowSize = maxPos - minPos;
 
             DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, Config.ShowBuffs, false, (drawList) =>
             {
                 // area
-                if (Config.Preview)
+                if (ConfigurationManager.Instance.DrawConfigWindow)
                 {
                     drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
                 }

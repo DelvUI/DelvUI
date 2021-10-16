@@ -33,6 +33,8 @@ namespace DelvUI.Interface.Party
 
         private readonly List<PartyFramesBar> bars;
 
+        private bool Locked => !ConfigurationManager.Instance.DrawConfigWindow;
+
 
         public PartyFramesHud(PartyFramesConfig config, string displayName) : base(config, displayName)
         {
@@ -267,17 +269,16 @@ namespace DelvUI.Interface.Party
 
             var windowFlags = ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoTitleBar |
-                ImGuiWindowFlags.NoBackground |
                 ImGuiWindowFlags.NoFocusOnAppearing |
                 ImGuiWindowFlags.NoBringToFrontOnFocus;
 
-            bool canDrag = !Config.Lock && !DraggingEnabled;
+            bool canDrag = !Locked && !DraggingEnabled;
             if (!canDrag)
             {
                 windowFlags |= ImGuiWindowFlags.NoMove;
             }
 
-            if (Config.Lock || DraggingEnabled)
+            if (Locked || DraggingEnabled)
             {
                 ImGui.SetNextWindowPos(origin + Config.Position);
                 windowFlags |= ImGuiWindowFlags.NoResize;
@@ -294,22 +295,15 @@ namespace DelvUI.Interface.Party
                     Config.Position = windowPos - origin;
                 }
 
-                // recalculate layout on settings or size change
-                var contentStartPos = windowPos + _contentMargin;
-                var maxSize = windowSize - _contentMargin * 2;
-
-                // preview
-                if (!Config.Lock)
-                {
-                    var margin = new Vector2(4, 0);
-                    drawList.AddRectFilled(contentStartPos, contentStartPos + maxSize, 0x66000000);
-                }
-
                 var count = PartyManager.Instance.MemberCount;
                 if (count < 1)
                 {
                     return;
                 }
+
+                // recalculate layout on settings or size change
+                var contentStartPos = windowPos + _contentMargin;
+                var maxSize = windowSize - _contentMargin * 2;
 
                 if (_layoutDirty || _size != maxSize || _memberCount != count)
                 {
@@ -419,6 +413,11 @@ namespace DelvUI.Interface.Party
                 ImGui.SetNextWindowPos(Config.Position - _contentMargin, ImGuiCond.FirstUseEver);
                 ImGui.SetNextWindowSize(Config.Size + _contentMargin * 2, ImGuiCond.FirstUseEver);
 
+                ImGui.PushStyleColor(ImGuiCol.Border, 0x66FFFFFF);
+                ImGui.PushStyleColor(ImGuiCol.WindowBg, 0x66000000);
+                ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
+                ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
+
                 bool begin = ImGui.Begin(ID, windowFlags);
                 if (!begin)
                 {
@@ -429,11 +428,15 @@ namespace DelvUI.Interface.Party
                 drawBarsAction(ImGui.GetWindowDrawList());
                 ImGui.End();
 
+                ImGui.PopStyleColor(2);
+                ImGui.PopStyleVar(2);
+
                 drawElementsAction();
             }
             else
             {
-                DrawHelper.DrawInWindow(ID, origin + Config.Position, Config.Size, !Config.Lock, false, true, windowFlags, drawBarsAction);
+                windowFlags |= ImGuiWindowFlags.NoBackground;
+                DrawHelper.DrawInWindow(ID, origin + Config.Position, Config.Size, !Locked, false, true, windowFlags, drawBarsAction);
                 drawElementsAction();
             }
         }

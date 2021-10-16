@@ -170,7 +170,6 @@ namespace DelvUI.Config.Tree
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 1);
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
 
             if (!ImGui.Begin("DelvUI_settings", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
             {
@@ -181,7 +180,7 @@ namespace DelvUI.Config.Tree
             _lastWindowPos = ImGui.GetWindowPos();
 
             ImGui.PopStyleColor(3);
-            ImGui.PopStyleVar(3);
+            ImGui.PopStyleVar(2);
             PushStyles();
 
 
