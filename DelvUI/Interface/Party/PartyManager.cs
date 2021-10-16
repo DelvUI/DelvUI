@@ -345,7 +345,7 @@ namespace DelvUI.Interface.Party
             }
 
             IntPtr namePtr = (HudAgent + (PartyCrossWorldNameOffset + PartyCrossWorldEntrySize * index));
-            return Marshal.PtrToStringAnsi(namePtr);
+            return Marshal.PtrToStringUTF8(namePtr);
         }
 
         private uint JobIdForIndex(int index)
@@ -489,7 +489,7 @@ namespace DelvUI.Interface.Party
 
             public PartyListMemberInfo(PartyListMemberRawInfo* info, string? crossWorldName, uint jobId)
             {
-                Name = crossWorldName ?? (Marshal.PtrToStringAnsi(new IntPtr(info->NamePtr)) ?? "");
+                Name = crossWorldName ?? (Marshal.PtrToStringUTF8(new IntPtr(info->NamePtr)) ?? "");
                 ObjectId = info->ObjectId;
                 Type = info->Type;
                 JobId = jobId;
@@ -516,7 +516,7 @@ namespace DelvUI.Interface.Party
             // 5 = summon?
             [FieldOffset(0x14)] public byte Type;
 
-            public string Name => Marshal.PtrToStringAnsi(new IntPtr(NamePtr)) ?? "";
+            public string Name => Marshal.PtrToStringUTF8(new IntPtr(NamePtr)) ?? "";
         }
         #endregion
     }
