@@ -24,6 +24,7 @@ using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Hooking;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
+using ImGuiNET;
 using Lumina.Excel;
 using System;
 using System.Diagnostics;
@@ -227,30 +228,40 @@ namespace DelvUI.Helpers
         #region mouseover inputs proxy
         public bool HandlingInputs => Target != null;
 
-        public bool LeftButtonClicked = false;
-        public bool RightButtonClicked = false;
+        private bool? _leftButtonClicked = null;
+        public bool LeftButtonClicked => _leftButtonClicked.HasValue ? _leftButtonClicked.Value : ImGui.GetIO().MouseClicked[0];
+
+        private bool? _rightButtonClicked = null;
+        public bool RightButtonClicked => _rightButtonClicked.HasValue ? _rightButtonClicked.Value : ImGui.GetIO().MouseClicked[1];
 
         // wnd proc detour
         // if we're "eating" inputs, we only process left and right clicks
         // any other message is passed along to the ImGui scene
         private IntPtr WndProcDetour(IntPtr hWnd, uint msg, ulong wParam, long lParam)
         {
-            // eat left and right clicks?
+            // eat right and right clicks?
             if (HandlingInputs)
             {
                 switch (msg)
                 {
                     case WM_LBUTTONDOWN:
                     case WM_RBUTTONDOWN:
-                        return (IntPtr)0;
-
                     case WM_LBUTTONUP:
-                        LeftButtonClicked = true;
-                        return (IntPtr)0;
-
                     case WM_RBUTTONUP:
-                        RightButtonClicked = true;
-                        return (IntPtr)0;
+
+                        // if there's not a game window covering the cursor location
+                        // we eat the message and handle the inputs manually
+                        if (!ClipRectsHelper.Instance.IsPointClipped(ImGui.GetMousePos()))
+                        {
+                            _leftButtonClicked = msg == WM_LBUTTONUP;
+                            _rightButtonClicked = msg == WM_RBUTTONUP;
+                            return (IntPtr)0;
+                        }
+
+                        // otherwise we let imgui handle the inputs
+                        _leftButtonClicked = null;
+                        _rightButtonClicked = null;
+                        break;
                 }
             }
 
@@ -260,8 +271,8 @@ namespace DelvUI.Helpers
 
         public void Update()
         {
-            LeftButtonClicked = false;
-            RightButtonClicked = false;
+            _leftButtonClicked = null;
+            _rightButtonClicked = null;
         }
 
         public delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, ulong wParam, long lParam);

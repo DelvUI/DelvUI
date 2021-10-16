@@ -2,6 +2,9 @@
 Features:
 - You can now attach HUD Layouts to be loaded alongside profiles.
 
+Fixes:
+- Fixed clicks not working on game windows when they are on top of unit frames or party frames.
+
 # 0.3.1.2
 Features:
 - Added a Text Tags list when editing a label:
