@@ -1,6 +1,7 @@
 # 0.3.1.3
 Features:
 - You can now attach HUD Layouts to be loaded alongside profiles.
+- When the status effects are cropped, the 1 stack icon is now the only one being shown regardless of the number of stacks to minimize clutter.
 
 Fixes:
 - Fixed clicks not working on game windows when they are on top of unit frames or party frames.

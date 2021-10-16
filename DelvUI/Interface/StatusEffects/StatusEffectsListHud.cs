@@ -25,7 +25,6 @@ namespace DelvUI.Interface.StatusEffects
 
         private LabelHud _durationLabel;
         private LabelHud _stacksLabel;
-
         public GameObject? Actor { get; set; } = null;
 
         protected override bool AnchorToParent => Config is UnitFrameStatusEffectsListConfig config ? config.AnchorToUnitFrame : false;
@@ -311,7 +310,7 @@ namespace DelvUI.Interface.StatusEffects
 
                     // icon
                     var cropIcon = Config.IconConfig.CropIcon;
-                    int stackCount = statusEffectData.Data.MaxStacks > 0 ? statusEffectData.Status.StackCount : 0;
+                    int stackCount = cropIcon ? 1 : statusEffectData.Data.MaxStacks > 0 ? statusEffectData.Status.StackCount : 0;
                     DrawHelper.DrawIcon<LuminaStatus>(drawList, statusEffectData.Data, iconPos, Config.IconConfig.Size, false, cropIcon, stackCount);
 
                     // border
