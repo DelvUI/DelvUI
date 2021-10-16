@@ -28,7 +28,6 @@ namespace DelvUI.Interface.GeneralElements
             set
             {
                 _actor = value;
-                _smoothHPHelper.Reset();
             }
         }
 
