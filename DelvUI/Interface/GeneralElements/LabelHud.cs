@@ -19,16 +19,17 @@ namespace DelvUI.Interface.GeneralElements
             Draw(origin);
         }
 
-        public void Draw(Vector2 origin, Vector2? parentSize = null, GameObject? actor = null, string? actorName = null)
+        public void Draw(Vector2 origin, Vector2? parentSize = null,
+            GameObject? actor = null, string? actorName = null, uint? actorCurrentHp = null, uint? actorMaxHp = null)
         {
             if (!Config.Enabled || Config.GetText() == null)
             {
                 return;
             }
 
-            var text = actor == null && actorName == null ?
+            var text = actor == null && actorName == null && actorCurrentHp == null && actorMaxHp == null ?
                 Config.GetText() :
-                TextTagsHelper.FormattedText(Config.GetText(), actor, actorName);
+                TextTagsHelper.FormattedText(Config.GetText(), actor, actorName, actorCurrentHp, actorMaxHp);
 
             DrawLabel(text, origin, parentSize ?? Vector2.Zero, actor);
         }
