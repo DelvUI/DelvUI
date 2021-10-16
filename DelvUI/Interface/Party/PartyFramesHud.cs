@@ -276,11 +276,6 @@ namespace DelvUI.Interface.Party
             if (!canDrag)
             {
                 windowFlags |= ImGuiWindowFlags.NoMove;
-            }
-
-            if (Locked || DraggingEnabled)
-            {
-                ImGui.SetNextWindowPos(origin + Config.Position);
                 windowFlags |= ImGuiWindowFlags.NoResize;
             }
 
@@ -292,7 +287,13 @@ namespace DelvUI.Interface.Party
 
                 if (canDrag)
                 {
-                    Config.Position = windowPos - origin;
+                    Vector2 newPosition = windowPos - origin;
+                    if (Config.Position != newPosition)
+                    {
+                        // have to flag it like this sadly
+                        ConfigurationManager.Instance.ForceNeedsSave();
+                        Config.Position = windowPos - origin;
+                    }
                 }
 
                 var count = PartyManager.Instance.MemberCount;
@@ -410,7 +411,7 @@ namespace DelvUI.Interface.Party
             if (canDrag)
             {
                 // size and position
-                ImGui.SetNextWindowPos(Config.Position - _contentMargin, ImGuiCond.FirstUseEver);
+                ImGui.SetNextWindowPos(origin + Config.Position, ImGuiCond.FirstUseEver);
                 ImGui.SetNextWindowSize(Config.Size + _contentMargin * 2, ImGuiCond.FirstUseEver);
 
                 ImGui.PushStyleColor(ImGuiCol.Border, 0x66FFFFFF);

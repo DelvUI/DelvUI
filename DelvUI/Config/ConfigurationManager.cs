@@ -320,6 +320,11 @@ namespace DelvUI.Config
             }
         }
 
+        public void ForceNeedsSave()
+        {
+            ConfigBaseNode.NeedsSave = true;
+        }
+
         public void LoadConfigurations()
         {
             ConfigBaseNode.Load(ConfigDirectory);
