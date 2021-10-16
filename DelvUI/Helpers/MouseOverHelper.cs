@@ -239,7 +239,7 @@ namespace DelvUI.Helpers
         // any other message is passed along to the ImGui scene
         private IntPtr WndProcDetour(IntPtr hWnd, uint msg, ulong wParam, long lParam)
         {
-            // eat right and right clicks?
+            // eat left and right clicks?
             if (HandlingInputs)
             {
                 switch (msg)
