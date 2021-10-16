@@ -189,6 +189,19 @@ namespace DelvUI.Helpers
 
             return invertedClipRects;
         }
+
+        public bool IsPointClipped(Vector2 point)
+        {
+            foreach (ClipRect clipRect in _clipRects)
+            {
+                if (clipRect.Contains(point))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 
     public struct ClipRect
