@@ -130,6 +130,10 @@ namespace DelvUI.Helpers
             _requsetActionHook?.Disable();
             _requsetActionHook?.Dispose();
 
+            // give imgui the control of inputs again
+            IntPtr windowHandle = Process.GetCurrentProcess().MainWindowHandle;
+            SetWindowLongPtr(windowHandle, GWL_WNDPROC, _imguiWndProcPtr);
+
             Instance = null!;
         }
         #endregion
