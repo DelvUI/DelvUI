@@ -251,7 +251,7 @@ namespace DelvUI.Helpers
 
                         // if there's not a game window covering the cursor location
                         // we eat the message and handle the inputs manually
-                        if (!ClipRectsHelper.Instance.IsPointClipped(ImGui.GetMousePos()))
+                        if (ClipRectsHelper.Instance?.IsPointClipped(ImGui.GetMousePos()) == false)
                         {
                             _leftButtonClicked = msg == WM_LBUTTONUP;
                             _rightButtonClicked = msg == WM_RBUTTONUP;
