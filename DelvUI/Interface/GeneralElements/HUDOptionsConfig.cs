@@ -75,7 +75,7 @@ namespace DelvUI.Interface.GeneralElements
         public bool EnableCombatActionBars = false;
 
         [Checkbox("Show in duty" + "##CombatActionBars")]
-        [Order(21, collapseWith = nameof(EnableCombatActionBars))]
+        [Order(201, collapseWith = nameof(EnableCombatActionBars))]
         public bool ShowCombatActionBarsInDuty = false;
 
         [Checkbox("Show on Weapon Drawn" + "##CombatActionBars")]
