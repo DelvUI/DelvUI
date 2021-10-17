@@ -1,12 +1,12 @@
-﻿using Dalamud.Interface;
-using DelvUI.Helpers;
-using DelvUI.Interface.GeneralElements;
-using ImGuiNET;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using Dalamud.Interface;
+using DelvUI.Helpers;
+using DelvUI.Interface.GeneralElements;
+using ImGuiNET;
 
 namespace DelvUI.Config.Attributes
 {
@@ -145,6 +145,52 @@ namespace DelvUI.Config.Attributes
             }
 
             return false;
+        }
+    }
+    
+    [AttributeUsage(AttributeTargets.Field)]
+    public class RadioSelector : ConfigAttribute
+    {
+        private string[] _options;
+        private string? _label;
+        
+        public RadioSelector(params string[] options) : base(string.Join("_", options))
+        {
+            _options = options;
+        }
+
+        public RadioSelector(string label, string[] options) : this(options)
+        {
+            _label = label;
+        }
+
+        public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID)
+        {
+            bool changed = false;
+            int intVal = (int?)field.GetValue(config) ?? 0;
+
+            if (_label is not null)
+            {
+                ImGui.Text($"{_label}: ");
+                ImGui.SameLine();
+            }
+            
+            for (int i = 0; i < _options.Length; i++)
+            {
+                changed |= ImGui.RadioButton(_options[i], ref intVal, i);
+                if (i < _options.Length - 1)
+                {
+                    ImGui.SameLine();
+                }
+            }
+
+            if (changed)
+            {
+                field.SetValue(config, intVal);
+                TriggerChangeEvent<int>(config, field.Name, intVal);
+            }
+
+            return changed;
         }
     }
 
@@ -620,24 +666,20 @@ namespace DelvUI.Config.Attributes
         public OrderAttribute(int pos)
         {
             this.pos = pos;
-
         }
     }
 
     [AttributeUsage(AttributeTargets.Field)]
-    public class NestedConfigAttribute : Attribute
+    public class NestedConfigAttribute : OrderAttribute
     {
         public string friendlyName;
-        public int pos;
         public bool separator = true;
         public bool spacing = false;
         public bool nest = false;
-        public string? collapseWith = "Enabled";
 
-        public NestedConfigAttribute(string friendlyName, int pos)
+        public NestedConfigAttribute(string friendlyName, int pos) : base(pos)
         {
             this.friendlyName = friendlyName;
-            this.pos = pos;
 
         }
     }

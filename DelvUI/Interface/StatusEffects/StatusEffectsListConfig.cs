@@ -349,7 +349,10 @@ namespace DelvUI.Interface.StatusEffects
     [Exportable(false)]
     public class StatusEffectsBlacklistConfig : PluginConfigObject
     {
-        public bool UseAsWhitelist = false;
+        [RadioSelector("Blacklist", "Whitelist")]
+        [Order(5)]
+        public int FilterType;
+        
         public SortedList<string, uint> List = new SortedList<string, uint>();
 
         [JsonIgnore] private string? _errorMessage = null;
@@ -364,7 +367,7 @@ namespace DelvUI.Interface.StatusEffects
         public bool StatusAllowed(Status status)
         {
             var inList = List.ContainsKey(KeyName(status));
-            if ((inList && !UseAsWhitelist) || (!inList && UseAsWhitelist))
+            if ((inList && FilterType == 0) || (!inList && FilterType == 1))
             {
                 return false;
             }
@@ -489,10 +492,10 @@ namespace DelvUI.Interface.StatusEffects
 
             if (ImGui.BeginChild("Filter Effects", new Vector2(0, 360), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
-                ImGui.SameLine();
-                changed |= ImGui.Checkbox("Use as Whitelist", ref UseAsWhitelist);
-                ImGui.NewLine();
+                // ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
+                // ImGui.SameLine();
+                // changed |= ImGui.Checkbox("Use as Whitelist", ref UseAsWhitelist);
+                // ImGui.NewLine();
 
                 ImGui.Text("\u2002 \u2002");
                 ImGui.SameLine();
@@ -707,7 +710,7 @@ namespace DelvUI.Interface.StatusEffects
             config.Directions = 5;
 
             // pre-populated white list
-            config.BlacklistConfig.UseAsWhitelist = true;
+            config.BlacklistConfig.FilterType = 1;
 
             ExcelSheet<Status>? sheet = Plugin.DataManager.GetExcelSheet<Status>();
             if (sheet != null)
