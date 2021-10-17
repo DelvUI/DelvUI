@@ -10,7 +10,6 @@ namespace DelvUI.Config
     public abstract class PluginConfigObjectConverter : JsonConverter
     {
         protected Dictionary<string, Type> FieldConvertersMap = new Dictionary<string, Type>();
-        protected Type TypeToConvert = null!;
 
         public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
