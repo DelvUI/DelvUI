@@ -10,6 +10,7 @@ Features:
 - Added sub-option to Hide DelvUI outside of combat to show when weapons are drawn.
 - Added sub-option to Enable Combat Hotbars to always show in duties.
 - Added sub-option to Enable Combat Hotbars to show when weapons are drawn.
+- Added a cleanse tracker.
 
 Fixes:
 - Fixed clicks not working on game windows when they are on top of unit frames or party frames.
