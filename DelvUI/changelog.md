@@ -7,6 +7,8 @@ Features:
 - Added alpha bar to color selections.
 - Making party frames and status effects list areas more clear now. When you open DelvUI's settings window, these areas will automatically show reflecting the real size of the hud elements.
 - Added sub-option to Hide DelvUI outside of combat to show when weapons are drawn.
+- Added sub-option to Enable Combat Hotbars to always show in duties.
+- Added sub-option to Enable Combat Hotbars to show when weapons are drawn.
 - DelvUI windows are now using Dalamus' window system.
 
 Fixes:
