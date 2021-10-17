@@ -288,6 +288,18 @@ namespace DelvUI.Helpers
             return tankInvulnBuff!;
         }
 
+        public static bool IsOnCleanseJob()
+        {
+            var player = Plugin.ClientState.LocalPlayer;
+
+            if (player == null)
+            {
+                return false;
+            }
+
+            return JobsHelper.IsJobWithCleanse(player.ClassJob.Id, player.Level);
+        }
+
         public static GameObject? FindTargetOfTarget(GameObject? target, GameObject? player, ObjectTable actors)
         {
             if (target == null)

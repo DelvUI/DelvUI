@@ -530,4 +530,33 @@ namespace DelvUI.Interface.Party
         [NestedConfig("Label", 60)]
         public LabelConfig LabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
     }
+    
+    [DisableParentSettings("Position")]
+    [Exportable(false)]
+    [Section("Party Frames")]
+    [SubSection("Cleanse Tracker", 0)]
+    public class PartyFramesCleanseTrackerConfig : MovablePluginConfigObject
+    {
+        public new static PartyFramesCleanseTrackerConfig DefaultConfig() { return new PartyFramesCleanseTrackerConfig(); }
+
+        [Checkbox("Show only on jobs with cleanses", spacing = true)]
+        [Order(10)]
+        public bool CleanseJobsOnly = true;
+        
+        [Checkbox("Change Health Bar Color ", spacing = true)]
+        [Order(15)]
+        public bool ChangeHealthBarCleanseColor = true;
+
+        [ColorEdit4("Health Bar Color")]
+        [Order(20, collapseWith = nameof(ChangeHealthBarCleanseColor))]
+        public PluginConfigColor HealthBarColor = new(new Vector4(255f / 255f, 0f / 255f, 104f / 255f, 100f / 100f));
+
+        [Checkbox("Change Border Color", spacing = true)]
+        [Order(25)]
+        public bool ChangeBorderCleanseColor = true;
+
+        [ColorEdit4("Border Color")]
+        [Order(30, collapseWith = nameof(ChangeBorderCleanseColor))]
+        public PluginConfigColor BorderColor = new(new Vector4(255f / 255f, 0f / 255f, 104f / 255f, 100f / 100f));
+    }
 }

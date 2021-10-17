@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
+using Dalamud.Logging;
 
 namespace DelvUI.Interface.Party
 {
@@ -17,6 +18,7 @@ namespace DelvUI.Interface.Party
         private PartyFramesHealthBarsConfig _healthBarsConfig;
         private PartyFramesRaiseTrackerConfig _raiseTrackerConfig;
         private PartyFramesInvulnTrackerConfig _invulnTrackerConfig;
+        private PartyFramesCleanseTrackerConfig _cleanseTrackerConfig;
 
         private delegate void OpenContextMenu(IntPtr agentHud, int parentAddonId, int index);
         private readonly OpenContextMenu _openContextMenu;
@@ -41,6 +43,7 @@ namespace DelvUI.Interface.Party
             _healthBarsConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesHealthBarsConfig>();
             _raiseTrackerConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesRaiseTrackerConfig>();
             _invulnTrackerConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesInvulnTrackerConfig>();
+            _cleanseTrackerConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesCleanseTrackerConfig>();
 
             var manaBarConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesManaBarConfig>();
             var castbarConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesCastbarConfig>();
@@ -66,7 +69,8 @@ namespace DelvUI.Interface.Party
                     buffsConfig,
                     debuffsConfig,
                     _raiseTrackerConfig,
-                    _invulnTrackerConfig
+                    _invulnTrackerConfig,
+                    _cleanseTrackerConfig
                 );
 
                 bar.MovePlayerEvent += OnMovePlayer;
@@ -343,6 +347,7 @@ namespace DelvUI.Interface.Party
                 var enmityLeaderIndex = -1;
                 var enmitySecondIndex = -1;
                 List<int> raisedIndexes = new List<int>();
+                List<int> cleanseIndexes = new List<int>();
 
                 // bars
                 for (int i = 0; i < count; i++)
@@ -354,6 +359,18 @@ namespace DelvUI.Interface.Party
                         if (target != null && member.ObjectId == target.ObjectId)
                         {
                             targetIndex = i;
+                            continue;
+                        }
+
+                        bool cleanseCheck = true;
+                        if (_cleanseTrackerConfig.CleanseJobsOnly)
+                        {
+                            cleanseCheck = Utils.IsOnCleanseJob();
+                        }
+                        
+                        if (_cleanseTrackerConfig.Enabled && _cleanseTrackerConfig.ChangeBorderCleanseColor && member.HasDispellableDebuff && cleanseCheck)
+                        {
+                            cleanseIndexes.Add(i);
                             continue;
                         }
 
@@ -406,6 +423,12 @@ namespace DelvUI.Interface.Party
                 if (targetIndex >= 0)
                 {
                     bars[targetIndex].Draw(origin, drawList, _healthBarsConfig.ColorsConfig.TargetBordercolor);
+                }
+
+                // cleanseable debuff
+                foreach (int index in cleanseIndexes)
+                {
+                    bars[index].Draw(origin, drawList, _cleanseTrackerConfig.BorderColor);
                 }
             };
 
