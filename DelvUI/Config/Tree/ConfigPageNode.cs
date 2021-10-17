@@ -1,14 +1,15 @@
+using Dalamud.Logging;
+using DelvUI.Config.Attributes;
+using DelvUI.Config.Profiles;
+using DelvUI.Helpers;
+using ImGuiNET;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
-using DelvUI.Config.Attributes;
-using DelvUI.Config.Profiles;
-using DelvUI.Helpers;
-using ImGuiNET;
-using Newtonsoft.Json;
 
 namespace DelvUI.Config.Tree
 {
@@ -17,7 +18,7 @@ namespace DelvUI.Config.Tree
         private PluginConfigObject _configObject = null!;
         private List<ConfigNode>? _drawList = null;
         private Dictionary<string, ConfigPageNode> _nestedConfigPageNodes = null!;
-        
+
         public PluginConfigObject ConfigObject
         {
             get => _configObject;
@@ -50,7 +51,7 @@ namespace DelvUI.Config.Tree
                     {
                         continue;
                     }
-                    
+
                     ConfigPageNode configPageNode = new();
                     configPageNode.ConfigObject = nestedConfig;
                     configPageNode.Name = nestedConfigAttribute.friendlyName;
@@ -118,7 +119,7 @@ namespace DelvUI.Config.Tree
         private List<ConfigNode> GenerateDrawList(string? ID = null)
         {
             Dictionary<string, ConfigNode> fieldMap = new Dictionary<string, ConfigNode>();
-            
+
             FieldInfo[] fields = ConfigObject.GetType().GetFields();
             foreach (var field in fields)
             {
@@ -126,7 +127,7 @@ namespace DelvUI.Config.Tree
                 {
                     continue;
                 }
-                
+
                 foreach (object attribute in field.GetCustomAttributes(true))
                 {
                     if (attribute is NestedConfigAttribute nestedConfigAttribute && _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode? node))
@@ -158,7 +159,7 @@ namespace DelvUI.Config.Tree
                 string id = $"ManualDraw##{method.GetHashCode()}";
                 fieldMap.Add(id, new ManualDrawNode(method, ConfigObject, id));
             }
-            
+
             foreach (var configNode in fieldMap.Values)
             {
                 if (configNode.ParentName is not null &&
@@ -170,7 +171,7 @@ namespace DelvUI.Config.Tree
                     {
                         continue;
                     }
-                    
+
                     if (parentNode is FieldNode parentFieldNode)
                     {
                         parentFieldNode.CollapseControl = true;
@@ -228,14 +229,21 @@ namespace DelvUI.Config.Tree
 
             string finalPath = path + ".json";
 
-            File.WriteAllText(
-                finalPath,
-                JsonConvert.SerializeObject(
-                    ConfigObject,
-                    Formatting.Indented,
-                    new JsonSerializerSettings { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects }
-                )
-            );
+            try
+            {
+                File.WriteAllText(
+                    finalPath,
+                    JsonConvert.SerializeObject(
+                        ConfigObject,
+                        Formatting.Indented,
+                        new JsonSerializerSettings { TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple, TypeNameHandling = TypeNameHandling.Objects }
+                    )
+                );
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error when saving config object: " + e.Message);
+            }
         }
 
         public override void Load(string path)
