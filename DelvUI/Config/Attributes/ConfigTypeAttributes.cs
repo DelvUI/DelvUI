@@ -152,27 +152,23 @@ namespace DelvUI.Config.Attributes
     public class RadioSelector : ConfigAttribute
     {
         private string[] _options;
-        private string? _label;
         
         public RadioSelector(params string[] options) : base(string.Join("_", options))
         {
             _options = options;
         }
 
-        public RadioSelector(string label, string[] options) : this(options)
-        {
-            _label = label;
-        }
+        public RadioSelector(Type enumType) : this(enumType.IsEnum ? Enum.GetNames(enumType) : Array.Empty<string>()) { }
 
         public override bool DrawField(FieldInfo field, PluginConfigObject config, string? ID)
         {
             bool changed = false;
-            int intVal = (int?)field.GetValue(config) ?? 0;
+            object? fieldVal = field.GetValue(config);
 
-            if (_label is not null)
+            int intVal = 0;
+            if (fieldVal != null)
             {
-                ImGui.Text($"{_label}: ");
-                ImGui.SameLine();
+                intVal = (int)fieldVal;
             }
             
             for (int i = 0; i < _options.Length; i++)

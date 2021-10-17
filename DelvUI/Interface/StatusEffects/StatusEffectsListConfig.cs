@@ -345,13 +345,19 @@ namespace DelvUI.Interface.StatusEffects
             return config;
         }
     }
-
+    
+    public enum FilterType
+    {
+        Blacklist,
+        Whitelist
+    }
+    
     [Exportable(false)]
     public class StatusEffectsBlacklistConfig : PluginConfigObject
     {
-        [RadioSelector("Blacklist", "Whitelist")]
+        [RadioSelector(typeof(FilterType))]
         [Order(5)]
-        public int FilterType;
+        public FilterType FilterType;
         
         public SortedList<string, uint> List = new SortedList<string, uint>();
 
@@ -367,7 +373,7 @@ namespace DelvUI.Interface.StatusEffects
         public bool StatusAllowed(Status status)
         {
             var inList = List.ContainsKey(KeyName(status));
-            if ((inList && FilterType == 0) || (!inList && FilterType == 1))
+            if ((inList && FilterType == FilterType.Blacklist) || (!inList && FilterType == FilterType.Whitelist))
             {
                 return false;
             }
@@ -705,7 +711,7 @@ namespace DelvUI.Interface.StatusEffects
             config.Directions = 5;
 
             // pre-populated white list
-            config.BlacklistConfig.FilterType = 1;
+            config.BlacklistConfig.FilterType = FilterType.Whitelist;
 
             ExcelSheet<Status>? sheet = Plugin.DataManager.GetExcelSheet<Status>();
             if (sheet != null)
