@@ -105,7 +105,7 @@ namespace DelvUI.Interface
         }
 
         internal static byte GetStatus(GameObject actor)
-        {            
+        {
             // 40 57 48 83 EC 70 48 8B F9 E8 ?? ?? ?? ?? 81 BF ?? ?? ?? ?? ?? ?? ?? ??
             const int offset = 0x19A0;
             return Marshal.ReadByte(actor.Address + offset);
@@ -174,7 +174,7 @@ namespace DelvUI.Interface
             bool isHidden = Config.ShowInDuty ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty() : Config.HideOutsideOfCombat && !IsInCombat();
             if (player is not null)
             {
-                isHidden = Config.ShowOnWeaponDrawn ? Config.HideOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn(player) : Config.HideOutsideOfCombat && !IsInCombat();
+                isHidden = isHidden && Config.ShowOnWeaponDrawn ? Config.HideOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn(player) : Config.HideOutsideOfCombat && !IsInCombat();
             }
 
             if (!isHidden && element is JobHud)
