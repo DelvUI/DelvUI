@@ -492,11 +492,6 @@ namespace DelvUI.Interface.StatusEffects
 
             if (ImGui.BeginChild("Filter Effects", new Vector2(0, 360), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                // ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
-                // ImGui.SameLine();
-                // changed |= ImGui.Checkbox("Use as Whitelist", ref UseAsWhitelist);
-                // ImGui.NewLine();
-
                 ImGui.Text("\u2002 \u2002");
                 ImGui.SameLine();
                 ImGui.Text("Type an ID or Name");
