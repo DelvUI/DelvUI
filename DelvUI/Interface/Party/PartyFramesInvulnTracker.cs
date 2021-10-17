@@ -1,8 +1,9 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
-using DelvUI.Config;
-using System.Collections.Generic;
 using Dalamud.Game.ClientState.Statuses;
+using DelvUI.Config;
 using DelvUI.Helpers;
+using System;
+using System.Collections.Generic;
 
 namespace DelvUI.Interface.Party
 {
@@ -19,7 +20,7 @@ namespace DelvUI.Interface.Party
             InvulnId = invulnId;
         }
     }
-    public class PartyFramesInvulnTracker
+    public class PartyFramesInvulnTracker : IDisposable
     {
         private PartyFramesInvulnTrackerConfig _config;
         public PartyFramesInvulnTracker()
@@ -27,7 +28,28 @@ namespace DelvUI.Interface.Party
             _config = ConfigurationManager.Instance.GetConfigObject<PartyFramesInvulnTrackerConfig>();
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
         }
-        
+
+        ~PartyFramesInvulnTracker()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
+        }
+
         public void OnConfigReset(ConfigurationManager sender)
         {
             _config = sender.GetConfigObject<PartyFramesInvulnTrackerConfig>();
@@ -39,11 +61,11 @@ namespace DelvUI.Interface.Party
             {
                 return;
             }
-            
+
 
             foreach (var member in partyMembers)
             {
-                
+
                 if (member.Character == null || member.ObjectId == 0)
                 {
                     member.InvulnStatus = null;
@@ -81,7 +103,7 @@ namespace DelvUI.Interface.Party
             { 409, 000266 },    // HOLMGANG
             { 1836, 003416 }    // SUPERBOLIDE
         };
-        
+
         #endregion
     }
 }
