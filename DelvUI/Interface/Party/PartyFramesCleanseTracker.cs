@@ -31,11 +31,7 @@ namespace DelvUI.Interface.Party
 
             foreach (var member in partyMembers)
             {
-                if (member.Character == null || member.ObjectId == 0)
-                {
-                    member.HasDispellableDebuff = false;
-                    continue;
-                }
+                member.HasDispellableDebuff = false;
 
                 if (member.Character is not BattleChara battleChara)
                 {

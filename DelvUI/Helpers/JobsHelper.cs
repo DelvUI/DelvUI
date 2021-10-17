@@ -70,7 +70,8 @@ namespace DelvUI.Helpers
             JobIDs.WHM,
             JobIDs.SCH,
             JobIDs.AST,
-            JobIDs.BRD
+            JobIDs.BRD,
+            JobIDs.BLU
         };
 
         public static bool IsJobHealer(uint jobId)
