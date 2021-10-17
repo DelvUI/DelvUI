@@ -34,17 +34,17 @@ namespace DelvUI.Interface.GeneralElements
         [Order(16, collapseWith = nameof(MouseoverEnabled))]
         public bool MouseoverAutomaticMode = true;
 
-        [Checkbox("Hide DelvUI outside of combat", separator = true, help = "Show in Duty and Show on Weapon Drawn-options available once enabed.")]
+        [Checkbox("Hide DelvUI outside of combat", isMonitored = true, separator = true, help = "Show in Duty and Show on Weapon Drawn-options available once enabled.")]
         [Order(20)]
         public bool HideOutsideOfCombat = false;
 
-        [Checkbox("Show in duty")]
+        [Checkbox("Show in duty" + "##HideOutsideCombat")]
         [Order(21, collapseWith = nameof(HideOutsideOfCombat))]
-        public bool ShowInDuty = false;
+        public bool ShowDelvUIFramesInDuty = false;
 
-        [Checkbox("Show on Weapon Drawn")]
+        [Checkbox("Show on Weapon Drawn" + "##HideOutsideCombat")]
         [Order(22, collapseWith = nameof(HideOutsideOfCombat))]
-        public bool ShowOnWeaponDrawn = false;
+        public bool ShowDelvUIFramesOnWeaponDrawn = false;
 
         [Checkbox("Hide DelvUI in Gold Saucer")]
         [Order(25)]
@@ -54,7 +54,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(30)]
         public bool HideOnlyJobPackHudOutsideOfCombat = false;
 
-        [Checkbox("Automatically disable HUD elements preview", help = "Enabling this will make it so all HUD elements preview modes are disabled when DelvUI's setting window is closed")]
+        [Checkbox("Automatically disable HUD elements preview", help = "Enabling this will make it so all HUD elements preview modes are disabled when DelvUI's setting window is closed.")]
         [Order(35)]
         public bool AutomaticPreviewDisabling = true;
 
@@ -70,12 +70,20 @@ namespace DelvUI.Interface.GeneralElements
         [Order(50)]
         public bool HideDefaultPulltimer = false;
 
-        [Checkbox("Enable Combat Hotbars", isMonitored = true, separator = true)]
+        [Checkbox("Enable Combat Hotbars", isMonitored = true, separator = true, help = "Show in Duty and Show on Weapon Drawn-options available once enabled.")]
         [Order(200)]
         public bool EnableCombatActionBars = false;
 
+        [Checkbox("Show in duty" + "##CombatActionBars")]
+        [Order(21, collapseWith = nameof(EnableCombatActionBars))]
+        public bool ShowCombatActionBarsInDuty = false;
+
+        [Checkbox("Show on Weapon Drawn" + "##CombatActionBars")]
+        [Order(202, collapseWith = nameof(EnableCombatActionBars))]
+        public bool ShowCombatActionBarsOnWeaponDrawn = false;
+
         [DynamicList("Hotbars Shown Only In Combat", "Hotbar 1", "Hotbar 2", "Hotbar 3", "Hotbar 4", "Hotbar 5", "Hotbar 6", "Hotbar 7", "Hotbar 8", "Hotbar 9", "Hotbar 10", isMonitored = true)]
-        [Order(201, collapseWith = nameof(EnableCombatActionBars))]
+        [Order(203, collapseWith = nameof(EnableCombatActionBars))]
         public List<string> CombatActionBars = new List<string>();
 
         public Vector2 CastBarOriginalPosition;
