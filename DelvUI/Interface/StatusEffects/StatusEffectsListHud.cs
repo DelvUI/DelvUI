@@ -246,11 +246,6 @@ namespace DelvUI.Interface.StatusEffects
             // no need to do anything else if there are no effects
             if (list.Count == 0)
             {
-                // draw area if the config window is opened
-                if (ConfigurationManager.Instance.DrawConfigWindow)
-                {
-                    drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
-                }
                 return;
             }
 
@@ -309,7 +304,7 @@ namespace DelvUI.Interface.StatusEffects
             DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, Config.ShowBuffs, false, (drawList) =>
             {
                 // area
-                if (ConfigurationManager.Instance.DrawConfigWindow)
+                if (Config.Preview)
                 {
                     drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
                 }

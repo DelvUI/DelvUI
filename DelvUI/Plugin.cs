@@ -169,7 +169,7 @@ namespace DelvUI
         {
             var configManager = ConfigurationManager.Instance;
 
-            if (configManager.DrawConfigWindow && !configManager.LockHUD)
+            if (configManager.IsConfigWindowOpened && !configManager.LockHUD)
             {
                 configManager.LockHUD = true;
             }
@@ -213,7 +213,7 @@ namespace DelvUI
                         break;
 
                     default:
-                        configManager.DrawConfigWindow = !configManager.DrawConfigWindow;
+                        configManager.ToggleConfigWindow();
 
                         break;
                 }
@@ -252,7 +252,7 @@ namespace DelvUI
 
         private void OpenConfigUi()
         {
-            ConfigurationManager.Instance.DrawConfigWindow = !ConfigurationManager.Instance.DrawConfigWindow;
+            ConfigurationManager.Instance.ToggleConfigWindow();
         }
 
         protected virtual void Dispose(bool disposing)
@@ -265,7 +265,7 @@ namespace DelvUI
             _menuHook.Dispose();
             _hudManager.Dispose();
 
-            ConfigurationManager.Instance.DrawConfigWindow = false;
+            ConfigurationManager.Instance.CloseConfigWindow();
 
             CommandManager.RemoveHandler("/delvui");
 
