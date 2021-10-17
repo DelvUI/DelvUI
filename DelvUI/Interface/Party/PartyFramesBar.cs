@@ -122,6 +122,13 @@ namespace DelvUI.Interface.Party
             return _config.ColorsConfig.GenericRoleColor;
         }
 
+        public void StopPreview()
+        {
+            _castbarHud.StopPreview();
+            _buffsListHud.StopPreview();
+            _debuffsListHud.StopPreview();
+        }
+
         public void StopMouseover()
         {
             if (_wasHovering)

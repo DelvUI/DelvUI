@@ -12,7 +12,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    public class CastbarHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
+    public class CastbarHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent, IHudElementWithPreview
     {
         private CastbarConfig Config => (CastbarConfig)_config;
         private LabelHud _castNameLabel;
@@ -29,6 +29,11 @@ namespace DelvUI.Interface.GeneralElements
         {
             _castNameLabel = new LabelHud(config.CastNameConfig);
             _castTimeLabel = new LabelHud(config.CastTimeConfig);
+        }
+
+        public void StopPreview()
+        {
+            Config.Preview = false;
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()

@@ -25,6 +25,7 @@ namespace DelvUI.Interface
         private List<IHudElementWithActor> _hudElementsUsingTarget = null!;
         private List<IHudElementWithActor> _hudElementsUsingTargetOfTarget = null!;
         private List<IHudElementWithActor> _hudElementsUsingFocusTarget = null!;
+        private List<IHudElementWithPreview> _hudElementsWithPreview = null!;
 
         private UnitFrameHud _playerUnitFrameHud = null!;
         private UnitFrameHud _targetUnitFrameHud = null!;
@@ -50,6 +51,7 @@ namespace DelvUI.Interface
 
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
             ConfigurationManager.Instance.LockEvent += OnHUDLockChanged;
+            ConfigurationManager.Instance.ConfigClosedEvent += OnConfingWindowClosed;
 
             CreateHudElements();
         }
@@ -108,6 +110,19 @@ namespace DelvUI.Interface
             _selectedElement = null;
         }
 
+        private void OnConfingWindowClosed(ConfigurationManager sender)
+        {
+            if (_hudOptions == null || !_hudOptions.AutomaticPreviewDisabling)
+            {
+                return;
+            }
+
+            foreach (IHudElementWithPreview element in _hudElementsWithPreview)
+            {
+                element.StopPreview();
+            }
+        }
+
         private void OnDraggableElementSelected(DraggableHudElement sender)
         {
             foreach (var element in _hudElements)
@@ -133,6 +148,7 @@ namespace DelvUI.Interface
             _hudElementsUsingTarget = new List<IHudElementWithActor>();
             _hudElementsUsingTargetOfTarget = new List<IHudElementWithActor>();
             _hudElementsUsingFocusTarget = new List<IHudElementWithActor>();
+            _hudElementsWithPreview = new List<IHudElementWithPreview>();
 
             CreateUnitFrames();
             CreateManaBars();
@@ -171,6 +187,7 @@ namespace DelvUI.Interface
             var partyFramesConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesConfig>();
             _partyFramesHud = new PartyFramesHud(partyFramesConfig, "Party Frames");
             _hudElements.Add(_partyFramesHud);
+            _hudElementsWithPreview.Add(_partyFramesHud);
         }
 
         private void CreateManaBars()
@@ -207,24 +224,28 @@ namespace DelvUI.Interface
             _playerCastbarHud.ParentConfig = _playerUnitFrameHud.Config;
             _hudElements.Add(_playerCastbarHud);
             _hudElementsUsingPlayer.Add(_playerCastbarHud);
+            _hudElementsWithPreview.Add(_playerCastbarHud);
 
             var targetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<TargetCastbarConfig>();
             var targetCastbar = new TargetCastbarHud(targetCastbarConfig, "Target Castbar");
             targetCastbar.ParentConfig = _targetUnitFrameHud.Config;
             _hudElements.Add(targetCastbar);
             _hudElementsUsingTarget.Add(targetCastbar);
+            _hudElementsWithPreview.Add(targetCastbar);
 
             var targetOfTargetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<TargetOfTargetCastbarConfig>();
             var targetOfTargetCastbar = new TargetCastbarHud(targetOfTargetCastbarConfig, "ToT Castbar");
             targetOfTargetCastbar.ParentConfig = _totUnitFrameHud.Config;
             _hudElements.Add(targetOfTargetCastbar);
             _hudElementsUsingTargetOfTarget.Add(targetOfTargetCastbar);
+            _hudElementsWithPreview.Add(targetOfTargetCastbar);
 
             var focusTargetCastbarConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetCastbarConfig>();
             var focusTargetCastbar = new TargetCastbarHud(focusTargetCastbarConfig, "Focus Castbar");
             focusTargetCastbar.ParentConfig = _focusTargetUnitFrameHud.Config;
             _hudElements.Add(focusTargetCastbar);
             _hudElementsUsingFocusTarget.Add(focusTargetCastbar);
+            _hudElementsWithPreview.Add(focusTargetCastbar);
         }
 
         private void CreateStatusEffectsLists()
@@ -234,41 +255,48 @@ namespace DelvUI.Interface
             playerBuffs.ParentConfig = _playerUnitFrameHud.Config;
             _hudElements.Add(playerBuffs);
             _hudElementsUsingPlayer.Add(playerBuffs);
+            _hudElementsWithPreview.Add(playerBuffs);
 
             var playerDebuffsConfig = ConfigurationManager.Instance.GetConfigObject<PlayerDebuffsListConfig>();
             var playerDebuffs = new StatusEffectsListHud(playerDebuffsConfig, "Debufffs");
             playerDebuffs.ParentConfig = _playerUnitFrameHud.Config;
             _hudElements.Add(playerDebuffs);
             _hudElementsUsingPlayer.Add(playerDebuffs);
+            _hudElementsWithPreview.Add(playerDebuffs);
 
             var targetBuffsConfig = ConfigurationManager.Instance.GetConfigObject<TargetBuffsListConfig>();
             var targetBuffs = new StatusEffectsListHud(targetBuffsConfig, "Target Buffs");
             targetBuffs.ParentConfig = _targetUnitFrameHud.Config;
             _hudElements.Add(targetBuffs);
             _hudElementsUsingTarget.Add(targetBuffs);
+            _hudElementsWithPreview.Add(targetBuffs);
 
             var targetDebuffsConfig = ConfigurationManager.Instance.GetConfigObject<TargetDebuffsListConfig>();
             var targetDebuffs = new StatusEffectsListHud(targetDebuffsConfig, "Target Debuffs");
             targetDebuffs.ParentConfig = _targetUnitFrameHud.Config;
             _hudElements.Add(targetDebuffs);
             _hudElementsUsingTarget.Add(targetDebuffs);
+            _hudElementsWithPreview.Add(targetDebuffs);
 
             var focusTargetBuffsConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetBuffsListConfig>();
             var focusTargetBuffs = new StatusEffectsListHud(focusTargetBuffsConfig, "focusTarget Buffs");
             focusTargetBuffs.ParentConfig = _focusTargetUnitFrameHud.Config;
             _hudElements.Add(focusTargetBuffs);
             _hudElementsUsingFocusTarget.Add(focusTargetBuffs);
+            _hudElementsWithPreview.Add(focusTargetBuffs);
 
             var focusTargetDebuffsConfig = ConfigurationManager.Instance.GetConfigObject<FocusTargetDebuffsListConfig>();
             var focusTargetDebuffs = new StatusEffectsListHud(focusTargetDebuffsConfig, "focusTarget Debuffs");
             focusTargetDebuffs.ParentConfig = _focusTargetUnitFrameHud.Config;
             _hudElements.Add(focusTargetDebuffs);
             _hudElementsUsingFocusTarget.Add(focusTargetDebuffs);
+            _hudElementsWithPreview.Add(focusTargetDebuffs);
 
             var custonEffectsConfig = ConfigurationManager.Instance.GetConfigObject<CustomEffectsListConfig>();
             _customEffectsHud = new CustomEffectsListHud(custonEffectsConfig, "Custom Effects");
             _hudElements.Add(_customEffectsHud);
             _hudElementsUsingPlayer.Add(_customEffectsHud);
+            _hudElementsWithPreview.Add(_customEffectsHud);
         }
 
         private void CreateMiscElements()

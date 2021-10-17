@@ -11,7 +11,7 @@ using System.Runtime.InteropServices;
 
 namespace DelvUI.Interface.Party
 {
-    public class PartyFramesHud : DraggableHudElement, IHudElementWithMouseOver
+    public class PartyFramesHud : DraggableHudElement, IHudElementWithMouseOver, IHudElementWithPreview
     {
         private PartyFramesConfig Config => (PartyFramesConfig)_config;
         private PartyFramesHealthBarsConfig _healthBarsConfig;
@@ -244,6 +244,16 @@ namespace DelvUI.Interface.Party
             foreach (var bar in bars)
             {
                 bar.Position = bar.Position + delta;
+            }
+        }
+
+        public void StopPreview()
+        {
+            Config.Preview = false;
+
+            foreach (var bar in bars)
+            {
+                bar.StopPreview();
             }
         }
 

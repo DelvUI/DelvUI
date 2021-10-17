@@ -60,4 +60,9 @@ namespace DelvUI.Interface
     {
         public void StopMouseover();
     }
+
+    public interface IHudElementWithPreview
+    {
+        public void StopPreview();
+    }
 }

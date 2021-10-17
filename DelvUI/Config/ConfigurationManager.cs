@@ -51,6 +51,8 @@ namespace DelvUI.Config
 
                 if (!_drawConfigWindow)
                 {
+                    ConfigClosedEvent?.Invoke(this);
+
                     if (ConfigBaseNode.NeedsSave)
                     {
                         SaveConfigurations();
@@ -98,28 +100,21 @@ namespace DelvUI.Config
 
         public event ConfigurationManagerEventHandler? ResetEvent;
         public event ConfigurationManagerEventHandler? LockEvent;
+        public event ConfigurationManagerEventHandler? ConfigClosedEvent;
 
-        public ConfigurationManager(
-            TextureWrap? bannerImage,
-            string configDirectory,
-            BaseNode configBaseNode,
-            ConfigurationManagerEventHandler? resetEvent = null,
-            ConfigurationManagerEventHandler? lockEvent = null)
+        public ConfigurationManager()
         {
-            BannerImage = bannerImage;
-            ConfigDirectory = configDirectory;
-            ConfigBaseNode = configBaseNode;
+            BannerImage = Plugin.BannerTexture;
+            ConfigDirectory = Plugin.PluginInterface.GetPluginConfigDirectory();
+
+            ConfigBaseNode = new BaseNode();
+            InitializeBaseNode(ConfigBaseNode);
             ConfigBaseNode.ConfigObjectResetEvent += OnConfigObjectReset;
 
             LoadChangelog();
             CheckVersion();
 
             LoadOrInitializeFiles();
-
-            LockEvent = lockEvent;
-
-            ResetEvent = resetEvent;
-            ResetEvent?.Invoke(this);
 
             Plugin.ClientState.Logout += OnLogout;
         }
@@ -149,24 +144,7 @@ namespace DelvUI.Config
             Instance = null!;
         }
 
-        public static void Initialize()
-        {
-            BaseNode node = new();
-            InitializeBaseNode(node);
-
-            TextureWrap? banner = Plugin.BannerTexture;
-
-            var currentResetEvent = (ConfigurationManagerEventHandler?)Instance?.ResetEvent?.Clone();
-            var currentLockEvent = (ConfigurationManagerEventHandler?)Instance?.LockEvent?.Clone();
-
-            Instance = new ConfigurationManager(
-                banner,
-                Plugin.PluginInterface.GetPluginConfigDirectory(),
-                node,
-                currentResetEvent,
-                currentLockEvent
-            );
-        }
+        public static void Initialize() { Instance = new ConfigurationManager(); }
 
         private void OnConfigObjectReset(BaseNode sender)
         {
