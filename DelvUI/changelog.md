@@ -5,6 +5,7 @@ Features:
 - Added option to dim DelvUI's setting window when not being focused (Misc > HUD Options).
 - Added alpha bar to color selections.
 - Pressing Escape will now close DelvUI's setting window.
+- Added sub-option to Hide DelvUI outside of combat to show when weapons are drawn.
 
 Fixes:
 - Fixed clicks not working on game windows when they are on top of unit frames or party frames.
