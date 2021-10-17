@@ -14,7 +14,7 @@ using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
 namespace DelvUI.Interface.StatusEffects
 {
-    public class StatusEffectsListHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
+    public class StatusEffectsListHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent, IHudElementWithPreview
     {
         protected StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
 
@@ -43,6 +43,12 @@ namespace DelvUI.Interface.StatusEffects
         ~StatusEffectsListHud()
         {
             _config.ValueChangeEvent -= OnConfigPropertyChanged;
+        }
+
+        public void StopPreview()
+        {
+            Config.Preview = false;
+            UpdatePreview();
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()

@@ -50,16 +50,20 @@ namespace DelvUI.Interface.GeneralElements
         [Order(30)]
         public bool HideOnlyJobPackHudOutsideOfCombat = false;
 
-        [Checkbox("Hide Default Job Gauges", isMonitored = true, spacing = true)]
+        [Checkbox("Automatically disable HUD elements preview", help = "Enabling this will make it so all HUD elements preview modes are disabled when DelvUI's setting window is closed")]
         [Order(35)]
+        public bool AutomaticPreviewDisabling = false;
+
+        [Checkbox("Hide Default Job Gauges", isMonitored = true, spacing = true)]
+        [Order(40)]
         public bool HideDefaultJobGauges = false;
 
         [Checkbox("Hide Default Castbar", isMonitored = true)]
-        [Order(40)]
+        [Order(45)]
         public bool HideDefaultCastbar = false;
 
         [Checkbox("Hide Default Pulltimer", isMonitored = true)]
-        [Order(45)]
+        [Order(50)]
         public bool HideDefaultPulltimer = false;
 
         [Checkbox("Enable Combat Hotbars", isMonitored = true, separator = true)]
