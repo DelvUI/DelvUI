@@ -8,13 +8,34 @@ using DelvUI.Helpers;
 
 namespace DelvUI.Interface.Party
 {
-    public class PartyFramesCleanseTracker
+    public class PartyFramesCleanseTracker : IDisposable
     {
         private PartyFramesCleanseTrackerConfig _config;
         public PartyFramesCleanseTracker()
         {
             _config = ConfigurationManager.Instance.GetConfigObject<PartyFramesCleanseTrackerConfig>();
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+        }
+
+        ~PartyFramesCleanseTracker()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
         }
 
         public void OnConfigReset(ConfigurationManager sender)

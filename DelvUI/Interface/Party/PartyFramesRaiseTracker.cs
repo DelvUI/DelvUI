@@ -6,13 +6,34 @@ using System.Linq;
 
 namespace DelvUI.Interface.Party
 {
-    public class PartyFramesRaiseTracker
+    public class PartyFramesRaiseTracker : IDisposable
     {
         private PartyFramesRaiseTrackerConfig _config;
         public PartyFramesRaiseTracker()
         {
             _config = ConfigurationManager.Instance.GetConfigObject<PartyFramesRaiseTrackerConfig>();
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+        }
+
+        ~PartyFramesRaiseTracker()
+        {
+            Dispose(false);
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected void Dispose(bool disposing)
+        {
+            if (!disposing)
+            {
+                return;
+            }
+
+            ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
         }
 
         public void OnConfigReset(ConfigurationManager sender)
