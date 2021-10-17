@@ -3,6 +3,7 @@ using Dalamud.Game.ClientState.Party;
 using DelvUI.Helpers;
 using ImGuiNET;
 using System;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 
 namespace DelvUI.Interface.Party
 {
@@ -36,7 +37,7 @@ namespace DelvUI.Interface.Party
         public bool IsPartyLeader { get; private set; } = false;
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
-
+        public bool HasDispellableDebuff { get; set; } = false;
 
         public PartyFramesMember(PartyMember partyMember, int order, EnmityLevel enmityLevel, bool isPartyLeader)
         {
@@ -107,7 +108,7 @@ namespace DelvUI.Interface.Party
         public bool IsPartyLeader { get; }
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
-
+        public bool HasDispellableDebuff { get; set; }
 
         public FakePartyFramesMember(int order, EnmityLevel enmityLevel, bool isPartyLeader)
         {
@@ -121,6 +122,7 @@ namespace DelvUI.Interface.Party
             Shield = RNG.Next(30) / 100f;
             EnmityLevel = enmityLevel;
             IsPartyLeader = isPartyLeader;
+            HasDispellableDebuff = RNG.Next(0, 2) == 1;
         }
 
         public void Update(EnmityLevel enmityLevel, bool isPartyLeader, uint jobId)
@@ -147,6 +149,7 @@ namespace DelvUI.Interface.Party
         public bool IsPartyLeader { get; }
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
+        public bool HasDispellableDebuff { get; set; }
 
         public void Update(EnmityLevel enmityLevel, bool isPartyLeader, uint jobId);
     }

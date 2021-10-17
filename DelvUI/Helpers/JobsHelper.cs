@@ -1,6 +1,7 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 
 namespace DelvUI.Helpers
 {
@@ -50,6 +51,27 @@ namespace DelvUI.Helpers
         {
             return IsJobARole(jobId, JobRoles.Tank);
         }
+        
+        public static bool IsJobWithCleanse(uint jobId, int level)
+        {
+            var isOnCleanseJob = _cleanseJobs.Contains(jobId);
+            
+            if (jobId == JobIDs.BRD && level < 35)
+            {
+                isOnCleanseJob = false;
+            }
+
+            return isOnCleanseJob;
+        }
+        
+        private static readonly List<uint> _cleanseJobs = new List<uint>()
+        {
+            JobIDs.CNJ,
+            JobIDs.WHM,
+            JobIDs.SCH,
+            JobIDs.AST,
+            JobIDs.BRD
+        };
 
         public static bool IsJobHealer(uint jobId)
         {

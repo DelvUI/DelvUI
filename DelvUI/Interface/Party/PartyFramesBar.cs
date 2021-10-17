@@ -26,6 +26,7 @@ namespace DelvUI.Interface.Party
         private PartyFramesDebuffsConfig _debuffsConfig;
         private PartyFramesRaiseTrackerConfig _raiseTrackerConfig;
         private PartyFramesInvulnTrackerConfig _invulnTrackerConfig;
+        private PartyFramesCleanseTrackerConfig _cleanseTrackerConfig;
 
         private LabelHud _nameLabelHud;
         private LabelHud _healthLabelHud;
@@ -56,7 +57,8 @@ namespace DelvUI.Interface.Party
             PartyFramesBuffsConfig buffsConfig,
             PartyFramesDebuffsConfig debuffsConfig,
             PartyFramesRaiseTrackerConfig raiseTrackerConfig,
-            PartyFramesInvulnTrackerConfig invulnTrackerConfig
+            PartyFramesInvulnTrackerConfig invulnTrackerConfig,
+            PartyFramesCleanseTrackerConfig cleanseTrackerConfig
         )
         {
             _config = config;
@@ -68,6 +70,7 @@ namespace DelvUI.Interface.Party
             _debuffsConfig = debuffsConfig;
             _raiseTrackerConfig = raiseTrackerConfig;
             _invulnTrackerConfig = invulnTrackerConfig;
+            _cleanseTrackerConfig = cleanseTrackerConfig;
 
             _nameLabelHud = new LabelHud(config.NameLabelConfig);
             _healthLabelHud = new LabelHud(config.HealthLabelConfig);
@@ -87,7 +90,17 @@ namespace DelvUI.Interface.Party
 
             if (Member != null && Member.Character?.ObjectKind != ObjectKind.BattleNpc)
             {
-                if (_config.ColorsConfig.UseRoleColors)
+                bool cleanseCheck = true;
+                if (_cleanseTrackerConfig.CleanseJobsOnly)
+                {
+                    cleanseCheck = Utils.IsOnCleanseJob();
+                }
+                
+                if (_cleanseTrackerConfig.Enabled && _cleanseTrackerConfig.ChangeHealthBarCleanseColor && Member.HasDispellableDebuff && cleanseCheck)
+                {
+                    color = _cleanseTrackerConfig.HealthBarColor;
+                }
+                else if (_config.ColorsConfig.UseRoleColors)
                 {
                     color = ColorForJob(Member.JobId);
                 }
