@@ -34,7 +34,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(16, collapseWith = nameof(MouseoverEnabled))]
         public bool MouseoverAutomaticMode = true;
 
-        [Checkbox("Hide DelvUI outside of combat", separator = true, help = "Show in Duty-option available once enabed.")]
+        [Checkbox("Hide DelvUI outside of combat", separator = true, help = "Show in Duty and Show on Weapon Drawn-options available once enabed.")]
         [Order(20)]
         public bool HideOutsideOfCombat = false;
 
