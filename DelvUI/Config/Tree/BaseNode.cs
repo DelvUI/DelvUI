@@ -1,6 +1,7 @@
 ﻿using Dalamud.Interface;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
+using DelvUI.Interface.GeneralElements;
 using ImGuiNET;
 using ImGuiScene;
 using System;
@@ -23,6 +24,8 @@ namespace DelvUI.Config.Tree
 
         private List<Node> _extraNodes = new List<Node>();
         private List<Node>? _nodes = null;
+
+        private Vector2 _lastWindowPos = Vector2.Zero;
 
         public BaseNode()
         {
@@ -130,6 +133,15 @@ namespace DelvUI.Config.Tree
             _nodes.AddRange(_extraNodes);
         }
 
+        private bool CheckWindowFocus(Vector2 size)
+        {
+            Vector2 mousePos = ImGui.GetMousePos();
+            Vector2 endPos = _lastWindowPos + size;
+
+            return mousePos.X >= _lastWindowPos.X && mousePos.X <= endPos.X &&
+                   mousePos.Y >= _lastWindowPos.Y && mousePos.Y <= endPos.Y;
+        }
+
         public void Draw()
         {
             CreateNodesIfNeeded();
@@ -141,14 +153,23 @@ namespace DelvUI.Config.Tree
             bool changed = false;
             bool didReset = false;
 
-            ImGui.SetNextWindowSize(new Vector2(1050, 750), ImGuiCond.Appearing);
-            ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 1f));
-            ImGui.PushStyleColor(ImGuiCol.BorderShadow, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 1f));
-            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(20f / 255f, 21f / 255f, 20f / 255f, 1f));
+            Vector2 size = new Vector2(1050, 750);
+            float alpha = 1;
+
+            HUDOptionsConfig? config = GetConfigObject<HUDOptionsConfig>();
+            if (config?.DimConfigWindow == true)
+            {
+                bool hasFocus = CheckWindowFocus(size);
+                alpha = hasFocus ? 1 : 0.5f;
+            }
+
+            ImGui.SetNextWindowSize(size, ImGuiCond.Appearing);
+            ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, alpha));
+            ImGui.PushStyleColor(ImGuiCol.BorderShadow, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, alpha));
+            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(20f / 255f, 21f / 255f, 20f / 255f, alpha));
 
             ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
             ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 1);
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
 
             if (!ImGui.Begin("DelvUI_settings", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
             {
@@ -156,8 +177,10 @@ namespace DelvUI.Config.Tree
                 return;
             }
 
+            _lastWindowPos = ImGui.GetWindowPos();
+
             ImGui.PopStyleColor(3);
-            ImGui.PopStyleVar(3);
+            ImGui.PopStyleVar(2);
             PushStyles();
 
 
@@ -225,7 +248,7 @@ namespace DelvUI.Config.Tree
                 {
                     foreach (SectionNode selectionNode in _nodes)
                     {
-                        didReset |= selectionNode.Draw(ref changed);
+                        didReset |= selectionNode.Draw(ref changed, alpha);
                     }
                 }
 
@@ -244,6 +267,7 @@ namespace DelvUI.Config.Tree
 
                 const float buttonWidth = 150;
 
+                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(45f / 255f, 45f / 255f, 45f / 255f, alpha));
                 ImGui.PushStyleVar(ImGuiStyleVar.FrameBorderSize, 1);
                 if (ImGui.Button((ConfigurationManager.Instance.ShowHUD ? "Hide" : "Show") + " HUD", new Vector2(buttonWidth, 0)))
                 {
@@ -265,9 +289,11 @@ namespace DelvUI.Config.Tree
                     ConfigurationManager.Instance.DrawChangelog = true;
                 }
 
+                ImGui.PopStyleColor();
+
                 ImGui.SameLine();
-                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, 1f));
-                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, .85f));
+                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, alpha));
+                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, alpha * .85f));
 
                 if (ImGui.Button("Help!", new Vector2(buttonWidth, 0)))
                 {
@@ -277,8 +303,8 @@ namespace DelvUI.Config.Tree
                 ImGui.PopStyleColor(2);
 
                 ImGui.SameLine();
-                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, 1f));
-                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, .85f));
+                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, alpha));
+                ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(255f / 255f, 94f / 255f, 91f / 255f, alpha * .85f));
 
                 if (ImGui.Button("Donate!", new Vector2(buttonWidth, 0)))
                 {
@@ -293,7 +319,7 @@ namespace DelvUI.Config.Tree
             // close button
             ImGui.SetCursorPos(new Vector2(ImGui.GetWindowWidth() - 28, 5));
             ImGui.PushFont(UiBuilder.IconFont);
-            ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f));
+            ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, alpha));
             if (ImGui.Button(FontAwesomeIcon.Times.ToIconString(), new Vector2(22, 22)))
             {
                 ConfigurationManager.Instance.DrawConfigWindow = !ConfigurationManager.Instance.DrawConfigWindow;

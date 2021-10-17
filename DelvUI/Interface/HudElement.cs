@@ -55,4 +55,14 @@ namespace DelvUI.Interface
     {
         public AnchorablePluginConfigObject? ParentConfig { get; set; }
     }
+
+    public interface IHudElementWithMouseOver
+    {
+        public void StopMouseover();
+    }
+
+    public interface IHudElementWithPreview
+    {
+        public void StopPreview();
+    }
 }

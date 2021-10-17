@@ -15,7 +15,7 @@ namespace DelvUI.Config.Tree
 
         public SectionNode() { }
 
-        public bool Draw(ref bool changed)
+        public bool Draw(ref bool changed, float alpha)
         {
             if (!Selected)
             {
@@ -34,6 +34,9 @@ namespace DelvUI.Config.Tree
             ); // Leave room for 1 line below us
 
             {
+                ImGui.PushStyleColor(ImGuiCol.Tab, new Vector4(45f / 255f, 45f / 255f, 45f / 255f, alpha));
+                ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(45f / 255f, 45f / 255f, 45f / 255f, alpha));
+
                 if (ImGui.BeginTabBar("##Tabs", ImGuiTabBarFlags.None))
                 {
                     foreach (SubSectionNode subSectionNode in _children)
@@ -54,6 +57,8 @@ namespace DelvUI.Config.Tree
 
                     ImGui.EndTabBar();
                 }
+
+                ImGui.PopStyleColor(2);
 
                 didReset |= DrawResetModal();
             }

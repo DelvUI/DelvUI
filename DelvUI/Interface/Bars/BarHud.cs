@@ -29,13 +29,18 @@ namespace DelvUI.Interface.Bars
 
         private int GlowSize { get; set; }
 
+        private float? Current;
+        private float? Max;
+
         public BarHud(
             string id,
             bool drawBorder = true,
             DrawAnchor anchor = DrawAnchor.TopLeft,
             GameObject? actor = null,
             PluginConfigColor? glowColor = null,
-            int? glowSize = 1)
+            int? glowSize = 1,
+            float? current = null,
+            float? max = null)
         {
             ID = id;
             DrawBorder = drawBorder;
@@ -43,10 +48,12 @@ namespace DelvUI.Interface.Bars
             Actor = actor;
             GlowColor = glowColor;
             GlowSize = glowSize ?? 1;
+            Current = current;
+            Max = max;
         }
 
-        public BarHud(BarConfig config, GameObject? actor = null, BarGlowConfig? glowConfig = null)
-            : this(config.ID, config.DrawBorder, config.Anchor, actor, glowConfig?.Color, glowConfig?.Size)
+        public BarHud(BarConfig config, GameObject? actor = null, BarGlowConfig? glowConfig = null, float? current = null, float? max = null)
+            : this(config.ID, config.DrawBorder, config.Anchor, actor, glowConfig?.Color, glowConfig?.Size, current, max)
         {
             BackgroundRect = new Rect(config.Position, config.Size, config.BackgroundColor);
         }
@@ -120,7 +127,7 @@ namespace DelvUI.Interface.Bars
             // Draw Labels
             foreach (LabelHud label in LabelHuds)
             {
-                label.Draw(backgroundPos, BackgroundRect.Size, Actor);
+                label.Draw(backgroundPos, BackgroundRect.Size, Actor, null, (uint?)Current, (uint?)Max);
             }
         }
     }

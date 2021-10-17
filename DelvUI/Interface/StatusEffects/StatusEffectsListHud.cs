@@ -14,7 +14,7 @@ using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
 namespace DelvUI.Interface.StatusEffects
 {
-    public class StatusEffectsListHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent
+    public class StatusEffectsListHud : ParentAnchoredDraggableHudElement, IHudElementWithActor, IHudElementWithAnchorableParent, IHudElementWithPreview
     {
         protected StatusEffectsListConfig Config => (StatusEffectsListConfig)_config;
 
@@ -25,7 +25,6 @@ namespace DelvUI.Interface.StatusEffects
 
         private LabelHud _durationLabel;
         private LabelHud _stacksLabel;
-
         public GameObject? Actor { get; set; } = null;
 
         protected override bool AnchorToParent => Config is UnitFrameStatusEffectsListConfig config ? config.AnchorToUnitFrame : false;
@@ -44,6 +43,12 @@ namespace DelvUI.Interface.StatusEffects
         ~StatusEffectsListHud()
         {
             _config.ValueChangeEvent -= OnConfigPropertyChanged;
+        }
+
+        public void StopPreview()
+        {
+            Config.Preview = false;
+            UpdatePreview();
         }
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
@@ -234,12 +239,18 @@ namespace DelvUI.Interface.StatusEffects
             GrowthDirections growthDirections = Config.GetGrowthDirections();
             Vector2 position = origin + GetAnchoredPosition(Config.Position, Config.Size, DrawAnchor.TopLeft);
             Vector2 areaPos = CalculateStartPosition(position, Config.Size, growthDirections);
+            var margin = new Vector2(14, 10);
 
             var drawList = ImGui.GetWindowDrawList();
 
             // no need to do anything else if there are no effects
             if (list.Count == 0)
             {
+                // draw area if the config window is opened
+                if (ConfigurationManager.Instance.DrawConfigWindow)
+                {
+                    drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
+                }
                 return;
             }
 
@@ -292,14 +303,13 @@ namespace DelvUI.Interface.StatusEffects
             // window
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
-            var margin = new Vector2(14, 10);
             var windowPos = minPos - margin;
             var windowSize = maxPos - minPos;
 
             DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, Config.ShowBuffs, false, (drawList) =>
             {
                 // area
-                if (Config.Preview)
+                if (ConfigurationManager.Instance.DrawConfigWindow)
                 {
                     drawList.AddRectFilled(areaPos, areaPos + Config.Size, 0x88000000);
                 }
@@ -311,7 +321,7 @@ namespace DelvUI.Interface.StatusEffects
 
                     // icon
                     var cropIcon = Config.IconConfig.CropIcon;
-                    int stackCount = statusEffectData.Data.MaxStacks > 0 ? statusEffectData.Status.StackCount : 0;
+                    int stackCount = cropIcon ? 1 : statusEffectData.Data.MaxStacks > 0 ? statusEffectData.Status.StackCount : 0;
                     DrawHelper.DrawIcon<LuminaStatus>(drawList, statusEffectData.Data, iconPos, Config.IconConfig.Size, false, cropIcon, stackCount);
 
                     // border
@@ -378,8 +388,8 @@ namespace DelvUI.Interface.StatusEffects
                         );
                     }
 
-                    bool leftClick = MouseOverHelper.Instance.HandlingInputs ? MouseOverHelper.Instance.LeftButtonClicked : ImGui.GetIO().MouseClicked[0];
-                    bool rightClick = MouseOverHelper.Instance.HandlingInputs ? MouseOverHelper.Instance.RightButtonClicked : ImGui.GetIO().MouseClicked[1];
+                    bool leftClick = InputsHelper.Instance.HandlingMouseInputs ? InputsHelper.Instance.LeftButtonClicked : ImGui.GetIO().MouseClicked[0];
+                    bool rightClick = InputsHelper.Instance.HandlingMouseInputs ? InputsHelper.Instance.RightButtonClicked : ImGui.GetIO().MouseClicked[1];
 
                     // remove buff on right click
                     bool isFromPlayer = statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId;

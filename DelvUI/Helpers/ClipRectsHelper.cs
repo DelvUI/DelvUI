@@ -62,6 +62,7 @@ namespace DelvUI.Helpers
             "Bank",
             "RetainerSellList",
             "RetainerSell",
+            "SelectString",
             "Shop",
             "ShopExchangeCurrency",
             "ShopExchangeItem",
@@ -93,6 +94,7 @@ namespace DelvUI.Helpers
             "HousingSignBoard",
             "CrossWorldLinkshell",
             "ContactList",
+            "ColorantColoring",
             "MonsterNote",
             "RecipeNote",
             "GatheringNote",
@@ -188,6 +190,19 @@ namespace DelvUI.Helpers
             invertedClipRects[3] = new ClipRect(belowMin, belowMax);
 
             return invertedClipRects;
+        }
+
+        public bool IsPointClipped(Vector2 point)
+        {
+            foreach (ClipRect clipRect in _clipRects)
+            {
+                if (clipRect.Contains(point))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 

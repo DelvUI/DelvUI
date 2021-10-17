@@ -118,7 +118,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(55)]
         public bool UseMissingHealthBar = false;
 
-        [ColorEdit4("Color")]
+        [ColorEdit4("Color" + "##MissingHealth")]
         [Order(60, collapseWith = nameof(UseMissingHealthBar))]
         public PluginConfigColor HealthMissingColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
@@ -126,7 +126,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(61)]
         public bool UseDeathIndicatorBackgroundColor = false;
 
-        [ColorEdit4("Color")]
+        [ColorEdit4("Color" + "##DeathIndicator")]
         [Order(62, collapseWith = nameof(UseDeathIndicatorBackgroundColor))]
         public PluginConfigColor DeathIndicatorBackgroundColor = new PluginConfigColor(new Vector4(204f / 255f, 3f / 255f, 3f / 255f, 50f / 100f));
 

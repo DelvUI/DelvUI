@@ -1,3 +1,23 @@
+# 0.3.2.0
+Features:
+- You can now attach HUD Layouts to be loaded alongside profiles.
+- Cropped status effects icons now always use the texture with 1 stack (This will make having texture mods for buffs and debuffs easier in the future).
+- Added option to dim DelvUI's setting window when not being focused.
+- Added option to automatically disable the preview mode on HUD elements when the DelvUI's setting window is closed.
+- Added alpha bar to color selections.
+- Making party frames and status effects list areas more clear now. When you open DelvUI's settings window, these areas will automatically show reflecting the real size of the hud elements.
+- Pressing Escape will now close DelvUI's setting window.
+- Added sub-option to Hide DelvUI outside of combat to show when weapons are drawn.
+
+Fixes:
+- Fixed clicks not working on game windows when they are on top of unit frames or party frames.
+- Fixed unit frame background color and death indicator background color being linked together.
+- Fixed storm's eye bar for warrior not tracking the buff duration properly.
+- Fixed mana bars not being visible when previewing party frames.
+- Fixed health and mana values not being correctly displayed when previewing party frames.
+- Fixed mouse clicks sometimes not responding at all.
+- Fixed hud not being properly centered when resizing the game window.
+
 # 0.3.1.2
 Features:
 - Added a Text Tags list when editing a label:

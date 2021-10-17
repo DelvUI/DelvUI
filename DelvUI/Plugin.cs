@@ -89,7 +89,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.3.1.2";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.3.2.0";
 
             FontsManager.Initialize(AssemblyLocation);
             LoadBanner();
@@ -104,10 +104,11 @@ namespace DelvUI
             ClipRectsHelper.Initialize();
             GlobalColors.Initialize();
             LimitBreakHelper.Initialize();
-            MouseOverHelper.Initialize();
+            InputsHelper.Initialize();
             PartyManager.Initialize();
             ProfilesManager.Initialize();
             PullTimerHelper.Initialize();
+            TextTagsHelper.Initialize();
             TexturesCache.Initialize();
             TooltipsHelper.Initialize();
 
@@ -246,7 +247,7 @@ namespace DelvUI
                 ImGui.PopFont();
             }
 
-            MouseOverHelper.Instance.Update();
+            InputsHelper.Instance.Update();
         }
 
         private void OpenConfigUi()
@@ -279,7 +280,7 @@ namespace DelvUI
             FontsManager.Instance.Dispose();
             GlobalColors.Instance.Dispose();
             LimitBreakHelper.Instance.Dispose();
-            MouseOverHelper.Instance.Dispose();
+            InputsHelper.Instance.Dispose();
             PartyManager.Instance.Dispose();
             PullTimerHelper.Instance.Dispose();
             ProfilesManager.Instance.Dispose();

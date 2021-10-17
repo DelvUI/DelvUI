@@ -31,7 +31,7 @@ namespace DelvUI.Interface.Bars
             BarGlowConfig? glowConfig = null
         )
         {
-            BarHud bar = new(config, actor, glowConfig);
+            BarHud bar = new(config, actor, glowConfig, current, max);
 
             PluginConfigColor color = fillColor ?? config.FillColor;
             if (thresholdConfig != null)

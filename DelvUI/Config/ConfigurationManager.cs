@@ -8,14 +8,11 @@ using DelvUI.Interface.Jobs;
 using DelvUI.Interface.Party;
 using DelvUI.Interface.StatusEffects;
 using ImGuiScene;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace DelvUI.Config
 {
@@ -54,6 +51,8 @@ namespace DelvUI.Config
 
                 if (!_drawConfigWindow)
                 {
+                    ConfigClosedEvent?.Invoke(this);
+
                     if (ConfigBaseNode.NeedsSave)
                     {
                         SaveConfigurations();
@@ -101,28 +100,21 @@ namespace DelvUI.Config
 
         public event ConfigurationManagerEventHandler? ResetEvent;
         public event ConfigurationManagerEventHandler? LockEvent;
+        public event ConfigurationManagerEventHandler? ConfigClosedEvent;
 
-        public ConfigurationManager(
-            TextureWrap? bannerImage,
-            string configDirectory,
-            BaseNode configBaseNode,
-            ConfigurationManagerEventHandler? resetEvent = null,
-            ConfigurationManagerEventHandler? lockEvent = null)
+        public ConfigurationManager()
         {
-            BannerImage = bannerImage;
-            ConfigDirectory = configDirectory;
-            ConfigBaseNode = configBaseNode;
+            BannerImage = Plugin.BannerTexture;
+            ConfigDirectory = Plugin.PluginInterface.GetPluginConfigDirectory();
+
+            ConfigBaseNode = new BaseNode();
+            InitializeBaseNode(ConfigBaseNode);
             ConfigBaseNode.ConfigObjectResetEvent += OnConfigObjectReset;
 
             LoadChangelog();
             CheckVersion();
 
             LoadOrInitializeFiles();
-
-            LockEvent = lockEvent;
-
-            ResetEvent = resetEvent;
-            ResetEvent?.Invoke(this);
 
             Plugin.ClientState.Logout += OnLogout;
         }
@@ -152,24 +144,7 @@ namespace DelvUI.Config
             Instance = null!;
         }
 
-        public static void Initialize()
-        {
-            BaseNode node = new();
-            InitializeBaseNode(node);
-
-            TextureWrap? banner = Plugin.BannerTexture;
-
-            var currentResetEvent = (ConfigurationManagerEventHandler?)Instance?.ResetEvent?.Clone();
-            var currentLockEvent = (ConfigurationManagerEventHandler?)Instance?.LockEvent?.Clone();
-
-            Instance = new ConfigurationManager(
-                banner,
-                Plugin.PluginInterface.GetPluginConfigDirectory(),
-                node,
-                currentResetEvent,
-                currentLockEvent
-            );
-        }
+        public static void Initialize() { Instance = new ConfigurationManager(); }
 
         private void OnConfigObjectReset(BaseNode sender)
         {
@@ -230,6 +205,31 @@ namespace DelvUI.Config
             {
                 PluginLog.Error("Error checking version: " + e.Message);
             }
+        }
+
+        public bool UseEscInput()
+        {
+            if (DrawChangelog)
+            {
+                DrawChangelog = false;
+                return true;
+            }
+
+            if (DrawConfigWindow)
+            {
+                if (LockHUD)
+                {
+                    DrawConfigWindow = false;
+                }
+                else
+                {
+                    LockHUD = true;
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
         public void Draw()
@@ -296,6 +296,11 @@ namespace DelvUI.Config
             {
                 PluginLog.Error("Error initializing configurations!");
             }
+        }
+
+        public void ForceNeedsSave()
+        {
+            ConfigBaseNode.NeedsSave = true;
         }
 
         public void LoadConfigurations()
