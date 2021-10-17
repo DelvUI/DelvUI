@@ -244,13 +244,8 @@ namespace DelvUI.Helpers
         // any other message is passed along to the ImGui scene
         private IntPtr WndProcDetour(IntPtr hWnd, uint msg, ulong wParam, long lParam)
         {
-            // esc key press
-            if (msg == WM_KEYDOWN && wParam == 27 && ConfigurationManager.Instance.UseEscInput())
-            {
-                return (IntPtr)0;
-            }
             // eat left and right clicks?
-            else if (HandlingMouseInputs)
+            if (HandlingMouseInputs)
             {
                 switch (msg)
                 {

@@ -33,7 +33,7 @@ namespace DelvUI.Interface.Party
 
         private readonly List<PartyFramesBar> bars;
 
-        private bool Locked => !ConfigurationManager.Instance.DrawConfigWindow;
+        private bool Locked => !ConfigurationManager.Instance.IsConfigWindowOpened;
 
 
         public PartyFramesHud(PartyFramesConfig config, string displayName) : base(config, displayName)

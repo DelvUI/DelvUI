@@ -25,8 +25,6 @@ namespace DelvUI.Config.Tree
         private List<Node> _extraNodes = new List<Node>();
         private List<Node>? _nodes = null;
 
-        private Vector2 _lastWindowPos = Vector2.Zero;
-
         public BaseNode()
         {
             _configPageNodesMap = new Dictionary<Type, ConfigPageNode>();
@@ -133,16 +131,7 @@ namespace DelvUI.Config.Tree
             _nodes.AddRange(_extraNodes);
         }
 
-        private bool CheckWindowFocus(Vector2 size)
-        {
-            Vector2 mousePos = ImGui.GetMousePos();
-            Vector2 endPos = _lastWindowPos + size;
-
-            return mousePos.X >= _lastWindowPos.X && mousePos.X <= endPos.X &&
-                   mousePos.Y >= _lastWindowPos.Y && mousePos.Y <= endPos.Y;
-        }
-
-        public void Draw()
+        public void Draw(float alpha)
         {
             CreateNodesIfNeeded();
             if (_nodes == null)
@@ -153,36 +142,7 @@ namespace DelvUI.Config.Tree
             bool changed = false;
             bool didReset = false;
 
-            Vector2 size = new Vector2(1050, 750);
-            float alpha = 1;
-
-            HUDOptionsConfig? config = GetConfigObject<HUDOptionsConfig>();
-            if (config?.DimConfigWindow == true)
-            {
-                bool hasFocus = CheckWindowFocus(size);
-                alpha = hasFocus ? 1 : 0.5f;
-            }
-
-            ImGui.SetNextWindowSize(size, ImGuiCond.Appearing);
-            ImGui.PushStyleColor(ImGuiCol.Border, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, alpha));
-            ImGui.PushStyleColor(ImGuiCol.BorderShadow, new Vector4(0f / 255f, 0f / 255f, 0f / 255f, alpha));
-            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(20f / 255f, 21f / 255f, 20f / 255f, alpha));
-
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
-            ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 1);
-
-            if (!ImGui.Begin("DelvUI_settings", ImGuiWindowFlags.NoTitleBar | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollWithMouse))
-            {
-                ImGui.End();
-                return;
-            }
-
-            _lastWindowPos = ImGui.GetWindowPos();
-
-            ImGui.PopStyleColor(3);
-            ImGui.PopStyleVar(2);
             PushStyles();
-
 
             ImGui.BeginGroup(); // Middle section
             {
@@ -286,7 +246,7 @@ namespace DelvUI.Config.Tree
                 ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 251);
                 if (ImGui.Button($"Changelog", new Vector2(buttonWidth, 0)))
                 {
-                    ConfigurationManager.Instance.DrawChangelog = true;
+                    ConfigurationManager.Instance.OpenChangelogWindow();
                 }
 
                 ImGui.PopStyleColor();
@@ -322,13 +282,12 @@ namespace DelvUI.Config.Tree
             ImGui.PushStyleColor(ImGuiCol.Text, new Vector4(229f / 255f, 57f / 255f, 57f / 255f, alpha));
             if (ImGui.Button(FontAwesomeIcon.Times.ToIconString(), new Vector2(22, 22)))
             {
-                ConfigurationManager.Instance.DrawConfigWindow = !ConfigurationManager.Instance.DrawConfigWindow;
+                ConfigurationManager.Instance.CloseConfigWindow();
             }
             ImGui.PopStyleColor();
             ImGui.PopFont();
 
             PopStyles();
-            ImGui.End();
 
             if (didReset)
             {
