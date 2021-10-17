@@ -122,6 +122,11 @@ namespace DelvUI.Config.Tree
             FieldInfo[] fields = ConfigObject.GetType().GetFields();
             foreach (var field in fields)
             {
+                if (ConfigObject.DisableParentSettings != null && ConfigObject.DisableParentSettings.Contains(field.Name))
+                {
+                    continue;
+                }
+                
                 foreach (object attribute in field.GetCustomAttributes(true))
                 {
                     if (attribute is NestedConfigAttribute nestedConfigAttribute && _nestedConfigPageNodes.TryGetValue(field.Name, out ConfigPageNode? node))
@@ -159,6 +164,13 @@ namespace DelvUI.Config.Tree
                 if (configNode.ParentName is not null &&
                     fieldMap.TryGetValue(configNode.ParentName, out ConfigNode? parentNode))
                 {
+                    if (!ConfigObject.Disableable &&
+                        parentNode.Name.Equals("Enabled") &&
+                        parentNode.ID is null)
+                    {
+                        continue;
+                    }
+                    
                     if (parentNode is FieldNode parentFieldNode)
                     {
                         parentFieldNode.CollapseControl = true;
