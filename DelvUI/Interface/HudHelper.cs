@@ -105,8 +105,7 @@ namespace DelvUI.Interface
         }
 
         internal static byte GetStatus(GameObject actor)
-        {
-            // Updated: 5.5
+        {            
             // 40 57 48 83 EC 70 48 8B F9 E8 ?? ?? ?? ?? 81 BF ?? ?? ?? ?? ?? ?? ?? ??
             const int offset = 0x19A0;
             return Marshal.ReadByte(actor.Address + offset);
