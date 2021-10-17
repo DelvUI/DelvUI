@@ -19,6 +19,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
@@ -103,6 +104,13 @@ namespace DelvUI.Interface
             _updateAddonPosition = Marshal.GetDelegateForFunctionPointer<UpdateAddonPositionDelegate>(updateAddonPositionPtr);
         }
 
+        internal static byte GetStatus(GameObject actor)
+        {            
+            // 40 57 48 83 EC 70 48 8B F9 E8 ?? ?? ?? ?? 81 BF ?? ?? ?? ?? ?? ?? ?? ??
+            const int offset = 0x19A0;
+            return Marshal.ReadByte(actor.Address + offset);
+        }
+
         ~HudHelper()
         {
             Dispose(false);
@@ -162,7 +170,12 @@ namespace DelvUI.Interface
                 return true;
             }
 
+            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             bool isHidden = Config.ShowInDuty ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty() : Config.HideOutsideOfCombat && !IsInCombat();
+            if (player is not null)
+            {
+                isHidden = Config.ShowOnWeaponDrawn ? Config.HideOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn(player) : Config.HideOutsideOfCombat && !IsInCombat();
+            }
 
             if (!isHidden && element is JobHud)
             {
@@ -171,7 +184,6 @@ namespace DelvUI.Interface
 
             if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig))
             {
-                PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
                 if (player is not null)
                 {
                     isHidden = isHidden && player.CurrentHp == player.MaxHp;
@@ -220,11 +232,15 @@ namespace DelvUI.Interface
                 return;
             }
 
-            var currentCombatState = IsInCombat();
-            if (_previousCombatState != currentCombatState && Config.CombatActionBars.Count > 0 || forceUpdate)
+            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+            if (player is not null)
             {
-                Config.CombatActionBars.ForEach(name => ToggleActionbar(name, !currentCombatState));
-                _previousCombatState = currentCombatState;
+                bool currentCombatState = Config.ShowOnWeaponDrawn ? HasWeaponDrawn(player) || IsInCombat() : IsInCombat();
+                if (_previousCombatState != currentCombatState && Config.CombatActionBars.Count > 0 || forceUpdate)
+                {
+                    Config.CombatActionBars.ForEach(name => ToggleActionbar(name, !currentCombatState));
+                    _previousCombatState = currentCombatState;
+                }
             }
         }
 
@@ -405,6 +421,11 @@ namespace DelvUI.Interface
         private bool IsInDuty()
         {
             return Plugin.Condition[ConditionFlag.BoundByDuty];
+        }
+
+        private bool HasWeaponDrawn(GameObject actor)
+        {
+            return (GetStatus(actor) & 4) > 0;
         }
         #endregion
     }
