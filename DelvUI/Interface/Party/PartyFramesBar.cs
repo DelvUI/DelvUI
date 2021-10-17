@@ -95,7 +95,7 @@ namespace DelvUI.Interface.Party
                 {
                     cleanseCheck = Utils.IsOnCleanseJob();
                 }
-                
+
                 if (_cleanseTrackerConfig.Enabled && _cleanseTrackerConfig.ChangeHealthBarCleanseColor && Member.HasDispellableDebuff && cleanseCheck)
                 {
                     color = _cleanseTrackerConfig.HealthBarColor;
@@ -195,23 +195,15 @@ namespace DelvUI.Interface.Party
             }
 
             // bg
-            PluginConfigColor bgColor;
-            if (Member.RaiseTime != null && _raiseTrackerConfig.Enabled && _raiseTrackerConfig.ChangeBackgroundColorWhenRaised)
-            {
-                bgColor = _raiseTrackerConfig.BackgroundColor;
-            }
-            else if (Member.InvulnStatus?.InvulnTime != null && _invulnTrackerConfig.Enabled && _invulnTrackerConfig.ChangeBackgroundColorWhenInvuln)
-            {
-                bgColor = Member.InvulnStatus?.InvulnId == 811 ? _invulnTrackerConfig.WalkingDeadBackgroundColor : _invulnTrackerConfig.BackgroundColor;
-            }
-            else if (_config.ColorsConfig.UseDeathIndicatorBackgroundColor && Member.HP <= 0)
-            {
-                bgColor = _config.ColorsConfig.DeathIndicatorBackgroundColor;
-            }
-            else
-            {
-                bgColor = _config.ColorsConfig.BackgroundColor;
-            }
+            PluginConfigColor bgColor = Member.RaiseTime != null && _raiseTrackerConfig.Enabled && _raiseTrackerConfig.ChangeBackgroundColorWhenRaised
+                ? _raiseTrackerConfig.BackgroundColor
+                : Member.InvulnStatus?.InvulnTime != null && _invulnTrackerConfig.Enabled && _invulnTrackerConfig.ChangeBackgroundColorWhenInvuln
+                    ? Member.InvulnStatus?.InvulnId == 811
+                        ? _invulnTrackerConfig.WalkingDeadBackgroundColor
+                        : _invulnTrackerConfig.BackgroundColor
+                    : _config.ColorsConfig.UseDeathIndicatorBackgroundColor && Member.HP <= 0
+                        ? _config.ColorsConfig.DeathIndicatorBackgroundColor
+                        : _config.ColorsConfig.BackgroundColor;
 
             drawList.AddRectFilled(Position, Position + _config.Size, bgColor.Base);
 
