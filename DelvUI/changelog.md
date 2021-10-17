@@ -1,9 +1,10 @@
-# 0.3.1.3
+# 0.3.2.0
 Features:
 - You can now attach HUD Layouts to be loaded alongside profiles.
 - Cropped status effects icons now always use the texture with 1 stack (This will make having texture mods for buffs and debuffs easier in the future).
 - Added option to dim DelvUI's setting window when not being focused (Misc > HUD Options).
 - Added alpha bar to color selections.
+- Making party frames and status effects list areas more clear now. When you open DelvUI's settings window, these areas will automatically show reflecting the real size of the hud elements.
 - Pressing Escape will now close DelvUI's setting window.
 
 Fixes:

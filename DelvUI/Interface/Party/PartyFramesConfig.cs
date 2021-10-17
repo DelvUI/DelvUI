@@ -8,6 +8,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.Party
 {
+    [DisableParentSettings("Position")]
     [Section("Party Frames")]
     [SubSection("General", 0)]
     public class PartyFramesConfig : MovablePluginConfigObject
@@ -20,15 +21,11 @@ namespace DelvUI.Interface.Party
             return config;
         }
 
-        [Checkbox("Lock")]
-        [Order(3)]
+        public Vector2 Size = new Vector2(380, 340);
 
-        public bool Lock = true;
         [Checkbox("Preview", isMonitored = true)]
         [Order(4)]
         public bool Preview = false;
-
-        public Vector2 Size = new Vector2(380, 340);
 
         [Anchor("Bars Anchor", isMonitored = true, spacing = true)]
         [Order(15)]
