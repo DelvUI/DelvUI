@@ -58,6 +58,10 @@ namespace DelvUI.Interface.Party
                 return;
             }
 
+            _raiseTracker.Dispose();
+            _invulnTracker.Dispose();
+            _cleanseTracker.Dispose();
+
             Plugin.Framework.Update -= FrameworkOnOnUpdateEvent;
             _config.ValueChangeEvent -= OnConfigPropertyChanged;
 

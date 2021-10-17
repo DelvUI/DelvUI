@@ -240,6 +240,8 @@ namespace DelvUI.Interface.Party
         public new static PartyFramesManaBarConfig DefaultConfig()
         {
             var config = new PartyFramesManaBarConfig(Vector2.Zero, new(180, 6));
+            config.HealthBarAnchor = DrawAnchor.Bottom;
+            config.Anchor = DrawAnchor.Bottom;
             config.ValueLabel.Enabled = false;
             return config;
         }
@@ -523,14 +525,10 @@ namespace DelvUI.Interface.Party
         [Order(50)]
         public bool ChangeBorderColorWhenInvuln = true;
 
-        [ColorEdit4("Invuln Border Color")]
-        [Order(55, collapseWith = nameof(ChangeBorderColorWhenInvuln))]
-        public PluginConfigColor BorderColor = new(new Vector4(47f / 255f, 169f / 255f, 215f / 255f, 100f / 100f));
-
         [NestedConfig("Label", 60)]
         public LabelConfig LabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
     }
-    
+
     [DisableParentSettings("Position")]
     [Exportable(false)]
     [Section("Party Frames")]
@@ -542,7 +540,7 @@ namespace DelvUI.Interface.Party
         [Checkbox("Show only on jobs with cleanses", spacing = true)]
         [Order(10)]
         public bool CleanseJobsOnly = true;
-        
+
         [Checkbox("Change Health Bar Color ", spacing = true)]
         [Order(15)]
         public bool ChangeHealthBarCleanseColor = true;

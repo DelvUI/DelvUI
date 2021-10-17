@@ -11,6 +11,7 @@ Features:
 - Added sub-option to Enable Combat Hotbars to always show in duties.
 - Added sub-option to Enable Combat Hotbars to show when weapons are drawn.
 - DelvUI windows are now using Dalamus' window system.
+- Change Alpha Based on Range now also applies to the Death Indicator Background Color.
 
 Fixes:
 - Fixed clicks not working on game windows when they are on top of unit frames or party frames.
