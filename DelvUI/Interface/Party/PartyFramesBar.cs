@@ -7,7 +7,7 @@ using ImGuiNET;
 using System;
 using System.Globalization;
 using System.Numerics;
-using Dalamud.Logging;
+using Dalamud.Game.ClientState.Objects.Types;
 
 namespace DelvUI.Interface.Party
 {
@@ -95,7 +95,7 @@ namespace DelvUI.Interface.Party
                 {
                     cleanseCheck = Utils.IsOnCleanseJob();
                 }
-                
+
                 if (_cleanseTrackerConfig.Enabled && _cleanseTrackerConfig.ChangeHealthBarCleanseColor && Member.HasDispellableDebuff && cleanseCheck)
                 {
                     color = _cleanseTrackerConfig.HealthBarColor;
@@ -161,7 +161,7 @@ namespace DelvUI.Interface.Party
 
             // click
             bool isHovering = ImGui.IsMouseHoveringRect(Position, Position + _config.Size);
-            var character = Member.Character;
+            Character? character = Member.Character;
 
             if (isHovering)
             {
@@ -206,7 +206,9 @@ namespace DelvUI.Interface.Party
             }
             else if (_config.ColorsConfig.UseDeathIndicatorBackgroundColor && Member.HP <= 0)
             {
-                bgColor = _config.ColorsConfig.DeathIndicatorBackgroundColor;
+                bgColor = _config.RangeConfig.Enabled
+                    ? GetDistance(character, _config.ColorsConfig.DeathIndicatorBackgroundColor)
+                    : _config.ColorsConfig.DeathIndicatorBackgroundColor;
             }
             else
             {
@@ -228,12 +230,9 @@ namespace DelvUI.Interface.Party
             var hpFillSize = new Vector2(_config.Size.X * hpScale, _config.Size.Y);
             PluginConfigColor? hpColor = GetColor(hpScale);
 
-            var distance = character != null ? character.YalmDistanceX : byte.MaxValue;
             if (_config.RangeConfig.Enabled)
             {
-                var currentAlpha = hpColor.Vector.W * 100f;
-                var alpha = _config.RangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
-                hpColor = new(hpColor.Vector.WithNewAlpha(alpha));
+                hpColor = GetDistance(character, hpColor);
             }
 
             DrawHelper.DrawGradientFilledRect(Position, hpFillSize, hpColor, drawList);
@@ -258,7 +257,7 @@ namespace DelvUI.Interface.Party
             // border
             var borderPos = Position - Vector2.One;
             var borderSize = _config.Size + Vector2.One * 2;
-            var color = borderColor != null ? borderColor.Base : _config.ColorsConfig.BorderColor.Base;
+            var color = borderColor?.Base ?? _config.ColorsConfig.BorderColor.Base;
             drawList.AddRect(borderPos, borderPos + borderSize, color);
 
             // role/job icon
@@ -318,6 +317,15 @@ namespace DelvUI.Interface.Party
             {
                 drawList.AddRectFilled(Position, Position + _config.Size, _config.ColorsConfig.HighlightColor.Base);
             }
+        }
+
+        private PluginConfigColor GetDistance(Character? character, PluginConfigColor color)
+        {
+            byte distance = character != null ? character.YalmDistanceX : byte.MaxValue;
+            float currentAlpha = color.Vector.W * 100f;
+            float alpha = _config.RangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
+
+            return new PluginConfigColor(color.Vector.WithNewAlpha(alpha));
         }
 
         // need to separate elements that have their own window so clipping doesn't get messy
