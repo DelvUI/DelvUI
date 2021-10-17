@@ -52,7 +52,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [Checkbox("Automatically disable HUD elements preview", help = "Enabling this will make it so all HUD elements preview modes are disabled when DelvUI's setting window is closed")]
         [Order(35)]
-        public bool AutomaticPreviewDisabling = false;
+        public bool AutomaticPreviewDisabling = true;
 
         [Checkbox("Hide Default Job Gauges", isMonitored = true, spacing = true)]
         [Order(40)]
