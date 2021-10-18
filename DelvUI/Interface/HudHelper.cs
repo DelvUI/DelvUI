@@ -171,10 +171,10 @@ namespace DelvUI.Interface
             }
 
             PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
-            bool isHidden = Config.ShowInDuty ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty() : Config.HideOutsideOfCombat && !IsInCombat();
+            bool isHidden = Config.ShowDelvUIFramesInDuty ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty() : Config.HideOutsideOfCombat && !IsInCombat();
             if (player is not null)
             {
-                isHidden = isHidden && Config.ShowOnWeaponDrawn ? Config.HideOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn(player) : Config.HideOutsideOfCombat && !IsInCombat();
+                isHidden = isHidden && Config.ShowDelvUIFramesOnWeaponDrawn ? Config.HideOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn(player) : Config.ShowDelvUIFramesInDuty ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty() : Config.HideOutsideOfCombat && !IsInCombat();
             }
 
             if (!isHidden && element is JobHud)
@@ -235,7 +235,9 @@ namespace DelvUI.Interface
             PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
             if (player is not null)
             {
-                bool currentCombatState = Config.ShowOnWeaponDrawn ? HasWeaponDrawn(player) || IsInCombat() : IsInCombat();
+                bool currentCombatState = Config.ShowCombatActionBarsInDuty ? (IsInDuty() || IsInCombat()) : IsInCombat();
+                currentCombatState = !currentCombatState && Config.ShowCombatActionBarsOnWeaponDrawn ? (HasWeaponDrawn(player) || IsInCombat()) : Config.ShowCombatActionBarsInDuty ? (IsInDuty() || IsInCombat()) : IsInCombat();
+
                 if (_previousCombatState != currentCombatState && Config.CombatActionBars.Count > 0 || forceUpdate)
                 {
                     Config.CombatActionBars.ForEach(name => ToggleActionbar(name, !currentCombatState));
