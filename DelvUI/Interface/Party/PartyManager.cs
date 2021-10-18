@@ -89,6 +89,7 @@ namespace DelvUI.Interface.Party
         private const int PartyJobIconIdsOffset = 0x0F20;
 
         private const int PartyCrossWorldNameOffset = 0x0E52;
+        private const int PartyCrossWorldDisplayNameOffset = 0x0DEA;
         private const int PartyCrossWorldEntrySize = 0xD8;
 
         private List<PartyListMemberInfo> _partyMembersInfo = null!;
@@ -160,7 +161,7 @@ namespace DelvUI.Interface.Party
                     foreach (var member in _groupMembers)
                     {
                         var index = member.ObjectId == player.ObjectId ? 0 : member.Order - 1;
-                        member.Update(EnmityForIndex(index), IsPartyLeader(index), JobIdForIndex(index));
+                        member.Update(EnmityForIndex(index), StatusForIndex(index), IsPartyLeader(index), JobIdForIndex(index));
                     }
                 }
                 // cross world party
@@ -214,11 +215,11 @@ namespace DelvUI.Interface.Party
             {
                 _groupMembers.Clear();
 
-                _groupMembers.Add(new PartyFramesMember(player, 1, playerEnmity, true));
+                _groupMembers.Add(new PartyFramesMember(player, 1, playerEnmity, PartyMemberStatus.None, true));
 
                 if (chocobo != null)
                 {
-                    _groupMembers.Add(new PartyFramesMember(chocobo, 2, chocoboEnmity, false));
+                    _groupMembers.Add(new PartyFramesMember(chocobo, 2, chocoboEnmity, PartyMemberStatus.None, false));
                 }
 
                 MembersChangedEvent?.Invoke(this);
@@ -227,7 +228,7 @@ namespace DelvUI.Interface.Party
             {
                 for (int i = 0; i < _groupMembers.Count; i++)
                 {
-                    _groupMembers[i].Update(i == 0 ? playerEnmity : chocoboEnmity, i == 0, i == 0 ? player.ClassJob.Id : 0);
+                    _groupMembers[i].Update(i == 0 ? playerEnmity : chocoboEnmity, PartyMemberStatus.None, i == 0, i == 0 ? player.ClassJob.Id : 0);
                 }
             }
         }
@@ -275,12 +276,13 @@ namespace DelvUI.Interface.Party
                     order = i + 1;
                 }
 
-                var enmity = EnmityForIndex(isPlayer ? 0 : order - 1);
+                var enmity = EnmityForIndex(i);
+                var status = StatusForIndex(i);
                 var isPartyLeader = IsPartyLeader(i);
 
                 var member = isPlayer ?
-                    new PartyFramesMember(player, order, enmity, isPartyLeader) :
-                    new PartyFramesMember(NameForIndex(i), order, JobIdForIndex(i), isPartyLeader);
+                    new PartyFramesMember(player, order, enmity, status, isPartyLeader) :
+                    new PartyFramesMember(NameForIndex(i), order, JobIdForIndex(i), status, isPartyLeader);
 
                 _groupMembers.Add(member);
             }
@@ -319,10 +321,12 @@ namespace DelvUI.Interface.Party
                     order = IndexForPartyMember(partyMember) ?? 9;
                 }
 
-                var enmity = EnmityForIndex(isPlayer ? 0 : order - 1);
-                var isPartyLeader = i == Plugin.PartyList.PartyLeaderIndex;
+                int index = isPlayer ? 0 : order - 1;
+                EnmityLevel enmity = EnmityForIndex(index);
+                PartyMemberStatus status = StatusForIndex(index);
+                bool isPartyLeader = i == Plugin.PartyList.PartyLeaderIndex;
 
-                var member = new PartyFramesMember(partyMember, order, enmity, isPartyLeader);
+                var member = new PartyFramesMember(partyMember, order, enmity, status, isPartyLeader);
                 _groupMembers.Add(member);
 
                 // player's chocobo (always last)
@@ -331,7 +335,7 @@ namespace DelvUI.Interface.Party
                     var companion = Utils.GetBattleChocobo(player);
                     if (companion is Character companionCharacter)
                     {
-                        _groupMembers.Add(new PartyFramesMember(companionCharacter, 10, EnmityLevel.Last, false));
+                        _groupMembers.Add(new PartyFramesMember(companionCharacter, 10, EnmityLevel.Last, PartyMemberStatus.None, false));
                     }
                 }
             }
@@ -354,6 +358,32 @@ namespace DelvUI.Interface.Party
 
             IntPtr namePtr = (HudAgent + (PartyCrossWorldNameOffset + PartyCrossWorldEntrySize * index));
             return Marshal.PtrToStringUTF8(namePtr);
+        }
+
+        private string? DisplayNameForIndex(int index)
+        {
+            if (HudAgent == IntPtr.Zero || index < 0 || index > 7)
+            {
+                return null;
+            }
+
+            IntPtr namePtr = (HudAgent + (PartyCrossWorldDisplayNameOffset + PartyCrossWorldEntrySize * index));
+            return Marshal.PtrToStringUTF8(namePtr);
+        }
+
+        private PartyMemberStatus StatusForIndex(int index)
+        {
+            string? displayName = DisplayNameForIndex(index);
+            PartyMemberStatus status = PartyMemberStatus.None;
+
+            // TODO: support for other languages
+            // couldn't figure out another way of doing this sadly
+            if (displayName != null && displayName.Contains("Viewing Cutscene"))
+            {
+                status = PartyMemberStatus.ViewingCutscene;
+            }
+
+            return status;
         }
 
         private uint JobIdForIndex(int index)

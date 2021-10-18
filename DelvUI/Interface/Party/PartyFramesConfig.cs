@@ -8,6 +8,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.Party
 {
+    [Exportable(false)]
     [DisableParentSettings("Position")]
     [Section("Party Frames")]
     [SubSection("General", 0)]
@@ -106,13 +107,17 @@ namespace DelvUI.Interface.Party
         [Order(15)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 70f / 100f));
 
+        [ColorEdit4("Out of Reach Background Color", help = "This background color will be used when the player's data couldn't be retreived (i.e. player is disconnected)")]
+        [Order(15)]
+        public PluginConfigColor OutOfReachBackgroundColor = new PluginConfigColor(new Vector4(50f / 255f, 50f / 255f, 50f / 255f, 70f / 100f));
+
         [Checkbox("Use Death Indicator Background Color", isMonitored = true, spacing = true)]
-        [Order(16)]
+        [Order(18)]
         public bool UseDeathIndicatorBackgroundColor = false;
 
         [ColorEdit4("Death Indicator Background Color")]
-        [Order(17, collapseWith = nameof(UseDeathIndicatorBackgroundColor))]
-        public PluginConfigColor DeathIndicatorBackgroundColor = new PluginConfigColor(new Vector4(204f / 255f, 3f / 255f, 3f / 255f, 50f / 100f));
+        [Order(19, collapseWith = nameof(UseDeathIndicatorBackgroundColor))]
+        public PluginConfigColor DeathIndicatorBackgroundColor = new PluginConfigColor(new Vector4(204f / 255f, 3f / 255f, 3f / 255f, 80f / 100f));
 
         [Checkbox("Use Role Colors", isMonitored = true)]
         [Order(20)]
@@ -322,6 +327,48 @@ namespace DelvUI.Interface.Party
         [Anchor("Anchor")]
         [Order(30)]
         public DrawAnchor Anchor = DrawAnchor.TopLeft;
+    }
+
+    [Exportable(false)]
+    [Section("Party Frames")]
+    [SubSection("Player Status", 0)]
+    public class PartyFramesPlayerStatusConfig : PluginConfigObject
+    {
+        public new static PartyFramesPlayerStatusConfig DefaultConfig()
+        {
+            var config = new PartyFramesPlayerStatusConfig();
+            config.LabelConfig.Enabled = false;
+
+            return config;
+        }
+
+
+        [Checkbox("Hide Name When Showing Status")]
+        [Order(5)]
+        public bool HideName = false;
+
+        [Checkbox("Icon", spacing = true)]
+        [Order(10)]
+        public bool ShowIcon = true;
+
+        [DragInt2("Position", min = -1000, max = 1000)]
+        [Order(15, collapseWith = nameof(ShowIcon))]
+        public Vector2 IconPosition = new(0, 5);
+
+        [DragInt2("Size", min = 1, max = 1000)]
+        [Order(20, collapseWith = nameof(ShowIcon))]
+        public Vector2 IconSize = new(16, 16);
+
+        [Anchor("Health Bar Anchor")]
+        [Order(25, collapseWith = nameof(ShowIcon))]
+        public DrawAnchor IconFrameAnchor = DrawAnchor.Top;
+
+        [Anchor("Anchor")]
+        [Order(30, collapseWith = nameof(ShowIcon))]
+        public DrawAnchor IconAnchor = DrawAnchor.Top;
+
+        [NestedConfig("Label", 35, spacing = true, separator = false, nest = true)]
+        public LabelConfig LabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
     }
 
     [Exportable(false)]
