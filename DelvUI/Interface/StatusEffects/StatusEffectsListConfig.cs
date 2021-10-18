@@ -389,19 +389,23 @@ namespace DelvUI.Interface.StatusEffects
         {
             if (input.Length > 0 && sheet != null)
             {
-                Status? status = null;
+                List<Status> statusToAdd = new List<Status>();
 
                 // try id
                 if (uint.TryParse(input, out uint uintValue))
                 {
                     if (uintValue > 0)
                     {
-                        status = sheet.GetRow(uintValue);
+                        Status? status = sheet.GetRow(uintValue);
+                        if (status != null)
+                        {
+                            statusToAdd.Add(status);
+                        }
                     }
                 }
 
                 // try name
-                if (status == null)
+                if (statusToAdd.Count == 0)
                 {
                     var enumerator = sheet.GetEnumerator();
 
@@ -410,13 +414,17 @@ namespace DelvUI.Interface.StatusEffects
                         Status item = enumerator.Current;
                         if (item.Name.ToString().ToLower() == input.ToLower())
                         {
-                            status = item;
-                            break;
+                            statusToAdd.Add(item);
                         }
                     }
                 }
 
-                return AddNewEntry(status);
+                bool added = false;
+                foreach (Status status in statusToAdd)
+                {
+                    added |= AddNewEntry(status);
+                }
+                return added;
             }
 
             return false;
