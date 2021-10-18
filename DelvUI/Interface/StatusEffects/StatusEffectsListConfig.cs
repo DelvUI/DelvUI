@@ -8,6 +8,7 @@ using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -346,10 +347,20 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 
+    public enum FilterType
+    {
+        Blacklist,
+        Whitelist
+    }
+
+    [JsonConverter(typeof(StatusEffectsBlacklistConfigConverter))]
     [Exportable(false)]
     public class StatusEffectsBlacklistConfig : PluginConfigObject
     {
-        public bool UseAsWhitelist = false;
+        [RadioSelector(typeof(FilterType))]
+        [Order(5)]
+        public FilterType FilterType;
+
         public SortedList<string, uint> List = new SortedList<string, uint>();
 
         [JsonIgnore] private string? _errorMessage = null;
@@ -364,7 +375,7 @@ namespace DelvUI.Interface.StatusEffects
         public bool StatusAllowed(Status status)
         {
             var inList = List.ContainsKey(KeyName(status));
-            if ((inList && !UseAsWhitelist) || (!inList && UseAsWhitelist))
+            if ((inList && FilterType == FilterType.Blacklist) || (!inList && FilterType == FilterType.Whitelist))
             {
                 return false;
             }
@@ -497,11 +508,6 @@ namespace DelvUI.Interface.StatusEffects
 
             if (ImGui.BeginChild("Filter Effects", new Vector2(0, 360), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
-                ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
-                ImGui.SameLine();
-                changed |= ImGui.Checkbox("Use as Whitelist", ref UseAsWhitelist);
-                ImGui.NewLine();
-
                 ImGui.Text("\u2002 \u2002");
                 ImGui.SameLine();
                 ImGui.Text("Type an ID or Name");
@@ -697,6 +703,36 @@ namespace DelvUI.Interface.StatusEffects
         }
     }
 
+
+    public class StatusEffectsBlacklistConfigConverter : PluginConfigObjectConverter
+    {
+        public StatusEffectsBlacklistConfigConverter()
+        {
+            FieldConvertersMap.Add("UseAsWhitelist", typeof(UseAsWhitelistConverter));
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(StatusEffectsBlacklistConfig);
+        }
+    }
+
+    public class UseAsWhitelistConverter : PluginConfigObjectFieldConverter
+    {
+        public override (string, object) Convert(JToken token)
+        {
+            FilterType result = FilterType.Blacklist;
+
+            bool? boolValue = token.ToObject<bool>();
+            if (boolValue.HasValue)
+            {
+                result = boolValue.Value ? FilterType.Whitelist : FilterType.Blacklist;
+            }
+
+            return ("FilterType", result);
+        }
+    }
+
     [Section("Buffs and Debuffs")]
     [SubSection("Custom Effects", 0)]
     public class CustomEffectsListConfig : StatusEffectsListConfig
@@ -715,7 +751,7 @@ namespace DelvUI.Interface.StatusEffects
             config.Directions = 5;
 
             // pre-populated white list
-            config.BlacklistConfig.UseAsWhitelist = true;
+            config.BlacklistConfig.FilterType = FilterType.Whitelist;
 
             ExcelSheet<Status>? sheet = Plugin.DataManager.GetExcelSheet<Status>();
             if (sheet != null)
