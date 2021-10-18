@@ -1,3 +1,7 @@
+# 0.4.0.0
+Fixes:
+- Fixed some offsensive spells not working when the cursor is on top of a player frame with mouseover in automatic mode, but the target is valid (ie GNB's Continuation or SMN's Egi Assault).
+
 # 0.3.2.0
 Features:
 - You can now attach HUD Layouts to be loaded alongside profiles.

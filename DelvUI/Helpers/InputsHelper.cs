@@ -212,6 +212,18 @@ namespace DelvUI.Helpers
                 return false;
             }
 
+            // handle actions that automatically switch to other actions
+            // ie GNB Continuation or SMN Egi Assaults
+            // these actions dont have an attack type or animation so in these cases
+            // we assume its a hostile spell
+            // if this doesn't work on all cases we can switch to a hardcoded list
+            // of special cases later
+            if (action.AttackType.Row == 0 && action.AnimationStart.Row == 0 &&
+                (action.CanTargetDead && !action.CanTargetFriendly && !action.CanTargetHostile && !action.CanTargetParty && action.CanTargetSelf))
+            {
+                return target is BattleNpc npcTarget && npcTarget.BattleNpcKind == BattleNpcSubKind.Enemy;
+            }
+
             // friendly player (TODO: pvp? lol)
             if (target is PlayerCharacter)
             {
