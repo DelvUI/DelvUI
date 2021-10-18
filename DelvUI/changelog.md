@@ -10,8 +10,9 @@ Features:
 - Added sub-option to Hide DelvUI outside of combat to show when weapons are drawn.
 - Added sub-option to Enable Combat Hotbars to always show in duties.
 - Added sub-option to Enable Combat Hotbars to show when weapons are drawn.
-- DelvUI windows are now using Dalamus' window system.
+- When adding a status effect to a filter list, if there are multiple effects with the same name, all of them will be added to the list at once.
 - Change Alpha Based on Range now also applies to the Death Indicator Background Color.
+- DelvUI windows are now using Dalamus' window system.
 
 Fixes:
 - Fixed clicks not working on game windows when they are on top of unit frames or party frames.
