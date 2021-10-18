@@ -271,7 +271,8 @@ namespace DelvUI.Interface.Party
             {
                 var windowPos = ImGui.GetWindowPos();
                 var windowSize = ImGui.GetWindowSize();
-                Config.Size = windowSize;
+                var contentStartPos = windowPos + _contentMargin;
+                var maxSize = windowSize - _contentMargin * 2;
 
                 if (canDrag)
                 {
@@ -282,6 +283,13 @@ namespace DelvUI.Interface.Party
                         ConfigurationManager.Instance.ForceNeedsSave();
                         Config.Position = windowPos - origin;
                     }
+
+                    if (Config.Size != maxSize)
+                    {
+                        // have to flag it like this sadly
+                        ConfigurationManager.Instance.ForceNeedsSave();
+                        Config.Size = maxSize;
+                    }
                 }
 
                 var count = PartyManager.Instance.MemberCount;
@@ -291,9 +299,6 @@ namespace DelvUI.Interface.Party
                 }
 
                 // recalculate layout on settings or size change
-                var contentStartPos = windowPos + _contentMargin;
-                var maxSize = windowSize - _contentMargin * 2;
-
                 if (_layoutDirty || _size != maxSize || _memberCount != count)
                 {
                     _layoutInfo = LayoutHelper.CalculateLayout(
@@ -418,15 +423,15 @@ namespace DelvUI.Interface.Party
             if (canDrag)
             {
                 // size and position
-                ImGui.SetNextWindowPos(origin + Config.Position, ImGuiCond.FirstUseEver);
-                ImGui.SetNextWindowSize(Config.Size + _contentMargin * 2, ImGuiCond.FirstUseEver);
+                ImGui.SetNextWindowPos(origin + Config.Position, ImGuiCond.Appearing);
+                ImGui.SetNextWindowSize(Config.Size + _contentMargin * 2, ImGuiCond.Appearing);
 
                 ImGui.PushStyleColor(ImGuiCol.Border, 0x66FFFFFF);
                 ImGui.PushStyleColor(ImGuiCol.WindowBg, 0x66000000);
                 ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
                 ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
 
-                bool begin = ImGui.Begin(ID, windowFlags);
+                bool begin = ImGui.Begin(ID + "_Drag", windowFlags);
                 if (!begin)
                 {
                     ImGui.End();
