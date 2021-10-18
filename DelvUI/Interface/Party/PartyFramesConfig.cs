@@ -2,12 +2,11 @@
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
-using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
-using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 
@@ -359,6 +358,21 @@ namespace DelvUI.Interface.Party
 
             return config;
         }
+
+        public override void ImportFromOldVersion(Dictionary<Type, PluginConfigObject> oldConfigObjects, string currentVersion, string? previousVersion)
+        {
+            if (oldConfigObjects.TryGetValue(typeof(PartyFramesRoleIconConfig), out PluginConfigObject? roleObj)
+                && roleObj is PartyFramesRoleIconConfig role)
+            {
+                Role = role;
+            }
+
+            if (oldConfigObjects.TryGetValue(typeof(PartyFramesLeaderIconConfig), out PluginConfigObject? leaderObj)
+                && leaderObj is PartyFramesLeaderIconConfig leader)
+            {
+                Leader = leader;
+            }
+        }
     }
 
     [Exportable(false)]
@@ -608,6 +622,27 @@ namespace DelvUI.Interface.Party
             }
 
             return config;
+        }
+
+        public override void ImportFromOldVersion(Dictionary<Type, PluginConfigObject> oldConfigObjects, string currentVersion, string? previousVersion)
+        {
+            if (oldConfigObjects.TryGetValue(typeof(PartyFramesRaiseTrackerConfig), out PluginConfigObject? raiseObj)
+                && raiseObj is PartyFramesRaiseTrackerConfig raise)
+            {
+                Raise = raise;
+            }
+
+            if (oldConfigObjects.TryGetValue(typeof(PartyFramesInvulnTrackerConfig), out PluginConfigObject? invulvObj)
+                && invulvObj is PartyFramesInvulnTrackerConfig invuln)
+            {
+                Invuln = invuln;
+            }
+
+            if (oldConfigObjects.TryGetValue(typeof(PartyFramesCleanseTrackerConfig), out PluginConfigObject? cleanseObj)
+                && cleanseObj is PartyFramesCleanseTrackerConfig cleanse)
+            {
+                Cleanse = cleanse;
+            }
         }
     }
 

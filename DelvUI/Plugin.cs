@@ -96,6 +96,8 @@ namespace DelvUI
 
             // initialize a not-necessarily-defaults configuration
             ConfigurationManager.Initialize();
+            ConfigurationManager.Instance.LoadOrInitializeFiles();
+
             FontsManager.Instance.LoadConfig();
 
             _menuHook = new SystemMenuHook(PluginInterface);

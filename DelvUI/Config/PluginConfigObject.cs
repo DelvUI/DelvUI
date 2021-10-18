@@ -3,6 +3,7 @@ using DelvUI.Enums;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
@@ -104,6 +105,11 @@ namespace DelvUI.Config
             if (!File.Exists(path)) { return null; }
 
             return JsonConvert.DeserializeObject<T>(File.ReadAllText(path));
+        }
+
+        public virtual void ImportFromOldVersion(Dictionary<Type, PluginConfigObject> oldConfigObjects, string currentVersion, string? previousVersion)
+        {
+            return; // override
         }
 
         #region IOnChangeEventArgs
