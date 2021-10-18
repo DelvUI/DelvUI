@@ -8,6 +8,7 @@ using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -345,20 +346,21 @@ namespace DelvUI.Interface.StatusEffects
             return config;
         }
     }
-    
+
     public enum FilterType
     {
         Blacklist,
         Whitelist
     }
-    
+
+    [JsonConverter(typeof(StatusEffectsBlacklistConfigConverter))]
     [Exportable(false)]
     public class StatusEffectsBlacklistConfig : PluginConfigObject
     {
         [RadioSelector(typeof(FilterType))]
         [Order(5)]
         public FilterType FilterType;
-        
+
         public SortedList<string, uint> List = new SortedList<string, uint>();
 
         [JsonIgnore] private string? _errorMessage = null;
@@ -690,6 +692,36 @@ namespace DelvUI.Interface.StatusEffects
             }
 
             return false;
+        }
+    }
+
+
+    public class StatusEffectsBlacklistConfigConverter : PluginConfigObjectConverter
+    {
+        public StatusEffectsBlacklistConfigConverter()
+        {
+            FieldConvertersMap.Add("UseAsWhitelist", typeof(UseAsWhitelistConverter));
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(StatusEffectsBlacklistConfig);
+        }
+    }
+
+    public class UseAsWhitelistConverter : PluginConfigObjectFieldConverter
+    {
+        public override (string, object) Convert(JToken token)
+        {
+            FilterType result = FilterType.Blacklist;
+
+            bool? boolValue = token.ToObject<bool>();
+            if (boolValue.HasValue)
+            {
+                result = boolValue.Value ? FilterType.Whitelist : FilterType.Blacklist;
+            }
+
+            return ("FilterType", result);
         }
     }
 
