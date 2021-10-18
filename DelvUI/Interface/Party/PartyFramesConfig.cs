@@ -1,9 +1,14 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Logging;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
+using DelvUI.Helpers;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
+using Newtonsoft.Json;
+using System;
+using System.IO;
 using System.Numerics;
 
 namespace DelvUI.Interface.Party
@@ -265,6 +270,97 @@ namespace DelvUI.Interface.Party
         }
     }
 
+
+    [Exportable(false)]
+    [Section("Party Frames")]
+    [SubSection("Castbars", 0)]
+    public class PartyFramesCastbarConfig : CastbarConfig
+    {
+        public new static PartyFramesCastbarConfig DefaultConfig()
+        {
+            var size = new Vector2(182, 10);
+            var pos = new Vector2(-1, 0);
+
+            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", DrawAnchor.Left, DrawAnchor.Left);
+            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
+            castTimeConfig.Enabled = false;
+
+            var config = new PartyFramesCastbarConfig(pos, size, castNameConfig, castTimeConfig);
+            config.HealthBarAnchor = DrawAnchor.BottomLeft;
+            config.Anchor = DrawAnchor.TopLeft;
+            config.ShowIcon = false;
+            config.Enabled = false;
+
+            return config;
+        }
+
+        [Anchor("Health Bar Anchor")]
+        [Order(14)]
+        public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;
+
+        public PartyFramesCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
+            : base(position, size, castNameConfig, castTimeConfig)
+        {
+
+        }
+    }
+
+    [Disableable(false)]
+    [Exportable(false)]
+    [Section("Party Frames")]
+    [SubSection("Icons", 0)]
+    public class PartyFramesIconsConfig : PluginConfigObject
+    {
+        public new static PartyFramesIconsConfig DefaultConfig() { return new PartyFramesIconsConfig(); }
+
+        [NestedConfig("Role / Job", 10, separator = false)]
+        public PartyFramesRoleIconConfig Role = new PartyFramesRoleIconConfig();
+
+        [NestedConfig("Leader", 15)]
+        public PartyFramesLeaderIconConfig Leader = new PartyFramesLeaderIconConfig();
+
+        [NestedConfig("Player Status", 15)]
+        public PartyFramesPlayerStatusConfig PlayerStatus = new PartyFramesPlayerStatusConfig();
+
+        protected override PluginConfigObject? InternalLoad(FileInfo fileInfo, string currentVersion, string? previousVersion)
+        {
+            if (previousVersion == null) { return null; }
+
+            // change introduced in 0.4.0.0
+            Version previous = new Version(previousVersion);
+            if (previous.Major > 0 || previous.Minor > 3) { return null; }
+
+            string? path = fileInfo.DirectoryName;
+            if (path == null) { return null; }
+
+            PartyFramesIconsConfig config = new PartyFramesIconsConfig();
+
+            // role / job icon
+            try
+            {
+                string nestedConfigPath = Path.Combine(path, "Role-Job Icon.json");
+                config.Role = LoadFromJson<PartyFramesRoleIconConfig>(nestedConfigPath) ?? config.Role;
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error while merging role-job icon configs: " + e.Message);
+            }
+
+            // party leader
+            try
+            {
+                string nestedConfigPath = Path.Combine(path, "Party Leader Icon.json");
+                config.Leader = LoadFromJson<PartyFramesLeaderIconConfig>(nestedConfigPath) ?? config.Leader;
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error while merging invuln tracker configs: " + e.Message);
+            }
+
+            return config;
+        }
+    }
+
     [Exportable(false)]
     [Section("Party Frames")]
     [SubSection("Role-Job Icon", 0)]
@@ -448,43 +544,74 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    [Disableable(false)]
     [Exportable(false)]
     [Section("Party Frames")]
-    [SubSection("Castbars", 0)]
-    public class PartyFramesCastbarConfig : CastbarConfig
+    [SubSection("Trackers", 0)]
+    public class PartyFramesTrackersConfig : PluginConfigObject
     {
-        public new static PartyFramesCastbarConfig DefaultConfig()
+        public new static PartyFramesTrackersConfig DefaultConfig() { return new PartyFramesTrackersConfig(); }
+
+        [NestedConfig("Raise Tracker", 10, separator = false)]
+        public PartyFramesRaiseTrackerConfig Raise = new PartyFramesRaiseTrackerConfig();
+
+        [NestedConfig("Invulnerabilities Tracker", 15)]
+        public PartyFramesInvulnTrackerConfig Invuln = new PartyFramesInvulnTrackerConfig();
+
+        [NestedConfig("Cleanse Tracker", 15)]
+        public PartyFramesCleanseTrackerConfig Cleanse = new PartyFramesCleanseTrackerConfig();
+
+        protected override PluginConfigObject? InternalLoad(FileInfo fileInfo, string currentVersion, string? previousVersion)
         {
-            var size = new Vector2(182, 10);
-            var pos = new Vector2(-1, 0);
+            if (previousVersion == null) { return null; }
 
-            var castNameConfig = new LabelConfig(new Vector2(5, 0), "", DrawAnchor.Left, DrawAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
-            castTimeConfig.Enabled = false;
+            // change introduced in 0.4.0.0
+            Version previous = new Version(previousVersion);
+            if (previous.Major > 0 || previous.Minor > 3) { return null; }
 
-            var config = new PartyFramesCastbarConfig(pos, size, castNameConfig, castTimeConfig);
-            config.HealthBarAnchor = DrawAnchor.BottomLeft;
-            config.Anchor = DrawAnchor.TopLeft;
-            config.ShowIcon = false;
-            config.Enabled = false;
+            string? path = fileInfo.DirectoryName;
+            if (path == null) { return null; }
+
+            PartyFramesTrackersConfig config = new PartyFramesTrackersConfig();
+
+            // raise tracker
+            try
+            {
+                string nestedConfigPath = Path.Combine(path, "Raise Tracker.json");
+                config.Raise = LoadFromJson<PartyFramesRaiseTrackerConfig>(nestedConfigPath) ?? config.Raise;
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error while merging raise tracker configs: " + e.Message);
+            }
+
+            // invuln tracker
+            try
+            {
+                string nestedConfigPath = Path.Combine(path, "Invuln Tracker.json");
+                config.Invuln = LoadFromJson<PartyFramesInvulnTrackerConfig>(nestedConfigPath) ?? config.Invuln;
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error while merging invuln tracker configs: " + e.Message);
+            }
+
+            // cleanse tracker
+            try
+            {
+                string nestedConfigPath = Path.Combine(path, "Cleanse Tracker.json");
+                config.Cleanse = LoadFromJson<PartyFramesCleanseTrackerConfig>(nestedConfigPath) ?? config.Cleanse;
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error("Error while merging cleanse tracker configs: " + e.Message);
+            }
 
             return config;
-        }
-
-        [Anchor("Health Bar Anchor")]
-        [Order(14)]
-        public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;
-
-        public PartyFramesCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
-            : base(position, size, castNameConfig, castTimeConfig)
-        {
-
         }
     }
 
     [Exportable(false)]
-    [Section("Party Frames")]
-    [SubSection("Raise Tracker", 0)]
     public class PartyFramesRaiseTrackerConfig : MovablePluginConfigObject
     {
         public new static PartyFramesRaiseTrackerConfig DefaultConfig() { return new PartyFramesRaiseTrackerConfig(); }
@@ -530,8 +657,6 @@ namespace DelvUI.Interface.Party
     }
 
     [Exportable(false)]
-    [Section("Party Frames")]
-    [SubSection("Invuln Tracker", 0)]
     public class PartyFramesInvulnTrackerConfig : MovablePluginConfigObject
     {
         public new static PartyFramesInvulnTrackerConfig DefaultConfig() { return new PartyFramesInvulnTrackerConfig(); }
@@ -578,8 +703,6 @@ namespace DelvUI.Interface.Party
 
     [DisableParentSettings("Position")]
     [Exportable(false)]
-    [Section("Party Frames")]
-    [SubSection("Cleanse Tracker", 0)]
     public class PartyFramesCleanseTrackerConfig : MovablePluginConfigObject
     {
         public new static PartyFramesCleanseTrackerConfig DefaultConfig() { return new PartyFramesCleanseTrackerConfig(); }

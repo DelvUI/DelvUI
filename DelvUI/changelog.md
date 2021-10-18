@@ -1,3 +1,7 @@
+# 0.4.0.0
+Features:
+- Added "Player Status" tracking for party frames. Currently only "Viewing Cutscene" is supported.
+
 # 0.3.2.0
 Features:
 - You can now attach HUD Layouts to be loaded alongside profiles.

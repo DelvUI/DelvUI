@@ -56,6 +56,9 @@ namespace DelvUI.Config
 
         public string ConfigDirectory;
 
+        public string CurrentVersion => Plugin.Version;
+        public string? PreviousVersion { get; private set; } = null;
+
         private bool _needsProfileUpdate = false;
         private bool _lockHUD = true;
 
@@ -201,8 +204,8 @@ namespace DelvUI.Config
                 }
                 else
                 {
-                    string version = File.ReadAllText(path);
-                    if (version != Plugin.Version)
+                    PreviousVersion = File.ReadAllText(path);
+                    if (PreviousVersion != Plugin.Version)
                     {
                         needsWrite = true;
                     }
@@ -288,9 +291,9 @@ namespace DelvUI.Config
                     LoadConfigurations();
                 }
             }
-            catch
+            catch (Exception e)
             {
-                PluginLog.Error("Error initializing configurations!");
+                PluginLog.Error("Error initializing configurations: " + e.Message);
             }
         }
 
@@ -301,7 +304,7 @@ namespace DelvUI.Config
 
         public void LoadConfigurations()
         {
-            ConfigBaseNode.Load(ConfigDirectory);
+            ConfigBaseNode.Load(ConfigDirectory, CurrentVersion, PreviousVersion);
         }
 
         public void SaveConfigurations(bool forced = false)
@@ -427,13 +430,10 @@ namespace DelvUI.Config
             typeof(PartyFramesHealthBarsConfig),
             typeof(PartyFramesManaBarConfig),
             typeof(PartyFramesCastbarConfig),
-            typeof(PartyFramesRoleIconConfig),
-            typeof(PartyFramesLeaderIconConfig),
-            typeof(PartyFramesPlayerStatusConfig),
+            typeof(PartyFramesIconsConfig),
             typeof(PartyFramesBuffsConfig),
             typeof(PartyFramesDebuffsConfig),
-            typeof(PartyFramesRaiseTrackerConfig),
-            typeof(PartyFramesInvulnTrackerConfig),
+            typeof(PartyFramesTrackersConfig),
 
             typeof(PaladinConfig),
             typeof(WarriorConfig),

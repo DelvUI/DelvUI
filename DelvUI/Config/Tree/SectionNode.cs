@@ -76,11 +76,11 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public override void Load(string path)
+        public override void Load(string path, string currentVersion, string? previousVersion = null)
         {
             foreach (SubSectionNode child in _children)
             {
-                child.Load(Path.Combine(path, Name));
+                child.Load(Path.Combine(path, Name), currentVersion, previousVersion);
             }
         }
 
@@ -112,7 +112,8 @@ namespace DelvUI.Config.Tree
                 }
             }
 
-            throw new ArgumentException("The provided configuration object does not specify a sub-section");
+            Type type = typeof(T);
+            throw new ArgumentException("The provided configuration object does not specify a sub-section: " + type.Name);
         }
     }
 }

@@ -321,7 +321,8 @@ namespace DelvUI.Config.Tree
                 }
             }
 
-            throw new ArgumentException("The provided configuration object does not specify a section");
+            Type type = typeof(T);
+            throw new ArgumentException("The provided configuration object does not specify a section: " + type.Name);
         }
     }
 }

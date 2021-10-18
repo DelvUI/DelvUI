@@ -246,33 +246,23 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public override void Load(string path)
+        public override void Load(string path, string currentVersion, string? previousVersion = null)
         {
+            if (ConfigObject is not PluginConfigObject) { return; }
 
             FileInfo finalPath = new(path + ".json");
-
-            if (!finalPath.Exists)
-            {
-                return;
-            }
 
             // Use reflection to call the LoadForType method, this allows us to specify a type at runtime.
             // While in general use this is important as the conversion from the superclass 'PluginConfigObject' to a specific subclass (e.g. 'BlackMageHudConfig') would
             // be handled by Json.NET, when the plugin is reloaded with a different assembly (as is the case when using LivePluginLoader, or updating the plugin in-game)
             // it fails. In order to fix this we need to specify the specific subclass, in order to do this during runtime we must use reflection to set the generic.
-            if (ConfigObject is PluginConfigObject)
-            {
-                MethodInfo? methodInfo = GetType().GetMethod("LoadForType");
-                MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigObject.GetType());
-                ConfigObject = (PluginConfigObject)function?.Invoke(this, new object[] { finalPath.FullName })!;
-            }
-        }
+            MethodInfo? methodInfo = ConfigObject.GetType().GetMethod("Load");
+            MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigObject.GetType());
 
-        public T? LoadForType<T>(string path) where T : PluginConfigObject
-        {
-            FileInfo file = new(path);
+            object[] args = previousVersion != null ? new object[] { finalPath, currentVersion, previousVersion } : new object[] { finalPath, currentVersion };
+            PluginConfigObject? config = (PluginConfigObject?)function?.Invoke(ConfigObject, args);
 
-            return JsonConvert.DeserializeObject<T>(File.ReadAllText(file.FullName));
+            ConfigObject = config ?? ConfigObject;
         }
 
         public override void Reset()

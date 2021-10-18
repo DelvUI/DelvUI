@@ -337,18 +337,18 @@ namespace DelvUI.Interface.Party
                         }
 
                         bool cleanseCheck = true;
-                        if (Configs.CleanseTracker.CleanseJobsOnly)
+                        if (Configs.Trackers.Cleanse.CleanseJobsOnly)
                         {
                             cleanseCheck = Utils.IsOnCleanseJob();
                         }
 
-                        if (Configs.CleanseTracker.Enabled && Configs.CleanseTracker.ChangeBorderCleanseColor && member.HasDispellableDebuff && cleanseCheck)
+                        if (Configs.Trackers.Cleanse.Enabled && Configs.Trackers.Cleanse.ChangeBorderCleanseColor && member.HasDispellableDebuff && cleanseCheck)
                         {
                             cleanseIndexes.Add(i);
                             continue;
                         }
 
-                        if (Configs.RaiseTracker.Enabled && Configs.RaiseTracker.ChangeBorderColorWhenRaised && member.RaiseTime.HasValue)
+                        if (Configs.Trackers.Raise.Enabled && Configs.Trackers.Raise.ChangeBorderColorWhenRaised && member.RaiseTime.HasValue)
                         {
                             raisedIndexes.Add(i);
                             continue;
@@ -390,7 +390,7 @@ namespace DelvUI.Interface.Party
                 // raise
                 foreach (int index in raisedIndexes)
                 {
-                    bars[index].Draw(origin, drawList, Configs.RaiseTracker.BorderColor);
+                    bars[index].Draw(origin, drawList, Configs.Trackers.Raise.BorderColor);
                 }
 
                 // target
@@ -402,7 +402,7 @@ namespace DelvUI.Interface.Party
                 // cleanseable debuff
                 foreach (int index in cleanseIndexes)
                 {
-                    bars[index].Draw(origin, drawList, Configs.CleanseTracker.BorderColor);
+                    bars[index].Draw(origin, drawList, Configs.Trackers.Cleanse.BorderColor);
                 }
             };
 
@@ -456,39 +456,27 @@ namespace DelvUI.Interface.Party
         public PartyFramesHealthBarsConfig HealthBar;
         public PartyFramesManaBarConfig ManaBar;
         public PartyFramesCastbarConfig CastBar;
-        public PartyFramesRoleIconConfig RoleIcon;
-        public PartyFramesLeaderIconConfig LeaderIcon;
-        public PartyFramesPlayerStatusConfig PlayerStatus;
+        public PartyFramesIconsConfig Icons;
         public PartyFramesBuffsConfig Buffs;
         public PartyFramesDebuffsConfig Debuffs;
-        public PartyFramesRaiseTrackerConfig RaiseTracker;
-        public PartyFramesInvulnTrackerConfig InvulnTracker;
-        public PartyFramesCleanseTrackerConfig CleanseTracker;
+        public PartyFramesTrackersConfig Trackers;
 
         public PartyFramesConfigs(
             PartyFramesHealthBarsConfig healthBar,
             PartyFramesManaBarConfig manaBar,
             PartyFramesCastbarConfig castBar,
-            PartyFramesRoleIconConfig roleIcon,
-            PartyFramesLeaderIconConfig leaderIcon,
-            PartyFramesPlayerStatusConfig playerStatus,
+            PartyFramesIconsConfig icons,
             PartyFramesBuffsConfig buffs,
             PartyFramesDebuffsConfig debuffs,
-            PartyFramesRaiseTrackerConfig raiseTracker,
-            PartyFramesInvulnTrackerConfig invulnTracker,
-            PartyFramesCleanseTrackerConfig cleanseTracker)
+            PartyFramesTrackersConfig trackers)
         {
             HealthBar = healthBar;
             ManaBar = manaBar;
             CastBar = castBar;
-            RoleIcon = roleIcon;
-            LeaderIcon = leaderIcon;
-            PlayerStatus = playerStatus;
+            Icons = icons;
             Buffs = buffs;
             Debuffs = debuffs;
-            RaiseTracker = raiseTracker;
-            InvulnTracker = invulnTracker;
-            CleanseTracker = cleanseTracker;
+            Trackers = trackers;
         }
 
         public static PartyFramesConfigs GetConfigs()
@@ -497,14 +485,10 @@ namespace DelvUI.Interface.Party
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesHealthBarsConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesManaBarConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesCastbarConfig>(),
-                ConfigurationManager.Instance.GetConfigObject<PartyFramesRoleIconConfig>(),
-                ConfigurationManager.Instance.GetConfigObject<PartyFramesLeaderIconConfig>(),
-                ConfigurationManager.Instance.GetConfigObject<PartyFramesPlayerStatusConfig>(),
+                ConfigurationManager.Instance.GetConfigObject<PartyFramesIconsConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesBuffsConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<PartyFramesDebuffsConfig>(),
-                ConfigurationManager.Instance.GetConfigObject<PartyFramesRaiseTrackerConfig>(),
-                ConfigurationManager.Instance.GetConfigObject<PartyFramesInvulnTrackerConfig>(),
-                ConfigurationManager.Instance.GetConfigObject<PartyFramesCleanseTrackerConfig>()
+                ConfigurationManager.Instance.GetConfigObject<PartyFramesTrackersConfig>()
             );
         }
 

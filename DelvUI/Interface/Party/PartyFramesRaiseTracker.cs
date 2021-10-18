@@ -8,11 +8,12 @@ namespace DelvUI.Interface.Party
 {
     public class PartyFramesRaiseTracker : IDisposable
     {
-        private PartyFramesRaiseTrackerConfig _config;
+        private PartyFramesRaiseTrackerConfig _config = null!;
+
         public PartyFramesRaiseTracker()
         {
-            _config = ConfigurationManager.Instance.GetConfigObject<PartyFramesRaiseTrackerConfig>();
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+            OnConfigReset(ConfigurationManager.Instance);
         }
 
         ~PartyFramesRaiseTracker()
@@ -38,7 +39,7 @@ namespace DelvUI.Interface.Party
 
         public void OnConfigReset(ConfigurationManager sender)
         {
-            _config = sender.GetConfigObject<PartyFramesRaiseTrackerConfig>();
+            _config = sender.GetConfigObject<PartyFramesTrackersConfig>().Raise;
         }
 
         public void Update(List<IPartyFramesMember> partyMembers)

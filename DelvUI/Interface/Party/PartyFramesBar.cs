@@ -46,9 +46,9 @@ namespace DelvUI.Interface.Party
             _nameLabelHud = new LabelHud(_configs.HealthBar.NameLabelConfig);
             _healthLabelHud = new LabelHud(_configs.HealthBar.HealthLabelConfig);
             _orderLabelHud = new LabelHud(_configs.HealthBar.OrderLabelConfig);
-            _statusLabelHud = new LabelHud(_configs.PlayerStatus.LabelConfig);
-            _raiseLabelHud = new LabelHud(_configs.RaiseTracker.LabelConfig);
-            _invulnLabelHud = new LabelHud(_configs.InvulnTracker.LabelConfig);
+            _statusLabelHud = new LabelHud(_configs.Icons.PlayerStatus.LabelConfig);
+            _raiseLabelHud = new LabelHud(_configs.Trackers.Raise.LabelConfig);
+            _invulnLabelHud = new LabelHud(_configs.Trackers.Invuln.LabelConfig);
 
             _manaBarHud = new PrimaryResourceHud(_configs.ManaBar, "");
             _castbarHud = new CastbarHud(_configs.CastBar, "");
@@ -69,14 +69,14 @@ namespace DelvUI.Interface.Party
             }
 
             bool cleanseCheck = true;
-            if (_configs.CleanseTracker.CleanseJobsOnly)
+            if (_configs.Trackers.Cleanse.CleanseJobsOnly)
             {
                 cleanseCheck = Utils.IsOnCleanseJob();
             }
 
-            if (_configs.CleanseTracker.Enabled && _configs.CleanseTracker.ChangeHealthBarCleanseColor && Member.HasDispellableDebuff && cleanseCheck)
+            if (_configs.Trackers.Cleanse.Enabled && _configs.Trackers.Cleanse.ChangeHealthBarCleanseColor && Member.HasDispellableDebuff && cleanseCheck)
             {
-                return _configs.CleanseTracker.HealthBarColor;
+                return _configs.Trackers.Cleanse.HealthBarColor;
             }
             else if (_configs.HealthBar.ColorsConfig.UseColorBasedOnHealthValue)
             {
@@ -177,13 +177,13 @@ namespace DelvUI.Interface.Party
 
             // bg
             PluginConfigColor bgColor;
-            if (Member.RaiseTime != null && _configs.RaiseTracker.Enabled && _configs.RaiseTracker.ChangeBackgroundColorWhenRaised)
+            if (Member.RaiseTime != null && _configs.Trackers.Raise.Enabled && _configs.Trackers.Raise.ChangeBackgroundColorWhenRaised)
             {
-                bgColor = _configs.RaiseTracker.BackgroundColor;
+                bgColor = _configs.Trackers.Raise.BackgroundColor;
             }
-            else if (Member.InvulnStatus?.InvulnTime != null && _configs.InvulnTracker.Enabled && _configs.InvulnTracker.ChangeBackgroundColorWhenInvuln)
+            else if (Member.InvulnStatus?.InvulnTime != null && _configs.Trackers.Invuln.Enabled && _configs.Trackers.Invuln.ChangeBackgroundColorWhenInvuln)
             {
-                bgColor = Member.InvulnStatus?.InvulnId == 811 ? _configs.InvulnTracker.WalkingDeadBackgroundColor : _configs.InvulnTracker.BackgroundColor;
+                bgColor = Member.InvulnStatus?.InvulnId == 811 ? _configs.Trackers.Invuln.WalkingDeadBackgroundColor : _configs.Trackers.Invuln.BackgroundColor;
             }
             else if (_configs.HealthBar.ColorsConfig.UseDeathIndicatorBackgroundColor && Member.HP <= 0)
             {
@@ -242,68 +242,68 @@ namespace DelvUI.Interface.Party
             drawList.AddRect(borderPos, borderPos + borderSize, color);
 
             // role/job icon
-            if (_configs.RoleIcon.Enabled && Member.JobId > 0)
+            if (_configs.Icons.Role.Enabled && Member.JobId > 0)
             {
                 uint iconId;
 
                 // chocobo icon
                 if (character != null && character.ObjectKind == ObjectKind.BattleNpc)
                 {
-                    iconId = JobsHelper.RoleIconIDForBattleCompanion + (uint)_configs.RoleIcon.Style * 100;
+                    iconId = JobsHelper.RoleIconIDForBattleCompanion + (uint)_configs.Icons.Role.Style * 100;
                 }
                 // role/job icon
                 else
                 {
-                    iconId = _configs.RoleIcon.UseRoleIcons ?
-                        JobsHelper.RoleIconIDForJob(Member.JobId, _configs.RoleIcon.UseSpecificDPSRoleIcons) :
-                        JobsHelper.IconIDForJob(Member.JobId) + (uint)_configs.RoleIcon.Style * 100;
+                    iconId = _configs.Icons.Role.UseRoleIcons ?
+                        JobsHelper.RoleIconIDForJob(Member.JobId, _configs.Icons.Role.UseSpecificDPSRoleIcons) :
+                        JobsHelper.IconIDForJob(Member.JobId) + (uint)_configs.Icons.Role.Style * 100;
                 }
 
                 if (iconId > 0)
                 {
-                    var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.RoleIcon.HealthBarAnchor);
-                    var iconPos = Utils.GetAnchoredPosition(parentPos + _configs.RoleIcon.Position, _configs.RoleIcon.Size, _configs.RoleIcon.Anchor);
+                    var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Icons.Role.HealthBarAnchor);
+                    var iconPos = Utils.GetAnchoredPosition(parentPos + _configs.Icons.Role.Position, _configs.Icons.Role.Size, _configs.Icons.Role.Anchor);
 
-                    DrawHelper.DrawIcon(iconId, iconPos, _configs.RoleIcon.Size, false, drawList);
+                    DrawHelper.DrawIcon(iconId, iconPos, _configs.Icons.Role.Size, false, drawList);
                 }
             }
 
             // leader icon
-            if (_configs.LeaderIcon.Enabled && Member.IsPartyLeader)
+            if (_configs.Icons.Leader.Enabled && Member.IsPartyLeader)
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.LeaderIcon.HealthBarAnchor);
-                var iconPos = Utils.GetAnchoredPosition(parentPos + _configs.LeaderIcon.Position, _configs.LeaderIcon.Size, _configs.LeaderIcon.Anchor);
+                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Icons.Leader.HealthBarAnchor);
+                var iconPos = Utils.GetAnchoredPosition(parentPos + _configs.Icons.Leader.Position, _configs.Icons.Leader.Size, _configs.Icons.Leader.Anchor);
 
-                DrawHelper.DrawIcon(61521, iconPos, _configs.LeaderIcon.Size, false, drawList);
+                DrawHelper.DrawIcon(61521, iconPos, _configs.Icons.Leader.Size, false, drawList);
             }
 
             // player status icon
-            if (_configs.PlayerStatus.Enabled && _configs.PlayerStatus.ShowIcon)
+            if (_configs.Icons.PlayerStatus.Enabled && _configs.Icons.PlayerStatus.ShowIcon)
             {
                 uint? iconId = IconIdForStatus(Member.Status);
                 if (iconId.HasValue)
                 {
-                    var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.PlayerStatus.IconFrameAnchor);
-                    var iconPos = Utils.GetAnchoredPosition(parentPos + _configs.PlayerStatus.IconPosition, _configs.PlayerStatus.IconSize, _configs.PlayerStatus.IconAnchor);
+                    var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Icons.PlayerStatus.IconFrameAnchor);
+                    var iconPos = Utils.GetAnchoredPosition(parentPos + _configs.Icons.PlayerStatus.IconPosition, _configs.Icons.PlayerStatus.IconSize, _configs.Icons.PlayerStatus.IconAnchor);
 
-                    DrawHelper.DrawIcon(iconId.Value, iconPos, _configs.PlayerStatus.IconSize, false, drawList);
+                    DrawHelper.DrawIcon(iconId.Value, iconPos, _configs.Icons.PlayerStatus.IconSize, false, drawList);
                 }
             }
 
             // raise icon
             if (ShowingRaise())
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.RaiseTracker.HealthBarAnchor);
-                var iconPos = Utils.GetAnchoredPosition(parentPos + _configs.RaiseTracker.Position, _configs.RaiseTracker.IconSize, _configs.RaiseTracker.Anchor);
-                DrawHelper.DrawIcon(411, iconPos, _configs.RaiseTracker.IconSize, true, drawList);
+                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Trackers.Raise.HealthBarAnchor);
+                var iconPos = Utils.GetAnchoredPosition(parentPos + _configs.Trackers.Raise.Position, _configs.Trackers.Raise.IconSize, _configs.Trackers.Raise.Anchor);
+                DrawHelper.DrawIcon(411, iconPos, _configs.Trackers.Raise.IconSize, true, drawList);
             }
 
             // invuln icon
             if (ShowingInvuln())
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.InvulnTracker.HealthBarAnchor);
-                var iconPos = Utils.GetAnchoredPosition(parentPos + _configs.InvulnTracker.Position, _configs.InvulnTracker.IconSize, _configs.InvulnTracker.Anchor);
-                DrawHelper.DrawIcon(Member.InvulnStatus!.InvulnIcon, iconPos, _configs.InvulnTracker.IconSize, true, drawList);
+                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Trackers.Invuln.HealthBarAnchor);
+                var iconPos = Utils.GetAnchoredPosition(parentPos + _configs.Trackers.Invuln.Position, _configs.Trackers.Invuln.IconSize, _configs.Trackers.Invuln.Anchor);
+                DrawHelper.DrawIcon(Member.InvulnStatus!.InvulnIcon, iconPos, _configs.Trackers.Invuln.IconSize, true, drawList);
             }
 
             // highlight
@@ -365,12 +365,12 @@ namespace DelvUI.Interface.Party
 
             if (showingRaise || showingInvuln)
             {
-                if ((showingRaise && _configs.RaiseTracker.HideNameWhenRaised) || (showingInvuln && _configs.InvulnTracker.HideNameWhenInvuln))
+                if ((showingRaise && _configs.Trackers.Raise.HideNameWhenRaised) || (showingInvuln && _configs.Trackers.Invuln.HideNameWhenInvuln))
                 {
                     drawName = false;
                 }
             }
-            else if (_configs.PlayerStatus.Enabled && _configs.PlayerStatus.HideName && Member.Status != PartyMemberStatus.None)
+            else if (_configs.Icons.PlayerStatus.Enabled && _configs.Icons.PlayerStatus.HideName && Member.Status != PartyMemberStatus.None)
             {
                 drawName = false;
             }
@@ -396,9 +396,9 @@ namespace DelvUI.Interface.Party
 
             // status
             string? statusString = StringForStatus(Member.Status);
-            if (_configs.PlayerStatus.Enabled && _configs.PlayerStatus.LabelConfig.Enabled && statusString != null)
+            if (_configs.Icons.PlayerStatus.Enabled && _configs.Icons.PlayerStatus.LabelConfig.Enabled && statusString != null)
             {
-                _configs.PlayerStatus.LabelConfig.SetText(statusString);
+                _configs.Icons.PlayerStatus.LabelConfig.SetText(statusString);
                 _statusLabelHud.Draw(Position, _configs.HealthBar.Size);
             }
 
@@ -407,7 +407,7 @@ namespace DelvUI.Interface.Party
             {
                 var duration = Math.Abs(Member.RaiseTime!.Value);
                 var text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
-                _configs.RaiseTracker.LabelConfig.SetText(text);
+                _configs.Trackers.Raise.LabelConfig.SetText(text);
                 _raiseLabelHud.Draw(Position, _configs.HealthBar.Size);
             }
             // invuln label
@@ -415,20 +415,20 @@ namespace DelvUI.Interface.Party
             {
                 var duration = Math.Abs(Member.InvulnStatus!.InvulnTime);
                 var text = duration < 10 ? duration.ToString("N1", CultureInfo.InvariantCulture) : Utils.DurationToString(duration);
-                _configs.InvulnTracker.LabelConfig.SetText(text);
+                _configs.Trackers.Invuln.LabelConfig.SetText(text);
                 _invulnLabelHud.Draw(Position, _configs.HealthBar.Size);
             }
         }
 
         private bool ShowingRaise()
         {
-            return Member != null && Member.RaiseTime.HasValue && _configs.RaiseTracker.Enabled &&
-                (Member.RaiseTime.Value > 0 || _configs.RaiseTracker.KeepIconAfterCastFinishes);
+            return Member != null && Member.RaiseTime.HasValue && _configs.Trackers.Raise.Enabled &&
+                (Member.RaiseTime.Value > 0 || _configs.Trackers.Raise.KeepIconAfterCastFinishes);
         }
 
         private bool ShowingInvuln()
         {
-            return Member != null && Member.InvulnStatus != null && _configs.InvulnTracker.Enabled && Member.InvulnStatus.InvulnTime > 0;
+            return Member != null && Member.InvulnStatus != null && _configs.Trackers.Invuln.Enabled && Member.InvulnStatus.InvulnTime > 0;
         }
 
         private bool ShowMana()
