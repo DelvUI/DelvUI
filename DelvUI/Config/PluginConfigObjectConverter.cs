@@ -73,7 +73,7 @@ namespace DelvUI.Config
             }
             catch
             {
-                PluginLog.Error("Error deserializing StatusEffectsBlacklistConfig!");
+                PluginLog.Error($"Error deserializing {type.Name}!");
             }
 
             return config;
