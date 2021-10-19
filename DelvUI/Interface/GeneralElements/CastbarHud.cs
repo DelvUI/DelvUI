@@ -66,6 +66,9 @@ namespace DelvUI.Interface.GeneralElements
             Vector2 startPos = origin + GetAnchoredPosition(Config.Position, Config.Size, Config.Anchor);
             Vector2 endPos = startPos + Config.Size;
 
+            bool validIcon = LastUsedCast != null && LastUsedCast.IconTexture != null;
+            Vector2 iconSize = Config.ShowIcon && validIcon ? new Vector2(Config.Size.Y, Config.Size.Y) : Vector2.Zero;
+
             DrawHelper.DrawInWindow(ID, startPos, Config.Size, false, false, (drawList) =>
             {
                 // bg
@@ -76,36 +79,36 @@ namespace DelvUI.Interface.GeneralElements
 
                 // cast bar
                 var color = Color();
-                DrawHelper.DrawGradientFilledRect(startPos, new Vector2(Config.Size.X * castScale, Config.Size.Y), color, drawList);
+                Vector2 fillStartPos = startPos + new Vector2(iconSize.X, 0);
+                Vector2 fillMaxSize = new Vector2(Config.Size.X - iconSize.X, Config.Size.Y);
+                DrawHelper.DrawGradientFilledRect(fillStartPos, new Vector2(fillMaxSize.X * castScale, fillMaxSize.Y), color, drawList);
 
                 // border
                 drawList.AddRect(startPos, endPos, 0xFF000000);
 
                 // icon
-                var iconSize = Vector2.Zero;
                 if (Config.ShowIcon)
                 {
-                    if (LastUsedCast != null && LastUsedCast.IconTexture != null)
+                    if (validIcon)
                     {
                         ImGui.SetCursorPos(startPos);
-                        iconSize = new Vector2(Config.Size.Y, Config.Size.Y);
-                        ImGui.Image(LastUsedCast.IconTexture.ImGuiHandle, iconSize);
+                        ImGui.Image(LastUsedCast!.IconTexture!.ImGuiHandle, iconSize);
                         drawList.AddRect(startPos, startPos + iconSize, 0xFF000000);
                     }
                     else if (Config.Preview)
                     {
-                        drawList.AddRect(startPos, startPos + new Vector2(Config.Size.Y, Config.Size.Y), 0xFF000000);
+                        drawList.AddRect(startPos, startPos + iconSize, 0xFF000000);
                     }
                 }
             });
 
             // cast name
-            var iconSize = Config.ShowIcon ? Config.Size.Y : 0;
-            var castNamePos = startPos + new Vector2(iconSize, 0);
+            var iconSizeX = Config.ShowIcon ? iconSize.X : 0;
+            var castNamePos = startPos + new Vector2(iconSizeX, 0);
             string? castName = LastUsedCast?.ActionText.CheckForUpperCase();
 
             Config.CastNameConfig.SetText(Config.Preview ? "Cast Name" : (castName != null ? castName : ""));
-            _castNameLabel.Draw(startPos + new Vector2(iconSize, 0), Config.Size, Actor);
+            _castNameLabel.Draw(startPos + new Vector2(iconSizeX, 0), Config.Size, Actor);
 
             // cast time
             var text = Config.Preview ? "Cast Time" : Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
