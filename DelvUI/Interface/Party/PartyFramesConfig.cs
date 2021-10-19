@@ -646,7 +646,7 @@ namespace DelvUI.Interface.Party
         public PluginConfigColor BorderColor = new(new Vector4(47f / 255f, 169f / 255f, 215f / 255f, 100f / 100f));
 
         [NestedConfig("Icon", 50, separator = false, spacing = true, nest = true)]
-        public IconWithDurationConfig Icon = new IconWithDurationConfig(
+        public IconWithLabelConfig Icon = new IconWithLabelConfig(
             new Vector2(0, 0),
             new Vector2(50, 50),
             DrawAnchor.Center,
@@ -681,7 +681,7 @@ namespace DelvUI.Interface.Party
         public PluginConfigColor WalkingDeadBackgroundColor = new(new Vector4(158f / 255f, 158f / 255f, 158f / 255f, 50f / 100f));
 
         [NestedConfig("Icon", 50, separator = false, spacing = true, nest = true)]
-        public IconWithDurationConfig Icon = new IconWithDurationConfig(
+        public IconWithLabelConfig Icon = new IconWithLabelConfig(
             new Vector2(0, 0),
             new Vector2(50, 50),
             DrawAnchor.Center,

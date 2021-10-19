@@ -25,12 +25,12 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    public class IconWithDurationConfig : IconConfig
+    public class IconWithLabelConfig : IconConfig
     {
         [NestedConfig("Label", 20, spacing = true, separator = false, nest = true)]
         public LabelConfig Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
 
-        public IconWithDurationConfig(Vector2 position, Vector2 size, DrawAnchor anchor, DrawAnchor frameAnchor)
+        public IconWithLabelConfig(Vector2 position, Vector2 size, DrawAnchor anchor, DrawAnchor frameAnchor)
             : base(position, size, anchor, frameAnchor)
         {
         }
