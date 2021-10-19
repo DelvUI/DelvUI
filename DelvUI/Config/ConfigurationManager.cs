@@ -376,7 +376,12 @@ namespace DelvUI.Config
                         var genericMethod = node.GetType().GetMethod("GetConfigObject");
                         var method = genericMethod?.MakeGenericMethod(type);
                         PluginConfigObject? config = (PluginConfigObject?)method?.Invoke(node, null);
-                        config?.ImportFromOldVersion(OldConfigObjects, CurrentVersion, PreviousVersion);
+
+                        if (config != null)
+                        {
+                            config.ImportFromOldVersion(OldConfigObjects, CurrentVersion, PreviousVersion);
+                            node.SetConfigObject(config); // needed to refresh nodes
+                        }
                     }
                 }
 

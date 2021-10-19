@@ -96,6 +96,7 @@ namespace DelvUI
 
             // initialize a not-necessarily-defaults configuration
             ConfigurationManager.Initialize();
+            ProfilesManager.Initialize();
             ConfigurationManager.Instance.LoadOrInitializeFiles();
 
             FontsManager.Instance.LoadConfig();
@@ -108,7 +109,6 @@ namespace DelvUI
             LimitBreakHelper.Initialize();
             InputsHelper.Initialize();
             PartyManager.Initialize();
-            ProfilesManager.Initialize();
             PullTimerHelper.Initialize();
             TextTagsHelper.Initialize();
             TexturesCache.Initialize();
