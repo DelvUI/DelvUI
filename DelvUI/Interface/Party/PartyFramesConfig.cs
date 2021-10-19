@@ -125,7 +125,7 @@ namespace DelvUI.Interface.Party
         [Order(19, collapseWith = nameof(UseDeathIndicatorBackgroundColor))]
         public PluginConfigColor DeathIndicatorBackgroundColor = new PluginConfigColor(new Vector4(204f / 255f, 3f / 255f, 3f / 255f, 80f / 100f));
 
-        [Checkbox("Use Role Colors", isMonitored = true)]
+        [Checkbox("Use Role Colors", isMonitored = true, spacing = true)]
         [Order(20)]
         public bool UseRoleColors = false;
 
@@ -145,7 +145,7 @@ namespace DelvUI.Interface.Party
         [Order(40, collapseWith = nameof(UseRoleColors))]
         public PluginConfigColor GenericRoleColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
 
-        [Checkbox("Color Based On Health Value", isMonitored = true)]
+        [Checkbox("Color Based On Health Value", isMonitored = true, spacing = true)]
         [Order(45)]
         public bool UseColorBasedOnHealthValue = false;
 
@@ -315,10 +315,20 @@ namespace DelvUI.Interface.Party
         public new static PartyFramesIconsConfig DefaultConfig() { return new PartyFramesIconsConfig(); }
 
         [NestedConfig("Role / Job", 10, separator = false)]
-        public PartyFramesRoleIconConfig Role = new PartyFramesRoleIconConfig();
+        public PartyFramesRoleIconConfig Role = new PartyFramesRoleIconConfig(
+            new Vector2(20, 0),
+            new Vector2(20, 20),
+            DrawAnchor.TopLeft,
+            DrawAnchor.TopLeft
+        );
 
         [NestedConfig("Leader", 15)]
-        public PartyFramesLeaderIconConfig Leader = new PartyFramesLeaderIconConfig();
+        public PartyFramesLeaderIconConfig Leader = new PartyFramesLeaderIconConfig(
+            new Vector2(-12, -12),
+            new Vector2(24, 24),
+            DrawAnchor.TopLeft,
+            DrawAnchor.TopLeft
+        );
 
         [NestedConfig("Player Status", 15)]
         public PartyFramesPlayerStatusConfig PlayerStatus = new PartyFramesPlayerStatusConfig();
@@ -381,12 +391,11 @@ namespace DelvUI.Interface.Party
     [Exportable(false)]
     public class PartyFramesRoleIconConfig : IconConfig
     {
-        public PartyFramesRoleIconConfig()
+        public PartyFramesRoleIconConfig() : base() { }
+
+        public PartyFramesRoleIconConfig(Vector2 position, Vector2 size, DrawAnchor anchor, DrawAnchor frameAnchor)
+            : base(position, size, anchor, frameAnchor)
         {
-            Position = new Vector2(20, 0);
-            Size = new Vector2(20, 20);
-            Anchor = DrawAnchor.TopLeft;
-            FrameAnchor = DrawAnchor.TopLeft;
         }
 
         [Combo("Style", "Style 1", "Style 2", spacing = true)]
@@ -406,12 +415,11 @@ namespace DelvUI.Interface.Party
     [Exportable(false)]
     public class PartyFramesLeaderIconConfig : IconConfig
     {
-        public PartyFramesLeaderIconConfig()
+        public PartyFramesLeaderIconConfig() : base() { }
+
+        public PartyFramesLeaderIconConfig(Vector2 position, Vector2 size, DrawAnchor anchor, DrawAnchor frameAnchor)
+            : base(position, size, anchor, frameAnchor)
         {
-            Position = new Vector2(-12, -12);
-            Size = new Vector2(24, 24);
-            Anchor = DrawAnchor.TopLeft;
-            FrameAnchor = DrawAnchor.TopLeft;
         }
     }
 
@@ -421,7 +429,7 @@ namespace DelvUI.Interface.Party
         public new static PartyFramesPlayerStatusConfig DefaultConfig()
         {
             var config = new PartyFramesPlayerStatusConfig();
-            config.LabelConfig.Enabled = false;
+            config.Label.Enabled = false;
 
             return config;
         }
@@ -430,28 +438,16 @@ namespace DelvUI.Interface.Party
         [Order(5)]
         public bool HideName = false;
 
-        [Checkbox("Icon", spacing = true)]
-        [Order(10)]
-        public bool ShowIcon = true;
+        [NestedConfig("Icon", 10, spacing = true, separator = false, nest = true)]
+        public IconConfig Icon = new IconConfig(
+            new Vector2(0, 5),
+            new Vector2(16, 16),
+            DrawAnchor.Top,
+            DrawAnchor.Top
+        );
 
-        [DragInt2("Position", min = -1000, max = 1000)]
-        [Order(15, collapseWith = nameof(ShowIcon))]
-        public Vector2 IconPosition = new(0, 5);
-
-        [DragInt2("Size", min = 1, max = 1000)]
-        [Order(20, collapseWith = nameof(ShowIcon))]
-        public Vector2 IconSize = new(16, 16);
-
-        [Anchor("Health Bar Anchor")]
-        [Order(25, collapseWith = nameof(ShowIcon))]
-        public DrawAnchor IconFrameAnchor = DrawAnchor.Top;
-
-        [Anchor("Anchor")]
-        [Order(30, collapseWith = nameof(ShowIcon))]
-        public DrawAnchor IconAnchor = DrawAnchor.Top;
-
-        [NestedConfig("Label", 35, spacing = true, separator = false, nest = true)]
-        public LabelConfig LabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+        [NestedConfig("Label", 15, spacing = true, separator = false, nest = true)]
+        public LabelConfig Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
     }
 
     [Exportable(false)]
@@ -619,94 +615,102 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    [JsonConverter(typeof(PartyFramesTrackerConfigConverter))]
     [Exportable(false)]
-    public class PartyFramesRaiseTrackerConfig : MovablePluginConfigObject
+    public class PartyFramesRaiseTrackerConfig : PluginConfigObject
     {
         public new static PartyFramesRaiseTrackerConfig DefaultConfig() { return new PartyFramesRaiseTrackerConfig(); }
 
-        [DragInt2("Icon Size", min = 1, max = 1000)]
+        [Checkbox("Hide Name When Raised")]
         [Order(10)]
-        public Vector2 IconSize = new(50, 50);
-
-        [Anchor("Health Bar Anchor")]
-        [Order(15)]
-        public DrawAnchor HealthBarAnchor = DrawAnchor.Center;
-
-        [Anchor("Anchor")]
-        [Order(20)]
-        public DrawAnchor Anchor = DrawAnchor.Center;
-
-        [Checkbox("Hide Name When Raised", spacing = true)]
-        [Order(25)]
         public bool HideNameWhenRaised = true;
 
         [Checkbox("Keep Icon After Cast Finishes")]
-        [Order(30)]
+        [Order(15)]
         public bool KeepIconAfterCastFinishes = true;
 
         [Checkbox("Change Background Color When Raised", spacing = true)]
-        [Order(35)]
+        [Order(20)]
         public bool ChangeBackgroundColorWhenRaised = true;
 
         [ColorEdit4("Raise Background Color")]
-        [Order(40, collapseWith = nameof(ChangeBackgroundColorWhenRaised))]
+        [Order(25, collapseWith = nameof(ChangeBackgroundColorWhenRaised))]
         public PluginConfigColor BackgroundColor = new(new Vector4(211f / 255f, 235f / 255f, 215f / 245f, 50f / 100f));
 
         [Checkbox("Change Border Color When Raised", spacing = true)]
-        [Order(45)]
+        [Order(30)]
         public bool ChangeBorderColorWhenRaised = true;
 
         [ColorEdit4("Raise Border Color")]
-        [Order(50, collapseWith = nameof(ChangeBorderColorWhenRaised))]
+        [Order(35, collapseWith = nameof(ChangeBorderColorWhenRaised))]
         public PluginConfigColor BorderColor = new(new Vector4(47f / 255f, 169f / 255f, 215f / 255f, 100f / 100f));
 
-        [NestedConfig("Label", 55)]
-        public LabelConfig LabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+        [NestedConfig("Icon", 50, separator = false, spacing = true, nest = true)]
+        public IconWithDurationConfig Icon = new IconWithDurationConfig(
+            new Vector2(0, 0),
+            new Vector2(50, 50),
+            DrawAnchor.Center,
+            DrawAnchor.Center
+        );
     }
 
+    [JsonConverter(typeof(PartyFramesTrackerConfigConverter))]
     [Exportable(false)]
-    public class PartyFramesInvulnTrackerConfig : MovablePluginConfigObject
+    public class PartyFramesInvulnTrackerConfig : PluginConfigObject
     {
         public new static PartyFramesInvulnTrackerConfig DefaultConfig() { return new PartyFramesInvulnTrackerConfig(); }
 
-        [DragInt2("Icon Size", min = 1, max = 1000)]
+        [Checkbox("Hide Name When Invuln is Up")]
         [Order(10)]
-        public Vector2 IconSize = new(50, 50);
-
-        [Anchor("Health Bar Anchor")]
-        [Order(15)]
-        public DrawAnchor HealthBarAnchor = DrawAnchor.Center;
-
-        [Anchor("Anchor")]
-        [Order(20)]
-        public DrawAnchor Anchor = DrawAnchor.Center;
-
-        [Checkbox("Hide Name When Invuln is Up", spacing = true)]
-        [Order(25)]
         public bool HideNameWhenInvuln = true;
 
         [Checkbox("Change Background Color When Invuln is Up", spacing = true)]
-        [Order(35)]
+        [Order(15)]
         public bool ChangeBackgroundColorWhenInvuln = true;
 
         [ColorEdit4("Invuln Background Color")]
-        [Order(40, collapseWith = nameof(ChangeBackgroundColorWhenInvuln))]
+        [Order(20, collapseWith = nameof(ChangeBackgroundColorWhenInvuln))]
         public PluginConfigColor BackgroundColor = new(new Vector4(211f / 255f, 235f / 255f, 215f / 245f, 50f / 100f));
 
         [Checkbox("Walking Dead Custom Color")]
-        [Order(42, collapseWith = nameof(ChangeBackgroundColorWhenInvuln))]
+        [Order(25, collapseWith = nameof(ChangeBackgroundColorWhenInvuln))]
         public bool UseCustomWalkingDeadColor = true;
 
         [ColorEdit4("Walking Dead Background Color")]
-        [Order(45, collapseWith = nameof(UseCustomWalkingDeadColor))]
+        [Order(30, collapseWith = nameof(UseCustomWalkingDeadColor))]
         public PluginConfigColor WalkingDeadBackgroundColor = new(new Vector4(158f / 255f, 158f / 255f, 158f / 255f, 50f / 100f));
 
-        [Checkbox("Change Border Color When Invuln is Up", spacing = true)]
-        [Order(50)]
-        public bool ChangeBorderColorWhenInvuln = true;
+        [NestedConfig("Icon", 50, separator = false, spacing = true, nest = true)]
+        public IconWithDurationConfig Icon = new IconWithDurationConfig(
+            new Vector2(0, 0),
+            new Vector2(50, 50),
+            DrawAnchor.Center,
+            DrawAnchor.Center
+        );
+    }
 
-        [NestedConfig("Label", 60)]
-        public LabelConfig LabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+    public class PartyFramesTrackerConfigConverter : PluginConfigObjectConverter
+    {
+        public PartyFramesTrackerConfigConverter()
+        {
+            SameTypeFieldConverter<Vector2> pos = new SameTypeFieldConverter<Vector2>("Icon.Position", Vector2.Zero);
+            FieldConvertersMap.Add("Position", pos);
+
+            SameTypeFieldConverter<Vector2> size = new SameTypeFieldConverter<Vector2>("Icon.Size", new Vector2(50, 50));
+            FieldConvertersMap.Add("IconSize", size);
+
+            SameTypeFieldConverter<DrawAnchor> anchor = new SameTypeFieldConverter<DrawAnchor>("Icon.Anchor", DrawAnchor.Center);
+            FieldConvertersMap.Add("Anchor", anchor);
+
+            SameTypeFieldConverter<DrawAnchor> frameAnchor = new SameTypeFieldConverter<DrawAnchor>("Icon.FrameAnchor", DrawAnchor.Center);
+            FieldConvertersMap.Add("HealthBarAnchor", frameAnchor);
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(PartyFramesRaiseTrackerConfig) ||
+                   objectType == typeof(PartyFramesInvulnTrackerConfig);
+        }
     }
 
     [DisableParentSettings("Position")]
