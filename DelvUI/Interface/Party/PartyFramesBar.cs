@@ -261,7 +261,7 @@ namespace DelvUI.Interface.Party
 
                 if (iconId > 0)
                 {
-                    var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Icons.Role.HealthBarAnchor);
+                    var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Icons.Role.FrameAnchor);
                     var iconPos = Utils.GetAnchoredPosition(parentPos + _configs.Icons.Role.Position, _configs.Icons.Role.Size, _configs.Icons.Role.Anchor);
 
                     DrawHelper.DrawIcon(iconId, iconPos, _configs.Icons.Role.Size, false, drawList);
@@ -271,7 +271,7 @@ namespace DelvUI.Interface.Party
             // leader icon
             if (_configs.Icons.Leader.Enabled && Member.IsPartyLeader)
             {
-                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Icons.Leader.HealthBarAnchor);
+                var parentPos = Utils.GetAnchoredPosition(Position, -_configs.HealthBar.Size, _configs.Icons.Leader.FrameAnchor);
                 var iconPos = Utils.GetAnchoredPosition(parentPos + _configs.Icons.Leader.Position, _configs.Icons.Leader.Size, _configs.Icons.Leader.Anchor);
 
                 DrawHelper.DrawIcon(61521, iconPos, _configs.Icons.Leader.Size, false, drawList);

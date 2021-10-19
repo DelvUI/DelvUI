@@ -5,6 +5,8 @@ using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -375,73 +377,45 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    [JsonConverter(typeof(PartyFramesIconsConverter))]
     [Exportable(false)]
-    [Section("Party Frames")]
-    [SubSection("Role-Job Icon", 0)]
-    public class PartyFramesRoleIconConfig : MovablePluginConfigObject
+    public class PartyFramesRoleIconConfig : IconConfig
     {
-        public new static PartyFramesRoleIconConfig DefaultConfig()
+        public PartyFramesRoleIconConfig()
         {
-            var config = new PartyFramesRoleIconConfig();
-            config.Position = new Vector2(20, 0);
-
-            return config;
+            Position = new Vector2(20, 0);
+            Size = new Vector2(20, 20);
+            Anchor = DrawAnchor.TopLeft;
+            FrameAnchor = DrawAnchor.TopLeft;
         }
 
-        [DragInt2("Size", min = 1, max = 1000)]
-        [Order(20)]
-        public Vector2 Size = new(20, 20);
-
-        [Anchor("Health Bar Anchor")]
+        [Combo("Style", "Style 1", "Style 2", spacing = true)]
         [Order(25)]
-        public DrawAnchor HealthBarAnchor = DrawAnchor.TopLeft;
-
-        [Anchor("Anchor")]
-        [Order(30)]
-        public DrawAnchor Anchor = DrawAnchor.TopLeft;
-
-        [Combo("Style", "Style 1", "Style 2")]
-        [Order(35)]
         public int Style = 0;
 
-        [Checkbox("Use Role Icons")]
-        [Order(40)]
+        [Checkbox("Use Role Icons", spacing = true)]
+        [Order(30)]
         public bool UseRoleIcons = false;
 
         [Checkbox("Use Specific DPS Role Icons")]
-        [Order(45, collapseWith = nameof(UseRoleIcons))]
+        [Order(35, collapseWith = nameof(UseRoleIcons))]
         public bool UseSpecificDPSRoleIcons = false;
     }
 
+    [JsonConverter(typeof(PartyFramesIconsConverter))]
     [Exportable(false)]
-    [Section("Party Frames")]
-    [SubSection("Party Leader Icon", 0)]
-    public class PartyFramesLeaderIconConfig : MovablePluginConfigObject
+    public class PartyFramesLeaderIconConfig : IconConfig
     {
-        public new static PartyFramesLeaderIconConfig DefaultConfig()
+        public PartyFramesLeaderIconConfig()
         {
-            var config = new PartyFramesLeaderIconConfig();
-            config.Position = new Vector2(-12, -12);
-
-            return config;
+            Position = new Vector2(-12, -12);
+            Size = new Vector2(24, 24);
+            Anchor = DrawAnchor.TopLeft;
+            FrameAnchor = DrawAnchor.TopLeft;
         }
-
-        [DragInt2("Size", min = 1, max = 1000)]
-        [Order(20)]
-        public Vector2 Size = new(24, 24);
-
-        [Anchor("Health Bar Anchor")]
-        [Order(25)]
-        public DrawAnchor HealthBarAnchor = DrawAnchor.TopLeft;
-
-        [Anchor("Anchor")]
-        [Order(30)]
-        public DrawAnchor Anchor = DrawAnchor.TopLeft;
     }
 
     [Exportable(false)]
-    [Section("Party Frames")]
-    [SubSection("Player Status", 0)]
     public class PartyFramesPlayerStatusConfig : PluginConfigObject
     {
         public new static PartyFramesPlayerStatusConfig DefaultConfig()
@@ -451,7 +425,6 @@ namespace DelvUI.Interface.Party
 
             return config;
         }
-
 
         [Checkbox("Hide Name When Showing Status")]
         [Order(5)]
