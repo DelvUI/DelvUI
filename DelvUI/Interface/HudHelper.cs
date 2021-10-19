@@ -43,7 +43,7 @@ namespace DelvUI.Interface
 
         private bool _previousCombatState = true;
         private bool _isInitial = true;
-        private uint[] GoldSaucerIDs = new uint[] { 144, 388, 389, 390, 391, 579, 792, 899, 941 };
+        private readonly uint[] _goldSaucerIDs = { 144, 388, 389, 390, 391, 579, 792, 899, 941 };
 
         private GetBaseUIObjectDelegate? _getBaseUIObject;
         private SetPositionDelegate? _setPosition;
@@ -51,6 +51,7 @@ namespace DelvUI.Interface
 
         public HudHelper()
         {
+            #region Signatures
             Config.ValueChangeEvent += ConfigValueChanged;
 
             /*
@@ -62,7 +63,7 @@ namespace DelvUI.Interface
             .text:00007FF6481C2F67                   Component__GUI__AtkStage_GetSingleton1 endp
             .text:00007FF6481C2F67
             */
-            var getBaseUiObjectPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 41 B8 01 00 00 00 48 8D 15 ?? ?? ?? ?? 48 8B 48 20 E8 ?? ?? ?? ?? 48 8B CF");
+            IntPtr getBaseUiObjectPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 41 B8 01 00 00 00 48 8D 15 ?? ?? ?? ?? 48 8B 48 20 E8 ?? ?? ?? ?? 48 8B CF");
             _getBaseUIObject = Marshal.GetDelegateForFunctionPointer<GetBaseUIObjectDelegate>(getBaseUiObjectPtr);
 
             /*
@@ -83,7 +84,7 @@ namespace DelvUI.Interface
             .text:00007FF6481BFF4B 4D 85 C9          test    r9, r9
             .text:00007FF6481BFF4E 74 3B             jz      short locret_7FF6481BFF8B
             */
-            var setPositionPtr = Plugin.SigScanner.ScanText("4C 8B 89 ?? ?? ?? ?? 41 0F BF C0");
+            IntPtr setPositionPtr = Plugin.SigScanner.ScanText("4C 8B 89 ?? ?? ?? ?? 41 0F BF C0");
             _setPosition = Marshal.GetDelegateForFunctionPointer<SetPositionDelegate>(setPositionPtr);
 
             /*
@@ -100,8 +101,9 @@ namespace DelvUI.Interface
             .text:00007FF6481CF030 48 85 D2          test    rdx, rdx
             .text:00007FF6481CF033 0F 84 CA 00 00 00 jz      loc_7FF6481CF103
             */
-            var updateAddonPositionPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? 33 D2 48 8B 01 FF 90 ?? ?? ?? ??");
+            IntPtr updateAddonPositionPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? 33 D2 48 8B 01 FF 90 ?? ?? ?? ??");
             _updateAddonPosition = Marshal.GetDelegateForFunctionPointer<UpdateAddonPositionDelegate>(updateAddonPositionPtr);
+            #endregion
         }
 
         internal static byte GetStatus(GameObject actor)
@@ -131,7 +133,7 @@ namespace DelvUI.Interface
 
             Config.ValueChangeEvent -= ConfigValueChanged;
 
-            UpdateCombatActionBars(true, true);
+            UpdateCombatActionBars(true);
             UpdateDefaultCastBar(true);
             UpdateDefaultPulltimer(true);
             UpdateJobGauges(true);
@@ -149,32 +151,25 @@ namespace DelvUI.Interface
 
         public bool IsElementHidden(HudElement element)
         {
-            if (!ConfigurationManager.Instance.LockHUD)
-            {
-                return false;
-            }
-
-            if (element.GetType() == typeof(PlayerCastbarHud))
-            {
-                return false;
-            }
-
-            if (!element.GetConfig().Enabled)
-            {
-                return true;
-            }
+            if (!ConfigurationManager.Instance.LockHUD) { return false; }
+            if (element.GetType() == typeof(PlayerCastbarHud)) { return false; }
+            if (!element.GetConfig().Enabled) { return true; }
 
             // hide in gold saucer
-            if (Config.HideInGoldSaucer && GoldSaucerIDs.Where(id => id == Plugin.ClientState.TerritoryType).Count() > 0)
-            {
-                return true;
-            }
+            if (Config.HideInGoldSaucer && _goldSaucerIDs.Count(id => id == Plugin.ClientState.TerritoryType) > 0) { return true; }
+
+            bool isHidden = Config.ShowDelvUIFramesInDuty
+                ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty()
+                : Config.HideOutsideOfCombat && !IsInCombat();
 
             PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
-            bool isHidden = Config.ShowDelvUIFramesInDuty ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty() : Config.HideOutsideOfCombat && !IsInCombat();
             if (player is not null)
             {
-                isHidden = isHidden && Config.ShowDelvUIFramesOnWeaponDrawn ? Config.HideOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn(player) : Config.ShowDelvUIFramesInDuty ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty() : Config.HideOutsideOfCombat && !IsInCombat();
+                isHidden = isHidden && Config.ShowDelvUIFramesOnWeaponDrawn
+                    ? Config.HideOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn(player)
+                    : Config.ShowDelvUIFramesInDuty
+                        ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty()
+                        : Config.HideOutsideOfCombat && !IsInCombat();
             }
 
             if (!isHidden && element is JobHud)
@@ -182,12 +177,9 @@ namespace DelvUI.Interface
                 return Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
             }
 
-            if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig))
+            if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig) && player is not null)
             {
-                if (player is not null)
-                {
-                    isHidden = isHidden && player.CurrentHp == player.MaxHp;
-                }
+                isHidden = isHidden && player.CurrentHp == player.MaxHp;
             }
 
             return isHidden;
@@ -195,48 +187,53 @@ namespace DelvUI.Interface
 
         private void ConfigValueChanged(object sender, OnChangeBaseArgs e)
         {
-            if (e.PropertyName == "HideDefaultCastbar")
+            switch (e.PropertyName)
             {
-                UpdateDefaultCastBar();
-            }
-            else if (e.PropertyName == "HideDefaultPulltimer")
-            {
-                UpdateDefaultPulltimer();
-            }
-            else if (e.PropertyName == "HideDefaultJobGauges" || e.PropertyName == "DisableJobGaugeSounds")
-            {
-                UpdateJobGauges();
-            }
-            else if (e.PropertyName == "EnableCombatActionBars")
-            {
-                Config.CombatActionBars.ForEach(name => ToggleActionbar(name, Config.EnableCombatActionBars));
-            }
-            else if (e.PropertyName == "CombatActionBars" && e is OnChangeEventArgs<string> listEvent)
-            {
-                switch (listEvent.ChangeType)
-                {
-                    case ChangeType.ListAdd:
-                        ToggleActionbar(listEvent.Value, !IsInCombat());
-                        break;
-                    case ChangeType.ListRemove:
-                        ToggleActionbar(listEvent.Value, false);
-                        break;
-                }
+                case "HideDefaultCastbar":
+                    UpdateDefaultCastBar();
+                    break;
+                case "HideDefaultPulltimer":
+                    UpdateDefaultPulltimer();
+                    break;
+                case "HideDefaultJobGauges":
+                case "DisableJobGaugeSounds":
+                    UpdateJobGauges();
+                    break;
+                case "EnableCombatActionBars":
+                    Config.CombatActionBars.ForEach(name => ToggleActionbar(name, Config.EnableCombatActionBars));
+                    break;
+                case "CombatActionBars" when e is OnChangeEventArgs<string> listEvent:
+                    switch (listEvent.ChangeType)
+                    {
+                        case ChangeType.ListAdd:
+                            ToggleActionbar(listEvent.Value, !IsInCombat());
+                            break;
+                        case ChangeType.ListRemove:
+                            ToggleActionbar(listEvent.Value, false);
+                            break;
+                    }
+
+                    break;
             }
         }
 
-        private void UpdateCombatActionBars(bool forceUpdate = false, bool forceVisible = false)
+        private void UpdateCombatActionBars(bool forceUpdate = false)
         {
-            if (!Config.EnableCombatActionBars)
-            {
-                return;
-            }
+            if (!Config.EnableCombatActionBars) { return; }
 
             PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+
+            bool currentCombatState = Config.ShowCombatActionBarsInDuty
+                ? IsInDuty() || IsInCombat()
+                : IsInCombat();
+
             if (player is not null)
             {
-                bool currentCombatState = Config.ShowCombatActionBarsInDuty ? (IsInDuty() || IsInCombat()) : IsInCombat();
-                currentCombatState = !currentCombatState && Config.ShowCombatActionBarsOnWeaponDrawn ? (HasWeaponDrawn(player) || IsInCombat()) : Config.ShowCombatActionBarsInDuty ? (IsInDuty() || IsInCombat()) : IsInCombat();
+                currentCombatState = !currentCombatState && Config.ShowCombatActionBarsOnWeaponDrawn
+                    ? HasWeaponDrawn(player) || IsInCombat()
+                    : Config.ShowCombatActionBarsInDuty
+                        ? IsInDuty() || IsInCombat()
+                        : IsInCombat();
 
                 if (_previousCombatState != currentCombatState && Config.CombatActionBars.Count > 0 || forceUpdate)
                 {
@@ -246,24 +243,21 @@ namespace DelvUI.Interface
             }
         }
 
-        private unsafe void ToggleActionbar(string targetName, bool isHidden)
+        private void ToggleActionbar(string targetName, bool isHidden)
         {
             string[] splits = targetName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
-            var hotbarNumber = splits.Last();
-            var toggleText = isHidden ? "off" : "on";
+            string hotbarNumber = splits.Last();
+            string toggleText = isHidden ? "off" : "on";
 
             ChatHelper.SendChatMessage("/hotbar display " + hotbarNumber + " " + toggleText);
         }
 
         private void SetAddonVisible(IntPtr addon, bool visible, Vector2 originalPosition)
         {
-            if (_getBaseUIObject == null || _setPosition == null || _updateAddonPosition == null)
-            {
-                return;
-            }
+            if (_getBaseUIObject == null || _setPosition == null || _updateAddonPosition == null) { return; }
 
-            var baseUi = _getBaseUIObject();
-            var manager = Marshal.ReadIntPtr(baseUi + 0x20);
+            IntPtr baseUi = _getBaseUIObject();
+            IntPtr manager = Marshal.ReadIntPtr(baseUi + 0x20);
 
             short x = visible ? (short)originalPosition.X : (short)32000;
             short y = visible ? (short)originalPosition.Y : (short)32000;
@@ -275,13 +269,10 @@ namespace DelvUI.Interface
 
         private unsafe bool UpdateAddonOriginalPosition(AtkUnitBase* addon, ref Vector2 originalPosition)
         {
-            if (addon == null)
-            {
-                return false;
-            }
+            if (addon == null) { return false; }
 
             const float outOfScreen = 30000f;
-            var addonPosition = new Vector2(addon->X, addon->Y);
+            Vector2 addonPosition = new(addon->X, addon->Y);
 
             if (addonPosition != Vector2.Zero && addonPosition.X < outOfScreen && addonPosition.Y < outOfScreen)
             {
@@ -294,53 +285,41 @@ namespace DelvUI.Interface
                 originalPosition = Vector2.Zero;
             }
 
-            return (addonPosition.X < outOfScreen || addonPosition.Y < outOfScreen);
+            return addonPosition.X < outOfScreen || addonPosition.Y < outOfScreen;
         }
 
         private unsafe void UpdateDefaultCastBar(bool forceVisible = false)
         {
-            var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_CastBar", 1);
-            if (addon == null)
-            {
-                return;
-            }
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_CastBar", 1);
+            if (addon == null) { return; }
 
-            var previousPos = Config.CastBarOriginalPosition;
-            var isVisible = UpdateAddonOriginalPosition(addon, ref Config.CastBarOriginalPosition);
+            Vector2 previousPos = Config.CastBarOriginalPosition;
+            bool isVisible = UpdateAddonOriginalPosition(addon, ref Config.CastBarOriginalPosition);
 
             if (previousPos != Config.CastBarOriginalPosition)
             {
                 ConfigurationManager.Instance.SaveConfigurations(true);
             }
 
-            if (isVisible != Config.HideDefaultCastbar && !forceVisible)
-            {
-                return;
-            }
+            if (isVisible != Config.HideDefaultCastbar && !forceVisible) { return; }
 
             SetAddonVisible((IntPtr)addon, forceVisible || !Config.HideDefaultCastbar, Config.CastBarOriginalPosition);
         }
 
         private unsafe void UpdateDefaultPulltimer(bool forceVisible = false)
         {
-            var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("ScreenInfo_CountDown", 1);
-            if (addon == null)
-            {
-                return;
-            }
+            AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("ScreenInfo_CountDown", 1);
+            if (addon == null) { return; }
 
-            var previousPos = Config.PulltimerOriginalPosition;
-            var isVisible = UpdateAddonOriginalPosition(addon, ref Config.PulltimerOriginalPosition);
+            Vector2 previousPos = Config.PulltimerOriginalPosition;
+            bool isVisible = UpdateAddonOriginalPosition(addon, ref Config.PulltimerOriginalPosition);
 
             if (previousPos != Config.PulltimerOriginalPosition)
             {
                 ConfigurationManager.Instance.SaveConfigurations(true);
             }
 
-            if (isVisible != Config.HideDefaultPulltimer && !forceVisible)
-            {
-                return;
-            }
+            if (isVisible != Config.HideDefaultPulltimer && !forceVisible) { return; }
 
             SetAddonVisible((IntPtr)addon, forceVisible || !Config.HideDefaultPulltimer, Config.PulltimerOriginalPosition);
         }
@@ -351,11 +330,10 @@ namespace DelvUI.Interface
 
             for (int i = 0; i < addons.Count; i++)
             {
-                var addon = (AtkUnitBase*)addons[i];
-                var name = names[i];
+                AtkUnitBase* addon = (AtkUnitBase*)addons[i];
+                string name = names[i];
 
-                Vector2 pos = Vector2.Zero;
-                bool existed = Config.JobGaugeOriginalPosition.TryGetValue(name, out pos);
+                bool existed = Config.JobGaugeOriginalPosition.TryGetValue(name, out Vector2 pos);
 
                 Vector2 previousPos = pos;
                 UpdateAddonOriginalPosition(addon, ref pos);
@@ -372,40 +350,28 @@ namespace DelvUI.Interface
 
         public static unsafe (List<IntPtr>, List<string>) FindAddonsStartingWith(string startingWith)
         {
-            var addons = new List<IntPtr>();
-            var names = new List<string>();
+            List<IntPtr> addons = new();
+            List<string> names = new();
 
-            var stage = AtkStage.GetSingleton();
+            AtkStage* stage = AtkStage.GetSingleton();
             if (stage == null)
             {
                 return (addons, names);
             }
 
-            var loadedUnitsList = &stage->RaptureAtkUnitManager->AtkUnitManager.AllLoadedUnitsList;
-            if (loadedUnitsList == null)
-            {
-                return (addons, names);
-            }
+            AtkUnitList* loadedUnitsList = &stage->RaptureAtkUnitManager->AtkUnitManager.AllLoadedUnitsList;
+            if (loadedUnitsList == null) { return (addons, names); }
 
-            var addonList = &loadedUnitsList->AtkUnitEntries;
-            if (addonList == null)
-            {
-                return (addons, names);
-            }
+            AtkUnitBase** addonList = &loadedUnitsList->AtkUnitEntries;
+            if (addonList == null) { return (addons, names); }
 
-            for (var i = 0; i < loadedUnitsList->Count; i++)
+            for (int i = 0; i < loadedUnitsList->Count; i++)
             {
                 AtkUnitBase* addon = addonList[i];
-                if (addon == null)
-                {
-                    continue;
-                }
+                if (addon == null) { continue; }
 
-                var name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
-                if (name == null || !name.StartsWith(startingWith))
-                {
-                    continue;
-                }
+                string? name = Marshal.PtrToStringAnsi(new IntPtr(addon->Name));
+                if (name == null || !name.StartsWith(startingWith)) { continue; }
 
                 addons.Add((IntPtr)addon);
                 names.Add(name);
@@ -415,20 +381,12 @@ namespace DelvUI.Interface
         }
         #region Helpers
 
-        private bool IsInCombat()
-        {
-            return Plugin.Condition[ConditionFlag.InCombat];
-        }
+        private bool IsInCombat() => Plugin.Condition[ConditionFlag.InCombat];
 
-        private bool IsInDuty()
-        {
-            return Plugin.Condition[ConditionFlag.BoundByDuty];
-        }
+        private bool IsInDuty() => Plugin.Condition[ConditionFlag.BoundByDuty];
 
-        private bool HasWeaponDrawn(GameObject actor)
-        {
-            return (GetStatus(actor) & 4) > 0;
-        }
+        private bool HasWeaponDrawn(GameObject actor) => (GetStatus(actor) & 4) > 0;
+
         #endregion
     }
 }
