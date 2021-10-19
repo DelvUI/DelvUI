@@ -1,8 +1,10 @@
 # 0.4.0.0
 Features:
 - Added "Player Status" tracking for party frames. Currently only "Viewing Cutscene" is supported.
+
 Fixes:
 - Fixed some offsensive spells not working when the cursor is on top of a player frame with mouseover in automatic mode, but the target is valid (ie GNB's Continuation or SMN's Egi Assault).
+- Fixed some bars not displaying the remaining duration properly.
 
 # 0.3.2.0
 Features:

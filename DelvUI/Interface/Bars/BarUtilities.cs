@@ -64,7 +64,7 @@ namespace DelvUI.Interface.Bars
 
             if (trackDuration)
             {
-                config.Label.SetText($"{(int)duration}");
+                config.Label.SetText($"{Math.Round(duration)}");
                 return GetProgressBar(config, duration, maxDuration, 0);
             }
 
@@ -107,7 +107,7 @@ namespace DelvUI.Interface.Bars
             float duration = Math.Abs(status?.RemainingTime ?? 0);
             float maxDuration = maxDurations[index];
 
-            config.Label.SetText($"{(int)duration}");
+            config.Label.SetText($"{Math.Round(duration)}");
             return GetProgressBar(config, duration, maxDuration, 0);
         }
 
@@ -220,7 +220,7 @@ namespace DelvUI.Interface.Bars
 
                 PluginConfigColor chunkColor = partialFillColor != null && current < chunkMax ? partialFillColor : fillColor ?? config.FillColor;
                 LabelConfig? label = null;
-                
+
                 if (labelTemplate != null)
                 {
                     label = labelTemplate.Clone();
