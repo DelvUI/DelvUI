@@ -22,11 +22,12 @@ namespace DelvUI.Interface.Party
     }
     public class PartyFramesInvulnTracker : IDisposable
     {
-        private PartyFramesInvulnTrackerConfig _config;
+        private PartyFramesInvulnTrackerConfig _config = null!;
+
         public PartyFramesInvulnTracker()
         {
-            _config = ConfigurationManager.Instance.GetConfigObject<PartyFramesInvulnTrackerConfig>();
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+            OnConfigReset(ConfigurationManager.Instance);
         }
 
         ~PartyFramesInvulnTracker()
@@ -52,7 +53,7 @@ namespace DelvUI.Interface.Party
 
         public void OnConfigReset(ConfigurationManager sender)
         {
-            _config = sender.GetConfigObject<PartyFramesInvulnTrackerConfig>();
+            _config = ConfigurationManager.Instance.GetConfigObject<PartyFramesTrackersConfig>().Invuln;
         }
 
         public void Update(List<IPartyFramesMember> partyMembers)

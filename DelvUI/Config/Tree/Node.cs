@@ -115,11 +115,11 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public virtual void Load(string path)
+        public virtual void Load(string path, string currentVersion, string? previousVersion = null)
         {
             foreach (Node child in _children)
             {
-                child.Load(path);
+                child.Load(path, currentVersion, previousVersion);
             }
         }
         #endregion

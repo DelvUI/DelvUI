@@ -13,7 +13,13 @@ namespace DelvUI.Interface.Party
         Second = 2,
         Last = 255
     }
-    
+
+    public enum PartyMemberStatus : byte
+    {
+        None,
+        ViewingCutscene
+    }
+
     public unsafe class PartyFramesMember : IPartyFramesMember
     {
         protected PartyMember? _partyMember = null;
@@ -34,16 +40,18 @@ namespace DelvUI.Interface.Party
         public uint MaxMP => _partyMember != null ? _partyMember.MaxMP : JobsHelper.MaxPrimaryResource(Character);
         public float Shield => Utils.ActorShieldValue(Character);
         public EnmityLevel EnmityLevel { get; private set; } = EnmityLevel.Last;
+        public PartyMemberStatus Status { get; private set; } = PartyMemberStatus.None;
         public bool IsPartyLeader { get; private set; } = false;
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
         public bool HasDispellableDebuff { get; set; } = false;
 
-        public PartyFramesMember(PartyMember partyMember, int order, EnmityLevel enmityLevel, bool isPartyLeader)
+        public PartyFramesMember(PartyMember partyMember, int order, EnmityLevel enmityLevel, PartyMemberStatus status, bool isPartyLeader)
         {
             _partyMember = partyMember;
             Order = order;
             EnmityLevel = enmityLevel;
+            Status = status;
             IsPartyLeader = isPartyLeader;
 
             var gameObject = partyMember.GameObject;
@@ -53,27 +61,30 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        public PartyFramesMember(Character character, int order, EnmityLevel enmityLevel, bool isPartyLeader)
+        public PartyFramesMember(Character character, int order, EnmityLevel enmityLevel, PartyMemberStatus status, bool isPartyLeader)
         {
             Order = order;
             EnmityLevel = enmityLevel;
+            Status = status;
             IsPartyLeader = isPartyLeader;
 
             _objectID = character.ObjectId;
             Character = character;
         }
 
-        public PartyFramesMember(string? name, int order, uint jobId, bool isPartyLeader)
+        public PartyFramesMember(string? name, int order, uint jobId, PartyMemberStatus status, bool isPartyLeader)
         {
             Order = order;
+            Status = status;
             IsPartyLeader = isPartyLeader;
             _name = name ?? "";
             _jobId = jobId;
         }
 
-        public void Update(EnmityLevel enmityLevel, bool isPartyLeader, uint jobId)
+        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, bool isPartyLeader, uint jobId)
         {
             EnmityLevel = enmityLevel;
+            Status = status;
             IsPartyLeader = isPartyLeader;
             _jobId = jobId;
 
@@ -105,6 +116,7 @@ namespace DelvUI.Interface.Party
         public uint MaxMP { get; private set; }
         public float Shield { get; private set; }
         public EnmityLevel EnmityLevel { get; private set; }
+        public PartyMemberStatus Status { get; private set; }
         public bool IsPartyLeader { get; }
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
@@ -121,11 +133,12 @@ namespace DelvUI.Interface.Party
             MP = (uint)(MaxMP * RNG.Next(100) / 100f);
             Shield = RNG.Next(30) / 100f;
             EnmityLevel = enmityLevel;
+            Status = (PartyMemberStatus)RNG.Next(0, 4);
             IsPartyLeader = isPartyLeader;
             HasDispellableDebuff = RNG.Next(0, 2) == 1;
         }
 
-        public void Update(EnmityLevel enmityLevel, bool isPartyLeader, uint jobId)
+        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, bool isPartyLeader, uint jobId)
         {
 
         }
@@ -146,11 +159,12 @@ namespace DelvUI.Interface.Party
         public uint MaxMP { get; }
         public float Shield { get; }
         public EnmityLevel EnmityLevel { get; }
+        public PartyMemberStatus Status { get; }
         public bool IsPartyLeader { get; }
         public float? RaiseTime { get; set; }
         public InvulnStatus? InvulnStatus { get; set; }
         public bool HasDispellableDebuff { get; set; }
 
-        public void Update(EnmityLevel enmityLevel, bool isPartyLeader, uint jobId);
+        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, bool isPartyLeader, uint jobId);
     }
 }

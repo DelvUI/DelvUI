@@ -89,13 +89,16 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.3.2.0";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.4.0.0";
 
             FontsManager.Initialize(AssemblyLocation);
             LoadBanner();
 
             // initialize a not-necessarily-defaults configuration
             ConfigurationManager.Initialize();
+            ProfilesManager.Initialize();
+            ConfigurationManager.Instance.LoadOrInitializeFiles();
+
             FontsManager.Instance.LoadConfig();
 
             _menuHook = new SystemMenuHook(PluginInterface);
@@ -106,7 +109,6 @@ namespace DelvUI
             LimitBreakHelper.Initialize();
             InputsHelper.Initialize();
             PartyManager.Initialize();
-            ProfilesManager.Initialize();
             PullTimerHelper.Initialize();
             TextTagsHelper.Initialize();
             TexturesCache.Initialize();

@@ -3,6 +3,8 @@ using DelvUI.Enums;
 using ImGuiNET;
 using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
 using System.Reflection;
 
@@ -56,7 +58,7 @@ namespace DelvUI.Config
                 return attribute == null || attribute.disableable;
             }
         }
-        
+
         [JsonIgnore]
         public string[]? DisableParentSettings
         {
@@ -85,6 +87,29 @@ namespace DelvUI.Config
         public static PluginConfigObject DefaultConfig()
         {
             return null!;
+        }
+
+        public T? Load<T>(FileInfo fileInfo, string currentVersion, string? previousVersion) where T : PluginConfigObject
+        {
+            PluginConfigObject? config = InternalLoad(fileInfo, currentVersion, previousVersion);
+            return (T?)config ?? LoadFromJson<T>(fileInfo.FullName);
+        }
+
+        protected virtual PluginConfigObject? InternalLoad(FileInfo fileInfo, string currentVersion, string? previousVersion)
+        {
+            return null; // override
+        }
+
+        public static T? LoadFromJson<T>(string path) where T : PluginConfigObject
+        {
+            if (!File.Exists(path)) { return null; }
+
+            return JsonConvert.DeserializeObject<T>(File.ReadAllText(path));
+        }
+
+        public virtual void ImportFromOldVersion(Dictionary<Type, PluginConfigObject> oldConfigObjects, string currentVersion, string? previousVersion)
+        {
+            return; // override
         }
 
         #region IOnChangeEventArgs
