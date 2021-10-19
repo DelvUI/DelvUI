@@ -5,6 +5,8 @@ Features:
 Fixes:
 - Fixed some offsensive spells not working when the cursor is on top of a player frame with mouseover in automatic mode, but the target is valid (ie GNB's Continuation or SMN's Egi Assault).
 - Fixed some bars not displaying the remaining duration properly.
+- Fixed delay with DRG Disembowel bar.
+- Fixed DRG Disembowel bar hiding itself for a second when re-applying buff with "Hide When Inactive" option checked.
 
 # 0.3.2.0
 Features:
