@@ -7,6 +7,7 @@ using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -15,7 +16,7 @@ namespace DelvUI.Interface.Jobs
 {
     public class RedMageHud : JobHud
     {
-        private new RedMageConfig Config => (RedMageConfig)_config;        
+        private new RedMageConfig Config => (RedMageConfig)_config;
 
         public RedMageHud(RedMageConfig config, string? displayName = null) : base(config, displayName)
         {
@@ -193,7 +194,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            Config.DualcastBar.Label.SetText($"{(int)duration}");
+            Config.DualcastBar.Label.SetText($"{Math.Round(duration)}");
             BarUtilities.GetProgressBar(Config.DualcastBar, duration, 15f).
                 Draw(origin);
         }
