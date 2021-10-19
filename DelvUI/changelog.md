@@ -1,6 +1,7 @@
 # 0.4.0.0
 Fixes:
 - Fixed some offsensive spells not working when the cursor is on top of a player frame with mouseover in automatic mode, but the target is valid (ie GNB's Continuation or SMN's Egi Assault).
+- Fixed game being frozen when importing or exporting profiles to .delvui files.
 
 # 0.3.2.0
 Features:

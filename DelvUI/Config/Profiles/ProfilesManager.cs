@@ -1,4 +1,5 @@
 ﻿using Dalamud.Interface;
+using Dalamud.Interface.ImGuiFileDialog;
 using Dalamud.Logging;
 using DelvUI.Config.Attributes;
 using DelvUI.Config.Tree;
@@ -10,7 +11,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
-using System.Windows.Forms;
 
 namespace DelvUI.Config.Profiles
 {
@@ -124,6 +124,8 @@ namespace DelvUI.Config.Profiles
         [JsonIgnore] private string? _deletingProfileName = null;
         [JsonIgnore] private string? _resetingProfileName = null;
         [JsonIgnore] private string? _renamingProfileName = null;
+
+        [JsonIgnore] private FileDialogManager _fileDialogManager = new FileDialogManager();
 
         public SortedList<string, Profile> Profiles = new SortedList<string, Profile>();
 
@@ -246,7 +248,7 @@ namespace DelvUI.Config.Profiles
             {
                 ChatHelper.SendChatMessage("/hudlayout " + currentProfile.HudLayout);
             }
-            
+
             if (!LoadCurrentProfile())
             {
                 _currentProfileName = oldProfile;
@@ -422,103 +424,63 @@ namespace DelvUI.Config.Profiles
             return Import(newProfileName, importString);
         }
 
-        private string? ImportFromFile(string newProfileName)
+        private void ImportFromFile(string newProfileName)
         {
             if (newProfileName.Length == 0)
             {
-                return null;
+                return;
             }
 
-            DialogResult result = DialogResult.Cancel;
-            OpenFileDialog? picker;
-
-            try
+            Action<bool, string> callback = (finished, path) =>
             {
-                picker = new OpenFileDialog
+                try
                 {
-                    Multiselect = true,
-                    Filter = "DelvUI Profile (*.delvui)|*.delvui",
-                    CheckFileExists = true,
-                    Title = "Select a DelvUI Profile to import",
-                };
+                    if (finished && path.Length > 0)
+                    {
+                        var importString = File.ReadAllText(path);
+                        _errorMessage = Import(newProfileName, importString);
 
-                result = picker.ShowDialog();
-            }
-            catch (Exception e)
-            {
-                PluginLog.Error("Error with file picker: " + e.Message);
-                return "Error trying to open file picker!";
-            }
+                        if (_errorMessage == null)
+                        {
+                            _newProfileName = "";
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    PluginLog.Error("Error reading import file: " + e.Message);
+                    _errorMessage = "Error reading the file!";
+                }
+            };
 
-            if (picker == null || result != DialogResult.OK)
-            {
-                return null;
-            }
-
-            try
-            {
-                var importString = File.ReadAllText(picker.FileName);
-                return Import(newProfileName, importString);
-            }
-            catch (Exception e)
-            {
-                PluginLog.Error("Error reading import file: " + e.Message);
-                return "Error reading the file!";
-            }
+            _fileDialogManager.OpenFileDialog("Select a DelvUI Profile to import", "DelvUI Profile{.delvui}", callback);
         }
 
-        private string? ExportToFile(string newProfileName)
+        private void ExportToFile(string newProfileName)
         {
             if (newProfileName.Length == 0)
             {
-                return null;
+                return;
             }
 
-            DialogResult result = DialogResult.Cancel;
-            SaveFileDialog? picker;
-
-            try
+            Action<bool, string> callback = (finished, path) =>
             {
-                picker = new SaveFileDialog
+                try
                 {
-                    OverwritePrompt = true,
-                    Filter = "DelvUI Profile (*.delvui)|*.delvui",
-                    Title = "Save Profile",
-                    DefaultExt = ".delvui",
-                    AddExtension = true
-                };
+                    string src = CurrentProfilePath();
+                    if (finished && path.Length > 0 && src != path)
+                    {
+                        File.Copy(src, path, true);
+                    }
+                }
+                catch (Exception e)
+                {
+                    PluginLog.Error("Error copying file: " + e.Message);
+                    _errorMessage = "Error exporting the file!";
+                }
+            };
 
-                result = picker.ShowDialog();
-            }
-            catch (Exception e)
-            {
-                PluginLog.Error("Error with folder picker: " + e.Message);
-                return "Error trying to open folder picker!";
-            }
-
-            if (picker == null || result != DialogResult.OK || picker.FileName.Length == 0)
-            {
-                return null;
-            }
-
-            string src = CurrentProfilePath();
-
-            if (src == picker.FileName)
-            {
-                return null;
-            }
-
-            try
-            {
-                File.Copy(src, picker.FileName, true);
-            }
-            catch (Exception e)
-            {
-                PluginLog.Error("Error copying file: " + e.Message);
-                return "Error exporting the file!";
-            }
-
-            return null;
+            _fileDialogManager.SaveFileDialog("Save Profile", "DelvUI Profile{.delvui}", newProfileName + ".delvui", ".delvui", callback);
         }
 
         private string? DeleteProfile(string profileName)
@@ -653,15 +615,15 @@ namespace DelvUI.Config.Profiles
                 ImGui.SameLine();
                 if (ImGui.Button("Export to File", new Vector2(200, 0)))
                 {
-                    _errorMessage = ExportToFile(_currentProfileName);
+                    ExportToFile(_currentProfileName);
                 }
-                
+
                 ImGuiHelper.NewLineAndTab();
                 DrawAttachHudLayout(ref changed);
-                
+
                 ImGuiHelper.NewLineAndTab();
-                DrawAutoSwitchSettings(ref changed);                
-                
+                DrawAutoSwitchSettings(ref changed);
+
                 ImGuiHelper.DrawSeparator(1, 1);
                 ImGuiHelper.Tab();
                 ImGui.Text("Create a new profile:");
@@ -723,12 +685,7 @@ namespace DelvUI.Config.Profiles
                     }
                     else
                     {
-                        _errorMessage = ImportFromFile(_newProfileName);
-
-                        if (_errorMessage == null)
-                        {
-                            _newProfileName = "";
-                        }
+                        ImportFromFile(_newProfileName);
                     }
                 }
 
@@ -805,6 +762,8 @@ namespace DelvUI.Config.Profiles
                 }
             }
 
+            _fileDialogManager.Draw();
+
             return false;
         }
 
@@ -866,7 +825,7 @@ namespace DelvUI.Config.Profiles
 
             ImGui.SetCursorPos(new Vector2(originalPos.X, maxY + 30));
         }
-        
+
         private void DrawAttachHudLayout(ref bool changed)
         {
             Profile profile = CurrentProfile();
@@ -882,12 +841,12 @@ namespace DelvUI.Config.Profiles
             int hudLayout = profile.HudLayout;
 
             ImGui.Text("\u2002\u2002\u2514");
-            
+
             for (int i = 1; i <= 4; i++)
             {
                 ImGui.SameLine();
                 bool hudLayoutEnabled = hudLayout == i;
-                if (ImGui.Checkbox("Hud Layout "+i, ref hudLayoutEnabled))
+                if (ImGui.Checkbox("Hud Layout " + i, ref hudLayoutEnabled))
                 {
                     profile.HudLayout = i;
                     changed = true;
