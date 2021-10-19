@@ -84,6 +84,7 @@ namespace DelvUI.Config.Tree
             if (_configAttribute is not null)
             {
                 Separator = _configAttribute.separator;
+                Spacing = _configAttribute.spacing;
             }
         }
 
