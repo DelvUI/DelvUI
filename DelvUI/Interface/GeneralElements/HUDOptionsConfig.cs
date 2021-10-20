@@ -82,7 +82,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(202, collapseWith = nameof(EnableCombatActionBars))]
         public bool ShowCombatActionBarsOnWeaponDrawn = false;
 
-        [Checkbox("Use with Cross Hotbar" + "##CombatActionBars")]
+        [Checkbox("Use with Cross Hotbar", isMonitored = true)]
         [Order(203, collapseWith = nameof(EnableCombatActionBars))]
         public bool CombatActionBarsWithCrossHotbar = false;
 
