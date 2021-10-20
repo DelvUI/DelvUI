@@ -195,7 +195,7 @@ namespace DelvUI.Interface.GeneralElements
             return config.GetText().Contains("[health");
         }
 
-        private PluginConfigColor GetColor(GameObject? actor, uint currentHp, uint maxHp)
+        private PluginConfigColor GetColor(GameObject? actor, uint currentHp = 0, uint maxHp = 0)
         {
             Character? character = actor as Character;
 
@@ -221,7 +221,7 @@ namespace DelvUI.Interface.GeneralElements
         private void DrawFriendlyNPC(Vector2 pos, GameObject? actor)
         {
             var bar = new BarHud(Config, actor);
-            bar.AddForegrounds(new Rect(Config.Position, Config.Size, GetColor(actor, 0, 0)));
+            bar.AddForegrounds(new Rect(Config.Position, Config.Size, GetColor(actor)));
             bar.AddLabels(GetLabels(0));
             bar.Draw(pos);
         }
