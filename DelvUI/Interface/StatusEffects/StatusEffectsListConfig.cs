@@ -11,6 +11,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
 namespace DelvUI.Interface.StatusEffects
@@ -374,7 +375,7 @@ namespace DelvUI.Interface.StatusEffects
 
         public bool StatusAllowed(Status status)
         {
-            var inList = List.ContainsKey(KeyName(status));
+            var inList = List.Any(pair => pair.Key.EndsWith($"[{status.RowId}]"));
             if ((inList && FilterType == FilterType.Blacklist) || (!inList && FilterType == FilterType.Whitelist))
             {
                 return false;
