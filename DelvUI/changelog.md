@@ -4,6 +4,7 @@ Features:
 - Added role color setting to unit frames.
 - Added role/job icon to unit frames.
 - Added setting to hide health related labels when appropiate in unit frames.
+- Enable Combat Hotbars sub-option to use with Cross Hotbar instead.
 
 Fixes:
 - Fixed some offensive spells not working when the cursor is on top of a player frame with mouseover in automatic mode, but the target is valid (ie GNB's Continuation or SMN's Egi Assault).
