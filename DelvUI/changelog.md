@@ -3,11 +3,12 @@ Features:
 - Added "Player Status" tracking for party frames. Currently only "Viewing Cutscene" is supported.
 
 Fixes:
-- Fixed some offsensive spells not working when the cursor is on top of a player frame with mouseover in automatic mode, but the target is valid (ie GNB's Continuation or SMN's Egi Assault).
+- Fixed some offensive spells not working when the cursor is on top of a player frame with mouseover in automatic mode, but the target is valid (ie GNB's Continuation or SMN's Egi Assault).
 - Fixed some bars not displaying the remaining duration properly.
 - Fixed delay with DRG Disembowel bar.
 - Fixed DRG Disembowel bar hiding itself for a second when re-applying buff with "Hide When Inactive" option checked.
 - Fixed "invisible" buffs.
+- Fixed status whitelists/blacklists not working properly if the imported profile was used a different game language.
 
 # 0.3.2.0
 Features:
