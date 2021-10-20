@@ -13,6 +13,8 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Player", 0)]
     public class PlayerUnitFrameConfig : UnitFrameConfig
     {
+        public PlayerUnitFrameConfig() { } // don't remove
+
         public PlayerUnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
             : base(position, size, leftLabelConfig, rightLabelConfig)
         {
@@ -37,6 +39,8 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Target", 0)]
     public class TargetUnitFrameConfig : UnitFrameConfig
     {
+        public TargetUnitFrameConfig() { } // don't remove
+
         public TargetUnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
             : base(position, size, leftLabelConfig, rightLabelConfig)
         {
@@ -59,6 +63,8 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Target of Target", 0)]
     public class TargetOfTargetUnitFrameConfig : UnitFrameConfig
     {
+        public TargetOfTargetUnitFrameConfig() { } // don't remove
+
         public TargetOfTargetUnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
             : base(position, size, leftLabelConfig, rightLabelConfig)
         {
@@ -84,6 +90,8 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Focus Target", 0)]
     public class FocusTargetUnitFrameConfig : UnitFrameConfig
     {
+        public FocusTargetUnitFrameConfig() { } // don't remove
+
         public FocusTargetUnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
             : base(position, size, leftLabelConfig, rightLabelConfig)
         {
@@ -104,7 +112,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [JsonConverter(typeof(ColorByHealthFieldsConverter))]
     [DisableParentSettings("HideWhenInactive")]
     public class UnitFrameConfig : BarConfig
     {
@@ -167,10 +174,10 @@ namespace DelvUI.Interface.GeneralElements
         public bool HideHealthIfPossible = true;
 
         [NestedConfig("Left Text", 125)]
-        public EditableLabelConfig LeftLabelConfig;
+        public EditableLabelConfig LeftLabelConfig = null!;
 
         [NestedConfig("Right Text", 130)]
-        public EditableLabelConfig RightLabelConfig;
+        public EditableLabelConfig RightLabelConfig = null!;
 
         [NestedConfig("Role/Job Icon", 135)]
         public RoleJobIconConfig RoleIconConfig = new RoleJobIconConfig(
@@ -191,20 +198,11 @@ namespace DelvUI.Interface.GeneralElements
             LeftLabelConfig = leftLabelConfig;
             RightLabelConfig = rightLabelConfig;
             BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+            RoleIconConfig.Enabled = false;
             ColorByHealth.Enabled = false;
         }
-    }
 
-    public enum BlendMode
-    {
-        LAB,
-        LChab,
-        XYZ,
-        RGB,
-        LChuv,
-        Luv,
-        Jzazbz,
-        JzCzhz
+        public UnitFrameConfig() : base(Vector2.Zero, Vector2.Zero, new(Vector4.Zero)) { } // don't remove
     }
 
     [Exportable(false)]

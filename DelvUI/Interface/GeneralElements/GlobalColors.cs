@@ -1,5 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Party;
 using System;
@@ -407,6 +408,10 @@ namespace DelvUI.Interface.GeneralElements
     {
         public ColorByHealthFieldsConverter()
         {
+            SameTypeFieldConverter<bool> enabled =
+                new SameTypeFieldConverter<bool>("ColorByHealth.Enabled", false);
+            FieldConvertersMap.Add("UseColorBasedOnHealthValue", enabled);
+
             SameClassFieldConverter<PluginConfigColor> fullHealth =
                 new SameClassFieldConverter<PluginConfigColor>("ColorByHealth.FullHealthColor", new PluginConfigColor(new(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f)));
             FieldConvertersMap.Add("FullHealthColor", fullHealth);
@@ -428,7 +433,11 @@ namespace DelvUI.Interface.GeneralElements
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(PartyFramesColorsConfig) ||
-                   objectType == typeof(UnitFrameConfig);
+                   objectType == typeof(UnitFrameConfig) ||
+                   objectType == typeof(PlayerUnitFrameConfig) ||
+                   objectType == typeof(TargetUnitFrameConfig) ||
+                   objectType == typeof(TargetOfTargetUnitFrameConfig) ||
+                   objectType == typeof(FocusTargetUnitFrameConfig);
         }
     }
 }

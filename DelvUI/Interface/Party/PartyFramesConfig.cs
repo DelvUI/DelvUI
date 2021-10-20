@@ -103,7 +103,6 @@ namespace DelvUI.Interface.Party
         public SmoothHealthConfig SmoothHealthConfig = new SmoothHealthConfig();
     }
 
-    [JsonConverter(typeof(ColorByHealthFieldsConverter))]
     [Disableable(false)]
     [Exportable(false)]
     public class PartyFramesColorsConfig : PluginConfigObject
@@ -357,7 +356,6 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    [JsonConverter(typeof(PartyFramesIconsConverter))]
     [Exportable(false)]
     public class PartyFramesRoleIconConfig : RoleJobIconConfig
     {
@@ -369,7 +367,6 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    [JsonConverter(typeof(PartyFramesIconsConverter))]
     [Exportable(false)]
     public class PartyFramesLeaderIconConfig : IconConfig
     {
@@ -573,7 +570,6 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    [JsonConverter(typeof(PartyFramesTrackerConfigConverter))]
     [Exportable(false)]
     public class PartyFramesRaiseTrackerConfig : PluginConfigObject
     {
@@ -612,7 +608,6 @@ namespace DelvUI.Interface.Party
         );
     }
 
-    [JsonConverter(typeof(PartyFramesTrackerConfigConverter))]
     [Exportable(false)]
     public class PartyFramesInvulnTrackerConfig : PluginConfigObject
     {
