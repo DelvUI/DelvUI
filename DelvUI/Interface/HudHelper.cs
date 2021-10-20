@@ -249,7 +249,16 @@ namespace DelvUI.Interface
             string hotbarNumber = splits.Last();
             string toggleText = isHidden ? "off" : "on";
 
-            ChatHelper.SendChatMessage("/hotbar display " + hotbarNumber + " " + toggleText);
+            switch (Config.CombatActionBarsWithCrossHotbar)
+            {
+                case true:
+                    ChatHelper.SendChatMessage("/crosshotbardisplay " + toggleText);
+                    break;
+
+                default:
+                    ChatHelper.SendChatMessage("/hotbar display " + hotbarNumber + " " + toggleText);
+                    break;
+            }
         }
 
         private void SetAddonVisible(IntPtr addon, bool visible, Vector2 originalPosition)

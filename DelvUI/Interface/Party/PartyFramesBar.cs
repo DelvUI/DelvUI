@@ -158,7 +158,7 @@ namespace DelvUI.Interface.Party
             }
 
             // bg
-            PluginConfigColor bgColor;
+            PluginConfigColor bgColor = _configs.HealthBar.ColorsConfig.BackgroundColor;
             if (Member.RaiseTime != null && RaiseTracker.Enabled && RaiseTracker.ChangeBackgroundColorWhenRaised)
             {
                 bgColor = RaiseTracker.BackgroundColor;
@@ -172,10 +172,6 @@ namespace DelvUI.Interface.Party
                 bgColor = _configs.HealthBar.RangeConfig.Enabled
                     ? GetDistance(character, _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor)
                     : _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor;
-            }
-            else
-            {
-                bgColor = _configs.HealthBar.ColorsConfig.BackgroundColor;
             }
 
             drawList.AddRectFilled(Position, Position + _configs.HealthBar.Size, bgColor.Base);
@@ -402,16 +398,11 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        private bool ShowingRaise()
-        {
-            return Member != null && Member.RaiseTime.HasValue && RaiseTracker.Enabled &&
-                (Member.RaiseTime.Value > 0 || RaiseTracker.KeepIconAfterCastFinishes);
-        }
+        private bool ShowingRaise() =>
+            Member != null && Member.RaiseTime.HasValue && RaiseTracker.Enabled &&
+            (Member.RaiseTime.Value > 0 || RaiseTracker.KeepIconAfterCastFinishes);
 
-        private bool ShowingInvuln()
-        {
-            return Member != null && Member.InvulnStatus != null && InvulnTracker.Enabled && Member.InvulnStatus.InvulnTime > 0;
-        }
+        private bool ShowingInvuln() => Member != null && Member.InvulnStatus != null && InvulnTracker.Enabled && Member.InvulnStatus.InvulnTime > 0;
 
         private bool ShowMana()
         {
@@ -426,22 +417,20 @@ namespace DelvUI.Interface.Party
 
         private static uint? IconIdForStatus(PartyMemberStatus status)
         {
-            switch (status)
+            return status switch
             {
-                case PartyMemberStatus.ViewingCutscene: return 61508;
-            }
-
-            return null;
+                PartyMemberStatus.ViewingCutscene => 61508,
+                _ => null
+            };
         }
 
         private static string? StringForStatus(PartyMemberStatus status)
         {
-            switch (status)
+            return status switch
             {
-                case PartyMemberStatus.ViewingCutscene: return "[Viewing Cutscene]";
-            }
-
-            return null;
+                PartyMemberStatus.ViewingCutscene => "[Viewing Cutscene]",
+                _ => null
+            };
         }
 
         #region convenience

@@ -82,8 +82,12 @@ namespace DelvUI.Interface.GeneralElements
         [Order(202, collapseWith = nameof(EnableCombatActionBars))]
         public bool ShowCombatActionBarsOnWeaponDrawn = false;
 
-        [DynamicList("Hotbars Shown Only In Combat", "Hotbar 1", "Hotbar 2", "Hotbar 3", "Hotbar 4", "Hotbar 5", "Hotbar 6", "Hotbar 7", "Hotbar 8", "Hotbar 9", "Hotbar 10", isMonitored = true)]
+        [Checkbox("Use with Cross Hotbar" + "##CombatActionBars")]
         [Order(203, collapseWith = nameof(EnableCombatActionBars))]
+        public bool CombatActionBarsWithCrossHotbar = false;
+
+        [DynamicList("Hotbars Shown Only In Combat", "Hotbar 1", "Hotbar 2", "Hotbar 3", "Hotbar 4", "Hotbar 5", "Hotbar 6", "Hotbar 7", "Hotbar 8", "Hotbar 9", "Hotbar 10", isMonitored = true)]
+        [Order(204, collapseWith = nameof(EnableCombatActionBars))]
         public List<string> CombatActionBars = new List<string>();
 
         public Vector2 CastBarOriginalPosition;
