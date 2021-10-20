@@ -108,16 +108,10 @@ namespace DelvUI.Interface.GeneralElements
                 currentHp = _smoothHPHelper.GetNextHp((int)currentHp, (int)maxHp, Config.SmoothHealthConfig.Velocity);
             }
 
-            PluginConfigColor fillColor = Config.UseJobColor ? Utils.ColorForActor(character) : Config.FillColor;
+            PluginConfigColor fillColor = GetColor(character, currentHp, maxHp);
+            Rect background = new Rect(Config.Position, Config.Size, BackgroundColor(character));
+            Rect healthFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentHp, maxHp);
 
-            if (Config.UseColorBasedOnHealthValue)
-            {
-                var scale = (float)currentHp / Math.Max(1, maxHp);
-                fillColor = Utils.GetColorByScale(scale, Config.LowHealthColorThreshold / 100f, Config.FullHealthColorThreshold / 100f, Config.LowHealthColor, Config.FullHealthColor, Config.blendMode);
-            }
-
-            var background = new Rect(Config.Position, Config.Size, BackgroundColor(character));
-            var healthFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentHp, maxHp);
             BarHud bar = new BarHud(Config, character);
             bar.SetBackground(background);
             bar.AddForegrounds(healthFill);
@@ -125,8 +119,8 @@ namespace DelvUI.Interface.GeneralElements
 
             if (Config.UseMissingHealthBar)
             {
-                var healthMissingSize = Config.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
-                var healthMissingPos = Config.FillDirection.IsInverted() ? Config.Position : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
+                Vector2 healthMissingSize = Config.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
+                Vector2 healthMissingPos = Config.FillDirection.IsInverted() ? Config.Position : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
                 PluginConfigColor? color = Config.UseDeathIndicatorBackgroundColor && character.CurrentHp <= 0 ? Config.DeathIndicatorBackgroundColor : Config.HealthMissingColor;
                 bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, color));
             }
@@ -151,6 +145,30 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             bar.Draw(pos);
+
+            // role/job icon
+            if (Config.RoleIconConfig.Enabled && character is PlayerCharacter)
+            {
+                uint jobId = character.ClassJob.Id;
+                uint iconId = Config.RoleIconConfig.UseRoleIcons ?
+                        JobsHelper.RoleIconIDForJob(jobId, Config.RoleIconConfig.UseSpecificDPSRoleIcons) :
+                        JobsHelper.IconIDForJob(jobId) + (uint)Config.RoleIconConfig.Style * 100;
+
+                if (iconId > 0)
+                {
+                    var barPos = Utils.GetAnchoredPosition(pos, Config.Size, Config.Anchor);
+                    var parentPos = Utils.GetAnchoredPosition(barPos + Config.Position, -Config.Size, Config.RoleIconConfig.FrameAnchor);
+                    var iconPos = Utils.GetAnchoredPosition(parentPos + Config.RoleIconConfig.Position, Config.RoleIconConfig.Size, Config.RoleIconConfig.Anchor);
+
+                    //DrawHelper.DrawInWindow(ID + "_jobIcon", iconPos, Config.RoleIconConfig.Size, false, false, (drawList) =>
+                    //{
+                    var drawList = ImGui.GetWindowDrawList();
+                    DrawHelper.DrawIcon(iconId, iconPos, Config.RoleIconConfig.Size, false, drawList);
+                    //});
+                }
+            }
+        }
+
         private LabelConfig[] GetLabels(uint maxHp)
         {
             List<LabelConfig> labels = new List<LabelConfig>();
@@ -177,12 +195,34 @@ namespace DelvUI.Interface.GeneralElements
         {
             return config.GetText().Contains("[health");
         }
+
+        private PluginConfigColor GetColor(GameObject? actor, uint currentHp, uint maxHp)
+        {
+            Character? character = actor as Character;
+
+            if (Config.UseJobColor && character != null)
+            {
+                return Utils.ColorForActor(character);
+            }
+            else if (Config.UseRoleColor)
+            {
+                return character is PlayerCharacter ?
+                    GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id) :
+                    Utils.ColorForActor(character);
+            }
+            else if (Config.ColorByHealth.Enabled && character != null)
+            {
+                var scale = (float)currentHp / Math.Max(1, maxHp);
+                return Utils.GetColorByScale(scale, Config.ColorByHealth);
+            }
+
+            return Config.FillColor;
         }
 
         private void DrawFriendlyNPC(Vector2 pos, GameObject? actor)
         {
             var bar = new BarHud(Config, actor);
-            bar.AddForegrounds(new Rect(Config.Position, Config.Size, Config.UseJobColor ? GlobalColors.Instance.NPCFriendlyColor : Config.FillColor));
+            bar.AddForegrounds(new Rect(Config.Position, Config.Size, GetColor(actor, 0, 0)));
             bar.AddLabels(GetLabels(0));
             bar.Draw(pos);
         }

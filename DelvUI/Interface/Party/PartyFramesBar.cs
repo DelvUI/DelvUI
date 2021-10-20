@@ -78,15 +78,15 @@ namespace DelvUI.Interface.Party
             {
                 return CleanseTracker.HealthBarColor;
             }
-            else if (_configs.HealthBar.ColorsConfig.UseColorBasedOnHealthValue)
+            else if (_configs.HealthBar.ColorsConfig.ColorByHealth.Enabled)
             {
-                return Utils.GetColorByScale(scale, _configs.HealthBar.ColorsConfig.LowHealthColorThreshold / 100f, _configs.HealthBar.ColorsConfig.FullHealthColorThreshold / 100f, _configs.HealthBar.ColorsConfig.LowHealthColor, _configs.HealthBar.ColorsConfig.FullHealthColor, _configs.HealthBar.ColorsConfig.blendMode);
+                return Utils.GetColorByScale(scale, _configs.HealthBar.ColorsConfig.ColorByHealth);
             }
             else if (Member.JobId > 0)
             {
                 if (_configs.HealthBar.ColorsConfig.UseRoleColors)
                 {
-                    return ColorForJob(Member.JobId);
+                    return GlobalColors.Instance.SafeRoleColorForJobId(Member.JobId);
                 }
 
                 else
@@ -96,24 +96,6 @@ namespace DelvUI.Interface.Party
             }
 
             return _configs.HealthBar.ColorsConfig.OutOfReachBackgroundColor;
-        }
-
-        private PluginConfigColor ColorForJob(uint jodId)
-        {
-            var role = JobsHelper.RoleForJob(jodId);
-
-            switch (role)
-            {
-                case JobRoles.Tank: return _configs.HealthBar.ColorsConfig.TankRoleColor;
-                case JobRoles.Healer: return _configs.HealthBar.ColorsConfig.HealerRoleColor;
-
-                case JobRoles.DPSMelee:
-                case JobRoles.DPSRanged:
-                case JobRoles.DPSCaster:
-                    return _configs.HealthBar.ColorsConfig.DPSRoleColor;
-            }
-
-            return _configs.HealthBar.ColorsConfig.GenericRoleColor;
         }
 
         public void StopPreview()

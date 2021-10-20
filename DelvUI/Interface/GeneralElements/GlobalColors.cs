@@ -1,6 +1,7 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
+using DelvUI.Interface.Party;
 using System;
 using System.Collections.Generic;
 
@@ -10,6 +11,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         #region Singleton
         private MiscColorConfig _miscColorConfig = null!;
+        private RolesColorConfig _rolesColorConfig = null!;
 
         private Dictionary<uint, PluginConfigColor> ColorMap = null!;
 
@@ -22,6 +24,7 @@ namespace DelvUI.Interface.GeneralElements
         private void OnConfigReset(ConfigurationManager sender)
         {
             _miscColorConfig = sender.GetConfigObject<MiscColorConfig>();
+            _rolesColorConfig = sender.GetConfigObject<RolesColorConfig>();
 
             var tanksColorConfig = sender.GetConfigObject<TanksColorConfig>();
             var healersColorConfig = sender.GetConfigObject<HealersColorConfig>();
@@ -69,19 +72,19 @@ namespace DelvUI.Interface.GeneralElements
                 [JobIDs.BLU] = castersColorConfig.BLUColor,
 
                 // crafters
-                [JobIDs.CRP] = _miscColorConfig.HANDColor,
-                [JobIDs.BSM] = _miscColorConfig.HANDColor,
-                [JobIDs.ARM] = _miscColorConfig.HANDColor,
-                [JobIDs.GSM] = _miscColorConfig.HANDColor,
-                [JobIDs.LTW] = _miscColorConfig.HANDColor,
-                [JobIDs.WVR] = _miscColorConfig.HANDColor,
-                [JobIDs.ALC] = _miscColorConfig.HANDColor,
-                [JobIDs.CUL] = _miscColorConfig.HANDColor,
+                [JobIDs.CRP] = _rolesColorConfig.HANDColor,
+                [JobIDs.BSM] = _rolesColorConfig.HANDColor,
+                [JobIDs.ARM] = _rolesColorConfig.HANDColor,
+                [JobIDs.GSM] = _rolesColorConfig.HANDColor,
+                [JobIDs.LTW] = _rolesColorConfig.HANDColor,
+                [JobIDs.WVR] = _rolesColorConfig.HANDColor,
+                [JobIDs.ALC] = _rolesColorConfig.HANDColor,
+                [JobIDs.CUL] = _rolesColorConfig.HANDColor,
 
                 // gatherers
-                [JobIDs.MIN] = _miscColorConfig.LANDColor,
-                [JobIDs.BOT] = _miscColorConfig.LANDColor,
-                [JobIDs.FSH] = _miscColorConfig.LANDColor
+                [JobIDs.MIN] = _rolesColorConfig.LANDColor,
+                [JobIDs.BOT] = _rolesColorConfig.LANDColor,
+                [JobIDs.FSH] = _rolesColorConfig.LANDColor
             };
         }
 
@@ -128,6 +131,32 @@ namespace DelvUI.Interface.GeneralElements
         public PluginConfigColor SafeColorForJobId(uint jobId)
         {
             return ColorForJobId(jobId) ?? _miscColorConfig.NPCNeutralColor;
+        }
+
+        public PluginConfigColor? RoleColorForJobId(uint jobId)
+        {
+            var role = JobsHelper.RoleForJob(jobId);
+
+            switch (role)
+            {
+                case JobRoles.Tank: return _rolesColorConfig.TankRoleColor;
+                case JobRoles.Healer: return _rolesColorConfig.HealerRoleColor;
+
+                case JobRoles.DPSMelee:
+                case JobRoles.DPSRanged:
+                case JobRoles.DPSCaster:
+                    return _rolesColorConfig.DPSRoleColor;
+
+                case JobRoles.Gatherer: return _rolesColorConfig.LANDColor;
+                case JobRoles.Crafter: return _rolesColorConfig.HANDColor;
+            }
+
+            return null;
+        }
+
+        public PluginConfigColor SafeRoleColorForJobId(uint jobId)
+        {
+            return RoleColorForJobId(jobId) ?? _miscColorConfig.NPCNeutralColor;
         }
 
         public PluginConfigColor EmptyUnitFrameColor => _miscColorConfig.EmptyUnitFrameColor;
@@ -288,6 +317,34 @@ namespace DelvUI.Interface.GeneralElements
 
     [Disableable(false)]
     [Section("Colors")]
+    [SubSection("Roles", 0)]
+    public class RolesColorConfig : PluginConfigObject
+    {
+        public new static RolesColorConfig DefaultConfig() { return new RolesColorConfig(); }
+
+        [ColorEdit4("Tank Role Color")]
+        [Order(10)]
+        public PluginConfigColor TankRoleColor = new PluginConfigColor(new(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f));
+
+        [ColorEdit4("DPS Role Color")]
+        [Order(15)]
+        public PluginConfigColor DPSRoleColor = new PluginConfigColor(new(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f));
+
+        [ColorEdit4("Healer Role Color")]
+        [Order(20)]
+        public PluginConfigColor HealerRoleColor = new PluginConfigColor(new(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f));
+
+        [ColorEdit4("Disciples of the Land", spacing = true)]
+        [Order(25)]
+        public PluginConfigColor LANDColor = new PluginConfigColor(new(99f / 255f, 172f / 255f, 14f / 255f, 100f / 100f));
+
+        [ColorEdit4("Disciples of the Hand")]
+        [Order(30)]
+        public PluginConfigColor HANDColor = new PluginConfigColor(new(99f / 255f, 172f / 255f, 14f / 255f, 100f / 100f));
+    }
+
+    [Disableable(false)]
+    [Section("Colors")]
     [SubSection("Misc", 0)]
     public class MiscColorConfig : PluginConfigObject
     {
@@ -320,13 +377,58 @@ namespace DelvUI.Interface.GeneralElements
         [ColorEdit4("NPC Neutral")]
         [Order(30)]
         public PluginConfigColor NPCNeutralColor = new PluginConfigColor(new(218f / 255f, 157f / 255f, 46f / 255f, 100f / 100f));
+    }
 
-        [ColorEdit4("Disciples of the Land", spacing = true)]
-        [Order(35)]
-        public PluginConfigColor LANDColor = new PluginConfigColor(new(99f / 255f, 172f / 255f, 14f / 255f, 100f / 100f));
+    [Exportable(false)]
+    public class ColorByHealthValueConfig : PluginConfigObject
+    {
+        [ColorEdit4("Full Health Color")]
+        [Order(10)]
+        public PluginConfigColor FullHealthColor = new PluginConfigColor(new(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
-        [ColorEdit4("Disciples of the Hand")]
-        [Order(40)]
-        public PluginConfigColor HANDColor = new PluginConfigColor(new(99f / 255f, 172f / 255f, 14f / 255f, 100f / 100f));
+        [ColorEdit4("Low Health Color")]
+        [Order(15)]
+        public PluginConfigColor LowHealthColor = new PluginConfigColor(new(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [DragFloat("Full Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
+        [Order(20)]
+        public float FullHealthColorThreshold = 75f;
+
+        [DragFloat("Low Health Color Below Health %", min = 0f, max = 50f, velocity = 1f)]
+        [Order(25)]
+        public float LowHealthColorThreshold = 25f;
+
+        [Combo("Blend Mode", "LAB", "LChab", "XYZ", "RGB", "LChuv", "Luv", "Jzazbz", "JzCzhz")]
+        [Order(30)]
+        public BlendMode BlendMode = BlendMode.LAB;
+    }
+
+    public class ColorByHealthFieldsConverter : PluginConfigObjectConverter
+    {
+        public ColorByHealthFieldsConverter()
+        {
+            SameClassFieldConverter<PluginConfigColor> fullHealth =
+                new SameClassFieldConverter<PluginConfigColor>("ColorByHealth.FullHealthColor", new PluginConfigColor(new(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f)));
+            FieldConvertersMap.Add("FullHealthColor", fullHealth);
+
+            SameClassFieldConverter<PluginConfigColor> lowHealth =
+                new SameClassFieldConverter<PluginConfigColor>("ColorByHealth.LowHealthColor", new PluginConfigColor(new(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f)));
+            FieldConvertersMap.Add("LowHealthColor", lowHealth);
+
+            SameTypeFieldConverter<float> fullThreshold = new SameTypeFieldConverter<float>("ColorByHealth.FullHealthColorThreshold", 75f);
+            FieldConvertersMap.Add("FullHealthColorThreshold", fullThreshold);
+
+            SameTypeFieldConverter<float> lowThreshold = new SameTypeFieldConverter<float>("ColorByHealth.LowHealthColorThreshold", 25f);
+            FieldConvertersMap.Add("LowHealthColorThreshold", lowThreshold);
+
+            SameTypeFieldConverter<BlendMode> blendMode = new SameTypeFieldConverter<BlendMode>("ColorByHealth.BlendMode", BlendMode.LAB);
+            FieldConvertersMap.Add("blendMode", blendMode);
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(PartyFramesColorsConfig) ||
+                   objectType == typeof(UnitFrameConfig);
+        }
     }
 }

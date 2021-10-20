@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Numerics;
+using System.Text.Json.Serialization;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
@@ -103,14 +104,22 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
+    [JsonConverter(typeof(ColorByHealthFieldsConverter))]
     [DisableParentSettings("HideWhenInactive")]
     public class UnitFrameConfig : BarConfig
     {
-        [Checkbox("Use Job Color")]
+        [Checkbox("Use Job Color", spacing = true)]
         [Order(45)]
         public bool UseJobColor = true;
 
-        [Checkbox("Job Color As Background Color")]
+        [Checkbox("Use Role Color")]
+        [Order(46)]
+        public bool UseRoleColor = false;
+
+        [NestedConfig("Color Based On Health Value", 50, spacing = true, separator = false, nest = true)]
+        public ColorByHealthValueConfig ColorByHealth = new ColorByHealthValueConfig();
+
+        [Checkbox("Job Color As Background Color", spacing = true)]
         [Order(50)]
         public bool UseJobColorAsBackgroundColor = false;
 
@@ -122,7 +131,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(60, collapseWith = nameof(UseMissingHealthBar))]
         public PluginConfigColor HealthMissingColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [Checkbox("Death Indicator Background Color")]
+        [Checkbox("Death Indicator Background Color", spacing = true)]
         [Order(61)]
         public bool UseDeathIndicatorBackgroundColor = false;
 
@@ -130,31 +139,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(62, collapseWith = nameof(UseDeathIndicatorBackgroundColor))]
         public PluginConfigColor DeathIndicatorBackgroundColor = new PluginConfigColor(new Vector4(204f / 255f, 3f / 255f, 3f / 255f, 50f / 100f));
 
-        [Checkbox("Color Based On Health Value")]
-        [Order(65)]
-        public bool UseColorBasedOnHealthValue = false;
-
-        [ColorEdit4("Full Health Color ##CustomFrame")]
-        [Order(70, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public PluginConfigColor FullHealthColor = new PluginConfigColor(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
-
-        [ColorEdit4("Low Health Color ##CustomFrame")]
-        [Order(75, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public PluginConfigColor LowHealthColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
-
-        [DragFloat("Full Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
-        [Order(80, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public float FullHealthColorThreshold = 75f;
-
-        [DragFloat("Low Health Color Below Health %", min = 0f, max = 50f, velocity = 1f)]
-        [Order(85, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public float LowHealthColorThreshold = 25f;
-
-        [Combo("Blend Mode", "LAB", "LChab", "XYZ", "RGB", "LChuv", "Luv", "Jzazbz", "JzCzhz")]
-        [Order(90, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public BlendMode blendMode = BlendMode.LAB;
-
-        [Checkbox("Tank Invulnerability")]
+        [Checkbox("Tank Invulnerability", spacing = true)]
         [Order(95)]
         public bool ShowTankInvulnerability = true;
 
@@ -174,7 +159,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(115, collapseWith = nameof(UseCustomWalkingDeadColor))]
         public PluginConfigColor CustomWalkingDeadColor = new PluginConfigColor(new Vector4(158f / 255f, 158f / 255f, 158f / 255f, 50f / 100f));
 
-        [NestedConfig("Use Smooth Transitions", 120, separator = false, nest = true)]
+        [NestedConfig("Use Smooth Transitions", 120, spacing = true, separator = false, nest = true)]
         public SmoothHealthConfig SmoothHealthConfig = new SmoothHealthConfig();
 
         [Checkbox("Hide Health if Possible", spacing = true, help = "This will hide any label that has a health tag if the character doesn't have health (ie minions, friendly npcs, etc)")]
@@ -187,7 +172,15 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Right Text", 130)]
         public EditableLabelConfig RightLabelConfig;
 
-        [NestedConfig("Shields", 135)]
+        [NestedConfig("Role/Job Icon", 135)]
+        public RoleJobIconConfig RoleIconConfig = new RoleJobIconConfig(
+            new Vector2(5, 0),
+            new Vector2(30, 30),
+            DrawAnchor.Left,
+            DrawAnchor.Left
+        );
+
+        [NestedConfig("Shields", 140)]
         public ShieldConfig ShieldConfig = new ShieldConfig();
 
         public UnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
@@ -198,6 +191,7 @@ namespace DelvUI.Interface.GeneralElements
             LeftLabelConfig = leftLabelConfig;
             RightLabelConfig = rightLabelConfig;
             BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+            ColorByHealth.Enabled = false;
         }
     }
 

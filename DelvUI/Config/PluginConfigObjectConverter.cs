@@ -162,4 +162,28 @@ namespace DelvUI.Config
         {
         }
     }
+
+    public class SameClassFieldConverter<T> : PluginConfigObjectFieldConverter where T : class
+    {
+        private T DefaultValue;
+
+        public SameClassFieldConverter(string newFieldPath, T defaultValue)
+            : base(newFieldPath)
+        {
+            DefaultValue = defaultValue;
+        }
+
+        public override (string, object) Convert(JToken token)
+        {
+            T result = DefaultValue;
+
+            T? oldValue = token.ToObject<T>();
+            if (oldValue != null)
+            {
+                result = oldValue;
+            }
+
+            return (NewFieldPath, result);
+        }
+    }
 }
