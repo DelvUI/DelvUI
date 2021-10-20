@@ -150,6 +150,12 @@ namespace DelvUI.Interface.StatusEffects
                     continue;
                 }
 
+                // filter "invisible" status effects
+                if (data.Name.ToString().Length == 0 || data.Icon == 0)
+                {
+                    continue;
+                }
+
                 // dont filter anything on preview mode
                 if (_fakeEffects != null)
                 {
