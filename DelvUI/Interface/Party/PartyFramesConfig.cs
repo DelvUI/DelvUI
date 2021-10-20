@@ -16,7 +16,7 @@ namespace DelvUI.Interface.Party
 {
     [Exportable(false)]
     [DisableParentSettings("Position")]
-    [Section("Party Frames")]
+    [Section("Party Frames", true)]
     [SubSection("General", 0)]
     public class PartyFramesConfig : MovablePluginConfigObject
     {
@@ -61,7 +61,7 @@ namespace DelvUI.Interface.Party
 
     [Exportable(false)]
     [Disableable(false)]
-    [Section("Party Frames")]
+    [Section("Party Frames", true)]
     [SubSection("Health Bar", 0)]
     public class PartyFramesHealthBarsConfig : PluginConfigObject
     {
@@ -244,7 +244,7 @@ namespace DelvUI.Interface.Party
 
     [DisableParentSettings("HideWhenInactive", "Label")]
     [Exportable(false)]
-    [Section("Party Frames")]
+    [Section("Party Frames", true)]
     [SubSection("Mana Bar", 0)]
     public class PartyFramesManaBarConfig : PrimaryResourceConfig
     {
@@ -273,7 +273,7 @@ namespace DelvUI.Interface.Party
 
 
     [Exportable(false)]
-    [Section("Party Frames")]
+    [Section("Party Frames", true)]
     [SubSection("Castbars", 0)]
     public class PartyFramesCastbarConfig : CastbarConfig
     {
@@ -308,7 +308,7 @@ namespace DelvUI.Interface.Party
 
     [Disableable(false)]
     [Exportable(false)]
-    [Section("Party Frames")]
+    [Section("Party Frames", true)]
     [SubSection("Icons", 0)]
     public class PartyFramesIconsConfig : PluginConfigObject
     {
@@ -451,7 +451,7 @@ namespace DelvUI.Interface.Party
     }
 
     [Exportable(false)]
-    [Section("Party Frames")]
+    [Section("Party Frames", true)]
     [SubSection("Buffs", 0)]
     public class PartyFramesBuffsConfig : PartyFramesStatusEffectsListConfig
     {
@@ -483,7 +483,7 @@ namespace DelvUI.Interface.Party
     }
 
     [Exportable(false)]
-    [Section("Party Frames")]
+    [Section("Party Frames", true)]
     [SubSection("Debuffs", 0)]
     public class PartyFramesDebuffsConfig : PartyFramesStatusEffectsListConfig
     {
@@ -529,7 +529,7 @@ namespace DelvUI.Interface.Party
 
     [Disableable(false)]
     [Exportable(false)]
-    [Section("Party Frames")]
+    [Section("Party Frames", true)]
     [SubSection("Trackers", 0)]
     public class PartyFramesTrackersConfig : PluginConfigObject
     {

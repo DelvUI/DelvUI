@@ -326,6 +326,7 @@ namespace DelvUI.Config.Tree
 
                     SectionNode newNode = new();
                     newNode.Name = sectionAttribute.SectionName;
+                    newNode.ForceAllowExport = sectionAttribute.ForceAllowExport;
                     _children.Add(newNode);
 
                     return newNode.GetOrAddConfig<T>();
