@@ -708,28 +708,18 @@ namespace DelvUI.Interface.StatusEffects
     {
         public StatusEffectsBlacklistConfigConverter()
         {
-            FieldConvertersMap.Add("UseAsWhitelist", typeof(UseAsWhitelistConverter));
+            NewTypeFieldConverter<bool, FilterType> converter;
+            converter = new NewTypeFieldConverter<bool, FilterType>("FilterType", FilterType.Blacklist, (oldValue) =>
+            {
+                return oldValue ? FilterType.Whitelist : FilterType.Blacklist;
+            });
+
+            FieldConvertersMap.Add("UseAsWhitelist", converter);
         }
 
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof(StatusEffectsBlacklistConfig);
-        }
-    }
-
-    public class UseAsWhitelistConverter : PluginConfigObjectFieldConverter
-    {
-        public override (string, object) Convert(JToken token)
-        {
-            FilterType result = FilterType.Blacklist;
-
-            bool? boolValue = token.ToObject<bool>();
-            if (boolValue.HasValue)
-            {
-                result = boolValue.Value ? FilterType.Whitelist : FilterType.Blacklist;
-            }
-
-            return ("FilterType", result);
         }
     }
 
