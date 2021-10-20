@@ -65,7 +65,13 @@ namespace DelvUI.Interface.Party
     [SubSection("Health Bar", 0)]
     public class PartyFramesHealthBarsConfig : PluginConfigObject
     {
-        public new static PartyFramesHealthBarsConfig DefaultConfig() { return new PartyFramesHealthBarsConfig(); }
+        public new static PartyFramesHealthBarsConfig DefaultConfig()
+        {
+            var config = new PartyFramesHealthBarsConfig();
+            config.ColorsConfig.ColorByHealth.Enabled = false;
+
+            return config;
+        }
 
         [DragInt2("Size", isMonitored = true)]
         [Order(30)]
@@ -129,72 +135,35 @@ namespace DelvUI.Interface.Party
         [Order(20)]
         public bool UseRoleColors = false;
 
-        [ColorEdit4("Tank Role Color")]
-        [Order(25, collapseWith = nameof(UseRoleColors))]
-        public PluginConfigColor TankRoleColor = new PluginConfigColor(new Vector4(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f));
-
-        [ColorEdit4("DPS Role Color")]
-        [Order(30, collapseWith = nameof(UseRoleColors))]
-        public PluginConfigColor DPSRoleColor = new PluginConfigColor(new Vector4(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f));
-
-        [ColorEdit4("Healer Role Color")]
-        [Order(35, collapseWith = nameof(UseRoleColors))]
-        public PluginConfigColor HealerRoleColor = new PluginConfigColor(new Vector4(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f));
-
-        [ColorEdit4("Generic Role Color")]
-        [Order(40, collapseWith = nameof(UseRoleColors))]
-        public PluginConfigColor GenericRoleColor = new PluginConfigColor(new Vector4(0f / 255f, 145f / 255f, 6f / 255f, 100f / 100f));
-
-        [Checkbox("Color Based On Health Value", isMonitored = true, spacing = true)]
-        [Order(45)]
-        public bool UseColorBasedOnHealthValue = false;
-
-        [ColorEdit4("Full Health Color")]
-        [Order(50, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public PluginConfigColor FullHealthColor = new PluginConfigColor(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
-
-        [ColorEdit4("Low Health Color")]
-        [Order(55, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public PluginConfigColor LowHealthColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
-
-        [DragFloat("Full Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
-        [Order(60, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public float FullHealthColorThreshold = 75f;
-
-        [DragFloat("Low Health Color Below Health %", min = 0f, max = 50f, velocity = 1f)]
-        [Order(65, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public float LowHealthColorThreshold = 25f;
-
-        [Combo("Blend Mode", "LAB", "LChab", "XYZ", "RGB", "LChuv", "Luv", "Jzazbz", "JzCzhz")]
-        [Order(66, collapseWith = nameof(UseColorBasedOnHealthValue))]
-        public BlendMode blendMode = BlendMode.LAB;
+        [NestedConfig("Color Based On Health Value", 30, spacing = true, separator = false, nest = true)]
+        public ColorByHealthValueConfig ColorByHealth = new ColorByHealthValueConfig();
 
         [Checkbox("Highlight When Hovering With Cursor", spacing = true)]
-        [Order(70)]
+        [Order(40)]
         public bool ShowHighlight = true;
 
         [ColorEdit4("Highlight Color")]
-        [Order(75, collapseWith = nameof(ShowHighlight))]
+        [Order(45, collapseWith = nameof(ShowHighlight))]
         public PluginConfigColor HighlightColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 5f / 100f));
 
         [Checkbox("Show Enmity Border Colors", spacing = true)]
-        [Order(80)]
+        [Order(50)]
         public bool ShowEnmityBorderColors = true;
 
         [ColorEdit4("Enmity Leader Color")]
-        [Order(85, collapseWith = nameof(ShowEnmityBorderColors))]
+        [Order(55, collapseWith = nameof(ShowEnmityBorderColors))]
         public PluginConfigColor EnmityLeaderBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
 
         [Checkbox("Show Second Enmity")]
-        [Order(90, collapseWith = nameof(ShowEnmityBorderColors))]
+        [Order(60, collapseWith = nameof(ShowEnmityBorderColors))]
         public bool ShowSecondEnmity = true;
 
         [Checkbox("Hide Second Enmity in Light Parties")]
-        [Order(95, collapseWith = nameof(ShowSecondEnmity))]
+        [Order(65, collapseWith = nameof(ShowSecondEnmity))]
         public bool HideSecondEnmityInLightParties = true;
 
         [ColorEdit4("Enmity Second Color")]
-        [Order(100, collapseWith = nameof(ShowSecondEnmity))]
+        [Order(70, collapseWith = nameof(ShowSecondEnmity))]
         public PluginConfigColor EnmitySecondBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 175f / 255f, 40f / 255f, 100f / 100f));
     }
 
@@ -387,9 +356,8 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    [JsonConverter(typeof(PartyFramesIconsConverter))]
     [Exportable(false)]
-    public class PartyFramesRoleIconConfig : IconConfig
+    public class PartyFramesRoleIconConfig : RoleJobIconConfig
     {
         public PartyFramesRoleIconConfig() : base() { }
 
@@ -397,21 +365,8 @@ namespace DelvUI.Interface.Party
             : base(position, size, anchor, frameAnchor)
         {
         }
-
-        [Combo("Style", "Style 1", "Style 2", spacing = true)]
-        [Order(25)]
-        public int Style = 0;
-
-        [Checkbox("Use Role Icons", spacing = true)]
-        [Order(30)]
-        public bool UseRoleIcons = false;
-
-        [Checkbox("Use Specific DPS Role Icons")]
-        [Order(35, collapseWith = nameof(UseRoleIcons))]
-        public bool UseSpecificDPSRoleIcons = false;
     }
 
-    [JsonConverter(typeof(PartyFramesIconsConverter))]
     [Exportable(false)]
     public class PartyFramesLeaderIconConfig : IconConfig
     {
@@ -615,7 +570,6 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    [JsonConverter(typeof(PartyFramesTrackerConfigConverter))]
     [Exportable(false)]
     public class PartyFramesRaiseTrackerConfig : PluginConfigObject
     {
@@ -654,7 +608,6 @@ namespace DelvUI.Interface.Party
         );
     }
 
-    [JsonConverter(typeof(PartyFramesTrackerConfigConverter))]
     [Exportable(false)]
     public class PartyFramesInvulnTrackerConfig : PluginConfigObject
     {

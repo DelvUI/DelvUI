@@ -36,6 +36,28 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
+    public class RoleJobIconConfig : IconConfig
+    {
+        public RoleJobIconConfig() : base() { }
+
+        public RoleJobIconConfig(Vector2 position, Vector2 size, DrawAnchor anchor, DrawAnchor frameAnchor)
+            : base(position, size, anchor, frameAnchor)
+        {
+        }
+
+        [Combo("Style", "Style 1", "Style 2", spacing = true)]
+        [Order(25)]
+        public int Style = 0;
+
+        [Checkbox("Use Role Icons", spacing = true)]
+        [Order(30)]
+        public bool UseRoleIcons = false;
+
+        [Checkbox("Use Specific DPS Role Icons")]
+        [Order(35, collapseWith = nameof(UseRoleIcons))]
+        public bool UseSpecificDPSRoleIcons = false;
+    }
+
     public class PartyFramesIconsConverter : PluginConfigObjectConverter
     {
         public PartyFramesIconsConverter()

@@ -1,6 +1,10 @@
 ﻿using Dalamud.Logging;
+using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.Party;
+using DelvUI.Interface.StatusEffects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -25,7 +29,7 @@ namespace DelvUI.Config
 
             try
             {
-                config = (T?)Activator.CreateInstance(type);
+                config = (T?)Activator.CreateInstance<T>();
                 if (config == null) { return null; }
 
                 JObject? jsonObject = (JObject?)serializer.Deserialize(reader);
@@ -83,9 +87,9 @@ namespace DelvUI.Config
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
-                PluginLog.Error($"Error deserializing {type.Name}!");
+                PluginLog.Error($"Error deserializing {type.Name}: " + e.Message);
             }
 
             return config;
@@ -117,6 +121,39 @@ namespace DelvUI.Config
         }
     }
 
+    #region contract resolver
+    public class PluginConfigObjectsContractResolver : DefaultContractResolver
+    {
+        private static Dictionary<Type, Type> ConvertersMap = new Dictionary<Type, Type>()
+        {
+            [typeof(UnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
+            [typeof(PlayerUnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
+            [typeof(TargetUnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
+            [typeof(TargetOfTargetUnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
+            [typeof(FocusTargetUnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
+            [typeof(PartyFramesColorsConfig)] = typeof(ColorByHealthFieldsConverter),
+            [typeof(PartyFramesRoleIconConfig)] = typeof(PartyFramesIconsConverter),
+            [typeof(PartyFramesLeaderIconConfig)] = typeof(PartyFramesIconsConverter),
+            [typeof(PartyFramesRaiseTrackerConfig)] = typeof(PartyFramesTrackerConfigConverter),
+            [typeof(PartyFramesInvulnTrackerConfig)] = typeof(PartyFramesTrackerConfigConverter),
+            [typeof(StatusEffectsBlacklistConfig)] = typeof(StatusEffectsBlacklistConfigConverter),
+        };
+
+        protected override JsonObjectContract CreateObjectContract(Type objectType)
+        {
+            JsonObjectContract contract = base.CreateObjectContract(objectType);
+
+            if (ConvertersMap.TryGetValue(objectType, out Type? converterType) && converterType != null)
+            {
+                contract.Converter = (JsonConverter?)Activator.CreateInstance(converterType);
+            }
+
+            return contract;
+        }
+    }
+    #endregion
+
+    #region field converters
     public abstract class PluginConfigObjectFieldConverter
     {
         public readonly string NewFieldPath;
@@ -162,4 +199,29 @@ namespace DelvUI.Config
         {
         }
     }
+
+    public class SameClassFieldConverter<T> : PluginConfigObjectFieldConverter where T : class
+    {
+        private T DefaultValue;
+
+        public SameClassFieldConverter(string newFieldPath, T defaultValue)
+            : base(newFieldPath)
+        {
+            DefaultValue = defaultValue;
+        }
+
+        public override (string, object) Convert(JToken token)
+        {
+            T result = DefaultValue;
+
+            T? oldValue = token.ToObject<T>();
+            if (oldValue != null)
+            {
+                result = oldValue;
+            }
+
+            return (NewFieldPath, result);
+        }
+    }
+    #endregion
 }

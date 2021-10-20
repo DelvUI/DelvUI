@@ -354,7 +354,6 @@ namespace DelvUI.Interface.StatusEffects
         Whitelist
     }
 
-    [JsonConverter(typeof(StatusEffectsBlacklistConfigConverter))]
     [Exportable(false)]
     public class StatusEffectsBlacklistConfig : PluginConfigObject
     {

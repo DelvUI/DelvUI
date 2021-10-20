@@ -163,7 +163,7 @@ namespace DelvUI.Helpers
 
             ["[company]"] = (chara) => chara.CompanyTag.ToString(),
 
-            ["[level]"] = (chara) => chara.Level.ToString(),
+            ["[level]"] = (chara) => chara.Level > 0 ? chara.Level.ToString() : "-",
 
             ["[job]"] = (chara) => JobsHelper.JobNames.TryGetValue(chara.ClassJob.Id, out var jobName) ? jobName : "",
             #endregion
