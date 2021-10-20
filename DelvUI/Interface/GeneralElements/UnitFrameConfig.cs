@@ -177,6 +177,10 @@ namespace DelvUI.Interface.GeneralElements
         [NestedConfig("Use Smooth Transitions", 120, separator = false, nest = true)]
         public SmoothHealthConfig SmoothHealthConfig = new SmoothHealthConfig();
 
+        [Checkbox("Hide Health if Possible", spacing = true, help = "This will hide any label that has a health tag if the character doesn't have health (ie minions, friendly npcs, etc)")]
+        [Order(121)]
+        public bool HideHealthIfPossible = true;
+
         [NestedConfig("Left Text", 125)]
         public EditableLabelConfig LeftLabelConfig;
 

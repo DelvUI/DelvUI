@@ -118,7 +118,10 @@ namespace DelvUI.Interface.GeneralElements
 
             var background = new Rect(Config.Position, Config.Size, BackgroundColor(character));
             var healthFill = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentHp, maxHp);
-            var bar = new BarHud(Config, character).SetBackground(background).AddForegrounds(healthFill).AddLabels(Config.LeftLabelConfig, Config.RightLabelConfig);
+            BarHud bar = new BarHud(Config, character);
+            bar.SetBackground(background);
+            bar.AddForegrounds(healthFill);
+            bar.AddLabels(GetLabels(maxHp));
 
             if (Config.UseMissingHealthBar)
             {
@@ -148,13 +151,39 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             bar.Draw(pos);
+        private LabelConfig[] GetLabels(uint maxHp)
+        {
+            List<LabelConfig> labels = new List<LabelConfig>();
+
+            if (Config.HideHealthIfPossible)
+            {
+                bool isHealthLabel = IsHealthLabel(Config.LeftLabelConfig);
+                if (!isHealthLabel || maxHp > 0)
+                {
+                    labels.Add(Config.LeftLabelConfig);
+                }
+
+                isHealthLabel = IsHealthLabel(Config.RightLabelConfig);
+                if (!isHealthLabel || maxHp > 0)
+                {
+                    labels.Add(Config.RightLabelConfig);
+                }
+            }
+
+            return labels.ToArray();
+        }
+
+        private bool IsHealthLabel(LabelConfig config)
+        {
+            return config.GetText().Contains("[health");
+        }
         }
 
         private void DrawFriendlyNPC(Vector2 pos, GameObject? actor)
         {
             var bar = new BarHud(Config, actor);
             bar.AddForegrounds(new Rect(Config.Position, Config.Size, Config.UseJobColor ? GlobalColors.Instance.NPCFriendlyColor : Config.FillColor));
-            bar.AddLabels(Config.LeftLabelConfig, Config.RightLabelConfig);
+            bar.AddLabels(GetLabels(0));
             bar.Draw(pos);
         }
 
