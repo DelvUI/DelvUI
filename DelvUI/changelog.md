@@ -11,7 +11,7 @@ Fixes:
 - Fixed delay with DRG Disembowel bar.
 - Fixed DRG Disembowel bar hiding itself for a second when re-applying buff with "Hide When Inactive" option checked.
 - Fixed "invisible" buffs.
-- Fixed status whitelists/blacklists not working properly if the imported profile was used a different game language.
+- Fixed status whitelists/blacklists not working properly if the imported profile was created with a different game language.
 
 # 0.3.2.0
 Features:
