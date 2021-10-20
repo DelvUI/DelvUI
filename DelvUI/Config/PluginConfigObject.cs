@@ -104,10 +104,15 @@ namespace DelvUI.Config
         {
             if (!File.Exists(path)) { return null; }
 
+            return LoadFromJsonString<T>(File.ReadAllText(path));
+        }
+
+        public static T? LoadFromJsonString<T>(string jsonString) where T : PluginConfigObject
+        {
             JsonSerializerSettings settings = new JsonSerializerSettings();
             settings.ContractResolver = new PluginConfigObjectsContractResolver();
 
-            return JsonConvert.DeserializeObject<T>(File.ReadAllText(path), settings);
+            return JsonConvert.DeserializeObject<T>(jsonString, settings);
         }
 
         public virtual void ImportFromOldVersion(Dictionary<Type, PluginConfigObject> oldConfigObjects, string currentVersion, string? previousVersion)
