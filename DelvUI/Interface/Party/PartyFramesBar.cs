@@ -63,11 +63,6 @@ namespace DelvUI.Interface.Party
                 return _configs.HealthBar.ColorsConfig.OutOfReachBackgroundColor;
             }
 
-            if (Member.Character?.ObjectKind == ObjectKind.BattleNpc)
-            {
-                return GlobalColors.Instance.NPCFriendlyColor;
-            }
-
             bool cleanseCheck = true;
             if (CleanseTracker.CleanseJobsOnly)
             {
@@ -93,6 +88,11 @@ namespace DelvUI.Interface.Party
                 {
                     return GlobalColors.Instance.SafeColorForJobId(Member.JobId);
                 }
+            }
+
+            if (Member.Character?.ObjectKind == ObjectKind.BattleNpc)
+            {
+                return GlobalColors.Instance.NPCFriendlyColor;
             }
 
             return _configs.HealthBar.ColorsConfig.OutOfReachBackgroundColor;
@@ -229,7 +229,7 @@ namespace DelvUI.Interface.Party
                 uint iconId;
 
                 // chocobo icon
-                if (character != null && character.ObjectKind == ObjectKind.BattleNpc)
+                if (character is BattleNpc battleNpc && battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo)
                 {
                     iconId = JobsHelper.RoleIconIDForBattleCompanion + (uint)RoleIcon.Style * 100;
                 }
