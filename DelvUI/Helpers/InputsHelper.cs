@@ -90,12 +90,6 @@ namespace DelvUI.Helpers
             _requsetActionHook = new Hook<OnRequestAction>(_requestAction, new OnRequestAction(HandleRequestAction));
             _requsetActionHook.Enable();
 
-            // WndProc detour
-            IntPtr windowHandle = Process.GetCurrentProcess().MainWindowHandle;
-            _wndProcDelegate = WndProcDetour;
-            _wndProcPtr = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate);
-            _imguiWndProcPtr = SetWindowLongPtr(windowHandle, GWL_WNDPROC, _wndProcPtr);
-
             // mouseover setting
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
             OnConfigReset(ConfigurationManager.Instance);
@@ -148,10 +142,6 @@ namespace DelvUI.Helpers
 
         private IntPtr _requestAction;
         private Hook<OnRequestAction> _requsetActionHook;
-
-        private WndProcDelegate _wndProcDelegate;
-        private IntPtr _wndProcPtr;
-        private IntPtr _imguiWndProcPtr;
 
         private ExcelSheet<Action>? _sheet;
 
@@ -289,9 +279,47 @@ namespace DelvUI.Helpers
 
         public void Update()
         {
+            HookWndProc();
+
             _leftButtonClicked = null;
             _rightButtonClicked = null;
         }
+
+        private void HookWndProc()
+        {
+            if (_wndProcPtr != IntPtr.Zero) { return; }
+
+            ulong processId = (ulong)Process.GetCurrentProcess().Id;
+
+            IntPtr hWnd = IntPtr.Zero;
+            do
+            {
+                hWnd = FindWindowExW(IntPtr.Zero, hWnd, "FFXIVGAME", null);
+                if (hWnd == IntPtr.Zero) { return; }
+
+                ulong wndProcessId = 0;
+                GetWindowThreadProcessId(hWnd, ref wndProcessId);
+
+                if (wndProcessId == processId)
+                {
+                    break;
+                }
+
+            } while (hWnd != IntPtr.Zero);
+
+            if (hWnd == IntPtr.Zero) { return; }
+
+            _wndProcDelegate = WndProcDetour;
+            _wndProcPtr = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate);
+            _imguiWndProcPtr = SetWindowLongPtr(hWnd, GWL_WNDPROC, _wndProcPtr);
+
+            PluginLog.Log("Hooking WndProc for window: " + hWnd.ToString("X"));
+            PluginLog.Log("Old WndProc: " + _imguiWndProcPtr.ToString("X"));
+        }
+
+        private WndProcDelegate _wndProcDelegate = null!;
+        private IntPtr _wndProcPtr = IntPtr.Zero;
+        private IntPtr _imguiWndProcPtr = IntPtr.Zero;
 
         public delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, ulong wParam, long lParam);
 
@@ -301,7 +329,12 @@ namespace DelvUI.Helpers
         [DllImport("user32.dll", EntryPoint = "CallWindowProcW")]
         public static extern long CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, uint Msg, ulong wParam, long lParam);
 
-        private const uint WM_KEYDOWN = 256;
+        [DllImport("user32.dll", EntryPoint = "FindWindowExW", SetLastError = true)]
+        public static extern IntPtr FindWindowExW(IntPtr hWndParent, IntPtr hWndChildAfter, [MarshalAs(UnmanagedType.LPWStr)] string? lpszClass, [MarshalAs(UnmanagedType.LPWStr)] string? lpszWindow);
+
+        [DllImport("user32.dll", EntryPoint = "GetWindowThreadProcessId", SetLastError = true)]
+        public static extern ulong GetWindowThreadProcessId(IntPtr hWnd, ref ulong id);
+
         private const uint WM_LBUTTONDOWN = 513;
         private const uint WM_LBUTTONUP = 514;
         private const uint WM_RBUTTONDOWN = 516;
