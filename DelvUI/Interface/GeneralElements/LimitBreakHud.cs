@@ -26,7 +26,7 @@ namespace DelvUI.Interface.GeneralElements
         public override void DrawChildren(Vector2 origin)
         {
             LimitBreakHelper helper = LimitBreakHelper.Instance;
-            
+
             Config.Label.SetText("");
 
             if (!Config.Enabled)
@@ -38,13 +38,13 @@ namespace DelvUI.Interface.GeneralElements
             {
                 return;
             }
-            
+
             int currentLimitBreak = helper.LimitBreakActive ? helper.LimitBreakBarWidth.Sum() : 0;
             int maxLimitBreak = helper.LimitBreakMaxLevel * helper.MaxLimitBarWidth;
             int limitBreakChunks = helper.LimitBreakActive ? helper.LimitBreakMaxLevel : 3;
-            
-            Config.Label.SetText($"{helper.LimitBreakLevel} / {limitBreakChunks}");
-            
+
+            Config.Label.SetValue(helper.LimitBreakLevel / limitBreakChunks);
+
             BarUtilities.GetChunkedProgressBars(Config, limitBreakChunks, currentLimitBreak, maxLimitBreak).Draw(origin);
         }
     }

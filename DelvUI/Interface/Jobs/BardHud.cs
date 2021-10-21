@@ -190,8 +190,8 @@ namespace DelvUI.Interface.Jobs
             }
             
             float duration = Math.Abs(songTimer / 1000f);
-            
-            Config.SongGaugeBar.Label.SetText($"{duration.ToString("N0", CultureInfo.InvariantCulture)}");
+
+            Config.SongGaugeBar.Label.SetValue(duration);
             BarUtilities.GetProgressBar(Config.SongGaugeBar, duration, 30f, 0f, null, songColor)
                         .Draw(origin);
         }
@@ -206,7 +206,8 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            config.Label.SetText($"{soulVoice,0}");
+            config.Label.SetValue(soulVoice);
+
             BarUtilities.GetProgressBar(
                 config, 
                 null, 

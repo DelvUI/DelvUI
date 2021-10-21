@@ -39,7 +39,7 @@ namespace DelvUI.Interface.Bars
         public PluginConfigColor PartialFillColor;
 
         [NestedConfig("Bar Text", 1000, separator = false, spacing = true)]
-        public LabelConfig Label;
+        public NumericLabelConfig Label;
 
         public ChunkedProgressBarConfig(
             Vector2 position,
@@ -48,7 +48,7 @@ namespace DelvUI.Interface.Bars
             int padding = 2,
             PluginConfigColor? partialFillColor = null) : base(position, size, fillColor, padding)
         {
-            Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+            Label = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
             Label.Enabled = false;
 
             PartialFillColor = partialFillColor ?? new PluginConfigColor(new(180f / 255f, 180f / 255f, 180f / 255f, 100f / 100f));

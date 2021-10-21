@@ -24,8 +24,8 @@ namespace DelvUI.Interface.GeneralElements
         public override void DrawChildren(Vector2 origin)
         {
             PullTimerState helper = PullTimerHelper.Instance.PullTimerState;
-            
-            Config.Label.SetText($"{helper.CountDownValue.ToString(Config.ShowDecimals ? "N2" : "N0", CultureInfo.InvariantCulture),0}");
+
+            Config.Label.SetValue(helper.CountDownValue);
 
             if (!helper.CountingDown)
             {

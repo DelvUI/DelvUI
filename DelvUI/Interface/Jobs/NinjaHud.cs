@@ -156,7 +156,7 @@ namespace DelvUI.Interface.Jobs
 
                 if (!Config.MudraBar.HideWhenInactive || current < max)
                 {
-                    Config.MudraBar.Label.SetText(Math.Truncate((max - current) % 20).ToString());
+                    Config.MudraBar.Label.SetValue((max - current) % 20);
                     BarUtilities.GetChunkedProgressBars(Config.MudraBar, 2, current, max, 0f, player).Draw(pos);
                 }
             }
@@ -166,9 +166,10 @@ namespace DelvUI.Interface.Jobs
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
             float hutonDuration = gauge.HutonTimer / 1000f;
+
             if (!Config.HutonBar.HideWhenInactive || gauge.HutonTimer > 0)
             {
-                Config.HutonBar.Label.SetText($"{Math.Round(hutonDuration)}");
+                Config.HutonBar.Label.SetValue(hutonDuration);
                 BarUtilities.GetProgressBar(Config.HutonBar, hutonDuration, 70f, 0f, player).Draw(pos);
             }
         }
@@ -176,9 +177,10 @@ namespace DelvUI.Interface.Jobs
         private void DrawNinkiGauge(Vector2 pos, PlayerCharacter player)
         {
             NINGauge gauge = Plugin.JobGauges.Get<NINGauge>();
+
             if (!Config.NinkiBar.HideWhenInactive || gauge.Ninki > 0)
             {
-                Config.NinkiBar.Label.SetText(gauge.Ninki.ToString("N0"));
+                Config.NinkiBar.Label.SetValue(gauge.Ninki);
                 BarUtilities.GetChunkedProgressBars(Config.NinkiBar, 2, gauge.Ninki, 100).Draw(pos);
             }
         }
@@ -195,7 +197,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.TrickAttackBar.HideWhenInactive || trickDuration > 0)
             {
-                Config.TrickAttackBar.Label.SetText(Math.Truncate(trickDuration).ToString());
+                Config.TrickAttackBar.Label.SetValue(trickDuration);
                 BarUtilities.GetProgressBar(Config.TrickAttackBar, trickDuration, 15f, 0f, player).Draw(pos);
             }
         }
@@ -206,7 +208,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.SuitonBar.HideWhenInactive || suitonDuration > 0)
             {
-                Config.SuitonBar.Label.SetText(Math.Truncate(suitonDuration).ToString("N0"));
+                Config.SuitonBar.Label.SetValue(suitonDuration);
                 BarUtilities.GetProgressBar(Config.SuitonBar, suitonDuration, 20f, 0f, player).Draw(pos);
             }
         }
@@ -232,10 +234,10 @@ namespace DelvUI.Interface.Jobs
     [SubSection("Ninja", 1)]
     public class NinjaConfig : JobConfig
     {
-        [JsonIgnore] public override uint JobId => JobIDs.NIN;       
+        [JsonIgnore] public override uint JobId => JobIDs.NIN;
 
-        public new static NinjaConfig DefaultConfig() 
-        { 
+        public new static NinjaConfig DefaultConfig()
+        {
             var config = new NinjaConfig();
 
             config.MudraBar.Label.FontID = FontsConfig.DefaultMediumFontKey;

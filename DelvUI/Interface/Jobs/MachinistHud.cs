@@ -80,7 +80,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.HeatGauge.HideWhenInactive || gauge.Heat > 0)
             {
-                Config.HeatGauge.Label.SetText(gauge.Heat.ToString("N0"));
+                Config.HeatGauge.Label.SetValue(gauge.Heat);
                 BarUtilities.GetChunkedProgressBars(Config.HeatGauge, 2, gauge.Heat, 100).Draw(origin);
             }
         }
@@ -91,7 +91,7 @@ namespace DelvUI.Interface.Jobs
 
             if ((!Config.BatteryGauge.HideWhenInactive || gauge.Battery > 0) && !gauge.IsRobotActive)
             {
-                Config.BatteryGauge.Label.SetText(gauge.Battery.ToString("N0"));
+                Config.BatteryGauge.Label.SetValue(gauge.Battery);
                 BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.Battery, 100f, 0f, player, Config.BatteryGauge.BatteryColor).Draw(origin);
             }
 
@@ -107,7 +107,7 @@ namespace DelvUI.Interface.Jobs
                     _robotMaxDurationSet = true;
                 }
 
-                Config.BatteryGauge.Label.SetText($"{gauge.SummonTimeRemaining / 1000}");
+                Config.BatteryGauge.Label.SetValue(gauge.SummonTimeRemaining / 1000f);
                 BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.SummonTimeRemaining, _robotMaxDuration, 0f, player, Config.BatteryGauge.RobotColor).Draw(origin);
             }
         }
@@ -115,12 +115,11 @@ namespace DelvUI.Interface.Jobs
         private void DrawOverheatBar(Vector2 origin)
         {
             MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
-            float overheatDuration = gauge.OverheatTimeRemaining / 1000f;
 
             if (!Config.OverheatGauge.HideWhenInactive || gauge.IsOverheated)
             {
-                Config.OverheatGauge.Label.SetText(overheatDuration.ToString("N0"));
-                BarUtilities.GetProgressBar(Config.OverheatGauge, overheatDuration, 8f, 0f).Draw(origin);
+                Config.OverheatGauge.Label.SetValue(gauge.OverheatTimeRemaining / 1000f);
+                BarUtilities.GetProgressBar(Config.OverheatGauge, gauge.OverheatTimeRemaining, 8000f, 0f).Draw(origin);
             }
         }
 
@@ -130,7 +129,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.WildfireBar.HideWhenInactive || wildfireDuration > 0)
             {
-                Config.WildfireBar.Label.SetText(wildfireDuration.ToString("N0"));
+                Config.WildfireBar.Label.SetValue(wildfireDuration);
                 BarUtilities.GetProgressBar(Config.WildfireBar, wildfireDuration, 10, 0f).Draw(origin);
             }
         }

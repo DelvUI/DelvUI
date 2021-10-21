@@ -89,13 +89,13 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.FairyGaugeBar.ShowSeraph && seraphDuration > 0)
             {
-                Config.FairyGaugeBar.Label.SetText($"{seraphDuration / 1000}");
+                Config.FairyGaugeBar.Label.SetValue(seraphDuration / 1000);
                 BarUtilities.GetProgressBar(Config.FairyGaugeBar, seraphDuration, 22000, fillColor: Config.FairyGaugeBar.SeraphColor).
                     Draw(origin);
             }
             else
             {
-                Config.FairyGaugeBar.Label.SetText($"{fairyGauge}");
+                Config.FairyGaugeBar.Label.SetValue(fairyGauge);
                 BarUtilities.GetProgressBar(Config.FairyGaugeBar, fairyGauge, 100).
                     Draw(origin);
             }
