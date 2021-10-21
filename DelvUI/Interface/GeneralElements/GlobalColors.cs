@@ -143,10 +143,9 @@ namespace DelvUI.Interface.GeneralElements
                 case JobRoles.Tank: return _rolesColorConfig.TankRoleColor;
                 case JobRoles.Healer: return _rolesColorConfig.HealerRoleColor;
 
-                case JobRoles.DPSMelee:
-                case JobRoles.DPSRanged:
-                case JobRoles.DPSCaster:
-                    return _rolesColorConfig.DPSRoleColor;
+                case JobRoles.DPSMelee: return _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.MeleeDPSRoleColor : _rolesColorConfig.DPSRoleColor;
+                case JobRoles.DPSRanged: return _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.RangedDPSRoleColor : _rolesColorConfig.DPSRoleColor;
+                case JobRoles.DPSCaster: return _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.CasterDPSRoleColor : _rolesColorConfig.DPSRoleColor;
 
                 case JobRoles.Gatherer: return _rolesColorConfig.LANDColor;
                 case JobRoles.Crafter: return _rolesColorConfig.HANDColor;
@@ -323,25 +322,41 @@ namespace DelvUI.Interface.GeneralElements
     {
         public new static RolesColorConfig DefaultConfig() { return new RolesColorConfig(); }
 
-        [ColorEdit4("Tank Role Color")]
+        [ColorEdit4("Tank")]
         [Order(10)]
         public PluginConfigColor TankRoleColor = new PluginConfigColor(new(21f / 255f, 28f / 255f, 100f / 255f, 100f / 100f));
 
-        [ColorEdit4("DPS Role Color")]
+        [ColorEdit4("DPS")]
         [Order(15)]
         public PluginConfigColor DPSRoleColor = new PluginConfigColor(new(153f / 255f, 23f / 255f, 23f / 255f, 100f / 100f));
 
-        [ColorEdit4("Healer Role Color")]
+        [ColorEdit4("Healer")]
         [Order(20)]
         public PluginConfigColor HealerRoleColor = new PluginConfigColor(new(46f / 255f, 125f / 255f, 50f / 255f, 100f / 100f));
 
-        [ColorEdit4("Disciples of the Land", spacing = true)]
+        [ColorEdit4("Disciple of the Land", spacing = true)]
         [Order(25)]
         public PluginConfigColor LANDColor = new PluginConfigColor(new(99f / 255f, 172f / 255f, 14f / 255f, 100f / 100f));
 
-        [ColorEdit4("Disciples of the Hand")]
+        [ColorEdit4("Disciple of the Hand")]
         [Order(30)]
         public PluginConfigColor HANDColor = new PluginConfigColor(new(99f / 255f, 172f / 255f, 14f / 255f, 100f / 100f));
+
+        [Checkbox("Use Specific DPS Colors", spacing = true)]
+        [Order(35)]
+        public bool UseSpecificDPSColors = false;
+
+        [ColorEdit4("Melee DPS")]
+        [Order(40, collapseWith = nameof(UseSpecificDPSColors))]
+        public PluginConfigColor MeleeDPSRoleColor = new PluginConfigColor(new(214f / 255f, 156f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Ranged DPS")]
+        [Order(40, collapseWith = nameof(UseSpecificDPSColors))]
+        public PluginConfigColor RangedDPSRoleColor = new PluginConfigColor(new(226f / 255f, 176f / 255f, 175f / 255f, 100f / 100f));
+
+        [ColorEdit4("Caster DPS")]
+        [Order(40, collapseWith = nameof(UseSpecificDPSColors))]
+        public PluginConfigColor CasterDPSRoleColor = new PluginConfigColor(new(165f / 255f, 121f / 255f, 214f / 255f, 100f / 100f));
     }
 
     [Disableable(false)]
