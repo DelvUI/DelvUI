@@ -186,6 +186,11 @@ namespace DelvUI.Interface.GeneralElements
                     labels.Add(Config.RightLabelConfig);
                 }
             }
+            else
+            {
+                labels.Add(Config.LeftLabelConfig);
+                labels.Add(Config.RightLabelConfig);
+            }
 
             return labels.ToArray();
         }
