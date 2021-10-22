@@ -31,12 +31,34 @@ namespace DelvUI.Helpers
             {
                 var gameObject = Plugin.ObjectTable[i];
 
-                if (gameObject == null || gameObject is not BattleNpc battleNpc)
+                if (gameObject == null || gameObject.ObjectId == GameObject.InvalidGameObjectId || gameObject is not BattleNpc battleNpc)
                 {
                     continue;
                 }
 
                 if (battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo && battleNpc.OwnerId == player.ObjectId)
+                {
+                    return gameObject;
+                }
+            }
+
+            return null;
+        }
+
+        public static GameObject? GetGameObjectByName(string name)
+        {
+            // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
+            // we do a step of 2 because its always an actor followed by its companion
+            for (var i = 0; i < 200; i += 2)
+            {
+                var gameObject = Plugin.ObjectTable[i];
+
+                if (gameObject == null || gameObject.ObjectId == GameObject.InvalidGameObjectId || gameObject.ObjectId == 0)
+                {
+                    continue;
+                }
+
+                if (gameObject.Name.ToString() == name)
                 {
                     return gameObject;
                 }
@@ -267,21 +289,25 @@ namespace DelvUI.Helpers
                 return GlobalColors.Instance.NPCNeutralColor;
             }
 
-            switch (character.ObjectKind)
+            if (character.ObjectKind == ObjectKind.Player)
             {
-                // Still need to figure out the "orange" state; aggroed but not yet attacked.
-                case ObjectKind.Player:
-                    return GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id);
+                return GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id);
+            }
 
-                case ObjectKind.BattleNpc when (character.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat:
+            if (character is BattleNpc battleNpc)
+            {
+                if (battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo ||
+                    battleNpc.BattleNpcKind == BattleNpcSubKind.Pet ||
+                    !IsHostileMemory(battleNpc))
+                {
+                    return GlobalColors.Instance.NPCFriendlyColor;
+                }
+
+                if (battleNpc.BattleNpcKind == BattleNpcSubKind.Enemy ||
+                   (battleNpc.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat) // I still don't think we should be defaulting to "in combat = hostile", but whatever
+                {
                     return GlobalColors.Instance.NPCHostileColor;
-
-                case ObjectKind.BattleNpc when (actor is BattleNpc battleNpc):
-                    if (!IsHostileMemory(battleNpc))
-                    {
-                        return GlobalColors.Instance.NPCFriendlyColor;
-                    }
-                    break;
+                }
             }
 
             return GlobalColors.Instance.NPCNeutralColor;

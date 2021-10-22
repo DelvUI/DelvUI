@@ -5,6 +5,8 @@ Features:
 - Added role/job icon to unit frames.
 - Added setting to hide health related labels when appropiate in unit frames.
 - Added thickness settings for party frames healthbars borders.
+- Added support for Trust parties.
+- Enable Combat Hotbars sub-option to use with Cross Hotbar instead.
 
 Fixes:
 - Fixed some offensive spells not working when the cursor is on top of a player frame with mouseover in automatic mode, but the target is valid (ie GNB's Continuation or SMN's Egi Assault).
@@ -13,6 +15,7 @@ Fixes:
 - Fixed DRG Disembowel bar hiding itself for a second when re-applying buff with "Hide When Inactive" option checked.
 - Fixed "invisible" buffs.
 - Fixed status whitelists/blacklists not working properly if the imported profile was created with a different game language.
+- Fixed unit frame colors being incorrect for NPCs in some situations.
 
 # 0.3.2.0
 Features:
