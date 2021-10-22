@@ -220,9 +220,9 @@ namespace DelvUI.Interface.Party
             drawList.AddRect(borderPos, borderPos + borderSize, color);
 
             // role/job icon
-            if (RoleIcon.Enabled && Member.JobId > 0)
+            if (RoleIcon.Enabled)
             {
-                uint iconId;
+                uint iconId = 0;
 
                 // chocobo icon
                 if (character != null && character.ObjectKind == ObjectKind.BattleNpc)
@@ -230,7 +230,7 @@ namespace DelvUI.Interface.Party
                     iconId = JobsHelper.RoleIconIDForBattleCompanion + (uint)RoleIcon.Style * 100;
                 }
                 // role/job icon
-                else
+                else if (Member.JobId > 0)
                 {
                     iconId = RoleIcon.UseRoleIcons ?
                         JobsHelper.RoleIconIDForJob(Member.JobId, RoleIcon.UseSpecificDPSRoleIcons) :
