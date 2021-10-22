@@ -8,7 +8,7 @@ using DelvUI.Interface.Bars;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [DisableParentSettings("HideWhenInactive")]
+    [DisableParentSettings("HideWhenInactive", "HideHealthIfPossible")]
     [Section("Unit Frames")]
     [SubSection("Player", 0)]
     public class PlayerUnitFrameConfig : UnitFrameConfig
