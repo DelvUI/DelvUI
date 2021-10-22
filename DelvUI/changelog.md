@@ -3,6 +3,7 @@ Features:
 - Added "Player Status" tracking for party frames. Currently only "Viewing Cutscene" is supported.
 - Added role color setting to unit frames.
 - Added role/job icon to unit frames.
+- Added role color settings for DPS types (melee / ranged / caster).
 - Added setting to hide health related labels when appropiate in unit frames.
 - Added thickness settings for party frames healthbars borders.
 - Added support for Trust parties.
