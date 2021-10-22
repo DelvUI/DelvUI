@@ -2,6 +2,7 @@
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using Newtonsoft.Json;
+using System;
 using System.Globalization;
 using System.Numerics;
 
@@ -37,32 +38,32 @@ namespace DelvUI.Interface.GeneralElements
         [Order(10)]
         public int NumberFormat;
 
-        [JsonIgnore] private string _numberText = "";
-        [JsonIgnore] private float _numberValue;
-
         public NumericLabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor)
             : base(position, text, frameAnchor, textAnchor)
         {
         }
 
-        public override string GetText()
-        {
-            return _numberText;
-        }
-
-        public override void SetText(string text)
-        {
-            _numberText = text;
-        }
-
         public void SetValue(float value)
         {
-            _numberValue = value;
-            _numberText = value == 0 ? "0" : value.ToString($"F{NumberFormat}", CultureInfo.InvariantCulture);
+            if (value == 0)
+            {
+                _text = "0";
+                return;
+            }
+
+            if (NumberFormat == 0)
+            {
+                _text = $"{Math.Truncate(value)}";
+                return;
+            }
+
+            int aux = (NumberFormat * 10);
+            double v = Math.Truncate(value * aux) / aux;
+            _text = v.ToString($"F{NumberFormat}", CultureInfo.InvariantCulture);
         }
 
         public NumericLabelConfig Clone() =>
-            new NumericLabelConfig(Position, _numberText, FrameAnchor, TextAnchor)
+            new NumericLabelConfig(Position, _text, FrameAnchor, TextAnchor)
             {
                 Color = Color,
                 OutlineColor = OutlineColor,
