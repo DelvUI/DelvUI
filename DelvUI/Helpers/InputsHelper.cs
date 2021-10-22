@@ -279,7 +279,10 @@ namespace DelvUI.Helpers
 
         public void Update()
         {
-            HookWndProc();
+            if (_wndProcPtr == IntPtr.Zero)
+            {
+                HookWndProc();
+            }
 
             _leftButtonClicked = null;
             _rightButtonClicked = null;
@@ -287,8 +290,6 @@ namespace DelvUI.Helpers
 
         private void HookWndProc()
         {
-            if (_wndProcPtr != IntPtr.Zero) { return; }
-
             ulong processId = (ulong)Process.GetCurrentProcess().Id;
 
             IntPtr hWnd = IntPtr.Zero;
