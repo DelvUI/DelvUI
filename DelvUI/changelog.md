@@ -4,6 +4,7 @@ Features:
 - Added role color setting to unit frames.
 - Added role/job icon to unit frames.
 - Added setting to hide health related labels when appropiate in unit frames.
+- Added thickness settings for party frames healthbars borders.
 - Added support for Trust parties.
 - Enable Combat Hotbars sub-option to use with Cross Hotbar instead.
 

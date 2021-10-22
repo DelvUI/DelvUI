@@ -214,10 +214,11 @@ namespace DelvUI.Interface.Party
             }
 
             // border
-            var borderPos = Position - Vector2.One;
-            var borderSize = _configs.HealthBar.Size + Vector2.One * 2;
-            var color = borderColor?.Base ?? _configs.HealthBar.ColorsConfig.BorderColor.Base;
-            drawList.AddRect(borderPos, borderPos + borderSize, color);
+            Vector2 borderPos = Position - Vector2.One;
+            Vector2 borderSize = _configs.HealthBar.Size + Vector2.One * 2;
+            uint color = borderColor?.Base ?? _configs.HealthBar.ColorsConfig.BorderColor.Base;
+            int thickness = borderColor != null ? _configs.HealthBar.ColorsConfig.ActiveBorderThickness : _configs.HealthBar.ColorsConfig.InactiveBorderThickness;
+            drawList.AddRect(borderPos, borderPos + borderSize, color, 0, ImDrawFlags.None, thickness);
 
             // role/job icon
             if (RoleIcon.Enabled)
