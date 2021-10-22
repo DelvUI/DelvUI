@@ -31,12 +31,34 @@ namespace DelvUI.Helpers
             {
                 var gameObject = Plugin.ObjectTable[i];
 
-                if (gameObject == null || gameObject is not BattleNpc battleNpc)
+                if (gameObject == null || gameObject.ObjectId == GameObject.InvalidGameObjectId || gameObject is not BattleNpc battleNpc)
                 {
                     continue;
                 }
 
                 if (battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo && battleNpc.OwnerId == player.ObjectId)
+                {
+                    return gameObject;
+                }
+            }
+
+            return null;
+        }
+
+        public static GameObject? GetGameObjectByName(string name)
+        {
+            // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
+            // we do a step of 2 because its always an actor followed by its companion
+            for (var i = 0; i < 200; i += 2)
+            {
+                var gameObject = Plugin.ObjectTable[i];
+
+                if (gameObject == null || gameObject.ObjectId == GameObject.InvalidGameObjectId || gameObject.ObjectId == 0)
+                {
+                    continue;
+                }
+
+                if (gameObject.Name.ToString() == name)
                 {
                     return gameObject;
                 }

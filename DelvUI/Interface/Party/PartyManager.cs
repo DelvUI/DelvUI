@@ -92,6 +92,9 @@ namespace DelvUI.Interface.Party
         private const int PartyCrossWorldDisplayNameOffset = 0x0DEA;
         private const int PartyCrossWorldEntrySize = 0xD8;
 
+        private const int PartyTrustNameOffset = 0x0B68;
+        private const int PartyTrustEntrySize = 0x18;
+
         private List<PartyListMemberInfo> _partyMembersInfo = null!;
         private bool _playerOrderChanged = false;
 
@@ -133,6 +136,14 @@ namespace DelvUI.Interface.Party
 
             try
             {
+                // trust
+                if (PartyListAddon->TrustCount > 0)
+                {
+                    UpdateTrustParty(player, PartyListAddon->TrustCount);
+                    UpdateTrackers();
+                    return;
+                }
+
                 // solo
                 if (_realMemberCount <= 1)
                 {
@@ -146,9 +157,7 @@ namespace DelvUI.Interface.Party
                         MembersChangedEvent?.Invoke(this);
                     }
 
-                    _raiseTracker.Update(_groupMembers);
-                    _invulnTracker.Update(_groupMembers);
-                    _cleanseTracker.Update(_groupMembers);
+                    UpdateTrackers();
                     return;
                 }
 
@@ -175,13 +184,53 @@ namespace DelvUI.Interface.Party
                     UpdateRegularParty(player);
                 }
 
-                _raiseTracker.Update(_groupMembers);
-                _invulnTracker.Update(_groupMembers);
-                _cleanseTracker.Update(_groupMembers);
+                UpdateTrackers();
             }
             catch (Exception e)
             {
                 PluginLog.LogError("ERROR getting party data: " + e.Message);
+            }
+        }
+
+        private void UpdateTrustParty(PlayerCharacter player, int trustCount)
+        {
+            bool needsUpdate = _playerOrderChanged || _groupMembers.Count != trustCount + 1;
+
+            if (needsUpdate)
+            {
+                _groupMembers.Clear();
+
+                int order = _config.PlayerOrderOverrideEnabled ? _config.PlayerOrder + 1 : 1;
+                _groupMembers.Add(new PartyFramesMember(player, order, EnmityForIndex(0), PartyMemberStatus.None, true));
+
+                order = 2;
+
+                for (int i = 0; i < trustCount; i++)
+                {
+                    long* namePtr = (long*)(HudAgent + (PartyTrustNameOffset + PartyTrustEntrySize * i));
+                    string? name = Marshal.PtrToStringUTF8(new IntPtr(*namePtr));
+                    if (name == null) { continue; }
+
+                    Character? trustChara = Utils.GetGameObjectByName(name) as Character;
+                    if (trustChara != null)
+                    {
+                        _groupMembers.Add(new PartyFramesMember(trustChara, order, EnmityForIndex(i + 1), PartyMemberStatus.None, true));
+                        order++;
+                    }
+                }
+
+                // sort
+                SortGroupMembers(player);
+                _playerOrderChanged = false;
+
+                MembersChangedEvent?.Invoke(this);
+            }
+            else
+            {
+                for (int i = 0; i < _groupMembers.Count; i++)
+                {
+                    _groupMembers[i].Update(EnmityForIndex(i), PartyMemberStatus.None, i == 0, i == 0 ? player.ClassJob.Id : 0);
+                }
             }
         }
 
@@ -346,6 +395,13 @@ namespace DelvUI.Interface.Party
 
             // fire event
             MembersChangedEvent?.Invoke(this);
+        }
+
+        private void UpdateTrackers()
+        {
+            _raiseTracker.Update(_groupMembers);
+            _invulnTracker.Update(_groupMembers);
+            _cleanseTracker.Update(_groupMembers);
         }
 
         #region utils
