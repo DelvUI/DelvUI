@@ -202,6 +202,9 @@ namespace DelvUI.Interface
                 case "EnableCombatActionBars":
                     Config.CombatActionBars.ForEach(name => ToggleActionbar(name, Config.EnableCombatActionBars));
                     break;
+                case "CombatActionBarsWithCrossHotbar":
+                    ToggleCrossActionbar(Config.CombatActionBarsWithCrossHotbar);
+                    break;
                 case "CombatActionBars" when e is OnChangeEventArgs<string> listEvent:
                     switch (listEvent.ChangeType)
                     {
@@ -240,6 +243,11 @@ namespace DelvUI.Interface
                     Config.CombatActionBars.ForEach(name => ToggleActionbar(name, !currentCombatState));
                     _previousCombatState = currentCombatState;
                 }
+                else if (_previousCombatState != currentCombatState && Config.CombatActionBarsWithCrossHotbar)
+                {
+                    ToggleCrossActionbar(!currentCombatState);
+                    _previousCombatState = currentCombatState;
+                }
             }
         }
 
@@ -250,6 +258,13 @@ namespace DelvUI.Interface
             string toggleText = isHidden ? "off" : "on";
 
             ChatHelper.SendChatMessage("/hotbar display " + hotbarNumber + " " + toggleText);
+        }
+
+        private void ToggleCrossActionbar(bool isHidden)
+        {
+            string toggleText = isHidden ? "off" : "on";
+
+            ChatHelper.SendChatMessage("/crosshotbardisplay" + " " + toggleText);
         }
 
         private void SetAddonVisible(IntPtr addon, bool visible, Vector2 originalPosition)
