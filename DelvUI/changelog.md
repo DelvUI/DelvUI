@@ -5,6 +5,8 @@ Features:
 - Added role/job icon to unit frames.
 - Added setting to hide health related labels when appropiate in unit frames.
 - Added a number format setting for labels in job specific bars.
+- Added thickness settings for party frames healthbars borders.
+- Added support for Trust parties.
 - Enable Combat Hotbars sub-option to use with Cross Hotbar instead.
 
 Fixes:
@@ -15,6 +17,7 @@ Fixes:
 - Fixed "invisible" buffs.
 - Fixed status whitelists/blacklists not working properly if the imported profile was created with a different game language.
 - Fixed chocobo icon not showing in party frames.
+- Fixed unit frame colors being incorrect for NPCs in some situations.
 
 # 0.3.2.0
 Features:

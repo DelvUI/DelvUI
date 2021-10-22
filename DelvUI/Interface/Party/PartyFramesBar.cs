@@ -63,11 +63,6 @@ namespace DelvUI.Interface.Party
                 return _configs.HealthBar.ColorsConfig.OutOfReachBackgroundColor;
             }
 
-            if (Member.Character?.ObjectKind == ObjectKind.BattleNpc)
-            {
-                return GlobalColors.Instance.NPCFriendlyColor;
-            }
-
             bool cleanseCheck = true;
             if (CleanseTracker.CleanseJobsOnly)
             {
@@ -93,6 +88,11 @@ namespace DelvUI.Interface.Party
                 {
                     return GlobalColors.Instance.SafeColorForJobId(Member.JobId);
                 }
+            }
+
+            if (Member.Character?.ObjectKind == ObjectKind.BattleNpc)
+            {
+                return GlobalColors.Instance.NPCFriendlyColor;
             }
 
             return _configs.HealthBar.ColorsConfig.OutOfReachBackgroundColor;
@@ -214,10 +214,11 @@ namespace DelvUI.Interface.Party
             }
 
             // border
-            var borderPos = Position - Vector2.One;
-            var borderSize = _configs.HealthBar.Size + Vector2.One * 2;
-            var color = borderColor?.Base ?? _configs.HealthBar.ColorsConfig.BorderColor.Base;
-            drawList.AddRect(borderPos, borderPos + borderSize, color);
+            Vector2 borderPos = Position - Vector2.One;
+            Vector2 borderSize = _configs.HealthBar.Size + Vector2.One * 2;
+            uint color = borderColor?.Base ?? _configs.HealthBar.ColorsConfig.BorderColor.Base;
+            int thickness = borderColor != null ? _configs.HealthBar.ColorsConfig.ActiveBorderThickness : _configs.HealthBar.ColorsConfig.InactiveBorderThickness;
+            drawList.AddRect(borderPos, borderPos + borderSize, color, 0, ImDrawFlags.None, thickness);
 
             // role/job icon
             if (RoleIcon.Enabled)
@@ -225,7 +226,7 @@ namespace DelvUI.Interface.Party
                 uint iconId = 0;
 
                 // chocobo icon
-                if (character != null && character.ObjectKind == ObjectKind.BattleNpc)
+                if (character is BattleNpc battleNpc && battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo)
                 {
                     iconId = JobsHelper.RoleIconIDForBattleCompanion + (uint)RoleIcon.Style * 100;
                 }

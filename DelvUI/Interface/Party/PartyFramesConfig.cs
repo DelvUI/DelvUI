@@ -5,8 +5,6 @@ using DelvUI.Enums;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -112,10 +110,18 @@ namespace DelvUI.Interface.Party
         public PluginConfigColor BorderColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Target Border Color")]
-        [Order(10)]
+        [Order(6)]
         public PluginConfigColor TargetBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
-        [ColorEdit4("Background Color")]
+        [DragInt("Inactive Border Thickness", min = 1, max = 10, help = "This is the border thickness that will be used when the border is in the default state (aka not targetted, not showing enmity, etc).")]
+        [Order(6)]
+        public int InactiveBorderThickness = 1;
+
+        [DragInt("Active Border Thickness", min = 1, max = 10, help = "This is the border thickness that will be used when the border active (aka targetted, showing enmity, etc).")]
+        [Order(7)]
+        public int ActiveBorderThickness = 1;
+
+        [ColorEdit4("Background Color", spacing = true)]
         [Order(15)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 70f / 100f));
 
