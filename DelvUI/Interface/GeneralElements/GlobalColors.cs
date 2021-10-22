@@ -348,15 +348,15 @@ namespace DelvUI.Interface.GeneralElements
 
         [ColorEdit4("Melee DPS")]
         [Order(40, collapseWith = nameof(UseSpecificDPSColors))]
-        public PluginConfigColor MeleeDPSRoleColor = new PluginConfigColor(new(214f / 255f, 156f / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor MeleeDPSRoleColor = new PluginConfigColor(new(151f / 255f, 56f / 255f, 56f / 255f, 100f / 100f));
 
         [ColorEdit4("Ranged DPS")]
         [Order(40, collapseWith = nameof(UseSpecificDPSColors))]
-        public PluginConfigColor RangedDPSRoleColor = new PluginConfigColor(new(226f / 255f, 176f / 255f, 175f / 255f, 100f / 100f));
+        public PluginConfigColor RangedDPSRoleColor = new PluginConfigColor(new(250f / 255f, 185f / 255f, 67f / 255f, 100f / 100f));
 
         [ColorEdit4("Caster DPS")]
         [Order(40, collapseWith = nameof(UseSpecificDPSColors))]
-        public PluginConfigColor CasterDPSRoleColor = new PluginConfigColor(new(165f / 255f, 121f / 255f, 214f / 255f, 100f / 100f));
+        public PluginConfigColor CasterDPSRoleColor = new PluginConfigColor(new(154f / 255f, 82f / 255f, 193f / 255f, 100f / 100f));
     }
 
     [Disableable(false)]
