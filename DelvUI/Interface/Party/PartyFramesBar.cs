@@ -79,23 +79,18 @@ namespace DelvUI.Interface.Party
             }
             else if (Member.JobId > 0)
             {
-                if (_configs.HealthBar.ColorsConfig.UseRoleColors)
+                return _configs.HealthBar.ColorsConfig.UseRoleColors switch
                 {
-                    return GlobalColors.Instance.SafeRoleColorForJobId(Member.JobId);
-                }
-
-                else
-                {
-                    return GlobalColors.Instance.SafeColorForJobId(Member.JobId);
-                }
+                    true => GlobalColors.Instance.SafeRoleColorForJobId(Member.JobId),
+                    _ => GlobalColors.Instance.SafeColorForJobId(Member.JobId)
+                };
             }
 
-            if (Member.Character?.ObjectKind == ObjectKind.BattleNpc)
+            return Member.Character?.ObjectKind switch
             {
-                return GlobalColors.Instance.NPCFriendlyColor;
-            }
-
-            return _configs.HealthBar.ColorsConfig.OutOfReachBackgroundColor;
+                ObjectKind.BattleNpc => GlobalColors.Instance.NPCFriendlyColor,
+                _ => _configs.HealthBar.ColorsConfig.OutOfReachBackgroundColor
+            };
         }
 
         public void StopPreview()

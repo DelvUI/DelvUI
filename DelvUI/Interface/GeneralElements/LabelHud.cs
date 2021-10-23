@@ -27,7 +27,7 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var text = actor == null && actorName == null && actorCurrentHp == null && actorMaxHp == null ?
+            string? text = actor == null && actorName == null && actorCurrentHp == null && actorMaxHp == null ?
                 Config.GetText() :
                 TextTagsHelper.FormattedText(Config.GetText(), actor, actorName, actorCurrentHp, actorMaxHp);
 
@@ -36,14 +36,14 @@ namespace DelvUI.Interface.GeneralElements
 
         private void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
         {
-            var fontPushed = FontsManager.Instance.PushFont(Config.FontID);
+            bool fontPushed = FontsManager.Instance.PushFont(Config.FontID);
 
-            var size = ImGui.CalcTextSize(text);
-            var pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
+            Vector2 size = ImGui.CalcTextSize(text);
+            Vector2 pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
 
             DrawHelper.DrawInWindow(ID, pos, size, false, true, (drawList) =>
             {
-                var color = Color(actor);
+                PluginConfigColor? color = Color(actor);
 
                 if (Config.ShowShadow)
                 {
@@ -72,6 +72,11 @@ namespace DelvUI.Interface.GeneralElements
             if (!Config.UseJobColor || actor == null)
             {
                 return Config.Color;
+            }
+
+            if (Config.UseJobColor && actor is Character || actor is BattleNpc battleNpc && battleNpc.ClassJob.Id > 0)
+            {
+                return Utils.ColorForActor(actor);
             }
 
             if (Config.UseJobColor && actor is not Character)
