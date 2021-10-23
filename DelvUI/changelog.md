@@ -6,7 +6,7 @@ Features:
 - Added role color settings for DPS types (melee / ranged / caster).
 - Added setting to hide health related labels when appropiate in unit frames.
 - Added thickness settings for party frames healthbars borders.
-- Added support for Trust parties.
+- Added support for Trust & Squadron command parties.
 - Enable Combat Hotbars sub-option to use with Cross Hotbar instead.
 
 Fixes:
