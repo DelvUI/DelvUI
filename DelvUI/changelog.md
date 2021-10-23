@@ -11,6 +11,7 @@ Features:
 - Added option to change background color and opacity of the Castbars.
 
 Fixes:
+- Fixed unit and party frames not being interactable when using XivAlexander.
 - Fixed some offensive spells not working when the cursor is on top of a player frame with mouseover in automatic mode, but the target is valid (ie GNB's Continuation or SMN's Egi Assault).
 - Fixed some bars not displaying the remaining duration properly.
 - Fixed delay with DRG Disembowel bar.
