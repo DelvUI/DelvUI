@@ -113,6 +113,8 @@ namespace DelvUI.Config.Tree
 
             didReset |= DrawPortableSection();
 
+            ImGui.NewLine(); // fixes some long pages getting cut off
+
             return didReset;
         }
 

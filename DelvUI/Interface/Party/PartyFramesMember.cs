@@ -81,12 +81,16 @@ namespace DelvUI.Interface.Party
             _jobId = jobId;
         }
 
-        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, bool isPartyLeader, uint jobId)
+        public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, bool isPartyLeader, uint jobId = 0)
         {
             EnmityLevel = enmityLevel;
             Status = status;
             IsPartyLeader = isPartyLeader;
-            _jobId = jobId;
+
+            if (jobId > 0)
+            {
+                _jobId = jobId;
+            }
 
             if (ObjectId == 0)
             {
@@ -133,7 +137,7 @@ namespace DelvUI.Interface.Party
             MP = (uint)(MaxMP * RNG.Next(100) / 100f);
             Shield = RNG.Next(30) / 100f;
             EnmityLevel = enmityLevel;
-            Status = (PartyMemberStatus)RNG.Next(0, 4);
+            Status = (PartyMemberStatus)RNG.Next(0, 2);
             IsPartyLeader = isPartyLeader;
             HasDispellableDebuff = RNG.Next(0, 2) == 1;
         }

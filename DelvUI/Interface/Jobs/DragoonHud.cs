@@ -149,7 +149,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDisembowelBar(Vector2 origin, PlayerCharacter player)
         {
-            float disembowelDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1914 or 121 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
+            float disembowelDuration = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId is 1914 or 121)?.RemainingTime ?? 0f);
             if (!Config.DisembowelBar.HideWhenInactive || disembowelDuration > 0f)
             {
                 Config.DisembowelBar.Label.SetText(Math.Truncate(disembowelDuration).ToString());

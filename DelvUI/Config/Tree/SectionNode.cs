@@ -1,6 +1,4 @@
-﻿using Dalamud.Interface;
-using DelvUI.Config.Attributes;
-using DelvUI.Helpers;
+﻿using DelvUI.Config.Attributes;
 using ImGuiNET;
 using System;
 using System.IO;
@@ -12,8 +10,16 @@ namespace DelvUI.Config.Tree
     {
         public bool Selected;
         public string Name = null!;
+        public bool ForceAllowExport = false;
 
         public SectionNode() { }
+
+        protected override bool AllowExport()
+        {
+            if (ForceAllowExport) { return true; }
+
+            return base.AllowExport();
+        }
 
         public bool Draw(ref bool changed, float alpha)
         {
