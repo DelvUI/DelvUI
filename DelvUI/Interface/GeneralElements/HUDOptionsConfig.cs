@@ -70,7 +70,8 @@ namespace DelvUI.Interface.GeneralElements
         [Order(50)]
         public bool HideDefaultPulltimer = false;
 
-        [Checkbox("Enable Combat Hotbars", isMonitored = true, separator = true, help = "Show in Duty and Show on Weapon Drawn-options available once enabled.")]
+        [Checkbox("Enable Combat Hotbars", isMonitored = true, separator = true, help =
+            "Show in Duty, Show on Weapon Drawn and Use with Cross Hotbar-options available once enabled.")]
         [Order(200)]
         public bool EnableCombatActionBars = false;
 
@@ -82,14 +83,18 @@ namespace DelvUI.Interface.GeneralElements
         [Order(202, collapseWith = nameof(EnableCombatActionBars))]
         public bool ShowCombatActionBarsOnWeaponDrawn = false;
 
-        [DynamicList("Hotbars Shown Only In Combat", "Hotbar 1", "Hotbar 2", "Hotbar 3", "Hotbar 4", "Hotbar 5", "Hotbar 6", "Hotbar 7", "Hotbar 8", "Hotbar 9", "Hotbar 10", isMonitored = true)]
+        [Checkbox("Use with Cross Hotbar", isMonitored = true, help = "Show in Duty and Show on Weapon Drawn will apply to Cross Hotbar instead when enabled.")]
         [Order(203, collapseWith = nameof(EnableCombatActionBars))]
-        public List<string> CombatActionBars = new List<string>();
+        public bool CombatActionBarsWithCrossHotbar = false;
+
+        [DynamicList("Hotbars Shown Only In Combat", "Hotbar 1", "Hotbar 2", "Hotbar 3", "Hotbar 4", "Hotbar 5", "Hotbar 6", "Hotbar 7", "Hotbar 8", "Hotbar 9", "Hotbar 10", isMonitored = true)]
+        [Order(204, collapseWith = nameof(EnableCombatActionBars))]
+        public List<string> CombatActionBars = new();
 
         public Vector2 CastBarOriginalPosition;
         public Vector2 PulltimerOriginalPosition;
-        public Dictionary<string, Vector2> JobGaugeOriginalPosition = new Dictionary<string, Vector2>();
+        public Dictionary<string, Vector2> JobGaugeOriginalPosition = new();
 
-        public new static HUDOptionsConfig DefaultConfig() { return new HUDOptionsConfig(); }
+        public new static HUDOptionsConfig DefaultConfig() => new();
     }
 }

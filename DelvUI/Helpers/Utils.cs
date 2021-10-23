@@ -31,12 +31,34 @@ namespace DelvUI.Helpers
             {
                 var gameObject = Plugin.ObjectTable[i];
 
-                if (gameObject == null || gameObject is not BattleNpc battleNpc)
+                if (gameObject == null || gameObject.ObjectId == GameObject.InvalidGameObjectId || gameObject is not BattleNpc battleNpc)
                 {
                     continue;
                 }
 
                 if (battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo && battleNpc.OwnerId == player.ObjectId)
+                {
+                    return gameObject;
+                }
+            }
+
+            return null;
+        }
+
+        public static GameObject? GetGameObjectByName(string name)
+        {
+            // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
+            // we do a step of 2 because its always an actor followed by its companion
+            for (var i = 0; i < 200; i += 2)
+            {
+                var gameObject = Plugin.ObjectTable[i];
+
+                if (gameObject == null || gameObject.ObjectId == GameObject.InvalidGameObjectId || gameObject.ObjectId == 0)
+                {
+                    continue;
+                }
+
+                if (gameObject.Name.ToString() == name)
                 {
                     return gameObject;
                 }
@@ -120,6 +142,11 @@ namespace DelvUI.Helpers
         private static float LinearInterpolation(float left, float right, float t)
             => left + ((right - left) * t);
 
+        public static PluginConfigColor GetColorByScale(float i, ColorByHealthValueConfig config)
+        {
+            return GetColorByScale(i, config.LowHealthColorThreshold / 100f, config.FullHealthColorThreshold / 100f, config.LowHealthColor, config.FullHealthColor, config.BlendMode);
+        }
+
         //Method used to interpolate two PluginConfigColors
         //i is scale [0 , 1]
         //min and max are used for color thresholds. for instance return colorLeft if i < min or return ColorRight if i > max
@@ -161,8 +188,8 @@ namespace DelvUI.Helpers
                         //convert RGB to LAB
                         var LabLeft = _rgbToLab.Convert(rgbColorLeft);
                         var LabRight = _rgbToLab.Convert(rgbColorRight);
-                        
-                        var Lab2RGB =_labToRgb.Convert(new LabColor(LinearInterpolation((float)LabLeft.L, (float)LabRight.L, ratio), LinearInterpolation((float)LabLeft.a, (float)LabRight.a, ratio), LinearInterpolation((float)LabLeft.b, (float)LabRight.b, ratio)));
+
+                        var Lab2RGB = _labToRgb.Convert(new LabColor(LinearInterpolation((float)LabLeft.L, (float)LabRight.L, ratio), LinearInterpolation((float)LabLeft.a, (float)LabRight.a, ratio), LinearInterpolation((float)LabLeft.b, (float)LabRight.b, ratio)));
 
                         Lab2RGB.NormalizeIntensity();
 
@@ -186,7 +213,7 @@ namespace DelvUI.Helpers
                         //convert RGB to XYZ
                         var XYZLeft = _rgbToXyz.Convert(rgbColorLeft);
                         var XYZRight = _rgbToXyz.Convert(rgbColorRight);
-                        
+
                         var XYZ2RGB = _xyzToRgb.Convert(new XYZColor(LinearInterpolation((float)XYZLeft.X, (float)XYZRight.X, ratio), LinearInterpolation((float)XYZLeft.Y, (float)XYZRight.Y, ratio), LinearInterpolation((float)XYZLeft.Z, (float)XYZRight.Z, ratio)));
 
                         XYZ2RGB.NormalizeIntensity();
@@ -197,7 +224,7 @@ namespace DelvUI.Helpers
                     {
                         //No conversion needed here because we are already working in RGB space
                         var newRGB = new RGBColor(LinearInterpolation((float)rgbColorLeft.R, (float)rgbColorRight.R, ratio), LinearInterpolation((float)rgbColorLeft.G, (float)rgbColorRight.G, ratio), LinearInterpolation((float)rgbColorLeft.B, (float)rgbColorRight.B, ratio));
-                        
+
                         return new PluginConfigColor(new Vector4((float)newRGB.R, (float)newRGB.G, (float)newRGB.B, alpha));
                     }
                 case BlendMode.LChuv:
@@ -262,21 +289,25 @@ namespace DelvUI.Helpers
                 return GlobalColors.Instance.NPCNeutralColor;
             }
 
-            switch (character.ObjectKind)
+            if (character.ObjectKind == ObjectKind.Player)
             {
-                // Still need to figure out the "orange" state; aggroed but not yet attacked.
-                case ObjectKind.Player:
-                    return GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id);
+                return GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id);
+            }
 
-                case ObjectKind.BattleNpc when (character.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat:
+            if (character is BattleNpc battleNpc)
+            {
+                if (battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo ||
+                    battleNpc.BattleNpcKind == BattleNpcSubKind.Pet ||
+                    !IsHostileMemory(battleNpc))
+                {
+                    return GlobalColors.Instance.NPCFriendlyColor;
+                }
+
+                if (battleNpc.BattleNpcKind == BattleNpcSubKind.Enemy ||
+                   (battleNpc.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat) // I still don't think we should be defaulting to "in combat = hostile", but whatever
+                {
                     return GlobalColors.Instance.NPCHostileColor;
-
-                case ObjectKind.BattleNpc when (actor is BattleNpc battleNpc):
-                    if (!IsHostileMemory(battleNpc))
-                    {
-                        return GlobalColors.Instance.NPCFriendlyColor;
-                    }
-                    break;
+                }
             }
 
             return GlobalColors.Instance.NPCNeutralColor;

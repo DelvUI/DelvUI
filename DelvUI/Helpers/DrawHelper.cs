@@ -2,7 +2,6 @@ using DelvUI.Config;
 using ImGuiNET;
 using ImGuiScene;
 using Lumina.Excel;
-using Lumina.Excel.GeneratedSheets;
 using System;
 using System.Numerics;
 
@@ -15,43 +14,42 @@ namespace DelvUI.Helpers
         Left,
         Up,
         Down,
-        CenteredHorizonal,
+        CenteredHorizonal
     }
 
     public static class DrawHelper
     {
         private static uint[] ColorArray(PluginConfigColor color, GradientDirection gradientDirection)
         {
-            switch (gradientDirection)
+            return gradientDirection switch
             {
-                case GradientDirection.None: return new uint[] { color.Base, color.Base, color.Base, color.Base };
-                case GradientDirection.Right: return new uint[] { color.TopGradient, color.BottomGradient, color.BottomGradient, color.TopGradient };
-                case GradientDirection.Left: return new uint[] { color.BottomGradient, color.TopGradient, color.TopGradient, color.BottomGradient };
-                case GradientDirection.Up: return new uint[] { color.BottomGradient, color.BottomGradient, color.TopGradient, color.TopGradient };
-            }
-
-            return new uint[] { color.TopGradient, color.TopGradient, color.BottomGradient, color.BottomGradient };
+                GradientDirection.None => new[] { color.Base, color.Base, color.Base, color.Base },
+                GradientDirection.Right => new[] { color.TopGradient, color.BottomGradient, color.BottomGradient, color.TopGradient },
+                GradientDirection.Left => new[] { color.BottomGradient, color.TopGradient, color.TopGradient, color.BottomGradient },
+                GradientDirection.Up => new[] { color.BottomGradient, color.BottomGradient, color.TopGradient, color.TopGradient },
+                _ => new[] { color.TopGradient, color.TopGradient, color.BottomGradient, color.BottomGradient }
+            };
         }
 
         public static void DrawGradientFilledRect(Vector2 position, Vector2 size, PluginConfigColor color, ImDrawListPtr drawList)
         {
-            var gradientDirection = ConfigurationManager.Instance.GradientDirection;
+            GradientDirection gradientDirection = ConfigurationManager.Instance.GradientDirection;
             DrawGradientFilledRect(position, size, color, drawList, gradientDirection);
         }
 
         public static void DrawGradientFilledRect(Vector2 position, Vector2 size, PluginConfigColor color, ImDrawListPtr drawList, GradientDirection gradientDirection = GradientDirection.Down)
         {
-            var colorArray = ColorArray(color, gradientDirection);
+            uint[]? colorArray = ColorArray(color, gradientDirection);
 
             if (gradientDirection == GradientDirection.CenteredHorizonal)
             {
-                var halfSize = new Vector2(size.X, size.Y / 2f);
+                Vector2 halfSize = new(size.X, size.Y / 2f);
                 drawList.AddRectFilledMultiColor(
                     position, position + halfSize,
                     colorArray[0], colorArray[1], colorArray[2], colorArray[3]
                 );
 
-                var pos = position + new Vector2(0, halfSize.Y);
+                Vector2 pos = position + new Vector2(0, halfSize.Y);
                 drawList.AddRectFilledMultiColor(
                     pos, pos + halfSize,
                     colorArray[3], colorArray[2], colorArray[1], colorArray[0]
@@ -104,10 +102,7 @@ namespace DelvUI.Helpers
         public static void DrawIcon<T>(dynamic row, Vector2 position, Vector2 size, bool drawBorder, bool cropIcon, int stackCount = 1) where T : ExcelRow
         {
             TextureWrap texture = TexturesCache.Instance.GetTexture<T>(row, (uint)Math.Max(0, stackCount - 1));
-            if (texture == null)
-            {
-                return;
-            }
+            if (texture == null) { return; }
 
             (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(texture, size, cropIcon);
 
@@ -116,7 +111,7 @@ namespace DelvUI.Helpers
 
             if (drawBorder)
             {
-                var drawList = ImGui.GetWindowDrawList();
+                ImDrawListPtr drawList = ImGui.GetWindowDrawList();
                 drawList.AddRect(position, position + size, 0xFF000000);
             }
         }
@@ -124,10 +119,7 @@ namespace DelvUI.Helpers
         public static void DrawIcon<T>(ImDrawListPtr drawList, dynamic row, Vector2 position, Vector2 size, bool drawBorder, bool cropIcon, int stackCount = 1) where T : ExcelRow
         {
             TextureWrap texture = TexturesCache.Instance.GetTexture<T>(row, (uint)Math.Max(0, stackCount - 1));
-            if (texture == null)
-            {
-                return;
-            }
+            if (texture == null) { return; }
 
             (Vector2 uv0, Vector2 uv1) = GetTexCoordinates(texture, size, cropIcon);
 
@@ -142,10 +134,7 @@ namespace DelvUI.Helpers
         public static void DrawIcon(uint iconId, Vector2 position, Vector2 size, bool drawBorder, ImDrawListPtr drawList)
         {
             TextureWrap? texture = TexturesCache.Instance.GetTextureFromIconId(iconId);
-            if (texture == null)
-            {
-                return;
-            }
+            if (texture == null) { return; }
 
             drawList.AddImage(texture.ImGuiHandle, position, position + size, Vector2.Zero, Vector2.One);
 
@@ -171,30 +160,24 @@ namespace DelvUI.Helpers
             float uv1x = cropIcon ? 4f : 1f;
             float uv1y = cropIcon ? 12f : 1f;
 
-            var uv0 = new Vector2(uv0x / texture.Width, uv0y / texture.Height);
-            var uv1 = new Vector2(1f - uv1x / texture.Width, 1f - uv1y / texture.Height);
+            Vector2 uv0 = new(uv0x / texture.Width, uv0y / texture.Height);
+            Vector2 uv1 = new(1f - uv1x / texture.Width, 1f - uv1y / texture.Height);
 
             return (uv0, uv1);
         }
 
         public static void DrawOvershield(float shield, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, PluginConfigColor color, ImDrawListPtr drawList)
         {
-            if (shield == 0)
-            {
-                return;
-            }
+            if (shield == 0) { return; }
 
-            var h = useRatioForHeight ? barSize.Y / 100 * height : height;
+            float h = useRatioForHeight ? barSize.Y / 100 * height : height;
 
             DrawGradientFilledRect(cursorPos, new Vector2(Math.Max(1, barSize.X * shield), h), color, drawList);
         }
 
         public static void DrawShield(float shield, float hp, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, PluginConfigColor color, ImDrawListPtr drawList)
         {
-            if (shield == 0)
-            {
-                return;
-            }
+            if (shield == 0) { return; }
 
             // on full hp just draw overshield
             if (hp == 1)
@@ -204,30 +187,26 @@ namespace DelvUI.Helpers
             }
 
             // hp portion
-            var h = useRatioForHeight ? barSize.Y / 100 * Math.Min(100, height) : height;
-            var missingHPRatio = 1 - hp;
-            var s = Math.Min(shield, missingHPRatio);
-            var shieldStartPos = cursorPos + new Vector2(Math.Max(1, barSize.X * hp), 0);
+            float h = useRatioForHeight ? barSize.Y / 100 * Math.Min(100, height) : height;
+            float missingHPRatio = 1 - hp;
+            float s = Math.Min(shield, missingHPRatio);
+            Vector2 shieldStartPos = cursorPos + new Vector2(Math.Max(1, barSize.X * hp), 0);
             DrawGradientFilledRect(shieldStartPos, new Vector2(Math.Max(1, barSize.X * s), barSize.Y), color, drawList);
 
             // overshield
-            shield = shield - s;
-            if (shield <= 0)
-            {
-                return;
-            }
+            shield -= s;
+            if (shield <= 0) { return; }
 
             DrawGradientFilledRect(cursorPos, new Vector2(Math.Max(1, barSize.X * shield), h), color, drawList);
         }
 
         public static void DrawInWindow(string name, Vector2 pos, Vector2 size, bool needsInput, bool needsFocus, Action<ImDrawListPtr> drawAction)
         {
-            ImGuiWindowFlags windowFlags =
-                ImGuiWindowFlags.NoTitleBar |
-                ImGuiWindowFlags.NoScrollbar |
-                ImGuiWindowFlags.NoBackground |
-                ImGuiWindowFlags.NoMove |
-                ImGuiWindowFlags.NoResize;
+            const ImGuiWindowFlags windowFlags = ImGuiWindowFlags.NoTitleBar |
+                                                 ImGuiWindowFlags.NoScrollbar |
+                                                 ImGuiWindowFlags.NoBackground |
+                                                 ImGuiWindowFlags.NoMove |
+                                                 ImGuiWindowFlags.NoResize;
 
             DrawInWindow(name, pos, size, needsInput, needsFocus, false, windowFlags, drawAction);
         }
@@ -268,7 +247,7 @@ namespace DelvUI.Helpers
                 ImGui.SetNextWindowPos(pos);
                 ImGui.SetNextWindowSize(size);
 
-                var begin = ImGui.Begin(name, windowFlags);
+                bool begin = ImGui.Begin(name, windowFlags);
                 if (!begin)
                 {
                     ImGui.End();
@@ -283,19 +262,19 @@ namespace DelvUI.Helpers
             // clip around game's window
             else
             {
-                var flags = windowFlags;
+                ImGuiWindowFlags flags = windowFlags;
                 if (needsInput && clipRect.Value.Contains(ImGui.GetMousePos()))
                 {
                     flags |= ImGuiWindowFlags.NoInputs;
                 }
 
-                var invertedClipRects = ClipRectsHelper.GetInvertedClipRects(clipRect.Value);
+                ClipRect[]? invertedClipRects = ClipRectsHelper.GetInvertedClipRects(clipRect.Value);
                 for (int i = 0; i < invertedClipRects.Length; i++)
                 {
                     ImGui.SetNextWindowPos(pos);
                     ImGui.SetNextWindowSize(size);
 
-                    var begin = ImGui.Begin(name + "_" + i, flags);
+                    bool begin = ImGui.Begin(name + "_" + i, flags);
                     if (!begin)
                     {
                         ImGui.End();
@@ -316,7 +295,7 @@ namespace DelvUI.Helpers
             float height = ImGui.CalcTextSize(changelog).Y + 100;
 
             bool didClose = false;
-            Vector2 size = new Vector2(500, Math.Min(height, 500));
+            Vector2 size = new(500, Math.Min(height, 500));
 
             ImGui.SetNextWindowSize(size, ImGuiCond.Appearing);
             ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));

@@ -64,7 +64,7 @@ namespace DelvUI.Interface.Bars
 
             if (trackDuration)
             {
-                config.Label.SetText($"{(int)duration}");
+                config.Label.SetText($"{Math.Round(duration)}");
                 return GetProgressBar(config, duration, maxDuration, 0);
             }
 
@@ -107,7 +107,7 @@ namespace DelvUI.Interface.Bars
             float duration = Math.Abs(status?.RemainingTime ?? 0);
             float maxDuration = maxDurations[index];
 
-            config.Label.SetText($"{(int)duration}");
+            config.Label.SetText($"{Math.Round(duration)}");
             return GetProgressBar(config, duration, maxDuration, 0);
         }
 
@@ -220,7 +220,7 @@ namespace DelvUI.Interface.Bars
 
                 PluginConfigColor chunkColor = partialFillColor != null && current < chunkMax ? partialFillColor : fillColor ?? config.FillColor;
                 LabelConfig? label = null;
-                
+
                 if (labelTemplate != null)
                 {
                     label = labelTemplate.Clone();
@@ -329,7 +329,7 @@ namespace DelvUI.Interface.Bars
 
         public static Rect GetFillRect(Vector2 pos, Vector2 size, BarDirection fillDirection, PluginConfigColor color, float current, float max, float min = 0f)
         {
-            float fillPercent = Math.Clamp((current - min) / (max - min), 0f, 1f);
+            float fillPercent = max == 0 ? 1f : Math.Clamp((current - min) / (max - min), 0f, 1f);
 
             Vector2 fillPos = Vector2.Zero;
             Vector2 fillSize = fillDirection.IsHorizontal() ? new(size.X * fillPercent, size.Y) : new(size.X, size.Y * fillPercent);

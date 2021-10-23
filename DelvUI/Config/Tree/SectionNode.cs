@@ -1,6 +1,4 @@
-﻿using Dalamud.Interface;
-using DelvUI.Config.Attributes;
-using DelvUI.Helpers;
+﻿using DelvUI.Config.Attributes;
 using ImGuiNET;
 using System;
 using System.IO;
@@ -12,8 +10,16 @@ namespace DelvUI.Config.Tree
     {
         public bool Selected;
         public string Name = null!;
+        public bool ForceAllowExport = false;
 
         public SectionNode() { }
+
+        protected override bool AllowExport()
+        {
+            if (ForceAllowExport) { return true; }
+
+            return base.AllowExport();
+        }
 
         public bool Draw(ref bool changed, float alpha)
         {
@@ -76,11 +82,11 @@ namespace DelvUI.Config.Tree
             }
         }
 
-        public override void Load(string path)
+        public override void Load(string path, string currentVersion, string? previousVersion = null)
         {
             foreach (SubSectionNode child in _children)
             {
-                child.Load(Path.Combine(path, Name));
+                child.Load(Path.Combine(path, Name), currentVersion, previousVersion);
             }
         }
 
@@ -112,7 +118,8 @@ namespace DelvUI.Config.Tree
                 }
             }
 
-            throw new ArgumentException("The provided configuration object does not specify a sub-section");
+            Type type = typeof(T);
+            throw new ArgumentException("The provided configuration object does not specify a sub-section: " + type.Name);
         }
     }
 }

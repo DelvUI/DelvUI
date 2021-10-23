@@ -168,7 +168,7 @@ namespace DelvUI.Interface.Jobs
             float hutonDuration = gauge.HutonTimer / 1000f;
             if (!Config.HutonBar.HideWhenInactive || gauge.HutonTimer > 0)
             {
-                Config.HutonBar.Label.SetText($"{(int)hutonDuration}");
+                Config.HutonBar.Label.SetText($"{Math.Round(hutonDuration)}");
                 BarUtilities.GetProgressBar(Config.HutonBar, hutonDuration, 70f, 0f, player).Draw(pos);
             }
         }

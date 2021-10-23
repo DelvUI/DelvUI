@@ -7,6 +7,7 @@ using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -208,7 +209,7 @@ namespace DelvUI.Interface.Jobs
                     break;
             }
 
-            Config.TranceBar.Label.SetText($"{(int)tranceDuration / 1000}");
+            Config.TranceBar.Label.SetText($"{Math.Round(tranceDuration / 1000)}");
             BarUtilities.GetProgressBar(Config.TranceBar, tranceDuration, maxDuration, fillColor: tranceColor)
                 .Draw(origin);
         }

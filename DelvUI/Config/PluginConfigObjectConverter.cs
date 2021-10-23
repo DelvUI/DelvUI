@@ -1,6 +1,10 @@
 ﻿using Dalamud.Logging;
+using DelvUI.Interface.GeneralElements;
+using DelvUI.Interface.Party;
+using DelvUI.Interface.StatusEffects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -9,7 +13,7 @@ namespace DelvUI.Config
 {
     public abstract class PluginConfigObjectConverter : JsonConverter
     {
-        protected Dictionary<string, Type> FieldConvertersMap = new Dictionary<string, Type>();
+        protected Dictionary<string, PluginConfigObjectFieldConverter> FieldConvertersMap = new Dictionary<string, PluginConfigObjectFieldConverter>();
 
         public override object? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
@@ -21,10 +25,13 @@ namespace DelvUI.Config
         public T? ConvertJson<T>(JsonReader reader, JsonSerializer serializer) where T : PluginConfigObject
         {
             Type type = typeof(T);
-            T? config = (T?)Activator.CreateInstance(typeof(T));
+            T? config = null;
 
             try
             {
+                config = (T?)Activator.CreateInstance<T>();
+                if (config == null) { return null; }
+
                 JObject? jsonObject = (JObject?)serializer.Deserialize(reader);
                 if (jsonObject == null) { return null; }
 
@@ -37,13 +44,9 @@ namespace DelvUI.Config
                     object? value = null;
 
                     // convert values if needed
-                    if (FieldConvertersMap.TryGetValue(propertyName, out Type? converterType))
+                    if (FieldConvertersMap.TryGetValue(propertyName, out PluginConfigObjectFieldConverter? fieldConverter) && fieldConverter != null)
                     {
-                        object? converterObj = Activator.CreateInstance(converterType);
-                        if (converterObj is PluginConfigObjectFieldConverter converter)
-                        {
-                            (propertyName, value) = converter.Convert(property.Value);
-                        }
+                        (propertyName, value) = fieldConverter.Convert(property.Value);
                     }
                     // read value from json
                     else
@@ -62,18 +65,31 @@ namespace DelvUI.Config
                 }
 
                 // apply values
-                FieldInfo[] fields = typeof(T).GetFields();
-                foreach (FieldInfo field in fields)
+                foreach (string key in ValuesMap.Keys)
                 {
-                    if (ValuesMap.TryGetValue(field.Name, out object? value) && value != null && value.GetType() == field.FieldType)
+                    string[] fields = key.Split(".", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+                    object? currentObject = config;
+                    object value = ValuesMap[key];
+
+                    for (int i = 0; i < fields.Length; i++)
                     {
-                        field.SetValue(config, value);
+                        FieldInfo? field = currentObject?.GetType().GetField(fields[i]);
+                        if (field == null) { break; }
+
+                        if (i == fields.Length - 1 && value.GetType() == field.FieldType)
+                        {
+                            field.SetValue(currentObject, value);
+                        }
+                        else
+                        {
+                            currentObject = field.GetValue(currentObject);
+                        }
                     }
                 }
             }
-            catch
+            catch (Exception e)
             {
-                PluginLog.Error($"Error deserializing {type.Name}!");
+                PluginLog.Error($"Error deserializing {type.Name}: " + e.Message);
             }
 
             return config;
@@ -105,8 +121,107 @@ namespace DelvUI.Config
         }
     }
 
+    #region contract resolver
+    public class PluginConfigObjectsContractResolver : DefaultContractResolver
+    {
+        private static Dictionary<Type, Type> ConvertersMap = new Dictionary<Type, Type>()
+        {
+            [typeof(UnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
+            [typeof(PlayerUnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
+            [typeof(TargetUnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
+            [typeof(TargetOfTargetUnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
+            [typeof(FocusTargetUnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
+            [typeof(PartyFramesColorsConfig)] = typeof(ColorByHealthFieldsConverter),
+            [typeof(PartyFramesRoleIconConfig)] = typeof(PartyFramesIconsConverter),
+            [typeof(PartyFramesLeaderIconConfig)] = typeof(PartyFramesIconsConverter),
+            [typeof(PartyFramesRaiseTrackerConfig)] = typeof(PartyFramesTrackerConfigConverter),
+            [typeof(PartyFramesInvulnTrackerConfig)] = typeof(PartyFramesTrackerConfigConverter),
+            [typeof(StatusEffectsBlacklistConfig)] = typeof(StatusEffectsBlacklistConfigConverter),
+        };
+
+        protected override JsonObjectContract CreateObjectContract(Type objectType)
+        {
+            JsonObjectContract contract = base.CreateObjectContract(objectType);
+
+            if (ConvertersMap.TryGetValue(objectType, out Type? converterType) && converterType != null)
+            {
+                contract.Converter = (JsonConverter?)Activator.CreateInstance(converterType);
+            }
+
+            return contract;
+        }
+    }
+    #endregion
+
+    #region field converters
     public abstract class PluginConfigObjectFieldConverter
     {
+        public readonly string NewFieldPath;
+        public PluginConfigObjectFieldConverter(string newFieldPath)
+        {
+            NewFieldPath = newFieldPath;
+        }
+
         public abstract (string, object) Convert(JToken token);
     }
+
+    public class NewTypeFieldConverter<TOld, TNew> : PluginConfigObjectFieldConverter
+        where TOld : struct
+        where TNew : struct
+    {
+        private TNew DefaultValue;
+        private Func<TOld, TNew> Func;
+
+        public NewTypeFieldConverter(string newFieldPath, TNew defaultValue, Func<TOld, TNew> func) : base(newFieldPath)
+        {
+            DefaultValue = defaultValue;
+            Func = func;
+        }
+
+        public override (string, object) Convert(JToken token)
+        {
+            TNew result = DefaultValue;
+
+            TOld? oldValue = token.ToObject<TOld>();
+            if (oldValue.HasValue)
+            {
+                result = Func(oldValue.Value);
+            }
+
+            return (NewFieldPath, result);
+        }
+    }
+
+    public class SameTypeFieldConverter<T> : NewTypeFieldConverter<T, T> where T : struct
+    {
+        public SameTypeFieldConverter(string newFieldPath, T defaultValue)
+            : base(newFieldPath, defaultValue, (oldValue) => { return oldValue; })
+        {
+        }
+    }
+
+    public class SameClassFieldConverter<T> : PluginConfigObjectFieldConverter where T : class
+    {
+        private T DefaultValue;
+
+        public SameClassFieldConverter(string newFieldPath, T defaultValue)
+            : base(newFieldPath)
+        {
+            DefaultValue = defaultValue;
+        }
+
+        public override (string, object) Convert(JToken token)
+        {
+            T result = DefaultValue;
+
+            T? oldValue = token.ToObject<T>();
+            if (oldValue != null)
+            {
+                result = oldValue;
+            }
+
+            return (NewFieldPath, result);
+        }
+    }
+    #endregion
 }

@@ -56,6 +56,9 @@ namespace DelvUI.Config
 
         public string ConfigDirectory;
 
+        public string CurrentVersion => Plugin.Version;
+        public string? PreviousVersion { get; private set; } = null;
+
         private bool _needsProfileUpdate = false;
         private bool _lockHUD = true;
 
@@ -125,8 +128,6 @@ namespace DelvUI.Config
             _windowSystem.AddWindow(_gridWindow);
 
             CheckVersion();
-
-            LoadOrInitializeFiles();
 
             Plugin.ClientState.Logout += OnLogout;
         }
@@ -201,8 +202,8 @@ namespace DelvUI.Config
                 }
                 else
                 {
-                    string version = File.ReadAllText(path);
-                    if (version != Plugin.Version)
+                    PreviousVersion = File.ReadAllText(path);
+                    if (PreviousVersion != Plugin.Version)
                     {
                         needsWrite = true;
                     }
@@ -274,7 +275,7 @@ namespace DelvUI.Config
         #endregion
 
         #region load / save / profiles
-        private void LoadOrInitializeFiles()
+        public void LoadOrInitializeFiles()
         {
             try
             {
@@ -286,11 +287,14 @@ namespace DelvUI.Config
                 else
                 {
                     LoadConfigurations();
+
+                    // gotta save after initial load store possible version update changes right away
+                    SaveConfigurations(true);
                 }
             }
-            catch
+            catch (Exception e)
             {
-                PluginLog.Error("Error initializing configurations!");
+                PluginLog.Error("Error initializing configurations: " + e.Message);
             }
         }
 
@@ -301,7 +305,7 @@ namespace DelvUI.Config
 
         public void LoadConfigurations()
         {
-            ConfigBaseNode.Load(ConfigDirectory);
+            ConfigBaseNode.Load(ConfigDirectory, CurrentVersion, PreviousVersion);
         }
 
         public void SaveConfigurations(bool forced = false)
@@ -346,6 +350,8 @@ namespace DelvUI.Config
             BaseNode node = new BaseNode();
             InitializeBaseNode(node);
 
+            Dictionary<Type, PluginConfigObject> OldConfigObjects = new Dictionary<Type, PluginConfigObject>();
+
             foreach (ImportData importData in imports)
             {
                 PluginConfigObject? config = importData.GetObject();
@@ -354,11 +360,31 @@ namespace DelvUI.Config
                     return false;
                 }
 
-                node.SetConfigObject(config);
+                if (!node.SetConfigObject(config))
+                {
+                    OldConfigObjects.Add(config.GetType(), config);
+                }
             }
 
             try
             {
+                // handle imports for breaking changes in the config
+                if (UnmergeableConfigTypesPerVersion.TryGetValue(CurrentVersion, out List<Type>? types) && types != null)
+                {
+                    foreach (Type type in types)
+                    {
+                        var genericMethod = node.GetType().GetMethod("GetConfigObject");
+                        var method = genericMethod?.MakeGenericMethod(type);
+                        PluginConfigObject? config = (PluginConfigObject?)method?.Invoke(node, null);
+
+                        if (config != null)
+                        {
+                            config.ImportFromOldVersion(OldConfigObjects, CurrentVersion, PreviousVersion);
+                            node.SetConfigObject(config); // needed to refresh nodes
+                        }
+                    }
+                }
+
                 node.Save(ConfigDirectory);
             }
             catch
@@ -390,7 +416,7 @@ namespace DelvUI.Config
         private static void InitializeBaseNode(BaseNode node)
         {
             // creates node tree in the right order...
-            foreach (Type type in configObjectTypes)
+            foreach (Type type in ConfigObjectTypes)
             {
                 var genericMethod = node.GetType().GetMethod("GetConfigPageNode");
                 var method = genericMethod?.MakeGenericMethod(type);
@@ -398,7 +424,7 @@ namespace DelvUI.Config
             }
         }
 
-        private static Type[] configObjectTypes = new Type[]
+        private static Type[] ConfigObjectTypes = new Type[]
         {
             typeof(PlayerUnitFrameConfig),
             typeof(TargetUnitFrameConfig),
@@ -427,12 +453,10 @@ namespace DelvUI.Config
             typeof(PartyFramesHealthBarsConfig),
             typeof(PartyFramesManaBarConfig),
             typeof(PartyFramesCastbarConfig),
-            typeof(PartyFramesRoleIconConfig),
-            typeof(PartyFramesLeaderIconConfig),
+            typeof(PartyFramesIconsConfig),
             typeof(PartyFramesBuffsConfig),
             typeof(PartyFramesDebuffsConfig),
-            typeof(PartyFramesRaiseTrackerConfig),
-            typeof(PartyFramesInvulnTrackerConfig),
+            typeof(PartyFramesTrackersConfig),
 
             typeof(PaladinConfig),
             typeof(WarriorConfig),
@@ -461,6 +485,7 @@ namespace DelvUI.Config
             typeof(MeleeColorConfig),
             typeof(RangedColorConfig),
             typeof(CastersColorConfig),
+            typeof(RolesColorConfig),
             typeof(MiscColorConfig),
 
             typeof(FontsConfig),
@@ -474,6 +499,14 @@ namespace DelvUI.Config
             typeof(GridConfig),
 
             typeof(ImportConfig)
+        };
+
+        private static Dictionary<string, List<Type>> UnmergeableConfigTypesPerVersion = new Dictionary<string, List<Type>>()
+        {
+            ["0.4.0.0"] = new List<Type>() {
+                typeof(PartyFramesIconsConfig),
+                typeof(PartyFramesTrackersConfig)
+            }
         };
         #endregion
     }

@@ -10,11 +10,12 @@ namespace DelvUI.Interface.Party
 {
     public class PartyFramesCleanseTracker : IDisposable
     {
-        private PartyFramesCleanseTrackerConfig _config;
+        private PartyFramesCleanseTrackerConfig _config = null!;
+
         public PartyFramesCleanseTracker()
         {
-            _config = ConfigurationManager.Instance.GetConfigObject<PartyFramesCleanseTrackerConfig>();
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+            OnConfigReset(ConfigurationManager.Instance);
         }
 
         ~PartyFramesCleanseTracker()
@@ -40,7 +41,7 @@ namespace DelvUI.Interface.Party
 
         public void OnConfigReset(ConfigurationManager sender)
         {
-            _config = sender.GetConfigObject<PartyFramesCleanseTrackerConfig>();
+            _config = ConfigurationManager.Instance.GetConfigObject<PartyFramesTrackersConfig>().Cleanse;
         }
 
         public void Update(List<IPartyFramesMember> partyMembers)
