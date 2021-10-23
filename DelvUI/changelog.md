@@ -18,7 +18,9 @@ Fixes:
 - Fixed "invisible" buffs.
 - Fixed status whitelists/blacklists not working properly if the imported profile was created with a different game language.
 - Fixed unit frame colors being incorrect for NPCs in some situations.
-- Fixed slidecast default value finally.
+- Fixed castbar progress not being accurate when showing the ability icon.
+- Fixed game being frozen when importing or exporting profiles to .delvui files.
+- Fixed castbar's slidecast default value.
 
 # 0.3.2.0
 Features:
