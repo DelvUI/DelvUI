@@ -6,7 +6,7 @@ Features:
 - Added role color settings for DPS types (melee / ranged / caster).
 - Added setting to hide health related labels when appropiate in unit frames.
 - Added thickness settings for party frames healthbars borders.
-- Added support for Trust parties.
+- Added support for Trust and Squadron Command parties.
 - Added Enable Combat Hotbars sub-option to use with Cross Hotbar instead.
 - Added option to change background color and opacity of the Castbars.
 
@@ -19,8 +19,8 @@ Fixes:
 - Fixed status whitelists/blacklists not working properly if the imported profile was created with a different game language.
 - Fixed unit frame colors being incorrect for NPCs in some situations.
 - Fixed castbar progress not being accurate when showing the ability icon.
-- Fixed game being frozen when importing or exporting profiles to .delvui files.
 - Fixed castbar's slidecast default value.
+- Fixed game being frozen when importing or exporting profiles to .delvui files.
 
 # 0.3.2.0
 Features:
