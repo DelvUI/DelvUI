@@ -68,9 +68,8 @@ namespace DelvUI.Interface.GeneralElements
 
             DrawHelper.DrawInWindow(ID, startPos, Config.Size, false, false, (drawList) =>
             {
-                uint bgColor = BackGroundColor();
                 // bg
-                drawList.AddRectFilled(startPos, endPos, bgColor);
+                drawList.AddRectFilled(startPos, endPos, Config.BackgroundColor.Base);
 
 
                 // extras
@@ -147,8 +146,6 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         public virtual PluginConfigColor Color() => Config.Color;
-
-        public virtual uint BackGroundColor() => Config.BackgroundColor.Base;
     }
 
     public class PlayerCastbarHud : CastbarHud
