@@ -104,7 +104,7 @@ namespace DelvUI.Interface.Party
         {
             if (_wasHovering)
             {
-                InputsHelper.Instance.Target = null;
+                InputsHelper.Instance.ClearTarget();
                 _wasHovering = false;
             }
         }
@@ -123,7 +123,7 @@ namespace DelvUI.Interface.Party
 
             if (isHovering)
             {
-                InputsHelper.Instance.Target = character;
+                InputsHelper.Instance.SetTarget(character);
                 _wasHovering = true;
 
                 // left click
@@ -148,7 +148,7 @@ namespace DelvUI.Interface.Party
             }
             else if (_wasHovering)
             {
-                InputsHelper.Instance.Target = null;
+                InputsHelper.Instance.ClearTarget();
                 _wasHovering = false;
             }
 

@@ -155,25 +155,30 @@ namespace DelvUI.Helpers
 
         private ExcelSheet<Action>? _sheet;
 
+        public bool HandlingMouseInputs { get; private set; } = false;
         private GameObject? _target = null;
-        public GameObject? Target
+
+        public void SetTarget(GameObject? target)
         {
-            get => _target;
-            set
+            _target = target;
+            HandlingMouseInputs = true;
+
+            // set mouseover target in-game
+            if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode)
             {
-                _target = value;
+                IntPtr uiModule = Plugin.GameGui.GetUIModule();
+                long unknownAddress = (long)uiModule + UnknownOffset;
+                long targetAddress = _target != null && _target.ObjectId != 0 ? (long)_target.Address : 0;
 
-                // set mouseover target in-game
-                if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode)
-                {
-                    IntPtr uiModule = Plugin.GameGui.GetUIModule();
-                    long unknownAddress = (long)uiModule + UnknownOffset;
-                    long targetAddress = _target != null && _target.ObjectId != 0 ? (long)_target.Address : 0;
-
-                    OnSetUIMouseoverActor func = Marshal.GetDelegateForFunctionPointer<OnSetUIMouseoverActor>(_setUIMouseOverActor);
-                    func.Invoke(unknownAddress, targetAddress);
-                }
+                OnSetUIMouseoverActor func = Marshal.GetDelegateForFunctionPointer<OnSetUIMouseoverActor>(_setUIMouseOverActor);
+                func.Invoke(unknownAddress, targetAddress);
             }
+        }
+
+        public void ClearTarget()
+        {
+            _target = null;
+            HandlingMouseInputs = false;
         }
 
         private void OnConfigReset(ConfigurationManager sender)
@@ -191,9 +196,9 @@ namespace DelvUI.Helpers
         {
             //PluginLog.Log("ACTION: {0} - {1} - {2} - {3} - {4} - {5} - {6}}", arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 
-            if (_config.MouseoverEnabled && _config.MouseoverAutomaticMode && IsActionValid(arg3, Target))
+            if (_config.MouseoverEnabled && _config.MouseoverAutomaticMode && IsActionValid(arg3, _target))
             {
-                return _requsetActionHook.Original(arg1, arg2, arg3, Target!.ObjectId, arg5, arg6, arg7);
+                return _requsetActionHook.Original(arg1, arg2, arg3, _target!.ObjectId, arg5, arg6, arg7);
             }
 
             return _requsetActionHook.Original(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -243,8 +248,6 @@ namespace DelvUI.Helpers
         }
 
         #region mouseover inputs proxy
-        public bool HandlingMouseInputs => Target != null;
-
         private bool? _leftButtonClicked = null;
         public bool LeftButtonClicked => _leftButtonClicked.HasValue ? _leftButtonClicked.Value : ImGui.GetIO().MouseClicked[0];
 
