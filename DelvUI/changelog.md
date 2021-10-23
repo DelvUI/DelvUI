@@ -21,6 +21,7 @@ Fixes:
 - Fixed castbar progress not being accurate when showing the ability icon.
 - Fixed castbar's slidecast default value.
 - Fixed game being frozen when importing or exporting profiles to .delvui files.
+- Fixed right click sometimes not working on party frames.
 
 # 0.3.2.0
 Features:

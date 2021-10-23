@@ -52,7 +52,7 @@ namespace DelvUI.Interface.GeneralElements
         {
             if (_wasHovering)
             {
-                InputsHelper.Instance.Target = null;
+                InputsHelper.Instance.ClearTarget();
                 _wasHovering = false;
             }
         }
@@ -78,7 +78,7 @@ namespace DelvUI.Interface.GeneralElements
             var startPos = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
             if (ImGui.IsMouseHoveringRect(startPos, startPos + Config.Size) && !DraggingEnabled)
             {
-                InputsHelper.Instance.Target = Actor;
+                InputsHelper.Instance.SetTarget(Actor);
                 _wasHovering = true;
 
                 if (InputsHelper.Instance.LeftButtonClicked)
@@ -93,7 +93,7 @@ namespace DelvUI.Interface.GeneralElements
             }
             else if (_wasHovering)
             {
-                InputsHelper.Instance.Target = null;
+                InputsHelper.Instance.ClearTarget();
                 _wasHovering = false;
             }
         }
