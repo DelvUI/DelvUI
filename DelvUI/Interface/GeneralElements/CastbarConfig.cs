@@ -163,11 +163,11 @@ namespace DelvUI.Interface.GeneralElements
     {
         [ColorEdit4("Color ##Castbar")]
         [Order(20)]
-        public PluginConfigColor Color = new(new Vector4(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
+        public PluginConfigColor Color = new PluginConfigColor(new(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
 
         [ColorEdit4("BackgroundColor ##Castbar")]
         [Order(21)]
-        public PluginConfigColor BackgroundColor = new(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
+        public PluginConfigColor BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
 
         [Checkbox("Show Ability Icon")]
         [Order(25)]
