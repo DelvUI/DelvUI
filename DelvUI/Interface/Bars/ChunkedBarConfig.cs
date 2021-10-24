@@ -26,11 +26,15 @@ namespace DelvUI.Interface.Bars
     [Exportable(false)]
     public class ChunkedProgressBarConfig : ChunkedBarConfig
     {
-        [Checkbox("Show In Chunks")]
+        [Checkbox("Show In Chunks", spacing = true)]
         [Order(46)]
         public bool UseChunks = true;
 
-        [Checkbox("Use Partial Fill Color")]
+        [RadioSelector("Show Text on All Chunks", "Show Text on Active Chunk")]
+        [Order(47, collapseWith = nameof(UseChunks))]
+        public LabelMode LabelMode;
+
+        [Checkbox("Use Partial Fill Color", spacing = true)]
         [Order(50)]
         public bool UsePartialFillColor = false;
 
@@ -53,5 +57,11 @@ namespace DelvUI.Interface.Bars
 
             PartialFillColor = partialFillColor ?? new PluginConfigColor(new(180f / 255f, 180f / 255f, 180f / 255f, 100f / 100f));
         }
+    }
+
+    public enum LabelMode
+    {
+        AllChunks,
+        ActiveChunk
     }
 }

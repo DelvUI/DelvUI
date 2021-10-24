@@ -239,6 +239,7 @@ namespace DelvUI.Interface.Jobs
             var config = new NinjaConfig();
 
             config.MudraBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.MudraBar.LabelMode = LabelMode.ActiveChunk;
 
             config.TrickAttackBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.TrickAttackBar.Enabled = false;
