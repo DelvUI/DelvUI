@@ -51,13 +51,7 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            if (NumberFormat == 0)
-            {
-                _text = $"{Math.Truncate(value)}";
-                return;
-            }
-
-            int aux = (NumberFormat * 10);
+            int aux = (int)Math.Pow(10, NumberFormat);
             double v = Math.Truncate(value * aux) / aux;
             _text = v.ToString($"F{NumberFormat}", CultureInfo.InvariantCulture);
         }
