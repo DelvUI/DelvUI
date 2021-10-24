@@ -63,12 +63,12 @@ namespace DelvUI.Interface.Jobs
 
             if ((!Config.StormsEyeBar.HideWhenInactive || stormsEyeDuration > 0) && innerReleaseDuration is 0)
             {
-                Config.StormsEyeBar.Label.SetText(Math.Truncate(stormsEyeDuration).ToString());
+                Config.StormsEyeBar.Label.SetValue(stormsEyeDuration);
                 BarUtilities.GetProgressBar(Config.StormsEyeBar, stormsEyeDuration, 60f, 0f, player, Config.StormsEyeBar.StormsEyeColor).Draw(origin);
             }
             if (innerReleaseDuration > 0)
             {
-                Config.StormsEyeBar.Label.SetText(Math.Truncate(innerReleaseDuration).ToString());
+                Config.StormsEyeBar.Label.SetValue(innerReleaseDuration);
                 BarUtilities.GetProgressBar(Config.StormsEyeBar, innerReleaseDuration, 10f, 0f, player, Config.StormsEyeBar.InnerReleaseColor).Draw(origin);
             }
         }
@@ -80,7 +80,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.BeastGauge.HideWhenInactive || gauge.BeastGauge > 0 || nascentChaosDuration > 0)
             {
-                Config.BeastGauge.Label.SetText(gauge.BeastGauge.ToString("N0"));
+                Config.BeastGauge.Label.SetValue(gauge.BeastGauge);
 
                 var color = nascentChaosDuration == 0 ? Config.BeastGauge.BeastGaugeColor : Config.BeastGauge.NascentChaosColor;
                 BarUtilities.GetChunkedProgressBars(Config.BeastGauge, 2, gauge.BeastGauge, 100, fillColor: color)

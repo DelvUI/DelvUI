@@ -154,7 +154,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            Config.WhiteManaBar.Label.SetText($"{mana}");
+            Config.WhiteManaBar.Label.SetValue(mana);
             BarUtilities.GetProgressBar(Config.WhiteManaBar, mana, 100).
                 Draw(origin);
         }
@@ -167,7 +167,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            Config.BlackManaBar.Label.SetText($"{mana}");
+            Config.BlackManaBar.Label.SetValue(mana);
             BarUtilities.GetProgressBar(Config.BlackManaBar, mana, 100).
                 Draw(origin);
         }
@@ -194,7 +194,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             };
 
-            Config.DualcastBar.Label.SetText($"{Math.Round(duration)}");
+            Config.DualcastBar.Label.SetValue(duration);
             BarUtilities.GetProgressBar(Config.DualcastBar, duration, 15f).
                 Draw(origin);
         }

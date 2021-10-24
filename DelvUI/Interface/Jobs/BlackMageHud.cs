@@ -137,13 +137,13 @@ namespace DelvUI.Interface.Jobs
             }
 
             // value
-            config.ValueLabelConfig.SetText($"{player.CurrentMp}");
+            config.ValueLabelConfig.SetValue(player.CurrentMp);
 
             // element timer
             if (gauge.InAstralFire || gauge.InUmbralIce)
             {
-                var time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000 + 1 : 0;
-                config.ElementTimerLabelConfig.SetText($"{time}");
+                float time = gauge.ElementTimeRemaining > 10 ? gauge.ElementTimeRemaining / 1000f : 0;
+                config.ElementTimerLabelConfig.SetValue(time);
             }
             else
             {
@@ -201,8 +201,8 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            int timer = gauge.IsEnochianActive ? (30000 - gauge.EnochianTimer) : 0;
-            Config.EnochianBar.Label.SetText($"{timer / 1000}");
+            float timer = gauge.IsEnochianActive ? (30000f - gauge.EnochianTimer) : 0f;
+            Config.EnochianBar.Label.SetValue(timer / 1000);
             BarUtilities.GetProgressBar(Config.EnochianBar, timer, 30000, 0f)
                 .Draw(origin);
         }
@@ -357,10 +357,10 @@ namespace DelvUI.Interface.Jobs
         public PluginConfigColor FireColor = new PluginConfigColor(new Vector4(204f / 255f, 40f / 255f, 40f / 255f, 100f / 100f));
 
         [NestedConfig("Value Label", 45, separator = false, spacing = true)]
-        public LabelConfig ValueLabelConfig = new LabelConfig(new Vector2(2, 0), "", DrawAnchor.Left, DrawAnchor.Left);
+        public NumericLabelConfig ValueLabelConfig = new NumericLabelConfig(new Vector2(2, 0), "", DrawAnchor.Left, DrawAnchor.Left);
 
         [NestedConfig("Element Timer Label", 50, separator = false, spacing = true)]
-        public LabelConfig ElementTimerLabelConfig = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+        public NumericLabelConfig ElementTimerLabelConfig = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
 
         [NestedConfig("Glow When Enochian Is Active", 55, separator = false, spacing = true)]
         public BarGlowConfig GlowConfig = new BarGlowConfig();

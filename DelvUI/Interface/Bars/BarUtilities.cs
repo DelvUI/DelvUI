@@ -64,7 +64,7 @@ namespace DelvUI.Interface.Bars
 
             if (trackDuration)
             {
-                config.Label.SetText($"{Math.Round(duration)}");
+                config.Label.SetValue(duration);
                 return GetProgressBar(config, duration, maxDuration, 0);
             }
 
@@ -107,7 +107,7 @@ namespace DelvUI.Interface.Bars
             float duration = Math.Abs(status?.RemainingTime ?? 0);
             float maxDuration = maxDurations[index];
 
-            config.Label.SetText($"{Math.Round(duration)}");
+            config.Label.SetValue(duration);
             return GetProgressBar(config, duration, maxDuration, 0);
         }
 
@@ -202,7 +202,7 @@ namespace DelvUI.Interface.Bars
             float max,
             float min = 0f,
             GameObject? actor = null,
-            LabelConfig? labelTemplate = null,
+            NumericLabelConfig? labelTemplate = null,
             PluginConfigColor? fillColor = null,
             PluginConfigColor? partialFillColor = null,
             BarGlowConfig? glowConfig = null,
@@ -219,12 +219,12 @@ namespace DelvUI.Interface.Bars
                 float chunkPercent = Math.Clamp((current - chunkMin) / (chunkMax - chunkMin), 0f, 1f);
 
                 PluginConfigColor chunkColor = partialFillColor != null && current < chunkMax ? partialFillColor : fillColor ?? config.FillColor;
-                LabelConfig? label = null;
+                NumericLabelConfig? label = null;
 
                 if (labelTemplate != null)
                 {
                     label = labelTemplate.Clone();
-                    label.SetText(Math.Clamp(current - chunkMin, 0, chunkRange).ToString("N0"));
+                    label.SetValue(Math.Clamp(current - chunkMin, 0, chunkRange));
                 }
 
                 barChunks[barIndex] = new Tuple<PluginConfigColor, float, LabelConfig?>(chunkColor, chunkPercent, label);

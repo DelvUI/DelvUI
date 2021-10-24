@@ -5,6 +5,7 @@ Features:
 - Added role/job icon to unit frames.
 - Added role color settings for DPS types (melee / ranged / caster).
 - Added setting to hide health related labels when appropiate in unit frames.
+- Added a number format setting for labels in job specific bars.
 - Added thickness settings for party frames healthbars borders.
 - Added support for Trust and Squadron Command parties.
 - Added Enable Combat Hotbars sub-option to use with Cross Hotbar instead.
@@ -18,6 +19,7 @@ Fixes:
 - Fixed DRG Disembowel bar hiding itself for a second when re-applying buff with "Hide When Inactive" option checked.
 - Fixed "invisible" buffs.
 - Fixed status whitelists/blacklists not working properly if the imported profile was created with a different game language.
+- Fixed chocobo icon not showing in party frames.
 - Fixed unit frame colors being incorrect for NPCs in some situations.
 - Fixed castbar progress not being accurate when showing the ability icon.
 - Fixed castbar's slidecast default value.

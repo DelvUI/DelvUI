@@ -101,12 +101,12 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private string RedrawText(float redrawCastInfo, int redrawStacks = 0)
+        private void SetRedrawText(float redrawCastInfo, int redrawStacks = 0)
         {
-            string redrawStacksString = Config.DrawBar.ShowRedrawStacks ? redrawStacks.ToString("N0", CultureInfo.InvariantCulture) : "()";
             if (redrawCastInfo < 0 || !Config.DrawBar.ShowRedrawCooldown)
             {
-                return Config.DrawBar.ShowRedrawStacks ? "(" + redrawStacksString + ")" : "";
+                Config.DrawBar.DrawRedrawLabel.SetText(Config.DrawBar.ShowRedrawStacks ? "(" + redrawStacks + ")" : "");
+                return;
             }
 
             if (!Config.DrawBar.EnableRedrawCooldownCumulated)
@@ -119,9 +119,13 @@ namespace DelvUI.Interface.Jobs
                 redrawCastInfo %= 30f;
             }
 
-            string format = Config.DrawBar.EnableDecimalRedrawBar ? "N1" : "N0";
-            return Config.DrawBar.ShowRedrawStacks ? redrawCastInfo.ToString(format, CultureInfo.InvariantCulture) + " (" + redrawStacksString + ")" : redrawCastInfo.ToString(format, CultureInfo.InvariantCulture);
+            Config.DrawBar.DrawRedrawLabel.SetValue(redrawCastInfo);
 
+            if (Config.DrawBar.ShowRedrawStacks)
+            {
+                string text = Config.DrawBar.DrawRedrawLabel.GetText();
+                Config.DrawBar.DrawRedrawLabel.SetText(text + " (" + redrawStacks + ")");
+            }
         }
 
         private unsafe void DrawDivinationBar(Vector2 origin, PlayerCharacter player)
@@ -279,18 +283,42 @@ namespace DelvUI.Interface.Jobs
                 cardPresent = 1f;
                 cardMax = 1f;
                 Config.DrawBar.Label.SetText(cardJob);
-                Config.DrawBar.DrawDrawLabel.SetText(Config.DrawBar.DrawDrawLabel.Enabled ? drawCastInfo > 0 ? Math.Abs(drawCastInfo).ToString(Config.DrawBar.EnableDecimalDrawBar ? "N1" : "N0", CultureInfo.InvariantCulture) : "READY" : "");
+
+                if (Config.DrawBar.DrawDrawLabel.Enabled)
+                {
+                    if (drawCastInfo > 0)
+                    {
+                        Config.DrawBar.DrawDrawLabel.SetValue(Math.Abs(drawCastInfo));
+                    }
+                    else
+                    {
+                        Config.DrawBar.DrawDrawLabel.SetText("READY");
+                    }
+                }
+                else
+                {
+                    Config.DrawBar.DrawDrawLabel.SetText("");
+                }
             }
             else
             {
                 cardPresent = drawCastInfo > 0 ? drawCastInfo : 1f;
-                Config.DrawBar.Label.SetText(drawCastInfo > 0 ? Math.Abs(drawCastInfo).ToString(Config.DrawBar.EnableDecimalDrawBar ? "N1" : "N0", CultureInfo.InvariantCulture) : "READY");
+
+                if (drawCastInfo > 0)
+                {
+                    Config.DrawBar.Label.SetValue(Math.Abs(drawCastInfo));
+                }
+                else
+                {
+                    Config.DrawBar.Label.SetText("READY");
+                }
+
                 Config.DrawBar.DrawDrawLabel.SetText("");
                 cardColor = drawCastInfo > 0 ? Config.DrawBar.DrawCdColor : Config.DrawBar.DrawCdReadyColor;
                 cardMax = drawCastInfo > 0 ? 30f : 1f;
             }
 
-            Config.DrawBar.DrawRedrawLabel.SetText(RedrawText(redrawCastInfo, redrawStacks));
+            SetRedrawText(redrawCastInfo, redrawStacks);
             LabelConfig[] labels = new LabelConfig[] { Config.DrawBar.Label, Config.DrawBar.DrawRedrawLabel, Config.DrawBar.DrawDrawLabel };
             BarGlowConfig? glowConfig = Config.DrawBar.DrawGlowConfig.Enabled && Math.Abs(cardMax - 1f) == 0f ? Config.DrawBar.DrawGlowConfig : null;
 
@@ -313,7 +341,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            Config.LightspeedBar.Label.SetText($"{lightspeedDuration.ToString(Config.LightspeedBar.EnableDecimalLightspeedBar ? "N1" : "N0", CultureInfo.InvariantCulture)}");
+            Config.LightspeedBar.Label.SetValue(lightspeedDuration);
             BarUtilities.GetProgressBar(Config.LightspeedBar, lightspeedDuration, LIGHTSPEED_MAX_DURATION).Draw(origin);
         }
 
@@ -329,7 +357,8 @@ namespace DelvUI.Interface.Jobs
 
             float currentStarDuration = starPreCookingBuff > 0 ? STAR_MAX_DURATION - Math.Abs(starPreCookingBuff) : Math.Abs(starPostCookingBuff);
             PluginConfigColor currentStarColor = starPreCookingBuff > 0 ? Config.StarBar.StarEarthlyColor : Config.StarBar.StarGiantColor;
-            Config.StarBar.Label.SetText($"{currentStarDuration.ToString(Config.StarBar.EnableDecimalStarBar ? "N1" : "N0", CultureInfo.InvariantCulture)}");
+
+            Config.StarBar.Label.SetValue(currentStarDuration);
             BarUtilities.GetProgressBar(Config.StarBar, currentStarDuration, STAR_MAX_DURATION, 0f, player, currentStarColor, Config.StarBar.StarGlowConfig.Enabled && starPostCookingBuff > 0 ? Config.StarBar.StarGlowConfig : null).Draw(origin); // Star Countdown after Star is ready 
         }
     }
@@ -365,7 +394,7 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Dot Bar", 300)]
-        public AstrologianDotBarConfig DotBar = new(
+        public ProgressBarConfig DotBar = new(
             new Vector2(-85, -54),
             new Vector2(84, 20),
             new PluginConfigColor(new Vector4(20f / 255f, 80f / 255f, 168f / 255f, 255f / 100f))
@@ -378,7 +407,7 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Lightspeed Bar", 500)]
-        public AstrologianLightspeedBarConfig LightspeedBar = new(
+        public ProgressBarConfig LightspeedBar = new(
             new Vector2(85, -54),
             new Vector2(84, 20),
             new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 173f / 255f, 100f / 100f))
@@ -390,14 +419,10 @@ namespace DelvUI.Interface.Jobs
         {
 
             [NestedConfig("Draw Side Timer Label" + "##Draw", 101, separator = false, spacing = true)]
-            public LabelConfig DrawDrawLabel = new(new Vector2(0, 0), "", DrawAnchor.Left, DrawAnchor.Left);
-
-            [Checkbox("Enable Draw Decimal Precision" + "##Draw")]
-            [Order(102)]
-            public bool EnableDecimalDrawBar;
+            public NumericLabelConfig DrawDrawLabel = new(new Vector2(0, 0), "", DrawAnchor.Left, DrawAnchor.Left);
 
             [NestedConfig("Redraw Timer Label" + "##Draw", 104, separator = false, spacing = true)]
-            public LabelConfig DrawRedrawLabel = new(new Vector2(0, 0), "", DrawAnchor.Right, DrawAnchor.Right);
+            public NumericLabelConfig DrawRedrawLabel = new(new Vector2(0, 0), "", DrawAnchor.Right, DrawAnchor.Right);
 
             [Checkbox("Redraw Stacks" + "##Redraw")]
             [Order(105)]
@@ -406,11 +431,6 @@ namespace DelvUI.Interface.Jobs
             [Checkbox("Show Redraw Cooldown" + "##Redraw")]
             [Order(106)]
             public bool ShowRedrawCooldown;
-
-            [Checkbox("Enable Redraw Decimal Precision" + "##Redraw")]
-            [Order(107)]
-            public bool EnableDecimalRedrawBar;
-
             [Checkbox("Total Redraw Cooldown Instead of Next" + "##Redraw")]
             [Order(108)]
             public bool EnableRedrawCooldownCumulated;
@@ -470,26 +490,9 @@ namespace DelvUI.Interface.Jobs
         }
 
         [Exportable(false)]
-        public class AstrologianDotBarConfig : ProgressBarConfig
-        {
-            // TODO: Implement EnableDecimalDotBar in DotBar
-            [Checkbox("Enable Decimal Precision" + "##Combust")]
-            [Order(301)]
-            public bool EnableDecimalDotBar;
-            public AstrologianDotBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
-                : base(position, size, fillColor)
-            {
-            }
-        }
-
-        [Exportable(false)]
         [DisableParentSettings("FillColor")]
         public class AstrologianStarBarConfig : ProgressBarConfig
         {
-            [Checkbox("Enable Decimal Precision" + "##Star")]
-            [Order(401)]
-            public bool EnableDecimalStarBar;
-
             [ColorEdit4("Earthly" + "##Star")]
             [Order(402)]
             public PluginConfigColor StarEarthlyColor = new(new Vector4(37f / 255f, 181f / 255f, 177f / 255f, 100f / 100f));
@@ -502,18 +505,6 @@ namespace DelvUI.Interface.Jobs
             public BarGlowConfig StarGlowConfig = new();
             public AstrologianStarBarConfig(Vector2 position, Vector2 size)
                 : base(position, size, new PluginConfigColor(Vector4.Zero))
-            {
-            }
-        }
-
-        [Exportable(false)]
-        public class AstrologianLightspeedBarConfig : ProgressBarConfig
-        {
-            [Checkbox("Enable Decimal Precision" + "##Lightspeed")]
-            [Order(501)]
-            public bool EnableDecimalLightspeedBar;
-            public AstrologianLightspeedBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
-                : base(position, size, fillColor)
             {
             }
         }
