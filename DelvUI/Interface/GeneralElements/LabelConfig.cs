@@ -96,7 +96,6 @@ namespace DelvUI.Interface.GeneralElements
         public virtual LabelConfig Clone() =>
             new LabelConfig(Position, _text, FrameAnchor, TextAnchor)
             {
-                _text = _text,
                 Color = Color,
                 OutlineColor = OutlineColor,
                 ShadowColor = ShadowColor,
