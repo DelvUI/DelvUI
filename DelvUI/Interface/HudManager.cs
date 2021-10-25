@@ -576,13 +576,12 @@ namespace DelvUI.Interface
                 // casters
                 [JobIDs.BLM] = new JobHudTypes(typeof(BlackMageHud), typeof(BlackMageConfig), "Black Mage HUD"),
                 [JobIDs.SMN] = new JobHudTypes(typeof(SummonerHud), typeof(SummonerConfig), "Summoner HUD"),
-                [JobIDs.RDM] = new JobHudTypes(typeof(RedMageHud), typeof(RedMageConfig), "Red Mage HUD")
+                [JobIDs.RDM] = new JobHudTypes(typeof(RedMageHud), typeof(RedMageConfig), "Red Mage HUD"),
+                [JobIDs.BLU] = new JobHudTypes(typeof(BlueMageHud), typeof(BlueMageConfig), "Blue Mage HUD")
             };
 
             _unsupportedJobsMap = new Dictionary<uint, Type>()
             {
-                [JobIDs.BLU] = typeof(BlueMageConfig),
-
                 // base jobs
                 [JobIDs.GLD] = typeof(GladiatorConfig),
                 [JobIDs.MRD] = typeof(MarauderConfig),
