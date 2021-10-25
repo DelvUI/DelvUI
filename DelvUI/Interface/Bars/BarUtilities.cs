@@ -64,7 +64,7 @@ namespace DelvUI.Interface.Bars
 
             if (trackDuration)
             {
-                config.Label.SetText($"{Math.Round(duration)}");
+                config.Label.SetValue(duration);
                 return GetProgressBar(config, duration, maxDuration, 0);
             }
 
@@ -107,7 +107,7 @@ namespace DelvUI.Interface.Bars
             float duration = Math.Abs(status?.RemainingTime ?? 0);
             float maxDuration = maxDurations[index];
 
-            config.Label.SetText($"{Math.Round(duration)}");
+            config.Label.SetValue(duration);
             return GetProgressBar(config, duration, maxDuration, 0);
         }
 
@@ -244,7 +244,7 @@ namespace DelvUI.Interface.Bars
 
             if (config.UseChunks)
             {
-                LabelConfig?[] labels = new LabelConfig[chunks];
+                NumericLabelConfig?[] labels = new NumericLabelConfig?[chunks];
                 for (int i = 0; i < chunks; i++)
                 {
                     float chunkRange = (max - min) / chunks;
@@ -252,12 +252,12 @@ namespace DelvUI.Interface.Bars
                     float chunkMax = min + chunkRange * (i + 1);
                     float chunkPercent = Math.Clamp((current - chunkMin) / (chunkMax - chunkMin), 0f, 1f);
 
-                    LabelConfig? label = config.Label;
+                    NumericLabelConfig? label = config.Label;
                     switch (config.LabelMode)
                     {
                         case LabelMode.AllChunks:
                             label = config.Label.Clone();
-                            label.SetText($"{(int)Math.Clamp(current - chunkMin, 0, chunkRange)}");
+                            label.SetValue(Math.Clamp(current - chunkMin, 0, chunkRange));
                             break;
                         case LabelMode.ActiveChunk:
                             label = chunkPercent < 1f && chunkPercent > 0f ? config.Label.Clone() : null;

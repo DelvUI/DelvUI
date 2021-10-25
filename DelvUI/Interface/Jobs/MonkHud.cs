@@ -23,9 +23,6 @@ namespace DelvUI.Interface.Jobs
         {
         }
 
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
-
-
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
             List<Vector2> positions = new List<Vector2>();
@@ -152,7 +149,7 @@ namespace DelvUI.Interface.Jobs
             float trueNorthDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1250 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
             if (!Config.TrueNorthBar.HideWhenInactive || trueNorthDuration > 0)
             {
-                Config.TrueNorthBar.Label.SetText(Math.Truncate(trueNorthDuration).ToString());
+                Config.TrueNorthBar.Label.SetValue(trueNorthDuration);
                 BarUtilities.GetProgressBar(Config.TrueNorthBar, trueNorthDuration, 10f, 0f, player).Draw(origin);
             }
         }
@@ -164,7 +161,7 @@ namespace DelvUI.Interface.Jobs
             {
                 float duration = perfectBalance?.RemainingTime ?? 0f;
                 float stacks = perfectBalance?.StackCount ?? 0f;
-                Config.PerfectBalanceBar.Label.SetText(stacks.ToString());
+                Config.PerfectBalanceBar.Label.SetValue(stacks);
                 BarUtilities.GetProgressBar(Config.PerfectBalanceBar, duration, 15f, 0, player).Draw(origin);
             }
         }
@@ -176,7 +173,7 @@ namespace DelvUI.Interface.Jobs
             {
                 float duration = riddleOfEarth?.RemainingTime ?? 0f;
                 float stacks = riddleOfEarth?.StackCount ?? 0f;
-                Config.RiddleofEarthBar.Label.SetText(stacks.ToString());
+                Config.RiddleofEarthBar.Label.SetValue(stacks);
                 BarUtilities.GetProgressBar(Config.RiddleofEarthBar, duration, 10f, 0, player).Draw(origin);
             }
         }
@@ -195,7 +192,7 @@ namespace DelvUI.Interface.Jobs
             float twinSnakesDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 101 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
             if (!Config.TwinSnakesBar.HideWhenInactive || twinSnakesDuration > 0)
             {
-                Config.TwinSnakesBar.Label.SetText(Math.Truncate(twinSnakesDuration).ToString());
+                Config.TwinSnakesBar.Label.SetValue(twinSnakesDuration);
                 BarUtilities.GetProgressBar(Config.TwinSnakesBar, twinSnakesDuration, 15f, 0f, player).Draw(origin);
             }
         }
@@ -205,7 +202,7 @@ namespace DelvUI.Interface.Jobs
             float leadenFistDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1861 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
             if (!Config.LeadenFistBar.HideWhenInactive || leadenFistDuration > 0)
             {
-                Config.LeadenFistBar.Label.SetText(Math.Truncate(leadenFistDuration).ToString());
+                Config.LeadenFistBar.Label.SetValue(leadenFistDuration);
                 BarUtilities.GetProgressBar(Config.LeadenFistBar, leadenFistDuration, 30f, 0f, player).Draw(origin);
             }
         }

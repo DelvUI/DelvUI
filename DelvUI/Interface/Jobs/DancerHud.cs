@@ -217,7 +217,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.EspritGauge.HideWhenInactive && gauge.Esprit is 0) { return; }
 
-            Config.EspritGauge.Label.SetText($"{gauge.Esprit,0}");
+            Config.EspritGauge.Label.SetValue(gauge.Esprit);
             BarUtilities.GetChunkedProgressBars(Config.EspritGauge, 2, gauge.Esprit, 100, 0f).Draw(origin);
         }
 
@@ -251,7 +251,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.TechnicalFinishBar.HideWhenInactive || technicalFinishDuration > 0)
             {
-                Config.TechnicalFinishBar.Label.SetText(Math.Abs(technicalFinishDuration).ToString("N0"));
+                Config.TechnicalFinishBar.Label.SetValue(Math.Abs(technicalFinishDuration));
                 BarUtilities.GetProgressBar(Config.TechnicalFinishBar, technicalFinishDuration, 20f, 0f, player).Draw(origin);
             }
         }
@@ -262,7 +262,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.DevilmentBar.HideWhenInactive || devilmentDuration > 0)
             {
-                Config.DevilmentBar.Label.SetText(Math.Abs(devilmentDuration).ToString("N0"));
+                Config.DevilmentBar.Label.SetValue(Math.Abs(devilmentDuration));
                 BarUtilities.GetProgressBar(Config.DevilmentBar, devilmentDuration, 20f, 0f, player).Draw(origin);
             }
         }
@@ -273,7 +273,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.StandardFinishBar.HideWhenInactive || standardFinishDuration > 0)
             {
-                Config.StandardFinishBar.Label.SetText(Math.Abs(standardFinishDuration).ToString("N0"));
+                Config.StandardFinishBar.Label.SetValue(Math.Abs(standardFinishDuration));
                 BarUtilities.GetProgressBar(Config.StandardFinishBar, standardFinishDuration, 60f, 0f, player).Draw(origin);
             }
         }

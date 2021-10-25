@@ -1,4 +1,5 @@
-﻿using DelvUI.Helpers;
+﻿using System.Diagnostics.CodeAnalysis;
+using DelvUI.Helpers;
 using ImGuiNET;
 using System.Numerics;
 using Dalamud.Game.ClientState.Objects.Types;
@@ -27,7 +28,7 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            var text = actor == null && actorName == null && actorCurrentHp == null && actorMaxHp == null ?
+            string? text = actor == null && actorName == null && actorCurrentHp == null && actorMaxHp == null ?
                 Config.GetText() :
                 TextTagsHelper.FormattedText(Config.GetText(), actor, actorName, actorCurrentHp, actorMaxHp);
 
@@ -36,14 +37,14 @@ namespace DelvUI.Interface.GeneralElements
 
         private void DrawLabel(string text, Vector2 parentPos, Vector2 parentSize, GameObject? actor = null)
         {
-            var fontPushed = FontsManager.Instance.PushFont(Config.FontID);
+            bool fontPushed = FontsManager.Instance.PushFont(Config.FontID);
 
-            var size = ImGui.CalcTextSize(text);
-            var pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
+            Vector2 size = ImGui.CalcTextSize(text);
+            Vector2 pos = Utils.GetAnchoredPosition(Utils.GetAnchoredPosition(parentPos + Config.Position, -parentSize, Config.FrameAnchor), size, Config.TextAnchor);
 
             DrawHelper.DrawInWindow(ID, pos, size, false, true, (drawList) =>
             {
-                var color = Color(actor);
+                PluginConfigColor? color = Color(actor);
 
                 if (Config.ShowShadow)
                 {
@@ -67,19 +68,12 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
-        public virtual PluginConfigColor Color(GameObject? actor = null)
+        public virtual PluginConfigColor Color(GameObject? actor = null) =>
+        Config.UseJobColor switch
         {
-            if (!Config.UseJobColor || actor == null)
-            {
-                return Config.Color;
-            }
-
-            if (Config.UseJobColor && actor is not Character)
-            {
-                return GlobalColors.Instance.NPCFriendlyColor;
-            }
-
-            return Utils.ColorForActor(actor);
-        }
+            true when actor is Character || actor is BattleNpc battleNpc && battleNpc.ClassJob.Id > 0 => Utils.ColorForActor(actor),
+            true when actor is not Character => GlobalColors.Instance.NPCFriendlyColor,
+            _ => Config.Color
+        };
     }
 }

@@ -2,6 +2,8 @@
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using Newtonsoft.Json;
+using System;
+using System.Globalization;
 using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
@@ -27,6 +29,46 @@ namespace DelvUI.Interface.GeneralElements
         {
             Text = text;
         }
+    }
+
+    [Exportable(false)]
+    public class NumericLabelConfig : LabelConfig
+    {
+        [Combo("Number Format", "No Decimals (i.e. \"12\")", "One Decimal (i.e. \"12.3\")", "Two Decimals (i.e. \"12.34\")")]
+        [Order(10)]
+        public int NumberFormat;
+
+        public NumericLabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor)
+            : base(position, text, frameAnchor, textAnchor)
+        {
+        }
+
+        public void SetValue(float value)
+        {
+            if (value == 0)
+            {
+                _text = "0";
+                return;
+            }
+
+            int aux = (int)Math.Pow(10, NumberFormat);
+            double v = Math.Truncate(value * aux) / aux;
+            _text = v.ToString($"F{NumberFormat}", CultureInfo.InvariantCulture);
+        }
+
+        public NumericLabelConfig Clone() =>
+            new NumericLabelConfig(Position, _text, FrameAnchor, TextAnchor)
+            {
+                Color = Color,
+                OutlineColor = OutlineColor,
+                ShadowColor = ShadowColor,
+                ShadowOffset = ShadowOffset,
+                ShowOutline = ShowOutline,
+                ShowShadow = ShowShadow,
+                FontID = FontID,
+                UseJobColor = UseJobColor,
+                Enabled = Enabled,
+            };
     }
 
     [Exportable(false)]
@@ -65,11 +107,11 @@ namespace DelvUI.Interface.GeneralElements
         [ColorEdit4("Color ##Shadow")]
         [Order(50, collapseWith = nameof(ShowShadow))]
         public PluginConfigColor ShadowColor = new PluginConfigColor(Vector4.UnitW);
-        
+
         [DragInt("Offset ##Shadow")]
         [Order(55, collapseWith = nameof(ShowShadow))]
         public int ShadowOffset = 2;
-        
+
         [Checkbox("Use Job Color")]
         [Order(60)]
         public bool UseJobColor = false;
@@ -92,19 +134,5 @@ namespace DelvUI.Interface.GeneralElements
         {
             _text = text;
         }
-
-        public virtual LabelConfig Clone() =>
-            new LabelConfig(Position, _text, FrameAnchor, TextAnchor)
-            {
-                Color = Color,
-                OutlineColor = OutlineColor,
-                ShadowColor = ShadowColor,
-                ShadowOffset = ShadowOffset,
-                ShowOutline = ShowOutline,
-                ShowShadow = ShowShadow,
-                FontID = FontID,
-                UseJobColor = UseJobColor,
-                Enabled = Enabled,
-            };
     }
 }
