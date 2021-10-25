@@ -239,6 +239,10 @@ namespace DelvUI.Interface.Party
         [Checkbox("Show Only For Healers")]
         [Order(42)]
         public bool ShowOnlyForHealers = true;
+        
+        [Checkbox("Show For Other Jobs with Raise")]
+        [Order(1, collapseWith = nameof(ShowOnlyForHealers))]
+        public bool ShowForRaiseJobs = true;
 
         public PartyFramesManaBarConfig(Vector2 position, Vector2 size)
             : base(position, size)

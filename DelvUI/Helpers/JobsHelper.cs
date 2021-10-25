@@ -114,6 +114,28 @@ namespace DelvUI.Helpers
             return IsJobARole(jobId, JobRoles.Gatherer);
         }
 
+        public static bool IsJobWithRaise(uint jobId, uint level)
+        {
+            var isOnRaiseJob = _raiseJobs.Contains(jobId);
+            
+            if ((jobId == JobIDs.RDM && level < 64) || level < 12)
+            {
+                isOnRaiseJob = false;
+            }
+
+            return isOnRaiseJob;
+        }
+        
+        private static readonly List<uint> _raiseJobs = new List<uint>()
+        {
+            JobIDs.CNJ,
+            JobIDs.WHM,
+            JobIDs.SCH,
+            JobIDs.AST,
+            JobIDs.RDM,
+            JobIDs.SMN,
+        };
+
         public static uint CurrentPrimaryResource(Character? character)
         {
             if (character == null)
