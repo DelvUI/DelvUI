@@ -217,6 +217,13 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    public enum PartyFramesManaBarDisplayMode
+    {
+        HealersAndRaiseJobs,
+        HealersOnly,
+        Always,
+    }
+
     [DisableParentSettings("HideWhenInactive", "Label")]
     [Exportable(false)]
     [Section("Party Frames", true)]
@@ -236,13 +243,9 @@ namespace DelvUI.Interface.Party
         [Order(14)]
         public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;
 
-        [Checkbox("Show Only For Healers")]
+        [RadioSelector("Show Only For Healers And Jobs With Raise", "Show Only For Healers", "Show Always")]
         [Order(42)]
-        public bool ShowOnlyForHealers = true;
-        
-        [Checkbox("Show For Other Jobs with Raise")]
-        [Order(1, collapseWith = nameof(ShowOnlyForHealers))]
-        public bool ShowForRaiseJobs = true;
+        public PartyFramesManaBarDisplayMode ManaBarDisplayMode = PartyFramesManaBarDisplayMode.HealersAndRaiseJobs;
 
         public PartyFramesManaBarConfig(Vector2 position, Vector2 size)
             : base(position, size)
