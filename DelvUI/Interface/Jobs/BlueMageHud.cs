@@ -20,14 +20,7 @@ namespace DelvUI.Interface.Jobs
     public class BlueMageHud : JobHud
     {
         private new BlueMageConfig Config => (BlueMageConfig)_config;
-        
-        //What's needed
-        //Dot bars (nightbloom and featherfall) -- done
-        //Surpanakha Bar (ID 18323) -- done
-        //Off-guard (ID 1717) -- done
-        //2121, 2122, 2123 Umbral Attunement
-        //2492 - Tingle
-        
+
         public BlueMageHud(BlueMageConfig config, string? displayName = null) : base(config, displayName)
         { 
         }
@@ -100,10 +93,6 @@ namespace DelvUI.Interface.Jobs
             {
                 DrawTingleBar(pos, player);
             }
-            // if (Config.ExampleBar.Enabled)
-            // {
-            //     DrawExampleBar(pos);
-            // }
         }
         private static List<uint> BleedID = new List<uint> { 1714 };
         private static List<float> BleedDurations = new List<float> { 30, 60 };
@@ -185,8 +174,6 @@ namespace DelvUI.Interface.Jobs
 
         protected void DrawSpellAmpBar(Vector2 origin, PlayerCharacter player)
         {
-            //2188 - Whistle
-            //1716 - Bristle
             Status? buff = player.StatusList.FirstOrDefault(o => o.StatusId is 2118 or 1716 && o.RemainingTime > 0f);
             if(!Config.SpellAmpBar.HideWhenInactive || buff is not null)
             {
