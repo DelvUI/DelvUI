@@ -203,8 +203,6 @@ namespace DelvUI.Interface.GeneralElements
             float currentPercent = current / total;
             float percentNonQueue = total != 0 ? 1F - (500f / 1000f) / total : 0;
 
-            PluginLog.Log(current + " - " + percentNonQueue + " - " + total);
-
             if (percentNonQueue > 0 && currentPercent >= percentNonQueue && Config.ShowGCDQueueIndicator)
             {
                 float scale = 1 - percentNonQueue;
