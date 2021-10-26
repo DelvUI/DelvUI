@@ -217,6 +217,28 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    public class PartyFramesManaBarConfigConverter : PluginConfigObjectConverter
+    {
+        public PartyFramesManaBarConfigConverter()
+        {
+            NewTypeFieldConverter<bool, PartyFramesManaBarDisplayMode> converter;
+            converter = new NewTypeFieldConverter<bool, PartyFramesManaBarDisplayMode>(
+                "PartyFramesManaBarDisplayMode",
+                PartyFramesManaBarDisplayMode.HealersOnly,
+                (oldValue) =>
+                {
+                    return oldValue ? PartyFramesManaBarDisplayMode.HealersOnly : PartyFramesManaBarDisplayMode.Always;
+                });
+
+            FieldConvertersMap.Add("ShowOnlyForHealers", converter);
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(PartyFramesManaBarConfig);
+        }
+    }
+
     public enum PartyFramesManaBarDisplayMode
     {
         HealersAndRaiseJobs,
@@ -245,7 +267,7 @@ namespace DelvUI.Interface.Party
 
         [RadioSelector("Show For All Jobs With Raise", "Show Only For Healers", "Show For All Jobs")]
         [Order(42)]
-        public PartyFramesManaBarDisplayMode ManaBarDisplayMode = PartyFramesManaBarDisplayMode.HealersAndRaiseJobs;
+        public PartyFramesManaBarDisplayMode ManaBarDisplayMode = PartyFramesManaBarDisplayMode.HealersOnly;
 
         public PartyFramesManaBarConfig(Vector2 position, Vector2 size)
             : base(position, size)
