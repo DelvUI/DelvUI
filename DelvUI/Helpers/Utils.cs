@@ -310,9 +310,9 @@ namespace DelvUI.Helpers
 
                         return new PluginConfigColor(new Vector4((float)JzCzhz2RGB.R, (float)JzCzhz2RGB.G, (float)JzCzhz2RGB.B, alpha));
                     }
-
-                default: throw new ArgumentOutOfRangeException();
             }
+
+            return new(Vector4.One);
         }
 
         public static PluginConfigColor ColorForActor(GameObject? actor)
