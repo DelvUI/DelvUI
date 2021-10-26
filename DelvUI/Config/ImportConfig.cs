@@ -278,14 +278,9 @@ namespace DelvUI.Interface
 
         public PluginConfigObject? GetObject()
         {
-            MethodInfo? methodInfo = GetType().GetMethod("DeserializeObject", BindingFlags.Public | BindingFlags.Static);
+            MethodInfo? methodInfo = typeof(PluginConfigObject).GetMethod("LoadFromJsonString", BindingFlags.Public | BindingFlags.Static);
             MethodInfo? function = methodInfo?.MakeGenericMethod(ConfigType);
             return (PluginConfigObject?)function?.Invoke(this, new object[] { JsonString })!;
-        }
-
-        public static T? DeserializeObject<T>(string jsonString)
-        {
-            return JsonConvert.DeserializeObject<T>(jsonString);
         }
     }
 }

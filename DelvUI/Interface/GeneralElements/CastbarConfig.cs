@@ -19,7 +19,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [DragInt("Time (milliseconds)", min = 0, max = 10000)]
         [Order(45, collapseWith = nameof(ShowSlideCast))]
-        public int SlideCastTime = 200;
+        public int SlideCastTime = 500;
 
         [ColorEdit4("Color ##SlidecastColor")]
         [Order(50, collapseWith = nameof(ShowSlideCast))]
@@ -164,6 +164,10 @@ namespace DelvUI.Interface.GeneralElements
         [ColorEdit4("Color ##Castbar")]
         [Order(20)]
         public PluginConfigColor Color = new PluginConfigColor(new(0f / 255f, 162f / 255f, 252f / 255f, 100f / 100f));
+
+        [ColorEdit4("BackgroundColor ##Castbar")]
+        [Order(21)]
+        public PluginConfigColor BackgroundColor = new PluginConfigColor(new(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
 
         [Checkbox("Show Ability Icon")]
         [Order(25)]

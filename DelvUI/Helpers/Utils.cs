@@ -13,6 +13,7 @@ using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 
 namespace DelvUI.Helpers
 {
@@ -31,7 +32,7 @@ namespace DelvUI.Helpers
             {
                 var gameObject = Plugin.ObjectTable[i];
 
-                if (gameObject == null || gameObject is not BattleNpc battleNpc)
+                if (gameObject == null || gameObject.ObjectId == GameObject.InvalidGameObjectId || gameObject is not BattleNpc battleNpc)
                 {
                     continue;
                 }
@@ -45,17 +46,33 @@ namespace DelvUI.Helpers
             return null;
         }
 
-        public static unsafe bool IsHostileMemory(BattleNpc npc)
+        public static GameObject? GetGameObjectByName(string name)
         {
-            if (npc == null)
+            // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
+            // we do a step of 2 because its always an actor followed by its companion
+            for (int i = 0; i < 200; i += 2)
             {
-                return false;
+                GameObject? gameObject = Plugin.ObjectTable[i];
+
+                if (gameObject == null || gameObject.ObjectId == GameObject.InvalidGameObjectId || gameObject.ObjectId == 0)
+                {
+                    continue;
+                }
+
+                if (gameObject.Name.ToString() == name)
+                {
+                    return gameObject;
+                }
             }
 
-            return (npc.BattleNpcKind == BattleNpcSubKind.Enemy || (int)npc.BattleNpcKind == 1)
-                && *(byte*)(npc.Address + 0x1980) != 0
-                && *(byte*)(npc.Address + 0x193C) != 1;
+            return null;
         }
+
+        public static unsafe bool IsHostileMemory(BattleNpc npc) =>
+            npc != null
+         && ((npc.BattleNpcKind == BattleNpcSubKind.Enemy || (int)npc.BattleNpcKind == 1)
+          && *(byte*)(npc.Address + 0x1980) != 0
+          && *(byte*)(npc.Address + 0x193C) != 1);
 
         public static unsafe float ActorShieldValue(GameObject? actor)
         {
@@ -74,24 +91,18 @@ namespace DelvUI.Helpers
                 return "";
             }
 
-            var t = TimeSpan.FromSeconds(duration);
+            TimeSpan t = TimeSpan.FromSeconds(duration);
 
-            if (t.Hours > 1)
+            return t.Hours switch
             {
-                return t.Hours + "h";
-            }
-
-            if (t.Minutes >= 5)
-            {
-                return t.Minutes + "m";
-            }
-
-            if (t.Minutes >= 1)
-            {
-                return $"{t.Minutes}:{t.Seconds:00}";
-            }
-
-            return t.Seconds.ToString();
+                > 1 => t.Hours + "h",
+                _ => t.Minutes switch
+                {
+                    >= 5 => t.Minutes + "m",
+                    >= 1 => $"{t.Minutes}:{t.Seconds:00}",
+                    _ => t.Seconds.ToString()
+                }
+            };
         }
 
         //Build our converter objects and store them in a field. This will be used to convert our PluginConfigColors into different color spaces to be used for interpolation
@@ -120,6 +131,9 @@ namespace DelvUI.Helpers
         private static float LinearInterpolation(float left, float right, float t)
             => left + ((right - left) * t);
 
+        public static PluginConfigColor GetColorByScale(float i, ColorByHealthValueConfig config) =>
+            GetColorByScale(i, config.LowHealthColorThreshold / 100f, config.FullHealthColorThreshold / 100f, config.LowHealthColor, config.FullHealthColor, config.BlendMode);
+
         //Method used to interpolate two PluginConfigColors
         //i is scale [0 , 1]
         //min and max are used for color thresholds. for instance return colorLeft if i < min or return ColorRight if i > max
@@ -140,17 +154,17 @@ namespace DelvUI.Helpers
                 }
                 else
                 {
-                    var range = max - min;
+                    float range = max - min;
                     ratio = (i - min) / range;
                 }
             }
 
             //Convert our PluginConfigColor to RGBColor
-            var rgbColorLeft = new RGBColor(colorLeft.Vector.X, colorLeft.Vector.Y, colorLeft.Vector.Z);
-            var rgbColorRight = new RGBColor(colorRight.Vector.X, colorRight.Vector.Y, colorRight.Vector.Z);
+            RGBColor rgbColorLeft = new RGBColor(colorLeft.Vector.X, colorLeft.Vector.Y, colorLeft.Vector.Z);
+            RGBColor rgbColorRight = new RGBColor(colorRight.Vector.X, colorRight.Vector.Y, colorRight.Vector.Z);
 
             //Interpolate our Alpha now
-            var alpha = LinearInterpolation(colorLeft.Vector.W, colorRight.Vector.W, ratio);
+            float alpha = LinearInterpolation(colorLeft.Vector.W, colorRight.Vector.W, ratio);
 
             //Allow the users to select different blend modes since interpolating between two colors can result in different blending depending on the color space
             //We convert our RGBColor values into different color spaces. We then interpolate each channel before converting the color back into RGBColor space
@@ -159,10 +173,16 @@ namespace DelvUI.Helpers
                 case BlendMode.LAB:
                     {
                         //convert RGB to LAB
-                        var LabLeft = _rgbToLab.Convert(rgbColorLeft);
-                        var LabRight = _rgbToLab.Convert(rgbColorRight);
-                        
-                        var Lab2RGB =_labToRgb.Convert(new LabColor(LinearInterpolation((float)LabLeft.L, (float)LabRight.L, ratio), LinearInterpolation((float)LabLeft.a, (float)LabRight.a, ratio), LinearInterpolation((float)LabLeft.b, (float)LabRight.b, ratio)));
+                        LabColor LabLeft = _rgbToLab.Convert(rgbColorLeft);
+                        LabColor LabRight = _rgbToLab.Convert(rgbColorRight);
+
+                        RGBColor Lab2RGB = _labToRgb.Convert(
+                            new LabColor(
+                                LinearInterpolation((float)LabLeft.L, (float)LabRight.L, ratio),
+                                LinearInterpolation((float)LabLeft.a, (float)LabRight.a, ratio),
+                                LinearInterpolation((float)LabLeft.b, (float)LabRight.b, ratio)
+                            )
+                        );
 
                         Lab2RGB.NormalizeIntensity();
 
@@ -172,10 +192,16 @@ namespace DelvUI.Helpers
                 case BlendMode.LChab:
                     {
                         //convert RGB to LChab
-                        var LChabLeft = _rgbToLChab.Convert(rgbColorLeft);
-                        var LChabRight = _rgbToLChab.Convert(rgbColorRight);
+                        LChabColor LChabLeft = _rgbToLChab.Convert(rgbColorLeft);
+                        LChabColor LChabRight = _rgbToLChab.Convert(rgbColorRight);
 
-                        var LChab2RGB = _lchabToRgb.Convert(new LChabColor(LinearInterpolation((float)LChabLeft.L, (float)LChabRight.L, ratio), LinearInterpolation((float)LChabLeft.C, (float)LChabRight.C, ratio), LinearInterpolation((float)LChabLeft.h, (float)LChabRight.h, ratio)));
+                        RGBColor LChab2RGB = _lchabToRgb.Convert(
+                            new LChabColor(
+                                LinearInterpolation((float)LChabLeft.L, (float)LChabRight.L, ratio),
+                                LinearInterpolation((float)LChabLeft.C, (float)LChabRight.C, ratio),
+                                LinearInterpolation((float)LChabLeft.h, (float)LChabRight.h, ratio)
+                            )
+                        );
 
                         LChab2RGB.NormalizeIntensity();
 
@@ -184,10 +210,16 @@ namespace DelvUI.Helpers
                 case BlendMode.XYZ:
                     {
                         //convert RGB to XYZ
-                        var XYZLeft = _rgbToXyz.Convert(rgbColorLeft);
-                        var XYZRight = _rgbToXyz.Convert(rgbColorRight);
-                        
-                        var XYZ2RGB = _xyzToRgb.Convert(new XYZColor(LinearInterpolation((float)XYZLeft.X, (float)XYZRight.X, ratio), LinearInterpolation((float)XYZLeft.Y, (float)XYZRight.Y, ratio), LinearInterpolation((float)XYZLeft.Z, (float)XYZRight.Z, ratio)));
+                        XYZColor XYZLeft = _rgbToXyz.Convert(rgbColorLeft);
+                        XYZColor XYZRight = _rgbToXyz.Convert(rgbColorRight);
+
+                        RGBColor XYZ2RGB = _xyzToRgb.Convert(
+                            new XYZColor(
+                                LinearInterpolation((float)XYZLeft.X, (float)XYZRight.X, ratio),
+                                LinearInterpolation((float)XYZLeft.Y, (float)XYZRight.Y, ratio),
+                                LinearInterpolation((float)XYZLeft.Z, (float)XYZRight.Z, ratio)
+                            )
+                        );
 
                         XYZ2RGB.NormalizeIntensity();
 
@@ -196,17 +228,27 @@ namespace DelvUI.Helpers
                 case BlendMode.RGB:
                     {
                         //No conversion needed here because we are already working in RGB space
-                        var newRGB = new RGBColor(LinearInterpolation((float)rgbColorLeft.R, (float)rgbColorRight.R, ratio), LinearInterpolation((float)rgbColorLeft.G, (float)rgbColorRight.G, ratio), LinearInterpolation((float)rgbColorLeft.B, (float)rgbColorRight.B, ratio));
-                        
+                        RGBColor newRGB = new RGBColor(
+                            LinearInterpolation((float)rgbColorLeft.R, (float)rgbColorRight.R, ratio),
+                            LinearInterpolation((float)rgbColorLeft.G, (float)rgbColorRight.G, ratio),
+                            LinearInterpolation((float)rgbColorLeft.B, (float)rgbColorRight.B, ratio)
+                        );
+
                         return new PluginConfigColor(new Vector4((float)newRGB.R, (float)newRGB.G, (float)newRGB.B, alpha));
                     }
                 case BlendMode.LChuv:
                     {
                         //convert RGB to LChuv
-                        var LChuvLeft = _rgbToLChuv.Convert(rgbColorLeft);
-                        var LChuvRight = _rgbToLChuv.Convert(rgbColorRight);
+                        LChuvColor LChuvLeft = _rgbToLChuv.Convert(rgbColorLeft);
+                        LChuvColor LChuvRight = _rgbToLChuv.Convert(rgbColorRight);
 
-                        var LChuv2RGB = _lchuvToRgb.Convert(new LChuvColor(LinearInterpolation((float)LChuvLeft.L, (float)LChuvRight.L, ratio), LinearInterpolation((float)LChuvLeft.C, (float)LChuvRight.C, ratio), LinearInterpolation((float)LChuvLeft.h, (float)LChuvRight.h, ratio)));
+                        RGBColor LChuv2RGB = _lchuvToRgb.Convert(
+                            new LChuvColor(
+                                LinearInterpolation((float)LChuvLeft.L, (float)LChuvRight.L, ratio),
+                                LinearInterpolation((float)LChuvLeft.C, (float)LChuvRight.C, ratio),
+                                LinearInterpolation((float)LChuvLeft.h, (float)LChuvRight.h, ratio)
+                            )
+                        );
 
                         LChuv2RGB.NormalizeIntensity();
 
@@ -216,10 +258,16 @@ namespace DelvUI.Helpers
                 case BlendMode.Luv:
                     {
                         //convert RGB to Luv
-                        var LuvLeft = _rgbToLuv.Convert(rgbColorLeft);
-                        var LuvRight = _rgbToLuv.Convert(rgbColorRight);
+                        LuvColor LuvLeft = _rgbToLuv.Convert(rgbColorLeft);
+                        LuvColor LuvRight = _rgbToLuv.Convert(rgbColorRight);
 
-                        var Luv2RGB = _luvToRgb.Convert(new LuvColor(LinearInterpolation((float)LuvLeft.L, (float)LuvRight.L, ratio), LinearInterpolation((float)LuvLeft.u, (float)LuvRight.u, ratio), LinearInterpolation((float)LuvLeft.v, (float)LuvRight.v, ratio)));
+                        RGBColor Luv2RGB = _luvToRgb.Convert(
+                            new LuvColor(
+                                LinearInterpolation((float)LuvLeft.L, (float)LuvRight.L, ratio),
+                                LinearInterpolation((float)LuvLeft.u, (float)LuvRight.u, ratio),
+                                LinearInterpolation((float)LuvLeft.v, (float)LuvRight.v, ratio)
+                            )
+                        );
 
                         Luv2RGB.NormalizeIntensity();
 
@@ -229,10 +277,16 @@ namespace DelvUI.Helpers
                 case BlendMode.Jzazbz:
                     {
                         //convert RGB to Jzazbz
-                        var JzazbzLeft = _rgbToJzazbz.Convert(rgbColorLeft);
-                        var JzazbzRight = _rgbToJzazbz.Convert(rgbColorRight);
+                        JzazbzColor JzazbzLeft = _rgbToJzazbz.Convert(rgbColorLeft);
+                        JzazbzColor JzazbzRight = _rgbToJzazbz.Convert(rgbColorRight);
 
-                        var Jzazbz2RGB = _jzazbzToRgb.Convert(new JzazbzColor(LinearInterpolation((float)JzazbzLeft.Jz, (float)JzazbzRight.Jz, ratio), LinearInterpolation((float)JzazbzLeft.az, (float)JzazbzRight.az, ratio), LinearInterpolation((float)JzazbzLeft.bz, (float)JzazbzRight.bz, ratio)));
+                        RGBColor Jzazbz2RGB = _jzazbzToRgb.Convert(
+                            new JzazbzColor(
+                                LinearInterpolation((float)JzazbzLeft.Jz, (float)JzazbzRight.Jz, ratio),
+                                LinearInterpolation((float)JzazbzLeft.az, (float)JzazbzRight.az, ratio),
+                                LinearInterpolation((float)JzazbzLeft.bz, (float)JzazbzRight.bz, ratio)
+                            )
+                        );
 
                         Jzazbz2RGB.NormalizeIntensity();
 
@@ -241,18 +295,24 @@ namespace DelvUI.Helpers
                 case BlendMode.JzCzhz:
                     {
                         //convert RGB to JzCzhz
-                        var JzCzhzLeft = _rgbToJzCzhz.Convert(rgbColorLeft);
-                        var JzCzhzRight = _rgbToJzCzhz.Convert(rgbColorRight);
+                        JzCzhzColor JzCzhzLeft = _rgbToJzCzhz.Convert(rgbColorLeft);
+                        JzCzhzColor JzCzhzRight = _rgbToJzCzhz.Convert(rgbColorRight);
 
-                        var JzCzhz2RGB = _jzCzhzToRgb.Convert(new JzCzhzColor(LinearInterpolation((float)JzCzhzLeft.Jz, (float)JzCzhzRight.Jz, ratio), LinearInterpolation((float)JzCzhzLeft.Cz, (float)JzCzhzRight.Cz, ratio), LinearInterpolation((float)JzCzhzLeft.hz, (float)JzCzhzRight.hz, ratio)));
+                        RGBColor JzCzhz2RGB = _jzCzhzToRgb.Convert(
+                            new JzCzhzColor(
+                                LinearInterpolation((float)JzCzhzLeft.Jz, (float)JzCzhzRight.Jz, ratio),
+                                LinearInterpolation((float)JzCzhzLeft.Cz, (float)JzCzhzRight.Cz, ratio),
+                                LinearInterpolation((float)JzCzhzLeft.hz, (float)JzCzhzRight.hz, ratio)
+                            )
+                        );
 
                         JzCzhz2RGB.NormalizeIntensity();
 
                         return new PluginConfigColor(new Vector4((float)JzCzhz2RGB.R, (float)JzCzhz2RGB.G, (float)JzCzhz2RGB.B, alpha));
                     }
-
-                default: throw new ArgumentOutOfRangeException();
             }
+
+            return new(Vector4.One);
         }
 
         public static PluginConfigColor ColorForActor(GameObject? actor)
@@ -262,42 +322,33 @@ namespace DelvUI.Helpers
                 return GlobalColors.Instance.NPCNeutralColor;
             }
 
-            switch (character.ObjectKind)
+            if (character.ObjectKind == ObjectKind.Player)
             {
-                // Still need to figure out the "orange" state; aggroed but not yet attacked.
-                case ObjectKind.Player:
-                    return GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id);
-
-                case ObjectKind.BattleNpc when (character.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat:
-                    return GlobalColors.Instance.NPCHostileColor;
-
-                case ObjectKind.BattleNpc when (actor is BattleNpc battleNpc):
-                    if (!IsHostileMemory(battleNpc))
-                    {
-                        return GlobalColors.Instance.NPCFriendlyColor;
-                    }
-                    break;
+                return GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id);
             }
 
-            return GlobalColors.Instance.NPCNeutralColor;
+            return character switch
+            {
+                BattleNpc { SubKind: 9 } battleNpc when battleNpc.ClassJob.Id > 0 => GlobalColors.Instance.SafeColorForJobId(character.ClassJob.Id), // Trust/Squadron NPCs
+                BattleNpc battleNpc when battleNpc.BattleNpcKind is BattleNpcSubKind.Chocobo or BattleNpcSubKind.Pet || !IsHostileMemory(battleNpc) => GlobalColors.Instance
+                    .NPCFriendlyColor,
+                BattleNpc battleNpc when battleNpc.BattleNpcKind == BattleNpcSubKind.Enemy || (battleNpc.StatusFlags & StatusFlags.InCombat) == StatusFlags.InCombat => GlobalColors
+                    .Instance.NPCHostileColor, // I still don't think we should be defaulting to "in combat = hostile", but whatever
+                _ => GlobalColors.Instance.NPCNeutralColor
+            };
         }
 
         public static Status HasTankInvulnerability(BattleChara actor)
         {
-            var tankInvulnBuff = actor.StatusList.FirstOrDefault(o => o.StatusId is 810 or 811 or 1302 or 409 or 1836 or 82);
+            Status? tankInvulnBuff = actor.StatusList.FirstOrDefault(o => o.StatusId is 810 or 811 or 1302 or 409 or 1836 or 82);
             return tankInvulnBuff!;
         }
 
         public static bool IsOnCleanseJob()
         {
-            var player = Plugin.ClientState.LocalPlayer;
+            PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
 
-            if (player == null)
-            {
-                return false;
-            }
-
-            return JobsHelper.IsJobWithCleanse(player.ClassJob.Id, player.Level);
+            return player != null && JobsHelper.IsJobWithCleanse(player.ClassJob.Id, player.Level);
         }
 
         public static GameObject? FindTargetOfTarget(GameObject? target, GameObject? player, ObjectTable actors)
@@ -314,9 +365,9 @@ namespace DelvUI.Helpers
 
             // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
             // we do a step of 2 because its always an actor followed by its companion
-            for (var i = 0; i < 200; i += 2)
+            for (int i = 0; i < 200; i += 2)
             {
-                var actor = actors[i];
+                GameObject? actor = actors[i];
                 if (actor?.ObjectId == target.TargetObjectId)
                 {
                     return actor;
@@ -328,32 +379,28 @@ namespace DelvUI.Helpers
 
         public static Vector2 GetAnchoredPosition(Vector2 position, Vector2 size, DrawAnchor anchor)
         {
-            switch (anchor)
+            return anchor switch
             {
-                case DrawAnchor.Center: return position - size / 2f;
-                case DrawAnchor.Left: return position + new Vector2(0, -size.Y / 2f);
-                case DrawAnchor.Right: return position + new Vector2(-size.X, -size.Y / 2f);
-                case DrawAnchor.Top: return position + new Vector2(-size.X / 2f, 0);
-                case DrawAnchor.TopLeft: return position;
-                case DrawAnchor.TopRight: return position + new Vector2(-size.X, 0);
-                case DrawAnchor.Bottom: return position + new Vector2(-size.X / 2f, -size.Y);
-                case DrawAnchor.BottomLeft: return position + new Vector2(0, -size.Y);
-                case DrawAnchor.BottomRight: return position + new Vector2(-size.X, -size.Y);
-            }
-
-            return position;
+                DrawAnchor.Center => position - size / 2f,
+                DrawAnchor.Left => position + new Vector2(0, -size.Y / 2f),
+                DrawAnchor.Right => position + new Vector2(-size.X, -size.Y / 2f),
+                DrawAnchor.Top => position + new Vector2(-size.X / 2f, 0),
+                DrawAnchor.TopLeft => position,
+                DrawAnchor.TopRight => position + new Vector2(-size.X, 0),
+                DrawAnchor.Bottom => position + new Vector2(-size.X / 2f, -size.Y),
+                DrawAnchor.BottomLeft => position + new Vector2(0, -size.Y),
+                DrawAnchor.BottomRight => position + new Vector2(-size.X, -size.Y),
+                _ => position
+            };
         }
 
-        public static string UserFriendlyConfigName(string configTypeName)
-        {
-            return UserFriendlyString(configTypeName, "Config");
-        }
+        public static string UserFriendlyConfigName(string configTypeName) => UserFriendlyString(configTypeName, "Config");
 
         public static string UserFriendlyString(string str, string? remove)
         {
-            var s = remove != null ? str.Replace(remove, "") : str;
+            string? s = remove != null ? str.Replace(remove, "") : str;
 
-            var regex = new Regex(@"
+            Regex? regex = new(@"
                     (?<=[A-Z])(?=[A-Z][a-z]) |
                     (?<=[^A-Z])(?=[A-Z]) |
                     (?<=[A-Za-z])(?=[^A-Za-z])",

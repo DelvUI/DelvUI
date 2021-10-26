@@ -27,27 +27,6 @@ namespace DelvUI.Interface.Jobs
         {
         }
 
-        private PluginConfigColor EmptyColor => GlobalColors.Instance.EmptyColor;
-
-        //protected List<uint> GetJobSpecificBuffs()
-        //{
-        //    uint[] ids =
-        //    {
-        //        // Dive Ready
-        //        1243,
-        //        // Life Surge
-        //        116, 2175,
-        //        // Lance Charge
-        //        1864,
-        //        // Right Eye
-        //        1183, 1453, 1910,
-        //        // Disembowel
-        //        121, 1914
-        //    };
-
-        //    return new List<uint>(ids);
-        //}
-
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
             List<Vector2> positions = new List<Vector2>();
@@ -132,7 +111,8 @@ namespace DelvUI.Interface.Jobs
             if (!config.HideWhenInactive || currTimerMs > 0f)
             {
                 PluginConfigColor color = gauge.BOTDState == BOTDState.LOTD ? config.LifeOfTheDragonColor : config.BloodOfTheDragonColor;
-                config.Label.SetText(Math.Truncate(currTimerMs / 1000f).ToString());
+                config.Label.SetValue(currTimerMs / 1000f);
+
                 BarUtilities.GetProgressBar(
                     config,
                     null,
@@ -149,10 +129,10 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDisembowelBar(Vector2 origin, PlayerCharacter player)
         {
-            float disembowelDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1914 or 121 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
+            float disembowelDuration = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId is 1914 or 121)?.RemainingTime ?? 0f);
             if (!Config.DisembowelBar.HideWhenInactive || disembowelDuration > 0f)
             {
-                Config.DisembowelBar.Label.SetText(Math.Truncate(disembowelDuration).ToString());
+                Config.DisembowelBar.Label.SetValue(disembowelDuration);
                 BarUtilities.GetProgressBar(Config.DisembowelBar, disembowelDuration, 30f, 0f, player).Draw(origin);
             }
         }
@@ -208,12 +188,12 @@ namespace DelvUI.Interface.Jobs
         public PluginConfigColor LifeOfTheDragonColor = new(new Vector4(139f / 255f, 24f / 255f, 24f / 255f, 100f / 100f));
 
         [NestedConfig("Bar Text", 1000, separator = false, spacing = true)]
-        public LabelConfig Label;
+        public NumericLabelConfig Label;
 
         public DragoonBloodOfTheDragonBar(Vector2 pos, Vector2 size, PluginConfigColor fillColor)
             : base(pos, size, fillColor)
         {
-            Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+            Label = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
         }
     }
 }

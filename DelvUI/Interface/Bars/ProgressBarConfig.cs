@@ -13,7 +13,7 @@ namespace DelvUI.Interface.Bars
         public ThresholdConfig ThresholdConfig = new ThresholdConfig();
 
         [NestedConfig("Bar Text", 1000, separator = false, spacing = true)]
-        public LabelConfig Label;
+        public NumericLabelConfig Label;
 
         public ProgressBarConfig(
             Vector2 position,
@@ -23,7 +23,7 @@ namespace DelvUI.Interface.Bars
             PluginConfigColor? threshHoldColor = null,
             float threshold = 0f) : base(position, size, fillColor, fillDirection)
         {
-            Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+            Label = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
             ThresholdConfig.Color = threshHoldColor ?? ThresholdConfig.Color;
             ThresholdConfig.Value = threshold;
         }

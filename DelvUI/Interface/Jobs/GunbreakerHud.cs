@@ -64,7 +64,7 @@ namespace DelvUI.Interface.Jobs
             float noMercyDuration = player.StatusList.FirstOrDefault(o => o.StatusId == 1831 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
             if (!Config.NoMercy.HideWhenInactive || noMercyDuration > 0)
             {
-                Config.NoMercy.Label.SetText(Math.Truncate(noMercyDuration).ToString());
+                Config.NoMercy.Label.SetValue(noMercyDuration);
                 BarUtilities.GetProgressBar(Config.NoMercy, noMercyDuration, 20f, 0f, player).Draw(pos);
             }
         }

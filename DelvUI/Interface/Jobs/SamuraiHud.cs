@@ -103,9 +103,10 @@ namespace DelvUI.Interface.Jobs
         private void DrawKenkiBar(Vector2 pos, PlayerCharacter player)
         {
             SAMGauge gauge = Plugin.JobGauges.Get<SAMGauge>();
+
             if (!Config.KenkiBar.HideWhenInactive || gauge.Kenki > 0)
             {
-                Config.KenkiBar.Label.SetText(gauge.Kenki.ToString("N0"));
+                Config.KenkiBar.Label.SetValue(gauge.Kenki);
                 BarUtilities.GetProgressBar(Config.KenkiBar, gauge.Kenki, 100f, 0f, player).Draw(pos);
             }
         }
@@ -113,9 +114,10 @@ namespace DelvUI.Interface.Jobs
         private void DrawShifuBar(Vector2 pos, PlayerCharacter player)
         {
             float shifuDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1299)?.RemainingTime ?? 0f;
+
             if (!Config.ShifuBar.HideWhenInactive || shifuDuration > 0)
             {
-                Config.ShifuBar.Label.SetText(Math.Truncate(shifuDuration).ToString());
+                Config.ShifuBar.Label.SetValue(shifuDuration);
                 BarUtilities.GetProgressBar(Config.ShifuBar, shifuDuration, 40f, 0f, player).Draw(pos);
             }
         }
@@ -123,9 +125,10 @@ namespace DelvUI.Interface.Jobs
         private void DrawJinpuBar(Vector2 pos, PlayerCharacter player)
         {
             float jinpuDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1298)?.RemainingTime ?? 0f;
+
             if (!Config.JinpuBar.HideWhenInactive || jinpuDuration > 0)
             {
-                Config.JinpuBar.Label.SetText(Math.Truncate(jinpuDuration).ToString());
+                Config.JinpuBar.Label.SetValue(jinpuDuration);
                 BarUtilities.GetProgressBar(Config.JinpuBar, jinpuDuration, 40f, 0f, player).Draw(pos);
             }
         }

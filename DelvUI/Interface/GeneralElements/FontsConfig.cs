@@ -1,4 +1,5 @@
 ﻿using Dalamud.Interface;
+using Dalamud.Interface.ImGuiFileDialog;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
@@ -47,6 +48,8 @@ namespace DelvUI.Interface.GeneralElements
 
         [JsonIgnore] private string[] _fonts = null!;
         [JsonIgnore] private string[] _sizes = null!;
+
+        [JsonIgnore] private FileDialogManager _fileDialogManager = new FileDialogManager();
 
         public FontsConfig()
         {
@@ -149,6 +152,20 @@ namespace DelvUI.Interface.GeneralElements
             return true;
         }
 
+        private void SelectFolder()
+        {
+            Action<bool, string> callback = (finished, path) =>
+            {
+                if (finished && path.Length > 0)
+                {
+                    FontsPath = path;
+                    ReloadFonts();
+                }
+            };
+
+            _fileDialogManager.OpenFolderDialog("Select Fonts Folder", callback);
+        }
+
         [ManualDraw]
         public bool Draw(ref bool changed)
         {
@@ -172,11 +189,19 @@ namespace DelvUI.Interface.GeneralElements
                 }
 
                 ImGuiHelper.NewLineAndTab();
-                if (ImGui.InputText("Fonts Path", ref FontsPath, 200, ImGuiInputTextFlags.EnterReturnsTrue))
+                if (ImGui.InputText("Path", ref FontsPath, 200, ImGuiInputTextFlags.EnterReturnsTrue))
                 {
                     changed = true;
                     ReloadFonts();
                 }
+
+                ImGui.SameLine();
+                ImGui.PushFont(UiBuilder.IconFont);
+                if (ImGui.Button(FontAwesomeIcon.Folder.ToIconString(), new Vector2(0, 0)))
+                {
+                    SelectFolder();
+                }
+                ImGui.PopFont();
 
                 ImGuiHelper.Tab();
                 ImGui.Combo("Font ##font", ref _inputFont, _fonts, _fonts.Length, 10);
@@ -276,6 +301,8 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             ImGui.EndChild();
+
+            _fileDialogManager.Draw();
 
             return false;
         }

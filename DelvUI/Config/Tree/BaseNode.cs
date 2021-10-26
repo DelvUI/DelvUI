@@ -43,6 +43,14 @@ namespace DelvUI.Config.Tree
             return pageNode != null ? (T)pageNode.ConfigObject : null;
         }
 
+        public void RemoveConfigObject<T>() where T : PluginConfigObject
+        {
+            if (_configPageNodesMap.ContainsKey(typeof(T)))
+            {
+                _configPageNodesMap.Remove(typeof(T));
+            }
+        }
+
         public ConfigPageNode? GetConfigPageNode<T>() where T : PluginConfigObject
         {
             if (_configPageNodesMap.TryGetValue(typeof(T), out var node))
@@ -72,12 +80,15 @@ namespace DelvUI.Config.Tree
             _configPageNodesMap[configPageNode.ConfigObject.GetType()] = configPageNode;
         }
 
-        public void SetConfigObject(PluginConfigObject configObject)
+        public bool SetConfigObject(PluginConfigObject configObject)
         {
             if (_configPageNodesMap.TryGetValue(configObject.GetType(), out ConfigPageNode? configPageNode))
             {
                 configPageNode.ConfigObject = configObject;
+                return true;
             }
+
+            return false;
         }
 
         private void PushStyles()
@@ -315,13 +326,15 @@ namespace DelvUI.Config.Tree
 
                     SectionNode newNode = new();
                     newNode.Name = sectionAttribute.SectionName;
+                    newNode.ForceAllowExport = sectionAttribute.ForceAllowExport;
                     _children.Add(newNode);
 
                     return newNode.GetOrAddConfig<T>();
                 }
             }
 
-            throw new ArgumentException("The provided configuration object does not specify a section");
+            Type type = typeof(T);
+            throw new ArgumentException("The provided configuration object does not specify a section: " + type.Name);
         }
     }
 }

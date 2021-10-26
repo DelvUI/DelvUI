@@ -6,8 +6,13 @@ namespace DelvUI.Config.Attributes
     public class SectionAttribute : Attribute
     {
         public string SectionName;
+        public bool ForceAllowExport;
 
-        public SectionAttribute(string name) { SectionName = name; }
+        public SectionAttribute(string name, bool forceAllowExport = false)
+        {
+            SectionName = name;
+            ForceAllowExport = forceAllowExport;
+        }
     }
 
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]

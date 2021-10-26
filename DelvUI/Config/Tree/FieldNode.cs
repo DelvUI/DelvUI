@@ -1,136 +1,171 @@
-﻿using DelvUI.Config.Attributes;
-using DelvUI.Helpers;
-using ImGuiNET;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Reflection;
+using DelvUI.Config.Attributes;
+using DelvUI.Helpers;
+using ImGuiNET;
 
 namespace DelvUI.Config.Tree
 {
-    public class FieldNode : Node
+    public abstract class ConfigNode
     {
-        public FieldInfo MainField;
-        public bool CollapseControl;
-        public int Depth = 0;
+        public bool CollapseControl  { get; set; }
+        
+        public bool IsChild { get; set; }
+        
+        public string Name  { get; private set; }
+        
+        public bool Nest  { get; set; } = true;
+        
+        public string? ParentName  { get; set; }
+        
+        public int Position  { get; set; } = Int32.MaxValue;
+        
+        public bool Separator  { get; set; }
+        
+        public bool Spacing  { get; set; }
+        
+        public string? ID { get; private set; }
+        
+        protected PluginConfigObject ConfigObject { get; set; }
 
-        private SortedDictionary<int, FieldNode> _childrenFields;
-        private PluginConfigObject _configObject;
-        private string? _id;
-        private bool _hasSeparator = false;
-        private bool _isChild = false;
-        private ConfigAttribute? _configAttribute;
-
-        public FieldNode(FieldInfo mainField, PluginConfigObject configObject, string? id = null)
+        public ConfigNode(PluginConfigObject configObject, string? id, string name)
         {
-            MainField = mainField;
-            CollapseControl = false;
-
-            _configObject = configObject;
-            _childrenFields = new SortedDictionary<int, FieldNode>();
-            _id = id;
-
-            _configAttribute = GetConfigAttribute(mainField);
-            if (_configAttribute is not null)
+            ConfigObject = configObject;
+            ID = id;
+            Name = name;
+        }
+        
+        public abstract bool Draw(ref bool changed, int depth = 0);
+        
+        protected void DrawSeparatorOrSpacing()
+        {
+            if (Separator)
             {
-                _hasSeparator = _configAttribute.separator;
+                ImGuiHelper.DrawSeparator(1, 1);
+            }
+
+            if (Spacing)
+            {
+                ImGuiHelper.DrawSpacing(1);
             }
         }
-
-        public void AddChild(int position, FieldNode field)
+        
+        protected static void DrawNestIndicator(int depth)
         {
-            field._isChild = true;
-
-            while (_childrenFields.ContainsKey(position))
-            {
-                position++;
-            }
-
-            _childrenFields.Add(position, field);
-        }
-
-        public void Draw(ref bool changed, bool separatorDrawn = false)
-        {
-            if (!_isChild)
-            {
-                DrawSeparatorOrSpacing(MainField, _id);
-
-                if (Depth > 0)
-                {
-                    DrawNestIndicator(Depth);
-                }
-            }
-
-            // Draw the ConfigAttribute
-            Draw(ref changed, MainField);
-
-            // Draw children
-            if (CollapseControl && Attribute.IsDefined(MainField, typeof(CheckboxAttribute)) && (MainField.GetValue(_configObject) as bool? ?? false))
-            {
-                ImGui.BeginGroup();
-
-                foreach (FieldNode child in _childrenFields.Values)
-                {
-                    DrawSeparatorOrSpacing(child.MainField, _id);
-                    separatorDrawn |= child._hasSeparator;
-
-                    // Shift everything left if a separator was drawn
-                    var depth = separatorDrawn ? child.Depth - 1 : child.Depth;
-
-                    // This draws the L shaped symbols and padding to the left of config items collapsible under a checkbox.
-                    if (depth > 0)
-                    {
-                        // Shift cursor to the right to pad for children with depth more than 1.
-                        // 26 is an arbitrary value I found to be around half the width of a checkbox
-                        DrawNestIndicator(depth);
-                    }
-
-                    child.Draw(ref changed, separatorDrawn);
-                }
-
-                ImGui.EndGroup();
-            }
-        }
-
-        private void DrawNestIndicator(int depth)
-        {
+            // This draws the L shaped symbols and padding to the left of config items collapsible under a checkbox.
+            // Shift cursor to the right to pad for children with depth more than 1.
+            // 26 is an arbitrary value I found to be around half the width of a checkbox
             ImGui.SetCursorPos(ImGui.GetCursorPos() + new Vector2(26, 0) * Math.Max((depth - 1), 0));
             ImGui.TextColored(new Vector4(229f / 255f, 57f / 255f, 57f / 255f, 1f), "\u2002\u2514");
             ImGui.SameLine();
         }
-
-        public void Draw(ref bool changed, FieldInfo field)
-        {
-            if (_configAttribute is not null)
-            {
-                changed |= _configAttribute.Draw(field, _configObject, _id);
-            }
-        }
-
-        public ConfigAttribute? GetConfigAttribute(FieldInfo field)
+        
+        protected static ConfigAttribute? GetConfigAttribute(FieldInfo field)
         {
             return field.GetCustomAttributes(true).Where(a => a is ConfigAttribute).FirstOrDefault() as ConfigAttribute;
         }
+    }
+    
+    public class FieldNode : ConfigNode
+    {
+        private SortedDictionary<int, ConfigNode> _childNodes;
+        private ConfigAttribute? _configAttribute;
+        private FieldInfo _mainField;
 
-        public void DrawSeparatorOrSpacing(FieldInfo field, string? ID)
+        public FieldNode(FieldInfo mainField, PluginConfigObject configObject, string? id) : base(configObject, id, mainField.Name)
         {
-            foreach (object attribute in field.GetCustomAttributes(true))
-            {
-                if (attribute is ConfigAttribute { separator: true })
-                {
-                    if (attribute is CheckboxAttribute checkboxAttribute && (checkboxAttribute.friendlyName != "Enabled" || ID is null) && checkboxAttribute.friendlyName == "Enabled")
-                    {
-                        continue;
-                    }
+            _mainField = mainField;
+            _childNodes = new SortedDictionary<int, ConfigNode>();
 
-                    ImGuiHelper.DrawSeparator(1, 1);
-                }
-                else if (attribute is ConfigAttribute { spacing: true })
-                {
-                    ImGuiHelper.DrawSpacing(1);
-                }
+            _configAttribute = GetConfigAttribute(mainField);
+            if (_configAttribute is not null)
+            {
+                Separator = _configAttribute.separator;
+                Spacing = _configAttribute.spacing;
             }
+        }
+
+        public void AddChild(int position, ConfigNode field)
+        {
+            field.IsChild = true;
+
+            while (_childNodes.ContainsKey(position))
+            {
+                position++;
+            }
+
+            _childNodes.Add(position, field);
+        }
+
+        public override bool Draw(ref bool changed, int depth = 0)
+        {
+            bool reset = false;
+            DrawSeparatorOrSpacing();
+
+            if (!Nest)
+            {
+                depth = 0;
+            }
+
+            if (depth > 0)
+            {
+                DrawNestIndicator(depth);
+            }
+
+            // Draw the ConfigAttribute
+            DrawConfigAttribute(ref changed, _mainField);
+
+            // Draw children
+            if (CollapseControl && Attribute.IsDefined(_mainField, typeof(CheckboxAttribute)) && (_mainField.GetValue(ConfigObject) as bool? ?? false))
+            {
+                ImGui.BeginGroup();
+
+                int childDepth = depth + 1;
+                foreach (ConfigNode child in _childNodes.Values)
+                {
+                    if (child.Separator)
+                    {
+                        childDepth = 0;
+                    }
+                    
+                    reset |= child.Draw(ref changed, childDepth);
+                }
+
+                ImGui.EndGroup();
+            }
+
+            return reset;
+        }
+        
+        private void DrawConfigAttribute(ref bool changed, FieldInfo field)
+        {
+            if (_configAttribute is not null)
+            {
+                changed |= _configAttribute.Draw(field, ConfigObject, ID);
+            }
+        }
+    }
+
+    public class ManualDrawNode : ConfigNode
+    {
+        private MethodInfo _drawMethod;
+        
+        public ManualDrawNode(MethodInfo method, PluginConfigObject configObject, string? id) : base(configObject, id, id ?? "")
+        {
+            _drawMethod = method;
+        }
+
+        public override bool Draw(ref bool changed, int depth = 0)
+        {
+            object[] args = new object[] { false };
+            bool? result = (bool?) _drawMethod.Invoke(ConfigObject, args);
+
+            bool arg = (bool) args[0];
+            changed |= arg;
+            return result ?? false;
         }
     }
 }

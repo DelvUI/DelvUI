@@ -90,12 +90,6 @@ namespace DelvUI.Helpers
             _requsetActionHook = new Hook<OnRequestAction>(_requestAction, new OnRequestAction(HandleRequestAction));
             _requsetActionHook.Enable();
 
-            // WndProc detour
-            IntPtr windowHandle = Process.GetCurrentProcess().MainWindowHandle;
-            _wndProcDelegate = WndProcDetour;
-            _wndProcPtr = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate);
-            _imguiWndProcPtr = SetWindowLongPtr(windowHandle, GWL_WNDPROC, _wndProcPtr);
-
             // mouseover setting
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
             OnConfigReset(ConfigurationManager.Instance);
@@ -149,31 +143,32 @@ namespace DelvUI.Helpers
         private IntPtr _requestAction;
         private Hook<OnRequestAction> _requsetActionHook;
 
-        private WndProcDelegate _wndProcDelegate;
-        private IntPtr _wndProcPtr;
-        private IntPtr _imguiWndProcPtr;
-
         private ExcelSheet<Action>? _sheet;
 
+        public bool HandlingMouseInputs { get; private set; } = false;
         private GameObject? _target = null;
-        public GameObject? Target
+
+        public void SetTarget(GameObject? target)
         {
-            get => _target;
-            set
+            _target = target;
+            HandlingMouseInputs = true;
+
+            // set mouseover target in-game
+            if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode)
             {
-                _target = value;
+                IntPtr uiModule = Plugin.GameGui.GetUIModule();
+                long unknownAddress = (long)uiModule + UnknownOffset;
+                long targetAddress = _target != null && _target.ObjectId != 0 ? (long)_target.Address : 0;
 
-                // set mouseover target in-game
-                if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode)
-                {
-                    IntPtr uiModule = Plugin.GameGui.GetUIModule();
-                    long unknownAddress = (long)uiModule + UnknownOffset;
-                    long targetAddress = _target != null && _target.ObjectId != 0 ? (long)_target.Address : 0;
-
-                    OnSetUIMouseoverActor func = Marshal.GetDelegateForFunctionPointer<OnSetUIMouseoverActor>(_setUIMouseOverActor);
-                    func.Invoke(unknownAddress, targetAddress);
-                }
+                OnSetUIMouseoverActor func = Marshal.GetDelegateForFunctionPointer<OnSetUIMouseoverActor>(_setUIMouseOverActor);
+                func.Invoke(unknownAddress, targetAddress);
             }
+        }
+
+        public void ClearTarget()
+        {
+            _target = null;
+            HandlingMouseInputs = false;
         }
 
         private void OnConfigReset(ConfigurationManager sender)
@@ -191,9 +186,9 @@ namespace DelvUI.Helpers
         {
             //PluginLog.Log("ACTION: {0} - {1} - {2} - {3} - {4} - {5} - {6}}", arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 
-            if (_config.MouseoverEnabled && _config.MouseoverAutomaticMode && IsActionValid(arg3, Target))
+            if (_config.MouseoverEnabled && _config.MouseoverAutomaticMode && IsActionValid(arg3, _target))
             {
-                return _requsetActionHook.Original(arg1, arg2, arg3, Target!.ObjectId, arg5, arg6, arg7);
+                return _requsetActionHook.Original(arg1, arg2, arg3, _target!.ObjectId, arg5, arg6, arg7);
             }
 
             return _requsetActionHook.Original(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -210,6 +205,18 @@ namespace DelvUI.Helpers
             if (action == null)
             {
                 return false;
+            }
+
+            // handle actions that automatically switch to other actions
+            // ie GNB Continuation or SMN Egi Assaults
+            // these actions dont have an attack type or animation so in these cases
+            // we assume its a hostile spell
+            // if this doesn't work on all cases we can switch to a hardcoded list
+            // of special cases later
+            if (action.AttackType.Row == 0 && action.AnimationStart.Row == 0 &&
+                (action.CanTargetDead && !action.CanTargetFriendly && !action.CanTargetHostile && !action.CanTargetParty && action.CanTargetSelf))
+            {
+                return target is BattleNpc npcTarget && npcTarget.BattleNpcKind == BattleNpcSubKind.Enemy;
             }
 
             // friendly player (TODO: pvp? lol)
@@ -231,8 +238,6 @@ namespace DelvUI.Helpers
         }
 
         #region mouseover inputs proxy
-        public bool HandlingMouseInputs => Target != null;
-
         private bool? _leftButtonClicked = null;
         public bool LeftButtonClicked => _leftButtonClicked.HasValue ? _leftButtonClicked.Value : ImGui.GetIO().MouseClicked[0];
 
@@ -277,9 +282,48 @@ namespace DelvUI.Helpers
 
         public void Update()
         {
+            if (_wndProcPtr == IntPtr.Zero)
+            {
+                HookWndProc();
+            }
+
             _leftButtonClicked = null;
             _rightButtonClicked = null;
         }
+
+        private void HookWndProc()
+        {
+            ulong processId = (ulong)Process.GetCurrentProcess().Id;
+
+            IntPtr hWnd = IntPtr.Zero;
+            do
+            {
+                hWnd = FindWindowExW(IntPtr.Zero, hWnd, "FFXIVGAME", null);
+                if (hWnd == IntPtr.Zero) { return; }
+
+                ulong wndProcessId = 0;
+                GetWindowThreadProcessId(hWnd, ref wndProcessId);
+
+                if (wndProcessId == processId)
+                {
+                    break;
+                }
+
+            } while (hWnd != IntPtr.Zero);
+
+            if (hWnd == IntPtr.Zero) { return; }
+
+            _wndProcDelegate = WndProcDetour;
+            _wndProcPtr = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate);
+            _imguiWndProcPtr = SetWindowLongPtr(hWnd, GWL_WNDPROC, _wndProcPtr);
+
+            PluginLog.Log("Hooking WndProc for window: " + hWnd.ToString("X"));
+            PluginLog.Log("Old WndProc: " + _imguiWndProcPtr.ToString("X"));
+        }
+
+        private WndProcDelegate _wndProcDelegate = null!;
+        private IntPtr _wndProcPtr = IntPtr.Zero;
+        private IntPtr _imguiWndProcPtr = IntPtr.Zero;
 
         public delegate IntPtr WndProcDelegate(IntPtr hWnd, uint msg, ulong wParam, long lParam);
 
@@ -289,7 +333,12 @@ namespace DelvUI.Helpers
         [DllImport("user32.dll", EntryPoint = "CallWindowProcW")]
         public static extern long CallWindowProc(IntPtr lpPrevWndFunc, IntPtr hWnd, uint Msg, ulong wParam, long lParam);
 
-        private const uint WM_KEYDOWN = 256;
+        [DllImport("user32.dll", EntryPoint = "FindWindowExW", SetLastError = true)]
+        public static extern IntPtr FindWindowExW(IntPtr hWndParent, IntPtr hWndChildAfter, [MarshalAs(UnmanagedType.LPWStr)] string? lpszClass, [MarshalAs(UnmanagedType.LPWStr)] string? lpszWindow);
+
+        [DllImport("user32.dll", EntryPoint = "GetWindowThreadProcessId", SetLastError = true)]
+        public static extern ulong GetWindowThreadProcessId(IntPtr hWnd, ref ulong id);
+
         private const uint WM_LBUTTONDOWN = 513;
         private const uint WM_LBUTTONUP = 514;
         private const uint WM_RBUTTONDOWN = 516;

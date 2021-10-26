@@ -97,7 +97,7 @@ namespace DelvUI.Interface.Jobs
         {
             if (Config.ManaBar.HideWhenInactive && player.CurrentMp == player.MaxMp) { return; }
 
-            Config.ManaBar.Label.SetText($"{player.CurrentMp,0}");
+            Config.ManaBar.Label.SetValue(player.CurrentMp);
             BarUtilities.GetChunkedProgressBars(Config.ManaBar, 5, player.CurrentMp, player.MaxMp, 0f, player).Draw(origin);
         }
 
@@ -107,7 +107,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.OathGauge.HideWhenInactive || gauge.OathGauge > 0)
             {
-                Config.OathGauge.Label.SetText(gauge.OathGauge.ToString("N0"));
+                Config.OathGauge.Label.SetValue(gauge.OathGauge);
                 BarUtilities.GetChunkedProgressBars(Config.OathGauge, 2, gauge.OathGauge, 100).Draw(origin);
             }
         }
@@ -118,7 +118,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.FightOrFlightBar.HideWhenInactive || fightOrFlightDuration > 0)
             {
-                Config.FightOrFlightBar.Label.SetText(Math.Abs(fightOrFlightDuration).ToString("N0"));
+                Config.FightOrFlightBar.Label.SetValue(fightOrFlightDuration);
                 BarUtilities.GetProgressBar(Config.FightOrFlightBar, fightOrFlightDuration, 25f, 0f, player).Draw(origin);
             }
         }
@@ -129,7 +129,7 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.RequiescatBar.HideWhenInactive || requiescatDuration > 0)
             {
-                Config.RequiescatBar.Label.SetText(Math.Abs(requiescatDuration).ToString("N0"));
+                Config.RequiescatBar.Label.SetValue(requiescatDuration);
                 BarUtilities.GetProgressBar(Config.RequiescatBar, requiescatDuration, 12f, 0f, player).Draw(origin);
             }
         }
@@ -160,8 +160,8 @@ namespace DelvUI.Interface.Jobs
     {
         [JsonIgnore] public override uint JobId => JobIDs.PLD;
 
-        public new static PaladinConfig DefaultConfig() 
-        { 
+        public new static PaladinConfig DefaultConfig()
+        {
             var config = new PaladinConfig();
 
             config.OathGauge.UsePartialFillColor = true;

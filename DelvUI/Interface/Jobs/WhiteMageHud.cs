@@ -111,9 +111,10 @@ namespace DelvUI.Interface.Jobs
         private void DrawAsylumBar(Vector2 origin, PlayerCharacter player)
         {
             float asylymDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 739 or 1911 or 1912 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+
             if (!Config.AsylumBar.HideWhenInactive || asylymDuration > 0)
             {
-                Config.AsylumBar.Label.SetText(Math.Truncate(asylymDuration).ToString());
+                Config.AsylumBar.Label.SetValue(asylymDuration);
                 BarUtilities.GetProgressBar(Config.AsylumBar, asylymDuration, 24f, 0f, player).Draw(origin);
             }
         }
@@ -121,9 +122,10 @@ namespace DelvUI.Interface.Jobs
         private void DrawPresenceOfMindBar(Vector2 origin, PlayerCharacter player)
         {
             float presenceOfMindDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 157 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+
             if (!Config.PresenceOfMindBar.HideWhenInactive || presenceOfMindDuration > 0)
             {
-                Config.PresenceOfMindBar.Label.SetText(Math.Truncate(presenceOfMindDuration).ToString());
+                Config.PresenceOfMindBar.Label.SetValue(presenceOfMindDuration);
                 BarUtilities.GetProgressBar(Config.PresenceOfMindBar, presenceOfMindDuration, 15f, 0f, player).Draw(origin);
             }
         }
@@ -131,9 +133,10 @@ namespace DelvUI.Interface.Jobs
         private void DrawPlenaryBar(Vector2 origin, PlayerCharacter player)
         {
             float plenaryDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1219 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+
             if (!Config.PlenaryBar.HideWhenInactive || plenaryDuration > 0)
             {
-                Config.PlenaryBar.Label.SetText(Math.Truncate(plenaryDuration).ToString());
+                Config.PlenaryBar.Label.SetValue(plenaryDuration);
                 BarUtilities.GetProgressBar(Config.PlenaryBar, plenaryDuration, 10f, 0f, player).Draw(origin);
             }
         }
@@ -141,9 +144,10 @@ namespace DelvUI.Interface.Jobs
         private void DrawTemperanceBar(Vector2 origin, PlayerCharacter player)
         {
             float temperanceDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1872 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+
             if (!Config.TemperanceBar.HideWhenInactive || temperanceDuration > 0)
             {
-                Config.TemperanceBar.Label.SetText(Math.Truncate(temperanceDuration).ToString());
+                Config.TemperanceBar.Label.SetValue(temperanceDuration);
                 BarUtilities.GetProgressBar(Config.TemperanceBar, temperanceDuration, 20f, 0f, player).Draw(origin);
             }
         }

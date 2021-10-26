@@ -14,10 +14,6 @@ namespace DelvUI.Interface.GeneralElements
         [Order(45)]
         public bool UseJobColor = false;
 
-        [Checkbox("Show Decimals")]
-        [Order(50)]
-        public bool ShowDecimals = true;
-
         public PullTimerConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {
         }

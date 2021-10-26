@@ -112,7 +112,8 @@ namespace DelvUI.Interface.Jobs
             }
             else { Config.ManaBar.UsePartialFillColor = true; }
 
-            Config.ManaBar.Label.SetText($"{player.CurrentMp,0}");
+            Config.ManaBar.Label.SetValue(player.CurrentMp);
+
             // hardcoded 9k as maxMP so the chunks are each 3k since that's what a DRK wants to see
             BarUtilities.GetChunkedProgressBars(
                 Config.ManaBar,
@@ -131,8 +132,8 @@ namespace DelvUI.Interface.Jobs
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
             if (Config.DarksideBar.HideWhenInactive && gauge.DarksideTimeRemaining == 0) { return; };
 
-            int timer = Math.Abs(gauge.DarksideTimeRemaining);
-            Config.DarksideBar.Label.SetText($"{timer / 1000}");
+            float timer = Math.Abs(gauge.DarksideTimeRemaining);
+            Config.DarksideBar.Label.SetValue(timer / 1000);
             BarUtilities.GetProgressBar(Config.DarksideBar, timer, 60000f)
                 .Draw(origin);
         }
@@ -142,7 +143,7 @@ namespace DelvUI.Interface.Jobs
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
             if (!Config.BloodGauge.HideWhenInactive || gauge.Blood > 0)
             {
-                Config.BloodGauge.Label.SetText(gauge.Blood.ToString("N0"));
+                Config.BloodGauge.Label.SetValue(gauge.Blood);
                 BarUtilities.GetChunkedProgressBars(Config.BloodGauge, 2, gauge.Blood, 100).Draw(origin);
             }
         }
@@ -153,7 +154,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.BloodWeaponBar.HideWhenInactive && bloodWeaponDuration is 0) { return; }
 
-            Config.BloodWeaponBar.Label.SetText(Math.Truncate(bloodWeaponDuration).ToString());
+            Config.BloodWeaponBar.Label.SetValue(bloodWeaponDuration);
             BarUtilities.GetProgressBar(Config.BloodWeaponBar, bloodWeaponDuration, 10, 0f)
                 .Draw(origin);
         }
@@ -164,7 +165,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.DeliriumBar.HideWhenInactive && deliriumDuration is 0) { return; }
 
-            Config.DeliriumBar.Label.SetText(Math.Truncate(deliriumDuration).ToString());
+            Config.DeliriumBar.Label.SetValue(deliriumDuration);
             BarUtilities.GetProgressBar(Config.DeliriumBar, deliriumDuration, 10, 0f)
                 .Draw(origin);
         }
@@ -174,8 +175,8 @@ namespace DelvUI.Interface.Jobs
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
             if (Config.LivingShadowBar.HideWhenInactive && gauge.ShadowTimeRemaining == 0) { return; }
 
-            int timer = Math.Abs(gauge.ShadowTimeRemaining);
-            Config.LivingShadowBar.Label.SetText($"{timer / 1000}");
+            float timer = Math.Abs(gauge.ShadowTimeRemaining);
+            Config.LivingShadowBar.Label.SetValue(timer / 1000);
             BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 24000f)
                 .Draw(origin);
         }
