@@ -243,7 +243,7 @@ namespace DelvUI.Interface.Party
         [Order(14)]
         public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;
 
-        [RadioSelector("Show Only For Healers And Jobs With Raise", "Show Only For Healers", "Show Always")]
+        [RadioSelector("Show For All Jobs With Raise", "Show Only For Healers", "Show For All Jobs")]
         [Order(42)]
         public PartyFramesManaBarDisplayMode ManaBarDisplayMode = PartyFramesManaBarDisplayMode.HealersAndRaiseJobs;
 
