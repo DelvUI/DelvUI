@@ -11,6 +11,7 @@ Features:
 - Added Enable Combat Hotbars sub-option to use with Cross Hotbar instead.
 - Added option to change background color and opacity of the Castbars.
 - Added an option to display mana bar for jobs with raise (in addition to healers) in party frames.
+- Added basic BLU implementation. Only supports tracking of DPS skills so far.
 
 Fixes:
 - Fixed unit and party frames not being interactable when using XivAlexander.
