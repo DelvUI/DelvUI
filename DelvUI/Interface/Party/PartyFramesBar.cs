@@ -407,8 +407,15 @@ namespace DelvUI.Interface.Party
                 return false;
             }
 
-            return (_configs.ManaBar.Enabled && Member.MaxHP > 0 &&
-                (!_configs.ManaBar.ShowOnlyForHealers || JobsHelper.IsJobHealer(Member.JobId)));
+            var isHealer = JobsHelper.IsJobHealer(Member.JobId);
+
+            return  _configs.ManaBar.Enabled && Member.MaxHP > 0 && _configs.ManaBar.ManaBarDisplayMode switch
+            {
+                PartyFramesManaBarDisplayMode.Always => true,
+                PartyFramesManaBarDisplayMode.HealersOnly => isHealer,
+                PartyFramesManaBarDisplayMode.HealersAndRaiseJobs => isHealer || JobsHelper.IsJobWithRaise(Member.JobId, Member.Level),
+                _ => throw new ArgumentOutOfRangeException(nameof(_configs.ManaBar.ManaBarDisplayMode))
+            };
         }
 
         private static uint? IconIdForStatus(PartyMemberStatus status)

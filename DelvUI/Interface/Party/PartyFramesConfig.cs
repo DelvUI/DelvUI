@@ -217,6 +217,35 @@ namespace DelvUI.Interface.Party
         }
     }
 
+    public class PartyFramesManaBarConfigConverter : PluginConfigObjectConverter
+    {
+        public PartyFramesManaBarConfigConverter()
+        {
+            NewTypeFieldConverter<bool, PartyFramesManaBarDisplayMode> converter;
+            converter = new NewTypeFieldConverter<bool, PartyFramesManaBarDisplayMode>(
+                "PartyFramesManaBarDisplayMode",
+                PartyFramesManaBarDisplayMode.HealersOnly,
+                (oldValue) =>
+                {
+                    return oldValue ? PartyFramesManaBarDisplayMode.HealersOnly : PartyFramesManaBarDisplayMode.Always;
+                });
+
+            FieldConvertersMap.Add("ShowOnlyForHealers", converter);
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(PartyFramesManaBarConfig);
+        }
+    }
+
+    public enum PartyFramesManaBarDisplayMode
+    {
+        HealersAndRaiseJobs,
+        HealersOnly,
+        Always,
+    }
+
     [DisableParentSettings("HideWhenInactive", "Label")]
     [Exportable(false)]
     [Section("Party Frames", true)]
@@ -236,9 +265,9 @@ namespace DelvUI.Interface.Party
         [Order(14)]
         public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;
 
-        [Checkbox("Show Only For Healers")]
+        [RadioSelector("Show For All Jobs With Raise", "Show Only For Healers", "Show For All Jobs")]
         [Order(42)]
-        public bool ShowOnlyForHealers = true;
+        public PartyFramesManaBarDisplayMode ManaBarDisplayMode = PartyFramesManaBarDisplayMode.HealersOnly;
 
         public PartyFramesManaBarConfig(Vector2 position, Vector2 size)
             : base(position, size)

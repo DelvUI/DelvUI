@@ -137,6 +137,7 @@ namespace DelvUI.Config
             [typeof(PartyFramesRaiseTrackerConfig)] = typeof(PartyFramesTrackerConfigConverter),
             [typeof(PartyFramesInvulnTrackerConfig)] = typeof(PartyFramesTrackerConfigConverter),
             [typeof(StatusEffectsBlacklistConfig)] = typeof(StatusEffectsBlacklistConfigConverter),
+            [typeof(PartyFramesManaBarConfig)] = typeof(PartyFramesManaBarConfigConverter),
         };
 
         protected override JsonObjectContract CreateObjectContract(Type objectType)
