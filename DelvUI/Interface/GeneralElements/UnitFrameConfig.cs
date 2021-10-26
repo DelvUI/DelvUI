@@ -13,8 +13,6 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Player", 0)]
     public class PlayerUnitFrameConfig : UnitFrameConfig
     {
-        public PlayerUnitFrameConfig() { } // don't remove
-
         public PlayerUnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
             : base(position, size, leftLabelConfig, rightLabelConfig)
         {
@@ -39,8 +37,6 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Target", 0)]
     public class TargetUnitFrameConfig : UnitFrameConfig
     {
-        public TargetUnitFrameConfig() { } // don't remove
-
         public TargetUnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
             : base(position, size, leftLabelConfig, rightLabelConfig)
         {
@@ -63,8 +59,6 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Target of Target", 0)]
     public class TargetOfTargetUnitFrameConfig : UnitFrameConfig
     {
-        public TargetOfTargetUnitFrameConfig() { } // don't remove
-
         public TargetOfTargetUnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
             : base(position, size, leftLabelConfig, rightLabelConfig)
         {
@@ -90,8 +84,6 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Focus Target", 0)]
     public class FocusTargetUnitFrameConfig : UnitFrameConfig
     {
-        public FocusTargetUnitFrameConfig() { } // don't remove
-
         public FocusTargetUnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
             : base(position, size, leftLabelConfig, rightLabelConfig)
         {

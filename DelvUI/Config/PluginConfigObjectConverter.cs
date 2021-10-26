@@ -8,6 +8,7 @@ using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.Serialization;
 
 namespace DelvUI.Config
 {
@@ -29,9 +30,31 @@ namespace DelvUI.Config
 
             try
             {
-                config = (T?)Activator.CreateInstance<T>();
-                if (config == null) { return null; }
+                ConstructorInfo? constructor = type.GetConstructor(new Type[] { });
+                if (constructor != null)
+                {
+                    config = (T?)Activator.CreateInstance<T>();
+                }
+                else
+                {
+                    config = (T?)ConfigurationManager.GetDefaultConfigObjectForType(type);
+                }
 
+                // last resource, hackily create an instance without calling the constructor
+                if (config == null)
+                {
+                    config = (T)FormatterServices.GetUninitializedObject(type);
+                }
+            }
+            catch (Exception e)
+            {
+                PluginLog.Error($"Error creating a {type.Name}: " + e.Message);
+            }
+
+            if (config == null) { return null; }
+
+            try
+            {
                 JObject? jsonObject = (JObject?)serializer.Deserialize(reader);
                 if (jsonObject == null) { return null; }
 

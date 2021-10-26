@@ -409,12 +409,12 @@ namespace DelvUI.Interface.Party
 
             var isHealer = JobsHelper.IsJobHealer(Member.JobId);
 
-            return  _configs.ManaBar.Enabled && Member.MaxHP > 0 && _configs.ManaBar.ManaBarDisplayMode switch
+            return _configs.ManaBar.Enabled && Member.MaxHP > 0 && _configs.ManaBar.ManaBarDisplayMode switch
             {
                 PartyFramesManaBarDisplayMode.Always => true,
                 PartyFramesManaBarDisplayMode.HealersOnly => isHealer,
                 PartyFramesManaBarDisplayMode.HealersAndRaiseJobs => isHealer || JobsHelper.IsJobWithRaise(Member.JobId, Member.Level),
-                _ => throw new ArgumentOutOfRangeException(nameof(_configs.ManaBar.ManaBarDisplayMode))
+                _ => true
             };
         }
 
