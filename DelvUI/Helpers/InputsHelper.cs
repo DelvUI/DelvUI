@@ -217,7 +217,7 @@ namespace DelvUI.Helpers
                 (action.CanTargetDead && !action.CanTargetFriendly && !action.CanTargetHostile && !action.CanTargetParty && action.CanTargetSelf))
             {
                 // special case for AST cards
-                if (actionID == 17055 && target is PlayerCharacter)
+                if ((actionID == 17055 || actionID == 7443) && target is PlayerCharacter)
                 {
                     return true;
                 }
