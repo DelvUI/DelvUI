@@ -234,14 +234,10 @@ namespace DelvUI.Config.Profiles
 
         public void CheckUpdateSwitchCurrentProfile(string specifiedProfile)
         {
-            // find a profile for specified string
-            foreach (Profile profile in Profiles.Values)
+            // found a valid profile, switch to it
+            if (Profiles.ContainsKey(specifiedProfile))
             {
-                // found a valid profile, switch to it
-                if (profile.Name == specifiedProfile)
-                {
-                    SwitchToProfile(profile.Name);
-                }
+                SwitchToProfile(specifiedProfile);
             }
         }
 
