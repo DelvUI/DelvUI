@@ -213,6 +213,17 @@ namespace DelvUI
                             }
                         }
                         break;
+                    
+                    case { } argument when argument.StartsWith("profile"):
+                        // TODO: Turn this into a helper function?
+                        var profile = argument.Split(" ", 2);
+
+                        if (profile.Length > 0)
+                        {
+                            ProfilesManager.Instance.CheckUpdateSwitchCurrentProfile(profile[1]);
+                        }
+                        
+                        break;
 
                     default:
                         configManager.ToggleConfigWindow();

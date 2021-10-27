@@ -1,4 +1,7 @@
 # 0.4.0.1
+Features:
+- Added a command to switch profiles: `/delvui profile ProfileName`, no quotation marks needed.
+
 Fixes:
 - Fixed BLU Job Specific Bar config not saving and only showing when actually on the BLU job.
 
