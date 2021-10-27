@@ -479,6 +479,7 @@ namespace DelvUI.Config
             typeof(BlackMageConfig),
             typeof(SummonerConfig),
             typeof(RedMageConfig),
+            typeof(BlueMageConfig),
 
             typeof(TanksColorConfig),
             typeof(HealersColorConfig),

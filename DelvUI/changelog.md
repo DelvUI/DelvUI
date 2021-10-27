@@ -1,3 +1,7 @@
+# 0.4.0.1
+Fixes:
+- Fixed BLU Job Specific Bar config not saving and only showing when actually on the BLU job.
+
 # 0.4.0.0
 Features:
 - Added "Player Status" tracking for party frames. Currently only "Viewing Cutscene" is supported.
