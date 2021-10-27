@@ -126,8 +126,10 @@ namespace DelvUI.Helpers
             _requsetActionHook?.Dispose();
 
             // give imgui the control of inputs again
-            IntPtr windowHandle = Process.GetCurrentProcess().MainWindowHandle;
-            SetWindowLongPtr(windowHandle, GWL_WNDPROC, _imguiWndProcPtr);
+            if (_wndHandle != IntPtr.Zero && _imguiWndProcPtr != IntPtr.Zero)
+            {
+                SetWindowLongPtr(_wndHandle, GWL_WNDPROC, _imguiWndProcPtr);
+            }
 
             Instance = null!;
         }
@@ -319,6 +321,7 @@ namespace DelvUI.Helpers
 
             if (hWnd == IntPtr.Zero) { return; }
 
+            _wndHandle = hWnd;
             _wndProcDelegate = WndProcDetour;
             _wndProcPtr = Marshal.GetFunctionPointerForDelegate(_wndProcDelegate);
             _imguiWndProcPtr = SetWindowLongPtr(hWnd, GWL_WNDPROC, _wndProcPtr);
@@ -327,6 +330,7 @@ namespace DelvUI.Helpers
             PluginLog.Log("Old WndProc: " + _imguiWndProcPtr.ToString("X"));
         }
 
+        private IntPtr _wndHandle = IntPtr.Zero;
         private WndProcDelegate _wndProcDelegate = null!;
         private IntPtr _wndProcPtr = IntPtr.Zero;
         private IntPtr _imguiWndProcPtr = IntPtr.Zero;
