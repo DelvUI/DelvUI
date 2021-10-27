@@ -232,6 +232,15 @@ namespace DelvUI.Config.Profiles
             }
         }
 
+        public void CheckUpdateSwitchCurrentProfile(string specifiedProfile)
+        {
+            // found a valid profile, switch to it
+            if (Profiles.ContainsKey(specifiedProfile))
+            {
+                SwitchToProfile(specifiedProfile);
+            }
+        }
+
         private string? SwitchToProfile(string profile, bool save = true)
         {
             // save if needed before switching

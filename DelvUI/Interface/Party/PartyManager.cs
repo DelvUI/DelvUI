@@ -96,7 +96,7 @@ namespace DelvUI.Interface.Party
         private const int PartyTrustEntrySize = 0x18;
 
         private List<PartyListMemberInfo> _partyMembersInfo = null!;
-        private bool _playerOrderChanged = false;
+        private bool _dirty = false;
 
         private List<IPartyFramesMember> _groupMembers = new List<IPartyFramesMember>();
         public IReadOnlyCollection<IPartyFramesMember> GroupMembers => _groupMembers.AsReadOnly();
@@ -194,7 +194,7 @@ namespace DelvUI.Interface.Party
 
         private void UpdateTrustParty(PlayerCharacter player, int trustCount)
         {
-            bool needsUpdate = _playerOrderChanged || _groupMembers.Count != trustCount + 1;
+            bool needsUpdate = _dirty || _groupMembers.Count != trustCount + 1;
 
             if (needsUpdate)
             {
@@ -221,7 +221,7 @@ namespace DelvUI.Interface.Party
 
                 // sort
                 SortGroupMembers(player);
-                _playerOrderChanged = false;
+                _dirty = false;
 
                 MembersChangedEvent?.Invoke(this);
             }
@@ -246,10 +246,12 @@ namespace DelvUI.Interface.Party
                 }
             }
 
-            bool needsUpdate = _groupMembers.Count == 0 ||
-                (_groupMembers.Count == 1 && _config.ShowChocobo) ||
+            bool needsUpdate =
+                _groupMembers.Count == 0 ||
+                (_groupMembers.Count != 2 && _config.ShowChocobo) ||
                 (_groupMembers.Count > 1 && !_config.ShowChocobo) ||
-                (_groupMembers.Count > 1 && chocobo == null);
+                (_groupMembers.Count > 1 && chocobo == null) ||
+                (_groupMembers.Count == 2 && _config.ShowChocobo && _groupMembers[1].ObjectId != chocobo?.ObjectId);
 
             EnmityLevel playerEnmity = PartyListAddon->EnmityLeaderIndex == 0 ? EnmityLevel.Leader : EnmityLevel.Last;
 
@@ -284,7 +286,7 @@ namespace DelvUI.Interface.Party
 
         private bool ParseRawData()
         {
-            bool partyChanged = _playerOrderChanged || _partyMembersInfo == null || _groupMembers.Count != _realMemberCount;
+            bool partyChanged = _dirty || _partyMembersInfo == null || _groupMembers.Count != _realMemberCount;
 
             if (HudAgent != IntPtr.Zero)
             {
@@ -338,7 +340,7 @@ namespace DelvUI.Interface.Party
 
             // sort according to default party list
             SortGroupMembers(player);
-            _playerOrderChanged = false;
+            _dirty = false;
 
             // fire event
             MembersChangedEvent?.Invoke(this);
@@ -391,7 +393,7 @@ namespace DelvUI.Interface.Party
 
             // sort according to default party list
             SortGroupMembers(player);
-            _playerOrderChanged = false;
+            _dirty = false;
 
             // fire event
             MembersChangedEvent?.Invoke(this);
@@ -529,7 +531,7 @@ namespace DelvUI.Interface.Party
         {
             if (_config.PlayerOrderOverrideEnabled)
             {
-                _playerOrderChanged = true;
+                _dirty = true;
             }
         }
 
@@ -542,6 +544,10 @@ namespace DelvUI.Interface.Party
             else if (args.PropertyName == "PlayerOrder" || args.PropertyName == "PlayerOrderOverrideEnabled")
             {
                 OnPlayerOrderChange();
+            }
+            else if (args.PropertyName == "ShowChocobo")
+            {
+                _dirty = true;
             }
         }
 

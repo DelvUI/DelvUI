@@ -89,7 +89,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.4.0.0";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.4.0.1";
 
             FontsManager.Initialize(AssemblyLocation);
             LoadBanner();
@@ -212,6 +212,17 @@ namespace DelvUI
                                 ForcedJob.ForcedJobId = (uint)(job.GetValue(null) ?? JobIDs.ACN);
                             }
                         }
+                        break;
+
+                    case { } argument when argument.StartsWith("profile"):
+                        // TODO: Turn this into a helper function?
+                        var profile = argument.Split(" ", 2);
+
+                        if (profile.Length > 0)
+                        {
+                            ProfilesManager.Instance.CheckUpdateSwitchCurrentProfile(profile[1]);
+                        }
+
                         break;
 
                     default:

@@ -258,7 +258,8 @@ namespace DelvUI.Interface.Party
             var windowFlags = ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoTitleBar |
                 ImGuiWindowFlags.NoFocusOnAppearing |
-                ImGuiWindowFlags.NoBringToFrontOnFocus;
+                ImGuiWindowFlags.NoBringToFrontOnFocus |
+                ImGuiWindowFlags.NoSavedSettings;
 
             bool canDrag = !Locked && !DraggingEnabled;
             if (!canDrag)

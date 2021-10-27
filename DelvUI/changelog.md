@@ -1,3 +1,12 @@
+# 0.4.0.1
+Features:
+- Added a command to switch profiles: `/delvui profile ProfileName`, no quotation marks needed.
+
+Fixes:
+- Fixed BLU Job Specific Bar config not saving and only showing when actually on the BLU job.
+- Fixed AST cards not working with mouseover.
+- Fixed party frames not updating properly in some cases when showing chocobo.
+
 # 0.4.0.0
 Features:
 - Added "Player Status" tracking for party frames. Currently only "Viewing Cutscene" is supported.

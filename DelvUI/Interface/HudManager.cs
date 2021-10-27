@@ -361,6 +361,7 @@ namespace DelvUI.Interface
               | ImGuiWindowFlags.NoBackground
               | ImGuiWindowFlags.NoInputs
               | ImGuiWindowFlags.NoBringToFrontOnFocus
+              | ImGuiWindowFlags.NoSavedSettings
             );
 
             if (!begin)
@@ -405,7 +406,10 @@ namespace DelvUI.Interface
             }
 
             // draw elements
-            DraggablesHelper.DrawElements(origin, _hudHelper, _hudElements, _jobHud, _selectedElement);
+            lock (_hudElements)
+            {
+                DraggablesHelper.DrawElements(origin, _hudHelper, _hudElements, _jobHud, _selectedElement);
+            }
 
             // tooltip
             TooltipsHelper.Instance.Draw();

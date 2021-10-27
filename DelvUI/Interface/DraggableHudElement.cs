@@ -93,7 +93,8 @@ namespace DelvUI.Interface
             | ImGuiWindowFlags.NoTitleBar
             | ImGuiWindowFlags.NoResize
             | ImGuiWindowFlags.NoBackground
-            | ImGuiWindowFlags.NoDecoration;
+            | ImGuiWindowFlags.NoDecoration
+            | ImGuiWindowFlags.NoSavedSettings;
 
             // always update size
             var size = MaxPos - MinPos + _contentMargin * 2;
