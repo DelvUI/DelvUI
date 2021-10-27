@@ -143,7 +143,8 @@ namespace DelvUI.Helpers
                 | ImGuiWindowFlags.NoTitleBar
                 | ImGuiWindowFlags.NoResize
                 | ImGuiWindowFlags.NoBackground
-                | ImGuiWindowFlags.NoDecoration;
+                | ImGuiWindowFlags.NoDecoration
+                | ImGuiWindowFlags.NoSavedSettings;
 
             var margin = new Vector2(4, 0);
             var windowSize = ArrowSize + margin * 2;

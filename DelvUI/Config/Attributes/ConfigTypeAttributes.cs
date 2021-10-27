@@ -147,12 +147,12 @@ namespace DelvUI.Config.Attributes
             return false;
         }
     }
-    
+
     [AttributeUsage(AttributeTargets.Field)]
     public class RadioSelector : ConfigAttribute
     {
         private string[] _options;
-        
+
         public RadioSelector(params string[] options) : base(string.Join("_", options))
         {
             _options = options;
@@ -170,7 +170,7 @@ namespace DelvUI.Config.Attributes
             {
                 intVal = (int)fieldVal;
             }
-            
+
             for (int i = 0; i < _options.Length; i++)
             {
                 changed |= ImGui.RadioButton(_options[i], ref intVal, i);
@@ -338,7 +338,7 @@ namespace DelvUI.Config.Attributes
             string stringVal = fieldVal ?? "";
             string? finalValue = null;
 
-            string popupId = ID != null ? "TextTagsList " + ID : "TextTagsList ##" + friendlyName;
+            string popupId = ID != null ? "DelvUI_TextTagsList " + ID : "DelvUI_TextTagsList ##" + friendlyName;
 
             if (ImGui.InputText(friendlyName + IDText(ID), ref stringVal, maxLength))
             {

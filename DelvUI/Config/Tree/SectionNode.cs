@@ -33,7 +33,7 @@ namespace DelvUI.Config.Tree
             ImGui.NewLine();
 
             ImGui.BeginChild(
-                "item view",
+                "DelvU_Settings_Tab",
                 new Vector2(0, -ImGui.GetFrameHeightWithSpacing() - 15),
                 false,
                 ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse

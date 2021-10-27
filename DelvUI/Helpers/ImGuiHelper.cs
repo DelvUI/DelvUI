@@ -75,14 +75,14 @@ namespace DelvUI.Helpers
             bool didConfirm = false;
             bool didClose = false;
 
-            ImGui.OpenPopup(title);
+            ImGui.OpenPopup(title + " ##Delvui");
 
             Vector2 center = ImGui.GetMainViewport().GetCenter();
             ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
 
             bool p_open = true; // i've no idea what this is used for
 
-            if (ImGui.BeginPopupModal(title, ref p_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
+            if (ImGui.BeginPopupModal(title + " ##Delvui", ref p_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
             {
                 float width = 300;
                 float height = Math.Min((ImGui.CalcTextSize(" ").Y + 5) * textLines.Count(), 240);
@@ -132,13 +132,13 @@ namespace DelvUI.Helpers
             ConfigurationManager.Instance.ShowingModalWindow = true;
 
             bool didClose = false;
-            ImGui.OpenPopup("Error");
+            ImGui.OpenPopup("Error ##Delvui");
 
             Vector2 center = ImGui.GetMainViewport().GetCenter();
             ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
 
             bool p_open = true; // i've no idea what this is used for
-            if (ImGui.BeginPopupModal("Error", ref p_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
+            if (ImGui.BeginPopupModal("Error ##Delvui", ref p_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
             {
                 ImGui.Text(message);
                 ImGui.NewLine();
@@ -174,14 +174,14 @@ namespace DelvUI.Helpers
             bool didConfirm = false;
             bool didClose = false;
 
-            ImGui.OpenPopup(title);
+            ImGui.OpenPopup(title + " ##Delvui");
 
             Vector2 center = ImGui.GetMainViewport().GetCenter();
             ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
 
             bool p_open = true; // i've no idea what this is used for
 
-            if (ImGui.BeginPopupModal(title, ref p_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
+            if (ImGui.BeginPopupModal(title + " ##Delvui", ref p_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
             {
                 var textSize = ImGui.CalcTextSize(message).X;
 

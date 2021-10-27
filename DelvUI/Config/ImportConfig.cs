@@ -167,14 +167,14 @@ namespace DelvUI.Interface
             bool didConfirm = false;
             bool didClose = false;
 
-            ImGui.OpenPopup("Import");
+            ImGui.OpenPopup("Import ##DelvUI");
 
             Vector2 center = ImGui.GetMainViewport().GetCenter();
             ImGui.SetNextWindowPos(center, ImGuiCond.Appearing, new Vector2(0.5f, 0.5f));
 
             bool p_open = true; // i've no idea what this is used for
 
-            if (ImGui.BeginPopupModal("Import", ref p_open, ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
+            if (ImGui.BeginPopupModal("Import ##DelvUI", ref p_open, ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.AlwaysAutoResize | ImGuiWindowFlags.NoMove))
             {
                 float width = 300;
 
