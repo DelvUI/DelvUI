@@ -5,6 +5,7 @@ Features:
 Fixes:
 - Fixed BLU Job Specific Bar config not saving and only showing when actually on the BLU job.
 - Fixed AST cards not working with mouseover.
+- Fixed party frames not updating properly in some cases when showing chocobo.
 
 # 0.4.0.0
 Features:
