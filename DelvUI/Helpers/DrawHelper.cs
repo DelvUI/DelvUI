@@ -221,6 +221,8 @@ namespace DelvUI.Helpers
             ImGuiWindowFlags windowFlags,
             Action<ImDrawListPtr> drawAction)
         {
+            windowFlags |= ImGuiWindowFlags.NoSavedSettings;
+
             if (!needsInput)
             {
                 windowFlags |= ImGuiWindowFlags.NoInputs;
@@ -288,40 +290,6 @@ namespace DelvUI.Helpers
                     ImGui.End();
                 }
             }
-        }
-
-        public static bool DrawChangelogWindow(string changelog)
-        {
-            float height = ImGui.CalcTextSize(changelog).Y + 100;
-
-            bool didClose = false;
-            Vector2 size = new(500, Math.Min(height, 500));
-
-            ImGui.SetNextWindowSize(size, ImGuiCond.Appearing);
-            ImGui.PushStyleColor(ImGuiCol.WindowBg, new Vector4(10f / 255f, 10f / 255f, 10f / 255f, 0.95f));
-
-            string title = "DelvUI Changelog v" + Plugin.Version + " ##DelvUI";
-            if (!ImGui.Begin(title, ImGuiWindowFlags.NoResize | ImGuiWindowFlags.NoScrollbar))
-            {
-                ImGui.End();
-                return didClose;
-            }
-
-            ImGui.BeginChild("##delvui_changelog", new Vector2(size.X - 10, size.Y - 80));
-            ImGui.PushTextWrapPos(ImGui.GetCursorPosX() + size.X - 24);
-            ImGui.TextWrapped(changelog);
-            ImGui.EndChild();
-
-            ImGui.SetCursorPos(new Vector2(10, size.Y - 40));
-            if (ImGui.Button("Close", new Vector2(size.X - 20, 30)))
-            {
-                didClose = true;
-            }
-
-            ImGui.End();
-            ImGui.PopStyleColor();
-
-            return didClose;
         }
     }
 }

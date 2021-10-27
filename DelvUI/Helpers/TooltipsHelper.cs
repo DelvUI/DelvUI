@@ -128,7 +128,8 @@ namespace DelvUI.Helpers
                 | ImGuiWindowFlags.NoMove
                 | ImGuiWindowFlags.NoDecoration
                 | ImGuiWindowFlags.NoBackground
-                | ImGuiWindowFlags.NoInputs;
+                | ImGuiWindowFlags.NoInputs
+                | ImGuiWindowFlags.NoSavedSettings;
 
             // imgui clips the left and right borders inside windows for some reason
             // we make the window bigger so the actual drawable size is the expected one
@@ -145,7 +146,8 @@ namespace DelvUI.Helpers
 
             drawList.AddRectFilled(_position, _position + _size, _config.BackgroundColor.Base);
 
-            if (_config.BorderConfig.Enabled) {
+            if (_config.BorderConfig.Enabled)
+            {
                 drawList.AddRect(_position, _position + _size, _config.BorderConfig.Color.Base, 0, ImDrawFlags.None, _config.BorderConfig.Thickness);
             }
 

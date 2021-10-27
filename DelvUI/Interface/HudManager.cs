@@ -361,6 +361,7 @@ namespace DelvUI.Interface
               | ImGuiWindowFlags.NoBackground
               | ImGuiWindowFlags.NoInputs
               | ImGuiWindowFlags.NoBringToFrontOnFocus
+              | ImGuiWindowFlags.NoSavedSettings
             );
 
             if (!begin)

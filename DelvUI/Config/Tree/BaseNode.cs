@@ -233,7 +233,7 @@ namespace DelvUI.Config.Tree
                 ImGui.SetCursorPosX(0);
 
                 ImGui.PushStyleColor(ImGuiCol.Border, Vector4.Zero);
-                ImGui.BeginChild("buttons", new Vector2(1200, 0), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
+                ImGui.BeginChild("DelvUI_Settings_Buttons", new Vector2(1200, 0), true, ImGuiWindowFlags.NoScrollWithMouse | ImGuiWindowFlags.NoScrollbar);
                 ImGui.PopStyleColor();
 
                 const float buttonWidth = 150;

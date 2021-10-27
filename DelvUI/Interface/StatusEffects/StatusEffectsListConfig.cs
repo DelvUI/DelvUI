@@ -506,7 +506,7 @@ namespace DelvUI.Interface.StatusEffects
             var iconSize = new Vector2(30, 30);
             var indexToRemove = -1;
 
-            if (ImGui.BeginChild("Filter Effects", new Vector2(0, 360), false, ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
+            if (ImGui.BeginChild("Filter Effects", new Vector2(0, 360), false, ImGuiWindowFlags.NoSavedSettings | ImGuiWindowFlags.NoScrollbar | ImGuiWindowFlags.NoScrollWithMouse))
             {
                 ImGui.Text("\u2002 \u2002");
                 ImGui.SameLine();
