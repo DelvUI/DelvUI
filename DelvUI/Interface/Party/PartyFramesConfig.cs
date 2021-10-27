@@ -52,7 +52,7 @@ namespace DelvUI.Interface.Party
         [Order(50)]
         public bool ShowWhenSolo = false;
 
-        [Checkbox("Show Chocobo")]
+        [Checkbox("Show Chocobo", isMonitored = true)]
         [Order(55)]
         public bool ShowChocobo = true;
     }
