@@ -1,6 +1,7 @@
 # 0.4.0.1
 Fixes:
 - Fixed BLU Job Specific Bar config not saving and only showing when actually on the BLU job.
+- Fixed AST cards not working with mouseover.
 
 # 0.4.0.0
 Features:

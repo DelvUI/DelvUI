@@ -216,6 +216,12 @@ namespace DelvUI.Helpers
             if (action.AttackType.Row == 0 && action.AnimationStart.Row == 0 &&
                 (action.CanTargetDead && !action.CanTargetFriendly && !action.CanTargetHostile && !action.CanTargetParty && action.CanTargetSelf))
             {
+                // special case for AST cards
+                if (actionID == 17055 && target is PlayerCharacter)
+                {
+                    return true;
+                }
+
                 return target is BattleNpc npcTarget && npcTarget.BattleNpcKind == BattleNpcSubKind.Enemy;
             }
 
