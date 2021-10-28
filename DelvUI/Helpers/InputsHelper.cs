@@ -155,22 +155,29 @@ namespace DelvUI.Helpers
             _target = target;
             HandlingMouseInputs = true;
 
-            // set mouseover target in-game
-            if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode)
-            {
-                IntPtr uiModule = Plugin.GameGui.GetUIModule();
-                long unknownAddress = (long)uiModule + UnknownOffset;
-                long targetAddress = _target != null && _target.ObjectId != 0 ? (long)_target.Address : 0;
-
-                OnSetUIMouseoverActor func = Marshal.GetDelegateForFunctionPointer<OnSetUIMouseoverActor>(_setUIMouseOverActor);
-                func.Invoke(unknownAddress, targetAddress);
-            }
+            long address = _target != null && _target.ObjectId != 0 ? (long)_target.Address : 0;
+            SetGameMouseoverTarget(address);
         }
 
         public void ClearTarget()
         {
             _target = null;
             HandlingMouseInputs = false;
+
+            SetGameMouseoverTarget(0);
+        }
+
+        private void SetGameMouseoverTarget(long address)
+        {
+            // set mouseover target in-game
+            if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode)
+            {
+                IntPtr uiModule = Plugin.GameGui.GetUIModule();
+                long unknownAddress = (long)uiModule + UnknownOffset;
+
+                OnSetUIMouseoverActor func = Marshal.GetDelegateForFunctionPointer<OnSetUIMouseoverActor>(_setUIMouseOverActor);
+                func.Invoke(unknownAddress, address);
+            }
         }
 
         private void OnConfigReset(ConfigurationManager sender)

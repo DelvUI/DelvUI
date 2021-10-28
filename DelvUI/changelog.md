@@ -1,3 +1,8 @@
+# 0.4.0.2
+Fixes:
+- Fixed some game windows not covering DelvUI elements.
+- Fixed mouseover getting "stuck" with automatic mode turned off.
+
 # 0.4.0.1
 Features:
 - Added a command to switch profiles: `/delvui profile ProfileName`, no quotation marks needed.
