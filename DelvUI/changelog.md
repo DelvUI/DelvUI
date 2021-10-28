@@ -1,3 +1,7 @@
+# 0.5.0.0
+Features:
+- Added "Offline Status" tracking for party frames.
+
 # 0.4.0.2
 Fixes:
 - Fixed some game windows not covering DelvUI elements.
