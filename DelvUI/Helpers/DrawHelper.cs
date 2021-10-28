@@ -236,7 +236,7 @@ namespace DelvUI.Helpers
             ClipRect? clipRect = ClipRectsHelper.Instance.GetClipRectForArea(pos, size);
 
             // no clipping needed
-            if (!clipRect.HasValue)
+            if (!ClipRectsHelper.Instance.Enabled || !clipRect.HasValue)
             {
                 ImDrawListPtr drawList = ImGui.GetWindowDrawList();
 
@@ -264,13 +264,16 @@ namespace DelvUI.Helpers
             // clip around game's window
             else
             {
+                // hide instead of clip?
+                if (!ClipRectsHelper.Instance.ClippingEnabled) { return; }
+
                 ImGuiWindowFlags flags = windowFlags;
                 if (needsInput && clipRect.Value.Contains(ImGui.GetMousePos()))
                 {
                     flags |= ImGuiWindowFlags.NoInputs;
                 }
 
-                ClipRect[]? invertedClipRects = ClipRectsHelper.GetInvertedClipRects(clipRect.Value);
+                ClipRect[] invertedClipRects = ClipRectsHelper.GetInvertedClipRects(clipRect.Value);
                 for (int i = 0; i < invertedClipRects.Length; i++)
                 {
                     ImGui.SetNextWindowPos(pos);

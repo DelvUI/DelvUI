@@ -1,3 +1,8 @@
+# 0.5.0.0
+Features:
+- Added "Offline Status" tracking for party frames.
+- Added window clipping settings. These settings are targetted for people that are experiencing performance issues or crashes. Until we find a definitive solution, disabling window clipping might help with these issues.
+
 # 0.4.0.2
 Fixes:
 - Fixed some game windows not covering DelvUI elements.

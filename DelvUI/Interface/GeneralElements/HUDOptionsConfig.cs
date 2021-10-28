@@ -91,6 +91,14 @@ namespace DelvUI.Interface.GeneralElements
         [Order(204, collapseWith = nameof(EnableCombatActionBars))]
         public List<string> CombatActionBars = new();
 
+        [Checkbox("Enable Game Windows Clipping", separator = true, isMonitored = true, help = "Disabling this will make it so DelvUI elements are not covered by in-game elements.\nMight help with performance issues and/or random crashes.")]
+        [Order(300)]
+        public bool EnableClipRects = true;
+
+        [Checkbox("Hide Elements Instead of Clipping", isMonitored = true, help = "This will make it so at least the DelvUI elements are completely hidden any in-game element is on top of them.\nIt will prevent DelvUI elements from covering in-game elements, but it won't look as good as clipping.\nMight help with performance issues and/or random crashes.")]
+        [Order(301, collapseWith = nameof(EnableClipRects))]
+        public bool HideInsteadOfClip = false;
+
         public Vector2 CastBarOriginalPosition;
         public Vector2 PulltimerOriginalPosition;
         public Dictionary<string, Vector2> JobGaugeOriginalPosition = new();
