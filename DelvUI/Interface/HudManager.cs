@@ -165,7 +165,7 @@ namespace DelvUI.Interface
         private void CreateUnitFrames()
         {
             var playerUnitFrameConfig = ConfigurationManager.Instance.GetConfigObject<PlayerUnitFrameConfig>();
-            _playerUnitFrameHud = new UnitFrameHud(playerUnitFrameConfig, "Player");
+            _playerUnitFrameHud = new PlayerUnitFrameHud(playerUnitFrameConfig, "Player");
             _hudElements.Add(_playerUnitFrameHud);
             _hudElementsUsingPlayer.Add(_playerUnitFrameHud);
 

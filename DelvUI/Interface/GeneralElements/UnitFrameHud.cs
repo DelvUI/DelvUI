@@ -8,6 +8,7 @@ using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.InteropServices;
 
@@ -65,6 +66,8 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
+            DrawExtras(origin, Actor);
+
             if (Actor is Character character)
             {
                 DrawCharacter(origin, character);
@@ -96,6 +99,11 @@ namespace DelvUI.Interface.GeneralElements
                 InputsHelper.Instance.ClearTarget();
                 _wasHovering = false;
             }
+        }
+
+        protected virtual void DrawExtras(Vector2 origin, GameObject? actor)
+        {
+            // override
         }
 
         private void DrawCharacter(Vector2 pos, Character character)
@@ -278,5 +286,118 @@ namespace DelvUI.Interface.GeneralElements
         }
 
         private delegate void OpenContextMenuFromTarget(IntPtr agentHud, IntPtr gameObject);
+    }
+
+    public unsafe class PlayerUnitFrameHud : UnitFrameHud
+    {
+        public new PlayerUnitFrameConfig Config => (PlayerUnitFrameConfig)_config;
+
+        public PlayerUnitFrameHud(PlayerUnitFrameConfig config, string displayName) : base(config, displayName)
+        {
+
+        }
+
+        protected override void DrawExtras(Vector2 origin, GameObject? actor)
+        {
+            TankStanceIndicatorConfig config = Config.TankStanceIndicatorConfig;
+
+            if (!config.Enabled || actor is not PlayerCharacter chara) { return; }
+
+            uint jobId = chara.ClassJob.Id;
+            if (JobsHelper.RoleForJob(jobId) != JobRoles.Tank) { return; }
+
+            var tankStanceBuff = chara.StatusList.Where(o =>
+                o.StatusId == 79 || // IRON WILL
+                o.StatusId == 91 || // DEFIANCE
+                o.StatusId == 392 || // ROYAL GUARD
+                o.StatusId == 393 || // IRON WILL
+                o.StatusId == 743 || // GRIT
+                o.StatusId == 1396 || // DEFIANCE
+                o.StatusId == 1397 || // GRIT
+                o.StatusId == 1833    // ROYAL GUARD
+            );
+
+            PluginConfigColor color = tankStanceBuff.Count() > 0 ? config.ActiveColor : config.InactiveColor;
+
+            Vector2 pos = GetTankStanceCornerOrigin(origin);
+            var (verticalDir, horizontalDir) = GetTankStanceLinesDirections();
+
+            pos = new Vector2(pos.X + config.Thickess * -horizontalDir, pos.Y + config.Thickess * -verticalDir);
+            Vector2 vSize = new Vector2(config.Thickess * horizontalDir, (config.Size.Y + config.Thickess) * verticalDir);
+            Vector2 vEndPos = pos + vSize;
+            Vector2 hSize = new Vector2((config.Size.X + config.Thickess) * horizontalDir, config.Thickess * verticalDir);
+            Vector2 hEndPos = pos + hSize;
+
+            Vector2 startPos = new Vector2(Math.Min(pos.X, hEndPos.X), Math.Min(pos.Y, hEndPos.Y));
+            Vector2 endPos = new Vector2(Math.Max(pos.X, hEndPos.X), Math.Max(pos.Y, hEndPos.Y)); ;
+
+            DrawHelper.DrawInWindow(ID + "_TankStance", startPos, endPos - startPos, false, false, (drawList) =>
+            {
+                // TODO: clean up hacky math 
+                // there's some 1px errors prob due to negative sizes
+                // couldn't figure it out so I did the hacky fixes
+
+                // vertical
+                drawList.AddRectFilled(pos, vEndPos, color.Base);
+
+                if (config.Corner == TankStanceCorner.TopRight)
+                {
+                    drawList.AddLine(pos, pos + new Vector2(0, vSize.Y + 1), 0xFF000000);
+                }
+                else
+                {
+                    drawList.AddLine(pos, pos + new Vector2(0, vSize.Y), 0xFF000000);
+                }
+
+                drawList.AddLine(pos + vSize, pos + vSize + new Vector2(-vSize.X, 0), 0xFF000000);
+
+                // horizontal
+                drawList.AddRectFilled(pos, hEndPos, color.Base);
+
+                if (config.Corner == TankStanceCorner.BottomLeft)
+                {
+                    drawList.AddLine(pos, pos + new Vector2(hSize.X + 1, 0), 0xFF000000);
+                }
+                else
+                {
+                    drawList.AddLine(pos, pos + new Vector2(hSize.X, 0), 0xFF000000);
+                }
+
+                if (config.Corner == TankStanceCorner.BottomRight)
+                {
+                    drawList.AddLine(pos + new Vector2(0, 1), pos + new Vector2(0, hSize.Y), 0xFF000000);
+                }
+                else
+                {
+                    drawList.AddLine(pos, pos + new Vector2(0, hSize.Y), 0xFF000000);
+                }
+
+                drawList.AddLine(pos + hSize, pos + hSize + new Vector2(0, -hSize.Y), 0xFF000000);
+            });
+        }
+
+        private Vector2 GetTankStanceCornerOrigin(Vector2 origin)
+        {
+            var topLeft = Utils.GetAnchoredPosition(origin + Config.Position, Config.Size, Config.Anchor);
+
+            return Config.TankStanceIndicatorConfig.Corner switch
+            {
+                TankStanceCorner.TopRight => topLeft + new Vector2(Config.Size.X - 1, 0),
+                TankStanceCorner.BottomLeft => topLeft + new Vector2(0, Config.Size.Y - 1),
+                TankStanceCorner.BottomRight => topLeft + Config.Size - Vector2.One,
+                _ => topLeft
+            };
+        }
+
+        private (int, int) GetTankStanceLinesDirections()
+        {
+            return Config.TankStanceIndicatorConfig.Corner switch
+            {
+                TankStanceCorner.TopLeft => (1, 1),
+                TankStanceCorner.TopRight => (1, -1),
+                TankStanceCorner.BottomLeft => (-1, 1),
+                _ => (-1, -1)
+            };
+        }
     }
 }

@@ -1,10 +1,8 @@
-﻿using System;
-using System.Numerics;
-using System.Text.Json.Serialization;
-using DelvUI.Config;
+﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Interface.Bars;
+using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
@@ -13,6 +11,9 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Player", 0)]
     public class PlayerUnitFrameConfig : UnitFrameConfig
     {
+        [NestedConfig("Tank Stance Indicator", 122, separator = true)]
+        public TankStanceIndicatorConfig TankStanceIndicatorConfig = new TankStanceIndicatorConfig();
+
         public PlayerUnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
             : base(position, size, leftLabelConfig, rightLabelConfig)
         {
@@ -30,6 +31,38 @@ namespace DelvUI.Interface.GeneralElements
 
             return config;
         }
+    }
+
+    public enum TankStanceCorner
+    {
+        TopLeft = 0,
+        TopRight,
+        BottomLeft,
+        BottomRight
+    }
+
+    [Exportable(false)]
+    public class TankStanceIndicatorConfig : PluginConfigObject
+    {
+        [Combo("Corner", "Top Left", "Top Right", "Bottom Left", "Bottom Right")]
+        [Order(5)]
+        public TankStanceCorner Corner = TankStanceCorner.BottomLeft;
+
+        [DragFloat2("Size", min = 1, max = 500)]
+        [Order(10)]
+        public Vector2 Size = new Vector2(HUDConstants.DefaultBigUnitFrameSize.Y - 20, HUDConstants.DefaultBigUnitFrameSize.Y - 20);
+
+        [DragInt("Thickness", min = 2, max = 20)]
+        [Order(15)]
+        public int Thickess = 4;
+
+        [ColorEdit4("Active Color")]
+        [Order(20)]
+        public PluginConfigColor ActiveColor = new PluginConfigColor(new Vector4(0f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
+
+        [ColorEdit4("Inactive Color")]
+        [Order(25)]
+        public PluginConfigColor InactiveColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
     }
 
     [DisableParentSettings("HideWhenInactive")]
