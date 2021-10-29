@@ -127,6 +127,17 @@ namespace DelvUI.Interface.EnemyList
         [DragFloat("Alpha", min = 1, max = 100)]
         [Order(10)]
         public float Alpha = 25;
+
+
+        public float AlphaForDistance(int distance, float alpha = 100f)
+        {
+            if (!Enabled)
+            {
+                return 100f;
+            }
+
+            return distance > Range ? Alpha : alpha;
+        }
     }
 
     [Exportable(false)]

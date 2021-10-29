@@ -165,7 +165,7 @@ namespace DelvUI.Interface.Party
             else if (_configs.HealthBar.ColorsConfig.UseDeathIndicatorBackgroundColor && Member.HP <= 0)
             {
                 bgColor = _configs.HealthBar.RangeConfig.Enabled
-                    ? GetDistance(character, _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor)
+                    ? GetDistanceColor(character, _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor)
                     : _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor;
             }
 
@@ -186,7 +186,7 @@ namespace DelvUI.Interface.Party
 
             if (_configs.HealthBar.RangeConfig.Enabled)
             {
-                hpColor = GetDistance(character, hpColor);
+                hpColor = GetDistanceColor(character, hpColor);
             }
 
             DrawHelper.DrawGradientFilledRect(Position, hpFillSize, hpColor, drawList);
@@ -287,7 +287,7 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        private PluginConfigColor GetDistance(Character? character, PluginConfigColor color)
+        private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)
         {
             byte distance = character != null ? character.YalmDistanceX : byte.MaxValue;
             float currentAlpha = color.Vector.W * 100f;

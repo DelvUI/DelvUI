@@ -130,6 +130,11 @@ namespace DelvUI.Interface.EnemyList
                 Rect background = new Rect(pos, Configs.HealthBar.Size, Configs.HealthBar.BackgroundColor);
 
                 PluginConfigColor fillColor = GetColor(character, currentHp, maxHp);
+                if (Configs.HealthBar.RangeConfig.Enabled)
+                {
+                    fillColor = GetDistanceColor(character, fillColor);
+                }
+
                 PluginConfigColor borderColor = GetBorderColor(character, enmityLevel);
                 Rect healthFill = BarUtilities.GetFillRect(pos, Configs.HealthBar.Size, Configs.HealthBar.FillDirection, fillColor, currentHp, maxHp);
 
@@ -235,6 +240,15 @@ namespace DelvUI.Interface.EnemyList
                 >= 1 => Configs.HealthBar.Colors.EnmitySecondBorderColor,
                 _ => Configs.HealthBar.BorderColor
             };
+        }
+
+        private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)
+        {
+            byte distance = character != null ? character.YalmDistanceX : byte.MaxValue;
+            float currentAlpha = color.Vector.W * 100f;
+            float alpha = Configs.HealthBar.RangeConfig.AlphaForDistance(distance, currentAlpha) / 100f;
+
+            return new PluginConfigColor(color.Vector.WithNewAlpha(alpha));
         }
     }
 
