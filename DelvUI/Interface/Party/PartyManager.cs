@@ -454,11 +454,15 @@ namespace DelvUI.Interface.Party
                 int arrayIndex = index * 5 + 3;
                 if (stringArrayData->AtkArrayData.Size > arrayIndex)
                 {
-                    string statusStr = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(stringArrayData->StringArray[arrayIndex])).ToString();
-                    if (statusStr.Contains("Offline"))
+                    try
                     {
-                        return PartyMemberStatus.Offline;
+                        string statusStr = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(stringArrayData->StringArray[arrayIndex])).ToString();
+                        if (statusStr.Contains("Offline"))
+                        {
+                            return PartyMemberStatus.Offline;
+                        }
                     }
+                    catch { }
                 }
             }
 
