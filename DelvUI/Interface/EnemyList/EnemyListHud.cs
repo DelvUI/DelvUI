@@ -19,7 +19,8 @@ namespace DelvUI.Interface.EnemyList
         private EnemyListConfigs Configs;
 
         private EnemyListHelper _helper = new EnemyListHelper();
-        private SmoothHPHelper _smoothHPHelper = new SmoothHPHelper();
+
+        private List<SmoothHPHelper> _smoothHPHelpers = new List<SmoothHPHelper>();
 
         private const int MaxEnemyCount = 8;
         private List<float> _previewValues = new List<float>(MaxEnemyCount);
@@ -46,6 +47,11 @@ namespace DelvUI.Interface.EnemyList
             _castbarHud = new CastbarHud(Configs.CastBar);
             _buffsListHud = new StatusEffectsListHud(Configs.Buffs);
             _debuffsListHud = new StatusEffectsListHud(Configs.Debuffs);
+
+            for (int i = 0; i < MaxEnemyCount; i++)
+            {
+                _smoothHPHelpers.Add(new SmoothHPHelper());
+            }
         }
 
         protected override void InternalDispose()
@@ -100,7 +106,7 @@ namespace DelvUI.Interface.EnemyList
 
             _helper.Update();
 
-            int count = Config.Preview ? MaxEnemyCount : _helper.EnemyCount;
+            int count = Math.Min(MaxEnemyCount, Config.Preview ? MaxEnemyCount : _helper.EnemyCount);
             uint fakeMaxHp = 100000;
 
             Character? mouseoverTarget = null;
@@ -117,7 +123,7 @@ namespace DelvUI.Interface.EnemyList
 
                 if (Configs.HealthBar.SmoothHealthConfig.Enabled)
                 {
-                    currentHp = _smoothHPHelper.GetNextHp((int)currentHp, (int)maxHp, Configs.HealthBar.SmoothHealthConfig.Velocity);
+                    currentHp = _smoothHPHelpers[i].GetNextHp((int)currentHp, (int)maxHp, Configs.HealthBar.SmoothHealthConfig.Velocity);
                 }
 
                 Vector2 pos = new Vector2(Config.Position.X, Config.Position.Y + i * Configs.HealthBar.Size.Y + i * Config.VerticalPadding);
