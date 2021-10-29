@@ -423,6 +423,7 @@ namespace DelvUI.Interface.Party
             return status switch
             {
                 PartyMemberStatus.ViewingCutscene => 61508,
+                PartyMemberStatus.Offline => 61504,
                 _ => null
             };
         }
@@ -432,6 +433,7 @@ namespace DelvUI.Interface.Party
             return status switch
             {
                 PartyMemberStatus.ViewingCutscene => "[Viewing Cutscene]",
+                PartyMemberStatus.Offline => "[Offline]",
                 _ => null
             };
         }

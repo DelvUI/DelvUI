@@ -3,6 +3,7 @@ using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Party;
 using Dalamud.Logging;
+using Dalamud.Memory;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using FFXIVClientStructs.FFXIV.Client.UI;
@@ -10,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using StructsFramework = FFXIVClientStructs.FFXIV.Client.System.Framework.Framework;
 
 namespace DelvUI.Interface.Party
 {
@@ -84,6 +86,8 @@ namespace DelvUI.Interface.Party
         public AddonPartyList* PartyListAddon { get; private set; } = null;
         public IntPtr HudAgent { get; private set; } = IntPtr.Zero;
 
+        public RaptureAtkModule* RaptureAtkModule { get; private set; } = null;
+
         private const int PartyListInfoOffset = 0x0B50;
         private const int PartyListMemberRawInfoSize = 0x18;
         private const int PartyJobIconIdsOffset = 0x0F20;
@@ -94,6 +98,8 @@ namespace DelvUI.Interface.Party
 
         private const int PartyTrustNameOffset = 0x0B68;
         private const int PartyTrustEntrySize = 0x18;
+
+        private const int PartyMembersInfoIndex = 11;
 
         private List<PartyListMemberInfo> _partyMembersInfo = null!;
         private bool _dirty = false;
@@ -114,6 +120,12 @@ namespace DelvUI.Interface.Party
             // find party list hud agent
             PartyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1);
             HudAgent = Plugin.GameGui.FindAgentInterface(PartyListAddon);
+
+            UIModule* uiModule = StructsFramework.Instance()->GetUiModule();
+            if (uiModule != null)
+            {
+                RaptureAtkModule = uiModule->GetRaptureAtkModule();
+            }
 
             // no need to update on preview mode
             if (_config.Preview)
@@ -431,17 +443,33 @@ namespace DelvUI.Interface.Party
 
         private PartyMemberStatus StatusForIndex(int index)
         {
-            string? displayName = DisplayNameForIndex(index);
-            PartyMemberStatus status = PartyMemberStatus.None;
-
             // TODO: support for other languages
             // couldn't figure out another way of doing this sadly
-            if (displayName != null && displayName.Contains("Viewing Cutscene"))
+
+
+            // offline status
+            if (RaptureAtkModule != null && RaptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrayCount > PartyMembersInfoIndex)
             {
-                status = PartyMemberStatus.ViewingCutscene;
+                var stringArrayData = RaptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrays[PartyMembersInfoIndex];
+                int arrayIndex = index * 5 + 3;
+                if (stringArrayData->AtkArrayData.Size > arrayIndex)
+                {
+                    string statusStr = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(stringArrayData->StringArray[arrayIndex])).ToString();
+                    if (statusStr.Contains("Offline"))
+                    {
+                        return PartyMemberStatus.Offline;
+                    }
+                }
             }
 
-            return status;
+            // viewing cutscene status
+            string? displayName = DisplayNameForIndex(index);
+            if (displayName != null && displayName.Contains("Viewing Cutscene"))
+            {
+                return PartyMemberStatus.ViewingCutscene;
+            }
+
+            return PartyMemberStatus.None;
         }
 
         private uint JobIdForIndex(int index)
