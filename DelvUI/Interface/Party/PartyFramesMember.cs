@@ -17,7 +17,8 @@ namespace DelvUI.Interface.Party
     public enum PartyMemberStatus : byte
     {
         None,
-        ViewingCutscene
+        ViewingCutscene,
+        Offline
     }
 
     public unsafe class PartyFramesMember : IPartyFramesMember
