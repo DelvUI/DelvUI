@@ -1,5 +1,6 @@
 # 0.5.0.0
 Features:
+- Added tank stance indicator for the player's unit frame.
 - Added "Offline Status" tracking for party frames.
 
 # 0.4.0.2
