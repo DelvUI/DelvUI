@@ -44,7 +44,7 @@ namespace DelvUI.Interface.GeneralElements
         protected override bool AnchorToParent => Config is UnitFramePrimaryResourceConfig config ? config.AnchorToUnitFrame : false;
         protected override DrawAnchor ParentAnchor => Config is UnitFramePrimaryResourceConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
 
-        public PrimaryResourceHud(PrimaryResourceConfig config, string displayName) : base(config, displayName)
+        public PrimaryResourceHud(PrimaryResourceConfig config, string? displayName = null) : base(config, displayName)
         {
         }
 

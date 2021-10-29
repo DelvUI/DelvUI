@@ -50,10 +50,10 @@ namespace DelvUI.Interface.Party
             _raiseLabelHud = new LabelHud(RaiseTracker.Icon.Label);
             _invulnLabelHud = new LabelHud(InvulnTracker.Icon.Label);
 
-            _manaBarHud = new PrimaryResourceHud(_configs.ManaBar, "");
-            _castbarHud = new CastbarHud(_configs.CastBar, "");
-            _buffsListHud = new StatusEffectsListHud(_configs.Buffs, "");
-            _debuffsListHud = new StatusEffectsListHud(_configs.Debuffs, "");
+            _manaBarHud = new PrimaryResourceHud(_configs.ManaBar);
+            _castbarHud = new CastbarHud(_configs.CastBar);
+            _buffsListHud = new StatusEffectsListHud(_configs.Buffs);
+            _debuffsListHud = new StatusEffectsListHud(_configs.Debuffs);
         }
 
         public PluginConfigColor GetColor(float scale)

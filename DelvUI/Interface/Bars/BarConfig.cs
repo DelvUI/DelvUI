@@ -9,7 +9,7 @@ namespace DelvUI.Interface.Bars
     {
         [ColorEdit4("Background Color")]
         [Order(20)]
-        public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));        
+        public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
 
         [ColorEdit4("Fill Color")]
         [Order(25)]
@@ -22,6 +22,14 @@ namespace DelvUI.Interface.Bars
         [Checkbox("Show Border")]
         [Order(35)]
         public bool DrawBorder = true;
+
+        [ColorEdit4("Border Color")]
+        [Order(36)]
+        public PluginConfigColor BorderColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [DragInt("Border Thickness", min = 1, max = 10)]
+        [Order(37)]
+        public int BorderThickness = 1;
 
         [Checkbox("Hide When Inactive")]
         [Order(40)]
