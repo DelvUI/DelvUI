@@ -92,6 +92,14 @@ namespace DelvUI.Interface.EnemyList
         [Order(41, collapseWith = nameof(ShowHighlight))]
         public PluginConfigColor HighlightColor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 5f / 100f));
 
+        [Checkbox("Missing Health Color", spacing = true)]
+        [Order(45)]
+        public bool UseMissingHealthBar = false;
+
+        [ColorEdit4("Color" + "##MissingHealth")]
+        [Order(46, collapseWith = nameof(UseMissingHealthBar))]
+        public PluginConfigColor HealthMissingColor = new PluginConfigColor(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
         [ColorEdit4("Target Border Color", spacing = true)]
         [Order(50)]
         public PluginConfigColor TargetBordercolor = new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));

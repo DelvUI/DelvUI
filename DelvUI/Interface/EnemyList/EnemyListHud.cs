@@ -146,6 +146,14 @@ namespace DelvUI.Interface.EnemyList
                 bar.SetBackground(background);
                 bar.AddForegrounds(healthFill);
 
+                if (Configs.HealthBar.Colors.UseMissingHealthBar)
+                {
+                    Vector2 healthMissingSize = Configs.HealthBar.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, Configs.HealthBar.FillDirection);
+                    Vector2 healthMissingPos = Configs.HealthBar.FillDirection.IsInverted() ? pos : pos + BarUtilities.GetFillDirectionOffset(healthFill.Size, Configs.HealthBar.FillDirection);
+                    PluginConfigColor? color = Configs.HealthBar.Colors.HealthMissingColor;
+                    bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, color));
+                }
+
                 // highlight
                 bool isHovering = ImGui.IsMouseHoveringRect(origin + pos, origin + pos + Configs.HealthBar.Size);
                 if (isHovering && Configs.HealthBar.Colors.ShowHighlight)
