@@ -122,7 +122,7 @@ namespace DelvUI.Interface.Party
                 Plugin.Condition[ConditionFlag.BetweenAreas] ||
                 Plugin.Condition[ConditionFlag.BetweenAreas51];
 
-            if (!hudState) { return; }
+            if (hudState) { return; }
 
             // find party list hud agent
             PartyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1);
