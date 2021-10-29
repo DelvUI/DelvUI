@@ -288,7 +288,7 @@ namespace DelvUI.Interface.GeneralElements
         private delegate void OpenContextMenuFromTarget(IntPtr agentHud, IntPtr gameObject);
     }
 
-    public unsafe class PlayerUnitFrameHud : UnitFrameHud
+    public class PlayerUnitFrameHud : UnitFrameHud
     {
         public new PlayerUnitFrameConfig Config => (PlayerUnitFrameConfig)_config;
 
@@ -317,7 +317,7 @@ namespace DelvUI.Interface.GeneralElements
                 o.StatusId == 1833    // ROYAL GUARD
             );
 
-            PluginConfigColor color = tankStanceBuff.Count() > 0 ? config.ActiveColor : config.InactiveColor;
+            PluginConfigColor color = tankStanceBuff.Any() ? config.ActiveColor : config.InactiveColor;
 
             Vector2 pos = GetTankStanceCornerOrigin(origin);
             var (verticalDir, horizontalDir) = GetTankStanceLinesDirections();
