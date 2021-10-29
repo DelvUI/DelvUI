@@ -119,6 +119,8 @@ namespace DelvUI.Interface.Party
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
             bool hudState =
+                Plugin.Condition[ConditionFlag.Occupied30] ||
+                Plugin.Condition[ConditionFlag.Occupied38] ||
                 Plugin.Condition[ConditionFlag.BetweenAreas] ||
                 Plugin.Condition[ConditionFlag.BetweenAreas51];
 
@@ -459,7 +461,7 @@ namespace DelvUI.Interface.Party
             {
                 var stringArrayData = RaptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrays[PartyMembersInfoIndex];
                 int arrayIndex = index * 5 + 3;
-                if (stringArrayData->AtkArrayData.Size > arrayIndex)
+                if (stringArrayData->AtkArrayData.Size > arrayIndex && stringArrayData->StringArray[arrayIndex] != null)
                 {
                     try
                     {
