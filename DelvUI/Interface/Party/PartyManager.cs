@@ -209,7 +209,7 @@ namespace DelvUI.Interface.Party
             }
             catch (Exception e)
             {
-                PluginLog.LogError("ERROR getting party data: " + e.Message);
+                //PluginLog.LogError("ERROR getting party data: " + e.Message);
             }
         }
 
