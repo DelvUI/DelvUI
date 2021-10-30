@@ -30,7 +30,7 @@ namespace DelvUI.Interface.EnemyList
         private LabelHud _nameLabelHud;
         private LabelHud _healthLabelHud;
         private LabelHud _orderLabelHud;
-        private CastbarHud _castbarHud;
+        private TargetCastbarHud _castbarHud;
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
 
@@ -44,7 +44,7 @@ namespace DelvUI.Interface.EnemyList
             _healthLabelHud = new LabelHud(Configs.HealthBar.HealthLabel);
             _orderLabelHud = new LabelHud(Configs.HealthBar.OrderLetterLabel);
 
-            _castbarHud = new CastbarHud(Configs.CastBar);
+            _castbarHud = new TargetCastbarHud(Configs.CastBar);
             _buffsListHud = new StatusEffectsListHud(Configs.Buffs);
             _debuffsListHud = new StatusEffectsListHud(Configs.Debuffs);
 

@@ -195,7 +195,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private TargetCastbarConfig Config => (TargetCastbarConfig)_config;
 
-        public TargetCastbarHud(TargetCastbarConfig config, string displayName) : base(config, displayName)
+        public TargetCastbarHud(TargetCastbarConfig config, string? displayName = null) : base(config, displayName)
         {
 
         }
