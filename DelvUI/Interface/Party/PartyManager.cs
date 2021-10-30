@@ -1,5 +1,4 @@
 ﻿using Dalamud.Game;
-using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Party;
@@ -118,23 +117,12 @@ namespace DelvUI.Interface.Party
 
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
-            bool hudState =
-                Plugin.Condition[ConditionFlag.Occupied30] ||
-                Plugin.Condition[ConditionFlag.Occupied38] ||
-                Plugin.Condition[ConditionFlag.BetweenAreas] ||
-                Plugin.Condition[ConditionFlag.BetweenAreas51];
-
-            if (hudState) { return; }
-
             // find party list hud agent
             PartyListAddon = (AddonPartyList*)Plugin.GameGui.GetAddonByName("_PartyList", 1);
             HudAgent = Plugin.GameGui.FindAgentInterface(PartyListAddon);
 
             UIModule* uiModule = StructsFramework.Instance()->GetUiModule();
-            if (uiModule != null)
-            {
-                RaptureAtkModule = uiModule->GetRaptureAtkModule();
-            }
+            RaptureAtkModule = uiModule != null ? uiModule->GetRaptureAtkModule() : null;
 
             // no need to update on preview mode
             if (_config.Preview)
@@ -449,9 +437,13 @@ namespace DelvUI.Interface.Party
 
         private PartyMemberStatus StatusForIndex(int index)
         {
+            if (index < 0 || index > 7)
+            {
+                return PartyMemberStatus.None;
+            }
+
             // TODO: support for other languages
             // couldn't figure out another way of doing this sadly
-
 
             // offline status
             if (RaptureAtkModule != null && RaptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrayCount > PartyMembersInfoIndex)
@@ -460,15 +452,12 @@ namespace DelvUI.Interface.Party
                 int arrayIndex = index * 5 + 3;
                 if (stringArrayData->AtkArrayData.Size > arrayIndex && stringArrayData->StringArray[arrayIndex] != null)
                 {
-                    try
+                    IntPtr ptr = new IntPtr(stringArrayData->StringArray[arrayIndex]);
+                    string statusStr = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
+                    if (statusStr.Contains("Offline"))
                     {
-                        string statusStr = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(stringArrayData->StringArray[arrayIndex])).ToString();
-                        if (statusStr.Contains("Offline"))
-                        {
-                            return PartyMemberStatus.Offline;
-                        }
+                        return PartyMemberStatus.Offline;
                     }
-                    catch { }
                 }
             }
 
