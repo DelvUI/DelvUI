@@ -207,10 +207,7 @@ namespace DelvUI.Interface.Party
 
                 UpdateTrackers();
             }
-            catch (Exception e)
-            {
-                //PluginLog.LogError("ERROR getting party data: " + e.Message);
-            }
+            catch { }
         }
 
         private void UpdateTrustParty(PlayerCharacter player, int trustCount)

@@ -140,10 +140,11 @@ namespace DelvUI.Interface.EnemyList
         }
     }
 
+    [DisableParentSettings("AnchorToUnitFrame", "UnitFrameAnchor")]
     [Exportable(false)]
     [Section("Enemy List", true)]
     [SubSection("Castbar", 0)]
-    public class EnemyListCastbarConfig : CastbarConfig
+    public class EnemyListCastbarConfig : TargetCastbarConfig
     {
         public new static EnemyListCastbarConfig DefaultConfig()
         {
@@ -196,6 +197,7 @@ namespace DelvUI.Interface.EnemyList
             var config = new EnemyListBuffsConfig(DrawAnchor.TopRight, pos, size, true, false, false, GrowthDirections.Right | GrowthDirections.Down, iconConfig);
             config.Limit = 4;
             config.ShowPermanentEffects = true;
+            config.IconConfig.DispellableBorderConfig.Enabled = false;
 
             return config;
         }
@@ -228,6 +230,7 @@ namespace DelvUI.Interface.EnemyList
             var config = new EnemyListDebuffsConfig(DrawAnchor.TopLeft, pos, size, false, true, false, GrowthDirections.Left | GrowthDirections.Down, iconConfig);
             config.Limit = 4;
             config.ShowPermanentEffects = true;
+            config.IconConfig.DispellableBorderConfig.Enabled = false;
 
             return config;
         }
