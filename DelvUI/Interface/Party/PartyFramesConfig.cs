@@ -278,7 +278,7 @@ namespace DelvUI.Interface.Party
 
     [Exportable(false)]
     [Section("Party Frames", true)]
-    [SubSection("Castbars", 0)]
+    [SubSection("Castbar", 0)]
     public class PartyFramesCastbarConfig : CastbarConfig
     {
         public new static PartyFramesCastbarConfig DefaultConfig()

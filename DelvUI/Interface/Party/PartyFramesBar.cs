@@ -50,10 +50,10 @@ namespace DelvUI.Interface.Party
             _raiseLabelHud = new LabelHud(RaiseTracker.Icon.Label);
             _invulnLabelHud = new LabelHud(InvulnTracker.Icon.Label);
 
-            _manaBarHud = new PrimaryResourceHud(_configs.ManaBar, "");
-            _castbarHud = new CastbarHud(_configs.CastBar, "");
-            _buffsListHud = new StatusEffectsListHud(_configs.Buffs, "");
-            _debuffsListHud = new StatusEffectsListHud(_configs.Debuffs, "");
+            _manaBarHud = new PrimaryResourceHud(_configs.ManaBar);
+            _castbarHud = new CastbarHud(_configs.CastBar);
+            _buffsListHud = new StatusEffectsListHud(_configs.Buffs);
+            _debuffsListHud = new StatusEffectsListHud(_configs.Debuffs);
         }
 
         public PluginConfigColor GetColor(float scale)
@@ -165,7 +165,7 @@ namespace DelvUI.Interface.Party
             else if (_configs.HealthBar.ColorsConfig.UseDeathIndicatorBackgroundColor && Member.HP <= 0)
             {
                 bgColor = _configs.HealthBar.RangeConfig.Enabled
-                    ? GetDistance(character, _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor)
+                    ? GetDistanceColor(character, _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor)
                     : _configs.HealthBar.ColorsConfig.DeathIndicatorBackgroundColor;
             }
 
@@ -186,7 +186,7 @@ namespace DelvUI.Interface.Party
 
             if (_configs.HealthBar.RangeConfig.Enabled)
             {
-                hpColor = GetDistance(character, hpColor);
+                hpColor = GetDistanceColor(character, hpColor);
             }
 
             DrawHelper.DrawGradientFilledRect(Position, hpFillSize, hpColor, drawList);
@@ -287,7 +287,7 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        private PluginConfigColor GetDistance(Character? character, PluginConfigColor color)
+        private PluginConfigColor GetDistanceColor(Character? character, PluginConfigColor color)
         {
             byte distance = character != null ? character.YalmDistanceX : byte.MaxValue;
             float currentAlpha = color.Vector.W * 100f;

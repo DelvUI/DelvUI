@@ -5,6 +5,7 @@ using DelvUI.Config.Tree;
 using DelvUI.Config.Windows;
 using DelvUI.Helpers;
 using DelvUI.Interface;
+using DelvUI.Interface.EnemyList;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
 using DelvUI.Interface.Party;
@@ -457,6 +458,12 @@ namespace DelvUI.Config
             typeof(PartyFramesBuffsConfig),
             typeof(PartyFramesDebuffsConfig),
             typeof(PartyFramesTrackersConfig),
+
+            typeof(EnemyListConfig),
+            typeof(EnemyListHealthBarConfig),
+            typeof(EnemyListCastbarConfig),
+            typeof(EnemyListBuffsConfig),
+            typeof(EnemyListDebuffsConfig),
 
             typeof(PaladinConfig),
             typeof(WarriorConfig),
