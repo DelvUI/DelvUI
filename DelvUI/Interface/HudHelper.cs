@@ -162,8 +162,6 @@ namespace DelvUI.Interface
                 ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty()
                 : Config.HideOutsideOfCombat && !IsInCombat();
 
-            bool isHidden2 = Config.HideOutsideOfCombat && !IsInCombat();
-
             PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
 
             if (player is not null)
@@ -187,11 +185,11 @@ namespace DelvUI.Interface
                             ? Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat() && !IsInDuty()
                             : Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
                 }
-            }
 
-            if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig) && player is not null)
-            {
-                isHidden = isHidden && player.CurrentHp == player.MaxHp;
+                else if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig))
+                {
+                    isHidden = isHidden && player.CurrentHp == player.MaxHp;
+                }
             }
 
             return isHidden;
