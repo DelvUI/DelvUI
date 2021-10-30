@@ -54,6 +54,14 @@ namespace DelvUI.Interface.GeneralElements
         [Order(30)]
         public bool HideOnlyJobPackHudOutsideOfCombat = false;
 
+        [Checkbox("Show in duty" + "##HideOnlyJobPack")]
+        [Order(31, collapseWith = nameof(HideOnlyJobPackHudOutsideOfCombat))]
+        public bool ShowJobPackInDuty = false;
+
+        [Checkbox("Show on Weapon Drawn" + "##HideOnlyJobPack")]
+        [Order(322, collapseWith = nameof(HideOnlyJobPackHudOutsideOfCombat))]
+        public bool ShowJobPackOnWeaponDrawn = false;
+
         [Checkbox("Automatically disable HUD elements preview", help = "Enabling this will make it so all HUD elements preview modes are disabled when DelvUI's setting window is closed.")]
         [Order(35)]
         public bool AutomaticPreviewDisabling = true;
