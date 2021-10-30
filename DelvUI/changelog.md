@@ -3,6 +3,7 @@ Features:
 - Added tank stance indicator for the player's unit frame.
 - Added "Offline Status" tracking for party frames.
 - Added window clipping settings. These settings are targetted for people that are experiencing performance issues or crashes. Until we find a definitive solution, disabling window clipping might help with these issues.
+- Added "Start Angle" setting for the circular GCD Indicator.
 
 Fixes: 
 - Fixed Bard's Soul Voice threshold not working.

@@ -152,41 +152,43 @@ namespace DelvUI.Interface.GeneralElements
                 const int segments = 100;
                 const float queueTime = 0.5f;
                 const float startAngle = 0f;
+                const float endAngle = 2f * (float)Math.PI;
+                float offset = (float)(-Math.PI / 2f + (Config.CircleStartAngle * (Math.PI / 180f)));
 
                 if (Config.AlwaysShow && current == total)
                 {
-                    drawList.PathArcTo(position, radius, startAngle, 2f * (float)Math.PI, segments);
+                    drawList.PathArcTo(position, radius, startAngle + offset, endAngle + offset, segments);
                     drawList.PathStroke(Config.FillColor.Base, ImDrawFlags.None, Config.CircleThickness);
                 }
                 else
                 {
                     // always draw until the queue threshold
-                    float progressAngle = Math.Min(current, total - (Config.ShowGCDQueueIndicator ? queueTime : 0f)) / total * 2f * (float)Math.PI;
+                    float progressAngle = Math.Min(current, total - (Config.ShowGCDQueueIndicator ? queueTime : 0f)) / total * endAngle;
 
                     // drawing an arc with thickness to make it look like an annular sector
-                    drawList.PathArcTo(position, radius, startAngle, progressAngle, segments);
+                    drawList.PathArcTo(position, radius, startAngle + offset, progressAngle + offset, segments);
                     drawList.PathStroke(Config.FillColor.Base, ImDrawFlags.None, Config.CircleThickness);
 
                     // draw the queue indicator
                     if (Config.ShowGCDQueueIndicator && current > total - queueTime)
                     {
-                        float oldAngle = progressAngle - 0.0003f * total * 2f * (float)Math.PI;
-                        progressAngle = current / total * 2f * (float)Math.PI;
-                        drawList.PathArcTo(position, radius, oldAngle, progressAngle, segments);
+                        float oldAngle = progressAngle - 0.0003f * total * endAngle;
+                        progressAngle = current / total * endAngle;
+                        drawList.PathArcTo(position, radius, oldAngle + offset, progressAngle + offset, segments);
                         drawList.PathStroke(Config.QueueColor.Base, ImDrawFlags.None, Config.CircleThickness);
                     }
 
                     // anything that remains is background
-                    drawList.PathArcTo(position, radius, progressAngle, 2f * (float)Math.PI, segments);
+                    drawList.PathArcTo(position, radius, progressAngle + offset, endAngle + offset, segments);
                     drawList.PathStroke(Config.BackgroundColor.Base, ImDrawFlags.None, Config.CircleThickness);
                 }
 
                 if (Config.ShowBorder)
                 {
-                    drawList.PathArcTo(position, radius - Config.CircleThickness / 2f, 0f, 2f * (float)Math.PI, segments);
+                    drawList.PathArcTo(position, radius - Config.CircleThickness / 2f, 0, endAngle, segments);
                     drawList.PathStroke(0xFF000000, ImDrawFlags.None, 1);
 
-                    drawList.PathArcTo(position, radius + Config.CircleThickness / 2f, 0f, 2f * (float)Math.PI, segments);
+                    drawList.PathArcTo(position, radius + Config.CircleThickness / 2f, 0, endAngle, segments);
                     drawList.PathStroke(0xFF000000, ImDrawFlags.None, 1);
                 }
             });
