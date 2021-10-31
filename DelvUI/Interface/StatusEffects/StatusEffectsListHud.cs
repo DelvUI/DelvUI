@@ -405,6 +405,7 @@ namespace DelvUI.Interface.StatusEffects
                         ImGui.GetIO().KeyCtrl && ImGui.GetIO().KeyAlt && ImGui.GetIO().KeyShift && leftClick)
                     {
                         Config.BlacklistConfig.AddNewEntry(statusEffectData.Data);
+                        ConfigurationManager.Instance.ForceNeedsSave();
                     }
                 }
             }

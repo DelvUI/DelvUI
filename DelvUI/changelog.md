@@ -10,6 +10,7 @@ Features:
 
 Fixes: 
 - Fixed Bard's Soul Voice threshold not working.
+- Fixed settings not saving in some situations.
 
 # 0.4.0.2
 Fixes:
