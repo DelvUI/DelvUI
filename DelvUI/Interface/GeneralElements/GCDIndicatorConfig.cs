@@ -54,6 +54,10 @@ namespace DelvUI.Interface.GeneralElements
         [Order(40, collapseWith = nameof(CircularMode))]
         public int CircleThickness = 10;
 
+        [DragInt("Start Angle", min = 0, max = 359)]
+        [Order(45, collapseWith = nameof(CircularMode))]
+        public int CircleStartAngle = 0;
+
         [NestedConfig("Bar Mode", 45, separator = false, spacing = true, nest = true)]
         public GCDBarConfig Bar = new GCDBarConfig(
             new Vector2(0, HUDConstants.BaseHUDOffsetY + 21),
