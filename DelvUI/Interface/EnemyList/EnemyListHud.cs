@@ -209,7 +209,14 @@ namespace DelvUI.Interface.EnemyList
                 // left click
                 if (InputsHelper.Instance.LeftButtonClicked)
                 {
+                    GameObject? oldTarget = Plugin.TargetManager.Target;
                     Plugin.TargetManager.SetTarget(mouseoverTarget);
+
+                    // fixes losing target if trying to target an un-targetable enemy
+                    if (Plugin.TargetManager.Target == null && oldTarget != null)
+                    {
+                        Plugin.TargetManager.SetTarget(oldTarget);
+                    }
                 }
             }
             else if (_wasHovering)
