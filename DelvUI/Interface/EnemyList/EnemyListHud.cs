@@ -6,6 +6,7 @@ using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.StatusEffects;
 using ImGuiNET;
+using ImGuiScene;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -34,6 +35,8 @@ namespace DelvUI.Interface.EnemyList
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
 
+        TextureWrap? _iconsTexture = null;
+
         public EnemyListHud(EnemyListConfig config, string displayName) : base(config, displayName)
         {
             Configs = EnemyListConfigs.GetConfigs();
@@ -52,6 +55,10 @@ namespace DelvUI.Interface.EnemyList
             {
                 _smoothHPHelpers.Add(new SmoothHPHelper());
             }
+
+            _iconsTexture = TexturesCache.Instance.GetTextureFromPath("ui/uld/enemylist_hr1.tex");
+
+            UpdatePreview();
         }
 
         protected override void InternalDispose()
@@ -63,17 +70,20 @@ namespace DelvUI.Interface.EnemyList
         {
             if (args.PropertyName == "Preview")
             {
-                _previewValues.Clear();
+                UpdatePreview();
+            }
+        }
 
-                if (Config.Preview)
-                {
-                    Random RNG = new Random((int)ImGui.GetTime());
+        private void UpdatePreview()
+        {
+            _previewValues.Clear();
+            if (!Config.Preview) { return; }
 
-                    for (int i = 0; i < MaxEnemyCount; i++)
-                    {
-                        _previewValues.Add(RNG.Next(0, 101) / 100f);
-                    }
-                }
+            Random RNG = new Random((int)ImGui.GetTime());
+
+            for (int i = 0; i < MaxEnemyCount; i++)
+            {
+                _previewValues.Add(RNG.Next(0, 101) / 100f);
             }
         }
 
@@ -176,6 +186,23 @@ namespace DelvUI.Interface.EnemyList
 
                 bar.Draw(origin);
 
+                // enmity icon
+                if (_iconsTexture != null && Configs.EnmityIcon.Enabled)
+                {
+                    var parentPos = Utils.GetAnchoredPosition(origin + pos, -Configs.HealthBar.Size, Configs.EnmityIcon.HealthBarAnchor);
+                    var iconPos = Utils.GetAnchoredPosition(parentPos + Configs.EnmityIcon.Position, Configs.EnmityIcon.Size, Configs.EnmityIcon.Anchor);
+
+                    DrawHelper.DrawInWindow(ID + "_enmityIcon", iconPos, Configs.EnmityIcon.Size, false, false, (drawList) =>
+                    {
+                        int enmityIndex = Config.Preview ? Math.Min(3, i) : _helper.EnemiesData.ElementAt(i).EnmityLevel - 1;
+                        float w = 48f / _iconsTexture.Width;
+                        float h = 48f / _iconsTexture.Height;
+                        Vector2 uv0 = new Vector2(w * enmityIndex, 0.60f);
+                        Vector2 uv1 = new Vector2(w * (enmityIndex + 1), 0.60f + h);
+                        drawList.AddImage(_iconsTexture.ImGuiHandle, iconPos, iconPos + Configs.EnmityIcon.Size, uv0, uv1);
+                    });
+                }
+
                 // labels
                 string? name = Config.Preview ? "Fake Name" : null;
                 _nameLabelHud.Draw(origin + pos, Configs.HealthBar.Size, character, name, currentHp, maxHp);
@@ -265,17 +292,20 @@ namespace DelvUI.Interface.EnemyList
     public struct EnemyListConfigs
     {
         public EnemyListHealthBarConfig HealthBar;
+        public EnemyListEnmityIconConfig EnmityIcon;
         public EnemyListCastbarConfig CastBar;
         public EnemyListBuffsConfig Buffs;
         public EnemyListDebuffsConfig Debuffs;
 
         public EnemyListConfigs(
             EnemyListHealthBarConfig healthBar,
+            EnemyListEnmityIconConfig enmityIcon,
             EnemyListCastbarConfig castBar,
             EnemyListBuffsConfig buffs,
             EnemyListDebuffsConfig debuffs)
         {
             HealthBar = healthBar;
+            EnmityIcon = enmityIcon;
             CastBar = castBar;
             Buffs = buffs;
             Debuffs = debuffs;
@@ -285,6 +315,7 @@ namespace DelvUI.Interface.EnemyList
         {
             return new EnemyListConfigs(
                 ConfigurationManager.Instance.GetConfigObject<EnemyListHealthBarConfig>(),
+                ConfigurationManager.Instance.GetConfigObject<EnemyListEnmityIconConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<EnemyListCastbarConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<EnemyListBuffsConfig>(),
                 ConfigurationManager.Instance.GetConfigObject<EnemyListDebuffsConfig>()

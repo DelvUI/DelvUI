@@ -150,6 +150,26 @@ namespace DelvUI.Interface.EnemyList
         }
     }
 
+    [DisableParentSettings("FrameAnchor")]
+    [Exportable(false)]
+    [Section("Enemy List", true)]
+    [SubSection("Enmity Icon", 0)]
+    public class EnemyListEnmityIconConfig : IconConfig
+    {
+        [Anchor("Health Bar Anchor")]
+        [Order(16)]
+        public DrawAnchor HealthBarAnchor = DrawAnchor.TopLeft;
+
+        public new static EnemyListEnmityIconConfig DefaultConfig() =>
+            new EnemyListEnmityIconConfig(new Vector2(5), new Vector2(24), DrawAnchor.Center, DrawAnchor.TopLeft);
+
+        public EnemyListEnmityIconConfig(Vector2 position, Vector2 size, DrawAnchor anchor, DrawAnchor frameAnchor)
+            : base(position, size, anchor, frameAnchor)
+        {
+            HealthBarAnchor = frameAnchor;
+        }
+    }
+
     [DisableParentSettings("AnchorToUnitFrame", "UnitFrameAnchor")]
     [Exportable(false)]
     [Section("Enemy List", true)]
