@@ -1,4 +1,4 @@
-﻿using DelvUI.Config;
+using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
@@ -84,6 +84,8 @@ namespace DelvUI.Helpers
             "Teleport",
             "ActionMenu",
             "Character",
+            "CharacterInspect",
+            "Tryon",
             "ArmouryBoard",
             "RecommendList",
             "GearSetList",
@@ -118,6 +120,7 @@ namespace DelvUI.Helpers
             "CountdownSettingDialog",
             "CircleFinder",
             "CircleList",
+            "CircleNameInputString",
             "Emote",
             "FreeCompany",
             "HousingMenu",
@@ -155,6 +158,7 @@ namespace DelvUI.Helpers
             "JournalDetail",
             "ContentsFinder",
             "ContentsFinderSetting",
+            "ContentsFinderMenu",
             "ContentsInfo",
             "Dawn",
             "BeginnersMansionProblem",

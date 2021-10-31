@@ -11,6 +11,7 @@ Features:
 Fixes: 
 - Fixed Bard's Soul Voice threshold not working.
 - Fixed settings not saving in some situations.
+- Fixed some more game windows not covering DelvUI elements
 
 # 0.4.0.2
 Fixes:
