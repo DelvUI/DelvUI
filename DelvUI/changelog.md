@@ -19,6 +19,7 @@ Fixes:
 # 0.4.0.1
 Features:
 - Added a command to switch profiles: `/delvui profile ProfileName`, no quotation marks needed.
+- Partial Fill Color is now used for bars when Show In Chunks is unchecked
 
 Fixes:
 - Fixed BLU Job Specific Bar config not saving and only showing when actually on the BLU job.

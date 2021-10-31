@@ -238,7 +238,8 @@ namespace DelvUI.Interface.Bars
             float min = 0f,
             GameObject? actor = null,
             BarGlowConfig? glowConfig = null,
-            PluginConfigColor? fillColor = null)
+            PluginConfigColor? fillColor = null,
+            int thresholdChunk = 1)
         {
             var color = fillColor ?? config.FillColor;
 
@@ -271,7 +272,8 @@ namespace DelvUI.Interface.Bars
                 return GetChunkedBars(config, chunks, current, max, min, actor, labels, color, partialColor, glowConfig);
             }
 
-            BarHud bar = GetProgressBar(config, null, new LabelConfig[] { config.Label }, current, max, min, actor, color, glowConfig);
+            var threshold = GetThresholdConfigForChunk(config, thresholdChunk, chunks, min, max);
+            BarHud bar = GetProgressBar(config, threshold, new LabelConfig[] { config.Label }, current, max, min, actor, color, glowConfig);
             return new BarHud[] { bar };
         }
 
@@ -359,5 +361,16 @@ namespace DelvUI.Interface.Bars
 
             return new Rect(pos + fillPos, fillSize, color);
         }
+        
+        public static ThresholdConfig GetThresholdConfigForChunk(ChunkedProgressBarConfig config, int chunk, int chunks, float min, float max) =>
+            new ThresholdConfig
+            {
+                ThresholdType = ThresholdType.Below,
+                Color = config.PartialFillColor,
+                Enabled = config.UsePartialFillColor,
+                Value = (max - min) / chunks * chunk,
+                ChangeColor = true,
+                ShowMarker = false
+            };
     }
 }
