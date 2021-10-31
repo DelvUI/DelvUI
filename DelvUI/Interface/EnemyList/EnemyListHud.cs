@@ -80,7 +80,9 @@ namespace DelvUI.Interface.EnemyList
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
             Vector2 size = new Vector2(Configs.HealthBar.Size.X, MaxEnemyCount * Configs.HealthBar.Size.Y + (MaxEnemyCount - 1) * Config.VerticalPadding);
-            return (new List<Vector2>() { Config.Position + size / 2f }, new List<Vector2>() { size });
+            Vector2 pos = Config.GrowthDirection == EnemyListGrowthDirection.Down ? Config.Position : Config.Position - new Vector2(0, size.Y);
+
+            return (new List<Vector2>() { pos + size / 2f }, new List<Vector2>() { size });
         }
 
         public void StopPreview()
@@ -126,7 +128,9 @@ namespace DelvUI.Interface.EnemyList
                     currentHp = _smoothHPHelpers[i].GetNextHp((int)currentHp, (int)maxHp, Configs.HealthBar.SmoothHealthConfig.Velocity);
                 }
 
-                Vector2 pos = new Vector2(Config.Position.X, Config.Position.Y + i * Configs.HealthBar.Size.Y + i * Config.VerticalPadding);
+                int direction = Config.GrowthDirection == EnemyListGrowthDirection.Down ? 1 : -1;
+                float y = Config.Position.Y + i * direction * Configs.HealthBar.Size.Y + i * direction * Config.VerticalPadding;
+                Vector2 pos = new Vector2(Config.Position.X, y);
                 Rect background = new Rect(pos, Configs.HealthBar.Size, Configs.HealthBar.BackgroundColor);
 
                 PluginConfigColor fillColor = GetColor(character, currentHp, maxHp);

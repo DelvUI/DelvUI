@@ -10,6 +10,12 @@ using System.Numerics;
 
 namespace DelvUI.Interface.EnemyList
 {
+    public enum EnemyListGrowthDirection
+    {
+        Down = 0,
+        Up
+    }
+
     [Exportable(false)]
     [Section("Enemy List", true)]
     [SubSection("General", 0)]
@@ -28,8 +34,12 @@ namespace DelvUI.Interface.EnemyList
         [Order(4)]
         public bool Preview = false;
 
-        [DragInt("Vertical Padding", min = 0, max = 500)]
+        [Combo("Growth Direction", "Down", "Up", spacing = true)]
         [Order(20)]
+        public EnemyListGrowthDirection GrowthDirection = EnemyListGrowthDirection.Down;
+
+        [DragInt("Vertical Padding", min = 0, max = 500)]
+        [Order(25)]
         public int VerticalPadding = 10;
     }
 
