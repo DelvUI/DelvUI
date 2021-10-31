@@ -81,7 +81,7 @@ namespace DelvUI.Config
 
                 if (_lockHUD)
                 {
-                    SaveConfigurations();
+                    ConfigBaseNode.NeedsSave = true;
                 }
             }
         }

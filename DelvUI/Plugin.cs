@@ -278,6 +278,7 @@ namespace DelvUI
             _menuHook.Dispose();
             _hudManager.Dispose();
 
+            ConfigurationManager.Instance.SaveConfigurations(true);
             ConfigurationManager.Instance.CloseConfigWindow();
 
             CommandManager.RemoveHandler("/delvui");
