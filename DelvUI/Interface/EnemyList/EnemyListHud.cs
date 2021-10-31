@@ -238,6 +238,11 @@ namespace DelvUI.Interface.EnemyList
                 return Configs.HealthBar.Colors.TargetBordercolor;
             }
 
+            if (!Configs.HealthBar.Colors.ShowEnmityBorderColors)
+            {
+                return Configs.HealthBar.BorderColor;
+            }
+
             return enmityLevel switch
             {
                 >= 3 => Configs.HealthBar.Colors.EnmityLeaderBorderColor,
