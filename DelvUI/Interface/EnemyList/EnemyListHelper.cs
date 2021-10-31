@@ -88,7 +88,7 @@ namespace DelvUI.Interface.EnemyList
             AtkImageNode* imageNode = (AtkImageNode*)node->GetComponent()->UldManager.SearchNodeById(13);
             if (imageNode == null) { return 0; }
 
-            return imageNode->PartId + 1;
+            return Math.Min(4, imageNode->PartId + 1);
         }
     }
 
