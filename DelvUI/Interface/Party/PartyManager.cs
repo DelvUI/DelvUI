@@ -122,10 +122,7 @@ namespace DelvUI.Interface.Party
             HudAgent = Plugin.GameGui.FindAgentInterface(PartyListAddon);
 
             UIModule* uiModule = StructsFramework.Instance()->GetUiModule();
-            if (uiModule != null)
-            {
-                RaptureAtkModule = uiModule->GetRaptureAtkModule();
-            }
+            RaptureAtkModule = uiModule != null ? uiModule->GetRaptureAtkModule() : null;
 
             // no need to update on preview mode
             if (_config.Preview)
@@ -198,10 +195,7 @@ namespace DelvUI.Interface.Party
 
                 UpdateTrackers();
             }
-            catch (Exception e)
-            {
-                PluginLog.LogError("ERROR getting party data: " + e.Message);
-            }
+            catch { }
         }
 
         private void UpdateTrustParty(PlayerCharacter player, int trustCount)
@@ -443,18 +437,23 @@ namespace DelvUI.Interface.Party
 
         private PartyMemberStatus StatusForIndex(int index)
         {
+            if (index < 0 || index > 7)
+            {
+                return PartyMemberStatus.None;
+            }
+
             // TODO: support for other languages
             // couldn't figure out another way of doing this sadly
-
 
             // offline status
             if (RaptureAtkModule != null && RaptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrayCount > PartyMembersInfoIndex)
             {
                 var stringArrayData = RaptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrays[PartyMembersInfoIndex];
                 int arrayIndex = index * 5 + 3;
-                if (stringArrayData->AtkArrayData.Size > arrayIndex)
+                if (stringArrayData->AtkArrayData.Size > arrayIndex && stringArrayData->StringArray[arrayIndex] != null)
                 {
-                    string statusStr = MemoryHelper.ReadSeStringNullTerminated(new IntPtr(stringArrayData->StringArray[arrayIndex])).ToString();
+                    IntPtr ptr = new IntPtr(stringArrayData->StringArray[arrayIndex]);
+                    string statusStr = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
                     if (statusStr.Contains("Offline"))
                     {
                         return PartyMemberStatus.Offline;

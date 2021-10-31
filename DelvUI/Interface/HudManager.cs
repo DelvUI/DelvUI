@@ -2,6 +2,7 @@ using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Interface;
 using DelvUI.Config;
 using DelvUI.Helpers;
+using DelvUI.Interface.EnemyList;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
 using DelvUI.Interface.Party;
@@ -36,7 +37,6 @@ namespace DelvUI.Interface
         private CustomEffectsListHud _customEffectsHud = null!;
         private PrimaryResourceHud _playerManaBarHud = null!;
         private JobHud? _jobHud = null;
-        private PartyFramesHud _partyFramesHud = null!;
 
         private Dictionary<uint, JobHudTypes> _jobsMap = null!;
         private Dictionary<uint, Type> _unsupportedJobsMap = null!;
@@ -185,9 +185,14 @@ namespace DelvUI.Interface
             _hudElementsUsingFocusTarget.Add(_focusTargetUnitFrameHud);
 
             var partyFramesConfig = ConfigurationManager.Instance.GetConfigObject<PartyFramesConfig>();
-            _partyFramesHud = new PartyFramesHud(partyFramesConfig, "Party Frames");
-            _hudElements.Add(_partyFramesHud);
-            _hudElementsWithPreview.Add(_partyFramesHud);
+            var partyFramesHud = new PartyFramesHud(partyFramesConfig, "Party Frames");
+            _hudElements.Add(partyFramesHud);
+            _hudElementsWithPreview.Add(partyFramesHud);
+
+            var enemyListConfig = ConfigurationManager.Instance.GetConfigObject<EnemyListConfig>();
+            var enemyListHud = new EnemyListHud(enemyListConfig, "Enemy List");
+            _hudElements.Add(enemyListHud);
+            _hudElementsWithPreview.Add(enemyListHud);
         }
 
         private void CreateManaBars()

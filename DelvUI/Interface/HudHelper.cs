@@ -163,6 +163,7 @@ namespace DelvUI.Interface
                 : Config.HideOutsideOfCombat && !IsInCombat();
 
             PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+
             if (player is not null)
             {
                 isHidden = isHidden && Config.ShowDelvUIFramesOnWeaponDrawn
@@ -170,16 +171,25 @@ namespace DelvUI.Interface
                     : Config.ShowDelvUIFramesInDuty
                         ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty()
                         : Config.HideOutsideOfCombat && !IsInCombat();
-            }
 
-            if (!isHidden && element is JobHud)
-            {
-                return Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
-            }
+                // hide only jobpack hud outside of combat
+                if (!isHidden && element is JobHud)
+                {
+                    isHidden = Config.ShowJobPackInDuty
+                        ? Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat() && !IsInDuty()
+                        : Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
 
-            if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig) && player is not null)
-            {
-                isHidden = isHidden && player.CurrentHp == player.MaxHp;
+                    isHidden = isHidden && Config.ShowJobPackOnWeaponDrawn
+                        ? Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn(player)
+                        : Config.ShowJobPackInDuty
+                            ? Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat() && !IsInDuty()
+                            : Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
+                }
+
+                else if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig))
+                {
+                    isHidden = isHidden && player.CurrentHp == player.MaxHp;
+                }
             }
 
             return isHidden;

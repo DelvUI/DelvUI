@@ -25,7 +25,7 @@ namespace DelvUI.Interface.GeneralElements
         protected override bool AnchorToParent => Config is UnitFrameCastbarConfig { AnchorToUnitFrame: true };
         protected override DrawAnchor ParentAnchor => Config is UnitFrameCastbarConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
 
-        public CastbarHud(CastbarConfig config, string displayName) : base(config, displayName)
+        public CastbarHud(CastbarConfig config, string? displayName = null) : base(config, displayName)
         {
             _castNameLabel = new LabelHud(config.CastNameConfig);
             _castTimeLabel = new LabelHud(config.CastTimeConfig);
@@ -195,7 +195,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         private TargetCastbarConfig Config => (TargetCastbarConfig)_config;
 
-        public TargetCastbarHud(TargetCastbarConfig config, string displayName) : base(config, displayName)
+        public TargetCastbarHud(TargetCastbarConfig config, string? displayName = null) : base(config, displayName)
         {
 
         }

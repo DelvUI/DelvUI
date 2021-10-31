@@ -30,7 +30,7 @@ namespace DelvUI.Interface.StatusEffects
         protected override bool AnchorToParent => Config is UnitFrameStatusEffectsListConfig config ? config.AnchorToUnitFrame : false;
         protected override DrawAnchor ParentAnchor => Config is UnitFrameStatusEffectsListConfig config ? config.UnitFrameAnchor : DrawAnchor.Center;
 
-        public StatusEffectsListHud(StatusEffectsListConfig config, string displayName) : base(config, displayName)
+        public StatusEffectsListHud(StatusEffectsListConfig config, string? displayName = null) : base(config, displayName)
         {
             _config.ValueChangeEvent += OnConfigPropertyChanged;
 

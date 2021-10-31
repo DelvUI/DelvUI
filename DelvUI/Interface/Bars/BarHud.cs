@@ -21,6 +21,10 @@ namespace DelvUI.Interface.Bars
 
         private bool DrawBorder { get; set; }
 
+        private PluginConfigColor? BorderColor { get; set; }
+
+        private int BorderThickness { get; set; }
+
         private DrawAnchor Anchor { get; set; }
 
         private GameObject? Actor { get; set; }
@@ -35,6 +39,8 @@ namespace DelvUI.Interface.Bars
         public BarHud(
             string id,
             bool drawBorder = true,
+            PluginConfigColor? borderColor = null,
+            int borderThickness = 1,
             DrawAnchor anchor = DrawAnchor.TopLeft,
             GameObject? actor = null,
             PluginConfigColor? glowColor = null,
@@ -44,6 +50,8 @@ namespace DelvUI.Interface.Bars
         {
             ID = id;
             DrawBorder = drawBorder;
+            BorderColor = borderColor;
+            BorderThickness = borderThickness;
             Anchor = anchor;
             Actor = actor;
             GlowColor = glowColor;
@@ -53,7 +61,7 @@ namespace DelvUI.Interface.Bars
         }
 
         public BarHud(BarConfig config, GameObject? actor = null, BarGlowConfig? glowConfig = null, float? current = null, float? max = null)
-            : this(config.ID, config.DrawBorder, config.Anchor, actor, glowConfig?.Color, glowConfig?.Size, current, max)
+            : this(config.ID, config.DrawBorder, config.BorderColor, config.BorderThickness, config.Anchor, actor, glowConfig?.Color, glowConfig?.Size, current, max)
         {
             BackgroundRect = new Rect(config.Position, config.Size, config.BackgroundColor);
         }
@@ -111,7 +119,7 @@ namespace DelvUI.Interface.Bars
                 // Draw Border
                 if (DrawBorder)
                 {
-                    drawList.AddRect(backgroundPos, backgroundPos + BackgroundRect.Size, 0xFF000000);
+                    drawList.AddRect(backgroundPos, backgroundPos + BackgroundRect.Size, BorderColor?.Base ?? 0xFF000000, 0, ImDrawFlags.None, BorderThickness);
                 }
 
                 // Draw Glow
