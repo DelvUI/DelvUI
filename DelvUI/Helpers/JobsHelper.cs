@@ -211,6 +211,13 @@ namespace DelvUI.Helpers
                 return "";
             }
             
+            uint jobId = character.ClassJob.Id;
+
+            if (!IsJobGatherer(jobId))
+            {
+                return "";
+            }
+            
             uint gpRate = GPResourceRate(character);
 
             if (character.CurrentGp == character.MaxGp)
