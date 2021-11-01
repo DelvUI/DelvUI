@@ -127,20 +127,22 @@ namespace DelvUI.Interface.Party
         public InvulnStatus? InvulnStatus { get; set; }
         public bool HasDispellableDebuff { get; set; }
 
-        public FakePartyFramesMember(int order, EnmityLevel enmityLevel, bool isPartyLeader)
+        public FakePartyFramesMember(int order)
         {
             Order = order + 1;
             Level = (uint)RNG.Next(1, 80);
             JobId = (uint)RNG.Next(19, 38);
             MaxHP = (uint)RNG.Next(90000, 150000);
-            HP = (uint)(MaxHP * RNG.Next(50, 100) / 100f);
+            HP = order == 2 ? 0 : (uint)(MaxHP * RNG.Next(50, 100) / 100f);
             MaxMP = 10000;
-            MP = (uint)(MaxMP * RNG.Next(100) / 100f);
-            Shield = RNG.Next(30) / 100f;
-            EnmityLevel = enmityLevel;
+            MP = order == 2 ? 0 : (uint)(MaxMP * RNG.Next(100) / 100f);
+            Shield = order == 2 ? 0 : RNG.Next(30) / 100f;
+            EnmityLevel = order <= 1 ? (EnmityLevel)order + 1 : EnmityLevel.Last;
             Status = (PartyMemberStatus)RNG.Next(0, 2);
-            IsPartyLeader = isPartyLeader;
+            IsPartyLeader = order == 0;
             HasDispellableDebuff = RNG.Next(0, 2) == 1;
+            RaiseTime = order == 2 ? RNG.Next(0, 60) : null;
+            InvulnStatus = order == 0 ? new InvulnStatus(3077, RNG.Next(0, 10), 810) : null;
         }
 
         public void Update(EnmityLevel enmityLevel, PartyMemberStatus status, bool isPartyLeader, uint jobId)

@@ -594,10 +594,7 @@ namespace DelvUI.Interface.Party
             {
                 for (int i = 0; i < 8; i++)
                 {
-                    EnmityLevel enmityLevel = i <= 1 ? (EnmityLevel)i + 1 : EnmityLevel.Last;
-                    bool isPartyLeader = i == 0;
-
-                    _groupMembers.Add(new FakePartyFramesMember(i, enmityLevel, isPartyLeader));
+                    _groupMembers.Add(new FakePartyFramesMember(i));
                 }
             }
 
