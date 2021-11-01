@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using ImGuiNET;
 
 namespace DelvUI.Helpers
 {
@@ -178,6 +179,50 @@ namespace DelvUI.Helpers
             }
 
             return character.MaxMp;
+        }
+
+        public static uint GPResourceRate(Character? character)
+        {
+            if (character == null)
+            {
+                return 0;
+            }
+
+            // Preferably I'd want to check the active traits because these traits are locked behind job quests, but no idea how to check traits.
+            // Level 80 Trait 236 (MIN), 237 (BTN), 238 (FSH)
+            if (character.Level == 80)
+            {
+                return 7;
+            }
+            
+            // Level 70 Trait 192 (MIN), 193 (BTN), 194 (FSH)
+            if (character.Level >= 70)
+            {
+                return 6;
+            }
+
+            return 5;
+        }
+
+        public static string TimeTillMaxGP(Character? character)
+        {
+            if (character == null)
+            {
+                return "";
+            }
+            
+            uint gpRate = GPResourceRate(character);
+
+            if (character.CurrentGp == character.MaxGp)
+            {
+                return "";
+            }
+            
+            // Since I'm not using a stopwatch or anything like MPTickHelper here the time will only update every 3 seconds, would be nice if the time ticks down every second.
+            float gpPerSecond = gpRate / 3f;
+            float secondsTillMax = (character.MaxGp - character.CurrentGp) / gpPerSecond;
+
+            return $"({Utils.DurationToFullString(secondsTillMax)})";
         }
 
         public static uint IconIDForJob(uint jobId)

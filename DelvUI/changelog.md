@@ -7,6 +7,7 @@ Features:
 - Added window clipping settings. These settings are targetted for people that are experiencing performance issues or crashes. Until we find a definitive solution, disabling window clipping might help with these issues.
 - Added "Start Angle" setting for the circular GCD Indicator.
 - Added sub-options to "Hide only JobPack HUD outside of combat" to always show in duties and/or when weapons are drawn.
+- Implement new tag `[time-till-max-gp]`, this will show you the time until your GP hits max again.
 
 Fixes: 
 - Fixed Bard's Soul Voice threshold not working.
