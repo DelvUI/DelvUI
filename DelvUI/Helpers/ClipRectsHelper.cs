@@ -170,7 +170,7 @@ namespace DelvUI.Helpers
             "LinkShell",
             "ChatConfig",
             "ColorPicker",
-            "Playguide"
+            "PlayGuide"
 
         };
 
