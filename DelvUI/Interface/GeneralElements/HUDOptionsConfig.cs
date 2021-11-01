@@ -1,5 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -107,10 +108,64 @@ namespace DelvUI.Interface.GeneralElements
         [Order(301, collapseWith = nameof(EnableClipRects))]
         public bool HideInsteadOfClip = false;
 
-        public Vector2 CastBarOriginalPosition;
-        public Vector2 PulltimerOriginalPosition;
-        public Dictionary<string, Vector2> JobGaugeOriginalPosition = new();
+        // saves original positions for all 4 layouts
+        public Vector2[] CastBarOriginalPositions = new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero };
+        public Vector2[] PulltimerOriginalPositions = new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero };
+        public Dictionary<string, Vector2>[] JobGaugeOriginalPositions = new Dictionary<string, Vector2>[] { new(), new(), new(), new() };
 
         public new static HUDOptionsConfig DefaultConfig() => new();
+    }
+
+    public class HUDOptionsConfigConverter : PluginConfigObjectConverter
+    {
+        public HUDOptionsConfigConverter()
+        {
+            Func<Vector2, Vector2[]> func = (value) =>
+            {
+                Vector2[] array = new Vector2[4];
+                for (int i = 0; i < 4; i++)
+                {
+                    array[i] = value;
+                }
+
+                return array;
+            };
+
+            TypeToClassFieldConverter<Vector2, Vector2[]> castBar = new TypeToClassFieldConverter<Vector2, Vector2[]>(
+                "CastBarOriginalPositions",
+                new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero },
+                func
+            );
+
+            TypeToClassFieldConverter<Vector2, Vector2[]> pullTimer = new TypeToClassFieldConverter<Vector2, Vector2[]>(
+                "PulltimerOriginalPositions",
+                new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero },
+                func
+            );
+
+            NewClassFieldConverter<Dictionary<string, Vector2>, Dictionary<string, Vector2>[]> jobGauge =
+                new NewClassFieldConverter<Dictionary<string, Vector2>, Dictionary<string, Vector2>[]>(
+                    "JobGaugeOriginalPositions",
+                    new Dictionary<string, Vector2>[] { new(), new(), new(), new() },
+                    (oldValue) =>
+                    {
+                        Dictionary<string, Vector2>[] array = new Dictionary<string, Vector2>[4];
+                        for (int i = 0; i < 4; i++)
+                        {
+                            array[i] = oldValue;
+                        }
+
+                        return array;
+                    });
+
+            FieldConvertersMap.Add("CastBarOriginalPosition", castBar);
+            FieldConvertersMap.Add("PulltimerOriginalPosition", pullTimer);
+            FieldConvertersMap.Add("JobGaugeOriginalPosition", jobGauge);
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(HUDOptionsConfig);
+        }
     }
 }
