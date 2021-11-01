@@ -71,6 +71,7 @@ namespace DelvUI.Interface.GeneralElements
 
             if (!Config.AlwaysShow && total == 0)
             {
+                _lastTotalCastTime = 0;
                 return;
             }
 
@@ -86,7 +87,10 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            if (Config.InstantGCDsOnly && _lastTotalCastTime != 0)
+            bool instantGCDsOnly = Config.InstantGCDsOnly && _lastTotalCastTime != 0;
+            bool thresholdGCDs = Config.LimitGCDThreshold && _lastTotalCastTime > Config.GCDThreshold;
+
+            if (instantGCDsOnly || thresholdGCDs)
             {
                 if (Config.AlwaysShow)
                 {
@@ -151,9 +155,15 @@ namespace DelvUI.Interface.GeneralElements
                 // controls how smooth the arc looks
                 const int segments = 100;
                 const float queueTime = 0.5f;
-                const float startAngle = 0f;
-                const float endAngle = 2f * (float)Math.PI;
+                float startAngle = 0f;
+                float endAngle = 2f * (float)Math.PI;
                 float offset = (float)(-Math.PI / 2f + (Config.CircleStartAngle * (Math.PI / 180f)));
+
+                if (Config.RotateCCW)
+                {
+                    startAngle *= -1;
+                    endAngle *= -1;
+                }
 
                 if (Config.AlwaysShow && current == total)
                 {
