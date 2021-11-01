@@ -104,6 +104,18 @@ namespace DelvUI.Helpers
                 }
             };
         }
+        
+        public static string DurationToFullString(double duration)
+        {
+            if (duration == 0)
+            {
+                return "";
+            }
+
+            TimeSpan t = TimeSpan.FromSeconds(duration);
+
+            return $"{t.Minutes:00}:{t.Seconds:00}";
+        }
 
         //Build our converter objects and store them in a field. This will be used to convert our PluginConfigColors into different color spaces to be used for interpolation
         private static readonly IColorConverter<RGBColor, LabColor> _rgbToLab = new ConverterBuilder().FromRGB().ToLab().Build();
