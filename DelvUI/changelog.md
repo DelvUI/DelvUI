@@ -8,6 +8,8 @@ Features:
 - Added "Start Angle" setting for the circular GCD Indicator.
 - Added sub-options to "Hide only JobPack HUD outside of combat" to always show in duties and/or when weapons are drawn.
 - Added Raise Tracker and Invuln Tracker to the party frames preview mode.
+- Added GCD Threshold to GCD Indicator.
+- Added Counter Clock Wise rotation to GCD Indicator.
 
 Fixes: 
 - Fixed Bard's Soul Voice threshold not working.
