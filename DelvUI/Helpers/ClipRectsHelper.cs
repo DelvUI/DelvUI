@@ -171,7 +171,6 @@ namespace DelvUI.Helpers
             "ChatConfig",
             "ColorPicker",
             "PlayGuide"
-
         };
 
         private List<ClipRect> _clipRects = new List<ClipRect>();
