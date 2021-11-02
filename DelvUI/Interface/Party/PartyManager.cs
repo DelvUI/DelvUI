@@ -292,24 +292,50 @@ namespace DelvUI.Interface.Party
 
         private bool ParseRawData()
         {
+            if (HudAgent == IntPtr.Zero) { return false; }
+
+            // player status
+            Dictionary<string, string> PlayerStatusMap = new Dictionary<string, string>();
+            if (RaptureAtkModule != null && RaptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrayCount > PartyMembersInfoIndex)
+            {
+                var stringArrayData = RaptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrays[PartyMembersInfoIndex];
+                for (int i = 5; i < 40; i += 5)
+                {
+                    if (stringArrayData->AtkArrayData.Size <= i + 3 || stringArrayData->StringArray[i] == null || stringArrayData->StringArray[i + 3] == null) { break; }
+
+                    IntPtr ptr = new IntPtr(stringArrayData->StringArray[i]);
+                    string name = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
+
+                    ptr = new IntPtr(stringArrayData->StringArray[i + 3]);
+                    string status = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
+
+                    PlayerStatusMap.Add(name, status);
+                }
+            }
+
+            // party data
             bool partyChanged = _dirty || _partyMembersInfo == null || _groupMembers.Count != _realMemberCount;
 
-            if (HudAgent != IntPtr.Zero)
+            List<PartyListMemberInfo> newInfo = new List<PartyListMemberInfo>(_realMemberCount);
+            for (int i = 0; i < _realMemberCount; i++)
             {
-                List<PartyListMemberInfo> newInfo = new List<PartyListMemberInfo>(_realMemberCount);
+                PartyListMemberRawInfo* info = (PartyListMemberRawInfo*)(HudAgent + (PartyListInfoOffset + PartyListMemberRawInfoSize * i));
+                string? name = NameForIndex(i);
+                string? status = null;
 
-                for (int i = 0; i < _realMemberCount; i++)
+                if (name != null)
                 {
-                    PartyListMemberRawInfo* info = (PartyListMemberRawInfo*)(HudAgent + (PartyListInfoOffset + PartyListMemberRawInfoSize * i));
-                    newInfo.Add(new PartyListMemberInfo(info, NameForIndex(i), JobIdForIndex(i)));
+                    PlayerStatusMap.TryGetValue(name, out status);
                 }
 
-                if (!partyChanged && _partyMembersInfo != null)
-                {
-                    partyChanged = !newInfo.SequenceEqual(_partyMembersInfo);
-                }
-                _partyMembersInfo = newInfo;
+                newInfo.Add(new PartyListMemberInfo(info, name, JobIdForIndex(i), status));
             }
+
+            if (!partyChanged && _partyMembersInfo != null)
+            {
+                partyChanged = !newInfo.SequenceEqual(_partyMembersInfo);
+            }
+            _partyMembersInfo = newInfo;
 
             return partyChanged;
         }
@@ -446,19 +472,10 @@ namespace DelvUI.Interface.Party
             // couldn't figure out another way of doing this sadly
 
             // offline status
-            if (RaptureAtkModule != null && RaptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrayCount > PartyMembersInfoIndex)
+            string status = _partyMembersInfo[index].Status;
+            if (status.Contains("Offline"))
             {
-                var stringArrayData = RaptureAtkModule->AtkModule.AtkArrayDataHolder.StringArrays[PartyMembersInfoIndex];
-                int arrayIndex = index * 5 + 3;
-                if (stringArrayData->AtkArrayData.Size > arrayIndex && stringArrayData->StringArray[arrayIndex] != null)
-                {
-                    IntPtr ptr = new IntPtr(stringArrayData->StringArray[arrayIndex]);
-                    string statusStr = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
-                    if (statusStr.Contains("Offline"))
-                    {
-                        return PartyMemberStatus.Offline;
-                    }
-                }
+                return PartyMemberStatus.Offline;
             }
 
             // viewing cutscene status
@@ -610,13 +627,15 @@ namespace DelvUI.Interface.Party
             public readonly uint ObjectId;
             public readonly byte Type;
             public readonly uint JobId;
+            public readonly string Status;
 
-            public PartyListMemberInfo(PartyListMemberRawInfo* info, string? crossWorldName, uint jobId)
+            public PartyListMemberInfo(PartyListMemberRawInfo* info, string? crossWorldName, uint jobId, string? status)
             {
                 Name = crossWorldName ?? (Marshal.PtrToStringUTF8(new IntPtr(info->NamePtr)) ?? "");
                 ObjectId = info->ObjectId;
                 Type = info->Type;
                 JobId = jobId;
+                Status = status ?? "";
             }
 
             public bool Equals(PartyListMemberInfo? other)
