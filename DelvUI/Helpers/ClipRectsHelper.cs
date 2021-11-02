@@ -156,6 +156,7 @@ namespace DelvUI.Helpers
             "Achievement",
             "RecommendList",
             "JournalDetail",
+            "Journal",
             "ContentsFinder",
             "ContentsFinderSetting",
             "ContentsFinderMenu",
@@ -164,7 +165,12 @@ namespace DelvUI.Helpers
             "BeginnersMansionProblem",
             "BeginnersMansionProblemCompList",
             "SupportDesk",
-            "HowToList"
+            "HowToList",
+            "HudLayout",
+            "LinkShell",
+            "ChatConfig",
+            "ColorPicker",
+            "PlayGuide"
         };
 
         private List<ClipRect> _clipRects = new List<ClipRect>();
