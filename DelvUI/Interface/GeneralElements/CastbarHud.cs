@@ -42,7 +42,7 @@ namespace DelvUI.Interface.GeneralElements
             return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
         }
 
-        public override unsafe void DrawChildren(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (!Config.Enabled)
             {
@@ -109,7 +109,7 @@ namespace DelvUI.Interface.GeneralElements
             _castTimeLabel.Draw(startPos, Config.Size, Actor);
         }
 
-        private unsafe void UpdateCurrentCast(out float currentCastTime, out float totalCastTime)
+        private void UpdateCurrentCast(out float currentCastTime, out float totalCastTime)
         {
             currentCastTime = Config.Preview ? 0.5f : 0f;
             totalCastTime = 1f;
