@@ -85,6 +85,7 @@ namespace DelvUI.Helpers
             "ActionMenu",
             "Character",
             "CharacterInspect",
+            "CharacterTitle",
             "Tryon",
             "ArmouryBoard",
             "RecommendList",
