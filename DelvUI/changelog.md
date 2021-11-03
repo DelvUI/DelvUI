@@ -15,7 +15,8 @@ Features:
 Fixes: 
 - Fixed Bard's Soul Voice threshold not working.
 - Fixed settings not saving in some situations.
-- Fixed some more game windows not covering DelvUI elements.
+- Fixed Death Indicator color showing for players that are not reachable instead of Out of Range color.
+- Fixed some more game windows not covering DelvUI elements
 - Fixed losing the original positions of the game's default cast bar and job gauges when using the DelvUI hide options for them and also using multiple HUD layouts.
 
 # 0.4.0.2
