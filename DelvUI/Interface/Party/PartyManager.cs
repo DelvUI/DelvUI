@@ -309,7 +309,10 @@ namespace DelvUI.Interface.Party
                     ptr = new IntPtr(stringArrayData->StringArray[i + 3]);
                     string status = MemoryHelper.ReadSeStringNullTerminated(ptr).ToString();
 
-                    PlayerStatusMap.Add(name, status);
+                    if (!PlayerStatusMap.ContainsKey(name))
+                    {
+                        PlayerStatusMap.Add(name, status);
+                    }
                 }
             }
 
