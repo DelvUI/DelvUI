@@ -170,7 +170,7 @@ namespace DelvUI.Interface.EnemyList
         }
     }
 
-    [DisableParentSettings("AnchorToUnitFrame", "UnitFrameAnchor")]
+    [DisableParentSettings("AnchorToUnitFrame", "UnitFrameAnchor", "HideWhenInactive", "FillDirection")]
     [Exportable(false)]
     [Section("Enemy List", true)]
     [SubSection("Castbar", 0)]
@@ -182,9 +182,10 @@ namespace DelvUI.Interface.EnemyList
 
             var castNameConfig = new LabelConfig(new Vector2(0, 0), "", DrawAnchor.Center, DrawAnchor.Center);
             castNameConfig.FontID = FontsConfig.DefaultMediumFontKey;
-            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
+            var castTimeConfig = new NumericLabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
             castTimeConfig.Enabled = false;
             castTimeConfig.FontID = FontsConfig.DefaultMediumFontKey;
+            castTimeConfig.NumberFormat = 1;
 
             var config = new EnemyListCastbarConfig(Vector2.Zero, size, castNameConfig, castTimeConfig);
             config.HealthBarAnchor = DrawAnchor.Bottom;
@@ -195,10 +196,10 @@ namespace DelvUI.Interface.EnemyList
         }
 
         [Anchor("Health Bar Anchor")]
-        [Order(14)]
+        [Order(16)]
         public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;
 
-        public EnemyListCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
+        public EnemyListCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, NumericLabelConfig castTimeConfig)
             : base(position, size, castNameConfig, castTimeConfig)
         {
 

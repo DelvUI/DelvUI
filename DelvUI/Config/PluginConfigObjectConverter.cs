@@ -1,4 +1,5 @@
 ﻿using Dalamud.Logging;
+using DelvUI.Interface.EnemyList;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Party;
 using DelvUI.Interface.StatusEffects;
@@ -154,14 +155,26 @@ namespace DelvUI.Config
             [typeof(TargetUnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
             [typeof(TargetOfTargetUnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
             [typeof(FocusTargetUnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
+
             [typeof(PartyFramesColorsConfig)] = typeof(ColorByHealthFieldsConverter),
             [typeof(PartyFramesRoleIconConfig)] = typeof(PartyFramesIconsConverter),
             [typeof(PartyFramesLeaderIconConfig)] = typeof(PartyFramesIconsConverter),
             [typeof(PartyFramesRaiseTrackerConfig)] = typeof(PartyFramesTrackerConfigConverter),
             [typeof(PartyFramesInvulnTrackerConfig)] = typeof(PartyFramesTrackerConfigConverter),
-            [typeof(StatusEffectsBlacklistConfig)] = typeof(StatusEffectsBlacklistConfigConverter),
             [typeof(PartyFramesManaBarConfig)] = typeof(PartyFramesManaBarConfigConverter),
+
+            [typeof(StatusEffectsBlacklistConfig)] = typeof(StatusEffectsBlacklistConfigConverter),
+
             [typeof(HUDOptionsConfig)] = typeof(HUDOptionsConfigConverter),
+
+            [typeof(CastbarConfig)] = typeof(CastbarConfigConverter),
+            [typeof(UnitFrameCastbarConfig)] = typeof(CastbarConfigConverter),
+            [typeof(PlayerCastbarConfig)] = typeof(CastbarConfigConverter),
+            [typeof(TargetCastbarConfig)] = typeof(CastbarConfigConverter),
+            [typeof(TargetOfTargetCastbarConfig)] = typeof(CastbarConfigConverter),
+            [typeof(FocusTargetCastbarConfig)] = typeof(CastbarConfigConverter),
+            [typeof(PartyFramesCastbarConfig)] = typeof(CastbarConfigConverter),
+            [typeof(EnemyListCastbarConfig)] = typeof(CastbarConfigConverter),
         };
 
         protected override JsonObjectContract CreateObjectContract(Type objectType)
