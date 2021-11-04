@@ -21,12 +21,14 @@ using ImGuiScene;
 using System;
 using System.IO;
 using System.Reflection;
+using Dalamud.Game.ClientState.Buddy;
 using SigScanner = Dalamud.Game.SigScanner;
 
 namespace DelvUI
 {
     public class Plugin : IDalamudPlugin
     {
+        public static BuddyList BuddyList { get; private set; } = null!;
         public static ClientState ClientState { get; private set; } = null!;
         public static CommandManager CommandManager { get; private set; } = null!;
         public static Condition Condition { get; private set; } = null!;
@@ -52,6 +54,7 @@ namespace DelvUI
         private SystemMenuHook _menuHook = null!;
 
         public Plugin(
+            BuddyList buddyList,
             ClientState clientState,
             CommandManager commandManager,
             Condition condition,
@@ -66,6 +69,7 @@ namespace DelvUI
             TargetManager targetManager
         )
         {
+            BuddyList = buddyList;
             ClientState = clientState;
             CommandManager = commandManager;
             Condition = condition;
@@ -89,7 +93,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.4.0.2";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.5.0.0";
 
             FontsManager.Initialize(AssemblyLocation);
             LoadBanner();
@@ -278,6 +282,7 @@ namespace DelvUI
             _menuHook.Dispose();
             _hudManager.Dispose();
 
+            ConfigurationManager.Instance.SaveConfigurations(true);
             ConfigurationManager.Instance.CloseConfigWindow();
 
             CommandManager.RemoveHandler("/delvui");

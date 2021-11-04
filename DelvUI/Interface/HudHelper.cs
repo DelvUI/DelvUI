@@ -38,6 +38,7 @@ namespace DelvUI.Interface
         private delegate void SetPositionDelegate(IntPtr addon, short x, short y);
         private delegate IntPtr GetBaseUIObjectDelegate();
         private delegate byte UpdateAddonPositionDelegate(IntPtr manager, IntPtr addon, byte clicked);
+        private delegate IntPtr GetFilePointerDelegate(byte index);
 
         private HUDOptionsConfig Config => ConfigurationManager.Instance.GetConfigObject<HUDOptionsConfig>();
 
@@ -48,6 +49,7 @@ namespace DelvUI.Interface
         private GetBaseUIObjectDelegate? _getBaseUIObject;
         private SetPositionDelegate? _setPosition;
         private UpdateAddonPositionDelegate? _updateAddonPosition;
+        private GetFilePointerDelegate? _getFilePointer = null;
 
         public HudHelper()
         {
@@ -103,6 +105,12 @@ namespace DelvUI.Interface
             */
             IntPtr updateAddonPositionPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B 8B ?? ?? ?? ?? 33 D2 48 8B 01 FF 90 ?? ?? ?? ??");
             _updateAddonPosition = Marshal.GetDelegateForFunctionPointer<UpdateAddonPositionDelegate>(updateAddonPositionPtr);
+
+            var getFilePointerPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 85 C0 74 14 83 7B 44 00");
+            if (getFilePointerPtr != IntPtr.Zero)
+            {
+                _getFilePointer = Marshal.GetDelegateForFunctionPointer<GetFilePointerDelegate>(getFilePointerPtr);
+            }
             #endregion
         }
 
@@ -111,6 +119,17 @@ namespace DelvUI.Interface
             // 40 57 48 83 EC 70 48 8B F9 E8 ?? ?? ?? ?? 81 BF ?? ?? ?? ?? ?? ?? ?? ??
             const int offset = 0x19A0;
             return Marshal.ReadByte(actor.Address + offset);
+        }
+
+        internal int GetActiveHUDLayoutIndex()
+        {
+            if (_getFilePointer == null) { return 0; }
+
+            IntPtr dataPtr = _getFilePointer.Invoke(0) + 0x50;
+            IntPtr slotPtr = Marshal.ReadIntPtr(dataPtr) + 0x59e8;
+            int index = Marshal.ReadInt32(slotPtr);
+
+            return Math.Clamp(index, 0, 3);
         }
 
         ~HudHelper()
@@ -163,6 +182,7 @@ namespace DelvUI.Interface
                 : Config.HideOutsideOfCombat && !IsInCombat();
 
             PlayerCharacter? player = Plugin.ClientState.LocalPlayer;
+
             if (player is not null)
             {
                 isHidden = isHidden && Config.ShowDelvUIFramesOnWeaponDrawn
@@ -170,16 +190,25 @@ namespace DelvUI.Interface
                     : Config.ShowDelvUIFramesInDuty
                         ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty()
                         : Config.HideOutsideOfCombat && !IsInCombat();
-            }
 
-            if (!isHidden && element is JobHud)
-            {
-                return Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
-            }
+                // hide only jobpack hud outside of combat
+                if (!isHidden && element is JobHud)
+                {
+                    isHidden = Config.ShowJobPackInDuty
+                        ? Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat() && !IsInDuty()
+                        : Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
 
-            if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig) && player is not null)
-            {
-                isHidden = isHidden && player.CurrentHp == player.MaxHp;
+                    isHidden = isHidden && Config.ShowJobPackOnWeaponDrawn
+                        ? Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn(player)
+                        : Config.ShowJobPackInDuty
+                            ? Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat() && !IsInDuty()
+                            : Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
+                }
+
+                else if (element.GetConfig().GetType() == typeof(PlayerUnitFrameConfig))
+                {
+                    isHidden = isHidden && player.CurrentHp == player.MaxHp;
+                }
             }
 
             return isHidden;
@@ -308,17 +337,18 @@ namespace DelvUI.Interface
             AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("_CastBar", 1);
             if (addon == null) { return; }
 
-            Vector2 previousPos = Config.CastBarOriginalPosition;
-            bool isVisible = UpdateAddonOriginalPosition(addon, ref Config.CastBarOriginalPosition);
+            int index = GetActiveHUDLayoutIndex();
+            Vector2 previousPos = Config.CastBarOriginalPositions[index];
+            bool isVisible = UpdateAddonOriginalPosition(addon, ref Config.CastBarOriginalPositions[index]);
 
-            if (previousPos != Config.CastBarOriginalPosition)
+            if (previousPos != Config.CastBarOriginalPositions[index])
             {
                 ConfigurationManager.Instance.SaveConfigurations(true);
             }
 
             if (isVisible != Config.HideDefaultCastbar && !forceVisible) { return; }
 
-            SetAddonVisible((IntPtr)addon, forceVisible || !Config.HideDefaultCastbar, Config.CastBarOriginalPosition);
+            SetAddonVisible((IntPtr)addon, forceVisible || !Config.HideDefaultCastbar, Config.CastBarOriginalPositions[index]);
         }
 
         private unsafe void UpdateDefaultPulltimer(bool forceVisible = false)
@@ -326,40 +356,44 @@ namespace DelvUI.Interface
             AtkUnitBase* addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName("ScreenInfo_CountDown", 1);
             if (addon == null) { return; }
 
-            Vector2 previousPos = Config.PulltimerOriginalPosition;
-            bool isVisible = UpdateAddonOriginalPosition(addon, ref Config.PulltimerOriginalPosition);
+            int index = GetActiveHUDLayoutIndex();
+            Vector2 previousPos = Config.PulltimerOriginalPositions[index];
+            bool isVisible = UpdateAddonOriginalPosition(addon, ref Config.PulltimerOriginalPositions[index]);
 
-            if (previousPos != Config.PulltimerOriginalPosition)
+            if (previousPos != Config.PulltimerOriginalPositions[index])
             {
                 ConfigurationManager.Instance.SaveConfigurations(true);
             }
 
             if (isVisible != Config.HideDefaultPulltimer && !forceVisible) { return; }
 
-            SetAddonVisible((IntPtr)addon, forceVisible || !Config.HideDefaultPulltimer, Config.PulltimerOriginalPosition);
+            SetAddonVisible((IntPtr)addon, forceVisible || !Config.HideDefaultPulltimer, Config.PulltimerOriginalPositions[index]);
         }
 
         private unsafe void UpdateJobGauges(bool forceVisible = false)
         {
             var (addons, names) = FindAddonsStartingWith("JobHud");
 
+            int index = GetActiveHUDLayoutIndex();
+            Dictionary<string, Vector2> dict = Config.JobGaugeOriginalPositions[index];
+
             for (int i = 0; i < addons.Count; i++)
             {
                 AtkUnitBase* addon = (AtkUnitBase*)addons[i];
                 string name = names[i];
 
-                bool existed = Config.JobGaugeOriginalPosition.TryGetValue(name, out Vector2 pos);
+                bool existed = dict.TryGetValue(name, out Vector2 pos);
 
                 Vector2 previousPos = pos;
                 UpdateAddonOriginalPosition(addon, ref pos);
 
                 if (previousPos != pos || !existed)
                 {
-                    Config.JobGaugeOriginalPosition[name] = pos;
+                    dict[name] = pos;
                     ConfigurationManager.Instance.SaveConfigurations(true);
                 }
 
-                SetAddonVisible((IntPtr)addon, forceVisible || !Config.HideDefaultJobGauges, Config.JobGaugeOriginalPosition[name]);
+                SetAddonVisible((IntPtr)addon, forceVisible || !Config.HideDefaultJobGauges, dict[name]);
             }
         }
 

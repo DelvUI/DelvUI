@@ -1,4 +1,5 @@
 ﻿using Dalamud.Logging;
+using DelvUI.Interface.EnemyList;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Party;
 using DelvUI.Interface.StatusEffects;
@@ -154,13 +155,26 @@ namespace DelvUI.Config
             [typeof(TargetUnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
             [typeof(TargetOfTargetUnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
             [typeof(FocusTargetUnitFrameConfig)] = typeof(ColorByHealthFieldsConverter),
+
             [typeof(PartyFramesColorsConfig)] = typeof(ColorByHealthFieldsConverter),
             [typeof(PartyFramesRoleIconConfig)] = typeof(PartyFramesIconsConverter),
             [typeof(PartyFramesLeaderIconConfig)] = typeof(PartyFramesIconsConverter),
             [typeof(PartyFramesRaiseTrackerConfig)] = typeof(PartyFramesTrackerConfigConverter),
             [typeof(PartyFramesInvulnTrackerConfig)] = typeof(PartyFramesTrackerConfigConverter),
-            [typeof(StatusEffectsBlacklistConfig)] = typeof(StatusEffectsBlacklistConfigConverter),
             [typeof(PartyFramesManaBarConfig)] = typeof(PartyFramesManaBarConfigConverter),
+
+            [typeof(StatusEffectsBlacklistConfig)] = typeof(StatusEffectsBlacklistConfigConverter),
+
+            [typeof(HUDOptionsConfig)] = typeof(HUDOptionsConfigConverter),
+
+            [typeof(CastbarConfig)] = typeof(CastbarConfigConverter),
+            [typeof(UnitFrameCastbarConfig)] = typeof(CastbarConfigConverter),
+            [typeof(PlayerCastbarConfig)] = typeof(CastbarConfigConverter),
+            [typeof(TargetCastbarConfig)] = typeof(CastbarConfigConverter),
+            [typeof(TargetOfTargetCastbarConfig)] = typeof(CastbarConfigConverter),
+            [typeof(FocusTargetCastbarConfig)] = typeof(CastbarConfigConverter),
+            [typeof(PartyFramesCastbarConfig)] = typeof(CastbarConfigConverter),
+            [typeof(EnemyListCastbarConfig)] = typeof(CastbarConfigConverter),
         };
 
         protected override JsonObjectContract CreateObjectContract(Type objectType)
@@ -224,24 +238,63 @@ namespace DelvUI.Config
         }
     }
 
-    public class SameClassFieldConverter<T> : PluginConfigObjectFieldConverter where T : class
+    public class NewClassFieldConverter<TOld, TNew> : PluginConfigObjectFieldConverter
+        where TOld : class
+        where TNew : class
     {
-        private T DefaultValue;
+        private TNew DefaultValue;
+        private Func<TOld, TNew> Func;
 
-        public SameClassFieldConverter(string newFieldPath, T defaultValue)
+        public NewClassFieldConverter(string newFieldPath, TNew defaultValue, Func<TOld, TNew> func)
             : base(newFieldPath)
         {
             DefaultValue = defaultValue;
+            Func = func;
         }
 
         public override (string, object) Convert(JToken token)
         {
-            T result = DefaultValue;
+            TNew result = DefaultValue;
 
-            T? oldValue = token.ToObject<T>();
+            TOld? oldValue = token.ToObject<TOld>();
             if (oldValue != null)
             {
-                result = oldValue;
+                result = Func(oldValue);
+            }
+
+            return (NewFieldPath, result);
+        }
+    }
+
+    public class SameClassFieldConverter<T> : NewClassFieldConverter<T, T> where T : class
+    {
+        public SameClassFieldConverter(string newFieldPath, T defaultValue)
+            : base(newFieldPath, defaultValue, (oldValue) => { return oldValue; })
+        {
+        }
+    }
+
+    public class TypeToClassFieldConverter<TOld, TNew> : PluginConfigObjectFieldConverter
+    where TOld : struct
+    where TNew : class
+    {
+        private TNew DefaultValue;
+        private Func<TOld, TNew> Func;
+
+        public TypeToClassFieldConverter(string newFieldPath, TNew defaultValue, Func<TOld, TNew> func) : base(newFieldPath)
+        {
+            DefaultValue = defaultValue;
+            Func = func;
+        }
+
+        public override (string, object) Convert(JToken token)
+        {
+            TNew result = DefaultValue;
+
+            TOld? oldValue = token.ToObject<TOld>();
+            if (oldValue.HasValue)
+            {
+                result = Func(oldValue.Value);
             }
 
             return (NewFieldPath, result);

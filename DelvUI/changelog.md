@@ -1,3 +1,26 @@
+# 0.5.0.0
+Features:
+- Added Enemy List hud.
+- Added more border options for bars.
+- Added tank stance indicator for the player's unit frame.
+- Added "Offline Status" tracking for party frames.
+- Added window clipping settings. These settings are targetted for people that are experiencing performance issues or crashes. Until we find a definitive solution, disabling window clipping might help with these issues.
+- Added "Start Angle" and "Counter Clock Wise Rotation" settings for the circular GCD Indicator.
+- Added GCD Threshold to GCD Indicator.
+- Added sub-options to "Hide only JobPack HUD outside of combat" to always show in duties and/or when weapons are drawn.
+- Implement new tag `[time-till-max-gp]`, this will show you the time until your GP hits max again.
+- Added Raise Tracker and Invuln Tracker to the party frames preview mode.
+- Added more settings for all castbars.
+- Added "Show Source Name" to status tooltips.
+- Added option to show pet effects as your own status.
+
+Fixes: 
+- Fixed Bard's Soul Voice threshold not working.
+- Fixed settings not saving in some situations.
+- Fixed Death Indicator color showing for players that are not reachable instead of Out of Range color.
+- Fixed some more game windows not covering DelvUI elements
+- Fixed losing the original positions of the game's default cast bar and job gauges when using the DelvUI hide options for them and also using multiple HUD layouts.
+
 # 0.4.0.2
 Fixes:
 - Fixed some game windows not covering DelvUI elements.
@@ -6,6 +29,7 @@ Fixes:
 # 0.4.0.1
 Features:
 - Added a command to switch profiles: `/delvui profile ProfileName`, no quotation marks needed.
+- Partial Fill Color is now used for bars when Show In Chunks is unchecked
 
 Fixes:
 - Fixed BLU Job Specific Bar config not saving and only showing when actually on the BLU job.

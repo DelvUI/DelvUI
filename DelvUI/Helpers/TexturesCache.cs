@@ -9,6 +9,7 @@ namespace DelvUI.Helpers
     public class TexturesCache : IDisposable
     {
         private Dictionary<uint, TextureWrap> _cache = new();
+        private Dictionary<string, TextureWrap> _pathCache = new();
 
         public TextureWrap? GetTexture<T>(uint rowId, uint stackCount = 0, bool hdIcon = true) where T : ExcelRow
         {
@@ -46,11 +47,34 @@ namespace DelvUI.Helpers
             return newTexture;
         }
 
+        public TextureWrap? GetTextureFromPath(string path)
+        {
+            if (_pathCache.TryGetValue(path, out var texture))
+            {
+                return texture;
+            }
+
+            var newTexture = LoadTexture(path);
+            if (newTexture == null)
+            {
+                return null;
+            }
+
+            _pathCache.Add(path, newTexture);
+
+            return newTexture;
+        }
+
         private unsafe TextureWrap? LoadTexture(uint id, bool hdIcon)
         {
             var hdString = hdIcon ? "_hr1" : "";
             var path = $"ui/icon/{id / 1000 * 1000:000000}/{id:000000}{hdString}.tex";
 
+            return LoadTexture(path);
+        }
+
+        private unsafe TextureWrap? LoadTexture(string path)
+        {
             try
             {
                 var resolvedPath = _penumbraPathResolver.InvokeFunc(path);
@@ -96,7 +120,19 @@ namespace DelvUI.Helpers
             }
         }
 
-        public void Clear() { _cache.Clear(); }
+        public void RemoveTexture(string path)
+        {
+            if (_pathCache.ContainsKey(path))
+            {
+                _pathCache.Remove(path);
+            }
+        }
+
+        public void Clear()
+        {
+            _cache.Clear();
+            _pathCache.Clear();
+        }
 
         #region Singleton
         private ICallGateSubscriber<string, string> _penumbraPathResolver;

@@ -1,4 +1,6 @@
-﻿using FFXIVClientStructs.FFXIV.Component.GUI;
+using DelvUI.Config;
+using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
@@ -12,6 +14,8 @@ namespace DelvUI.Helpers
         #region Singleton
         private ClipRectsHelper()
         {
+            ConfigurationManager.Instance.ResetEvent += OnConfigReset;
+            OnConfigReset(ConfigurationManager.Instance);
         }
 
         public static void Initialize() { Instance = new ClipRectsHelper(); }
@@ -36,9 +40,36 @@ namespace DelvUI.Helpers
                 return;
             }
 
+            ConfigurationManager.Instance.ResetEvent -= OnConfigReset;
+            _config.ValueChangeEvent -= OnConfigPropertyChanged;
+
             Instance = null!;
         }
         #endregion
+
+        private HUDOptionsConfig _config = null!;
+
+        private void OnConfigReset(ConfigurationManager sender)
+        {
+            if (_config != null)
+            {
+                _config.ValueChangeEvent -= OnConfigPropertyChanged;
+            }
+
+            _config = sender.GetConfigObject<HUDOptionsConfig>();
+            _config.ValueChangeEvent += OnConfigPropertyChanged;
+        }
+
+        private void OnConfigPropertyChanged(object sender, OnChangeBaseArgs args)
+        {
+            if (args.PropertyName == "EnableClipRects" && !_config.EnableClipRects)
+            {
+                _clipRects.Clear();
+            }
+        }
+
+        public bool Enabled => _config.EnableClipRects;
+        public bool ClippingEnabled => _config.EnableClipRects && !_config.HideInsteadOfClip;
 
         // these are ordered by priority, if 2 game windows are on top of a DelvUI element
         // the one that comes first in this list is the one that will be clipped around
@@ -53,6 +84,9 @@ namespace DelvUI.Helpers
             "Teleport",
             "ActionMenu",
             "Character",
+            "CharacterInspect",
+            "CharacterTitle",
+            "Tryon",
             "ArmouryBoard",
             "RecommendList",
             "GearSetList",
@@ -87,6 +121,7 @@ namespace DelvUI.Helpers
             "CountdownSettingDialog",
             "CircleFinder",
             "CircleList",
+            "CircleNameInputString",
             "Emote",
             "FreeCompany",
             "HousingMenu",
@@ -122,26 +157,35 @@ namespace DelvUI.Helpers
             "Achievement",
             "RecommendList",
             "JournalDetail",
+            "Journal",
             "ContentsFinder",
             "ContentsFinderSetting",
+            "ContentsFinderMenu",
             "ContentsInfo",
             "Dawn",
             "BeginnersMansionProblem",
             "BeginnersMansionProblemCompList",
             "SupportDesk",
-            "HowToList"
+            "HowToList",
+            "HudLayout",
+            "LinkShell",
+            "ChatConfig",
+            "ColorPicker",
+            "PlayGuide"
         };
 
         private List<ClipRect> _clipRects = new List<ClipRect>();
 
         public unsafe void Update()
         {
+            if (!_config.EnableClipRects) { return; }
+
             _clipRects.Clear();
 
             foreach (string addonName in AddonNames)
             {
                 var addon = (AtkUnitBase*)Plugin.GameGui.GetAddonByName(addonName, 1);
-                if (addon == null || !addon->IsVisible || addon->WindowNode == null)
+                if (addon == null || !addon->IsVisible || addon->WindowNode == null || addon->Scale == 0)
                 {
                     continue;
                 }
@@ -156,6 +200,12 @@ namespace DelvUI.Helpers
                         addon->Y + addon->WindowNode->AtkResNode.Height * addon->Scale - bottomMargin
                     )
                 );
+
+                // just in case this causes weird issues / crashes (doubt it though...)
+                if (clipRect.Max.X < clipRect.Min.X || clipRect.Max.Y < clipRect.Min.Y)
+                {
+                    continue;
+                }
 
                 _clipRects.Add(clipRect);
             }

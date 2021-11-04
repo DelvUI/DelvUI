@@ -34,8 +34,16 @@ namespace DelvUI.Interface.GeneralElements
         [Order(19)]
         public bool InstantGCDsOnly = false;
 
-        [Checkbox("Show GCD Queue Indicator", spacing = true)]
+        [Checkbox("Only show when under GCD Threshold", spacing = true)]
         [Order(20)]
+        public bool LimitGCDThreshold = false;
+
+        [DragFloat("GCD Threshold", velocity = 0.01f)]
+        [Order(21, collapseWith = nameof(LimitGCDThreshold))]
+        public float GCDThreshold = 1.50f;
+
+        [Checkbox("Show GCD Queue Indicator", spacing = true)]
+        [Order(24)]
         public bool ShowGCDQueueIndicator = true;
 
         [ColorEdit4("GCD Queue Color")]
@@ -53,6 +61,14 @@ namespace DelvUI.Interface.GeneralElements
         [DragInt("Thickness")]
         [Order(40, collapseWith = nameof(CircularMode))]
         public int CircleThickness = 10;
+
+        [DragInt("Start Angle", min = 0, max = 359)]
+        [Order(45, collapseWith = nameof(CircularMode))]
+        public int CircleStartAngle = 0;
+
+        [Checkbox("Rotate CCW")]
+        [Order(50, collapseWith = nameof(CircularMode))]
+        public bool RotateCCW = false;
 
         [NestedConfig("Bar Mode", 45, separator = false, spacing = true, nest = true)]
         public GCDBarConfig Bar = new GCDBarConfig(

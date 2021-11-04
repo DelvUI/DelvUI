@@ -1,5 +1,6 @@
 ﻿using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using System;
 using System.Collections.Generic;
 using System.Numerics;
 
@@ -54,6 +55,14 @@ namespace DelvUI.Interface.GeneralElements
         [Order(30)]
         public bool HideOnlyJobPackHudOutsideOfCombat = false;
 
+        [Checkbox("Show in duty" + "##HideOnlyJobPack")]
+        [Order(31, collapseWith = nameof(HideOnlyJobPackHudOutsideOfCombat))]
+        public bool ShowJobPackInDuty = false;
+
+        [Checkbox("Show on Weapon Drawn" + "##HideOnlyJobPack")]
+        [Order(322, collapseWith = nameof(HideOnlyJobPackHudOutsideOfCombat))]
+        public bool ShowJobPackOnWeaponDrawn = false;
+
         [Checkbox("Automatically disable HUD elements preview", help = "Enabling this will make it so all HUD elements preview modes are disabled when DelvUI's setting window is closed.")]
         [Order(35)]
         public bool AutomaticPreviewDisabling = true;
@@ -91,10 +100,72 @@ namespace DelvUI.Interface.GeneralElements
         [Order(204, collapseWith = nameof(EnableCombatActionBars))]
         public List<string> CombatActionBars = new();
 
-        public Vector2 CastBarOriginalPosition;
-        public Vector2 PulltimerOriginalPosition;
-        public Dictionary<string, Vector2> JobGaugeOriginalPosition = new();
+        [Checkbox("Enable Game Windows Clipping", separator = true, isMonitored = true, help = "Disabling this will make it so DelvUI elements are not covered by in-game elements.\nMight help with performance issues and/or random crashes.")]
+        [Order(300)]
+        public bool EnableClipRects = true;
+
+        [Checkbox("Hide Elements Instead of Clipping", isMonitored = true, help = "This will make it so at least the DelvUI elements are completely hidden any in-game element is on top of them.\nIt will prevent DelvUI elements from covering in-game elements, but it won't look as good as clipping.\nMight help with performance issues and/or random crashes.")]
+        [Order(301, collapseWith = nameof(EnableClipRects))]
+        public bool HideInsteadOfClip = false;
+
+        // saves original positions for all 4 layouts
+        public Vector2[] CastBarOriginalPositions = new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero };
+        public Vector2[] PulltimerOriginalPositions = new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero };
+        public Dictionary<string, Vector2>[] JobGaugeOriginalPositions = new Dictionary<string, Vector2>[] { new(), new(), new(), new() };
 
         public new static HUDOptionsConfig DefaultConfig() => new();
+    }
+
+    public class HUDOptionsConfigConverter : PluginConfigObjectConverter
+    {
+        public HUDOptionsConfigConverter()
+        {
+            Func<Vector2, Vector2[]> func = (value) =>
+            {
+                Vector2[] array = new Vector2[4];
+                for (int i = 0; i < 4; i++)
+                {
+                    array[i] = value;
+                }
+
+                return array;
+            };
+
+            TypeToClassFieldConverter<Vector2, Vector2[]> castBar = new TypeToClassFieldConverter<Vector2, Vector2[]>(
+                "CastBarOriginalPositions",
+                new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero },
+                func
+            );
+
+            TypeToClassFieldConverter<Vector2, Vector2[]> pullTimer = new TypeToClassFieldConverter<Vector2, Vector2[]>(
+                "PulltimerOriginalPositions",
+                new Vector2[] { Vector2.Zero, Vector2.Zero, Vector2.Zero, Vector2.Zero },
+                func
+            );
+
+            NewClassFieldConverter<Dictionary<string, Vector2>, Dictionary<string, Vector2>[]> jobGauge =
+                new NewClassFieldConverter<Dictionary<string, Vector2>, Dictionary<string, Vector2>[]>(
+                    "JobGaugeOriginalPositions",
+                    new Dictionary<string, Vector2>[] { new(), new(), new(), new() },
+                    (oldValue) =>
+                    {
+                        Dictionary<string, Vector2>[] array = new Dictionary<string, Vector2>[4];
+                        for (int i = 0; i < 4; i++)
+                        {
+                            array[i] = oldValue;
+                        }
+
+                        return array;
+                    });
+
+            FieldConvertersMap.Add("CastBarOriginalPosition", castBar);
+            FieldConvertersMap.Add("PulltimerOriginalPosition", pullTimer);
+            FieldConvertersMap.Add("JobGaugeOriginalPosition", jobGauge);
+        }
+
+        public override bool CanConvert(Type objectType)
+        {
+            return objectType == typeof(HUDOptionsConfig);
+        }
     }
 }

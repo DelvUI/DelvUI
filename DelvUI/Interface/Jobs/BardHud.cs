@@ -210,7 +210,7 @@ namespace DelvUI.Interface.Jobs
 
             BarUtilities.GetProgressBar(
                 config, 
-                null, 
+                config.ThresholdConfig, 
                 new LabelConfig[] { config.Label }, 
                 soulVoice, 
                 100f, 
