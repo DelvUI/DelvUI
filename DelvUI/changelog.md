@@ -12,6 +12,7 @@ Features:
 - Added GCD Threshold to GCD Indicator.
 - Added Counter Clock Wise rotation to GCD Indicator.
 - Added "Show Source Name" to status tooltips.
+- Added option to show pet effects as your own status.
 
 Fixes: 
 - Fixed Bard's Soul Voice threshold not working.

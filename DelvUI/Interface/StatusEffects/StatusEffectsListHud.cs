@@ -9,6 +9,7 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Dalamud.Game.ClientState.Buddy;
 using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
 using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
@@ -188,7 +189,14 @@ namespace DelvUI.Interface.StatusEffects
                 }
 
                 // only mine
-                if (Config.ShowOnlyMine && player?.ObjectId != status->SourceID)
+                var mine = player?.ObjectId == status->SourceID;
+
+                if (Config.IncludePetAsOwn)
+                {
+                    mine = player?.ObjectId == status->SourceID || IsStatusFromPlayerPet(*status);
+                }
+
+                if (Config.ShowOnlyMine && !mine)
                 {
                     continue;
                 }
@@ -205,6 +213,18 @@ namespace DelvUI.Interface.StatusEffects
             return list;
         }
 
+        protected bool IsStatusFromPlayerPet(StatusStruct status)
+        {
+            var buddy = Plugin.BuddyList.PetBuddy;
+
+            if (buddy == null)
+            {
+                return false;
+            }
+
+            return buddy.ObjectId == status.SourceID;
+        }
+
         protected void OrderByMineFirst(List<StatusEffectData> list)
         {
             var player = Plugin.ClientState.LocalPlayer;
@@ -217,13 +237,21 @@ namespace DelvUI.Interface.StatusEffects
             {
                 bool isAFromPlayer = a.Status.SourceID == player.ObjectId;
                 bool isBFromPlayer = b.Status.SourceID == player.ObjectId;
+                bool isAFromPlayerPet = false;
+                bool isBFromPlayerPet = false;
+                
+                if (Config.IncludePetAsOwn)
+                {
+                    isAFromPlayerPet = IsStatusFromPlayerPet(a.Status);
+                    isBFromPlayerPet = IsStatusFromPlayerPet(b.Status);
+                }
 
-                if (isAFromPlayer && !isBFromPlayer)
+                if ((isAFromPlayer || isAFromPlayerPet) && (!isBFromPlayer || !isBFromPlayerPet))
                 {
                     return -1;
                 }
 
-                if (!isAFromPlayer && isBFromPlayer)
+                if ((!isAFromPlayer || !isAFromPlayerPet) && (isBFromPlayer || isBFromPlayerPet))
                 {
                     return 1;
                 }
@@ -477,7 +505,13 @@ namespace DelvUI.Interface.StatusEffects
         {
             StatusEffectIconBorderConfig? borderConfig = null;
 
-            if (Config.IconConfig.OwnedBorderConfig.Enabled && statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId)
+            bool isFromPlayerPet = false;
+            if (Config.IncludePetAsOwn)
+            {
+                isFromPlayerPet = IsStatusFromPlayerPet(statusEffectData.Status);
+            }
+            
+            if (Config.IconConfig.OwnedBorderConfig.Enabled && (statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId || isFromPlayerPet))
             {
                 borderConfig = Config.IconConfig.OwnedBorderConfig;
             }
