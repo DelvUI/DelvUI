@@ -11,6 +11,7 @@ Features:
 - Added Raise Tracker and Invuln Tracker to the party frames preview mode.
 - Added GCD Threshold to GCD Indicator.
 - Added Counter Clock Wise rotation to GCD Indicator.
+- Added "Show Source Name" to status tooltips.
 
 Fixes: 
 - Fixed Bard's Soul Voice threshold not working.
