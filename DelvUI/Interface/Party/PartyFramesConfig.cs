@@ -275,7 +275,6 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    [DisableParentSettings("HideWhenInactive", "FillDirection")]
     [Exportable(false)]
     [Section("Party Frames", true)]
     [SubSection("Castbar", 0)]

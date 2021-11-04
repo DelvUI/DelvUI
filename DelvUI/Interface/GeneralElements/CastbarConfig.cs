@@ -7,7 +7,6 @@ using System.Numerics;
 
 namespace DelvUI.Interface.GeneralElements
 {
-    [DisableParentSettings("HideWhenInactive", "FillDirection")]
     [Section("Castbars")]
     [SubSection("Player", 0)]
     public class PlayerCastbarConfig : UnitFrameCastbarConfig
@@ -47,7 +46,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [DisableParentSettings("HideWhenInactive", "FillDirection")]
     [Section("Castbars")]
     [SubSection("Target", 0)]
     public class TargetCastbarConfig : UnitFrameCastbarConfig
@@ -94,7 +92,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [DisableParentSettings("HideWhenInactive", "FillDirection")]
     [Section("Castbars")]
     [SubSection("Target of Target", 0)]
     public class TargetOfTargetCastbarConfig : TargetCastbarConfig
@@ -123,7 +120,6 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
-    [DisableParentSettings("HideWhenInactive", "FillDirection")]
     [Section("Castbars")]
     [SubSection("Focus Target", 0)]
     public class FocusTargetCastbarConfig : TargetCastbarConfig
@@ -169,6 +165,7 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
+    [DisableParentSettings("HideWhenInactive", "FillDirection")]
     public abstract class CastbarConfig : BarConfig
     {
         [Checkbox("Preview")]

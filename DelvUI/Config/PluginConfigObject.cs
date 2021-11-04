@@ -64,7 +64,7 @@ namespace DelvUI.Config
         {
             get
             {
-                DisableParentSettingsAttribute? attribute = (DisableParentSettingsAttribute?)GetType().GetCustomAttribute(typeof(DisableParentSettingsAttribute), false);
+                DisableParentSettingsAttribute? attribute = (DisableParentSettingsAttribute?)GetType().GetCustomAttribute(typeof(DisableParentSettingsAttribute), true);
                 return attribute?.DisabledFields;
             }
         }
