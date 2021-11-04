@@ -9,6 +9,7 @@ using ImGuiNET;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using Dalamud.Game.ClientState.Buddy;
 using LuminaStatus = Lumina.Excel.GeneratedSheets.Status;
 using StatusStruct = FFXIVClientStructs.FFXIV.Client.Game.Status;
 
@@ -213,14 +214,14 @@ namespace DelvUI.Interface.StatusEffects
             {
                 return false;
             }
-            
-            var character = Plugin.ObjectTable.SearchById(status.SourceID);
-            if (character == null)
+            var buddy = Plugin.BuddyList.PetBuddy;
+
+            if (buddy == null)
             {
                 return false;
             }
 
-            if (character.OwnerId == player.ObjectId)
+            if (buddy.ObjectId == status.SourceID)
             {
                 return true;
             }
