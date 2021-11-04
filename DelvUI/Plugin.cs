@@ -21,12 +21,14 @@ using ImGuiScene;
 using System;
 using System.IO;
 using System.Reflection;
+using Dalamud.Game.ClientState.Buddy;
 using SigScanner = Dalamud.Game.SigScanner;
 
 namespace DelvUI
 {
     public class Plugin : IDalamudPlugin
     {
+        public static BuddyList BuddyList { get; private set; } = null!;
         public static ClientState ClientState { get; private set; } = null!;
         public static CommandManager CommandManager { get; private set; } = null!;
         public static Condition Condition { get; private set; } = null!;
@@ -52,6 +54,7 @@ namespace DelvUI
         private SystemMenuHook _menuHook = null!;
 
         public Plugin(
+            BuddyList buddyList,
             ClientState clientState,
             CommandManager commandManager,
             Condition condition,
@@ -66,6 +69,7 @@ namespace DelvUI
             TargetManager targetManager
         )
         {
+            BuddyList = buddyList;
             ClientState = clientState;
             CommandManager = commandManager;
             Condition = condition;
