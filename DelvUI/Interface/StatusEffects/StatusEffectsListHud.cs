@@ -209,11 +209,6 @@ namespace DelvUI.Interface.StatusEffects
 
         protected bool IsStatusFromPlayerPet(StatusStruct status)
         {
-            var player = Plugin.ClientState.LocalPlayer;
-            if (player == null)
-            {
-                return false;
-            }
             var buddy = Plugin.BuddyList.PetBuddy;
 
             if (buddy == null)
@@ -221,12 +216,7 @@ namespace DelvUI.Interface.StatusEffects
                 return false;
             }
 
-            if (buddy.ObjectId == status.SourceID)
-            {
-                return true;
-            }
-
-            return false;
+            return buddy.ObjectId == status.SourceID;
         }
 
         protected void OrderByMineFirst(List<StatusEffectData> list)
