@@ -19,7 +19,7 @@ namespace DelvUI.Interface.Bars
         [Order(30)]
         public BarDirection FillDirection;
 
-        [Checkbox("Show Border")]
+        [Checkbox("Show Border", spacing = true)]
         [Order(35)]
         public bool DrawBorder = true;
 

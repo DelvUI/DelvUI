@@ -5,12 +5,12 @@ Features:
 - Added tank stance indicator for the player's unit frame.
 - Added "Offline Status" tracking for party frames.
 - Added window clipping settings. These settings are targetted for people that are experiencing performance issues or crashes. Until we find a definitive solution, disabling window clipping might help with these issues.
-- Added "Start Angle" setting for the circular GCD Indicator.
+- Added "Start Angle" and "Counter Clock Wise Rotation" settings for the circular GCD Indicator.
+- Added GCD Threshold to GCD Indicator.
 - Added sub-options to "Hide only JobPack HUD outside of combat" to always show in duties and/or when weapons are drawn.
 - Implement new tag `[time-till-max-gp]`, this will show you the time until your GP hits max again.
 - Added Raise Tracker and Invuln Tracker to the party frames preview mode.
-- Added GCD Threshold to GCD Indicator.
-- Added Counter Clock Wise rotation to GCD Indicator.
+- Added more settings for all castbars.
 - Added "Show Source Name" to status tooltips.
 - Added option to show pet effects as your own status.
 

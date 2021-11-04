@@ -275,7 +275,6 @@ namespace DelvUI.Interface.Party
         }
     }
 
-
     [Exportable(false)]
     [Section("Party Frames", true)]
     [SubSection("Castbar", 0)]
@@ -287,8 +286,9 @@ namespace DelvUI.Interface.Party
             var pos = new Vector2(-1, 0);
 
             var castNameConfig = new LabelConfig(new Vector2(5, 0), "", DrawAnchor.Left, DrawAnchor.Left);
-            var castTimeConfig = new LabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
+            var castTimeConfig = new NumericLabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
             castTimeConfig.Enabled = false;
+            castTimeConfig.NumberFormat = 1;
 
             var config = new PartyFramesCastbarConfig(pos, size, castNameConfig, castTimeConfig);
             config.HealthBarAnchor = DrawAnchor.BottomLeft;
@@ -300,10 +300,10 @@ namespace DelvUI.Interface.Party
         }
 
         [Anchor("Health Bar Anchor")]
-        [Order(14)]
+        [Order(16)]
         public DrawAnchor HealthBarAnchor = DrawAnchor.BottomLeft;
 
-        public PartyFramesCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, LabelConfig castTimeConfig)
+        public PartyFramesCastbarConfig(Vector2 position, Vector2 size, LabelConfig castNameConfig, NumericLabelConfig castTimeConfig)
             : base(position, size, castNameConfig, castTimeConfig)
         {
 

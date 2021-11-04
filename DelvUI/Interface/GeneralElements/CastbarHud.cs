@@ -3,6 +3,7 @@ using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Enums;
 using DelvUI.Helpers;
+using DelvUI.Interface.Bars;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using ImGuiNET;
 using System;
@@ -27,8 +28,8 @@ namespace DelvUI.Interface.GeneralElements
 
         public CastbarHud(CastbarConfig config, string? displayName = null) : base(config, displayName)
         {
-            _castNameLabel = new LabelHud(config.CastNameConfig);
-            _castTimeLabel = new LabelHud(config.CastTimeConfig);
+            _castNameLabel = new LabelHud(config.CastNameLabel);
+            _castTimeLabel = new LabelHud(config.CastTimeLabel);
         }
 
         public void StopPreview()
@@ -41,7 +42,7 @@ namespace DelvUI.Interface.GeneralElements
             return (new List<Vector2>() { Config.Position }, new List<Vector2>() { Config.Size });
         }
 
-        public override unsafe void DrawChildren(Vector2 origin)
+        public override void DrawChildren(Vector2 origin)
         {
             if (!Config.Enabled)
             {
@@ -60,64 +61,55 @@ namespace DelvUI.Interface.GeneralElements
                 return;
             }
 
-            float castPercent = 100f / totalCastTime * currentCastTime;
-            float castScale = castPercent / 100f;
-
-            Vector2 startPos = origin + GetAnchoredPosition(Config.Position, Config.Size, Config.Anchor);
-            Vector2 endPos = startPos + Config.Size;
-
             bool validIcon = LastUsedCast != null && LastUsedCast.IconTexture != null;
             Vector2 iconSize = Config.ShowIcon && validIcon ? new Vector2(Config.Size.Y, Config.Size.Y) : Vector2.Zero;
 
-            DrawHelper.DrawInWindow(ID, startPos, Config.Size, false, false, (drawList) =>
+            PluginConfigColor fillColor = GetColor();
+            Rect background = new Rect(Config.Position, Config.Size, Config.BackgroundColor);
+            Rect progress = BarUtilities.GetFillRect(Config.Position, Config.Size, Config.FillDirection, fillColor, currentCastTime, totalCastTime);
+
+            BarHud bar = new BarHud(Config, Actor);
+            bar.SetBackground(background);
+            AddExtras(bar, totalCastTime);
+            bar.AddForegrounds(progress);
+
+            Vector2 pos = origin + ParentPos();
+            bar.Draw(pos);
+
+            // icon
+            Vector2 startPos = pos + GetAnchoredPosition(Config.Position, Config.Size, Config.Anchor);
+            if (Config.ShowIcon)
             {
-                // bg
-                drawList.AddRectFilled(startPos, endPos, Config.BackgroundColor.Base);
-
-
-                // extras
-                DrawExtras(startPos, totalCastTime);
-
-                // cast bar
-                PluginConfigColor? color = Color();
-                Vector2 fillStartPos = startPos + new Vector2(iconSize.X, 0);
-                Vector2 fillMaxSize = new Vector2(Config.Size.X - iconSize.X, Config.Size.Y);
-                DrawHelper.DrawGradientFilledRect(fillStartPos, new Vector2(fillMaxSize.X * castScale, fillMaxSize.Y), color, drawList);
-
-                // border
-                drawList.AddRect(startPos, endPos, 0xFF000000);
-
-                // icon
-                if (Config.ShowIcon)
+                DrawHelper.DrawInWindow(ID + "_icon", startPos, Config.Size, false, false, (drawList) =>
                 {
                     if (validIcon)
                     {
                         ImGui.SetCursorPos(startPos);
                         ImGui.Image(LastUsedCast!.IconTexture!.ImGuiHandle, iconSize);
-                        drawList.AddRect(startPos, startPos + iconSize, 0xFF000000);
                     }
-                    else if (Config.Preview)
+
+                    if (Config.DrawBorder)
                     {
-                        drawList.AddRect(startPos, startPos + iconSize, 0xFF000000);
+                        drawList.AddRect(startPos, startPos + iconSize, Config.BorderColor.Base, 0, ImDrawFlags.None, Config.BorderThickness);
                     }
-                }
-            });
+                });
+            }
 
             // cast name
             float iconSizeX = Config.ShowIcon ? iconSize.X : 0;
             Vector2 castNamePos = startPos + new Vector2(iconSizeX, 0);
             string? castName = LastUsedCast?.ActionText.CheckForUpperCase();
 
-            Config.CastNameConfig.SetText(Config.Preview ? "Cast Name" : castName ?? "");
+            Config.CastNameLabel.SetText(Config.Preview ? "Cast Name" : castName ?? "");
             _castNameLabel.Draw(startPos + new Vector2(iconSizeX, 0), Config.Size, Actor);
 
             // cast time
-            string? text = Config.Preview ? "Cast Time" : Math.Round(totalCastTime - totalCastTime * castScale, 1).ToString(CultureInfo.InvariantCulture);
-            Config.CastTimeConfig.SetText(text);
+            float value = Config.Preview ? 0.5f : totalCastTime - currentCastTime;
+            Config.CastTimeLabel.SetValue(value);
             _castTimeLabel.Draw(startPos, Config.Size, Actor);
         }
 
-        private unsafe void UpdateCurrentCast(out float currentCastTime, out float totalCastTime)
+        private void UpdateCurrentCast(out float currentCastTime, out float totalCastTime)
         {
             currentCastTime = Config.Preview ? 0.5f : 0f;
             totalCastTime = 1f;
@@ -144,12 +136,12 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
-        public virtual void DrawExtras(Vector2 castbarPos, float totalCastTime)
+        public virtual void AddExtras(BarHud bar, float totalCastTime)
         {
             // override
         }
 
-        public virtual PluginConfigColor Color() => Config.Color;
+        public virtual PluginConfigColor GetColor() => Config.FillColor;
     }
 
     public class PlayerCastbarHud : CastbarHud
@@ -161,33 +153,29 @@ namespace DelvUI.Interface.GeneralElements
 
         }
 
-        public override void DrawExtras(Vector2 castbarPos, float totalCastTime)
+        public override void AddExtras(BarHud bar, float totalCastTime)
         {
             if (!Config.ShowSlideCast || Config.SlideCastTime <= 0 || Config.Preview)
             {
                 return;
             }
 
-            ImDrawListPtr drawList = ImGui.GetWindowDrawList();
-
             float slideCastWidth = Math.Min(Config.Size.X, (Config.SlideCastTime / 1000f) * Config.Size.X / totalCastTime);
-            Vector2 startPos = new(castbarPos.X + Config.Size.X - slideCastWidth, castbarPos.Y);
-            Vector2 endPos = startPos + new Vector2(slideCastWidth, Config.Size.Y);
-            PluginConfigColor? color = Config.SlideCastColor;
-
-            DrawHelper.DrawGradientFilledRect(startPos, new Vector2(slideCastWidth, Config.Size.Y), color, drawList);
+            Vector2 size = new Vector2(slideCastWidth, Config.Size.Y);
+            Rect slideCast = new Rect(Config.Position + Config.Size - size, size, Config.SlideCastColor);
+            bar.AddForegrounds(slideCast);
         }
 
-        public override PluginConfigColor Color()
+        public override PluginConfigColor GetColor()
         {
             if (!Config.UseJobColor || Actor is not Character)
             {
-                return Config.Color;
+                return Config.FillColor;
             }
 
             Character? chara = (Character)Actor;
             PluginConfigColor? color = GlobalColors.Instance.ColorForJobId(chara.ClassJob.Id);
-            return color ?? Config.Color;
+            return color ?? Config.FillColor;
         }
     }
 
@@ -200,7 +188,7 @@ namespace DelvUI.Interface.GeneralElements
 
         }
 
-        public override PluginConfigColor Color()
+        public override PluginConfigColor GetColor()
         {
             if (Config.ShowInterruptableColor && LastUsedCast?.Interruptible == true)
             {
@@ -209,7 +197,7 @@ namespace DelvUI.Interface.GeneralElements
 
             if (!Config.UseColorForDamageTypes)
             {
-                return Config.Color;
+                return Config.FillColor;
             }
 
             if (LastUsedCast != null)
@@ -230,7 +218,7 @@ namespace DelvUI.Interface.GeneralElements
                 }
             }
 
-            return Config.Color;
+            return Config.FillColor;
         }
     }
 }
