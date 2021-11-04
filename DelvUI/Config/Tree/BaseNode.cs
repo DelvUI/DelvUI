@@ -254,10 +254,22 @@ namespace DelvUI.Config.Tree
                 ImGui.PopStyleVar();
 
                 ImGui.SameLine();
-                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 251);
+                ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 93);
                 if (ImGui.Button($"Changelog", new Vector2(buttonWidth, 0)))
                 {
                     ConfigurationManager.Instance.OpenChangelogWindow();
+                }
+
+                ImGui.SameLine();
+
+                if (ImGui.Button("Browse Presets", new Vector2(buttonWidth, 0)))
+                {
+                    Utils.OpenUrl("https://wago.io/delvui");
+                }
+
+                if (ImGui.IsItemHovered())
+                {
+                    ImGui.SetTooltip("Find premade profiles on Wago.io!");
                 }
 
                 ImGui.PopStyleColor();
@@ -266,7 +278,7 @@ namespace DelvUI.Config.Tree
                 ImGui.PushStyleColor(ImGuiCol.Button, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, alpha));
                 ImGui.PushStyleColor(ImGuiCol.ButtonHovered, new Vector4(114f / 255f, 137f / 255f, 218f / 255f, alpha * .85f));
 
-                if (ImGui.Button("Help!", new Vector2(buttonWidth, 0)))
+                if (ImGui.Button("Discord", new Vector2(buttonWidth, 0)))
                 {
                     Utils.OpenUrl("https://discord.gg/delvui");
                 }

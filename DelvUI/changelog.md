@@ -11,6 +11,8 @@ Features:
 - Implement new tag `[time-till-max-gp]`, this will show you the time until your GP hits max again.
 - Added Raise Tracker and Invuln Tracker to the party frames preview mode.
 - Added more settings for all castbars.
+- Added "Show Source Name" to status tooltips.
+- Added option to show pet effects as your own status.
 
 Fixes: 
 - Fixed Bard's Soul Voice threshold not working.

@@ -217,15 +217,19 @@ namespace DelvUI.Interface.StatusEffects
         [Checkbox("My Effects First")]
         [Order(50)]
         public bool ShowMineFirst = false;
+        
+        [Checkbox("Pet As Own Effect")]
+        [Order(55)]
+        public bool IncludePetAsOwn = false;
 
         [Checkbox("Tooltips")]
-        [Order(55)]
+        [Order(60)]
         public bool ShowTooltips = true;
 
-        [NestedConfig("Icons", 60)]
+        [NestedConfig("Icons", 65)]
         public StatusEffectIconConfig IconConfig;
 
-        [NestedConfig("Filter Status Effects", 65)]
+        [NestedConfig("Filter Status Effects", 70)]
         public StatusEffectsBlacklistConfig BlacklistConfig = new StatusEffectsBlacklistConfig();
 
 

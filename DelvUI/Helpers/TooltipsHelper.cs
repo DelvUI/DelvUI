@@ -55,12 +55,12 @@ namespace DelvUI.Helpers
 
         private bool _dataIsValid = false;
 
-        public void ShowTooltipOnCursor(string text, string? title = null, uint id = 0)
+        public void ShowTooltipOnCursor(string text, string? title = null, uint id = 0, string name = "")
         {
-            ShowTooltip(text, ImGui.GetMousePos(), title, id);
+            ShowTooltip(text, ImGui.GetMousePos(), title, id, name);
         }
 
-        public void ShowTooltip(string text, Vector2 position, string? title = null, uint id = 0)
+        public void ShowTooltip(string text, Vector2 position, string? title = null, uint id = 0, string name = "")
         {
             if (text == null)
             {
@@ -80,6 +80,11 @@ namespace DelvUI.Helpers
             {
                 _currentTooltipTitle = title;
 
+                if (_config.ShowSourceName)
+                {
+                    _currentTooltipTitle += $" ({name})";
+                }
+                
                 if (_config.ShowStatusIDs)
                 {
                     _currentTooltipTitle += " (ID: " + id + ")";
@@ -228,28 +233,32 @@ namespace DelvUI.Helpers
         [Checkbox("Show Status Effects IDs")]
         [Order(5)]
         public bool ShowStatusIDs = false;
+        
+        [Checkbox("Show Source Name")]
+        [Order(10)]
+        public bool ShowSourceName = false;
 
         [ColorEdit4("Background Color")]
-        [Order(10)]
+        [Order(15)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new(19f / 255f, 19f / 255f, 19f / 255f, 190f / 250f));
 
         [Font("Title Font and Size", spacing = true)]
-        [Order(15)]
+        [Order(20)]
         public string? TitleFontID = null;
 
         [ColorEdit4("Title Color")]
-        [Order(20)]
+        [Order(25)]
         public PluginConfigColor TitleColor = new PluginConfigColor(new(255f / 255f, 210f / 255f, 31f / 255f, 100f / 100f));
 
         [Font("Text Font and Size", spacing = true)]
-        [Order(25)]
+        [Order(30)]
         public string? TextFontID = null;
 
         [ColorEdit4("Text Color")]
-        [Order(30)]
+        [Order(35)]
         public PluginConfigColor TextColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
-        [NestedConfig("Border", 35, separator = false, spacing = true)]
+        [NestedConfig("Border", 40, separator = false, spacing = true)]
         public TooltipBorderConfig BorderConfig = new();
     }
 
