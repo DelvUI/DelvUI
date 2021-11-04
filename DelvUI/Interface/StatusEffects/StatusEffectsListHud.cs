@@ -77,6 +77,12 @@ namespace DelvUI.Interface.StatusEffects
 
             return count;
         }
+        
+        protected string GetStatusActorName(StatusStruct status)
+        {
+            var character = Plugin.ObjectTable.SearchById(status.SourceID);
+            return character == null ? "" : character.Name.ToString();
+        }
 
         protected virtual List<StatusEffectData> StatusEffectsData()
         {
@@ -385,7 +391,8 @@ namespace DelvUI.Interface.StatusEffects
                         TooltipsHelper.Instance.ShowTooltipOnCursor(
                             statusEffectData.Data.Description.ToDalamudString().ToString(),
                             statusEffectData.Data.Name,
-                            statusEffectData.Status.StatusID
+                            statusEffectData.Status.StatusID,
+                            GetStatusActorName(statusEffectData.Status)
                         );
                     }
 
