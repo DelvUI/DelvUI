@@ -77,7 +77,7 @@ namespace DelvUI.Interface.GeneralElements
             bar.Draw(pos);
 
             // icon
-            Vector2 startPos = pos + GetAnchoredPosition(Config.Position, Config.Size, Config.Anchor);
+            Vector2 startPos = Config.Position + Utils.GetAnchoredPosition(pos, Config.Size, Config.Anchor);
             if (Config.ShowIcon)
             {
                 DrawHelper.DrawInWindow(ID + "_icon", startPos, Config.Size, false, false, (drawList) =>
@@ -96,17 +96,18 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             // cast name
-            float iconSizeX = Config.ShowIcon ? iconSize.X : 0;
-            Vector2 castNamePos = startPos + new Vector2(iconSizeX, 0);
+            bool isNameLeftAnchored = Config.CastNameLabel.TextAnchor == DrawAnchor.Left || Config.CastNameLabel.TextAnchor == DrawAnchor.TopLeft || Config.CastNameLabel.TextAnchor == DrawAnchor.BottomLeft;
+            var namePos = Config.ShowIcon && isNameLeftAnchored ? startPos + new Vector2(iconSize.X, 0) : startPos;
             string? castName = LastUsedCast?.ActionText.CheckForUpperCase();
-
             Config.CastNameLabel.SetText(Config.Preview ? "Cast Name" : castName ?? "");
-            _castNameLabel.Draw(startPos + new Vector2(iconSizeX, 0), Config.Size, Actor);
+            _castNameLabel.Draw(namePos, Config.Size, Actor);
 
             // cast time
+            bool isTimeLeftAnchored = Config.CastTimeLabel.TextAnchor == DrawAnchor.Left || Config.CastTimeLabel.TextAnchor == DrawAnchor.TopLeft || Config.CastTimeLabel.TextAnchor == DrawAnchor.BottomLeft;
+            var timePos = Config.ShowIcon && isTimeLeftAnchored ? startPos + new Vector2(iconSize.X, 0) : startPos;
             float value = Config.Preview ? 0.5f : totalCastTime - currentCastTime;
             Config.CastTimeLabel.SetValue(value);
-            _castTimeLabel.Draw(startPos, Config.Size, Actor);
+            _castTimeLabel.Draw(timePos, Config.Size, Actor);
         }
 
         private void UpdateCurrentCast(out float currentCastTime, out float totalCastTime)
