@@ -1,3 +1,6 @@
+# 0.5.0.1
+- Fixed castbars not drawing properly when anchored to unit frames.
+
 # 0.5.0.0
 Features:
 - Added Enemy List hud.
