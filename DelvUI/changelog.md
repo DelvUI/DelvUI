@@ -1,3 +1,6 @@
+# 0.5.0.2
+- Fixed crash when using the "Pet As Own Effect" on buff lists.
+
 # 0.5.0.1
 - Fixed castbars not drawing properly when anchored to unit frames.
 

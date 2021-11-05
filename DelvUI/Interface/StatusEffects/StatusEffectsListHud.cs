@@ -237,26 +237,14 @@ namespace DelvUI.Interface.StatusEffects
             {
                 bool isAFromPlayer = a.Status.SourceID == player.ObjectId;
                 bool isBFromPlayer = b.Status.SourceID == player.ObjectId;
-                bool isAFromPlayerPet = false;
-                bool isBFromPlayerPet = false;
-                
+
                 if (Config.IncludePetAsOwn)
                 {
-                    isAFromPlayerPet = IsStatusFromPlayerPet(a.Status);
-                    isBFromPlayerPet = IsStatusFromPlayerPet(b.Status);
+                    isAFromPlayer |= IsStatusFromPlayerPet(a.Status);
+                    isBFromPlayer |= IsStatusFromPlayerPet(b.Status);
                 }
 
-                if ((isAFromPlayer || isAFromPlayerPet) && (!isBFromPlayer || !isBFromPlayerPet))
-                {
-                    return -1;
-                }
-
-                if ((!isAFromPlayer || !isAFromPlayerPet) && (isBFromPlayer || isBFromPlayerPet))
-                {
-                    return 1;
-                }
-
-                return 0;
+                return isAFromPlayer ? -1 : (isBFromPlayer ? 1 : 0);
             });
         }
 
