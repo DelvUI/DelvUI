@@ -78,7 +78,7 @@ namespace DelvUI.Interface.StatusEffects
 
             return count;
         }
-        
+
         protected string GetStatusActorName(StatusStruct status)
         {
             var character = Plugin.ObjectTable.SearchById(status.SourceID);
@@ -244,7 +244,17 @@ namespace DelvUI.Interface.StatusEffects
                     isBFromPlayer |= IsStatusFromPlayerPet(b.Status);
                 }
 
-                return isAFromPlayer ? -1 : (isBFromPlayer ? 1 : 0);
+                if (isAFromPlayer && !isBFromPlayer)
+                {
+                    return -1;
+                }
+
+                if (!isAFromPlayer && isBFromPlayer)
+                {
+                    return 1;
+                }
+
+                return 0;
             });
         }
 
@@ -498,7 +508,7 @@ namespace DelvUI.Interface.StatusEffects
             {
                 isFromPlayerPet = IsStatusFromPlayerPet(statusEffectData.Status);
             }
-            
+
             if (Config.IconConfig.OwnedBorderConfig.Enabled && (statusEffectData.Status.SourceID == Plugin.ClientState.LocalPlayer?.ObjectId || isFromPlayerPet))
             {
                 borderConfig = Config.IconConfig.OwnedBorderConfig;
