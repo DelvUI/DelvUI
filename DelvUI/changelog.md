@@ -1,3 +1,6 @@
+# 0.5.0.3
+- Fixed more buff related crashes.
+
 # 0.5.0.2
 - Fixed crash when using the "Pet As Own Effect" setting on buff lists.
 
