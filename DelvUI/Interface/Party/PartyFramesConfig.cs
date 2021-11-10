@@ -141,7 +141,7 @@ namespace DelvUI.Interface.Party
         [Order(20)]
         public bool UseRoleColors = false;
 
-        [NestedConfig("Color Based On Health Value", 30, spacing = true, separator = false, nest = true)]
+        [NestedConfig("Color Based On Health Value", 30, spacing = true, separator = false, nest = true, collapsingHeader = false)]
         public ColorByHealthValueConfig ColorByHealth = new ColorByHealthValueConfig();
 
         [Checkbox("Highlight When Hovering With Cursor", spacing = true)]

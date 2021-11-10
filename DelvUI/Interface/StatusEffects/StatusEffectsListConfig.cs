@@ -8,7 +8,6 @@ using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -217,7 +216,7 @@ namespace DelvUI.Interface.StatusEffects
         [Checkbox("My Effects First")]
         [Order(50)]
         public bool ShowMineFirst = false;
-        
+
         [Checkbox("Pet As Own Effect")]
         [Order(55)]
         public bool IncludePetAsOwn = false;
@@ -229,7 +228,7 @@ namespace DelvUI.Interface.StatusEffects
         [NestedConfig("Icons", 65)]
         public StatusEffectIconConfig IconConfig;
 
-        [NestedConfig("Filter Status Effects", 70)]
+        [NestedConfig("Filter Status Effects", 70, collapsingHeader = false)]
         public StatusEffectsBlacklistConfig BlacklistConfig = new StatusEffectsBlacklistConfig();
 
 
@@ -286,24 +285,24 @@ namespace DelvUI.Interface.StatusEffects
         [Order(5)]
         public Vector2 Size = new(40, 40);
 
-        [NestedConfig("Duration", 10, separator = false, spacing = true)]
-        public LabelConfig DurationLabelConfig;
-
-        [NestedConfig("Stacks", 15, separator = false, spacing = true)]
-        public LabelConfig StacksLabelConfig;
-
         [Checkbox("Crop Icon", spacing = true)]
         [Order(20)]
         public bool CropIcon = true;
 
-        [NestedConfig("Border", 25, collapseWith = nameof(CropIcon), separator = false, spacing = true)]
+        [NestedConfig("Border", 25, collapseWith = nameof(CropIcon), nest = true, collapsingHeader = false)]
         public StatusEffectIconBorderConfig BorderConfig = new();
 
-        [NestedConfig("Dispellable Effects Border", 30, collapseWith = nameof(CropIcon), separator = false, spacing = true)]
+        [NestedConfig("Dispellable Effects Border", 30, collapseWith = nameof(CropIcon), nest = true, collapsingHeader = false)]
         public StatusEffectIconBorderConfig DispellableBorderConfig = new(new PluginConfigColor(new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f)), 2);
 
-        [NestedConfig("My Effects Border", 35, collapseWith = nameof(CropIcon), separator = false, spacing = true)]
+        [NestedConfig("My Effects Border", 35, collapseWith = nameof(CropIcon), nest = true, collapsingHeader = false)]
         public StatusEffectIconBorderConfig OwnedBorderConfig = new(new PluginConfigColor(new Vector4(35f / 255f, 179f / 255f, 69f / 255f, 100f / 100f)), 1);
+
+        [NestedConfig("Duration", 50, nest = true)]
+        public LabelConfig DurationLabelConfig;
+
+        [NestedConfig("Stacks", 60, nest = true)]
+        public LabelConfig StacksLabelConfig;
 
         public StatusEffectIconConfig(LabelConfig? durationLabelConfig = null, LabelConfig? stacksLabelConfig = null)
         {

@@ -1,3 +1,6 @@
+# 0.5.1.0
+- Improved UI of the main config window.
+
 # 0.5.0.3
 - Fixed more buff related crashes.
 
