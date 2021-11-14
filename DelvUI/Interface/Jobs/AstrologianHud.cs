@@ -464,7 +464,7 @@ namespace DelvUI.Interface.Jobs
         }
 
         [Exportable(false)]
-        [DisableParentSettings("FillColor", "UsePartialFillColor", "UseChunks")]
+        [DisableParentSettings("FillColor", "UsePartialFillColor", "UseChunks", "PartialFillColor", "LabelMode")]
         public class AstrologianDivinationBarConfig : ChunkedProgressBarConfig
         {
 
