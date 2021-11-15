@@ -84,7 +84,7 @@ namespace DelvUI.Helpers
                 {
                     _currentTooltipTitle += $" ({name})";
                 }
-                
+
                 if (_config.ShowStatusIDs)
                 {
                     _currentTooltipTitle += " (ID: " + id + ")";
@@ -233,7 +233,7 @@ namespace DelvUI.Helpers
         [Checkbox("Show Status Effects IDs")]
         [Order(5)]
         public bool ShowStatusIDs = false;
-        
+
         [Checkbox("Show Source Name")]
         [Order(10)]
         public bool ShowSourceName = false;
@@ -258,7 +258,7 @@ namespace DelvUI.Helpers
         [Order(35)]
         public PluginConfigColor TextColor = new PluginConfigColor(new(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
 
-        [NestedConfig("Border", 40, separator = false, spacing = true)]
+        [NestedConfig("Border", 40, separator = false, spacing = true, collapsingHeader = false)]
         public TooltipBorderConfig BorderConfig = new();
     }
 

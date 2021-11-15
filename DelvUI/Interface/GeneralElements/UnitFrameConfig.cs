@@ -11,7 +11,7 @@ namespace DelvUI.Interface.GeneralElements
     [SubSection("Player", 0)]
     public class PlayerUnitFrameConfig : UnitFrameConfig
     {
-        [NestedConfig("Tank Stance Indicator", 122, separator = true)]
+        [NestedConfig("Tank Stance Indicator", 122, spacing = true)]
         public TankStanceIndicatorConfig TankStanceIndicatorConfig = new TankStanceIndicatorConfig();
 
         public PlayerUnitFrameConfig(Vector2 position, Vector2 size, EditableLabelConfig leftLabelConfig, EditableLabelConfig rightLabelConfig)
@@ -148,7 +148,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(46)]
         public bool UseRoleColor = false;
 
-        [NestedConfig("Color Based On Health Value", 50, spacing = true, separator = false, nest = true)]
+        [NestedConfig("Color Based On Health Value", 50, spacing = true, separator = false, nest = true, collapsingHeader = false)]
         public ColorByHealthValueConfig ColorByHealth = new ColorByHealthValueConfig();
 
         [Checkbox("Job Color As Background Color", spacing = true)]
@@ -191,7 +191,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(115, collapseWith = nameof(UseCustomWalkingDeadColor))]
         public PluginConfigColor CustomWalkingDeadColor = new PluginConfigColor(new Vector4(158f / 255f, 158f / 255f, 158f / 255f, 50f / 100f));
 
-        [NestedConfig("Use Smooth Transitions", 120, spacing = true, separator = false, nest = true)]
+        [NestedConfig("Use Smooth Transitions", 120, spacing = true, separator = false, nest = true, collapsingHeader = false)]
         public SmoothHealthConfig SmoothHealthConfig = new SmoothHealthConfig();
 
         [Checkbox("Hide Health if Possible", spacing = true, help = "This will hide any label that has a health tag if the character doesn't have health (ie minions, friendly npcs, etc)")]
