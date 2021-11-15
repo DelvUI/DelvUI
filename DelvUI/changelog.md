@@ -1,5 +1,6 @@
 # 0.5.1.0
 - Improved UI of the main config window.
+- Font sizes can now go up to 100. Be aware that fonts are shared between all plugins. If you add too many big fonts it may cause issues with Dalamud or straight up crash the game.
 
 # 0.5.0.3
 - Fixed more buff related crashes.
