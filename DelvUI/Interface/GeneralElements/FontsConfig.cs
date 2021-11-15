@@ -68,7 +68,7 @@ namespace DelvUI.Interface.GeneralElements
             }
 
             // sizes
-            _sizes = new string[40];
+            _sizes = new string[100];
             for (int i = 0; i < _sizes.Length; i++)
             {
                 _sizes[i] = (i + 1).ToString();
