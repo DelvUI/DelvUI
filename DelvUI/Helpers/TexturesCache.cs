@@ -86,7 +86,13 @@ namespace DelvUI.Helpers
             }
             catch { }
 
-            return TextureLoader.LoadTexture(path, false);
+            try
+            {
+                return TextureLoader.LoadTexture(path, false);
+            }
+            catch { }
+
+            return null;
         }
 
         private void RemoveTexture<T>(uint rowId) where T : ExcelRow
