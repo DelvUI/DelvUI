@@ -142,6 +142,7 @@ namespace DelvUI.Config.Tree
                             newNode.Spacing = nestedConfigAttribute.spacing;
                             newNode.ParentName = nestedConfigAttribute.collapseWith;
                             newNode.Nest = nestedConfigAttribute.nest;
+                            newNode.CollapsingHeader = nestedConfigAttribute.collapsingHeader;
                             fieldMap.Add($"{node.Name}_{newNode.Name}", newNode);
                         }
                     }

@@ -259,6 +259,9 @@ namespace DelvUI.Helpers
         private bool? _rightButtonClicked = null;
         public bool RightButtonClicked => _rightButtonClicked.HasValue ? _rightButtonClicked.Value : ImGui.GetIO().MouseClicked[1];
 
+        private bool _leftButtonWasDown = false;
+        private bool _rightButtonWasDown = false;
+
         // wnd proc detour
         // if we're "eating" inputs, we only process left and right clicks
         // any other message is passed along to the ImGui scene
@@ -279,14 +282,30 @@ namespace DelvUI.Helpers
                         // we eat the message and handle the inputs manually
                         if (ClipRectsHelper.Instance?.IsPointClipped(ImGui.GetMousePos()) == false)
                         {
-                            _leftButtonClicked = msg == WM_LBUTTONUP;
-                            _rightButtonClicked = msg == WM_RBUTTONUP;
-                            return (IntPtr)0;
-                        }
+                            _leftButtonClicked = _leftButtonWasDown && msg == WM_LBUTTONUP;
+                            _rightButtonClicked = _rightButtonWasDown && msg == WM_RBUTTONUP;
 
+                            bool shouldTakeInput = true;
+                            if (msg == WM_LBUTTONUP && !_leftButtonWasDown ||
+                                msg == WM_RBUTTONUP && !_rightButtonWasDown)
+                            {
+                                shouldTakeInput = false;
+                            }
+
+                            _leftButtonWasDown = msg == WM_LBUTTONDOWN;
+                            _rightButtonWasDown = msg == WM_RBUTTONDOWN;
+
+                            if (shouldTakeInput)
+                            {
+                                return (IntPtr)0;
+                            }
+                        }
                         // otherwise we let imgui handle the inputs
-                        _leftButtonClicked = null;
-                        _rightButtonClicked = null;
+                        else
+                        {
+                            _leftButtonClicked = null;
+                            _rightButtonClicked = null;
+                        }
                         break;
                 }
             }

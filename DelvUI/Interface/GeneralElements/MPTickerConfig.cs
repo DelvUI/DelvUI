@@ -39,6 +39,7 @@ namespace DelvUI.Interface.GeneralElements
         }
     }
 
+    [Disableable(false)]
     [DisableParentSettings("HideWhenInactive")]
     [Exportable(false)]
     public class MPTickerBarConfig : BarConfig
