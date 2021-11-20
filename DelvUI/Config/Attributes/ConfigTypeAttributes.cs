@@ -671,7 +671,7 @@ namespace DelvUI.Config.Attributes
         public string friendlyName;
         public bool separator = false;
         public bool spacing = true;
-        public bool nest = false;
+        public bool nest = true;
         public bool collapsingHeader = true;
 
         public NestedConfigAttribute(string friendlyName, int pos) : base(pos)

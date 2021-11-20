@@ -91,7 +91,7 @@ namespace DelvUI.Interface.EnemyList
     [Exportable(false)]
     public class EnemyListHealthBarColorsConfig : PluginConfigObject
     {
-        [NestedConfig("Color Based On Health Value", 30, spacing = true, separator = false, nest = true, collapsingHeader = false)]
+        [NestedConfig("Color Based On Health Value", 30, collapsingHeader = false)]
         public ColorByHealthValueConfig ColorByHealth = new ColorByHealthValueConfig();
 
         [Checkbox("Highlight When Hovering With Cursor", spacing = true)]

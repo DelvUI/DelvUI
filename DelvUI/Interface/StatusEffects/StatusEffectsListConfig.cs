@@ -186,7 +186,7 @@ namespace DelvUI.Interface.StatusEffects
         [Order(20)]
         public bool Preview;
 
-        [Checkbox("Fill Rows First", separator = true)]
+        [Checkbox("Fill Rows First", spacing = true)]
         [Order(25)]
         public bool FillRowsFirst = true;
 
@@ -228,7 +228,7 @@ namespace DelvUI.Interface.StatusEffects
         [NestedConfig("Icons", 65)]
         public StatusEffectIconConfig IconConfig;
 
-        [NestedConfig("Filter Status Effects", 70, collapsingHeader = false)]
+        [NestedConfig("Filter Status Effects", 70, separator = true, spacing = false, collapsingHeader = false)]
         public StatusEffectsBlacklistConfig BlacklistConfig = new StatusEffectsBlacklistConfig();
 
 
@@ -289,19 +289,19 @@ namespace DelvUI.Interface.StatusEffects
         [Order(20)]
         public bool CropIcon = true;
 
-        [NestedConfig("Border", 25, collapseWith = nameof(CropIcon), nest = true, collapsingHeader = false)]
+        [NestedConfig("Border", 25, collapseWith = nameof(CropIcon), collapsingHeader = false)]
         public StatusEffectIconBorderConfig BorderConfig = new();
 
-        [NestedConfig("Dispellable Effects Border", 30, collapseWith = nameof(CropIcon), nest = true, collapsingHeader = false)]
+        [NestedConfig("Dispellable Effects Border", 30, collapseWith = nameof(CropIcon), collapsingHeader = false)]
         public StatusEffectIconBorderConfig DispellableBorderConfig = new(new PluginConfigColor(new Vector4(141f / 255f, 206f / 255f, 229f / 255f, 100f / 100f)), 2);
 
-        [NestedConfig("My Effects Border", 35, collapseWith = nameof(CropIcon), nest = true, collapsingHeader = false)]
+        [NestedConfig("My Effects Border", 35, collapseWith = nameof(CropIcon), collapsingHeader = false)]
         public StatusEffectIconBorderConfig OwnedBorderConfig = new(new PluginConfigColor(new Vector4(35f / 255f, 179f / 255f, 69f / 255f, 100f / 100f)), 1);
 
-        [NestedConfig("Duration", 50, nest = true)]
+        [NestedConfig("Duration", 50)]
         public LabelConfig DurationLabelConfig;
 
-        [NestedConfig("Stacks", 60, nest = true)]
+        [NestedConfig("Stacks", 60)]
         public LabelConfig StacksLabelConfig;
 
         public StatusEffectIconConfig(LabelConfig? durationLabelConfig = null, LabelConfig? stacksLabelConfig = null)
