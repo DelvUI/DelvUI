@@ -130,14 +130,17 @@ namespace DelvUI.Config.Tree
             // Draw children
             if (CollapseControl && Attribute.IsDefined(_mainField, typeof(CheckboxAttribute)))
             {
-                if (collapsing && ImGui.CollapsingHeader(ID + "##CollapsingHeader"))
+                if (collapsing)
                 {
-                    DrawNestIndicator(depth + 1);
-                    DrawConfigAttribute(ref changed, _mainField);
-
-                    if (enabled)
+                    if (ImGui.CollapsingHeader(ID + "##CollapsingHeader"))
                     {
-                        reset |= DrawChildren(ref changed, depth + 1);
+                        DrawNestIndicator(depth);
+                        DrawConfigAttribute(ref changed, _mainField);
+
+                        if (enabled)
+                        {
+                            reset |= DrawChildren(ref changed, depth);
+                        }
                     }
                 }
                 else if (!collapsing && enabled)

@@ -70,7 +70,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(50, collapseWith = nameof(CircularMode))]
         public bool RotateCCW = false;
 
-        [NestedConfig("Bar Mode", 45, separator = false, spacing = true, nest = true, collapsingHeader = false)]
+        [NestedConfig("Bar Mode", 45, collapsingHeader = false)]
         public GCDBarConfig Bar = new GCDBarConfig(
             new Vector2(0, HUDConstants.BaseHUDOffsetY + 21),
             new Vector2(254, 8),

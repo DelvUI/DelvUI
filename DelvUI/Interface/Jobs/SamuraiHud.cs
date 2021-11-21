@@ -224,7 +224,7 @@ namespace DelvUI.Interface.Jobs
             15f
         );
 
-        [NestedConfig("Meditation Bar", 65, separator = true)]
+        [NestedConfig("Meditation Bar", 65)]
         public ChunkedBarConfig MeditationBar = new ChunkedBarConfig(
             new(0, -5),
             new(254, 10),

@@ -141,7 +141,7 @@ namespace DelvUI.Interface.Party
         [Order(20)]
         public bool UseRoleColors = false;
 
-        [NestedConfig("Color Based On Health Value", 30, spacing = true, separator = false, nest = true, collapsingHeader = false)]
+        [NestedConfig("Color Based On Health Value", 30, collapsingHeader = false)]
         public ColorByHealthValueConfig ColorByHealth = new ColorByHealthValueConfig();
 
         [Checkbox("Highlight When Hovering With Cursor", spacing = true)]
@@ -428,7 +428,7 @@ namespace DelvUI.Interface.Party
         [Order(5)]
         public bool HideName = false;
 
-        [NestedConfig("Icon", 10, spacing = true, separator = false, nest = true)]
+        [NestedConfig("Icon", 10)]
         public IconConfig Icon = new IconConfig(
             new Vector2(0, 5),
             new Vector2(16, 16),
@@ -436,7 +436,7 @@ namespace DelvUI.Interface.Party
             DrawAnchor.Top
         );
 
-        [NestedConfig("Label", 15, spacing = true, separator = false, nest = true)]
+        [NestedConfig("Label", 15)]
         public LabelConfig Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
     }
 
@@ -634,7 +634,7 @@ namespace DelvUI.Interface.Party
         [Order(35, collapseWith = nameof(ChangeBorderColorWhenRaised))]
         public PluginConfigColor BorderColor = new(new Vector4(47f / 255f, 169f / 255f, 215f / 255f, 100f / 100f));
 
-        [NestedConfig("Icon", 50, separator = false, spacing = true, nest = true)]
+        [NestedConfig("Icon", 50)]
         public IconWithLabelConfig Icon = new IconWithLabelConfig(
             new Vector2(0, 0),
             new Vector2(50, 50),
@@ -668,7 +668,7 @@ namespace DelvUI.Interface.Party
         [Order(30, collapseWith = nameof(UseCustomWalkingDeadColor))]
         public PluginConfigColor WalkingDeadBackgroundColor = new(new Vector4(158f / 255f, 158f / 255f, 158f / 255f, 50f / 100f));
 
-        [NestedConfig("Icon", 50, separator = false, spacing = true, nest = true)]
+        [NestedConfig("Icon", 50)]
         public IconWithLabelConfig Icon = new IconWithLabelConfig(
             new Vector2(0, 0),
             new Vector2(50, 50),

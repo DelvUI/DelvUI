@@ -27,7 +27,7 @@ namespace DelvUI.Interface.GeneralElements
 
     public class IconWithLabelConfig : IconConfig
     {
-        [NestedConfig("Label", 20, spacing = true, separator = false, nest = true)]
+        [NestedConfig("Label", 20)]
         public LabelConfig Label = new LabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
 
         public IconWithLabelConfig(Vector2 position, Vector2 size, DrawAnchor anchor, DrawAnchor frameAnchor)

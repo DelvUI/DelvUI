@@ -24,11 +24,11 @@ namespace DelvUI.Interface.Bars
         public bool DrawBorder = true;
 
         [ColorEdit4("Border Color")]
-        [Order(36)]
+        [Order(36, collapseWith = nameof(DrawBorder))]
         public PluginConfigColor BorderColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [DragInt("Border Thickness", min = 1, max = 10)]
-        [Order(37)]
+        [Order(37, collapseWith = nameof(DrawBorder))]
         public int BorderThickness = 1;
 
         [Checkbox("Hide When Inactive")]
