@@ -15,7 +15,7 @@ namespace DelvUI.Interface.GeneralElements
         [Order(19)]
         public bool UseJobColor = false;
 
-        [Checkbox("Slide Cast", separator = true)]
+        [Checkbox("Slide Cast", spacing = true)]
         [Order(60)]
         public bool ShowSlideCast = true;
 
