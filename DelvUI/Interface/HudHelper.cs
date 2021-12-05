@@ -65,7 +65,7 @@ namespace DelvUI.Interface
             .text:00007FF6481C2F67                   Component__GUI__AtkStage_GetSingleton1 endp
             .text:00007FF6481C2F67
             */
-            IntPtr getBaseUiObjectPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 41 B8 01 00 00 00 48 8D 15 ?? ?? ?? ?? 48 8B 48 20 E8 ?? ?? ?? ?? 48 8B CF");
+            IntPtr getBaseUiObjectPtr = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 0F BF D5");
             _getBaseUIObject = Marshal.GetDelegateForFunctionPointer<GetBaseUIObjectDelegate>(getBaseUiObjectPtr);
 
             /*
@@ -90,7 +90,7 @@ namespace DelvUI.Interface
             _setPosition = Marshal.GetDelegateForFunctionPointer<SetPositionDelegate>(setPositionPtr);
 
             /*
-             Part of updateAddonPosition disassembly signature
+            Part of updateAddonPosition disassembly signature
             .text:00007FF6481CF020                   sub_7FF6481CF020 proc near
             .text:00007FF6481CF020
             .text:00007FF6481CF020                   arg_0= qword ptr  8

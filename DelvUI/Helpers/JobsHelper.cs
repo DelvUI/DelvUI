@@ -71,6 +71,7 @@ namespace DelvUI.Helpers
             JobIDs.WHM,
             JobIDs.SCH,
             JobIDs.AST,
+            JobIDs.SGE,
             JobIDs.BRD,
             JobIDs.BLU
         };
@@ -135,6 +136,7 @@ namespace DelvUI.Helpers
             JobIDs.AST,
             JobIDs.RDM,
             JobIDs.SMN,
+            JobIDs.SGE
         };
 
         public static uint CurrentPrimaryResource(Character? character)
@@ -283,6 +285,7 @@ namespace DelvUI.Helpers
             [JobIDs.WHM] = JobRoles.Healer,
             [JobIDs.SCH] = JobRoles.Healer,
             [JobIDs.AST] = JobRoles.Healer,
+            [JobIDs.SGE] = JobRoles.Healer,
 
             // melee dps
             [JobIDs.PGL] = JobRoles.DPSMelee,
@@ -292,6 +295,7 @@ namespace DelvUI.Helpers
             [JobIDs.DRG] = JobRoles.DPSMelee,
             [JobIDs.NIN] = JobRoles.DPSMelee,
             [JobIDs.SAM] = JobRoles.DPSMelee,
+            [JobIDs.RPR] = JobRoles.DPSMelee,
 
             // ranged phys dps
             [JobIDs.ARC] = JobRoles.DPSRanged,
@@ -342,6 +346,7 @@ namespace DelvUI.Helpers
                 JobIDs.WHM,
                 JobIDs.SCH,
                 JobIDs.AST,
+                JobIDs.SGE
             },
 
             // melee dps
@@ -353,6 +358,7 @@ namespace DelvUI.Helpers
                 JobIDs.DRG,
                 JobIDs.NIN,
                 JobIDs.SAM,
+                JobIDs.RPR
             },
 
             // ranged phys dps
@@ -418,6 +424,7 @@ namespace DelvUI.Helpers
             [JobIDs.DRG] = "DRG",
             [JobIDs.NIN] = "NIN",
             [JobIDs.SAM] = "SAM",
+            [JobIDs.RPR] = "RPR",
 
             // ranged phys dps
             [JobIDs.ARC] = "ARC",
@@ -437,6 +444,7 @@ namespace DelvUI.Helpers
             [JobIDs.CNJ] = "CNJ",
             [JobIDs.WHM] = "WHM",
             [JobIDs.SCH] = "SCH",
+            [JobIDs.SGE] = "SGE",
             [JobIDs.AST] = "AST",
 
             // crafters
@@ -477,6 +485,7 @@ namespace DelvUI.Helpers
             [JobIDs.DRG] = 62584,
             [JobIDs.NIN] = 62584,
             [JobIDs.SAM] = 62584,
+            [JobIDs.RPR] = 62584,
 
             // ranged phys dps
             [JobIDs.ARC] = 62586,
@@ -519,6 +528,7 @@ namespace DelvUI.Helpers
         public const uint WHM = 24;
         public const uint SCH = 28;
         public const uint AST = 33;
+        public const uint SGE = 40;
 
         public const uint PGL = 2;
         public const uint LNC = 4;
@@ -527,6 +537,7 @@ namespace DelvUI.Helpers
         public const uint DRG = 22;
         public const uint NIN = 30;
         public const uint SAM = 34;
+        public const uint RPR = 39;
 
         public const uint ARC = 5;
         public const uint BRD = 23;

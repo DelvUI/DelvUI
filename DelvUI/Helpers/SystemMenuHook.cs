@@ -63,7 +63,7 @@ namespace DelvUI.Helpers
             .text:00007FF647D8B7C6 88 5C 24 48       mov     [rsp+78h+var_30], bl
             */
             IntPtr atkValueChangeTypeAddress =
-                Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 45 84 F6 48 8D 4C 24 ??");
+                Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? B2 34");
 
             _atkValueChangeType =
                 Marshal.GetDelegateForFunctionPointer<AtkValueChangeType>(atkValueChangeTypeAddress);

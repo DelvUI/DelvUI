@@ -474,11 +474,13 @@ namespace DelvUI.Config
             typeof(WhiteMageConfig),
             typeof(ScholarConfig),
             typeof(AstrologianConfig),
+            typeof(SageConfig),
 
             typeof(MonkConfig),
             typeof(DragoonConfig),
             typeof(NinjaConfig),
             typeof(SamuraiConfig),
+            typeof(ReaperConfig),
 
             typeof(BardConfig),
             typeof(MachinistConfig),
