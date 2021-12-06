@@ -435,7 +435,6 @@ namespace DelvUI.Interface
 
         private bool IsInDuty() => Plugin.Condition[ConditionFlag.BoundByDuty];
 
-        private bool HasWeaponDrawn(GameObject actor) => (GetStatus(actor) & 4) > 0;
         private bool HasWeaponDrawn() => (Plugin.ClientState.LocalPlayer != null && Plugin.ClientState.LocalPlayer.StatusFlags.HasFlag(StatusFlags.WeaponOut));
 
         #endregion
