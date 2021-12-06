@@ -263,7 +263,7 @@ namespace DelvUI.Interface
             if (player is not null)
             {
                 currentCombatState = !currentCombatState && Config.ShowCombatActionBarsOnWeaponDrawn
-                    ? HasWeaponDrawn(player) || IsInCombat()
+                    ? HasWeaponDrawn() || IsInCombat()
                     : Config.ShowCombatActionBarsInDuty
                         ? IsInDuty() || IsInCombat()
                         : IsInCombat();
