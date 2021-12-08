@@ -35,7 +35,7 @@ namespace DelvUI.Interface.EnemyList
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
 
-        TextureWrap? _iconsTexture = null;
+        private TextureWrap? _iconsTexture = null;
 
         public EnemyListHud(EnemyListConfig config, string displayName) : base(config, displayName)
         {
