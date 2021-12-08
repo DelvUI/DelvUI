@@ -259,24 +259,15 @@ namespace DelvUI.Interface.Party
                 (_groupMembers.Count > 1 && chocobo == null) ||
                 (_groupMembers.Count == 2 && _config.ShowChocobo && _groupMembers[1].ObjectId != chocobo?.ObjectId);
 
-            EnmityLevel playerEnmity = PartyListAddon->EnmityLeaderIndex == 0 ? EnmityLevel.Leader : EnmityLevel.Last;
-
-            // for some reason chocobos never get a proper enmity value even though they have aggro
-            // if the player enmity is set to first, but the "leader index" is invalid
-            // we can pretty much deduce that the chocobo is the one with aggro
-            // this might fail on some cases when there are other players not in party hitting the same thing
-            // but the edge case is so minor we should be fine
-            EnmityLevel chocoboEnmity = PartyListAddon->EnmityLeaderIndex == -1 && PartyListAddon->PartyMember[0].EmnityByte == 1 ? EnmityLevel.Leader : EnmityLevel.Last;
-
             if (needsUpdate)
             {
                 _groupMembers.Clear();
 
-                _groupMembers.Add(new PartyFramesMember(player, 1, playerEnmity, PartyMemberStatus.None, true));
+                _groupMembers.Add(new PartyFramesMember(player, 1, EnmityLevel.Last, PartyMemberStatus.None, true));
 
                 if (chocobo != null)
                 {
-                    _groupMembers.Add(new PartyFramesMember(chocobo, 2, chocoboEnmity, PartyMemberStatus.None, false));
+                    _groupMembers.Add(new PartyFramesMember(chocobo, 2, EnmityLevel.Last, PartyMemberStatus.None, false));
                 }
 
                 MembersChangedEvent?.Invoke(this);
@@ -285,7 +276,7 @@ namespace DelvUI.Interface.Party
             {
                 for (int i = 0; i < _groupMembers.Count; i++)
                 {
-                    _groupMembers[i].Update(i == 0 ? playerEnmity : chocoboEnmity, PartyMemberStatus.None, i == 0, i == 0 ? player.ClassJob.Id : 0);
+                    _groupMembers[i].Update(EnmityLevel.Last, PartyMemberStatus.None, i == 0, i == 0 ? player.ClassJob.Id : 0);
                 }
             }
         }
