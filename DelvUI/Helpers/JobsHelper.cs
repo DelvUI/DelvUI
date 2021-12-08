@@ -1,8 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using Dalamud.Game.ClientState.Objects.SubKinds;
-using ImGuiNET;
 
 namespace DelvUI.Helpers
 {
@@ -52,11 +49,11 @@ namespace DelvUI.Helpers
         {
             return IsJobARole(jobId, JobRoles.Tank);
         }
-        
+
         public static bool IsJobWithCleanse(uint jobId, int level)
         {
             var isOnCleanseJob = _cleanseJobs.Contains(jobId);
-            
+
             if (jobId == JobIDs.BRD && level < 35)
             {
                 isOnCleanseJob = false;
@@ -64,7 +61,7 @@ namespace DelvUI.Helpers
 
             return isOnCleanseJob;
         }
-        
+
         private static readonly List<uint> _cleanseJobs = new List<uint>()
         {
             JobIDs.CNJ,
@@ -119,7 +116,7 @@ namespace DelvUI.Helpers
         public static bool IsJobWithRaise(uint jobId, uint level)
         {
             var isOnRaiseJob = _raiseJobs.Contains(jobId);
-            
+
             if ((jobId == JobIDs.RDM && level < 64) || level < 12)
             {
                 isOnRaiseJob = false;
@@ -127,7 +124,7 @@ namespace DelvUI.Helpers
 
             return isOnRaiseJob;
         }
-        
+
         private static readonly List<uint> _raiseJobs = new List<uint>()
         {
             JobIDs.CNJ,
@@ -196,7 +193,7 @@ namespace DelvUI.Helpers
             {
                 return 7;
             }
-            
+
             // Level 70 Trait 192 (MIN), 193 (BTN), 194 (FSH)
             if (character.Level >= 70)
             {
@@ -212,21 +209,21 @@ namespace DelvUI.Helpers
             {
                 return "";
             }
-            
+
             uint jobId = character.ClassJob.Id;
 
             if (!IsJobGatherer(jobId))
             {
                 return "";
             }
-            
+
             uint gpRate = GPResourceRate(character);
 
             if (character.CurrentGp == character.MaxGp)
             {
                 return "";
             }
-            
+
             // Since I'm not using a stopwatch or anything like MPTickHelper here the time will only update every 3 seconds, would be nice if the time ticks down every second.
             float gpPerSecond = gpRate / 3f;
             float secondsTillMax = (character.MaxGp - character.CurrentGp) / gpPerSecond;
@@ -268,7 +265,7 @@ namespace DelvUI.Helpers
             return 0;
         }
 
-        public static uint RoleIconIDForBattleCompanion => 62039;
+        public static uint RoleIconIDForBattleCompanion => 62041;
 
         public static Dictionary<uint, JobRoles> JobRolesMap = new Dictionary<uint, JobRoles>()
         {
