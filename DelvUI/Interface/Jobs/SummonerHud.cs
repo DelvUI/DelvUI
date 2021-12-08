@@ -130,7 +130,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawDemiStatusIndicatorBar(Vector2 origin)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
-            var stacks = gauge.AetherFlags;
+            byte stacks = (byte)gauge.AetherFlags;
 
             if (Config.DemiStatusIndicatorBar.HideWhenInactive && stacks == 0)
             {
@@ -147,7 +147,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawDreadwyrmAetherBar(Vector2 origin)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
-            var stacks = gauge.AetherFlags;
+            byte stacks = (byte)gauge.AetherFlags;
 
             if (Config.DreadwyrmAetherBar.HideWhenInactive && stacks == 0)
             {
@@ -175,7 +175,7 @@ namespace DelvUI.Interface.Jobs
 
             PluginConfigColor tranceColor;
             float maxDuration;
-            float tranceDuration = gauge.TimerRemaining;
+            float tranceDuration = gauge.SummonTimerRemaining;
 
             if (!_bahamutFinished && tranceDuration < 1)
             {
@@ -187,7 +187,8 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            switch (gauge.AetherFlags)
+            byte flags = (byte)gauge.AetherFlags;
+            switch (flags)
             {
                 case >= 16:
                     tranceColor = Config.TranceBar.PhoenixColor;
