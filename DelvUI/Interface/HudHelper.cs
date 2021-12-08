@@ -1,4 +1,4 @@
-﻿/*
+/*
 Copyright(c) 2021 jkcclemens HUD Manager
 Modifications Copyright(c) 2021 DelvUI
 09/27/2021 - Extracted code to move in-game UI elements.
@@ -18,6 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 using Dalamud.Game.ClientState.Conditions;
+using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
@@ -186,7 +187,7 @@ namespace DelvUI.Interface
             if (player is not null)
             {
                 isHidden = isHidden && Config.ShowDelvUIFramesOnWeaponDrawn
-                    ? Config.HideOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn(player)
+                    ? Config.HideOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn()
                     : Config.ShowDelvUIFramesInDuty
                         ? Config.HideOutsideOfCombat && !IsInCombat() && !IsInDuty()
                         : Config.HideOutsideOfCombat && !IsInCombat();
@@ -199,7 +200,7 @@ namespace DelvUI.Interface
                         : Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
 
                     isHidden = isHidden && Config.ShowJobPackOnWeaponDrawn
-                        ? Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn(player)
+                        ? Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat() && !HasWeaponDrawn()
                         : Config.ShowJobPackInDuty
                             ? Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat() && !IsInDuty()
                             : Config.HideOnlyJobPackHudOutsideOfCombat && !IsInCombat();
@@ -262,7 +263,7 @@ namespace DelvUI.Interface
             if (player is not null)
             {
                 currentCombatState = !currentCombatState && Config.ShowCombatActionBarsOnWeaponDrawn
-                    ? HasWeaponDrawn(player) || IsInCombat()
+                    ? HasWeaponDrawn() || IsInCombat()
                     : Config.ShowCombatActionBarsInDuty
                         ? IsInDuty() || IsInCombat()
                         : IsInCombat();
@@ -434,7 +435,7 @@ namespace DelvUI.Interface
 
         private bool IsInDuty() => Plugin.Condition[ConditionFlag.BoundByDuty];
 
-        private bool HasWeaponDrawn(GameObject actor) => (GetStatus(actor) & 4) > 0;
+        private bool HasWeaponDrawn() => (Plugin.ClientState.LocalPlayer != null && Plugin.ClientState.LocalPlayer.StatusFlags.HasFlag(StatusFlags.WeaponOut));
 
         #endregion
     }
