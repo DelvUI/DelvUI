@@ -96,8 +96,8 @@ namespace DelvUI.Interface.Party
         private const int PartyCrossWorldDisplayNameOffset = 0x0DEA;
         private const int PartyCrossWorldEntrySize = 0xD8;
 
-        private const int PartyTrustNameOffset = 0x0B68;
-        private const int PartyTrustEntrySize = 0x18;
+        private const int PartyTrustNameOffset = 0x0C00;
+        private const int PartyTrustEntrySize = 0x20;
 
         private const int PartyMembersInfoIndex = 11;
 
@@ -220,7 +220,7 @@ namespace DelvUI.Interface.Party
                     Character? trustChara = Utils.GetGameObjectByName(name) as Character;
                     if (trustChara != null)
                     {
-                        _groupMembers.Add(new PartyFramesMember(trustChara, order, EnmityForIndex(i + 1), PartyMemberStatus.None, true));
+                        _groupMembers.Add(new PartyFramesMember(trustChara, order, EnmityForTrustMemberIndex(i), PartyMemberStatus.None, true));
                         order++;
                     }
                 }
@@ -235,7 +235,14 @@ namespace DelvUI.Interface.Party
             {
                 for (int i = 0; i < _groupMembers.Count; i++)
                 {
-                    _groupMembers[i].Update(EnmityForIndex(i), PartyMemberStatus.None, i == 0, i == 0 ? player.ClassJob.Id : 0);
+                    if (_groupMembers[i].ObjectId == player.ObjectId)
+                    {
+                        _groupMembers[i].Update(EnmityForIndex(0), PartyMemberStatus.None, true, player.ClassJob.Id);
+                    }
+                    else
+                    {
+                        _groupMembers[i].Update(EnmityForTrustMemberIndex(Math.Max(0, _groupMembers[i].Order - 2)), PartyMemberStatus.None, false, 0);
+                    }
                 }
             }
         }
@@ -259,15 +266,24 @@ namespace DelvUI.Interface.Party
                 (_groupMembers.Count > 1 && chocobo == null) ||
                 (_groupMembers.Count == 2 && _config.ShowChocobo && _groupMembers[1].ObjectId != chocobo?.ObjectId);
 
+            EnmityLevel playerEnmity = PartyListAddon->EnmityLeaderIndex == 0 ? EnmityLevel.Leader : EnmityLevel.Last;
+
+            // for some reason chocobos never get a proper enmity value even though they have aggro
+            // if the player enmity is set to first, but the "leader index" is invalid
+            // we can pretty much deduce that the chocobo is the one with aggro
+            // this might fail on some cases when there are other players not in party hitting the same thing
+            // but the edge case is so minor we should be fine
+            EnmityLevel chocoboEnmity = PartyListAddon->EnmityLeaderIndex == -1 && PartyListAddon->PartyMember[0].EmnityByte == 1 ? EnmityLevel.Leader : EnmityLevel.Last;
+
             if (needsUpdate)
             {
                 _groupMembers.Clear();
 
-                _groupMembers.Add(new PartyFramesMember(player, 1, EnmityLevel.Last, PartyMemberStatus.None, true));
+                _groupMembers.Add(new PartyFramesMember(player, 1, playerEnmity, PartyMemberStatus.None, true));
 
                 if (chocobo != null)
                 {
-                    _groupMembers.Add(new PartyFramesMember(chocobo, 2, EnmityLevel.Last, PartyMemberStatus.None, false));
+                    _groupMembers.Add(new PartyFramesMember(chocobo, 2, chocoboEnmity, PartyMemberStatus.None, false));
                 }
 
                 MembersChangedEvent?.Invoke(this);
@@ -276,7 +292,7 @@ namespace DelvUI.Interface.Party
             {
                 for (int i = 0; i < _groupMembers.Count; i++)
                 {
-                    _groupMembers[i].Update(EnmityLevel.Last, PartyMemberStatus.None, i == 0, i == 0 ? player.ClassJob.Id : 0);
+                    _groupMembers[i].Update(i == 0 ? playerEnmity : chocoboEnmity, PartyMemberStatus.None, i == 0, i == 0 ? player.ClassJob.Id : 0);
                 }
             }
         }
@@ -511,6 +527,16 @@ namespace DelvUI.Interface.Party
             }
 
             return enmityLevel;
+        }
+
+        private EnmityLevel EnmityForTrustMemberIndex(int index)
+        {
+            if (PartyListAddon == null || index < 0 || index > 6)
+            {
+                return EnmityLevel.Last;
+            }
+
+            return (EnmityLevel)PartyListAddon->TrustMember[index].EmnityByte;
         }
 
         private bool IsPartyLeader(int index)
