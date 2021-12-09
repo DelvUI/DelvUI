@@ -81,7 +81,7 @@ namespace DelvUI.Helpers
                 return 0f;
             }
 
-            return Math.Min(*(int*)(actor.Address + 0x1997), 100) / 100f;
+            return Math.Min(*(byte*)(actor.Address + 0x19D9), (byte)100) / 100f;
         }
 
         public static string DurationToString(double duration)
