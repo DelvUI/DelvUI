@@ -188,6 +188,13 @@ namespace DelvUI.Helpers
             }
 
             // Preferably I'd want to check the active traits because these traits are locked behind job quests, but no idea how to check traits.
+
+            // Level 83 Trait 239 (MIN), 240 (BTN), 241 (FSH)
+            if (character.Level == 83)
+            {
+                return 8;
+            }
+
             // Level 80 Trait 236 (MIN), 237 (BTN), 238 (FSH)
             if (character.Level == 80)
             {
