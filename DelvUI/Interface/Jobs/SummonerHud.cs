@@ -143,7 +143,7 @@ namespace DelvUI.Interface.Jobs
             {
                 DrawStacksBar(origin, player, attunementStacks, 4, Config.StacksBar.GarudaStackColor);
             }
-            else
+            else if (!Config.StacksBar.HideWhenInactive)
             {
                 DrawStacksBar(origin, player, 0, 1, Config.StacksBar.FillColor);
             }
