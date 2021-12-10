@@ -98,7 +98,10 @@ namespace DelvUI.Interface.Jobs
                 DrawGarudaBar(pos);
             }
 
-            HandleAttunementStacks(pos, player);
+            if (Config.StacksBar.Enabled)
+            {
+                HandleAttunementStacks(pos, player);
+            }
 
         }
 
@@ -127,34 +130,22 @@ namespace DelvUI.Interface.Jobs
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             byte attunementStacks = gauge.Attunement;
-            string currentAttunement = gauge.IsIfritAttuned ? "Ifrit" : gauge.IsTitanAttuned ? "Titan" : gauge.IsGarudaAttuned ? "Garuda" : "None";
 
-            switch (currentAttunement)
+            if (gauge.IsIfritAttuned && Config.StacksBar.ShowIfritStacks)
             {
-                case "Ifrit":
-                    if (Config.StacksBar.Enabled && Config.StacksBar.ShowIfritStacks)
-                    {
-                        DrawStacksBar(origin, player, attunementStacks, 2, Config.StacksBar.IfritStackColor);
-                    }
-                    break;
-                case "Titan":
-                    if (Config.StacksBar.Enabled && Config.StacksBar.ShowTitanStacks)
-                    {
-                        DrawStacksBar(origin, player, attunementStacks, 4, Config.StacksBar.TitanStackColor);
-                    }
-                    break;
-                case "Garuda":
-                    if (Config.StacksBar.Enabled && Config.StacksBar.ShowGarudaStacks)
-                    {
-                        DrawStacksBar(origin, player, attunementStacks, 4, Config.StacksBar.GarudaStackColor);
-                    }
-                    break;
-                default:
-                    if (Config.StacksBar.Enabled && !Config.StacksBar.HideWhenInactive)
-                    {
-                        DrawStacksBar(origin, player, 0, 1, Config.StacksBar.FillColor);
-                    }
-                    break;
+                DrawStacksBar(origin, player, attunementStacks, 2, Config.StacksBar.IfritStackColor);
+            }
+            else if (gauge.IsTitanAttuned && Config.StacksBar.ShowTitanStacks)
+            {
+                DrawStacksBar(origin, player, attunementStacks, 4, Config.StacksBar.TitanStackColor);
+            }
+            else if (gauge.IsGarudaAttuned && Config.StacksBar.ShowGarudaStacks)
+            {
+                DrawStacksBar(origin, player, attunementStacks, 4, Config.StacksBar.GarudaStackColor);
+            }
+            else
+            {
+                DrawStacksBar(origin, player, 0, 1, Config.StacksBar.FillColor);
             }
         }
 
@@ -173,7 +164,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawTranceBar(Vector2 origin)
         {
-            
+
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             PluginConfigColor tranceColor;
             uint spellID = 0;
