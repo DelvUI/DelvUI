@@ -68,11 +68,12 @@ namespace DelvUI.Helpers
             return null;
         }
 
-        public static unsafe bool IsHostileMemory(BattleNpc npc) =>
-            npc != null
-         && ((npc.BattleNpcKind == BattleNpcSubKind.Enemy || (int)npc.BattleNpcKind == 1)
-          && *(byte*)(npc.Address + 0x19D8) != 0
-          && *(byte*)(npc.Address + 0x1994) != 1);
+        public static unsafe bool IsHostileMemory(BattleNpc npc)
+        {
+            return npc != null
+                && ((npc.BattleNpcKind == BattleNpcSubKind.Enemy || (int)npc.BattleNpcKind == 1)
+                && *(byte*)(npc.Address + 0x19C3) != 0);
+        }
 
         public static unsafe float ActorShieldValue(GameObject? actor)
         {
@@ -104,7 +105,7 @@ namespace DelvUI.Helpers
                 }
             };
         }
-        
+
         public static string DurationToFullString(double duration)
         {
             if (duration == 0)
