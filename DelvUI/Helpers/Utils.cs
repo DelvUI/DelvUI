@@ -71,8 +71,8 @@ namespace DelvUI.Helpers
         public static unsafe bool IsHostileMemory(BattleNpc npc) =>
             npc != null
          && ((npc.BattleNpcKind == BattleNpcSubKind.Enemy || (int)npc.BattleNpcKind == 1)
-          && *(byte*)(npc.Address + 0x1980) != 0
-          && *(byte*)(npc.Address + 0x193C) != 1);
+          && *(byte*)(npc.Address + 0x19D8) != 0
+          && *(byte*)(npc.Address + 0x1994) != 1);
 
         public static unsafe float ActorShieldValue(GameObject? actor)
         {
