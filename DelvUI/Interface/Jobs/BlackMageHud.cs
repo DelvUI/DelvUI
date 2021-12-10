@@ -1,5 +1,6 @@
 ﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
@@ -18,7 +19,7 @@ namespace DelvUI.Interface.Jobs
         private new BlackMageConfig Config => (BlackMageConfig)_config;
 
         private static readonly List<uint> ThunderDoTIDs = new() { 161, 162, 163, 1210 };
-        private static readonly List<float> ThunderDoTDurations = new() { 18, 12, 24, 18 };
+        private static readonly List<float> ThunderDoTDurations = new() { 21, 18, 30, 18 };
 
         public BlackMageHud(BlackMageConfig config, string? displayName = null) : base(config, displayName)
         {
@@ -58,6 +59,12 @@ namespace DelvUI.Interface.Jobs
             {
                 positions.Add(Config.Position + Config.PolyglotBar.Position);
                 sizes.Add(Config.PolyglotBar.Size);
+            }
+
+            if (Config.ParadoxBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.ParadoxBar.Position);
+                sizes.Add(Config.ParadoxBar.Size);
             }
 
             if (Config.ThundercloudBar.Enabled && !Config.ThundercloudBar.HideWhenInactive)
@@ -100,6 +107,11 @@ namespace DelvUI.Interface.Jobs
                 DrawPolyglotBar(pos, player);
             }
 
+            if (Config.ParadoxBar.Enabled)
+            {
+                DrawParadoxBar(pos, player);
+            }
+
             if (Config.ManaBar.Enabled)
             {
                 DrawManaBar(pos, player);
@@ -129,7 +141,7 @@ namespace DelvUI.Interface.Jobs
         protected void DrawManaBar(Vector2 origin, PlayerCharacter player)
         {
             BlackMageManaBarConfig config = Config.ManaBar;
-            var gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
 
             if (config.HideWhenInactive && !gauge.InAstralFire && !gauge.InUmbralIce && player.CurrentMp == player.MaxMp)
             {
@@ -169,7 +181,7 @@ namespace DelvUI.Interface.Jobs
 
         protected void DrawUmbralHeartBar(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
             if (Config.UmbralHeartBar.HideWhenInactive && gauge.UmbralHearts == 0)
             {
                 return;
@@ -194,7 +206,7 @@ namespace DelvUI.Interface.Jobs
 
         protected void DrawEnochianBar(Vector2 origin)
         {
-            var gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
 
             if (Config.EnochianBar.HideWhenInactive && !gauge.IsEnochianActive)
             {
@@ -209,7 +221,7 @@ namespace DelvUI.Interface.Jobs
 
         protected void DrawPolyglotBar(Vector2 origin, PlayerCharacter player)
         {
-            var gauge = Plugin.JobGauges.Get<BLMGauge>();
+            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
 
             if (Config.PolyglotBar.HideWhenInactive && gauge.PolyglotStacks == 0)
             {
@@ -219,34 +231,48 @@ namespace DelvUI.Interface.Jobs
             // only 1 stack before level 80
             if (player.Level < 80)
             {
-                var glow = gauge.PolyglotStacks == 1 && Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
+                BarGlowConfig? glow = gauge.PolyglotStacks == 1 && Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
                 BarUtilities.GetBar(Config.PolyglotBar, gauge.PolyglotStacks, 1, 0, glowConfig: glow)
                     .Draw(origin);
             }
             // 2 stacks for level 80+
             else
             {
-                var glow = Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
+                BarGlowConfig? glow = Config.PolyglotBar.GlowConfig.Enabled ? Config.PolyglotBar.GlowConfig : null;
                 BarUtilities.GetChunkedBars(Config.PolyglotBar, 2, gauge.PolyglotStacks, 2f, 0, glowConfig: glow)
                     .Draw(origin);
             }
         }
 
+        protected void DrawParadoxBar(Vector2 origin, PlayerCharacter player)
+        {
+            BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
+
+            if (Config.ParadoxBar.HideWhenInactive && !gauge.IsParadoxActive)
+            {
+                return;
+            };
+
+            BarGlowConfig? glow = gauge.IsParadoxActive && Config.ParadoxBar.GlowConfig.Enabled ? Config.ParadoxBar.GlowConfig : null;
+            BarUtilities.GetBar(Config.ParadoxBar, gauge.IsParadoxActive ? 1 : 0, 1, 0, glowConfig: glow)
+                .Draw(origin);
+        }
+
         protected void DrawThundercloudBar(Vector2 origin, PlayerCharacter player)
         {
-            BarUtilities.GetProcBar(Config.ThundercloudBar, player, 164, 18f)?
+            BarUtilities.GetProcBar(Config.ThundercloudBar, player, 164, 40f)?
                 .Draw(origin);
         }
 
         protected void DrawFirestarterBar(Vector2 origin, PlayerCharacter player)
         {
-            BarUtilities.GetProcBar(Config.FirestarterBar, player, 165, 18f)?
+            BarUtilities.GetProcBar(Config.FirestarterBar, player, 165, 30f)?
                 .Draw(origin);
         }
 
         protected void DrawThunderDoTBar(Vector2 origin, PlayerCharacter player)
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
             BarUtilities.GetDoTBar(Config.ThunderDoTBar, player, target, ThunderDoTIDs, ThunderDoTDurations)?.
                 Draw(origin);
@@ -322,18 +348,25 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f))
         );
 
+        [NestedConfig("Paradox Bar", 52)]
+        public BlackMageParadoxBarConfig ParadoxBar = new BlackMageParadoxBarConfig(
+            new(0, -69),
+            new(14, 14),
+            new PluginConfigColor(new Vector4(123f / 255f, 66f / 255f, 177f / 255f, 100f / 100f))
+        );
+
         [NestedConfig("Thundercloud Bar", 55)]
         public ProgressBarConfig ThundercloudBar = new ProgressBarConfig(
-            new(-64, -69),
-            new(126, 14),
+            new(-68, -69),
+            new(118, 14),
             new PluginConfigColor(new Vector4(240f / 255f, 163f / 255f, 255f / 255f, 100f / 100f)),
             BarDirection.Left
         );
 
         [NestedConfig("Thunder DoT Bar", 60)]
         public ProgressBarConfig ThunderDoTBar = new ProgressBarConfig(
-            new(64, -69),
-            new(126, 14),
+            new(68, -69),
+            new(118, 14),
             new PluginConfigColor(new Vector4(67f / 255f, 187 / 255f, 255f / 255f, 100f / 100f))
         );
 
@@ -398,6 +431,18 @@ namespace DelvUI.Interface.Jobs
         public BarGlowConfig GlowConfig = new BarGlowConfig();
 
         public BlackMagePolyglotBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
+        }
+    }
+
+    [Exportable(false)]
+    public class BlackMageParadoxBarConfig : BarConfig
+    {
+        [NestedConfig("Show Glow", 60, separator = false, spacing = true)]
+        public BarGlowConfig GlowConfig = new BarGlowConfig();
+
+        public BlackMageParadoxBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
              : base(position, size, fillColor)
         {
         }
