@@ -116,6 +116,7 @@ namespace DelvUI.Helpers
             "SocialDetailA",
             "SocialDetailB",
             "LookingForGroup",
+            "LookingForGroupSearch",
             "Marker",
             "FieldMarker",
             "CountdownSettingDialog",
