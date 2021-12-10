@@ -1,7 +1,6 @@
 ﻿using DelvUI.Helpers;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace DelvUI.Config.Profiles
 {
@@ -17,13 +16,12 @@ namespace DelvUI.Config.Profiles
         public Profile(string name, bool autoSwitchEnabled = false, AutoSwitchData? autoSwitchData = null, bool attachHudEnabled = false, int hudLayout = 0)
         {
             Name = name;
-            
+
             AutoSwitchEnabled = autoSwitchEnabled;
             AutoSwitchData = autoSwitchData ?? AutoSwitchData;
-            
+
             AttachHudEnabled = attachHudEnabled;
             HudLayout = hudLayout;
-
         }
     }
 
@@ -70,6 +68,46 @@ namespace DelvUI.Config.Profiles
             {
                 Map[role][i] = value;
             }
+        }
+
+        public bool IsEnabled(JobRoles role, int index)
+        {
+            if (Map.TryGetValue(role, out List<bool>? list) && list != null)
+            {
+                if (index >= list.Count)
+                {
+                    return false;
+                }
+
+                return list[index];
+            }
+
+            return false;
+        }
+
+        public bool ValidateRolesData()
+        {
+            bool changed = false;
+
+            JobRoles[] roles = (JobRoles[])Enum.GetValues(typeof(JobRoles));
+
+            foreach (JobRoles role in roles)
+            {
+                int count = JobsHelper.JobsByRole[role].Count;
+                List<bool> list = Map[role];
+
+                if (list.Count < count)
+                {
+                    for (int i = 0; i < count - list.Count; i++)
+                    {
+                        list.Add(false);
+                    }
+
+                    changed = true;
+                }
+            }
+
+            return changed;
         }
     }
 }
