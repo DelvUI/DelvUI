@@ -1,6 +1,5 @@
 using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
@@ -100,10 +99,6 @@ namespace DelvUI.Interface.Jobs
             }
 
             HandleAttunementStacks(pos, player);
-            // if (Config.RuinBar.Enabled)
-            // {
-            //     DrawRuinBar(pos, player);
-            // }
 
         }
 
@@ -178,13 +173,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawTranceBar(Vector2 origin)
         {
-            // Summon Bahamut Spell ID : 7427
-            // Summon Phoenix Spell ID : 25831
-            // Dreadwyrm Trance Spell ID : 3581
-            // Aethercharge Spell ID : 25800
-
-            // Level 6 to 57 is Aether Charge
-            // Level 58 to 70 is Dreadwyrm
+            
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             PluginConfigColor tranceColor;
             uint spellID = 0;
