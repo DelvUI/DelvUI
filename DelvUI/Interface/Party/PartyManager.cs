@@ -88,12 +88,12 @@ namespace DelvUI.Interface.Party
 
         public RaptureAtkModule* RaptureAtkModule { get; private set; } = null;
 
-        private const int PartyListInfoOffset = 0x0B50;
-        private const int PartyListMemberRawInfoSize = 0x18;
-        private const int PartyJobIconIdsOffset = 0x0F20;
+        private const int PartyListInfoOffset = 0x0BE0;
+        private const int PartyListMemberRawInfoSize = 0x20;
+        private const int PartyJobIconIdsOffset = 0x1320;
 
-        private const int PartyCrossWorldNameOffset = 0x0E52;
-        private const int PartyCrossWorldDisplayNameOffset = 0x0DEA;
+        private const int PartyCrossWorldNameOffset = 0x0F2A;
+        private const int PartyCrossWorldDisplayNameOffset = 0x0EC2;
         private const int PartyCrossWorldEntrySize = 0xD8;
 
         private const int PartyTrustNameOffset = 0x0C00;
