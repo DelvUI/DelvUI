@@ -10,7 +10,9 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
+using Dalamud.Logging;
 using DelvUI.Enums;
 
 namespace DelvUI.Interface.Jobs
@@ -60,6 +62,12 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.StormbiteDoTBar.Size);
             }
 
+            if (Config.CodaBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.CodaBar.Position);
+                sizes.Add(Config.CodaBar.Size);
+            }
+
             return (positions, sizes);
         }
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
@@ -81,6 +89,30 @@ namespace DelvUI.Interface.Jobs
             if (Config.SoulVoiceBar.Enabled)
             {
                 DrawSoulVoiceBar(pos);
+            }
+            
+            if (Config.CodaBar.Enabled)
+            {
+                DrawCodaBar(pos, player);
+            }
+        }
+
+        private void DrawCodaBar(Vector2 origin, PlayerCharacter player)
+        {
+            BRDGauge gauge = Plugin.JobGauges.Get<BRDGauge>();
+            if (!Config.CodaBar.HideWhenInactive)
+            {
+                var order = Config.CodaBar.CodaOrder;
+                var hasCoda = new[] { gauge.Coda.Contains(Song.WANDERER) ? 1 : 0, gauge.Coda.Contains(Song.MAGE) ? 1 : 0, gauge.Coda.Contains(Song.ARMY) ? 1 : 0 };
+                var colors = new[] { Config.CodaBar.WMColor, Config.CodaBar.MBColor, Config.CodaBar.APColor };
+
+                var coda = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
+                for (int i = 0; i < 3; i++)
+                {
+                    coda[i] = new Tuple<PluginConfigColor, float, LabelConfig?>(colors[order[i]], hasCoda[order[i]], null);
+                }
+
+                BarUtilities.GetChunkedBars(Config.CodaBar, coda, player).Draw(origin);
             }
         }
 
@@ -176,8 +208,16 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBloodletterReady(Vector2 origin, PlayerCharacter player)
         {
-            int active = _spellHelper.GetSpellCooldown(110) == 0 ? 1 : 0;
-            DrawStacksBar(origin, player, active, 1, Config.StacksBar.MBProcColor,
+            int cooldown = _spellHelper.GetSpellCooldownInt(110);
+
+            int stacks = cooldown switch
+            {
+                > 30 => 0,
+                > 15 => 1,
+                var _ => 2
+            };
+
+            DrawStacksBar(origin, player, stacks, 2, Config.StacksBar.MBProcColor,
                 Config.StacksBar.MBGlowConfig.Enabled ? Config.StacksBar.MBGlowConfig : null);
         }
 
@@ -254,6 +294,12 @@ namespace DelvUI.Interface.Jobs
             config.CausticBiteDoTBar.Label.FrameAnchor = DrawAnchor.Right;
             config.CausticBiteDoTBar.Label.Position = new Vector2(-2, 0);
             config.CausticBiteDoTBar.FillDirection = BarDirection.Left;
+            
+            config.SoulVoiceBar.ThresholdConfig.Enabled = true;
+            config.SoulVoiceBar.ThresholdConfig.Value = 80;
+            config.SoulVoiceBar.ThresholdConfig.ThresholdType = ThresholdType.Above;
+            config.SoulVoiceBar.ThresholdConfig.ChangeColor = true;
+            config.SoulVoiceBar.ThresholdConfig.Color = new PluginConfigColor(new Vector4(150f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
 
             return config;
         }
@@ -291,6 +337,13 @@ namespace DelvUI.Interface.Jobs
             new(64, -51),
             new(126, 10),
             new PluginConfigColor(new Vector4(72f / 255f, 117f / 255f, 202f / 255f, 100f / 100f))
+        );
+        
+        [NestedConfig("Coda Bar", 40)]
+        public BardCodaBarConfig CodaBar = new BardCodaBarConfig(
+            new(0, -63),
+            new(254, 10),
+            new PluginConfigColor(new Vector4(0, 0, 0, 0))
         );
     }
 
@@ -366,5 +419,28 @@ namespace DelvUI.Interface.Jobs
             : base(position, size, fillColor)
         {
         }
+    }
+
+    [DisableParentSettings("FillColor")]
+    [Exportable(false)]
+    public class BardCodaBarConfig : ChunkedBarConfig
+    {
+        [ColorEdit4("Wanderer's Minuet" + "##Coda", spacing = true)]
+        [Order(71)]
+        public PluginConfigColor WMColor = new(new Vector4(145f / 255f, 186f / 255f, 94f / 255f, 100f / 100f));
+
+        [ColorEdit4("Mage's Ballad" + "##Coda")]
+        [Order(72)]
+        public PluginConfigColor MBColor = new(new Vector4(143f / 255f, 90f / 255f, 143f / 255f, 100f / 100f));
+
+        [ColorEdit4("Army's Paeon" + "##Coda")]
+        [Order(73)]
+        public PluginConfigColor APColor = new(new Vector4(207f / 255f, 205f / 255f, 52f / 255f, 100f / 100f));
+
+        [DragDropHorizontal("Order", "Wanderer's Minuet", "Mage's Ballad", "Army's Paeon")]
+        [Order(74)]
+        public int[] CodaOrder = new int[] { 0, 1, 2 };
+
+        public BardCodaBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor, 2) { }
     }
 }
