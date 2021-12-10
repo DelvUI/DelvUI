@@ -197,8 +197,8 @@ namespace DelvUI.Interface.EnemyList
                         int enmityIndex = Config.Preview ? Math.Min(3, i) : _helper.EnemiesData.ElementAt(i).EnmityLevel - 1;
                         float w = 48f / _iconsTexture.Width;
                         float h = 48f / _iconsTexture.Height;
-                        Vector2 uv0 = new Vector2(w * enmityIndex, 0.60f);
-                        Vector2 uv1 = new Vector2(w * (enmityIndex + 1), 0.60f + h);
+                        Vector2 uv0 = new Vector2(w * enmityIndex, 0.48f);
+                        Vector2 uv1 = new Vector2(w * (enmityIndex + 1), 0.48f + h);
                         drawList.AddImage(_iconsTexture.ImGuiHandle, iconPos, iconPos + Configs.EnmityIcon.Size, uv0, uv1);
                     });
                 }

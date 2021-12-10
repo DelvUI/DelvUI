@@ -38,7 +38,7 @@ namespace DelvUI.Interface.EnemyList
             int enemyCount = numberArrayData->IntArray[1];
             for (int i = 0; i < enemyCount; i++)
             {
-                int index = 8 + (i * 5);
+                int index = 8 + (i * 6);
                 if (numberArrayData->AtkArrayData.Size <= index) { break; }
 
                 int objectId = numberArrayData->IntArray[index];
