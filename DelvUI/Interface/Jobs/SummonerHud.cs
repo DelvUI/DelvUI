@@ -219,7 +219,7 @@ namespace DelvUI.Interface.Jobs
                         Config.TranceBar.Label.SetValue(maxDuration - currentCooldown);
                         if (currentCooldown == maxDuration)
                         {
-                            Config.TranceBar.Label.SetText("Ready");
+                            Config.TranceBar.Label.SetText("READY");
                         }
                         BarUtilities.GetProgressBar(Config.TranceBar, currentCooldown, maxDuration, fillColor: tranceColor).Draw(origin);
                     }
