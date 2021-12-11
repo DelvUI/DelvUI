@@ -38,6 +38,10 @@ namespace DelvUI.Interface.GeneralElements
         [Order(10)]
         public int NumberFormat;
 
+        [Checkbox("Hide Text When Zero")]
+        [Order(65)]
+        public bool HideIfZero = false;
+
         public NumericLabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor)
             : base(position, text, frameAnchor, textAnchor)
         {
@@ -47,7 +51,7 @@ namespace DelvUI.Interface.GeneralElements
         {
             if (value == 0)
             {
-                _text = "0";
+                _text = HideIfZero ? string.Empty : "0";
                 return;
             }
 
@@ -68,6 +72,7 @@ namespace DelvUI.Interface.GeneralElements
                 FontID = FontID,
                 UseJobColor = UseJobColor,
                 Enabled = Enabled,
+                HideIfZero = HideIfZero
             };
     }
 

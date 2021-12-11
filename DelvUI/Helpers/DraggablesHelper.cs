@@ -130,8 +130,8 @@ namespace DelvUI.Helpers
             // job hud
             if (jobHud != null && jobHud != selectedElement && !hudHelper.IsElementHidden(jobHud))
             {
-               jobHud.CanTakeInputForDrag = canTakeInput;
-               jobHud.Draw(origin);
+                jobHud.CanTakeInputForDrag = canTakeInput;
+                jobHud.Draw(origin);
             }
         }
 

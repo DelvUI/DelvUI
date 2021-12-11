@@ -52,7 +52,6 @@ namespace DelvUI.Helpers
             */
             _setUIMouseOverActor = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B 6C 24 ?? 48 8B 5C 24 ?? 4C 8B 7C 24 ?? 41 83 FC 02");
             _uiMouseOverActorHook = new Hook<OnSetUIMouseoverActor>(_setUIMouseOverActor, new OnSetUIMouseoverActor(HandleUIMouseOverActorId));
-            //_uiMouseOverActorIdHook.Enable();
 
             /*
              Part of requestAction disassembly signature

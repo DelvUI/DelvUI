@@ -170,7 +170,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.HutonBar.HideWhenInactive || gauge.HutonTimer > 0)
             {
                 Config.HutonBar.Label.SetValue(hutonDuration);
-                BarUtilities.GetProgressBar(Config.HutonBar, hutonDuration, 70f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.HutonBar, hutonDuration, 60f, 0f, player).Draw(pos);
             }
         }
 

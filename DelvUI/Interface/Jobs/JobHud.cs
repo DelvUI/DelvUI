@@ -26,7 +26,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            //DrawJobHud(origin, Player);
+            DrawJobHud(origin, Player);
         }
 
         public virtual void DrawJobHud(Vector2 origin, PlayerCharacter player)
