@@ -162,8 +162,16 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new ReaperConfig();
             config.DeathsDesignBar.UseChunks = false;
+            config.DeathsDesignBar.Label.Enabled = true;
+
             config.SoulBar.UseChunks = false;
+            config.SoulBar.Label.Enabled = true;
+
             config.ShroudBar.UseChunks = false;
+            config.ShroudBar.Label.Enabled = true;
+
+            config.DeathGauge.EnshroudTimerLabel.HideIfZero = true;
+
             return config;
         }
 
