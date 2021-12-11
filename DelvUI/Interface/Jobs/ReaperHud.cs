@@ -179,7 +179,7 @@ namespace DelvUI.Interface.Jobs
         public ChunkedProgressBarConfig DeathsDesignBar = new ChunkedProgressBarConfig(
             new(0, -10),
             new(254, 20),
-            new PluginConfigColor(new Vector4(195f / 255f, 0f / 255f, 58f / 255f, 100f / 100f))
+            new PluginConfigColor(new Vector4(145f / 255f, 0f / 255f, 25f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Soul Bar", 40)]
