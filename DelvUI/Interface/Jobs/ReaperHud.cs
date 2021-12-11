@@ -94,7 +94,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.DeathsDesignBar.HideWhenInactive || duration > 0)
             {
                 Config.DeathsDesignBar.Label.SetValue(duration);
-                BarUtilities.GetProgressBar(Config.DeathsDesignBar, duration, 60f, 0f, player).Draw(pos);
+                BarUtilities.GetChunkedProgressBars(Config.DeathsDesignBar, 2, duration, 60f, 0f, player).Draw(pos);
             }
         }
 
@@ -105,7 +105,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.SoulBar.HideWhenInactive || soul > 0)
             {
                 Config.SoulBar.Label.SetValue(soul);
-                BarUtilities.GetProgressBar(Config.SoulBar, soul, 100f, 0f, player).Draw(pos);
+                BarUtilities.GetChunkedProgressBars(Config.SoulBar, 2, soul, 100f, 0f, player).Draw(pos);
             }
         }
 
@@ -116,7 +116,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.ShroudBar.HideWhenInactive || shroud > 0)
             {
                 Config.ShroudBar.Label.SetValue(shroud);
-                BarUtilities.GetProgressBar(Config.ShroudBar, shroud, 100f, 0f, player).Draw(pos);
+                BarUtilities.GetChunkedProgressBars(Config.ShroudBar, 2, shroud, 100f, 0f, player).Draw(pos);
             }
         }
 
@@ -161,26 +161,28 @@ namespace DelvUI.Interface.Jobs
         public new static ReaperConfig DefaultConfig()
         {
             var config = new ReaperConfig();
-
+            config.DeathsDesignBar.UseChunks = false;
+            config.SoulBar.UseChunks = false;
+            config.ShroudBar.UseChunks = false;
             return config;
         }
 
         [NestedConfig("Death's Design Bar", 35)]
-        public ProgressBarConfig DeathsDesignBar = new ProgressBarConfig(
+        public ChunkedProgressBarConfig DeathsDesignBar = new ChunkedProgressBarConfig(
             new(0, -10),
             new(254, 20),
             new PluginConfigColor(new Vector4(195f / 255f, 0f / 255f, 58f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Soul Bar", 40)]
-        public ProgressBarConfig SoulBar = new ProgressBarConfig(
+        public ChunkedProgressBarConfig SoulBar = new ChunkedProgressBarConfig(
             new(0, -32),
             new(254, 20),
             new PluginConfigColor(new Vector4(254f / 255f, 21f / 255f, 94f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Shroud Bar", 45)]
-        public ProgressBarConfig ShroudBar = new ProgressBarConfig(
+        public ChunkedProgressBarConfig ShroudBar = new ChunkedProgressBarConfig(
             new(0, -54),
             new(254, 20),
             new PluginConfigColor(new Vector4(0f / 255f, 176f / 255f, 196f / 255f, 100f / 100f))
