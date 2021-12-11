@@ -1,7 +1,6 @@
 ﻿using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Plugin;
-using DelvUI.Helpers;
 using System.Numerics;
 
 namespace DelvUI.Interface.Jobs

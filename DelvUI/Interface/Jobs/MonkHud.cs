@@ -178,14 +178,14 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        //private void DrawChakraGauge(Vector2 origin)
-        //{
-        //    var gauge = Plugin.JobGauges.Get<MNKGauge>();
-        //    if (!Config.ChakraBar.HideWhenInactive || gauge.Chakra > 0)
-        //    {
-        //        BarUtilities.GetChunkedBars(Config.ChakraBar, 5, gauge.Chakra, 5).Draw(origin);
-        //    }
-        //}
+        private void DrawChakraGauge(Vector2 origin)
+        {
+            var gauge = Plugin.JobGauges.Get<MNKGauge>();
+            //if (!Config.ChakraBar.HideWhenInactive || gauge.Chakra > 0)
+            //{
+            //    BarUtilities.GetChunkedBars(Config.ChakraBar, 5, gauge.Chakra, 5).Draw(origin);
+            //}
+        }
 
         private void DrawTwinSnakesBar(Vector2 origin, PlayerCharacter player)
         {

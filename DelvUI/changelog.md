@@ -1,3 +1,11 @@
+# 0.6.0.0
+Endwalker Beta Release:
+- Reworked job huds according to the new job changes
+- Added job huds for Reaper and Sage
+
+Fixes:
+- Fixed enmity in party frames for Trust and GC parties
+
 # 0.5.1.0
 - Improved UI of the main config window.
 - Font sizes can now go up to 100. Be aware that fonts are shared between all plugins. If you add too many big fonts it may cause issues with Dalamud or straight up crash the game.

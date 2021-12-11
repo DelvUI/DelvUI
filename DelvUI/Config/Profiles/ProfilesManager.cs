@@ -59,6 +59,17 @@ namespace DelvUI.Config.Profiles
                 if (instance != null)
                 {
                     Instance = instance;
+
+                    bool needsSave = false;
+                    foreach (Profile profile in Instance.Profiles.Values)
+                    {
+                        needsSave |= profile.AutoSwitchData.ValidateRolesData();
+                    }
+
+                    if (needsSave)
+                    {
+                        Instance.Save();
+                    }
                 }
             }
             catch
@@ -210,7 +221,7 @@ namespace DelvUI.Config.Profiles
             }
 
             // current profile is enabled for this job, do nothing
-            if (currentProfile.AutoSwitchEnabled && currentProfile.AutoSwitchData.Map[role][index])
+            if (currentProfile.AutoSwitchEnabled && currentProfile.AutoSwitchData.IsEnabled(role, index))
             {
                 return;
             }
@@ -224,7 +235,7 @@ namespace DelvUI.Config.Profiles
                 }
 
                 // found a valid profile, switch to it
-                if (profile.AutoSwitchData.Map[role][index])
+                if (profile.AutoSwitchData.IsEnabled(role, index))
                 {
                     SwitchToProfile(profile.Name);
                     return;
@@ -797,6 +808,7 @@ namespace DelvUI.Config.Profiles
             foreach (JobRoles role in roles)
             {
                 if (role == JobRoles.Unknown) { continue; }
+                if (!data.Map.ContainsKey(role)) { continue; }
 
                 bool roleValue = data.GetRoleEnabled(role);
                 string roleName = JobsHelper.RoleNames[role];

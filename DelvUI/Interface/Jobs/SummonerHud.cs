@@ -11,12 +11,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 
 namespace DelvUI.Interface.Jobs
 {
     public class SummonerHud : JobHud
     {
-        private bool _bahamutFinished = true;
 
         private new SummonerConfig Config => (SummonerConfig)_config;
 
@@ -35,41 +35,36 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.AetherflowBar.Size);
             }
 
-            if (Config.DemiStatusIndicatorBar.Enabled)
-            {
-                positions.Add(Config.Position + Config.DemiStatusIndicatorBar.Position);
-                sizes.Add(Config.DemiStatusIndicatorBar.Size);
-            }
-
-            if (Config.DreadwyrmAetherBar.Enabled)
-            {
-                positions.Add(Config.Position + Config.DreadwyrmAetherBar.Position);
-                sizes.Add(Config.DreadwyrmAetherBar.Size);
-            }
-
             if (Config.TranceBar.Enabled)
             {
                 positions.Add(Config.Position + Config.TranceBar.Position);
                 sizes.Add(Config.TranceBar.Size);
             }
 
-            if (Config.RuinBar.Enabled)
+            if (Config.IfritBar.Enabled)
             {
-                positions.Add(Config.Position + Config.RuinBar.Position);
-                sizes.Add(Config.RuinBar.Size);
+                positions.Add(Config.Position + Config.IfritBar.Position);
+                sizes.Add(Config.IfritBar.Size);
             }
 
-            if (Config.MiasmaBar.Enabled)
+            if (Config.TitanBar.Enabled)
             {
-                positions.Add(Config.Position + Config.MiasmaBar.Position);
-                sizes.Add(Config.MiasmaBar.Size);
+                positions.Add(Config.Position + Config.TitanBar.Position);
+                sizes.Add(Config.TitanBar.Size);
             }
 
-            if (Config.BioBar.Enabled)
+            if (Config.GarudaBar.Enabled)
             {
-                positions.Add(Config.Position + Config.BioBar.Position);
-                sizes.Add(Config.BioBar.Size);
+                positions.Add(Config.Position + Config.GarudaBar.Position);
+                sizes.Add(Config.GarudaBar.Size);
             }
+
+            if (Config.StacksBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.StacksBar.Position);
+                sizes.Add(Config.StacksBar.Size);
+            }
+
 
             return (positions, sizes);
         }
@@ -83,34 +78,74 @@ namespace DelvUI.Interface.Jobs
                 DrawAetherBar(pos, player);
             }
 
-            if (Config.DemiStatusIndicatorBar.Enabled)
-            {
-                DrawDemiStatusIndicatorBar(pos);
-            }
-
-            if (Config.DreadwyrmAetherBar.Enabled)
-            {
-                DrawDreadwyrmAetherBar(pos);
-            }
-
             if (Config.TranceBar.Enabled)
             {
                 DrawTranceBar(pos);
             }
 
-            if (Config.RuinBar.Enabled)
+            if (Config.IfritBar.Enabled)
             {
-                DrawRuinBar(pos, player);
+                DrawIfritBar(pos);
             }
 
-            if (Config.MiasmaBar.Enabled)
+            if (Config.TitanBar.Enabled)
             {
-                DrawMiasmaBar(pos, player);
+                DrawTitanBar(pos);
             }
 
-            if (Config.BioBar.Enabled)
+            if (Config.GarudaBar.Enabled)
             {
-                DrawBioBar(pos, player);
+                DrawGarudaBar(pos);
+            }
+
+            if (Config.StacksBar.Enabled)
+            {
+                HandleAttunementStacks(pos, player);
+            }
+
+        }
+
+        private void DrawIfritBar(Vector2 origin)
+        {
+            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
+            int stackCount = gauge.IsIfritReady ? 1 : 0;
+            BarUtilities.GetChunkedBars(Config.IfritBar, 1, stackCount, 0).Draw(origin);
+        }
+
+        private void DrawTitanBar(Vector2 origin)
+        {
+            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
+            int stackCount = gauge.IsTitanReady ? 1 : 0;
+            BarUtilities.GetChunkedBars(Config.TitanBar, 1, stackCount, 0).Draw(origin);
+        }
+
+        private void DrawGarudaBar(Vector2 origin)
+        {
+            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
+            int stackCount = gauge.IsGarudaReady ? 1 : 0;
+            BarUtilities.GetChunkedBars(Config.GarudaBar, 1, stackCount, 0).Draw(origin);
+        }
+
+        private void HandleAttunementStacks(Vector2 origin, PlayerCharacter player)
+        {
+            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
+            byte attunementStacks = gauge.Attunement;
+
+            if (gauge.IsIfritAttuned && Config.StacksBar.ShowIfritStacks)
+            {
+                DrawStacksBar(origin, player, attunementStacks, 2, Config.StacksBar.IfritStackColor);
+            }
+            else if (gauge.IsTitanAttuned && Config.StacksBar.ShowTitanStacks)
+            {
+                DrawStacksBar(origin, player, attunementStacks, 4, Config.StacksBar.TitanStackColor);
+            }
+            else if (gauge.IsGarudaAttuned && Config.StacksBar.ShowGarudaStacks)
+            {
+                DrawStacksBar(origin, player, attunementStacks, 4, Config.StacksBar.GarudaStackColor);
+            }
+            else if (!Config.StacksBar.HideWhenInactive)
+            {
+                DrawStacksBar(origin, player, 0, 1, Config.StacksBar.FillColor);
             }
         }
 
@@ -127,127 +162,80 @@ namespace DelvUI.Interface.Jobs
                 .Draw(origin);
         }
 
-        private void DrawDemiStatusIndicatorBar(Vector2 origin)
-        {
-            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
-            byte stacks = (byte)gauge.AetherFlags;
-
-            if (Config.DemiStatusIndicatorBar.HideWhenInactive && stacks == 0)
-            {
-                return;
-            }
-
-            PluginConfigColor color = stacks >= 16 ? Config.DemiStatusIndicatorBar.PhoenixColor : Config.DemiStatusIndicatorBar.BahamutColor;
-            int value = stacks < 8 ? 0 : 1;
-
-            BarUtilities.GetBar(Config.DemiStatusIndicatorBar, value, 1, fillColor: color)
-                .Draw(origin);
-        }
-
-        private void DrawDreadwyrmAetherBar(Vector2 origin)
-        {
-            SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
-            byte stacks = (byte)gauge.AetherFlags;
-
-            if (Config.DreadwyrmAetherBar.HideWhenInactive && stacks == 0)
-            {
-                return;
-            }
-
-            var value = 0;
-
-            if (stacks >= 4 && stacks < 8)
-            {
-                value = 1;
-            }
-            else if (stacks >= 8 && stacks < 16)
-            {
-                value = 2;
-            }
-
-            BarUtilities.GetChunkedBars(Config.DreadwyrmAetherBar, 2, value, 2)
-                .Draw(origin);
-        }
-
         private void DrawTranceBar(Vector2 origin)
         {
+
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
-
             PluginConfigColor tranceColor;
-            float maxDuration;
-            float tranceDuration = gauge.SummonTimerRemaining;
+            uint spellID = 0;
+            float maxDuration = 0f;
+            float currentCooldown = 0f;
+            float tranceDuration = 0f;
+            tranceColor = Config.TranceBar.FillColor;
 
-            if (!_bahamutFinished && tranceDuration < 1)
+            if (gauge.IsIfritAttuned || gauge.IsTitanAttuned || gauge.IsGarudaAttuned)
             {
-                _bahamutFinished = true;
+                tranceColor = gauge.IsIfritAttuned ? Config.TranceBar.IfritColor : gauge.IsTitanAttuned ? Config.TranceBar.TitanColor : gauge.IsGarudaAttuned ? Config.TranceBar.GarudaColor : Config.TranceBar.FillColor;
+                tranceDuration = gauge.AttunmentTimerRemaining;
+                maxDuration = 30000f;
+
             }
-
-            if (Config.TranceBar.HideWhenInactive && tranceDuration == 0)
+            else
             {
-                return;
-            }
-
-            byte flags = (byte)gauge.AetherFlags;
-            switch (flags)
-            {
-                case >= 16:
-                    tranceColor = Config.TranceBar.PhoenixColor;
-                    maxDuration = 20000f;
-                    break;
-
-                case >= 8:
+                if (gauge.IsBahamutReady)
+                {
                     tranceColor = Config.TranceBar.BahamutColor;
-                    maxDuration = 20000f;
-                    _bahamutFinished = false;
-
-                    break;
-
-                default:
-                    // This is needed because as soon as you summon Bahamut the flag goes back to 0-2
-                    tranceColor = _bahamutFinished ? Config.TranceBar.FillColor : Config.TranceBar.BahamutColor;
-                    maxDuration = _bahamutFinished ? 15000f : 20000f;
-
-                    break;
+                    tranceDuration = gauge.SummonTimerRemaining;
+                    spellID = 7427;
+                    maxDuration = 15000f;
+                }
+                else if (gauge.IsPhoenixReady)
+                {
+                    tranceColor = Config.TranceBar.PhoenixColor;
+                    tranceDuration = gauge.SummonTimerRemaining;
+                    spellID = 25831;
+                    maxDuration = 15000f;
+                }
             }
 
-            Config.TranceBar.Label.SetValue(tranceDuration / 1000f);
-            BarUtilities.GetProgressBar(Config.TranceBar, tranceDuration, maxDuration, fillColor: tranceColor)
-                .Draw(origin);
-        }
-
-        private void DrawRuinBar(Vector2 origin, PlayerCharacter player)
-        {
-            byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId == 1212)?.StackCount ?? 0;
-
-            if (Config.RuinBar.HideWhenInactive && stackCount == 0)
+            if (tranceDuration != 0)
             {
-                return;
-            };
+                if (Config.TranceBar.HideWhenInactive && tranceDuration == 0)
+                {
+                    return;
+                }
+                Config.TranceBar.Label.SetValue(tranceDuration / 1000f);
+                BarUtilities.GetProgressBar(Config.TranceBar, tranceDuration, maxDuration, fillColor: tranceColor).Draw(origin);
+            }
+            else
+            {
+                if (!Config.TranceBar.HideWhenInactive || currentCooldown < maxDuration)
+                {
+                    if (gauge.AttunmentTimerRemaining == 0)
+                    {
+                        maxDuration = SpellHelper.Instance.GetRecastTime(spellID);
+                        float tranceCooldown = SpellHelper.Instance.GetSpellCooldown(spellID);
+                        currentCooldown = maxDuration - tranceCooldown;
+                        Config.TranceBar.Label.SetValue(maxDuration - currentCooldown);
+                        if (currentCooldown == maxDuration)
+                        {
+                            Config.TranceBar.Label.SetText("Ready");
+                        }
+                        BarUtilities.GetProgressBar(Config.TranceBar, currentCooldown, maxDuration, fillColor: tranceColor).Draw(origin);
+                    }
+                }
 
-            BarUtilities.GetChunkedBars(Config.RuinBar, 4, stackCount, 4)
-                .Draw(origin);
+            }
+
         }
 
-        private static List<uint> MiasmaIDs = new List<uint> { 1215, 180 };
-        private static List<float> MiasmaDurations = new List<float> { 30, 30 };
-
-        protected void DrawMiasmaBar(Vector2 origin, PlayerCharacter player)
+        private void DrawStacksBar(Vector2 origin, PlayerCharacter player, int amount, int max, PluginConfigColor stackColor, BarGlowConfig? glowConfig = null)
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            SummonerStacksBarConfig config = Config.StacksBar;
 
-            BarUtilities.GetDoTBar(Config.MiasmaBar, player, target, MiasmaIDs, MiasmaDurations)?.
-                Draw(origin);
-        }
-
-        private static List<uint> BioIDs = new List<uint> { 1214, 179, 189 };
-        private static List<float> BioDurations = new List<float> { 30, 30, 30 };
-
-        protected void DrawBioBar(Vector2 origin, PlayerCharacter player)
-        {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-
-            BarUtilities.GetDoTBar(Config.BioBar, player, target, BioIDs, BioDurations)?.
-                Draw(origin);
+            config.FillColor = stackColor;
+            BarUtilities.GetChunkedBars(Config.StacksBar, max, amount, max, 0F, glowConfig: glowConfig).
+                         Draw(origin);
         }
     }
 
@@ -263,86 +251,53 @@ namespace DelvUI.Interface.Jobs
 
             config.TranceBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
 
-            config.MiasmaBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.MiasmaBar.Label.TextAnchor = DrawAnchor.Right;
-            config.MiasmaBar.Label.FrameAnchor = DrawAnchor.Right;
-            config.MiasmaBar.Label.Position = new Vector2(-2, 0);
-
-            config.BioBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
-            config.BioBar.Label.TextAnchor = DrawAnchor.Left;
-            config.BioBar.Label.FrameAnchor = DrawAnchor.Left;
-            config.BioBar.Label.Position = new Vector2(2, 0);
-
             return config;
         }
 
         [NestedConfig("Aetherflow Bar", 40)]
         public ChunkedBarConfig AetherflowBar = new ChunkedBarConfig(
-            new(-67, -6),
-            new(120, 10),
+            new(-0, -7),
+            new(254, 14),
             new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Demi Status Indicator Bar", 45)]
-        public SummonerDemiStatusIndicatorBarConfig DemiStatusIndicatorBar = new SummonerDemiStatusIndicatorBarConfig(
-            new(0, -6),
-            new(10, 10)
-        );
-
-        [NestedConfig("Dreadwyrm Aether Bar", 50)]
-        public ChunkedBarConfig DreadwyrmAetherBar = new ChunkedBarConfig(
-            new(67, -6),
-            new(120, 10),
-            new(new Vector4(128f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
-        );
-
-        [NestedConfig("Trance Bar", 55)]
+        [NestedConfig("Trance Bar", 45)]
         public SummonerTranceBarConfig TranceBar = new SummonerTranceBarConfig(
-            new(0, -20),
+            new(0, -23),
             new(254, 14),
             new(new Vector4(128f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Ruin Bar", 60)]
-        public ChunkedBarConfig RuinBar = new ChunkedBarConfig(
-            new(0, -34),
-            new(254, 10),
-            new PluginConfigColor(new Vector4(94f / 255f, 250f / 255f, 154f / 255f, 100f / 100f))
+        [NestedConfig("Ifrit Bar", 50)]
+        public ChunkedBarConfig IfritBar = new ChunkedBarConfig(
+            new(-85, -39),
+            new(84, 14),
+            new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Miasma Bar", 65)]
-        public ProgressBarConfig MiasmaBar = new ProgressBarConfig(
-            new(-64, -48),
-            new(126, 14),
-            new PluginConfigColor(new Vector4(106f / 255f, 237f / 255f, 241f / 255f, 100f / 100f)),
-            BarDirection.Left
+        [NestedConfig("Titan Bar", 55)]
+        public ChunkedBarConfig TitanBar = new ChunkedBarConfig(
+            new(0, -39),
+            new(84, 14),
+            new(new Vector4(255f / 255f, 255f / 255f, 0f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Bio Bar", 70)]
-        public ProgressBarConfig BioBar = new ProgressBarConfig(
-            new(64, -48),
-            new(126, 14),
-            new PluginConfigColor(new Vector4(50f / 255f, 93f / 255f, 37f / 255f, 100f / 100f))
+        [NestedConfig("Garuda Bar", 60)]
+        public ChunkedBarConfig GarudaBar = new ChunkedBarConfig(
+            new(85, -39),
+            new(84, 14),
+            new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f))
         );
+
+        [NestedConfig("Attunement Stacks Bar", 65)]
+        public SummonerStacksBarConfig StacksBar = new SummonerStacksBarConfig(
+            new(0, -55),
+            new(254, 14),
+            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
+        );
+
     }
 
-    [DisableParentSettings("FillColor")]
-    [Exportable(false)]
-    public class SummonerDemiStatusIndicatorBarConfig : BarConfig
-    {
-        [ColorEdit4("Bahamut Color")]
-        [Order(26)]
-        public PluginConfigColor BahamutColor = new(new Vector4(128f / 255f, 255f / 255f, 255f / 255f, 100f / 100f));
-
-        [ColorEdit4("Phoenix Color")]
-        [Order(27)]
-        public PluginConfigColor PhoenixColor = new(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f));
-
-        public SummonerDemiStatusIndicatorBarConfig(Vector2 position, Vector2 size)
-            : base(position, size, new(Vector4.Zero))
-        {
-        }
-    }
 
     [Exportable(false)]
     public class SummonerTranceBarConfig : ProgressBarConfig
@@ -355,7 +310,52 @@ namespace DelvUI.Interface.Jobs
         [Order(27)]
         public PluginConfigColor PhoenixColor = new(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f));
 
+        [ColorEdit4("Ifrit Color")]
+        [Order(28)]
+        public PluginConfigColor IfritColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Titan Color")]
+        [Order(29)]
+        public PluginConfigColor TitanColor = new(new Vector4(255f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Garuda Color")]
+        [Order(30)]
+        public PluginConfigColor GarudaColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+
         public SummonerTranceBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+            : base(position, size, fillColor)
+        {
+        }
+    }
+
+    [Exportable(false)]
+    public class SummonerStacksBarConfig : ChunkedBarConfig
+    {
+        [Checkbox("Ifrit Stacks", separator = false, spacing = false)]
+        [Order(51)]
+        public bool ShowIfritStacks = true;
+
+        [Checkbox("Titan Stacks", separator = false, spacing = false)]
+        [Order(53)]
+        public bool ShowTitanStacks = true;
+
+        [Checkbox("Garuda Stacks", separator = false, spacing = false)]
+        [Order(55)]
+        public bool ShowGarudaStacks = true;
+
+        [ColorEdit4("Ifrit Stacks Color")]
+        [Order(56)]
+        public PluginConfigColor IfritStackColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Titan Stacks Color")]
+        [Order(57)]
+        public PluginConfigColor TitanStackColor = new(new Vector4(255f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Garuda Stacks Color")]
+        [Order(58)]
+        public PluginConfigColor GarudaStackColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+
+        public SummonerStacksBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
             : base(position, size, fillColor)
         {
         }
