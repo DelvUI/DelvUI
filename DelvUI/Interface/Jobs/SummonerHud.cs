@@ -258,7 +258,7 @@ namespace DelvUI.Interface.Jobs
         public ChunkedBarConfig AetherflowBar = new ChunkedBarConfig(
             new(-0, -7),
             new(254, 14),
-            new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f))
+            new(new Vector4(255f / 255f, 177f / 255f, 255f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Trance Bar", 45)]
@@ -272,21 +272,21 @@ namespace DelvUI.Interface.Jobs
         public ChunkedBarConfig IfritBar = new ChunkedBarConfig(
             new(-85, -39),
             new(84, 14),
-            new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f))
+            new(new Vector4(200f / 255f, 40f / 255f, 0f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Titan Bar", 55)]
         public ChunkedBarConfig TitanBar = new ChunkedBarConfig(
             new(0, -39),
             new(84, 14),
-            new(new Vector4(255f / 255f, 255f / 255f, 0f / 255f, 100f / 100f))
+            new(new Vector4(210f / 255f, 150f / 255f, 26f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Garuda Bar", 60)]
         public ChunkedBarConfig GarudaBar = new ChunkedBarConfig(
             new(85, -39),
             new(84, 14),
-            new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f))
+            new(new Vector4(60f / 255f, 160f / 255f, 100f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Attunement Stacks Bar", 65)]
@@ -308,19 +308,19 @@ namespace DelvUI.Interface.Jobs
 
         [ColorEdit4("Phoenix Color")]
         [Order(27)]
-        public PluginConfigColor PhoenixColor = new(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor PhoenixColor = new(new Vector4(240f / 255f, 100f / 255f, 10f / 255f, 100f / 100f));
 
         [ColorEdit4("Ifrit Color")]
         [Order(28)]
-        public PluginConfigColor IfritColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor IfritColor = new(new Vector4(200f / 255f, 40f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Titan Color")]
         [Order(29)]
-        public PluginConfigColor TitanColor = new(new Vector4(255f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor TitanColor = new(new Vector4(210f / 255f, 150f / 255f, 26f / 255f, 100f / 100f));
 
         [ColorEdit4("Garuda Color")]
         [Order(30)]
-        public PluginConfigColor GarudaColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor GarudaColor = new(new Vector4(60f / 255f, 160f / 255f, 100f / 255f, 100f / 100f));
 
         public SummonerTranceBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
             : base(position, size, fillColor)
@@ -345,15 +345,15 @@ namespace DelvUI.Interface.Jobs
 
         [ColorEdit4("Ifrit Stacks Color")]
         [Order(56)]
-        public PluginConfigColor IfritStackColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor IfritStackColor = new(new Vector4(200f / 255f, 40f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Titan Stacks Color")]
         [Order(57)]
-        public PluginConfigColor TitanStackColor = new(new Vector4(255f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor TitanStackColor = new(new Vector4(210f / 255f, 150f / 255f, 26f / 255f, 100f / 100f));
 
         [ColorEdit4("Garuda Stacks Color")]
         [Order(58)]
-        public PluginConfigColor GarudaStackColor = new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor GarudaStackColor = new(new Vector4(60f / 255f, 160f / 255f, 100f / 255f, 100f / 100f));
 
         public SummonerStacksBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
             : base(position, size, fillColor)
