@@ -410,7 +410,7 @@ namespace DelvUI.Interface.GeneralElements
     {
         [ColorEdit4("Max Health Color")]
         [Order(5)]
-        public PluginConfigColor MaxHealthColor = new PluginConfigColor(new(18f / 255f, 18f / 255f, 40f / 18f, 100f / 100f));
+        public PluginConfigColor MaxHealthColor = new PluginConfigColor(new(18f / 255f, 18f / 255f, 18f / 255f, 100f / 100f));
 
         [ColorEdit4("High Health Color")]
         [Order(10)]
