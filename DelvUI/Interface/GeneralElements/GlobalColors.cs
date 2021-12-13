@@ -408,24 +408,33 @@ namespace DelvUI.Interface.GeneralElements
     [Exportable(false)]
     public class ColorByHealthValueConfig : PluginConfigObject
     {
-        [ColorEdit4("Full Health Color")]
-        [Order(10)]
+
+        [Checkbox("Use Max Health Color")]
+        [Order(5)]
+        public bool UseMaxHealthColor = false;
+
+        [ColorEdit4("Max Health Color")]
+        [Order(10, collapseWith = nameof(UseMaxHealthColor))]
+        public PluginConfigColor MaxHealthColor = new PluginConfigColor(new(18f / 255f, 18f / 255f, 18f / 255f, 100f / 100f));
+
+        [ColorEdit4("High Health Color")]
+        [Order(15)]
         public PluginConfigColor FullHealthColor = new PluginConfigColor(new(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Low Health Color")]
-        [Order(15)]
+        [Order(20)]
         public PluginConfigColor LowHealthColor = new PluginConfigColor(new(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [DragFloat("Full Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
-        [Order(20)]
+        [DragFloat("Max Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
+        [Order(25)]
         public float FullHealthColorThreshold = 75f;
 
         [DragFloat("Low Health Color Below Health %", min = 0f, max = 50f, velocity = 1f)]
-        [Order(25)]
+        [Order(30)]
         public float LowHealthColorThreshold = 25f;
 
         [Combo("Blend Mode", "LAB", "LChab", "XYZ", "RGB", "LChuv", "Luv", "Jzazbz", "JzCzhz")]
-        [Order(30)]
+        [Order(35)]
         public BlendMode BlendMode = BlendMode.LAB;
     }
 

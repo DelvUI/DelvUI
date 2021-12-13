@@ -145,12 +145,12 @@ namespace DelvUI.Helpers
             => left + ((right - left) * t);
 
         public static PluginConfigColor GetColorByScale(float i, ColorByHealthValueConfig config) =>
-            GetColorByScale(i, config.LowHealthColorThreshold / 100f, config.FullHealthColorThreshold / 100f, config.LowHealthColor, config.FullHealthColor, config.BlendMode);
+            GetColorByScale(i, config.LowHealthColorThreshold / 100f, config.FullHealthColorThreshold / 100f, config.LowHealthColor, config.FullHealthColor, config.MaxHealthColor, config.UseMaxHealthColor, config.BlendMode);
 
         //Method used to interpolate two PluginConfigColors
         //i is scale [0 , 1]
         //min and max are used for color thresholds. for instance return colorLeft if i < min or return ColorRight if i > max
-        public static PluginConfigColor GetColorByScale(float i, float min, float max, PluginConfigColor colorLeft, PluginConfigColor colorRight, BlendMode blendMode)
+        public static PluginConfigColor GetColorByScale(float i, float min, float max, PluginConfigColor colorLeft, PluginConfigColor colorRight, PluginConfigColor colorMax, bool useMaxColor, BlendMode blendMode)
         {
             //Set our thresholds where the ratio is the range of values we will use for interpolation. 
             //Values outside this range will either return colorLeft or colorRight
@@ -179,6 +179,11 @@ namespace DelvUI.Helpers
             //Interpolate our Alpha now
             float alpha = LinearInterpolation(colorLeft.Vector.W, colorRight.Vector.W, ratio);
 
+            if (ratio >= 1 && useMaxColor)
+            {
+                return new PluginConfigColor(new Vector4((float)colorMax.Vector.X, (float)colorMax.Vector.Y, (float)colorMax.Vector.Z, colorMax.Vector.W));
+            }
+
             //Allow the users to select different blend modes since interpolating between two colors can result in different blending depending on the color space
             //We convert our RGBColor values into different color spaces. We then interpolate each channel before converting the color back into RGBColor space
             switch (blendMode)
@@ -198,7 +203,6 @@ namespace DelvUI.Helpers
                         );
 
                         Lab2RGB.NormalizeIntensity();
-
                         return new PluginConfigColor(new Vector4((float)Lab2RGB.R, (float)Lab2RGB.G, (float)Lab2RGB.B, alpha));
                     }
 
@@ -324,7 +328,6 @@ namespace DelvUI.Helpers
                         return new PluginConfigColor(new Vector4((float)JzCzhz2RGB.R, (float)JzCzhz2RGB.G, (float)JzCzhz2RGB.B, alpha));
                     }
             }
-
             return new(Vector4.One);
         }
 
