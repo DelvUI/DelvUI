@@ -145,12 +145,12 @@ namespace DelvUI.Helpers
             => left + ((right - left) * t);
 
         public static PluginConfigColor GetColorByScale(float i, ColorByHealthValueConfig config) =>
-            GetColorByScale(i, config.LowHealthColorThreshold / 100f, config.FullHealthColorThreshold / 100f, config.LowHealthColor, config.HighHealthColor, config.FullHealthColor, config.BlendMode);
+            GetColorByScale(i, config.LowHealthColorThreshold / 100f, config.FullHealthColorThreshold / 100f, config.LowHealthColor, config.FullHealthColor, config.MaxHealthColor, config.UseMaxHealthColor, config.BlendMode);
 
         //Method used to interpolate two PluginConfigColors
         //i is scale [0 , 1]
         //min and max are used for color thresholds. for instance return colorLeft if i < min or return ColorRight if i > max
-        public static PluginConfigColor GetColorByScale(float i, float min, float max, PluginConfigColor colorLeft, PluginConfigColor colorRight, PluginConfigColor colorMax, BlendMode blendMode)
+        public static PluginConfigColor GetColorByScale(float i, float min, float max, PluginConfigColor colorLeft, PluginConfigColor colorRight, PluginConfigColor colorMax, bool useMaxColor, BlendMode blendMode)
         {
             //Set our thresholds where the ratio is the range of values we will use for interpolation. 
             //Values outside this range will either return colorLeft or colorRight
@@ -179,7 +179,7 @@ namespace DelvUI.Helpers
             //Interpolate our Alpha now
             float alpha = LinearInterpolation(colorLeft.Vector.W, colorRight.Vector.W, ratio);
 
-            if (ratio >= 1)
+            if (ratio >= 1 && useMaxColor)
             {
                 return new PluginConfigColor(new Vector4((float)colorMax.Vector.X, (float)colorMax.Vector.Y, (float)colorMax.Vector.Z, colorMax.Vector.W));
             }
