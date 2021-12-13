@@ -176,7 +176,7 @@ namespace DelvUI.Interface.Party
             208, // WHM
             4247, // SCH
             4248, // AST
-            // Needs SGE ID
+            24859 // SGE
         };
         #endregion
     }
