@@ -16,6 +16,10 @@ namespace DelvUI.Interface.Jobs
     {
         private new PaladinConfig Config => (PaladinConfig)_config;
 
+        // goring blade and blade of valor
+        private static readonly List<uint> DoTIDs = new() { 725, 2721 };
+        private static readonly List<float> DoTDurations = new() { 21, 21 };
+
         public PaladinHud(PaladinConfig config, string? displayName = null) : base(config, displayName)
         {
         }
@@ -130,7 +134,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.RequiescatBar.HideWhenInactive || requiescatDuration > 0)
             {
                 Config.RequiescatBar.Label.SetValue(requiescatDuration);
-                BarUtilities.GetProgressBar(Config.RequiescatBar, requiescatDuration, 12f, 0f, player).Draw(origin);
+                BarUtilities.GetProgressBar(Config.RequiescatBar, requiescatDuration, 30f, 0f, player).Draw(origin);
             }
         }
 
@@ -148,7 +152,7 @@ namespace DelvUI.Interface.Jobs
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
-            BarUtilities.GetDoTBar(Config.GoringBladeBar, player, target, 725, 21f)?.
+            BarUtilities.GetDoTBar(Config.GoringBladeBar, player, target, DoTIDs, DoTDurations)?.
                 Draw(origin);
         }
     }
@@ -206,7 +210,7 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Goring Blade Bar", 55)]
+        [NestedConfig("DoT Bar", 55)]
         public ProgressBarConfig GoringBladeBar = new ProgressBarConfig(
             new(0, -98),
             new(254, 20),
