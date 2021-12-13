@@ -408,15 +408,19 @@ namespace DelvUI.Interface.GeneralElements
     [Exportable(false)]
     public class ColorByHealthValueConfig : PluginConfigObject
     {
-        [ColorEdit4("Full Health Color")]
+        [ColorEdit4("Max Health Color")]
+        [Order(5)]
+        public PluginConfigColor MaxHealthColor = new PluginConfigColor(new(18f / 255f, 18f / 255f, 40f / 18f, 100f / 100f));
+
+        [ColorEdit4("High Health Color")]
         [Order(10)]
-        public PluginConfigColor FullHealthColor = new PluginConfigColor(new(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
+        public PluginConfigColor HighHealthColor = new PluginConfigColor(new(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Low Health Color")]
         [Order(15)]
         public PluginConfigColor LowHealthColor = new PluginConfigColor(new(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [DragFloat("Full Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
+        [DragFloat("Max Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
         [Order(20)]
         public float FullHealthColorThreshold = 75f;
 
