@@ -422,7 +422,7 @@ namespace DelvUI.Interface.GeneralElements
 
         [DragFloat("Max Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
         [Order(20)]
-        public float FullHealthColorThreshold = 75f;
+        public float MaxHealthColorThreshold = 75f;
 
         [DragFloat("Low Health Color Below Health %", min = 0f, max = 50f, velocity = 1f)]
         [Order(25)]

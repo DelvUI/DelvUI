@@ -145,7 +145,7 @@ namespace DelvUI.Helpers
             => left + ((right - left) * t);
 
         public static PluginConfigColor GetColorByScale(float i, ColorByHealthValueConfig config) =>
-            GetColorByScale(i, config.LowHealthColorThreshold / 100f, config.FullHealthColorThreshold / 100f, config.LowHealthColor, config.HighHealthColor, config.MaxHealthColor, config.BlendMode);
+            GetColorByScale(i, config.LowHealthColorThreshold / 100f, config.MaxHealthColorThreshold / 100f, config.LowHealthColor, config.HighHealthColor, config.MaxHealthColor, config.BlendMode);
 
         //Method used to interpolate two PluginConfigColors
         //i is scale [0 , 1]
