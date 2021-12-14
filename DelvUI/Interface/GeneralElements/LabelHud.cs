@@ -1,7 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using DelvUI.Helpers;
+﻿using DelvUI.Helpers;
 using ImGuiNET;
 using System.Numerics;
+using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 
@@ -68,12 +68,30 @@ namespace DelvUI.Interface.GeneralElements
             }
         }
 
-        public virtual PluginConfigColor Color(GameObject? actor = null) =>
-        Config.UseJobColor switch
+        public virtual PluginConfigColor Color(GameObject? actor = null)
         {
-            true when actor is Character || actor is BattleNpc battleNpc && battleNpc.ClassJob.Id > 0 => Utils.ColorForActor(actor),
-            true when actor is not Character => GlobalColors.Instance.NPCFriendlyColor,
-            _ => Config.Color
-        };
+            switch (Config.UseJobColor)
+            {
+                case true when (actor is Character || actor is BattleNpc battleNpc && battleNpc.ClassJob.Id > 0):
+                    return Utils.ColorForActor(actor);
+                case true when actor is not Character:
+                    return GlobalColors.Instance.NPCFriendlyColor;
+            }
+
+            switch (Config.UseRoleColor)
+            {
+                case true when (actor is Character || actor is BattleNpc battleNpc && battleNpc.ClassJob.Id > 0):
+                    {
+                        Character? character = actor as Character;
+                        return character != null && character.ClassJob.Id > 0 ?
+                            GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id) :
+                            Utils.ColorForActor(character);
+                    }
+                case true when actor is not Character:
+                    return GlobalColors.Instance.NPCFriendlyColor;
+                default:
+                    return Config.Color;
+            }
+        }
     }
 }

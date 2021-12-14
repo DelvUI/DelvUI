@@ -121,45 +121,28 @@ namespace DelvUI.Interface.GeneralElements
         }
         #endregion
 
-        public PluginConfigColor? ColorForJobId(uint jobId)
-        {
-            if (ColorMap.TryGetValue(jobId, out var color))
-            {
-                return color;
-            }
+        public PluginConfigColor? ColorForJobId(uint jobId) => ColorMap.TryGetValue(jobId, out PluginConfigColor? color) ? color : null;
 
-            return null;
-        }
-
-        public PluginConfigColor SafeColorForJobId(uint jobId)
-        {
-            return ColorForJobId(jobId) ?? _miscColorConfig.NPCNeutralColor;
-        }
+        public PluginConfigColor SafeColorForJobId(uint jobId) => ColorForJobId(jobId) ?? _miscColorConfig.NPCNeutralColor;
 
         public PluginConfigColor? RoleColorForJobId(uint jobId)
         {
-            var role = JobsHelper.RoleForJob(jobId);
+            JobRoles role = JobsHelper.RoleForJob(jobId);
 
-            switch (role)
+            return role switch
             {
-                case JobRoles.Tank: return _rolesColorConfig.TankRoleColor;
-                case JobRoles.Healer: return _rolesColorConfig.HealerRoleColor;
-
-                case JobRoles.DPSMelee: return _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.MeleeDPSRoleColor : _rolesColorConfig.DPSRoleColor;
-                case JobRoles.DPSRanged: return _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.RangedDPSRoleColor : _rolesColorConfig.DPSRoleColor;
-                case JobRoles.DPSCaster: return _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.CasterDPSRoleColor : _rolesColorConfig.DPSRoleColor;
-
-                case JobRoles.Gatherer: return _rolesColorConfig.LANDColor;
-                case JobRoles.Crafter: return _rolesColorConfig.HANDColor;
-            }
-
-            return null;
+                JobRoles.Tank => _rolesColorConfig.TankRoleColor,
+                JobRoles.Healer => _rolesColorConfig.HealerRoleColor,
+                JobRoles.DPSMelee => _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.MeleeDPSRoleColor : _rolesColorConfig.DPSRoleColor,
+                JobRoles.DPSRanged => _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.RangedDPSRoleColor : _rolesColorConfig.DPSRoleColor,
+                JobRoles.DPSCaster => _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.CasterDPSRoleColor : _rolesColorConfig.DPSRoleColor,
+                JobRoles.Gatherer => _rolesColorConfig.LANDColor,
+                JobRoles.Crafter => _rolesColorConfig.HANDColor,
+                _ => null
+            };
         }
 
-        public PluginConfigColor SafeRoleColorForJobId(uint jobId)
-        {
-            return RoleColorForJobId(jobId) ?? _miscColorConfig.NPCNeutralColor;
-        }
+        public PluginConfigColor SafeRoleColorForJobId(uint jobId) => RoleColorForJobId(jobId) ?? _miscColorConfig.NPCNeutralColor;
 
         public PluginConfigColor EmptyUnitFrameColor => _miscColorConfig.EmptyUnitFrameColor;
         public PluginConfigColor EmptyColor => _miscColorConfig.EmptyColor;
