@@ -172,7 +172,8 @@ namespace DelvUI.Helpers
             "LinkShell",
             "ChatConfig",
             "ColorPicker",
-            "PlayGuide"
+            "PlayGuide",
+            "SelectYesno"
         };
 
         private List<ClipRect> _clipRects = new List<ClipRect>();
