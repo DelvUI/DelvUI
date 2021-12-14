@@ -7,6 +7,7 @@ using DelvUI.Interface.Bars;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Interface.GeneralElements;
 
 namespace DelvUI.Interface.Jobs
@@ -52,7 +53,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDotBar(Vector2 origin, PlayerCharacter player)
         {
-            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
             BarUtilities.GetDoTBar(Config.DotBar, player, target, DotIDs, DotDurations)?.
                     Draw(origin);
@@ -70,12 +71,12 @@ namespace DelvUI.Interface.Jobs
 
             if (!Config.AddersgallBar.HideWhenInactive || adderScale > 0)
             {
-                BarUtilities.GetChunkedBars(Config.AddersgallBar, 3, adderScale, 3, glowConfig: glow).Draw(origin);
+                BarUtilities.GetChunkedBars(Config.AddersgallBar, 3, adderScale, 3, glowConfig: glow, chunksToGlow: new[] { true, true, true }).Draw(origin);
             }
 
             if (!Config.AdderstingBar.HideWhenInactive || gauge.Addersting > 0)
             {
-                BarUtilities.GetChunkedBars(Config.AdderstingBar, 3, gauge.Addersting, 3, glowConfig: glow).Draw(origin);
+                BarUtilities.GetChunkedBars(Config.AdderstingBar, 3, gauge.Addersting, 3, glowConfig: glow, chunksToGlow: new[] { true, true, true }).Draw(origin);
             }
         }
     }
