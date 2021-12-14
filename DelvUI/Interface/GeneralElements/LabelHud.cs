@@ -83,7 +83,7 @@ namespace DelvUI.Interface.GeneralElements
                 case true when (actor is Character || actor is BattleNpc battleNpc && battleNpc.ClassJob.Id > 0):
                     {
                         Character? character = actor as Character;
-                        return character is PlayerCharacter ?
+                        return character != null && character.ClassJob.Id > 0 ?
                             GlobalColors.Instance.SafeRoleColorForJobId(character.ClassJob.Id) :
                             Utils.ColorForActor(character);
                     }
