@@ -1,15 +1,22 @@
-﻿using System.Collections.Generic;
-using System.Numerics;
-using Dalamud.Game.ClientState.Objects.SubKinds;
+﻿using System.Numerics;
+using Dalamud.Game.ClientState.JobGauge.Types;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
+using DelvUI.Interface.Bars;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using DelvUI.Interface.GeneralElements;
 
 namespace DelvUI.Interface.Jobs
 {
     public class SageHud : JobHud
     {
         private new SageConfig Config => (SageConfig)_config;
+
+        private static readonly List<uint> DotIDs = new() { 2614, 2615, 2616 };
+        private static readonly List<float> DotDurations = new() { 30, 30, 30 };
 
         public SageHud(JobConfig config, string? displayName = null) : base(config, displayName)
         {
@@ -20,12 +27,56 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new();
             List<Vector2> sizes = new();
 
+            if (Config.AddersgallBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.AddersgallBar.Position);
+                sizes.Add(Config.AddersgallBar.Size);
+            }
+
+            if (Config.DotBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.DotBar.Position);
+                sizes.Add(Config.DotBar.Size);
+            }
+
             return (positions, sizes);
         }
 
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
+
+            if (Config.AddersgallBar.Enabled) { DrawAddersgallBar(pos, player); }
+            if (Config.DotBar.Enabled) { DrawDotBar(pos, player); }
+        }
+
+        private void DrawDotBar(Vector2 origin, PlayerCharacter player)
+        {
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+
+            BarUtilities.GetDoTBar(Config.DotBar, player, target, DotIDs, DotDurations)?.
+                    Draw(origin);
+        }
+
+        private void DrawAddersgallBar(Vector2 origin, PlayerCharacter player)
+        {
+            SGEGauge gauge = Plugin.JobGauges.Get<SGEGauge>();
+
+            const float addersgallCooldown = 20000f;
+
+            float GetScale(int num, float timer) => num + (timer / addersgallCooldown);
+            float adderScale = GetScale(gauge.Addersgall, gauge.AddersgallTimer);
+            BarGlowConfig? glow = gauge.Eukrasia ? Config.AddersgallBar.GlowConfig : null;
+
+            if (!Config.AddersgallBar.HideWhenInactive || adderScale > 0)
+            {
+                BarUtilities.GetChunkedBars(Config.AddersgallBar, 3, adderScale, 3, glowConfig: glow).Draw(origin);
+            }
+
+            if (!Config.AdderstingBar.HideWhenInactive || gauge.Addersting > 0)
+            {
+                BarUtilities.GetChunkedBars(Config.AdderstingBar, 3, gauge.Addersting, 3, glowConfig: glow).Draw(origin);
+            }
         }
     }
 
@@ -40,7 +91,42 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new SageConfig();
 
+            config.DotBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+
             return config;
+        }
+
+        [NestedConfig("Addersgall Bar", 35)]
+        public AddersgallBarConfig AddersgallBar = new AddersgallBarConfig(
+            new(-64, -32),
+            new(126, 20),
+            new PluginConfigColor(new(197f / 255f, 247f / 255f, 255f / 255f, 100f / 100f))
+        );
+
+        [NestedConfig("Addersting Bar", 40)]
+        public AddersgallBarConfig AdderstingBar = new AddersgallBarConfig(
+            new(64, -32),
+            new(126, 20),
+            new PluginConfigColor(new(255f / 255f, 232f / 255f, 255f / 255f, 100f / 100f))
+        );
+
+        [NestedConfig("Eukrasian Dosis Bar", 45)]
+        public ProgressBarConfig DotBar = new ProgressBarConfig(
+            new(0, -10),
+            new(254, 20),
+            new PluginConfigColor(new(41f / 255f, 142f / 255f, 144f / 255f, 100f / 100f))
+        );
+    }
+
+    [Exportable(false)]
+    public class AddersgallBarConfig : ChunkedBarConfig
+    {
+        [NestedConfig("Glow when Eukrasia active", 60, separator = false, spacing = true)]
+        public BarGlowConfig GlowConfig = new BarGlowConfig();
+
+        public AddersgallBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+             : base(position, size, fillColor)
+        {
         }
     }
 }
