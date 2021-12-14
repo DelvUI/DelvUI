@@ -122,7 +122,7 @@ namespace DelvUI.Interface.Jobs
             PluginConfigColor color = Config.BalanceBar.FillColor;
             int value = 0;
 
-            if (whiteGauge >= 80 && blackGauge >= 80)
+            if (whiteGauge >= 50 && blackGauge >= 50)
             {
                 value = 1;
             }
