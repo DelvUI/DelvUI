@@ -66,7 +66,7 @@ namespace DelvUI.Interface.Jobs
 
             float GetScale(int num, float timer) => num + (timer / addersgallCooldown);
             float adderScale = GetScale(gauge.Addersgall, gauge.AddersgallTimer);
-            BarGlowConfig? glow = gauge.Eukrasia ? Config.AddersgallBar.GlowConfig : null;
+            BarGlowConfig? glow = gauge.Eukrasia && Config.EukrasiaGlow ? Config.AddersgallBar.GlowConfig : null;
 
             if (!Config.AddersgallBar.HideWhenInactive || adderScale > 0)
             {
@@ -116,17 +116,22 @@ namespace DelvUI.Interface.Jobs
             new(254, 20),
             new PluginConfigColor(new(41f / 255f, 142f / 255f, 144f / 255f, 100f / 100f))
         );
+
+        [Checkbox("Enable Eukrasia Glow", spacing = true)]
+        [Order(50)]
+        public bool EukrasiaGlow = true;
     }
 
     [Exportable(false)]
     public class AddersgallBarConfig : ChunkedBarConfig
     {
-        [NestedConfig("Glow when Eukrasia active", 60, separator = false, spacing = true)]
-        public BarGlowConfig GlowConfig = new BarGlowConfig();
+        [NestedConfig("Glow Color (when Eukrasia active)", 60, separator = false, spacing = true)]
+        public BarGlowConfig GlowConfig = new();
 
         public AddersgallBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
              : base(position, size, fillColor)
         {
+            GlowConfig.Color = new PluginConfigColor(new(247f / 255f, 177f / 255f, 67f / 255f, 100f / 100f));
         }
     }
 }
