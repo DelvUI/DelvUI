@@ -1,5 +1,7 @@
 # 0.6.1.0
 - Change Storms Eye tracker to track Surging Tempest
+- Fixed "Hide When Inactive" option of SMN trance bar
+- Added an option to hide trance bar when primals are active (i.e. to only show trance bar for bahamut and phoenix)
 
 # 0.6.0.0
 Endwalker Beta Release:
