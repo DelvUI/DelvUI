@@ -161,14 +161,14 @@ namespace DelvUI.Interface.Jobs
 
         [NestedConfig("Kerachole Bar", 50)]
         public ProgressBarConfig KeracholeBar = new ProgressBarConfig(
-            new(96, -52),
+            new(64, -52),
             new(126, 15),
             new PluginConfigColor(new(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Physis Bar", 55)]
         public ProgressBarConfig PhysisBar = new ProgressBarConfig(
-            new(-96, -52),
+            new(-64, -52),
             new(126, 15),
             new PluginConfigColor(new(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f))
         );
