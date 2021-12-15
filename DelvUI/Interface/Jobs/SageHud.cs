@@ -129,6 +129,7 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new SageConfig();
 
+            config.UseDefaultPrimaryResourceBar = true;
             config.DotBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
 
             return config;
