@@ -117,7 +117,7 @@ namespace DelvUI.Interface.Jobs
         }
 
         private static List<uint> CausticBiteDoTIDs = new List<uint> { 124, 1200 };
-        private static List<float> CausticBiteDoTDurations = new List<float> { 30, 30 };
+        private static List<float> CausticBiteDoTDurations = new List<float> { 45, 45 };
 
         protected void DrawCausticBiteDoTBar(Vector2 origin, PlayerCharacter player)
         {
@@ -128,7 +128,7 @@ namespace DelvUI.Interface.Jobs
         }
 
         private static List<uint> StormbiteDoTIDs = new List<uint> { 129, 1201 };
-        private static List<float> StormbiteDoTDurations = new List<float> { 30, 30 };
+        private static List<float> StormbiteDoTDurations = new List<float> { 45, 45 };
 
         protected void DrawStormbiteDoTBar(Vector2 origin, PlayerCharacter player)
         {
