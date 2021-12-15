@@ -1,5 +1,7 @@
-# 0.6.1.0
-- Change Storms Eye tracker to track Surging Tempest
+# 0.6.0.1
+Fixes:
+- Fixed Storm's Eye Bar not tracking the new Surging Tempest buff (renamed to Surging Tempest Bar).
+- Fixed Bard's DoTs and songs durations.
 
 # 0.6.0.0
 Endwalker Beta Release:
