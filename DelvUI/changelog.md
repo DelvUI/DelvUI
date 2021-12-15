@@ -1,3 +1,6 @@
+# 0.6.1.0
+- Change Storms Eye tracker to track Surging Tempest
+
 # 0.6.0.0
 Endwalker Beta Release:
 - Reworked job huds according to the new job changes.

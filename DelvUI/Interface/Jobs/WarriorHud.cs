@@ -59,12 +59,12 @@ namespace DelvUI.Interface.Jobs
         private void DrawStormsEyeBar(Vector2 origin, PlayerCharacter player)
         {
             float innerReleaseDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1177 or 86 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
-            float stormsEyeDuration = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId is 90)?.RemainingTime ?? 0f);
+            float surgingTempestDuration = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId is 2677)?.RemainingTime ?? 0f);
 
-            if ((!Config.StormsEyeBar.HideWhenInactive || stormsEyeDuration > 0) && innerReleaseDuration is 0)
+            if ((!Config.StormsEyeBar.HideWhenInactive || surgingTempestDuration > 0) && innerReleaseDuration is 0)
             {
-                Config.StormsEyeBar.Label.SetValue(stormsEyeDuration);
-                BarUtilities.GetProgressBar(Config.StormsEyeBar, stormsEyeDuration, 60f, 0f, player, Config.StormsEyeBar.StormsEyeColor).Draw(origin);
+                Config.StormsEyeBar.Label.SetValue(surgingTempestDuration);
+                BarUtilities.GetProgressBar(Config.StormsEyeBar, surgingTempestDuration, 60f, 0f, player, Config.StormsEyeBar.StormsEyeColor).Draw(origin);
             }
             if (innerReleaseDuration > 0)
             {
