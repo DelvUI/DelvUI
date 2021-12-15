@@ -140,9 +140,13 @@ namespace DelvUI.Interface.Jobs
 
                 for (int i = 0; i < chunks.Length; i++)
                 {
-                    chunks[i] = new(Config.PerfectBalanceBar.FillColor, i < stacks ? 1f : 0, null);
+                    chunks[i] = new(
+                        Config.PerfectBalanceBar.FillColor,
+                        i < stacks ? 1f : 0,
+                        i == 1 ? Config.PerfectBalanceBar.PerfectBalanceLabel : null);
                 }
 
+                Config.PerfectBalanceBar.PerfectBalanceLabel.SetValue(duration);
                 BarUtilities.GetChunkedBars(Config.PerfectBalanceBar, chunks, player).Draw(pos);
             }
         }
@@ -246,6 +250,7 @@ namespace DelvUI.Interface.Jobs
             config.FormsBar.Enabled = false;
             config.LeadenFistBar.FillDirection = BarDirection.Up;
             config.MastersGauge.BlitzTimerLabel.HideIfZero = true;
+            config.PerfectBalanceBar.PerfectBalanceLabel.HideIfZero = true;
 
             return config;
         }
@@ -286,7 +291,7 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Perfect Balance", 55)]
-        public ChunkedBarConfig PerfectBalanceBar = new ChunkedBarConfig(
+        public PerfectBalanceBar PerfectBalanceBar = new PerfectBalanceBar(
             new(0, -76),
             new(254, 20),
             new(new Vector4(150f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
@@ -300,16 +305,28 @@ namespace DelvUI.Interface.Jobs
         );
     }
 
+    public class PerfectBalanceBar : ChunkedBarConfig
+    {
+        [NestedConfig("Perfect Balance Duration Text", 50, spacing = true)]
+        public NumericLabelConfig PerfectBalanceLabel;
+
+        public PerfectBalanceBar(Vector2 position, Vector2 size, PluginConfigColor fillColor, int padding = 2) : base(position, size, fillColor, padding)
+        {
+            PerfectBalanceLabel = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
+        }
+    }
+
     [DisableParentSettings("FillColor", "FillDirection")]
     public class MastersGauge : ChunkedBarConfig
     {
-        [ColorEdit4("Solar Nadi Color")]
-        [Order(19)]
-        public PluginConfigColor SolarNadiColor = new PluginConfigColor(new Vector4(246f / 255f, 243f / 131f, 196f / 255f, 100f / 100f));
 
         [ColorEdit4("Lunar Nadi Color")]
-        [Order(20)]
+        [Order(19)]
         public PluginConfigColor LunarNadiColor = new PluginConfigColor(new Vector4(240f / 255f, 227f / 255f, 246f / 255f, 100f / 100f));
+
+        [ColorEdit4("Solar Nadi Color")]
+        [Order(20)]
+        public PluginConfigColor SolarNadiColor = new PluginConfigColor(new Vector4(255f / 255f, 248f / 255f, 141f / 255f, 100f / 100f));
 
         [ColorEdit4("Raptor Chakra Color")]
         [Order(21)]
