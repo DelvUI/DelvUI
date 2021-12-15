@@ -178,7 +178,6 @@ namespace DelvUI.Interface.Jobs
                 tranceColor = gauge.IsIfritAttuned ? Config.TranceBar.IfritColor : gauge.IsTitanAttuned ? Config.TranceBar.TitanColor : gauge.IsGarudaAttuned ? Config.TranceBar.GarudaColor : Config.TranceBar.FillColor;
                 tranceDuration = gauge.AttunmentTimerRemaining;
                 maxDuration = 30000f;
-
             }
             else
             {
@@ -200,7 +199,7 @@ namespace DelvUI.Interface.Jobs
 
             if (tranceDuration != 0)
             {
-                if (Config.TranceBar.HideWhenInactive && tranceDuration == 0)
+                if (gauge.AttunmentTimerRemaining > 0 && Config.TranceBar.HidePrimals)
                 {
                     return;
                 }
@@ -209,7 +208,7 @@ namespace DelvUI.Interface.Jobs
             }
             else
             {
-                if (!Config.TranceBar.HideWhenInactive || currentCooldown < maxDuration)
+                if (!Config.TranceBar.HideWhenInactive)
                 {
                     if (gauge.AttunmentTimerRemaining == 0)
                     {
@@ -321,6 +320,10 @@ namespace DelvUI.Interface.Jobs
         [ColorEdit4("Garuda Color")]
         [Order(30)]
         public PluginConfigColor GarudaColor = new(new Vector4(60f / 255f, 160f / 255f, 100f / 255f, 100f / 100f));
+        
+        [Checkbox("Hide Primals")]
+        [Order(45)]
+        public bool HidePrimals = false;
 
         public SummonerTranceBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
             : base(position, size, fillColor)
