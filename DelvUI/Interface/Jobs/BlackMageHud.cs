@@ -345,13 +345,13 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new Vector4(234f / 255f, 95f / 255f, 155f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Umbreal Ice / Astral Fire Bar", 31)]
+        [NestedConfig("Umbral Ice / Astral Fire Bar", 31)]
         public BlackMageStacksBarConfig StacksBar = new BlackMageStacksBarConfig(
             new(-67, -27),
             new(120, 10)
         );
 
-        [NestedConfig("Umbreal Heart Bar", 32)]
+        [NestedConfig("Umbral Heart Bar", 32)]
         public ChunkedBarConfig UmbralHeartBar = new ChunkedBarConfig(
             new(67, -27),
             new(120, 10),

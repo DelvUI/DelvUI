@@ -193,14 +193,14 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new Vector4(0, 0, 0, 0))
         );
 
-        [NestedConfig("Shifu Bar", 45)]
+        [NestedConfig("Fuka Bar", 45)]
         public ProgressBarConfig ShifuBar = new ProgressBarConfig(
             new(-64, -56),
             new(126, 20),
             new PluginConfigColor(new(219f / 255f, 211f / 255f, 136f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Jinpu Bar", 50)]
+        [NestedConfig("Fugetsu Bar", 50)]
         public ProgressBarConfig JinpuBar = new ProgressBarConfig(
             new(64, -56),
             new(126, 20),

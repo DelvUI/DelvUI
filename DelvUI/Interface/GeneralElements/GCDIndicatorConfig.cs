@@ -77,7 +77,7 @@ namespace DelvUI.Interface.GeneralElements
             new PluginConfigColor(Vector4.Zero)
         );
 
-        public new static GCDIndicatorConfig DefaultConfig() { return new GCDIndicatorConfig(); }
+        public new static GCDIndicatorConfig DefaultConfig() { return new GCDIndicatorConfig() { Enabled = false }; }
     }
 
     [DisableParentSettings("Position", "Anchor", "HideWhenInactive", "FillColor", "BackgroundColor", "DrawBorder")]
