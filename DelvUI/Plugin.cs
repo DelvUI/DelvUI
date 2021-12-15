@@ -1,6 +1,10 @@
-﻿using Dalamud.Data;
+﻿using System;
+using System.IO;
+using System.Reflection;
+using Dalamud.Data;
 using Dalamud.Game;
 using Dalamud.Game.ClientState;
+using Dalamud.Game.ClientState.Buddy;
 using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.JobGauge;
 using Dalamud.Game.ClientState.Objects;
@@ -18,10 +22,6 @@ using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Party;
 using ImGuiNET;
 using ImGuiScene;
-using System;
-using System.IO;
-using System.Reflection;
-using Dalamud.Game.ClientState.Buddy;
 using SigScanner = Dalamud.Game.SigScanner;
 
 namespace DelvUI
@@ -93,7 +93,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.5.1.0";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.6.0.0";
 
             FontsManager.Initialize(AssemblyLocation);
             LoadBanner();

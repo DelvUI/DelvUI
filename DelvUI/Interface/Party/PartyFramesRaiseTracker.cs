@@ -167,7 +167,8 @@ namespace DelvUI.Interface.Party
             18317, // BLU
             22345, // Lost Sacrifice, Bozja
             20730, // Lost Arise, Bozja
-            12996 // Raise L, Eureka
+            12996, // Raise L, Eureka
+            24287 // SGE
         };
 
         private static List<uint> LimitBreakIds = new List<uint>()
@@ -175,6 +176,7 @@ namespace DelvUI.Interface.Party
             208, // WHM
             4247, // SCH
             4248, // AST
+            24859 // SGE
         };
         #endregion
     }

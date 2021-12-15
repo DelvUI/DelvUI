@@ -48,6 +48,7 @@ namespace DelvUI.Interface.GeneralElements
                 [JobIDs.WHM] = healersColorConfig.WHMColor,
                 [JobIDs.SCH] = healersColorConfig.SCHColor,
                 [JobIDs.AST] = healersColorConfig.ASTColor,
+                [JobIDs.SGE] = healersColorConfig.SGEColor,
 
                 // melee
                 [JobIDs.PGL] = meleeColorConfig.PGLColor,
@@ -57,6 +58,7 @@ namespace DelvUI.Interface.GeneralElements
                 [JobIDs.DRG] = meleeColorConfig.DRGColor,
                 [JobIDs.NIN] = meleeColorConfig.NINColor,
                 [JobIDs.SAM] = meleeColorConfig.SAMColor,
+                [JobIDs.RPR] = meleeColorConfig.RPRColor,
 
                 // ranged 
                 [JobIDs.ARC] = rangedColorConfig.ARCColor,
@@ -119,45 +121,28 @@ namespace DelvUI.Interface.GeneralElements
         }
         #endregion
 
-        public PluginConfigColor? ColorForJobId(uint jobId)
-        {
-            if (ColorMap.TryGetValue(jobId, out var color))
-            {
-                return color;
-            }
+        public PluginConfigColor? ColorForJobId(uint jobId) => ColorMap.TryGetValue(jobId, out PluginConfigColor? color) ? color : null;
 
-            return null;
-        }
-
-        public PluginConfigColor SafeColorForJobId(uint jobId)
-        {
-            return ColorForJobId(jobId) ?? _miscColorConfig.NPCNeutralColor;
-        }
+        public PluginConfigColor SafeColorForJobId(uint jobId) => ColorForJobId(jobId) ?? _miscColorConfig.NPCNeutralColor;
 
         public PluginConfigColor? RoleColorForJobId(uint jobId)
         {
-            var role = JobsHelper.RoleForJob(jobId);
+            JobRoles role = JobsHelper.RoleForJob(jobId);
 
-            switch (role)
+            return role switch
             {
-                case JobRoles.Tank: return _rolesColorConfig.TankRoleColor;
-                case JobRoles.Healer: return _rolesColorConfig.HealerRoleColor;
-
-                case JobRoles.DPSMelee: return _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.MeleeDPSRoleColor : _rolesColorConfig.DPSRoleColor;
-                case JobRoles.DPSRanged: return _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.RangedDPSRoleColor : _rolesColorConfig.DPSRoleColor;
-                case JobRoles.DPSCaster: return _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.CasterDPSRoleColor : _rolesColorConfig.DPSRoleColor;
-
-                case JobRoles.Gatherer: return _rolesColorConfig.LANDColor;
-                case JobRoles.Crafter: return _rolesColorConfig.HANDColor;
-            }
-
-            return null;
+                JobRoles.Tank => _rolesColorConfig.TankRoleColor,
+                JobRoles.Healer => _rolesColorConfig.HealerRoleColor,
+                JobRoles.DPSMelee => _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.MeleeDPSRoleColor : _rolesColorConfig.DPSRoleColor,
+                JobRoles.DPSRanged => _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.RangedDPSRoleColor : _rolesColorConfig.DPSRoleColor,
+                JobRoles.DPSCaster => _rolesColorConfig.UseSpecificDPSColors ? _rolesColorConfig.CasterDPSRoleColor : _rolesColorConfig.DPSRoleColor,
+                JobRoles.Gatherer => _rolesColorConfig.LANDColor,
+                JobRoles.Crafter => _rolesColorConfig.HANDColor,
+                _ => null
+            };
         }
 
-        public PluginConfigColor SafeRoleColorForJobId(uint jobId)
-        {
-            return RoleColorForJobId(jobId) ?? _miscColorConfig.NPCNeutralColor;
-        }
+        public PluginConfigColor SafeRoleColorForJobId(uint jobId) => RoleColorForJobId(jobId) ?? _miscColorConfig.NPCNeutralColor;
 
         public PluginConfigColor EmptyUnitFrameColor => _miscColorConfig.EmptyUnitFrameColor;
         public PluginConfigColor EmptyColor => _miscColorConfig.EmptyColor;
@@ -218,8 +203,12 @@ namespace DelvUI.Interface.GeneralElements
         [Order(15)]
         public PluginConfigColor ASTColor = new PluginConfigColor(new(255f / 255f, 231f / 255f, 74f / 255f, 100f / 100f));
 
-        [ColorEdit4("Conjurer", spacing = true)]
+        [ColorEdit4("Sage")]
         [Order(20)]
+        public PluginConfigColor SGEColor = new PluginConfigColor(new(144f / 255f, 176f / 255f, 255f / 255f, 100f / 100f));
+
+        [ColorEdit4("Conjurer", spacing = true)]
+        [Order(25)]
         public PluginConfigColor CNJColor = new PluginConfigColor(new(255f / 255f, 240f / 255f, 220f / 255f, 100f / 100f));
     }
 
@@ -246,16 +235,20 @@ namespace DelvUI.Interface.GeneralElements
         [Order(20)]
         public PluginConfigColor SAMColor = new PluginConfigColor(new(228f / 255f, 109f / 255f, 4f / 255f, 100f / 100f));
 
-        [ColorEdit4("Pugilist", spacing = true)]
+        [ColorEdit4("Reaper")]
         [Order(25)]
+        public PluginConfigColor RPRColor = new PluginConfigColor(new(150f / 255f, 90f / 255f, 144f / 255f, 100f / 100f));
+
+        [ColorEdit4("Pugilist", spacing = true)]
+        [Order(30)]
         public PluginConfigColor PGLColor = new PluginConfigColor(new(214f / 255f, 156f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Rogue")]
-        [Order(30)]
+        [Order(35)]
         public PluginConfigColor ROGColor = new PluginConfigColor(new(175f / 255f, 25f / 255f, 100f / 255f, 100f / 100f));
 
         [ColorEdit4("Lancer")]
-        [Order(35)]
+        [Order(40)]
         public PluginConfigColor LNCColor = new PluginConfigColor(new(65f / 255f, 100f / 255f, 205f / 255f, 100f / 100f));
     }
 
@@ -398,24 +391,33 @@ namespace DelvUI.Interface.GeneralElements
     [Exportable(false)]
     public class ColorByHealthValueConfig : PluginConfigObject
     {
-        [ColorEdit4("Full Health Color")]
-        [Order(10)]
+
+        [Checkbox("Use Max Health Color")]
+        [Order(5)]
+        public bool UseMaxHealthColor = false;
+
+        [ColorEdit4("Max Health Color")]
+        [Order(10, collapseWith = nameof(UseMaxHealthColor))]
+        public PluginConfigColor MaxHealthColor = new PluginConfigColor(new(18f / 255f, 18f / 255f, 18f / 255f, 100f / 100f));
+
+        [ColorEdit4("High Health Color")]
+        [Order(15)]
         public PluginConfigColor FullHealthColor = new PluginConfigColor(new(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Low Health Color")]
-        [Order(15)]
+        [Order(20)]
         public PluginConfigColor LowHealthColor = new PluginConfigColor(new(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
-        [DragFloat("Full Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
-        [Order(20)]
+        [DragFloat("Max Health Color Above Health %", min = 50f, max = 100f, velocity = 1f)]
+        [Order(25)]
         public float FullHealthColorThreshold = 75f;
 
         [DragFloat("Low Health Color Below Health %", min = 0f, max = 50f, velocity = 1f)]
-        [Order(25)]
+        [Order(30)]
         public float LowHealthColorThreshold = 25f;
 
         [Combo("Blend Mode", "LAB", "LChab", "XYZ", "RGB", "LChuv", "Luv", "Jzazbz", "JzCzhz")]
-        [Order(30)]
+        [Order(35)]
         public BlendMode BlendMode = BlendMode.LAB;
     }
 

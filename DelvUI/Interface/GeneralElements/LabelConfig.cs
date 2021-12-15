@@ -20,10 +20,7 @@ namespace DelvUI.Interface.GeneralElements
             Text = text;
         }
 
-        public override string GetText()
-        {
-            return Text;
-        }
+        public override string GetText() => Text;
 
         public override void SetText(string text)
         {
@@ -38,6 +35,10 @@ namespace DelvUI.Interface.GeneralElements
         [Order(10)]
         public int NumberFormat;
 
+        [Checkbox("Hide Text When Zero")]
+        [Order(65)]
+        public bool HideIfZero = false;
+
         public NumericLabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor)
             : base(position, text, frameAnchor, textAnchor)
         {
@@ -47,7 +48,7 @@ namespace DelvUI.Interface.GeneralElements
         {
             if (value == 0)
             {
-                _text = "0";
+                _text = HideIfZero ? string.Empty : "0";
                 return;
             }
 
@@ -68,6 +69,7 @@ namespace DelvUI.Interface.GeneralElements
                 FontID = FontID,
                 UseJobColor = UseJobColor,
                 Enabled = Enabled,
+                HideIfZero = HideIfZero
             };
     }
 
@@ -116,6 +118,10 @@ namespace DelvUI.Interface.GeneralElements
         [Order(60)]
         public bool UseJobColor = false;
 
+        [Checkbox("Use Role Color")]
+        [Order(65)]
+        public bool UseRoleColor = false;
+
         public LabelConfig(Vector2 position, string text, DrawAnchor frameAnchor, DrawAnchor textAnchor)
         {
             Position = position;
@@ -125,10 +131,7 @@ namespace DelvUI.Interface.GeneralElements
             Position = position;
         }
 
-        public virtual string GetText()
-        {
-            return _text;
-        }
+        public virtual string GetText() => _text;
 
         public virtual void SetText(string text)
         {

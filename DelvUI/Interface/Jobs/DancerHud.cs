@@ -123,10 +123,10 @@ namespace DelvUI.Interface.Jobs
 
             if (!showingStepBar || !Config.StepsBar.HideProcs)
             {
-                DrawProcBar(pos, player, Config.CascadeBar, 1814);
-                DrawProcBar(pos, player, Config.FountainBar, 1815);
-                DrawProcBar(pos, player, Config.WindmillBar, 1816);
-                DrawProcBar(pos, player, Config.ShowerBar, 1817);
+                DrawProcBar(pos, player, Config.CascadeBar, 2693);
+                DrawProcBar(pos, player, Config.FountainBar, 2694);
+                DrawProcBar(pos, player, Config.WindmillBar, 2693);
+                DrawProcBar(pos, player, Config.ShowerBar, 2694);
             }
         }
 

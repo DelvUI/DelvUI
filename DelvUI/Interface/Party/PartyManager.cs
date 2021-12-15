@@ -88,16 +88,16 @@ namespace DelvUI.Interface.Party
 
         public RaptureAtkModule* RaptureAtkModule { get; private set; } = null;
 
-        private const int PartyListInfoOffset = 0x0B50;
-        private const int PartyListMemberRawInfoSize = 0x18;
-        private const int PartyJobIconIdsOffset = 0x0F20;
+        private const int PartyListInfoOffset = 0x0BE0;
+        private const int PartyListMemberRawInfoSize = 0x20;
+        private const int PartyJobIconIdsOffset = 0x1320;
 
-        private const int PartyCrossWorldNameOffset = 0x0E52;
-        private const int PartyCrossWorldDisplayNameOffset = 0x0DEA;
+        private const int PartyCrossWorldNameOffset = 0x0F2A;
+        private const int PartyCrossWorldDisplayNameOffset = 0x0EC2;
         private const int PartyCrossWorldEntrySize = 0xD8;
 
-        private const int PartyTrustNameOffset = 0x0B68;
-        private const int PartyTrustEntrySize = 0x18;
+        private const int PartyTrustNameOffset = 0x0C00;
+        private const int PartyTrustEntrySize = 0x20;
 
         private const int PartyMembersInfoIndex = 11;
 
@@ -220,7 +220,7 @@ namespace DelvUI.Interface.Party
                     Character? trustChara = Utils.GetGameObjectByName(name) as Character;
                     if (trustChara != null)
                     {
-                        _groupMembers.Add(new PartyFramesMember(trustChara, order, EnmityForIndex(i + 1), PartyMemberStatus.None, true));
+                        _groupMembers.Add(new PartyFramesMember(trustChara, order, EnmityForTrustMemberIndex(i), PartyMemberStatus.None, true));
                         order++;
                     }
                 }
@@ -235,7 +235,14 @@ namespace DelvUI.Interface.Party
             {
                 for (int i = 0; i < _groupMembers.Count; i++)
                 {
-                    _groupMembers[i].Update(EnmityForIndex(i), PartyMemberStatus.None, i == 0, i == 0 ? player.ClassJob.Id : 0);
+                    if (_groupMembers[i].ObjectId == player.ObjectId)
+                    {
+                        _groupMembers[i].Update(EnmityForIndex(0), PartyMemberStatus.None, true, player.ClassJob.Id);
+                    }
+                    else
+                    {
+                        _groupMembers[i].Update(EnmityForTrustMemberIndex(Math.Max(0, _groupMembers[i].Order - 2)), PartyMemberStatus.None, false, 0);
+                    }
                 }
             }
         }
@@ -520,6 +527,16 @@ namespace DelvUI.Interface.Party
             }
 
             return enmityLevel;
+        }
+
+        private EnmityLevel EnmityForTrustMemberIndex(int index)
+        {
+            if (PartyListAddon == null || index < 0 || index > 6)
+            {
+                return EnmityLevel.Last;
+            }
+
+            return (EnmityLevel)PartyListAddon->TrustMember[index].EmnityByte;
         }
 
         private bool IsPartyLeader(int index)

@@ -38,6 +38,7 @@ namespace DelvUI.Helpers
             [JobIDs.AST] = 3596,  // Malefic
             [JobIDs.WHM] = 119,   // Stone
             [JobIDs.CNJ] = 119,   // Stone
+            [JobIDs.SGE] = 24283, // Dosis
 
             [JobIDs.BRD] = 97,    // Heavy Shot
             [JobIDs.ARC] = 97,    // Heavy Shot
@@ -54,6 +55,7 @@ namespace DelvUI.Helpers
             [JobIDs.NIN] = 2240,  // Spinning Edge
             [JobIDs.MNK] = 53,    // Bootshine
             [JobIDs.DRG] = 75,    // True Thrust
+            [JobIDs.RPR] = 24373, // Slice
 
             [JobIDs.BLU] = 11385  // Water Cannon
         };

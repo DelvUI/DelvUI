@@ -1,13 +1,12 @@
-﻿using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -41,7 +40,7 @@ namespace DelvUI.Interface.Jobs
         {
             if (Config.PowderGauge.Enabled)
             {
-                DrawPowderGauge(origin + Config.Position);
+                DrawPowderGauge(origin + Config.Position, player);
             }
 
             if (Config.NoMercy.Enabled)
@@ -50,12 +49,13 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawPowderGauge(Vector2 pos)
+        private void DrawPowderGauge(Vector2 pos, PlayerCharacter player)
         {
             var gauge = Plugin.JobGauges.Get<GNBGauge>();
             if (!Config.PowderGauge.HideWhenInactive || gauge.Ammo > 0)
             {
-                BarUtilities.GetChunkedBars(Config.PowderGauge, 2, gauge.Ammo, 2).Draw(pos);
+                var maxCartridges = player.Level >= 88 ? 3 : 2;
+                BarUtilities.GetChunkedBars(Config.PowderGauge, maxCartridges, gauge.Ammo, maxCartridges).Draw(pos);
             }
         }
 

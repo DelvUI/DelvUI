@@ -35,7 +35,7 @@ namespace DelvUI.Interface.EnemyList
         private StatusEffectsListHud _buffsListHud;
         private StatusEffectsListHud _debuffsListHud;
 
-        TextureWrap? _iconsTexture = null;
+        private TextureWrap? _iconsTexture = null;
 
         public EnemyListHud(EnemyListConfig config, string displayName) : base(config, displayName)
         {
@@ -197,8 +197,8 @@ namespace DelvUI.Interface.EnemyList
                         int enmityIndex = Config.Preview ? Math.Min(3, i) : _helper.EnemiesData.ElementAt(i).EnmityLevel - 1;
                         float w = 48f / _iconsTexture.Width;
                         float h = 48f / _iconsTexture.Height;
-                        Vector2 uv0 = new Vector2(w * enmityIndex, 0.60f);
-                        Vector2 uv1 = new Vector2(w * (enmityIndex + 1), 0.60f + h);
+                        Vector2 uv0 = new Vector2(w * enmityIndex, 0.48f);
+                        Vector2 uv1 = new Vector2(w * (enmityIndex + 1), 0.48f + h);
                         drawList.AddImage(_iconsTexture.ImGuiHandle, iconPos, iconPos + Configs.EnmityIcon.Size, uv0, uv1);
                     });
                 }
@@ -248,7 +248,7 @@ namespace DelvUI.Interface.EnemyList
 
         private PluginConfigColor GetColor(Character? character, uint currentHp = 0, uint maxHp = 0)
         {
-            if (Configs.HealthBar.Colors.ColorByHealth.Enabled && character != null)
+            if (Configs.HealthBar.Colors.ColorByHealth.Enabled && (character != null || Config.Preview))
             {
                 var scale = (float)currentHp / Math.Max(1, maxHp);
                 return Utils.GetColorByScale(scale, Configs.HealthBar.Colors.ColorByHealth);

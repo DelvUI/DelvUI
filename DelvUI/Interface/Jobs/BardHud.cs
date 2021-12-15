@@ -10,7 +10,9 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Numerics;
+using Dalamud.Logging;
 using DelvUI.Enums;
 
 namespace DelvUI.Interface.Jobs
@@ -60,17 +62,23 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.StormbiteDoTBar.Size);
             }
 
+            if (Config.CodaBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.CodaBar.Position);
+                sizes.Add(Config.CodaBar.Size);
+            }
+
             return (positions, sizes);
         }
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
-            
+
             if (Config.CausticBiteDoTBar.Enabled)
             {
                 DrawCausticBiteDoTBar(pos, player);
             }
-            
+
             if (Config.StormbiteDoTBar.Enabled)
             {
                 DrawStormbiteDoTBar(pos, player);
@@ -82,11 +90,35 @@ namespace DelvUI.Interface.Jobs
             {
                 DrawSoulVoiceBar(pos);
             }
+            
+            if (Config.CodaBar.Enabled)
+            {
+                DrawCodaBar(pos, player);
+            }
+        }
+
+        private void DrawCodaBar(Vector2 origin, PlayerCharacter player)
+        {
+            BRDGauge gauge = Plugin.JobGauges.Get<BRDGauge>();
+            if (!Config.CodaBar.HideWhenInactive)
+            {
+                var order = Config.CodaBar.CodaOrder;
+                var hasCoda = new[] { gauge.Coda.Contains(Song.WANDERER) ? 1 : 0, gauge.Coda.Contains(Song.MAGE) ? 1 : 0, gauge.Coda.Contains(Song.ARMY) ? 1 : 0 };
+                var colors = new[] { Config.CodaBar.WMColor, Config.CodaBar.MBColor, Config.CodaBar.APColor };
+
+                var coda = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
+                for (int i = 0; i < 3; i++)
+                {
+                    coda[i] = new Tuple<PluginConfigColor, float, LabelConfig?>(colors[order[i]], hasCoda[order[i]], null);
+                }
+
+                BarUtilities.GetChunkedBars(Config.CodaBar, coda, player).Draw(origin);
+            }
         }
 
         private static List<uint> CausticBiteDoTIDs = new List<uint> { 124, 1200 };
         private static List<float> CausticBiteDoTDurations = new List<float> { 30, 30 };
-        
+
         protected void DrawCausticBiteDoTBar(Vector2 origin, PlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
@@ -94,10 +126,10 @@ namespace DelvUI.Interface.Jobs
             BarUtilities.GetDoTBar(Config.CausticBiteDoTBar, player, target, CausticBiteDoTIDs, CausticBiteDoTDurations)?.
                          Draw(origin);
         }
-        
+
         private static List<uint> StormbiteDoTIDs = new List<uint> { 129, 1201 };
         private static List<float> StormbiteDoTDurations = new List<float> { 30, 30 };
-        
+
         protected void DrawStormbiteDoTBar(Vector2 origin, PlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
@@ -105,13 +137,13 @@ namespace DelvUI.Interface.Jobs
             BarUtilities.GetDoTBar(Config.StormbiteDoTBar, player, target, StormbiteDoTIDs, StormbiteDoTDurations)?.
                          Draw(origin);
         }
-        
+
         private void HandleCurrentSong(Vector2 origin, PlayerCharacter player)
         {
             BRDGauge gauge = Plugin.JobGauges.Get<BRDGauge>();
             byte songStacks = gauge.Repertoire;
             Song song = gauge.Song;
-            short songTimer = gauge.SongTimer;
+            ushort songTimer = gauge.SongTimer;
 
             switch (song)
             {
@@ -119,11 +151,11 @@ namespace DelvUI.Interface.Jobs
                     if (Config.StacksBar.Enabled && Config.StacksBar.ShowWMStacks)
                     {
                         DrawStacksBar(
-                            origin, 
-                            player, 
-                            songStacks, 
-                            3, 
-                            Config.StacksBar.WMStackColor, 
+                            origin,
+                            player,
+                            songStacks,
+                            3,
+                            Config.StacksBar.WMStackColor,
                             Config.StacksBar.WMGlowConfig.Enabled && songStacks == 3 ? Config.StacksBar.WMGlowConfig : null
                             );
                     }
@@ -176,19 +208,27 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBloodletterReady(Vector2 origin, PlayerCharacter player)
         {
-            int active = _spellHelper.GetSpellCooldown(110) == 0 ? 1 : 0;
-            DrawStacksBar(origin, player, active, 1, Config.StacksBar.MBProcColor, 
+            int cooldown = _spellHelper.GetSpellCooldownInt(110);
+
+            int stacks = cooldown switch
+            {
+                > 30 => 0,
+                > 15 => 1,
+                var _ => 2
+            };
+
+            DrawStacksBar(origin, player, stacks, 2, Config.StacksBar.MBProcColor,
                 Config.StacksBar.MBGlowConfig.Enabled ? Config.StacksBar.MBGlowConfig : null);
         }
 
-        protected void DrawSongTimerBar(Vector2 origin, short songTimer, PluginConfigColor songColor)
+        protected void DrawSongTimerBar(Vector2 origin, ushort songTimer, PluginConfigColor songColor)
         {
-            
+
             if (Config.SongGaugeBar.HideWhenInactive && songTimer == 0 || !Config.SongGaugeBar.Enabled)
             {
                 return;
             }
-            
+
             float duration = Math.Abs(songTimer / 1000f);
 
             Config.SongGaugeBar.Label.SetValue(duration);
@@ -209,14 +249,14 @@ namespace DelvUI.Interface.Jobs
             config.Label.SetValue(soulVoice);
 
             BarUtilities.GetProgressBar(
-                config, 
-                config.ThresholdConfig, 
-                new LabelConfig[] { config.Label }, 
-                soulVoice, 
-                100f, 
-                0f, 
-                null, 
-                config.FillColor, 
+                config,
+                config.ThresholdConfig,
+                new LabelConfig[] { config.Label },
+                soulVoice,
+                100f,
+                0f,
+                null,
+                config.FillColor,
                 soulVoice == 100f && config.GlowConfig.Enabled ? config.GlowConfig : null
             ).Draw(origin);
         }
@@ -230,7 +270,7 @@ namespace DelvUI.Interface.Jobs
                          Draw(origin);
         }
     }
-    
+
     [Section("Job Specific Bars")]
     [SubSection("Ranged", 0)]
     [SubSection("Bard", 1)]
@@ -248,12 +288,18 @@ namespace DelvUI.Interface.Jobs
             config.StormbiteDoTBar.Label.TextAnchor = DrawAnchor.Left;
             config.StormbiteDoTBar.Label.FrameAnchor = DrawAnchor.Left;
             config.StormbiteDoTBar.Label.Position = new Vector2(2, 0);
-            
+
             config.CausticBiteDoTBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
             config.CausticBiteDoTBar.Label.TextAnchor = DrawAnchor.Right;
             config.CausticBiteDoTBar.Label.FrameAnchor = DrawAnchor.Right;
             config.CausticBiteDoTBar.Label.Position = new Vector2(-2, 0);
-            config.CausticBiteDoTBar.FillDirection = BarDirection.Left;                        
+            config.CausticBiteDoTBar.FillDirection = BarDirection.Left;
+            
+            config.SoulVoiceBar.ThresholdConfig.Enabled = true;
+            config.SoulVoiceBar.ThresholdConfig.Value = 80;
+            config.SoulVoiceBar.ThresholdConfig.ThresholdType = ThresholdType.Above;
+            config.SoulVoiceBar.ThresholdConfig.ChangeColor = true;
+            config.SoulVoiceBar.ThresholdConfig.Color = new PluginConfigColor(new Vector4(150f / 255f, 0f / 255f, 255f / 255f, 100f / 100f));
 
             return config;
         }
@@ -264,7 +310,7 @@ namespace DelvUI.Interface.Jobs
             new(254, 20),
             new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
         );
-      
+
         [NestedConfig("Soul Voice Bar", 35)]
         public BardSoulVoiceBarConfig SoulVoiceBar = new BardSoulVoiceBarConfig(
             new(0, -5),
@@ -285,15 +331,22 @@ namespace DelvUI.Interface.Jobs
             new(126, 10),
             new PluginConfigColor(new Vector4(182f / 255f, 68f / 255f, 235f / 255f, 100f / 100f))
         );
-        
+
         [NestedConfig("Stormbite Bar", 65)]
         public ProgressBarConfig StormbiteDoTBar = new ProgressBarConfig(
             new(64, -51),
             new(126, 10),
             new PluginConfigColor(new Vector4(72f / 255f, 117f / 255f, 202f / 255f, 100f / 100f))
         );
+        
+        [NestedConfig("Coda Bar", 40)]
+        public BardCodaBarConfig CodaBar = new BardCodaBarConfig(
+            new(0, -63),
+            new(254, 10),
+            new PluginConfigColor(new Vector4(0, 0, 0, 0))
+        );
     }
-    
+
     [DisableParentSettings("FillColor")]
     [Exportable(false)]
     public class BardSongBarConfig : ProgressBarConfig
@@ -315,7 +368,7 @@ namespace DelvUI.Interface.Jobs
         {
         }
     }
-    
+
     [Exportable(false)]
     public class BardSoulVoiceBarConfig : ProgressBarConfig
     {
@@ -327,7 +380,7 @@ namespace DelvUI.Interface.Jobs
         {
         }
     }
-    
+
     [DisableParentSettings("FillColor")]
     [Exportable(false)]
     public class BardStacksBarConfig : ChunkedBarConfig
@@ -335,7 +388,7 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Wanderer's Minuet Stacks", separator = false, spacing = true)]
         [Order(51)]
         public bool ShowWMStacks = true;
-        
+
         [NestedConfig("Wanderer's Minuet Stacks Glow", 52, separator = false, spacing = true)]
         public BarGlowConfig WMGlowConfig = new BarGlowConfig();
 
@@ -349,7 +402,7 @@ namespace DelvUI.Interface.Jobs
         [Checkbox("Army's Paeon Stacks" + "##Stacks")]
         [Order(56)]
         public bool ShowAPStacks = true;
-        
+
         [ColorEdit4("Wanderer's Minuet Stack" + "##Stacks")]
         [Order(57)]
         public PluginConfigColor WMStackColor = new(new Vector4(150f / 255f, 215f / 255f, 232f / 255f, 100f / 100f));
@@ -366,5 +419,28 @@ namespace DelvUI.Interface.Jobs
             : base(position, size, fillColor)
         {
         }
+    }
+
+    [DisableParentSettings("FillColor")]
+    [Exportable(false)]
+    public class BardCodaBarConfig : ChunkedBarConfig
+    {
+        [ColorEdit4("Wanderer's Minuet" + "##Coda", spacing = true)]
+        [Order(71)]
+        public PluginConfigColor WMColor = new(new Vector4(145f / 255f, 186f / 255f, 94f / 255f, 100f / 100f));
+
+        [ColorEdit4("Mage's Ballad" + "##Coda")]
+        [Order(72)]
+        public PluginConfigColor MBColor = new(new Vector4(143f / 255f, 90f / 255f, 143f / 255f, 100f / 100f));
+
+        [ColorEdit4("Army's Paeon" + "##Coda")]
+        [Order(73)]
+        public PluginConfigColor APColor = new(new Vector4(207f / 255f, 205f / 255f, 52f / 255f, 100f / 100f));
+
+        [DragDropHorizontal("Order", "Wanderer's Minuet", "Mage's Ballad", "Army's Paeon")]
+        [Order(74)]
+        public int[] CodaOrder = new int[] { 0, 1, 2 };
+
+        public BardCodaBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor, 2) { }
     }
 }

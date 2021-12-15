@@ -2,16 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Enums;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
-using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
 
 namespace DelvUI.Interface.Jobs
@@ -20,8 +17,8 @@ namespace DelvUI.Interface.Jobs
     {
         private new DragoonConfig Config => (DragoonConfig)_config;
 
-        private static readonly List<uint> ChaosThrustIDs = new() { 118, 1312 };
-        private static readonly List<float> ChaosThrustDurations = new() { 24, 24 };
+        private static readonly List<uint> ChaosThrustIDs = new() { 118, 1312, 2719 };
+        private static readonly List<float> ChaosThrustDurations = new() { 24, 24, 24 };
 
         public DragoonHud(DragoonConfig config, string? displayName = null) : base(config, displayName)
         {
@@ -38,10 +35,10 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.ChaosThrustBar.Size);
             }
 
-            if (Config.DisembowelBar.Enabled)
+            if (Config.PowerSurgeBar.Enabled)
             {
-                positions.Add(Config.Position + Config.DisembowelBar.Position);
-                sizes.Add(Config.DisembowelBar.Size);
+                positions.Add(Config.Position + Config.PowerSurgeBar.Position);
+                sizes.Add(Config.PowerSurgeBar.Size);
             }
 
             if (Config.EyeOfTheDragonBar.Enabled)
@@ -50,10 +47,16 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.EyeOfTheDragonBar.Size);
             }
 
-            if (Config.BloodOfTheDragonBar.Enabled)
+            if (Config.FirstmindsFocusBar.Enabled)
             {
-                positions.Add(Config.Position + Config.BloodOfTheDragonBar.Position);
-                sizes.Add(Config.BloodOfTheDragonBar.Size);
+                positions.Add(Config.Position + Config.FirstmindsFocusBar.Position);
+                sizes.Add(Config.FirstmindsFocusBar.Size);
+            }
+
+            if (Config.LifeOfTheDragonBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.LifeOfTheDragonBar.Position);
+                sizes.Add(Config.LifeOfTheDragonBar.Size);
             }
 
             return (positions, sizes);
@@ -67,9 +70,9 @@ namespace DelvUI.Interface.Jobs
                 DrawChaosThrustBar(position, player);
             }
 
-            if (Config.DisembowelBar.Enabled)
+            if (Config.PowerSurgeBar.Enabled)
             {
-                DrawDisembowelBar(position, player);
+                DrawPowerSurgeBar(position, player);
             }
 
             if (Config.EyeOfTheDragonBar.Enabled)
@@ -77,63 +80,64 @@ namespace DelvUI.Interface.Jobs
                 DrawEyeOfTheDragonBars(position);
             }
 
-            if (Config.BloodOfTheDragonBar.Enabled)
+            if (Config.FirstmindsFocusBar.Enabled)
+            {
+                DrawFirstmindsFocusBars(position);
+            }
+
+            if (Config.LifeOfTheDragonBar.Enabled)
             {
                 DrawBloodOfTheDragonBar(position, player);
             }
         }
 
-        private void DrawChaosThrustBar(Vector2 origin, PlayerCharacter player)
+        private void DrawChaosThrustBar(Vector2 pos, PlayerCharacter player)
         {
             GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
 
             BarUtilities.GetDoTBar(Config.ChaosThrustBar, player, target, ChaosThrustIDs, ChaosThrustDurations)?.
-                Draw(origin);
+                Draw(pos);
         }
 
-        private void DrawEyeOfTheDragonBars(Vector2 origin)
+        private void DrawEyeOfTheDragonBars(Vector2 pos)
         {
             DRGGauge gauge = Plugin.JobGauges.Get<DRGGauge>();
 
             if (!Config.EyeOfTheDragonBar.HideWhenInactive || gauge.EyeCount > 0)
             {
-                BarUtilities.GetChunkedBars(Config.EyeOfTheDragonBar, 2, gauge.EyeCount, 2).Draw(origin);
+                BarUtilities.GetChunkedBars(Config.EyeOfTheDragonBar, 2, gauge.EyeCount, 2).Draw(pos);
             }
         }
 
-        private void DrawBloodOfTheDragonBar(Vector2 origin, PlayerCharacter player)
+        private void DrawFirstmindsFocusBars(Vector2 pos)
         {
             DRGGauge gauge = Plugin.JobGauges.Get<DRGGauge>();
-            int maxTimerMs = 30 * 1000;
-            short currTimerMs = gauge.BOTDTimer;
 
-            var config = Config.BloodOfTheDragonBar;
-            if (!config.HideWhenInactive || currTimerMs > 0f)
+            if (!Config.FirstmindsFocusBar.HideWhenInactive || gauge.FirstmindsFocusCount > 0)
             {
-                PluginConfigColor color = gauge.BOTDState == BOTDState.LOTD ? config.LifeOfTheDragonColor : config.BloodOfTheDragonColor;
-                config.Label.SetValue(currTimerMs / 1000f);
-
-                BarUtilities.GetProgressBar(
-                    config,
-                    null,
-                    new[] { config.Label },
-                    currTimerMs,
-                    maxTimerMs,
-                    0f,
-                    player,
-                    color)
-                .Draw(origin);
+                BarUtilities.GetChunkedBars(Config.FirstmindsFocusBar, 2, gauge.FirstmindsFocusCount, 2).Draw(pos);
             }
-
         }
 
-        private void DrawDisembowelBar(Vector2 origin, PlayerCharacter player)
+        private void DrawBloodOfTheDragonBar(Vector2 pos, PlayerCharacter player)
         {
-            float disembowelDuration = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId is 1914 or 121)?.RemainingTime ?? 0f);
-            if (!Config.DisembowelBar.HideWhenInactive || disembowelDuration > 0f)
+            DRGGauge gauge = Plugin.JobGauges.Get<DRGGauge>();
+            var durationMs = gauge.LOTDTimer;
+
+            if (!Config.LifeOfTheDragonBar.HideWhenInactive || durationMs > 0f)
             {
-                Config.DisembowelBar.Label.SetValue(disembowelDuration);
-                BarUtilities.GetProgressBar(Config.DisembowelBar, disembowelDuration, 30f, 0f, player).Draw(origin);
+                Config.LifeOfTheDragonBar.Label.SetValue(durationMs / 1000);
+                BarUtilities.GetProgressBar(Config.LifeOfTheDragonBar, durationMs, 30000f, 0f, player).Draw(pos);
+            }
+        }
+
+        private void DrawPowerSurgeBar(Vector2 origin, PlayerCharacter player)
+        {
+            var duration = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId is 2720)?.RemainingTime ?? 0f);
+            if (!Config.PowerSurgeBar.HideWhenInactive || duration > 0f)
+            {
+                Config.PowerSurgeBar.Label.SetValue(duration);
+                BarUtilities.GetProgressBar(Config.PowerSurgeBar, duration, 30f, 0f, player).Draw(origin);
             }
         }
     }
@@ -150,11 +154,11 @@ namespace DelvUI.Interface.Jobs
         public ProgressBarConfig ChaosThrustBar = new ProgressBarConfig(
             new(0, -76),
             new(254, 20),
-            new(new Vector4(106f / 255f, 82f / 255f, 148f / 255f, 100f / 100f))
+            new(new Vector4(217f / 255f, 145f / 255f, 232f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Disembowel", 35)]
-        public ProgressBarConfig DisembowelBar = new ProgressBarConfig(
+        [NestedConfig("Power Surge", 35)]
+        public ProgressBarConfig PowerSurgeBar = new ProgressBarConfig(
             new(0, -54),
             new(254, 20),
             new(new Vector4(244f / 255f, 206f / 255f, 191f / 255f, 100f / 100f))
@@ -162,38 +166,23 @@ namespace DelvUI.Interface.Jobs
 
         [NestedConfig("Eye of the Dragon", 40)]
         public ChunkedBarConfig EyeOfTheDragonBar = new ChunkedBarConfig(
-            new(0, -32),
-            new(254, 20),
-            new(new Vector4(1f, 182f / 255f, 194f / 255f, 100f / 100f))
+            new(-64, -32),
+            new(126, 20),
+            new(new Vector4(255f / 255f, 125f / 255f, 125f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Blood of the Dragon", 45)]
-        public DragoonBloodOfTheDragonBar BloodOfTheDragonBar = new DragoonBloodOfTheDragonBar(
+        [NestedConfig("Firstminds' Focus", 40)]
+        public ChunkedBarConfig FirstmindsFocusBar = new ChunkedBarConfig(
+            new(64, -32),
+            new(126, 20),
+            new PluginConfigColor(new(134f / 255f, 120f / 255f, 255f / 255f, 100f / 100f))
+        );
+
+        [NestedConfig("Life of the Dragon", 45)]
+        public ProgressBarConfig LifeOfTheDragonBar = new ProgressBarConfig(
             new(0, -10),
             new(254, 20),
-            new(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 100f / 100f))
+            new(new Vector4(185f / 255f, 0f / 255f, 25f / 255f, 100f / 100f))
         );
-    }
-
-    [DisableParentSettings("FillColor")]
-    [Exportable(false)]
-    public class DragoonBloodOfTheDragonBar : BarConfig
-    {
-        [ColorEdit4("Blood of the Dragon")]
-        [Order(21)]
-        public PluginConfigColor BloodOfTheDragonColor = new(new Vector4(78f / 255f, 198f / 255f, 238f / 255f, 100f / 100f));
-
-        [ColorEdit4("Life of the Dragon")]
-        [Order(22)]
-        public PluginConfigColor LifeOfTheDragonColor = new(new Vector4(139f / 255f, 24f / 255f, 24f / 255f, 100f / 100f));
-
-        [NestedConfig("Bar Text", 1000, separator = false, spacing = true)]
-        public NumericLabelConfig Label;
-
-        public DragoonBloodOfTheDragonBar(Vector2 pos, Vector2 size, PluginConfigColor fillColor)
-            : base(pos, size, fillColor)
-        {
-            Label = new NumericLabelConfig(Vector2.Zero, "", DrawAnchor.Center, DrawAnchor.Center);
-        }
     }
 }

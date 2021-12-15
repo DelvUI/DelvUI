@@ -1,8 +1,5 @@
 ﻿using Dalamud.Game.ClientState.Objects.Types;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using Dalamud.Game.ClientState.Objects.SubKinds;
-using ImGuiNET;
 
 namespace DelvUI.Helpers
 {
@@ -52,11 +49,11 @@ namespace DelvUI.Helpers
         {
             return IsJobARole(jobId, JobRoles.Tank);
         }
-        
+
         public static bool IsJobWithCleanse(uint jobId, int level)
         {
             var isOnCleanseJob = _cleanseJobs.Contains(jobId);
-            
+
             if (jobId == JobIDs.BRD && level < 35)
             {
                 isOnCleanseJob = false;
@@ -64,13 +61,14 @@ namespace DelvUI.Helpers
 
             return isOnCleanseJob;
         }
-        
+
         private static readonly List<uint> _cleanseJobs = new List<uint>()
         {
             JobIDs.CNJ,
             JobIDs.WHM,
             JobIDs.SCH,
             JobIDs.AST,
+            JobIDs.SGE,
             JobIDs.BRD,
             JobIDs.BLU
         };
@@ -118,7 +116,7 @@ namespace DelvUI.Helpers
         public static bool IsJobWithRaise(uint jobId, uint level)
         {
             var isOnRaiseJob = _raiseJobs.Contains(jobId);
-            
+
             if ((jobId == JobIDs.RDM && level < 64) || level < 12)
             {
                 isOnRaiseJob = false;
@@ -126,7 +124,7 @@ namespace DelvUI.Helpers
 
             return isOnRaiseJob;
         }
-        
+
         private static readonly List<uint> _raiseJobs = new List<uint>()
         {
             JobIDs.CNJ,
@@ -135,6 +133,7 @@ namespace DelvUI.Helpers
             JobIDs.AST,
             JobIDs.RDM,
             JobIDs.SMN,
+            JobIDs.SGE
         };
 
         public static uint CurrentPrimaryResource(Character? character)
@@ -189,12 +188,19 @@ namespace DelvUI.Helpers
             }
 
             // Preferably I'd want to check the active traits because these traits are locked behind job quests, but no idea how to check traits.
+
+            // Level 83 Trait 239 (MIN), 240 (BTN), 241 (FSH)
+            if (character.Level == 83)
+            {
+                return 8;
+            }
+
             // Level 80 Trait 236 (MIN), 237 (BTN), 238 (FSH)
             if (character.Level == 80)
             {
                 return 7;
             }
-            
+
             // Level 70 Trait 192 (MIN), 193 (BTN), 194 (FSH)
             if (character.Level >= 70)
             {
@@ -210,21 +216,21 @@ namespace DelvUI.Helpers
             {
                 return "";
             }
-            
+
             uint jobId = character.ClassJob.Id;
 
             if (!IsJobGatherer(jobId))
             {
                 return "";
             }
-            
+
             uint gpRate = GPResourceRate(character);
 
             if (character.CurrentGp == character.MaxGp)
             {
                 return "";
             }
-            
+
             // Since I'm not using a stopwatch or anything like MPTickHelper here the time will only update every 3 seconds, would be nice if the time ticks down every second.
             float gpPerSecond = gpRate / 3f;
             float secondsTillMax = (character.MaxGp - character.CurrentGp) / gpPerSecond;
@@ -266,7 +272,7 @@ namespace DelvUI.Helpers
             return 0;
         }
 
-        public static uint RoleIconIDForBattleCompanion => 62039;
+        public static uint RoleIconIDForBattleCompanion => 62041;
 
         public static Dictionary<uint, JobRoles> JobRolesMap = new Dictionary<uint, JobRoles>()
         {
@@ -283,6 +289,7 @@ namespace DelvUI.Helpers
             [JobIDs.WHM] = JobRoles.Healer,
             [JobIDs.SCH] = JobRoles.Healer,
             [JobIDs.AST] = JobRoles.Healer,
+            [JobIDs.SGE] = JobRoles.Healer,
 
             // melee dps
             [JobIDs.PGL] = JobRoles.DPSMelee,
@@ -292,6 +299,7 @@ namespace DelvUI.Helpers
             [JobIDs.DRG] = JobRoles.DPSMelee,
             [JobIDs.NIN] = JobRoles.DPSMelee,
             [JobIDs.SAM] = JobRoles.DPSMelee,
+            [JobIDs.RPR] = JobRoles.DPSMelee,
 
             // ranged phys dps
             [JobIDs.ARC] = JobRoles.DPSRanged,
@@ -342,6 +350,7 @@ namespace DelvUI.Helpers
                 JobIDs.WHM,
                 JobIDs.SCH,
                 JobIDs.AST,
+                JobIDs.SGE
             },
 
             // melee dps
@@ -353,6 +362,7 @@ namespace DelvUI.Helpers
                 JobIDs.DRG,
                 JobIDs.NIN,
                 JobIDs.SAM,
+                JobIDs.RPR
             },
 
             // ranged phys dps
@@ -418,6 +428,7 @@ namespace DelvUI.Helpers
             [JobIDs.DRG] = "DRG",
             [JobIDs.NIN] = "NIN",
             [JobIDs.SAM] = "SAM",
+            [JobIDs.RPR] = "RPR",
 
             // ranged phys dps
             [JobIDs.ARC] = "ARC",
@@ -437,6 +448,7 @@ namespace DelvUI.Helpers
             [JobIDs.CNJ] = "CNJ",
             [JobIDs.WHM] = "WHM",
             [JobIDs.SCH] = "SCH",
+            [JobIDs.SGE] = "SGE",
             [JobIDs.AST] = "AST",
 
             // crafters
@@ -477,6 +489,7 @@ namespace DelvUI.Helpers
             [JobIDs.DRG] = 62584,
             [JobIDs.NIN] = 62584,
             [JobIDs.SAM] = 62584,
+            [JobIDs.RPR] = 62584,
 
             // ranged phys dps
             [JobIDs.ARC] = 62586,
@@ -519,6 +532,7 @@ namespace DelvUI.Helpers
         public const uint WHM = 24;
         public const uint SCH = 28;
         public const uint AST = 33;
+        public const uint SGE = 40;
 
         public const uint PGL = 2;
         public const uint LNC = 4;
@@ -527,6 +541,7 @@ namespace DelvUI.Helpers
         public const uint DRG = 22;
         public const uint NIN = 30;
         public const uint SAM = 34;
+        public const uint RPR = 39;
 
         public const uint ARC = 5;
         public const uint BRD = 23;

@@ -45,10 +45,10 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.BlackManaBar.Size);
             }
 
-            if (Config.AccelerationBar.Enabled)
+            if (Config.ManaStacksBar.Enabled)
             {
-                positions.Add(Config.Position + Config.AccelerationBar.Position);
-                sizes.Add(Config.AccelerationBar.Size);
+                positions.Add(Config.Position + Config.ManaStacksBar.Position);
+                sizes.Add(Config.ManaStacksBar.Size);
             }
 
             if (Config.DualcastBar.Enabled)
@@ -91,9 +91,9 @@ namespace DelvUI.Interface.Jobs
                 DrawBlackManaBar(pos);
             }
 
-            if (Config.AccelerationBar.Enabled)
+            if (Config.ManaStacksBar.Enabled)
             {
-                DrawAccelerationBar(pos, player);
+                DrawManaStacksBarBar(pos, player);
             }
 
             if (Config.DualcastBar.Enabled)
@@ -122,7 +122,7 @@ namespace DelvUI.Interface.Jobs
             PluginConfigColor color = Config.BalanceBar.FillColor;
             int value = 0;
 
-            if (whiteGauge >= 80 && blackGauge >= 80)
+            if (whiteGauge >= 50 && blackGauge >= 50)
             {
                 value = 1;
             }
@@ -172,16 +172,15 @@ namespace DelvUI.Interface.Jobs
                 Draw(origin);
         }
 
-        private void DrawAccelerationBar(Vector2 origin, PlayerCharacter player)
+        private void DrawManaStacksBarBar(Vector2 origin, PlayerCharacter player)
         {
-            byte stackCount = player.StatusList.FirstOrDefault(o => o.StatusId is 1238)?.StackCount ?? 0;
-
-            if (Config.AccelerationBar.HideWhenInactive && stackCount == 0)
+            byte manaStacks = Plugin.JobGauges.Get<RDMGauge>().ManaStacks;
+            if (Config.ManaStacksBar.HideWhenInactive && manaStacks == 0)
             {
                 return;
-            };
+            }
 
-            BarUtilities.GetChunkedBars(Config.AccelerationBar, 3, stackCount, 3f)
+            BarUtilities.GetChunkedBars(Config.ManaStacksBar, 3, manaStacks, 3f)
                 .Draw(origin);
         }
 
@@ -277,11 +276,11 @@ namespace DelvUI.Interface.Jobs
             threshold: 80
         );
 
-        [NestedConfig("Acceleration Bar", 45)]
-        public ChunkedBarConfig AccelerationBar = new ChunkedBarConfig(
+        [NestedConfig("Mana Stacks Bar", 45)]
+        public ChunkedBarConfig ManaStacksBar = new ChunkedBarConfig(
             new(0, -27),
             new(254, 10),
-            new PluginConfigColor(new(194f / 255f, 74f / 255f, 74f / 255f, 100f / 100f))
+            new PluginConfigColor(new(200f / 255f, 45f / 255f, 40f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Dualcast Bar", 50)]

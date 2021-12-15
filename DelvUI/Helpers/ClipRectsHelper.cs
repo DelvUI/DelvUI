@@ -116,6 +116,7 @@ namespace DelvUI.Helpers
             "SocialDetailA",
             "SocialDetailB",
             "LookingForGroup",
+            "LookingForGroupSearch",
             "Marker",
             "FieldMarker",
             "CountdownSettingDialog",
@@ -171,7 +172,8 @@ namespace DelvUI.Helpers
             "LinkShell",
             "ChatConfig",
             "ColorPicker",
-            "PlayGuide"
+            "PlayGuide",
+            "SelectYesno"
         };
 
         private List<ClipRect> _clipRects = new List<ClipRect>();

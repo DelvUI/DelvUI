@@ -10,7 +10,6 @@ using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Numerics;
 using DelvUI.Enums;
@@ -44,10 +43,10 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.DrawBar.Size);
             }
 
-            if (Config.DivinationBar.Enabled)
+            if (Config.AstrodyneBar.Enabled)
             {
-                positions.Add(Config.Position + Config.DivinationBar.Position);
-                sizes.Add(Config.DivinationBar.Size);
+                positions.Add(Config.Position + Config.AstrodyneBar.Position);
+                sizes.Add(Config.AstrodyneBar.Size);
             }
 
             if (Config.DotBar.Enabled)
@@ -75,14 +74,14 @@ namespace DelvUI.Interface.Jobs
         {
             Vector2 pos = origin + Config.Position;
 
-            if (Config.DivinationBar.Enabled)
+            if (Config.AstrodyneBar.Enabled)
             {
-                DrawDivinationBar(pos, player);
+                DrawAstrodyneBar(pos, player);
             }
 
             if (Config.DrawBar.Enabled)
             {
-                DrawDraw(pos);
+                DrawDraw(pos, player);
             }
 
             if (Config.DotBar.Enabled)
@@ -101,34 +100,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void SetRedrawText(float redrawCastInfo, int redrawStacks = 0)
-        {
-            if (redrawCastInfo < 0 || !Config.DrawBar.ShowRedrawCooldown)
-            {
-                Config.DrawBar.DrawRedrawLabel.SetText(Config.DrawBar.ShowRedrawStacks ? "(" + redrawStacks + ")" : "");
-                return;
-            }
-
-            if (!Config.DrawBar.EnableRedrawCooldownCumulated)
-            {
-                if (redrawCastInfo % 30 == 0)
-                {
-                    redrawCastInfo = 30f;
-                }
-
-                redrawCastInfo %= 30f;
-            }
-
-            Config.DrawBar.DrawRedrawLabel.SetValue(redrawCastInfo);
-
-            if (Config.DrawBar.ShowRedrawStacks)
-            {
-                string text = Config.DrawBar.DrawRedrawLabel.GetText();
-                Config.DrawBar.DrawRedrawLabel.SetText(text + " (" + redrawStacks + ")");
-            }
-        }
-
-        private unsafe void DrawDivinationBar(Vector2 origin, PlayerCharacter player)
+        private unsafe void DrawAstrodyneBar(Vector2 origin, PlayerCharacter player)
         {
             List<PluginConfigColor> chunkColors = new();
             ASTGauge gauge = Plugin.JobGauges.Get<ASTGauge>();
@@ -155,23 +127,23 @@ namespace DelvUI.Interface.Jobs
                         break;
 
                     case SealType.MOON:
-                        chunkColors.Add(Config.DivinationBar.SealLunarColor);
+                        chunkColors.Add(Config.AstrodyneBar.SealLunarColor);
 
                         break;
 
                     case SealType.SUN:
-                        chunkColors.Add(Config.DivinationBar.SealSunColor);
+                        chunkColors.Add(Config.AstrodyneBar.SealSunColor);
 
                         break;
 
                     case SealType.CELESTIAL:
-                        chunkColors.Add(Config.DivinationBar.SealCelestialColor);
+                        chunkColors.Add(Config.AstrodyneBar.SealCelestialColor);
 
                         break;
                 }
 
                 int sealNumbers = 0;
-                Config.DivinationBar.Label.SetText("");
+                Config.AstrodyneBar.Label.SetText("");
 
                 if (gauge.ContainsSeal(SealType.NONE))
                 {
@@ -193,7 +165,7 @@ namespace DelvUI.Interface.Jobs
                     sealNumbers++;
                 }
 
-                Config.DivinationBar.Label.SetText(sealNumbers.ToString());
+                Config.AstrodyneBar.Label.SetText(sealNumbers.ToString());
 
 
                 for (int i = 0; i < sealNumbers; i++)
@@ -203,21 +175,21 @@ namespace DelvUI.Interface.Jobs
 
             }
 
-            if (chunkColors.All(n => n == EmptyColor) && Config.DivinationBar.HideWhenInactive)
+            if (chunkColors.All(n => n == EmptyColor) && Config.AstrodyneBar.HideWhenInactive)
             {
                 return;
             }
 
-            Tuple<PluginConfigColor, float, LabelConfig?>[] divinationChunks = {
+            Tuple<PluginConfigColor, float, LabelConfig?>[] astrodyneChunks = {
                 new(chunkColors[0], chunkColors[0] != EmptyColor ? 1f : 0f, null),
-                new(chunkColors[1], chunkColors[1] != EmptyColor ? 1f : 0f, Config.DivinationBar.Label),
+                new(chunkColors[1], chunkColors[1] != EmptyColor ? 1f : 0f, Config.AstrodyneBar.Label),
                 new(chunkColors[2], chunkColors[2] != EmptyColor ? 1f : 0f, null) };
 
-            BarUtilities.GetChunkedBars(Config.DivinationBar, divinationChunks, player, Config.DivinationBar.DivinationGlowConfig, chucksToGlow)
+            BarUtilities.GetChunkedBars(Config.AstrodyneBar, astrodyneChunks, player, Config.AstrodyneBar.AstrodyneGlowConfig, chucksToGlow)
                 .Draw(origin);
         }
 
-        private void DrawDraw(Vector2 origin)
+        private void DrawDraw(Vector2 origin, PlayerCharacter player)
         {
             ASTGauge gauge = Plugin.JobGauges.Get<ASTGauge>();
 
@@ -232,37 +204,37 @@ namespace DelvUI.Interface.Jobs
             switch (gauge.DrawnCard)
             {
                 case CardType.BALANCE:
-                    cardColor = Config.DivinationBar.SealSunColor;
+                    cardColor = Config.AstrodyneBar.SealSunColor;
                     cardJob = "MELEE";
                     Config.DrawBar.DrawGlowConfig.Color = new PluginConfigColor(Config.DrawBar.DrawMeleeGlowColor.Vector);
                     break;
 
                 case CardType.BOLE:
-                    cardColor = Config.DivinationBar.SealSunColor;
+                    cardColor = Config.AstrodyneBar.SealSunColor;
                     cardJob = "RANGED";
                     Config.DrawBar.DrawGlowConfig.Color = new PluginConfigColor(Config.DrawBar.DrawRangedGlowColor.Vector);
                     break;
 
                 case CardType.ARROW:
-                    cardColor = Config.DivinationBar.SealLunarColor;
+                    cardColor = Config.AstrodyneBar.SealLunarColor;
                     cardJob = "MELEE";
                     Config.DrawBar.DrawGlowConfig.Color = new PluginConfigColor(Config.DrawBar.DrawMeleeGlowColor.Vector);
                     break;
 
                 case CardType.EWER:
-                    cardColor = Config.DivinationBar.SealLunarColor;
+                    cardColor = Config.AstrodyneBar.SealLunarColor;
                     cardJob = "RANGED";
                     Config.DrawBar.DrawGlowConfig.Color = new PluginConfigColor(Config.DrawBar.DrawRangedGlowColor.Vector);
                     break;
 
                 case CardType.SPEAR:
-                    cardColor = Config.DivinationBar.SealCelestialColor;
+                    cardColor = Config.AstrodyneBar.SealCelestialColor;
                     cardJob = "MELEE";
                     Config.DrawBar.DrawGlowConfig.Color = new PluginConfigColor(Config.DrawBar.DrawMeleeGlowColor.Vector);
                     break;
 
                 case CardType.SPIRE:
-                    cardColor = Config.DivinationBar.SealCelestialColor;
+                    cardColor = Config.AstrodyneBar.SealCelestialColor;
                     cardJob = "RANGED";
                     Config.DrawBar.DrawGlowConfig.Color = new PluginConfigColor(Config.DrawBar.DrawRangedGlowColor.Vector);
                     break;
@@ -275,8 +247,8 @@ namespace DelvUI.Interface.Jobs
             float cardPresent;
             float cardMax;
             float drawCastInfo = _spellHelper.GetSpellCooldown(3590);
-            float redrawCastInfo = _spellHelper.GetSpellCooldown(3593);
-            int redrawStacks = _spellHelper.GetStackCount(3, 3593);
+            int drawCharges = _spellHelper.GetStackCount(2, 3590);
+            float current = drawCastInfo % 30 + 0.75f;
 
             if (cardJob != "")
             {
@@ -286,9 +258,13 @@ namespace DelvUI.Interface.Jobs
 
                 if (Config.DrawBar.DrawDrawLabel.Enabled)
                 {
-                    if (drawCastInfo > 0)
+                    if (drawCastInfo > 0 && drawCharges == 0)
                     {
-                        Config.DrawBar.DrawDrawLabel.SetValue(Math.Abs(drawCastInfo));
+                        Config.DrawBar.DrawDrawLabel.SetValue(current);
+                    }
+                    else if (drawCastInfo > 0 && drawCharges > 0)
+                    {
+                        Config.DrawBar.DrawDrawLabel.SetText("READY (" + current.ToString("0") + ")");
                     }
                     else
                     {
@@ -302,11 +278,15 @@ namespace DelvUI.Interface.Jobs
             }
             else
             {
-                cardPresent = drawCastInfo > 0 ? drawCastInfo : 1f;
+                cardPresent = drawCastInfo > 0 ? current : 1f;
 
-                if (drawCastInfo > 0)
+                if (drawCastInfo > 0 && drawCharges == 0)
                 {
-                    Config.DrawBar.Label.SetValue(Math.Abs(drawCastInfo));
+                    Config.DrawBar.Label.SetValue(current);
+                }
+                else if (drawCastInfo > 0 && drawCharges > 0)
+                {
+                    Config.DrawBar.Label.SetText("READY (" + current.ToString("0") + ")");
                 }
                 else
                 {
@@ -314,15 +294,15 @@ namespace DelvUI.Interface.Jobs
                 }
 
                 Config.DrawBar.DrawDrawLabel.SetText("");
-                cardColor = drawCastInfo > 0 ? Config.DrawBar.DrawCdColor : Config.DrawBar.DrawCdReadyColor;
-                cardMax = drawCastInfo > 0 ? 30f : 1f;
+                cardColor = drawCharges > 0 ? Config.DrawBar.DrawCdReadyColor : Config.DrawBar.DrawCdColor;
+                cardMax = drawCastInfo > 0 ? 60f : 1f;
             }
 
-            SetRedrawText(redrawCastInfo, redrawStacks);
-            LabelConfig[] labels = new LabelConfig[] { Config.DrawBar.Label, Config.DrawBar.DrawRedrawLabel, Config.DrawBar.DrawDrawLabel };
+            Config.DrawBar.DrawDrawChargesLabel.SetValue(drawCharges);
+            LabelConfig[] labels = new LabelConfig[] { Config.DrawBar.Label, Config.DrawBar.DrawDrawChargesLabel, Config.DrawBar.DrawDrawLabel };
             BarGlowConfig? glowConfig = Config.DrawBar.DrawGlowConfig.Enabled && Math.Abs(cardMax - 1f) == 0f ? Config.DrawBar.DrawGlowConfig : null;
 
-            BarUtilities.GetBar(Config.DrawBar, cardPresent, cardMax, 0f, Player, cardColor, glowConfig, labels)
+            BarUtilities.GetBar(Config.DrawBar, cardPresent, cardMax, 0f, player, cardColor, glowConfig, labels)
                 .Draw(origin);
         }
 
@@ -375,7 +355,7 @@ namespace DelvUI.Interface.Jobs
             var config = new AstrologianConfig();
 
             config.UseDefaultPrimaryResourceBar = true;
-            config.DivinationBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.AstrodyneBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
 
             return config;
         }
@@ -387,8 +367,8 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
         );
 
-        [NestedConfig("Divination Bar", 200)]
-        public AstrologianDivinationBarConfig DivinationBar = new(
+        [NestedConfig("Astrodyne Bar", 200)]
+        public AstrologianAstrodyneBarConfig AstrodyneBar = new(
             new Vector2(0, -71),
             new Vector2(254, 10)
         );
@@ -421,19 +401,8 @@ namespace DelvUI.Interface.Jobs
             [NestedConfig("Draw Side Timer Label" + "##Draw", 101, separator = false, spacing = true)]
             public NumericLabelConfig DrawDrawLabel = new(new Vector2(0, 0), "", DrawAnchor.Left, DrawAnchor.Left);
 
-            [NestedConfig("Redraw Timer Label" + "##Draw", 104, separator = false, spacing = true)]
-            public NumericLabelConfig DrawRedrawLabel = new(new Vector2(0, 0), "", DrawAnchor.Right, DrawAnchor.Right);
-
-            [Checkbox("Redraw Stacks" + "##Redraw")]
-            [Order(105)]
-            public bool ShowRedrawStacks = true;
-
-            [Checkbox("Show Redraw Cooldown" + "##Redraw")]
-            [Order(106)]
-            public bool ShowRedrawCooldown;
-            [Checkbox("Total Redraw Cooldown Instead of Next" + "##Redraw")]
-            [Order(108)]
-            public bool EnableRedrawCooldownCumulated;
+            [NestedConfig("Draw Charges Label" + "##Draw", 104, separator = false, spacing = true)]
+            public NumericLabelConfig DrawDrawChargesLabel = new(new Vector2(0, 0), "", DrawAnchor.Right, DrawAnchor.Right);
 
             [ColorEdit4("Draw on CD" + "##Draw")]
             [Order(109)]
@@ -444,7 +413,7 @@ namespace DelvUI.Interface.Jobs
             public PluginConfigColor DrawCdReadyColor = new(new Vector4(137f / 255f, 26f / 255f, 42f / 255f, 100f / 100f));
 
 
-            [NestedConfig("Card Preferred Target with Glow" + "##Divination", 111, separator = false, spacing = true)]
+            [NestedConfig("Card Preferred Target with Glow" + "##Astrodyne", 111, separator = false, spacing = true)]
             //[DisableParentSettings("Color")]
             //TODO: Remove Color from GlowConfig
             public BarGlowConfig DrawGlowConfig = new();
@@ -465,25 +434,25 @@ namespace DelvUI.Interface.Jobs
 
         [Exportable(false)]
         [DisableParentSettings("FillColor", "UsePartialFillColor", "UseChunks", "PartialFillColor", "LabelMode")]
-        public class AstrologianDivinationBarConfig : ChunkedProgressBarConfig
+        public class AstrologianAstrodyneBarConfig : ChunkedProgressBarConfig
         {
 
-            [ColorEdit4("Sun" + "##Divination")]
+            [ColorEdit4("Sun" + "##Astrodyne")]
             [Order(201)]
             public PluginConfigColor SealSunColor = new(new Vector4(213f / 255f, 124f / 255f, 97f / 255f, 100f / 100f));
 
-            [ColorEdit4("Lunar" + "##Divination")]
+            [ColorEdit4("Lunar" + "##Astrodyne")]
             [Order(202)]
             public PluginConfigColor SealLunarColor = new(new Vector4(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f));
 
-            [ColorEdit4("Celestial" + "##Divination")]
+            [ColorEdit4("Celestial" + "##Astrodyne")]
             [Order(203)]
             public PluginConfigColor SealCelestialColor = new(new Vector4(100f / 255f, 207f / 255f, 211f / 255f, 100f / 100f));
 
-            [NestedConfig("Glow" + "##Divination", 205, separator = false, spacing = true)]
-            public BarGlowConfig DivinationGlowConfig = new();
+            [NestedConfig("Glow" + "##Astrodyne", 205, separator = false, spacing = true)]
+            public BarGlowConfig AstrodyneGlowConfig = new();
 
-            public AstrologianDivinationBarConfig(Vector2 position, Vector2 size)
+            public AstrologianAstrodyneBarConfig(Vector2 position, Vector2 size)
                 : base(position, size, new PluginConfigColor(Vector4.Zero))
             {
             }

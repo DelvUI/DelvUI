@@ -34,11 +34,11 @@ using Action = Lumina.Excel.GeneratedSheets.Action;
 
 namespace DelvUI.Helpers
 {
-    public delegate void OnSetUIMouseoverActor(long arg1, long arg2);
-    public delegate ulong OnRequestAction(long arg1, uint arg2, ulong arg3, long arg4, uint arg5, uint arg6, int arg7);
-
     public unsafe class InputsHelper : IDisposable
     {
+        public delegate void OnSetUIMouseoverActor(long arg1, long arg2);
+        public delegate ulong OnRequestAction(long arg1, uint arg2, uint arg3, long arg4, int arg5, int arg6, int arg7, byte* arg8);
+
         #region Singleton
         private InputsHelper()
         {
@@ -50,9 +50,8 @@ namespace DelvUI.Helpers
             .text:00007FF64830FD70 48 89 91 90 02 00+mov     [rcx+290h], rdx
             .text:00007FF64830FD70 00
             */
-            _setUIMouseOverActor = Plugin.SigScanner.ScanText("48 89 91 ?? ?? ?? ?? C3 CC CC CC CC CC CC CC CC 48 89 5C 24 ?? 55 56 57 48 81 EC ?? ?? ?? ?? 48 8B 05 ?? ?? ?? ?? 48 33 C4 48 89 84 24 ?? ?? ?? ?? 48 8D B1 ?? ?? ?? ?? 44 89 44 24 ?? 48 8B EA 48 8B D9 48 8B CE 48 8D 15 ?? ?? ?? ?? 41 B9 ?? ?? ?? ??");
+            _setUIMouseOverActor = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? 48 8B 6C 24 ?? 48 8B 5C 24 ?? 4C 8B 7C 24 ?? 41 83 FC 02");
             _uiMouseOverActorHook = new Hook<OnSetUIMouseoverActor>(_setUIMouseOverActor, new OnSetUIMouseoverActor(HandleUIMouseOverActorId));
-            //_uiMouseOverActorIdHook.Enable();
 
             /*
              Part of requestAction disassembly signature
@@ -86,9 +85,9 @@ namespace DelvUI.Helpers
             .text:00007FF6484F05C0 41 8B D8          mov     ebx, r8d
             .text:00007FF6484F05C3 74 14             jz      short loc_7FF6484F05D9
             */
-            _requestAction = Plugin.SigScanner.ScanText("40 53 55 57 41 54 41 57 48 83 EC 60 83 BC 24 ?? ?? ?? ?? ?? 49 8B E9 45 8B E0 44 8B FA 48 8B F9 41 8B D8 74 14 80 79 68 00 74 0E 32 C0 48 83 C4 60 41 5F 41 5C 5F 5D 5B C3");
-            _requsetActionHook = new Hook<OnRequestAction>(_requestAction, new OnRequestAction(HandleRequestAction));
-            _requsetActionHook.Enable();
+            _requestAction = Plugin.SigScanner.ScanText("E8 ?? ?? ?? ?? EB 64 B1 01");
+            _requestActionHook = new Hook<OnRequestAction>(_requestAction, new OnRequestAction(HandleRequestAction));
+            _requestActionHook.Enable();
 
             // mouseover setting
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
@@ -122,8 +121,8 @@ namespace DelvUI.Helpers
             _uiMouseOverActorHook?.Disable();
             _uiMouseOverActorHook?.Dispose();
 
-            _requsetActionHook?.Disable();
-            _requsetActionHook?.Dispose();
+            _requestActionHook?.Disable();
+            _requestActionHook?.Dispose();
 
             // give imgui the control of inputs again
             if (_wndHandle != IntPtr.Zero && _imguiWndProcPtr != IntPtr.Zero)
@@ -143,7 +142,7 @@ namespace DelvUI.Helpers
         private Hook<OnSetUIMouseoverActor>? _uiMouseOverActorHook;
 
         private IntPtr _requestAction;
-        private Hook<OnRequestAction> _requsetActionHook;
+        private Hook<OnRequestAction> _requestActionHook;
 
         private ExcelSheet<Action>? _sheet;
 
@@ -191,16 +190,14 @@ namespace DelvUI.Helpers
             _uiMouseOverActorHook?.Original(arg1, arg2);
         }
 
-        private ulong HandleRequestAction(long arg1, uint arg2, ulong arg3, long arg4, uint arg5, uint arg6, int arg7)
+        private ulong HandleRequestAction(long arg1, uint arg2, uint arg3, long arg4, int arg5, int arg6, int arg7, byte* arg8)
         {
-            //PluginLog.Log("ACTION: {0} - {1} - {2} - {3} - {4} - {5} - {6}}", arg1, arg2, arg3, arg4, arg5, arg6, arg7);
-
             if (_config.MouseoverEnabled && _config.MouseoverAutomaticMode && IsActionValid(arg3, _target))
             {
-                return _requsetActionHook.Original(arg1, arg2, arg3, _target!.ObjectId, arg5, arg6, arg7);
+                return _requestActionHook.Original(arg1, arg2, arg3, _target!.ObjectId, arg5, arg6, arg7, arg8);
             }
 
-            return _requsetActionHook.Original(arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+            return _requestActionHook.Original(arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8);
         }
 
         private bool IsActionValid(ulong actionID, GameObject? target)

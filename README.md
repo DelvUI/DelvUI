@@ -12,30 +12,10 @@ https://discord.gg/delvui
 
 **How to contribute**  
 
-https://github.com/DelvUI/DelvUI/wiki/Contributing  
+Join our Discord!
 ***
 
-**Tank Previews (DRK - GNB - WAR - PLD)**  
+**Previews and Profiles**  
 
-https://github.com/DelvUI/DelvUI/wiki/Tanks  
-***
-
-**Healer Previews (WHM - SCH - AST)**  
-
-https://github.com/DelvUI/DelvUI/wiki/Healer  
-***
-
-**Melee Previews (DRG - SAM - MNK - NIN)**  
-
-https://github.com/DelvUI/DelvUI/wiki/Melee  
-***
-
-**Ranged Previews (BRD - DNC - MCH)**  
-
-https://github.com/DelvUI/DelvUI/wiki/Ranged  
-***
-
-**Caster Previews (RDM - BLM - SMN - BLU)**  
-
-https://github.com/DelvUI/DelvUI/wiki/Caster  
+https://wago.io/delvui
 ***

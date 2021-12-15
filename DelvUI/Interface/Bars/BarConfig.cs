@@ -8,7 +8,7 @@ namespace DelvUI.Interface.Bars
     public class BarConfig : AnchorablePluginConfigObject
     {
         [ColorEdit4("Background Color")]
-        [Order(20)]
+        [Order(16)]
         public PluginConfigColor BackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 0f / 255f, 0f / 255f, 50f / 100f));
 
         [ColorEdit4("Fill Color")]
