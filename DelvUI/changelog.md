@@ -1,11 +1,12 @@
 # 0.6.0.0
 Endwalker Beta Release:
-- Reworked job huds according to the new job changes
-- Added job huds for Reaper and Sage
-- Added a 3rd color option to "Color Based On Health Value" setting
+- Reworked job huds according to the new job changes.
+- Added job huds for Reaper and Sage.
+- Added a 3rd color option to "Color Based On Health Value" setting.
+- Added a Use Role Color option for labels.
 
 Fixes:
-- Fixed enmity in party frames for Trust and GC parties
+- Fixed enmity in party frames for Trust and GC parties.
 
 # 0.5.1.0
 - Improved UI of the main config window.
