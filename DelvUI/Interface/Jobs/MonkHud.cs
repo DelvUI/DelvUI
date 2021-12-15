@@ -205,7 +205,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawTwinSnakesBar(Vector2 pos, PlayerCharacter player)
         {
-            float twinSnakesDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 101 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
+            float twinSnakesDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 3001 && o.RemainingTime > 0)?.RemainingTime ?? 0f;
             if (!Config.TwinSnakesBar.HideWhenInactive || twinSnakesDuration > 0)
             {
                 Config.TwinSnakesBar.Label.SetValue(twinSnakesDuration);
