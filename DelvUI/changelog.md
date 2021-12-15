@@ -2,6 +2,7 @@
 Fixes:
 - Fixed Storm's Eye Bar not tracking the new Surging Tempest buff (renamed to Surging Tempest Bar).
 - Fixed Bard's DoTs and songs durations.
+- Fixed mana bar not being visible by default for Sage.
 
 # 0.6.0.0
 Endwalker Beta Release:
