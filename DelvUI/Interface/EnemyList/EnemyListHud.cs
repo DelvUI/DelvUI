@@ -248,7 +248,7 @@ namespace DelvUI.Interface.EnemyList
 
         private PluginConfigColor GetColor(Character? character, uint currentHp = 0, uint maxHp = 0)
         {
-            if (Configs.HealthBar.Colors.ColorByHealth.Enabled && character != null)
+            if (Configs.HealthBar.Colors.ColorByHealth.Enabled && (character != null || Config.Preview))
             {
                 var scale = (float)currentHp / Math.Max(1, maxHp);
                 return Utils.GetColorByScale(scale, Configs.HealthBar.Colors.ColorByHealth);
