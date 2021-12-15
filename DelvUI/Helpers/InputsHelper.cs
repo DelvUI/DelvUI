@@ -136,7 +136,7 @@ namespace DelvUI.Helpers
 
         private HUDOptionsConfig _config = null!;
 
-        private const int UnknownOffset = 0xAA750;
+        private const int UnknownOffset = 0xAB610;
 
         private IntPtr _setUIMouseOverActor;
         private Hook<OnSetUIMouseoverActor>? _uiMouseOverActorHook;
