@@ -104,7 +104,7 @@ namespace DelvUI.Interface.Jobs
             return config;
         }
 
-        [NestedConfig("Storm's Eye Bar", 30)]
+        [NestedConfig("Surging Tempest Bar", 30)]
         public WarriorStormsEyeBarConfig StormsEyeBar = new WarriorStormsEyeBarConfig(
             new(0, -32),
             new(254, 20),
