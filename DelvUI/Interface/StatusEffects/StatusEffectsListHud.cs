@@ -339,7 +339,7 @@ namespace DelvUI.Interface.StatusEffects
             var windowPos = minPos - margin;
             var windowSize = maxPos - minPos;
 
-            DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, Config.ShowBuffs, false, (drawList) =>
+            DrawHelper.DrawInWindow(ID, windowPos, windowSize + margin * 2, true, false, (drawList) =>
             {
                 // area
                 if (Config.Preview)
