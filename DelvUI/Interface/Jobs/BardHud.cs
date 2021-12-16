@@ -209,7 +209,9 @@ namespace DelvUI.Interface.Jobs
         private void DrawBloodletterReady(Vector2 origin, PlayerCharacter player)
         {
             int maxStacks = player.Level < 84 ? 2 : 3;
-            int stacks = _spellHelper.GetStackCount(maxStacks, 110);
+            int maxCooldown = maxStacks * 15;
+            int cooldown = _spellHelper.GetSpellCooldownInt(110);
+            int stacks = (maxCooldown - cooldown) / 15;
 
             DrawStacksBar(origin, player, stacks, maxStacks, Config.StacksBar.MBProcColor,
                 Config.StacksBar.MBGlowConfig.Enabled ? Config.StacksBar.MBGlowConfig : null);
