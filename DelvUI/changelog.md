@@ -1,5 +1,5 @@
 # 0.6.0.3
-- Fixed Astrologian draw number being incorrect when on max stacks.
+- Fixed Astrologian card stacks number when at max stacks.
 
 # 0.6.0.2
 Features:
