@@ -90,7 +90,7 @@ namespace DelvUI.Interface.Jobs
             {
                 DrawSoulVoiceBar(pos);
             }
-            
+
             if (Config.CodaBar.Enabled)
             {
                 DrawCodaBar(pos, player);
@@ -208,16 +208,10 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawBloodletterReady(Vector2 origin, PlayerCharacter player)
         {
-            int cooldown = _spellHelper.GetSpellCooldownInt(110);
+            int maxStacks = player.Level < 84 ? 2 : 3;
+            int stacks = _spellHelper.GetStackCount(maxStacks, 110);
 
-            int stacks = cooldown switch
-            {
-                > 30 => 0,
-                > 15 => 1,
-                var _ => 2
-            };
-
-            DrawStacksBar(origin, player, stacks, 2, Config.StacksBar.MBProcColor,
+            DrawStacksBar(origin, player, stacks, maxStacks, Config.StacksBar.MBProcColor,
                 Config.StacksBar.MBGlowConfig.Enabled ? Config.StacksBar.MBGlowConfig : null);
         }
 
@@ -294,7 +288,7 @@ namespace DelvUI.Interface.Jobs
             config.CausticBiteDoTBar.Label.FrameAnchor = DrawAnchor.Right;
             config.CausticBiteDoTBar.Label.Position = new Vector2(-2, 0);
             config.CausticBiteDoTBar.FillDirection = BarDirection.Left;
-            
+
             config.SoulVoiceBar.ThresholdConfig.Enabled = true;
             config.SoulVoiceBar.ThresholdConfig.Value = 80;
             config.SoulVoiceBar.ThresholdConfig.ThresholdType = ThresholdType.Above;
@@ -338,7 +332,7 @@ namespace DelvUI.Interface.Jobs
             new(126, 10),
             new PluginConfigColor(new Vector4(72f / 255f, 117f / 255f, 202f / 255f, 100f / 100f))
         );
-        
+
         [NestedConfig("Coda Bar", 40)]
         public BardCodaBarConfig CodaBar = new BardCodaBarConfig(
             new(0, -63),
