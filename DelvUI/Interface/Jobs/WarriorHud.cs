@@ -100,6 +100,16 @@ namespace DelvUI.Interface.Jobs
             float innerReleaseDuration = Math.Max(innerReleaseStatus?.RemainingTime ?? 0f, 0f);
             byte innerReleaseStacks = innerReleaseStatus?.StackCount ?? 0;
 
+            BarGlowConfig? primalRendGlow = null;
+            if (Config.InnerReleaseBar.PrimalRendReadyGlowConfig.Enabled)
+            {
+                bool isPrimalRendReady = player.StatusList.FirstOrDefault(o => o.StatusId is 2624)?.RemainingTime > 0;
+                if (isPrimalRendReady)
+                {
+                    primalRendGlow = Config.InnerReleaseBar.PrimalRendReadyGlowConfig;
+                }
+            }
+
             if (innerReleaseStacks == 0 && Config.InnerReleaseBar.ShowCooldown)
             {
                 uint spellID = 7389;
@@ -113,11 +123,11 @@ namespace DelvUI.Interface.Jobs
                     {
                         return;
                     }
-                    BarUtilities.GetChunkedProgressBars(Config.InnerReleaseBar, 1, 1, 1, fillColor: Config.InnerReleaseBar.CooldownFinishedColor).Draw(origin);
+                    BarUtilities.GetChunkedProgressBars(Config.InnerReleaseBar, 1, 1, 1, fillColor: Config.InnerReleaseBar.CooldownFinishedColor, glowConfig: primalRendGlow, chunksToGlow: new[] { true }).Draw(origin);
                 }
                 else
                 {
-                    BarUtilities.GetChunkedProgressBars(Config.InnerReleaseBar, 1, currentCooldown, maxDuration, fillColor: Config.InnerReleaseBar.CooldownInProgressColor).Draw(origin);
+                    BarUtilities.GetChunkedProgressBars(Config.InnerReleaseBar, 1, currentCooldown, maxDuration, fillColor: Config.InnerReleaseBar.CooldownInProgressColor, glowConfig: primalRendGlow, chunksToGlow: new[] { true }).Draw(origin);
                 }
                 return;
             }
@@ -136,7 +146,7 @@ namespace DelvUI.Interface.Jobs
                     innerReleaseDuration = Math.Min(innerReleaseDuration, innerReleaseMaxDuration);
                 }
 
-                BarUtilities.GetChunkedProgressBars(Config.InnerReleaseBar, 3, (innerReleaseStacks - 1) * innerReleaseMaxDuration + innerReleaseDuration, 3 * innerReleaseMaxDuration)
+                BarUtilities.GetChunkedProgressBars(Config.InnerReleaseBar, 3, (innerReleaseStacks - 1) * innerReleaseMaxDuration + innerReleaseDuration, 3 * innerReleaseMaxDuration, glowConfig: primalRendGlow, chunksToGlow: new[] { true, true, true })
                     .Draw(origin);
             }
         }
@@ -154,6 +164,7 @@ namespace DelvUI.Interface.Jobs
 
             config.BeastGauge.UsePartialFillColor = true;
             config.InnerReleaseBar.LabelMode = LabelMode.ActiveChunk;
+            config.InnerReleaseBar.PrimalRendReadyGlowConfig.Color = new PluginConfigColor(new Vector4(246f / 255f, 30f / 255f, 136f / 255f, 100f / 100f));
 
             return config;
         }
@@ -215,6 +226,9 @@ namespace DelvUI.Interface.Jobs
         [ColorEdit4("Inner Release Ready Color")]
         [Order(95)]
         public PluginConfigColor CooldownFinishedColor = new(new Vector4(38f / 255f, 192f / 255f, 94f / 255f, 100f / 100f));
+
+        [NestedConfig("Glow Color (when Primal Rend is ready)", 100, separator = false, spacing = true)]
+        public BarGlowConfig PrimalRendReadyGlowConfig = new();
 
         public WarriorInnerReleaseBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {

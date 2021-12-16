@@ -239,7 +239,8 @@ namespace DelvUI.Interface.Bars
             GameObject? actor = null,
             BarGlowConfig? glowConfig = null,
             PluginConfigColor? fillColor = null,
-            int thresholdChunk = 1)
+            int thresholdChunk = 1,
+            bool[]? chunksToGlow = null)
         {
             var color = fillColor ?? config.FillColor;
 
@@ -269,7 +270,7 @@ namespace DelvUI.Interface.Bars
                 }
 
                 var partialColor = config.UsePartialFillColor ? config.PartialFillColor : null;
-                return GetChunkedBars(config, chunks, current, max, min, actor, labels, color, partialColor, glowConfig);
+                return GetChunkedBars(config, chunks, current, max, min, actor, labels, color, partialColor, glowConfig, chunksToGlow);
             }
 
             var threshold = GetThresholdConfigForChunk(config, thresholdChunk, chunks, min, max);

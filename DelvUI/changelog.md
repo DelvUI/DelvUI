@@ -2,6 +2,11 @@
 Features:
 - Added a Sacred Soil Bar for Summoner.
 - Separated Surging Tempest and Inner Release into 2 separate bars to better accomodate for the new Warrior changes.
+- New Warrior Inner Release Bar Features:
+    + Shows Inner Release (or Berserk) Stacks
+    + Option to show Inner Release buff duration
+    + Option to track Inner Release ability cooldown
+    + Optional bar glow when Primal Rend buff is gained by Inner Release at level 90.
 
 Fixes:
 - Fixed Bard's Bloodletter Bar showing 2 charges instead of 3 with the level 84 trait.
