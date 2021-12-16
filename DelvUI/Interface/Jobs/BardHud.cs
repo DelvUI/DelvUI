@@ -210,7 +210,9 @@ namespace DelvUI.Interface.Jobs
         {
             int maxStacks = player.Level < 84 ? 2 : 3;
             int maxCooldown = maxStacks * 15;
-            int cooldown = Math.Max(0, _spellHelper.GetSpellCooldownInt(110) - 15);
+            int cooldown = _spellHelper.GetSpellCooldownInt(110);
+            cooldown = player.Level < 84 ? Math.Max(0, cooldown - 15) : cooldown;
+
             int stacks = (maxCooldown - cooldown) / 15;
 
             DrawStacksBar(origin, player, stacks, maxStacks, Config.StacksBar.MBProcColor,
