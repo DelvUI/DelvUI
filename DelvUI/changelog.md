@@ -1,6 +1,6 @@
 # 0.6.0.2
 Features:
-- Added a Sacred Soil Bar for Summoner.
+- Added a Sacred Soil Bar for Scholar.
 - Separated Surging Tempest and Inner Release into 2 separate bars to better accomodate for the new Warrior changes.
 - New Warrior Inner Release Bar Features:
     + Shows Inner Release (or Berserk) Stacks
