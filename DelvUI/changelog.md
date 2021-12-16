@@ -1,4 +1,6 @@
 # 0.6.0.2
+Features:
+- Added Sacred Soil tracking to SCH HUD.
 Fixes:
 - Fixed Bard's Bloodletter Bar showing 2 charges instead of 3 with the level 84 trait.
 - Fixed "[time-till-max-gp]" text tag not working properly.
