@@ -1,10 +1,12 @@
 # 0.6.0.2
 Features:
+- Added a Sacred Soil Bar for Summoner.
 - Separated Surging Tempest and Inner Release into 2 separate bars to better accomodate for the new Warrior changes.
 
 Fixes:
 - Fixed Bard's Bloodletter Bar showing 2 charges instead of 3 with the level 84 trait.
 - Fixed "[time-till-max-gp]" text tag not working properly.
+- Fixed Border Color on chunked bars.
 
 # 0.6.0.1
 Fixes:

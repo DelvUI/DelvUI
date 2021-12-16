@@ -46,6 +46,12 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.BioBar.Size);
             }
 
+            if (Config.SacredSoilBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.SacredSoilBar.Position);
+                sizes.Add(Config.SacredSoilBar.Size);
+            }
+
             return (positions, sizes);
         }
 
@@ -53,20 +59,10 @@ namespace DelvUI.Interface.Jobs
         {
             Vector2 pos = origin + Config.Position;
 
-            if (Config.BioBar.Enabled)
-            {
-                DrawBioBar(pos, player);
-            }
-
-            if (Config.FairyGaugeBar.Enabled)
-            {
-                DrawFairyGaugeBar(pos);
-            }
-
-            if (Config.AetherflowBar.Enabled)
-            {
-                DrawAetherBar(pos, player);
-            }
+            if (Config.BioBar.Enabled) { DrawBioBar(pos, player); }
+            if (Config.FairyGaugeBar.Enabled) { DrawFairyGaugeBar(pos); }
+            if (Config.AetherflowBar.Enabled) { DrawAetherBar(pos, player); }
+            if (Config.SacredSoilBar.Enabled) { DrawSacredSoilBar(pos, player); }
         }
 
         private void DrawBioBar(Vector2 origin, PlayerCharacter player)
@@ -113,6 +109,17 @@ namespace DelvUI.Interface.Jobs
             BarUtilities.GetChunkedBars(Config.AetherflowBar, 3, stackCount, 3)
                 .Draw(origin);
         }
+
+        private void DrawSacredSoilBar(Vector2 origin, PlayerCharacter player)
+        {
+            float sacredSoilDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 298 or 299 or 1944 or 2637 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+
+            if (!Config.SacredSoilBar.HideWhenInactive || sacredSoilDuration > 0)
+            {
+                Config.SacredSoilBar.Label.SetValue(sacredSoilDuration);
+                BarUtilities.GetProgressBar(Config.SacredSoilBar, sacredSoilDuration, 15f, 0f, player).Draw(origin);
+            }
+        }
     }
 
     [Section("Job Specific Bars")]
@@ -147,6 +154,13 @@ namespace DelvUI.Interface.Jobs
             new(0, -54),
             new(254, 20),
             new(new Vector4(0f / 255f, 255f / 255f, 0f / 255f, 100f / 100f))
+        );
+
+        [NestedConfig("Sacred Soil Bar", 45)]
+        public ProgressBarConfig SacredSoilBar = new ProgressBarConfig(
+            new(-0, -76),
+            new(254, 20),
+            new PluginConfigColor(new(241f / 255f, 217f / 255f, 125f / 255f, 100f / 100f))
         );
     }
 
