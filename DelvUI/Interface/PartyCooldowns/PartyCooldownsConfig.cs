@@ -245,32 +245,36 @@ namespace DelvUI.Interface.PartyCooldowns
 
             // HEALER
             [16552] = new PartyCooldown(16552, JobIDs.AST, 50, 120, 15, 30, 2), // divination
-            [3613] = new PartyCooldown(3613, JobIDs.AST, 58, 60, 20, 80, 1), // collective unconscious
+            [3613] = new PartyCooldown(3613, JobIDs.AST, 58, 60, 18, 80, 1), // collective unconscious
             [7436] = new PartyCooldown(7436, JobIDs.SCH, 66, 120, 15, 30, 2), // chain stratagem
             [805] = new PartyCooldown(805, JobIDs.SCH, 40, 120, 20, 50, 3), // fey illumination
             [188] = new PartyCooldown(188, JobIDs.SCH, 50, 30, 15, 80, 1), // sacred soil
+            [25868] = new PartyCooldown(25868, JobIDs.SCH, 90, 120, 20, 80, 1), // expedient
             [16536] = new PartyCooldown(16536, JobIDs.WHM, 80, 120, 20, 80, 1), // temperance
             [3569] = new PartyCooldown(3569, JobIDs.WHM, 52, 90, 24, 50, 3), // asylum
+            [24298] = new PartyCooldown(24298, JobIDs.SGE, 50, 30, 15, 80, 1), // kerachole
+            [24310] = new PartyCooldown(24310, JobIDs.SGE, 76, 120, 20, 80, 1), // holos
+            [24311] = new PartyCooldown(24311, JobIDs.SGE, 80, 120, 15, 80, 1), // panhaima
 
             // MELEE
             [7549] = new RolePartyCooldown(7549, JobRoles.DPSMelee, 22, 90, 10, 100, 1), // feint
             [2258] = new PartyCooldown(2258, JobIDs.NIN, 18, 60, 15, 30, 2), // trick attack
-            [3557] = new PartyCooldown(3557, JobIDs.DRG, 70, 90, 15, 30, 2), // battle litany
-            [7396] = new PartyCooldown(7396, JobIDs.MNK, 58, 60, 20, 90, 1), // brotherhood
+            [3557] = new PartyCooldown(3557, JobIDs.DRG, 52, 120, 15, 30, 2), // battle litany
+            [7396] = new PartyCooldown(7396, JobIDs.MNK, 70, 120, 15, 90, 1), // brotherhood
             [65] = new PartyCooldown(65, JobIDs.MNK, 42, 90, 15, 50, 3), // mantra
+            [24405] = new PartyCooldown(24405, JobIDs.RPR, 72, 120, 20, 30, 2), // arcane circle
 
             // RANGED
-            [118] = new PartyCooldown(118, JobIDs.BRD, 50, 180, 20, 30, 2), // battle voice
-            [7405] = new PartyCooldown(7405, JobIDs.BRD, 62, 120, 15, 70, 1), // troubadour
+            [118] = new PartyCooldown(118, JobIDs.BRD, 50, 120, 15, 30, 2), // battle voice
+            [7405] = new PartyCooldown(7405, JobIDs.BRD, 88, 90, 15, 70, 1), // troubadour
             [7408] = new PartyCooldown(7408, JobIDs.BRD, 66, 90, 15, 40, 3), // nature's minne
-            [16012] = new PartyCooldown(16012, JobIDs.DNC, 56, 120, 15, 70, 1), // shield samba
-            [16014] = new PartyCooldown(16014, JobIDs.DNC, 80, 120, 15, 40, 3), // improvisation
-            [16889] = new PartyCooldown(16889, JobIDs.MCH, 56, 120, 15, 70, 1), // tactician
+            [16012] = new PartyCooldown(16012, JobIDs.DNC, 88, 90, 15, 70, 1), // shield samba
+            [16889] = new PartyCooldown(16889, JobIDs.MCH, 56, 90, 15, 70, 1), // tactician
 
             // CASTER
             [7560] = new RolePartyCooldown(7560, JobRoles.DPSCaster, 8, 90, 10, 100, 1), // addle
             [7520] = new PartyCooldown(7520, JobIDs.RDM, 58, 120, 20, 30, 2), // embolden
-            [7450] = new PartyCooldown(7450, JobIDs.SMN, 64, 180, 15, 30, 2), // devotion
+            [25801] = new PartyCooldown(25801, JobIDs.SMN, 66, 120, 30, 30, 2), // searing light
         };
     }
 }
