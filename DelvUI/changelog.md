@@ -1,3 +1,18 @@
+# 0.6.0.2
+Features:
+- Added a Sacred Soil Bar for Scholar.
+- Separated Surging Tempest and Inner Release into 2 separate bars to better accomodate for the new Warrior changes.
+- New Warrior Inner Release Bar Features:
+    + Shows Inner Release (or Berserk) Stacks
+    + Option to show Inner Release buff duration
+    + Option to track Inner Release ability cooldown
+    + Optional bar glow when Primal Rend buff is gained by Inner Release at level 90.
+
+Fixes:
+- Fixed Bard's Bloodletter Bar showing 2 charges instead of 3 with the level 84 trait.
+- Fixed "[time-till-max-gp]" text tag not working properly.
+- Fixed Border Color on chunked bars.
+
 # 0.6.0.1
 Fixes:
 - Fixed Storm's Eye Bar not tracking the new Surging Tempest buff (renamed to Surging Tempest Bar).

@@ -181,7 +181,7 @@ namespace DelvUI.Interface.Bars
                 Rect foreground = GetFillRect(chunkPos, chunkSize, config.FillDirection, chunks[i].Item1, chunks[i].Item2, 1f, 0f);
                 BarGlowConfig? glow = chunksToGlow?[i] == true ? glowConfig : null;
 
-                bars[i] = new BarHud(config.ID + i, config.DrawBorder, actor: actor, glowColor: glow?.Color, glowSize: glow?.Size)
+                bars[i] = new BarHud(config.ID + i, config.DrawBorder, borderColor:config.BorderColor, actor: actor, glowColor: glow?.Color, glowSize: glow?.Size)
                           .SetBackground(background)
                           .AddForegrounds(foreground);
 
@@ -239,7 +239,8 @@ namespace DelvUI.Interface.Bars
             GameObject? actor = null,
             BarGlowConfig? glowConfig = null,
             PluginConfigColor? fillColor = null,
-            int thresholdChunk = 1)
+            int thresholdChunk = 1,
+            bool[]? chunksToGlow = null)
         {
             var color = fillColor ?? config.FillColor;
 
@@ -269,7 +270,7 @@ namespace DelvUI.Interface.Bars
                 }
 
                 var partialColor = config.UsePartialFillColor ? config.PartialFillColor : null;
-                return GetChunkedBars(config, chunks, current, max, min, actor, labels, color, partialColor, glowConfig);
+                return GetChunkedBars(config, chunks, current, max, min, actor, labels, color, partialColor, glowConfig, chunksToGlow);
             }
 
             var threshold = GetThresholdConfigForChunk(config, thresholdChunk, chunks, min, max);
