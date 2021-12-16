@@ -55,13 +55,15 @@ namespace DelvUI.Helpers
 
         public int GetStackCount(int maxStacks, uint actionId)
         {
-            if (GetSpellCooldownInt(actionId) == 0 || GetSpellCooldownInt(actionId) < 0)
+            int cooldown = GetSpellCooldownInt(actionId);
+            float recastTime = GetRecastTime(actionId);
+
+            if (cooldown <= 0 || recastTime == 0)
             {
                 return maxStacks;
             }
 
-            int cooldown = GetSpellCooldownInt(actionId);
-            return maxStacks - (int)Math.Ceiling(cooldown / (GetRecastTime(actionId) / maxStacks));
+            return maxStacks - (int)Math.Ceiling(cooldown / (recastTime / maxStacks));
         }
     }
 }
