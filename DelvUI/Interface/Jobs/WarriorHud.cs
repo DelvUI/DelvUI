@@ -26,16 +26,22 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new();
             List<Vector2> sizes = new();
 
-            if (Config.StormsEyeBar.Enabled)
+            if (Config.SurgingTempestBar.Enabled)
             {
-                positions.Add(Config.Position + Config.StormsEyeBar.Position);
-                sizes.Add(Config.StormsEyeBar.Size);
+                positions.Add(Config.Position + Config.SurgingTempestBar.Position);
+                sizes.Add(Config.SurgingTempestBar.Size);
             }
 
             if (Config.BeastGauge.Enabled)
             {
                 positions.Add(Config.Position + Config.BeastGauge.Position);
                 sizes.Add(Config.BeastGauge.Size);
+            }
+
+            if (Config.InnerReleaseBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.InnerReleaseBar.Position);
+                sizes.Add(Config.InnerReleaseBar.Size);
             }
 
             return (positions, sizes);
@@ -45,31 +51,30 @@ namespace DelvUI.Interface.Jobs
         {
             Vector2 pos = origin + Config.Position;
 
-            if (Config.StormsEyeBar.Enabled)
+            if (Config.SurgingTempestBar.Enabled)
             {
-                DrawStormsEyeBar(pos, player);
+                DrawSurgingTempestBar(pos, player);
             }
 
             if (Config.BeastGauge.Enabled)
             {
                 DrawBeastGauge(pos, player);
             }
+
+            if (Config.InnerReleaseBar.Enabled)
+            {
+                DrawInnerReleaseBar(pos, player);
+            }
         }
 
-        private void DrawStormsEyeBar(Vector2 origin, PlayerCharacter player)
+        private void DrawSurgingTempestBar(Vector2 origin, PlayerCharacter player)
         {
-            float innerReleaseDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1177 or 86 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
             float surgingTempestDuration = Math.Abs(player.StatusList.FirstOrDefault(o => o.StatusId is 2677)?.RemainingTime ?? 0f);
 
-            if ((!Config.StormsEyeBar.HideWhenInactive || surgingTempestDuration > 0) && innerReleaseDuration is 0)
+            if (!Config.SurgingTempestBar.HideWhenInactive || surgingTempestDuration > 0)
             {
-                Config.StormsEyeBar.Label.SetValue(surgingTempestDuration);
-                BarUtilities.GetProgressBar(Config.StormsEyeBar, surgingTempestDuration, 60f, 0f, player, Config.StormsEyeBar.StormsEyeColor).Draw(origin);
-            }
-            if (innerReleaseDuration > 0)
-            {
-                Config.StormsEyeBar.Label.SetValue(innerReleaseDuration);
-                BarUtilities.GetProgressBar(Config.StormsEyeBar, innerReleaseDuration, 10f, 0f, player, Config.StormsEyeBar.InnerReleaseColor).Draw(origin);
+                Config.SurgingTempestBar.Label.SetValue(surgingTempestDuration);
+                BarUtilities.GetProgressBar(Config.SurgingTempestBar, surgingTempestDuration, 60f).Draw(origin);
             }
         }
 
@@ -87,6 +92,54 @@ namespace DelvUI.Interface.Jobs
                     .Draw(origin);
             }
         }
+
+        private void DrawInnerReleaseBar(Vector2 origin, PlayerCharacter player)
+        {
+            var innerReleaseStatus = player.StatusList.FirstOrDefault(o => o.StatusId is 1177 or 86);
+
+            float innerReleaseDuration = Math.Max(innerReleaseStatus?.RemainingTime ?? 0f, 0f);
+            byte innerReleaseStacks = innerReleaseStatus?.StackCount ?? 0;
+
+            if (innerReleaseStacks == 0 && Config.InnerReleaseBar.ShowCooldown)
+            {
+                uint spellID = 7389;
+                float maxDuration = SpellHelper.Instance.GetRecastTime(spellID);
+                float cooldown = SpellHelper.Instance.GetSpellCooldown(spellID);
+                float currentCooldown = maxDuration - cooldown;
+                Config.InnerReleaseBar.Label.SetValue(maxDuration - currentCooldown);
+                if (currentCooldown == maxDuration)
+                {
+                    if (Config.InnerReleaseBar.HideWhenInactive)
+                    {
+                        return;
+                    }
+                    BarUtilities.GetChunkedProgressBars(Config.InnerReleaseBar, 1, 1, 1, fillColor: Config.InnerReleaseBar.CooldownFinishedColor).Draw(origin);
+                }
+                else
+                {
+                    BarUtilities.GetChunkedProgressBars(Config.InnerReleaseBar, 1, currentCooldown, maxDuration, fillColor: Config.InnerReleaseBar.CooldownInProgressColor).Draw(origin);
+                }
+                return;
+            }
+
+            if (!Config.InnerReleaseBar.HideWhenInactive || innerReleaseStacks > 0)
+            {
+                float innerReleaseMaxDuration = 15f;
+                Config.InnerReleaseBar.Label.SetValue(innerReleaseDuration);
+
+                if (!Config.InnerReleaseBar.ShowBuffTimerOnActiveChunk)
+                {
+                    innerReleaseDuration = innerReleaseMaxDuration;
+                }
+                else
+                {
+                    innerReleaseDuration = Math.Min(innerReleaseDuration, innerReleaseMaxDuration);
+                }
+
+                BarUtilities.GetChunkedProgressBars(Config.InnerReleaseBar, 3, (innerReleaseStacks - 1) * innerReleaseMaxDuration + innerReleaseDuration, 3 * innerReleaseMaxDuration)
+                    .Draw(origin);
+            }
+        }
     }
 
     [Section("Job Specific Bars")]
@@ -100,15 +153,16 @@ namespace DelvUI.Interface.Jobs
             var config = new WarriorConfig();
 
             config.BeastGauge.UsePartialFillColor = true;
+            config.InnerReleaseBar.LabelMode = LabelMode.ActiveChunk;
 
             return config;
         }
 
         [NestedConfig("Surging Tempest Bar", 30)]
-        public WarriorStormsEyeBarConfig StormsEyeBar = new WarriorStormsEyeBarConfig(
+        public ProgressBarConfig SurgingTempestBar = new ProgressBarConfig(
             new(0, -32),
             new(254, 20),
-            new PluginConfigColor(new Vector4(0, 0, 0, 0))
+            new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 146f / 255f, 100f / 100f))
         );
 
         [NestedConfig("Beast Gauge", 35)]
@@ -117,23 +171,13 @@ namespace DelvUI.Interface.Jobs
             new(254, 20),
             new PluginConfigColor(new Vector4(0, 0, 0, 0))
         );
-    }
 
-    [DisableParentSettings("FillColor")]
-    [Exportable(false)]
-    public class WarriorStormsEyeBarConfig : ProgressBarConfig
-    {
-        [ColorEdit4("Storm's Eye Color", spacing = true)]
-        [Order(55)]
-        public PluginConfigColor StormsEyeColor = new(new Vector4(255f / 255f, 136f / 255f, 146f / 255f, 100f / 100f));
-
-        [ColorEdit4("Inner Release")]
-        [Order(60)]
-        public PluginConfigColor InnerReleaseColor = new(new Vector4(255f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
-
-        public WarriorStormsEyeBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
-        {
-        }
+        [NestedConfig("Inner Release Bar", 40)]
+        public WarriorInnerReleaseBarConfig InnerReleaseBar = new WarriorInnerReleaseBarConfig(
+            new(0, -54),
+            new(254, 20),
+            new PluginConfigColor(new Vector4(255f / 255f, 136f / 255f, 146f / 255f, 100f / 100f))
+        );
     }
 
     [DisableParentSettings("FillColor")]
@@ -149,6 +193,30 @@ namespace DelvUI.Interface.Jobs
         public PluginConfigColor NascentChaosColor = new(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f));
 
         public WarriorBeastGaugeConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
+        {
+        }
+    }
+
+    [Exportable(false)]
+    public class WarriorInnerReleaseBarConfig : ChunkedProgressBarConfig
+    {
+        [Checkbox("Show Buff Timer On Active Chunk", spacing = true)]
+        [Order(80)]
+        public bool ShowBuffTimerOnActiveChunk;
+
+        [Checkbox("Show Inner Release Cooldown", spacing = true)]
+        [Order(85)]
+        public bool ShowCooldown;
+
+        [ColorEdit4("Inner Release On Cooldown Color")]
+        [Order(90)]
+        public PluginConfigColor CooldownInProgressColor = new(new Vector4(240f / 255f, 176f / 255f, 0f / 255f, 100f / 100f));
+
+        [ColorEdit4("Inner Release Ready Color")]
+        [Order(95)]
+        public PluginConfigColor CooldownFinishedColor = new(new Vector4(38f / 255f, 192f / 255f, 94f / 255f, 100f / 100f));
+
+        public WarriorInnerReleaseBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor) : base(position, size, fillColor)
         {
         }
     }
