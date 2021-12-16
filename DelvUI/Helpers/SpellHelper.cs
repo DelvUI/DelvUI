@@ -34,9 +34,9 @@ namespace DelvUI.Helpers
 
         private readonly unsafe ActionManager* _actionManager;
 
-        public unsafe SpellHelper() 
-        { 
-            _actionManager = ActionManager.Instance(); 
+        public unsafe SpellHelper()
+        {
+            _actionManager = ActionManager.Instance();
         }
 
         public unsafe uint GetSpellActionId(uint actionId) => _actionManager->GetAdjustedActionId(actionId);
@@ -49,27 +49,14 @@ namespace DelvUI.Helpers
 
         public int GetSpellCooldownInt(uint actionId)
         {
-            if ((int)Math.Ceiling(GetSpellCooldown(actionId) % GetRecastTime(actionId)) <= 0)
-            {
-                return 0;
-            }
-
-            return (int)Math.Ceiling(GetSpellCooldown(actionId) % GetRecastTime(actionId));
+            int cooldown = (int)Math.Ceiling(GetSpellCooldown(actionId) % GetRecastTime(actionId));
+            return Math.Max(0, cooldown);
         }
 
         public int GetStackCount(int maxStacks, uint actionId)
         {
-            if (GetSpellCooldownInt(actionId) == 0 || GetSpellCooldownInt(actionId) < 0)
-            {
-                return maxStacks;
-            }
-
-            return maxStacks - (int)Math.Ceiling(GetSpellCooldownInt(actionId) / (GetRecastTime(actionId) / maxStacks));
+            int cooldown = GetSpellCooldownInt(actionId);
+            return maxStacks - (int)Math.Ceiling(cooldown / (GetRecastTime(actionId) / maxStacks));
         }
-
-        /*public unsafe uint CheckActionResources(uint ActionID)
-        {
-            return _actionManager->CheckActionResources(ActionType.Spell, ActionID);
-        }*/
     }
 }
