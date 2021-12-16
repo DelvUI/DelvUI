@@ -1,3 +1,7 @@
+# 0.6.0.3
+Fixes:
+- Fixed AST card stacks number when at max stacks.
+
 # 0.6.0.2
 Features:
 - Added a Sacred Soil Bar for Scholar.
