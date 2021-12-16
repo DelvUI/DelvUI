@@ -1,3 +1,8 @@
+# 0.6.0.2
+Fixes:
+- Fixed Bard's Bloodletter Bar showing 2 charges instead of 3 with the level 84 trait.
+- Fixed "[time-till-max-gp]" text tag not working properly.
+
 # 0.6.0.1
 Fixes:
 - Fixed Storm's Eye Bar not tracking the new Surging Tempest buff (renamed to Surging Tempest Bar).
