@@ -1,50 +1,67 @@
 ﻿using DelvUI.Helpers;
+using DelvUI.Interface.Party;
+using ImGuiNET;
 
 namespace DelvUI.Interface.PartyCooldowns
 {
     public class PartyCooldown
     {
-        public readonly uint ActionID;
-        public readonly uint JobID;
-        public readonly uint RequiredLevel;
+        public readonly PartyCooldownData Data;
+        public readonly uint SourceId;
+        public readonly PartyFramesMember? Member;
 
-        public int CooldownDuration;
-        public int EffectDuration;
+        public double LastTimeUsed = 0;
 
-        public int Priority;
-        public int Column;
-
-        public PartyCooldown(uint actionID, uint jobID, uint requiredLevel, int cooldownDuration, int effectDuration, int priority, int column)
+        public PartyCooldown(PartyCooldownData data, uint sourceID, PartyFramesMember? member)
         {
-            ActionID = actionID;
-            JobID = jobID;
-            RequiredLevel = requiredLevel;
-            CooldownDuration = cooldownDuration;
-            EffectDuration = effectDuration;
-            Priority = priority;
-            Column = column;
+            Data = data;
+            SourceId = sourceID;
+            Member = member;
         }
 
-        public virtual bool IsUsableBy(uint jobId)
+        public float EffectTimeRemaining()
         {
-            return JobID == jobId;
+            double timeSinceUse = ImGui.GetTime() - LastTimeUsed;
+            if (timeSinceUse > Data.EffectDuration)
+            {
+                return 0;
+            }
+
+            return Data.EffectDuration - (float)timeSinceUse;
+        }
+
+        public float CooldownTimeRemaining()
+        {
+            double timeSinceUse = ImGui.GetTime() - LastTimeUsed;
+            if (timeSinceUse > Data.CooldownDuration)
+            {
+                return 0;
+            }
+
+            return Data.CooldownDuration - (float)timeSinceUse;
         }
     }
 
-    public class RolePartyCooldown : PartyCooldown
+    public class PartyCooldownData
     {
-        public readonly JobRoles Role;
+        public uint ActionId = 0;
+        public uint JobId = 0;
+        public JobRoles Role = JobRoles.Unknown;
+        public uint RequiredLevel = 0;
 
-        public RolePartyCooldown(uint actionID, JobRoles role, uint requiredLevel, int cooldownDuration, int effectDuration, int priority, int column)
-            : base(actionID, 0, requiredLevel, cooldownDuration, effectDuration, priority, column)
+        public bool Enabled = true;
+
+        public int CooldownDuration = 0;
+        public int EffectDuration = 0;
+
+        public int Priority = 0;
+        public int Column = 1;
+
+        public uint IconId = 0;
+
+        public virtual bool IsUsableBy(uint jobId)
         {
-            Role = role;
-        }
-
-
-        public override bool IsUsableBy(uint jobId)
-        {
-            return JobsHelper.RoleForJob(jobId) == Role;
+            return Role != JobRoles.Unknown ? JobsHelper.RoleForJob(jobId) == Role : JobId == jobId;
         }
     }
 }

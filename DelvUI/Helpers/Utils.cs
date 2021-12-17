@@ -26,6 +26,11 @@ namespace DelvUI.Helpers
                 return null;
             }
 
+            return GetBuddy(player.ObjectId, BattleNpcSubKind.Chocobo);
+        }
+
+        public static GameObject? GetBuddy(uint ownerId, BattleNpcSubKind kind)
+        {
             // only the first 200 elements in the array are relevant due to the order in which SE packs data into the array
             // we do a step of 2 because its always an actor followed by its companion
             for (var i = 0; i < 200; i += 2)
@@ -37,7 +42,7 @@ namespace DelvUI.Helpers
                     continue;
                 }
 
-                if (battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo && battleNpc.OwnerId == player.ObjectId)
+                if (battleNpc.BattleNpcKind == kind && battleNpc.OwnerId == ownerId)
                 {
                     return gameObject;
                 }

@@ -132,6 +132,7 @@ namespace DelvUI.Config
             CheckVersion();
 
             Plugin.ClientState.Logout += OnLogout;
+            Plugin.JobChangedEvent += OnJobChanged;
         }
 
         ~ConfigurationManager()
@@ -170,6 +171,11 @@ namespace DelvUI.Config
         {
             SaveConfigurations();
             ProfilesManager.Instance.SaveCurrentProfile();
+        }
+
+        private void OnJobChanged(uint jobId)
+        {
+            UpdateCurrentProfile();
         }
 
         private string LoadChangelog()
