@@ -1,3 +1,10 @@
+# 0.6.1.0
+Features:
+- Added Party Cooldowns tracker:
+    + You can choose which spells to track (only party-wide effects enabled for now).
+    + THe hud displays a grid with all the tracked spells for every member.
+    + You can organize them by priorty and column.
+
 # 0.6.0.3
 Features:
 - Updated Paladin's hud to accommodate with the latest changes:
