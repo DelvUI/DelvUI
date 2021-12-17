@@ -96,6 +96,7 @@ namespace DelvUI.Interface.PartyCooldowns
         private delegate void OnActionUsedDelegate(int characterId, IntPtr characterAddress, IntPtr position, IntPtr effect, IntPtr unk1, IntPtr unk2);
         private Hook<OnActionUsedDelegate> OnActionUsedHook;
 
+        private Dictionary<uint, Dictionary<uint, PartyCooldown>>? _oldMap;
         private Dictionary<uint, Dictionary<uint, PartyCooldown>> _cooldownsMap = new Dictionary<uint, Dictionary<uint, PartyCooldown>>();
         public IReadOnlyDictionary<uint, Dictionary<uint, PartyCooldown>> CooldownsMap => _cooldownsMap;
 
@@ -144,7 +145,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
         private void OnMembersChanged(PartyManager sender)
         {
-            if (sender.Previewing) { return; }
+            if (sender.Previewing || _config.Preview) { return; }
 
             _cooldownsMap.Clear();
             bool changed = false;
@@ -219,9 +220,66 @@ namespace DelvUI.Interface.PartyCooldowns
             OnMembersChanged(PartyManager.Instance);
         }
 
-        private void UpdatePreview()
+        public void UpdatePreview()
         {
+            if (!_config.Preview)
+            {
+                if (_oldMap != null)
+                {
+                    _cooldownsMap = _oldMap;
+                }
+                else
+                {
+                    _cooldownsMap.Clear();
+                }
 
+                if (PartyManager.Instance.Previewing)
+                {
+                    CooldownsChangedEvent?.Invoke(this);
+                }
+                else
+                {
+                    OnMembersChanged(PartyManager.Instance);
+                }
+                return;
+            }
+
+            if (PartyManager.Instance?.Previewing == false)
+            {
+                _oldMap = _cooldownsMap;
+            }
+
+            _cooldownsMap.Clear();
+            Random RNG = new Random((int)ImGui.GetTime());
+
+            for (uint i = 1; i < 9; i++)
+            {
+                Dictionary<uint, PartyCooldown> cooldowns = new Dictionary<uint, PartyCooldown>();
+
+                JobRoles role = i < 3 ? JobRoles.Tank : (i < 5 ? JobRoles.Healer : JobRoles.Unknown);
+                role = role == JobRoles.Unknown ? JobRoles.DPSMelee + RNG.Next(3) : role;
+                int jobCount = JobsHelper.JobsByRole[role].Count;
+                int jobIndex = RNG.Next(jobCount);
+                uint jobId = JobsHelper.JobsByRole[role][jobIndex];
+
+                _cooldownsMap.Add(i, CooldownsForMember(i, jobId, 90, null));
+
+                foreach (PartyCooldown cooldown in _cooldownsMap[i].Values)
+                {
+                    int rng = RNG.Next(100);
+                    if (rng > 80)
+                    {
+                        cooldown.LastTimeUsed = ImGui.GetTime() - 30;
+                    }
+                    else if (rng > 50)
+                    {
+                        cooldown.LastTimeUsed = ImGui.GetTime() + 1;
+                    }
+
+                }
+            }
+
+            CooldownsChangedEvent?.Invoke(this);
         }
         #endregion
     }

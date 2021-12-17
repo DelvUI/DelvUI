@@ -12,7 +12,7 @@ using System.Numerics;
 
 namespace DelvUI.Interface.PartyCooldowns
 {
-    public class PartyCooldownsHud : DraggableHudElement
+    public class PartyCooldownsHud : DraggableHudElement, IHudElementWithPreview
     {
         private PartyCooldownsConfig Config => (PartyCooldownsConfig)_config;
         private PartyCooldownsBarConfig _barConfig = null!;
@@ -41,6 +41,12 @@ namespace DelvUI.Interface.PartyCooldowns
         {
             _dataConfig.CooldownsDataChangedEvent -= OnCooldownsDataChanged;
             PartyCooldownsManager.Instance.CooldownsChangedEvent -= OnCooldownsChanged;
+        }
+
+        public void StopPreview()
+        {
+            Config.Preview = false;
+            PartyCooldownsManager.Instance?.UpdatePreview();
         }
 
         private void OnCooldownsDataChanged(PartyCooldownsDataConfig sender)

@@ -31,9 +31,9 @@ namespace DelvUI.Interface.PartyCooldowns
             return config;
         }
 
-        //[Checkbox("Preview", isMonitored = true)]
-        //[Order(4)]
-        //public bool Preview = false;
+        [Checkbox("Preview", isMonitored = true)]
+        [Order(4)]
+        public bool Preview = false;
 
         [Combo("Growth Direction", "Down", "Up", spacing = true)]
         [Order(20)]

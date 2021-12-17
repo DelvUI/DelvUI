@@ -334,6 +334,7 @@ namespace DelvUI.Interface
             var partyCooldownsConfig = ConfigurationManager.Instance.GetConfigObject<PartyCooldownsConfig>();
             var partyCooldownsHud = new PartyCooldownsHud(partyCooldownsConfig, "Party Cooldowns");
             _hudElements.Add(partyCooldownsHud);
+            _hudElementsWithPreview.Add(partyCooldownsHud);
         }
 
         public void Draw(uint jobId)
