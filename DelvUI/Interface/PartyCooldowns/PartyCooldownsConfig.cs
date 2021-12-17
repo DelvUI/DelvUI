@@ -236,13 +236,6 @@ namespace DelvUI.Interface.PartyCooldowns
                     {
                         ImGui.SetCursorPosX(ImGui.GetCursorPosX() + 3);
                         DrawHelper.DrawIcon<Action>(action, ImGui.GetCursorPos(), iconSize, false, true);
-
-                        //TooltipsHelper.Instance.ShowTooltipOnCursor(
-                        //    action.Description.ToDalamudString().ToString(),
-                        //    statusEffectData.Data.Name,
-                        //    statusEffectData.Status.StatusID,
-                        //    GetStatusActorName(statusEffectData.Status)
-                        //);
                     }
 
                     // name
