@@ -1,4 +1,10 @@
 # 0.6.0.3
+Features:
+- Updated Paladin's hud to accommodate with the latest changes:
+    + Paladin hud mana bar removed since it doesn't have a special purpose anymore (the generic mana bar can be used instead).
+    + Requiescat Bar now shows the amount of stacks along with the duration of the buff.
+
+Fixes:
 - Fixed Astrologian card stacks number when at max stacks.
 
 # 0.6.0.2
