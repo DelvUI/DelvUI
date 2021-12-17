@@ -148,7 +148,6 @@ namespace DelvUI.Interface.PartyCooldowns
             if (sender.Previewing || _config.Preview) { return; }
 
             _cooldownsMap.Clear();
-            bool changed = false;
 
             // add new members
             foreach (PartyFramesMember member in sender.GroupMembers)
@@ -156,7 +155,6 @@ namespace DelvUI.Interface.PartyCooldowns
                 if (member.ObjectId > 0)
                 {
                     _cooldownsMap.Add(member.ObjectId, CooldownsForMember(member));
-                    changed = true;
                 }
             }
 
@@ -167,14 +165,10 @@ namespace DelvUI.Interface.PartyCooldowns
                 if (player != null)
                 {
                     _cooldownsMap.Add(player.ObjectId, CooldownsForMember(player.ObjectId, player.ClassJob.Id, player.Level, null));
-                    changed = true;
                 }
             }
 
-            if (changed)
-            {
-                CooldownsChangedEvent?.Invoke(this);
-            }
+            CooldownsChangedEvent?.Invoke(this);
         }
 
         private Dictionary<uint, PartyCooldown> CooldownsForMember(PartyFramesMember member)
