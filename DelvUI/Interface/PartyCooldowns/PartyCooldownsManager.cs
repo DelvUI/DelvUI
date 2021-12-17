@@ -81,7 +81,6 @@ namespace DelvUI.Interface.PartyCooldowns
             _config = sender.GetConfigObject<PartyCooldownsConfig>();
             _config.ValueChangeEvent += OnConfigPropertyChanged;
 
-
             if (_dataConfig != null)
             {
                 _dataConfig.CooldownsDataEnabledChangedEvent -= OnCooldownEnabledChanged;
@@ -89,6 +88,7 @@ namespace DelvUI.Interface.PartyCooldowns
 
             _dataConfig = sender.GetConfigObject<PartyCooldownsDataConfig>();
             _dataConfig.CooldownsDataEnabledChangedEvent += OnCooldownEnabledChanged;
+            _dataConfig.UpdateDataIfNeeded();
         }
 
         #endregion Singleton
@@ -275,7 +275,6 @@ namespace DelvUI.Interface.PartyCooldowns
                     {
                         cooldown.LastTimeUsed = ImGui.GetTime() + 1;
                     }
-
                 }
             }
 

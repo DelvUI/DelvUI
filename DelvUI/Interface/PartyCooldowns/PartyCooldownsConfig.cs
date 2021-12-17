@@ -8,6 +8,7 @@ using ImGuiNET;
 using Lumina.Excel;
 using Lumina.Excel.GeneratedSheets;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 
 namespace DelvUI.Interface.PartyCooldowns
@@ -139,6 +140,24 @@ namespace DelvUI.Interface.PartyCooldowns
                 cooldown.IconId = action.Icon;
             }
             return config;
+        }
+
+        public void UpdateDataIfNeeded()
+        {
+            bool needsSave = false;
+
+            foreach (uint key in DefaultCooldowns.Keys)
+            {
+                if (Cooldowns.Any(data => data.ActionId == key)) { continue; }
+
+                Cooldowns.Add(DefaultCooldowns[key]);
+                needsSave = true;
+            }
+
+            if (needsSave)
+            {
+                ConfigurationManager.Instance.SaveConfigurations(true);
+            }
         }
 
         [ManualDraw]
