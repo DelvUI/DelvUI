@@ -1,16 +1,12 @@
-﻿using Dalamud.Game.ClientState.Objects.Enums;
+﻿using Dalamud.Game.ClientState.Conditions;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Hooking;
-using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Helpers;
 using DelvUI.Interface.Party;
 using ImGuiNET;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DelvUI.Interface.PartyCooldowns
 {
@@ -30,6 +26,7 @@ namespace DelvUI.Interface.PartyCooldowns
             PartyManager.Instance.MembersChangedEvent += OnMembersChanged;
             ConfigurationManager.Instance.ResetEvent += OnConfigReset;
             Plugin.JobChangedEvent += OnJobChanged;
+            Plugin.ClientState.TerritoryChanged += OnTerritoryChanged;
 
             OnConfigReset(ConfigurationManager.Instance);
             UpdatePreview();
@@ -67,6 +64,7 @@ namespace DelvUI.Interface.PartyCooldowns
             Plugin.JobChangedEvent -= OnJobChanged;
             _config.ValueChangeEvent -= OnConfigPropertyChanged;
             _dataConfig.CooldownsDataEnabledChangedEvent -= OnCooldownEnabledChanged;
+            Plugin.ClientState.TerritoryChanged -= OnTerritoryChanged;
 
             Instance = null!;
         }
@@ -102,6 +100,8 @@ namespace DelvUI.Interface.PartyCooldowns
 
         public delegate void PartyCooldownsChangedEventHandler(PartyCooldownsManager sender);
         public event PartyCooldownsChangedEventHandler? CooldownsChangedEvent;
+
+        private bool _wasInDuty = false;
 
         private unsafe void OnActionUsed(int characterId, IntPtr characterAddress, IntPtr position, IntPtr effect, IntPtr unk1, IntPtr unk2)
         {
@@ -149,13 +149,10 @@ namespace DelvUI.Interface.PartyCooldowns
 
             _cooldownsMap.Clear();
 
-            // add new members
-            foreach (PartyFramesMember member in sender.GroupMembers)
+            if (_config.ShowOnlyInDuties && !Plugin.Condition[ConditionFlag.BoundByDuty])
             {
-                if (member.ObjectId > 0)
-                {
-                    _cooldownsMap.Add(member.ObjectId, CooldownsForMember(member));
-                }
+                CooldownsChangedEvent?.Invoke(this);
+                return;
             }
 
             // show when solo
@@ -165,6 +162,17 @@ namespace DelvUI.Interface.PartyCooldowns
                 if (player != null)
                 {
                     _cooldownsMap.Add(player.ObjectId, CooldownsForMember(player.ObjectId, player.ClassJob.Id, player.Level, null));
+                }
+            }
+            else if (!_config.ShowOnlyInDuties || Plugin.Condition[ConditionFlag.BoundByDuty])
+            {
+                // add new members
+                foreach (PartyFramesMember member in sender.GroupMembers)
+                {
+                    if (member.ObjectId > 0)
+                    {
+                        _cooldownsMap.Add(member.ObjectId, CooldownsForMember(member));
+                    }
                 }
             }
 
@@ -202,6 +210,10 @@ namespace DelvUI.Interface.PartyCooldowns
             {
                 OnMembersChanged(PartyManager.Instance);
             }
+            else if (args.PropertyName == "ShowOnlyInDuties" && PartyManager.Instance != null)
+            {
+                OnMembersChanged(PartyManager.Instance);
+            }
         }
 
         private void OnJobChanged(uint jobId)
@@ -212,6 +224,17 @@ namespace DelvUI.Interface.PartyCooldowns
         private void OnCooldownEnabledChanged(PartyCooldownsDataConfig config)
         {
             OnMembersChanged(PartyManager.Instance);
+        }
+
+        private void OnTerritoryChanged(object? sender, ushort territoryId)
+        {
+            bool isInDuty = Plugin.Condition[ConditionFlag.BoundByDuty];
+            if (_config.ShowOnlyInDuties && _wasInDuty != isInDuty)
+            {
+                OnMembersChanged(PartyManager.Instance);
+            }
+
+            _wasInDuty = isInDuty;
         }
 
         public void UpdatePreview()
