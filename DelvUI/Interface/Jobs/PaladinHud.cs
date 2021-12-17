@@ -9,6 +9,8 @@ using System.Linq;
 using System.Numerics;
 using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Statuses;
+using DelvUI.Interface.GeneralElements;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -29,12 +31,6 @@ namespace DelvUI.Interface.Jobs
             List<Vector2> positions = new();
             List<Vector2> sizes = new();
 
-            if (Config.ManaBar.Enabled)
-            {
-                positions.Add(Config.Position + Config.ManaBar.Position);
-                sizes.Add(Config.ManaBar.Size);
-            }
-
             if (Config.OathGauge.Enabled)
             {
                 positions.Add(Config.Position + Config.OathGauge.Position);
@@ -47,10 +43,10 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.FightOrFlightBar.Size);
             }
 
-            if (Config.RequiescatBar.Enabled)
+            if (Config.RequiescatStacksBar.Enabled)
             {
-                positions.Add(Config.Position + Config.RequiescatBar.Position);
-                sizes.Add(Config.RequiescatBar.Size);
+                positions.Add(Config.Position + Config.RequiescatStacksBar.Position);
+                sizes.Add(Config.RequiescatStacksBar.Size);
             }
 
             if (Config.AtonementBar.Enabled)
@@ -66,11 +62,6 @@ namespace DelvUI.Interface.Jobs
         {
             Vector2 pos = origin + Config.Position;
 
-            if (Config.ManaBar.Enabled)
-            {
-                DrawManaBar(pos, player);
-            }
-
             if (Config.OathGauge.Enabled)
             {
                 DrawOathGauge(pos);
@@ -81,7 +72,7 @@ namespace DelvUI.Interface.Jobs
                 DrawFightOrFlightBar(pos, player);
             }
 
-            if (Config.RequiescatBar.Enabled)
+            if (Config.RequiescatStacksBar.Enabled)
             {
                 DrawRequiescatBar(pos, player);
             }
@@ -95,14 +86,6 @@ namespace DelvUI.Interface.Jobs
             {
                 DrawDoTBar(pos, player);
             }
-        }
-
-        private void DrawManaBar(Vector2 origin, PlayerCharacter player)
-        {
-            if (Config.ManaBar.HideWhenInactive && player.CurrentMp == player.MaxMp) { return; }
-
-            Config.ManaBar.Label.SetValue(player.CurrentMp);
-            BarUtilities.GetChunkedProgressBars(Config.ManaBar, 5, player.CurrentMp, player.MaxMp, 0f, player).Draw(origin);
         }
 
         private void DrawOathGauge(Vector2 origin)
@@ -129,12 +112,22 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawRequiescatBar(Vector2 origin, PlayerCharacter player)
         {
-            float requiescatDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1368)?.RemainingTime ?? 0f;
+            Status? requiescatBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 1368);
+            float requiescatDuration = Math.Max(0f, requiescatBuff?.RemainingTime ?? 0f);
+            byte stacks = requiescatBuff?.StackCount ?? 0;
 
-            if (!Config.RequiescatBar.HideWhenInactive || requiescatDuration > 0)
+            if (!Config.RequiescatStacksBar.HideWhenInactive || requiescatDuration > 0)
             {
-                Config.RequiescatBar.Label.SetValue(requiescatDuration);
-                BarUtilities.GetProgressBar(Config.RequiescatBar, requiescatDuration, 30f, 0f, player).Draw(origin);
+                var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[5];
+
+                for (int i = 0; i < 5; i++)
+                {
+                    chunks[i] = new(Config.RequiescatStacksBar.FillColor, i < stacks ? 1 : 0, i == 2 ? Config.RequiescatStacksBar.Label : null);
+                }
+
+                Config.RequiescatStacksBar.Label.SetValue(requiescatDuration);
+                BarUtilities.GetChunkedBars(Config.RequiescatStacksBar, chunks, player)
+                    .Draw(origin);
             }
         }
 
@@ -168,17 +161,12 @@ namespace DelvUI.Interface.Jobs
         {
             var config = new PaladinConfig();
 
+            config.UseDefaultPrimaryResourceBar = true;
             config.OathGauge.UsePartialFillColor = true;
+            config.RequiescatStacksBar.Label.Enabled = true;
 
             return config;
         }
-
-        [NestedConfig("Mana Bar", 30)]
-        public ChunkedProgressBarConfig ManaBar = new ChunkedProgressBarConfig(
-            new Vector2(0, -76),
-            new Vector2(254, 20),
-            new PluginConfigColor(new Vector4(0f / 255f, 203f / 255f, 230f / 255f, 100f / 100f))
-        );
 
         [NestedConfig("Oath Gauge", 35)]
         public ChunkedProgressBarConfig OathGauge = new ChunkedProgressBarConfig(
@@ -197,7 +185,7 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Requiescat Bar", 45)]
-        public ProgressBarConfig RequiescatBar = new ProgressBarConfig(
+        public ChunkedProgressBarConfig RequiescatStacksBar = new ChunkedProgressBarConfig(
             new Vector2(64, -32),
             new Vector2(126, 20),
             new PluginConfigColor(new Vector4(61f / 255f, 61f / 255f, 255f / 255f, 100f / 100f))
@@ -212,7 +200,7 @@ namespace DelvUI.Interface.Jobs
 
         [NestedConfig("DoT Bar", 55)]
         public ProgressBarConfig GoringBladeBar = new ProgressBarConfig(
-            new(0, -98),
+            new(0, -76),
             new(254, 20),
             new PluginConfigColor(new Vector4(255f / 255f, 128f / 255f, 0f / 255f, 100f / 100f)),
             BarDirection.Right,
