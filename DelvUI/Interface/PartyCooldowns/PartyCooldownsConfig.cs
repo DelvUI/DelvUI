@@ -76,7 +76,7 @@ namespace DelvUI.Interface.PartyCooldowns
         public PluginConfigColor RechargingBackgroundColor = new PluginConfigColor(new Vector4(150f / 255f, 0f / 255f, 0f / 255f, 25f / 100f));
 
         [NestedConfig("Name Label", 100)]
-        public EditableLabelConfig NameLabel = new EditableLabelConfig(new Vector2(5, 0), "[name:first-npcmedium]", DrawAnchor.Left, DrawAnchor.Left);
+        public EditableLabelConfig NameLabel = new EditableLabelConfig(new Vector2(5, 0), "[name:initials]", DrawAnchor.Left, DrawAnchor.Left);
 
         [NestedConfig("Time Label", 105)]
         public NumericLabelConfig TimeLabel = new NumericLabelConfig(new Vector2(-5, 0), "", DrawAnchor.Right, DrawAnchor.Right);
@@ -293,44 +293,44 @@ namespace DelvUI.Interface.PartyCooldowns
         {
             // TANKS
             [7535] = NewData(7535, JobRoles.Tank, 22, 60, 10, 100, 1), // reprisal
-            [3540] = NewData(3540, JobIDs.PLD, 56, 90, 30, 90, 1), // divine veil
-            [7385] = NewData(7385, JobIDs.PLD, 70, 120, 18, 90, 1), // passage of arms
-            [7388] = NewData(7388, JobIDs.WAR, 68, 90, 15, 90, 1), // shake it off
-            [16471] = NewData(16471, JobIDs.DRK, 76, 90, 15, 90, 1), // dark missionary
-            [16160] = NewData(16160, JobIDs.GNB, 64, 90, 15, 90, 1), // heart of light
+            [3540] = NewData(3540, JobIDs.PLD, 56, 90, 30, 90, 2), // divine veil
+            [7385] = NewData(7385, JobIDs.PLD, 70, 120, 18, 90, 2), // passage of arms
+            [7388] = NewData(7388, JobIDs.WAR, 68, 90, 15, 90, 2), // shake it off
+            [16471] = NewData(16471, JobIDs.DRK, 76, 90, 15, 90, 2), // dark missionary
+            [16160] = NewData(16160, JobIDs.GNB, 64, 90, 15, 90, 2), // heart of light
 
             // HEALER
-            [16552] = NewData(16552, JobIDs.AST, 50, 120, 15, 30, 2), // divination
-            [3613] = NewData(3613, JobIDs.AST, 58, 60, 18, 80, 1), // collective unconscious
-            [7436] = NewData(7436, JobIDs.SCH, 66, 120, 15, 30, 2), // chain stratagem
-            [805] = NewData(805, JobIDs.SCH, 40, 120, 20, 50, 3), // fey illumination
-            [188] = NewData(188, JobIDs.SCH, 50, 30, 15, 80, 1), // sacred soil
-            [25868] = NewData(25868, JobIDs.SCH, 90, 120, 20, 80, 1), // expedient
-            [16536] = NewData(16536, JobIDs.WHM, 80, 120, 20, 80, 1), // temperance
-            [3569] = NewData(3569, JobIDs.WHM, 52, 90, 24, 50, 3), // asylum
-            [24298] = NewData(24298, JobIDs.SGE, 50, 30, 15, 80, 1), // kerachole
-            [24310] = NewData(24310, JobIDs.SGE, 76, 120, 20, 80, 1), // holos
-            [24311] = NewData(24311, JobIDs.SGE, 80, 120, 15, 80, 1), // panhaima
+            [16552] = NewData(16552, JobIDs.AST, 50, 120, 15, 30, 3), // divination
+            [3613] = NewData(3613, JobIDs.AST, 58, 60, 18, 80, 2), // collective unconscious
+            [7436] = NewData(7436, JobIDs.SCH, 66, 120, 15, 30, 3), // chain stratagem
+            [805] = NewData(805, JobIDs.SCH, 40, 120, 20, 50, 2), // fey illumination
+            [188] = NewData(188, JobIDs.SCH, 50, 30, 15, 80, 2), // sacred soil
+            [25868] = NewData(25868, JobIDs.SCH, 90, 120, 20, 80, 2), // expedient
+            [16536] = NewData(16536, JobIDs.WHM, 80, 120, 20, 80, 2), // temperance
+            [3569] = NewData(3569, JobIDs.WHM, 52, 90, 24, 50, 2), // asylum
+            [24298] = NewData(24298, JobIDs.SGE, 50, 30, 15, 80, 2), // kerachole
+            [24310] = NewData(24310, JobIDs.SGE, 76, 120, 20, 80, 2), // holos
+            [24311] = NewData(24311, JobIDs.SGE, 80, 120, 15, 80, 2), // panhaima
 
             // MELEE
             [7549] = NewData(7549, JobRoles.DPSMelee, 22, 90, 10, 100, 1), // feint
-            [2258] = NewData(2258, JobIDs.NIN, 18, 60, 15, 30, 2), // trick attack
-            [3557] = NewData(3557, JobIDs.DRG, 52, 120, 15, 30, 2), // battle litany
-            [7396] = NewData(7396, JobIDs.MNK, 70, 120, 15, 90, 1), // brotherhood
-            [65] = NewData(65, JobIDs.MNK, 42, 90, 15, 50, 3), // mantra
-            [24405] = NewData(24405, JobIDs.RPR, 72, 120, 20, 30, 2), // arcane circle
+            [2258] = NewData(2258, JobIDs.NIN, 18, 60, 15, 30, 3), // trick attack
+            [3557] = NewData(3557, JobIDs.DRG, 52, 120, 15, 30, 3), // battle litany
+            [7396] = NewData(7396, JobIDs.MNK, 70, 120, 15, 90, 3), // brotherhood
+            [65] = NewData(65, JobIDs.MNK, 42, 90, 15, 50, 2), // mantra
+            [24405] = NewData(24405, JobIDs.RPR, 72, 120, 20, 30, 3), // arcane circle
 
             // RANGED
-            [118] = NewData(118, JobIDs.BRD, 50, 120, 15, 30, 2), // battle voice
-            [7405] = NewData(7405, JobIDs.BRD, 88, 90, 15, 70, 1), // troubadour
-            [7408] = NewData(7408, JobIDs.BRD, 66, 90, 15, 40, 3), // nature's minne
-            [16012] = NewData(16012, JobIDs.DNC, 88, 90, 15, 70, 1), // shield samba
-            [16889] = NewData(16889, JobIDs.MCH, 56, 90, 15, 70, 1), // tactician
+            [118] = NewData(118, JobIDs.BRD, 50, 120, 15, 30, 3), // battle voice
+            [7405] = NewData(7405, JobIDs.BRD, 88, 90, 15, 70, 2), // troubadour
+            [7408] = NewData(7408, JobIDs.BRD, 66, 90, 15, 40, 2), // nature's minne
+            [16012] = NewData(16012, JobIDs.DNC, 88, 90, 15, 70, 2), // shield samba
+            [16889] = NewData(16889, JobIDs.MCH, 56, 90, 15, 70, 2), // tactician
 
             // CASTER
             [7560] = NewData(7560, JobRoles.DPSCaster, 8, 90, 10, 100, 1), // addle
-            [7520] = NewData(7520, JobIDs.RDM, 58, 120, 20, 30, 2), // embolden
-            [25801] = NewData(25801, JobIDs.SMN, 66, 120, 30, 30, 2), // searing light
+            [7520] = NewData(7520, JobIDs.RDM, 58, 120, 20, 30, 3), // embolden
+            [25801] = NewData(25801, JobIDs.SMN, 66, 120, 30, 30, 3), // searing light
         };
 
         #region helpers

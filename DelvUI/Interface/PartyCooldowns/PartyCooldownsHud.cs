@@ -100,8 +100,9 @@ namespace DelvUI.Interface.PartyCooldowns
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            int columnCount = PartyCooldownsDataConfig.ColumnCount;
-            int rowCount = 4; // hardcoded just for draggable area purposes
+            // hardcoded just for draggable area purposes
+            const int columnCount = 3;
+            const int rowCount = 4;
 
             Vector2 size = new Vector2(
                 _barConfig.Size.X * columnCount + Config.Padding.X * (columnCount - 1),
@@ -175,7 +176,7 @@ namespace DelvUI.Interface.PartyCooldowns
                     Vector2 iconPos = origin + new Vector2(Config.Position.X + offsetX, y);
                     Vector2 iconSize = new Vector2(size.Y);
 
-                    DrawHelper.DrawInWindow(barId + "_enmityIcon", iconPos, iconSize, false, false, (drawList) =>
+                    DrawHelper.DrawInWindow(barId + "_icon", iconPos, iconSize, false, false, (drawList) =>
                     {
                         DrawHelper.DrawIcon(cooldown.Data.IconId, iconPos, iconSize, false, drawList);
 
@@ -186,7 +187,12 @@ namespace DelvUI.Interface.PartyCooldowns
                     });
 
                     // name
-                    Character? character = cooldown.Member?.Character ?? cooldown.SourceId == player.ObjectId ? player : null;
+                    Character? character = cooldown.Member?.Character;
+                    if (character == null && cooldown.SourceId == player.ObjectId)
+                    {
+                        character = player;
+                    }
+
                     string? name = character == null ? "Fake Name" : null;
                     _nameLabelHud.Draw(origin + pos, size, character, name);
 
