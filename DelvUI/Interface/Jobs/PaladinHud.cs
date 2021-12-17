@@ -113,7 +113,7 @@ namespace DelvUI.Interface.Jobs
         private void DrawRequiescatBar(Vector2 origin, PlayerCharacter player)
         {
             Status? requiescatBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 1368);
-            float requiescatDuration = requiescatBuff?.RemainingTime ?? 0f;
+            float requiescatDuration = Math.Max(0f, requiescatBuff?.RemainingTime ?? 0f);
             byte stacks = requiescatBuff?.StackCount ?? 0;
 
             if (!Config.RequiescatStacksBar.HideWhenInactive || requiescatDuration > 0)
@@ -122,7 +122,7 @@ namespace DelvUI.Interface.Jobs
 
                 for (int i = 0; i < 5; i++)
                 {
-                    chunks[i] = new(Config.RequiescatStacksBar.FillColor, i + 1 >= stacks ? 1 : 0, i == 2 ? Config.RequiescatStacksBar.Label : null);
+                    chunks[i] = new(Config.RequiescatStacksBar.FillColor, i < stacks ? 1 : 0, i == 2 ? Config.RequiescatStacksBar.Label : null);
                 }
 
                 Config.RequiescatStacksBar.Label.SetValue(requiescatDuration);
