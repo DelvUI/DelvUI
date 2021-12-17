@@ -100,10 +100,10 @@ namespace DelvUI.Interface.Jobs
         private void DrawCodaBar(Vector2 origin, PlayerCharacter player)
         {
             BRDGauge gauge = Plugin.JobGauges.Get<BRDGauge>();
-            if (!Config.CodaBar.HideWhenInactive)
+            var hasCoda = new[] { gauge.Coda.Contains(Song.WANDERER) ? 1 : 0, gauge.Coda.Contains(Song.MAGE) ? 1 : 0, gauge.Coda.Contains(Song.ARMY) ? 1 : 0 };
+            if (!Config.CodaBar.HideWhenInactive || hasCoda.Length > 0)
             {
                 var order = Config.CodaBar.CodaOrder;
-                var hasCoda = new[] { gauge.Coda.Contains(Song.WANDERER) ? 1 : 0, gauge.Coda.Contains(Song.MAGE) ? 1 : 0, gauge.Coda.Contains(Song.ARMY) ? 1 : 0 };
                 var colors = new[] { Config.CodaBar.WMColor, Config.CodaBar.MBColor, Config.CodaBar.APColor };
 
                 var coda = new Tuple<PluginConfigColor, float, LabelConfig?>[3];

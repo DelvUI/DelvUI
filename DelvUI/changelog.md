@@ -1,3 +1,7 @@
+# 0.6.0.4
+Fixes:
+- Fixed Bard Coda bar never showing when "Hide When Inactive" is checked.
+
 # 0.6.0.3
 Features:
 - Updated Paladin's hud to accommodate with the latest changes:
