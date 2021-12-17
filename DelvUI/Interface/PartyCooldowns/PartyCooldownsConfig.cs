@@ -330,6 +330,7 @@ namespace DelvUI.Interface.PartyCooldowns
             // CASTER
             [7560] = NewData(7560, JobRoles.DPSCaster, 8, 90, 10, 100, 1), // addle
             [7520] = NewData(7520, JobIDs.RDM, 58, 120, 20, 30, 3), // embolden
+            [25857] = NewData(25857, JobIDs.RDM, 86, 120, 10, 70, 2), // magick barrier
             [25801] = NewData(25801, JobIDs.SMN, 66, 120, 30, 30, 3), // searing light
         };
 
