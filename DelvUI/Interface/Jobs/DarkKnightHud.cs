@@ -132,9 +132,9 @@ namespace DelvUI.Interface.Jobs
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
             if (Config.DarksideBar.HideWhenInactive && gauge.DarksideTimeRemaining == 0) { return; };
 
-            float timer = Math.Abs(gauge.DarksideTimeRemaining);
-            Config.DarksideBar.Label.SetValue(timer / 1000);
-            BarUtilities.GetProgressBar(Config.DarksideBar, timer, 60000f)
+            float timer = Math.Abs(gauge.DarksideTimeRemaining) / 1000;
+            Config.DarksideBar.Label.SetValue(timer);
+            BarUtilities.GetProgressBar(Config.DarksideBar, timer, 60)
                 .Draw(origin);
         }
 
@@ -175,9 +175,9 @@ namespace DelvUI.Interface.Jobs
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
             if (Config.LivingShadowBar.HideWhenInactive && gauge.ShadowTimeRemaining == 0) { return; }
 
-            float timer = Math.Abs(gauge.ShadowTimeRemaining);
-            Config.LivingShadowBar.Label.SetValue(timer / 1000);
-            BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 24000f)
+            float timer = Math.Abs(gauge.ShadowTimeRemaining) / 1000;
+            Config.LivingShadowBar.Label.SetValue(timer);
+            BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 24)
                 .Draw(origin);
         }
     }

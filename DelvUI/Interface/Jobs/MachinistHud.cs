@@ -108,7 +108,7 @@ namespace DelvUI.Interface.Jobs
                 }
 
                 Config.BatteryGauge.Label.SetValue(gauge.SummonTimeRemaining / 1000f);
-                BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.SummonTimeRemaining, _robotMaxDuration, 0f, player, Config.BatteryGauge.RobotColor).Draw(origin);
+                BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.SummonTimeRemaining / 1000, _robotMaxDuration / 1000, 0f, player, Config.BatteryGauge.RobotColor).Draw(origin);
             }
         }
 
@@ -119,7 +119,7 @@ namespace DelvUI.Interface.Jobs
             if (!Config.OverheatGauge.HideWhenInactive || gauge.IsOverheated)
             {
                 Config.OverheatGauge.Label.SetValue(gauge.OverheatTimeRemaining / 1000f);
-                BarUtilities.GetProgressBar(Config.OverheatGauge, gauge.OverheatTimeRemaining, 8000f, 0f).Draw(origin);
+                BarUtilities.GetProgressBar(Config.OverheatGauge, gauge.OverheatTimeRemaining / 1000f, 8, 0f).Draw(origin);
             }
         }
 

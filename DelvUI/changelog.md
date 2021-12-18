@@ -5,6 +5,10 @@ Features:
     + THe hud displays a grid with all the tracked spells for every member.
     + You can organize them by priorty and column.
 
+Fixes:
+- Fixed Bard Coda bar never showing when "Hide When Inactive" is checked.
+- Fixed threshold values for some bars being incorrect.
+
 # 0.6.0.3
 Features:
 - Updated Paladin's hud to accommodate with the latest changes:
