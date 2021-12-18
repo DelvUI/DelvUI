@@ -122,12 +122,12 @@ namespace DelvUI.Interface.Jobs
         private void DrawBloodOfTheDragonBar(Vector2 pos, PlayerCharacter player)
         {
             DRGGauge gauge = Plugin.JobGauges.Get<DRGGauge>();
-            var durationMs = gauge.LOTDTimer;
+            float duration = gauge.LOTDTimer / 1000f;
 
-            if (!Config.LifeOfTheDragonBar.HideWhenInactive || durationMs > 0f)
+            if (!Config.LifeOfTheDragonBar.HideWhenInactive || duration > 0f)
             {
-                Config.LifeOfTheDragonBar.Label.SetValue(durationMs / 1000);
-                BarUtilities.GetProgressBar(Config.LifeOfTheDragonBar, durationMs, 30000f, 0f, player).Draw(pos);
+                Config.LifeOfTheDragonBar.Label.SetValue(duration);
+                BarUtilities.GetProgressBar(Config.LifeOfTheDragonBar, duration, 30, 0f, player).Draw(pos);
             }
         }
 

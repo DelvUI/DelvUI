@@ -240,7 +240,7 @@ namespace DelvUI.Interface.Jobs
 
             float timer = gauge.IsEnochianActive ? (30000f - gauge.EnochianTimer) : 0f;
             Config.EnochianBar.Label.SetValue(timer / 1000);
-            BarUtilities.GetProgressBar(Config.EnochianBar, timer, 30000, 0f)
+            BarUtilities.GetProgressBar(Config.EnochianBar, timer / 1000, 30, 0f)
                 .Draw(origin);
         }
 

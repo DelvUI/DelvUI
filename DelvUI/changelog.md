@@ -1,6 +1,7 @@
 # 0.6.0.4
 Fixes:
 - Fixed Bard Coda bar never showing when "Hide When Inactive" is checked.
+- Fixed threshold values for some bars being incorrect.
 
 # 0.6.0.3
 Features:
