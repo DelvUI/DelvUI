@@ -133,10 +133,15 @@ namespace DelvUI.Helpers
 
         public static void DrawIcon(uint iconId, Vector2 position, Vector2 size, bool drawBorder, ImDrawListPtr drawList)
         {
+            DrawIcon(iconId, position, size, drawBorder, 0xFFFFFFFF, drawList);
+        }
+
+        public static void DrawIcon(uint iconId, Vector2 position, Vector2 size, bool drawBorder, uint color, ImDrawListPtr drawList)
+        {
             TextureWrap? texture = TexturesCache.Instance.GetTextureFromIconId(iconId);
             if (texture == null) { return; }
 
-            drawList.AddImage(texture.ImGuiHandle, position, position + size, Vector2.Zero, Vector2.One);
+            drawList.AddImage(texture.ImGuiHandle, position, position + size, Vector2.Zero, Vector2.One, color);
 
             if (drawBorder)
             {
@@ -164,6 +169,18 @@ namespace DelvUI.Helpers
             Vector2 uv1 = new(1f - uv1x / texture.Width, 1f - uv1y / texture.Height);
 
             return (uv0, uv1);
+        }
+
+        public static void DrawIconCooldown(Vector2 position, Vector2 size, float elapsed, float total, ImDrawListPtr drawList)
+        {
+            float completion = elapsed / total;
+            float endAngle = (float)Math.PI * 2f * -completion;
+            float offset = (float)Math.PI / 2;
+
+            ImGui.PushClipRect(position, position + size, false);
+            drawList.PathArcTo(position + size / 2, size.X / 2, endAngle - offset, -offset, 50);
+            drawList.PathStroke(0xCC000000, ImDrawFlags.None, size.X);
+            ImGui.PopClipRect();
         }
 
         public static void DrawOvershield(float shield, Vector2 cursorPos, Vector2 barSize, float height, bool useRatioForHeight, PluginConfigColor color, ImDrawListPtr drawList)

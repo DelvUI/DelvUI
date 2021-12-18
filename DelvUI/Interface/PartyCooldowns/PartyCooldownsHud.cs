@@ -143,6 +143,8 @@ namespace DelvUI.Interface.PartyCooldowns
                         addedOffset = true;
                     }
 
+                    string barId = _barConfig.ID + $"_{offsetX + i}";
+
                     // cooldown bar
                     float cooldownTime = cooldown.CooldownTimeRemaining();
                     float effectTime = cooldown.EffectTimeRemaining();
@@ -157,40 +159,55 @@ namespace DelvUI.Interface.PartyCooldowns
                     float y = Config.Position.Y + i * direction * size.Y + i * direction * Config.Padding.Y;
                     Vector2 pos = new Vector2(Config.Position.X + size.Y + offsetX - 1, y);
 
-                    PluginConfigColor fillColor = effectTime > 0 ? _barConfig.AvailableColor : _barConfig.RechargingColor;
-                    PluginConfigColor bgColor = effectTime > 0 || cooldownTime == 0 ? _barConfig.AvailableBackgroundColor : _barConfig.RechargingBackgroundColor;
+                    if (_barConfig.ShowBar)
+                    {
+                        PluginConfigColor fillColor = effectTime > 0 ? _barConfig.AvailableColor : _barConfig.RechargingColor;
+                        PluginConfigColor bgColor = effectTime > 0 || cooldownTime == 0 ? _barConfig.AvailableBackgroundColor : _barConfig.RechargingBackgroundColor;
 
-                    Rect background = new Rect(pos, size, bgColor);
-                    Rect fill = BarUtilities.GetFillRect(pos, size, _barConfig.FillDirection, fillColor, current, max);
+                        Rect background = new Rect(pos, size, bgColor);
+                        Rect fill = BarUtilities.GetFillRect(pos, size, _barConfig.FillDirection, fillColor, current, max);
 
-                    string barId = _barConfig.ID + $"_{offsetX + i}";
-                    BarHud bar = new BarHud(
-                        barId,
-                        _barConfig.DrawBorder,
-                        _barConfig.BorderColor,
-                        _barConfig.BorderThickness,
-                        DrawAnchor.TopLeft,
-                        current: current,
-                        max: max
-                    );
+                        BarHud bar = new BarHud(
+                            barId,
+                            _barConfig.DrawBorder,
+                            _barConfig.BorderColor,
+                            _barConfig.BorderThickness,
+                            DrawAnchor.TopLeft,
+                            current: current,
+                            max: max
+                        );
 
-                    bar.SetBackground(background);
-                    bar.AddForegrounds(fill);
-                    bar.Draw(origin);
+                        bar.SetBackground(background);
+                        bar.AddForegrounds(fill);
+                        bar.Draw(origin);
+                    }
 
                     // icon
-                    Vector2 iconPos = origin + new Vector2(Config.Position.X + offsetX, y);
-                    Vector2 iconSize = new Vector2(size.Y);
-
-                    DrawHelper.DrawInWindow(barId + "_icon", iconPos, iconSize, false, false, (drawList) =>
+                    if (_barConfig.ShowIcon)
                     {
-                        DrawHelper.DrawIcon(cooldown.Data.IconId, iconPos, iconSize, false, drawList);
+                        Vector2 iconPos = origin + new Vector2(Config.Position.X + offsetX, y);
+                        Vector2 iconSize = new Vector2(size.Y);
+                        bool recharging = effectTime == 0 && cooldownTime > 0;
 
-                        if (_barConfig.DrawBorder)
+                        DrawHelper.DrawInWindow(barId + "_icon", iconPos, iconSize, false, false, (drawList) =>
                         {
-                            drawList.AddRect(iconPos, iconPos + iconSize, _barConfig.BorderColor.Base, 0, ImDrawFlags.None, _barConfig.BorderThickness);
-                        }
-                    });
+                            uint color = recharging ? 0xAAFFFFFF : 0xFFFFFFFF;
+                            DrawHelper.DrawIcon(cooldown.Data.IconId, iconPos, iconSize, false, color, drawList);
+
+                            if (_barConfig.ShowIconCooldownAnimation && effectTime == 0 && cooldownTime > 0)
+                            {
+                                DrawHelper.DrawIconCooldown(iconPos, iconSize, cooldownTime, cooldown.Data.CooldownDuration, drawList);
+                            }
+
+                            if (_barConfig.DrawBorder)
+                            {
+                                bool active = effectTime > 0 && _barConfig.ChangeIconBorderWhenActive;
+                                uint iconBorderColor = active ? _barConfig.IconActiveBorderColor.Base : _barConfig.BorderColor.Base;
+                                int thickness = active ? _barConfig.IconActiveBorderThickness : _barConfig.BorderThickness;
+                                drawList.AddRect(iconPos, iconPos + iconSize, iconBorderColor, 0, ImDrawFlags.None, thickness);
+                            }
+                        });
+                    }
 
                     // name
                     Character? character = cooldown.Member?.Character;

@@ -40,7 +40,7 @@ namespace DelvUI.Interface.PartyCooldowns
         [Order(20)]
         public PartyCooldownsGrowthDirection GrowthDirection = PartyCooldownsGrowthDirection.Down;
 
-        [DragInt2("Padding", min = -10, max = 100)]
+        [DragInt2("Padding", min = -1000, max = 1000)]
         [Order(15)]
         public Vector2 Padding = new Vector2(0, -1);
 
@@ -60,21 +60,45 @@ namespace DelvUI.Interface.PartyCooldowns
     [SubSection("Cooldown Bar", 0)]
     public class PartyCooldownsBarConfig : BarConfig
     {
-        [ColorEdit4("Available Color", spacing = true)]
+        [Checkbox("Show Bar", spacing = true)]
         [Order(70)]
+        public bool ShowBar = true;
+
+        [ColorEdit4("Available Color")]
+        [Order(71, collapseWith = nameof(ShowBar))]
         public PluginConfigColor AvailableColor = new PluginConfigColor(new Vector4(0f / 255f, 150f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Available Background Color")]
-        [Order(71)]
+        [Order(72, collapseWith = nameof(ShowBar))]
         public PluginConfigColor AvailableBackgroundColor = new PluginConfigColor(new Vector4(0f / 255f, 150f / 255f, 0f / 255f, 25f / 100f));
 
-        [ColorEdit4("Recharging Color", spacing = true)]
-        [Order(72)]
+        [ColorEdit4("Recharging Color")]
+        [Order(73, collapseWith = nameof(ShowBar))]
         public PluginConfigColor RechargingColor = new PluginConfigColor(new Vector4(150f / 255f, 0f / 255f, 0f / 255f, 100f / 100f));
 
         [ColorEdit4("Recharging Background Color")]
-        [Order(73)]
+        [Order(74, collapseWith = nameof(ShowBar))]
         public PluginConfigColor RechargingBackgroundColor = new PluginConfigColor(new Vector4(150f / 255f, 0f / 255f, 0f / 255f, 25f / 100f));
+
+        [Checkbox("Show Icon", spacing = true)]
+        [Order(80)]
+        public bool ShowIcon = true;
+
+        [Checkbox("Show Icon Cooldown Animation")]
+        [Order(81, collapseWith = nameof(ShowIcon))]
+        public bool ShowIconCooldownAnimation = false;
+
+        [Checkbox("Change Icon Border When Active")]
+        [Order(82, collapseWith = nameof(ShowIcon))]
+        public bool ChangeIconBorderWhenActive = false;
+
+        [ColorEdit4("Icon Active Border Color")]
+        [Order(83, collapseWith = nameof(ChangeIconBorderWhenActive))]
+        public PluginConfigColor IconActiveBorderColor = new PluginConfigColor(new Vector4(255f / 255f, 200f / 255f, 35f / 255f, 100f / 100f));
+
+        [DragInt("Icon Active Border Thickness", min = 1, max = 10)]
+        [Order(84, collapseWith = nameof(ChangeIconBorderWhenActive))]
+        public int IconActiveBorderThickness = 3;
 
         [NestedConfig("Name Label", 100)]
         public EditableLabelConfig NameLabel = new EditableLabelConfig(new Vector2(5, 0), "[name:initials]", DrawAnchor.Left, DrawAnchor.Left);
