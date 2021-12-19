@@ -249,6 +249,7 @@ namespace DelvUI.Interface.Jobs
             var config = new SummonerConfig();
 
             config.TranceBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.UseDefaultPrimaryResourceBar = true;
 
             return config;
         }
