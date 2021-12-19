@@ -344,7 +344,7 @@ namespace DelvUI.Interface.Jobs
         [Order(24)]
         public int[] ChakraOrder = new int[] { 0, 1, 2, 3, 4 };
 
-        [NestedConfig("Enshroud Duration Text", 50, spacing = true)]
+        [NestedConfig("Blitz Timer Text", 50, spacing = true)]
         public NumericLabelConfig BlitzTimerLabel;
 
         public MastersGauge(Vector2 position, Vector2 size, PluginConfigColor fillColor, int padding = 2) : base(position, size, fillColor, padding)
