@@ -4,9 +4,11 @@ Features:
     + You can choose which spells to track (only party-wide effects enabled for now).
     + THe hud displays a grid with all the tracked spells for every member.
     + You can organize them by priorty and column.
+- Added a Minor Arcana Bar for Astrologian.
 
 Fixes:
 - Fixed Bard Coda bar never showing when "Hide When Inactive" is checked.
+- Fixed mana bar not being visible by default for Summoner.
 - Fixed threshold values for some bars being incorrect.
 
 # 0.6.0.3

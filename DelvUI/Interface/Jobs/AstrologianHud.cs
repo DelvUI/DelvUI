@@ -43,6 +43,12 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.DrawBar.Size);
             }
 
+            if (Config.MinorArcanaBar.Enabled)
+            {
+                positions.Add(Config.Position + Config.MinorArcanaBar.Position);
+                sizes.Add(Config.MinorArcanaBar.Size);
+            }
+
             if (Config.AstrodyneBar.Enabled)
             {
                 positions.Add(Config.Position + Config.AstrodyneBar.Position);
@@ -82,6 +88,11 @@ namespace DelvUI.Interface.Jobs
             if (Config.DrawBar.Enabled)
             {
                 DrawDraw(pos, player);
+            }
+
+            if (Config.MinorArcanaBar.Enabled)
+            {
+                DrawMinorArcana(pos, player);
             }
 
             if (Config.DotBar.Enabled)
@@ -306,6 +317,63 @@ namespace DelvUI.Interface.Jobs
                 .Draw(origin);
         }
 
+        private void DrawMinorArcana(Vector2 pos, PlayerCharacter player)
+        {
+            ASTGauge gauge = Plugin.JobGauges.Get<ASTGauge>();
+
+            string crownCardDrawn = "";
+            PluginConfigColor crownCardColor = EmptyColor;
+
+            if (gauge.DrawnCard == CardType.NONE && Config.MinorArcanaBar.HideWhenInactive)
+            {
+                return;
+            }
+
+            switch (gauge.DrawnCrownCard)
+            {
+                case CardType.LADY:
+                    crownCardColor = Config.MinorArcanaBar.LadyDrawnColor;
+                    crownCardDrawn = "LADY";
+                    break;
+
+                case CardType.LORD:
+                    crownCardColor = Config.MinorArcanaBar.LordDrawnColor;
+                    crownCardDrawn = "LORD";
+                    break;
+            }
+
+            float crownCardPresent;
+            float crownCardMax;
+            float cooldown = _spellHelper.GetSpellCooldown(7443);
+
+            if (crownCardDrawn != "")
+            {
+                crownCardPresent = 1f;
+                crownCardMax = 1f;
+                Config.MinorArcanaBar.Label.SetText(crownCardDrawn);
+            }
+            else
+            {
+                crownCardPresent = cooldown > 0 ? cooldown : 1f;
+
+                if (cooldown > 0)
+                {
+                    Config.MinorArcanaBar.Label.SetValue(cooldown);
+                }
+                else
+                {
+                    Config.MinorArcanaBar.Label.SetText("READY");
+                }
+
+                crownCardColor = cooldown > 0 ? Config.MinorArcanaBar.CrownDrawCdColor : Config.MinorArcanaBar.CrownDrawCdReadyColor;
+                crownCardMax = cooldown > 0 ? 60f : 1f;
+            }
+
+            LabelConfig[] labels = { Config.MinorArcanaBar.Label };
+            BarUtilities.GetBar(Config.MinorArcanaBar, crownCardPresent, crownCardMax, 0f, player, crownCardColor, labels: labels)
+                .Draw(pos);
+        }
+
         private void DrawDot(Vector2 origin, PlayerCharacter player)
         {
             GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
@@ -367,10 +435,17 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
         );
 
+        [NestedConfig("Minor Arcana Bar", 150)]
+        public AstrologianCrownDrawBarConfig MinorArcanaBar = new(
+            new Vector2(64, -71),
+            new Vector2(126, 10),
+            new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 0f / 100f))
+        );
+
         [NestedConfig("Astrodyne Bar", 200)]
         public AstrologianAstrodyneBarConfig AstrodyneBar = new(
-            new Vector2(0, -71),
-            new Vector2(254, 10)
+            new Vector2(-64, -71),
+            new Vector2(126, 10)
         );
 
         [NestedConfig("Dot Bar", 300)]
@@ -427,6 +502,32 @@ namespace DelvUI.Interface.Jobs
             public PluginConfigColor DrawRangedGlowColor = new(new Vector4(124f / 255f, 34f / 255f, 120f / 255f, 100f / 100f));
 
             public AstrologianDrawBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
+                : base(position, size, fillColor)
+            {
+            }
+        }
+
+        [DisableParentSettings("FillColor", "Color")]
+        [Exportable(false)]
+        public class AstrologianCrownDrawBarConfig : ProgressBarConfig
+        {
+            [ColorEdit4("Minor Arcana on CD" + "##CrownDraw")]
+            [Order(120)]
+            public PluginConfigColor CrownDrawCdColor = new(new Vector4(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f));
+
+            [ColorEdit4("Minor Arcana Ready" + "##CrownDraw")]
+            [Order(121)]
+            public PluginConfigColor CrownDrawCdReadyColor = new(new Vector4(65f / 255f, 100f / 255f, 205f / 255f, 100f / 100f));
+
+            [ColorEdit4("Lord Color" + "##CrownDraw")]
+            [Order(112)]
+            public PluginConfigColor LordDrawnColor = new(new Vector4(182f / 255f, 92f / 255f, 72f / 255f, 100f / 100f));
+
+            [ColorEdit4("Lady Color" + "##CrownDraw")]
+            [Order(113)]
+            public PluginConfigColor LadyDrawnColor = new(new Vector4(252f / 255f, 209f / 255f, 239f / 255f, 100f / 100f));
+
+            public AstrologianCrownDrawBarConfig(Vector2 position, Vector2 size, PluginConfigColor fillColor)
                 : base(position, size, fillColor)
             {
             }
