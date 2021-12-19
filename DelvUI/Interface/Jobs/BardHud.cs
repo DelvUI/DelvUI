@@ -100,8 +100,10 @@ namespace DelvUI.Interface.Jobs
         private void DrawCodaBar(Vector2 origin, PlayerCharacter player)
         {
             BRDGauge gauge = Plugin.JobGauges.Get<BRDGauge>();
-            var hasCoda = new[] { gauge.Coda.Contains(Song.WANDERER) ? 1 : 0, gauge.Coda.Contains(Song.MAGE) ? 1 : 0, gauge.Coda.Contains(Song.ARMY) ? 1 : 0 };
-            if (!Config.CodaBar.HideWhenInactive || hasCoda.Length > 0)
+            var containsCoda = new[] { gauge.Coda.Contains(Song.WANDERER) ? 1 : 0, gauge.Coda.Contains(Song.MAGE) ? 1 : 0, gauge.Coda.Contains(Song.ARMY) ? 1 : 0 };
+            bool hasCoda = containsCoda.Any(o => o == 1);
+
+            if (!Config.CodaBar.HideWhenInactive || hasCoda)
             {
                 var order = Config.CodaBar.CodaOrder;
                 var colors = new[] { Config.CodaBar.WMColor, Config.CodaBar.MBColor, Config.CodaBar.APColor };
@@ -109,7 +111,7 @@ namespace DelvUI.Interface.Jobs
                 var coda = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
                 for (int i = 0; i < 3; i++)
                 {
-                    coda[i] = new Tuple<PluginConfigColor, float, LabelConfig?>(colors[order[i]], hasCoda[order[i]], null);
+                    coda[i] = new Tuple<PluginConfigColor, float, LabelConfig?>(colors[order[i]], containsCoda[order[i]], null);
                 }
 
                 BarUtilities.GetChunkedBars(Config.CodaBar, coda, player).Draw(origin);
