@@ -9,6 +9,7 @@ using DelvUI.Interface.EnemyList;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
 using DelvUI.Interface.Party;
+using DelvUI.Interface.PartyCooldowns;
 using DelvUI.Interface.StatusEffects;
 using ImGuiScene;
 using System;
@@ -131,6 +132,7 @@ namespace DelvUI.Config
             CheckVersion();
 
             Plugin.ClientState.Logout += OnLogout;
+            Plugin.JobChangedEvent += OnJobChanged;
         }
 
         ~ConfigurationManager()
@@ -169,6 +171,11 @@ namespace DelvUI.Config
         {
             SaveConfigurations();
             ProfilesManager.Instance.SaveCurrentProfile();
+        }
+
+        private void OnJobChanged(uint jobId)
+        {
+            UpdateCurrentProfile();
         }
 
         private string LoadChangelog()
@@ -458,6 +465,10 @@ namespace DelvUI.Config
             typeof(PartyFramesBuffsConfig),
             typeof(PartyFramesDebuffsConfig),
             typeof(PartyFramesTrackersConfig),
+
+            typeof(PartyCooldownsConfig),
+            typeof(PartyCooldownsBarConfig),
+            typeof(PartyCooldownsDataConfig),
 
             typeof(EnemyListConfig),
             typeof(EnemyListHealthBarConfig),

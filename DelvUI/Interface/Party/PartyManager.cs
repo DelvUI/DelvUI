@@ -23,7 +23,7 @@ namespace DelvUI.Interface.Party
         public static PartyManager Instance { get; private set; } = null!;
         private PartyFramesConfig _config = null!;
 
-        private PartyManager(PartyFramesConfig config)
+        private PartyManager()
         {
             _raiseTracker = new PartyFramesRaiseTracker();
             _invulnTracker = new PartyFramesInvulnTracker();
@@ -38,8 +38,7 @@ namespace DelvUI.Interface.Party
 
         public static void Initialize()
         {
-            var config = ConfigurationManager.Instance.GetConfigObject<PartyFramesConfig>();
-            Instance = new PartyManager(config);
+            Instance = new PartyManager();
         }
 
         ~PartyManager()
@@ -114,6 +113,7 @@ namespace DelvUI.Interface.Party
 
         public event PartyMembersChangedEventHandler? MembersChangedEvent;
 
+        public bool Previewing => _config.Preview;
 
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
