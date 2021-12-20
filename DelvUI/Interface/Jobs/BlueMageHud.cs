@@ -1,4 +1,3 @@
-using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
@@ -6,14 +5,10 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
-using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Numerics;
-using DelvUI.Enums;
 using System.Linq;
+using System.Numerics;
 
 namespace DelvUI.Interface.Jobs
 {
