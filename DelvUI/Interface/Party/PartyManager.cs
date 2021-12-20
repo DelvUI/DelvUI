@@ -1,8 +1,8 @@
 ﻿using Dalamud.Game;
+using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Party;
-using Dalamud.Logging;
 using Dalamud.Memory;
 using DelvUI.Config;
 using DelvUI.Helpers;
@@ -114,6 +114,15 @@ namespace DelvUI.Interface.Party
         public event PartyMembersChangedEventHandler? MembersChangedEvent;
 
         public bool Previewing => _config.Preview;
+
+        public bool IsSoloParty()
+        {
+            if (!_config.ShowWhenSolo) { return false; }
+
+            return _groupMembers.Count <= 1 ||
+                (_groupMembers.Count == 2 && _config.ShowChocobo &&
+                _groupMembers[1].Character is BattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Chocobo);
+        }
 
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
