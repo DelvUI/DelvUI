@@ -167,8 +167,10 @@ namespace DelvUI.Interface.PartyCooldowns
             else if (!_config.ShowOnlyInDuties || Plugin.Condition[ConditionFlag.BoundByDuty])
             {
                 // add new members
-                foreach (PartyFramesMember member in sender.GroupMembers)
+                foreach (IPartyFramesMember partyFramesMember in sender.GroupMembers)
                 {
+                    PartyFramesMember member = (PartyFramesMember)partyFramesMember;
+
                     if (member.ObjectId > 0)
                     {
                         _cooldownsMap.Add(member.ObjectId, CooldownsForMember(member));
