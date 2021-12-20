@@ -102,7 +102,7 @@ namespace DelvUI.Interface.Jobs
                 BarUtilities.GetChunkedBars(Config.LilyBar, 3, lilyScale, 3).Draw(origin);
             }
 
-            if (!Config.BloodLilyBar.HideWhenInactive || gauge.BloodLily > 0)
+            if (!Config.BloodLilyBar.HideWhenInactive && Config.BloodLilyBar.Enabled || gauge.BloodLily > 0)
             {
                 BarUtilities.GetChunkedBars(Config.BloodLilyBar, 3, gauge.BloodLily, 3).Draw(origin);
             }

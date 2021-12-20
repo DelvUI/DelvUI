@@ -89,7 +89,7 @@ namespace DelvUI.Interface.Jobs
                 BarUtilities.GetChunkedBars(Config.AddersgallBar, 3, adderScale, 3, glowConfig: glow, chunksToGlow: new[] { true, true, true }).Draw(origin);
             }
 
-            if (!Config.AdderstingBar.HideWhenInactive || gauge.Addersting > 0)
+            if (!Config.AdderstingBar.HideWhenInactive && Config.AdderstingBar.Enabled || gauge.Addersting > 0)
             {
                 BarUtilities.GetChunkedBars(Config.AdderstingBar, 3, gauge.Addersting, 3, glowConfig: glow, chunksToGlow: new[] { true, true, true }).Draw(origin);
             }
