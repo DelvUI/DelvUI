@@ -8,11 +8,11 @@ namespace DelvUI.Interface.PartyCooldowns
     {
         public readonly PartyCooldownData Data;
         public readonly uint SourceId;
-        public readonly PartyFramesMember? Member;
+        public readonly IPartyFramesMember? Member;
 
         public double LastTimeUsed = 0;
 
-        public PartyCooldown(PartyCooldownData data, uint sourceID, PartyFramesMember? member)
+        public PartyCooldown(PartyCooldownData data, uint sourceID, IPartyFramesMember? member)
         {
             Data = data;
             SourceId = sourceID;

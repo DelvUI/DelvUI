@@ -167,7 +167,7 @@ namespace DelvUI.Interface.PartyCooldowns
             else if (!_config.ShowOnlyInDuties || Plugin.Condition[ConditionFlag.BoundByDuty])
             {
                 // add new members
-                foreach (PartyFramesMember member in sender.GroupMembers)
+                foreach (IPartyFramesMember member in sender.GroupMembers)
                 {
                     if (member.ObjectId > 0)
                     {
@@ -179,12 +179,12 @@ namespace DelvUI.Interface.PartyCooldowns
             CooldownsChangedEvent?.Invoke(this);
         }
 
-        private Dictionary<uint, PartyCooldown> CooldownsForMember(PartyFramesMember member)
+        private Dictionary<uint, PartyCooldown> CooldownsForMember(IPartyFramesMember member)
         {
             return CooldownsForMember(member.ObjectId, member.JobId, member.Level, member);
         }
 
-        private Dictionary<uint, PartyCooldown> CooldownsForMember(uint objectId, uint jobId, uint level, PartyFramesMember? member)
+        private Dictionary<uint, PartyCooldown> CooldownsForMember(uint objectId, uint jobId, uint level, IPartyFramesMember? member)
         {
             Dictionary<uint, PartyCooldown> cooldowns = new Dictionary<uint, PartyCooldown>();
 

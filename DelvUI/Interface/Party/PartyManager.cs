@@ -624,7 +624,7 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        private void UpdatePreview()
+        public void UpdatePreview()
         {
             if (!_config.Preview)
             {
