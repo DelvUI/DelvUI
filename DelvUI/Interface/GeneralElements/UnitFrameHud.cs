@@ -193,11 +193,18 @@ namespace DelvUI.Interface.GeneralElements
                 {
                     labels.Add(Config.RightLabelConfig);
                 }
+
+                isHealthLabel = IsHealthLabel(Config.OptionalLabelConfig);
+                if (!isHealthLabel || maxHp > 0)
+                {
+                    labels.Add(Config.OptionalLabelConfig);
+                }
             }
             else
             {
                 labels.Add(Config.LeftLabelConfig);
                 labels.Add(Config.RightLabelConfig);
+                labels.Add(Config.OptionalLabelConfig);
             }
 
             return labels.ToArray();
