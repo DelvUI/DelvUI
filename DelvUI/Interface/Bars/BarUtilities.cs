@@ -65,7 +65,7 @@ namespace DelvUI.Interface.Bars
             if (trackDuration)
             {
                 config.Label.SetValue(duration);
-                return GetProgressBar(config, duration, maxDuration, 0);
+                return GetProgressBar(config, duration, maxDuration, 0, player);
             }
 
             config.Label.SetText("");
@@ -108,7 +108,7 @@ namespace DelvUI.Interface.Bars
             float maxDuration = maxDurations[index];
 
             config.Label.SetValue(duration);
-            return GetProgressBar(config, duration, maxDuration, 0);
+            return GetProgressBar(config, duration, maxDuration, 0, player);
         }
 
         private static void AddThresholdMarker(BarHud bar, BarConfig config, ThresholdConfig? thresholdConfig, float max, float min)
@@ -181,7 +181,7 @@ namespace DelvUI.Interface.Bars
                 Rect foreground = GetFillRect(chunkPos, chunkSize, config.FillDirection, chunks[i].Item1, chunks[i].Item2, 1f, 0f);
                 BarGlowConfig? glow = chunksToGlow?[i] == true ? glowConfig : null;
 
-                bars[i] = new BarHud(config.ID + i, config.DrawBorder, borderColor:config.BorderColor, actor: actor, glowColor: glow?.Color, glowSize: glow?.Size)
+                bars[i] = new BarHud(config.ID + i, config.DrawBorder, borderColor: config.BorderColor, actor: actor, glowColor: glow?.Color, glowSize: glow?.Size)
                           .SetBackground(background)
                           .AddForegrounds(foreground);
 
@@ -362,7 +362,7 @@ namespace DelvUI.Interface.Bars
 
             return new Rect(pos + fillPos, fillSize, color);
         }
-        
+
         public static ThresholdConfig GetThresholdConfigForChunk(ChunkedProgressBarConfig config, int chunk, int chunks, float min, float max) =>
             new ThresholdConfig
             {
