@@ -5,6 +5,7 @@ Features:
     + The hud displays a grid with all the tracked spells for every member.
     + You can organize them by priorty and column.
 - Added a Minor Arcana Bar for Astrologian.
+- Added a third label for unit frames that is empty by default.
 
 Fixes:
 - Fixed Bard Coda bar never showing when "Hide When Inactive" is checked.
