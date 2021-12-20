@@ -11,6 +11,7 @@ Fixes:
 - Fixed mana bar not being visible by default for Summoner.
 - Fixed threshold values for some bars being incorrect.
 - Fixed disable for Sage Addersting and White Mage Blood Lily bars.
+- Fixed Tank Invulnerability Background Color so it now also works for unit frame profiles that use "Missing Health Color".
 
 # 0.6.0.3
 Features:

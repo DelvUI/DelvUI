@@ -80,7 +80,7 @@ namespace DelvUI.Interface.Party
                 }
 
                 // check invuln buff
-                Status tankInvuln = Utils.HasTankInvulnerability(battleChara);
+                Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
                 if (tankInvuln == null)
                 {
                     member.InvulnStatus = null;
