@@ -243,7 +243,7 @@ namespace DelvUI.Interface.GeneralElements
         {
             if (Config.ShowTankInvulnerability && chara is BattleChara battleChara)
             {
-                Status tankInvuln = Utils.HasTankInvulnerability(battleChara);
+                Status? tankInvuln = Utils.HasTankInvulnerability(battleChara);
 
                 if (tankInvuln != null)
                 {
