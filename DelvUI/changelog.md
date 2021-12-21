@@ -6,6 +6,7 @@ Features:
     + You can organize them by priorty and column.
 - Added a Minor Arcana Bar for Astrologian.
 - Added a third label for unit frames that is empty by default.
+- Sage Kerachole tracker now also tracks Holos uptime and the config option for this bar was renamed to show that.
 
 Fixes:
 - Fixed Bard Coda bar never showing when "Hide When Inactive" is checked.
