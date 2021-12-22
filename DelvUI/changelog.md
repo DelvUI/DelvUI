@@ -1,4 +1,7 @@
 # 0.6.1.1
+Features:
+- Sage Kerachole tracker now also tracks Holos uptime and the config option for this bar was renamed to show that.
+
 Fixes:
 - Fixed some game windows covering DelvUI elements.
 - Fixed Summoner's Rekindle not working with mouseover on automatic mode.

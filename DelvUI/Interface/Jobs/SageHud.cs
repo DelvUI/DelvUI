@@ -109,11 +109,14 @@ namespace DelvUI.Interface.Jobs
         private void DrawKeracholeBar(Vector2 origin, PlayerCharacter player)
         {
             float keracholeDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 2618 or 2938 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+            float holosDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 3003 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
 
-            if (!Config.KeracholeBar.HideWhenInactive || keracholeDuration > 0)
+            if (!Config.KeracholeBar.HideWhenInactive || keracholeDuration > 0 || holosDuration > 0)
             {
-                Config.KeracholeBar.Label.SetValue(keracholeDuration);
-                BarUtilities.GetProgressBar(Config.KeracholeBar, keracholeDuration, 15f, 0f, player).Draw(origin);
+                float duration = holosDuration > 0 ? holosDuration : keracholeDuration;
+                float maxDuration = holosDuration > 0 ? 20f : 15f;
+                Config.KeracholeBar.Label.SetValue(duration);
+                BarUtilities.GetProgressBar(Config.KeracholeBar, duration, maxDuration, 0f, player).Draw(origin);
             }
         }
     }
@@ -160,7 +163,7 @@ namespace DelvUI.Interface.Jobs
             new PluginConfigColor(new(41f / 255f, 142f / 255f, 144f / 255f, 100f / 100f))
         );
 
-        [NestedConfig("Kerachole Bar", 50)]
+        [NestedConfig("Kerachole / Holos Bar", 50)]
         public ProgressBarConfig KeracholeBar = new ProgressBarConfig(
             new(64, -52),
             new(126, 15),
