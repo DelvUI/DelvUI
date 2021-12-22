@@ -228,6 +228,7 @@ namespace DelvUI.Interface.Party
         public void StopPreview()
         {
             Config.Preview = false;
+            PartyManager.Instance?.UpdatePreview();
 
             foreach (var bar in bars)
             {

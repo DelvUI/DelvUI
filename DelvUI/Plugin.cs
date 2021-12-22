@@ -20,6 +20,7 @@ using DelvUI.Helpers;
 using DelvUI.Interface;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Party;
+using DelvUI.Interface.PartyCooldowns;
 using ImGuiNET;
 using ImGuiScene;
 using SigScanner = Dalamud.Game.SigScanner;
@@ -52,6 +53,10 @@ namespace DelvUI
 
         private HudManager _hudManager = null!;
         private SystemMenuHook _menuHook = null!;
+
+        public delegate void JobChangedEventHandler(uint jobId);
+        public static event JobChangedEventHandler? JobChangedEvent;
+        private uint _jobId = 0;
 
         public Plugin(
             BuddyList buddyList,
@@ -93,7 +98,7 @@ namespace DelvUI
                 AssemblyLocation = Assembly.GetExecutingAssembly().Location;
             }
 
-            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.6.0.3";
+            Version = Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "0.6.1.1";
 
             FontsManager.Initialize(AssemblyLocation);
             LoadBanner();
@@ -113,6 +118,7 @@ namespace DelvUI
             LimitBreakHelper.Initialize();
             InputsHelper.Initialize();
             PartyManager.Initialize();
+            PartyCooldownsManager.Initialize();
             PullTimerHelper.Initialize();
             TextTagsHelper.Initialize();
             TexturesCache.Initialize();
@@ -237,8 +243,28 @@ namespace DelvUI
             }
         }
 
+        private void UpdateJob()
+        {
+            var player = ClientState.LocalPlayer;
+            if (player is null) { return; }
+
+            var newJobId = player.ClassJob.Id;
+            if (ForcedJob.Enabled)
+            {
+                newJobId = ForcedJob.ForcedJobId;
+            }
+
+            if (_jobId != newJobId)
+            {
+                _jobId = newJobId;
+                JobChangedEvent?.Invoke(_jobId);
+            }
+        }
+
         private void Draw()
         {
+            UpdateJob();
+
             bool hudState =
                 Condition[ConditionFlag.WatchingCutscene] ||
                 Condition[ConditionFlag.WatchingCutscene78] ||
@@ -256,7 +282,7 @@ namespace DelvUI
 
             if (!hudState)
             {
-                _hudManager?.Draw();
+                _hudManager?.Draw(_jobId);
             }
 
             if (fontPushed)
@@ -299,6 +325,7 @@ namespace DelvUI
             GlobalColors.Instance.Dispose();
             LimitBreakHelper.Instance.Dispose();
             InputsHelper.Instance.Dispose();
+            PartyCooldownsManager.Instance.Dispose();
             PartyManager.Instance.Dispose();
             PullTimerHelper.Instance.Dispose();
             ProfilesManager.Instance.Dispose();

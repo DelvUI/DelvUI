@@ -177,7 +177,7 @@ namespace DelvUI.Interface.Jobs
             {
                 tranceColor = gauge.IsIfritAttuned ? Config.TranceBar.IfritColor : gauge.IsTitanAttuned ? Config.TranceBar.TitanColor : gauge.IsGarudaAttuned ? Config.TranceBar.GarudaColor : Config.TranceBar.FillColor;
                 tranceDuration = gauge.AttunmentTimerRemaining;
-                maxDuration = 30000f;
+                maxDuration = 30f;
             }
             else
             {
@@ -186,14 +186,14 @@ namespace DelvUI.Interface.Jobs
                     tranceColor = Config.TranceBar.BahamutColor;
                     tranceDuration = gauge.SummonTimerRemaining;
                     spellID = 7427;
-                    maxDuration = 15000f;
+                    maxDuration = 15f;
                 }
                 else if (gauge.IsPhoenixReady)
                 {
                     tranceColor = Config.TranceBar.PhoenixColor;
                     tranceDuration = gauge.SummonTimerRemaining;
                     spellID = 25831;
-                    maxDuration = 15000f;
+                    maxDuration = 15f;
                 }
             }
 
@@ -204,7 +204,7 @@ namespace DelvUI.Interface.Jobs
                     return;
                 }
                 Config.TranceBar.Label.SetValue(tranceDuration / 1000f);
-                BarUtilities.GetProgressBar(Config.TranceBar, tranceDuration, maxDuration, fillColor: tranceColor).Draw(origin);
+                BarUtilities.GetProgressBar(Config.TranceBar, tranceDuration / 1000f, maxDuration, fillColor: tranceColor).Draw(origin);
             }
             else
             {
@@ -249,6 +249,7 @@ namespace DelvUI.Interface.Jobs
             var config = new SummonerConfig();
 
             config.TranceBar.Label.FontID = FontsConfig.DefaultMediumFontKey;
+            config.UseDefaultPrimaryResourceBar = true;
 
             return config;
         }
@@ -320,7 +321,7 @@ namespace DelvUI.Interface.Jobs
         [ColorEdit4("Garuda Color")]
         [Order(30)]
         public PluginConfigColor GarudaColor = new(new Vector4(60f / 255f, 160f / 255f, 100f / 255f, 100f / 100f));
-        
+
         [Checkbox("Hide Primals")]
         [Order(45)]
         public bool HidePrimals = false;

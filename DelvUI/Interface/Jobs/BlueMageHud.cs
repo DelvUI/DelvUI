@@ -1,4 +1,3 @@
-using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Statuses;
@@ -6,14 +5,10 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
-using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Numerics;
-using DelvUI.Enums;
 using System.Linq;
+using System.Numerics;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -22,19 +17,19 @@ namespace DelvUI.Interface.Jobs
         private new BlueMageConfig Config => (BlueMageConfig)_config;
 
         public BlueMageHud(BlueMageConfig config, string? displayName = null) : base(config, displayName)
-        { 
+        {
         }
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
             List<Vector2> positions = new List<Vector2>();
             List<Vector2> sizes = new List<Vector2>();
-            
+
             if (Config.BleedBar.Enabled)
             {
                 positions.Add(Config.Position + Config.BleedBar.Position);
                 sizes.Add(Config.BleedBar.Size);
             }
-            
+
             if (Config.WindburnBar.Enabled)
             {
                 positions.Add(Config.Position + Config.WindburnBar.Position);
@@ -46,7 +41,7 @@ namespace DelvUI.Interface.Jobs
                 positions.Add(Config.Position + Config.SurpanakhaBar.Position);
                 sizes.Add(Config.SurpanakhaBar.Size);
             }
-             
+
             if (Config.OffGuardBar.Enabled)
             {
                 positions.Add(Config.Position + Config.OffGuardBar.Position);
@@ -59,37 +54,37 @@ namespace DelvUI.Interface.Jobs
         public override void DrawJobHud(Vector2 origin, PlayerCharacter player)
         {
             Vector2 pos = origin + Config.Position;
-            if(Config.BleedBar.Enabled)
+            if (Config.BleedBar.Enabled)
             {
                 DrawBleedBar(pos, player);
             }
 
-            if(Config.WindburnBar.Enabled)
+            if (Config.WindburnBar.Enabled)
             {
                 DrawWindburnBar(pos, player);
             }
 
-            if(Config.SurpanakhaBar.Enabled)
+            if (Config.SurpanakhaBar.Enabled)
             {
                 DrawSurpanakhaBar(pos, player);
             }
 
-            if(Config.OffGuardBar.Enabled)
+            if (Config.OffGuardBar.Enabled)
             {
                 DrawOffGuardBar(pos, player);
             }
 
-            if(Config.MoonFluteBar.Enabled)
+            if (Config.MoonFluteBar.Enabled)
             {
                 DrawMoonFluteBar(pos, player);
             }
 
-            if(Config.SpellAmpBar.Enabled)
+            if (Config.SpellAmpBar.Enabled)
             {
                 DrawSpellAmpBar(pos, player);
             }
 
-            if(Config.TingleBar.Enabled)
+            if (Config.TingleBar.Enabled)
             {
                 DrawTingleBar(pos, player);
             }
@@ -107,14 +102,14 @@ namespace DelvUI.Interface.Jobs
             float featherRainCD = SpellHelper.Instance.GetSpellCooldown(11426);
             GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             float current = 0f;
-            float max = 0f; 
+            float max = 0f;
             bool dotExists = false;
-            if(target != null && target is BattleChara targetChara)
+            if (target != null && target is BattleChara targetChara)
             {
-                dotExists = targetChara.StatusList.FirstOrDefault(o => o.SourceID == player.ObjectId && o.StatusId == 1723) != null; 
+                dotExists = targetChara.StatusList.FirstOrDefault(o => o.SourceID == player.ObjectId && o.StatusId == 1723) != null;
             }
-            
-            if(dotExists)
+
+            if (dotExists)
             {
                 BarUtilities.GetDoTBar(Config.WindburnBar, player, target, 1723, 6f)?.Draw(origin);
             }
@@ -122,10 +117,10 @@ namespace DelvUI.Interface.Jobs
             {
                 max = 30f;
                 current = max - featherRainCD;
-                if(!Config.WindburnBar.HideWhenInactive || current < max)
+                if (!Config.WindburnBar.HideWhenInactive || current < max)
                 {
                     Config.WindburnBar.Label.SetValue(max - current);
-                    if(current == max)
+                    if (current == max)
                     {
                         Config.WindburnBar.Label.SetText("Ready");
                     }
@@ -142,7 +137,7 @@ namespace DelvUI.Interface.Jobs
 
             max = 120f;
             current = max - surpanakhaCD;
-            if(!Config.SurpanakhaBar.HideWhenInactive || current < max)
+            if (!Config.SurpanakhaBar.HideWhenInactive || current < max)
             {
                 Config.SurpanakhaBar.Label.SetValue((max - current) % 30);
                 BarUtilities.GetChunkedProgressBars(Config.SurpanakhaBar, 4, current, max, 0f, player).Draw(origin);
@@ -150,14 +145,14 @@ namespace DelvUI.Interface.Jobs
         }
         protected void DrawOffGuardBar(Vector2 origin, PlayerCharacter player)
         {
-           var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-           BarUtilities.GetDoTBar(Config.OffGuardBar, player, target, 1717, 15f)?.Draw(origin); 
+            var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
+            BarUtilities.GetDoTBar(Config.OffGuardBar, player, target, 1717, 15f)?.Draw(origin);
         }
-        
+
         protected void DrawMoonFluteBar(Vector2 origin, PlayerCharacter player)
         {
             Status? buff = player.StatusList.FirstOrDefault(o => o.StatusId is 1718 or 1727 && o.RemainingTime > 0f);
-            if(!Config.MoonFluteBar.HideWhenInactive || buff is not null)
+            if (!Config.MoonFluteBar.HideWhenInactive || buff is not null)
             {
                 var buffColor = buff is not null ? buff.StatusId switch
                 {
@@ -175,7 +170,7 @@ namespace DelvUI.Interface.Jobs
         protected void DrawSpellAmpBar(Vector2 origin, PlayerCharacter player)
         {
             Status? buff = player.StatusList.FirstOrDefault(o => o.StatusId is 2118 or 1716 && o.RemainingTime > 0f);
-            if(!Config.SpellAmpBar.HideWhenInactive || buff is not null)
+            if (!Config.SpellAmpBar.HideWhenInactive || buff is not null)
             {
                 var buffColor = buff is not null ? buff.StatusId switch
                 {
@@ -189,7 +184,7 @@ namespace DelvUI.Interface.Jobs
 
             }
         }
-        
+
         protected void DrawTingleBar(Vector2 origin, PlayerCharacter player)
         {
             BarUtilities.GetProcBar(Config.TingleBar, player, 2492, 15f)?.Draw(origin);

@@ -1,8 +1,8 @@
 ﻿using Dalamud.Game;
+using Dalamud.Game.ClientState.Objects.Enums;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using Dalamud.Game.ClientState.Party;
-using Dalamud.Logging;
 using Dalamud.Memory;
 using DelvUI.Config;
 using DelvUI.Helpers;
@@ -23,7 +23,7 @@ namespace DelvUI.Interface.Party
         public static PartyManager Instance { get; private set; } = null!;
         private PartyFramesConfig _config = null!;
 
-        private PartyManager(PartyFramesConfig config)
+        private PartyManager()
         {
             _raiseTracker = new PartyFramesRaiseTracker();
             _invulnTracker = new PartyFramesInvulnTracker();
@@ -38,8 +38,7 @@ namespace DelvUI.Interface.Party
 
         public static void Initialize()
         {
-            var config = ConfigurationManager.Instance.GetConfigObject<PartyFramesConfig>();
-            Instance = new PartyManager(config);
+            Instance = new PartyManager();
         }
 
         ~PartyManager()
@@ -114,6 +113,16 @@ namespace DelvUI.Interface.Party
 
         public event PartyMembersChangedEventHandler? MembersChangedEvent;
 
+        public bool Previewing => _config.Preview;
+
+        public bool IsSoloParty()
+        {
+            if (!_config.ShowWhenSolo) { return false; }
+
+            return _groupMembers.Count <= 1 ||
+                (_groupMembers.Count == 2 && _config.ShowChocobo &&
+                _groupMembers[1].Character is BattleNpc npc && npc.BattleNpcKind == BattleNpcSubKind.Chocobo);
+        }
 
         private void FrameworkOnOnUpdateEvent(Framework framework)
         {
@@ -261,7 +270,7 @@ namespace DelvUI.Interface.Party
 
             bool needsUpdate =
                 _groupMembers.Count == 0 ||
-                (_groupMembers.Count != 2 && _config.ShowChocobo) ||
+                (_groupMembers.Count != 2 && _config.ShowChocobo && chocobo != null) ||
                 (_groupMembers.Count > 1 && !_config.ShowChocobo) ||
                 (_groupMembers.Count > 1 && chocobo == null) ||
                 (_groupMembers.Count == 2 && _config.ShowChocobo && _groupMembers[1].ObjectId != chocobo?.ObjectId);
@@ -615,7 +624,7 @@ namespace DelvUI.Interface.Party
             }
         }
 
-        private void UpdatePreview()
+        public void UpdatePreview()
         {
             if (!_config.Preview)
             {

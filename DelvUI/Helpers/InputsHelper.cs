@@ -25,6 +25,7 @@ using Dalamud.Hooking;
 using Dalamud.Logging;
 using DelvUI.Config;
 using DelvUI.Interface.GeneralElements;
+using FFXIVClientStructs.FFXIV.Client.System.Framework;
 using ImGuiNET;
 using Lumina.Excel;
 using System;
@@ -136,8 +137,6 @@ namespace DelvUI.Helpers
 
         private HUDOptionsConfig _config = null!;
 
-        private const int UnknownOffset = 0xAB610;
-
         private IntPtr _setUIMouseOverActor;
         private Hook<OnSetUIMouseoverActor>? _uiMouseOverActorHook;
 
@@ -166,16 +165,15 @@ namespace DelvUI.Helpers
             SetGameMouseoverTarget(0);
         }
 
-        private void SetGameMouseoverTarget(long address)
+        private unsafe void SetGameMouseoverTarget(long address)
         {
             // set mouseover target in-game
             if (_config.MouseoverEnabled && !_config.MouseoverAutomaticMode)
             {
-                IntPtr uiModule = Plugin.GameGui.GetUIModule();
-                long unknownAddress = (long)uiModule + UnknownOffset;
+                long pronounModuleAddress = (long)Framework.Instance()->GetUiModule()->GetPronounModule();
 
                 OnSetUIMouseoverActor func = Marshal.GetDelegateForFunctionPointer<OnSetUIMouseoverActor>(_setUIMouseOverActor);
-                func.Invoke(unknownAddress, address);
+                func.Invoke(pronounModuleAddress, address);
             }
         }
 
@@ -222,8 +220,8 @@ namespace DelvUI.Helpers
             if (action.AttackType.Row == 0 && action.AnimationStart.Row == 0 &&
                 (action.CanTargetDead && !action.CanTargetFriendly && !action.CanTargetHostile && !action.CanTargetParty && action.CanTargetSelf))
             {
-                // special case for AST cards
-                if (actionID == 17055 || actionID == 7443)
+                // special case for AST cards and SMN rekindle
+                if (actionID == 17055 || actionID == 7443 || actionID == 25822)
                 {
                     return target is PlayerCharacter || target is BattleNpc battleNpc && battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo;
                 }

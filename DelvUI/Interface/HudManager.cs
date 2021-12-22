@@ -6,6 +6,7 @@ using DelvUI.Interface.EnemyList;
 using DelvUI.Interface.GeneralElements;
 using DelvUI.Interface.Jobs;
 using DelvUI.Interface.Party;
+using DelvUI.Interface.PartyCooldowns;
 using DelvUI.Interface.StatusEffects;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using ImGuiNET;
@@ -306,37 +307,37 @@ namespace DelvUI.Interface
 
         private void CreateMiscElements()
         {
-            // gcd indicator
             var gcdIndicatorConfig = ConfigurationManager.Instance.GetConfigObject<GCDIndicatorConfig>();
             var gcdIndicator = new GCDIndicatorHud(gcdIndicatorConfig, "GCD Indicator");
             _hudElements.Add(gcdIndicator);
             _hudElementsUsingPlayer.Add(gcdIndicator);
 
-            // mp ticker
             var mpTickerConfig = ConfigurationManager.Instance.GetConfigObject<MPTickerConfig>();
             var mpTicker = new MPTickerHud(mpTickerConfig, "MP Ticker");
             _hudElements.Add(mpTicker);
             _hudElementsUsingPlayer.Add(mpTicker);
 
-            //exp bar
             var expBarConfig = ConfigurationManager.Instance.GetConfigObject<ExperienceBarConfig>();
             var expBarHud = new ExperienceBarHud(expBarConfig, "Experience Bar");
             _hudElements.Add(expBarHud);
             _hudElementsUsingPlayer.Add(expBarHud);
 
-            //pull timer
             var pullTimerConfig = ConfigurationManager.Instance.GetConfigObject<PullTimerConfig>();
             var pullTimerHud = new PullTimerHud(pullTimerConfig, "Pull Timer");
             _hudElements.Add(pullTimerHud);
             _hudElementsUsingPlayer.Add(pullTimerHud);
 
-            //limit break
             var limitBreakConfig = ConfigurationManager.Instance.GetConfigObject<LimitBreakConfig>();
             var limitBreakHud = new LimitBreakHud(limitBreakConfig, "Limit Break");
             _hudElements.Add(limitBreakHud);
+
+            var partyCooldownsConfig = ConfigurationManager.Instance.GetConfigObject<PartyCooldownsConfig>();
+            var partyCooldownsHud = new PartyCooldownsHud(partyCooldownsConfig, "Party Cooldowns");
+            _hudElements.Add(partyCooldownsHud);
+            _hudElementsWithPreview.Add(partyCooldownsHud);
         }
 
-        public void Draw()
+        public void Draw(uint jobId)
         {
             if (!FontsManager.Instance.DefaultFontBuilt)
             {
@@ -377,16 +378,7 @@ namespace DelvUI.Interface
 
             _hudHelper.Update();
 
-            if (UpdateJob())
-            {
-                // not the cleanest way of doing this
-                // we should probably have some class that checks for the 
-                // player's job changing and then firing an event
-                // however i didn't want to deal with possible race conditions
-                // on the hud manager so for now i'm taking the lazy apporach
-                ConfigurationManager.Instance.UpdateCurrentProfile();
-            }
-
+            UpdateJob(jobId);
             AssignActors();
 
             var origin = ImGui.GetMainViewport().Size / 2f;
@@ -469,24 +461,11 @@ namespace DelvUI.Interface
             return false;
         }
 
-        private bool UpdateJob()
+        private void UpdateJob(uint newJobId)
         {
-            var player = Plugin.ClientState.LocalPlayer;
-            if (player is null)
-            {
-                return false;
-            }
-
-            var newJobId = player.ClassJob.Id;
-
-            if (ForcedJob.Enabled)
-            {
-                newJobId = ForcedJob.ForcedJobId;
-            }
-
             if (_jobHud != null && _jobHud.Config.JobId == newJobId)
             {
-                return false;
+                return;
             }
 
             JobConfig? config = null;
@@ -505,8 +484,6 @@ namespace DelvUI.Interface
                 _jobHud = (JobHud)Activator.CreateInstance(types.HudType, config, types.DisplayName)!;
                 _jobHud.SelectEvent += OnDraggableElementSelected;
             }
-
-            return true;
         }
 
         private void AssignActors()

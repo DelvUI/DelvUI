@@ -102,7 +102,7 @@ namespace DelvUI.Interface.Jobs
                 BarUtilities.GetChunkedBars(Config.LilyBar, 3, lilyScale, 3).Draw(origin);
             }
 
-            if (!Config.BloodLilyBar.HideWhenInactive || gauge.BloodLily > 0)
+            if (!Config.BloodLilyBar.HideWhenInactive && Config.BloodLilyBar.Enabled || gauge.BloodLily > 0)
             {
                 BarUtilities.GetChunkedBars(Config.BloodLilyBar, 3, gauge.BloodLily, 3).Draw(origin);
             }
@@ -110,7 +110,7 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawAsylumBar(Vector2 origin, PlayerCharacter player)
         {
-            float asylymDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 739 or 1911 or 1912 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
+            float asylymDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 739 or 1911 && o.SourceID == player.ObjectId)?.RemainingTime ?? 0f;
 
             if (!Config.AsylumBar.HideWhenInactive || asylymDuration > 0)
             {

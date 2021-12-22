@@ -1,3 +1,29 @@
+# 0.6.1.1
+Features:
+- Sage Kerachole tracker now also tracks Holos uptime and the config option for this bar was renamed to show that.
+
+Fixes:
+- Fixed some game windows covering DelvUI elements.
+- Fixed Summoner's Rekindle not working with mouseover on automatic mode.
+- Fixed "Hide when inactive" not working properly for Astrologian Minor Arcana Bar.
+- Fixed Party Cooldowns not working properly when "Show When Solo" is enabled.
+
+# 0.6.1.0
+Features:
+- Added Party Cooldowns tracker:
+    + You can choose which spells to track (only party-wide effects enabled for now).
+    + The hud displays a grid with all the tracked spells for every member.
+    + You can organize them by priorty and column.
+- Added a Minor Arcana Bar for Astrologian.
+- Added a third label for unit frames that is empty by default.
+
+Fixes:
+- Fixed Bard Coda bar never showing when "Hide When Inactive" is checked.
+- Fixed mana bar not being visible by default for Summoner.
+- Fixed threshold values for some bars being incorrect.
+- Fixed disable for Sage Addersting and White Mage Blood Lily bars.
+- Fixed Tank Invulnerability Background Color so it now also works for unit frame profiles that use "Missing Health Color".
+
 # 0.6.0.3
 Features:
 - Updated Paladin's hud to accommodate with the latest changes:

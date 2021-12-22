@@ -130,7 +130,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.EnochianBar.Enabled)
             {
-                DrawEnochianBar(pos);
+                DrawEnochianBar(pos, player);
             }
 
             if (Config.ThundercloudBar.Enabled)
@@ -229,7 +229,7 @@ namespace DelvUI.Interface.Jobs
                 .Draw(origin);
         }
 
-        protected void DrawEnochianBar(Vector2 origin)
+        protected void DrawEnochianBar(Vector2 origin, PlayerCharacter player)
         {
             BLMGauge gauge = Plugin.JobGauges.Get<BLMGauge>();
 
@@ -240,7 +240,7 @@ namespace DelvUI.Interface.Jobs
 
             float timer = gauge.IsEnochianActive ? (30000f - gauge.EnochianTimer) : 0f;
             Config.EnochianBar.Label.SetValue(timer / 1000);
-            BarUtilities.GetProgressBar(Config.EnochianBar, timer, 30000, 0f)
+            BarUtilities.GetProgressBar(Config.EnochianBar, timer / 1000, 30, 0f, player)
                 .Draw(origin);
         }
 

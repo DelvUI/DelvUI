@@ -129,7 +129,7 @@ namespace DelvUI.Interface.GeneralElements
             {
                 Vector2 healthMissingSize = Config.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
                 Vector2 healthMissingPos = Config.FillDirection.IsInverted() ? Config.Position : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
-                PluginConfigColor? color = Config.UseDeathIndicatorBackgroundColor && character.CurrentHp <= 0 ? Config.DeathIndicatorBackgroundColor : Config.HealthMissingColor;
+                PluginConfigColor? color = BackgroundColor(character);
                 bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, color));
             }
 
@@ -193,11 +193,18 @@ namespace DelvUI.Interface.GeneralElements
                 {
                     labels.Add(Config.RightLabelConfig);
                 }
+
+                isHealthLabel = IsHealthLabel(Config.OptionalLabelConfig);
+                if (!isHealthLabel || maxHp > 0)
+                {
+                    labels.Add(Config.OptionalLabelConfig);
+                }
             }
             else
             {
                 labels.Add(Config.LeftLabelConfig);
                 labels.Add(Config.RightLabelConfig);
+                labels.Add(Config.OptionalLabelConfig);
             }
 
             return labels.ToArray();
@@ -243,7 +250,7 @@ namespace DelvUI.Interface.GeneralElements
         {
             if (Config.ShowTankInvulnerability && chara is BattleChara battleChara)
             {
-                Status tankInvuln = Utils.HasTankInvulnerability(battleChara);
+                Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
 
                 if (tankInvuln != null)
                 {
@@ -275,6 +282,10 @@ namespace DelvUI.Interface.GeneralElements
                 else if (Config.UseDeathIndicatorBackgroundColor && chara.CurrentHp <= 0)
                 {
                     return Config.DeathIndicatorBackgroundColor;
+                }
+                else if (Config.UseMissingHealthBar)
+                {
+                    return Config.HealthMissingColor;
                 }
                 else
                 {
