@@ -270,7 +270,7 @@ namespace DelvUI.Interface.Party
 
             bool needsUpdate =
                 _groupMembers.Count == 0 ||
-                (_groupMembers.Count != 2 && _config.ShowChocobo) ||
+                (_groupMembers.Count != 2 && _config.ShowChocobo && chocobo != null) ||
                 (_groupMembers.Count > 1 && !_config.ShowChocobo) ||
                 (_groupMembers.Count > 1 && chocobo == null) ||
                 (_groupMembers.Count == 2 && _config.ShowChocobo && _groupMembers[1].ObjectId != chocobo?.ObjectId);

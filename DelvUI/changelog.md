@@ -6,6 +6,7 @@ Fixes:
 - Fixed some game windows covering DelvUI elements.
 - Fixed Summoner's Rekindle not working with mouseover on automatic mode.
 - Fixed "Hide when inactive" not working properly for Astrologian Minor Arcana Bar.
+- Fixed Party Cooldowns not working properly when "Show When Solo" is enabled.
 
 # 0.6.1.0
 Features:
