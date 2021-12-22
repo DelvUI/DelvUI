@@ -324,7 +324,7 @@ namespace DelvUI.Interface.Jobs
             string crownCardDrawn = "";
             PluginConfigColor crownCardColor = EmptyColor;
 
-            if (gauge.DrawnCard == CardType.NONE && Config.MinorArcanaBar.HideWhenInactive)
+            if (gauge.DrawnCrownCard == CardType.NONE && Config.MinorArcanaBar.HideWhenInactive)
             {
                 return;
             }
