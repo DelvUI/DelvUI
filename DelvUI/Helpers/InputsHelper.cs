@@ -220,8 +220,8 @@ namespace DelvUI.Helpers
             if (action.AttackType.Row == 0 && action.AnimationStart.Row == 0 &&
                 (action.CanTargetDead && !action.CanTargetFriendly && !action.CanTargetHostile && !action.CanTargetParty && action.CanTargetSelf))
             {
-                // special case for AST cards
-                if (actionID == 17055 || actionID == 7443)
+                // special case for AST cards and SMN rekindle
+                if (actionID == 17055 || actionID == 7443 || actionID == 25822)
                 {
                     return target is PlayerCharacter || target is BattleNpc battleNpc && battleNpc.BattleNpcKind == BattleNpcSubKind.Chocobo;
                 }

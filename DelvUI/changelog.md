@@ -1,3 +1,8 @@
+# 0.6.1.1
+Fixes:
+- Fixed some game windows covering DelvUI elements.
+- Fixed Summoner's Rekindle not working with mouseover on automatic mode.
+
 # 0.6.1.0
 Features:
 - Added Party Cooldowns tracker:
