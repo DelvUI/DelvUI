@@ -2,6 +2,10 @@
 Features:
 - Sage Kerachole tracker now also tracks Holos uptime and the config option for this bar was renamed to show that.
 
+Fixes:
+- Fixed some game windows covering DelvUI elements.
+- Fixed Summoner's Rekindle not working with mouseover on automatic mode.
+
 # 0.6.1.0
 Features:
 - Added Party Cooldowns tracker:
