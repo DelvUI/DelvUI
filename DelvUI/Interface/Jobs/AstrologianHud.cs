@@ -344,13 +344,40 @@ namespace DelvUI.Interface.Jobs
 
             float crownCardPresent;
             float crownCardMax;
+            float maxDuration = SpellHelper.Instance.GetRecastTime(7443);
             float cooldown = _spellHelper.GetSpellCooldown(7443);
+            float currentCooldown = maxDuration - cooldown;
 
             if (crownCardDrawn != "")
             {
                 crownCardPresent = 1f;
                 crownCardMax = 1f;
                 Config.MinorArcanaBar.Label.SetText(crownCardDrawn);
+
+                if (Config.MinorArcanaBar.CrownDrawTimerLabel.Enabled)
+                {
+                    switch (cooldown)
+                    {
+                        case > 0:
+                            Config.MinorArcanaBar.CrownDrawTimerLabel.SetValue(maxDuration - currentCooldown);
+
+                            break;
+
+                        case 0 when gauge.DrawnCrownCard != CardType.NONE:
+                            Config.MinorArcanaBar.CrownDrawTimerLabel.SetText("READY (" + (maxDuration - currentCooldown).ToString("0") + ")");
+
+                            break;
+
+                        default:
+                            Config.MinorArcanaBar.CrownDrawTimerLabel.SetText("READY");
+
+                            break;
+                    }
+                }
+                else
+                {
+                    Config.MinorArcanaBar.CrownDrawTimerLabel.SetText("");
+                }
             }
             else
             {
@@ -365,11 +392,12 @@ namespace DelvUI.Interface.Jobs
                     Config.MinorArcanaBar.Label.SetText("READY");
                 }
 
+                Config.MinorArcanaBar.CrownDrawTimerLabel.SetText("");
                 crownCardColor = cooldown > 0 ? Config.MinorArcanaBar.CrownDrawCdColor : Config.MinorArcanaBar.CrownDrawCdReadyColor;
                 crownCardMax = cooldown > 0 ? 60f : 1f;
             }
 
-            LabelConfig[] labels = { Config.MinorArcanaBar.Label };
+            LabelConfig[] labels = { Config.MinorArcanaBar.Label, Config.MinorArcanaBar.CrownDrawTimerLabel };
             BarUtilities.GetBar(Config.MinorArcanaBar, crownCardPresent, crownCardMax, 0f, player, crownCardColor, labels: labels)
                 .Draw(pos);
         }
@@ -513,6 +541,9 @@ namespace DelvUI.Interface.Jobs
         [Exportable(false)]
         public class AstrologianCrownDrawBarConfig : ProgressBarConfig
         {
+            [NestedConfig("Minor Arcana Side Timer Label" + "##CrownDraw", 119, separator = false, spacing = true)]
+            public NumericLabelConfig CrownDrawTimerLabel = new(new Vector2(0, 0), "", DrawAnchor.Left, DrawAnchor.Left);
+
             [ColorEdit4("Minor Arcana on CD" + "##CrownDraw")]
             [Order(120)]
             public PluginConfigColor CrownDrawCdColor = new(new Vector4(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f));
