@@ -2,6 +2,7 @@
 Fixes:
 - Fixed job and role colors not working on some job hud bars.
 - Fixed Summoner's Ifrit, Titan and Garuda bars "Hide When Inactive" not working.
+- Fixed Missing Health color when using transparent bars.
 
 # 0.6.1.1
 Features:
