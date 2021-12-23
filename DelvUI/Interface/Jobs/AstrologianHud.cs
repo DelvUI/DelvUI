@@ -291,17 +291,17 @@ namespace DelvUI.Interface.Jobs
             {
                 cardPresent = drawCastInfo > 0 ? current : 1f;
 
-                if (drawCastInfo > 0 && drawCharges == 0)
+                switch (drawCastInfo)
                 {
-                    Config.DrawBar.Label.SetValue(current);
-                }
-                else if (drawCastInfo > 0 && drawCharges > 0)
-                {
-                    Config.DrawBar.Label.SetText("READY (" + current.ToString("0") + ")");
-                }
-                else
-                {
-                    Config.DrawBar.Label.SetText("READY");
+                    case > 0 when drawCharges == 0:
+                        Config.DrawBar.Label.SetValue(current);
+                        break;
+                    case > 0 when drawCharges > 0:
+                        Config.DrawBar.Label.SetText("READY (" + current.ToString("0") + ")");
+                        break;
+                    default:
+                        Config.DrawBar.Label.SetText("READY");
+                        break;
                 }
 
                 Config.DrawBar.DrawDrawLabel.SetText("");
@@ -344,9 +344,7 @@ namespace DelvUI.Interface.Jobs
 
             float crownCardPresent;
             float crownCardMax;
-            float maxDuration = SpellHelper.Instance.GetRecastTime(7443);
             float cooldown = _spellHelper.GetSpellCooldown(7443);
-            float currentCooldown = maxDuration - cooldown;
 
             if (crownCardDrawn != "")
             {
@@ -359,18 +357,10 @@ namespace DelvUI.Interface.Jobs
                     switch (cooldown)
                     {
                         case > 0:
-                            Config.MinorArcanaBar.CrownDrawTimerLabel.SetValue(maxDuration - currentCooldown);
-
+                            Config.MinorArcanaBar.CrownDrawTimerLabel.SetValue(cooldown);
                             break;
-
-                        case 0 when gauge.DrawnCrownCard != CardType.NONE:
-                            Config.MinorArcanaBar.CrownDrawTimerLabel.SetText("READY (" + (maxDuration - currentCooldown).ToString("0") + ")");
-
-                            break;
-
                         default:
                             Config.MinorArcanaBar.CrownDrawTimerLabel.SetText("READY");
-
                             break;
                     }
                 }
