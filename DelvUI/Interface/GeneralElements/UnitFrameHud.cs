@@ -131,8 +131,18 @@ namespace DelvUI.Interface.GeneralElements
                 Vector2 healthMissingPos = Config.FillDirection.IsInverted()
                     ? Config.Position
                     : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
-                    
-                bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, Config.HealthMissingColor));
+
+                PluginConfigColor missingHealthColor = Config.HealthMissingColor;
+                if (Config.UseCustomInvulnerabilityColor && character is BattleChara battleChara)
+                {
+                    Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
+                    if (tankInvuln is not null)
+                    {
+                        missingHealthColor = Config.CustomInvulnerabilityColor;
+                    }
+                }
+
+                bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, missingHealthColor));
             }
 
             if (Config.ShieldConfig.Enabled)
@@ -250,7 +260,9 @@ namespace DelvUI.Interface.GeneralElements
 
         private PluginConfigColor BackgroundColor(Character? chara)
         {
-            if (Config.ShowTankInvulnerability && chara is BattleChara battleChara)
+            if (Config.ShowTankInvulnerability &&
+                !Config.UseMissingHealthBar &&
+                chara is BattleChara battleChara)
             {
                 Status? tankInvuln = Utils.GetTankInvulnerabilityID(battleChara);
 
@@ -272,7 +284,6 @@ namespace DelvUI.Interface.GeneralElements
 
                     return color;
                 }
-
             }
 
             if (chara is BattleChara)
