@@ -128,9 +128,11 @@ namespace DelvUI.Interface.GeneralElements
             if (Config.UseMissingHealthBar)
             {
                 Vector2 healthMissingSize = Config.Size - BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
-                Vector2 healthMissingPos = Config.FillDirection.IsInverted() ? Config.Position : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
-                PluginConfigColor? color = BackgroundColor(character);
-                bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, color));
+                Vector2 healthMissingPos = Config.FillDirection.IsInverted()
+                    ? Config.Position
+                    : Config.Position + BarUtilities.GetFillDirectionOffset(healthFill.Size, Config.FillDirection);
+                    
+                bar.AddForegrounds(new Rect(healthMissingPos, healthMissingSize, Config.HealthMissingColor));
             }
 
             if (Config.ShieldConfig.Enabled)
@@ -282,10 +284,6 @@ namespace DelvUI.Interface.GeneralElements
                 else if (Config.UseDeathIndicatorBackgroundColor && chara.CurrentHp <= 0)
                 {
                     return Config.DeathIndicatorBackgroundColor;
-                }
-                else if (Config.UseMissingHealthBar)
-                {
-                    return Config.HealthMissingColor;
                 }
                 else
                 {
