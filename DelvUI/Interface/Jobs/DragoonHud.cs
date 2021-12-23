@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
@@ -10,6 +6,10 @@ using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -77,12 +77,12 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.EyeOfTheDragonBar.Enabled)
             {
-                DrawEyeOfTheDragonBars(position);
+                DrawEyeOfTheDragonBars(position, player);
             }
 
             if (Config.FirstmindsFocusBar.Enabled)
             {
-                DrawFirstmindsFocusBars(position);
+                DrawFirstmindsFocusBars(position, player);
             }
 
             if (Config.LifeOfTheDragonBar.Enabled)
@@ -99,23 +99,25 @@ namespace DelvUI.Interface.Jobs
                 Draw(pos);
         }
 
-        private void DrawEyeOfTheDragonBars(Vector2 pos)
+        private void DrawEyeOfTheDragonBars(Vector2 pos, PlayerCharacter player)
         {
             DRGGauge gauge = Plugin.JobGauges.Get<DRGGauge>();
 
             if (!Config.EyeOfTheDragonBar.HideWhenInactive || gauge.EyeCount > 0)
             {
-                BarUtilities.GetChunkedBars(Config.EyeOfTheDragonBar, 2, gauge.EyeCount, 2).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.EyeOfTheDragonBar, 2, gauge.EyeCount, 2, 0, player)
+                    .Draw(pos);
             }
         }
 
-        private void DrawFirstmindsFocusBars(Vector2 pos)
+        private void DrawFirstmindsFocusBars(Vector2 pos, PlayerCharacter player)
         {
             DRGGauge gauge = Plugin.JobGauges.Get<DRGGauge>();
 
             if (!Config.FirstmindsFocusBar.HideWhenInactive || gauge.FirstmindsFocusCount > 0)
             {
-                BarUtilities.GetChunkedBars(Config.FirstmindsFocusBar, 2, gauge.FirstmindsFocusCount, 2).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.FirstmindsFocusBar, 2, gauge.FirstmindsFocusCount, 2, 0, player)
+                    .Draw(pos);
             }
         }
 
@@ -127,7 +129,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.LifeOfTheDragonBar.HideWhenInactive || duration > 0f)
             {
                 Config.LifeOfTheDragonBar.Label.SetValue(duration);
-                BarUtilities.GetProgressBar(Config.LifeOfTheDragonBar, duration, 30, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.LifeOfTheDragonBar, duration, 30, 0f, player)
+                    .Draw(pos);
             }
         }
 
@@ -137,7 +140,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.PowerSurgeBar.HideWhenInactive || duration > 0f)
             {
                 Config.PowerSurgeBar.Label.SetValue(duration);
-                BarUtilities.GetProgressBar(Config.PowerSurgeBar, duration, 30f, 0f, player).Draw(origin);
+                BarUtilities.GetProgressBar(Config.PowerSurgeBar, duration, 30f, 0f, player)
+                    .Draw(origin);
             }
         }
     }

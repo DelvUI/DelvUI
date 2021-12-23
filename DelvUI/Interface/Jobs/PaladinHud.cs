@@ -1,16 +1,16 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
+using Dalamud.Game.ClientState.Objects.SubKinds;
+using Dalamud.Game.ClientState.Statuses;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
+using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
-using Dalamud.Game.ClientState.Objects.SubKinds;
-using Dalamud.Game.ClientState.Statuses;
-using DelvUI.Interface.GeneralElements;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -64,7 +64,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.OathGauge.Enabled)
             {
-                DrawOathGauge(pos);
+                DrawOathGauge(pos, player);
             }
 
             if (Config.FightOrFlightBar.Enabled)
@@ -88,14 +88,15 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawOathGauge(Vector2 origin)
+        private void DrawOathGauge(Vector2 origin, PlayerCharacter player)
         {
             PLDGauge gauge = Plugin.JobGauges.Get<PLDGauge>();
 
             if (!Config.OathGauge.HideWhenInactive || gauge.OathGauge > 0)
             {
                 Config.OathGauge.Label.SetValue(gauge.OathGauge);
-                BarUtilities.GetChunkedProgressBars(Config.OathGauge, 2, gauge.OathGauge, 100).Draw(origin);
+                BarUtilities.GetChunkedProgressBars(Config.OathGauge, 2, gauge.OathGauge, 100, 0, player)
+                    .Draw(origin);
             }
         }
 
@@ -106,7 +107,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.FightOrFlightBar.HideWhenInactive || fightOrFlightDuration > 0)
             {
                 Config.FightOrFlightBar.Label.SetValue(fightOrFlightDuration);
-                BarUtilities.GetProgressBar(Config.FightOrFlightBar, fightOrFlightDuration, 25f, 0f, player).Draw(origin);
+                BarUtilities.GetProgressBar(Config.FightOrFlightBar, fightOrFlightDuration, 25f, 0f, player)
+                    .Draw(origin);
             }
         }
 
@@ -137,7 +139,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.AtonementBar.HideWhenInactive && stackCount == 0) { return; };
 
-            BarUtilities.GetChunkedBars(Config.AtonementBar, 3, stackCount, 3f)
+            BarUtilities.GetChunkedBars(Config.AtonementBar, 3, stackCount, 3f, 0, player)
                 .Draw(origin);
         }
 

@@ -3,17 +3,15 @@ using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
+using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Numerics;
-using Dalamud.Logging;
-using DelvUI.Enums;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -88,7 +86,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.SoulVoiceBar.Enabled)
             {
-                DrawSoulVoiceBar(pos);
+                DrawSoulVoiceBar(pos, player);
             }
 
             if (Config.CodaBar.Enabled)
@@ -162,7 +160,7 @@ namespace DelvUI.Interface.Jobs
                             );
                     }
 
-                    DrawSongTimerBar(origin, songTimer, Config.SongGaugeBar.WMColor);
+                    DrawSongTimerBar(origin, songTimer, Config.SongGaugeBar.WMColor, player);
 
                     break;
 
@@ -172,7 +170,7 @@ namespace DelvUI.Interface.Jobs
                         DrawBloodletterReady(origin, player);
                     }
 
-                    DrawSongTimerBar(origin, songTimer, Config.SongGaugeBar.MBColor);
+                    DrawSongTimerBar(origin, songTimer, Config.SongGaugeBar.MBColor, player);
 
                     break;
 
@@ -182,7 +180,7 @@ namespace DelvUI.Interface.Jobs
                         DrawStacksBar(origin, player, songStacks, 4, Config.StacksBar.APStackColor);
                     }
 
-                    DrawSongTimerBar(origin, songTimer, Config.SongGaugeBar.APColor);
+                    DrawSongTimerBar(origin, songTimer, Config.SongGaugeBar.APColor, player);
 
                     break;
 
@@ -192,7 +190,7 @@ namespace DelvUI.Interface.Jobs
                         DrawStacksBar(origin, player, 0, 3, Config.StacksBar.WMStackColor);
                     }
 
-                    DrawSongTimerBar(origin, 0, EmptyColor);
+                    DrawSongTimerBar(origin, 0, EmptyColor, player);
 
                     break;
 
@@ -202,7 +200,7 @@ namespace DelvUI.Interface.Jobs
                         DrawStacksBar(origin, player, 0, 3, Config.StacksBar.WMStackColor);
                     }
 
-                    DrawSongTimerBar(origin, 0, EmptyColor);
+                    DrawSongTimerBar(origin, 0, EmptyColor, player);
 
                     break;
             }
@@ -221,7 +219,7 @@ namespace DelvUI.Interface.Jobs
                 Config.StacksBar.MBGlowConfig.Enabled ? Config.StacksBar.MBGlowConfig : null);
         }
 
-        protected void DrawSongTimerBar(Vector2 origin, ushort songTimer, PluginConfigColor songColor)
+        protected void DrawSongTimerBar(Vector2 origin, ushort songTimer, PluginConfigColor songColor, PlayerCharacter player)
         {
 
             if (Config.SongGaugeBar.HideWhenInactive && songTimer == 0 || !Config.SongGaugeBar.Enabled)
@@ -232,11 +230,11 @@ namespace DelvUI.Interface.Jobs
             float duration = Math.Abs(songTimer / 1000f);
 
             Config.SongGaugeBar.Label.SetValue(duration);
-            BarUtilities.GetProgressBar(Config.SongGaugeBar, duration, 45f, 0f, null, songColor)
+            BarUtilities.GetProgressBar(Config.SongGaugeBar, duration, 45f, 0f, player, songColor)
                         .Draw(origin);
         }
 
-        protected void DrawSoulVoiceBar(Vector2 origin)
+        protected void DrawSoulVoiceBar(Vector2 origin, PlayerCharacter player)
         {
             BardSoulVoiceBarConfig config = Config.SoulVoiceBar;
             byte soulVoice = Plugin.JobGauges.Get<BRDGauge>().SoulVoice;
@@ -255,7 +253,7 @@ namespace DelvUI.Interface.Jobs
                 soulVoice,
                 100f,
                 0f,
-                null,
+                player,
                 config.FillColor,
                 soulVoice == 100f && config.GlowConfig.Enabled ? config.GlowConfig : null
             ).Draw(origin);
@@ -266,7 +264,7 @@ namespace DelvUI.Interface.Jobs
             BardStacksBarConfig config = Config.StacksBar;
 
             config.FillColor = stackColor;
-            BarUtilities.GetChunkedBars(Config.StacksBar, max, amount, max, 0F, glowConfig: glowConfig).
+            BarUtilities.GetChunkedBars(Config.StacksBar, max, amount, max, 0f, player, glowConfig: glowConfig).
                          Draw(origin);
         }
     }

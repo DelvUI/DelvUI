@@ -92,7 +92,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.EspritGauge.Enabled)
             {
-                DrawEspritBar(pos);
+                DrawEspritBar(pos, player);
             }
 
             if (Config.FeatherGauge.Enabled)
@@ -118,7 +118,7 @@ namespace DelvUI.Interface.Jobs
             bool showingStepBar = false;
             if (Config.StepsBar.Enabled)
             {
-                showingStepBar = DrawStepBar(pos);
+                showingStepBar = DrawStepBar(pos, player);
             }
 
             if (!showingStepBar || !Config.StepsBar.HideProcs)
@@ -132,16 +132,11 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawProcBar(Vector2 origin, PlayerCharacter player, DancerProcBarConfig config, uint statusId)
         {
-            if (!config.Enabled)
-            {
-                return;
-            }
-
             BarUtilities.GetProcBar(config, player, statusId, 20f, !config.IgnoreBuffDuration)?.
                 Draw(origin);
         }
 
-        private unsafe bool DrawStepBar(Vector2 origin)
+        private unsafe bool DrawStepBar(Vector2 origin, PlayerCharacter player)
         {
             var gauge = Plugin.JobGauges.Get<DNCGauge>();
             if (!gauge.IsDancing)
@@ -205,20 +200,21 @@ namespace DelvUI.Interface.Jobs
                 }
             }
 
-            BarUtilities.GetChunkedBars(Config.StepsBar, chunks.ToArray(), null, Config.StepsBar.GlowConfig, glows.ToArray())
+            BarUtilities.GetChunkedBars(Config.StepsBar, chunks.ToArray(), player, Config.StepsBar.GlowConfig, glows.ToArray())
                 .Draw(origin);
 
             return true;
         }
 
-        private void DrawEspritBar(Vector2 origin)
+        private void DrawEspritBar(Vector2 origin, PlayerCharacter player)
         {
             DNCGauge gauge = Plugin.JobGauges.Get<DNCGauge>();
 
             if (Config.EspritGauge.HideWhenInactive && gauge.Esprit is 0) { return; }
 
             Config.EspritGauge.Label.SetValue(gauge.Esprit);
-            BarUtilities.GetChunkedProgressBars(Config.EspritGauge, 2, gauge.Esprit, 100, 0f).Draw(origin);
+            BarUtilities.GetChunkedProgressBars(Config.EspritGauge, 2, gauge.Esprit, 100, 0f, player)
+                .Draw(origin);
         }
 
         private void DrawFeathersBar(Vector2 origin, PlayerCharacter player)
@@ -239,7 +235,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             BarGlowConfig? config = hasFlourishingBuff ? Config.FeatherGauge.GlowConfig : null;
-            BarUtilities.GetChunkedBars(Config.FeatherGauge, 4, gauge.Feathers, 4, glowConfig: config, chunksToGlow: glows)
+            BarUtilities.GetChunkedBars(Config.FeatherGauge, 4, gauge.Feathers, 4, 0, player, glowConfig: config, chunksToGlow: glows)
                 .Draw(origin);
         }
 
@@ -252,7 +248,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.TechnicalFinishBar.HideWhenInactive || technicalFinishDuration > 0)
             {
                 Config.TechnicalFinishBar.Label.SetValue(Math.Abs(technicalFinishDuration));
-                BarUtilities.GetProgressBar(Config.TechnicalFinishBar, technicalFinishDuration, 20f, 0f, player).Draw(origin);
+                BarUtilities.GetProgressBar(Config.TechnicalFinishBar, technicalFinishDuration, 20f, 0f, player)
+                    .Draw(origin);
             }
         }
 
@@ -263,7 +260,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.DevilmentBar.HideWhenInactive || devilmentDuration > 0)
             {
                 Config.DevilmentBar.Label.SetValue(Math.Abs(devilmentDuration));
-                BarUtilities.GetProgressBar(Config.DevilmentBar, devilmentDuration, 20f, 0f, player).Draw(origin);
+                BarUtilities.GetProgressBar(Config.DevilmentBar, devilmentDuration, 20f, 0f, player)
+                    .Draw(origin);
             }
         }
 
@@ -274,7 +272,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.StandardFinishBar.HideWhenInactive || standardFinishDuration > 0)
             {
                 Config.StandardFinishBar.Label.SetValue(Math.Abs(standardFinishDuration));
-                BarUtilities.GetProgressBar(Config.StandardFinishBar, standardFinishDuration, 60f, 0f, player).Draw(origin);
+                BarUtilities.GetProgressBar(Config.StandardFinishBar, standardFinishDuration, 60f, 0f, player)
+                    .Draw(origin);
             }
         }
     }
