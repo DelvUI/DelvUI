@@ -1,4 +1,5 @@
-﻿using DelvUI.Config;
+﻿using Dalamud.Utility;
+using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Enums;
 using DelvUI.Helpers;
@@ -43,6 +44,10 @@ namespace DelvUI.Interface.PartyCooldowns
         [DragInt2("Padding", min = -1000, max = 1000)]
         [Order(15)]
         public Vector2 Padding = new Vector2(0, -1);
+
+        [Checkbox("Tooltips", spacing = true)]
+        [Order(16)]
+        public bool ShowTooltips = true;
 
         [Checkbox("Show Only in Duties", spacing = true, isMonitored = true)]
         [Order(20)]
@@ -142,29 +147,8 @@ namespace DelvUI.Interface.PartyCooldowns
         public delegate void CooldownsDataEnabledChangedEventHandler(PartyCooldownsDataConfig sender);
         public event CooldownsDataEnabledChangedEventHandler? CooldownsDataEnabledChangedEvent;
 
-        public new static PartyCooldownsDataConfig DefaultConfig()
-        {
-            var config = new PartyCooldownsDataConfig();
+        public new static PartyCooldownsDataConfig DefaultConfig() => new PartyCooldownsDataConfig();
 
-            ExcelSheet<Action>? sheet = Plugin.DataManager.GetExcelSheet<Action>();
-            config.Cooldowns.AddRange(DefaultCooldowns.Values);
-
-            // get cooldowns from data just in case
-            // i'd like to get the level requirements as well but thats more complicated
-            foreach (PartyCooldownData cooldown in config.Cooldowns)
-            {
-                Action? action = sheet?.GetRow(cooldown.ActionId);
-                if (action == null) { continue; }
-
-                if (action.Recast100ms > 0)
-                {
-                    cooldown.CooldownDuration = action.Recast100ms / 10;
-                }
-
-                cooldown.IconId = action.Icon;
-            }
-            return config;
-        }
 
         public void UpdateDataIfNeeded()
         {
@@ -176,6 +160,23 @@ namespace DelvUI.Interface.PartyCooldowns
 
                 Cooldowns.Add(DefaultCooldowns[key]);
                 needsSave = true;
+            }
+
+            ExcelSheet<Action>? sheet = Plugin.DataManager.GetExcelSheet<Action>();
+            ExcelSheet<ActionTransient>? descriptionsSheet = Plugin.DataManager.GetExcelSheet<ActionTransient>();
+
+            foreach (PartyCooldownData cooldown in Cooldowns)
+            {
+                Action? action = sheet?.GetRow(cooldown.ActionId);
+                if (action == null) { continue; }
+
+                if (action.Recast100ms > 0)
+                {
+                    cooldown.CooldownDuration = action.Recast100ms / 10;
+                }
+
+                cooldown.IconId = action.Icon;
+                cooldown.Name = action.Name;
             }
 
             if (needsSave)
@@ -231,13 +232,9 @@ namespace DelvUI.Interface.PartyCooldowns
                 foreach (PartyCooldownData cooldown in Cooldowns)
                 {
                     // apply filter
-                    if (_roleFilter != JobRoles.Unknown)
+                    if (_roleFilter != JobRoles.Unknown && !cooldown.HasRole(_roleFilter))
                     {
-                        JobRoles role = cooldown.Role != JobRoles.Unknown ? cooldown.Role : JobsHelper.RoleForJob(cooldown.JobId);
-                        if (role != _roleFilter)
-                        {
-                            continue;
-                        }
+                        continue;
                     }
 
                     Action? action = sheet?.GetRow(cooldown.ActionId);
@@ -265,7 +262,7 @@ namespace DelvUI.Interface.PartyCooldowns
                     // name
                     if (ImGui.TableSetColumnIndex(2))
                     {
-                        ImGui.Text(action?.Name ?? "");
+                        ImGui.Text(cooldown.Name);
                     }
 
                     // cooldown
@@ -327,6 +324,8 @@ namespace DelvUI.Interface.PartyCooldowns
 
         public static Dictionary<uint, PartyCooldownData> DefaultCooldowns = new Dictionary<uint, PartyCooldownData>()
         {
+            // PARTY-WIDE EFFECTS
+
             // TANKS
             [7535] = NewData(7535, JobRoles.Tank, 22, 60, 10, 100, 1), // reprisal
             [3540] = NewData(3540, JobIDs.PLD, 56, 90, 30, 90, 2), // divine veil
@@ -368,35 +367,57 @@ namespace DelvUI.Interface.PartyCooldowns
             [7520] = NewData(7520, JobIDs.RDM, 58, 120, 20, 30, 3), // embolden
             [25857] = NewData(25857, JobIDs.RDM, 86, 120, 10, 70, 2), // magick barrier
             [25801] = NewData(25801, JobIDs.SMN, 66, 120, 30, 30, 3), // searing light
+
+
+            // SINGLE-TARGET EFFECTS (disabled by default)
+
+            [30] = NewData(30, JobIDs.PLD, 50, 420, 10, 100, 4, false), // hallowed ground
+            [43] = NewData(43, JobIDs.WAR, 42, 240, 10, 100, 4, false), // holmgang
+            [3638] = NewData(3638, JobIDs.DRK, 50, 300, 10, 100, 4, false), // living dead
+            [16152] = NewData(16152, JobIDs.GNB, 50, 360, 10, 100, 4, false), // superbolide
+            [7571] = NewData(7571, JobRoles.Healer, 48, 120, 0, 80, 4, false), // rescue
+            [7561] = NewData(7561, new List<JobRoles>() { JobRoles.Healer, JobRoles.DPSCaster }, 18, 60, 0, 80, 4, false), // swiftcast
         };
 
         #region helpers
-        private static PartyCooldownData NewData(uint actionId, uint jobId, uint level, int cooldown, int effectDuration, int priority, int column)
+        private static PartyCooldownData NewData(uint actionId, uint jobId, uint level, int cooldown, int effectDuration, int priority, int column, bool enabled = true)
         {
-            PartyCooldownData data = new PartyCooldownData();
-            data.ActionId = actionId;
+            PartyCooldownData data = NewData(actionId, level, cooldown, effectDuration, priority, column, enabled);
             data.JobId = jobId;
             data.Role = JobRoles.Unknown;
-            data.RequiredLevel = level;
-            data.CooldownDuration = cooldown;
-            data.EffectDuration = effectDuration;
-            data.Priority = priority;
-            data.Column = column;
 
             return data;
         }
 
-        private static PartyCooldownData NewData(uint actionId, JobRoles role, uint level, int cooldown, int effectDuration, int priority, int column)
+        private static PartyCooldownData NewData(uint actionId, JobRoles role, uint level, int cooldown, int effectDuration, int priority, int column, bool enabled = true)
+        {
+            PartyCooldownData data = NewData(actionId, level, cooldown, effectDuration, priority, column, enabled);
+            data.JobId = 0;
+            data.Role = role;
+
+            return data;
+        }
+
+        private static PartyCooldownData NewData(uint actionId, List<JobRoles> roles, uint level, int cooldown, int effectDuration, int priority, int column, bool enabled = true)
+        {
+            PartyCooldownData data = NewData(actionId, level, cooldown, effectDuration, priority, column, enabled);
+            data.JobId = 0;
+            data.Role = JobRoles.Unknown;
+            data.Roles = roles;
+
+            return data;
+        }
+
+        private static PartyCooldownData NewData(uint actionId, uint level, int cooldown, int effectDuration, int priority, int column, bool enabled = true)
         {
             PartyCooldownData data = new PartyCooldownData();
             data.ActionId = actionId;
-            data.JobId = 0;
-            data.Role = role;
             data.RequiredLevel = level;
             data.CooldownDuration = cooldown;
             data.EffectDuration = effectDuration;
             data.Priority = priority;
             data.Column = column;
+            data.Enabled = enabled;
 
             return data;
         }

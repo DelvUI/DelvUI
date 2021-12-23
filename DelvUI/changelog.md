@@ -1,4 +1,8 @@
 # 0.6.1.2
+Features:
+- Added tooltips for party cooldowns.
+- Added Rescue, Swiftcast and Tank's invulnerabilities as trackable party cooldowns (disabled by default).
+
 Fixes:
 - Fixed job and role colors not working on some job hud bars.
 - Fixed Summoner's Ifrit, Titan and Garuda bars "Hide When Inactive" not working.
