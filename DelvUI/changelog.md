@@ -1,6 +1,8 @@
 # 0.6.1.2
 Features:
 - Astrologian Minor Arcana Bar now has a label to track cooldown of Minor Arcana whilst a Crown Card is drawn. Note that this will not work for users of the XIVCombo plugin that has selected the option to turn Minor Arcana into Crown Play.
+- Added tooltips for party cooldowns.
+- Added Rescue, Swiftcast and Tank's invulnerabilities as trackable party cooldowns (disabled by default).
 
 Fixes:
 - Fixed job and role colors not working on some job hud bars.
