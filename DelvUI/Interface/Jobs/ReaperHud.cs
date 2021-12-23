@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using Dalamud.Game.ClientState.Objects.Types;
 using DelvUI.Config;
@@ -12,6 +8,10 @@ using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -94,7 +94,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.DeathsDesignBar.HideWhenInactive || duration > 0)
             {
                 Config.DeathsDesignBar.Label.SetValue(duration);
-                BarUtilities.GetChunkedProgressBars(Config.DeathsDesignBar, 2, duration, 60f, 0f, player).Draw(pos);
+                BarUtilities.GetChunkedProgressBars(Config.DeathsDesignBar, 2, duration, 60f, 0f, player)
+                    .Draw(pos);
             }
         }
 
@@ -105,7 +106,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.SoulBar.HideWhenInactive || soul > 0)
             {
                 Config.SoulBar.Label.SetValue(soul);
-                BarUtilities.GetChunkedProgressBars(Config.SoulBar, 2, soul, 100f, 0f, player).Draw(pos);
+                BarUtilities.GetChunkedProgressBars(Config.SoulBar, 2, soul, 100f, 0f, player)
+                    .Draw(pos);
             }
         }
 
@@ -116,7 +118,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.ShroudBar.HideWhenInactive || shroud > 0)
             {
                 Config.ShroudBar.Label.SetValue(shroud);
-                BarUtilities.GetChunkedProgressBars(Config.ShroudBar, 2, shroud, 100f, 0f, player).Draw(pos);
+                BarUtilities.GetChunkedProgressBars(Config.ShroudBar, 2, shroud, 100f, 0f, player)
+                    .Draw(pos);
             }
         }
 
@@ -146,7 +149,8 @@ namespace DelvUI.Interface.Jobs
                 }
 
                 Config.DeathGauge.EnshroudTimerLabel.SetValue(gauge.EnshroudedTimeRemaining / 1000);
-                BarUtilities.GetChunkedBars(Config.DeathGauge, deathChunks, player).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.DeathGauge, deathChunks, player)
+                    .Draw(pos);
             }
         }
     }

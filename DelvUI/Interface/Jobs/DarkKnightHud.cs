@@ -81,7 +81,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.DarksideBar.Enabled)
             {
-                DrawDarkside(pos);
+                DrawDarkside(pos, player);
             }
 
             if (Config.BloodWeaponBar.Enabled)
@@ -96,7 +96,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.LivingShadowBar.Enabled)
             {
-                DrawLivingShadowBar(pos);
+                DrawLivingShadowBar(pos, player);
             }
         }
 
@@ -127,14 +127,15 @@ namespace DelvUI.Interface.Jobs
                 ).Draw(origin);
         }
 
-        private void DrawDarkside(Vector2 origin)
+        private void DrawDarkside(Vector2 origin, PlayerCharacter player)
         {
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
             if (Config.DarksideBar.HideWhenInactive && gauge.DarksideTimeRemaining == 0) { return; };
 
             float timer = Math.Abs(gauge.DarksideTimeRemaining) / 1000;
+
             Config.DarksideBar.Label.SetValue(timer);
-            BarUtilities.GetProgressBar(Config.DarksideBar, timer, 60)
+            BarUtilities.GetProgressBar(Config.DarksideBar, timer, 60, 0, player)
                 .Draw(origin);
         }
 
@@ -144,7 +145,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.BloodGauge.HideWhenInactive || gauge.Blood > 0)
             {
                 Config.BloodGauge.Label.SetValue(gauge.Blood);
-                BarUtilities.GetChunkedProgressBars(Config.BloodGauge, 2, gauge.Blood, 100).Draw(origin);
+                BarUtilities.GetChunkedProgressBars(Config.BloodGauge, 2, gauge.Blood, 100, 0, player)
+                    .Draw(origin);
             }
         }
 
@@ -155,7 +157,7 @@ namespace DelvUI.Interface.Jobs
             if (Config.BloodWeaponBar.HideWhenInactive && bloodWeaponDuration is 0) { return; }
 
             Config.BloodWeaponBar.Label.SetValue(bloodWeaponDuration);
-            BarUtilities.GetProgressBar(Config.BloodWeaponBar, bloodWeaponDuration, 10, 0f)
+            BarUtilities.GetProgressBar(Config.BloodWeaponBar, bloodWeaponDuration, 10, 0f, player)
                 .Draw(origin);
         }
 
@@ -166,18 +168,19 @@ namespace DelvUI.Interface.Jobs
             if (Config.DeliriumBar.HideWhenInactive && deliriumDuration is 0) { return; }
 
             Config.DeliriumBar.Label.SetValue(deliriumDuration);
-            BarUtilities.GetProgressBar(Config.DeliriumBar, deliriumDuration, 10, 0f)
+            BarUtilities.GetProgressBar(Config.DeliriumBar, deliriumDuration, 10, 0f, player)
                 .Draw(origin);
         }
 
-        private void DrawLivingShadowBar(Vector2 origin)
+        private void DrawLivingShadowBar(Vector2 origin, PlayerCharacter player)
         {
             DRKGauge gauge = Plugin.JobGauges.Get<DRKGauge>();
             if (Config.LivingShadowBar.HideWhenInactive && gauge.ShadowTimeRemaining == 0) { return; }
 
             float timer = Math.Abs(gauge.ShadowTimeRemaining) / 1000;
             Config.LivingShadowBar.Label.SetValue(timer);
-            BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 24)
+
+            BarUtilities.GetProgressBar(Config.LivingShadowBar, timer, 24, 0, player)
                 .Draw(origin);
         }
     }

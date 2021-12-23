@@ -89,21 +89,21 @@ namespace DelvUI.Interface.Jobs
                 DrawTingleBar(pos, player);
             }
         }
+
         private static List<uint> BleedID = new List<uint> { 1714 };
         private static List<float> BleedDurations = new List<float> { 30, 60 };
+
         protected void DrawBleedBar(Vector2 origin, PlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
             BarUtilities.GetDoTBar(Config.BleedBar, player, target, BleedID, BleedDurations)?.Draw(origin);
-
         }
+
         protected void DrawWindburnBar(Vector2 origin, PlayerCharacter player)
         {
-            float featherRainCD = SpellHelper.Instance.GetSpellCooldown(11426);
             GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
-            float current = 0f;
-            float max = 0f;
             bool dotExists = false;
+
             if (target != null && target is BattleChara targetChara)
             {
                 dotExists = targetChara.StatusList.FirstOrDefault(o => o.SourceID == player.ObjectId && o.StatusId == 1723) != null;
@@ -115,8 +115,10 @@ namespace DelvUI.Interface.Jobs
             }
             else
             {
-                max = 30f;
-                current = max - featherRainCD;
+                float featherRainCD = SpellHelper.Instance.GetSpellCooldown(11426);
+                float max = 30f;
+                float current = max - featherRainCD;
+
                 if (!Config.WindburnBar.HideWhenInactive || current < max)
                 {
                     Config.WindburnBar.Label.SetValue(max - current);
@@ -124,25 +126,25 @@ namespace DelvUI.Interface.Jobs
                     {
                         Config.WindburnBar.Label.SetText("Ready");
                     }
+
                     BarUtilities.GetProgressBar(Config.WindburnBar, current, max, 0f, player).Draw(origin);
                 }
             }
         }
+
         protected void DrawSurpanakhaBar(Vector2 origin, PlayerCharacter player)
         {
-            int surpanakhaStacks = SpellHelper.Instance.GetStackCount(4, 18323);
             float surpanakhaCD = SpellHelper.Instance.GetSpellCooldown(18323);
-            float current = 0f;
-            float max = 0f;
+            float max = 120f;
+            float current = max - surpanakhaCD;
 
-            max = 120f;
-            current = max - surpanakhaCD;
             if (!Config.SurpanakhaBar.HideWhenInactive || current < max)
             {
                 Config.SurpanakhaBar.Label.SetValue((max - current) % 30);
                 BarUtilities.GetChunkedProgressBars(Config.SurpanakhaBar, 4, current, max, 0f, player).Draw(origin);
             }
         }
+
         protected void DrawOffGuardBar(Vector2 origin, PlayerCharacter player)
         {
             var target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
@@ -160,10 +162,11 @@ namespace DelvUI.Interface.Jobs
                     1727 => Config.MoonFluteBar.WaningCrescentColor,
                     _ => Config.MoonFluteBar.WaxingCrescentColor
                 } : Config.MoonFluteBar.WaxingCrescentColor;
+
                 float buffDuration = buff?.RemainingTime ?? 0f;
+
                 Config.MoonFluteBar.Label.SetValue(buffDuration);
                 BarUtilities.GetProgressBar(Config.MoonFluteBar, buffDuration, 15f, 0, player, fillColor: buffColor).Draw(origin);
-
             }
         }
 
@@ -178,7 +181,9 @@ namespace DelvUI.Interface.Jobs
                     1716 => Config.SpellAmpBar.WhistleColor,
                     _ => Config.SpellAmpBar.BristleColor
                 } : Config.SpellAmpBar.BristleColor;
+
                 float buffDuration = buff?.RemainingTime ?? 0f;
+
                 Config.SpellAmpBar.Label.SetValue(buffDuration);
                 BarUtilities.GetProgressBar(Config.SpellAmpBar, buffDuration, 30f, 0, player, fillColor: buffColor).Draw(origin);
 

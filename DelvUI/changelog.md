@@ -1,3 +1,8 @@
+# 0.6.1.2
+Fixes:
+- Fixed job and role colors not working on some job hud bars.
+- Fixed Summoner's Ifrit, Titan and Garuda bars "Hide When Inactive" not working.
+
 # 0.6.1.1
 Features:
 - Sage Kerachole tracker now also tracks Holos uptime and the config option for this bar was renamed to show that.

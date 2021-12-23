@@ -2,22 +2,18 @@ using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Config;
 using DelvUI.Config.Attributes;
-using DelvUI.Enums;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using FFXIVClientStructs.FFXIV.Client.Game.Gauge;
 
 namespace DelvUI.Interface.Jobs
 {
     public class SummonerHud : JobHud
     {
-
         private new SummonerConfig Config => (SummonerConfig)_config;
 
         public SummonerHud(SummonerConfig config, string? displayName = null) : base(config, displayName)
@@ -65,7 +61,6 @@ namespace DelvUI.Interface.Jobs
                 sizes.Add(Config.StacksBar.Size);
             }
 
-
             return (positions, sizes);
         }
 
@@ -80,50 +75,64 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.TranceBar.Enabled)
             {
-                DrawTranceBar(pos);
+                DrawTranceBar(pos, player);
             }
 
             if (Config.IfritBar.Enabled)
             {
-                DrawIfritBar(pos);
+                DrawIfritBar(pos, player);
             }
 
             if (Config.TitanBar.Enabled)
             {
-                DrawTitanBar(pos);
+                DrawTitanBar(pos, player);
             }
 
             if (Config.GarudaBar.Enabled)
             {
-                DrawGarudaBar(pos);
+                DrawGarudaBar(pos, player);
             }
 
             if (Config.StacksBar.Enabled)
             {
                 HandleAttunementStacks(pos, player);
             }
-
         }
 
-        private void DrawIfritBar(Vector2 origin)
+        private void DrawIfritBar(Vector2 origin, PlayerCharacter player)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             int stackCount = gauge.IsIfritReady ? 1 : 0;
-            BarUtilities.GetChunkedBars(Config.IfritBar, 1, stackCount, 0).Draw(origin);
+
+            if (!Config.IfritBar.HideWhenInactive || stackCount > 1)
+            {
+                BarUtilities.GetChunkedBars(Config.IfritBar, 1, stackCount, 1, 0, player)
+                    .Draw(origin);
+            }
         }
 
-        private void DrawTitanBar(Vector2 origin)
+        private void DrawTitanBar(Vector2 origin, PlayerCharacter player)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             int stackCount = gauge.IsTitanReady ? 1 : 0;
-            BarUtilities.GetChunkedBars(Config.TitanBar, 1, stackCount, 0).Draw(origin);
+
+            if (!Config.TitanBar.HideWhenInactive || stackCount > 1)
+            {
+                BarUtilities.GetChunkedBars(Config.TitanBar, 1, stackCount, 1, 0, player)
+                    .Draw(origin);
+            }
         }
 
-        private void DrawGarudaBar(Vector2 origin)
+        private void DrawGarudaBar(Vector2 origin, PlayerCharacter player)
         {
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             int stackCount = gauge.IsGarudaReady ? 1 : 0;
-            BarUtilities.GetChunkedBars(Config.GarudaBar, 1, stackCount, 0).Draw(origin);
+
+            if (!Config.GarudaBar.HideWhenInactive || stackCount > 1)
+            {
+                BarUtilities.GetChunkedBars(Config.GarudaBar, 1, stackCount, 1, 0, player)
+                    .Draw(origin);
+            }
         }
 
         private void HandleAttunementStacks(Vector2 origin, PlayerCharacter player)
@@ -156,15 +165,14 @@ namespace DelvUI.Interface.Jobs
             if (Config.AetherflowBar.HideWhenInactive && stackCount == 0)
             {
                 return;
-            };
+            }
 
-            BarUtilities.GetChunkedBars(Config.AetherflowBar, 2, stackCount, 2)
+            BarUtilities.GetChunkedBars(Config.AetherflowBar, 2, stackCount, 2, 0, player)
                 .Draw(origin);
         }
 
-        private void DrawTranceBar(Vector2 origin)
+        private void DrawTranceBar(Vector2 origin, PlayerCharacter player)
         {
-
             SMNGauge gauge = Plugin.JobGauges.Get<SMNGauge>();
             PluginConfigColor tranceColor;
             uint spellID = 0;
@@ -204,7 +212,8 @@ namespace DelvUI.Interface.Jobs
                     return;
                 }
                 Config.TranceBar.Label.SetValue(tranceDuration / 1000f);
-                BarUtilities.GetProgressBar(Config.TranceBar, tranceDuration / 1000f, maxDuration, fillColor: tranceColor).Draw(origin);
+                BarUtilities.GetProgressBar(Config.TranceBar, tranceDuration / 1000f, maxDuration, 0, player, tranceColor).
+                    Draw(origin);
             }
             else
             {
@@ -215,17 +224,18 @@ namespace DelvUI.Interface.Jobs
                         maxDuration = SpellHelper.Instance.GetRecastTime(spellID);
                         float tranceCooldown = SpellHelper.Instance.GetSpellCooldown(spellID);
                         currentCooldown = maxDuration - tranceCooldown;
+
                         Config.TranceBar.Label.SetValue(maxDuration - currentCooldown);
                         if (currentCooldown == maxDuration)
                         {
                             Config.TranceBar.Label.SetText("READY");
                         }
-                        BarUtilities.GetProgressBar(Config.TranceBar, currentCooldown, maxDuration, fillColor: tranceColor).Draw(origin);
+
+                        BarUtilities.GetProgressBar(Config.TranceBar, currentCooldown, maxDuration, 0, player, tranceColor)
+                            .Draw(origin);
                     }
                 }
-
             }
-
         }
 
         private void DrawStacksBar(Vector2 origin, PlayerCharacter player, int amount, int max, PluginConfigColor stackColor, BarGlowConfig? glowConfig = null)
@@ -233,7 +243,7 @@ namespace DelvUI.Interface.Jobs
             SummonerStacksBarConfig config = Config.StacksBar;
 
             config.FillColor = stackColor;
-            BarUtilities.GetChunkedBars(Config.StacksBar, max, amount, max, 0F, glowConfig: glowConfig).
+            BarUtilities.GetChunkedBars(Config.StacksBar, max, amount, max, 0f, player, glowConfig: glowConfig).
                          Draw(origin);
         }
     }

@@ -4,7 +4,6 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
-using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -55,12 +54,12 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.OverheatGauge.Enabled)
             {
-                DrawOverheatBar(pos);
+                DrawOverheatBar(pos, player);
             }
 
             if (Config.HeatGauge.Enabled)
             {
-                DrawHeatGauge(pos);
+                DrawHeatGauge(pos, player);
             }
 
             if (Config.BatteryGauge.Enabled)
@@ -74,14 +73,15 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawHeatGauge(Vector2 origin)
+        private void DrawHeatGauge(Vector2 origin, PlayerCharacter player)
         {
             MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
 
             if (!Config.HeatGauge.HideWhenInactive || gauge.Heat > 0)
             {
                 Config.HeatGauge.Label.SetValue(gauge.Heat);
-                BarUtilities.GetChunkedProgressBars(Config.HeatGauge, 2, gauge.Heat, 100).Draw(origin);
+                BarUtilities.GetChunkedProgressBars(Config.HeatGauge, 2, gauge.Heat, 100, 0, player)
+                    .Draw(origin);
             }
         }
 
@@ -92,7 +92,8 @@ namespace DelvUI.Interface.Jobs
             if ((!Config.BatteryGauge.HideWhenInactive || gauge.Battery > 0) && !gauge.IsRobotActive)
             {
                 Config.BatteryGauge.Label.SetValue(gauge.Battery);
-                BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.Battery, 100f, 0f, player, Config.BatteryGauge.BatteryColor).Draw(origin);
+                BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.Battery, 100f, 0f, player, Config.BatteryGauge.BatteryColor)
+                    .Draw(origin);
             }
 
             if (!gauge.IsRobotActive && _robotMaxDurationSet)
@@ -108,18 +109,20 @@ namespace DelvUI.Interface.Jobs
                 }
 
                 Config.BatteryGauge.Label.SetValue(gauge.SummonTimeRemaining / 1000f);
-                BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.SummonTimeRemaining / 1000, _robotMaxDuration / 1000, 0f, player, Config.BatteryGauge.RobotColor).Draw(origin);
+                BarUtilities.GetProgressBar(Config.BatteryGauge, gauge.SummonTimeRemaining / 1000, _robotMaxDuration / 1000, 0f, player, Config.BatteryGauge.RobotColor)
+                    .Draw(origin);
             }
         }
 
-        private void DrawOverheatBar(Vector2 origin)
+        private void DrawOverheatBar(Vector2 origin, PlayerCharacter player)
         {
             MCHGauge gauge = Plugin.JobGauges.Get<MCHGauge>();
 
             if (!Config.OverheatGauge.HideWhenInactive || gauge.IsOverheated)
             {
                 Config.OverheatGauge.Label.SetValue(gauge.OverheatTimeRemaining / 1000f);
-                BarUtilities.GetProgressBar(Config.OverheatGauge, gauge.OverheatTimeRemaining / 1000f, 8, 0f).Draw(origin);
+                BarUtilities.GetProgressBar(Config.OverheatGauge, gauge.OverheatTimeRemaining / 1000f, 8, 0f, player)
+                    .Draw(origin);
             }
         }
 
@@ -130,7 +133,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.WildfireBar.HideWhenInactive || wildfireDuration > 0)
             {
                 Config.WildfireBar.Label.SetValue(wildfireDuration);
-                BarUtilities.GetProgressBar(Config.WildfireBar, wildfireDuration, 10, 0f).Draw(origin);
+                BarUtilities.GetProgressBar(Config.WildfireBar, wildfireDuration, 10, 0f, player)
+                    .Draw(origin);
             }
         }
     }

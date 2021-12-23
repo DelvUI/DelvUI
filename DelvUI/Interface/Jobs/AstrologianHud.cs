@@ -390,7 +390,8 @@ namespace DelvUI.Interface.Jobs
             }
 
             Config.LightspeedBar.Label.SetValue(lightspeedDuration);
-            BarUtilities.GetProgressBar(Config.LightspeedBar, lightspeedDuration, LIGHTSPEED_MAX_DURATION).Draw(origin);
+            BarUtilities.GetProgressBar(Config.LightspeedBar, lightspeedDuration, LIGHTSPEED_MAX_DURATION, 0, player)
+                .Draw(origin);
         }
 
         private void DrawStar(Vector2 origin, PlayerCharacter player)
@@ -407,7 +408,8 @@ namespace DelvUI.Interface.Jobs
             PluginConfigColor currentStarColor = starPreCookingBuff > 0 ? Config.StarBar.StarEarthlyColor : Config.StarBar.StarGiantColor;
 
             Config.StarBar.Label.SetValue(currentStarDuration);
-            BarUtilities.GetProgressBar(Config.StarBar, currentStarDuration, STAR_MAX_DURATION, 0f, player, currentStarColor, Config.StarBar.StarGlowConfig.Enabled && starPostCookingBuff > 0 ? Config.StarBar.StarGlowConfig : null).Draw(origin); // Star Countdown after Star is ready 
+            BarUtilities.GetProgressBar(Config.StarBar, currentStarDuration, STAR_MAX_DURATION, 0f, player, currentStarColor, Config.StarBar.StarGlowConfig.Enabled && starPostCookingBuff > 0 ? Config.StarBar.StarGlowConfig : null)
+                .Draw(origin); // Star Countdown after Star is ready 
         }
     }
 

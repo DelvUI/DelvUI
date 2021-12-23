@@ -84,7 +84,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ChakraBar.Enabled)
             {
-                DrawChakraGauge(position);
+                DrawChakraGauge(position, player);
             }
 
             if (Config.MastersGauge.Enabled)
@@ -125,7 +125,8 @@ namespace DelvUI.Interface.Jobs
                 } : "";
 
                 Config.FormsBar.Label.SetText(label);
-                BarUtilities.GetProgressBar(Config.FormsBar, formDuration, 30f, 0, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.FormsBar, formDuration, 30f, 0, player)
+                    .Draw(pos);
             }
         }
 
@@ -147,16 +148,18 @@ namespace DelvUI.Interface.Jobs
                 }
 
                 Config.PerfectBalanceBar.PerfectBalanceLabel.SetValue(duration);
-                BarUtilities.GetChunkedBars(Config.PerfectBalanceBar, chunks, player).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.PerfectBalanceBar, chunks, player)
+                    .Draw(pos);
             }
         }
 
-        private void DrawChakraGauge(Vector2 pos)
+        private void DrawChakraGauge(Vector2 pos, PlayerCharacter player)
         {
             var gauge = Plugin.JobGauges.Get<MNKGauge>();
             if (!Config.ChakraBar.HideWhenInactive || gauge.Chakra > 0)
             {
-                BarUtilities.GetChunkedBars(Config.ChakraBar, 5, gauge.Chakra, 5).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.ChakraBar, 5, gauge.Chakra, 5, 0, player)
+                    .Draw(pos);
             }
         }
 
@@ -195,7 +198,8 @@ namespace DelvUI.Interface.Jobs
                 }
 
                 Config.MastersGauge.BlitzTimerLabel.SetValue(gauge.BlitzTimeRemaining / 1000);
-                BarUtilities.GetChunkedBars(Config.MastersGauge, chunks, player).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.MastersGauge, chunks, player)
+                    .Draw(pos);
             }
         }
 
@@ -204,7 +208,7 @@ namespace DelvUI.Interface.Jobs
             BeastChakra.RAPTOR => Config.MastersGauge.RaptorChakraColor,
             BeastChakra.COEURL => Config.MastersGauge.CoeurlChakraColor,
             BeastChakra.OPOOPO => Config.MastersGauge.OpoopoChakraColor,
-            _                  => new PluginConfigColor(new(0, 0, 0, 0))
+            _ => new PluginConfigColor(new(0, 0, 0, 0))
         };
 
         private void DrawTwinSnakesBar(Vector2 pos, PlayerCharacter player)
@@ -213,7 +217,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.TwinSnakesBar.HideWhenInactive || twinSnakesDuration > 0)
             {
                 Config.TwinSnakesBar.Label.SetValue(twinSnakesDuration);
-                BarUtilities.GetProgressBar(Config.TwinSnakesBar, twinSnakesDuration, 15f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.TwinSnakesBar, twinSnakesDuration, 15f, 0f, player)
+                    .Draw(pos);
             }
         }
 
@@ -223,7 +228,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.LeadenFistBar.HideWhenInactive || leadenFistDuration > 0)
             {
                 Config.LeadenFistBar.Label.SetValue(leadenFistDuration);
-                BarUtilities.GetProgressBar(Config.LeadenFistBar, leadenFistDuration, 30f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.LeadenFistBar, leadenFistDuration, 30f, 0f, player)
+                    .Draw(pos);
             }
         }
 
