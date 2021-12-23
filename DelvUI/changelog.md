@@ -1,4 +1,7 @@
 # 0.6.1.2
+Features:
+- Astrologian Minor Arcana Bar now has a label to track cooldown of Minor Arcana whilst a Crown Card is drawn. Note that this will not work for users of the XIVCombo plugin that has selected the option to turn Minor Arcana into Crown Play.
+
 Fixes:
 - Fixed job and role colors not working on some job hud bars.
 - Fixed Summoner's Ifrit, Titan and Garuda bars "Hide When Inactive" not working.
