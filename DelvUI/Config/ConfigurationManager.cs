@@ -303,6 +303,11 @@ namespace DelvUI.Config
             catch (Exception e)
             {
                 PluginLog.Error("Error initializing configurations: " + e.Message);
+
+                if (e.StackTrace != null)
+                {
+                    PluginLog.Error(e.StackTrace);
+                }
             }
         }
 

@@ -4,7 +4,6 @@ using DelvUI.Config;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
-using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -74,7 +73,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.SurgingTempestBar.HideWhenInactive || surgingTempestDuration > 0)
             {
                 Config.SurgingTempestBar.Label.SetValue(surgingTempestDuration);
-                BarUtilities.GetProgressBar(Config.SurgingTempestBar, surgingTempestDuration, 60f).Draw(origin);
+                BarUtilities.GetProgressBar(Config.SurgingTempestBar, surgingTempestDuration, 60f, 0, player)
+                    .Draw(origin);
             }
         }
 
@@ -88,7 +88,7 @@ namespace DelvUI.Interface.Jobs
                 Config.BeastGauge.Label.SetValue(gauge.BeastGauge);
 
                 var color = nascentChaosDuration == 0 ? Config.BeastGauge.BeastGaugeColor : Config.BeastGauge.NascentChaosColor;
-                BarUtilities.GetChunkedProgressBars(Config.BeastGauge, 2, gauge.BeastGauge, 100, fillColor: color)
+                BarUtilities.GetChunkedProgressBars(Config.BeastGauge, 2, gauge.BeastGauge, 100, 0, player, fillColor: color)
                     .Draw(origin);
             }
         }
@@ -116,19 +116,41 @@ namespace DelvUI.Interface.Jobs
                 float maxDuration = SpellHelper.Instance.GetRecastTime(spellID);
                 float cooldown = SpellHelper.Instance.GetSpellCooldown(spellID);
                 float currentCooldown = maxDuration - cooldown;
+
                 Config.InnerReleaseBar.Label.SetValue(maxDuration - currentCooldown);
+
                 if (currentCooldown == maxDuration)
                 {
-                    if (Config.InnerReleaseBar.HideWhenInactive)
+                    if (!Config.InnerReleaseBar.HideWhenInactive)
                     {
-                        return;
+                        BarUtilities.GetChunkedProgressBars(
+                            Config.InnerReleaseBar,
+                            1,
+                            1,
+                            1,
+                            0,
+                            player,
+                            fillColor: Config.InnerReleaseBar.CooldownFinishedColor,
+                            glowConfig: primalRendGlow,
+                            chunksToGlow: new[] { true })
+                            .Draw(origin);
                     }
-                    BarUtilities.GetChunkedProgressBars(Config.InnerReleaseBar, 1, 1, 1, fillColor: Config.InnerReleaseBar.CooldownFinishedColor, glowConfig: primalRendGlow, chunksToGlow: new[] { true }).Draw(origin);
                 }
                 else
                 {
-                    BarUtilities.GetChunkedProgressBars(Config.InnerReleaseBar, 1, currentCooldown, maxDuration, fillColor: Config.InnerReleaseBar.CooldownInProgressColor, glowConfig: primalRendGlow, chunksToGlow: new[] { true }).Draw(origin);
+                    BarUtilities.GetChunkedProgressBars(
+                        Config.InnerReleaseBar,
+                        1,
+                        currentCooldown,
+                        maxDuration,
+                        0,
+                        player,
+                        fillColor: Config.InnerReleaseBar.CooldownInProgressColor,
+                        glowConfig: primalRendGlow,
+                        chunksToGlow: new[] { true })
+                        .Draw(origin);
                 }
+
                 return;
             }
 
@@ -146,7 +168,15 @@ namespace DelvUI.Interface.Jobs
                     innerReleaseDuration = Math.Min(innerReleaseDuration, innerReleaseMaxDuration);
                 }
 
-                BarUtilities.GetChunkedProgressBars(Config.InnerReleaseBar, 3, (innerReleaseStacks - 1) * innerReleaseMaxDuration + innerReleaseDuration, 3 * innerReleaseMaxDuration, glowConfig: primalRendGlow, chunksToGlow: new[] { true, true, true })
+                BarUtilities.GetChunkedProgressBars(
+                    Config.InnerReleaseBar,
+                    3,
+                    (innerReleaseStacks - 1) * innerReleaseMaxDuration + innerReleaseDuration,
+                    3 * innerReleaseMaxDuration,
+                    0,
+                    player,
+                    primalRendGlow,
+                    chunksToGlow: new[] { true, true, true })
                     .Draw(origin);
             }
         }

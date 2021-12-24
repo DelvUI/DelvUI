@@ -7,7 +7,6 @@ using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using DelvUI.Interface.GeneralElements;
 using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -78,17 +77,17 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.BalanceBar.Enabled)
             {
-                DrawBalanceBar(pos);
+                DrawBalanceBar(pos, player);
             }
 
             if (Config.WhiteManaBar.Enabled)
             {
-                DrawWhiteManaBar(pos);
+                DrawWhiteManaBar(pos, player);
             }
 
             if (Config.BlackManaBar.Enabled)
             {
-                DrawBlackManaBar(pos);
+                DrawBlackManaBar(pos, player);
             }
 
             if (Config.ManaStacksBar.Enabled)
@@ -112,7 +111,7 @@ namespace DelvUI.Interface.Jobs
             }
         }
 
-        private void DrawBalanceBar(Vector2 origin)
+        private void DrawBalanceBar(Vector2 origin, PlayerCharacter player)
         {
             RDMGauge gauge = Plugin.JobGauges.Get<RDMGauge>();
             float whiteGauge = (float)Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
@@ -142,11 +141,11 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            BarUtilities.GetBar(Config.BalanceBar, value, 1, fillColor: color)
+            BarUtilities.GetBar(Config.BalanceBar, value, 1, 0, player, color)
                 .Draw(origin);
         }
 
-        private void DrawWhiteManaBar(Vector2 origin)
+        private void DrawWhiteManaBar(Vector2 origin, PlayerCharacter player)
         {
             byte mana = Plugin.JobGauges.Get<RDMGauge>().WhiteMana;
             if (Config.WhiteManaBar.HideWhenInactive && mana == 0)
@@ -155,11 +154,11 @@ namespace DelvUI.Interface.Jobs
             }
 
             Config.WhiteManaBar.Label.SetValue(mana);
-            BarUtilities.GetProgressBar(Config.WhiteManaBar, mana, 100).
+            BarUtilities.GetProgressBar(Config.WhiteManaBar, mana, 100, 0, player).
                 Draw(origin);
         }
 
-        private void DrawBlackManaBar(Vector2 origin)
+        private void DrawBlackManaBar(Vector2 origin, PlayerCharacter player)
         {
             byte mana = Plugin.JobGauges.Get<RDMGauge>().BlackMana;
             if (Config.BlackManaBar.HideWhenInactive && mana == 0)
@@ -168,7 +167,7 @@ namespace DelvUI.Interface.Jobs
             }
 
             Config.BlackManaBar.Label.SetValue(mana);
-            BarUtilities.GetProgressBar(Config.BlackManaBar, mana, 100).
+            BarUtilities.GetProgressBar(Config.BlackManaBar, mana, 100, 0, player).
                 Draw(origin);
         }
 
@@ -180,7 +179,7 @@ namespace DelvUI.Interface.Jobs
                 return;
             }
 
-            BarUtilities.GetChunkedBars(Config.ManaStacksBar, 3, manaStacks, 3f)
+            BarUtilities.GetChunkedBars(Config.ManaStacksBar, 3, manaStacks, 3f, 0, player)
                 .Draw(origin);
         }
 
@@ -194,7 +193,7 @@ namespace DelvUI.Interface.Jobs
             };
 
             Config.DualcastBar.Label.SetValue(duration);
-            BarUtilities.GetProgressBar(Config.DualcastBar, duration, 15f).
+            BarUtilities.GetProgressBar(Config.DualcastBar, duration, 15f, 0, player).
                 Draw(origin);
         }
 

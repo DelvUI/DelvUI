@@ -234,6 +234,17 @@ namespace DelvUI.Interface.PartyCooldowns
                     }
                     _timeLabelHud.Draw(origin + pos, size, character);
 
+                    // tooltip
+                    pos = origin + new Vector2(Config.Position.X + offsetX, y);
+                    if (Config.ShowTooltips && ImGui.IsMouseHoveringRect(pos, pos + _barConfig.Size))
+                    {
+                        TooltipsHelper.Instance.ShowTooltipOnCursor(
+                            cooldown.Data.TooltipText(),
+                            cooldown.Data.Name,
+                            cooldown.Data.ActionId
+                        );
+                    }
+
                     i++;
                 }
 

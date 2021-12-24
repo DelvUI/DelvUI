@@ -1,3 +1,14 @@
+# 0.6.1.2
+Features:
+- Astrologian Minor Arcana Bar now has a label to track cooldown of Minor Arcana whilst a Crown Card is drawn. Note that this will not work for users of the XIVCombo plugin that has selected the option to turn Minor Arcana into Crown Play.
+- Added tooltips for party cooldowns.
+- Added Rescue, Swiftcast and Tank's invulnerabilities as trackable party cooldowns (disabled by default).
+
+Fixes:
+- Fixed job and role colors not working on some job hud bars.
+- Fixed Summoner's Ifrit, Titan and Garuda bars "Hide When Inactive" not working.
+- Fixed Missing Health color when using transparent bars.
+
 # 0.6.1.1
 Features:
 - Sage Kerachole tracker now also tracks Holos uptime and the config option for this bar was renamed to show that.

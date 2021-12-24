@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using Dalamud.Game.ClientState.JobGauge.Types;
+﻿using Dalamud.Game.ClientState.JobGauge.Types;
 using Dalamud.Game.ClientState.Objects.SubKinds;
 using DelvUI.Config.Attributes;
 using DelvUI.Helpers;
 using DelvUI.Interface.Bars;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -55,7 +55,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.PowderGauge.HideWhenInactive || gauge.Ammo > 0)
             {
                 var maxCartridges = player.Level >= 88 ? 3 : 2;
-                BarUtilities.GetChunkedBars(Config.PowderGauge, maxCartridges, gauge.Ammo, maxCartridges).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.PowderGauge, maxCartridges, gauge.Ammo, maxCartridges, 0, player)
+                    .Draw(pos);
             }
         }
 
@@ -65,7 +66,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.NoMercy.HideWhenInactive || noMercyDuration > 0)
             {
                 Config.NoMercy.Label.SetValue(noMercyDuration);
-                BarUtilities.GetProgressBar(Config.NoMercy, noMercyDuration, 20f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.NoMercy, noMercyDuration, 20f, 0f, player)
+                    .Draw(pos);
             }
         }
     }

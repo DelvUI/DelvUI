@@ -91,7 +91,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.MeditationBar.Enabled)
             {
-                DrawMeditationBar(origin + Config.Position);
+                DrawMeditationBar(origin + Config.Position, player);
             }
 
             if (Config.HiganbanaBar.Enabled)
@@ -107,7 +107,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.KenkiBar.HideWhenInactive || gauge.Kenki > 0)
             {
                 Config.KenkiBar.Label.SetValue(gauge.Kenki);
-                BarUtilities.GetProgressBar(Config.KenkiBar, gauge.Kenki, 100f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.KenkiBar, gauge.Kenki, 100f, 0f, player)
+                    .Draw(pos);
             }
         }
 
@@ -118,7 +119,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.ShifuBar.HideWhenInactive || shifuDuration > 0)
             {
                 Config.ShifuBar.Label.SetValue(shifuDuration);
-                BarUtilities.GetProgressBar(Config.ShifuBar, shifuDuration, 40f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.ShifuBar, shifuDuration, 40f, 0f, player)
+                    .Draw(pos);
             }
         }
 
@@ -129,7 +131,8 @@ namespace DelvUI.Interface.Jobs
             if (!Config.JinpuBar.HideWhenInactive || jinpuDuration > 0)
             {
                 Config.JinpuBar.Label.SetValue(jinpuDuration);
-                BarUtilities.GetProgressBar(Config.JinpuBar, jinpuDuration, 40f, 0f, player).Draw(pos);
+                BarUtilities.GetProgressBar(Config.JinpuBar, jinpuDuration, 40f, 0f, player)
+                    .Draw(pos);
             }
         }
 
@@ -156,16 +159,18 @@ namespace DelvUI.Interface.Jobs
                     sen[i] = new Tuple<PluginConfigColor, float, LabelConfig?>(colors[order[i]], hasSen[order[i]], null);
                 }
 
-                BarUtilities.GetChunkedBars(Config.SenBar, sen, player).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.SenBar, sen, player)
+                    .Draw(pos);
             }
         }
 
-        private void DrawMeditationBar(Vector2 pos)
+        private void DrawMeditationBar(Vector2 pos, PlayerCharacter player)
         {
             SAMGauge gauge = Plugin.JobGauges.Get<SAMGauge>();
             if (!Config.MeditationBar.HideWhenInactive || gauge.MeditationStacks > 0)
             {
-                BarUtilities.GetChunkedBars(Config.MeditationBar, 3, gauge.MeditationStacks, 3f).Draw(pos);
+                BarUtilities.GetChunkedBars(Config.MeditationBar, 3, gauge.MeditationStacks, 3f, 0, player)
+                    .Draw(pos);
             }
         }
     }

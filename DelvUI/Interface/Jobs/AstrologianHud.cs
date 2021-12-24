@@ -291,17 +291,17 @@ namespace DelvUI.Interface.Jobs
             {
                 cardPresent = drawCastInfo > 0 ? current : 1f;
 
-                if (drawCastInfo > 0 && drawCharges == 0)
+                switch (drawCastInfo)
                 {
-                    Config.DrawBar.Label.SetValue(current);
-                }
-                else if (drawCastInfo > 0 && drawCharges > 0)
-                {
-                    Config.DrawBar.Label.SetText("READY (" + current.ToString("0") + ")");
-                }
-                else
-                {
-                    Config.DrawBar.Label.SetText("READY");
+                    case > 0 when drawCharges == 0:
+                        Config.DrawBar.Label.SetValue(current);
+                        break;
+                    case > 0 when drawCharges > 0:
+                        Config.DrawBar.Label.SetText("READY (" + current.ToString("0") + ")");
+                        break;
+                    default:
+                        Config.DrawBar.Label.SetText("READY");
+                        break;
                 }
 
                 Config.DrawBar.DrawDrawLabel.SetText("");
@@ -351,6 +351,23 @@ namespace DelvUI.Interface.Jobs
                 crownCardPresent = 1f;
                 crownCardMax = 1f;
                 Config.MinorArcanaBar.Label.SetText(crownCardDrawn);
+
+                if (Config.MinorArcanaBar.CrownDrawTimerLabel.Enabled)
+                {
+                    switch (cooldown)
+                    {
+                        case > 0:
+                            Config.MinorArcanaBar.CrownDrawTimerLabel.SetValue(cooldown);
+                            break;
+                        default:
+                            Config.MinorArcanaBar.CrownDrawTimerLabel.SetText("READY");
+                            break;
+                    }
+                }
+                else
+                {
+                    Config.MinorArcanaBar.CrownDrawTimerLabel.SetText("");
+                }
             }
             else
             {
@@ -365,11 +382,12 @@ namespace DelvUI.Interface.Jobs
                     Config.MinorArcanaBar.Label.SetText("READY");
                 }
 
+                Config.MinorArcanaBar.CrownDrawTimerLabel.SetText("");
                 crownCardColor = cooldown > 0 ? Config.MinorArcanaBar.CrownDrawCdColor : Config.MinorArcanaBar.CrownDrawCdReadyColor;
                 crownCardMax = cooldown > 0 ? 60f : 1f;
             }
 
-            LabelConfig[] labels = { Config.MinorArcanaBar.Label };
+            LabelConfig[] labels = { Config.MinorArcanaBar.Label, Config.MinorArcanaBar.CrownDrawTimerLabel };
             BarUtilities.GetBar(Config.MinorArcanaBar, crownCardPresent, crownCardMax, 0f, player, crownCardColor, labels: labels)
                 .Draw(pos);
         }
@@ -390,7 +408,8 @@ namespace DelvUI.Interface.Jobs
             }
 
             Config.LightspeedBar.Label.SetValue(lightspeedDuration);
-            BarUtilities.GetProgressBar(Config.LightspeedBar, lightspeedDuration, LIGHTSPEED_MAX_DURATION).Draw(origin);
+            BarUtilities.GetProgressBar(Config.LightspeedBar, lightspeedDuration, LIGHTSPEED_MAX_DURATION, 0, player)
+                .Draw(origin);
         }
 
         private void DrawStar(Vector2 origin, PlayerCharacter player)
@@ -407,7 +426,8 @@ namespace DelvUI.Interface.Jobs
             PluginConfigColor currentStarColor = starPreCookingBuff > 0 ? Config.StarBar.StarEarthlyColor : Config.StarBar.StarGiantColor;
 
             Config.StarBar.Label.SetValue(currentStarDuration);
-            BarUtilities.GetProgressBar(Config.StarBar, currentStarDuration, STAR_MAX_DURATION, 0f, player, currentStarColor, Config.StarBar.StarGlowConfig.Enabled && starPostCookingBuff > 0 ? Config.StarBar.StarGlowConfig : null).Draw(origin); // Star Countdown after Star is ready 
+            BarUtilities.GetProgressBar(Config.StarBar, currentStarDuration, STAR_MAX_DURATION, 0f, player, currentStarColor, Config.StarBar.StarGlowConfig.Enabled && starPostCookingBuff > 0 ? Config.StarBar.StarGlowConfig : null)
+                .Draw(origin); // Star Countdown after Star is ready 
         }
     }
 
@@ -511,6 +531,9 @@ namespace DelvUI.Interface.Jobs
         [Exportable(false)]
         public class AstrologianCrownDrawBarConfig : ProgressBarConfig
         {
+            [NestedConfig("Minor Arcana Side Timer Label" + "##CrownDraw", 119, separator = false, spacing = true)]
+            public NumericLabelConfig CrownDrawTimerLabel = new(new Vector2(0, 0), "", DrawAnchor.Left, DrawAnchor.Left);
+
             [ColorEdit4("Minor Arcana on CD" + "##CrownDraw")]
             [Order(120)]
             public PluginConfigColor CrownDrawCdColor = new(new Vector4(26f / 255f, 167f / 255f, 109f / 255f, 100f / 100f));
