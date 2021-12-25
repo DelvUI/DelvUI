@@ -163,7 +163,7 @@ namespace DelvUI.Interface.Jobs
             Status? deliriumBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 1972);
             float deliriumDuration = Math.Max(0f, deliriumBuff?.RemainingTime ?? 0f);
             byte stacks = deliriumBuff?.StackCount ?? 0;
-            
+
             if (!Config.DeliriumBar.HideWhenInactive || deliriumDuration > 0)
             {
                 var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
@@ -172,7 +172,7 @@ namespace DelvUI.Interface.Jobs
                 {
                     chunks[i] = new(Config.DeliriumBar.FillColor, i < stacks ? 1 : 0, i == 2 ? Config.DeliriumBar.Label : null);
                 }
-                
+
                 Config.DeliriumBar.Label.SetValue(deliriumDuration);
                 BarUtilities.GetChunkedBars(Config.DeliriumBar, chunks, player)
                             .Draw(origin);
