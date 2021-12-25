@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Dalamud.Game.ClientState.Statuses;
 
 namespace DelvUI.Interface.Jobs
 {
@@ -106,11 +107,7 @@ namespace DelvUI.Interface.Jobs
 
             if (Config.ManaBar.HideWhenInactive && !gauge.HasDarkArts && player.CurrentMp == player.MaxMp) { return; }
 
-            if (gauge.HasDarkArts)
-            {
-                Config.ManaBar.UsePartialFillColor = false;
-            }
-            else { Config.ManaBar.UsePartialFillColor = true; }
+            Config.ManaBar.UsePartialFillColor = !gauge.HasDarkArts;
 
             Config.ManaBar.Label.SetValue(player.CurrentMp);
 
@@ -119,10 +116,10 @@ namespace DelvUI.Interface.Jobs
                 Config.ManaBar,
                 gauge.HasDarkArts ? 1 : 3,
                 player.CurrentMp,
-                Config.ManaBar.UseChunks ? 9000 : player.MaxMp,
+                9000,
                 0f,
                 player,
-                glowConfig: null,
+                null,
                 gauge.HasDarkArts ? Config.ManaBar.DarkArtsColor : Config.ManaBar.FillColor
                 ).Draw(origin);
         }
@@ -163,13 +160,23 @@ namespace DelvUI.Interface.Jobs
 
         private void DrawDeliriumBar(Vector2 origin, PlayerCharacter player)
         {
-            float deliriumDuration = player.StatusList.FirstOrDefault(o => o.StatusId is 1972 && o.RemainingTime > 0f)?.RemainingTime ?? 0f;
+            Status? deliriumBuff = player.StatusList.FirstOrDefault(o => o.StatusId is 1972);
+            float deliriumDuration = Math.Max(0f, deliriumBuff?.RemainingTime ?? 0f);
+            byte stacks = deliriumBuff?.StackCount ?? 0;
+            
+            if (!Config.DeliriumBar.HideWhenInactive || deliriumDuration > 0)
+            {
+                var chunks = new Tuple<PluginConfigColor, float, LabelConfig?>[3];
 
-            if (Config.DeliriumBar.HideWhenInactive && deliriumDuration is 0) { return; }
-
-            Config.DeliriumBar.Label.SetValue(deliriumDuration);
-            BarUtilities.GetProgressBar(Config.DeliriumBar, deliriumDuration, 10, 0f, player)
-                .Draw(origin);
+                for (int i = 0; i < 3; i++)
+                {
+                    chunks[i] = new(Config.DeliriumBar.FillColor, i < stacks ? 1 : 0, i == 2 ? Config.DeliriumBar.Label : null);
+                }
+                
+                Config.DeliriumBar.Label.SetValue(deliriumDuration);
+                BarUtilities.GetChunkedBars(Config.DeliriumBar, chunks, player)
+                            .Draw(origin);
+            }
         }
 
         private void DrawLivingShadowBar(Vector2 origin, PlayerCharacter player)
@@ -241,7 +248,7 @@ namespace DelvUI.Interface.Jobs
         );
 
         [NestedConfig("Delirium Bar", 50)]
-        public ProgressBarConfig DeliriumBar = new ProgressBarConfig(
+        public ChunkedProgressBarConfig DeliriumBar = new ChunkedProgressBarConfig(
             new Vector2(64, -32),
             new Vector2(126, 20),
             new PluginConfigColor(new Vector4(255f / 255f, 255f / 255f, 255f / 255f, 100f / 100f))
