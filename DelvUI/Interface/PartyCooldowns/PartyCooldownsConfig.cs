@@ -248,6 +248,7 @@ namespace DelvUI.Interface.PartyCooldowns
                         ImGui.SetCursorPos(new Vector2(ImGui.GetCursorPosX() + 10, ImGui.GetCursorPosY() + 4));
                         if (ImGui.Checkbox("", ref cooldown.Enabled))
                         {
+                            changed = true;
                             CooldownsDataEnabledChangedEvent?.Invoke(this);
                         }
                     }
@@ -283,7 +284,11 @@ namespace DelvUI.Interface.PartyCooldowns
                         ImGui.PushItemWidth(160);
                         ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 4);
 
-                        changed |= ImGui.DragInt($"##{cooldown.ActionId}_priority", ref cooldown.Priority, 1, 0, 100);
+                        if (ImGui.DragInt($"##{cooldown.ActionId}_priority", ref cooldown.Priority, 1, 0, 100))
+                        {
+                            changed = true;
+                            CooldownsDataChangedEvent?.Invoke(this);
+                        }
 
                         if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Priority determines which cooldows show first on the list."); }
                     }
@@ -294,7 +299,11 @@ namespace DelvUI.Interface.PartyCooldowns
                         ImGui.PushItemWidth(160);
                         ImGui.SetCursorPosY(ImGui.GetCursorPosY() + 4);
 
-                        changed |= ImGui.DragInt($"##{cooldown.ActionId}_column", ref cooldown.Column, 0.1f, 1, ColumnCount);
+                        if (ImGui.DragInt($"##{cooldown.ActionId}_column", ref cooldown.Column, 0.1f, 1, ColumnCount))
+                        {
+                            changed = true;
+                            CooldownsDataChangedEvent?.Invoke(this);
+                        }
 
                         if (ImGui.IsItemHovered()) { ImGui.SetTooltip("Allows to separate cooldowns in different columns."); }
                     }
@@ -303,11 +312,6 @@ namespace DelvUI.Interface.PartyCooldowns
                 }
 
                 ImGui.EndTable();
-            }
-
-            if (changed)
-            {
-                CooldownsDataChangedEvent?.Invoke(this);
             }
 
             return false;
