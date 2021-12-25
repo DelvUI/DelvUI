@@ -10,6 +10,7 @@ Fixes:
 - Fixed Summoner's Ifrit, Titan and Garuda bars "Hide When Inactive" not working.
 - Dark Knight's Mana Bar now shows correct mana thresholds on the non-chunked version.
 - Fixed Missing Health color when using transparent bars.
+- Fixed Party Cooldowns not saving properly in some situations.
 
 # 0.6.1.1
 Features:
