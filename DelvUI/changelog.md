@@ -1,19 +1,14 @@
-# 0.6.1.3
-Features:
-- Dark Knight's' Delirium Bar now shows the amount of stacks along with the duration of the buff.
-
-Fixes:
-- Dark Knight's Mana Bar now shows correct mana thresholds on the non-chunked version.
-
 # 0.6.1.2
 Features:
 - Astrologian Minor Arcana Bar now has a label to track cooldown of Minor Arcana whilst a Crown Card is drawn. Note that this will not work for users of the XIVCombo plugin that has selected the option to turn Minor Arcana into Crown Play.
+- Dark Knight's' Delirium Bar now shows the amount of stacks along with the duration of the buff.
 - Added tooltips for party cooldowns.
 - Added Rescue, Swiftcast and Tank's invulnerabilities as trackable party cooldowns (disabled by default).
 
 Fixes:
 - Fixed job and role colors not working on some job hud bars.
 - Fixed Summoner's Ifrit, Titan and Garuda bars "Hide When Inactive" not working.
+- Dark Knight's Mana Bar now shows correct mana thresholds on the non-chunked version.
 - Fixed Missing Health color when using transparent bars.
 
 # 0.6.1.1
