@@ -1,4 +1,7 @@
 # 0.6.1.3
+Features:
+- Added Thresholds for Bard Songs with the recommended song rotation (43, 34, 43).  
+
 Fixes:
 - Fixed Dancer Proc Bars so they can be individually disabled.
 
