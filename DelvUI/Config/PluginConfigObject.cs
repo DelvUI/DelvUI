@@ -139,6 +139,12 @@ namespace DelvUI.Config
         [JsonIgnore]
         public readonly string ID;
 
+        [StrataLevel("Strata Level")]
+        [Order(2)]
+        public StrataLevel? Strata;
+
+        public StrataLevel StrataLevel => Strata ?? StrataLevel.LOWEST;
+
         [DragInt2("Position", min = -4000, max = 4000)]
         [Order(5)]
         public Vector2 Position = Vector2.Zero;

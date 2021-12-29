@@ -701,7 +701,7 @@ namespace DelvUI.Interface.Party
         }
     }
 
-    [DisableParentSettings("Position")]
+    [DisableParentSettings("Position", "Strata")]
     [Exportable(false)]
     public class PartyFramesCleanseTrackerConfig : MovablePluginConfigObject
     {

@@ -2,6 +2,8 @@
 using System.Numerics;
 using Dalamud.Game.ClientState.Objects.Types;
 using System;
+using System.Collections.Generic;
+using DelvUI.Enums;
 
 namespace DelvUI.Interface
 {
@@ -12,12 +14,38 @@ namespace DelvUI.Interface
 
         public string ID => _config.ID;
 
+        private SortedList<PluginConfigObject, Action> _drawActions = new SortedList<PluginConfigObject, Action>(new StrataLevelComparer<PluginConfigObject>());
+
         public HudElement(MovablePluginConfigObject config)
         {
             _config = config;
         }
 
-        public abstract void Draw(Vector2 origin);
+        public virtual void Draw(Vector2 origin)
+        {
+            _drawActions.Clear();
+            CreateDrawActions(origin);
+
+            foreach (Action drawAction in _drawActions.Values)
+            {
+                drawAction();
+            }
+        }
+
+        protected void AddDrawAction(PluginConfigObject config, Action drawAction)
+        {
+            _drawActions.Add(config, drawAction);
+        }
+
+        protected void AddDrawActions(List<(PluginConfigObject, Action)> drawActions)
+        {
+            foreach ((PluginConfigObject config, Action drawAction) in drawActions)
+            {
+                _drawActions.Add(config, drawAction);
+            }
+        }
+
+        protected abstract void CreateDrawActions(Vector2 origin);
 
         ~HudElement()
         {

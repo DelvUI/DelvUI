@@ -21,6 +21,7 @@ using System.Reflection;
 namespace DelvUI.Config
 {
     public delegate void ConfigurationManagerEventHandler(ConfigurationManager configurationManager);
+    public delegate void StrataLevelsEventHandler(ConfigurationManager configurationManager, PluginConfigObject config);
 
     public class ConfigurationManager : IDisposable
     {
@@ -92,6 +93,7 @@ namespace DelvUI.Config
         public event ConfigurationManagerEventHandler? ResetEvent;
         public event ConfigurationManagerEventHandler? LockEvent;
         public event ConfigurationManagerEventHandler? ConfigClosedEvent;
+        public event StrataLevelsEventHandler? StrataLevelsChangedEvent;
 
         public ConfigurationManager()
         {
@@ -229,6 +231,13 @@ namespace DelvUI.Config
                 PluginLog.Error("Error checking version: " + e.Message);
             }
         }
+
+        #region strata
+        public void OnStrataLevelChanged(PluginConfigObject config)
+        {
+            StrataLevelsChangedEvent?.Invoke(this, config);
+        }
+        #endregion
 
         #region windows
         public void ToggleConfigWindow()

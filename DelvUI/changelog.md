@@ -1,5 +1,6 @@
-# 0.6.1.3
+# 0.6.2.0
 Features:
+- Added Strata Level settings to most UI elements (these allow the user to choose which elements are drawn on top of others).
 - Added Thresholds for Bard Songs with the recommended song rotation (43, 34, 43).  
 
 Fixes:
