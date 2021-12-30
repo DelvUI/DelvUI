@@ -66,7 +66,6 @@ namespace DelvUI.Interface.GeneralElements
 
             BarHud bar = new(Config, Actor);
             bar.SetBackground(background);
-            AddExtras(bar, totalCastTime);
             bar.AddForegrounds(progress);
 
             if (Config.UseReverseFill)
@@ -79,6 +78,7 @@ namespace DelvUI.Interface.GeneralElements
                 PluginConfigColor reverseFillColor = Config.ReverseFillColor;
                 bar.AddForegrounds(new Rect(reverseFillPos, reverseFillSize, reverseFillColor));
             }
+            AddExtras(bar, totalCastTime);
 
             Vector2 pos = origin + ParentPos();
             bar.Draw(pos);
