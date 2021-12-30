@@ -26,7 +26,6 @@ namespace DelvUI.Interface.Party
 
         // layout
         private Vector2 _origin;
-        private Vector2 _size;
         private LayoutInfo _layoutInfo;
         private uint _memberCount = 0;
         private bool _layoutDirty = true;
@@ -125,7 +124,9 @@ namespace DelvUI.Interface.Party
             if (args.PropertyName == "Size" ||
                 args.PropertyName == "FillRowsFirst" ||
                 args.PropertyName == "BarsAnchor" ||
-                args.PropertyName == "Padding")
+                args.PropertyName == "Padding" ||
+                args.PropertyName == "Rows" ||
+                args.PropertyName == "Columns")
             {
                 _layoutDirty = true;
             }
@@ -141,7 +142,6 @@ namespace DelvUI.Interface.Party
             uint memberCount = PartyManager.Instance.MemberCount;
             uint row = 0;
             uint col = 0;
-            Vector2 spaceSize = Config.Size - _contentMargin * 2;
 
             for (int i = 0; i < bars.Count; i++)
             {
@@ -158,7 +158,7 @@ namespace DelvUI.Interface.Party
                 bar.Visible = true;
 
                 // anchor and position
-                CalculateBarPosition(origin, spaceSize, out var x, out var y);
+                CalculateBarPosition(origin, Size, out var x, out var y);
                 bar.Position = new Vector2(
                     x + Configs.HealthBar.Size.X * col + Configs.HealthBar.Padding.X * col,
                     y + Configs.HealthBar.Size.Y * row + Configs.HealthBar.Padding.Y * row
@@ -239,7 +239,7 @@ namespace DelvUI.Interface.Party
 
         protected override (List<Vector2>, List<Vector2>) ChildrenPositionsAndSizes()
         {
-            return (new List<Vector2>() { Config.Position + Config.Size / 2f }, new List<Vector2>() { Config.Size });
+            return (new List<Vector2>() { Config.Position + Size / 2f }, new List<Vector2>() { Size });
         }
 
         public void StopMouseover()
@@ -250,6 +250,11 @@ namespace DelvUI.Interface.Party
             }
         }
 
+        private Vector2 Size => new Vector2(
+            Config.Columns * Configs.HealthBar.Size.X + (Config.Columns - 1) * Configs.HealthBar.Padding.X,
+            Config.Rows * Configs.HealthBar.Size.Y + (Config.Rows - 1) * Configs.HealthBar.Padding.Y
+        );
+
         public override void DrawChildren(Vector2 origin)
         {
             if (!_config.Enabled)
@@ -259,41 +264,18 @@ namespace DelvUI.Interface.Party
 
             var windowFlags = ImGuiWindowFlags.NoScrollbar |
                 ImGuiWindowFlags.NoTitleBar |
-                //ImGuiWindowFlags.NoFocusOnAppearing |
-                //ImGuiWindowFlags.NoBringToFrontOnFocus |
-                ImGuiWindowFlags.NoSavedSettings;
+                ImGuiWindowFlags.NoSavedSettings |
+                ImGuiWindowFlags.NoMove |
+                ImGuiWindowFlags.NoResize;
 
-            bool canDrag = !Locked && !DraggingEnabled;
-            if (!canDrag)
+            if (Locked)
             {
-                windowFlags |= ImGuiWindowFlags.NoMove;
-                windowFlags |= ImGuiWindowFlags.NoResize;
+                windowFlags |= ImGuiWindowFlags.NoBackground;
             }
 
             Action<ImDrawListPtr> drawBarsAction = (drawList) =>
             {
-                Vector2 windowPos = ImGui.GetWindowPos();
-                Vector2 windowSize = ImGui.GetWindowSize();
-                Vector2 contentStartPos = windowPos + _contentMargin;
-                Vector2 maxSize = windowSize - _contentMargin * 2;
-
-                if (canDrag)
-                {
-                    Vector2 newPosition = windowPos - origin;
-                    if (Config.Position != newPosition)
-                    {
-                        // have to flag it like this sadly
-                        ConfigurationManager.Instance.ForceNeedsSave();
-                        Config.Position = windowPos - origin;
-                    }
-
-                    if (Config.Size != maxSize)
-                    {
-                        // have to flag it like this sadly
-                        ConfigurationManager.Instance.ForceNeedsSave();
-                        Config.Size = maxSize;
-                    }
-                }
+                Vector2 contentStartPos = origin + Config.Position;
 
                 uint count = PartyManager.Instance.MemberCount;
                 if (count < 1)
@@ -302,16 +284,15 @@ namespace DelvUI.Interface.Party
                 }
 
                 // recalculate layout on settings or size change
-                if (_layoutDirty || _size != maxSize || _memberCount != count)
+                if (_layoutDirty || _memberCount != count)
                 {
                     _layoutInfo = LayoutHelper.CalculateLayout(
-                        maxSize,
+                        Size,
                         Configs.HealthBar.Size,
                         count,
                         Configs.HealthBar.Padding,
                         Config.FillRowsFirst
                     );
-
                     UpdateBars(contentStartPos);
                 }
                 else if (_origin != contentStartPos)
@@ -322,7 +303,6 @@ namespace DelvUI.Interface.Party
                 _layoutDirty = false;
                 _origin = contentStartPos;
                 _memberCount = count;
-                _size = maxSize;
 
                 GameObject? target = Plugin.TargetManager.SoftTarget ?? Plugin.TargetManager.Target;
                 int targetIndex = -1;
@@ -422,47 +402,20 @@ namespace DelvUI.Interface.Party
                 }
             };
 
-            // no clipping when unlocked, creates way too many issues
-            if (canDrag)
+            AddDrawAction(Config.StrataLevel, () =>
             {
-                AddDrawAction(Config.StrataLevel, () =>
-                {
-                    // size and position
-                    ImGui.SetNextWindowPos(origin + Config.Position, ImGuiCond.Appearing);
-                    ImGui.SetNextWindowSize(Config.Size + _contentMargin * 2, ImGuiCond.Appearing);
+                ImGui.PushStyleColor(ImGuiCol.Border, 0x66FFFFFF);
+                ImGui.PushStyleColor(ImGuiCol.WindowBg, 0x66000000);
+                ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
+                ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
 
-                    ImGui.PushStyleColor(ImGuiCol.Border, 0x66FFFFFF);
-                    ImGui.PushStyleColor(ImGuiCol.WindowBg, 0x66000000);
-                    ImGui.PushStyleVar(ImGuiStyleVar.WindowBorderSize, 1);
-                    ImGui.PushStyleVar(ImGuiStyleVar.WindowRounding, 0);
+                DrawHelper.DrawInWindow(ID, origin + Config.Position - _contentMargin, Size + _contentMargin * 2, true, false, true, windowFlags, drawBarsAction);
 
-                    bool begin = ImGui.Begin(ID + "_Drag", windowFlags);
-                    if (!begin)
-                    {
-                        ImGui.End();
-                        return;
-                    }
+                ImGui.PopStyleColor(2);
+                ImGui.PopStyleVar(2);
+            });
 
-                    drawBarsAction(ImGui.GetWindowDrawList());
-                    ImGui.End();
-
-                    ImGui.PopStyleColor(2);
-                    ImGui.PopStyleVar(2);
-                });
-
-                drawElementsAction();
-            }
-            else
-            {
-                windowFlags |= ImGuiWindowFlags.NoBackground;
-
-                AddDrawAction(Config.StrataLevel, () =>
-                {
-                    DrawHelper.DrawInWindow(ID, origin + Config.Position, Config.Size, !Locked, false, true, windowFlags, drawBarsAction);
-                });
-
-                drawElementsAction();
-            }
+            drawElementsAction();
         }
     }
 

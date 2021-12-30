@@ -228,7 +228,7 @@ namespace DelvUI.Config.Attributes
     {
         public int min;
         public int max;
-        public int velocity;
+        public float velocity;
 
         public DragIntAttribute(string friendlyName) : base(friendlyName)
         {
@@ -246,7 +246,7 @@ namespace DelvUI.Config.Attributes
             {
                 field.SetValue(config, intVal);
 
-                TriggerChangeEvent<float>(config, field.Name, intVal);
+                TriggerChangeEvent<int>(config, field.Name, intVal);
 
                 return true;
             }
